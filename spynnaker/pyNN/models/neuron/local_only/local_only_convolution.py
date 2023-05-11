@@ -114,7 +114,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractLocalOnly.write_parameters)
     def write_parameters(self, spec, region, machine_vertex, weight_scales):
-
         # Get incoming sources for this machine vertex, and sort by key
         app_vertex = machine_vertex.app_vertex
         sources_for_targets = self.__get_sources_for_target(app_vertex)
@@ -171,17 +170,17 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.write_array(numpy.concatenate(data, dtype="uint32"))
 
         # Write weights where they are unique
-        kernel_data = list()
-        for conn, app_edge in unique_connectors:
-            kernel_data.append(
-                conn.get_encoded_kernel_weights(app_edge, weight_scales))
+        kernel_data = [
+            conn.get_encoded_kernel_weights(app_edge, weight_scales)
+            for conn, app_edge in unique_connectors]
         if next_weight_index % 2 != 0:
             kernel_data.append(numpy.array([0], dtype="int16"))
         # pylint: disable=unexpected-keyword-arg
         spec.write_array(
             numpy.concatenate(kernel_data, dtype="int16").view("uint32"))
 
-    def __merge_key_and_mask(self, key_a, mask_a, key_b, mask_b):
+    @staticmethod
+    def __merge_key_and_mask(key_a, mask_a, key_b, mask_b):
         new_xs = (~(key_a ^ key_b)) & 0xFFFFFFFF
         mask = mask_a & mask_b & new_xs
         key = (key_a | key_b) & mask
@@ -227,7 +226,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         :rtype: list(Source)
         """
-        routing_info = SpynnakerDataView.get_routing_infos()
         delay_vertex = None
         if self.__delay > app_vertex.splitter.max_support_delay():
             # pylint: disable=protected-access
@@ -245,30 +243,31 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             if cache_key in key_cache:
                 keys.append(key_cache.get(cache_key))
             else:
-                r_info = self.__get_rinfo(
-                    routing_info, slice_sources[0], delay_vertex)
-                group_key = r_info.key
-                group_mask = r_info.mask
-                for source in slice_sources:
-                    r_info = self.__get_rinfo(
-                        routing_info, source, delay_vertex)
-                    group_key, group_mask = self.__merge_key_and_mask(
-                        group_key, group_mask, r_info.key,
-                        r_info.mask)
-                key_source = Source(
-                    incoming, vertex_slice, group_key, group_mask)
+                key_source = self.__build_source(
+                    slice_sources, delay_vertex, incoming, vertex_slice)
                 key_cache[cache_key] = key_source
                 keys.append(key_source)
         return keys
 
-    def __get_rinfo(self, routing_info, source, delay_vertex):
-        if delay_vertex is None:
-            return routing_info.get_routing_info_from_pre_vertex(
-                source, SPIKE_PARTITION_ID)
-        delay_source = delay_vertex.splitter.get_machine_vertex(
-            source.vertex_slice)
+    def __build_source(
+            self, slice_sources, delay_vertex, incoming, vertex_slice):
+        r_info = self.__get_rinfo(slice_sources[0], delay_vertex)
+        group_key = r_info.key
+        group_mask = r_info.mask
+        for source in slice_sources:
+            r_info = self.__get_rinfo(source, delay_vertex)
+            group_key, group_mask = self.__merge_key_and_mask(
+                group_key, group_mask, r_info.key, r_info.mask)
+        return Source(incoming, vertex_slice, group_key, group_mask)
+
+    @staticmethod
+    def __get_rinfo(source, delay_vertex):
+        if delay_vertex:
+            source = delay_vertex.splitter.get_machine_vertex(
+                source.vertex_slice)
+        routing_info = SpynnakerDataView.get_routing_infos()
         return routing_info.get_routing_info_from_pre_vertex(
-            delay_source, SPIKE_PARTITION_ID)
+            source, SPIKE_PARTITION_ID)
 
     @property
     @overrides(AbstractLocalOnly.delay)

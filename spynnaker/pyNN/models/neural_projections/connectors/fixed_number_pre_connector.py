@@ -134,17 +134,14 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
 
             # Loop over all the post neurons
             for m in range(0, synapse_info.n_post_neurons):
-
                 # If the pre and post populations are the same
                 # then deal with allow_self_connections=False
-                if ((synapse_info.pre_population
-                        is synapse_info.post_population)
+                if (synapse_info.pre_population is synapse_info.post_population
                         and not self.__allow_self_connections):
                     # Exclude the current pre-neuron from the post-neuron
                     # list
                     no_self_pre_neurons = [
-                        n for n in range(
-                            synapse_info.n_pre_neurons) if n != m]
+                        n for n in range(synapse_info.n_pre_neurons) if n != m]
 
                     # Now use this list in the random choice
                     self.__pre_neurons[m] = self._rng.choice(
@@ -172,7 +169,6 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
-        # pylint: disable=too-many-arguments
         prob_selection = 1.0 / float(synapse_info.n_pre_neurons)
         n_connections_total = utility_calls.get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
@@ -194,12 +190,10 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        # pylint: disable=too-many-arguments
         return self.__n_pre
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
-        # pylint: disable=too-many-arguments
         return self._get_weight_maximum(
            synapse_info.weights, self.__n_pre * synapse_info.n_post_neurons,
            synapse_info)
@@ -207,8 +201,6 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
-        # pylint: disable=too-many-arguments
-
         # Get lo and hi for the post vertex
         lo = post_vertex_slice.lo_atom
         hi = post_vertex_slice.hi_atom

@@ -216,10 +216,8 @@ class PopulationMachineNeurons(
         :param list(int) ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
         """
-        # pylint: disable=too-many-arguments
         n_atoms = self._vertex_slice.n_atoms
-        spec.comment(
-            f"\nWriting Neuron Parameters for {n_atoms} Neurons:\n")
+        spec.comment(f"\nWriting Neuron Parameters for {n_atoms} Neurons:\n")
 
         # Reserve and switch to the memory region
         params_size = self._app_vertex.get_sdram_usage_for_core_neuron_params(
@@ -268,7 +266,6 @@ class PopulationMachineNeurons(
         spec.write_array(keys)
 
     def _write_current_source_parameters(self, spec):
-        # pylint: disable=too-many-arguments
         n_atoms = self._vertex_slice.n_atoms
         lo_atom = self._vertex_slice.lo_atom
         hi_atom = self._vertex_slice.hi_atom

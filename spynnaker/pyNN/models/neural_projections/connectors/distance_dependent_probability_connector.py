@@ -141,7 +141,6 @@ class DistanceDependentProbabilityConnector(
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
-        # pylint: disable=too-many-arguments
         max_prob = numpy.amax(self.__probs)
         n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
@@ -157,7 +156,6 @@ class DistanceDependentProbabilityConnector(
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        # pylint: disable=too-many-arguments
         return get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_post_neurons,
@@ -165,7 +163,6 @@ class DistanceDependentProbabilityConnector(
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
-        # pylint: disable=too-many-arguments
         return self._get_weight_maximum(
             synapse_info.weights,
             get_probable_maximum_selected(

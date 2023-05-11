@@ -38,7 +38,7 @@ class SPIFOutputDevice(
     def __init__(self, board_address=None, chip_coords=None, label=None,
                  create_database=True, database_notify_host=None,
                  database_notify_port_num=None, database_ack_port_num=None):
-        super(SPIFOutputDevice, self).__init__(
+        super().__init__(
             n_atoms=1,
             outgoing_fpga_connection=FPGAConnection(
                 SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address,

@@ -172,7 +172,7 @@ class PopulationMachineVertex(
         :param SynapticMatrices synaptic_matrices: The synaptic matrices
         :param NeuronData neuron_data: The handler of neuron data
         """
-        super(PopulationMachineVertex, self).__init__(
+        super().__init__(
             label, app_vertex, vertex_slice, sdram,
             self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS +

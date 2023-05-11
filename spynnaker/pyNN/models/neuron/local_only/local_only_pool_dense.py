@@ -157,7 +157,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         key = (key_a | key_b) & mask
         return key, mask
 
-    def __get_rinfo(self, routing_info, source, delay_vertex):
+    @staticmethod
+    def __get_rinfo(routing_info, source, delay_vertex):
         if delay_vertex is None:
             return routing_info.get_routing_info_from_pre_vertex(
                 source, SPIKE_PARTITION_ID)

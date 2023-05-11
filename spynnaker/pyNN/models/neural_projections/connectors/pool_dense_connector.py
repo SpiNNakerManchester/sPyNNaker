@@ -92,16 +92,10 @@ class PoolDenseConnector(AbstractConnector):
         :param bool verbose: (ignored)
         :param callable callback: (ignored)
         """
-        super(PoolDenseConnector, self).__init__(
-            safe=safe, callback=callback, verbose=verbose)
-
+        super().__init__(safe=safe, callback=callback, verbose=verbose)
         self.__weights = numpy.array(weights)
-
         self.__pool_shape = pool_shape
-        self.__pool_stride = pool_stride
-        if self.__pool_stride is None:
-            self.__pool_stride = self.__pool_shape
-
+        self.__pool_stride = pool_shape if pool_stride is None else pool_stride
         self.__positive_receptor_type = positive_receptor_type
         self.__negative_receptor_type = negative_receptor_type
 
@@ -254,7 +248,7 @@ class PoolDenseConnector(AbstractConnector):
         if isinstance(self.__weights, Iterable):
             return numpy.amax(numpy.abs(self.__weights))
         n_conns = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
-        return super(PoolDenseConnector, self)._get_weight_maximum(
+        return super()._get_weight_maximum(
             self.__weights, n_conns, synapse_info)
 
     def __pre_as_post(self, pre_coords):

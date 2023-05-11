@@ -42,7 +42,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
     """
     Abstract class that all PyNN Connectors extend.
     """
-    # pylint: disable=unused-argument,too-many-arguments
+    # pylint: disable=unused-argument
 
     NUMPY_SYNAPSES_DTYPE = [("source", "uint32"), ("target", "uint16"),
                             ("weight", "float64"), ("delay", "float64"),

@@ -126,7 +126,7 @@ class PopulationNeuronsMachineVertex(
         :param int max_atoms_per_core:
             The maximum number of atoms per core
         """
-        super(PopulationNeuronsMachineVertex, self).__init__(
+        super().__init__(
             label, app_vertex, vertex_slice, sdram, self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS + NeuronMainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))

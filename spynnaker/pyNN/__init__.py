@@ -250,7 +250,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
         if both ``n_chips_required`` and ``n_boards_required`` are used.
     """
-    # pylint: disable=global-statement
+    # pylint: disable=global-statement,too-many-arguments
     global __simulator
     # Check for "auto" values
     if timestep == "auto":
@@ -261,7 +261,6 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         logger.warning(
             "max_delay is not supported by sPyNNaker so will be ignored")
 
-    # pylint: disable=too-many-arguments
     # setup PyNN common stuff
     pynn_common.setup(timestep, min_delay, **extra_params)
 

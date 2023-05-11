@@ -220,7 +220,7 @@ class SynapticMatrixApp(object):
         :param int max_addr: The maximum allowed address
         :return: The updated address
         :rtype: int
-        :raises Exception: If the updated address is out of range
+        :raises ValueError: If the updated address is out of range
         """
         next_addr = block_addr + size
         if next_addr > self.__all_syn_block_sz:
@@ -298,13 +298,12 @@ class SynapticMatrixApp(object):
         post_splitter = self.__app_edge.post_vertex.splitter
         post_vertex_max_delay_ticks = post_splitter.max_support_delay()
         for conn_holder in self.__synapse_info.pre_run_connection_holders:
-            conn_holder.add_connections(
-                read_all_synapses(
-                    data, delayed_data, self.__synapse_info,
-                    self.__n_synapse_types, self.__weight_scales,
-                    post_vertex_slice, self.__app_edge.pre_vertex.n_atoms,
-                    post_vertex_max_delay_ticks,
-                    self.__max_row_info, self.__max_atoms_per_core))
+            conn_holder.add_connections(read_all_synapses(
+                data, delayed_data, self.__synapse_info,
+                self.__n_synapse_types, self.__weight_scales,
+                post_vertex_slice, self.__app_edge.pre_vertex.n_atoms,
+                post_vertex_max_delay_ticks,
+                self.__max_row_info, self.__max_atoms_per_core))
 
     def get_generator_data(self):
         """
@@ -329,7 +328,7 @@ class SynapticMatrixApp(object):
             Where the matrix is on the machine
         :return: A list of arrays of connections, each with dtype
             :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
-        :rtype: ~numpy.ndarray
+        :rtype: list(~numpy.ndarray)
         """
         synapses_address = locate_memory_region_for_placement(
             placement, self.__synaptic_matrix_region)
@@ -359,7 +358,7 @@ class SynapticMatrixApp(object):
             The base address of the synaptic matrix region
         :return: A list of arrays of connections, each with dtype
             :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
-        :rtype: ~numpy.ndarray
+        :rtype: list(~numpy.ndarray)
         """
         connections = list()
 
@@ -393,12 +392,12 @@ class SynapticMatrixApp(object):
         :param Placement placement: Where the matrix is on the machine
         :param int synapses_address:
             The base address of the synaptic matrix region
-        :rtype: bytearray
+        :return: The raw data from the synaptic matrix
+        :rtype: bytes
         """
         address = self.__syn_mat_offset + synapses_address
-        block = SpynnakerDataView.read_memory(
+        return SpynnakerDataView.read_memory(
             placement.x, placement.y, address, self.__matrix_size)
-        return block
 
     def __get_delayed_block(self, placement, synapses_address):
         """
@@ -408,12 +407,12 @@ class SynapticMatrixApp(object):
             Where the matrix is on the machine
         :param int synapses_address:
             The base address of the synaptic matrix region
-        :rtype: bytearray
+        :return: The raw data from the delayed synaptic matrix
+        :rtype: bytes
         """
         address = self.__delay_syn_mat_offset + synapses_address
-        block = SpynnakerDataView.read_memory(
+        return SpynnakerDataView.read_memory(
             placement.x, placement.y, address, self.__delay_matrix_size)
-        return block
 
     def get_index(self):
         """

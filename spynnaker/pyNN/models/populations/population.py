@@ -230,7 +230,6 @@ class Population(PopulationBase):
             If the variable or variables have not been previously set to
             record.
         """
-        # pylint: disable=too-many-arguments
         self._check_params(gather, annotations)
 
         if isinstance(io, str):
@@ -767,8 +766,7 @@ class Population(PopulationBase):
                 "cell_params must be None")
         return model
 
-    def __create_vertex(
-            self, model, size, label, additional_parameters):
+    def __create_vertex(self, model, size, label, additional_parameters):
         """
         :param model: The implementation of the individual neurons.
         :type model: ApplicationVertex or AbstractPyNNModel
@@ -779,7 +777,6 @@ class Population(PopulationBase):
             Additional parameters to pass to the vertex creation function.
         :type additional_parameters: dict(str, ...)
         """
-        # pylint: disable=too-many-arguments
         self.__celltype = model
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):

@@ -163,7 +163,6 @@ class SynapseDynamicsNeuromodulation(
             self, connections, connection_row_indices, n_rows,
             post_vertex_slice, n_synapse_types, max_n_synapses,
             max_atoms_per_core):
-        # pylint: disable=too-many-arguments
         weights = numpy.rint(
             numpy.abs(connections["weight"]) * STDP_FIXED_POINT_ONE)
         fixed_plastic = (

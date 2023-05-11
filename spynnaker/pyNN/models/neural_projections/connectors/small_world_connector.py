@@ -66,15 +66,13 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             Whether to output extra information about the connectivity to a
             CSV file
         """
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, unused-private-member
         super().__init__(safe, callback, verbose, rng)
         self.__rewiring = rewiring
         self.__degree = degree
-        # pylint:disable=unused-private-member
         self.__allow_self_connections = allow_self_connections
         self.__mask = None
         self.__n_connections = None
-
         if n_connections is not None:
             raise NotImplementedError(
                 "n_connections is not implemented for"
@@ -108,7 +106,6 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             d = distances
 
         self.__mask = (d < self.__degree).astype(float)
-
         self.__n_connections = int(math.ceil(numpy.sum(self.__mask)))
 
     @overrides(AbstractConnector.get_delay_maximum)
@@ -125,7 +122,6 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
-
         # Break the array into n_post_atoms units
         split_positions = numpy.arange(
             0, synapse_info.n_post_neurons, n_post_atoms)
@@ -146,21 +142,18 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        # pylint: disable=too-many-arguments
         return numpy.amax([
             numpy.sum(self.__mask[:, i]) for i in range(
                 synapse_info.n_post_neurons)])
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
-        # pylint: disable=too-many-arguments
         return self._get_weight_maximum(
             synapse_info.weights, self.__n_connections, synapse_info)
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
-        # pylint: disable=too-many-arguments
         ids = numpy.where(self.__mask[:, post_vertex_slice.as_slice])
         n_connections = len(ids[0])
 

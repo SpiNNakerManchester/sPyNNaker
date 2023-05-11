@@ -23,8 +23,7 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     """
 
     @abstractmethod
-    def get_parameters_usage_in_bytes(
-            self, n_atoms, incoming_projections):
+    def get_parameters_usage_in_bytes(self, n_atoms, incoming_projections):
         """
         Get the size of the parameters in bytes.
 
@@ -38,7 +37,7 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     @abstractmethod
     def write_parameters(self, spec, region, machine_vertex, weight_scales):
         """
-        Write the parameters to the spec.
+        Write the parameters to the data specification for a vertex.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The specification to write to
@@ -50,6 +49,15 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
 
     @property
     def absolute_max_atoms_per_core(self):
+        """
+        The absolute maximum number of atoms per core.
+
+        .. note::
+            This is *not* constrained by the usual limits of the master
+            population table.
+
+        :rtype: int
+        """
         # A bit of an estimate for these local-only systems, which don't use
         # the master population table and so don't have the same limit
         return 2048

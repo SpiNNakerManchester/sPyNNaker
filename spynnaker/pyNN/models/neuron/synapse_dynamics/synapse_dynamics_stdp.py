@@ -343,7 +343,6 @@ class SynapseDynamicsSTDP(
             self, connections, connection_row_indices, n_rows,
             post_vertex_slice, n_synapse_types, max_n_synapses,
             max_atoms_per_core):
-        # pylint: disable=too-many-arguments
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
@@ -443,7 +442,6 @@ class SynapseDynamicsSTDP(
     def read_plastic_synaptic_data(
             self, post_vertex_slice, n_synapse_types, pp_size, pp_data,
             fp_size, fp_data, max_atoms_per_core):
-        # pylint: disable=too-many-arguments
         n_rows = len(fp_size)
 
         n_synapse_type_bits = get_n_bits(n_synapse_types)

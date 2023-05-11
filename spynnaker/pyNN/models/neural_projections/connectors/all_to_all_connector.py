@@ -72,8 +72,6 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
-        # pylint: disable=too-many-arguments
-
         if min_delay is None or max_delay is None:
             return n_post_atoms
 
@@ -88,7 +86,6 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
-        # pylint: disable=too-many-arguments
         n_conns = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
         return self._get_weight_maximum(
             synapse_info.weights, n_conns, synapse_info)
@@ -96,7 +93,6 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
-        # pylint: disable=too-many-arguments
         n_connections = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
         if not self.__allow_self_connections:
             n_connections -= post_vertex_slice.n_atoms

@@ -314,10 +314,8 @@ def get_synapses(
     # Split the connections up based on the delays
     if max_delay is not None:
         plastic_delay_mask = (connections["delay"] <= max_delay)
-        undelayed_connections = connections[
-            numpy.where(plastic_delay_mask)]
-        delayed_connections = connections[
-            numpy.where(~plastic_delay_mask)]
+        undelayed_connections = connections[numpy.where(plastic_delay_mask)]
+        delayed_connections = connections[numpy.where(~plastic_delay_mask)]
     else:
         undelayed_connections = connections
         delayed_connections = numpy.zeros(
@@ -334,7 +332,6 @@ def get_synapses(
             synapse_info.synapse_dynamics,
             max_row_info.undelayed_max_n_synapses,
             max_row_info.undelayed_max_words, max_atoms_per_core)
-
         del undelayed_row_indices
     del undelayed_connections
 
@@ -344,8 +341,7 @@ def get_synapses(
         # Get the delay stages and which row each delayed connection will
         # go into
         stages = numpy.floor((numpy.round(
-            delayed_connections["delay"] - 1.0)) / max_delay).astype(
-            "uint32")
+            delayed_connections["delay"] - 1.0)) / max_delay).astype("uint32")
         delayed_cores = delayed_connections["source"] // max_atoms_per_core
         local_sources = delayed_connections["source"] - (
             delayed_cores * max_atoms_per_core)
@@ -601,7 +597,7 @@ def _read_static_data(
         max_atoms_per_core)
     if delayed:
         n_synapses = dynamics.get_n_synapses_in_rows(ff_size)
-        connections = __convert_delayed_data(
+        connections = _convert_delayed_data(
             n_synapses, n_pre_atoms, connections,
             post_vertex_max_delay_ticks)
     return connections
@@ -670,14 +666,13 @@ def _read_plastic_data(
 
     if delayed:
         n_synapses = dynamics.get_n_synapses_in_rows(pp_size, fp_size)
-        connections = __convert_delayed_data(
+        connections = _convert_delayed_data(
             n_synapses, n_pre_atoms, connections,
             post_vertex_max_delay_ticks)
     return connections
 
 
-def _rescale_connections(
-        connections, weight_scales, synapse_info):
+def _rescale_connections(connections, weight_scales, synapse_info):
     """
     Scale the connection data into machine values.
 
@@ -687,14 +682,13 @@ def _rescale_connections(
         The synapse information of the connections
     """
     # Return the delays values to milliseconds
-    connections["delay"] /= \
-        SpynnakerDataView.get_simulation_time_step_per_ms()
+    connections["delay"] /= SpynnakerDataView.get_simulation_time_step_per_ms()
     # Undo the weight scaling
     connections["weight"] /= weight_scales[synapse_info.synapse_type]
     return connections
 
 
-def __convert_delayed_data(
+def _convert_delayed_data(
         n_synapses, n_pre_atoms, delayed_connections,
         post_vertex_max_delay_ticks):
     """

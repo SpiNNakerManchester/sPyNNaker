@@ -39,16 +39,15 @@ def neuron_expander():
     # Find the places where the neuron expander should run
     expander_cores, expanded_pop_vertices = _plan_expansion()
 
-    progress = ProgressBar(expander_cores.total_processors,
-                           "Expanding Neuron Data")
-    expander_app_id = SpynnakerDataView.get_new_id()
-    run_system_application(
-        expander_cores, expander_app_id,
-        get_config_bool("Reports", "write_expander_iobuf"),
-        None, [CPUState.FINISHED], False,
-        "neuron_expander_on_{}_{}_{}.txt", progress_bar=progress,
-        logger=logger)
-    progress.end()
+    with ProgressBar(expander_cores.total_processors,
+                     "Expanding Neuron Data") as progress:
+        expander_app_id = SpynnakerDataView.get_new_id()
+        run_system_application(
+            expander_cores, expander_app_id,
+            get_config_bool("Reports", "write_expander_iobuf"),
+            None, [CPUState.FINISHED], False,
+            "neuron_expander_on_{}_{}_{}.txt", progress_bar=progress,
+            logger=logger)
 
     _fill_in_initial_data(expanded_pop_vertices)
 

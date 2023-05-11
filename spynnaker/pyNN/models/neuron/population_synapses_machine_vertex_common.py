@@ -154,7 +154,7 @@ class PopulationSynapsesMachineVertexCommon(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
         """
-        super(PopulationSynapsesMachineVertexCommon, self).__init__(
+        super().__init__(
             label, app_vertex, vertex_slice, sdram, self.COMMON_REGIONS,
             SynapseProvenance.N_ITEMS + SpikeProcessingFastProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))

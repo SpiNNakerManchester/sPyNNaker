@@ -426,7 +426,7 @@ class AbstractPopulationVertex(
     def atoms_shape(self):
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.__n_atoms)
-        return super(AbstractPopulationVertex, self).atoms_shape
+        return super().atoms_shape
 
     @property
     def size(self):

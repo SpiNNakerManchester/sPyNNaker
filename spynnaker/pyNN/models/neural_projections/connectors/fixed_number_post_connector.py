@@ -207,7 +207,6 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
-        # pylint: disable=too-many-arguments
         prob_in_slice = min(
             n_post_atoms / float(
                 synapse_info.n_post_neurons), 1.0)
@@ -225,7 +224,6 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        # pylint: disable=too-many-arguments
         selection_prob = 1.0 / float(synapse_info.n_post_neurons)
         n_connections = utility_calls.get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
@@ -242,7 +240,6 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
-        # pylint: disable=too-many-arguments
         # Get lo and hi for the pre vertex
         lo = 0
         hi = synapse_info.n_pre_neurons - 1

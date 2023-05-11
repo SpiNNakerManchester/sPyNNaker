@@ -381,6 +381,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         Register an additional binary search path for executables.
 
+        .. deprecated:: 7.0
+            Use :py:meth:`SpynnakerDataView.register_binary_search_path`.
+
         :param str search_path: absolute search path for binaries
         """
         # pylint: disable=protected-access
@@ -398,9 +401,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             return None
 
     def _execute_spynnaker_pair_compressor(self):
-        with FecTimer(
-                "Spynnaker machine bitfield pair router compressor",
-                TimerWork.COMPRESSING) as timer:
+        with FecTimer("Spynnaker machine bitfield pair router compressor",
+                      TimerWork.COMPRESSING) as timer:
             if timer.skip_if_virtual_board():
                 return
             spynnaker_machine_bitField_pair_router_compressor()

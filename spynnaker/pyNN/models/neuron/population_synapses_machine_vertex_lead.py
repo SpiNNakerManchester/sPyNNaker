@@ -53,7 +53,7 @@ class PopulationSynapsesMachineVertexLead(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
         """
-        super(PopulationSynapsesMachineVertexLead, self).__init__(
+        super().__init__(
             sdram, label, app_vertex, vertex_slice)
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales

@@ -298,7 +298,7 @@ class NeoCsv(object):
         :param ~numpy.ndarray signal_array: the raw signal data
         :param list(int) indexes: The indexes for the data
         """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
+        # pylint: disable=no-member, c-extension-no-member
         self._csv_indexes(indexes, csv_writer)
         csv_writer.writerows(signal_array)
         csv_writer.writerow([])
@@ -330,7 +330,7 @@ class NeoCsv(object):
         :param list[~quantities.Quantity] formation_times:
         :param list[str] formation_labels:
         """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
+        # pylint: disable=no-member, c-extension-no-member
         formation_event_array = neo.Event(
             times=formation_times,
             labels=formation_labels,
@@ -350,7 +350,7 @@ class NeoCsv(object):
         :param list[~quantities.Quantity] elimination_times:
         :param list[str] elimination_labels:
         """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
+        # pylint: disable=no-member, c-extension-no-member
         elimination_event_array = neo.Event(
             times=elimination_times,
             labels=elimination_labels,
@@ -360,8 +360,7 @@ class NeoCsv(object):
             array_annotations={})
         segment.events.append(elimination_event_array)
 
-    def _insert_neo_rewirings(
-            self, segment, event_array, variable):
+    def _insert_neo_rewirings(self, segment, event_array, variable):
         """
         Adds data that represent rewirings events to a neo segment.
 
@@ -369,7 +368,7 @@ class NeoCsv(object):
         :param ~numpy.ndarray event_array: the raw "event" data
         :param str variable: the variable name
         """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
+        # pylint: disable=no-member, c-extension-no-member
         formation_times = []
         formation_labels = []
         elimination_times = []
@@ -400,7 +399,7 @@ class NeoCsv(object):
         :param ~csv.writer csv_writer: Open CSV writer to write to
         :param ~numpy.ndarray event_array: the raw "event" data
         """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
+        # pylint: disable=no-member, c-extension-no-member
 
         formation = []
         elimination = []

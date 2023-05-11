@@ -119,8 +119,7 @@ class ConvolutionConnector(AbstractConnector):
         :param bool verbose: (ignored)
         :param callable callback: (ignored)
         """
-        super(ConvolutionConnector, self).__init__(
-            safe=safe, callback=callback, verbose=verbose)
+        super().__init__(safe=safe, callback=callback, verbose=verbose)
 
         self.__decode_kernel(kernel_weights, kernel_shape)
         self.__decode_padding(padding)

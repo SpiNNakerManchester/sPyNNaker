@@ -13,9 +13,9 @@
 # limitations under the License.
 
 """
-The code that used to be here has been merged into SpiNNaker.
+The code that used to be here has been merged into :py:class:`SpiNNaker`.
 
-This is now just a depreciation redirect hook
+This is now just a deprecation redirect hook
 """
 
 from spynnaker.pyNN.utilities.utility_calls import (
@@ -28,17 +28,23 @@ moved_in_v7("spynnaker.pyNN.abstract_spinnaker_common",
 
 
 class AbstractSpiNNakerCommon(SpiNNaker):
+    """
+    .. deprecated:: 7.0
+        Use :py:class:`SpiNNaker` directly instead.
+    """
 
     def __init__(
             self, graph_label, database_socket_addresses, n_chips_required,
             n_boards_required, timestep, min_delay,
             time_scale_factor=None):
-        # pylint: disable=super-init-not-called
+        # pylint: disable=super-init-not-called, unused-argument
         moved_in_v7("spynnaker.pyNN.abstract_spinnaker_common",
                     "spynnaker.pyNN.spinnaker")
-        super(database_socket_addresses,
-              time_scale_factor, min_delay, graph_label,
+        super().__init__(
+              time_scale_factor, min_delay,
               n_chips_required, n_boards_required, timestep)
+        SpynnakerDataView.add_database_socket_addresses(
+            database_socket_addresses)
 
     @staticmethod
     def register_binary_search_path(search_path):

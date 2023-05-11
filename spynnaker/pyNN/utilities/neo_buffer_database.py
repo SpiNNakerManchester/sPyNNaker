@@ -743,10 +743,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         view_set = set(view_indexes)
         missing = view_set.difference(data_indexes)
         if missing:
-            missing_list = list(missing)
-            missing_list.sort()
             logger.warning("No {} available for neurons {}",
-                           variable, missing_list)
+                           variable, sorted(missing))
         return indexes
 
     def __get_spikes(self, cursor, rec_id, view_indexes, buffer_type,

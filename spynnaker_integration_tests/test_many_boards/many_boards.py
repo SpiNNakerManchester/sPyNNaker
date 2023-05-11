@@ -24,15 +24,16 @@ CHIPS_PER_BOARD_EXCLUDING_SAFETY = 43.19
 
 
 class ManyBoards(BaseTestCase):
+    # pylint: disable=attribute-defined-outside-init
     n_boards = 1
     n_neurons = 400
     simtime = 600
 
-    def add_pop(self, x, y, n_neurons, input):
+    def add_pop(self, x, y, n_neurons, input_pop):
         pop = sim.Population(
             n_neurons, sim.IF_curr_exp(), label="pop_{}_{}".format(x, y))
         pop.add_placement_constraint(x=x, y=y)
-        sim.Projection(input, pop, sim.AllToAllConnector(),
+        sim.Projection(input_pop, pop, sim.AllToAllConnector(),
                        synapse_type=sim.StaticSynapse(weight=5, delay=1))
         pop.record("all")
         return pop
@@ -50,7 +51,7 @@ class ManyBoards(BaseTestCase):
 
         input_spikes = list(range(0, self.simtime - 100, 10))
         self._expected_spikes = len(input_spikes)
-        input = sim.Population(1, sim.SpikeSourceArray(
+        input_pop = sim.Population(1, sim.SpikeSourceArray(
             spike_times=input_spikes), label="input")
         self._pops = []
         for i, chip in enumerate(machine.ethernet_connected_chips):
@@ -63,7 +64,7 @@ class ManyBoards(BaseTestCase):
             if not machine.is_chip_at(x, y):
                 x = chip.x
                 y = chip.y
-            self._pops.append(self.add_pop(x, y, self.n_neurons, input))
+            self._pops.append(self.add_pop(x, y, self.n_neurons, input_pop))
 
     def report_file(self):
         if get_config_bool("Java", "use_java"):
@@ -100,10 +101,6 @@ class ManyBoards(BaseTestCase):
 
 
 if __name__ == '__main__':
-    """
-    main entrance method
-    """
     me = ManyBoards()
-    run = me.do_run()
+    me.do_run()
     me.check_all_data()
-    run.end()

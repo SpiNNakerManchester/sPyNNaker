@@ -435,7 +435,6 @@ class Projection(object):
         :param callable(ConnectionHolder,None) notify:
         :rtype: ConnectionHolder
         """
-        # pylint: disable=too-many-arguments
         post_vertex = self.__projection_edge.post_vertex
         pre_vertex = self.__projection_edge.pre_vertex
 

@@ -139,7 +139,6 @@ class SpynnakerExternalDevicePluginManager(object):
         # Use the mask to remove the colour from non-translated keys
         received_key_mask = 0xFFFFFFFF & ~((2 ** n_colour_bits) - 1)
 
-        # pylint: disable=too-many-arguments, too-many-locals
         params = LivePacketGatherParameters(
             port=port, hostname=host, tag=tag, strip_sdp=strip_sdp,
             use_prefix=use_prefix, key_prefix=key_prefix,

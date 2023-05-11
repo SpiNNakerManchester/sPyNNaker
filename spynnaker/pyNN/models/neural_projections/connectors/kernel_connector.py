@@ -351,21 +351,17 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     def get_delay_variance(self, delays, synapse_info):
         if self._krn_delays is not None:
             return numpy.var(self._krn_delays)
-
-        return super(KernelConnector, self).get_delay_variance(
-            delays, synapse_info)
+        return super().get_delay_variance(delays, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
-        return numpy.clip(self._kernel_h * self._kernel_w, 0,
-                          n_post_atoms)
+        return numpy.clip(self._kernel_h * self._kernel_w, 0, n_post_atoms)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        return numpy.clip(
-            self._kernel_h * self._kernel_w, 0, 255)
+        return numpy.clip(self._kernel_h * self._kernel_w, 0, 255)
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
@@ -374,8 +370,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             return numpy.max(self._krn_weights)
 
         # I think this is overestimated, but not by much
-        n_conns = (
-            self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
+        n_conns = self._pre_w * self._pre_h * self._kernel_w * self._kernel_h
         return self._get_weight_maximum(
             synapse_info.weights, n_conns, synapse_info)
 
@@ -384,18 +379,14 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         # Use the kernel weights if user has supplied them
         if self._krn_weights is not None:
             return numpy.mean(self._krn_weights)
-
-        return super(KernelConnector, self).get_weight_mean(
-            weights, synapse_info)
+        return super().get_weight_mean(weights, synapse_info)
 
     @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(self, weights, synapse_info):
         # Use the kernel weights if user has supplied them
         if self._krn_weights is not None:
             return numpy.var(self._krn_weights)
-
-        return super(KernelConnector, self).get_weight_variance(
-            weights, synapse_info)
+        return super().get_weight_variance(weights, synapse_info)
 
     def __repr__(self):
         return \

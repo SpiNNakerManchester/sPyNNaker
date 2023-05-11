@@ -222,7 +222,6 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         if not len(self.__targets):
             return 0
-        # pylint: disable=too-many-arguments
         return numpy.max(numpy.bincount(
             self.__targets.astype('int64', copy=False)))
 
@@ -238,7 +237,6 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
-        # pylint: disable=too-many-arguments
         if self.__weights is None:
             if hasattr(synapse_info.weights, "__len__"):
                 return numpy.amax(synapse_info.weights)
@@ -249,7 +247,6 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(self, weights, synapse_info):
-        # pylint: disable=too-many-arguments
         if self.__weights is None:
             if hasattr(synapse_info.weights, "__len__"):
                 return numpy.var(synapse_info.weights)
@@ -261,7 +258,6 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
-        # pylint: disable=too-many-arguments
         self._split_connections(post_slices)
         post_hi = post_vertex_slice.hi_atom
         if post_hi not in self.__split_conn_list:

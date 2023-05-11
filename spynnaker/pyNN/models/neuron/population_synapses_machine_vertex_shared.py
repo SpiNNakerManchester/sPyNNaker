@@ -43,8 +43,7 @@ class PopulationSynapsesMachineVertexShared(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
         """
-        super(PopulationSynapsesMachineVertexShared, self).__init__(
-            sdram, label, app_vertex, vertex_slice)
+        super().__init__(sdram, label, app_vertex, vertex_slice)
         self.__synapse_references = synapse_references
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)

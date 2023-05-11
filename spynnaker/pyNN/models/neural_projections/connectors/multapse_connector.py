@@ -207,7 +207,6 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
-        # pylint: disable=too-many-arguments
         # update the synapses as required, and get the number of connections
 
         post_slice_index = post_slices.index(post_vertex_slice)

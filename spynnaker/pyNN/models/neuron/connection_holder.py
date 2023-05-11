@@ -148,7 +148,7 @@ class ConnectionHolder(object):
         connections = numpy.concatenate(self.__connections)
 
         # If there are additional fixed values, merge them in
-        if self.__fixed_values is not None and self.__fixed_values:
+        if self.__fixed_values:
             # Generate a numpy type for the fixed values
             fixed_dtypes = [
                 (f'{field[0]}', None)

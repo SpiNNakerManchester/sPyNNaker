@@ -91,8 +91,7 @@ class PopulationMachineCommon(
             A mapping of profile identifiers to names
         :param str binary_file_name: The name of the binary file
         """
-        super(PopulationMachineCommon, self).__init__(
-            label, app_vertex, vertex_slice)
+        super().__init__(label, app_vertex, vertex_slice)
         self.__sdram = sdram
         self.__regions = regions
         self.__n_provenance_items = n_provenance_items

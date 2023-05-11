@@ -304,8 +304,7 @@ class _MasterPopEntry(object):
 
         entry.n_colour_bits = self.__n_colour_bits
         entry.core_mask = self.__core_mask
-        entry.n_words = int(math.ceil(
-            self.__n_neurons / BIT_IN_A_WORD))
+        entry.n_words = int(math.ceil(self.__n_neurons / BIT_IN_A_WORD))
         entry.n_neurons = self.__n_neurons
         entry.mask_shift = self.__core_shift
 

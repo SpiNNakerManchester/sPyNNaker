@@ -46,7 +46,6 @@ class ParameterHolder(object):
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         :type selector: None or slice or int or list(bool) or list(int)
         """
-        # pylint: disable=too-many-arguments
         self.__data_items_to_return = data_items_to_return
         self.__get_call = get_call
         self.__data_items = None

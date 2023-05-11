@@ -169,7 +169,7 @@ class SpikeSourceArrayVertex(
     def atoms_shape(self):
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.n_atoms)
-        return super(ReverseIpTagMultiCastSource, self).atoms_shape
+        return super().atoms_shape
 
     def _to_early_spikes_single_list(self, spike_times):
         """

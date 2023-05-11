@@ -75,7 +75,6 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
-        # pylint: disable=too-many-arguments
         if min_delay is None or max_delay is None:
             return 1
 

@@ -112,8 +112,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "__neuromodulators"
         ]
 
-    def __init__(self, n_synapse_vertices=1,
-                 max_delay=None,
+    def __init__(self, n_synapse_vertices=1, max_delay=None,
                  allow_delay_extension=None):
         """
         :param int n_synapse_vertices:
@@ -130,7 +129,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             whether delay extensions should be needed.
         :type allow_delay_extension: bool or None
         """
-        super(SplitterAbstractPopulationVertexNeuronsSynapses, self).__init__()
+        super().__init__()
         AbstractSpynnakerSplitterDelay.__init__(self)
 
         if n_synapse_vertices + 1 > _MAX_CORES:

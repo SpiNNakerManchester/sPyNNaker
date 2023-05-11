@@ -480,7 +480,7 @@ class SpikeSourcePoissonVertex(
     def atoms_shape(self):
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.__n_atoms)
-        return super(SpikeSourcePoissonVertex, self).atoms_shape
+        return super().atoms_shape
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(self, vertex_slice, sdram, label=None):

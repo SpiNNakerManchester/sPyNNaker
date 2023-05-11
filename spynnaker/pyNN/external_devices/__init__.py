@@ -322,7 +322,6 @@ def SpikeInjector(
         :py:class:`~spynnaker.pyNN.models.populations.Population`.
     :rtype: AbstractPyNNModel
     """
-    # pylint: disable=too-many-arguments
     if notify:
         Plugins.add_database_socket_address(
             database_notify_host, database_notify_port_num,

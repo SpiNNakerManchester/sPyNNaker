@@ -244,13 +244,10 @@ class NeuronRecorder(object):
             return vertex_slice.get_raster_ids()
         all_set = set(self.__indexes[variable])
         ids = set(vertex_slice.get_raster_ids())
-        local_list = list(all_set.intersection(ids))
-        local_list.sort()
-        return local_list
+        return sorted(all_set & ids)
 
     def _convert_placement_matrix_data(
             self, row_data, n_rows, data_row_length, n_neurons, data_type):
-
         surplus_bytes = self._N_BYTES_FOR_TIMESTAMP
         var_data = (row_data[:, surplus_bytes:].reshape(
             n_rows * data_row_length))
@@ -713,8 +710,7 @@ class NeuronRecorder(object):
                 # merge the two indexes
                 indexes = self.__indexes[variable] + indexes
             # Avoid duplicates and keep in numerical order
-            self.__indexes[variable] = list(set(indexes))
-            self.__indexes[variable].sort()
+            self.__indexes[variable] = sorted(set(indexes))
 
     def set_recording(self, variable, new_state, sampling_interval=None,
                       indexes=None):

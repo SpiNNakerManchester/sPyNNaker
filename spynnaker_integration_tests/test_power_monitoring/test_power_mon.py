@@ -14,14 +14,14 @@
 
 import os
 import numpy
+import sqlite3
 import unittest
 import pyNN.spiNNaker as p
-from spinnaker_testbase import BaseTestCase
-from spynnaker_integration_tests.scripts import SynfireRunner
 from spinn_front_end_common.interface.provenance import ProvenanceReader
 from spinn_front_end_common.utilities.report_functions import EnergyReport
 from spynnaker.pyNN.data import SpynnakerDataView
-import sqlite3
+from spynnaker_integration_tests.scripts import SynfireRunner
+from spinnaker_testbase import BaseTestCase
 
 n_neurons = 200  # number of neurons in each population
 neurons_per_core = n_neurons / 2

@@ -192,5 +192,4 @@ class MachineMunichMotorDevice(
     def get_n_keys_for_partition(self, partition_id):
         if partition_id == self.MOTOR_PARTITION_ID:
             return self._MOTOR_N_KEYS
-        return super(MachineMunichMotorDevice, self).get_n_keys_for_partition(
-            partition_id)
+        return super().get_n_keys_for_partition(partition_id)

@@ -149,7 +149,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
         :param int max_atoms_per_core:
             The maximum number of atoms per core
         """
-        super(PopulationMachineLocalOnlyCombinedVertex, self).__init__(
+        super().__init__(
             label, app_vertex, vertex_slice, sdram,
             self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS +
