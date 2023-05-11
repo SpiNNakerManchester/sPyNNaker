@@ -425,10 +425,10 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 db.write_segment_metadata()
                 db.write_metadata()
 
-    @overrides(AbstractSpinnakerBase._do_write_metadata)
-    def _do_write_metadata(self):
+    @overrides(AbstractSpinnakerBase._do_database_updates)
+    def _do_database_updates(self, run_time):
         self._execute_write_neo_metadata()
-        super()._do_write_metadata()
+        super()._do_database_updates(run_time)
 
     def _execute_synapse_expander(self):
         with FecTimer("Synapse expander", TimerWork.SYNAPSE) as timer:
