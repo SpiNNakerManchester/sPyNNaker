@@ -14,7 +14,6 @@
 import io
 import shutil
 import struct
-import tempfile
 from tempfile import mkdtemp
 import numpy
 import pytest

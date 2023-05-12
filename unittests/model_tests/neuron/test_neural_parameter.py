@@ -12,11 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import io
-import os
-import platform
 import struct
-import tempfile
 from data_specification.enums import DataType
 from data_specification import DataSpecificationGenerator
 from spynnaker.pyNN.config_setup import unittest_setup
