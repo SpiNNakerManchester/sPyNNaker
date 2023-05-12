@@ -128,8 +128,7 @@ def test_write_data_spec():
     post_vertex_slice = post_vertex.vertex_slice
     post_vertex_placement = Placement(post_vertex, 0, 0, 3)
 
-    temp_spec = tempfile.mktemp()
-    spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
+    spec = DataSpecificationGenerator(None)
 
     regions = SynapseRegions(
         synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
@@ -146,9 +145,9 @@ def test_write_data_spec():
     synaptic_matrices.write_synaptic_data(spec, post_vertex_slice, references)
     spec.end_specification()
 
-    with io.FileIO(temp_spec, "rb") as spec_reader:
-        executor = DataSpecificationExecutor(spec_reader, 20000)
-        executor.execute()
+    spec_reader = io.BytesIO(spec.get_bytes_after_close())
+    executor = DataSpecificationExecutor(spec_reader, 20000)
+    executor.execute()
 
     all_data = bytearray()
     all_data.extend(bytearray(executor.get_header()))
@@ -463,8 +462,7 @@ def test_pop_based_master_pop_table_standard(
     post_vertex_slice = post_mac_vertex.vertex_slice
 
     # Generate the data
-    temp_spec = tempfile.mktemp()
-    spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
+    spec = DataSpecificationGenerator(None)
 
     regions = SynapseRegions(
         synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
@@ -480,10 +478,11 @@ def test_pop_based_master_pop_table_standard(
     synaptic_matrices.generate_data()
     synaptic_matrices.write_synaptic_data(spec, post_vertex_slice, references)
 
-    with io.FileIO(temp_spec, "rb") as spec_reader:
-        executor = DataSpecificationExecutor(
-            spec_reader, Machine.DEFAULT_SDRAM_BYTES)
-        executor.execute()
+    spec.end_specification(True)
+    spec_reader = io.BytesIO(spec.get_bytes_after_close())
+    executor = DataSpecificationExecutor(
+        spec_reader, Machine.DEFAULT_SDRAM_BYTES)
+    executor.execute()
 
     # Read the population table and check entries
     region = executor.get_region(3)

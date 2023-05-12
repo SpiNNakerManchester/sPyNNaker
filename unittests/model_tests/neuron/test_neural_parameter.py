@@ -40,21 +40,9 @@ def _iterate_parameter_values(iterator, data_type):
 
 
 def run_spec_check(method):
-    if platform.system() == "Windows":
-        spec_writer = io.FileIO("test.dat", "wb")
-        spec = DataSpecificationGenerator(spec_writer, None)
-        try:
-            method(spec)
-        finally:
-            spec.end_specification()
-            os.remove("test.dat")
-    else:
-        with tempfile.NamedTemporaryFile() as temp:
-            spec = DataSpecificationGenerator(io.FileIO(temp.name, "wb"), None)
-            try:
-                method(spec)
-            finally:
-                spec.end_specification()
+    spec = DataSpecificationGenerator(None)
+    method(spec)
+    spec.end_specification()
 
 
 def range_list(spec):
