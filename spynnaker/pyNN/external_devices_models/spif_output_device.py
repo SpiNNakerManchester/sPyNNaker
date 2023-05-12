@@ -87,20 +87,21 @@ class SPIFOutputDevice(
             self.__incoming_partition.identifier).mask
 
     @property
+    @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
         # The commands here are delayed, as at the time of providing them,
         # we don't know the key or mask of the incoming link...
-        return [
-            SpiNNFPGARegister.P_KEY.delayed_command(
-                self._get_set_key_payload),
-            SpiNNFPGARegister.P_MASK.delayed_command(
-                self._get_set_mask_payload)
-        ]
+        yield SpiNNFPGARegister.P_KEY.delayed_command(
+            self._get_set_key_payload)
+        yield SpiNNFPGARegister.P_MASK.delayed_command(
+            self._get_set_mask_payload)
 
     @property
+    @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         return []
 
     @property
+    @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self):
         return []

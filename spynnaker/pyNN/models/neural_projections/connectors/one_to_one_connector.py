@@ -115,7 +115,6 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
-
         max_lo_atom = post_vertex_slice.lo_atom
         min_hi_atom = min(
             synapse_info.n_pre_neurons, post_vertex_slice.hi_atom)

@@ -239,7 +239,6 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             self.__receiver_connection = UDPConnection(
                 remote_host=self.__spif_host, remote_port=self.__spif_port)
         for label_id, label in enumerate(self.__receive_labels):
-
             key_to_atom_id = db.get_key_to_atom_id_mapping(label)
             for key, atom_id in key_to_atom_id.items():
                 self.__key_to_atom_id_and_label[key] = (atom_id, label_id)

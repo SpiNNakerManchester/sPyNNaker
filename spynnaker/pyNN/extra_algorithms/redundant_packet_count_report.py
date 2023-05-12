@@ -22,6 +22,7 @@ from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
+#: How to make the redundancy information table in the provenance DB
 REDUNDANCY_BY_CORE = f"""
     CREATE VIEW IF NOT EXISTS redundancy_by_core AS
     SELECT pro.x, pro.y, pro.p, core_name,
@@ -58,6 +59,7 @@ REDUNDANCY_BY_CORE = f"""
     """
 
 
+#: How to generate summary information from the redundancy table
 REDUNDANCY_SUMMARY = """
     CREATE VIEW IF NOT EXISTS redundancy_summary AS
     SELECT SUM(total), MAX(total), MIN(total), AVG(total),
@@ -94,7 +96,7 @@ def _create_views():
 
 def _write_report(output):
     with ProvenanceReader() as db:
-        for data in db.run_query("select * from redundancy_by_core"):
+        for data in db.run_query("SELECT * FROM redundancy_by_core"):
             (_, _, _, source, _, filtered, invalid, _,
              redundant, total, percent) = data
             output.write(f"\ncore {source} \n")
@@ -111,7 +113,7 @@ def _write_report(output):
             output.write(
                 "    Overall this makes a redundant percentage of "
                 f"{percent}\n")
-        data = db.run_query("select * from redundancy_summary")
+        data = db.run_query("SELECT * FROM redundancy_summary LIMIT 1")
         (sum_total, max_total, min_total, avg_total,
             sum_reduant, max_redundant, min_redundant, avg_redundant,
             max_percent, min_percent, avg_percent, global_percent) = data[0]

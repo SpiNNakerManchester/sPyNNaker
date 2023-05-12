@@ -1165,7 +1165,6 @@ class NeuronRecorder(object):
         last_recorded = i
         n_recorded = 0
         while next_id is not None and next_index is not None:
-
             # Find the next index to be recorded
             while (next_id is not None and next_index is not None and
                    next_id != next_index):

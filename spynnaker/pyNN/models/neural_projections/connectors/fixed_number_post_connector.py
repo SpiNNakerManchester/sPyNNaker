@@ -134,13 +134,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             # Loop over all the pre neurons
             for m in range(0, synapse_info.n_pre_neurons):
                 if self.__post_neurons[m] is None:
-
                     # If the pre and post populations are the same
                     # then deal with allow_self_connections=False
                     if (synapse_info.pre_population is
                             synapse_info.post_population and
                             not self.__allow_self_connections):
-
                         # Create a list without the pre_neuron in it
                         no_self_post_neurons = numpy.concatenate(
                             [numpy.arange(0, m),

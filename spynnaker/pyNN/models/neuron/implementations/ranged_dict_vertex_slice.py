@@ -61,7 +61,6 @@ class _RangedListVertexSlice(object):
                 self.__vertex_slice.lo_atom, self.__vertex_slice.hi_atom,
                 value)
         else:
-
             # Find the ranges where the data is the same
             changes = numpy.nonzero(numpy.diff(value))[0] + 1
 

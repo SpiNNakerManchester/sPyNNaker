@@ -169,7 +169,6 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
-
         # If the chance of there being a connection in the slice is almost 0,
         # there will probably be at least 1 connection somewhere
         prob_in_slice = min(

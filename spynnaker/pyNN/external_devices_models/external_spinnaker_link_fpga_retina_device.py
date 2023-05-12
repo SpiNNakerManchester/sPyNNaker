@@ -148,14 +148,14 @@ class ExternalFPGARetinaDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
-        return [MultiCastCommand(
-            key=0x0000FFFF, payload=1, repeat=5, delay_between_repeats=100)]
+        yield MultiCastCommand(
+            key=0x0000FFFF, payload=1, repeat=5, delay_between_repeats=100)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
-        return [MultiCastCommand(
-            key=0x0000FFFE, payload=0, repeat=5, delay_between_repeats=100)]
+        yield MultiCastCommand(
+            key=0x0000FFFE, payload=0, repeat=5, delay_between_repeats=100)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

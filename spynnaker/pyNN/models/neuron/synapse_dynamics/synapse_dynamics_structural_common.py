@@ -39,6 +39,9 @@ DEFAULT_S_MAX = 32
 
 class SynapseDynamicsStructuralCommon(
         AbstractSynapseDynamicsStructural, metaclass=AbstractBase):
+    """
+    Common code for structural synapse dynamics.
+    """
 
     # 8 32-bit numbers (fast; p_rew; s_max; app_no_atoms; machine_no_atoms;
     # low_atom; high_atom; with_replacement) + 2 4-word RNG seeds (shared_seed;

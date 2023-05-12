@@ -285,7 +285,7 @@ class SPIFRetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         # Send the stop signal
-        return [SpiNNFPGARegister.STOP.cmd()]
+        yield SpiNNFPGARegister.STOP.cmd()
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

@@ -56,14 +56,13 @@ def spynnaker_neuron_graph_network_specification_report():
 
     graph_format = get_config_str("Reports", "network_graph_format")
     if graph_format is None:
+        graph_format = _GRAPH_FORMAT
         if (SpynnakerDataView.get_n_vertices() +
                 SpynnakerDataView.get_n_partitions()) > CUTOFF:
             logger.warning(
                 "cfg write_network_graph ignored as network_graph_format "
                 "is None and the network is big")
             return
-        else:
-            graph_format = _GRAPH_FORMAT
     # build progress bar for the vertices, edges, and rendering
     progress = ProgressBar(
         SpynnakerDataView.get_n_vertices() +
@@ -90,6 +89,7 @@ def _generate_vertices(dot_diagram, progress):
     """
     :param ~graphviz.Digraph dot_diagram:
     :param ~.ProgressBar progress:
+    :return: the mapping from vertex to ID for the generated vertices
     :rtype: dict(~.ApplicationVertex,str)
     """
     vertex_ids = dict()

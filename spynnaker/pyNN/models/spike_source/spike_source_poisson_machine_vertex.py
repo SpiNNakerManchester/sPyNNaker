@@ -160,6 +160,9 @@ class SpikeSourcePoissonMachineVertex(
         AbstractHasAssociatedBinary, AbstractRewritesDataSpecification,
         AbstractGeneratesDataSpecification,
         SendsSynapticInputsOverSDRAM):
+    """
+    Vertex that implements a Poisson-distributed spike source.
+    """
 
     __slots__ = [
         "__buffered_sdram_per_timestep",
@@ -560,5 +563,4 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id):
-        n_colours = 2 ** self.app_vertex.n_colour_bits
-        return self._vertex_slice.n_atoms * n_colours
+        return self._vertex_slice.n_atoms << self.app_vertex.n_colour_bits

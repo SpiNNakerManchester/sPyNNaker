@@ -142,13 +142,11 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractStaticSynapseDynamics.get_n_static_words_per_row)
     def get_n_static_words_per_row(self, ff_size):
-
         # The sizes are in words, so just return them
         return ff_size
 
     @overrides(AbstractStaticSynapseDynamics.get_n_synapses_in_rows)
     def get_n_synapses_in_rows(self, ff_size):
-
         # Each word is a synapse and sizes are in words, so just return them
         return ff_size
 
@@ -156,7 +154,6 @@ class SynapseDynamicsStatic(
     def read_static_synaptic_data(
             self, post_vertex_slice, n_synapse_types, ff_size, ff_data,
             max_atoms_per_core):
-
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1

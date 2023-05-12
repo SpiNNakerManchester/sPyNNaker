@@ -154,12 +154,10 @@ class Projection(object):
         # Find out if there is an existing edge between the populations
         edge_to_merge = self._find_existing_edge(pre_vertex, post_vertex)
         if edge_to_merge is not None:
-
             # If there is an existing edge, add the connector
             edge_to_merge.add_synapse_information(self.__synapse_information)
             self.__projection_edge = edge_to_merge
         else:
-
             # If there isn't an existing edge, create a new one and add it
             self.__projection_edge = ProjectionApplicationEdge(
                 pre_vertex, post_vertex, self.__synapse_information,
@@ -179,12 +177,10 @@ class Projection(object):
         self.__virtual_connection_list = None
         if get_config_bool("Machine", "virtual_board"):
             self.__virtual_connection_list = list()
-            connection_holder = ConnectionHolder(
-                None, False, pre_vertex.n_atoms, post_vertex.n_atoms,
-                self.__virtual_connection_list)
-
             self.__synapse_information.add_pre_run_connection_holder(
-                connection_holder)
+                ConnectionHolder(
+                    None, False, pre_vertex.n_atoms, post_vertex.n_atoms,
+                    self.__virtual_connection_list))
 
         # If the target is a population, add to the list of incoming
         # projections

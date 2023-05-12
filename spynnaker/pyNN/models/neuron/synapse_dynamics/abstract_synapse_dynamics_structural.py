@@ -17,6 +17,9 @@ from spinn_utilities.abstract_base import (
 
 
 class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
+    """
+    Base class for synapse dynamics that structural plasticity understands.
+    """
 
     @abstractmethod
     def get_structural_parameters_sdram_usage_in_bytes(

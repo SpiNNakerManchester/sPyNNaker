@@ -420,15 +420,21 @@ class SpikeSourcePoissonVertex(
             raise KeyError(f"Cannot record {name}")
         return None
 
+    @overrides(PopulationApplicationVertex.get_neurons_recording)
     def get_neurons_recording(self, name, vertex_slice):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return vertex_slice.get_raster_ids()
 
     def max_spikes_per_ts(self):
+        """
+        Compute the maximum spike rate.
+
+        :return: The maximum number of spikes per simulation timestep.
+        :rtype: float
+        """
         ts_per_second = SpynnakerDataView.get_simulation_time_step_per_s()
-        if float(self.__max_rate) / ts_per_second < \
-                SLOW_RATE_PER_TICK_CUTOFF:
+        if float(self.__max_rate) / ts_per_second < SLOW_RATE_PER_TICK_CUTOFF:
             return 1
 
         # Experiments show at 1000 this result is typically higher than actual
@@ -441,6 +447,7 @@ class SpikeSourcePoissonVertex(
     def get_recording_sdram_usage(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: ~pacman.model.resources.AbstractSDRAM
         """
         variable_sdram = self.__spike_recorder.get_sdram_usage_in_bytes(
             vertex_slice.n_atoms, self.max_spikes_per_ts())
@@ -508,8 +515,7 @@ class SpikeSourcePoissonVertex(
 
     def kiss_seed(self, vertex_slice):
         if vertex_slice not in self.__kiss_seed:
-            self.__kiss_seed[vertex_slice] = create_mars_kiss_seeds(
-                self.__rng)
+            self.__kiss_seed[vertex_slice] = create_mars_kiss_seeds(self.__rng)
         return self.__kiss_seed[vertex_slice]
 
     def update_kiss_seed(self, vertex_slice, seed):
@@ -546,13 +552,12 @@ class SpikeSourcePoissonVertex(
         """
         parameters = self.get_parameter_values(self.__model.default_parameters)
 
-        context = {
+        return {
             "name": self.__model_name,
             "default_parameters": self.__model.default_parameters,
             "default_initial_values": self.__model.default_parameters,
             "parameters": parameters,
         }
-        return context
 
     def set_live_poisson_control_edge(self, edge):
         if self.__incoming_control_edge is not None:

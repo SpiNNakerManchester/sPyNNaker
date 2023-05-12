@@ -43,10 +43,7 @@ def _as_numpy_ticks(times, time_step):
 def _send_buffer_times(spike_times, time_step):
     # Convert to ticks
     if len(spike_times) and hasattr(spike_times[0], "__len__"):
-        data = []
-        for times in spike_times:
-            data.append(_as_numpy_ticks(times, time_step))
-        return data
+        return [_as_numpy_ticks(times, time_step) for times in spike_times]
     else:
         return _as_numpy_ticks(spike_times, time_step)
 
@@ -329,13 +326,12 @@ class SpikeSourceArrayVertex(
         """
         parameters = self.get_parameter_values(self.__model.default_parameters)
 
-        context = {
+        return {
             "name": self.__model_name,
             "default_parameters": self.__model.default_parameters,
             "default_initial_values": self.__model.default_parameters,
             "parameters": parameters,
         }
-        return context
 
     @property
     @overrides(PopulationApplicationVertex.n_colour_bits)

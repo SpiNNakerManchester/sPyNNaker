@@ -245,7 +245,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             total_sdram += shared_synapse_core_sdram
 
         for index, vertex_slice in enumerate(self.__get_fixed_slices()):
-
             # Create the neuron vertex for the slice
             neuron_vertex = self.__add_neuron_core(
                 vertex_slice, neuron_sdram, label, index, rb_shifts,

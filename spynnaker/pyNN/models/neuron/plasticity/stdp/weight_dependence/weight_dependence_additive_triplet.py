@@ -123,10 +123,8 @@ class WeightDependenceAdditiveTriplet(
     def write_parameters(
             self, spec, global_weight_scale, synapse_weight_scales,
             n_weight_terms):
-
         # Loop through each synapse type
         for _ in synapse_weight_scales:
-
             # Scale the weights
             spec.write_value(data=self.__w_min * global_weight_scale,
                              data_type=DataType.S1615)

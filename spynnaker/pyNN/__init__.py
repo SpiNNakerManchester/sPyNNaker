@@ -426,11 +426,10 @@ def list_standard_models():
 
     :rtype: list(str)
     """
-    results = list()
-    for (key, obj) in globals().items():
-        if isinstance(obj, type) and issubclass(obj, AbstractPyNNModel):
-            results.append(key)
-    return results
+    return [
+        key
+        for (key, obj) in globals().items()
+        if isinstance(obj, type) and issubclass(obj, AbstractPyNNModel)]
 
 
 def set_number_of_neurons_per_core(neuron_type, max_permitted):

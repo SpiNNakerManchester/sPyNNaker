@@ -17,14 +17,14 @@ from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
 from spynnaker.pyNN.utilities.struct import Struct
 
-DEVICE = "device"
-KEY = "key"
-SCALE = "scale"
-MIN = "min"
-MAX = "max"
-TS_INTER_SEND = "ts_inter_send"
-TS_NEXT_SEND = "ts_next_send"
-TYPE = "type"
+_DEVICE = "device"
+_KEY = "key"
+_SCALE = "scale"
+_MIN = "min"
+_MAX = "max"
+_TS_INTER_SEND = "ts_inter_send"
+_TS_NEXT_SEND = "ts_next_send"
+_TYPE = "type"
 
 
 class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
@@ -40,34 +40,34 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
         """
         super().__init__(
             [Struct([
-                (DataType.UINT32, KEY),
-                (DataType.UINT32, SCALE),
-                (DataType.S1615, MIN),
-                (DataType.S1615, MAX),
-                (DataType.UINT32, TS_INTER_SEND),
-                (DataType.UINT32, TS_NEXT_SEND),
-                (DataType.UINT32, TYPE)])],
-            {KEY: "", SCALE: "", MIN: "mV", MAX: "mV",
-             TS_INTER_SEND: "time steps", TS_NEXT_SEND: "time steps",
-             TYPE: ""})
+                (DataType.UINT32, _KEY),
+                (DataType.UINT32, _SCALE),
+                (DataType.S1615, _MIN),
+                (DataType.S1615, _MAX),
+                (DataType.UINT32, _TS_INTER_SEND),
+                (DataType.UINT32, _TS_NEXT_SEND),
+                (DataType.UINT32, _TYPE)])],
+            {_KEY: "", _SCALE: "", _MIN: "mV", _MAX: "mV",
+             _TS_INTER_SEND: "time steps", _TS_NEXT_SEND: "time steps",
+             _TYPE: ""})
         self.__devices = devices
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
-        parameters[KEY] = [
+        parameters[_KEY] = [
             d.device_control_key for d in self.__devices]
-        parameters[SCALE] = [
+        parameters[_SCALE] = [
             d.device_control_scaling_factor for d in self.__devices]
-        parameters[MIN] = [
+        parameters[_MIN] = [
             d.device_control_min_value for d in self.__devices]
-        parameters[MAX] = [
+        parameters[_MAX] = [
             d.device_control_max_value for d in self.__devices]
-        parameters[TS_INTER_SEND] = [
+        parameters[_TS_INTER_SEND] = [
             d.device_control_timesteps_between_sending for d in self.__devices]
-        parameters[TYPE] = [
+        parameters[_TYPE] = [
             d.device_control_send_type.value for d in self.__devices]
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables[TS_NEXT_SEND] = [
+        state_variables[_TS_NEXT_SEND] = [
             d.device_control_first_send_timestep for d in self.__devices]

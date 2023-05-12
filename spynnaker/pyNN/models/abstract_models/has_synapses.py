@@ -17,7 +17,6 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 @add_metaclass(AbstractBase)
 class HasSynapses(object):
-
     @abstractmethod
     def get_connections_from_machine(
             self, placement, app_edge, synapse_info):

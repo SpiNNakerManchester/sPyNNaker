@@ -17,6 +17,9 @@ from spinn_utilities.abstract_base import (
 
 
 class AbstractTimingDependence(object, metaclass=AbstractBase):
+    """
+    An STDP timing dependence rule.
+    """
 
     __slots__ = ()
 

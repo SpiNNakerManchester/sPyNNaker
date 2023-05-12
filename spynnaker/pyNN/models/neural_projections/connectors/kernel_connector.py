@@ -284,7 +284,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             # Loop over post-vertices
             for post_idx in range(
                     post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1):
-
                 # convert to common coord system
                 pac_r = post_as_pre_r[post_idx - post_lo]
                 pac_c = post_as_pre_c[post_idx - post_lo]

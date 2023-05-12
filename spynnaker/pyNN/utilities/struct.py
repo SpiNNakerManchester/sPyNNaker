@@ -222,7 +222,6 @@ class Struct(object):
 
         # Go through all values and add in generator data for each
         for data_type, name in self.__fields:
-
             # Store the writer type based on the data type
             data.append(get_generator_type(data_type))
 
@@ -290,7 +289,6 @@ class Struct(object):
                 data.append(param_generator_id(vals))
                 gen_data.append(param_generator_params(vals))
             else:
-
                 # Store where to update with the number of items and
                 # set to 0 to start
                 n_items_index = len(data)

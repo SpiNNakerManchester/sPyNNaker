@@ -29,6 +29,10 @@ from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 class DelayExtensionMachineVertex(
         MachineVertex, ProvidesProvenanceDataFromMachineImpl,
         AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification):
+    """
+    Vertex that implements a delay extension.
+    Not expected to be directly referenced in user code.
+    """
 
     __slots__ = [
         "__sdram",

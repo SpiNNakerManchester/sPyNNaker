@@ -85,9 +85,7 @@ class ExternalDeviceLifControlVertex(
         self.__message_translator = translator
 
         # Add the edges to the devices if required
-        self.__dependent_vertices = list()
-        if create_edges:
-            self.__dependent_vertices = devices
+        self.__dependent_vertices = devices if create_edges else []
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.dependent_vertices)
     def dependent_vertices(self):

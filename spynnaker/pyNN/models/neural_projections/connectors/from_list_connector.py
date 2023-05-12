@@ -163,7 +163,6 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
-
         mask = None
         delays_handled = False
         if (min_delay is not None and max_delay is not None and

@@ -68,11 +68,11 @@ class SpikeSourceFromFile(SpikeSourceArray):
             spike_list, min_idx, max_idx, tmin, tmax, tstep):
         # pylint: disable=too-many-arguments
         times = numpy.array(range(tmin, tmax, tstep))
-        spike_ids = sorted(spike_list)
         possible_neurons = range(min_idx, max_idx)
-        spike_array = dict([(neuron, times) for neuron in spike_ids
-                            if neuron in possible_neurons])
-        return spike_array
+        return {
+            neuron: times
+            for neuron in sorted(spike_list)
+            if neuron in possible_neurons}
 
     @property
     def spike_times(self):

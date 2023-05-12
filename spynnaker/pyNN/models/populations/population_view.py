@@ -643,7 +643,6 @@ class PopulationView(PopulationBase):
 
 
 class IDMixin(PopulationView):
-
     __slots__ = []
 
     def get_parameters(self):

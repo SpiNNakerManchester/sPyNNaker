@@ -503,7 +503,6 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractPlasticSynapseDynamics.get_max_synapses)
     def get_max_synapses(self, n_words):
-
         # Subtract the header size that will always exist
         n_header_words = self._n_header_bytes // BYTES_PER_WORD
         n_words_space = n_words - n_header_words

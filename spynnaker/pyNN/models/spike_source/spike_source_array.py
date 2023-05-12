@@ -18,7 +18,6 @@ from .spike_source_array_vertex import SpikeSourceArrayVertex
 
 
 class SpikeSourceArray(AbstractPyNNModel):
-
     default_population_parameters = {
         "splitter": None, "n_colour_bits": None}
 

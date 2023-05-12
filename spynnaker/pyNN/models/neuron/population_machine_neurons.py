@@ -405,7 +405,6 @@ class PopulationMachineNeurons(
         # Only do this if we actually need the data now i.e. if someone has
         # requested that the data be read before calling run
         if self._app_vertex.read_initial_values:
-
             # If we do decide to read now, we can also copy the initial values
             self._neuron_data.read_data(placement, self._neuron_regions)
             self._app_vertex.copy_initial_state_variables(self._vertex_slice)

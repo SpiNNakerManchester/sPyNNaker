@@ -391,7 +391,6 @@ def _get_row_data(
     ff_data, ff_size = None, None
     fp_data, pp_data, fp_size, pp_size = None, None, None, None
     if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics):
-
         # Get the static data
         ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
             connections, row_indices, n_rows, post_vertex_slice,
@@ -403,7 +402,6 @@ def _get_row_data(
         fp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
         pp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
     else:
-
         # Blank the static data
         ff_data = [numpy.zeros(0, dtype="uint32") for _ in row_ids]
         ff_size = [numpy.zeros(1, dtype="uint32") for _ in row_ids]

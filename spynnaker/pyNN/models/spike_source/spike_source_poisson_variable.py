@@ -22,7 +22,6 @@ DEFAULT_MAX_ATOMS_PER_CORE = 500
 
 
 class SpikeSourcePoissonVariable(AbstractPyNNModel):
-
     default_population_parameters = _population_parameters
 
     def __init__(self, rates, starts, durations=None):

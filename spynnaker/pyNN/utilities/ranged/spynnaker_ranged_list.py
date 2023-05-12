@@ -26,17 +26,15 @@ class SpynnakerRangedList(RangedList):
     @staticmethod
     @overrides(RangedList.is_list)
     def is_list(value, size):
-
         if isinstance(value, RandomDistribution):
             return True
 
-        return RangedList.is_list(value, size)
+        return super().is_list(value, size)
 
     @staticmethod
     @overrides(RangedList.as_list)
     def as_list(value, size, ids=None):
-
         if isinstance(value, RandomDistribution):
             return value.next(n=size)
 
-        return RangedList.as_list(value, size, ids)
+        return super().as_list(value, size, ids)
