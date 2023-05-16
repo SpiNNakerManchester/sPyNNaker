@@ -15,6 +15,7 @@
 import pyNN.spiNNaker as sim
 from spinn_utilities.config_holder import set_config
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 
 
 class TestConstraint(BaseTestCase):
@@ -38,9 +39,10 @@ class TestConstraint(BaseTestCase):
                        synapse_type=sim.StaticSynapse(weight=5, delay=1))
         simtime = 10
         sim.run(simtime)
-        placements = self.get_placements("pop_1")
+        placements = [SpynnakerDataView.get_placement_of_vertex(vertex)
+                      for vertex in pop_1._vertex.machine_vertices]
         sim.end()
         self.assertGreater(len(placements), 0)
-        for [x, y, _] in placements:
-            self.assertEqual("1", x)
-            self.assertEqual("1", y)
+        for pl in placements:
+            self.assertEqual(1, pl.x)
+            self.assertEqual(1, pl.y)
