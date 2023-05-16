@@ -29,6 +29,7 @@ from pacman.operations.routing_info_allocator_algorithms import (
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
+from pacman.operations.partition_algorithms import splitter_partitioner
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices,\
     SynapseRegions
@@ -49,7 +50,7 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexFixed, spynnaker_splitter_partitioner)
+    SplitterAbstractPopulationVertexFixed)
 from spynnaker.pyNN.extra_algorithms import delay_support_adder
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
@@ -119,7 +120,7 @@ def test_write_data_spec():
     for edge in d_edges:
         writer.add_edge(
             edge, constants.SPIKE_PARTITION_ID)
-    spynnaker_splitter_partitioner()
+    splitter_partitioner()
     allocator = ZonedRoutingInfoAllocator()
     writer.set_routing_infos(allocator.__call__([], flexible=False))
 
@@ -453,7 +454,7 @@ def test_pop_based_master_pop_table_standard(
     for edge in d_edges:
         writer.add_edge(
             edge, constants.SPIKE_PARTITION_ID)
-    spynnaker_splitter_partitioner()
+    splitter_partitioner()
     allocator = ZonedRoutingInfoAllocator()
     writer.set_routing_infos(allocator.__call__([], flexible=False))
 

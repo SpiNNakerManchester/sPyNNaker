@@ -23,5 +23,4 @@ def spynnaker_splitter_partitioner():
          The number of chips needed to satisfy this partitioning.
     :rtype: int
     """
-    with ReferenceContext():
-        return splitter_partitioner()
+    return splitter_partitioner()
