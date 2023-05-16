@@ -21,8 +21,6 @@ from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import (
         machine_bit_field_ordered_covering_compressor,
         machine_bit_field_pair_router_compressor)
-from spinn_front_end_common.utilities.helpful_functions import (
-    write_address_to_user1)
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -46,6 +44,7 @@ def _locate_expander_rerun_targets(bitfield_targets):
     # locate expander executable path
     expander_executable_path = SpynnakerDataView.get_executable_path(
         SYNAPSE_EXPANDER_APLX)
+    txrx = SpynnakerDataView.get_transceiver()
 
     # if any ones are going to be ran on host, ignore them from the new
     # core setup
@@ -56,7 +55,7 @@ def _locate_expander_rerun_targets(bitfield_targets):
             placement.x, placement.y, placement.p,
             executable_type=ExecutableType.SYSTEM)
         # Write the region to USER1, as that is the best we can do
-        write_address_to_user1(
+        txrx.write_user_1(
             placement.x, placement.y, placement.p,
             placement.vertex.connection_generator_region)
     return new_cores

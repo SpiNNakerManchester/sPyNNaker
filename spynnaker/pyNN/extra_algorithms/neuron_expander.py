@@ -15,13 +15,11 @@ import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_front_end_common.utilities.system_control_logic import (
-    run_system_application)
 from spinnman.model.enums import ExecutableType
-from spinn_front_end_common.utilities.helpful_functions import (
-    write_address_to_user1)
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
+from spinn_front_end_common.utilities.system_control_logic import (
+    run_system_application)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractNeuronExpandable, NEURON_EXPANDER_APLX)
@@ -59,6 +57,7 @@ def _plan_expansion():
     :rtype: tuple(ExecutableTargets, list(tuple(MachineVertex, Placement)))
     """
     neuron_bin = SpynnakerDataView.get_executable_path(NEURON_EXPANDER_APLX)
+    txrx = SpynnakerDataView.get_transceiver()
 
     expander_cores = ExecutableTargets()
     expanded_pop_vertices = list()
@@ -77,7 +76,7 @@ def _plan_expansion():
                     neuron_bin, placement.x, placement.y, placement.p,
                     executable_type=ExecutableType.SYSTEM)
                 # Write the region to USER1, as that is the best we can do
-                write_address_to_user1(
+                txrx.write_user_1(
                     placement.x, placement.y, placement.p,
                     vertex.neuron_generator_region)
 

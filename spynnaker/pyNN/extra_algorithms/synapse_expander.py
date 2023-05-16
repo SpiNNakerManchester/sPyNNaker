@@ -20,8 +20,6 @@ from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
-from spinn_front_end_common.utilities.helpful_functions import (
-    write_address_to_user1)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
@@ -70,6 +68,7 @@ def _plan_expansion():
     synapse_bin = SpynnakerDataView.get_executable_path(SYNAPSE_EXPANDER_APLX)
     expander_cores = ExecutableTargets()
     expanded_placements = list()
+    txrx = SpynnakerDataView.get_transceiver()
 
     max_data = 0
     max_bit_field = 0
@@ -86,7 +85,7 @@ def _plan_expansion():
                     executable_type=ExecutableType.SYSTEM)
                 expanded_placements.append(placement)
                 # Write the region to USER1, as that is the best we can do
-                write_address_to_user1(
+                txrx.write_user_1(
                     placement.x, placement.y, placement.p,
                     vertex.connection_generator_region)
                 max_data = max(max_data, vertex.max_gen_data)
