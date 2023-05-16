@@ -42,8 +42,19 @@ typedef struct {
 typedef struct {
     uint32_t key;
     uint32_t mask;
-    uint32_t n_colour_bits;
-} source_key_info;
+    //! The index into ::connectors for this entry
+	uint32_t start: 13;
+	//! The number of bits of key used for colour (0 if no colour)
+	uint32_t n_colour_bits: 3;
+	//! The number of entries in ::connectors for this entry
+	uint32_t count: 16;
+	//! The mask to apply to the key once shifted to get the core index
+	uint32_t core_mask: 16;
+	//! The shift to apply to the key to get the core part
+	uint32_t mask_shift: 16;
+	//! The number of neurons per core
+	uint32_t n_neurons: 16;
+} source_info;
 
 // A reciprocal of a 16-bit signed integer will have 1 sign bit, 1 integer bit
 // and 14 fractional bits to allow 1 to be properly represented
@@ -51,19 +62,21 @@ typedef struct {
 
 // Information about each dimension
 typedef struct {
-    uint32_t mask;
-    uint32_t shift;
-    uint16_t pre_start;
+	//! The size of the source in the dimension
+    uint32_t dim_size;
+    //! The values used to divide to get the dimension value from a scalar
+    uint32_t dim_m;
+    uint32_t dim_sh1: 16;
+    uint32_t dim_sh2: 16;
+    //! The start position of the dimension that maps to this core
     uint16_t pre_in_post_start;
     uint16_t pre_in_post_end;
     uint16_t pre_in_post_shape;
     uint16_t recip_pool_stride;
-    uint16_t _PADDING;
 } dimension;
 
 // One per connector
 typedef struct {
-    source_key_info key_info;
     uint32_t n_dims;
     uint32_t n_weights;
     uint16_t positive_synapse_type;
@@ -76,13 +89,15 @@ typedef struct {
 
 typedef struct {
     uint32_t n_post;
+    uint32_t n_sources;
     uint32_t n_connectors;
-    // In SDRAM, below here is the following:
+    source_info sources[];
+    // In SDRAM, below here is the following (each variable size):
     // connector connectors[n_connectors]
 } conv_config;
 
 // The main configuration data
-static conv_config config;
+static conv_config *config;
 
 // The per-connection data
 static connector** connectors;
@@ -95,17 +110,25 @@ static lc_weight_t *get_weights(connector *conn) {
 bool local_only_impl_initialise(void *address){
     log_info("+++++++++++++++++ CONV init ++++++++++++++++++++");
     conv_config* sdram_config = address;
-    config = *sdram_config;
+    uint32_t config_size = sizeof(conv_config) +
+    		(sizeof(source_info) * sdram_config->n_sources);
+    config = spin1_malloc(config_size);
+    if (config == NULL) {
+    	log_error("Can't allocate %u bytes of memory for config with %u sources",
+    			config_size, sdram_config->n_sources);
+    	return false;
+    }
+    spin1_memcpy(config, sdram_config, config_size);
 
-    log_info("num connectors = %u", config.n_connectors);
-    if (config.n_connectors == 0) {
+    log_info("num connectors = %u", config->n_connectors);
+    if (config->n_connectors == 0) {
         return false;
     }
 
-    log_info("num post = %u", config.n_post);
+    log_info("num post = %u", config->n_post);
 
     // Allocate space for connector information and pre-to-post table
-    connectors = spin1_malloc(config.n_connectors * sizeof(connectors[0]));
+    connectors = spin1_malloc(config->n_connectors * sizeof(connectors[0]));
     if (connectors == NULL) {
         log_error("Can't allocate memory for connectors");
         return false;
@@ -113,9 +136,7 @@ bool local_only_impl_initialise(void *address){
 
     // The first connector comes after the configuration in SDRAM
     connector *conn = (connector *) &sdram_config[1];
-    for (uint32_t i = 0; i < config.n_connectors; i++) {
-        log_info("Connector %u: key=0x%08x, mask=0x%08x",
-                i, conn->key_info.key, conn->key_info.mask);
+    for (uint32_t i = 0; i < config->n_connectors; i++) {
 
         uint32_t n_bytes = sizeof(*conn) + (conn->n_weights * sizeof(lc_weight_t)) +
                 (conn->n_dims * sizeof(dimension));
@@ -150,40 +171,47 @@ static inline int16_t recip_multiply(int16_t integer, int16_t recip) {
     return (int16_t) ((i * r) >> RECIP_FRACT_BITS);
 }
 
-static inline bool key_to_index_lookup(uint32_t spike, uint32_t *start, uint32_t *end) {
-    for (uint32_t i = 0; i < config.n_connectors; i++) {
-        connector *c = connectors[i];
-        if ((spike & c->key_info.mask) == c->key_info.key) {
-        	*start = i;
-			uint32_t e = i + 1;
-			while (e < config.n_connectors) {
-				connector *c_e = connectors[e];
-				if ((spike & c_e->key_info.mask) != c_e->key_info.mask) {
-					break;
-				}
-				e = e + 1;
-			}
-			*end = e;
+static inline uint32_t get_pop_neuron_id(uint32_t spike, source_info *s_info) {
+	uint32_t local_mask = ~s_info->mask | (s_info->core_mask << s_info->mask_shift);
+	uint32_t local = spike & local_mask;
+	uint32_t core_id = ((spike >> s_info->mask_shift) & s_info->core_mask);
+	uint32_t core_sum = core_id * s_info->n_neurons;
+	return (local >> s_info->n_colour_bits) + core_sum;
+}
+
+static inline uint32_t div_by_dim_size(uint32_t n, dimension *dim) {
+	uint32_t t1 = (uint32_t) (((uint64_t) n * (uint64_t) dim->dim_m) >> 32);
+	uint32_t nsubt1 = (n - t1) >> dim->dim_sh1;
+	return (t1 + nsubt1) >> dim->dim_sh2;
+}
+
+static inline bool key_to_index_lookup(uint32_t spike, uint32_t *start,
+		uint32_t *end, uint32_t *pop_neuron_id) {
+    for (uint32_t i = 0; i < config->n_sources; i++) {
+        source_info *s_info = &(config->sources[i]);
+        if ((spike & s_info->mask) == s_info->key) {
+        	*start = s_info->start;
+        	*end = s_info->start + s_info->count;
+        	// Get the population-based neuron id
+			*pop_neuron_id = get_pop_neuron_id(spike, s_info);
+			return true;
         }
     }
     return false;
 }
 
-bool get_conn_weights(uint32_t spike, uint32_t i, lc_weight_t **weights) {
+bool get_conn_weights(uint32_t pop_neuron_id, uint32_t i, lc_weight_t **weights) {
 	connector *c = connectors[i];
-	uint32_t local_spike = (spike & ~c->key_info.mask) & c->key_info.n_colour_bits;
 
 	// Now work out the index into the weights from the coordinates
 	uint32_t last_extent = 1;
 	uint32_t index = 0;
+    uint32_t remainder = pop_neuron_id;
 	for (uint32_t j = 0; j < c->n_dims; j++) {
 		dimension *dim = &c->dimensions[j];
 
-		// Get the coordinate for this dimension from the spike
-		uint32_t coord = (local_spike & dim->mask) >> dim->shift;
-
-		// Work out the position in the global space
-		coord += dim->pre_start;
+		// Get the coordinate for this dimension in the global space
+		uint32_t coord = div_by_dim_size(remainder, dim);
 
 		// Work out the position after pooling
 		coord = recip_multiply(coord, dim->recip_pool_stride);
@@ -202,7 +230,7 @@ bool get_conn_weights(uint32_t spike, uint32_t i, lc_weight_t **weights) {
 		last_extent = dim->pre_in_post_shape;
 	}
 	lc_weight_t *all_weights = get_weights(c);
-	*weights = &all_weights[index * config.n_post];
+	*weights = &all_weights[index * config->n_post];
 	return true;
 }
 
@@ -218,7 +246,8 @@ void local_only_impl_process_spike(
     // Lookup the spike, and if found, get the appropriate parts
     uint32_t start;
     uint32_t end;
-    if (!key_to_index_lookup(spike, &start, &end)) {
+    uint32_t pop_neuron_id;
+    if (!key_to_index_lookup(spike, &start, &end, &pop_neuron_id)) {
         return;
     }
 
@@ -226,11 +255,11 @@ void local_only_impl_process_spike(
     for (uint32_t i = start; i < end; i++) {
 	    connector *connector = connectors[i];
 	    lc_weight_t *weights;
-	    if (!get_conn_weights(spike, i, &weights)) {
+	    if (!get_conn_weights(pop_neuron_id, i, &weights)) {
 	    	continue;
 	    }
 
-		for (uint32_t post_index = 0; post_index < config.n_post; post_index++) {
+		for (uint32_t post_index = 0; post_index < config->n_post; post_index++) {
 
 			lc_weight_t weight = weights[post_index];
 			if (weight == 0) {

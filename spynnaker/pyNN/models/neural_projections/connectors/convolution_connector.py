@@ -16,25 +16,16 @@
 
 import numpy
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from .abstract_connector import AbstractConnector
 from collections.abc import Iterable
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 
-#: The number of 32-bit words in the source_key_info struct
-SOURCE_KEY_INFO_WORDS = 7
-
-#: The number of 16-bit shorts in the connector struct,
-#: ignoring the source_key_info struct but including the delay and the
-#: 32-bit weight index
-CONNECTOR_CONFIG_SHORTS = 16
+#: The number of 16-bit shorts in the connector struct
+CONNECTOR_CONFIG_SHORTS = 14
 
 
 class ConvolutionConnector(AbstractConnector):
@@ -380,61 +371,36 @@ class ConvolutionConnector(AbstractConnector):
 
     @property
     def parameters_n_bytes(self):
-        return (
-            (SOURCE_KEY_INFO_WORDS * BYTES_PER_WORD) +
-            (CONNECTOR_CONFIG_SHORTS * BYTES_PER_SHORT))
+        return CONNECTOR_CONFIG_SHORTS * BYTES_PER_SHORT
 
     def get_local_only_data(
-            self, app_edge, vertex_slice, key, mask, n_colour_bits,
-            delay, weight_index):
+            self, app_edge, local_delay, delay_stage, weight_index):
         # Get info about things
         kernel_shape = self.__kernel_weights.shape
         ps_x, ps_y = 1, 1
         if self.__pool_stride is not None:
             ps_x, ps_y = self.__pool_stride
 
-        # Start with source key info
-        values = [key, mask, n_colour_bits]
-
-        # Add the column and row mask and shifts to extract the column and
-        # row from the incoming spike
-        if isinstance(app_edge.pre_vertex, HasShapeKeyFields):
-            (c_start, _c_end, c_mask, c_shift), \
-                (r_start, _r_end, r_mask, r_shift) = \
-                app_edge.pre_vertex.get_shape_key_fields(vertex_slice)
-            start = (c_start, r_start)
-            values.extend([c_mask, c_shift, r_mask, r_shift])
-        else:
-            start = vertex_slice.start
-            n_bits_col = get_n_bits(vertex_slice.shape[0])
-            col_mask = (1 << n_bits_col) - 1
-            n_bits_row = get_n_bits(vertex_slice.shape[1])
-            row_mask = ((1 << n_bits_row) - 1) << n_bits_col
-            values.extend([col_mask, 0, row_mask, n_bits_col])
-
         # Do a new list for remaining connector details as uint16s
         pos_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
             self.__positive_receptor_type)
         neg_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
             self.__negative_receptor_type)
+
+        # Work out the pre-vertex position based on the delay stage
+        pre_vertex = app_edge.pre_vertex
+        first_neuron = pre_vertex.n_atoms * delay_stage
+        last_neuron = (first_neuron + pre_vertex.n_atoms) - 1
+
+        # Produce the values needed
         short_values = numpy.array([
-            start[1], start[0],
             kernel_shape[1], kernel_shape[0],
             self.__padding_shape[1], self.__padding_shape[0],
             self.__recip(self.__strides[1]), self.__recip(self.__strides[0]),
             self.__recip(ps_y), self.__recip(ps_x),
-            pos_synapse_type, neg_synapse_type], dtype="uint16")
-
-        # Work out delay
-        delay_step = (delay *
-                      SpynnakerDataView.get_simulation_time_step_per_ms())
-        local_delay = (delay_step %
-                       app_edge.post_vertex.splitter.max_support_delay())
-
-        data = [numpy.array(values, dtype="uint32"),
-                short_values.view("uint32"),
-                numpy.array([local_delay, weight_index], dtype="uint32")]
-        return data
+            pos_synapse_type, neg_synapse_type, first_neuron, last_neuron,
+            local_delay, weight_index], dtype="uint16")
+        return short_values.view("uint32")
 
     def get_encoded_kernel_weights(self, app_edge, weight_scales):
         # Encode weights with weight scaling
