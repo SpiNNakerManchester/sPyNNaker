@@ -373,7 +373,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             synapse core, and the basic label for the synapse cores
         :rtype: tuple(SynapseRegions, str)
         """
-        synapse_references = self.__synapse_references
+        synapse_references = SynapseRegions(
+            *SpynnakerDataView.get_next_ds_references(7))
         syn_label = (
             f"{label}_Synapses:{vertex_slice.lo_atom}-{vertex_slice.hi_atom}")
 
@@ -650,15 +651,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         :rtype: int
         """
         return self.__n_synapse_vertices
-
-    @property
-    def __synapse_references(self):
-        """
-        The reference identifiers for the shared synapse regions.
-
-        :rtype: SynapseRegions
-        """
-        return SynapseRegions(*SpynnakerDataView.get_next_ds_references(7))
 
     def __get_neuron_sdram(self, n_atoms, sdram_edge_sdram):
         """
