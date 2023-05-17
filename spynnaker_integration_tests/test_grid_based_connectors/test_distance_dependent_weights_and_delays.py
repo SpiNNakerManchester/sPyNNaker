@@ -47,6 +47,7 @@ def do_run(plot):
 
     # Network
     grid = create_grid(n, 'grid')
+    grid.set_max_atoms_per_core((16, 16))
 
     # SpikeInjector
     injectionConnection = [(0, 0)]

@@ -20,17 +20,13 @@ on:
 env:
   ROOT_DOC_DIR: doc/global
   C_DOC_DIR: neural_modelling/html
-  PY_DOC_DIR: doc/source/_build/html
   DEPLOY_DIR: deploy
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
       - name: Checkout
         uses: actions/checkout@v3
       - name: Checkout SupportScripts
@@ -42,31 +38,20 @@ jobs:
         run: |
           echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
           echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
-      - name: Install pip, etc
-        uses: ./support/actions/python-tools
 
       - name: Checkout SpiNNaker Dependencies
         uses: ./support/actions/install-spinn-deps
         with:
           repositories: >
-            spinnaker_tools SpiNNUtils SpiNNMachine SpiNNMan PACMAN
-            DataSpecification spalloc SpiNNFrontEndCommon TestBase
+            spinnaker_tools
           install: true
 
-      - name: Install matplotlib
-        uses: ./support/actions/install-matplotlib
       - name: Read tags
         run: make doxysetup
         working-directory: neural_modelling
-      - name: Setup
-        uses: ./support/actions/run-install
 
-      - name: Build Python Documentation
-        uses: ./support/actions/sphinx
-        with:
-          directory: doc/source
       - name: Build C documentation
-        uses: mattnotmitt/doxygen-action@v1.3.1
+        uses: mattnotmitt/doxygen-action@v1.9.5
         with:
           working-directory: neural_modelling
 
@@ -74,11 +59,9 @@ jobs:
         run: |
           cp -vaT $ROOT_DOC_DIR $DEPLOY_DIR
           cp -vaT $C_DOC_DIR $DEPLOY_DIR/c
-          cp -vaT $PY_DOC_DIR $DEPLOY_DIR/python
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
           folder: ${{ env.DEPLOY_DIR }}

@@ -65,8 +65,8 @@ class ExternalDeviceLifControlVertex(
         :param float ring_buffer_sigma:
         :param int incoming_spike_buffer_size:
         :param splitter: splitter from application vertices to machine vertices
-        :type splitter: None or
-            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+        :type splitter:
+            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
         :param int seed: The seed to use
         :param int n_colour_bits: The number of colour bits to use
         :param list min_weights: The min_weights

@@ -21,10 +21,9 @@ depend upon for a complete editable install.
 
 Documentation
 -------------
-[sPyNNaker Python documentation](http://spinnakermanchester.github.io/sPyNNaker/python/)
+[sPyNNaker Python documentation](https://spynnaker.readthedocs.io/)
 <br>
 [sPyNNaker C documentation](http://spinnakermanchester.github.io/sPyNNaker/c/)
 
-[Combined PyNN7 python documentation](http://spinnaker7manchester.readthedocs.io)
-<br>
-[Combined PyNN8 python documentation](http://spinnaker8manchester.readthedocs.io)
+[Combined PyNN8 python documentation](http://spinnakermanchester.readthedocs.io)
+

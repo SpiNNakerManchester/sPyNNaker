@@ -108,7 +108,7 @@ class SpikeSourcePoissonVertex(
         :param float max_rate:
         :param splitter:
         :type splitter:
-            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
         :param int n_colour_bits:
         """
         # pylint: disable=too-many-arguments
@@ -423,7 +423,7 @@ class SpikeSourcePoissonVertex(
     def get_neurons_recording(self, name, vertex_slice):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
-        return vertex_slice.get_raster_ids(self.atoms_shape)
+        return vertex_slice.get_raster_ids()
 
     def max_spikes_per_ts(self):
         ts_per_second = SpynnakerDataView.get_simulation_time_step_per_s()
