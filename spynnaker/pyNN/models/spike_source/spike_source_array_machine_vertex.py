@@ -13,7 +13,6 @@
 # limitations under the License.
 import numpy
 from spinn_utilities.overrides import overrides
-from pacman.utilities.utility_calls import get_field_based_keys
 from spinn_front_end_common.utility_models import (
     ReverseIPTagMulticastSourceMachineVertex)
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
@@ -37,15 +36,13 @@ class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
         end_time_step = SpynnakerDataView.get_current_run_timesteps()
         if first_time_step == end_time_step:
             return
-        keys = get_field_based_keys(
-            key_base, self._vertex_slice, self.app_vertex.n_colour_bits)
-        key_list = numpy.array(
-            [keys[atom] for atom in range(self._vertex_slice.n_atoms)])
+        keys = numpy.arange(key_base, key_base + self._vertex_slice.n_atoms)
+        keys = keys << self.app_vertex.n_colour_bits
         colour_mask = (2 ** self.app_vertex.n_colour_bits) - 1
         for tick in sorted(self._send_buffer_times):
             if self._is_in_range(tick, first_time_step, end_time_step):
                 self._send_buffer.add_keys(
-                    tick, key_list + (tick & colour_mask))
+                    tick, keys + (tick & colour_mask))
 
     @overrides(ReverseIPTagMulticastSourceMachineVertex._fill_send_buffer_2d)
     def _fill_send_buffer_2d(self, key_base):
@@ -53,8 +50,8 @@ class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
         end_time_step = SpynnakerDataView.get_current_run_timesteps()
         if first_time_step == end_time_step:
             return
-        keys = get_field_based_keys(
-            key_base, self._vertex_slice, self.app_vertex.n_colour_bits)
+        keys = numpy.arange(key_base, key_base + self._vertex_slice.n_atoms)
+        keys = keys << self.app_vertex.n_colour_bits
         colour_mask = (2 ** self.app_vertex.n_colour_bits) - 1
         for atom in range(self._vertex_slice.n_atoms):
             for tick in sorted(self._send_buffer_times[atom]):

@@ -169,31 +169,45 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             r_info, core_mask, mask_shift = self.__get_rinfo_for_source(
                 pre_vertex)
 
-            # Calculate the parameters to do 1 / source width
-            source_width = pre_vertex.atoms_shape[0]
-            log_sw = int(ceil(log2(source_width)))
-            log_m_sw = ((2 ** log_sw) - source_width) / source_width
-            source_width_m = int(floor((2 ** BYTES_PER_SHORT) * log_m_sw) + 1)
-            source_width_sh1 = min(log_sw, 1)
-            source_width_sh2 = max(log_sw - 1, 0)
+            # Get the width / height per core / last_core
+            m_vertices = list(pre_vertex.machine_vertices)
+            first_slice = m_vertices[0].vertex_slice
+            last_slice = m_vertices[-1].vertex_slice
+            width_per_core = first_slice.shape[0]
+            height_per_core = first_slice.shape[1]
+            width_on_last_core = last_slice.shape[0]
+            height_on_last_core = last_slice.shape[1]
+
+            # Get cores per width / height
+            pre_shape = list(pre_vertex.atoms_shape)
+            cores_per_width = int(ceil(pre_shape[0] / width_per_core))
+            cores_per_height = int(ceil(pre_shape[1] / height_per_core))
 
             # Add the key and mask...
             source_data.extend([r_info.key, r_info.mask])
-            # ... start connector index, n colour bits, count of connectors ...
+            # ... start connector index, n_colour_bits, count of connectors ...
             source_data.append(
-                (first_conn_index << (BITS_PER_SHORT + N_COLOUR_BITS_BITS)) +
-                (pre_vertex.n_colour_bits << BITS_PER_SHORT) +
-                len(source_infos))
+                (len(source_infos) << BITS_PER_SHORT) +
+                (pre_vertex.n_colour_bits <<
+                 (BITS_PER_SHORT - N_COLOUR_BITS_BITS)) +
+                first_conn_index)
             # ... core mask, mask shift ...
-            source_data.append((core_mask << BITS_PER_SHORT) + mask_shift)
-            # ... n neurons, source width ...
+            source_data.append((mask_shift << BITS_PER_SHORT) + core_mask)
+            # ... height / width per core ...
             source_data.append(
-                (pre_vertex.n_atoms << BITS_PER_SHORT) +
-                pre_vertex.atoms_shape[0])
-            # ... 1 / source width parameters
+                (width_per_core << BITS_PER_SHORT) + height_per_core)
+            # ... height / width last core ...
             source_data.append(
-                (source_width_m << BITS_PER_SHORT) +
-                (source_width_sh1 << BITS_PER_BYTE) + source_width_sh2)
+                (width_on_last_core << BITS_PER_SHORT) + height_on_last_core)
+            # ... cores per height / width ...
+            source_data.append(
+                (cores_per_width << BITS_PER_SHORT) + cores_per_height)
+            # ... 1 / width per core ...
+            source_data.append(self.__get_div_const(width_per_core))
+            # ... 1 / width last core ...
+            source_data.append(self.__get_div_const(width_on_last_core))
+            # ... 1 / cores_per_width
+            source_data.append(self.__get_div_const(cores_per_width))
 
         if next_weight_index % 2 != 0:
             weight_data.append(numpy.array([0], dtype="int16"))
@@ -215,10 +229,19 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         # Write the data
         # pylint: disable=unexpected-keyword-arg
-        spec.write_array(numpy.concatenate(source_data, dtype="uint32"))
+        spec.write_array(numpy.array(source_data, dtype="uint32"))
         spec.write_array(numpy.concatenate(connector_data, dtype="uint32"))
         spec.write_array(
             numpy.concatenate(weight_data, dtype="int16").view("uint32"))
+
+    def __get_div_const(self, value):
+        log_val = int(ceil(log2(value)))
+        log_m_val = ((2 ** log_val) - value) / value
+        m = int(floor((2 ** BITS_PER_SHORT) * log_m_val) + 1)
+        sh1 = min(log_val, 1)
+        sh2 = max(log_val - 1, 0)
+        return ((sh2 << (BITS_PER_SHORT + BITS_PER_BYTE))
+                + (sh1 << BITS_PER_SHORT) + m)
 
     def __get_sources_for_target(self, app_vertex):
         """

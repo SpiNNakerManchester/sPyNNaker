@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ctypes
+import numpy
 from dataclasses import dataclass
 
 from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 from spinn_utilities.overrides import overrides
 
-from pacman.utilities.utility_calls import get_field_based_keys
 
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -25,7 +25,6 @@ from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import AbstractNeuronExpandable
 from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
-from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.utilities.utility_calls import convert_to
 
 
@@ -235,18 +234,9 @@ class PopulationMachineNeurons(
             spec.write_value(data=0)
             keys = [0] * n_atoms
         else:
-            n_colour_bits = self._app_vertex.n_colour_bits
             spec.write_value(data=1)
-            # Quick and dirty way to avoid using field based keys in cases
-            # which use grids but not local-only neuron models
-            if isinstance(self._app_vertex.synapse_dynamics,
-                          AbstractLocalOnly):
-                keys = get_field_based_keys(
-                    self._key, self._vertex_slice, n_colour_bits)
-            else:
-                # keys are consecutive from the base value
-                keys = [self._key + (nn << n_colour_bits)
-                        for nn in range(n_atoms)]
+            keys = numpy.arange(self._key, self._key + n_atoms)
+            keys = keys << self._app_vertex.n_colour_bits
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)

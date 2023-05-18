@@ -80,6 +80,11 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
         return self.__partition.pre_vertex.n_atoms
 
     @property
+    @overrides(ApplicationVertex.atoms_shape)
+    def atoms_shape(self):
+        return self.__partition.pre_vertex.atoms_shape
+
+    @property
     def drop_late_spikes(self):
         """
         Whether to drop late spikes.

@@ -25,7 +25,6 @@ from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from data_specification.enums import DataType
 from pacman.model.graphs.common import MDSlice
-from pacman.utilities.utility_calls import get_field_based_index
 from spinn_front_end_common.interface.buffer_management.storage_objects \
     import BufferDatabase
 from spinn_front_end_common.utilities.constants import (
@@ -602,7 +601,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         number_of_bytes_written = len(spike_data)
         offset = 0
-        indices = get_field_based_index(base_key, vertex_slice, n_colour_bits)
+        indices = {
+            key: index for key, index in enumerate(
+                range(base_key, base_key + vertex_slice.n_atoms))}
         slice_ids = vertex_slice.get_raster_ids()
         colour_mask = (2 ** n_colour_bits) - 1
         inv_colour_mask = ~colour_mask & 0xFFFFFFFF

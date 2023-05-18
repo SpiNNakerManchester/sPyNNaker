@@ -387,19 +387,14 @@ class ConvolutionConnector(AbstractConnector):
         neg_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
             self.__negative_receptor_type)
 
-        # Work out the pre-vertex position based on the delay stage
-        pre_vertex = app_edge.pre_vertex
-        first_neuron = pre_vertex.n_atoms * delay_stage
-        last_neuron = (first_neuron + pre_vertex.n_atoms) - 1
-
         # Produce the values needed
         short_values = numpy.array([
             kernel_shape[1], kernel_shape[0],
             self.__padding_shape[1], self.__padding_shape[0],
             self.__recip(self.__strides[1]), self.__recip(self.__strides[0]),
             self.__recip(ps_y), self.__recip(ps_x),
-            pos_synapse_type, neg_synapse_type, first_neuron, last_neuron,
-            local_delay, weight_index], dtype="uint16")
+            pos_synapse_type, neg_synapse_type, delay_stage, local_delay,
+            weight_index, 0], dtype="uint16")
         return short_values.view("uint32")
 
     def get_encoded_kernel_weights(self, app_edge, weight_scales):

@@ -25,7 +25,6 @@ from spinn_front_end_common.utilities.constants import (
     SIMULATION_N_BYTES, BYTES_PER_WORD, BYTES_PER_SHORT)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
-from pacman.utilities.utility_calls import get_field_based_keys
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary,
     AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
@@ -462,8 +461,8 @@ class SpikeSourcePoissonMachineVertex(
             keys = [0] * self.vertex_slice.n_atoms
         else:
             spec.write_value(1)
-            keys = get_field_based_keys(
-                key, self.vertex_slice, self.app_vertex.n_colour_bits)
+            keys = numpy.arange(key, key + self.vertex_slice.n_atoms)
+            keys = keys << self.app_vertex.n_colour_bits
 
         # Write the incoming mask if there is one
         incoming_mask = 0

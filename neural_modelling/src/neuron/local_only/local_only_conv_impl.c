@@ -58,19 +58,21 @@ typedef struct {
     uint16_t positive_synapse_type;
     //! The index of the synapse for negative weights
     uint16_t negative_synapse_type;
-	//! The first source neuron to accept (helps with delay extensions)
-	uint16_t first_neuron;
-    //! The last source neuron to accept (helps with delay extensions)
-	uint16_t last_neuron;
+	//! The delay stage
+	uint16_t delay_stage;
 	//! The delay in time steps
     uint16_t delay;
     //! The index of the weights for the kernel
     uint16_t kernel_index;
+    //! Padding
+    uint16_t _PAD;
 } connector;
 
 typedef struct {
-
-} reciprocal;
+	uint32_t m: 16;
+	uint32_t sh1: 8;
+	uint32_t sh2: 8;
+} div_const;
 
 typedef struct {
 	//! The key to match against the incoming message
@@ -91,15 +93,20 @@ typedef struct {
 	uint32_t source_height_per_core: 16;
 	//! The source population width per core
 	uint32_t source_width_per_core: 16;
+	//! The source population height on the last core in a column
+	uint32_t source_height_last_core: 16;
+	//! The source population width on the last core on a row
+	uint32_t source_width_last_core: 16;
+	//! The number cores in a height of the source
+	uint32_t cores_per_source_height: 16;
+    //! Number of cores in a width of the source
+    uint32_t cores_per_source_width: 16;
 	//! Used to calculate division by the source width per core efficiently
-    uint32_t source_width_m: 16;
-    uint32_t source_width_sh1: 8;
-    uint32_t source_width_sh2: 8;
-    //! Number of cores in a width
-    uint32_t cores_per_source_width;
+    div_const source_width_div;
+    //! Division by last core width
+    div_const source_width_last_div;
     //! Division by cores per source width
-    uint32_t cores_per_source_m: 16;
-    uint32_t
+    div_const cores_per_width_div;
 } source_info;
 
 typedef struct {
@@ -121,6 +128,10 @@ static conv_config *config;
 static connector *connectors;
 
 static lc_weight_t *weights;
+
+static inline void log_div_const(const char *name, div_const d) {
+	log_debug("    %s=(m: %u, sh1: %u, sh2: %u)", name, d.m, d.sh1, d.sh2);
+}
 
 //! \brief Load the required data into DTCM.
 bool local_only_impl_initialise(void *address){
@@ -156,6 +167,7 @@ bool local_only_impl_initialise(void *address){
     			n_connector_bytes, config->n_connectors_total);
     	return false;
     }
+    spin1_memcpy(connectors, sdram_connectors, n_connector_bytes);
 
     // The weights come after the connectors in SDRAM
     lc_weight_t *kernel_weights =
@@ -171,8 +183,27 @@ bool local_only_impl_initialise(void *address){
 
     // Print what we have
     for (uint32_t i = 0; i < config->n_sources; i++) {
-        log_info("Source %u: key=0x%08x, mask=0x%08x",
-                i, config->sources[i].key, config->sources[i].mask);
+    	source_info *s_info = &(config->sources[i]);
+        log_debug("Source %u: key=0x%08x, mask=0x%08x, start=%u, count=%u",
+                i, s_info->key, s_info->mask, s_info->start, s_info->count);
+        log_debug("    core_mask=0x%08x, mask_shift=0x%08x",
+        		s_info->core_mask, s_info->mask_shift);
+        log_debug("    height_per_core=%u, width_per_core=%u",
+        		s_info->source_height_per_core, s_info->source_width_per_core);
+        log_debug("    height_last_core=%u, width_last_core=%u",
+        		s_info->source_height_last_core, s_info->source_width_last_core);
+        log_debug("    cores_per_height=%u, cores_per_width=%u",
+        		s_info->cores_per_source_height, s_info->cores_per_source_width);
+        log_div_const("source_width_div", s_info->source_width_div);
+        log_div_const("source_width_last_div", s_info->source_width_last_div);
+        log_div_const("cores_per_width_div", s_info->cores_per_width_div);
+    }
+
+    for (uint32_t i = 0; i < config->n_connectors_total; i++) {
+    	connector *conn = &(connectors[i]);
+    	log_debug("Connector %u: kernel size=%u, %u", i, conn->kernel.width,
+    			conn->kernel.height);
+    	log_debug("    delay=%u, delay_stage=%u", conn->delay, conn->delay_stage);
     }
 
     return true;
@@ -264,38 +295,45 @@ static inline void do_convolution_operation(
     }
 }
 
+static inline uint32_t div_by_const(uint32_t i, div_const d) {
+	uint t1 = (i * d.m) >> 16;
+	uint isubt1 = (i - t1) >> d.sh1;
+	return (t1 + isubt1) >> d.sh2;
+}
+
 static inline uint32_t get_core_id(uint32_t spike, source_info *s_info) {
 	return ((spike >> s_info->mask_shift) & s_info->core_mask);
 }
 
 static inline uint32_t get_core_row(uint32_t core_id, source_info *s_info) {
-	return core_id * s_info->source_width;
+	return div_by_const(core_id, s_info->cores_per_width_div);
+}
+
+static inline uint32_t get_core_col(uint32_t core_id, uint32_t core_row,
+		source_info *s_info) {
+	return core_id - (core_row * s_info->cores_per_source_width);
+}
+
+static inline bool is_last_core_on_row(uint32_t core_col, source_info *s_info) {
+	return core_col == (uint32_t) (s_info->cores_per_source_width - 1);
+}
+
+static inline bool is_last_core_in_col(uint32_t core_row, source_info *s_info) {
+	return core_row == (uint32_t) (s_info->cores_per_source_height - 1);
 }
 
 static inline uint32_t get_local_id(uint32_t spike, source_info *s_info) {
-	uint32_t local_mask = ~s_info->mask | (s_info->core_mask << s_info->mask_shift);
+	uint32_t local_mask = ~(s_info->mask | (s_info->core_mask << s_info->mask_shift));
     uint32_t local = spike & local_mask;
     return local >> s_info->n_colour_bits;
 }
 
-static inline uint32_t div_by_width(uint32_t n, source_info *s_info) {
-	uint32_t t1 = (n * s_info->source_width_m) >> 16;
-	uint32_t nsubt1 = (n - t1) >> s_info->source_width_sh1;
-	return (t1 + nsubt1) >> s_info->source_width_sh2;
-}
-
-static inline bool key_to_index_lookup(uint32_t spike, uint32_t *start_index,
-		uint32_t *end_index, uint32_t *local_id, source_info **rs_info) {
+static inline bool key_to_index_lookup(uint32_t spike, source_info **rs_info) {
     for (uint32_t i = 0; i < config->n_sources; i++) {
         source_info *s_info = &(config->sources[i]);
         // We have a match on key
         if ((spike & s_info->mask) == s_info->key) {
         	*rs_info = s_info;
-        	// Use the info in the source to note where to start and end
-        	*start_index = s_info->start;
-        	*end_index = s_info->start + s_info->count;
-        	// Get the population-based neuron id
-        	*pop_neuron_id = get_pop_neuron_id(spike, s_info);
         	return true;
         }
     }
@@ -312,38 +350,66 @@ void local_only_impl_process_spike(
         uint32_t time, uint32_t spike, uint16_t* ring_buffers) {
 
     // Lookup the spike, and if found, get the appropriate parts
-    uint32_t start;
-    uint32_t end;
-    uint32_t pop_neuron_id;
     source_info *s_info;
-    if (!key_to_index_lookup(spike, &start, &end, &pop_neuron_id, &s_info)) {
-    	log_warning("Spike %u didn't match any connectors!", spike);
+    if (!key_to_index_lookup(spike, &s_info)) {
+    	log_debug("Spike %x didn't match any connectors!", spike);
         return;
     }
-    log_debug("Received spike %u using connectors between %u and %u",
-    		spike, start, end);
+
+    uint32_t core_id = get_core_id(spike, s_info);
+    uint32_t core_row = get_core_row(core_id, s_info);
+    uint32_t core_col = get_core_col(core_id, core_row, s_info);
+    bool last_core_on_row = is_last_core_on_row(core_col, s_info);
+    bool last_core_in_col = is_last_core_in_col(core_row, s_info);
+    uint32_t source_height = 0;
+    uint32_t source_width = 0;
+    div_const source_width_d;
+    if (last_core_on_row) {
+    	source_width = s_info->source_width_last_core;
+    	source_width_d = s_info->source_width_last_div;
+    } else {
+    	source_width = s_info->source_width_per_core;
+    	source_width_d = s_info->source_width_div;
+    }
+    if (last_core_in_col) {
+    	source_height = s_info->source_height_last_core;
+    } else {
+    	source_height = s_info->source_height_per_core;
+    }
+    uint32_t local_id = get_local_id(spike, s_info);
+    uint32_t neurons_per_core = source_width * source_height;
+
+    log_debug("Spike %x, on core %u (%u, %u), is last (%u, %u), local %u",
+    		spike, core_id, core_col, core_row, last_core_on_row, last_core_in_col,
+			local_id);
 
     // compute the population-based coordinates
-    for (uint32_t i = start; i < end; i++) {
+    uint32_t end = s_info->start + s_info->count;
+    for (uint32_t i = s_info->start; i < end; i++) {
 		connector *connector = &(connectors[i]);
 
-    	// We are ignoring the neuron because the delay does not match
-    	if (pop_neuron_id < connector->first_neuron
-    			|| pop_neuron_id > connector->last_neuron) {
+    	// Ignore the neuron if the delay does not match
+		uint32_t first_neuron = neurons_per_core * connector->delay_stage;
+		uint32_t last_neuron = first_neuron + neurons_per_core;
+		log_debug("Connector %u, delay stage = %u, first = %u, last = %u",
+				i, connector->delay_stage, first_neuron, last_neuron);
+    	if (local_id < first_neuron	|| local_id >= last_neuron) {
     		continue;
     	}
 
-    	uint32_t local_pop_neuron_id = pop_neuron_id - connector->first_neuron;
-
-    	// Calculate the source x and y by dividing by source width
-    	uint32_t y = div_by_width(local_pop_neuron_id, s_info);
+    	uint32_t local_neuron_id = local_id - first_neuron;
+    	uint32_t local_row = div_by_const(local_neuron_id, source_width_d);
+    	uint32_t local_col = local_neuron_id - (local_row * source_width);
 
     	lc_coord_t pre_coord = {
     	    // The x-coordinate is the remainder of the "division"
-    	    .col = pop_neuron_id - (y * s_info->source_width),
+    	    .col = (core_col * s_info->source_width_per_core) + local_col,
     	    // The y-coordinate is the integer part of the "division".
-    	    .row = y
+    	    .row = (core_row * s_info->source_height_per_core) + local_row
     	};
+
+    	log_debug("Local coord = %u, %u, Pre coord = %u, %u",
+    			local_col, local_row, pre_coord.col, pre_coord.col);
 
 		// Compute the convolution
 		do_convolution_operation(time, pre_coord, connector, ring_buffers);
