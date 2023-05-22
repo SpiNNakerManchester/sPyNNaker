@@ -15,14 +15,16 @@
 # limitations under the License.
 
 import numpy
+from collections.abc import Iterable
+from pyNN.random import RandomDistribution
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
-from pyNN.random import RandomDistribution
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from .abstract_connector import AbstractConnector
-from collections.abc import Iterable
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.models.common.local_only_2d_common import (
+    get_div_const)
+from .abstract_connector import AbstractConnector
 
 #: The number of 16-bit shorts in the connector struct
 CONNECTOR_CONFIG_SHORTS = 14
@@ -391,11 +393,12 @@ class ConvolutionConnector(AbstractConnector):
         short_values = numpy.array([
             kernel_shape[1], kernel_shape[0],
             self.__padding_shape[1], self.__padding_shape[0],
-            self.__recip(self.__strides[1]), self.__recip(self.__strides[0]),
-            self.__recip(ps_y), self.__recip(ps_x),
             pos_synapse_type, neg_synapse_type, delay_stage, local_delay,
             weight_index, 0], dtype="uint16")
-        return short_values.view("uint32")
+        long_values = numpy.array([
+            get_div_const(self.__strides[1]), get_div_const(self.__strides[0]),
+            get_div_const(ps_y), get_div_const(ps_x)], dtype="uint32")
+        return numpy.concatenate((short_values.view("uint32"), long_values))
 
     def get_encoded_kernel_weights(self, app_edge, weight_scales):
         # Encode weights with weight scaling
@@ -411,10 +414,3 @@ class ConvolutionConnector(AbstractConnector):
         kernel_weights = numpy.round(encoded_kernel_weights).astype(
             numpy.int16)
         return kernel_weights
-
-    def __recip(self, v):
-        """
-        Compute the reciprocal of a number as an signed 1-bit integer,
-        14-bit fractional fixed point number, encoded in an integer.
-        """
-        return int(round((1 / v) * (1 << 14)))

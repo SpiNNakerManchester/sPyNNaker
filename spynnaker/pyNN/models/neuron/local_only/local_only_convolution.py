@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy
-from math import ceil, log2, floor
-from collections import namedtuple, defaultdict
+from math import ceil
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
@@ -24,24 +23,17 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     ConvolutionConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.models.common.local_only_2d_common import (
+    get_div_const, get_rinfo_for_source, get_sources_for_target,
+    BITS_PER_SHORT)
 from .abstract_local_only import AbstractLocalOnly
 
-Source = namedtuple(
-    "Source", ["projection", "local_delay", "delay_stage"])
 
 #: Number of shorts in the conv_config struct
 CONV_CONFIG_N_SHORTS = 6
 
 #: Number of words in the conv_config struct
 CONV_CONFIG_N_WORDS = 2
-
-#: The number of bits in a short value
-BITS_PER_SHORT = 16
-
-#: The number of bits in a byte value
-BITS_PER_BYTE = 8
 
 #: The number of bits to represent n_colour_bits
 N_COLOUR_BITS_BITS = 3
@@ -166,7 +158,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     weight_index))
 
             # Get the source routing information
-            r_info, core_mask, mask_shift = self.__get_rinfo_for_source(
+            r_info, core_mask, mask_shift = get_rinfo_for_source(
                 pre_vertex)
 
             # Get the width / height per core / last_core
@@ -203,11 +195,11 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             source_data.append(
                 (cores_per_width << BITS_PER_SHORT) + cores_per_height)
             # ... 1 / width per core ...
-            source_data.append(self.__get_div_const(width_per_core))
+            source_data.append(get_div_const(width_per_core))
             # ... 1 / width last core ...
-            source_data.append(self.__get_div_const(width_on_last_core))
+            source_data.append(get_div_const(width_on_last_core))
             # ... 1 / cores_per_width
-            source_data.append(self.__get_div_const(cores_per_width))
+            source_data.append(get_div_const(cores_per_width))
 
         if next_weight_index % 2 != 0:
             weight_data.append(numpy.array([0], dtype="int16"))
@@ -234,15 +226,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.write_array(
             numpy.concatenate(weight_data, dtype="int16").view("uint32"))
 
-    def __get_div_const(self, value):
-        log_val = int(ceil(log2(value)))
-        log_m_val = ((2 ** log_val) - value) / value
-        m = int(floor((2 ** BITS_PER_SHORT) * log_m_val) + 1)
-        sh1 = min(log_val, 1)
-        sh2 = max(log_val - 1, 0)
-        return ((sh2 << (BITS_PER_SHORT + BITS_PER_BYTE))
-                + (sh1 << BITS_PER_SHORT) + m)
-
     def __get_sources_for_target(self, app_vertex):
         """
         Get all the application vertex sources that will hit the given
@@ -255,48 +238,9 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         """
         sources = self.__cached_sources.get(app_vertex)
         if sources is None:
-            sources = defaultdict(list)
-            for incoming in app_vertex.incoming_projections:
-                pre_vertex, local_delay, delay_stage = \
-                    self.__get_delay_for_source(incoming)
-                source = Source(incoming, local_delay, delay_stage)
-                sources[pre_vertex].append(source)
+            sources = get_sources_for_target(app_vertex)
             self.__cached_sources[app_vertex] = sources
         return sources
-
-    def __get_delay_for_source(self, incoming):
-        # pylint: disable=protected-access
-        app_edge = incoming._projection_edge
-        delay = incoming._synapse_information.synapse_dynamics.delay
-        steps = delay * SpynnakerDataView.get_simulation_time_step_per_ms()
-        max_delay = app_edge.post_vertex.splitter.max_support_delay()
-        local_delay = steps % max_delay
-        delay_stage = 0
-        pre_vertex = app_edge.pre_vertex
-        if steps > max_delay:
-            delay_stage = (steps // max_delay) - 1
-            pre_vertex = app_edge.delay_edge.pre_vertex
-        return pre_vertex, local_delay, delay_stage
-
-    def __get_rinfo_for_source(self, pre_vertex):
-        """
-        Get the routing information for the source of a projection.
-
-        :param ApplicationVertex pre_vertex: The source of incoming data
-        :return: Routing information, core mask, core mask shift
-        :rtype: AppVertexRoutingInfo, int, int
-        """
-        routing_info = SpynnakerDataView.get_routing_infos()
-
-        # Find the routing information
-        r_info = routing_info.get_routing_info_from_pre_vertex(
-                pre_vertex, SPIKE_PARTITION_ID)
-
-        mask_shift = r_info.n_bits_atoms
-        core_mask = (2 ** get_n_bits(
-            len(r_info.vertex.splitter.get_out_going_vertices(
-                SPIKE_PARTITION_ID)))) - 1
-        return r_info, core_mask, mask_shift
 
     @property
     @overrides(AbstractLocalOnly.delay)

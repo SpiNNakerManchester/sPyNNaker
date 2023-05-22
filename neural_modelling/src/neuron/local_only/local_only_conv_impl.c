@@ -18,31 +18,12 @@
 //! \file DTCM-only convolutional processing implementation
 
 #include "local_only_impl.h"
+#include "local_only_2d_common.h"
 #include <stdlib.h>
 #include <debug.h>
 #include <stdfix-full-iso.h>
 #include "../population_table/population_table.h"
 #include "../neuron.h"
-
-typedef int16_t lc_weight_t;
-
-// Dimensions are needed to be signed due to mapping from pre- to post-synaptic.
-typedef int16_t lc_dim_t;
-
-// Reduce the number of parameters with the following structs
-typedef struct {
-    lc_dim_t row;
-    lc_dim_t col;
-} lc_coord_t;
-
-typedef struct {
-    lc_dim_t height;
-    lc_dim_t width;
-} lc_shape_t;
-
-// A reciprocal of a 16-bit signed integer will have 1 sign bit, 1 integer bit
-// and 14 fractional bits to allow 1 to be properly represented
-#define RECIP_FRACT_BITS 14
 
 // One per connector
 typedef struct {
@@ -50,10 +31,6 @@ typedef struct {
     lc_shape_t kernel;
     //! The shape of the padding
     lc_shape_t padding;
-    //! 1 / shape of stride
-    lc_coord_t recip_strides;
-    //! 1 / shape of pooling stride
-    lc_coord_t recip_pool_strides;
     //! The index of the synapse for positive weights
     uint16_t positive_synapse_type;
     //! The index of the synapse for negative weights
@@ -66,29 +43,19 @@ typedef struct {
     uint16_t kernel_index;
     //! Padding
     uint16_t _PAD;
+    //! 1 / stride height
+    div_const stride_height_div;
+    //! 1 / stride width;
+    div_const stride_width_div;
+    //! 1 / pooling stride height
+    div_const pool_stride_height_div;
+    //! 1 / pooling stride width
+    div_const pool_stride_width_div;
 } connector;
 
 typedef struct {
-	uint32_t m: 16;
-	uint32_t sh1: 8;
-	uint32_t sh2: 8;
-} div_const;
-
-typedef struct {
-	//! The key to match against the incoming message
-	uint32_t key;
-	//! The mask to select the relevant bits of \p key for matching
-	uint32_t mask;
-	//! The index into ::connectors for this entry
-	uint32_t start: 13;
-	//! The number of bits of key used for colour (0 if no colour)
-	uint32_t n_colour_bits: 3;
-	//! The number of entries in ::connectors for this entry
-	uint32_t count: 16;
-	//! The mask to apply to the key once shifted to get the core index
-	uint32_t core_mask: 16;
-	//! The shift to apply to the key to get the core part
-	uint32_t mask_shift: 16;
+	//! Information about the key
+	key_info key_info;
 	//! The source population height per core
 	uint32_t source_height_per_core: 16;
 	//! The source population width per core
@@ -185,9 +152,10 @@ bool local_only_impl_initialise(void *address){
     for (uint32_t i = 0; i < config->n_sources; i++) {
     	source_info *s_info = &(config->sources[i]);
         log_debug("Source %u: key=0x%08x, mask=0x%08x, start=%u, count=%u",
-                i, s_info->key, s_info->mask, s_info->start, s_info->count);
+                i, s_info->key_info.key, s_info->key_info.mask,
+				s_info->key_info.start, s_info->key_info.count);
         log_debug("    core_mask=0x%08x, mask_shift=0x%08x",
-        		s_info->core_mask, s_info->mask_shift);
+        		s_info->key_info.core_mask, s_info->key_info.mask_shift);
         log_debug("    height_per_core=%u, width_per_core=%u",
         		s_info->source_height_per_core, s_info->source_width_per_core);
         log_debug("    height_last_core=%u, width_last_core=%u",
@@ -209,14 +177,6 @@ bool local_only_impl_initialise(void *address){
     return true;
 }
 
-//! \brief Multiply an integer by a 16-bit reciprocal and return the floored
-//!        integer result
-static inline int16_t recip_multiply(int16_t integer, int16_t recip) {
-    int32_t i = integer;
-    int32_t r = recip;
-    return (int16_t) ((i * r) >> RECIP_FRACT_BITS);
-}
-
 //! \brief Do a mapping from pre to post 2D spaces, we use the standard
 //! padding, kernel, strides from Convolutional Neural Networks
 //! because of the way we're looping through the kernel, we divide the kernel
@@ -224,12 +184,12 @@ static inline int16_t recip_multiply(int16_t integer, int16_t recip) {
 static inline lc_coord_t map_pre_to_post(connector *connector, lc_coord_t pre,
         int16_t half_kh, int16_t half_kw) {
     lc_coord_t post = pre;
-    post.col = recip_multiply(post.col, connector->recip_pool_strides.col);
-    post.row = recip_multiply(post.row, connector->recip_pool_strides.row);
-    post.col = post.col - half_kw + connector->padding.width;
+    post.row = div_by_const(post.row, connector->pool_stride_height_div);
+    post.col = div_by_const(post.col, connector->pool_stride_width_div);
     post.row = post.row - half_kh + connector->padding.height;
-    post.col = recip_multiply(post.col, connector->recip_strides.col);
-    post.row = recip_multiply(post.row, connector->recip_strides.row);
+    post.col = post.col - half_kw + connector->padding.width;
+    post.row = div_by_const(post.row, connector->stride_height_div);
+    post.col = div_by_const(post.col, connector->stride_width_div);
     return post;
 }
 
@@ -295,16 +255,6 @@ static inline void do_convolution_operation(
     }
 }
 
-static inline uint32_t div_by_const(uint32_t i, div_const d) {
-	uint t1 = (i * d.m) >> 16;
-	uint isubt1 = (i - t1) >> d.sh1;
-	return (t1 + isubt1) >> d.sh2;
-}
-
-static inline uint32_t get_core_id(uint32_t spike, source_info *s_info) {
-	return ((spike >> s_info->mask_shift) & s_info->core_mask);
-}
-
 static inline uint32_t get_core_row(uint32_t core_id, source_info *s_info) {
 	return div_by_const(core_id, s_info->cores_per_width_div);
 }
@@ -322,17 +272,11 @@ static inline bool is_last_core_in_col(uint32_t core_row, source_info *s_info) {
 	return core_row == (uint32_t) (s_info->cores_per_source_height - 1);
 }
 
-static inline uint32_t get_local_id(uint32_t spike, source_info *s_info) {
-	uint32_t local_mask = ~(s_info->mask | (s_info->core_mask << s_info->mask_shift));
-    uint32_t local = spike & local_mask;
-    return local >> s_info->n_colour_bits;
-}
-
 static inline bool key_to_index_lookup(uint32_t spike, source_info **rs_info) {
     for (uint32_t i = 0; i < config->n_sources; i++) {
         source_info *s_info = &(config->sources[i]);
         // We have a match on key
-        if ((spike & s_info->mask) == s_info->key) {
+        if ((spike & s_info->key_info.mask) == s_info->key_info.key) {
         	*rs_info = s_info;
         	return true;
         }
@@ -356,7 +300,7 @@ void local_only_impl_process_spike(
         return;
     }
 
-    uint32_t core_id = get_core_id(spike, s_info);
+    uint32_t core_id = get_core_id(spike, s_info->key_info);
     uint32_t core_row = get_core_row(core_id, s_info);
     uint32_t core_col = get_core_col(core_id, core_row, s_info);
     bool last_core_on_row = is_last_core_on_row(core_col, s_info);
@@ -376,7 +320,7 @@ void local_only_impl_process_spike(
     } else {
     	source_height = s_info->source_height_per_core;
     }
-    uint32_t local_id = get_local_id(spike, s_info);
+    uint32_t local_id = get_local_id(spike, s_info->key_info);
     uint32_t neurons_per_core = source_width * source_height;
 
     log_debug("Spike %x, on core %u (%u, %u), is last (%u, %u), local %u",
@@ -384,8 +328,8 @@ void local_only_impl_process_spike(
 			local_id);
 
     // compute the population-based coordinates
-    uint32_t end = s_info->start + s_info->count;
-    for (uint32_t i = s_info->start; i < end; i++) {
+    uint32_t end = s_info->key_info.start + s_info->key_info.count;
+    for (uint32_t i = s_info->key_info.start; i < end; i++) {
 		connector *connector = &(connectors[i]);
 
     	// Ignore the neuron if the delay does not match
