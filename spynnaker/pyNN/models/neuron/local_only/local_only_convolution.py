@@ -25,18 +25,15 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
 from spynnaker.pyNN.models.common.local_only_2d_common import (
     get_div_const, get_rinfo_for_source, get_sources_for_target,
-    BITS_PER_SHORT)
+    BITS_PER_SHORT, N_COLOUR_BITS_BITS, KEY_INFO_SIZE)
 from .abstract_local_only import AbstractLocalOnly
 
 
-#: Number of shorts in the conv_config struct
-CONV_CONFIG_N_SHORTS = 6
+#: Size of convolution config main bytes
+CONV_CONFIG_SIZE = (6 * BYTES_PER_SHORT) + (4 * BYTES_PER_WORD)
 
-#: Number of words in the conv_config struct
-CONV_CONFIG_N_WORDS = 2
-
-#: The number of bits to represent n_colour_bits
-N_COLOUR_BITS_BITS = 3
+#: Size of source information
+SOURCE_INFO_SIZE = KEY_INFO_SIZE + (6 * BYTES_PER_WORD)
 
 
 class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
@@ -46,7 +43,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     __slots__ = [
         "__cached_sources",
-        "__cached_n_incoming"
         "__delay"
     ]
 
@@ -57,9 +53,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         """
         # Store the sources to avoid recalculation
         self.__cached_sources = dict()
-
-        # Store the n_incoming to avoid recalcaultion
-        self.__cached_n_incoming = dict()
 
         self.__delay = delay
         if delay is None:
@@ -90,6 +83,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, n_atoms, incoming_projections):
         n_bytes = 0
         kernel_bytes = 0
+        connectors_seen = set()
+        edges_seen = set()
         for incoming in incoming_projections:
             # pylint: disable=protected-access
             s_info = incoming._synapse_information
@@ -99,22 +94,18 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     " of Convolution")
             # pylint: disable=protected-access
             app_edge = incoming._projection_edge
-
-            if app_edge in self.__cached_n_incoming:
-                n_incoming = self.__cached_n_incoming[app_edge]
-            else:
-                n_incoming = s_info.connector.get_max_n_incoming_slices(
-                    app_edge.pre_vertex, app_edge.post_vertex)
-                self.__cached_n_incoming[app_edge] = n_incoming
-            n_bytes += s_info.connector.parameters_n_bytes * n_incoming
-            kernel_bytes += s_info.connector.kernel_n_bytes
+            if app_edge not in edges_seen:
+                edges_seen.add(app_edge)
+                n_bytes += SOURCE_INFO_SIZE
+            if s_info.connector not in connectors_seen:
+                connectors_seen.add(s_info.connector)
+                kernel_bytes += s_info.connector.kernel_n_bytes
+            n_bytes += s_info.connector.parameters_n_bytes
 
         if kernel_bytes % BYTES_PER_WORD != 0:
             kernel_bytes += BYTES_PER_SHORT
 
-        return ((CONV_CONFIG_N_SHORTS * BYTES_PER_SHORT) +
-                (CONV_CONFIG_N_WORDS * BYTES_PER_WORD) + n_bytes +
-                kernel_bytes)
+        return CONV_CONFIG_SIZE + n_bytes + kernel_bytes
 
     @overrides(AbstractLocalOnly.write_parameters)
     def write_parameters(self, spec, region, machine_vertex, weight_scales):

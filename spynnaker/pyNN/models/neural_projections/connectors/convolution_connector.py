@@ -18,16 +18,16 @@ import numpy
 from collections.abc import Iterable
 from pyNN.random import RandomDistribution
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_SHORT, BYTES_PER_WORD)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spynnaker.pyNN.models.common.local_only_2d_common import (
-    get_div_const)
+from spynnaker.pyNN.models.common.local_only_2d_common import get_div_const
 from .abstract_connector import AbstractConnector
 
-#: The number of 16-bit shorts in the connector struct
-CONNECTOR_CONFIG_SHORTS = 14
+#: The size of the connector struct in bytes
+CONNECTOR_CONFIG_SIZE = (10 * BYTES_PER_SHORT) + (4 * BYTES_PER_WORD)
 
 
 class ConvolutionConnector(AbstractConnector):
@@ -209,8 +209,7 @@ class ConvolutionConnector(AbstractConnector):
         """
         shape = numpy.array(shape)
         if self.__pool_shape is not None:
-            post_pool_shape = shape - (self.__pool_shape - 1)
-            shape = (post_pool_shape // self.__pool_stride) + 1
+            shape = shape // self.__pool_stride
 
         kernel_shape = numpy.array(self.__kernel_weights.shape)
         post_shape = (shape - (kernel_shape - 1) +
@@ -312,39 +311,6 @@ class ConvolutionConnector(AbstractConnector):
 
         return connected
 
-    def get_max_n_incoming_slices(self, source_vertex, target_vertex):
-        pre_slices = list(source_vertex.splitter.get_out_going_slices())
-        pre_slices_x = [vtx_slice.get_slice(0) for vtx_slice in pre_slices]
-        pre_slices_y = [vtx_slice.get_slice(1) for vtx_slice in pre_slices]
-        pre_ranges = [[[px.start, py.start], [px.stop - 1, py.stop - 1]]
-                      for px, py in zip(pre_slices_x, pre_slices_y)]
-        pres_as_posts = self.__pre_as_post(pre_ranges)
-        hlf_k_w, hlf_k_h = numpy.array(self.__kernel_weights.shape) // 2
-
-        max_connected = 0
-        for post_slice in target_vertex.splitter.get_in_coming_slices():
-            post_slice_x = post_slice.get_slice(0)
-            post_slice_y = post_slice.get_slice(1)
-
-            # Get ranges allowed in post
-            min_x = post_slice_x.start - hlf_k_w
-            max_x = (post_slice_x.stop + hlf_k_w) - 1
-            min_y = post_slice_y.start - hlf_k_h
-            max_y = (post_slice_y.stop + hlf_k_h) - 1
-
-            # Test that the start coords are in range i.e. less than max
-            start_in_range = numpy.logical_not(
-                numpy.any(pres_as_posts[:, 0] > [max_x, max_y], axis=1))
-            # Test that the end coords are in range i.e. more than min
-            end_in_range = numpy.logical_not(
-                numpy.any(pres_as_posts[:, 1] < [min_x, min_y], axis=1))
-            # When both things are true, we have a vertex in range
-            pre_in_range = numpy.logical_and(start_in_range, end_in_range)
-            n_connected = pre_in_range.sum()
-            max_connected = max(max_connected, n_connected)
-
-        return max_connected
-
     def __pre_as_post(self, pre_coords):
         """
         Write pre-population coordinates as post-population coordinates.
@@ -373,7 +339,7 @@ class ConvolutionConnector(AbstractConnector):
 
     @property
     def parameters_n_bytes(self):
-        return CONNECTOR_CONFIG_SHORTS * BYTES_PER_SHORT
+        return CONNECTOR_CONFIG_SIZE
 
     def get_local_only_data(
             self, app_edge, local_delay, delay_stage, weight_index):

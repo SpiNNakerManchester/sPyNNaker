@@ -27,16 +27,22 @@
 typedef struct {
 	//! The size of the source in the dimension
 	uint32_t size_per_core;
+	//! The cumulative size per core to be divided by to get this dimension
+	uint32_t cum_size_per_core;
 	//! The values used to divide to get the dimension value from a scalar
-	div_const size_per_core_div;
+	div_const cum_size_per_core_div;
 	//! The number of cores in the full population in this dimension
 	uint32_t cores;
+	//! The cumulative cores to divide by to get this dimension
+	uint32_t cum_cores;
 	//! Division by cores per dim
-	div_const cores_div;
+	div_const cum_cores_div;
 	//! The size of the last core in the dimension
 	uint32_t size_last_core;
+	//! The cumulative size on the last core to divide by to get this dimension
+	uint32_t cum_size_last_core;
 	//! The division by the dimension on the last core
-	div_const size_last_core_div;
+	div_const cum_size_last_core_div;
 	//! The start position of the dimension that maps to this core
 } source_dim;
 
@@ -78,7 +84,7 @@ static source_info **source_infos;
 static connector** connectors;
 
 static inline lc_weight_t *get_weights(connector *conn) {
-    return (lc_weight_t *) &conn->pool_stride_div[conn->n_dims];
+    return (lc_weight_t *) &(conn->pool_stride_div[conn->n_dims]);
 }
 
 //! \brief Load the required data into DTCM.
@@ -149,10 +155,32 @@ bool local_only_impl_initialise(void *address){
         // after the last dimension!
         lc_weight_t* weights = get_weights(conn);
         uint32_t n_weights = connectors[i]->n_weights;
+
         if (n_weights & 0x1) {
         	n_weights += 1;
         }
         conn = (connector *) &weights[n_weights];
+    }
+
+    for (uint s = 0; s < config->n_sources; s++) {
+    	uint32_t start = source_infos[s]->key_info.start;
+    	uint32_t end = source_infos[s]->key_info.count + start;
+    	log_info("Source %u: Key = 0x%08x, Mask = 0x%08x, %u Dimensions",
+    			s, source_infos[s]->key_info.key, source_infos[s]->key_info.mask,
+				source_infos[s]->n_dims);
+    	for (uint32_t d = 0; d < source_infos[s]->n_dims; d++) {
+    		log_info("    Dim %u, core size=%u, cores per size=%u, last core=%u",
+    				d, source_infos[s]->source_dim[d].size_per_core,
+					source_infos[s]->source_dim[d].cores,
+					source_infos[s]->source_dim[d].size_last_core);
+    	}
+    	for (uint32_t c = start; c < end; c++) {
+    		log_info("    Connector %u, %u dims, %u weights, +synapse %u, -synapse %u,"
+    				" delay_stage %u, delay %u",
+    				c, connectors[c]->n_dims, connectors[c]->n_weights,
+					connectors[c]->positive_synapse_type, connectors[c]->negative_synapse_type,
+					connectors[c]->delay_stage, connectors[c]->delay);
+    	}
     }
 
     return true;
@@ -199,8 +227,9 @@ static bool get_conn_weights(connector *c, source_info *s_info, uint32_t local_i
 		// Add into the final index
 		index += (coord * last_extent);
 
-		// Remember the shape from this dimension to pass to the next
-		last_extent = sizes[j];
+		// Remember the full stride size from this dimension to pass to the next
+		last_extent = ((s_dim->cores - 1) * s_dim->size_per_core) + s_dim->size_last_core;
+		last_extent = div_by_const(last_extent, stride_div);
 	}
 	lc_weight_t *all_weights = get_weights(c);
 	*weights = &all_weights[index * config->n_post];
@@ -225,25 +254,27 @@ void local_only_impl_process_spike(
 	// Work out the local coordinate for this source
     uint32_t core_id = get_core_id(spike, s_info->key_info);
     uint32_t local_id = get_local_id(spike, s_info->key_info);
-	uint32_t sizes[s_info->n_dims];
-	uint32_t core_coords[s_info->n_dims];
-	div_const divs[s_info->n_dims];
+	uint32_t n_dims = s_info->n_dims;
+	uint32_t sizes[n_dims];
+	uint32_t core_coords[n_dims];
+	div_const divs[n_dims];
 	uint32_t neurons_per_core = 1;
 	uint32_t core_remainder = core_id;
-	for (uint32_t j = 0; j < s_info->n_dims; j++) {
+	for (uint32_t j = 0; j < n_dims; j++) {
 		source_dim *s_dim = &s_info->source_dim[j];
 		// Get the core coordinates for this dimension in the global space
-		core_coords[j] = div_by_const(core_remainder, s_dim->cores_div);
+		core_coords[j] = div_by_const(core_remainder, s_dim->cum_cores_div);
 		bool is_last_core = core_coords[j] == (s_dim->cores - 1);
-		core_remainder -= core_coords[j] * s_dim->cores;
+		core_remainder -= core_coords[j] * s_dim->cum_cores;
 		if (is_last_core) {
-			sizes[j] = s_dim->size_last_core;
-			divs[j] = s_dim->size_last_core_div;
+			neurons_per_core *= s_dim->size_last_core;
+			sizes[j] = s_dim->cum_size_last_core;
+			divs[j] = s_dim->cum_size_last_core_div;
 		} else {
-			sizes[j] = s_dim->size_per_core;
-			divs[j] = s_dim->size_per_core_div;
+			neurons_per_core *= s_dim->size_per_core;
+			sizes[j] = s_dim->cum_size_per_core;
+			divs[j] = s_dim->cum_size_per_core_div;
 		}
-		neurons_per_core *= sizes[j];
     }
 
     // Go through the weights and process them into the ring buffers

@@ -26,11 +26,8 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.common.local_only_2d_common import get_div_const
 
 
-_DIMENSION_SIZE = (2 * BYTES_PER_WORD) + (6 * BYTES_PER_SHORT)
-_KEY_INFO_SIZE = 3 * BYTES_PER_WORD
-_CONN_SIZE = _KEY_INFO_SIZE + (3 * BYTES_PER_WORD) + (2 * BYTES_PER_SHORT)
-_DIM_DTYPE = [("pre_in_post_start", "uint16"), ("pre_in_post_end", "uint16"),
-              ("pre_in_post_shape", "uint16"), ("recip_pool_stride", "uint16")]
+_DIMENSION_SIZE = BYTES_PER_WORD
+_CONN_SIZE = (6 * BYTES_PER_SHORT)
 
 
 class PoolDenseConnector(AbstractConnector):
@@ -124,7 +121,7 @@ class PoolDenseConnector(AbstractConnector):
 
     def __decode_weights(self, pre_shape, post_shape, post_vertex_slice):
         if isinstance(self.__weights, (int, float)):
-            n_weights = self.__get_n_sub_weights(
+            n_weights = self.__get_n_weights(
                 pre_shape, post_vertex_slice.n_atoms)
             return numpy.full(n_weights, self.__weights, dtype="float64")
         elif isinstance(self.__weights, Iterable):
@@ -137,7 +134,7 @@ class PoolDenseConnector(AbstractConnector):
             post_slices = post_vertex_slice.dimension
             return all_weights[pip_slices + post_slices].flatten()
         elif isinstance(self.__weights, RandomDistribution):
-            n_weights = self.__get_n_sub_weights(
+            n_weights = self.__get_n_weights(
                 pre_shape, post_vertex_slice.n_atoms)
             return numpy.array(self.__weights.next(n_weights), dtype="float64")
         else:
@@ -167,8 +164,7 @@ class PoolDenseConnector(AbstractConnector):
             pool_stride = pool_shape
         shape = numpy.array(pre_shape)
         if pool_shape is not None:
-            post_pool_shape = shape - (pool_shape - 1)
-            shape = (post_pool_shape // pool_stride) + 1
+            shape = shape // pool_stride
         return shape
 
     def __get_pre_in_post_shape(self, pre_shape):
@@ -181,11 +177,6 @@ class PoolDenseConnector(AbstractConnector):
         """
         shape = self.__get_pre_in_post_shape(pre_shape)
         return numpy.prod(shape) * numpy.prod(post_shape)
-
-    def __get_n_sub_weights(self, pre_shape, n_post_atoms):
-        pre_in_post_end = self.__pre_as_post(pre_shape)
-        return (numpy.prod(pre_in_post_end) *
-                n_post_atoms)
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(self, application_edge, synapse_info):
@@ -248,33 +239,18 @@ class PoolDenseConnector(AbstractConnector):
         return super(PoolDenseConnector, self)._get_weight_maximum(
             self.__weights, n_conns, synapse_info)
 
-    def __pre_as_post(self, pre_coords):
+    def local_only_n_bytes(self, pre_shape, n_post_atoms):
         """
-        Map pre coordinates to post coordinates.
-
-        :param ~collections.abc.Iterable pre_coords:
-            An iterable of (x, y) coordinates
-        :rtype: ~numpy.ndarray
-        """
-        coords = numpy.array(pre_coords)
-        if self.__pool_stride is not None:
-            coords //= self.__pool_stride
-        return coords
-
-    def local_only_n_bytes(self, incoming_slices, n_post_atoms):
-        """
-        :param iterable(~pacman.model.graphs.common.Slice) incoming_slices:
+        :param tuple(int) pre_shape:
         :param int n_post_atoms:
         :rtype: int
         """
-        n_weights = [self.__get_n_sub_weights(s, n_post_atoms)
-                     for s in incoming_slices]
-        n_weights = [n + 1 if n % 2 != 0 else n for n in n_weights]
-        n_dims = [len(s.shape) for s in incoming_slices]
+        n_weights = self.__get_n_weights(pre_shape, n_post_atoms)
+        n_weights = n_weights + 1 if n_weights % 2 != 0 else n_weights
+        n_dims = len(pre_shape)
 
-        return ((sum(n_dims) * _DIMENSION_SIZE) +
-                (sum(n_weights) * BYTES_PER_SHORT) +
-                (len(incoming_slices) * _CONN_SIZE))
+        return ((n_dims * _DIMENSION_SIZE) + (n_weights * BYTES_PER_SHORT) +
+                _CONN_SIZE)
 
     def get_local_only_data(
             self, app_edge, local_delay, delay_stage, post_vertex_slice,
@@ -292,7 +268,7 @@ class PoolDenseConnector(AbstractConnector):
 
         # Write numbers of things
         n_dims = len(app_edge.pre_vertex.atoms_shape)
-        n_weights = self.__get_n_sub_weights(
+        n_weights = self.__get_n_weights(
             app_edge.pre_vertex.atoms_shape, post_vertex_slice.n_atoms)
 
         # Write synapse information
@@ -336,10 +312,3 @@ class PoolDenseConnector(AbstractConnector):
         all_data.append(numpy.round(weights).astype(numpy.int16).view(
             numpy.uint32))
         return numpy.concatenate(all_data)
-
-    def __recip(self, v):
-        """
-        Compute the reciprocal of a number as an signed 1-bit integer,
-        14-bit fractional fixed point number, encoded in an integer.
-        """
-        return int(round((1 / v) * (1 << 14)))
