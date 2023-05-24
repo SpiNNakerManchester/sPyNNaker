@@ -235,7 +235,7 @@ class PopulationMachineNeurons(
             keys = [0] * n_atoms
         else:
             spec.write_value(data=1)
-            keys = get_field_based_keys(
+            keys = get_keys(
                 self._key, self._vertex_slice, self._app_vertex.n_colour_bits)
 
         # Write the number of neurons in the block:
