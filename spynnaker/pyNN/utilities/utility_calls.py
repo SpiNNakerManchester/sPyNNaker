@@ -441,11 +441,12 @@ def get_time_to_write_us(n_bytes, n_cores):
 
 
 def get_neo_io(file_or_folder):
-    _, suffix = os.path.splitext(file_or_folder)
-    if len(suffix) > 0:
+    try:
+        return neo.get_io(file_or_folder)
+    except ValueError as ex:
+        # As neo.get_io only works with existinf files
+        _, suffix = os.path.splitext(file_or_folder)
         suffix = suffix[1:].lower()
         if suffix in neo.io_by_extension:
             writer_list = neo.io_by_extension[suffix]
             return writer_list[0](file_or_folder)
-
-    return neo.get_io()
