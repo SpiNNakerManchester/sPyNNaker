@@ -608,7 +608,6 @@ class PopulationView(PopulationBase):
                 return
             io = get_neo_io(io)
 
-
         data = self.__recorder.extract_neo_block(
             variables, self.__indexes, clear, annotations)
 
