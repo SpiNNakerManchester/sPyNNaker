@@ -11,10 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import numpy
 from spinn_utilities.overrides import overrides
 from spinn_utilities.helpful_functions import is_singleton
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.utilities.utility_calls import get_keys
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import HasCustomAtomKeyMap
 
@@ -406,6 +406,5 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         if base_key is None:
             base_key = 0
         vertex_slice = pre_vertex.vertex_slice
-        keys = numpy.arange(base_key, base_key + vertex_slice.n_atoms)
-        keys = keys << self.n_colour_bits
+        get_keys(base_key, vertex_slice, self.n_colour_bits)
         return enumerate(keys, vertex_slice.lo_atom)

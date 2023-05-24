@@ -19,7 +19,6 @@ from pacman.utilities.constants import BITS_IN_KEY
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SPIF_INPUT_FPGA_LINKS,
@@ -31,7 +30,7 @@ from .spif_devices import (
 
 class SPIFRetinaDevice(
         Application2DFPGAVertex, PopulationApplicationVertex,
-        AbstractSendMeMulticastCommandsVertex, HasShapeKeyFields):
+        AbstractSendMeMulticastCommandsVertex):
     """
     A retina device connected to SpiNNaker using a SPIF board.
     """
@@ -291,10 +290,6 @@ class SPIFRetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self):
         return []
-
-    @overrides(HasShapeKeyFields.get_shape_key_fields)
-    def get_shape_key_fields(self, vertex_slice):
-        return self._key_fields
 
     @overrides(PopulationApplicationVertex.get_atom_key_map)
     def get_atom_key_map(self, pre_vertex, partition_id, routing_info):

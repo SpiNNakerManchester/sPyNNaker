@@ -30,7 +30,7 @@ from data_specification.enums.data_type import DataType
 from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import MultiRegionSDRAM
-from pacman.utilities.utility_calls import get_n_bits_for_fields, get_n_bits
+from pacman.utilities.utility_calls import get_n_bits
 from spinn_front_end_common.abstract_models import (
     AbstractCanReset)
 from spinn_front_end_common.utilities.constants import (
@@ -1513,10 +1513,7 @@ class AbstractPopulationVertex(
         """
         :rtype: int
         """
-        field_sizes = [
-            min(max_atoms, n) for max_atoms, n in zip(
-                self.get_max_atoms_per_dimension_per_core(), self.atoms_shape)]
-        return get_n_bits_for_fields(field_sizes)
+        return get_n_bits(self.n_atoms)
 
 
 class _Stats(object):
