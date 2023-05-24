@@ -603,7 +603,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         number_of_bytes_written = len(spike_data)
         offset = 0
         indices = {
-            key: index for key, index in enumerate(
+            key: index for index, key in enumerate(
                 get_keys(base_key, vertex_slice, n_colour_bits))}
         slice_ids = vertex_slice.get_raster_ids()
         colour_mask = (2 ** n_colour_bits) - 1
