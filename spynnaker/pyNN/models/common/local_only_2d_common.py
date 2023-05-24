@@ -13,13 +13,13 @@
 # limitations under the License.
 from math import ceil, log2, floor
 from collections import namedtuple, defaultdict
+from pacman.model.graphs.application import ApplicationVirtualVertex
+from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.common.mdslice import MDSlice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-from pacman.model.graphs.application.application_virtual_vertex import ApplicationVirtualVertex
-from pacman.model.graphs.common.slice import Slice
-from pacman.model.graphs.common.mdslice import MDSlice
 
 #: The number of bits in a short value
 BITS_PER_SHORT = 16
