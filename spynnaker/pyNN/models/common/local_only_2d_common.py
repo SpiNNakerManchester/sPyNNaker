@@ -87,10 +87,13 @@ def get_rinfo_for_source(pre_vertex):
     r_info = routing_info.get_routing_info_from_pre_vertex(
             pre_vertex, SPIKE_PARTITION_ID)
 
+    n_cores = len(r_info.vertex.splitter.get_out_going_vertices(
+            SPIKE_PARTITION_ID))
+    if n_cores == 1:
+        return r_info, 0, 0
+
     mask_shift = r_info.n_bits_atoms
-    core_mask = (2 ** get_n_bits(
-        len(r_info.vertex.splitter.get_out_going_vertices(
-            SPIKE_PARTITION_ID)))) - 1
+    core_mask = (2 ** get_n_bits(n_cores)) - 1
     return r_info, core_mask, mask_shift
 
 
