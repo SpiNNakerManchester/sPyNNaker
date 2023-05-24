@@ -1513,7 +1513,7 @@ class AbstractPopulationVertex(
         """
         :rtype: int
         """
-        return get_n_bits(self.n_atoms)
+        return get_n_bits(min(self.n_atoms, self.get_max_atoms_per_core()))
 
 
 class _Stats(object):

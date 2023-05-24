@@ -17,6 +17,9 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from pacman.model.graphs.application.application_virtual_vertex import ApplicationVirtualVertex
+from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.common.mdslice import MDSlice
 
 #: The number of bits in a short value
 BITS_PER_SHORT = 16
@@ -89,7 +92,10 @@ def get_rinfo_for_source(pre_vertex):
 
     n_cores = len(r_info.vertex.splitter.get_out_going_vertices(
             SPIKE_PARTITION_ID))
-    if n_cores == 1:
+
+    # If there is 1 core, we don't use the core mask
+    # If there is a virtual vertex, these also don't use core masks
+    if n_cores == 1 or isinstance(pre_vertex, ApplicationVirtualVertex):
         return r_info, 0, 0
 
     mask_shift = r_info.n_bits_atoms
@@ -114,3 +120,23 @@ def get_sources_for_target(app_vertex):
         source = Source(incoming, local_delay, delay_stage)
         sources[pre_vertex].append(source)
     return sources
+
+
+def get_first_and_last_slice(pre_vertex):
+    """
+    Get the first and last slice of an application vertex.
+
+    :param ApplicationVertex pre_vertex: The source vertex
+    :rtype: tuple(Slice, Slice) or tuple(MDSlice, MDSlice)
+    """
+    if isinstance(pre_vertex, ApplicationVirtualVertex):
+        if len(pre_vertex.atoms_shape) == 1:
+            full_slice = Slice(0, pre_vertex.n_atoms - 1)
+            return full_slice, full_slice
+        atoms_shape = pre_vertex.atoms_shape
+        full_slice = MDSlice(
+            0, pre_vertex.n_atoms - 1, atoms_shape, (0 for _ in atoms_shape),
+            atoms_shape)
+        return full_slice, full_slice
+    m_vertices = list(pre_vertex.machine_vertices)
+    return m_vertices[0].vertex_slice, m_vertices[-1].vertex_slice

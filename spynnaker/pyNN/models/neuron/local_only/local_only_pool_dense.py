@@ -24,7 +24,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
 from spynnaker.pyNN.models.common.local_only_2d_common import (
     get_sources_for_target, get_rinfo_for_source, BITS_PER_SHORT,
-    get_div_const, N_COLOUR_BITS_BITS, KEY_INFO_SIZE)
+    get_div_const, N_COLOUR_BITS_BITS, KEY_INFO_SIZE, get_first_and_last_slice)
 from .abstract_local_only import AbstractLocalOnly
 
 #: Size of the source information
@@ -132,9 +132,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
                 pre_vertex)
 
             # Get the width / height per core / last_core
-            m_vertices = list(pre_vertex.machine_vertices)
-            first_slice = m_vertices[0].vertex_slice
-            last_slice = m_vertices[-1].vertex_slice
+            first_slice, last_slice = get_first_and_last_slice(pre_vertex)
             n_dims = len(pre_vertex.atoms_shape)
             pre_shape = list(pre_vertex.atoms_shape)
 

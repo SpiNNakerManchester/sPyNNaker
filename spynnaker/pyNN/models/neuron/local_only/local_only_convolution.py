@@ -25,7 +25,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
 from spynnaker.pyNN.models.common.local_only_2d_common import (
     get_div_const, get_rinfo_for_source, get_sources_for_target,
-    BITS_PER_SHORT, N_COLOUR_BITS_BITS, KEY_INFO_SIZE)
+    BITS_PER_SHORT, N_COLOUR_BITS_BITS, KEY_INFO_SIZE,
+    get_first_and_last_slice)
 from .abstract_local_only import AbstractLocalOnly
 
 
@@ -153,9 +154,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                 pre_vertex)
 
             # Get the width / height per core / last_core
-            m_vertices = list(pre_vertex.machine_vertices)
-            first_slice = m_vertices[0].vertex_slice
-            last_slice = m_vertices[-1].vertex_slice
+            first_slice, last_slice = get_first_and_last_slice(pre_vertex)
             width_per_core = first_slice.shape[0]
             height_per_core = first_slice.shape[1]
             width_on_last_core = last_slice.shape[0]

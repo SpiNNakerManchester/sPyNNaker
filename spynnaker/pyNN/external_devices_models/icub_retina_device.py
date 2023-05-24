@@ -11,15 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from math import ceil, log2
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import Application2DSpiNNakerLinkVertex
-from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.utilities.constants import BITS_IN_KEY
+from pacman.utilities.utility_calls import is_power_of_2
 
 
-class ICUBRetinaDevice(
-        Application2DSpiNNakerLinkVertex, HasShapeKeyFields):
+class ICUBRetinaDevice(Application2DSpiNNakerLinkVertex):
     """
     An ICUB retina device connected to SpiNNaker using a SpiNNakerLink.
     """
@@ -47,6 +47,11 @@ class ICUBRetinaDevice(
             or `None` for the first board
         :type board_address: str or None
         """
+        # Fake the width if not a power of 2, as we need this for the sake
+        # of passing on to other 2D vertices
+        if not is_power_of_2(width):
+            width = 2 ** int(ceil(log2(width)))
+
         # Call the super
         super().__init__(
             width, height, sub_width, sub_height, spinnaker_link_id,
@@ -74,10 +79,6 @@ class ICUBRetinaDevice(
         n_key_bits = BITS_IN_KEY - self._key_shift
         key_mask = ((1 << n_key_bits) - 1) << self._key_shift
         return BaseKeyAndMask(self.__base_key << self._key_shift, key_mask)
-
-    @overrides(HasShapeKeyFields.get_shape_key_fields)
-    def get_shape_key_fields(self, vertex_slice):
-        return self._key_fields
 
     @property
     def _source_x_mask(self):

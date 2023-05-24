@@ -97,11 +97,11 @@ def do_run():
     # Set the number of neurons per core to a rectangle
     # (creates 512 neurons per core)
     p.set_number_of_neurons_per_core(p.IF_curr_exp, (SUB_WIDTH, SUB_HEIGHT))
-
-    dev = p.Population(None, p.external_devices.SPIFRetinaDevice(
+    spif_dev = p.external_devices.SPIFRetinaDevice(
             pipe=0, width=WIDTH, height=HEIGHT, sub_width=SUB_WIDTH,
             sub_height=SUB_HEIGHT, input_x_shift=X_SHIFT,
-            input_y_shift=Y_SHIFT))
+            input_y_shift=Y_SHIFT)
+    dev = p.Population(None, spif_dev)
 
     # Make a kernel and convolution connector
     k_shape = numpy.array([5, 5], dtype='int32')
@@ -110,7 +110,7 @@ def do_run():
     conn = p.ConvolutionConnector(kernel)
 
     # Start with an input shape, and deduce the output shape
-    in_shape = (WIDTH, HEIGHT)
+    in_shape = (spif_dev.width, spif_dev.height)
     out_shape = conn.get_post_shape(in_shape)
 
     # Make a 2D target Population and record it

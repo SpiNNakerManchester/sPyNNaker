@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from math import log2, ceil
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     Application2DFPGAVertex, FPGAConnection)
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.constants import BITS_IN_KEY
+from pacman.utilities.utility_calls import is_power_of_2
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -106,6 +108,11 @@ class SPIFRetinaDevice(
         if pipe >= N_PIPES:
             raise ConfigurationException(
                 f"Pipe {pipe} is bigger than maximum allowed {N_PIPES}")
+
+        # Fake the width if not a power of 2, as we need this for the sake
+        # of passing on to other 2D vertices
+        if not is_power_of_2(width):
+            width = 2 ** int(ceil(log2(width)))
 
         # Call the super
         super().__init__(
@@ -231,11 +238,11 @@ class SPIFRetinaDevice(
             set_field_mask(self.__pipe, 0, self.__input_x_mask),
             set_field_shift(self.__pipe, 0, self.__input_x_shift),
             set_field_limit(self.__pipe, 0,
-                            (self._width - 1) << self._source_x_shift),
+                            (self.width - 1) << self._source_x_shift),
             set_field_mask(self.__pipe, 1, self.__input_y_mask),
             set_field_shift(self.__pipe, 1, self.__input_y_shift),
             set_field_limit(self.__pipe, 1,
-                            (self._height - 1) << self._source_y_shift),
+                            (self.height - 1) << self._source_y_shift),
             # These are unused but set them to be sure
             set_field_mask(self.__pipe, 2, 0),
             set_field_shift(self.__pipe, 2, 0),
@@ -297,8 +304,8 @@ class SPIFRetinaDevice(
         x_start, y_start = pre_vertex.vertex_slice.start
         key_and_mask = self.get_machine_fixed_key_and_mask(
             pre_vertex, partition_id)
-        x_end = x_start + self._sub_width
-        y_end = y_start + self._sub_height
+        x_end = x_start + self.sub_width
+        y_end = y_start + self.sub_height
         key_x = (key_and_mask.key >> self._source_x_shift) & self.X_MASK
         key_y = (key_and_mask.key >> self._source_y_shift) & self.Y_MASK
         neuron_id = (pre_vertex.vertex_slice.lo_atom +
