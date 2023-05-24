@@ -441,13 +441,24 @@ def get_time_to_write_us(n_bytes, n_cores):
 
 
 def get_neo_io(file_or_folder):
+    """
+    Hack for https://github.com/NeuralEnsemble/python-neo/issues/1287
+
+    In Neo 0.12 neo.get_io only works with existing files
+
+    :param str file_or_folder:
+    """
     try:
         return neo.get_io(file_or_folder)
     except ValueError as ex:
-        # As neo.get_io only works with existing files
-        _, suffix = os.path.splitext(file_or_folder)
-        suffix = suffix[1:].lower()
-        if suffix in neo.io_by_extension:
-            writer_list = neo.io_by_extension[suffix]
-            return writer_list[0](file_or_folder)
+        try:
+            _, suffix = os.path.splitext(file_or_folder)
+            suffix = suffix[1:].lower()
+            # pylint: disable=no-member
+            if suffix in neo.io_by_extension:
+                writer_list = neo.io_by_extension[suffix]
+                return writer_list[0](file_or_folder)
+        except AttributeError:
+            # for older neo which has no io_by_extension
+            pass
         raise ex
