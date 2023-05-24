@@ -17,8 +17,8 @@ from collections import namedtuple
 
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.utility_calls import allocator_bits_needed
+from pacman.model.graphs.application import ApplicationVirtualVertex
 from data_specification.enums.data_type import DataType
-
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.master_pop_table import (
@@ -366,26 +366,31 @@ class SynapticMatrices(object):
         spec.write_array(self.__bit_field_key_map)
 
     def __get_app_key_and_mask(
-            self, r_info, n_stages, max_atoms_per_core, n_colour_bits):
+            self, r_info, n_stages, pre_vertex):
         """
         Get a key and mask for an incoming application vertex as a whole.
 
         :param RoutingInfo r_info: The routing information for the vertex
         :param int n_stages: The number of delay stages
-        :param int max_atoms_per_core: The max atoms per core
-        :param int n_colour_bits: The number of colour bits sent
+        :param ApplicationVertex pre_vertex:
         :rtype: AppKeyInfo
         """
-        # Find the part that is just for the core
-        mask_size = r_info.n_bits_atoms
-        core_mask = (2 ** allocator_bits_needed(
-            len(r_info.vertex.splitter.get_out_going_vertices(
-                SPIKE_PARTITION_ID)))) - 1
-        pre = r_info.vertex
-        n_atoms = min(max_atoms_per_core, pre.n_atoms)
+        if isinstance(pre_vertex, ApplicationVirtualVertex):
+            mask_size = 0
+            core_mask = 0
+            n_atoms = 0
+        else:
+            # Find the part that is just for the core
+            mask_size = r_info.n_bits_atoms
+            core_mask = (2 ** allocator_bits_needed(
+                len(r_info.vertex.splitter.get_out_going_vertices(
+                    SPIKE_PARTITION_ID)))) - 1
+            n_atoms = min(pre_vertex.get_max_atoms_per_core(),
+                          pre_vertex.n_atoms)
 
-        return AppKeyInfo(r_info.key, r_info.mask, core_mask,
-                          mask_size, n_atoms * n_stages, n_colour_bits)
+        return AppKeyInfo(
+            r_info.key, r_info.mask, core_mask,
+            mask_size, n_atoms * n_stages, pre_vertex.n_colour_bits)
 
     def __app_key_and_mask(self, app_edge):
         """
@@ -399,9 +404,7 @@ class SynapticMatrices(object):
             app_edge.pre_vertex, SPIKE_PARTITION_ID)
         if r_info is None:
             return None
-        return self.__get_app_key_and_mask(
-            r_info, 1, app_edge.pre_vertex.get_max_atoms_per_core(),
-            app_edge.pre_vertex.n_colour_bits)
+        return self.__get_app_key_and_mask(r_info, 1, app_edge.pre_vertex)
 
     def __delay_app_key_and_mask(self, app_edge):
         """
@@ -421,9 +424,7 @@ class SynapticMatrices(object):
         # We use the app_edge pre-vertex max atoms here as the delay vertex
         # is split according to this
         return self.__get_app_key_and_mask(
-            r_info, app_edge.n_delay_stages,
-            app_edge.pre_vertex.get_max_atoms_per_core(),
-            app_edge.pre_vertex.n_colour_bits)
+            r_info, app_edge.n_delay_stages, app_edge.pre_vertex)
 
     def get_connections_from_machine(self, placement, app_edge, synapse_info):
         """
