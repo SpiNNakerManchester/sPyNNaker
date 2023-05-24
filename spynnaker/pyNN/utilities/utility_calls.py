@@ -444,7 +444,7 @@ def get_neo_io(file_or_folder):
     try:
         return neo.get_io(file_or_folder)
     except ValueError as ex:
-        # As neo.get_io only works with existinf files
+        # As neo.get_io only works with existing files
         _, suffix = os.path.splitext(file_or_folder)
         suffix = suffix[1:].lower()
         if suffix in neo.io_by_extension:
