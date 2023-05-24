@@ -18,6 +18,7 @@ Utility package containing simple helper functions.
 import logging
 import os
 import math
+import neo
 import numpy
 from math import isnan
 from pyNN.random import RandomDistribution
@@ -437,3 +438,16 @@ def get_time_to_write_us(n_bytes, n_cores):
     bandwidth_per_core = WRITE_BANDWIDTH_BYTES_PER_SECOND / n_cores
     seconds = n_bytes / bandwidth_per_core
     return int(math.ceil(seconds * MICRO_TO_SECOND_CONVERSION))
+
+
+def get_neo_io(file_or_folder):
+    try:
+        return neo.get_io(file_or_folder)
+    except ValueError as ex:
+        # As neo.get_io only works with existinf files
+        _, suffix = os.path.splitext(file_or_folder)
+        suffix = suffix[1:].lower()
+        if suffix in neo.io_by_extension:
+            writer_list = neo.io_by_extension[suffix]
+            return writer_list[0](file_or_folder)
+

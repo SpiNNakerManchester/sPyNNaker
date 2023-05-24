@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import logging
-import neo
 import numpy
 import os
 from spinn_utilities.log import FormatAdapter
@@ -24,6 +23,7 @@ from spinn_utilities.ranged.abstract_sized import AbstractSized
 from .population_base import PopulationBase
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -606,7 +606,8 @@ class PopulationView(PopulationBase):
                     io, variables, view_indexes=self.__indexes,
                     annotations=annotations)
                 return
-            io = neo.get_io(io)
+            io = get_neo_io(io)
+
 
         data = self.__recorder.extract_neo_block(
             variables, self.__indexes, clear, annotations)

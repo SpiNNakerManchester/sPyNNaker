@@ -13,13 +13,13 @@
 # limitations under the License.
 
 import logging
-import neo
 import numpy
 from spinn_utilities.ranged.abstract_sized import AbstractSized
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 
 logger = FormatAdapter(logging.getLogger(__file__))
 _SELECTIVE_RECORDED_MSG = (
@@ -52,11 +52,10 @@ class DataPopulation(object):
         if clear:
             logger.warning("Ignoring clear as supported in this mode")
         if isinstance(io, str):
-            io = neo.get_io(io)
-
+            io = get_neo_io(io)
         data = self.get_data(variables)
         # write the neo block to the file
-        io.write(data)
+        io.write(bl=data)
 
     @overrides(Population.describe)
     def describe(self, template=None, engine=None):
