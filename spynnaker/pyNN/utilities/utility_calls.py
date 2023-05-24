@@ -450,3 +450,4 @@ def get_neo_io(file_or_folder):
         if suffix in neo.io_by_extension:
             writer_list = neo.io_by_extension[suffix]
             return writer_list[0](file_or_folder)
+        raise ex
