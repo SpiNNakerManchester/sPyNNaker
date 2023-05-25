@@ -146,6 +146,9 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         sort_indices = numpy.argsort(post_indices)
 
         # Split the sort order in to groups of connection indices
+        a = numpy.cumsum(index_count)
+        b = numpy.split(sort_indices, numpy.cumsum(index_count))
+        c = numpy.array(numpy.split(sort_indices, numpy.cumsum(index_count)))
         split_indices = numpy.array(numpy.split(
             sort_indices, numpy.cumsum(index_count)))[:-1]
 
