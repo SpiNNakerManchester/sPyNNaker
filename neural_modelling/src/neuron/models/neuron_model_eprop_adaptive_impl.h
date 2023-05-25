@@ -27,7 +27,7 @@
 static bool printed_value = false;
 extern REAL learning_signal;
 extern uint32_t time; // this is probably unnecessary
-extern uint32_t syn_dynamics_neurons_in_partition;
+extern uint32_t neuron_impl_neurons_in_partition;
 
 typedef struct eprop_syn_state_t {
 	REAL delta_w; // weight change to apply
@@ -99,7 +99,6 @@ struct neuron_params_t {
     eprop_syn_state_t syn_state[SYNAPSES_PER_NEURON];
 };
 
-
 //! eprop neuron state
 struct neuron_t {
     // membrane voltage [mV]
@@ -162,8 +161,7 @@ struct neuron_t {
     eprop_syn_state_t syn_state[SYNAPSES_PER_NEURON];
 };
 
-
-// TODO: use the threshold type for this instead
+// TODO: Can we use the threshold type for this instead?
 static inline void threshold_type_update_threshold(state_t z,
 		neuron_t *threshold_type){
 
@@ -203,9 +201,9 @@ static inline void neuron_model_initialise(
 	state->V_reset = params->V_reset;
 	state->T_refract = lif_ceil_accum(kdivk(params->T_refract_ms, ts));
 
-//	log_info("V_membrane %k V_rest %k R_membrane %k exp_TC %k I_offset %k refract_timer %k V_reset %k T_refract_ms %k T_refract %d",
-//			state->V_membrane, state->V_rest, state->R_membrane, state->exp_TC, state->I_offset,
-//			state->refract_timer, state->V_reset, params->T_refract_ms, state->T_refract);
+	log_info("V_membrane %k V_rest %k R_membrane %k exp_TC %k I_offset %k refract_timer %k V_reset %k T_refract_ms %k T_refract %d",
+			state->V_membrane, state->V_rest, state->R_membrane, state->exp_TC, state->I_offset,
+			state->refract_timer, state->V_reset, params->T_refract_ms, state->T_refract);
 
 	// for everything else just copy across for now
 	state->z = params->z;
@@ -214,25 +212,26 @@ static inline void neuron_model_initialise(
 	state->B = params->B;
 	state->b = params->b;
 	state->b_0 = params->b_0;
-	state->e_to_dt_on_tau_a = expk(-kdivk(ts, params->tau_a));
+	REAL exp_tau_a = expk(-kdivk(ts, params->tau_a));
+	state->e_to_dt_on_tau_a = (UFRACT) exp_tau_a;
 	state->beta = params->beta;
-	state->adpt = 1 - expk(-kdivk(ts, params->tau_a));
+	state->adpt = (UFRACT) (1.0k - exp_tau_a);
 	state->scalar = params->scalar;
 	state->L = params->L;
 	state->w_fb = params->w_fb;
 	state->window_size = params->window_size;
 	state->number_of_cues = params->number_of_cues;
 
-//	log_info("Check: z %k A %k psi %k B %k b %k b_0 %k window_size %u",
-//			state->z, state->A, state->psi, state->B, state->b, state->b_0, state->window_size);
+	log_info("Check: z %k A %k psi %k B %k b %k b_0 %k window_size %u",
+			state->z, state->A, state->psi, state->B, state->b, state->b_0, state->window_size);
 
 	state->core_pop_rate = params->pop_rate;
 	state->core_target_rate = params->target_rate;
 	state->rate_exp_TC = expk(-kdivk(ts, params->tau_err));
 	state->eta = params->eta;
 
-//	log_info("Check: core_pop_rate %k core_target_rate %k rate_exp_TC %k eta %k",
-//			state->core_pop_rate, state->core_target_rate, state->rate_exp_TC, state->eta);
+	log_info("Check: core_pop_rate %k core_target_rate %k rate_exp_TC %k eta %k",
+			state->core_pop_rate, state->core_target_rate, state->rate_exp_TC, state->eta);
 
 	for (uint32_t n_syn = 0; n_syn < SYNAPSES_PER_NEURON; n_syn++) {
 		state->syn_state[n_syn] = params->syn_state[n_syn];
@@ -265,20 +264,20 @@ static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *par
 }
 
 // simple Leaky I&F ODE
-static inline void lif_neuron_closed_form(
+static inline void lif_eprop_neuron_closed_form(
         neuron_t *neuron, REAL V_prev, input_t input_this_timestep,
 		REAL B_t) {
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
 
     // update membrane voltage
     neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev))
-    		- neuron->z * B_t; // this line achieves reset (?)
+    		- neuron->z * B_t; // this line achieves reset (Comment not needed?)
 }
 
 state_t neuron_model_state_update(
 		uint16_t num_excitatory_inputs, input_t* exc_input,
 		uint16_t num_inhibitory_inputs, input_t* inh_input,
-		input_t external_bias, REAL current_offset, neuron_t *restrict neuron,  // this has a *restrict on it in LIF?
+		input_t external_bias, REAL current_offset, neuron_t *restrict neuron,
 		REAL B_t) {
 
 	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
@@ -288,13 +287,13 @@ state_t neuron_model_state_update(
     input_t input_this_timestep =
     		exc_input[0] + exc_input[1] + neuron->I_offset + external_bias + current_offset;
 
-    lif_neuron_closed_form(
+    lif_eprop_neuron_closed_form(
             neuron, neuron->V_membrane, input_this_timestep, B_t);
 
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
       	// Allow spiking again
-       	neuron->A = 1;
+       	neuron->A = 1.0k;
     } else {
        	// Neuron cannot fire, as neuron->A=0;
         // countdown refractory timer
@@ -308,7 +307,7 @@ state_t neuron_model_state_update(
     REAL psi_temp2 = ((absk(psi_temp1)));
     neuron->psi =  ((1.0k - psi_temp2) > 0.0k)?
     		(1.0k/neuron->b_0) *
-			0.3k * //todo why is this commented?
+			0.3k *
 			(1.0k - psi_temp2) : 0.0k;
     neuron->psi *= neuron->A;
 
@@ -319,8 +318,7 @@ state_t neuron_model_state_update(
     uint32_t total_recurrent_synapses_per_neuron = 0; //todo should this be fixed?
     uint32_t recurrent_offset = 100;
 
-    // TODO: check if this has already been calculated above...
-    REAL rho = neuron->e_to_dt_on_tau_a; // decay_s1615(1.k, neuron->e_to_dt_on_tau_a);
+    REAL rho = decay_s1615(1.0k, neuron->e_to_dt_on_tau_a);
 
     // TODO: Is there a better way of doing this?
     REAL accum_time = (accum)(time%neuron->window_size) * 0.001k;
@@ -328,8 +326,8 @@ state_t neuron_model_state_update(
         accum_time += 1.k;
     }
 
+    // Calculate the membrane error
     REAL v_mem_error;
-
     if (neuron->V_membrane > neuron->B){
         v_mem_error = neuron->V_membrane - neuron->B;
     }
@@ -345,7 +343,7 @@ state_t neuron_model_state_update(
 //                                    / ((accum)(time%1300)
 //                                    / (1.225k // 00000!!!!!
                                     / (accum_time
-                                    * (accum)syn_dynamics_neurons_in_partition))
+                                    * (accum)neuron_impl_neurons_in_partition))
                                     - neuron->core_target_rate;
 
     // hardcoded reset
@@ -353,14 +351,13 @@ state_t neuron_model_state_update(
         printed_value = true;
     }
     if (time % neuron->window_size == 0){
-    	// TODO: does this need editing to be done for all neurons?
-//        global_parameters->core_pop_rate = 0.k;
         printed_value = false;
     }
 
     // Calculate new learning signal
     REAL new_learning_signal = (learning_signal * neuron->w_fb) + v_mem_error;
 
+    // TODO: magic constants need naming at least (and passing in?)
     uint32_t test_length = (150*neuron->number_of_cues)+1000+150;
     if(neuron->number_of_cues == 0) {
         test_length = neuron->window_size;
@@ -378,7 +375,7 @@ state_t neuron_model_state_update(
     // eta used to be a global parameter, but now just copy from neuron
     REAL local_eta = neuron->eta;
 
-    // Reset parameter check
+    // Reset relevant parameters ahead of filtering
     if ((time % test_length == 0 || time % test_length == 1) && neuron->number_of_cues){
         neuron->B = neuron->b_0;
         neuron->b = 0.k;
@@ -491,7 +488,8 @@ state_t neuron_model_state_update(
 void neuron_model_has_spiked(neuron_t *restrict neuron) {
     // reset z to zero
     neuron->z = 0;
-	// TODO: Not sure this should be commented out
+	// TODO: Not sure this should be commented out but I think the change
+    //       in the lif_eprop_neuron_closed_form(...) function possibly makes it redundant
 //    neuron->V_membrane = neuron->V_rest;
     // Set refractory timer
     neuron->refract_timer  = neuron->T_refract - 1;

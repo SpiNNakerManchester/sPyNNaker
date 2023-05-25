@@ -222,10 +222,10 @@ class NeuronModelLeftRightReadout(AbstractStandardNeuronComponent):
         parameters[W_FB] = self.__w_fb
         parameters[WINDOW_SIZE] = self.__window_size
         # These should probably have defaults earlier than this
-        parameters[SEED1] = 10065
-        parameters[SEED2] = 232
-        parameters[SEED3] = 3634
-        parameters[SEED4] = 4877
+        parameters[SEED1] = 1  # 10065
+        parameters[SEED2] = 2  # 232
+        parameters[SEED3] = 3  # 3634
+        parameters[SEED4] = 4  # 4877
 
         # parameters[PROB_COMMAND] = self._prob_command
         parameters[RATE_ON] = self.__rate_on

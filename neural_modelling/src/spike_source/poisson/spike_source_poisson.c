@@ -364,8 +364,8 @@ void set_spike_source_rate(uint32_t sub_id, unsigned long accum rate) {
 
     REAL rate_per_tick = kbits(
             (__U64(bitsk(rate)) * __U64(bitsulr(ssp_params.seconds_per_tick))) >> 32);
-    log_debug("Setting rate of %u to %kHz (%k per tick)",
-            sub_id, rate, rate_per_tick);
+    log_debug("At time %u setting rate of %u to %k Hz (%k per tick)",
+            time, sub_id, (accum) rate, rate_per_tick);
     spike_source_t *spike_source = &source[sub_id];
 
     if (rate_per_tick >= ssp_params.slow_rate_per_tick_cutoff) {
@@ -417,7 +417,8 @@ static inline void set_spike_source_details(uint32_t id, bool rate_changed) {
     log_debug("Source %u is at index %u", id, index);
     source_details details = source_data[id]->details[index];
     if (rate_changed) {
-        log_debug("Setting rate of %u to %k at %u", id, (s1615) details.rate, time);
+        log_debug("At time %u setting rate of %u to %k",
+        		time, id, (s1615) details.rate);
         set_spike_source_rate(id, details.rate);
     }
     spike_source_t *p = &(source[id]);

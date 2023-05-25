@@ -90,6 +90,9 @@ typedef enum
 } left_right_state_t;
 
 // Left right parameters
+// TODO: should these be set as parameters elsewhere or remain as constants
+//       that are just in the C code?
+//       (Conversely, should any current parameters become constants?)
 left_right_state_t current_state = 0;
 uint32_t current_time = 0;
 uint32_t cue_number = 0;
@@ -100,8 +103,8 @@ uint32_t duration_of_cue = 100; // ms
 uint32_t wait_before_result = 1000; // ms but should be a range between 500-1500
 uint32_t prompt_duration = 150; //ms
 bool start_prompt = false;
-accum softmax_0 = 0k;
-accum softmax_1 = 0k;
+REAL softmax_0 = 0k;
+REAL softmax_1 = 0k;
 bool completed_broadcast = true;
 
 
@@ -258,7 +261,6 @@ static void neuron_impl_do_timestep_update(
 
 		// Get the neuron itself
 		neuron_t *neuron = &neuron_array[neuron_index];
-//		bool spike = false;
 
 		// Get the input_type parameters and voltage for this neuron
 		input_type_t *input_type = &input_type_array[neuron_index];
@@ -342,11 +344,6 @@ static void neuron_impl_do_timestep_update(
 				// This sends a "completed" signal
 				send_spike_mc_payload(
 						neuron_keys[neuron_index], bitsk(neuron->cross_entropy));
-//				while (!spin1_send_mc_packet(
-//						neuron_keys[neuron_index],
-//						bitsk(neuron->cross_entropy), 1)) {
-//					spin1_delay_us(1);
-//				}
 			}
 		}
 
@@ -362,11 +359,16 @@ static void neuron_impl_do_timestep_update(
 					if ((time - current_time) %
 							(wait_between_cues + duration_of_cue) == wait_between_cues){
 						// pick new value and broadcast
-//						REAL random_value = kdivui(
-//								(REAL)(mars_kiss64_seed(neuron->kiss_seed)), UINT32_MAX); // 0-1
-						REAL random_value = (
-								(REAL)mars_kiss64_seed(neuron->kiss_seed) / (REAL)UINT32_MAX); // 0-1
-						if (random_value < 0.5k) {
+//						REAL random_value = (
+//								REAL)(mars_kiss64_seed(neuron->kiss_seed) / (REAL)0xffffffff); // 0-1
+						// The above does not actually give a REAL between 0 and 1
+						// since (REAL)0xffffffff = -1.0k; however it's pretty much
+						// what we're looking for as it converts an uint32_t to a
+						// (signed) REAL, so the test just needs to be positive vs
+						// negative, removing the need for any dividing
+						REAL random_value = kbits(
+								mars_kiss64_seed(neuron->kiss_seed));
+						if (random_value < ZERO) {
 							current_cue_direction = 0;
 						}
 						else{
@@ -378,8 +380,6 @@ static void neuron_impl_do_timestep_update(
 						for (int j = current_cue_direction*neuron->p_pop_size;
 								j < current_cue_direction*neuron->p_pop_size + neuron->p_pop_size; j++){
 							send_spike_mc_payload(neuron->p_key | j, bitsk(payload));
-//							spin1_send_mc_packet(
-//									neuron->p_key | j, bitsk(payload), WITH_PAYLOAD);
 						}
 					}
 				}
@@ -392,8 +392,6 @@ static void neuron_impl_do_timestep_update(
 					for (int j = current_cue_direction*neuron->p_pop_size;
 							j < current_cue_direction*neuron->p_pop_size + neuron->p_pop_size; j++) {
 						send_spike_mc_payload(neuron->p_key | j, bitsk(payload));
-//						spin1_send_mc_packet(
-//								neuron->p_key | j, bitsk(payload), WITH_PAYLOAD);
 					}
 					if (cue_number >= neuron->number_of_cues) {
 						current_state = (current_state + 1) % 3;
@@ -422,8 +420,6 @@ static void neuron_impl_do_timestep_update(
 					for (int j = 2*neuron->p_pop_size;
 							j < 2*neuron->p_pop_size + neuron->p_pop_size; j++){
 						send_spike_mc_payload(neuron->p_key | j, bitsk(payload));
-//						spin1_send_mc_packet(
-//								neuron->p_key | j, bitsk(payload), WITH_PAYLOAD);
 					}
 				}
 			}
@@ -432,10 +428,9 @@ static void neuron_impl_do_timestep_update(
 			if (neuron_index == 2) {
 				// Switched to always broadcasting error but with packet
 				start_prompt = false;
-				accum exp_0 = expk(neuron->readout_V_0);// * 0.1k);
-				accum exp_1 = expk(neuron->readout_V_1);// * 0.1k);
+				REAL exp_0 = expk(neuron->readout_V_0);// * 0.1k);
+				REAL exp_1 = expk(neuron->readout_V_1);// * 0.1k);
 
-				// TODO: I'm not sure how an exponential can be zero?
 				// Set up softmax calculation
 				if (exp_0 == 0k && exp_1 == 0k) {
 					if (neuron->readout_V_0 > neuron->readout_V_1) {
@@ -448,9 +443,11 @@ static void neuron_impl_do_timestep_update(
 					}
 				}
 				else {
+					softmax_0 = exp_0 / (exp_1 + exp_0);
+					softmax_1 = exp_1 / (exp_1 + exp_0);
 					// These divides are okay in kdivk because exp is always positive
-					softmax_0 = kdivk(exp_0, (exp_1 + exp_0));
-					softmax_1 = kdivk(exp_1, (exp_1 + exp_0));
+//					softmax_0 = kdivk(exp_0, (exp_1 + exp_0));
+//					softmax_1 = kdivk(exp_1, (exp_1 + exp_0));
 				}
 
 				// What to do if log(0)?
@@ -461,7 +458,6 @@ static void neuron_impl_do_timestep_update(
 						glob_neuron->cross_entropy = -logk(softmax_1);
 					}
 					learning_signal = softmax_0;
-//					is_it_right = 1;
 				}
 				else{
 					for (uint32_t glob_n = 0; glob_n < n_neurons; glob_n++) {
@@ -470,14 +466,9 @@ static void neuron_impl_do_timestep_update(
 						glob_neuron->cross_entropy = -logk(softmax_0);
 					}
 					learning_signal = softmax_0 - 1.k;
-//					is_it_right = 0;
 				}
 				if (use_key) {
 					send_spike_mc_payload(neuron_keys[neuron_index], bitsk(learning_signal));
-//					while (!spin1_send_mc_packet(
-//							neuron_keys[neuron_index],  bitsk(learning_signal), 1 )) {
-//						spin1_delay_us(1);
-//					}
 				}
 			}
 
@@ -491,8 +482,6 @@ static void neuron_impl_do_timestep_update(
 					for (int j = 2*neuron->p_pop_size;
 							j < 2*neuron->p_pop_size + neuron->p_pop_size; j++){
 						send_spike_mc_payload(neuron->p_key | j, payload);
-//						spin1_send_mc_packet(
-//								neuron->p_key | j, payload, WITH_PAYLOAD);
 					}
 				}
 			}
@@ -520,16 +509,6 @@ static void neuron_impl_do_timestep_update(
 					GSYN_EXC_RECORDING_INDEX, neuron_index,
 					neuron->syn_state[0].delta_w);
 		}
-
-		// This model doesn't spike so this can be commented out
-//		if (spike) {
-//			// Call relevant model-based functions
-//			// Tell the neuron model
-//	//        neuron_model_has_spiked(neuron);
-//
-//			// Tell the additional input
-//			additional_input_has_spiked(additional_input);
-//		}
 
 		// Shape the existing input according to the included rule
 		synapse_types_shape_input(synapse_type);

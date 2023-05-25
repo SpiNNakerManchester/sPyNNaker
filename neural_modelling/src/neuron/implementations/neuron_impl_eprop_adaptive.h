@@ -224,6 +224,16 @@ static void neuron_impl_load_neuron_parameters(
     	spin1_memcpy(save_initial_state, address, next * sizeof(uint32_t));
     }
 
+    log_info("neuron_impl_load_neuron_parameters n_neurons %u", n_neurons);
+    log_info("local_eta %k", neuron_array[0].eta);
+    log_info("core pop rate %k", neuron_array[0].core_pop_rate);
+    log_info("core target rate %k", neuron_array[0].core_target_rate);
+    log_info("rate exp TC %k", neuron_array[0].rate_exp_TC);
+    for (index_t n = 0; n < n_neurons; n++) {
+    	log_info("neuron index %u voltage %k", n, neuron_array[n].V_membrane);
+    	log_info("neuron index %u core_pop_rate %k", n, neuron_array[n].core_pop_rate);
+    }
+
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
@@ -237,18 +247,24 @@ static void neuron_impl_load_neuron_parameters(
 static void neuron_impl_do_timestep_update(
 		uint32_t timer_count, uint32_t time, uint32_t n_neurons) {
 
+	// Decay the "global" rate trace (done once per timestep)
+	for (uint32_t n_ind=0; n_ind < n_neurons; n_ind++) {
+		neuron_t *global_neuron = &neuron_array[n_ind];
+		global_neuron->core_pop_rate =
+				global_neuron->core_pop_rate * global_neuron->rate_exp_TC;
+	}
+
 	for (uint32_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
 
 		// Get the neuron itself
 		neuron_t *neuron = &neuron_array[neuron_index];
 
-		// Decay the "global" rate trace
-		neuron->core_pop_rate = neuron->core_pop_rate * neuron->rate_exp_TC;
-
 		// Get the input_type parameters and voltage for this neuron
 		input_type_t *input_type = &input_type_array[neuron_index];
 
 		// Get threshold and additional input parameters for this neuron
+		// TODO: for some reason threshold is incorporated into neuron_model
+		//       for this neuron; investigate if it can be separated
 //	    threshold_type_pointer_t threshold_type =
 //	            &threshold_type_array[neuron_index];
 		additional_input_t *additional_input =
@@ -256,7 +272,7 @@ static void neuron_impl_do_timestep_update(
 		synapse_types_t *synapse_type =
 				&synapse_types_array[neuron_index];
 
-		// This would be where a steps per timestep loop begins if desired
+		// TODO: This would be where a steps per timestep loop begins if desired
 
 		// Get the voltage
 		state_t voltage = neuron_model_get_membrane_voltage(neuron);
@@ -430,7 +446,7 @@ static void neuron_impl_store_neuron_parameters(
     }
     log_debug("****** STORING COMPLETE ******");
 
-    log_debug("neuron 0 'global' parameters, core_target_rate, core_pop_rate %k %k",
+    log_info("neuron 0 'global' parameters, core_target_rate, core_pop_rate %k %k",
     		&neuron_array[0].core_target_rate, &neuron_array[0].core_pop_rate);
 }
 

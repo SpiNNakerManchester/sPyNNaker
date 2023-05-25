@@ -73,7 +73,7 @@ extern neuron_t *neuron_array;
 //uint32_t num_plastic_pre_synaptic_events = 0;
 //uint32_t plastic_saturation_count = 0;
 
-uint32_t syn_dynamics_neurons_in_partition;
+extern uint32_t neuron_impl_neurons_in_partition;
 
 //---------------------------------------
 // Macros
@@ -336,7 +336,7 @@ static inline final_state_t eprop_plasticity_update(
 
 	// Calculate regularisation error
 //	REAL reg_error = global_parameters->core_target_rate - (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition); // this needs swapping for an inverse multiply - too expensive to do divide on every spike
-	REAL reg_error = neuron_array[0].core_target_rate - (neuron_array[0].core_pop_rate / syn_dynamics_neurons_in_partition); // this needs swapping for an inverse multiply - too expensive to do divide on every spike
+	REAL reg_error = neuron_array[0].core_target_rate - (neuron_array[0].core_pop_rate / neuron_impl_neurons_in_partition); // this needs swapping for an inverse multiply - too expensive to do divide on every spike
 //	REAL reg_error = ((global_parameters->core_target_rate + ((neuron_array->w_fb - 0.5) * 20)) - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition; // this needs swapping for an inverse multiply - too expensive to do divide on every spike
 
 //    REAL reg_error = (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;

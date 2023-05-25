@@ -160,7 +160,6 @@ static inline void neuron_model_initialise(
 	state->ticks_per_second = params->ticks_per_second;
 	state->readout_V_0 = params->readout_V_0;
 	state->readout_V_1 = params->readout_V_1;
-//	REAL prob_command;
 	state->rate_on = params->rate_on;
 	state->rate_off = params->rate_off;
 	state->mean_0 = params->mean_0;
@@ -171,11 +170,11 @@ static inline void neuron_model_initialise(
 	state->eta = params->eta;
 	state->number_of_cues = params->number_of_cues;
 
-//	log_info("Check p_key %u p_pop_size %u", params->p_key, params->p_pop_size);
-//	log_info("Check number_of_cues %u eta %k", params->number_of_cues, params->eta);
-//	log_info("mean_0 %k mean_1 %k rate_on %k rate_off %k readout_V_0 %k readout_V_1 %k",
-//			params->mean_0, params->mean_1, params->rate_on, params->rate_off,
-//			params->readout_V_0, params->readout_V_1);
+	log_info("Check p_key %u p_pop_size %u", params->p_key, params->p_pop_size);
+	log_info("Check number_of_cues %u eta %k", params->number_of_cues, params->eta);
+	log_info("mean_0 %k mean_1 %k rate_on %k rate_off %k readout_V_0 %k readout_V_1 %k",
+			params->mean_0, params->mean_1, params->rate_on, params->rate_off,
+			params->readout_V_0, params->readout_V_1);
 
 	for (uint32_t n_syn = 0; n_syn < SYNAPSES_PER_NEURON; n_syn++) {
 		state->syn_state[n_syn] = params->syn_state[n_syn];
@@ -183,7 +182,6 @@ static inline void neuron_model_initialise(
 }
 
 static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *params) {
-	// TODO: probably more parameters need copying across at this point, syn_state for a start
 	params->V_init = state->V_membrane;
 	params->refract_timer_init = state->refract_timer;
 	params->L = state->L;
@@ -193,7 +191,6 @@ static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *par
 		params->syn_state[n_syn] = state->syn_state[n_syn];
 	}
 }
-
 
 // simple Leaky I&F ODE
 static inline void lif_neuron_closed_form(
