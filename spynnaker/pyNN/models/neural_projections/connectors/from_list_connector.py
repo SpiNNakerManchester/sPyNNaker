@@ -146,15 +146,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         sort_indices = numpy.argsort(post_indices)
 
         # Split the sort order in to groups of connection indices
-        print(sort_indices)
-        print(index_count)
-        a = numpy.cumsum(index_count)
-        print(a)
-        b = numpy.split(sort_indices, numpy.cumsum(index_count))
-        print(b)
-        c = numpy.array(numpy.split(sort_indices, numpy.cumsum(index_count)))
         split_indices = numpy.array(numpy.split(
-            sort_indices, numpy.cumsum(index_count)))[:-1]
+            sort_indices, numpy.cumsum(index_count)), dtype=object)[:-1]
 
         # Get the results indexed by hi_atom in the slices
         post_bins = [(post - 1) for post in post_bins]
