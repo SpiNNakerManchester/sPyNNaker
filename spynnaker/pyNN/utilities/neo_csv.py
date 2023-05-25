@@ -236,23 +236,6 @@ class NeoCsv(object):
                              "So this data will be skipped", variable, ex)
             return
 
-    def __get_channel_index(self, ids, block):
-        """
-        Creates a Channel Index object.
-
-        :param list(int) ids:
-        :param ~neo.core.Block block: neo block
-        :rtype: ~neo.core.ChannelIndex
-        """
-        for channel_index in block.channel_indexes:
-            if numpy.array_equal(channel_index.index, ids):
-                return channel_index
-        count = len(block.channel_indexes)
-        channel_index = neo.ChannelIndex(
-            fname=f"Index {count}", index=ids)
-        block.channel_indexes.append(channel_index)
-        return channel_index
-
     def _insert_matrix_data(
             self, variable, segment, signal_array,
             indexes, t_start, sampling_rate, units):
@@ -283,12 +266,10 @@ class NeoCsv(object):
             sampling_rate=sampling_rate,
             name=variable,
             source_population=block.name,
-            source_ids=ids)
-        channel_index = self.__get_channel_index(indexes, segment.block)
-        data_array.channel_index = channel_index
+            source_ids=ids,
+            channel_names=indexes)
         data_array.shape = (data_array.shape[0], data_array.shape[1])
         segment.analogsignals.append(data_array)
-        channel_index.analogsignals.append(data_array)
 
     def _csv_matrix_data(self, csv_writer, signal_array, indexes):
         """
