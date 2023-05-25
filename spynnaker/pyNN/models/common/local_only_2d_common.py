@@ -135,8 +135,8 @@ def get_first_and_last_slice(pre_vertex):
             return full_slice, full_slice
         atoms_shape = pre_vertex.atoms_shape
         full_slice = MDSlice(
-            0, pre_vertex.n_atoms - 1, atoms_shape, (0 for _ in atoms_shape),
-            atoms_shape)
+            0, pre_vertex.n_atoms - 1, atoms_shape,
+            tuple(0 for _ in atoms_shape), atoms_shape)
         return full_slice, full_slice
     m_vertices = list(pre_vertex.machine_vertices)
     return m_vertices[0].vertex_slice, m_vertices[-1].vertex_slice
