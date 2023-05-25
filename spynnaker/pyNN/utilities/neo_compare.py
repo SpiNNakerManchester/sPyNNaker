@@ -86,8 +86,8 @@ def compare_analogsignal(as1, as2, same_length=True):
         data extracted part way with data extracted at the end.
     :raises AssertionError: If the analog signals are not equal
     """
-    as1_index = as1.channel_index.index
-    as2_index = as2.channel_index.index
+    as1_index = as1.annotations["channel_names"]
+    as2_index = as2.annotations["channel_names"]
 
     if as1.name != as2.name:
         raise AssertionError(
