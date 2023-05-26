@@ -87,7 +87,7 @@ def do_run():
     # Constants
     Y_SHIFT = 0
     X_SHIFT = 16
-    WIDTH = 346
+    WIDTH = 512
     HEIGHT = 260
 
     # Creates 512 neurons per core
