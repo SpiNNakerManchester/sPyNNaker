@@ -34,14 +34,14 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
     """
     Classic leaky integrate and fire neuron model.
     """
-    __slots__ = [
+    __slots__ = (
         "__v_init",
         "__v_rest",
         "__tau_m",
         "__cm",
         "__i_offset",
         "__v_reset",
-        "__tau_refrac"]
+        "__tau_refrac")
 
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac):

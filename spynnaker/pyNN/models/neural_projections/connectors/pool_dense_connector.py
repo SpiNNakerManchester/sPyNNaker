@@ -45,13 +45,12 @@ class PoolDenseConnector(AbstractConnector):
     through a (kernel) set of weights and/or delays.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__weights",
         "__pool_shape",
         "__pool_stride",
         "__positive_receptor_type",
-        "__negative_receptor_type"
-    ]
+        "__negative_receptor_type")
 
     def __init__(self, weights, pool_shape=None, pool_stride=None,
                  positive_receptor_type="excitatory",

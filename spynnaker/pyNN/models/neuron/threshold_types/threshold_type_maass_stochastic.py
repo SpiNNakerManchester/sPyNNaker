@@ -33,10 +33,10 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
     `doi:10.1371/journal.pcbi.1003311
     <https://doi.org/10.1371/journal.pcbi.1003311>`_
     """
-    __slots__ = [
+    __slots__ = (
         "__du_th",
         "__tau_th",
-        "__v_thresh"]
+        "__v_thresh")
 
     def __init__(self, du_th, tau_th, v_thresh):
         r"""

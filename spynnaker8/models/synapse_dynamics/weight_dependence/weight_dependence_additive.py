@@ -26,7 +26,6 @@ class WeightDependenceAdditive(_BaseClass):
     """
     __slots__ = []
 
-    # noinspection PyPep8Naming
     def __init__(self, w_min=0.0, w_max=1.0):
         r"""
         :param float w_min: :math:`w_\mathrm{min}`
@@ -36,5 +35,4 @@ class WeightDependenceAdditive(_BaseClass):
                     ".WeightDependenceAdditive",
                     "spynnaker.pyNN.models.neuron.plasticity.stdp."
                     "weight_dependence.WeightDependenceAdditive")
-        super(WeightDependenceAdditive, self).__init__(
-            w_min=w_min, w_max=w_max)
+        super().__init__(w_min=w_min, w_max=w_max)

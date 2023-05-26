@@ -43,14 +43,14 @@ class SynapseDynamicsNeuromodulation(
     Synapses that target a neuromodulation receptor.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__weight",
         "__tau_c",
         "__tau_d",
         "__tau_c_data",
         "__tau_d_data",
         "__w_min",
-        "__w_max"]
+        "__w_max")
 
     def __init__(self, weight=StaticSynapse.default_parameters['weight'],
                  tau_c=1000.0, tau_d=200.0, w_min=0.0, w_max=1.0):
@@ -222,8 +222,7 @@ class SynapseDynamicsNeuromodulation(
 
     @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)
     def get_parameter_names(self):
-        names = ['weight']
-        return names
+        yield 'weight'
 
     @overrides(AbstractPlasticSynapseDynamics.get_max_synapses)
     def get_max_synapses(self, n_words):

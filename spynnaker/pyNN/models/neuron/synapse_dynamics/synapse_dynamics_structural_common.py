@@ -96,12 +96,11 @@ class SynapseDynamicsStructuralCommon(
 
         # Get relevant edges
         structural_projections = self.__get_structural_projections(
-                app_vertex.incoming_projections)
+            app_vertex.incoming_projections)
 
         # Write the common part of the rewiring data
         self.__write_common_rewiring_data(
-            spec, app_vertex, vertex_slice,
-            len(structural_projections))
+            spec, app_vertex, vertex_slice, len(structural_projections))
 
         # Write the pre-population info
         pop_index, subpop_index, lo_atom_index = \
@@ -143,11 +142,9 @@ class SynapseDynamicsStructuralCommon(
                 if isinstance(synapse_info.synapse_dynamics,
                               AbstractSynapseDynamicsStructural):
                     if app_edge in seen_app_edges:
-                        raise SynapticConfigurationException(
-                            self.PAIR_ERROR)
-                    else:
-                        seen_app_edges.add(app_edge)
-                        structural_projections.append(proj)
+                        raise SynapticConfigurationException(self.PAIR_ERROR)
+                    seen_app_edges.add(app_edge)
+                    structural_projections.append(proj)
         return structural_projections
 
     def __write_common_rewiring_data(

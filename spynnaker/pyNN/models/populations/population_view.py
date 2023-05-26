@@ -43,7 +43,7 @@ class PopulationView(PopulationBase):
     .. note::
         Selector to Id is actually handled by :py:class:`~.AbstractSized`.
     """
-    __slots__ = [
+    __slots__ = (
         "__annotations",
         "__indexes",
         "__label",
@@ -51,9 +51,9 @@ class PopulationView(PopulationBase):
         "__parent",
         "__population",
         "__vertex",
-        "__recorder"]
+        "__recorder")
 
-    __realslots__ = tuple("_PopulationView" + item for item in __slots__)
+    __realslots__ = frozenset("_PopulationView" + item for item in __slots__)
 
     def __init__(self, parent, selector, label=None):
         """
@@ -643,7 +643,7 @@ class PopulationView(PopulationBase):
 
 
 class IDMixin(PopulationView):
-    __slots__ = []
+    __slots__ = ()
 
     def get_parameters(self):
         """

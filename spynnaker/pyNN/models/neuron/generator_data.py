@@ -23,9 +23,7 @@ class GeneratorData(object):
     """
     Data for each connection of the synapse generator.
     """
-    __slots__ = [
-        "__data"
-    ]
+    __slots__ = ("__data", )
 
     BASE_SIZE = 11 * BYTES_PER_WORD
 

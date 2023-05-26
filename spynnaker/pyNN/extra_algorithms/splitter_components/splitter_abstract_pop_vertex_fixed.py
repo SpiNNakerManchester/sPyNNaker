@@ -49,12 +49,11 @@ class SplitterAbstractPopulationVertexFixed(
     using fixed slices.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The pre-calculated slices of the vertex
         "__slices",
         "__max_delay",
-        "__expect_delay_extension"
-    ]
+        "__expect_delay_extension")
 
     def __init__(self):
         super().__init__()

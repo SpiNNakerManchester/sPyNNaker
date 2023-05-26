@@ -16,7 +16,11 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 class AbstractEthernetSensor(object, metaclass=AbstractBase):
-    __slots__ = []
+    """
+    An Ethernet-connected device that can send events (spikes) to SpiNNaker
+    via a Spike Injector.
+    """
+    __slots__ = ()
 
     @abstractmethod
     def get_n_neurons(self):

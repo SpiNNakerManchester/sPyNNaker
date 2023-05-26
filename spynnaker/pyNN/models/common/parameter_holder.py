@@ -32,15 +32,14 @@ class ParameterHolder(object):
         "__data_items",
 
         # A selector to use if requested
-        "__selector"
-    )
+        "__selector")
 
     def __init__(self, data_items_to_return, get_call, selector=None):
         """
         :param data_items_to_return: A list of data fields to be returned
         :type data_items_to_return: list(str) or tuple(str)
         :param get_call: A function to call to read a value
-        :type get_call: callable(str, selector=None)->list
+        :type get_call: callable(str, selector)->list
         :param selector: a description of the subrange to accept,
             or `None` for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
@@ -70,6 +69,8 @@ class ParameterHolder(object):
     def _get_data_items(self):
         """
         Merges the parameters and values in to the final data items
+
+        :rtype: dict
         """
         # If there are already merged connections cached, return those
         if self.__data_items is not None:

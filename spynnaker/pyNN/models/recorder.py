@@ -28,11 +28,11 @@ class Recorder(object):
     Object to hold recording behaviour, used by populations.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__data_cache",
         "__population",
         "__vertex",
-        "__write_to_files_indicators"]
+        "__write_to_files_indicators")
 
     def __init__(self, population, vertex):
         """

@@ -65,14 +65,14 @@ class PopulationMachineLocalOnlyCombinedVertex(
     A machine vertex for PyNN Populations.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__key",
         "__ring_buffer_shifts",
         "__weight_scales",
         "__slice_index",
         "__neuron_data",
         "__max_atoms_per_core",
-        "__regenerate_data"]
+        "__regenerate_data")
 
     # log_n_neurons, log_n_synapse_types, log_max_delay, input_buffer_size,
     # clear_input_buffer

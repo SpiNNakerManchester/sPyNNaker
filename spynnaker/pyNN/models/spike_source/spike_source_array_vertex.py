@@ -54,12 +54,12 @@ class SpikeSourceArrayVertex(
     """
     Model for play back of spikes.
     """
-
-    __slots__ = ["__model_name",
-                 "__model",
-                 "__structure",
-                 "_spike_times",
-                 "__n_colour_bits"]
+    __slots__ = (
+        "__model_name",
+        "__model",
+        "__structure",
+        "_spike_times",
+        "__n_colour_bits")
 
     SPIKE_RECORDING_REGION_ID = 0
 
@@ -174,7 +174,7 @@ class SpikeSourceArrayVertex(
 
         Logs a warning for the first one found
 
-        :param iterable(int) spike_times:
+        :param list(int) spike_times:
         """
         current_time = SpynnakerDataView.get_current_run_time_ms()
         for i in range(len(spike_times)):

@@ -30,11 +30,11 @@ class ExternalDeviceLifControlVertex(
     Abstract control module for the pushbot, based on the LIF neuron, but
     without spikes, and using the voltage as the output to the various devices.
     """
-    __slots__ = [
+    __slots__ = (
         "__dependent_vertices",
         "__devices",
         "__indices",
-        "__message_translator"]
+        "__message_translator")
 
     # all commands will use this mask
     _DEFAULT_COMMAND_MASK = 0xFFFFFFFF

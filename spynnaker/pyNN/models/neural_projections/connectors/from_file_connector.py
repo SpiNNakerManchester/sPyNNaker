@@ -22,7 +22,7 @@ class FromFileConnector(FromListConnector):
     """
     Make connections according to a list read from a file.
     """
-    __slots__ = ["_file"]
+    __slots__ = ("_file", )
 
     def __init__(
             self, file,  # @ReservedAssignment

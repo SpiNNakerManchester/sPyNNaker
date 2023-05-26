@@ -34,9 +34,9 @@ class PushBotTranslator(AbstractEthernetTranslator):
     Translates packets between PushBot Multicast packets and PushBot
     Wi-Fi Commands.
     """
-    __slots__ = [
+    __slots__ = (
         "__protocol",
-        "__pushbot_wifi_connection"]
+        "__pushbot_wifi_connection")
 
     def __init__(self, protocol, pushbot_wifi_connection):
         """

@@ -32,7 +32,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     Spike Timing-Dependent Plasticity. *Journal of Neuroscience*,
     20 September 2006, 26 (38) 9673-9682; DOI: 10.1523/JNEUROSCI.1425-06.2006
     """
-    __slots__ = [
+    __slots__ = (
         "__synapse_structure",
         "__tau_minus",
         "__tau_minus_data",
@@ -43,7 +43,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         "__tau_y",
         "__tau_y_data",
         "__a_plus",
-        "__a_minus"]
+        "__a_minus")
     __PARAM_NAMES = ('tau_plus', 'tau_minus', 'tau_x', 'tau_y')
 
     # noinspection PyPep8Naming

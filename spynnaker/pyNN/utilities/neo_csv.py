@@ -430,7 +430,7 @@ class NeoCsv(object):
 
         :param ~csv.reader csv_reader: Open CSV writer to read from
         :return: A list of times and a list of labels
-        :rtype: (list[~quantities.Quantity], list[str])
+        :rtype: tuple(list[~quantities.Quantity], list[str])
         """
         times = []
         labels = []

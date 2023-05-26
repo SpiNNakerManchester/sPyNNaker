@@ -159,7 +159,7 @@ class _MasterPopEntry(object):
     """
     Internal class that contains a master population table entry.
     """
-    __slots__ = [
+    __slots__ = (
         "__addresses_and_row_lengths",
         # The mask to match this entry on
         "__mask",
@@ -172,8 +172,7 @@ class _MasterPopEntry(object):
         # The number of neurons on every core except the last
         "__n_neurons",
         # The number of bits reserved for the colour
-        "__n_colour_bits"
-        ]
+        "__n_colour_bits")
 
     def __init__(self, routing_key, mask, core_mask, core_shift, n_neurons,
                  n_colour_bits):
@@ -323,9 +322,9 @@ class MasterPopTableAsBinarySearch(object):
     """
     Master population table, implemented as binary search master.
     """
-    __slots__ = [
+    __slots__ = (
         "__entries",
-        "__n_addresses"]
+        "__n_addresses")
 
     def __init__(self):
         self.__entries = None

@@ -24,12 +24,12 @@ class DCSource(AbstractCurrentSource):
     """
     Current source with amplitude turned on at "start" and off at "stop".
     """
-    __slots__ = [
+    __slots__ = (
         "__amplitude",
         "__start",
         "__stop",
         "__parameters",
-        "__parameter_types"]
+        "__parameter_types")
 
     def __init__(self, amplitude=0.0, start=0.0, stop=0.0):
         """

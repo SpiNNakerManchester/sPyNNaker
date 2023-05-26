@@ -25,9 +25,9 @@ class SynapseTypeDelta(AbstractSynapseType):
     """
     This represents a synapse type with two delta synapses.
     """
-    __slots__ = [
+    __slots__ = (
         "__isyn_exc",
-        "__isyn_inh"]
+        "__isyn_inh")
 
     def __init__(self, isyn_exc, isyn_inh):
         """

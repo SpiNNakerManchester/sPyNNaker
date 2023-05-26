@@ -71,7 +71,7 @@ class PopulationMachineVertex(
     A machine vertex for PyNN Populations.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__synaptic_matrices",
         "__neuron_data",
         "__key",
@@ -81,7 +81,7 @@ class PopulationMachineVertex(
         "__slice_index",
         "__max_atoms_per_core",
         "__regenerate_neuron_data",
-        "__regenerate_synapse_data"]
+        "__regenerate_synapse_data")
 
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
     DMA_COMPLETE = "DMA's that were completed"

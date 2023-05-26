@@ -26,8 +26,7 @@ _TWO_WORDS = struct.Struct("<II")
 
 
 class MultiSpikeRecorder(object):
-    __slots__ = [
-        "__record"]
+    __slots__ = ("__record", )
 
     def __init__(self):
         self.__record = False
@@ -41,7 +40,7 @@ class MultiSpikeRecorder(object):
 
     @record.setter
     def record(self, record):
-        self.__record = record
+        self.__record = bool(record)
 
     def get_sdram_usage_in_bytes(self, n_neurons, spikes_per_timestep):
         """

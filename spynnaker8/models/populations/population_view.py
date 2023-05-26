@@ -61,4 +61,4 @@ class PopulationView(_BaseClass):
         """
         moved_in_v6("spynnaker8.models.populations.PopulationView",
                     "spynnaker.pyNN.models.populations.PopulationView")
-        super(PopulationView, self).__init__(parent, selector, label)
+        super().__init__(parent, selector, label)

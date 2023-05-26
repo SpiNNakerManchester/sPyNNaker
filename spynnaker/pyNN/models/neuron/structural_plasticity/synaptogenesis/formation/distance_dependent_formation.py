@@ -28,15 +28,14 @@ class DistanceDependentFormation(AbstractFormation):
     Formation rule that depends on the physical distance between neurons.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__grid",
         "__p_form_forward",
         "__sigma_form_forward",
         "__p_form_lateral",
         "__sigma_form_lateral",
         "__ff_distance_probabilities",
-        "__lat_distance_probabilities"
-    ]
+        "__lat_distance_probabilities")
 
     def __init__(
             self, grid=(16, 16), p_form_forward=0.16,
@@ -166,5 +165,5 @@ class DistanceDependentFormation(AbstractFormation):
 
     @overrides(AbstractFormation.get_parameter_names)
     def get_parameter_names(self):
-        return ["grid", "p_form_forward", "sigma_form_forward",
-                "p_form_lateral", "sigma_form_lateral"]
+        return ("grid", "p_form_forward", "sigma_form_forward",
+                "p_form_lateral", "sigma_form_lateral")

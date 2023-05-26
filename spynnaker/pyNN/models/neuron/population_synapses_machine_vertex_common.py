@@ -95,10 +95,10 @@ class PopulationSynapsesMachineVertexCommon(
     LATEST_RECEIVE = "Latest_receive_time"
     MAX_SPIKE_OVERFLOW = "Max_spike_overflow_in_time_step"
 
-    __slots__ = [
+    __slots__ = (
         "__sdram_partition",
         "__neuron_vertex",
-        "__partition_id"]
+        "__partition_id")
 
     class REGIONS(Enum):
         """

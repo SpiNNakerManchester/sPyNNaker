@@ -26,7 +26,7 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
     A connection for receiving and sending live spikes from and to
     SpiNNaker.
     """
-    __slots__ = []
+    __slots__ = ()
 
     def __init__(self, receive_labels=None, send_labels=None, local_host=None,
                  local_port=NOTIFY_PORT,

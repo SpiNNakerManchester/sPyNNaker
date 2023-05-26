@@ -48,5 +48,5 @@ class CSAConnector(_BaseClass):
         moved_in_v6("spynnaker8.models.connectors.CSAConnector",
                     "spynnaker.pyNN.models.neural_projections.connectors"
                     ".CSAConnector")
-        super(CSAConnector, self).__init__(
+        super().__init__(
             cset=cset, safe=safe, callback=callback, verbose=verbose)

@@ -31,6 +31,6 @@ class SpiNNaker(_BaseClass):
         # pylint: disable=too-many-arguments, too-many-locals, unused-argument
         moved_in_v7("spynnaker8.spinnaker",
                     "spynnaker.pyNN.spinnaker")
-        super(SpiNNaker, self).__init__(
+        super().__init__(
             time_scale_factor, min_delay,
             n_chips_required, n_boards_required, timestep)

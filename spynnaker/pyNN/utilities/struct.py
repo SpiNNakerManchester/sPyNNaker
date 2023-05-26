@@ -40,12 +40,10 @@ class Struct(object):
     """
     Represents a C code structure.
     """
-
-    __slots__ = [
+    __slots__ = (
         "__fields",
         "__repeat_type",
-        "__default_values"
-    ]
+        "__default_values")
 
     def __init__(self, fields, repeat_type=StructRepeat.PER_NEURON,
                  default_values=None):

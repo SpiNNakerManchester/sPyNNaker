@@ -24,11 +24,11 @@ class StepCurrentSource(AbstractCurrentSource):
     """
     Current source where the amplitude changes based on a time array.
     """
-    __slots__ = [
+    __slots__ = (
         "__amplitudes",
         "__times",
         "__parameters",
-        "__parameter_types"]
+        "__parameter_types")
 
     def __init__(self, times=None, amplitudes=None):
         """

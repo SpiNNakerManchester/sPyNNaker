@@ -54,7 +54,7 @@ class MultapseConnector(_BaseClass):
         moved_in_v6("spynnaker8.models.connectors.MultapseConnector",
                     "spynnaker.pyNN.models.neural_projections.connectors."
                     "MultapseConnector")
-        super(MultapseConnector, self).__init__(
+        super().__init__(
             n=n, allow_self_connections=allow_self_connections,
             with_replacement=with_replacement, safe=safe, verbose=verbose,
             rng=rng)

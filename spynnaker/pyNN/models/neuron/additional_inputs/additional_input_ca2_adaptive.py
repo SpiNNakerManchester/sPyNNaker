@@ -25,10 +25,10 @@ TIME_STEP = "time_step"
 
 
 class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
-    __slots__ = [
+    __slots__ = (
         "__tau_ca2",
         "__i_ca2",
-        "__i_alpha"]
+        "__i_alpha")
 
     def __init__(self, tau_ca2, i_ca2, i_alpha):
         r"""

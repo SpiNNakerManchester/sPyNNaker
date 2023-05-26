@@ -159,9 +159,8 @@ def convert_gsyn(gsyn_exc, gsyn_inh):
         raise ValueError("times in gsyn_exc and gsyn_inh do not match")
     all_times = np.tile(times, len(ids))
     neurons = np.repeat(ids, len(times))
-    idlist = list(range(len(ids)))
-    exc_np = np.concatenate([exc[:, x] for x in idlist])
-    inh_np = np.concatenate([inh[:, x] for x in idlist])
+    exc_np = np.concatenate([exc[:, x] for x in range(len(ids))])
+    inh_np = np.concatenate([inh[:, x] for x in range(len(ids))])
     return np.column_stack((neurons, all_times, exc_np, inh_np))
 
 

@@ -29,7 +29,7 @@ class NoisyCurrentSource(AbstractCurrentSource):
     noise simulated based on the given mean and standard deviation, and
     updating every `dt` (`dt` should default to the machine time step).
     """
-    __slots__ = [
+    __slots__ = (
         "__mean",
         "__stdev",
         "__start",
@@ -37,7 +37,7 @@ class NoisyCurrentSource(AbstractCurrentSource):
         "__dt",
         "__rng",
         "__parameters",
-        "__parameter_types"]
+        "__parameter_types")
 
     def __init__(self, mean=0.0, stdev=0.0, start=0.0, stop=0.0, dt=1.0,
                  rng=None):

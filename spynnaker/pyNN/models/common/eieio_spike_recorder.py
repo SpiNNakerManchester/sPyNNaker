@@ -24,8 +24,7 @@ class EIEIOSpikeRecorder(object):
     """
     Records spikes using EIEIO format.
     """
-    __slots__ = (
-        "__record")
+    __slots__ = ("__record", )
 
     def __init__(self):
         self.__record = False
@@ -42,7 +41,7 @@ class EIEIOSpikeRecorder(object):
         """
         Old method assumed to be spikes.
         """
-        self.__record = new_state
+        self.__record = bool(new_state)
 
     def set_recording(self, new_state, sampling_interval=None):
         """
@@ -52,4 +51,4 @@ class EIEIOSpikeRecorder(object):
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported for "
                            "SpikeSourceArray so being ignored")
-        self.__record = new_state
+        self.__record = bool(new_state)

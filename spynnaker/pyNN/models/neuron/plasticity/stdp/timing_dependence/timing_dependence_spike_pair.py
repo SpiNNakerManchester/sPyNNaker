@@ -27,14 +27,14 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
     """
     A basic timing dependence STDP rule.
     """
-    __slots__ = [
+    __slots__ = (
         "__synapse_structure",
         "__tau_minus",
         "__tau_minus_data",
         "__tau_plus",
         "__tau_plus_data",
         "__a_plus",
-        "__a_minus"]
+        "__a_minus")
     __PARAM_NAMES = ('tau_plus', 'tau_minus')
 
     def __init__(

@@ -25,7 +25,7 @@ class InputTypeDelta(AbstractInputType):
     """
     The delta input type.
     """
-    __slots__ = []
+    __slots__ = ()
 
     def __init__(self):
         """

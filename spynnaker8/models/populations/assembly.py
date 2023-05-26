@@ -35,4 +35,4 @@ class Assembly(_BaseClass):
         """
         moved_in_v6("spynnaker8.models.populations.Assembly",
                     "spynnaker.pyNN.models.populations.Assembly")
-        super(Assembly, self).__init__(*populations, **kwargs)
+        super().__init__(*populations, **kwargs)

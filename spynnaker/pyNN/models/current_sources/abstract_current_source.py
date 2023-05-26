@@ -33,9 +33,9 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
     out the actual offset value on the SpiNNaker machine itself based on
     the parameters during the run.
     """
-    __slots__ = [
+    __slots__ = (
         "__app_vertex",
-        "__population"]
+        "__population")
 
     def __init__(self):
         self.__app_vertex = None

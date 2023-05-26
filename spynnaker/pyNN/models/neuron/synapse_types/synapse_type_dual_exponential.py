@@ -28,13 +28,13 @@ TIMESTEP_MS = "timestep_ms"
 
 
 class SynapseTypeDualExponential(AbstractSynapseType):
-    __slots__ = [
+    __slots__ = (
         "__tau_syn_E",
         "__tau_syn_E2",
         "__tau_syn_I",
         "__isyn_exc",
         "__isyn_exc2",
-        "__isyn_inh"]
+        "__isyn_inh")
 
     def __init__(
             self, tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2,

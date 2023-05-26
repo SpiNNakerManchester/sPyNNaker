@@ -25,9 +25,9 @@ class InputTypeConductance(AbstractInputType):
     """
     The conductance input type.
     """
-    __slots__ = [
+    __slots__ = (
         "__e_rev_E",
-        "__e_rev_I"]
+        "__e_rev_I")
 
     def __init__(self, e_rev_E, e_rev_I):
         """

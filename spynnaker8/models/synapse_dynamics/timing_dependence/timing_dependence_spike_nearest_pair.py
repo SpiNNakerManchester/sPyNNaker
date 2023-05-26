@@ -43,6 +43,6 @@ class TimingDependenceSpikeNearestPair(_BaseClass):
                     "TimingDependenceSpikeNearestPair",
                     "spynnaker.pyNN.models.neuron.plasticity.stdp."
                     "timing_dependence.TimingDependenceSpikeNearestPair")
-        super(TimingDependenceSpikeNearestPair, self).__init__(
+        super().__init__(
             tau_plus=tau_plus, tau_minus=tau_minus,
             A_plus=A_plus, A_minus=A_minus)

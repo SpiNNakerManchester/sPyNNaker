@@ -62,7 +62,7 @@ class SmallWorldConnector(_BaseClass):
         moved_in_v6("spynnaker8.models.connectors.SmallWorldConnector",
                     "spynnaker.pyNN.models.neural_projections.connectors."
                     "SmallWorldConnector")
-        super(SmallWorldConnector, self).__init__(
+        super().__init__(
             degree=degree, rewiring=rewiring,
             allow_self_connections=allow_self_connections,
             n_connections=n_connections, rng=rng, safe=safe, callback=callback,

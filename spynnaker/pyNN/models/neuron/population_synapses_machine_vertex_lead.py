@@ -30,14 +30,14 @@ class PopulationSynapsesMachineVertexLead(
     writing shared areas.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__synaptic_matrices",
         "__ring_buffer_shifts",
         "__weight_scales",
         "__structural_sz",
         "__synapse_references",
         "__max_atoms_per_core",
-        "__regenerate_data"]
+        "__regenerate_data")
 
     def __init__(
             self, sdram, label, app_vertex,

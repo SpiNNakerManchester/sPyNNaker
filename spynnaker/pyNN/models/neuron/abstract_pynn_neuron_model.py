@@ -29,7 +29,7 @@ _population_parameters = {
 
 
 class AbstractPyNNNeuronModel(AbstractPyNNModel):
-    __slots__ = ["__model"]
+    __slots__ = ("__model", )
 
     default_population_parameters = _population_parameters
 

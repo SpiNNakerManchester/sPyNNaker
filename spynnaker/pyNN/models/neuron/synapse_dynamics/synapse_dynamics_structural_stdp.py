@@ -37,7 +37,7 @@ class SynapseDynamicsStructuralSTDP(
 
     Written by Petrut Bogdan.
     """
-    __slots__ = [
+    __slots__ = (
         # Frequency of rewiring (Hz)
         "__f_rew",
         # Initial weight assigned to a newly formed connection
@@ -62,8 +62,7 @@ class SynapseDynamicsStructuralSTDP(
         # The formation rule
         "__formation",
         # The elimination rule
-        "__elimination"
-    ]
+        "__elimination")
 
     def __init__(
             self, partner_selection, formation, elimination,
@@ -192,9 +191,8 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.get_parameter_names)
     def get_parameter_names(self):
-        names = super().get_parameter_names()
-        names.extend(SynapseDynamicsStructuralCommon.get_parameter_names(self))
-        return names
+        yield from super().get_parameter_names()
+        yield from SynapseDynamicsStructuralCommon.get_parameter_names(self)
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.f_rew)

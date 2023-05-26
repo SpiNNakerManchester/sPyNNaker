@@ -22,7 +22,7 @@ class LastNeuronSelection(AbstractPartnerSelection):
     that spiked in the last timestep.
     """
 
-    __slots__ = ["__spike_buffer_size"]
+    __slots__ = ("__spike_buffer_size", )
 
     def __init__(self, spike_buffer_size=64):
         """
@@ -45,4 +45,4 @@ class LastNeuronSelection(AbstractPartnerSelection):
 
     @overrides(AbstractPartnerSelection.get_parameter_names)
     def get_parameter_names(self):
-        return ["spike_buffer_size"]
+        yield "spike_buffer_size"

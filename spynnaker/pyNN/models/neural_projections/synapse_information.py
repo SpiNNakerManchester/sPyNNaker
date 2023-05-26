@@ -25,7 +25,7 @@ class SynapseInformation(object):
     Contains the synapse information including the connector, synapse type
     and synapse dynamics.
     """
-    __slots__ = [
+    __slots__ = (
         "__connector",
         "__pre_population",
         "__post_population",
@@ -38,7 +38,7 @@ class SynapseInformation(object):
         "__weights",
         "__delays",
         "__pre_run_connection_holders",
-        "__synapse_type_from_dynamics"]
+        "__synapse_type_from_dynamics")
 
     def __init__(self, connector, pre_population, post_population,
                  prepop_is_view, postpop_is_view, rng,

@@ -14,9 +14,11 @@
 
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractHasParameterNames)
 
 
-class AbstractElimination(object, metaclass=AbstractBase):
+class AbstractElimination(AbstractHasParameterNames, metaclass=AbstractBase):
     """
     A synaptic connection elimination rule.
     """
@@ -46,12 +48,4 @@ class AbstractElimination(object, metaclass=AbstractBase):
 
         :param ~data_specification.DataSpecificationGenerator spec:
         :param float weight_scale:
-        """
-
-    @abstractmethod
-    def get_parameter_names(self):
-        """
-        Return the names of the parameters supported by this rule.
-
-        :rtype: iterable(str)
         """

@@ -14,25 +14,19 @@
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-class AbstractGenerateConnectorOnHost(object, metaclass=AbstractBase):
+class AbstractHasParameterNames(object, metaclass=AbstractBase):
     """
-    A connector that can be generated on host.
+    A component that has parameter names. Parameter names are usually
+    properties of the component, and are frequently also settable by named
+    parameter when making the component.
     """
 
-    # Mix-in class, so don't add anything here!
     __slots__ = ()
 
     @abstractmethod
-    def create_synaptic_block(
-            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
+    def get_parameter_names(self):
         """
-        Create a synaptic block from the data.
+        Get the parameter names available from the component.
 
-        :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param AbstractSynapseType synapse_type:
-        :param SynapseInformation synapse_info:
-        :returns:
-            The synaptic matrix data to go to the machine, as a Numpy array
-        :rtype: ~numpy.ndarray
+        :rtype: iterable(str)
         """

@@ -34,9 +34,9 @@ class DelayExtensionMachineVertex(
     Not expected to be directly referenced in user code.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__sdram",
-        "__drop_late_spikes"]
+        "__drop_late_spikes")
 
     class _DELAY_EXTENSION_REGIONS(IntEnum):
         """

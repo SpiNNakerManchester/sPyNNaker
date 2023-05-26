@@ -14,9 +14,12 @@
 
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractHasParameterNames)
 
 
-class AbstractPartnerSelection(object, metaclass=AbstractBase):
+class AbstractPartnerSelection(
+        AbstractHasParameterNames, metaclass=AbstractBase):
     """
     A partner selection rule.
     """
@@ -45,12 +48,4 @@ class AbstractPartnerSelection(object, metaclass=AbstractBase):
         Write the parameters of the rule to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
-        """
-
-    @abstractmethod
-    def get_parameter_names(self):
-        """
-        Return the names of the parameters supported by this rule.
-
-        :rtype: iterable(str)
         """

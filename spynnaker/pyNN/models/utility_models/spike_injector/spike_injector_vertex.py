@@ -34,9 +34,9 @@ class SpikeInjectorVertex(
     An Injector of Spikes for PyNN populations.  This only allows the user
     to specify the virtual_key of the population to identify the population.
     """
-    __slots__ = [
+    __slots__ = (
         "__spike_recorder",
-        "__structure"]
+        "__structure")
 
     default_parameters = {
         'label': "spikeInjector", 'port': None, 'virtual_key': None}

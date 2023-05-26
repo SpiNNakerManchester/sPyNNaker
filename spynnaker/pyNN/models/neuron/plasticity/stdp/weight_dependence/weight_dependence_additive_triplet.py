@@ -26,11 +26,11 @@ class WeightDependenceAdditiveTriplet(
     """
     An triplet-based additive weight dependence STDP rule.
     """
-    __slots__ = [
+    __slots__ = (
         "__a3_minus",
         "__a3_plus",
         "__w_max",
-        "__w_min"]
+        "__w_min")
     __PARAM_NAMES = ('w_min', 'w_max', 'A3_plus', 'A3_minus')
 
     default_parameters = {'w_min': 0.0, 'w_max': 1.0, 'A3_plus': 0.01,

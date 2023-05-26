@@ -31,12 +31,12 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
     to all post-synaptic neurons.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__allow_self_connections",
         "__n_pre",
         "__pre_neurons",
         "__pre_neurons_set",
-        "__with_replacement"]
+        "__with_replacement")
 
     def __init__(
             self, n, allow_self_connections=True, safe=True, verbose=False,

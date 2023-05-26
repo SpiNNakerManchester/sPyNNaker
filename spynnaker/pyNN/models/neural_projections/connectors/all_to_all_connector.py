@@ -29,8 +29,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     the postsynaptic population.
     """
 
-    __slots__ = [
-        "__allow_self_connections"]
+    __slots__ = ("__allow_self_connections", )
 
     def __init__(self, allow_self_connections=True, safe=True,
                  verbose=None, callback=None):

@@ -77,7 +77,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     one-to-one Poisson cores are also added here if they meet the criteria.
     """
 
-    __slots__ = [
+    __slots__ = (
         # All the neuron cores
         "__neuron_vertices",
         # All the synapse cores
@@ -109,8 +109,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # The same chip groups
         "__same_chip_groups",
         # The application vertex sources that are neuromodulators
-        "__neuromodulators"
-        ]
+        "__neuromodulators")
 
     def __init__(self, n_synapse_vertices=1, max_delay=None,
                  allow_delay_extension=None):

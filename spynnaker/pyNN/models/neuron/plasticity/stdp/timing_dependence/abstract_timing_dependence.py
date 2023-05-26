@@ -14,9 +14,12 @@
 
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractHasParameterNames)
 
 
-class AbstractTimingDependence(object, metaclass=AbstractBase):
+class AbstractTimingDependence(
+        AbstractHasParameterNames, metaclass=AbstractBase):
     """
     An STDP timing dependence rule.
     """
@@ -84,13 +87,4 @@ class AbstractTimingDependence(object, metaclass=AbstractBase):
         The synaptic structure of the plastic part of the rows.
 
         :rtype: AbstractSynapseStructure
-        """
-
-    @abstractmethod
-    def get_parameter_names(self):
-        """
-        Return the names of the parameters supported by this timing
-        dependency model.
-
-        :rtype: iterable(str)
         """

@@ -39,7 +39,7 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
     A device that can be controlled by sending multicast packets to it,
     either directly, or via Ethernet using an AbstractEthernetTranslator.
     """
-    __slots__ = []
+    __slots__ = ()
 
     @abstractproperty
     def device_control_partition_id(self):

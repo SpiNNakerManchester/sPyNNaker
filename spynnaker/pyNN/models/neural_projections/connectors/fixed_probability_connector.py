@@ -39,9 +39,9 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     For each pair of pre-post cells, the connection probability is constant.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__allow_self_connections",
-        "_p_connect"]
+        "_p_connect")
 
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,

@@ -289,7 +289,10 @@ class MunichIoSpiNNakerLinkProtocol(object):
     """
     Provides Multicast commands for the Munich SpiNNaker-Link protocol.
     """
-    __slots__ = ["__instance_key", "__mode", "__uart_id"]
+    __slots__ = (
+        "__instance_key",
+        "__mode",
+        "__uart_id")
 
     # The instance of the protocol in use, to ensure that each vertex that is
     # to send commands to the PushBot uses a different outgoing key; the top

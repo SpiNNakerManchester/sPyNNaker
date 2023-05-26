@@ -17,7 +17,7 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 class ExternalCochleaDevice(
         ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex):
-    __slots__ = []
+    __slots__ = ()
 
     def __init__(
             self, n_neurons, spinnaker_link, label=None, board_address=None):

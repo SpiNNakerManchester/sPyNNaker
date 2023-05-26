@@ -28,9 +28,7 @@ class PopulationSynapsesMachineVertexShared(
     A machine vertex for PyNN Populations.
     """
 
-    __slots__ = [
-        "__synapse_references"
-    ]
+    __slots__ = ("__synapse_references", )
 
     def __init__(
             self, sdram, label, app_vertex, vertex_slice, synapse_references):

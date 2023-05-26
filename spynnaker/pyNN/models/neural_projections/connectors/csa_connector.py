@@ -35,8 +35,10 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         https://github.com/INCF/csa/issues/10
     """
 
-    __slots__ = [
-        "__cset", "__full_connection_set", "__full_cset"]
+    __slots__ = (
+        "__cset",
+        "__full_connection_set",
+        "__full_cset")
 
     def __init__(self, cset, safe=True, callback=None, verbose=False):
         """

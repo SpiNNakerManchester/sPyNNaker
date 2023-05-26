@@ -61,9 +61,9 @@ def get_spike_value_from_fpga_retina(key, mode):
 class ExternalFPGARetinaDevice(
         ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex,
         AbstractSendMeMulticastCommandsVertex):
-    __slots__ = [
+    __slots__ = (
         "__fixed_key",
-        "__fixed_mask"]
+        "__fixed_mask")
 
     MODE_128 = "128"
     MODE_64 = "64"

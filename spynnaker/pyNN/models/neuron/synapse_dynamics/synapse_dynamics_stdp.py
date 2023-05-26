@@ -47,7 +47,7 @@ class SynapseDynamicsSTDP(
     Spike Timing Dependent Plasticity (STDP) rule.
     """
 
-    __slots__ = [
+    __slots__ = (
         # Fraction of delay that is dendritic (instead of axonal or synaptic)
         "__dendritic_delay_fraction",
         # timing dependence to use for the STDP rule
@@ -63,7 +63,7 @@ class SynapseDynamicsSTDP(
         # Delay of connections formed by connector
         "__delay",
         # Whether to use back-propagation delay or not
-        "__backprop_delay"]
+        "__backprop_delay")
 
     def __init__(
             self, timing_dependence, weight_dependence,
@@ -496,10 +496,10 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)
     def get_parameter_names(self):
-        names = ['weight', 'delay']
-        names.extend(self.__timing_dependence.get_parameter_names())
-        names.extend(self.__weight_dependence.get_parameter_names())
-        return names
+        yield 'weight'
+        yield 'delay'
+        yield from self.__timing_dependence.get_parameter_names()
+        yield from self.__weight_dependence.get_parameter_names()
 
     @overrides(AbstractPlasticSynapseDynamics.get_max_synapses)
     def get_max_synapses(self, n_words):

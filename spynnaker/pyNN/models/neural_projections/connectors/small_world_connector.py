@@ -27,12 +27,12 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     .. note::
         This is typically used from a population to itself.
     """
-    __slots__ = [
+    __slots__ = (
         "__allow_self_connections",  # TODO: currently ignored
         "__degree",
         "__mask",
         "__n_connections",
-        "__rewiring"]
+        "__rewiring")
 
     def __init__(
             self, degree, rewiring, allow_self_connections=True,

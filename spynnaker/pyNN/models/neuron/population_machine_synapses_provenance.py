@@ -52,7 +52,7 @@ class PopulationMachineSynapsesProvenance(object):
     """
 
     # This MUST stay empty to allow mixing with other things with slots
-    __slots__ = []
+    __slots__ = ()
 
     TOTAL_PRE_SYNAPTIC_EVENT_NAME = "Total_pre_synaptic_events"
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"

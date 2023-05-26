@@ -72,7 +72,7 @@ class NeuronData(object):
     Holds and creates the data for a group of neurons.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The application vertex
         "__app_vertex",
 
@@ -89,8 +89,7 @@ class NeuronData(object):
         "__generation_done",
 
         # Whether to generate things on the machine
-        "__gen_on_machine"
-    ]
+        "__gen_on_machine")
 
     def __init__(self, app_vertex):
         self.__app_vertex = app_vertex
@@ -362,10 +361,9 @@ class NeuronData(object):
 
 
 class _MergedDict(object):
-    __slots__ = [
+    __slots__ = (
         "__params",
-        "__state_vars"
-    ]
+        "__state_vars")
 
     def __init__(self, params, state_vars):
         self.__params = params

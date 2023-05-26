@@ -118,4 +118,4 @@ class SpynnakerPanel(_BaseClass):
     def __init__(self, *data, **options):
         moved_in_v6(
             "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
-        super(SpynnakerPanel, self).__init__(*data, **options)
+        super().__init__(*data, **options)

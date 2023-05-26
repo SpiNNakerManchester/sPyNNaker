@@ -40,11 +40,10 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     A convolution synapse dynamics that can process spikes with only DTCM.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__cached_2d_overlaps",
         "__cached_n_incoming"
-        "__delay"
-    ]
+        "__delay")
 
     def __init__(self, delay=None):
         """
@@ -224,6 +223,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         .. note::
             This happens in retinas from FPGAs.
 
+        :param dict key_cache:
         :rtype: list(Source)
         """
         delay_vertex = None
@@ -240,13 +240,12 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         keys = list()
         for vertex_slice, slice_sources in sources.items():
             cache_key = (app_edge.pre_vertex, vertex_slice)
-            if cache_key in key_cache:
-                keys.append(key_cache.get(cache_key))
-            else:
+            key_source = key_cache.get(cache_key, None)
+            if not key_source:
                 key_source = self.__build_source(
                     slice_sources, delay_vertex, incoming, vertex_slice)
                 key_cache[cache_key] = key_source
-                keys.append(key_source)
+            keys.append(key_source)
         return keys
 
     def __build_source(

@@ -65,7 +65,7 @@ class SynapticMatrices(object):
     Handler of synaptic matrices for a core of a population vertex.
     """
 
-    __slots__ = [
+    __slots__ = (
         # The number of synapse types received
         "__n_synapse_types",
         # The region identifiers
@@ -105,8 +105,7 @@ class SynapticMatrices(object):
         # The bit field key map generated
         "__bit_field_key_map",
         # The maximum generated data, for calculating timeouts
-        "__max_gen_data"
-    ]
+        "__max_gen_data")
 
     def __init__(
             self, app_vertex, regions, max_atoms_per_core, weight_scales,
@@ -481,8 +480,13 @@ class AppKeyInfo(object):
     details.
     """
 
-    __slots__ = ["app_key", "app_mask", "core_mask", "core_shift", "n_neurons",
-                 "n_colour_bits"]
+    __slots__ = (
+        "app_key",
+        "app_mask",
+        "core_mask",
+        "core_shift",
+        "n_neurons",
+        "n_colour_bits")
 
     def __init__(self, app_key, app_mask, core_mask, core_shift, n_neurons,
                  n_colour_bits):

@@ -56,7 +56,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
     A connection for receiving live spikes from SPIF.
     """
     # TODO: define SPIF
-    __slots__ = [
+    __slots__ = (
         "_atom_id_to_key",
         "__error_keys",
         "__init_callbacks",
@@ -70,7 +70,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         "__spif_host",
         "__spif_port",
         "__spif_packet_size",
-        "__spif_packet_time_us"]
+        "__spif_packet_time_us")
 
     def __init__(self, receive_labels, spif_host, spif_port=_DEFAULT_SPIF_PORT,
                  events_per_packet=_EVENTS_PER_PACKET,

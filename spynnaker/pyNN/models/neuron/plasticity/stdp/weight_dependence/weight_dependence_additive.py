@@ -27,9 +27,9 @@ class WeightDependenceAdditive(
     An additive weight dependence STDP rule.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__w_max",
-        "__w_min"]
+        "__w_min")
     __PARAM_NAMES = ('w_min', 'w_max', 'A_plus', 'A_minus')
 
     # noinspection PyPep8Naming

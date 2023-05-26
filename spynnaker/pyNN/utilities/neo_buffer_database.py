@@ -488,18 +488,18 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
         :return:
-            region_id, neurons, vertex_slice, selective_recording, base_key
-        :rtype: iterable(tuple(int, ~numpy.ndarray, Slice, bool, int))
+            region_id, neurons, vertex_slice, selective_recording, base_key,
+            index
+        :rtype: iterable(tuple(int, ~numpy.ndarray, Slice, bool, int, int))
         """
-        rows = list(cursor.execute(
-            """
-            SELECT region_id, recording_neurons_st, vertex_slice, base_key
-            FROM region_metadata
-            WHERE rec_id = ?
-            ORDER BY region_metadata_id
-            """, [rec_id]))
         index = 0
-        for row in rows:
+        for row in cursor.execute(
+                """
+                SELECT region_id, recording_neurons_st, vertex_slice, base_key
+                FROM region_metadata
+                WHERE rec_id = ?
+                ORDER BY region_metadata_id
+                """, [rec_id]):
             vertex_slice = MDSlice.from_string(
                 str(row["vertex_slice"], "utf-8"))
             recording_neurons_st = row["recording_neurons_st"]
@@ -897,26 +897,25 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param list(int) rewire_times:
         """
         record_raw = self._read_contents(cursor, region_id)
-        if len(record_raw) > 0:
-            raw_data = (
-                numpy.asarray(record_raw, dtype="uint8").view(
-                    dtype="<i4")).reshape([-1, self.__REWIRING_N_WORDS])
-        else:
+        if len(record_raw) < 1:
             return
+
+        raw_data = numpy.asarray(record_raw, dtype="uint8").view(
+            dtype="<i4").reshape([-1, self.__REWIRING_N_WORDS])
 
         record_time = (raw_data[:, 0] * sampling_interval_ms)
         rewires_raw = raw_data[:, 1:]
         rew_length = len(rewires_raw)
         # rewires is 0 (elimination) or 1 (formation) in the first bit
-        rewires = [rewires_raw[i][0] & self.__FIRST_BIT
-                   for i in range(rew_length)]
+        rewires = (rewires_raw[i][0] & self.__FIRST_BIT
+                   for i in range(rew_length))
         # the post-neuron ID is stored in the next 8 bytes
-        post_ids = [((int(rewires_raw[i]) >> self.__POST_ID_SHIFT) %
+        post_ids = (((int(rewires_raw[i]) >> self.__POST_ID_SHIFT) %
                      self.__POST_ID_FACTOR) + vertex_slice.lo_atom
-                    for i in range(rew_length)]
+                    for i in range(rew_length))
         # the pre-neuron ID is stored in the remaining 23 bytes
-        pre_ids = [int(rewires_raw[i]) >> self.__PRE_ID_SHIFT
-                   for i in range(rew_length)]
+        pre_ids = (int(rewires_raw[i]) >> self.__PRE_ID_SHIFT
+                   for i in range(rew_length))
 
         rewire_values.extend(rewires)
         rewire_postids.extend(post_ids)

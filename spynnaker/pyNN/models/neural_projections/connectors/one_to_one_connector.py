@@ -38,7 +38,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     connect cell *i* in the presynaptic population to cell *i* in
     the postsynaptic population, for all *i*.
     """
-    __slots__ = []
+    __slots__ = ()
 
     def __init__(self, safe=True, callback=None, verbose=False):
         """

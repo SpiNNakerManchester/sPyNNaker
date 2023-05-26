@@ -22,13 +22,13 @@ class _Range_Iterator(object):
     Iterator over a :py:class:`~spinn_utilities.ranged.RangedList`
     which is range based.
     """
-    __slots__ = [
+    __slots__ = (
         "__cmd_pair",
         "__datatype",
         "__index",
         "__iterator",
         "__spec",
-        "__stop_range"]
+        "__stop_range")
 
     def __init__(self, value, data_type, slice_start, slice_stop, spec):
         """
@@ -69,12 +69,12 @@ class _Get_Iterator(object):
     """
     Iterator over a standard collection that supports ``__getitem__``.
     """
-    __slots__ = [
+    __slots__ = (
         "__datatype",
         "__index",
         "__slice_stop",
         "__spec",
-        "__value"]
+        "__value")
 
     def __init__(self, value, data_type, slice_start, slice_stop, spec):
         """
@@ -111,10 +111,10 @@ class _SingleValue_Iterator(object):
     a given length.
     Caches `cmd_word_list` and `cmd_string` so they are only created once.
     """
-    __slots__ = [
+    __slots__ = (
         "__cmd_pair",
         "__index",
-        "__stop"]
+        "__stop")
 
     def __init__(self, value, data_type, slice_start, slice_stop, spec):
         """
@@ -143,10 +143,9 @@ class NeuronParameter(object):
     """
     A settable parameter of a neuron model.
     """
-
-    __slots__ = [
+    __slots__ = (
         "__data_type",
-        "__value"]
+        "__value")
 
     def __init__(self, value, data_type):
         """

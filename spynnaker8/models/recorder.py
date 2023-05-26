@@ -31,4 +31,4 @@ class Recorder(_BaseClass):
         """
         moved_in_v6("spynnaker8.models.recorder",
                     "spynnaker.pyNN.models.recorder")
-        super(Recorder, self).__init__(population, vertex)
+        super().__init__(population, vertex)

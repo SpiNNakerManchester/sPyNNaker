@@ -47,6 +47,6 @@ class Projection(_BaseClass):
         """
         moved_in_v6("spynnaker8.models.projection",
                     "spynnaker.pyNN.models.projection")
-        super(Projection, self).__init__(
+        super().__init__(
             pre_synaptic_population, post_synaptic_population, connector,
             synapse_type, source, receptor_type, space, label)

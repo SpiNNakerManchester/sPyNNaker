@@ -45,15 +45,14 @@ class ConvolutionConnector(AbstractConnector):
     through a (kernel) set of weights and/or delays.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__kernel_weights",
         "__strides",
         "__padding_shape",
         "__pool_shape",
         "__pool_stride",
         "__positive_receptor_type",
-        "__negative_receptor_type"
-    ]
+        "__negative_receptor_type")
 
     def __init__(self, kernel_weights, kernel_shape=None, strides=None,
                  padding=None, pool_shape=None, pool_stride=None,

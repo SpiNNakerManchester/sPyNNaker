@@ -20,7 +20,7 @@ class RunningStats(object):
     Keeps running statistics.
     From: https://www.johndcook.com/blog/skewness_kurtosis/
     """
-    __slots__ = ["__mean", "__mean_2", "__n_items"]
+    __slots__ = ("__mean", "__mean_2", "__n_items")
 
     def __init__(self):
         self.__mean = 0.0

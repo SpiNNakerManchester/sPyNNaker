@@ -48,5 +48,5 @@ class ArrayConnector(_BaseClass):
         moved_in_v6("spynnaker8.models.connectors.ArrayConnector",
                     "spynnaker.pyNN.models.neural_projections.connectors"
                     ".ArrayConnector")
-        super(ArrayConnector, self).__init__(
+        super().__init__(
             array=array, safe=safe, callback=callback, verbose=verbose)

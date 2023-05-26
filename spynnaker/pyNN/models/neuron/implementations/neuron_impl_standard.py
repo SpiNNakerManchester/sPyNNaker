@@ -34,7 +34,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
     The standard componentised neuron implementation.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__model_name",
         "__binary",
         "__neuron_model",
@@ -43,8 +43,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
         "__threshold_type",
         "__additional_input_type",
         "__components",
-        "__n_steps_per_timestep"
-    ]
+        "__n_steps_per_timestep")
 
     _RECORDABLES = ["v", "gsyn_exc", "gsyn_inh"]
 

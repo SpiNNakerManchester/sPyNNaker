@@ -30,7 +30,7 @@ class SynapticMatrixApp(object):
 
     # pylint: disable=unused-private-member
     # https://github.com/SpiNNakerManchester/sPyNNaker/issues/1201
-    __slots__ = [
+    __slots__ = (
         # The synaptic info that these matrices are for
         "__synapse_info",
         # The application edge that these matrices are for
@@ -63,8 +63,7 @@ class SynapticMatrixApp(object):
         # table
         "__delay_index",
         # The number of bits to use for neuron IDs
-        "__max_atoms_per_core"
-    ]
+        "__max_atoms_per_core")
 
     def __init__(
             self, synapse_info, app_edge, n_synapse_types,

@@ -58,7 +58,7 @@ class IndexBasedProbabilityConnector(_BaseClass):
                     ".IndexBasedProbabilityConnector",
                     "spynnaker.pyNN.models.neural_projections.connectors"
                     ".IndexBasedProbabilityConnector")
-        super(IndexBasedProbabilityConnector, self).__init__(
+        super().__init__(
             index_expression=index_expression,
             allow_self_connections=allow_self_connections, rng=rng,
             safe=safe, callback=callback, verbose=verbose)

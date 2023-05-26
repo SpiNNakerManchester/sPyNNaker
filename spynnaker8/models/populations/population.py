@@ -48,6 +48,6 @@ class Population(_BaseClass):
         # pylint: disable=too-many-arguments
         moved_in_v6("spynnaker8.models.populations.Population",
                     "spynnaker.pyNN.models.populations.Population")
-        super(Population, self).__init__(
+        super().__init__(
             size, cellclass, cellparams, structure, initial_values, label,
             additional_parameters)

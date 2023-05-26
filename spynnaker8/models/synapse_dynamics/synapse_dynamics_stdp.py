@@ -49,7 +49,7 @@ class SynapseDynamicsSTDP(_BaseClass):
         moved_in_v6("spynnaker8.models.synapse_dynamics.SynapseDynamicsSTDP",
                     "spynnaker.pyNN.models.neuron.synapse_dynamics"
                     ".SynapseDynamicsSTDP")
-        super(SynapseDynamicsSTDP, self).__init__(
+        super().__init__(
             timing_dependence, weight_dependence, voltage_dependence,
             dendritic_delay_fraction, weight, delay,
             backprop_delay=backprop_delay)

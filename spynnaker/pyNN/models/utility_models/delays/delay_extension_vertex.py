@@ -29,14 +29,14 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
     Provide delays to incoming spikes in multiples of the maximum delays
     of a neuron (typically 16 or 32).
     """
-    __slots__ = [
-        # The parition this Delay is supporting
+    __slots__ = (
+        # The partition this Delay is supporting
         "__partition",
         "__delay_per_stage",
         "__n_delay_stages",
         "__drop_late_spikes",
         "__outgoing_edges",
-        "__n_colour_bits"]
+        "__n_colour_bits")
 
     # this maps to what master assumes
     MAX_SLOTS = 8

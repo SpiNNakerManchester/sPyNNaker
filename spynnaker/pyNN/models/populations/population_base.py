@@ -38,7 +38,7 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     Mainly pass through and not implemented.
     """
-    __slots__ = []
+    __slots__ = ()
 
     @property
     def local_cells(self):

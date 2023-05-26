@@ -21,11 +21,10 @@ class RandomByWeightElimination(AbstractElimination):
     Elimination Rule that depends on the weight of a synapse.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__prob_elim_depressed",
         "__prob_elim_potentiated",
-        "__threshold"
-    ]
+        "__threshold")
 
     def __init__(
             self, threshold, prob_elim_depressed=0.0245,
@@ -63,4 +62,4 @@ class RandomByWeightElimination(AbstractElimination):
 
     @overrides(AbstractElimination.get_parameter_names)
     def get_parameter_names(self):
-        return ["prob_elim_depressed", "prob_elim_potentiated", "threshold"]
+        return ("prob_elim_depressed", "prob_elim_potentiated", "threshold")

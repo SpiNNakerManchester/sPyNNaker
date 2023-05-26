@@ -62,7 +62,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     Main interface for the sPyNNaker implementation of PyNN 0.8/0.9.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     def __init__(
             self, time_scale_factor, min_delay,
@@ -95,7 +95,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             min_delay = timestep
 
         # pynn demanded objects
-        self.__recorders = set([])
+        self.__recorders = set()
 
         # main pynn interface inheritance
         pynn_control.BaseState.__init__(self)
@@ -165,7 +165,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         Clear the current recordings and reset the simulation.
         """
-        self.recorders = set([])
+        self.recorders = set()
         self.reset()
 
         # Stop any currently running SpiNNaker application

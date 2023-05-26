@@ -48,7 +48,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
                             ("weight", "float64"), ("delay", "float64"),
                             ("synapse_type", "uint8")]
 
-    __slots__ = [
+    __slots__ = (
         "_delays",
         "__min_delay",
         "__n_clipped_delays",
@@ -58,7 +58,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         "__verbose",
         "_weights",
         "__param_seeds",
-        "__synapse_info"]
+        "__synapse_info")
 
     def __init__(self, safe=True, callback=None, verbose=False, rng=None):
         """

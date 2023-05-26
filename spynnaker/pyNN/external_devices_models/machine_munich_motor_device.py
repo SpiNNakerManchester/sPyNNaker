@@ -38,13 +38,13 @@ class MachineMunichMotorDevice(
     An Omnibot motor control device. This has a real vertex and an
     external device vertex.
     """
-    __slots__ = [
+    __slots__ = (
         "__continue_if_not_different",
         "__delay_time",
         "__delta_threshold",
         "__sample_time",
         "__speed",
-        "__update_time"]
+        "__update_time")
 
     MOTOR_PARTITION_ID = "MOTOR"
 

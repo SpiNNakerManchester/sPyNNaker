@@ -32,7 +32,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
     A threshold type that can send multicast keys with the value of
     membrane voltage as the payload.
     """
-    __slots__ = ["__devices"]
+    __slots__ = ("__devices", )
 
     def __init__(self, devices):
         """

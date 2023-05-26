@@ -31,7 +31,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     A convolution synapse dynamics that can process spikes with only DTCM.
     """
 
-    __slots__ = ["__delay"]
+    __slots__ = ("__delay", )
 
     def __init__(self, delay=None):
         """
@@ -115,8 +115,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     raise SynapticConfigurationException(
                         f"Missing r_info for {pre_m_vertex}")
                 vertex_slice = pre_m_vertex.vertex_slice
-                key = (app_edge.pre_vertex, vertex_slice)
-                edges_for_source[key].append((pre_m_vertex, r_info))
+                edges_for_source[app_edge.pre_vertex, vertex_slice].append(
+                    (pre_m_vertex, r_info))
 
             # Merge edges with the same source
             for (_, vertex_slice), edge_list in edges_for_source.items():

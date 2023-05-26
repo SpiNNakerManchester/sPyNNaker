@@ -24,7 +24,7 @@ class ThresholdTypeStatic(AbstractThresholdType):
     """
     A threshold that is a static value.
     """
-    __slots__ = ["__v_thresh"]
+    __slots__ = ("__v_thresh", )
 
     def __init__(self, v_thresh):
         """

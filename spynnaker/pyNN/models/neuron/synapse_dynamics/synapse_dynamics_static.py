@@ -32,13 +32,13 @@ class SynapseDynamicsStatic(
     The dynamics of a synapse that does not change over time.
     """
 
-    __slots__ = [
+    __slots__ = (
         # padding to add to a synaptic row for synaptic rewiring
         "__pad_to_length",
         # weight of connections
         "__weight",
         # delay of connections
-        "__delay"]
+        "__delay")
 
     def __init__(self, weight=StaticSynapse.default_parameters['weight'],
                  delay=None, pad_to_length=None):
@@ -172,7 +172,7 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractStaticSynapseDynamics.get_parameter_names)
     def get_parameter_names(self):
-        return ['weight', 'delay']
+        return ('weight', 'delay')
 
     @overrides(AbstractStaticSynapseDynamics.get_max_synapses)
     def get_max_synapses(self, n_words):

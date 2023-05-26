@@ -46,11 +46,11 @@ class _DelaySupportAdder(object):
     Adds delay extension vertices into the application graph as needed.
     """
 
-    __slots__ = [
+    __slots__ = (
         "_app_to_delay_map",
         "_delay_post_edge_map",
         "_new_edges",
-        "_new_vertices"]
+        "_new_vertices")
 
     def __init__(self):
         self._app_to_delay_map = dict()

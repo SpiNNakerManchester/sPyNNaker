@@ -21,7 +21,7 @@ class EthernetControlConnection(LiveEventConnection):
     A connection that can translate Ethernet control messages received
     from a Population.
     """
-    __slots__ = ["__translators"]
+    __slots__ = ("__translators", )
 
     def __init__(
             self, translator, label, live_packet_gather_label, local_host=None,

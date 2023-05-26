@@ -54,11 +54,11 @@ class Projection(object):
     """
     # "format" param name defined by PyNN/
     # pylint: disable=redefined-builtin
-    __slots__ = [
+    __slots__ = (
         "__projection_edge",
         "__synapse_information",
         "__virtual_connection_list",
-        "__label"]
+        "__label")
 
     def __init__(
             self, pre_synaptic_population, post_synaptic_population,

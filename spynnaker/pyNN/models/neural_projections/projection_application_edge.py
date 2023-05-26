@@ -61,11 +61,10 @@ class ProjectionApplicationEdge(
     """
     An edge which terminates on an :py:class:`AbstractPopulationVertex`.
     """
-    __slots__ = [
+    __slots__ = (
         "__delay_edge",
         "__synapse_information",
-        "__is_neuromodulation"
-    ]
+        "__is_neuromodulation")
 
     def __init__(
             self, pre_vertex, post_vertex, synapse_information, label=None):

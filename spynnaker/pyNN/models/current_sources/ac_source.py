@@ -26,7 +26,7 @@ class ACSource(AbstractCurrentSource):
     AC current source (i.e. sine wave) turned on at "start" and off at
     "stop", given (y-)offset, amplitude, frequency and phase.
     """
-    __slots__ = [
+    __slots__ = (
         "__start",
         "__stop",
         "__amplitude",
@@ -34,7 +34,7 @@ class ACSource(AbstractCurrentSource):
         "__frequency",
         "__phase",
         "__parameters",
-        "__parameter_types"]
+        "__parameter_types")
 
     def __init__(self, start=0.0, stop=0.0, amplitude=0.0, offset=0.0,
                  frequency=0.0, phase=0.0):

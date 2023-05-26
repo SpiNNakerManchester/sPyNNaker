@@ -35,5 +35,4 @@ class WeightDependenceMultiplicative(_BaseClass):
                     ".WeightDependenceMultiplicative",
                     "spynnaker.pyNN.models.neuron.plasticity.stdp."
                     "weight_dependence.WeightDependenceMultiplicative")
-        super(WeightDependenceMultiplicative, self).__init__(
-            w_max=w_max, w_min=w_min)
+        super().__init__(w_max=w_max, w_min=w_min)

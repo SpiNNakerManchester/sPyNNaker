@@ -18,7 +18,11 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
 class ArbitraryFPGADevice(ApplicationFPGAVertex, PopulationApplicationVertex):
-    __slots__ = []
+    """
+    A device connected to SpiNNaker via one of the on-board FPGAs.
+    """
+
+    __slots__ = ()
 
     def __init__(
             self, n_neurons, fpga_link_id, fpga_id, board_address=None,

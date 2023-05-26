@@ -60,7 +60,7 @@ class PopulationMachineCommon(
     A common machine vertex for all population binaries.
     """
 
-    __slots__ = [
+    __slots__ = (
         # Sdram used by the machine vertex
         "__sdram",
         # Regions to be used
@@ -70,8 +70,7 @@ class PopulationMachineCommon(
         # The profile tags to be decoded
         "__profile_tags",
         # The name of the binary to run on the core
-        "__binary_file_name"
-    ]
+        "__binary_file_name")
 
     def __init__(
             self, label, app_vertex, vertex_slice, sdram,

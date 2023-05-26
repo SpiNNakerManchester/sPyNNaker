@@ -28,8 +28,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
     via slice logic.
     """
 
-    __slots__ = [
-        "_machine_vertex_by_slice"]
+    __slots__ = ("_machine_vertex_by_slice", )
 
     _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 

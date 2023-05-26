@@ -34,12 +34,12 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
     synapses is created by selecting at random from the source and target
     populations with replacement. Uniform selection probability is assumed.
     """
-    __slots__ = [
+    __slots__ = (
         "__allow_self_connections",
         "__num_synapses",
         "__post_slices",
         "__synapses_per_edge",
-        "__with_replacement"]
+        "__with_replacement")
 
     def __init__(self, n, allow_self_connections=True,
                  with_replacement=True, safe=True,

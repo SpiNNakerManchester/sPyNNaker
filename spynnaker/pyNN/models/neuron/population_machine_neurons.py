@@ -67,7 +67,7 @@ class PopulationMachineNeurons(
     """
 
     # This MUST stay empty to allow mixing with other things with slots
-    __slots__ = []
+    __slots__ = ()
 
     @abstractproperty
     def _app_vertex(self):

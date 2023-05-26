@@ -164,13 +164,13 @@ class SpikeSourcePoissonMachineVertex(
     Vertex that implements a Poisson-distributed spike source.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__buffered_sdram_per_timestep",
         "__is_recording",
         "__minimum_buffer_sdram",
         "__sdram",
         "__sdram_partition",
-        "__rate_changed"]
+        "__rate_changed")
 
     class POISSON_SPIKE_SOURCE_REGIONS(IntEnum):
         """

@@ -26,9 +26,9 @@ class WeightDependenceMultiplicative(
     """
     A multiplicative weight dependence STDP rule.
     """
-    __slots__ = [
+    __slots__ = (
         "__w_max",
-        "__w_min"]
+        "__w_min")
     __PARAM_NAMES = ('w_min', 'w_max', 'A_plus', 'A_minus')
 
     def __init__(self, w_min=0.0, w_max=1.0):

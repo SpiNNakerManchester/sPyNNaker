@@ -15,9 +15,9 @@ from pacman.model.graphs.application import ApplicationEdge
 
 
 class DelayedApplicationEdge(ApplicationEdge):
-    __slots__ = [
+    __slots__ = (
         "__synapse_information",
-        "__undelayed_edge"]
+        "__undelayed_edge")
 
     def __init__(
             self, pre_vertex, post_vertex, synapse_information, undelayed_edge,

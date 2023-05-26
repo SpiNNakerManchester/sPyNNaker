@@ -46,8 +46,7 @@ class Population(PopulationBase):
     """
     PyNN 0.9 population object.
     """
-
-    __slots__ = [
+    __slots__ = (
         "__annotations",
         "__celltype",
         "__first_id",
@@ -56,7 +55,7 @@ class Population(PopulationBase):
         "__recorder",
         "__size",
         "__structure",
-        "__vertex"]
+        "__vertex")
 
     def __init__(
             self, size, cellclass, cellparams=None, structure=None,
@@ -511,10 +510,7 @@ class Population(PopulationBase):
         """
         :rtype: list(IDMixin)
         """
-        cells = []
-        for _id in range(self.__size):
-            cells.append(IDMixin(self, _id))
-        return cells
+        return [IDMixin(self, _id) for _id in range(self.__size)]
 
     @property
     def position_generator(self):

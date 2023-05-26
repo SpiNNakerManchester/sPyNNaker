@@ -81,7 +81,7 @@ class KernelConnector(_BaseClass):
         moved_in_v6("spynnaker8.models.connectors.KernelConnector",
                     "spynnaker.pyNN.models.neural_projections.connectors"
                     ".KernelConnector")
-        super(KernelConnector, self).__init__(
+        super().__init__(
             shape_pre, shape_post, shape_kernel, weight_kernel,
             delay_kernel, shape_common, pre_sample_steps_in_post,
             pre_start_coords_in_post, post_sample_steps_in_pre,

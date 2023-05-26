@@ -28,7 +28,7 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
     A Model that can be passed in to a Population object in PyNN.
     """
 
-    __slots__ = []
+    __slots__ = ()
     _max_atoms_per_core = defaultdict(lambda: None)
 
     @classmethod

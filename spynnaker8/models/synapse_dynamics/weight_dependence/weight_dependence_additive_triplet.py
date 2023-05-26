@@ -39,5 +39,5 @@ class WeightDependenceAdditiveTriplet(_BaseClass):
                     ".WeightDependenceAdditiveTriplet",
                     "spynnaker.pyNN.models.neuron.plasticity.stdp."
                     "weight_dependence.WeightDependenceAdditiveTriplet")
-        super(WeightDependenceAdditiveTriplet, self).__init__(
+        super().__init__(
             w_max=w_max, w_min=w_min, A3_plus=A3_plus, A3_minus=A3_minus)

@@ -27,7 +27,7 @@ class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
     """
     A synapse dynamics that can be generated on the machine.
     """
-    __slots__ = []
+    __slots__ = ()
 
     def generate_on_machine(self):
         """

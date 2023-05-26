@@ -30,7 +30,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     """
     A timing dependence STDP rule based on recurrences.
     """
-    __slots__ = [
+    __slots__ = (
         "__accumulator_depression_plus_one",
         "__accumulator_potentiation_minus_one",
         "__dual_fsm",
@@ -38,7 +38,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         "__mean_pre_window",
         "__synapse_structure",
         "__a_plus",
-        "__a_minus"]
+        "__a_minus")
     __PARAM_NAMES = (
         'accumulator_depression', 'accumulator_potentiation',
         'mean_pre_window', 'mean_post_window', 'dual_fsm')

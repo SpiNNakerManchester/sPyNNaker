@@ -33,14 +33,13 @@ class MaxRowInfo(object):
     Information about the maximums for rows in a synaptic matrix.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__undelayed_max_n_synapses",
         "__delayed_max_n_synapses",
         "__undelayed_max_bytes",
         "__delayed_max_bytes",
         "__undelayed_max_words",
-        "__delayed_max_words",
-    ]
+        "__delayed_max_words")
 
     def __init__(
             self, undelayed_max_n_synapses, delayed_max_n_synapses,

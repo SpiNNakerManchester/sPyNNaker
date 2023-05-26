@@ -24,7 +24,7 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
     accept spikes from a :py:class:`DelayExtensionMachineVertex`.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     @abstractmethod
     def max_support_delay(self):

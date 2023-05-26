@@ -39,10 +39,10 @@ class DistanceDependentProbabilityConnector(
     Make connections using a distribution which varies with distance.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__allow_self_connections",
         "__d_expression",
-        "__probs"]
+        "__probs")
 
     def __init__(
             self, d_expression, allow_self_connections=True, safe=True,

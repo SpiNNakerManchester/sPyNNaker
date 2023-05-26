@@ -30,7 +30,7 @@ class SpynnakerExternalDevicePluginManager(object):
     """
     User-level interface for the external device plug-in manager.
     """
-    __slots__ = []
+    __slots__ = ()
 
     @staticmethod
     def add_database_socket_address(

@@ -40,5 +40,5 @@ class TimingDependenceVogels2011(_BaseClass):
                     "TimingDependenceVogels2011",
                     "spynnaker.pyNN.models.neuron.plasticity.stdp."
                     "timing_dependence.TimingDependenceVogels2011")
-        super(TimingDependenceVogels2011, self).__init__(
+        super().__init__(
             tau=tau, alpha=alpha, A_plus=A_plus, A_minus=A_minus)

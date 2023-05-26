@@ -112,7 +112,7 @@ class AbstractPopulationVertex(
     Not actually abstract.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__incoming_spike_buffer_size",
         "__n_atoms",
         "__n_profile_samples",
@@ -142,7 +142,7 @@ class AbstractPopulationVertex(
         "__read_initial_values",
         "__have_read_initial_values",
         "__last_parameter_read_time",
-        "__n_colour_bits"]
+        "__n_colour_bits")
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -733,10 +733,9 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.get_recordable_variables)
     def get_recordable_variables(self):
-        variables = list()
-        variables.extend(self.__neuron_recorder.get_recordable_variables())
-        variables.extend(self.__synapse_recorder.get_recordable_variables())
-        return variables
+        return [
+            *self.__neuron_recorder.get_recordable_variables(),
+            *self.__synapse_recorder.get_recordable_variables()]
 
     @overrides(PopulationApplicationVertex.get_buffer_data_type)
     def get_buffer_data_type(self, name):
@@ -769,10 +768,9 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.get_recording_variables)
     def get_recording_variables(self):
-        recording = list()
-        recording.extend(self.__neuron_recorder.recording_variables)
-        recording.extend(self.__synapse_recorder.recording_variables)
-        return recording
+        return [
+            *self.__neuron_recorder.recording_variables,
+            *self.__synapse_recorder.recording_variables]
 
     @overrides(PopulationApplicationVertex.get_sampling_interval_ms)
     def get_sampling_interval_ms(self, name):
@@ -1394,8 +1392,7 @@ class AbstractPopulationVertex(
         :rtype: iterable(~spynnaker.pyNN.models.projection.Projection)
         """
         for proj_list in self.__incoming_projections.values():
-            for proj in proj_list:
-                yield proj
+            yield from proj_list
 
     def get_incoming_projections_from(self, source_vertex):
         """
@@ -1523,7 +1520,7 @@ class _Stats(object):
     """
     Object to keep hold of and process statistics for ring buffer scaling.
     """
-    __slots__ = [
+    __slots__ = (
         "w_scale",
         "w_scale_sq",
         "n_synapse_types",
@@ -1534,8 +1531,7 @@ class _Stats(object):
         "rate_stats",
         "steps_per_second",
         "default_spikes_per_second",
-        "ring_buffer_sigma"
-    ]
+        "ring_buffer_sigma")
 
     def __init__(
             self, neuron_impl, default_spikes_per_second, ring_buffer_sigma):

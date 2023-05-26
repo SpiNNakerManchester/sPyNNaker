@@ -31,7 +31,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     """
     Make connections according to a list.
     """
-    __slots__ = [
+    __slots__ = (
         "__conn_list",
         "__column_names",
         "__sources",
@@ -41,7 +41,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         "__extra_parameters",
         "__extra_parameter_names",
         "__split_conn_list",
-        "__split_post_slices"]
+        "__split_post_slices")
 
     def __init__(self, conn_list, safe=True, verbose=False, column_names=None,
                  callback=None):

@@ -21,8 +21,8 @@ class RangedDictVertexSlice(object):
     """
     A slice of a ranged dict to be used to update values.
     """
-    __slots__ = [
-        "__ranged_dict", "__vertex_slice"]
+    __slots__ = (
+        "__ranged_dict", "__vertex_slice")
 
     def __init__(self, ranged_dict, vertex_slice):
         """
@@ -48,8 +48,8 @@ class _RangedListVertexSlice(object):
     """
     A slice of ranged list to be used to update values.
     """
-    __slots__ = [
-        "__ranged_list", "__vertex_slice"]
+    __slots__ = (
+        "__ranged_list", "__vertex_slice")
 
     def __init__(self, ranged_list, vertex_slice):
         self.__ranged_list = ranged_list

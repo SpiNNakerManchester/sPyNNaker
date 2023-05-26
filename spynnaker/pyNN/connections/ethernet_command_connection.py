@@ -23,9 +23,9 @@ class EthernetCommandConnection(DatabaseConnection):
     A connection that can send commands to a device at the start and end
     of a simulation.
     """
-    __slots__ = [
+    __slots__ = (
         "__command_containers",
-        "__translator"]
+        "__translator")
 
     def __init__(
             self, translator, command_containers=None, local_host=None,

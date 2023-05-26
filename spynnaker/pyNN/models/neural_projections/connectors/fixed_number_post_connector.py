@@ -33,12 +33,12 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     to all pre-synaptic neurons.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__allow_self_connections",
         "__n_post",
         "__post_neurons",
         "__post_neurons_set",
-        "__with_replacement"]
+        "__with_replacement")
 
     def __init__(
             self, n, allow_self_connections=True, safe=True, verbose=False,

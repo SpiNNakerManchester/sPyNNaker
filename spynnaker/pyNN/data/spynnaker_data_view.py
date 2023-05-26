@@ -39,15 +39,14 @@ class _SpynnakerDataModel(object):
 
     __singleton = None
 
-    __slots__ = [
+    __slots__ = (
         # Data values cached
         "_id_counter",
         "_min_delay",
         "_neurons_per_core_set",
         "_populations",
         "_projections",
-        "_segment_counter"
-    ]
+        "_segment_counter")
 
     def __new__(cls):
         if cls.__singleton:
@@ -99,7 +98,7 @@ class SpynnakerDataView(FecDataView):
 
     __spy_data = _SpynnakerDataModel()
 
-    __slots__ = []
+    __slots__ = ()
 
     @classmethod
     def get_min_delay(cls):

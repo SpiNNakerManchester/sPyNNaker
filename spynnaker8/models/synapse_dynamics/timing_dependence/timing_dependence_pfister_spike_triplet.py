@@ -44,6 +44,6 @@ class TimingDependencePfisterSpikeTriplet(_BaseClass):
                     "TimingDependencePfisterSpikeTriplet",
                     "spynnaker.pyNN.models.neuron.plasticity.stdp."
                     "timing_dependence.TimingDependencePfisterSpikeTriplet")
-        super(TimingDependencePfisterSpikeTriplet, self).__init__(
+        super().__init__(
             tau_plus=tau_plus, tau_minus=tau_minus, tau_x=tau_x,
             tau_y=tau_y, A_plus=A_plus, A_minus=A_minus)

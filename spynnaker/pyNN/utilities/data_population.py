@@ -29,11 +29,11 @@ _SELECTIVE_RECORDED_MSG = (
 
 
 class DataPopulation(object):
-    __slots__ = [
+    __slots__ = (
         "__database_file",
         "__label",
         "_indexes",
-        "_size"]
+        "_size")
 
     def __init__(self, database_file, label, indexes=None):
         self.__label = label

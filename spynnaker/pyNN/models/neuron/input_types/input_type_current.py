@@ -21,7 +21,7 @@ class InputTypeCurrent(AbstractInputType):
     """
     The current input type.
     """
-    __slots__ = []
+    __slots__ = ()
 
     def __init__(self):
         """

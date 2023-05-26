@@ -44,9 +44,7 @@ class AbstractGenerateConnectorOnMachine(
     Indicates that the connectivity can be generated on the machine.
     """
 
-    __slots__ = [
-        "__connector_seed"
-    ]
+    __slots__ = ("__connector_seed", )
 
     def __init__(self, safe=True, callback=None, verbose=False):
         """

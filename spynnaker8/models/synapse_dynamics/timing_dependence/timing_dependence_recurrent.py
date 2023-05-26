@@ -48,7 +48,7 @@ class TimingDependenceRecurrent(_BaseClass):
                     "TimingDependenceRecurrent",
                     "spynnaker.pyNN.models.neuron.plasticity.stdp."
                     "timing_dependence.TimingDependenceRecurrent")
-        super(TimingDependenceRecurrent, self).__init__(
+        super().__init__(
             accumulator_depression=accumulator_depression,
             accumulator_potentiation=accumulator_potentiation,
             mean_pre_window=mean_pre_window,

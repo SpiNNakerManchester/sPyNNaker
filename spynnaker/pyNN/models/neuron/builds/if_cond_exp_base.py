@@ -69,7 +69,7 @@ class IFCondExpBase(AbstractPyNNNeuronModelStandard):
     :type isyn_inh: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     """
-    __slots__ = []
+    __slots__ = ()
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(

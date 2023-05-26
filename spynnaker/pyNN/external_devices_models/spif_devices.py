@@ -258,13 +258,15 @@ class _DelayedMultiCastCommand(MultiCastCommand):
     """
     A command where the getting of the payload is delayed.
     """
-    __slots__ = ["__get_payload"]
+    __slots__ = ("__get_payload", )
 
     def __init__(self, key, get_payload, repeat, delay_between_repeats):
         """
         :param int key: The key to send
         :param callable()->int get_payload:
-            A function to call that returns a payload
+            A function to call that returns a payload.
+            May be called multiple times; should produce the same value each
+            time.
         :param int repeat: The number of times to repeat the command
         :param int delay_between_repeats: The delay between the repeats
         """

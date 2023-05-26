@@ -14,18 +14,13 @@
 
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractHasParameterNames)
 
 
-class AbstractWeightDependence(object, metaclass=AbstractBase):
+class AbstractWeightDependence(
+        AbstractHasParameterNames, metaclass=AbstractBase):
     __slots__ = ()
-
-    @abstractmethod
-    def get_parameter_names(self):
-        """
-        Returns the parameter names.
-
-        :rtype: iterable(str)
-        """
 
     @abstractmethod
     def is_same_as(self, weight_dependence):

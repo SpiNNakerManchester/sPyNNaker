@@ -30,7 +30,7 @@ TIMESTEP_MS = "timestep_ms"
 
 
 class SynapseTypeAlpha(AbstractSynapseType):
-    __slots__ = [
+    __slots__ = (
         "__exc_exp_response",
         "__exc_response",
         "__inh_exp_response",
@@ -38,7 +38,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
         "__tau_syn_E",
         "__tau_syn_I",
         "__q_exc",
-        "__q_inh"]
+        "__q_inh")
 
     def __init__(self, exc_response, exc_exp_response,
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):

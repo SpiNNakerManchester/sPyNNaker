@@ -14,7 +14,7 @@
 
 
 class PyNNSynapseDynamics(object):
-    __slots__ = ["__slow"]
+    __slots__ = ("__slow", )
 
     def __init__(self, slow=None, fast=None):
         if fast is not None:

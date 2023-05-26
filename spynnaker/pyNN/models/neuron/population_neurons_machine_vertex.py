@@ -57,7 +57,7 @@ class PopulationNeuronsMachineVertex(
     A machine vertex for the Neurons of PyNN Populations.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__key",
         "__sdram_partition",
         "__ring_buffer_shifts",
@@ -65,7 +65,7 @@ class PopulationNeuronsMachineVertex(
         "__slice_index",
         "__neuron_data",
         "__max_atoms_per_core",
-        "__regenerate_data"]
+        "__regenerate_data")
 
     class REGIONS(Enum):
         """

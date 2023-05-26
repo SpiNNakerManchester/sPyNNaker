@@ -64,10 +64,10 @@ class SpikeSourcePoissonVertex(
         PopulationApplicationVertex,
         LegacyPartitionerAPI, SupportsStructure):
     """
-    A Poisson Spike source object.
+    A SpiNNaker vertex that is a Poisson-distributed Spike source.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__last_rate_read_time",
         "__model",
         "__model_name",
@@ -85,7 +85,7 @@ class SpikeSourcePoissonVertex(
         "__incoming_control_edge",
         "__structure",
         "__allowed_parameters",
-        "__n_colour_bits"]
+        "__n_colour_bits")
 
     SPIKE_RECORDING_REGION_ID = 0
 

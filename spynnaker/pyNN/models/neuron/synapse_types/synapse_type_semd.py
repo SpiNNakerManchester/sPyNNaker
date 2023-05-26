@@ -31,7 +31,7 @@ TIMESTEP_MS = "timestep_ms"
 
 
 class SynapseTypeSEMD(AbstractSynapseType):
-    __slots__ = [
+    __slots__ = (
         "__tau_syn_E",
         "__tau_syn_E2",
         "__tau_syn_I",
@@ -40,7 +40,7 @@ class SynapseTypeSEMD(AbstractSynapseType):
         "__isyn_inh",
         "__multiplicator",
         "__exc2_old",
-        "__scaling_factor"]
+        "__scaling_factor")
 
     def __init__(
             self, tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2,

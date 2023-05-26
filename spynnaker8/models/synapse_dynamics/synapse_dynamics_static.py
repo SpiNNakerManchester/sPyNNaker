@@ -38,4 +38,4 @@ class SynapseDynamicsStatic(_BaseClass):
         moved_in_v6("spynnaker8.models.synapse_dynamics.SynapseDynamicsStatic",
                     "spynnaker.pyNN.models.neuron.synapse_dynamics"
                     ".SynapseDynamicsStatic")
-        super(SynapseDynamicsStatic, self).__init__(weight, delay)
+        super().__init__(weight, delay)

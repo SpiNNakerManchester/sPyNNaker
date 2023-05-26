@@ -28,7 +28,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     """
 
     # No data required here; makes it easy to mix in!
-    __slots__ = []
+    __slots__ = ()
 
     @staticmethod
     def _as_list(names):
@@ -248,7 +248,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :raises KeyError: if the variable cannot be recorded
         """
         # pylint: disable=unused-argument
-        if self.get_recordable_variables() == []:
+        if not self.get_recordable_variables():
             raise KeyError("This Population does not support recording")
         raise NotImplementedError(
             f"{type(self)} has recording variables so should implement "
@@ -265,7 +265,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :raises KeyError: if the variable cannot be stopped from recording
         """
         # pylint: disable=unused-argument
-        if self.get_recordable_variables() == []:
+        if not self.get_recordable_variables():
             raise KeyError("This Population does not support recording")
         raise NotImplementedError(
             f"{type(self)} has recording variables so should implement "
@@ -277,7 +277,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
         :rtype: list(str)
         """
-        if self.get_recordable_variables() == []:
+        if not self.get_recordable_variables():
             return []
         raise NotImplementedError(
             f"{type(self)} has recording variables so should implement "

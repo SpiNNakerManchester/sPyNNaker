@@ -27,7 +27,7 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
     pattern for point neurons.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     default_population_parameters = _population_parameters
 

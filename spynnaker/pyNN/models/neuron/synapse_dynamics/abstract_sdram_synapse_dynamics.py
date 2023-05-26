@@ -16,9 +16,11 @@ import math
 import numpy
 from spinn_utilities.abstract_base import abstractmethod, abstractproperty
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
+from .abstract_has_parameter_names import AbstractHasParameterNames
 
 
-class AbstractSDRAMSynapseDynamics(AbstractSynapseDynamics):
+class AbstractSDRAMSynapseDynamics(
+        AbstractSynapseDynamics, AbstractHasParameterNames):
     """
     How do the dynamics of a synapse interact with the rest of the model.
     """
@@ -61,14 +63,6 @@ class AbstractSDRAMSynapseDynamics(AbstractSynapseDynamics):
         :param list(float) synapse_weight_scales:
             The total weight scale applied to each synapse including the global
             weight scale
-        """
-
-    @abstractmethod
-    def get_parameter_names(self):
-        """
-        Get the parameter names available from the synapse dynamics components.
-
-        :rtype: iterable(str)
         """
 
     @abstractmethod

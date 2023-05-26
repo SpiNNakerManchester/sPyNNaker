@@ -28,7 +28,10 @@ DEFAULT_MAX_ATOMS_PER_CORE = 500
 
 
 class SpikeSourcePoisson(AbstractPyNNModel):
-    __slots__ = ["__duration", "__rate", "__start"]
+    """
+    A model of a Poisson-distributed source of spikes.
+    """
+    __slots__ = ("__duration", "__rate", "__start")
 
     default_population_parameters = _population_parameters
 

@@ -24,9 +24,9 @@ class ICUBRetinaDevice(
     An ICUB retina device connected to SpiNNaker using a SpiNNakerLink.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__index_by_slice",
-        "__base_key"]
+        "__base_key")
 
     def __init__(self, base_key=0, width=304, height=240, sub_width=16,
                  sub_height=16, spinnaker_link_id=0, board_address=None):
@@ -58,8 +58,7 @@ class ICUBRetinaDevice(
 
     @overrides(Application2DSpiNNakerLinkVertex.get_incoming_slice)
     def get_incoming_slice(self, index):
-        vertex_slice = super(
-            ICUBRetinaDevice, self).get_incoming_slice(index)
+        vertex_slice = super().get_incoming_slice(index)
         self.__index_by_slice[vertex_slice] = index
         return vertex_slice
 

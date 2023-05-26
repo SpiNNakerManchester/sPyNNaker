@@ -21,7 +21,7 @@ class AbstractEthernetTranslator(object, metaclass=AbstractBase):
     control of an external device.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     @abstractmethod
     def translate_control_packet(self, multicast_packet):

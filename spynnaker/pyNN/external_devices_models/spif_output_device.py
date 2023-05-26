@@ -33,7 +33,7 @@ class SPIFOutputDevice(
     Output (only) to a SPIF device.
     """
 
-    __slots__ = ["__incoming_partition", "__create_database"]
+    __slots__ = ("__incoming_partition", "__create_database")
 
     def __init__(self, board_address=None, chip_coords=None, label=None,
                  create_database=True, database_notify_host=None,
@@ -71,6 +71,8 @@ class SPIFOutputDevice(
     def _get_set_key_payload(self):
         """
         Get the payload for the command to set the router key.
+
+        :rtype: int
         """
         r_infos = SpynnakerDataView.get_routing_infos()
         return r_infos.get_first_key_from_pre_vertex(
@@ -80,6 +82,8 @@ class SPIFOutputDevice(
     def _get_set_mask_payload(self):
         """
         Get the payload for the command to set the router mask.
+
+        :rtype: int
         """
         r_infos = SpynnakerDataView.get_routing_infos()
         return r_infos.get_routing_info_from_pre_vertex(

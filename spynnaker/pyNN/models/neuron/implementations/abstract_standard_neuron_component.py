@@ -19,8 +19,9 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
     """
     Represents a component of a standard neural model.
     """
-
-    __slots__ = ["__structs", "__units"]
+    __slots__ = (
+        "__structs",
+        "__units")
 
     def __init__(self, structs, units):
         """

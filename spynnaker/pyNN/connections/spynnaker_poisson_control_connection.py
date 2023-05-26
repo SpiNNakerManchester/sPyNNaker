@@ -25,10 +25,10 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
     A connection used to control a Poisson-distributed random event source's
     firing rate at runtime.
     """
-    __slots__ = [
+    __slots__ = (
         "__control_label_extension",
         "__control_label_to_label",
-        "__label_to_control_label"]
+        "__label_to_control_label")
 
     def __init__(
             self, poisson_labels=None, local_host=None, local_port=NOTIFY_PORT,

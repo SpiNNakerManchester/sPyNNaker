@@ -20,7 +20,7 @@ class HasShapeKeyFields(object, metaclass=AbstractBase):
     source.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     @abstractmethod
     def get_shape_key_fields(self, vertex_slice):
