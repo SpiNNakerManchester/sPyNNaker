@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from math import log2, ceil
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     Application2DFPGAVertex, FPGAConnection)
@@ -101,7 +100,7 @@ class SPIFRetinaDevice(
         :type chip_coords: tuple(int, int) or None
         """
         # Do some checks
-        if sub_width < self.X_MASK or sub_height < self.Y_MASK:
+        if sub_width < self.X_MASK + 1 or sub_height < self.Y_MASK + 1:
             raise ConfigurationException(
                 "The sub-squares must be >=4 x >= 2"
                 f" ({sub_width} x {sub_height} specified)")
@@ -112,7 +111,11 @@ class SPIFRetinaDevice(
         # Fake the width if not a power of 2, as we need this for the sake
         # of passing on to other 2D vertices
         if not is_power_of_2(width):
-            width = 2 ** int(ceil(log2(width)))
+            raise ConfigurationException(
+                "The width of the SPIF retina must be a power of 2.  If the"
+                " real retina size is less than this, please round it up."
+                " This will ensure that following Populations can decode the"
+                " spikes correctly.")
 
         # Call the super
         super().__init__(
