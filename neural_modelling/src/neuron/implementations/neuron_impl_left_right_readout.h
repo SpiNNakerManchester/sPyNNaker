@@ -82,8 +82,7 @@ extern REAL learning_signal;
 //uint32_t choice = 0;
 
 // Left right state parameters
-typedef enum
-{
+typedef enum {
     STATE_CUE,
     STATE_WAITING,
     STATE_PROMPT,

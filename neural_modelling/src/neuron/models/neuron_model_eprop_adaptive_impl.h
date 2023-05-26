@@ -201,9 +201,11 @@ static inline void neuron_model_initialise(
 	state->V_reset = params->V_reset;
 	state->T_refract = lif_ceil_accum(kdivk(params->T_refract_ms, ts));
 
-	log_info("V_membrane %k V_rest %k R_membrane %k exp_TC %k I_offset %k refract_timer %k V_reset %k T_refract_ms %k T_refract %d",
-			state->V_membrane, state->V_rest, state->R_membrane, state->exp_TC, state->I_offset,
-			state->refract_timer, state->V_reset, params->T_refract_ms, state->T_refract);
+	log_info("V_membrane %k V_rest %k R_membrane %k exp_TC %k I_offset %k"
+			"refract_timer %k V_reset %k T_refract_ms %k T_refract %d",
+			state->V_membrane, state->V_rest, state->R_membrane, state->exp_TC,
+			state->I_offset, state->refract_timer, state->V_reset,
+			params->T_refract_ms, state->T_refract);
 
 	// for everything else just copy across for now
 	state->z = params->z;
@@ -223,7 +225,8 @@ static inline void neuron_model_initialise(
 	state->number_of_cues = params->number_of_cues;
 
 	log_info("Check: z %k A %k psi %k B %k b %k b_0 %k window_size %u",
-			state->z, state->A, state->psi, state->B, state->b, state->b_0, state->window_size);
+			state->z, state->A, state->psi, state->B, state->b, state->b_0,
+			state->window_size);
 
 	state->core_pop_rate = params->pop_rate;
 	state->core_target_rate = params->target_rate;
@@ -231,7 +234,8 @@ static inline void neuron_model_initialise(
 	state->eta = params->eta;
 
 	log_info("Check: core_pop_rate %k core_target_rate %k rate_exp_TC %k eta %k",
-			state->core_pop_rate, state->core_target_rate, state->rate_exp_TC, state->eta);
+			state->core_pop_rate, state->core_target_rate, state->rate_exp_TC,
+			state->eta);
 
 	for (uint32_t n_syn = 0; n_syn < SYNAPSES_PER_NEURON; n_syn++) {
 		state->syn_state[n_syn] = params->syn_state[n_syn];
@@ -271,7 +275,7 @@ static inline void lif_eprop_neuron_closed_form(
 
     // update membrane voltage
     neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev))
-    		- neuron->z * B_t; // this line achieves reset (Comment not needed?)
+    		- neuron->z * B_t;  // this line achieves reset
 }
 
 state_t neuron_model_state_update(
@@ -359,7 +363,7 @@ state_t neuron_model_state_update(
 
     // TODO: magic constants need naming at least (and passing in?)
     uint32_t test_length = (150*neuron->number_of_cues)+1000+150;
-    if(neuron->number_of_cues == 0) {
+    if (neuron->number_of_cues == 0) {
         test_length = neuron->window_size;
     }
 
@@ -376,7 +380,7 @@ state_t neuron_model_state_update(
     REAL local_eta = neuron->eta;
 
     // Reset relevant parameters ahead of filtering
-    if ((time % test_length == 0 || time % test_length == 1) && neuron->number_of_cues){
+    if ((time % test_length == 0 || time % test_length == 1) && neuron->number_of_cues) {
         neuron->B = neuron->b_0;
         neuron->b = 0.k;
         neuron->V_membrane = neuron->V_rest;
@@ -386,7 +390,7 @@ state_t neuron_model_state_update(
 
     // All subsequent operations now need doing once per eprop synapse
     for (uint32_t syn_ind=0; syn_ind < total_input_synapses_per_neuron; syn_ind++){
-        if ((time % test_length == 0 || time % test_length == 1) && neuron->number_of_cues){
+        if ((time % test_length == 0 || time % test_length == 1) && neuron->number_of_cues) {
             neuron->syn_state[syn_ind].z_bar_inp = 0.k;
             neuron->syn_state[syn_ind].z_bar = 0.k;
             neuron->syn_state[syn_ind].el_a = 0.k;
@@ -399,7 +403,8 @@ state_t neuron_model_state_update(
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
     			+
     			(1 - neuron->exp_TC) *
-    			neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
+    			neuron->syn_state[syn_ind].z_bar_inp;
+    			// updating z_bar is problematic, if spike could come and interrupt neuron update
 
 
 		// ******************************************************************
@@ -425,7 +430,9 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	REAL this_dt_weight_change =
     			local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
-    	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change; // -= here to enable compiler to handle previous line (can crash when -ve is at beginning of previous line)
+    	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change;
+    	// -= here to enable compiler to handle previous line (can crash when
+    	// -ve is at beginning of previous line)
 
     	// reset input (can't have more than one spike per timestep
     	neuron->syn_state[syn_ind].z_bar_inp = 0;
@@ -435,8 +442,9 @@ state_t neuron_model_state_update(
     }
 
     // All further operations now need doing once per recurrent eprop synapse
-    for (uint32_t syn_ind=recurrent_offset; syn_ind < total_recurrent_synapses_per_neuron+recurrent_offset; syn_ind++){
-        if ((time % test_length == 0 || time % test_length == 1) && neuron->number_of_cues){
+    for (uint32_t syn_ind=recurrent_offset;
+    		syn_ind < total_recurrent_synapses_per_neuron+recurrent_offset; syn_ind++) {
+        if ((time % test_length == 0 || time % test_length == 1) && neuron->number_of_cues) {
             neuron->syn_state[syn_ind].z_bar_inp = 0.k;
             neuron->syn_state[syn_ind].z_bar = 0.k;
             neuron->syn_state[syn_ind].el_a = 0.k;
@@ -473,7 +481,9 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	REAL this_dt_weight_change =
     			local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
-    	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change; // -= here to enable compiler to handle previous line (can crash when -ve is at beginning of previous line)
+    	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change;
+    	// -= here to enable compiler to handle previous line (can crash when
+    	// -ve is at beginning of previous line)
 
     	// reset input (can't have more than one spike per timestep
     	neuron->syn_state[syn_ind].z_bar_inp = 0;
@@ -506,7 +516,8 @@ void neuron_model_print_state_variables(const neuron_t *neuron) {
 
     log_debug("Printing synapse state values:");
     for (uint32_t syn_ind=0; syn_ind < 100; syn_ind++){
-    	log_debug("synapse number %u delta_w, z_bar, z_bar_inp, e_bar, el_a %11.4k %11.4k %11.4k %11.4k %11.4k",
+    	log_debug("synapse number %u delta_w, z_bar, z_bar_inp, e_bar, el_a "
+    			"%11.4k %11.4k %11.4k %11.4k %11.4k",
     			syn_ind, neuron->syn_state[syn_ind].delta_w,
 				neuron->syn_state[syn_ind].z_bar, neuron->syn_state[syn_ind].z_bar_inp,
 				neuron->syn_state[syn_ind].e_bar, neuron->syn_state[syn_ind].el_a);

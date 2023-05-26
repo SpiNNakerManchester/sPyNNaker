@@ -11,7 +11,6 @@
 #ifndef _SYNAPSE_TYPES_EPROP_ADPATIVE_IMPL_H_
 #define _SYNAPSE_TYPES_EPROP_ADAPTIVE_IMPL_H_
 
-
 //---------------------------------------
 // Macros
 //---------------------------------------
@@ -29,15 +28,12 @@
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
-//input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
-//input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
 struct synapse_types_params_t {
 	input_t exc;
 	input_t exc2;
 	input_t inh;
 	input_t inh2;
-//	REAL time_step_ms;
 };
 
 struct synapse_types_t {
@@ -47,23 +43,9 @@ struct synapse_types_t {
     input_t inh2;          //!< Second inhibitory synaptic input
 };
 
-//typedef struct synapse_param_t {
-//    decay_t exc_decay;
-//    decay_t exc_init;
-//    decay_t exc2_decay;
-//    decay_t exc2_init;
-//    decay_t inh_decay;
-//    decay_t inh_init;
-//    decay_t inh2_decay;
-//    decay_t inh2_init;
-//    input_t input_buffer_excitatory_value;
-//    input_t input_buffer_excitatory2_value;
-//    input_t input_buffer_inhibitory_value;
-//    input_t input_buffer_inhibitory2_value;
-//} synapse_param_t;
-
 //! human readable definition for the positions in the input regions for the
 //! different synapse types.
+// TODO: these have different names on the python side...
 typedef enum input_buffer_regions {
     EXCITATORY_ONE, EXCITATORY_TWO, INHIBITORY_ONE, INHIBITORY_TWO
 } input_buffer_regions;
@@ -71,7 +53,6 @@ typedef enum input_buffer_regions {
 //---------------------------------------
 // Synapse shaping inline implementation
 //---------------------------------------
-
 static inline void synapse_types_initialise(synapse_types_t *state,
 		synapse_types_params_t *params, UNUSED uint32_t n_steps_per_timestep) {
 	state->exc = params->exc;
@@ -97,23 +78,10 @@ static inline void synapse_types_save_state(synapse_types_t *state,
 //! \return nothing
 static inline void synapse_types_shape_input(
         synapse_types_t *parameter) {
-
     parameter->exc = 0;
-//    		decay_s1615(
-//        parameter->input_buffer_excitatory_value,
-//        parameter->exc_decay);
     parameter->exc2 = 0;
-//    decay_s1615(
-//        parameter->input_buffer_excitatory2_value,
-//        parameter->exc2_decay);
     parameter->inh = 0;
-//    decay_s1615(
-//        parameter->input_buffer_inhibitory_value,
-//        parameter->inh_decay);
     parameter->inh2 = 0;
-//    decay_s1615(
-//        parameter->input_buffer_inhibitory2_value,
-//        parameter->inh2_decay);
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
@@ -126,32 +94,14 @@ static inline void synapse_types_shape_input(
 static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index, synapse_types_t *parameter,
         input_t input) {
-//    if (input){
-//        io_printf(IO_BUF, "index = %u, %d \t input = %u, %d\t%u\n", synapse_type_index, synapse_type_index, input, input, input>>3);
-//    }
     if (synapse_type_index == EXCITATORY_ONE) {
         parameter->exc += input;
-//		=
-//            parameter->input_buffer_excitatory_value +
-//            decay_s1615(input, parameter->exc_init);
-
     } else if (synapse_type_index == EXCITATORY_TWO) {
         parameter->exc2 += input;
-//		=
-//            parameter->input_buffer_excitatory2_value +
-//            decay_s1615(input, parameter->exc2_init);
-
     } else if (synapse_type_index == INHIBITORY_ONE) {
         parameter->inh += input;
-//		=
-//            parameter->input_buffer_inhibitory_value +
-//            decay_s1615(input, parameter->inh_init);
-
     } else if (synapse_type_index == INHIBITORY_TWO) {
         parameter->inh2 += input;
-//		=
-//            parameter->input_buffer_inhibitory2_value +
-//            decay_s1615(input, parameter->inh2_init);
     }
 }
 
