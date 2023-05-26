@@ -41,10 +41,6 @@ from spynnaker.pyNN.extra_algorithms import (
     delay_support_adder, neuron_expander, synapse_expander,
     redundant_packet_count_report,
     spynnaker_neuron_graph_network_specification_report)
-from spynnaker.pyNN.extra_algorithms.\
-    spynnaker_machine_bit_field_router_compressor import (
-        spynnaker_machine_bitfield_ordered_covering_compressor,
-        spynnaker_machine_bitField_pair_router_compressor)
 from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
@@ -386,38 +382,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # pylint: disable=protected-access
         moved_in_v7_warning("register_binary_search_path is now a View method")
         SpynnakerDataView.register_binary_search_path(search_path)
-
-    def _execute_spynnaker_ordered_covering_compressor(self):
-        with FecTimer("Spynnaker machine bitfield ordered covering compressor",
-                      TimerWork.COMPRESSING) as timer:
-            if timer.skip_if_virtual_board():
-                return
-            spynnaker_machine_bitfield_ordered_covering_compressor()
-            # pylint: disable=attribute-defined-outside-init
-            self._multicast_routes_loaded = True
-            return None
-
-    def _execute_spynnaker_pair_compressor(self):
-        with FecTimer(
-                "Spynnaker machine bitfield pair router compressor",
-                TimerWork.COMPRESSING) as timer:
-            if timer.skip_if_virtual_board():
-                return
-            spynnaker_machine_bitField_pair_router_compressor()
-            # pylint: disable=attribute-defined-outside-init
-            self._multicast_routes_loaded = True
-            return None
-
-    @overrides(AbstractSpinnakerBase._do_delayed_compression)
-    def _do_delayed_compression(self, name, compressed):
-        if name == "SpynnakerMachineBitFieldOrderedCoveringCompressor":
-            return self._execute_spynnaker_ordered_covering_compressor()
-
-        if name == "SpynnakerMachineBitFieldPairRouterCompressor":
-            return self._execute_spynnaker_pair_compressor()
-
-        return AbstractSpinnakerBase._do_delayed_compression(
-            self, name, compressed)
 
     def _execute_write_neo_metadata(self):
         with FecTimer("Write Neo Metadata", TimerWork.OTHER):

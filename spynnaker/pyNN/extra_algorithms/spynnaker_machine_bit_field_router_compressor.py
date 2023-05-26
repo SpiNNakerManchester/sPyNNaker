@@ -17,10 +17,6 @@ from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState, ExecutableType
-from spinn_front_end_common.interface.interface_functions.\
-    machine_bit_field_router_compressor import (
-        machine_bit_field_ordered_covering_compressor,
-        machine_bit_field_pair_router_compressor)
 from spinn_front_end_common.utilities.helpful_functions import (
     write_address_to_user1)
 from spinn_front_end_common.utilities.system_control_logic import (
@@ -93,33 +89,3 @@ def _rerun_synaptic_cores(
             get_config_bool("Reports", "write_expander_iobuf"),
             None, [CPUState.FINISHED], needs_sync_barrier,
             _RERUN_IOBUF_NAME_PATTERN)
-
-
-def spynnaker_machine_bitfield_ordered_covering_compressor():
-    """
-    Perform routing table compression using ordered coverings with bit fields.
-    """
-    compressor_executable_targets = \
-        machine_bit_field_ordered_covering_compressor()
-
-    # adjust cores to exclude the ones which did not give sdram.
-    expander_chip_cores = _locate_expander_rerun_targets(
-        compressor_executable_targets)
-
-    # just rerun the synaptic expander for safety purposes
-    _rerun_synaptic_cores(expander_chip_cores, True)
-
-
-def spynnaker_machine_bitField_pair_router_compressor():
-    """
-    Perform routing table compression using pairs with bit fields.
-    """
-    compressor_executable_targets = \
-        machine_bit_field_pair_router_compressor()
-
-    # adjust cores to exclude the ones which did not give sdram.
-    expander_chip_cores = _locate_expander_rerun_targets(
-        compressor_executable_targets)
-
-    # just rerun the synaptic expander for safety purposes
-    _rerun_synaptic_cores(expander_chip_cores, True)
