@@ -99,7 +99,7 @@ static inline final_state_t plasticity_update_synapse(
     }
 
     // Return final synaptic word and weight
-    return synapse_structure_get_final_state(current_state);
+    return synapse_structure_get_final_state(current_state, 0.0k);
 }
 
 bool synapse_dynamics_initialise(
@@ -150,7 +150,7 @@ void synapse_dynamics_print_plastic_synapses(
         update_state_t update_state = synapse_structure_get_update_state(
                 *plastic_words++, synapse_type);
         final_state_t final_state = synapse_structure_get_final_state(
-                update_state);
+                update_state, 0.0k);
         weight_t weight = synapse_structure_get_final_weight(final_state);
 
         log_debug("%08x [%3d: (w: %5u (=", control_word, i, weight);

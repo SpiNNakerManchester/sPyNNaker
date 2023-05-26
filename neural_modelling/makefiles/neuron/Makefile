@@ -17,7 +17,7 @@ MODELS = eprop_adaptive \
          sinusoid_readout \
          sinusoid_readout_stdp_mad_eprop_reg \
          left_right_readout_stdp_mad_eprop_reg \
-	 # IF_curr_exp \
+	     IF_curr_exp \
          IF_cond_exp \
          IZK_curr_exp \
          IZK_cond_exp \
@@ -26,7 +26,7 @@ MODELS = eprop_adaptive \
          IF_curr_exp_ca2_adaptive
 
 ifneq ($(SPYNNAKER_DEBUG), DEBUG)
-#    MODELS += external_device_lif_control \
+    MODELS += external_device_lif_control \
               IF_curr_alpha \
               IF_cond_exp_stoc \
               IF_curr_exp_sEMD \

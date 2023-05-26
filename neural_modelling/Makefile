@@ -16,10 +16,10 @@ BUILDS = synapse_expander \
          spike_source/poisson \
          delay_extension \
          robot_motor_control \
+         neuron_only \
+         synapse_only \
          neuron \
          local_only_combined
-#         neuron_only \
-         synapse_only \
 
 DIRS = $(BUILDS:%=makefiles/%)
 
