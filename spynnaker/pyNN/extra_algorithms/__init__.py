@@ -15,9 +15,6 @@ from .connection_holder_finisher import finish_connection_holders
 from .redundant_packet_count_report import redundant_packet_count_report
 from .spynnaker_connection_holder_generations import (
     SpYNNakerConnectionHolderGenerator)
-from .spynnaker_machine_bit_field_router_compressor import (
-    spynnaker_machine_bitfield_ordered_covering_compressor,
-    spynnaker_machine_bitField_pair_router_compressor)
 from .spynnaker_neuron_network_specification_report import (
     spynnaker_neuron_graph_network_specification_report)
 from .spynnaker_synaptic_matrix_report import SpYNNakerSynapticMatrixReport
@@ -30,8 +27,6 @@ __all__ = [
     "finish_connection_holders",
     "redundant_packet_count_report",
     "SpYNNakerConnectionHolderGenerator",
-    "spynnaker_machine_bitField_pair_router_compressor",
-    "spynnaker_machine_bitfield_ordered_covering_compressor",
     "spynnaker_neuron_graph_network_specification_report",
     "SpYNNakerSynapticMatrixReport",
     "synapse_expander", "neuron_expander"]
