@@ -28,7 +28,7 @@ def convert_analog_signal(signal_array, time_unit=quantities.ms):
         Data time unit for time index
     :rtype: ~numpy.ndarray
     """
-    ids = signal_array.channel_index.index.astype(int)
+    ids = signal_array.annotations["channel_names"]
     xs = range(len(ids))
     if time_unit == quantities.ms:
         times = signal_array.times.magnitude
@@ -141,8 +141,8 @@ def convert_gsyn(gsyn_exc, gsyn_inh):
     """
     exc = gsyn_exc.segments[0].filter(name='gsyn_exc')[0]
     inh = gsyn_inh.segments[0].filter(name='gsyn_inh')[0]
-    ids = exc.channel_index
-    ids2 = inh.channel_index
+    ids = exc.annotations["channel_names"]
+    ids2 = inh.annotations["channel_names"]
     if len(ids) != len(ids2):
         raise ValueError(
             f"Found {len(ids)} neuron IDs in gsyn_exc "
