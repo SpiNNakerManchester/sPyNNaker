@@ -15,11 +15,12 @@ import numpy
 
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
-from .generator_data import GeneratorData
-from .synapse_io import read_all_synapses, convert_to_connections, get_synapses
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
+from .generator_data import GeneratorData
+from .synapse_io import read_all_synapses, convert_to_connections, get_synapses
 
 
 class SynapticMatrixApp(object):
@@ -229,24 +230,43 @@ class SynapticMatrixApp(object):
                 f"{next_addr} of {self.__all_syn_block_sz} ")
         return next_addr
 
-    def write_matrix(self, spec, post_vertex_slice):
+    def append_matrix(
+            self, post_vertex_slice, data_to_write, block_addr):
         """
-        Write a synaptic matrix from host.
+        Append a synaptic matrix from be written from host.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The specification to write to
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of the post-vertex the matrix is for
+        :param list data_to_write: List to append the data to write to
+        :param int block_addr: The amount of data written so far
+        :return: The amount of data written after this data has been written
+        :rtype: int
         """
         row_data, delay_row_data = self.__get_row_data(post_vertex_slice)
         self.__update_connection_holders(
             row_data, delay_row_data, post_vertex_slice)
         if self.__syn_mat_offset is not None:
-            spec.set_write_pointer(self.__syn_mat_offset)
-            spec.write_array(row_data)
+            block_addr = self.__get_padding(
+                data_to_write, self.__syn_mat_offset, block_addr)
+            data_to_write.append(row_data)
+            block_addr += self.__matrix_size
         if self.__delay_syn_mat_offset is not None:
-            spec.set_write_pointer(self.__delay_syn_mat_offset)
-            spec.write_array(delay_row_data)
+            block_addr = self.__get_padding(
+                data_to_write, self.__delay_syn_mat_offset, block_addr)
+            data_to_write.append(delay_row_data)
+            block_addr += self.__delay_matrix_size
+        return block_addr
+
+    def __get_padding(self, data_to_write, expected_offset, block_addr):
+        if expected_offset < block_addr:
+            raise ValueError(
+                "The block address is already beyond where is expected!:"
+                f" {expected_offset} expected, {block_addr} found.")
+        if expected_offset > block_addr:
+            padding = (expected_offset - block_addr) // BYTES_PER_WORD
+            data_to_write.append(numpy.zeros(padding, dtype="uint32"))
+            return block_addr + (padding * BYTES_PER_WORD)
+        return block_addr
 
     def __get_row_data(self, post_vertex_slice):
         """
