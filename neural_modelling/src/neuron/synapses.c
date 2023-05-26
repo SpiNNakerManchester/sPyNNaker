@@ -237,7 +237,9 @@ static inline bool process_fixed_synapses(
         int32_t weight = synapse_row_sparse_weight(synaptic_word);
 
         // Add weight to current ring buffer value
-        int32_t accumulation = ring_buffers[ring_buffer_index] + weight; // switch to saturated arithmetic to avoid complicated saturation check, will it check saturation at both ends?
+        int32_t accumulation = ring_buffers[ring_buffer_index] + weight;
+        // TODO: switch to saturated arithmetic to avoid complicated saturation check,
+        //       will it check saturation at both ends?
 
         // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
         // **NOTE** 0x10000 can be expressed as an ARM literal,
