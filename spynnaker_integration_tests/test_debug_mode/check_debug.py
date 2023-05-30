@@ -82,7 +82,6 @@ class CheckDebug(BaseTestCase):
             # write_routing_tables_from_machine_report
             # write_network_specification_report
             network_specification_file_name,
-            # write_provenance_data
             "provenance_data",
             # write_tag_allocation_reports
             reports_names._TAGS_FILENAME,
