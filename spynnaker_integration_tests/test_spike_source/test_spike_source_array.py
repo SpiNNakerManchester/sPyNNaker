@@ -142,8 +142,7 @@ class TestSpikeSourceArray(BaseTestCase):
 
         spikes_test = [list(spikes[i].times.magnitude) for i in range(
             len(spikes))]
-        for s_test, s_times in zip(spikes_test, spike_times):
-            self.assertEqual(s_test, s_times)
+        self.assertListEqual(spikes_test, spike_times)
 
         p.end()
 
@@ -164,8 +163,7 @@ class TestSpikeSourceArray(BaseTestCase):
 
         spikes_test = [list(spikes[i].times.magnitude) for i in range(
             len(spikes))]
-        for s_test, s_times in zip(spikes_test, spike_times):
-            self.assertEqual(s_test, s_times)
+        self.assertListEqual(spikes_test, spike_times)
 
         p.end()
 
