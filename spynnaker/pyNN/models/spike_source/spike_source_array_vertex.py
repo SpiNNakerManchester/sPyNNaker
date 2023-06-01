@@ -61,6 +61,7 @@ class SpikeSourceArrayVertex(
         "_spike_times",
         "__n_colour_bits")
 
+    #: ID of the recording region used for recording transmitted spikes.
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
@@ -95,22 +96,12 @@ class SpikeSourceArrayVertex(
                 "Simulation", "n_colour_bits")
 
     @overrides(ReverseIpTagMultiCastSource.create_machine_vertex)
-    def create_machine_vertex(
-            self, vertex_slice, sdram, label=None):
+    def create_machine_vertex(self, vertex_slice, sdram, label=None):
         send_buffer_times = self._filtered_send_buffer_times(vertex_slice)
         machine_vertex = SpikeSourceArrayMachineVertex(
-            vertex_slice=vertex_slice,
-            label=label, app_vertex=self,
-            receive_port=self._receive_port,
-            receive_sdp_port=self._receive_sdp_port,
-            receive_tag=self._receive_tag,
-            receive_rate=self._receive_rate,
-            virtual_key=self._virtual_key, prefix=self._prefix,
-            prefix_type=self._prefix_type, check_keys=self._check_keys,
-            send_buffer_times=send_buffer_times,
-            send_buffer_partition_id=self._send_buffer_partition_id,
-            reserve_reverse_ip_tag=self._reserve_reverse_ip_tag,
-            injection_partition_id=self._injection_partition_id)
+            label=label, app_vertex=self, vertex_slice=vertex_slice,
+            eieio_params=self._eieio_params,
+            send_buffer_times=send_buffer_times)
         machine_vertex.enable_recording(self._is_recording)
         # Known issue with ReverseIPTagMulticastSourceMachineVertex
         if sdram:
@@ -305,7 +296,7 @@ class SpikeSourceArrayVertex(
     def get_recording_region(self, name):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
-        return 0
+        return self.SPIKE_RECORDING_REGION_ID
 
     @overrides(PopulationApplicationVertex.get_data_type)
     def get_data_type(self, name):
@@ -324,13 +315,12 @@ class SpikeSourceArrayVertex(
         If template is `None`, then a dictionary containing the template
         context will be returned.
         """
-        parameters = self.get_parameter_values(self.__model.default_parameters)
-
         return {
             "name": self.__model_name,
             "default_parameters": self.__model.default_parameters,
             "default_initial_values": self.__model.default_parameters,
-            "parameters": parameters,
+            "parameters": self.get_parameter_values(
+                self.__model.default_parameters),
         }
 
     @property

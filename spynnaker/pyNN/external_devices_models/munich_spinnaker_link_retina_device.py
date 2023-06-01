@@ -131,8 +131,8 @@ class MunichRetinaDevice(
         key_set_payload = self.__fixed_key if self.__is_right else 0
 
         yield MultiCastCommand(
-            key=key_set_command, payload=key_set_payload, repeat=5,
-            delay_between_repeats=1000)
+            key_set_command, key_set_payload,
+            repeat=5, delay_between_repeats=1000)
 
         # make retina enabled (dependent on if its a left or right retina
         enable_command = self._MANAGEMENT_BIT | (
@@ -140,8 +140,7 @@ class MunichRetinaDevice(
             else self._LEFT_RETINA_ENABLE)
 
         yield MultiCastCommand(
-            key=enable_command, payload=1, repeat=5,
-            delay_between_repeats=1000)
+            enable_command, payload=1, repeat=5, delay_between_repeats=1000)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
