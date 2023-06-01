@@ -196,7 +196,7 @@ class Population(PopulationBase):
         if not rng:
             rng = NumpyRNG()
         indices = rng.permutation(
-            numpy.arange(len(self), dtype=numpy.int))[0:n]
+            numpy.arange(len(self), dtype=numpy.int32))[0:n]
         return PopulationView(
             self, indices,
             label=f"Random sample size {n} from {self.label}")
