@@ -26,10 +26,10 @@ from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
 from pacman.operations.routing_info_allocator_algorithms import (
     ZonedRoutingInfoAllocator)
-from data_specification import (
-    DataSpecificationGenerator, DataSpecificationExecutor)
-from data_specification.constants import MAX_MEM_REGIONS
 from pacman.operations.partition_algorithms import splitter_partitioner
+from spinn_front_end_common.interface.ds import (
+    DataSpecificationGenerator)
+from spinn_front_end_common.utilities.constants import MAX_MEM_REGIONS
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices,\
     SynapseRegions
