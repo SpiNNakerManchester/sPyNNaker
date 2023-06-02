@@ -104,11 +104,11 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     (simulation_time_step_ms, segment_number, rec_datetime,
                      dt, simulator)
                  VALUES (?, ?, ?, ?, ?)
-                """, [SpynnakerDataView.get_simulation_time_step_ms(),
+                """, (SpynnakerDataView.get_simulation_time_step_ms(),
                       SpynnakerDataView.get_segment_counter(),
                       datetime.now(),
                       SpynnakerDataView.get_simulation_time_step_ms(),
-                      SpynnakerDataView.get_sim_name()])
+                      SpynnakerDataView.get_sim_name()))
 
     def write_t_stop(self):
         """
@@ -126,7 +126,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 """
                 UPDATE segment
                 SET t_stop = ?
-                """, (t_stop, ))
+                """, (t_stop,))
 
     def __get_segment_info(self, cursor):
         """
@@ -483,9 +483,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         raise ConfigurationException(
             f"No metadata for {variable} on {pop_label}")
 
-    def __get_region_metadata(self, cursor, rec_id):
+    def __get_region_metadata(self, rec_id):
         """
-        :param ~sqlite3.Cursor cursor:
         :param int rec_id:
         :return:
             region_id, neurons, vertex_slice, selective_recording, base_key,
@@ -493,13 +492,18 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :rtype: iterable(tuple(int, ~numpy.ndarray, Slice, bool, int, int))
         """
         index = 0
-        for row in cursor.execute(
+        # Need a new cursor here to allow the result set to persist until the
+        # end of the iteration. This is NOT well documented in the Python
+        # documentation for the sqlite3 package!
+        # See: https://stackoverflow.com/a/50078982/301832
+        # The underlying SQLite API uses result sets, not cursors.
+        for row in self.connection.cursor().execute(
                 """
                 SELECT region_id, recording_neurons_st, vertex_slice, base_key
                 FROM region_metadata
                 WHERE rec_id = ?
                 ORDER BY region_metadata_id
-                """, [rec_id]):
+                """, (rec_id,)):
             vertex_slice = MDSlice.from_string(
                 str(row["vertex_slice"], "utf-8"))
             recording_neurons_st = row["recording_neurons_st"]
@@ -574,7 +578,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         simulation_time_step_ms = self.__get_simulation_time_step_ms(cursor)
         indexes = []
         for region_id, neurons, _, selective_recording, _, _ in \
-                self.__get_region_metadata(cursor, rec_id):
+                self.__get_region_metadata(rec_id):
             indexes.extend(neurons)
             self.__get_spikes_by_region(
                 cursor, region_id, neurons, simulation_time_step_ms,
@@ -645,7 +649,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         indexes = []
 
         for region_id, _, vertex_slice, selective_recording, base_key, _ in \
-                self.__get_region_metadata(cursor, rec_id):
+                self.__get_region_metadata(rec_id):
             if selective_recording:
                 raise NotImplementedError(
                     "Unable to handle selective recording")
@@ -711,7 +715,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         indexes = []
         simulation_time_step_ms = self.__get_simulation_time_step_ms(cursor)
         for region_id, neurons, _, selective_recording, _, _ in \
-                self.__get_region_metadata(cursor, rec_id):
+                self.__get_region_metadata(rec_id):
             if selective_recording:
                 raise NotImplementedError(
                     "Unable to handle selective recording")
@@ -840,7 +844,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         indexes = []
 
         for region_id, neurons, _, _, _, index in \
-                self.__get_region_metadata(cursor, rec_id):
+                self.__get_region_metadata(rec_id):
             if neurons is not None:
                 pop_neurons.extend(neurons)
             else:
@@ -937,7 +941,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         rewire_preids = list()
 
         for region_id, _, vertex_slice, _, _, _ in \
-                self.__get_region_metadata(cursor, rec_id):
+                self.__get_region_metadata(rec_id):
             # as no neurons for "rewires" selective_recording will be true
 
             self.__get_rewires_by_region(

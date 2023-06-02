@@ -227,7 +227,7 @@ class TestGetting(BaseTestCase):
         copy_db(_ALL_DATA)
 
         v = pop.spinnaker_get_data("v")
-        assert len(v) == 35 * 9
+        assert len(v) == 35 * N_NEURONS
 
         with pytest.raises(ConfigurationException):
             pop.spinnaker_get_data(["v", "spikes"])
