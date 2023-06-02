@@ -59,7 +59,7 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def activate_live_output_for(
-            population, database_notify_host=None,
+            population, *, database_notify_host=None,
             database_notify_port_num=None,
             database_ack_port_num=None, port=None, host=None, tag=None,
             strip_sdp=True, use_prefix=False, key_prefix=None,
@@ -211,7 +211,7 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def add_poisson_live_rate_control(
-            poisson_population, control_label_extension="_control",
+            poisson_population, *, control_label_extension="_control",
             receive_port=None, database_notify_host=None,
             database_notify_port_num=None,
             database_ack_port_num=None, notify=True,
