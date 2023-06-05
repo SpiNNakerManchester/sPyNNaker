@@ -94,6 +94,10 @@ class _MockTransceiverinOut(Transceiver):
         datum, = struct.unpack("<I", self.read_memory(x, y, base_address, 4))
         return datum
 
+    @overrides(Transceiver.close)
+    def close(self):
+        pass
+
 
 def say_false(self, weights, delays):
     return False
