@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import io
 import shutil
 import struct
 import unittest
@@ -21,8 +20,6 @@ import pytest
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import load_config, set_config
-
-from spinn_machine import Machine
 from spinnman.model import CPUInfo
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
@@ -73,7 +70,7 @@ class _MockTransceiverinOut(Transceiver):
 
     @overrides(Transceiver.write_memory)
     def write_memory(self, x, y, base_address, data, n_bytes=None, offset=0,
-                 cpu=0, is_filename=False, get_sum=False):
+                     cpu=0, is_filename=False, get_sum=False):
         if data is None:
             return
         if isinstance(data, int):
@@ -172,21 +169,6 @@ def test_write_data_spec():
 
     writer.set_transceiver(_MockTransceiverinOut())
     execute_application_data_specs()
-
-    #spec_reader = io.BytesIO(spec.get_bytes_after_close())
-    #executor = DataSpecificationExecutor(spec_reader, 20000)
-    #executor.execute()
-
-    #all_data = bytearray()
-    #all_data.extend(bytearray(executor.get_header()))
-    #all_data.extend(bytearray(executor.get_pointer_table(0)))
-    #for r in range(MAX_MEM_REGIONS):
-    #    region = executor.get_region(r)
-    #    if region is not None:
-    #        all_data.extend(region.region_data)
-    #    if r == regions.synaptic_matrix:
-    #        assert len(region.region_data) > 0
-
 
     report_folder = mkdtemp()
     try:
