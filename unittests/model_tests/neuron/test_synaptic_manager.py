@@ -449,7 +449,6 @@ def test_set_synapse_dynamics():
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
         n_pre_neurons, neurons_per_core, max_delay):
-    raise unittest.SkipTest("needs fixing")
     unittest_setup()
     writer = SpynnakerDataWriter.mock()
 
@@ -492,7 +491,9 @@ def test_pop_based_master_pop_table_standard(
     post_vertex_slice = post_mac_vertex.vertex_slice
 
     # Generate the data
-    spec = DataSpecificationGenerator(None)
+    db = DsSqlliteDatabase()
+    spec = DataSpecificationGenerator(1, 2, 3, post_mac_vertex, db)
+    writer.set_dsg_targets(db)
 
     regions = SynapseRegions(
         synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
@@ -508,16 +509,11 @@ def test_pop_based_master_pop_table_standard(
     synaptic_matrices.generate_data()
     synaptic_matrices.write_synaptic_data(spec, post_vertex_slice, references)
 
-    spec.end_specification(True)
-    spec_reader = io.BytesIO(spec.get_bytes_after_close())
-    executor = DataSpecificationExecutor(
-        spec_reader, Machine.DEFAULT_SDRAM_BYTES)
-    executor.execute()
-
     # Read the population table and check entries
-    region = executor.get_region(3)
-    mpop_data = numpy.frombuffer(
-        region.region_data, dtype="uint8").view("uint32")
+    info = list(db.get_region_pointers_and_content(1, 2, 3))
+    region, _, region_data = info[1]
+    assert region == 3
+    mpop_data = numpy.frombuffer(region_data, dtype="uint8").view("uint32")
     n_entries = mpop_data[0]
     n_addresses = mpop_data[1]
 
