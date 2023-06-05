@@ -20,7 +20,8 @@ import numpy
 import pytest
 
 from spinn_utilities.overrides import overrides
-from spinn_utilities.config_holder import load_config
+from spinn_utilities.config_holder import load_config, set_config
+
 from spinn_machine import Machine
 from spinnman.model import CPUInfo
 from spinnman.transceiver import Transceiver
@@ -29,8 +30,9 @@ from pacman.operations.routing_info_allocator_algorithms import (
     ZonedRoutingInfoAllocator)
 from pacman.operations.partition_algorithms import splitter_partitioner
 from spinn_front_end_common.interface.ds import (
-    DataSpecificationGenerator)
-from spinn_front_end_common.utilities.constants import MAX_MEM_REGIONS
+    DataSpecificationGenerator, DsSqlliteDatabase)
+from spinn_front_end_common.interface.interface_functions import (
+    execute_application_data_specs)
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices,\
     SynapseRegions
@@ -60,9 +62,23 @@ from spynnaker.pyNN.utilities import constants
 import pyNN.spiNNaker as p
 
 
-class MockTransceiverRawData(Transceiver):
-    def __init__(self, data_to_read):
-        self._data_to_read = data_to_read
+class _MockTransceiverinOut(Transceiver):
+    def __init__(self):
+        pass
+
+    @overrides(Transceiver.malloc_sdram)
+    def malloc_sdram(self, x, y, size, app_id, tag=None):
+        self._data_to_read = bytearray(size)
+        return 0
+
+    @overrides(Transceiver.write_memory)
+    def write_memory(self, x, y, base_address, data, n_bytes=None, offset=0,
+                 cpu=0, is_filename=False, get_sum=False):
+        if data is None:
+            return
+        if isinstance(data, int):
+            data = struct.Struct("<I").pack(data)
+        self._data_to_read[base_address:base_address + len(data)] = data
 
     @overrides(Transceiver.get_cpu_information_from_core)
     def get_cpu_information_from_core(self, x, y, p):
@@ -84,13 +100,15 @@ def say_false(self, weights, delays):
 
 
 def test_write_data_spec():
-    raise unittest.SkipTest("needs fixing")
     unittest_setup()
     writer = SpynnakerDataWriter.mock()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
 
     load_config()
+    set_config("Machine", "enable_advanced_monitor_support", "False")
+    set_config("Java", "use_java", "False")
+
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
     pre_pop = p.Population(
         10, p.IF_curr_exp(), label="Pre",
@@ -130,8 +148,6 @@ def test_write_data_spec():
     post_vertex_slice = post_vertex.vertex_slice
     post_vertex_placement = Placement(post_vertex, 0, 0, 3)
 
-    spec = DataSpecificationGenerator(None)
-
     regions = SynapseRegions(
         synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
         bitfield_filter=8,
@@ -144,24 +160,30 @@ def test_write_data_spec():
         post_pop._vertex, regions, max_atoms_per_core=10,
         weight_scales=[32, 32], all_syn_block_sz=10000)
     synaptic_matrices.generate_data()
+
+    ds_db = DsSqlliteDatabase()
+    spec = DataSpecificationGenerator(0, 0, 3, post_vertex, ds_db)
     synaptic_matrices.write_synaptic_data(spec, post_vertex_slice, references)
-    spec.end_specification()
+    writer.set_dsg_targets(ds_db)
 
-    spec_reader = io.BytesIO(spec.get_bytes_after_close())
-    executor = DataSpecificationExecutor(spec_reader, 20000)
-    executor.execute()
+    writer.set_transceiver(_MockTransceiverinOut())
+    execute_application_data_specs()
 
-    all_data = bytearray()
-    all_data.extend(bytearray(executor.get_header()))
-    all_data.extend(bytearray(executor.get_pointer_table(0)))
-    for r in range(MAX_MEM_REGIONS):
-        region = executor.get_region(r)
-        if region is not None:
-            all_data.extend(region.region_data)
-        if r == regions.synaptic_matrix:
-            assert len(region.region_data) > 0
+    #spec_reader = io.BytesIO(spec.get_bytes_after_close())
+    #executor = DataSpecificationExecutor(spec_reader, 20000)
+    #executor.execute()
 
-    writer.set_transceiver(MockTransceiverRawData(all_data))
+    #all_data = bytearray()
+    #all_data.extend(bytearray(executor.get_header()))
+    #all_data.extend(bytearray(executor.get_pointer_table(0)))
+    #for r in range(MAX_MEM_REGIONS):
+    #    region = executor.get_region(r)
+    #    if region is not None:
+    #        all_data.extend(region.region_data)
+    #    if r == regions.synaptic_matrix:
+    #        assert len(region.region_data) > 0
+
+
     report_folder = mkdtemp()
     try:
         connections_1 = numpy.concatenate(
