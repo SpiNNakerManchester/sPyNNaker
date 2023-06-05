@@ -88,6 +88,6 @@ class IzkCondDualExpBase(AbstractPyNNNeuronModelStandard):
         threshold_type = ThresholdTypeStatic(_IZK_THRESHOLD)
 
         super().__init__(
-            model_name="IZK_cond_exp", binary="IZK_cond_exp_dual.aplx",
+            model_name="IZK_cond_exp_dual", binary="IZK_cond_exp_dual.aplx",
             neuron_model=neuron_model, input_type=input_type,
             synapse_type=synapse_type, threshold_type=threshold_type)
