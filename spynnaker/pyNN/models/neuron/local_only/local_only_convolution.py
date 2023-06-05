@@ -11,10 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import numpy
-from collections import defaultdict, namedtuple
+from collections import defaultdict
+import typing
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
+from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_SHORT, BYTES_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -25,8 +28,16 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .abstract_local_only import AbstractLocalOnly
+if typing.TYPE_CHECKING:
+    from spynnaker.pyNN.models.projection import Projection
 
-Source = namedtuple("Source", ["projection", "vertex_slice", "key", "mask"])
+
+class Source(typing.NamedTuple):
+    projection: Projection
+    vertex_slice: Slice
+    key: int
+    mask: int
+
 
 #: Number of shorts in the conv_config struct
 CONV_CONFIG_N_SHORTS = 6

@@ -738,10 +738,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             PopulationSynapsesMachineVertexLead.COMMON_REGIONS))
 
         sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.REGIONS
-            .SDRAM_EDGE_PARAMS.value, SYNAPSES_SDRAM_PARAMS_SIZE)
+            PopulationSynapsesMachineVertexLead.REGIONS.SDRAM_EDGE_PARAMS,
+            SYNAPSES_SDRAM_PARAMS_SIZE)
         sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.REGIONS.KEY_REGION.value,
+            PopulationSynapsesMachineVertexLead.REGIONS.KEY_REGION,
             KEY_CONFIG_SIZE)
         sdram.nest(
             len(PopulationSynapsesMachineVertexLead.REGIONS) + 1,

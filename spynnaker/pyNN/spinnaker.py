@@ -132,14 +132,15 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             this duration.  The continue_simulation() method must then be
             called for the simulation to continue.
         """
-        # pylint: disable=protected-access
-
         # extra post prerun algorithms
-        for projection in self._data_writer.iterate_projections():
-            projection._clear_cache()
+        self.__flush_post_vertex_caches()
 
         super(SpiNNaker, self).run(run_time, sync_time)
         # extra post run algorithms
+        self.__flush_post_vertex_caches()
+
+    def __flush_post_vertex_caches(self):
+        # pylint: disable=protected-access
         for projection in self._data_writer.iterate_projections():
             projection._clear_cache()
 

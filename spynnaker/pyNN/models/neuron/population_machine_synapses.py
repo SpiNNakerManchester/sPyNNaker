@@ -27,7 +27,7 @@ from spynnaker.pyNN.models.abstract_models import (
 
 from .population_machine_synapses_provenance import (
     PopulationMachineSynapsesProvenance)
-from .synaptic_matrices import SynapseRegions, SYNAPSE_FIELDS
+from .synaptic_matrices import SynapseRegions
 
 
 class PopulationMachineSynapses(
@@ -101,7 +101,7 @@ class PopulationMachineSynapses(
 
         :rtype: .SynapseRegions
         """
-        return SynapseRegions(*[None for _ in range(len(SYNAPSE_FIELDS))])
+        return SynapseRegions()
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                bit_field_base_address)

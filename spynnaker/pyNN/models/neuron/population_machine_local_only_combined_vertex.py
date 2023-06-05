@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from enum import Enum
+from enum import IntEnum
 import os
 import ctypes
 
@@ -85,7 +85,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
-    class REGIONS(Enum):
+    class REGIONS(IntEnum):
         """
         Regions for populations.
         """
@@ -104,20 +104,19 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
-        system=REGIONS.SYSTEM.value,
-        provenance=REGIONS.PROVENANCE_DATA.value,
-        profile=REGIONS.PROFILING.value,
-        recording=REGIONS.RECORDING.value)
+        REGIONS.SYSTEM,
+        REGIONS.PROVENANCE_DATA,
+        REGIONS.PROFILING,
+        REGIONS.RECORDING)
 
     # Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
-        core_params=REGIONS.CORE_PARAMS.value,
-        neuron_params=REGIONS.NEURON_PARAMS.value,
-        current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
-        neuron_recording=REGIONS.NEURON_RECORDING.value,
-        neuron_builder=REGIONS.NEURON_BUILDER.value,
-        initial_values=REGIONS.INITIAL_VALUES.value
-    )
+        REGIONS.CORE_PARAMS,
+        REGIONS.NEURON_PARAMS,
+        REGIONS.CURRENT_SOURCE_PARAMS,
+        REGIONS.NEURON_RECORDING,
+        REGIONS.NEURON_BUILDER,
+        REGIONS.INITIAL_VALUES)
 
     _PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -260,7 +259,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
         self.__write_local_only_data(spec)
 
         self._app_vertex.synapse_dynamics.write_parameters(
-            spec, self.REGIONS.LOCAL_ONLY_PARAMS.value, self,
+            spec, self.REGIONS.LOCAL_ONLY_PARAMS, self,
             self.__weight_scales)
 
         # End the writing of this specification:
@@ -268,8 +267,8 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     def __write_local_only_data(self, spec):
         spec.reserve_memory_region(
-            self.REGIONS.LOCAL_ONLY.value, self.LOCAL_ONLY_SIZE, "local_only")
-        spec.switch_write_focus(self.REGIONS.LOCAL_ONLY.value)
+            self.REGIONS.LOCAL_ONLY, self.LOCAL_ONLY_SIZE, "local_only")
+        spec.switch_write_focus(self.REGIONS.LOCAL_ONLY)
         log_n_max_atoms = get_n_bits(self._max_atoms_per_core)
         log_n_synapse_types = get_n_bits(
             self._app_vertex.neuron_impl.get_n_synapse_types())

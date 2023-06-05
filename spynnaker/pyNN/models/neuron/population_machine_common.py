@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from dataclasses import dataclass
+from typing import NamedTuple
 from spinn_utilities.overrides import overrides
 from spinnman.model.enums import ExecutableType
 from pacman.model.graphs.machine import MachineVertex
@@ -35,8 +35,7 @@ from spinn_front_end_common.interface.profiling import AbstractHasProfileData
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 
 
-@dataclass
-class CommonRegions:
+class CommonRegions(NamedTuple):
     """
     Identifiers for common regions.
     """

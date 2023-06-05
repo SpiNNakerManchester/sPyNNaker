@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from enum import Enum
+from enum import IntEnum
 import os
 import ctypes
 
@@ -92,7 +92,7 @@ class PopulationMachineVertex(
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
-    class REGIONS(Enum):
+    class REGIONS(IntEnum):
         """
         Regions for populations.
         """
@@ -116,31 +116,29 @@ class PopulationMachineVertex(
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
-        system=REGIONS.SYSTEM.value,
-        provenance=REGIONS.PROVENANCE_DATA.value,
-        profile=REGIONS.PROFILING.value,
-        recording=REGIONS.RECORDING.value)
+        REGIONS.SYSTEM,
+        REGIONS.PROVENANCE_DATA,
+        REGIONS.PROFILING,
+        REGIONS.RECORDING)
 
     # Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
-        core_params=REGIONS.CORE_PARAMS.value,
-        neuron_params=REGIONS.NEURON_PARAMS.value,
-        current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
-        neuron_recording=REGIONS.NEURON_RECORDING.value,
-        neuron_builder=REGIONS.NEURON_BUILDER.value,
-        initial_values=REGIONS.INITIAL_VALUES.value
-    )
+        REGIONS.CORE_PARAMS,
+        REGIONS.NEURON_PARAMS,
+        REGIONS.CURRENT_SOURCE_PARAMS,
+        REGIONS.NEURON_RECORDING,
+        REGIONS.NEURON_BUILDER,
+        REGIONS.INITIAL_VALUES)
 
     # Regions for this vertex used by synapse parts
     SYNAPSE_REGIONS = SynapseRegions(
-        synapse_params=REGIONS.SYNAPSE_PARAMS.value,
-        pop_table=REGIONS.POPULATION_TABLE.value,
-        synaptic_matrix=REGIONS.SYNAPTIC_MATRIX.value,
-        synapse_dynamics=REGIONS.SYNAPSE_DYNAMICS.value,
-        structural_dynamics=REGIONS.STRUCTURAL_DYNAMICS.value,
-        bitfield_filter=REGIONS.BIT_FIELD_FILTER.value,
-        connection_builder=REGIONS.CONNECTOR_BUILDER.value
-    )
+        REGIONS.SYNAPSE_PARAMS,
+        REGIONS.POPULATION_TABLE,
+        REGIONS.SYNAPTIC_MATRIX,
+        REGIONS.SYNAPSE_DYNAMICS,
+        REGIONS.STRUCTURAL_DYNAMICS,
+        REGIONS.BIT_FIELD_FILTER,
+        REGIONS.CONNECTOR_BUILDER)
 
     _PROFILE_TAG_LABELS = {
         0: "TIMER",

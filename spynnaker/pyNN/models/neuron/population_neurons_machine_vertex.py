@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from enum import Enum
+from enum import IntEnum
 import os
 import ctypes
 
@@ -67,7 +67,7 @@ class PopulationNeuronsMachineVertex(
         "__max_atoms_per_core",
         "__regenerate_data")
 
-    class REGIONS(Enum):
+    class REGIONS(IntEnum):
         """
         Regions for populations.
         """
@@ -83,22 +83,21 @@ class PopulationNeuronsMachineVertex(
         NEURON_BUILDER = 9
         INITIAL_VALUES = 10
 
-    # Regions for this vertex used by common parts
+    #: Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
-        system=REGIONS.SYSTEM.value,
-        provenance=REGIONS.PROVENANCE_DATA.value,
-        profile=REGIONS.PROFILING.value,
-        recording=REGIONS.RECORDING.value)
+        REGIONS.SYSTEM,
+        REGIONS.PROVENANCE_DATA,
+        REGIONS.PROFILING,
+        REGIONS.RECORDING)
 
-    # Regions for this vertex used by neuron parts
+    #: Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
-        core_params=REGIONS.CORE_PARAMS.value,
-        neuron_params=REGIONS.NEURON_PARAMS.value,
-        current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
-        neuron_recording=REGIONS.NEURON_RECORDING.value,
-        neuron_builder=REGIONS.NEURON_BUILDER.value,
-        initial_values=REGIONS.INITIAL_VALUES.value
-    )
+        REGIONS.CORE_PARAMS,
+        REGIONS.NEURON_PARAMS,
+        REGIONS.CURRENT_SOURCE_PARAMS,
+        REGIONS.NEURON_RECORDING,
+        REGIONS.NEURON_BUILDER,
+        REGIONS.INITIAL_VALUES)
 
     _PROFILE_TAG_LABELS = {
         0: "TIMER_NEURONS"}
@@ -233,9 +232,9 @@ class PopulationNeuronsMachineVertex(
 
         # Write information about SDRAM
         spec.reserve_memory_region(
-            region=self.REGIONS.SDRAM_EDGE_PARAMS.value,
+            region=self.REGIONS.SDRAM_EDGE_PARAMS,
             size=SDRAM_PARAMS_SIZE, label="SDRAM Params")
-        spec.switch_write_focus(self.REGIONS.SDRAM_EDGE_PARAMS.value)
+        spec.switch_write_focus(self.REGIONS.SDRAM_EDGE_PARAMS)
         spec.write_value(
             self.__sdram_partition.get_sdram_base_address_for(self))
         spec.write_value(self.n_bytes_for_transfer)

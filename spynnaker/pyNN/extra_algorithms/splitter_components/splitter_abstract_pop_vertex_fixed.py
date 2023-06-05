@@ -248,11 +248,11 @@ class SplitterAbstractPopulationVertexFixed(
         s_dynamics = app_vertex.synapse_dynamics
         sdram = MultiRegionSDRAM()
         sdram.add_cost(
-            PopulationMachineLocalOnlyCombinedVertex.REGIONS.LOCAL_ONLY.value,
+            PopulationMachineLocalOnlyCombinedVertex.REGIONS.LOCAL_ONLY,
             PopulationMachineLocalOnlyCombinedVertex.LOCAL_ONLY_SIZE)
         sdram.add_cost(
             (PopulationMachineLocalOnlyCombinedVertex.
-             REGIONS.LOCAL_ONLY_PARAMS.value),
+             REGIONS.LOCAL_ONLY_PARAMS),
             s_dynamics.get_parameters_usage_in_bytes(
                 n_atoms, app_vertex.incoming_projections))
         return sdram

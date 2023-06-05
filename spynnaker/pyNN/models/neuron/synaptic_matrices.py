@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import numpy
-from collections import namedtuple
+from typing import NamedTuple, Optional
 
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.utility_calls import allocator_bits_needed
@@ -52,12 +52,18 @@ DIRECT_MATRIX_HEADER_COST_BYTES = 1 * BYTES_PER_WORD
 # Value to use when there is no region
 INVALID_REGION_ID = 0xFFFFFFFF
 
-# Identifiers for synapse regions
-SYNAPSE_FIELDS = [
-    "synapse_params", "pop_table", "synaptic_matrix", "synapse_dynamics",
-    "structural_dynamics", "bitfield_filter", "connection_builder"]
-SynapseRegions = namedtuple(
-    "SynapseRegions", SYNAPSE_FIELDS)
+
+class SynapseRegions(NamedTuple):
+    """
+    Indices of regions of synapse-implementing binaries.
+    """
+    synapse_params: Optional[int] = None
+    pop_table: Optional[int] = None
+    synaptic_matrix: Optional[int] = None
+    synapse_dynamics: Optional[int] = None
+    structural_dynamics: Optional[int] = None
+    bitfield_filter: Optional[int] = None
+    connection_builder: Optional[int] = None
 
 
 class SynapticMatrices(object):

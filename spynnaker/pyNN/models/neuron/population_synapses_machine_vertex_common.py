@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from enum import Enum
+from enum import IntEnum
 import ctypes
 
 from spinn_utilities.overrides import overrides
@@ -100,7 +100,7 @@ class PopulationSynapsesMachineVertexCommon(
         "__neuron_vertex",
         "__partition_id")
 
-    class REGIONS(Enum):
+    class REGIONS(IntEnum):
         """
         Regions for populations.
         """
@@ -120,21 +120,20 @@ class PopulationSynapsesMachineVertexCommon(
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
-        system=REGIONS.SYSTEM.value,
-        provenance=REGIONS.PROVENANCE_DATA.value,
-        profile=REGIONS.PROFILING.value,
-        recording=REGIONS.RECORDING.value)
+        REGIONS.SYSTEM,
+        REGIONS.PROVENANCE_DATA,
+        REGIONS.PROFILING,
+        REGIONS.RECORDING)
 
     # Regions for this vertex used by synapse parts
     SYNAPSE_REGIONS = SynapseRegions(
-        synapse_params=REGIONS.SYNAPSE_PARAMS.value,
-        pop_table=REGIONS.POPULATION_TABLE.value,
-        synaptic_matrix=REGIONS.SYNAPTIC_MATRIX.value,
-        synapse_dynamics=REGIONS.SYNAPSE_DYNAMICS.value,
-        structural_dynamics=REGIONS.STRUCTURAL_DYNAMICS.value,
-        bitfield_filter=REGIONS.BIT_FIELD_FILTER.value,
-        connection_builder=REGIONS.CONNECTOR_BUILDER.value
-    )
+        REGIONS.SYNAPSE_PARAMS,
+        REGIONS.POPULATION_TABLE,
+        REGIONS.SYNAPTIC_MATRIX,
+        REGIONS.SYNAPSE_DYNAMICS,
+        REGIONS.STRUCTURAL_DYNAMICS,
+        REGIONS.BIT_FIELD_FILTER,
+        REGIONS.CONNECTOR_BUILDER)
 
     _PROFILE_TAG_LABELS = {
         0: "TIMER_SYNAPSES",
@@ -215,9 +214,9 @@ class PopulationSynapsesMachineVertexCommon(
         """
         send_size = self.__sdram_partition.get_sdram_size_of_region_for(self)
         spec.reserve_memory_region(
-            region=self.REGIONS.SDRAM_EDGE_PARAMS.value,
+            region=self.REGIONS.SDRAM_EDGE_PARAMS,
             size=SDRAM_PARAMS_SIZE, label="SDRAM Params")
-        spec.switch_write_focus(self.REGIONS.SDRAM_EDGE_PARAMS.value)
+        spec.switch_write_focus(self.REGIONS.SDRAM_EDGE_PARAMS)
         spec.write_value(
             self.__sdram_partition.get_sdram_base_address_for(self))
         spec.write_value(send_size)
@@ -232,9 +231,9 @@ class PopulationSynapsesMachineVertexCommon(
             The generator of the specification to write
         """
         spec.reserve_memory_region(
-            region=self.REGIONS.KEY_REGION.value, size=KEY_CONFIG_SIZE,
+            region=self.REGIONS.KEY_REGION, size=KEY_CONFIG_SIZE,
             label="Key Config")
-        spec.switch_write_focus(self.REGIONS.KEY_REGION.value)
+        spec.switch_write_focus(self.REGIONS.KEY_REGION)
         if self.__neuron_vertex is None:
             # No Key = make sure it doesn't match; i.e. spike & 0x0 != 0x1
             spec.write_value(1)

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from enum import Enum, IntEnum
+from enum import IntEnum
 
 from spinnman.model.enums import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
@@ -47,7 +47,7 @@ class DelayExtensionMachineVertex(
         PROVENANCE_REGION = 2
         TDMA_REGION = 3
 
-    class EXTRA_PROVENANCE_DATA_ENTRIES(Enum):
+    class EXTRA_PROVENANCE_DATA_ENTRIES(IntEnum):
         """
         Indices into raw provenance data about delay extension vertices.
         """
