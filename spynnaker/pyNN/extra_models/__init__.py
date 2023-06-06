@@ -27,7 +27,8 @@ from spynnaker.pyNN.models.neuron.builds import (
     IFCurrExpCa2Adaptive,
     IFCurrDualExpBase as IF_curr_dual_exp,
     IzkCondExpBase as Izhikevich_cond,
-    IFCurrExpSEMDBase as IF_curr_exp_sEMD)
+    IFCurrExpSEMDBase as IF_curr_exp_sEMD,
+    IFCurrDeltaCa2Adaptive)
 
 # Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
@@ -36,6 +37,7 @@ __all__ = [
     # sPyNNaker models not currently part of full pyNN
     'IFCurDelta', 'IFCurrExpCa2Adaptive', 'IFCondExpStoc',
     'Izhikevich_cond', 'IF_curr_dual_exp', 'IF_curr_exp_sEMD',
+    'IFCurrDeltaCa2Adaptive',
 
     # Neuromodulation synapse dynamics (Mantas Mikaitis)
     'Neuromodulation',
