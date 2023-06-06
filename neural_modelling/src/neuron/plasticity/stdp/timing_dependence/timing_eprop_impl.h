@@ -29,7 +29,7 @@ typedef int16_t pre_trace_t;
 #include <neuron/plasticity/stdp/weight_dependence/weight_one_term.h>
 
 // Include debug header for log_info etc
-#include <debug.h>
+//#include <debug.h>
 
 // Include generic plasticity maths functions
 #include <neuron/plasticity/stdp/maths.h>

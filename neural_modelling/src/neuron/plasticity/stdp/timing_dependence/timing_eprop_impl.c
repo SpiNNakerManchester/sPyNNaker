@@ -28,8 +28,8 @@ int16_t tau_minus_lookup[TAU_MINUS_SIZE];
 // Functions
 //---------------------------------------
 address_t timing_initialise(address_t address) {
-    io_printf(IO_BUF, "timing_initialise: starting\n");
-    io_printf(IO_BUF, "\t Nothing to be done\n");
+//    io_printf(IO_BUF, "timing_initialise: starting\n");
+//    io_printf(IO_BUF, "\t Nothing to be done\n");
 
     return address;
 }
