@@ -69,7 +69,7 @@ class IFCurrDeltaCa2Adaptive(AbstractPyNNNeuronModelStandard):
     """
 
     # noinspection PyPep8Naming
-    @default_initial_values({"v", "isyn_exc", "isyn_inh"})
+    @default_initial_values({"v", "isyn_exc", "isyn_inh", "i_ca2"})
     def __init__(
             self, tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0,
             v_thresh=-50.0, tau_refrac=0.1, tau_ca2=50.0, i_ca2=0.0,
