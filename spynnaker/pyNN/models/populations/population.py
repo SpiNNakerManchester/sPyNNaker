@@ -14,7 +14,6 @@
 
 import logging
 import numpy
-import neo
 import os
 import inspect
 from pyNN import descriptions
@@ -32,6 +31,7 @@ from .population_view import PopulationView, IDMixin
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 
 logger = FormatAdapter(logging.getLogger(__file__))
 
@@ -196,7 +196,7 @@ class Population(PopulationBase):
         if not rng:
             rng = NumpyRNG()
         indices = rng.permutation(
-            numpy.arange(len(self), dtype=numpy.int))[0:n]
+            numpy.arange(len(self), dtype=numpy.int32))[0:n]
         return PopulationView(
             self, indices,
             label=f"Random sample size {n} from {self.label}")
@@ -239,7 +239,7 @@ class Population(PopulationBase):
                 self.__recorder.csv_neo_block(
                     io, variables, annotations=annotations)
                 return
-            io = neo.get_io(io)
+            io = get_neo_io(io)
 
         data = self.__recorder.extract_neo_block(
             variables, None, clear, annotations)

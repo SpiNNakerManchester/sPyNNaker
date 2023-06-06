@@ -144,7 +144,8 @@ class TestDataPopulation(BaseTestCase):
         v = neo.segments[0].filter(name='v')[0].magnitude
         target = self.v_expected[:, 1:3]
         assert numpy.array_equal(
-            [1, 2], neo.segments[0].filter(name='v')[0].channel_index.index)
+            [1, 2],
+            neo.segments[0].filter(name='v')[0].annotations["channel_names"])
         assert v.shape == target.shape
         for i in range(35):
             print(i)
