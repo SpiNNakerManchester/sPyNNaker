@@ -216,8 +216,6 @@ class SynapseInformation(object):
         :rtype: bool
         """
         # If we are using a virtual machine, we can't generate on the machine
-        if get_config_bool("Machine", "virtual_board"):
-            return False
         connector_gen = (
             isinstance(self.connector, AbstractGenerateConnectorOnMachine) and
             self.connector.generate_on_machine(self.weights, self.delays))
