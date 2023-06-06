@@ -12,12 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-MODELS = eprop_adaptive \
-         eprop_adaptive_stdp_mad_eprop_reg \
-         sinusoid_readout \
-         sinusoid_readout_stdp_mad_eprop_reg \
-         left_right_readout_stdp_mad_eprop_reg \
-	     IF_curr_exp \
+MODELS = IF_curr_exp \
          IF_cond_exp \
          IZK_curr_exp \
          IZK_cond_exp \
@@ -43,7 +38,12 @@ ifneq ($(SPYNNAKER_DEBUG), DEBUG)
               IZK_cond_exp_stdp_mad_pair_additive \
               IF_curr_alpha_stdp_mad_pair_additive \
               IF_curr_exp_stdp_mad_recurrent_pre_stochastic_multiplicative \
-              IF_curr_exp_stdp_mad_pfister_triplet_additive
+              IF_curr_exp_stdp_mad_pfister_triplet_additive \
+              eprop_adaptive \
+              eprop_adaptive_stdp_mad_eprop_reg \
+              sinusoid_readout \
+              sinusoid_readout_stdp_mad_eprop_reg \
+              left_right_readout_stdp_mad_eprop_reg
 endif
 
 all:
