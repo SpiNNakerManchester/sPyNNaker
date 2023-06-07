@@ -23,11 +23,6 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
 
 logger = logging.getLogger(__name__)
 
-# LOOKUP_TAU_PLUS_SIZE = 256
-# LOOKUP_TAU_PLUS_SHIFT = 0
-# LOOKUP_TAU_MINUS_SIZE = 256
-# LOOKUP_TAU_MINUS_SHIFT = 0
-
 
 class TimingDependenceEprop(AbstractTimingDependence):
     __slots__ = [
@@ -41,10 +36,6 @@ class TimingDependenceEprop(AbstractTimingDependence):
         self.__a_minus = A_minus
 
         self.__synapse_structure = SynapseStructureWeightOnly()
-
-#         # provenance data
-#         self.__tau_plus_last_entry = None
-#         self.__tau_minus_last_entry = None
 
     @property
     def A_plus(self):
@@ -66,8 +57,7 @@ class TimingDependenceEprop(AbstractTimingDependence):
     def is_same_as(self, timing_dependence):
         if not isinstance(timing_dependence, TimingDependenceEprop):
             return False
-        return (self.__tau_plus == timing_dependence.tau_plus and
-                self.__tau_minus == timing_dependence.tau_minus)
+        return True
 
     @property
     def vertex_executable_suffix(self):
@@ -75,7 +65,6 @@ class TimingDependenceEprop(AbstractTimingDependence):
 
     @property
     def pre_trace_n_bytes(self):
-
         # Pair rule requires no pre-synaptic trace when only the nearest
         # Neighbours are considered and, a single 16-bit R1 trace
         return 2
@@ -93,19 +82,6 @@ class TimingDependenceEprop(AbstractTimingDependence):
             self, spec, global_weight_scale, synapse_weight_scales):
         # There are currently no parameters to write for this rule
         pass
-
-        # Check timestep is valid
-#         if machine_time_step != 1000:
-#             raise NotImplementedError(
-#                 "STDP LUT generation currently only supports 1ms timesteps")
-
-#         # Write lookup tables
-#         self.__tau_plus_last_entry = plasticity_helpers.write_exp_lut(
-#             spec, self.__tau_plus, LOOKUP_TAU_PLUS_SIZE,
-#             LOOKUP_TAU_PLUS_SHIFT)
-#         self.__tau_minus_last_entry = plasticity_helpers.write_exp_lut(
-#             spec, self.__tau_minus, LOOKUP_TAU_MINUS_SIZE,
-#             LOOKUP_TAU_MINUS_SHIFT)
 
     @property
     def synaptic_structure(self):

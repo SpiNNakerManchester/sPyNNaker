@@ -228,8 +228,8 @@ class SynapseDynamicsSTDP(
         if not isinstance(synapse_dynamics, SynapseDynamicsSTDP):
             return False
         return (
-            # self.__timing_dependence.is_same_as(
-            #     synapse_dynamics.timing_dependence) and
+            self.__timing_dependence.is_same_as(
+                synapse_dynamics.timing_dependence) and
             self.__weight_dependence.is_same_as(
                 synapse_dynamics.weight_dependence) and
             (self.__dendritic_delay_fraction ==
