@@ -27,7 +27,6 @@ from .if_curr_delta import IFCurrDelta
 from .if_curr_exp_ca2_adaptive import IFCurrExpCa2Adaptive
 from .if_curr_exp_semd_base import IFCurrExpSEMDBase
 from .eprop_adaptive import EPropAdaptive
-# from .store_recall_readout import StoreRecallReadout
 from .sinusoid_readout import SinusoidReadout
 from .left_right_readout import LeftRightReadout
 
@@ -36,4 +35,4 @@ __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCurrExpBase", "IFFacetsConductancePopulation", "IzkCondExpBase",
            "IzkCurrExpBase", "IFCondExpStoc",
            "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase",
-           "EPropAdaptive", "SinusoidReadout", "LeftRightReadout"] # , "StoreRecallReadout"
+           "EPropAdaptive", "SinusoidReadout", "LeftRightReadout"]
