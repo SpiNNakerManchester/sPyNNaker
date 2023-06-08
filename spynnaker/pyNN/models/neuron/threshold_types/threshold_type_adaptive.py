@@ -79,7 +79,7 @@ class ThresholdTypeAdaptive(AbstractThresholdType):
 
     @property
     def small_b(self):
-        return self._small_b
+        return self.__small_b
 
     @small_b.setter
     def small_b(self, new_value):
