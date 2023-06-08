@@ -21,10 +21,10 @@
 
 // Includes for model parts used in this implementation
 #include <neuron/models/neuron_model_sinusoid_readout_impl.h>
+#include <neuron/synapse_types/synapse_types_eprop_adaptive_impl.h>
 #include <neuron/input_types/input_type_current.h>
 #include <neuron/additional_inputs/additional_input_none_impl.h>
 #include <neuron/threshold_types/threshold_type_static.h>
-#include <neuron/synapse_types/synapse_types_eprop_adaptive_impl.h>
 
 #include <neuron/current_sources/current_source.h>
 
