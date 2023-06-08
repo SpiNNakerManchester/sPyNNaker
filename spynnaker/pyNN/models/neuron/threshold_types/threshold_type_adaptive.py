@@ -50,32 +50,32 @@ class ThresholdTypeAdaptive(AbstractThresholdType):
                 (DataType.UINT32, SCALAR)])],
             {BIG_B: "mV", SMALL_B: "mV", SMALL_B_0: "mV", TAU_A: "ms",
              BETA: "", SCALAR: ""})
-        self._B = B
-        self._small_b = small_b
-        self._small_b_0 = small_b_0
-        self._tau_a = tau_a
-        self._beta = beta
-        self._scalar = 1000
+        self.__B = B
+        self.__small_b = small_b
+        self.__small_b_0 = small_b_0
+        self.__tau_a = tau_a
+        self.__beta = beta
+        self.__scalar = 1000
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
-        parameters[SMALL_B_0] = self._small_b_0
-        parameters[TAU_A] = self._tau_a
-        parameters[BETA] = self._beta
-        parameters[SCALAR] = self._scalar
+        parameters[SMALL_B_0] = self.__small_b_0
+        parameters[TAU_A] = self.__tau_a
+        parameters[BETA] = self.__beta
+        parameters[SCALAR] = self.__scalar
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables[BIG_B] = self._B
-        state_variables[SMALL_B] = self._small_b
+        state_variables[BIG_B] = self.__B
+        state_variables[SMALL_B] = self.__small_b
 
     @property
     def B(self):
-        return self._B
+        return self.__B
 
     @B.setter
     def B(self, new_value):
-        self._B = new_value
+        self.__B = new_value
 
     @property
     def small_b(self):
@@ -83,28 +83,28 @@ class ThresholdTypeAdaptive(AbstractThresholdType):
 
     @small_b.setter
     def small_b(self, new_value):
-        self._small_b = new_value
+        self.__small_b = new_value
 
     @property
     def small_b_0(self):
-        return self._small_b_0
+        return self.__small_b_0
 
     @small_b_0.setter
     def small_b_0(self, new_value):
-        self._small_b_0 = new_value
+        self.__small_b_0 = new_value
 
     @property
     def tau_a(self):
-        return self._tau_a
+        return self.__tau_a
 
     @tau_a.setter
     def tau_a(self, new_value):
-        self._tau_a = new_value
+        self.__tau_a = new_value
 
     @property
     def beta(self):
-        return self._beta
+        return self.__beta
 
     @beta.setter
     def beta(self, new_value):
-        self._beta = new_value
+        self.__beta = new_value
