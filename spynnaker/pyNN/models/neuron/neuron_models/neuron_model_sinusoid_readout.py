@@ -65,7 +65,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(
 
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
-            target_data, l, w_fb, eta, update_ready):
+            target_data, learning_signal, w_fb, eta, update_ready):
 
         struct_neuron_vals = [
             (DataType.S1615, V),  # v
@@ -140,7 +140,6 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(
             parameters[TARGET_DATA+str(n)] = self.__target_data[n]
 
         parameters[ETA] = self.__eta
-
 
     @overrides(AbstractStandardNeuronComponent.add_state_variables)
     def add_state_variables(self, state_variables):

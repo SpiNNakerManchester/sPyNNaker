@@ -22,4 +22,4 @@ from .synapse_type_eprop_adaptive import SynapseTypeEPropAdaptive
 
 __all__ = ["AbstractSynapseType", "SynapseTypeDualExponential",
            "SynapseTypeExponential", "SynapseTypeDelta", "SynapseTypeAlpha",
-           "SynapseTypeSEMD", "SynapseTypeEpropAdaptive"]
+           "SynapseTypeSEMD", "SynapseTypeEPropAdaptive"]
