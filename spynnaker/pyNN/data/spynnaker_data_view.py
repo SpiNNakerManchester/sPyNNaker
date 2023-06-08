@@ -11,12 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import logging
+from typing import Iterable, Union, TYPE_CHECKING
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.data import FecDataView
 from spynnaker import _version
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.projection import Projection
+    from spynnaker.pyNN.models.populations import Population
+    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access
@@ -101,7 +106,7 @@ class SpynnakerDataView(FecDataView):
     __slots__ = ()
 
     @classmethod
-    def get_min_delay(cls):
+    def get_min_delay(cls) -> float:
         """
         The minimum supported delay if available, in milliseconds.
 
@@ -117,7 +122,7 @@ class SpynnakerDataView(FecDataView):
         return cls.get_simulation_time_step_ms()
 
     @classmethod
-    def has_min_delay(cls):
+    def has_min_delay(cls) -> bool:
         """
         Report if there is a minimum supported delay available.
 
@@ -128,7 +133,7 @@ class SpynnakerDataView(FecDataView):
         return cls.has_time_step()
 
     @classmethod
-    def iterate_projections(cls):
+    def iterate_projections(cls) -> Iterable[Projection]:
         """
         An iteration of the projections previously added.
 
@@ -139,7 +144,7 @@ class SpynnakerDataView(FecDataView):
         return iter(cls.__spy_data._projections)
 
     @classmethod
-    def get_n_projections(cls):
+    def get_n_projections(cls) -> int:
         """
         The number of projections previously added.
 
@@ -148,7 +153,7 @@ class SpynnakerDataView(FecDataView):
         return len(cls.__spy_data._projections)
 
     @classmethod
-    def add_projection(cls, projection):
+    def add_projection(cls, projection: Projection):
         """
         Called by each projection to add itself to the list.
 
@@ -161,17 +166,17 @@ class SpynnakerDataView(FecDataView):
             If projections should not be added in the current state
         """
         # UGLY but needed to avoid circular import
-        from spynnaker.pyNN.models.projection import Projection
+        from spynnaker.pyNN.models.projection import Projection as Proj
         cls.check_user_can_act()
         if projection in cls.__spy_data._projections:
             raise NotImplementedError(
                 "This method should only be called from the Projection init")
-        if not isinstance(projection, Projection):
+        if not isinstance(projection, Proj):
             raise TypeError("The projection must be a Projection")
         cls.__spy_data._projections.append(projection)
 
     @classmethod
-    def iterate_populations(cls):
+    def iterate_populations(cls) -> Iterable[Population]:
         """
         An iteration of the populations previously added.
 
@@ -182,7 +187,7 @@ class SpynnakerDataView(FecDataView):
         return iter(cls.__spy_data._populations)
 
     @classmethod
-    def get_n_populations(cls):
+    def get_n_populations(cls) -> int:
         """
         The number of populations previously added.
 
@@ -191,7 +196,7 @@ class SpynnakerDataView(FecDataView):
         return len(cls.__spy_data._populations)
 
     @classmethod
-    def add_population(cls, population):
+    def add_population(cls, population: Population):
         """
         Called by each population to add itself to the list.
 
@@ -212,9 +217,10 @@ class SpynnakerDataView(FecDataView):
             If called after `sim.end`
         """
         # UGLY but needed to avoid circular import
-        from spynnaker.pyNN.models.populations.population import Population
+        from spynnaker.pyNN.models.populations.population import (
+            Population as Pop)
         cls.check_user_can_act()
-        if not isinstance(population, Population):
+        if not isinstance(population, Pop):
             raise TypeError("The population must be a Population")
         if population in cls.__spy_data._populations:
             raise NotImplementedError(
@@ -226,12 +232,13 @@ class SpynnakerDataView(FecDataView):
 
     @classmethod
     def set_number_of_neurons_per_dimension_per_core(
-            cls, neuron_type, max_permitted):
+            cls, neuron_type: type[AbstractPopulationVertex],
+            max_permitted: Union[int, tuple, None]):
         """
         Sets a ceiling on the number of neurons of a given type that can be
         placed on a single core for each dimension.
 
-        :param AbstractPopulationVertex neuron_type: neuron type
+        :param type neuron_type: neuron type
         :param max_permitted: the number to set to
         :type max_permitted: int or tuple or None
         """
@@ -243,7 +250,7 @@ class SpynnakerDataView(FecDataView):
         cls.__spy_data._neurons_per_core_set.add(neuron_type)
 
     @classmethod
-    def get_segment_counter(cls):
+    def get_segment_counter(cls) -> int:
         """
         The number of the current recording segment being generated.
 
@@ -253,7 +260,7 @@ class SpynnakerDataView(FecDataView):
         return cls.__spy_data._segment_counter
 
     @classmethod
-    def get_sim_name(cls):
+    def get_sim_name(cls) -> str:
         """
         Gets the name to be returned by `pyNN.spiNNaker.name`.
 
