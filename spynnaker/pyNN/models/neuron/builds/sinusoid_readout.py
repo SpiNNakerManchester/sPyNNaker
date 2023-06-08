@@ -33,7 +33,7 @@ class SinusoidReadout(AbstractPyNNNeuronModelStandard):
             self, tau_m=20.0, cm=1.0, v_rest=0.0, v_reset=0.0,
             v_thresh=100, tau_refrac=0.1, i_offset=0.0, v=50,
             isyn_exc=0.0, isyn_exc2=0.0, isyn_inh=0.0, isyn_inh2=0.0,
-            target_data=[0],
+            target_data=0,
             # Learning signal and weight update constants
             learning_signal=0, w_fb=0.5, eta=1.0, update_ready=1024):
 
