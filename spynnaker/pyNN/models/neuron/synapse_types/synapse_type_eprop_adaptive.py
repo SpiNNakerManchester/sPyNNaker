@@ -16,7 +16,6 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_synapse_type import AbstractSynapseType
 from spynnaker.pyNN.utilities.struct import Struct
-from spynnaker.pyNN.data import SpynnakerDataView
 
 ISYN_EXC = "isyn_exc"
 ISYN_EXC2 = "isyn_exc2"

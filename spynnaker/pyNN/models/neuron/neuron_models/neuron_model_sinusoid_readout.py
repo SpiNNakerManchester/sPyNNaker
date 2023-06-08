@@ -57,7 +57,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(
         "__target_data",
 
         # learning signal
-        "__l",
+        "__learning_signal",
         "__w_fb",
         "__eta",
         "__update_ready"
@@ -115,7 +115,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(
         self.__target_data = target_data
 
         # learning signal
-        self.__l = l
+        self.__learning_signal = learning_signal
         self.__w_fb = w_fb
 
         self.__eta = eta
@@ -148,7 +148,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(
         state_variables[REFRACT_TIMER] = 0
 
         # learning params
-        state_variables[L] = self.__l
+        state_variables[L] = self.__learning_signal
 
         for n in range(SYNAPSES_PER_NEURON):
             state_variables[DELTA_W+str(n)] = 0

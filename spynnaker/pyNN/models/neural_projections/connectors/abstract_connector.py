@@ -465,8 +465,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if self.__safe:
             if not weights.size:
                 warn_once(logger, "No connection in " + str(self))
-            # TODO: I think this is allowed for local_only so investigate what's
-            #       going on there
+            # TODO: I think this is allowed for local_only so investigate
+            #       what's going on there
         #     elif numpy.amin(weights) < 0 < numpy.amax(weights):
         #         raise SpynnakerException(
         #             "Weights must be either all positive or all negative in "

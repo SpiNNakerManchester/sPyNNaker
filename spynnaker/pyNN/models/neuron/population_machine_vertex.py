@@ -420,7 +420,7 @@ class PopulationMachineVertex(
             n_keys = 0
             # Seems like overkill, there should be a simpler way to do this
             partitions = (
-                SpynnakerDataView.\
+                SpynnakerDataView.
                 get_outgoing_edge_partitions_starting_at_vertex(
                     self._app_vertex))
             for partition in partitions:

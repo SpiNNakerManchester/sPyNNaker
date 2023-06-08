@@ -1054,7 +1054,7 @@ class AbstractPopulationVertex(
         # TODO: check this EPROP (from synaptic_manager)
         # fix weight shift so we can scale eligibility trace calculations
         # accordingly.
-        max_weight_powers = (2 #if w >= 1 else w
+        max_weight_powers = (2  # if w >= 1 else w
                              for w in max_weight_powers)
 
         # Not entirely sure why but eprop also had signed weights stuff...

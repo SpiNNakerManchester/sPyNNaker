@@ -27,11 +27,9 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_exc2",
-                             "isyn_inh", "isyn_inh2",
-                             "psi", "target_rate", "tau_err",
-                             "B", "small_b",
-                             "l", "w_fb", "window_size", "number_of_cues",
-                             "eta"})
+                             "isyn_inh", "isyn_inh2", "psi", "target_rate",
+                             "tau_err", "B", "small_b", "learning_signal",
+                             "w_fb", "window_size",  "number_of_cues", "eta"})
     def __init__(
             self,
             # neuron model params
@@ -49,28 +47,23 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             B=10.0, small_b=0.0, small_b_0=10.0, tau_a=500.0, beta=1.8,
 
             # Learning signal and weight update constants
-            l=0.0, w_fb=0.5, window_size=13000, number_of_cues=0,
+            learning_signal=0.0, w_fb=0.5, window_size=13000,
+            number_of_cues=0,
 
             # eprop "global"
             eta=1.0
-
             ):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelEPropAdaptive(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac, psi,
             # threshold params
-            B,
-            small_b,
-            small_b_0,
-            tau_a,
-            beta,
+            B, small_b, small_b_0, tau_a, beta,
             # Regularisation params
             target_rate, tau_err,
             # Learning signal params
-            l, w_fb, window_size, number_of_cues,
+            learning_signal, w_fb, window_size, number_of_cues,
             # eprop global
-            eta
-            )
+            eta)
 
         synapse_type = SynapseTypeEPropAdaptive(
             isyn_exc, isyn_exc2, isyn_inh, isyn_inh2)

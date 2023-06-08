@@ -47,8 +47,7 @@ class ThresholdTypeAdaptive(AbstractThresholdType):
                 (DataType.S1615, SMALL_B_0),
                 (DataType.UINT32, TAU_A),
                 (DataType.S1615, BETA),
-                (DataType.UINT32, SCALAR),
-                (DataType.S1615, TIMESTEP_MS)])],
+                (DataType.UINT32, SCALAR)])],
             {BIG_B: "mV", SMALL_B: "mV", SMALL_B_0: "mV", TAU_A: "ms",
              BETA: "", SCALAR: ""})
         self._B = B

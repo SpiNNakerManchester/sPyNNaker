@@ -29,7 +29,6 @@ CM = "cm"
 I_OFFSET = "i_offset"
 V_RESET = "v_reset"
 TAU_REFRAC = "tau_refrac"
-# COUNT_REFRAC = "count_refrac"
 TIMESTEP = "timestep"
 REFRACT_TIMER = "refract_timer"
 
@@ -37,14 +36,15 @@ REFRACT_TIMER = "refract_timer"
 PSI = "psi"
 Z = "z"
 A = "a"
+
 # Threshold
 BIG_B = "big_b"
 SMALL_B = "small_b"
 SMALL_B_0 = "small_b_0"
 TAU_A = "tau_a"
 BETA = "beta"
-# ADPT = "adpt"
 SCALAR = "scalar"
+
 # Learning signal
 L = "learning_signal"
 W_FB = "feedback_weight"
@@ -89,7 +89,7 @@ class NeuronModelEPropAdaptive(AbstractStandardNeuronComponent):
         "__target_rate",
         "__tau_err",
         # learning signal
-        "__l",
+        "__learning_signal",
         "__w_fb",
         "__window_size",
         "__number_of_cues",
@@ -101,28 +101,12 @@ class NeuronModelEPropAdaptive(AbstractStandardNeuronComponent):
         ]
 
     def __init__(
-            self,
-            v_init,
-            v_rest,
-            tau_m,
-            cm,
-            i_offset,
-            v_reset,
-            tau_refrac,
+            self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
             psi,
             # threshold params
-            B,
-            small_b,
-            small_b_0,
-            tau_a,
-            beta,
+            B, small_b, small_b_0, tau_a, beta,
             # regularisation params
-            target_rate,
-            tau_err,
-            l,
-            w_fb,
-            # eta,
-            window_size,
+            target_rate, tau_err, learning_signal, w_fb, window_size,
             number_of_cues,
             # eprop "global"
             eta
@@ -142,7 +126,7 @@ class NeuronModelEPropAdaptive(AbstractStandardNeuronComponent):
             (DataType.S1615, TIMESTEP),
             (DataType.S1615, Z),
             (DataType.S1615, A),
-            (DataType.S1615, PSI),  #  psi, pseuo_derivative
+            (DataType.S1615, PSI),  # psi, pseuo_derivative
             (DataType.S1615, BIG_B),
             (DataType.S1615, SMALL_B),
             (DataType.S1615, SMALL_B_0),
@@ -199,9 +183,8 @@ class NeuronModelEPropAdaptive(AbstractStandardNeuronComponent):
         self.__tau_err = tau_err
 
         # learning signal
-        self.__l = l
+        self.__learning_signal = learning_signal
         self.__w_fb = w_fb
-        # self.__eta = eta
         self.__window_size = window_size
         self.__number_of_cues = number_of_cues
 
@@ -243,7 +226,7 @@ class NeuronModelEPropAdaptive(AbstractStandardNeuronComponent):
         state_variables[BIG_B] = self.__B
         state_variables[SMALL_B] = self.__small_b
 
-        state_variables[L] = self.__l
+        state_variables[L] = self.__learning_signal
 
         for n in range(SYNAPSES_PER_NEURON):
             state_variables[DELTA_W+str(n)] = 0

@@ -72,7 +72,7 @@ class NeuronModelLeftRightReadout(AbstractStandardNeuronComponent):
         "__tau_refrac",
         "__rate_off",
         "__rate_on",
-        "__l",
+        "__learning_signal",
         "__w_fb",
         "__window_size",
         "__eta",
@@ -87,8 +87,8 @@ class NeuronModelLeftRightReadout(AbstractStandardNeuronComponent):
 
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
-            rate_on, rate_off, poisson_pop_size, l, w_fb, eta, window_size,
-            number_of_cues):
+            rate_on, rate_off, poisson_pop_size, learning_signal, w_fb, eta,
+            window_size, number_of_cues):
 
         struct_neuron_vals = [
             (DataType.S1615, V),  # v
@@ -101,7 +101,7 @@ class NeuronModelLeftRightReadout(AbstractStandardNeuronComponent):
             (DataType.INT32, REFRACT_TIMER),  # count_refrac
             (DataType.S1615, TIMESTEP),  # timestep
             # Learning signal
-            (DataType.S1615, L),  # L
+            (DataType.S1615, L),  # Learning_signal
             (DataType.S1615, W_FB),  # w_fb
             (DataType.UINT32, WINDOW_SIZE),  # window_size
             # former global parameters
@@ -153,7 +153,7 @@ class NeuronModelLeftRightReadout(AbstractStandardNeuronComponent):
         self.__cross_entropy = 0.0
         self.__poisson_key = 0  # None TODO: work out how to pass this in
         self.__poisson_pop_size = poisson_pop_size
-        self.__l = l
+        self.__learning_signal = learning_signal
         self.__w_fb = w_fb
         self.__eta = eta
         self.__window_size = window_size
@@ -174,7 +174,7 @@ class NeuronModelLeftRightReadout(AbstractStandardNeuronComponent):
         parameters[TAU_REFRAC] = self.__tau_refrac
         parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
-        parameters[L] = self.__l
+        parameters[L] = self.__learning_signal
         parameters[W_FB] = self.__w_fb
         parameters[WINDOW_SIZE] = self.__window_size
         # These should probably have defaults earlier than this
@@ -204,8 +204,8 @@ class NeuronModelLeftRightReadout(AbstractStandardNeuronComponent):
         state_variables[V] = self.__v_init
         state_variables[REFRACT_TIMER] = 0
 
-        #learning params
-        state_variables[L] = self.__l
+        # learning params
+        state_variables[L] = self.__learning_signal
 
         for n in range(SYNAPSES_PER_NEURON):
             state_variables[DELTA_W+str(n)] = 0
