@@ -77,7 +77,7 @@ class WeightDependenceEpropReg(
                 "Eprop_reg weight dependence only supports single terms")
 
         # Loop through each synapse type's weight scale
-        for w in synapse_weight_scales:
+        for _ in synapse_weight_scales:
             spec.write_value(
                 data=self.__w_min * global_weight_scale,
                 data_type=DataType.S1615)

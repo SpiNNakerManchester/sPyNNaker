@@ -81,7 +81,6 @@ class NeuronModelLeftRightReadout(AbstractStandardNeuronComponent):
         "__cross_entropy",
         "__poisson_key",
         "__poisson_pop_size",
-        "__n_keys_in_target",
         "__number_of_cues"
         ]
 
@@ -158,8 +157,6 @@ class NeuronModelLeftRightReadout(AbstractStandardNeuronComponent):
         self.__eta = eta
         self.__window_size = window_size
         self.__number_of_cues = number_of_cues
-
-        self.__n_keys_in_target = poisson_pop_size * 4
 
     def set_poisson_key(self, p_key):
         self.__poisson_key = p_key

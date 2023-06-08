@@ -303,10 +303,12 @@ class PopulationMachineVertex(
 
         # Set the poisson key for eprop left-right
         routing_info = SpynnakerDataView.get_routing_infos()
+        # pylint: disable=protected-access
         if isinstance(self._app_vertex._pynn_model._model.neuron_model,
                       NeuronModelLeftRightReadout):
             poisson_key = routing_info.get_first_key_from_pre_vertex(
                 placement.vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
+            # pylint: disable=protected-access
             self._app_vertex._pynn_model._model.neuron_model.set_poisson_key(
                 poisson_key)
 
