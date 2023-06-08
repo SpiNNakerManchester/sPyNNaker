@@ -1,12 +1,18 @@
-/*! \file
-*
-* \brief implementation of synapse_types.h for a simple duel exponential decay
-* to synapses.
-*
-* \details If we have combined excitatory_one/excitatory_two/inhibitory
-* synapses it will be because both excitatory and inhibitory synaptic
-* time-constants (and thus propogators) are identical.
-*/
+/*
+ * Copyright (c) 2019 The University of Manchester
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #ifndef _SYNAPSE_TYPES_EPROP_ADPATIVE_IMPL_H_
 #define _SYNAPSE_TYPES_EPROP_ADAPTIVE_IMPL_H_

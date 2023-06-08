@@ -1,14 +1,30 @@
+/*
+ * Copyright (c) 2019 The University of Manchester
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #ifndef _NEURON_IMPL_SINUSOID_READOUT_H_
 #define _NEURON_IMPL_SINUSOID_READOUT_H_
 
 #include "neuron_impl.h"
 
 // Includes for model parts used in this implementation
-#include <neuron/synapse_types/synapse_type_eprop_adaptive.h>
 #include <neuron/models/neuron_model_sinusoid_readout_impl.h>
 #include <neuron/input_types/input_type_current.h>
 #include <neuron/additional_inputs/additional_input_none_impl.h>
 #include <neuron/threshold_types/threshold_type_static.h>
+#include <neuron/synapse_types/synapse_types_eprop_adaptive_impl.h>
 
 #include <neuron/current_sources/current_source.h>
 
