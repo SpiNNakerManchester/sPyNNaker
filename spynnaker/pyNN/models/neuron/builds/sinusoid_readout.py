@@ -1,3 +1,17 @@
+# Copyright (c) 2019 The University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.neuron_models import (
@@ -20,8 +34,6 @@ class SinusoidReadout(AbstractPyNNNeuronModelStandard):
             v_thresh=100, tau_refrac=0.1, i_offset=0.0, v=50,
 
             isyn_exc=0.0, isyn_exc2=0.0, isyn_inh=0.0, isyn_inh2=0.0,
-            # tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0, tau_syn_I2=5.0,
-#             mean_isi_ticks=65000, time_to_spike_ticks=65000, rate_update_threshold=0.25,
 
             target_data=[],
 
@@ -35,7 +47,6 @@ class SinusoidReadout(AbstractPyNNNeuronModelStandard):
             l, w_fb, eta, update_ready)
 
         synapse_type = SynapseTypeEPropAdaptive(
-            # tau_syn_E, tau_syn_E2, tau_syn_I, tau_syn_I2,
             isyn_exc, isyn_exc2, isyn_inh, isyn_inh2)
 
         input_type = InputTypeCurrent()

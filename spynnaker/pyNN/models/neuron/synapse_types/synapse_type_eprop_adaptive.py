@@ -1,37 +1,31 @@
- # import numpy
+# Copyright (c) 2019 The University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from spinn_utilities.overrides import overrides
-# from pacman.executor.injection_decorator import inject_items
 from data_specification.enums import DataType
 from .abstract_synapse_type import AbstractSynapseType
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
 
-# TAU_SYN_E = 'tau_syn_E'
-# TAU_SYN_E2 = 'tau_syn_E2'
-# TAU_SYN_I = 'tau_syn_I'
-# TAU_SYN_I2 = 'tau_syn_I2'
 ISYN_EXC = "isyn_exc"
 ISYN_EXC2 = "isyn_exc2"
 ISYN_INH = "isyn_inh"
 ISYN_INH2 = "isyn_inh2"
-# TIMESTEP_MS = "timestep_ms"
-
-# UNITS = {
-#     TAU_SYN_E: "mV",
-#     TAU_SYN_E2: "mV",
-#     TAU_SYN_I: 'mV',
-#     ISYN_EXC: "",
-#     ISYN_EXC2: "",
-#     ISYN_INH: "",
-# }
 
 
 class SynapseTypeEPropAdaptive(AbstractSynapseType):
     __slots__ = [
-        # "_tau_syn_E",
-        # "_tau_syn_E2",
-        # "_tau_syn_I",
-        # "_tau_syn_I2",
         "_isyn_exc",
         "_isyn_exc2",
         "_isyn_inh",
@@ -42,32 +36,17 @@ class SynapseTypeEPropAdaptive(AbstractSynapseType):
             ):
         super().__init__(
             [Struct([
-                # (DataType.S1615, TAU_SYN_E),
                 (DataType.S1615, ISYN_EXC),
-                # (DataType.S1615, TAU_SYN_E2),
                 (DataType.S1615, ISYN_EXC2),
-                # (DataType.S1615, TAU_SYN_I),
                 (DataType.S1615, ISYN_INH),
-                # (DataType.S1615, TAU_SYN_I2),
                 (DataType.S1615, ISYN_INH2)])],
             {ISYN_EXC: "", ISYN_EXC2: "",
              ISYN_INH: "", ISYN_INH2: ""})
-            # {TAU_SYN_E: "mV", TAU_SYN_E2: "mV", TAU_SYN_I: "mV",
-            #  TAU_SYN_I2: "mV", ISYN_EXC: "", ISYN_EXC2: "",
-            #  ISYN_INH: "", ISYN_INH2: ""})
 
-        # self._tau_syn_E = tau_syn_E
-        # self._tau_syn_E2 = tau_syn_E2
-        # self._tau_syn_I = tau_syn_I
-        # self._tau_syn_I2 = tau_syn_I2
         self._isyn_exc = isyn_exc
         self._isyn_exc2 = isyn_exc2
         self._isyn_inh = isyn_inh
         self._isyn_inh2 = isyn_inh2
-
-    # @overrides(AbstractSynapseType.get_n_cpu_cycles)
-    # def get_n_cpu_cycles(self, n_neurons):
-    #     return 100 * n_neurons
 
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
@@ -79,48 +58,6 @@ class SynapseTypeEPropAdaptive(AbstractSynapseType):
         state_variables[ISYN_EXC2] = self._isyn_exc2
         state_variables[ISYN_INH] = self._isyn_inh
         state_variables[ISYN_INH2] = self._isyn_inh2
-
-    # @overrides(AbstractSynapseType.get_units)
-    # def get_units(self, variable):
-    #     return UNITS[variable]
-    #
-    # @overrides(AbstractSynapseType.has_variable)
-    # def has_variable(self, variable):
-    #     return variable in UNITS
-
-    # @inject_items({"ts": "MachineTimeStep"})
-    # @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
-    # def get_values(self, parameters, state_variables, vertex_slice, ts):
-    #
-    #     tsfloat = float(ts) / 1000.0
-    #     decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731
-    #     init = lambda x: (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))  # noqa E731
-    #
-    #     # Add the rest of the data
-    #     return [parameters[TAU_SYN_E].apply_operation(decay),
-    #             parameters[TAU_SYN_E].apply_operation(init),
-    #             parameters[TAU_SYN_E2].apply_operation(decay),
-    #             parameters[TAU_SYN_E2].apply_operation(init),
-    #             parameters[TAU_SYN_I].apply_operation(decay),
-    #             parameters[TAU_SYN_I].apply_operation(init),
-    #             parameters[TAU_SYN_I2].apply_operation(decay),
-    #             parameters[TAU_SYN_I2].apply_operation(init),
-    #             state_variables[ISYN_EXC],
-    #             state_variables[ISYN_EXC2],
-    #             state_variables[ISYN_INH],
-    #             state_variables[ISYN_INH2]]
-    #
-    # @overrides(AbstractSynapseType.update_values)
-    # def update_values(self, values, parameters, state_variables):
-    #
-    #     # Read the data
-    #     (_decay_E, _init_E, _decay_E2, _init_E2, _decay_I, _init_I, _decay_I2, _init_I2,
-    #      isyn_exc, isyn_exc2, isyn_inh, isyn_inh2) = values
-    #
-    #     state_variables[ISYN_EXC] = isyn_exc
-    #     state_variables[ISYN_EXC2] = isyn_exc2
-    #     state_variables[ISYN_INH] = isyn_inh
-    #     state_variables[ISYN_INH2] = isyn_inh2
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):
@@ -140,39 +77,8 @@ class SynapseTypeEPropAdaptive(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.get_synapse_targets)
     def get_synapse_targets(self):
-        return "input_connections", "recurrent_connections", "learning_signal", "unused"
-
-    # @property
-    # def tau_syn_E(self):
-    #     return self._tau_syn_E
-    #
-    # @tau_syn_E.setter
-    # def tau_syn_E(self, tau_syn_E):
-    #     self._tau_syn_E = tau_syn_E
-    #
-    # @property
-    # def tau_syn_E2(self):
-    #     return self._tau_syn_E2
-    #
-    # @tau_syn_E2.setter
-    # def tau_syn_E2(self, tau_syn_E2):
-    #     self._tau_syn_E2 = tau_syn_E2
-    #
-    # @property
-    # def tau_syn_I(self):
-    #     return self._tau_syn_I
-    #
-    # @tau_syn_I.setter
-    # def tau_syn_I(self, tau_syn_I):
-    #     self._tau_syn_I = tau_syn_I
-    #
-    # @property
-    # def tau_syn_I2(self):
-    #     return self._tau_syn_I2
-    #
-    # @tau_syn_I2.setter
-    # def tau_syn_I2(self, tau_syn_I2):
-    #     self._tau_syn_I2 = tau_syn_I2
+        return ["input_connections", "recurrent_connections",
+                "learning_signal", "unused"]
 
     @property
     def isyn_exc(self):

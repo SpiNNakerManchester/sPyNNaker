@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from enum import Enum
 import os
 import ctypes
@@ -419,10 +420,12 @@ class PopulationMachineVertex(
             n_keys = 0
             # Seems like overkill, there should be a simpler way to do this
             partitions = (
-                SpynnakerDataView.get_outgoing_edge_partitions_starting_at_vertex(
-                self._app_vertex))
+                SpynnakerDataView.\
+                get_outgoing_edge_partitions_starting_at_vertex(
+                    self._app_vertex))
             for partition in partitions:
-                if partition.identifier == constants.LIVE_POISSON_CONTROL_PARTITION_ID:
+                if partition.identifier == (
+                        constants.LIVE_POISSON_CONTROL_PARTITION_ID):
                     for edge in partition.edges:
                         n_keys += edge.post_vertex.n_atoms
             return n_keys * n_colours

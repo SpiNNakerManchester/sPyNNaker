@@ -355,7 +355,7 @@ class SynapseDynamicsSTDP(
         fixed_plastic = (
             ((dendritic_delays.astype("uint16") & 0xFF) <<
              # master code commented out
-            # (connections["delay"].astype("uint16") <<
+             # (connections["delay"].astype("uint16") <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype("uint16")
              << n_neuron_id_bits) |

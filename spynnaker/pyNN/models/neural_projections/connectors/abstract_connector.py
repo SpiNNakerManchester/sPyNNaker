@@ -99,8 +99,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param SynapseInformation synapse_info: the synapse info
         """
         self._rng = (self._rng or NumpyRNG())
-        # TODO: this was set to zero but I'm unconvinced that it needs to be
-        self.__min_delay = 0 # SpynnakerDataView.get_simulation_time_step_ms()
+        self.__min_delay = SpynnakerDataView.get_simulation_time_step_ms()
 
     def _get_delay_minimum(self, delays, n_connections, synapse_info):
         """
@@ -466,14 +465,15 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if self.__safe:
             if not weights.size:
                 warn_once(logger, "No connection in " + str(self))
-            # TODO: I think this is allowed for local_only so investigate what's going on there
+            # TODO: I think this is allowed for local_only so investigate what's
+            #       going on there
         #     elif numpy.amin(weights) < 0 < numpy.amax(weights):
         #         raise SpynnakerException(
         #             "Weights must be either all positive or all negative in "
         #             f"projection {synapse_info.pre_population.label}->"
         #             f"{synapse_info.post_population.label}")
         # return numpy.abs(weights)
-        return weights # numpy.abs(weights)
+        return weights  # numpy.abs(weights)
 
     def _clip_delays(self, delays):
         """

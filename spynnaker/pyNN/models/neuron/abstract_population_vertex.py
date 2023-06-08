@@ -1051,8 +1051,9 @@ class AbstractPopulationVertex(
             w + 1 if (2 ** w) <= a else w
             for w, a in zip(max_weight_powers, max_weights))
 
-        # EPROP (from synaptic_manager)
-        # fix weight shift so we can scale eligibility trace calculations accordingly.
+        # TODO: check this EPROP (from synaptic_manager)
+        # fix weight shift so we can scale eligibility trace calculations
+        # accordingly.
         max_weight_powers = (2 #if w >= 1 else w
                              for w in max_weight_powers)
 

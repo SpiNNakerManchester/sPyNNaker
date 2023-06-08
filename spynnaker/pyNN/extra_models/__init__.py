@@ -55,7 +55,7 @@ __all__ = [
     'RecurrentRule', 'Vogels2011Rule',
     # eprop plastic stuff
     'TimingDependenceEprop',
-    'WeightDependenceEprop',
+    'WeightDependenceEpropReg',
 
     # Variable rate Poisson
     'SpikeSourcePoissonVariable']
