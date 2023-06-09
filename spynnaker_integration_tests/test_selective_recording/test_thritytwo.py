@@ -43,6 +43,6 @@ class TestSampling(BaseTestCase):
         for i in range(32, 40):
             self.assertEqual(0, len(spikes[i]))
         v = neo.segments[0].filter(name='v')[0]
-        self.assertEqual(32, len(v.channel_index.index))
+        self.assertEqual(32, len(v.annotations["channel_names"]))
         self.assertEqual(32, len(v[0]))
         sim.end()
