@@ -20,7 +20,7 @@ from spinn_utilities.log import FormatAdapter
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import (
-    get_probable_maximum_selected, get_probable_minimum_selected)
+    get_probable_maximum_selected, get_probable_minimum_selected, check_rng)
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
@@ -60,9 +60,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         :param bool verbose:
             Whether to output extra information about the connectivity to a
             CSV file
-        :param rng:
-            Seeded random number generator, or `None` to make one when needed
-        :type rng: ~pyNN.random.NumpyRNG or None
+        :param None rng: This is not supported in sPyNNaker!  Please instead
+            use additional_parameters={"seed": <seed>} in the target Population
         :param callable callback:
             if given, a callable that display a progress bar on the terminal.
 
@@ -84,6 +83,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
         self._rng = rng
+        check_rng(rng)
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):

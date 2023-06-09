@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from spinn_utilities.config_holder import get_config_bool
 
 """
 Utility package containing simple helper functions.
@@ -462,3 +463,31 @@ def get_neo_io(file_or_folder):
             # for older neo which has no io_by_extension
             pass
         raise ex
+
+
+def report_non_spynnaker_pyNN(msg):
+    """
+    Report a case of non-spynnaker-compatible PyNN being used.  This will warn
+    or error depending on the configuration setting.
+
+    :param str msg: The message to report
+    """
+    if get_config_bool("Simulation", "error_on_non_spynnaker_pynn"):
+        raise ConfigurationException(msg)
+    else:
+        logger.warning(msg)
+
+
+def check_rng(rng):
+    """
+    Check for non-None rng parameter since this is no longer compatible with
+    sPyNNaker.  If not None, warn or error depending on a config value.
+
+    :param rng: The rng parameter value.
+    """
+    if rng is not None:
+        report_non_spynnaker_pyNN(
+            "Use of rng in connectors and RandomDistribution is no longer"
+            " supported in sPyNNaker.  Please instead use"
+            " additional_parameters={'seed': <seed>} in target Population to"
+            " ensure random numbers are seeded.)")

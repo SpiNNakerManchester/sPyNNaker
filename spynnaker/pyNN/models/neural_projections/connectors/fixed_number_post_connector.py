@@ -63,10 +63,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             between neuron pairs are possible; if ``False``, then once a
             post-synaptic neuron has been connected to a pre-neuron, it can't
             be connected again.
-        :param rng:
-            Seeded random number generator, or ``None`` to make one when
-            needed.
-        :type rng: ~pyNN.random.NumpyRNG or None
+        :param None rng: This is not supported in sPyNNaker!  Please instead
+            use additional_parameters={"seed": <seed>} in the target Population
         :param callable callback:
             if given, a callable that display a progress bar on the terminal.
 
@@ -80,6 +78,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         self.__post_neurons = None
         self.__post_neurons_set = False
         self._rng = rng
+        utility_calls.check_rng(rng)
 
     def set_projection_information(self, synapse_info):
         super().set_projection_information(synapse_info)

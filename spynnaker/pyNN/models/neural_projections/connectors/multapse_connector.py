@@ -57,10 +57,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         :param bool verbose:
             Whether to output extra information about the connectivity to a
             CSV file
-        :param rng:
-            Seeded random number generator, or ``None`` to make one when
-            needed.
-        :type rng: ~pyNN.random.NumpyRNG or None
+        :param None rng: This is not supported in sPyNNaker!  Please instead
+            use additional_parameters={"seed": <seed>} in the target Population
         :param callable callback:
             if given, a callable that display a progress bar on the terminal.
 
@@ -75,6 +73,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         self.__post_slices = None
         self.__synapses_per_edge = None
         self._rng = rng
+        utility_calls.check_rng(rng)
 
     def set_projection_information(self, synapse_info):
         super().set_projection_information(synapse_info)
