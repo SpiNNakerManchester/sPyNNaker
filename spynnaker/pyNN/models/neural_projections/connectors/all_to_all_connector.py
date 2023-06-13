@@ -107,7 +107,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
             n_atoms = synapse_info.n_pre_neurons
             sources = numpy.where(numpy.diag(
                 numpy.repeat(1, n_atoms)) == 0)[0]
-            targets = nump.array([sources[
+            targets = numpy.array([sources[
                 ((n_atoms * i) + (n_atoms - 1)) - j]
                 for j in range(n_atoms) for i in range(n_atoms - 1)])
             targets += post_vertex_slice.lo_atom
