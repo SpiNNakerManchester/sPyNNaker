@@ -352,8 +352,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                     f"Need to set 'column_names' for n_columns={n_columns}")
 
         # Set the source and targets
-        self.__sources = self.__conn_list[:, _SOURCE]
-        self.__targets = self.__conn_list[:, _TARGET]
+        self.__sources = self.__conn_list[:, _SOURCE].astype(numpy.uint32)
+        self.__targets = self.__conn_list[:, _TARGET].astype(numpy.uint32)
 
         # Find any weights
         self.__weights = None
