@@ -71,9 +71,11 @@ def test_connector(
             assert extra_params[:, i].shape == (len(clist), )
 
     # Check weights and delays are used or ignored as expected
-    post_slice = Slice(0, 10)
+    pre_pop = MockPopulation(10, "Pre")
+    pre_pop._vertex = MockAppVertex([Slice(0, 9)])
+    post_slice = Slice(0, 9)
     synapse_info = SynapseInformation(
-            connector=None, pre_population=MockPopulation(10, "Pre"),
+            connector=None, pre_population=pre_pop,
             post_population=MockPopulation(10, "Post"), prepop_is_view=False,
             postpop_is_view=False, rng=None, synapse_dynamics=None,
             synapse_type=None, receptor_type=None,
@@ -92,8 +94,8 @@ class MockFromListConnector(FromListConnector):
             conn_list, safe=safe, verbose=verbose, column_names=column_names)
         self._split_count = 0
 
-    def _split_connections(self, post_slices):
-        split = super()._split_connections(post_slices)
+    def _split_connections(self, n_atoms, post_slices):
+        split = super()._split_connections(n_atoms, post_slices)
         if split:
             self._split_count += 1
         return split
@@ -107,15 +109,18 @@ def test_connector_split():
     post_neurons_per_core = 59
     sources = numpy.random.randint(0, n_sources, n_connections)
     targets = numpy.random.randint(0, n_targets, n_connections)
-    post_slices = [Slice(i, i + post_neurons_per_core - 1)
-                   for i in range(0, n_targets, post_neurons_per_core)]
+    post_slices = [
+        Slice(i, min((i + post_neurons_per_core) - 1, n_targets - 1))
+        for i in range(0, n_targets, post_neurons_per_core)]
 
     connection_list = numpy.dstack((sources, targets))[0]
     connector = MockFromListConnector(connection_list)
     weight = 1.0
     delay = 1.0
+    pre_pop = MockPopulation(n_sources, "Pre")
+    pre_pop._vertex = MockAppVertex([Slice(0, n_sources - 1)])
     synapse_info = SynapseInformation(
-        connector=None, pre_population=MockPopulation(n_sources, "Pre"),
+        connector=None, pre_population=pre_pop,
         post_population=MockPopulation(n_targets, "Post"),
         prepop_is_view=False, postpop_is_view=False, rng=None,
         synapse_dynamics=None, synapse_type=None, receptor_type=None,
@@ -184,7 +189,15 @@ def test_get_connected():
     post_slices = [Slice(0, 2), Slice(3, 5), Slice(6, 9)]
     pre_vertex = MockAppVertex(pre_slices)
     post_vertex = MockAppVertex(post_slices)
-    connected = connector.get_connected_vertices(None, pre_vertex, post_vertex)
+    pre_pop = MockPopulation(10, "Pre")
+    post_pop = MockPopulation(10, "Post")
+    # pylint: disable=protected-access
+    pre_pop._vertex = pre_vertex
+    post_pop._vertex = post_vertex
+    s_info = SynapseInformation(None, pre_pop, post_pop, False, False, None,
+                                None, 1, None, None, 1.0, 1.0)
+    connected = connector.get_connected_vertices(
+        s_info, pre_vertex, post_vertex)
 
     for post_vertex, pre_vertices in connected:
         post_slice = post_vertex.vertex_slice
