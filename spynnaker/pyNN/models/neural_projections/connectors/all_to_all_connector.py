@@ -107,9 +107,9 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
             n_atoms = synapse_info.n_pre_neurons
             sources = numpy.where(numpy.diag(
                 numpy.repeat(1, n_atoms)) == 0)[0]
-            targets = [sources[
+            targets = nump.array([sources[
                 ((n_atoms * i) + (n_atoms - 1)) - j]
-                for j in range(n_atoms) for i in range(n_atoms - 1)]
+                for j in range(n_atoms) for i in range(n_atoms - 1)])
             targets += post_vertex_slice.lo_atom
         else:
             sources = numpy.repeat(numpy.arange(
@@ -123,8 +123,8 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
         # pylint: disable=protected-access
         pre_raster_to_core = self._get_raster_to_core(
             self._get_pre_slices(synapse_info.pre_population._vertex))
-        block["sources"] = pre_raster_to_core[sources]
-        block["targets"] = targets
+        block["source"] = pre_raster_to_core[sources]
+        block["target"] = targets
 
         block["weight"] = self._generate_weights(
             block["source"], block["target"], n_connections, post_vertex_slice,
