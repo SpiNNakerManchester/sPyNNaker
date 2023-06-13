@@ -1447,9 +1447,9 @@ class AbstractPopulationVertex(
             The slice to copy now
         """
         for key in self.__state_variables.keys():
-            value = self.__state_variables[key][vertex_slice.as_slice]
-            self.__initial_state_variables[key].set_value_by_slice(
-                vertex_slice.lo_atom, vertex_slice.hi_atom + 1, value)
+            value = self.__state_variables[key][vertex_slice.get_raster_ids()]
+            self.__initial_state_variables[key].set_value_by_ids(
+                vertex_slice.get_raster_ids(), value)
         # This is called during reading of initial values, so we don't
         # need to do it again
         self.__read_initial_values = False
