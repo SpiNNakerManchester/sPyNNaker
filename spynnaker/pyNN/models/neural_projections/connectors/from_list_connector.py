@@ -270,19 +270,13 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         else:
             indices = self.__split_conn_list[post_lo]
         # pylint: disable=protected-access
-        pre_vertex = synapse_info.pre_population._vertex
-        pre_mapping = numpy.concatenate([
-            m.vertex_slice.get_raster_ids()
-            for m in pre_vertex.splitter.get_out_going_vertices(
-                SPIKE_PARTITION_ID)])
-        inv_pre_mapping = numpy.argsort(pre_mapping)
-        post_mapping = numpy.concatenate(
-            [s.get_raster_ids() for s in post_slices])
-        inv_post_mapping = numpy.argsort(post_mapping)
+        pre_raster_to_core = self._get_raster_to_core(
+            self._get_pre_slices(synapse_info.pre_population._vertex))
+        post_raster_to_core = self._get_raster_to_core(post_slices)
 
         block = numpy.zeros(len(indices), dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = inv_pre_mapping[self.__sources[indices]]
-        block["target"] = inv_post_mapping[self.__targets[indices]]
+        block["source"] = pre_raster_to_core[self.__sources[indices]]
+        block["target"] = post_raster_to_core[self.__targets[indices]]
         # check that conn_list has weights, if not then use the value passed in
         if self.__weights is None:
             if hasattr(synapse_info.weights, "__len__"):

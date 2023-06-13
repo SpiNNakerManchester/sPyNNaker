@@ -105,18 +105,26 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
 
         if not self.__allow_self_connections:
             n_atoms = synapse_info.n_pre_neurons
-            block["source"] = numpy.where(numpy.diag(
+            sources = numpy.where(numpy.diag(
                 numpy.repeat(1, n_atoms)) == 0)[0]
-            block["target"] = [block["source"][
+            targets = [block["source"][
                 ((n_atoms * i) + (n_atoms - 1)) - j]
                 for j in range(n_atoms) for i in range(n_atoms - 1)]
-            block["target"] += post_vertex_slice.lo_atom
+            targets += post_vertex_slice.lo_atom
         else:
-            block["source"] = numpy.repeat(numpy.arange(
+            sources = numpy.repeat(numpy.arange(
                 0, synapse_info.n_pre_neurons), post_vertex_slice.n_atoms)
-            block["target"] = numpy.tile(numpy.arange(
+            targets = numpy.tile(numpy.arange(
                 post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),
                 synapse_info.n_pre_neurons)
+
+        # pylint: disable=protected-access
+        pre_raster_to_core = self._get_raster_to_core(
+            self._get_pre_slices(synapse_info.pre_population._vertex))
+        post_raster_to_core = self._get_raster_to_core(post_slices)
+        block["sources"] = pre_raster_to_core[sources]
+        block["targets"] = post_raster_to_core[targets]
+
         block["weight"] = self._generate_weights(
             block["source"], block["target"], n_connections, post_vertex_slice,
             synapse_info)

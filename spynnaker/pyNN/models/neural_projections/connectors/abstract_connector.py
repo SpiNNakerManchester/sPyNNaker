@@ -645,3 +645,25 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param SynapseInformation synapse_info: The synaptic information
         """
         return
+
+    def _get_pre_slices(self, pre_vertex):
+        """ Get the outgoing slices of an application vertex for spikes
+
+        :param ApplicationVertex pre_vertex: The vertex to get the slices of
+        :rtype list(Slice)
+        """
+        return [
+            m.vertex_slice for m in pre_vertex.splitter.get_out_going_vertices(
+                SPIKE_PARTITION_ID)]
+
+    def _get_raster_to_core(self, slices):
+        """ Get raster id to core id mapping array from vertex slices
+
+        :param list slices: The slices to convert into an id map
+        :return: an array n_atoms long where the value at raster index i is
+            the per-core index of the neuron
+        :rtype: numpy.ndarray
+        """
+        global_to_raster = numpy.concatenate(
+            [s.get_raster_ids() for s in slices])
+        return numpy.argsort(global_to_raster)
