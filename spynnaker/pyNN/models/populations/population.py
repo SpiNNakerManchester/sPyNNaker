@@ -60,7 +60,8 @@ class Population(PopulationBase):
 
     def __init__(
             self, size, cellclass, cellparams=None, structure=None,
-            initial_values=None, label=None, additional_parameters=None):
+            initial_values=None, label=None, additional_parameters=None,
+            **additional_kwargs):
         """
         :param int size: The number of neurons in the population
         :param cellclass: The implementation of the individual neurons.
@@ -76,14 +77,23 @@ class Population(PopulationBase):
         :param additional_parameters:
             Additional parameters to pass to the vertex creation function.
         :type additional_parameters: dict(str, ...)
+        :param additional_kwargs:
+            A nicer way of allowing additional things
+        :type additional_kwargs: dict(str, ...)
         """
         # pylint: disable=too-many-arguments
+
+        # Deal with the kwargs!
+        additional = dict()
+        if additional_parameters is not None:
+            additional.update(additional_parameters)
+        if additional_kwargs:
+            additional.update(additional_kwargs)
 
         # build our initial objects
         model = self.__create_model(cellclass, cellparams)
         size = self.__roundsize(size, label)
-        self.__create_vertex(
-            model, size, label, additional_parameters)
+        self.__create_vertex(model, size, label, additional)
         self.__recorder = Recorder(population=self, vertex=self.__vertex)
 
         # Internal structure now supported 23 November 2014 ADR
