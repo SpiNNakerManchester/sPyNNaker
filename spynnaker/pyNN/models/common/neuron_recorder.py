@@ -205,8 +205,8 @@ class NeuronRecorder(object):
             return 0, 0
         if self.__indexes[variable] is None:
             return self.__sampling_rates[variable], vertex_slice.n_atoms
-        count = sum(vertex_slice.lo_atom <= index <= vertex_slice.hi_atom
-                    for index in self.__indexes[variable])
+        count = len(numpy.intersect1d(
+            vertex_slice.get_raster_ids(), self.__indexes[variable]))
         if count:
             return self.__sampling_rates[variable], count
         return 0, 0
@@ -488,10 +488,7 @@ class NeuronRecorder(object):
         if self.__indexes[variable] is None:
             return True
         indexes = self.__indexes[variable]
-        for index in range(vertex_slice.lo_atom, vertex_slice.hi_atom+1):
-            if index in indexes:
-                return True
-        return False
+        return numpy.isin(vertex_slice.get_raster_ids(), indexes)
 
     def recorded_ids_by_slice(self, vertex_slice):
         """
@@ -1130,8 +1127,7 @@ class NeuronRecorder(object):
         n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)
         data = [n_vars, len(self.__bitfield_variables)]
         for variable in self.__sampling_rates:
-            rate, _ = self._rate_and_count_per_slice(
-                variable, vertex_slice)
+            rate = self.__sampling_rates[variable]
             if variable in self.__bitfield_variables:
                 data.append(rate)
             else:

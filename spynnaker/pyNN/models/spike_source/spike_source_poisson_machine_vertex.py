@@ -61,8 +61,7 @@ def get_n_rates(vertex_slice, rate_data):
     """
     How many rates there are to be stored in total.
     """
-    return sum(len(rate_data[i]) for i in range(
-        vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
+    return sum(len(rate_data[i]) for i in vertex_slice.get_raster_ids())
 
 
 def get_params_bytes(n_atoms):
@@ -536,8 +535,7 @@ class SpikeSourcePoissonMachineVertex(
 
             # For each atom, read the number of rates and the rate parameters
             offset = 0
-            for i in range(self._vertex_slice.lo_atom,
-                           self._vertex_slice.hi_atom + 1):
+            for i in self._vertex_slice.get_raster_ids():
                 n_rates, = _ONE_WORD.unpack_from(byte_array, offset)
                 # Skip the count and index
                 offset += PARAMS_WORDS_PER_NEURON * BYTES_PER_WORD
