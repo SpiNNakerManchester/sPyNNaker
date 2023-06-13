@@ -99,13 +99,14 @@ def test_write_data_spec():
         additional_parameters={
             "splitter": SplitterAbstractPopulationVertexFixed()})
     proj_one_to_one_1 = p.Projection(
-        pre_pop, post_pop, p.OneToOneConnector(),
+        pre_pop, post_pop, p.FromListConnector([(i, i) for i in range(10)]),
         p.StaticSynapse(weight=1.5, delay=1.0))
     proj_one_to_one_2 = p.Projection(
-        pre_pop, post_pop, p.OneToOneConnector(),
+        pre_pop, post_pop, p.FromListConnector([(i, i) for i in range(10)]),
         p.StaticSynapse(weight=2.5, delay=2.0))
     proj_all_to_all = p.Projection(
-        pre_pop, post_pop, p.AllToAllConnector(allow_self_connections=False),
+        pre_pop, post_pop, p.FromListConnector(
+            [(i, j) for i in range(10) for j in range(10) if i != j]),
         p.StaticSynapse(weight=4.5, delay=4.0))
 
     from_list_list = [(i, i, i, (i * 5) + 1) for i in range(10)]
@@ -416,7 +417,7 @@ def test_set_synapse_dynamics():
         # (app keys work because all undelayed exist)
         (range(10), [4, 5, 6, 7], 1000, 100, 200),
         # Should work but number of cores doesn't work out
-        (range(2000), [], 10000, 5, None)
+        (range(100), [], 10000, 5, None)
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,

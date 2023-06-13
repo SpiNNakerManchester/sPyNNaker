@@ -485,3 +485,16 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         if self.__extra_parameter_names:
             for i, name in enumerate(self.__extra_parameter_names):
                 synapse_type.set_value(name, self.__extra_parameters[:, i])
+
+    @overrides(AbstractConnector.validate_connection)
+    def validate_connection(self, application_edge, synapse_info):
+        out_of_range_targets = self.__targets >= synapse_info.n_post_neurons
+        if any(out_of_range_targets):
+            raise ValueError(
+                "Some targets are out of range:"
+                f" {self.__conn_list[out_of_range_targets]}")
+        out_of_range_sources = self.__sources >= synapse_info.n_pre_neurons
+        if any(out_of_range_sources):
+            raise ValueError(
+                "Some sources are out of range:"
+                f" {self.__conn_list[out_of_range_sources]}")
