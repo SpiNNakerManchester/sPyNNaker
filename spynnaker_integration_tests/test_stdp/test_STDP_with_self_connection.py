@@ -29,19 +29,19 @@ def stdp_with_self_connection():
         additional_parameters={
             'splitter': SplitterAbstractPopulationVertexNeuronsSynapses(1)})
 
-    delay1 = sim.RandomDistribution('uniform', (2,3))
-    delayself = sim.RandomDistribution('uniform', (5,6))
+    delay1 = sim.RandomDistribution('uniform', (2, 3))
+    delayself = sim.RandomDistribution('uniform', (5, 6))
 
     stdpmodel = sim.STDPMechanism(
         timing_dependence=sim.SpikePairRule(),
         weight_dependence=sim.AdditiveWeightDependence(),
         weight=0.3, delay=delay1)
 
-    exc1_proj = sim.Projection(
+    sim.Projection(
         input_pop1, main_pop, sim.AllToAllConnector(), synapse_type=stdpmodel,
         receptor_type='excitatory')
 
-    self_inhib_proj = sim.Projection(
+    sim.Projection(
         main_pop, main_pop, sim.AllToAllConnector(),
         synapse_type=sim.StaticSynapse(weight=0.2, delay=delayself),
         receptor_type='inhibitory')
@@ -49,6 +49,7 @@ def stdp_with_self_connection():
     sim.run(1000)
 
     sim.end()
+
 
 class TestSTDPWithSelfConnection(BaseTestCase):
 
