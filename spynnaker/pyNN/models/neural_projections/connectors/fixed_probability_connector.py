@@ -15,6 +15,7 @@
 import math
 import numpy
 import logging
+from pyNN.random import NumpyRNG
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from data_specification.enums.data_type import DataType
@@ -41,7 +42,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     __slots__ = [
         "__allow_self_connections",
-        "_p_connect"]
+        "_p_connect",
+        "__rng"]
 
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,
@@ -60,8 +62,9 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         :param bool verbose:
             Whether to output extra information about the connectivity to a
             CSV file
-        :param None rng: This is not supported in sPyNNaker!  Please instead
-            use additional_parameters={"seed": <seed>} in the target Population
+        :param rng:
+            Seeded random number generator, or `None` to make one when needed
+        :type rng: ~pyNN.random.NumpyRNG or None
         :param callable callback:
             if given, a callable that display a progress bar on the terminal.
 
@@ -82,8 +85,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         super().__init__(safe, callback, verbose)
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
-        self._rng = rng
-        check_rng(rng)
+        self.__rng = rng
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
@@ -142,9 +144,10 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
+        rng = self.__rng or NumpyRNG()
         # pylint: disable=too-many-arguments
         n_items = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
-        items = self._rng.next(n_items)
+        items = rng.next(n_items)
 
         # If self connections are not allowed, remove possibility the self
         # connections by setting them to a value of infinity
@@ -198,3 +201,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             raise ConfigurationException(
                 "The probability must be between 0 and 1 (inclusive)")
         self._p_connect = new_value
+
+    @overrides(AbstractConnector.validate_connection)
+    def validate_connection(self, application_edge, synapse_info):
+        if self.generate_on_machine(synapse_info.weight, synapse_info.delay):
+            check_rng(self.__rng, "FixedProbabilityConnector")

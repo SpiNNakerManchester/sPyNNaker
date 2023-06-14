@@ -16,7 +16,6 @@ from enum import Enum
 import numpy
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -25,6 +24,8 @@ from spynnaker.pyNN.models.common.param_generator_data import (
     param_generator_id, is_param_generatable)
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+from pyNN.random import RandomDistribution
+from spynnaker.pyNN.utilities.utility_calls import check_rng
 
 
 # Hashes of the connection generators supported by the synapse expander
@@ -44,18 +45,7 @@ class AbstractGenerateConnectorOnMachine(
     Indicates that the connectivity can be generated on the machine.
     """
 
-    __slots__ = [
-        "__connector_seed"
-    ]
-
-    def __init__(self, safe=True, callback=None, verbose=False):
-        """
-        :param bool safe:
-        :param callable callback: Ignored
-        :param bool verbose:
-        """
-        super().__init__(safe=safe, callback=callback, verbose=verbose)
-        self.__connector_seed = dict()
+    __slots__ = []
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(self, application_edge, synapse_info):
@@ -68,20 +58,6 @@ class AbstractGenerateConnectorOnMachine(
                     " generated on the machine, but the connector cannot"
                     " be generated on host!")
 
-    def _get_connector_seed(self, pre_vertex_slice, post_vertex_slice, rng):
-        """
-        Get the seed of the connector for a given pre-post pairing.
-
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param ~pyNN.random.NumpyRNG rng:
-        """
-        key = (id(pre_vertex_slice), id(post_vertex_slice))
-        if key not in self.__connector_seed:
-            self.__connector_seed[key] = utility_calls.create_mars_kiss_seeds(
-                rng)
-        return self.__connector_seed[key]
-
     def generate_on_machine(self, weights, delays):
         """
         Determine if this instance can generate on the machine.
@@ -90,23 +66,27 @@ class AbstractGenerateConnectorOnMachine(
         be generated on the machine
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
-            float or list(int) or list(float)
+        :type weights: ~numpy.ndarray or ~pyNN.random.RandomDistribution
+            or int or float or list(int) or list(float)
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
-            float or list(int) or list(float)
+        :type delays: ~numpy.ndarray or ~pyNN.random.RandomDistribution
+            or int or float or list(int) or list(float)
         :rtype: bool
         """
-        return (is_param_generatable(weights) and
-                is_param_generatable(delays))
+        if (not is_param_generatable(weights) or
+                not is_param_generatable(delays)):
+            return False
+        if isinstance(weights, RandomDistribution):
+            check_rng(weights.rng, "RandomDistribution in weight")
+        if isinstance(delays, RandomDistribution):
+            check_rng(delays.rng, "RandomDistribution in delay")
 
     def gen_weights_id(self, weights):
         """
         Get the id of the weight generator on the machine.
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
-            float or list(int) or list(float)
+        :type weights: ~pyNN.random.RandomDistribtuion or int or float
         :rtype: int
         """
         return param_generator_id(weights)
@@ -116,7 +96,7 @@ class AbstractGenerateConnectorOnMachine(
         Get the parameters of the weight generator on the machine.
 
         :param weights:
-        :type weights: ~pyNN.random.NumpyRNG or int or float
+        :type weights: ~pyNN.random.RandomDistribution or int or float
         :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         return param_generator_params(weights)
@@ -126,7 +106,7 @@ class AbstractGenerateConnectorOnMachine(
         The size of the weight parameters in bytes.
 
         :param weights:
-        :type weights: ~pyNN.random.NumpyRNG or int or float
+        :type weights: ~pyNN.random.RandomDistribution or int or float
         :rtype: int
         """
         return param_generator_params_size_in_bytes(weights)
@@ -136,7 +116,7 @@ class AbstractGenerateConnectorOnMachine(
         Get the id of the delay generator on the machine.
 
         :param delays:
-        :type delays: ~pyNN.random.NumpyRNG or int or float
+        :type delays: ~pyNN.random.RandomDistribution or int or float
         :rtype: int
         """
         return param_generator_id(delays)
@@ -146,7 +126,7 @@ class AbstractGenerateConnectorOnMachine(
         Get the parameters of the delay generator on the machine.
 
         :param delays:
-        :type delays: ~pyNN.random.NumpyRNG or int or float
+        :type delays: ~pyNN.random.RandomDistribution or int or float
         :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         return param_generator_params(delays)
@@ -156,8 +136,7 @@ class AbstractGenerateConnectorOnMachine(
         The size of the delay parameters in bytes.
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
-            float or list(int) or list(float)
+        :type delays: ~pyNN.random.RandomDistribution  or int or float
         :rtype: int
         """
         return param_generator_params_size_in_bytes(delays)

@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from spinn_utilities.config_holder import get_config_bool
 
 """
 Utility package containing simple helper functions.
@@ -26,6 +25,8 @@ from pyNN.random import RandomDistribution
 from scipy.stats import binom
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.safe_eval import SafeEval
+from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.logger_utils import warn_once
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
@@ -77,8 +78,8 @@ def convert_param_to_numpy(param, no_atoms):
     Convert parameters into numpy arrays.
 
     :param param: the param to convert
-    :type param: ~pyNN.random.NumpyRNG or int or float or list(int) or
-        list(float) or ~numpy.ndarray
+    :type param: ~pyNN.random.RandomDistribution or int or float or list(int)
+        or list(float) or ~numpy.ndarray
     :param int no_atoms: the number of atoms available for conversion of param
     :return: the converted param as an array of floats
     :rtype: ~numpy.ndarray(float)
@@ -475,10 +476,10 @@ def report_non_spynnaker_pyNN(msg):
     if get_config_bool("Simulation", "error_on_non_spynnaker_pynn"):
         raise ConfigurationException(msg)
     else:
-        logger.warning(msg)
+        warn_once(logger, msg)
 
 
-def check_rng(rng):
+def check_rng(rng, where):
     """
     Check for non-None rng parameter since this is no longer compatible with
     sPyNNaker.  If not None, warn or error depending on a config value.
@@ -487,7 +488,6 @@ def check_rng(rng):
     """
     if rng is not None:
         report_non_spynnaker_pyNN(
-            "Use of rng in connectors and RandomDistribution is no longer"
-            " supported in sPyNNaker.  Please instead use"
-            " additional_parameters={'seed': <seed>} in target Population to"
-            " ensure random numbers are seeded.)")
+            f"Use of rng in {where} is not supported in sPyNNaker in this"
+            " case. Please instead use seed=<seed> in the target Population to"
+            " ensure random numbers are seeded.")

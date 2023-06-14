@@ -797,7 +797,7 @@ class Population(PopulationBase):
                 raise ConfigurationException(
                     "A population cannot have a negative or zero size.")
             population_parameters = dict(model.default_population_parameters)
-            if additional_parameters is not None:
+            if additional_parameters:
                 # check that the additions are suitable. report wrong ones
                 # and ignore
                 population_parameters = self.__process_additional_params(
@@ -808,7 +808,7 @@ class Population(PopulationBase):
 
         # Use a provided application vertex directly
         elif isinstance(model, PopulationApplicationVertex):
-            if additional_parameters is not None:
+            if additional_parameters:
                 raise ConfigurationException(
                     "Cannot accept additional parameters "
                     f"{additional_parameters} when the cell is a vertex")

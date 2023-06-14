@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pyNN.random
-from spynnaker.pyNN.utilities.utility_calls import check_rng
+# This file is to work around a Sphinx bug
 
 
 class RandomDistribution(pyNN.random.RandomDistribution):
@@ -81,8 +81,10 @@ class RandomDistribution(pyNN.random.RandomDistribution):
             parameters of the distribution, provided as a tuple. For the
             correct ordering, see `random.available_distributions`.
         :type parameters_pos: tuple or None
-        :param None rng: This is not supported in sPyNNaker!  Please instead
-            use additional_parameters={"seed": <seed>} in the target Population
+        :param rng: the random number generator to use, if a specific one is
+            desired (e.g., to provide a seed).
+        :type rng: ~pyNN.random.NumpyRNG or ~pyNN.random.GSLRNG or
+            ~pyNN.random.NativeRNG or None
         :param parameters_named:
             parameters of the distribution, provided as keyword arguments.
 
@@ -91,7 +93,6 @@ class RandomDistribution(pyNN.random.RandomDistribution):
         there are no default values. Parameter names are, in general, as used
         in Wikipedia.
         """
-        check_rng(rng)
         super().__init__(distribution, parameters_pos, rng, **parameters_named)
 
     def __repr__(self):
