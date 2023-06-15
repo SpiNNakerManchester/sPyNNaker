@@ -105,7 +105,7 @@ def param_generator_params(values):
     Get the parameter generator parameters as a numpy array.
 
     :param values:
-    :type values: int or ~pyNN.random.NumpyRNG
+    :type values: int or ~pyNN.random.RandomDistribution
     :rtype: ~numpy.ndarray
     """
     if numpy.isscalar(values):
@@ -137,7 +137,7 @@ def param_generator_params_size_in_bytes(values):
     Get the size of the parameter generator parameters in bytes.
 
     :param values:
-    :type values: int or ~pyNN.random.NumpyRNG
+    :type values: int or ~pyNN.random.RandomDistribution
     :rtype: int
     :raises TypeError: If `values` is of an unsupported data type
     """
