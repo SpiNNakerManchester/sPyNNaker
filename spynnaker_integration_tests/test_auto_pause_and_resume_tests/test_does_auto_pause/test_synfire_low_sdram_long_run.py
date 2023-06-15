@@ -27,7 +27,7 @@ neurons_per_core = 9
 synfire_run = SynfireRunner()
 
 
-class TestVeryLow(BaseTestCase):
+class TestDoesAutoPause(BaseTestCase):
     """
     tests the run is split buy auto pause resume
     """
