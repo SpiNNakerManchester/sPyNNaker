@@ -538,7 +538,7 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
             if (((spike & key_config.mask) == key_config.key) &&
                     (key_config.self_connected)) {
                 synapse_dynamics_process_post_synaptic_event(
-                        time, spike & key_config.spike_id_mask);
+                        time, (spike & key_config.spike_id_mask) >> key_config.colour_shift);
             }
 
             // See if there is another DMA to do
