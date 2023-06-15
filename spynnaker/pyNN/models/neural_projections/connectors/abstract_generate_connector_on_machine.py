@@ -80,6 +80,7 @@ class AbstractGenerateConnectorOnMachine(
             check_rng(weights.rng, "RandomDistribution in weight")
         if isinstance(delays, RandomDistribution):
             check_rng(delays.rng, "RandomDistribution in delay")
+        return True
 
     def gen_weights_id(self, weights):
         """

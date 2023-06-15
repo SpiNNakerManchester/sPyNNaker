@@ -277,5 +277,5 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(self, application_edge, synapse_info):
-        if self.generate_on_machine(synapse_info.weight, synapse_info.delay):
+        if self.generate_on_machine(synapse_info.weights, synapse_info.delays):
             utility_calls.check_rng(self.__rng, "FixedNumberPreConnector")
