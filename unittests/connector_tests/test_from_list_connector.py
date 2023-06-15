@@ -75,7 +75,7 @@ def test_connector(
     synapse_info = SynapseInformation(
             connector=None, pre_population=MockPopulation(10, "Pre"),
             post_population=MockPopulation(10, "Post"), prepop_is_view=False,
-            postpop_is_view=False, rng=None, synapse_dynamics=None,
+            postpop_is_view=False, synapse_dynamics=None,
             synapse_type=None, receptor_type=None,
             synapse_type_from_dynamics=False, weights=weights, delays=delays)
     block = connector.create_synaptic_block(
@@ -117,7 +117,7 @@ def test_connector_split():
     synapse_info = SynapseInformation(
         connector=None, pre_population=MockPopulation(n_sources, "Pre"),
         post_population=MockPopulation(n_targets, "Post"),
-        prepop_is_view=False, postpop_is_view=False, rng=None,
+        prepop_is_view=False, postpop_is_view=False,
         synapse_dynamics=None, synapse_type=None, receptor_type=None,
         synapse_type_from_dynamics=False, weights=weight, delays=delay)
     has_block = set()

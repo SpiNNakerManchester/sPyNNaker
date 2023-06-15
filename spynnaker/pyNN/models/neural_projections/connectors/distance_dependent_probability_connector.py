@@ -18,6 +18,7 @@ from numpy import (
     arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
     hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
     minimum, e, pi)
+from pyNN.random import NumpyRNG
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 from spynnaker.pyNN.utilities.utility_calls import (
@@ -42,7 +43,8 @@ class DistanceDependentProbabilityConnector(
     __slots__ = [
         "__allow_self_connections",
         "__d_expression",
-        "__probs"]
+        "__probs",
+        "__rng"]
 
     def __init__(
             self, d_expression, allow_self_connections=True, safe=True,
@@ -81,7 +83,7 @@ class DistanceDependentProbabilityConnector(
         super().__init__(safe, callback, verbose)
         self.__d_expression = d_expression
         self.__allow_self_connections = allow_self_connections
-        self._rng = rng
+        self.__rng = rng or NumpyRNG()
         self.__probs = None
         if n_connections is not None:
             raise NotImplementedError(
@@ -179,7 +181,7 @@ class DistanceDependentProbabilityConnector(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         probs = self.__probs[:, post_vertex_slice.as_slice].reshape(-1)
         n_items = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
-        items = self._rng.next(n_items)
+        items = self.__rng.next(n_items)
 
         # If self connections are not allowed, remove the possibility of
         # self connections by setting them to a value of infinity
