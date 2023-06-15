@@ -18,6 +18,7 @@ from numpy import (
     arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
     hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
     minimum, e, pi)
+from pyNN.random import NumpyRNG
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 from spynnaker.pyNN.utilities import utility_calls
@@ -42,7 +43,8 @@ class IndexBasedProbabilityConnector(AbstractConnector,
     __slots = [
         "__allow_self_connections",
         "__index_expression",
-        "__probs"]
+        "__probs",
+        "__rng"]
 
     def __init__(
             self, index_expression, allow_self_connections=True, rng=None,
@@ -77,7 +79,7 @@ class IndexBasedProbabilityConnector(AbstractConnector,
             CSV file
         """
         super().__init__(safe, callback, verbose)
-        self._rng = rng
+        self.__rng = rng or NumpyRNG()
         self.__index_expression = index_expression
         self.__allow_self_connections = allow_self_connections
         self.__probs = None
@@ -157,7 +159,7 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         probs = self.__probs[:, post_vertex_slice.as_slice].reshape(-1)
 
         n_items = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
-        items = self._rng.next(n_items)
+        items = self.__rng.next(n_items)
 
         # If self connections are not allowed, remove the possibility of self
         # connections by setting the probability to a value of infinity
