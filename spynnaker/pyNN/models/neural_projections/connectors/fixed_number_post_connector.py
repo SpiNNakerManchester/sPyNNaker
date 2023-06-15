@@ -13,6 +13,7 @@
 # limitations under the License.
 import math
 import numpy
+from pyNN.random import NumpyRNG
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
@@ -38,7 +39,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         "__n_post",
         "__post_neurons",
         "__post_neurons_set",
-        "__with_replacement"]
+        "__with_replacement",
+        "__rng"]
 
     def __init__(
             self, n, allow_self_connections=True, safe=True, verbose=False,
@@ -79,7 +81,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         self.__with_replacement = with_replacement
         self.__post_neurons = None
         self.__post_neurons_set = False
-        self._rng = rng
+        self.__rng = rng
 
     def set_projection_information(self, synapse_info):
         super().set_projection_information(synapse_info)
@@ -113,6 +115,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         :param SynapseInformation synapse_info:
         :rtype: list(~numpy.ndarray)
         """
+        rng = self.__rng or NumpyRNG()
         # If we haven't set the array up yet, do it now
         if not self.__post_neurons_set:
             self.__post_neurons = [None] * synapse_info.n_pre_neurons
@@ -148,11 +151,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
                                           synapse_info.n_post_neurons)])
 
                         # Now use this list in the random choice
-                        self.__post_neurons[m] = self._rng.choice(
+                        self.__post_neurons[m] = rng.choice(
                             no_self_post_neurons, self.__n_post,
                             self.__with_replacement)
                     else:
-                        self.__post_neurons[m] = self._rng.choice(
+                        self.__post_neurons[m] = rng.choice(
                             synapse_info.n_post_neurons, self.__n_post,
                             self.__with_replacement)
 
@@ -305,3 +308,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         return 3 * BYTES_PER_WORD
+
+    @overrides(AbstractConnector.validate_connection)
+    def validate_connection(self, application_edge, synapse_info):
+        if self.generate_on_machine(synapse_info.weights, synapse_info.delays):
+            utility_calls.check_rng(self.__rng, "FixedNumberPostConnector")

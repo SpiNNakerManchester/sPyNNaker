@@ -40,12 +40,11 @@ class TestViews(BaseTestCase):
 
     def test_initial_value_random(self):
         sim.setup(timestep=1.0)
-        pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
+        pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1", seed=85524)
         self.assertEqual([-65, -65, -65, -65, -65], pop.initial_values["v"])
         view = sim.PopulationView(pop, [1, 3], label="Odds")
         rand_distr = sim.RandomDistribution(
-            "uniform", parameters_pos=[-65.0, -55.0],
-            rng=sim.NumpyRNG(seed=85524))
+            "uniform", parameters_pos=[-65.0, -55.0])
         view.initialize(v=rand_distr)
         sim.run(0)
         for val in view.initial_values["v"]:
