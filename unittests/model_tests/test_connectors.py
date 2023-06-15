@@ -95,7 +95,7 @@ def test_connectors(
         synapse_info = SynapseInformation(
             connector=None, pre_population=MockPopulation(n_pre, "Pre"),
             post_population=MockPopulation(n_post, "Post"),
-            prepop_is_view=False, postpop_is_view=False, rng=None,
+            prepop_is_view=False, postpop_is_view=False,
             synapse_dynamics=None, synapse_type=None, receptor_type=None,
             synapse_type_from_dynamics=False,
             weights=weight, delays=delay)
