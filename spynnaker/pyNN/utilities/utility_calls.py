@@ -486,7 +486,7 @@ def check_rng(rng, where):
 
     :param rng: The rng parameter value.
     """
-    if rng is not None:
+    if rng is not None and rng.seed is not None:
         report_non_spynnaker_pyNN(
             f"Use of rng in {where} is not supported in sPyNNaker in this"
             " case. Please instead use seed=<seed> in the target Population to"
