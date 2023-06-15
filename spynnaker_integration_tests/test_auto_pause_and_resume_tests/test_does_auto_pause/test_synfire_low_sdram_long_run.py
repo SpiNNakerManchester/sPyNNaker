@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 """
 Synfirechain-like example
 """
-import unittest
-
 from testfixtures import LogCapture
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
@@ -25,26 +23,25 @@ from spynnaker_integration_tests.scripts import SynfireRunner
 
 n_neurons = 200  # number of neurons in each population
 runtime = 3000
-neurons_per_core = 43
+neurons_per_core = 9
 synfire_run = SynfireRunner()
 
 
-class TestVeryLow(BaseTestCase):
+class TestDoesAutoPause(BaseTestCase):
     """
     tests the run is split buy auto pause resume
     """
 
-    @unittest.skip("does not work with this size for purely the java. Python "
-                   "is fine. Needs investigating.")
     def more_runs(self):
         with LogCapture() as lc:
             synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                                run_times=[runtime])
             spikes = synfire_run.get_output_pop_spikes_numpy()
-            # CB Currently eight but could change
+
+            # CB Currently six but could change
             # Needs to be larger than 1000 timesteps version
             self.assert_logs_messages(
-                lc.records, "*** Running simulation... ***", 'INFO', 3)
+                lc.records, "*** Running simulation... ***", 'INFO', 6)
 
         self.assertEqual(158, len(spikes))
         spike_checker.synfire_spike_checker(spikes, n_neurons)
