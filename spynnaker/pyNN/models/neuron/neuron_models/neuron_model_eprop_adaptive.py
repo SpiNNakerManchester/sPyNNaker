@@ -352,8 +352,8 @@ class NeuronModelEPropAdaptive(AbstractStandardNeuronComponent):
     def number_of_cues(self):
         return self.__number_of_cues
 
-    @window_size.setter
-    def window_size(self, new_value):
+    @number_of_cues.setter
+    def number_of_cues(self, new_value):
         self.__number_of_cues = new_value
 
     # TODO: setters for "globals" like target rate, eta, etc.
