@@ -532,6 +532,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         return (isinstance(pre_vertex, SpikeSourcePoissonVertex) and
                 isinstance(pre_vertex.splitter, SplitterPoissonDelegate) and
                 len(pre_vertex.outgoing_projections) == 1 and
+                pre_vertex.n_atoms == self.governed_app_vertex.n_atoms and
                 isinstance(connector, OneToOneConnector) and
                 isinstance(dynamics, SynapseDynamicsStatic))
 
