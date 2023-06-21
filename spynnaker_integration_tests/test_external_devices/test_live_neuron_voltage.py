@@ -18,7 +18,7 @@ from spynnaker.pyNN.external_devices_models import AbstractEthernetTranslator
 from spynnaker.pyNN.external_devices_models\
     .abstract_multicast_controllable_device import (
         AbstractMulticastControllableDevice, SendType)
-from data_specification.enums.data_type import DataType
+from spinn_front_end_common.interface.ds import DataType
 import decimal
 import numpy
 from collections import defaultdict
