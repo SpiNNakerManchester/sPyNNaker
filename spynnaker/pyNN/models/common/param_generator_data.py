@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from pyNN.random import RandomDistribution, available_distributions
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
