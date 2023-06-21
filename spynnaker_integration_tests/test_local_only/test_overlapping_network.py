@@ -14,7 +14,7 @@
 import pyNN.spiNNaker as p
 import numpy
 from pyNN.space import Grid2D
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetTranslator, AbstractMulticastControllableDevice)
 from spinnaker_testbase.base_test_case import BaseTestCase

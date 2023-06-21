@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from spinn_utilities.overrides import overrides
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 from spynnaker.pyNN.utilities.struct import Struct

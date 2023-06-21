@@ -12,7 +12,6 @@
 **/*.npy
 **/*.jpg
 **/*.elf
-**/DataSpecification/**
 **/PACMAN/**
 **/spalloc/**
 **/spinnaker_tools/**
