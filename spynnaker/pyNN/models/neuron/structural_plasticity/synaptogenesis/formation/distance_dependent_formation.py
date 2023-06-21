@@ -15,7 +15,7 @@
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_formation import AbstractFormation
-from data_specification.enums.data_type import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 # 6 32-bit words (grid_x, grid_y, grid_x_recip, grid_y_recep, ff_prob_size,
