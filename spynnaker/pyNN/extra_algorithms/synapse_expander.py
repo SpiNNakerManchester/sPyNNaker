@@ -23,8 +23,6 @@ from spinnman.model.enums import CPUState
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
-from spinn_front_end_common.utilities.helpful_functions import (
-    write_address_to_user1)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -85,8 +83,8 @@ def _plan_expansion():
                     executable_type=ExecutableType.SYSTEM)
                 expanded_pop_vertices.append((vertex, placement))
                 # Write the region to USER1, as that is the best we can do
-                write_address_to_user1(
-                    placement.x, placement.y, placement.p,
+                SpynnakerDataView.write_user(
+                    1, placement.x, placement.y, placement.p,
                     vertex.connection_generator_region)
                 max_data = max(max_data, vertex.max_gen_data)
                 max_bit_field = max(max_bit_field, vertex.bit_field_size)
