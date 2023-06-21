@@ -17,8 +17,7 @@ from collections import namedtuple
 
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.utility_calls import allocator_bits_needed
-from data_specification.enums.data_type import DataType
-
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.master_pop_table import (
