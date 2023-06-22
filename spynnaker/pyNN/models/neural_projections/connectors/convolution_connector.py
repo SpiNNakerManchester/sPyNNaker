@@ -45,14 +45,15 @@ class ConvolutionConnector(AbstractConnector):
         "__pool_shape",
         "__pool_stride",
         "__positive_receptor_type",
-        "__negative_receptor_type"
+        "__negative_receptor_type",
+        "__filter_edges"
     ]
 
     def __init__(self, kernel_weights, kernel_shape=None, strides=None,
                  padding=None, pool_shape=None, pool_stride=None,
                  positive_receptor_type="excitatory",
                  negative_receptor_type="inhibitory", safe=True,
-                 verbose=False, callback=None):
+                 verbose=False, callback=None, filter_edges=True):
         """
         :param kernel_weights:
             The synaptic strengths, shared by neurons in the post population.
@@ -111,12 +112,20 @@ class ConvolutionConnector(AbstractConnector):
         :param bool safe: (ignored)
         :param bool verbose: (ignored)
         :param callable callback: (ignored)
+        :param bool filter_edges:
+            Whether to filter the edges based on connectivity or not; filtered
+            means that the receiving cores will receive fewer packets, whereas
+            non-filtered means that receiving cores will receive all packets
+            whether relevant or not.  However non-filtered may be more
+            efficient in the routing tables, so may be needed if routing
+            compression doesn't work.
         """
         super(ConvolutionConnector, self).__init__(
             safe=safe, callback=callback, verbose=verbose)
 
         self.__decode_kernel(kernel_weights, kernel_shape)
         self.__decode_padding(padding)
+        self.__filter_edges = filter_edges
 
         if strides is None:
             strides = (1, 1)
@@ -275,6 +284,9 @@ class ConvolutionConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_connected_vertices)
     def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        if not self.__filter_edges:
+            return super(ConvolutionConnector, self).get_connected_vertices(
+                s_info, source_vertex, target_vertex)
         pre_vertices = numpy.array(
             source_vertex.splitter.get_out_going_vertices(SPIKE_PARTITION_ID))
         pre_slices = [m_vertex.vertex_slice for m_vertex in pre_vertices]
