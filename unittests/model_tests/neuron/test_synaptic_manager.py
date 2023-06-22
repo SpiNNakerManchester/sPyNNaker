@@ -475,7 +475,7 @@ def test_pop_based_master_pop_table_standard(
     # Generate the data
     db = DsSqlliteDatabase()
     spec = DataSpecificationGenerator(1, 2, 3, post_mac_vertex, db)
-    writer.set_dsg_targets(db)
+    writer.set_ds_database(db)
 
     regions = SynapseRegions(
         synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
