@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections.abc import Iterable
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import (
@@ -21,7 +22,6 @@ from spinn_front_end_common.utilities.constants import (
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from .abstract_connector import AbstractConnector
-from collections.abc import Iterable
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.common.local_only_2d_common import get_div_const
 

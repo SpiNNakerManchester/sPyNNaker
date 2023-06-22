@@ -25,8 +25,8 @@ from pacman.model.graphs.machine import (
     MulticastEdgePartition)
 from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
     import get_multidimensional_slices
-from data_specification.reference_context import ReferenceContext
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron import (
     PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertexLead,
     PopulationSynapsesMachineVertexShared, NeuronProvenance, SynapseProvenance,
@@ -373,7 +373,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             synapse core, and the basic label for the synapse cores
         :rtype: tuple(SynapseRegions, str)
         """
-        synapse_references = self.__synapse_references
+        synapse_references = SynapseRegions(
+            *SpynnakerDataView.get_next_ds_references(7))
         syn_label = (
             f"{label}_Synapses:{vertex_slice.lo_atom}")
 
@@ -651,19 +652,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         :rtype: int
         """
         return self.__n_synapse_vertices
-
-    @property
-    def __synapse_references(self):
-        """
-        The reference identifiers for the shared synapse regions.
-
-        :rtype: SynapseRegions
-        """
-        references = [
-            ReferenceContext.next()
-            for _ in range(
-                len(PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS))]
-        return SynapseRegions(*references)
 
     def __get_neuron_sdram(self, n_atoms, sdram_edge_sdram):
         """

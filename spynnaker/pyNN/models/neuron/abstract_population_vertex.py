@@ -28,7 +28,6 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ranged import RangeDictionary
 from spinn_utilities.helpful_functions import is_singleton
-from data_specification.enums.data_type import DataType
 from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import MultiRegionSDRAM
@@ -39,6 +38,7 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profile_region_size)
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.interface.buffer_management\
     .recording_utilities import (
        get_recording_header_size, get_recording_data_constant_size)
