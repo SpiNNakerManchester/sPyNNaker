@@ -13,6 +13,7 @@
 # limitations under the License.
 import math
 import numpy
+from pyNN.random import NumpyRNG
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
@@ -32,7 +33,8 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         "__degree",
         "__mask",
         "__n_connections",
-        "__rewiring"]
+        "__rewiring",
+        "__rng"]
 
     def __init__(
             self, degree, rewiring, allow_self_connections=True,
@@ -67,13 +69,14 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             CSV file
         """
         # pylint: disable=too-many-arguments
-        super().__init__(safe, callback, verbose, rng)
+        super().__init__(safe, callback, verbose)
         self.__rewiring = rewiring
         self.__degree = degree
         # pylint:disable=unused-private-member
         self.__allow_self_connections = allow_self_connections
         self.__mask = None
         self.__n_connections = None
+        self.__rng = rng or NumpyRNG()
 
         if n_connections is not None:
             raise NotImplementedError(
@@ -178,9 +181,9 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
         # Re-wire some connections
         rewired = numpy.where(
-            self._rng.next(n_connections) < self.__rewiring)[0]
+            self.__rng.next(n_connections) < self.__rewiring)[0]
         block["target"][rewired] = (
-            (self._rng.next(rewired.size) * (post_vertex_slice.n_atoms - 1)) +
+            (self.__rng.next(rewired.size) * (post_vertex_slice.n_atoms - 1)) +
             post_vertex_slice.lo_atom)
 
         return block

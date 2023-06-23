@@ -18,13 +18,16 @@ Utility package containing simple helper functions.
 import logging
 import os
 import math
+import neo
 import numpy
 from math import isnan
 from pyNN.random import RandomDistribution
 from scipy.stats import binom
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.safe_eval import SafeEval
-from data_specification.enums.data_type import DataType
+from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.logger_utils import warn_once
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
@@ -78,8 +81,8 @@ def convert_param_to_numpy(param, no_atoms):
     Convert parameters into numpy arrays.
 
     :param param: the param to convert
-    :type param: ~pyNN.random.NumpyRNG or int or float or list(int) or
-        list(float) or ~numpy.ndarray
+    :type param: ~pyNN.random.RandomDistribution or int or float or list(int)
+        or list(float) or ~numpy.ndarray
     :param int no_atoms: the number of atoms available for conversion of param
     :return: the converted param as an array of floats
     :rtype: ~numpy.ndarray(float)
@@ -479,3 +482,54 @@ def get_time_to_write_us(n_bytes, n_cores):
     bandwidth_per_core = WRITE_BANDWIDTH_BYTES_PER_SECOND / n_cores
     seconds = n_bytes / bandwidth_per_core
     return int(math.ceil(seconds * MICRO_TO_SECOND_CONVERSION))
+
+
+def get_neo_io(file_or_folder):
+    """
+    Hack for https://github.com/NeuralEnsemble/python-neo/issues/1287
+
+    In Neo 0.12 neo.get_io only works with existing files
+
+    :param str file_or_folder:
+    """
+    try:
+        return neo.get_io(file_or_folder)
+    except ValueError as ex:
+        try:
+            _, suffix = os.path.splitext(file_or_folder)
+            suffix = suffix[1:].lower()
+            # pylint: disable=no-member
+            if suffix in neo.io_by_extension:
+                writer_list = neo.io_by_extension[suffix]
+                return writer_list[0](file_or_folder)
+        except AttributeError:
+            # for older neo which has no io_by_extension
+            pass
+        raise ex
+
+
+def report_non_spynnaker_pyNN(msg):
+    """
+    Report a case of non-spynnaker-compatible PyNN being used.  This will warn
+    or error depending on the configuration setting.
+
+    :param str msg: The message to report
+    """
+    if get_config_bool("Simulation", "error_on_non_spynnaker_pynn"):
+        raise ConfigurationException(msg)
+    else:
+        warn_once(logger, msg)
+
+
+def check_rng(rng, where):
+    """
+    Check for non-None rng parameter since this is no longer compatible with
+    sPyNNaker.  If not None, warn or error depending on a config value.
+
+    :param rng: The rng parameter value.
+    """
+    if rng is not None and rng.seed is not None:
+        report_non_spynnaker_pyNN(
+            f"Use of rng in {where} is not supported in sPyNNaker in this"
+            " case. Please instead use seed=<seed> in the target Population to"
+            " ensure random numbers are seeded.")

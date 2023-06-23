@@ -139,12 +139,10 @@ class Projection(object):
         #  when needed)
         post_vertex.set_synapse_dynamics(synapse_dynamics)
 
-        # get rng if needed
-        rng = connector.rng if hasattr(connector, "rng") else None
         # Set and store synapse information for future processing
         self.__synapse_information = SynapseInformation(
             connector, pre_synaptic_population, post_synaptic_population,
-            pre_is_view, post_is_view, rng, synapse_dynamics,
+            pre_is_view, post_is_view, synapse_dynamics,
             synaptic_type, receptor_type, synapse_type_from_dynamics,
             synapse_dynamics.weight, synapse_dynamics.delay)
 

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pyNN.random import NumpyRNG
 from spinn_utilities.config_holder import get_config_bool
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine, OneToOneConnector)
@@ -31,7 +30,6 @@ class SynapseInformation(object):
         "__post_population",
         "__prepop_is_view",
         "__postpop_is_view",
-        "__rng",
         "__synapse_dynamics",
         "__synapse_type",
         "__receptor_type",
@@ -41,9 +39,9 @@ class SynapseInformation(object):
         "__synapse_type_from_dynamics"]
 
     def __init__(self, connector, pre_population, post_population,
-                 prepop_is_view, postpop_is_view, rng,
-                 synapse_dynamics, synapse_type, receptor_type,
-                 synapse_type_from_dynamics, weights=None, delays=None):
+                 prepop_is_view, postpop_is_view, synapse_dynamics,
+                 synapse_type, receptor_type, synapse_type_from_dynamics,
+                 weights=None, delays=None):
         """
         :param AbstractConnector connector:
             The connector connected to the synapse
@@ -55,8 +53,6 @@ class SynapseInformation(object):
             or ~spynnaker.pyNN.models.populations.PopulationView
         :param bool prepop_is_view: Whether the ``pre_population`` is a view
         :param bool postpop_is_view: Whether the ``post_population`` is a view
-        :param rng: Seeded random number generator
-        :type rng: ~pyNN.random.NumpyRNG or None
         :param AbstractSynapseDynamics synapse_dynamics:
             The dynamic behaviour of the synapse
         :param int synapse_type: The type of the synapse
@@ -73,7 +69,6 @@ class SynapseInformation(object):
         self.__post_population = post_population
         self.__prepop_is_view = prepop_is_view
         self.__postpop_is_view = postpop_is_view
-        self.__rng = (rng or NumpyRNG())
         self.__synapse_dynamics = synapse_dynamics
         self.__synapse_type = synapse_type
         self.__receptor_type = receptor_type
@@ -148,15 +143,6 @@ class SynapseInformation(object):
         :rtype: bool
         """
         return self.__postpop_is_view
-
-    @property
-    def rng(self):
-        """
-        Random number generator.
-
-        :rtype: ~pyNN.random.NumpyRNG
-        """
-        return self.__rng
 
     @property
     def synapse_dynamics(self):

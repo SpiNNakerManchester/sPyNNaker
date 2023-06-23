@@ -13,7 +13,7 @@
 # limitations under the License.
 import numpy
 from spinn_utilities.overrides import overrides
-from data_specification.enums.data_type import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from pyNN.random import RandomDistribution
 from .abstract_connector import AbstractConnector
@@ -69,11 +69,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         :type shape_kernel: list(int) or tuple(int,int)
         :param weight_kernel: (optional)
             2D matrix of size shape_kernel describing the weights
-        :type weight_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG
+        :type weight_kernel: ~numpy.ndarray or ~pyNN.random.RandomDistribution
             or int or float or list(int) or list(float) or None
         :param delay_kernel: (optional)
             2D matrix of size shape_kernel describing the delays
-        :type delay_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG
+        :type delay_kernel: ~numpy.ndarray or ~pyNN.random.RandomDistribution
             or int or float or list(int) or list(float) or None
         :param shape_common: (optional)
             2D shape of common coordinate system (for both pre- and post-,
@@ -215,8 +215,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         Convert kernel values given into the correct format.
 
         :param vals:
-        :type vals: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray
-            or ConvolutionKernel
+        :type vals: int or float or ~pyNN.random.RandomDistribution
+            or ~numpy.ndarray or ConvolutionKernel
         :rtype: ~numpy.ndarray
         """
         if vals is None:
@@ -246,11 +246,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         Compute the relevant information required for the connections.
 
         :param weights:
-        :type weights: int or float or ~pyNN.random.NumpyRNG or
+        :type weights: int or float or ~pyNN.random.RandomDistribution or
             ~numpy.ndarray or ConvolutionKernel
         :param delays:
-        :type delays: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray
-            or ConvolutionKernel
+        :type delays: int or float or ~pyNN.random.RandomDistribution or
+            ~numpy.ndarray or ConvolutionKernel
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         """
         # If __compute_statistics is called more than once, there's
