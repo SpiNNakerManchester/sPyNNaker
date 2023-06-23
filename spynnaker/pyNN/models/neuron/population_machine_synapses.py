@@ -14,8 +14,7 @@
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 
-from data_specification.enums import DataType
-
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.abstract_models import (

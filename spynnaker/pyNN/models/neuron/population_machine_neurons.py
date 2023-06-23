@@ -14,14 +14,14 @@
 import ctypes
 from dataclasses import dataclass
 
-from data_specification.enums import DataType
-
 from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 from spinn_utilities.overrides import overrides
 
 from pacman.utilities.utility_calls import get_field_based_keys
 
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
