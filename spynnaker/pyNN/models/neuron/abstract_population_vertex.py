@@ -21,12 +21,13 @@ from functools import reduce
 from collections import defaultdict
 
 from pyNN.space import Grid2D, Grid3D
+from pyNN.random import RandomDistribution
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ranged import RangeDictionary
-from data_specification.enums.data_type import DataType
+from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import MultiRegionSDRAM
@@ -37,6 +38,7 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profile_region_size)
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.interface.buffer_management\
     .recording_utilities import (
        get_recording_header_size, get_recording_data_constant_size)
@@ -55,12 +57,14 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
-from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
+from spynnaker.pyNN.utilities.utility_calls import (
+    create_mars_kiss_seeds, check_rng)
 from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
 from spynnaker.pyNN.utilities.struct import StructRepeat
 from spynnaker.pyNN.models.common import (
     ParameterHolder, PopulationApplicationVertex)
-from spynnaker.pyNN.models.common.param_generator_data import MAX_PARAMS_BYTES
+from spynnaker.pyNN.models.common.param_generator_data import (
+    MAX_PARAMS_BYTES, is_param_generatable)
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from .population_machine_neurons import PopulationMachineNeurons
@@ -102,6 +106,40 @@ def _prod(iterable):
     :param iterable iterable: Things to multiply together
     """
     return reduce(operator.mul, iterable, 1)
+
+
+def _all_gen(rd):
+    """
+    Determine if all the values of a ranged dictionary can be generated.
+
+    :rtype: bool
+    """
+    for key in rd.keys():
+        if is_singleton(rd[key]):
+            if not is_param_generatable(rd[key]):
+                return False
+        else:
+            if not rd[key].range_based():
+                return False
+            for _start, _stop, val in rd[key].iter_ranges():
+                if not is_param_generatable(val):
+                    return False
+    return True
+
+
+def _check_random_dists(rd):
+    """
+    Check all RandomDistribution instances in a range dictionary to see if
+    they have the rng value set.
+    """
+    for key in rd.keys():
+        if is_singleton(rd[key]):
+            if isinstance(rd[key], RandomDistribution):
+                check_rng(rd[key].rng, f"RandomDistribtion for {key}")
+        else:
+            for _start, _stop, val in rd[key].iter_ranges():
+                if isinstance(val, RandomDistribution):
+                    check_rng(val.rng, f"RandomDistribution for {key}")
 
 
 class AbstractPopulationVertex(
@@ -1532,6 +1570,28 @@ class AbstractPopulationVertex(
             min(max_atoms, n) for max_atoms, n in zip(
                 self.get_max_atoms_per_dimension_per_core(), self.atoms_shape)]
         return get_n_bits_for_fields(field_sizes)
+
+    def can_generate_on_machine(self):
+        """
+        Determine if the parameters of this vertex can be generated on the
+        machine
+
+        :rtype: bool
+        """
+
+        # Check that all the structs can actually be generated
+        for struct in self.__neuron_impl.structs:
+            if not struct.is_generatable:
+                # If this is false, we can't generate anything on machine
+                return False
+
+        if (not _all_gen(self.__parameters) or
+                not _all_gen(self.__state_variables)):
+            return False
+
+        _check_random_dists(self.__parameters)
+        _check_random_dists(self.__state_variables)
+        return True
 
 
 class _Stats(object):

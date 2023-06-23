@@ -17,8 +17,7 @@ from collections import namedtuple
 
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.utility_calls import allocator_bits_needed
-from data_specification.enums.data_type import DataType
-
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.master_pop_table import (
@@ -287,21 +286,27 @@ class SynapticMatrices(object):
             Regions which are referenced; each region which is not referenced
             can be `None`.
         """
-        # Reserve the region
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
 
+        # Write the pop table
         self.__write_pop_table(spec, references.pop_table)
 
+        # Get the on-host data to be written
+        block_addr = 0
+        data_to_write = list()
+        for matrix in self.__on_host_matrices:
+            block_addr = matrix.append_matrix(
+                post_vertex_slice, data_to_write, block_addr)
+
+        # Write on-host data
         spec.reserve_memory_region(
             region=self.__regions.synaptic_matrix,
             size=self.__all_syn_block_sz, label='SynBlocks',
             reference=references.synaptic_matrix)
-
-        # Write data for each matrix
-        spec.switch_write_focus(self.__regions.synaptic_matrix)
-        for matrix in self.__on_host_matrices:
-            matrix.write_matrix(spec, post_vertex_slice)
+        if data_to_write:
+            spec.switch_write_focus(self.__regions.synaptic_matrix)
+            spec.write_array(numpy.concatenate(data_to_write))
 
         self.__write_synapse_expander_data_spec(
             spec, post_vertex_slice, references.connection_builder)

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
