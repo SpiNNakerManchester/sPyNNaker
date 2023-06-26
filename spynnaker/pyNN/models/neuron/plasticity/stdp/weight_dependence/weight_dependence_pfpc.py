@@ -78,9 +78,6 @@ class WeightDependencePFPC(
         # Loop through each synapse type's weight scale
         for _ in synapse_weight_scales:
 
-            print("PFPC, writing values min, max, pot_alpha, A_minus ",
-                  self.__w_min, self.__w_max, self.__pot_alpha, self.A_minus)
-
             # Scale the weights
             spec.write_value(
                 data=self.__w_min * global_weight_scale,
