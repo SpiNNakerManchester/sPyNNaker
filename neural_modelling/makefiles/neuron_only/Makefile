@@ -16,6 +16,7 @@ MODELS = IF_curr_exp_neuron\
          IZK_curr_exp_neuron\
          IF_cond_exp_neuron\
          IZK_cond_exp_neuron\
+         IZK_cond_exp_dual_neuron\
          IF_curr_exp_ca2_adaptive_neuron\
          IF_curr_delta_ca2_adaptive_neuron\
          IF_curr_exp_dual_neuron\

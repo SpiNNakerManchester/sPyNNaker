@@ -17,6 +17,7 @@ MODELS = IF_curr_exp \
          IZK_curr_exp \
          IZK_cond_exp \
          IF_curr_exp_dual \
+         IZK_cond_exp_dual \
          IF_curr_delta \
          IF_curr_exp_ca2_adaptive \
          IF_curr_delta_ca2_adaptive
@@ -37,6 +38,7 @@ ifneq ($(SPYNNAKER_DEBUG), DEBUG)
               IF_cond_exp_stdp_mad_nearest_pair_additive \
               IZK_curr_exp_stdp_mad_pair_additive \
               IZK_cond_exp_stdp_mad_pair_additive \
+              IZK_cond_exp_dual_stdp_mad_pair_additive \
               IF_curr_alpha_stdp_mad_pair_additive \
               IF_curr_exp_stdp_mad_recurrent_pre_stochastic_multiplicative \
               IF_curr_exp_stdp_mad_pfister_triplet_additive

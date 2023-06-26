@@ -21,6 +21,7 @@ from .if_curr_dual_exp_base import IFCurrDualExpBase
 from .if_curr_exp_base import IFCurrExpBase
 from .if_facets_hardware1 import IFFacetsConductancePopulation
 from .izk_cond_exp_base import IzkCondExpBase
+from .izk_cond_dual_exp_base import IzkCondDualExpBase
 from .izk_curr_exp_base import IzkCurrExpBase
 from .if_cond_exp_stoc import IFCondExpStoc
 from .if_curr_delta import IFCurrDelta
@@ -31,6 +32,6 @@ from .if_curr_delta_ca2_adaptive import IFCurrDeltaCa2Adaptive
 __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",
            "IFCurrExpBase", "IFFacetsConductancePopulation", "IzkCondExpBase",
-           "IzkCurrExpBase", "IFCondExpStoc",
+           "IzkCurrExpBase", "IFCondExpStoc", "IzkCondDualExpBase",
            "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase",
            "IFCurrDeltaCa2Adaptive"]

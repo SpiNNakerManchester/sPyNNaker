@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 from spynnaker.pyNN.external_devices_models.push_bot import (
     AbstractPushBotOutputDevice)
