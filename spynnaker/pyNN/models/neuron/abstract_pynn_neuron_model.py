@@ -11,17 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from typing import Any, Dict
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
+from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
 
 # The maximum atoms per core is the master population table row length to
 # make it easier when all-to-all-connector is used
 DEFAULT_MAX_ATOMS_PER_CORE = POP_TABLE_MAX_ROW_LENGTH
 
-_population_parameters = {
+_population_parameters: Dict[str, Any] = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
     "incoming_spike_buffer_size": None, "drop_late_spikes": None,
     "splitter": None, "seed": None, "n_colour_bits": None
@@ -31,16 +32,18 @@ _population_parameters = {
 class AbstractPyNNNeuronModel(AbstractPyNNModel):
     __slots__ = ("__model", )
 
-    default_population_parameters = _population_parameters
-
-    def __init__(self, model):
+    def __init__(self, model: AbstractNeuronImpl):
         """
         :param AbstractNeuronImpl model: The model implementation
         """
         self.__model = model
 
     @property
-    def _model(self):
+    def default_population_parameters(self) -> Dict[str, Any]:
+        return _population_parameters
+
+    @property
+    def _model(self) -> AbstractNeuronImpl:
         return self.__model
 
     @overrides(AbstractPyNNModel.create_vertex,
@@ -69,5 +72,5 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
 
     @property
     @overrides(AbstractPyNNModel.name)
-    def name(self):
+    def name(self) -> str:
         return self.__model.model_name

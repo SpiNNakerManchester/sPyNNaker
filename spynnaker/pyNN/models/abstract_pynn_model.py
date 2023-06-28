@@ -11,16 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 from collections import defaultdict
 import sys
+from typing import (
+    Any, Callable, Dict, FrozenSet, Optional, Sequence, Tuple, Union,
+    cast, TYPE_CHECKING)
+from typing_extensions import TypeAlias
 import numpy
 from pyNN import descriptions
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+    AbstractBase, abstractmethod)
 from spynnaker.pyNN.models.defaults import get_dict_from_init
 from spynnaker.pyNN.exceptions import SpynnakerException
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.common.population_application_vertex import (
+        PopulationApplicationVertex)
+
+_NAtoms: TypeAlias = Optional[Union[int, Tuple[int, ...]]]
 
 
 class AbstractPyNNModel(object, metaclass=AbstractBase):
@@ -29,10 +38,11 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
     """
 
     __slots__ = ()
-    _max_atoms_per_core = defaultdict(lambda: None)
+    _max_atoms_per_core: Dict[type, _NAtoms] = defaultdict(lambda: None)
 
     @classmethod
-    def set_model_max_atoms_per_dimension_per_core(cls, n_atoms=None):
+    def set_model_max_atoms_per_dimension_per_core(
+            cls, n_atoms: _NAtoms = None):
         """
         Set the default maximum number of atoms per dimension per core for
         this model.  This can be overridden by the individual Population.
@@ -70,7 +80,8 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         return cls.absolute_max_atoms_per_core
 
     @classproperty
-    def absolute_max_atoms_per_core(cls):  # pylint: disable=no-self-argument
+    def absolute_max_atoms_per_core(  # pylint: disable=no-self-argument
+            cls) -> int:
         """
         The absolute maximum number of atoms per core.
         This is an integer regardless of the number of dimensions
@@ -81,7 +92,8 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         return sys.maxsize
 
     @staticmethod
-    def __get_init_params_and_svars(the_cls):
+    def __get_init_params_and_svars(the_cls: type) -> Tuple[
+            Callable, Optional[FrozenSet[str]], Optional[FrozenSet[str]]]:
         init = getattr(the_cls, "__init__")
         while hasattr(init, "_method"):
             init = getattr(init, "_method")
@@ -94,29 +106,31 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         return init, params, svars
 
     @classproperty
-    def default_parameters(cls):  # pylint: disable=no-self-argument
+    def default_parameters(  # pylint: disable=no-self-argument
+            cls) -> Dict[str, Any]:
         """
         Get the default values for the parameters of the model.
 
         :rtype: dict(str, Any)
         """
-        init, params, svars = cls.__get_init_params_and_svars(cls)
+        init, params, svars = cls.__get_init_params_and_svars(cast(type, cls))
         return get_dict_from_init(init, skip=svars, include=params)
 
     @classproperty
-    def default_initial_values(cls):  # pylint: disable=no-self-argument
+    def default_initial_values(  # pylint: disable=no-self-argument
+            cls) -> Dict[str, Any]:
         """
         Get the default initial values for the state variables of the model.
 
         :rtype: dict(str, Any)
         """
-        init, params, svars = cls.__get_init_params_and_svars(cls)
+        init, params, svars = cls.__get_init_params_and_svars(cast(type, cls))
         if params is None and svars is None:
             return {}
         return get_dict_from_init(init, skip=params, include=svars)
 
     @classmethod
-    def get_parameter_names(cls):
+    def get_parameter_names(cls) -> Sequence[str]:
         """
         Get the names of the parameters of the model.
 
@@ -125,7 +139,7 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         return cls.default_parameters.keys()  # pylint: disable=no-member
 
     @classmethod
-    def has_parameter(cls, name):
+    def has_parameter(cls, name: str) -> bool:
         """
         Determine if the model has a parameter with the given name.
 
@@ -134,8 +148,9 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         """
         return name in cls.default_parameters
 
-    @abstractproperty
-    def default_population_parameters(self):
+    @property
+    @abstractmethod
+    def default_population_parameters(self) -> Dict[str, Any]:
         """
         The default values for the parameters at the population level.
         These are parameters that can be passed in to the Population
@@ -143,9 +158,11 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
 
         :rtype: dict(str, Any)
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def create_vertex(self, n_neurons, label):
+    def create_vertex(
+            self, n_neurons: int, label: str) -> PopulationApplicationVertex:
         """
         Create a vertex for a population of the model.
 
@@ -154,9 +171,10 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         :return: An application vertex for the population
         :rtype: PopulationApplicationVertex
         """
+        raise NotImplementedError
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         The name of this model.
 

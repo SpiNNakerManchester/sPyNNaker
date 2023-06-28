@@ -12,11 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+from typing import List, Optional, Union, TYPE_CHECKING
+import numpy
 from spinn_utilities.config_holder import get_config_bool
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine, OneToOneConnector)
+    AbstractConnector, AbstractGenerateConnectorOnMachine, OneToOneConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractGenerateOnMachine, SynapseDynamicsStatic)
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.populations import Population, PopulationView
+    from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 
 class SynapseInformation(object):
@@ -80,7 +86,7 @@ class SynapseInformation(object):
         self.__pre_run_connection_holders = list()
 
     @property
-    def connector(self):
+    def connector(self) -> AbstractConnector:
         """
         The connector connected to the synapse.
 
@@ -89,7 +95,7 @@ class SynapseInformation(object):
         return self.__connector
 
     @property
-    def pre_population(self):
+    def pre_population(self) -> Union[Population, PopulationView]:
         """
         The population sending spikes to the synapse.
 
@@ -99,7 +105,7 @@ class SynapseInformation(object):
         return self.__pre_population
 
     @property
-    def post_population(self):
+    def post_population(self) -> Union[Population, PopulationView]:
         """
         The population hosting the synapse.
 
@@ -109,7 +115,7 @@ class SynapseInformation(object):
         return self.__post_population
 
     @property
-    def n_pre_neurons(self):
+    def n_pre_neurons(self) -> int:
         """
         The number of neurons in the pre-population.
 
@@ -118,7 +124,7 @@ class SynapseInformation(object):
         return self.__pre_population.size
 
     @property
-    def n_post_neurons(self):
+    def n_post_neurons(self) -> int:
         """
         The number of neurons in the post-population.
 
@@ -127,7 +133,7 @@ class SynapseInformation(object):
         return self.__post_population.size
 
     @property
-    def prepop_is_view(self):
+    def prepop_is_view(self) -> bool:
         """
         Whether the :py:meth:`pre_population` is a view.
 
@@ -136,7 +142,7 @@ class SynapseInformation(object):
         return self.__prepop_is_view
 
     @property
-    def postpop_is_view(self):
+    def postpop_is_view(self) -> bool:
         """
         Whether the :py:meth:`post_population` is a view.
 
@@ -154,7 +160,7 @@ class SynapseInformation(object):
         return self.__synapse_dynamics
 
     @property
-    def synapse_type(self):
+    def synapse_type(self) -> int:
         """
         The type of the synapse.
 
@@ -163,7 +169,7 @@ class SynapseInformation(object):
         return self.__synapse_type
 
     @property
-    def receptor_type(self):
+    def receptor_type(self) -> str:
         """
         A string representing the receptor type.
 
@@ -172,7 +178,7 @@ class SynapseInformation(object):
         return self.__receptor_type
 
     @property
-    def weights(self):
+    def weights(self) -> Optional[Union[float, List[float], numpy.ndarray]]:
         """
         The synaptic weights (if any).
 
@@ -181,7 +187,7 @@ class SynapseInformation(object):
         return self.__weights
 
     @property
-    def delays(self):
+    def delays(self) -> Optional[Union[float, List[float], numpy.ndarray]]:
         """
         The total synaptic delays (if any).
 
@@ -189,7 +195,7 @@ class SynapseInformation(object):
         """
         return self.__delays
 
-    def may_generate_on_machine(self):
+    def may_generate_on_machine(self) -> bool:
         """
         Do we describe a collection of synapses whose synaptic matrix may
         be generated on SpiNNaker instead of needing to be calculated in
@@ -212,7 +218,7 @@ class SynapseInformation(object):
             self.synapse_dynamics.generate_on_machine())
         return connector_gen and synapse_gen
 
-    def may_use_direct_matrix(self):
+    def may_use_direct_matrix(self) -> bool:
         """
         Do the properties of the synaptic information allow it to use the
         direct matrix?
@@ -226,7 +232,7 @@ class SynapseInformation(object):
             not self.prepop_is_view and not self.postpop_is_view)
 
     @property
-    def pre_run_connection_holders(self):
+    def pre_run_connection_holders(self) -> List[ConnectionHolder]:
         """
         The list of connection holders to be filled in before run.
 
@@ -234,7 +240,8 @@ class SynapseInformation(object):
         """
         return self.__pre_run_connection_holders
 
-    def add_pre_run_connection_holder(self, pre_run_connection_holder):
+    def add_pre_run_connection_holder(
+            self, pre_run_connection_holder: ConnectionHolder):
         """
         Add a connection holder that will be filled in before run.
 
@@ -243,7 +250,7 @@ class SynapseInformation(object):
         """
         self.__pre_run_connection_holders.append(pre_run_connection_holder)
 
-    def finish_connection_holders(self):
+    def finish_connection_holders(self) -> None:
         """
         Finish all the connection holders, and clear the list so that they
         are not generated again later.
@@ -253,7 +260,7 @@ class SynapseInformation(object):
         del self.__pre_run_connection_holders[:]
 
     @property
-    def synapse_type_from_dynamics(self):
+    def synapse_type_from_dynamics(self) -> bool:
         """
         Whether the synapse type comes from the synapse dynamics.
 

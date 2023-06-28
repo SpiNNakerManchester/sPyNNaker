@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import List
+from numpy import ndarray
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pacman.model.graphs.common import Slice
+from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
+from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 
 class AbstractGenerateConnectorOnHost(object, metaclass=AbstractBase):
@@ -24,7 +29,9 @@ class AbstractGenerateConnectorOnHost(object, metaclass=AbstractBase):
 
     @abstractmethod
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
+            self, post_slices: List[Slice], post_vertex_slice: Slice,
+            synapse_type: AbstractSynapseType,
+            synapse_info: SynapseInformation) -> ndarray:
         """
         Create a synaptic block from the data.
 
@@ -36,3 +43,4 @@ class AbstractGenerateConnectorOnHost(object, metaclass=AbstractBase):
             The synaptic matrix data to go to the machine, as a Numpy array
         :rtype: ~numpy.ndarray
         """
+        raise NotImplementedError

@@ -16,6 +16,7 @@ from enum import Enum
 import numpy
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.application import ApplicationEdge
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -26,6 +27,8 @@ from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.utilities.utility_calls import check_rng
+from spynnaker.pyNN.models.neural_projections import SynapseInformation
+from .connection_types import WD
 
 
 # Hashes of the connection generators supported by the synapse expander
@@ -48,7 +51,9 @@ class AbstractGenerateConnectorOnMachine(
     __slots__ = ()
 
     @overrides(AbstractConnector.validate_connection)
-    def validate_connection(self, application_edge, synapse_info):
+    def validate_connection(
+            self, application_edge: ApplicationEdge,
+            synapse_info: SynapseInformation):
         # If we can't generate on machine, we must be able to generate on host
         if not self.generate_on_machine(
                 synapse_info.weights, synapse_info.delays):
@@ -58,7 +63,7 @@ class AbstractGenerateConnectorOnMachine(
                     " generated on the machine, but the connector cannot"
                     " be generated on host!")
 
-    def generate_on_machine(self, weights, delays):
+    def generate_on_machine(self, weights: WD, delays: WD) -> bool:
         """
         Determine if this instance can generate on the machine.
 
@@ -82,7 +87,7 @@ class AbstractGenerateConnectorOnMachine(
             check_rng(delays.rng, "RandomDistribution in delay")
         return True
 
-    def gen_weights_id(self, weights):
+    def gen_weights_id(self, weights: WD) -> int:
         """
         Get the id of the weight generator on the machine.
 
@@ -92,7 +97,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_id(weights)
 
-    def gen_weights_params(self, weights):
+    def gen_weights_params(self, weights: WD) -> numpy.ndarray:
         """
         Get the parameters of the weight generator on the machine.
 
@@ -102,7 +107,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_params(weights)
 
-    def gen_weight_params_size_in_bytes(self, weights):
+    def gen_weight_params_size_in_bytes(self, weights) -> int:
         """
         The size of the weight parameters in bytes.
 
@@ -112,7 +117,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_params_size_in_bytes(weights)
 
-    def gen_delays_id(self, delays):
+    def gen_delays_id(self, delays: WD) -> int:
         """
         Get the id of the delay generator on the machine.
 
@@ -122,7 +127,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_id(delays)
 
-    def gen_delay_params(self, delays):
+    def gen_delay_params(self, delays: WD) -> numpy.ndarray:
         """
         Get the parameters of the delay generator on the machine.
 
@@ -132,7 +137,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_params(delays)
 
-    def gen_delay_params_size_in_bytes(self, delays):
+    def gen_delay_params_size_in_bytes(self, delays: WD) -> int:
         """
         The size of the delay parameters in bytes.
 
@@ -149,8 +154,9 @@ class AbstractGenerateConnectorOnMachine(
 
         :rtype: int
         """
+        raise NotImplementedError
 
-    def gen_connector_params(self):
+    def gen_connector_params(self) -> numpy.ndarray:
         """
         Get the parameters of the on machine generation.
 
@@ -160,7 +166,7 @@ class AbstractGenerateConnectorOnMachine(
         return numpy.zeros(0, dtype="uint32")
 
     @property
-    def gen_connector_params_size_in_bytes(self):
+    def gen_connector_params_size_in_bytes(self) -> int:
         """
         The size of the connector parameters, in bytes.
 
