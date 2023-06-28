@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-from typing import Iterable, Union, TYPE_CHECKING
+from typing import (
+    Iterator, List, Optional, Set, Union, TYPE_CHECKING)
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.data import FecDataView
 from spynnaker import _version
@@ -21,7 +22,6 @@ from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.populations import Population
-    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access
@@ -42,7 +42,7 @@ class _SpynnakerDataModel(object):
     What data is held where and how can change without notice.
     """
 
-    __singleton = None
+    __singleton: Optional['_SpynnakerDataModel'] = None
 
     __slots__ = (
         # Data values cached
@@ -53,8 +53,8 @@ class _SpynnakerDataModel(object):
         "_projections",
         "_segment_counter")
 
-    def __new__(cls):
-        if cls.__singleton:
+    def __new__(cls) -> '_SpynnakerDataModel':
+        if cls.__singleton is not None:
             return cls.__singleton
         # pylint: disable=protected-access
         obj = object.__new__(cls)
@@ -62,26 +62,26 @@ class _SpynnakerDataModel(object):
         obj._clear()
         return obj
 
-    def _clear(self):
+    def _clear(self) -> None:
         """
         Clears out all data.
         """
         self._id_counter = 0
-        self._min_delay = None
+        self._min_delay: Optional[float] = None
         # Using a dict to verify if later could be stored here only
-        self._neurons_per_core_set = set()
-        self._populations = []
-        self._projections = []
+        self._neurons_per_core_set: Set[type[AbstractPyNNModel]] = set()
+        self._populations: List[Population] = []
+        self._projections: List[Projection] = []
         self._segment_counter = 0
 
-    def _hard_reset(self):
+    def _hard_reset(self) -> None:
         """
         Puts all data back into the state expected at graph changed and
         `sim.reset`.
         """
         self._soft_reset()
 
-    def _soft_reset(self):
+    def _soft_reset(self) -> None:
         """
         Puts all data back into the state expected at `sim.reset` but not
         graph changed.
@@ -133,7 +133,7 @@ class SpynnakerDataView(FecDataView):
         return cls.has_time_step()
 
     @classmethod
-    def iterate_projections(cls) -> Iterable[Projection]:
+    def iterate_projections(cls) -> Iterator[Projection]:
         """
         An iteration of the projections previously added.
 
@@ -176,7 +176,7 @@ class SpynnakerDataView(FecDataView):
         cls.__spy_data._projections.append(projection)
 
     @classmethod
-    def iterate_populations(cls) -> Iterable[Population]:
+    def iterate_populations(cls) -> Iterator[Population]:
         """
         An iteration of the populations previously added.
 
@@ -232,7 +232,7 @@ class SpynnakerDataView(FecDataView):
 
     @classmethod
     def set_number_of_neurons_per_dimension_per_core(
-            cls, neuron_type: type[AbstractPopulationVertex],
+            cls, neuron_type: type[AbstractPyNNModel],
             max_permitted: Union[int, tuple, None]):
         """
         Sets a ceiling on the number of neurons of a given type that can be

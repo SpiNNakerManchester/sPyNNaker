@@ -610,7 +610,7 @@ class AbstractPopulationVertex(
 
         return sdram_usage
 
-    def __read_parameters_now(self):
+    def __read_parameters_now(self) -> None:
         # If we already read the parameters at this time, don't do it again
         current_time = SpynnakerDataView().get_current_run_time_ms()
         if self.__last_parameter_read_time == current_time:
