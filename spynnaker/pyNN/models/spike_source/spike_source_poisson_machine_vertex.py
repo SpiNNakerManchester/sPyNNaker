@@ -16,7 +16,7 @@ from enum import IntEnum
 import numpy
 
 from spinnman.model.enums import ExecutableType
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.interface.simulation import simulation_utilities

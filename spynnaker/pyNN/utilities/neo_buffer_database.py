@@ -23,7 +23,7 @@ import struct
 import re
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from pacman.model.graphs.common import MDSlice
 from pacman.utilities.utility_calls import get_field_based_index
 from spinn_front_end_common.interface.buffer_management.storage_objects \

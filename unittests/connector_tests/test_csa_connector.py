@@ -28,7 +28,7 @@ def test_csa_one_to_one_connector():
     synapse_info = SynapseInformation(
             connector=None, pre_population=MockPopulation(10, "Pre"),
             post_population=MockPopulation(10, "Post"), prepop_is_view=False,
-            postpop_is_view=False, rng=None, synapse_dynamics=None,
+            postpop_is_view=False, synapse_dynamics=None,
             synapse_type=None, receptor_type=None,
             synapse_type_from_dynamics=False, weights=weight, delays=delay)
     connector.set_projection_information(synapse_info)
@@ -50,7 +50,7 @@ def test_csa_from_list_connector():
     mock_synapse_info = SynapseInformation(
             connector=None, pre_population=MockPopulation(10, "Pre"),
             post_population=MockPopulation(10, "Post"), prepop_is_view=False,
-            postpop_is_view=False, rng=None, synapse_dynamics=None,
+            postpop_is_view=False, synapse_dynamics=None,
             synapse_type=None, receptor_type=None,
             synapse_type_from_dynamics=False, weights=weight, delays=delay)
     connector.set_projection_information(mock_synapse_info)
@@ -74,7 +74,7 @@ def test_csa_random_connector():
     mock_synapse_info = SynapseInformation(
             connector=None, pre_population=MockPopulation(10, "Pre"),
             post_population=MockPopulation(10, "Post"), prepop_is_view=False,
-            postpop_is_view=False, rng=None, synapse_dynamics=None,
+            postpop_is_view=False, synapse_dynamics=None,
             synapse_type=None, receptor_type=None,
             synapse_type_from_dynamics=False, weights=weight, delays=delay)
     connector.set_projection_information(mock_synapse_info)
@@ -97,7 +97,7 @@ def test_csa_block_connector():
     mock_synapse_info = SynapseInformation(
         connector=None, pre_population=MockPopulation(10, "Pre"),
         post_population=MockPopulation(10, "Post"), prepop_is_view=False,
-        postpop_is_view=False, rng=None, synapse_dynamics=None,
+        postpop_is_view=False, synapse_dynamics=None,
         synapse_type=None, receptor_type=None,
         synapse_type_from_dynamics=False,
         weights=weight, delays=delay)

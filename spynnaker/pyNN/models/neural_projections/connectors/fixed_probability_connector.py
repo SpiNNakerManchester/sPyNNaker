@@ -15,12 +15,13 @@
 import math
 import numpy
 import logging
+from pyNN.random import NumpyRNG
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
-from data_specification.enums.data_type import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import (
-    get_probable_maximum_selected, get_probable_minimum_selected)
+    get_probable_maximum_selected, get_probable_minimum_selected, check_rng)
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
@@ -41,7 +42,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     __slots__ = (
         "__allow_self_connections",
-        "_p_connect")
+        "_p_connect",
+        "__rng")
 
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,
@@ -83,7 +85,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         super().__init__(safe, callback, verbose)
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
-        self._rng = rng
+        self.__rng = rng
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
@@ -139,8 +141,9 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
+        rng = self.__rng or NumpyRNG()
         n_items = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
-        items = self._rng.next(n_items)
+        items = rng.next(n_items)
 
         # If self connections are not allowed, remove possibility the self
         # connections by setting them to a value of infinity
@@ -194,3 +197,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             raise ConfigurationException(
                 "The probability must be between 0 and 1 (inclusive)")
         self._p_connect = new_value
+
+    @overrides(AbstractConnector.validate_connection)
+    def validate_connection(self, application_edge, synapse_info):
+        if self.generate_on_machine(synapse_info.weights, synapse_info.delays):
+            check_rng(self.__rng, "FixedProbabilityConnector")

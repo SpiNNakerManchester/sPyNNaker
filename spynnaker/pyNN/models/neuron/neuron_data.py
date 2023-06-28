@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy
-from spynnaker.pyNN.models.common.param_generator_data import (
-    is_param_generatable)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -24,8 +22,8 @@ from spynnaker.pyNN.data import SpynnakerDataView
 
 def _all_one_val_gen(rd):
     """
-    Determine if all the values of a dictionary are the same,
-    and can be generated.
+    Determine if all the values of a dictionary are the same, assuming we
+    already know that they are generatable
 
     .. note::
         A random distribution is considered the same if the same distribution
@@ -35,34 +33,12 @@ def _all_one_val_gen(rd):
     """
     for key in rd.keys():
         if is_singleton(rd[key]):
-            if not is_param_generatable(rd[key]):
-                return False
+            return True
         else:
             if not rd[key].range_based():
                 return False
-            for i, (_start, _stop, val) in enumerate(rd[key].iter_ranges()):
+            for i, (_start, _stop, _val) in enumerate(rd[key].iter_ranges()):
                 if i > 0:
-                    return False
-                if not is_param_generatable(val):
-                    return False
-    return True
-
-
-def _all_gen(rd):
-    """
-    Determine if all the values of a ranged dictionary can be generated.
-
-    :rtype: bool
-    """
-    for key in rd.keys():
-        if is_singleton(rd[key]):
-            if not is_param_generatable(rd[key]):
-                return False
-        else:
-            if not rd[key].range_based():
-                return False
-            for _start, _stop, val in rd[key].iter_ranges():
-                if not is_param_generatable(val):
                     return False
     return True
 
@@ -106,16 +82,6 @@ class NeuronData(object):
 
         :rtype: bool
         """
-        if self.__gen_on_machine is None:
-            # First try to generate data.  This might have already been done.
-            self.generate_data()
-            if self.__gen_on_machine is not None:
-                return self.__gen_on_machine
-
-            # If we get here, we know the structs are fine so check params
-            params = self.__app_vertex.parameters
-            state_vars = self.__app_vertex.state_variables
-            self.__gen_on_machine = _all_gen(params) and _all_gen(state_vars)
         return self.__gen_on_machine
 
     def generate_data(self):
@@ -126,25 +92,22 @@ class NeuronData(object):
             return
         self.__generation_done = True
 
-        # Check that all the structs can actually be generated
-        structs = self.__app_vertex.neuron_impl.structs
-        for struct in structs:
-            if not struct.is_generatable:
-                # If this is false, we can't generate anything on machine
-                self.__gen_on_machine = False
-                return
-
-        params = self.__app_vertex.parameters
-        state_vars = self.__app_vertex.state_variables
+        if not self.__app_vertex.can_generate_on_machine():
+            self.__gen_on_machine = False
+            return
 
         # Check that all parameters and state variables have a single range
-        if (not _all_one_val_gen(params) or not _all_one_val_gen(state_vars)):
+        params = self.__app_vertex.parameters
+        state_vars = self.__app_vertex.state_variables
+        if not _all_one_val_gen(params) or not _all_one_val_gen(state_vars):
             # Note at this point, we can still generate ranges on machine,
             # just that it has to be different per core
-            self.__gen_on_machine = None
+            self.__gen_on_machine = True
+            self.__neuron_data = None
             return
 
         # Go through all the structs and make all the data
+        structs = self.__app_vertex.neuron_impl.structs
         values = _MergedDict(params, state_vars)
         all_data = [struct.get_generator_data(values) for struct in structs]
         self.__neuron_data = numpy.concatenate(all_data)

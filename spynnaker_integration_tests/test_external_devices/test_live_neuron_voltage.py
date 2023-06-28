@@ -16,7 +16,7 @@ from collections import defaultdict
 import decimal
 import numpy
 import pyNN.spiNNaker as p
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetTranslator, AbstractMulticastControllableDevice, SendType)
 from spinnaker_testbase import BaseTestCase
