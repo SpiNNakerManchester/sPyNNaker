@@ -237,3 +237,25 @@ class TestPoissonSpikeSource(BaseTestCase):
 
     def test_poisson_live_rates(self):
         self.runsafe(self.poisson_live_rates)
+
+    def poisson_multi_run_change_rate(self):
+
+        n_p = 2
+        sim.setup(timestep=1.0)
+
+        simtime = 1000
+
+        init_rate = [50, 50]
+        pop_src = sim.Population(
+            n_p, sim.SpikeSourcePoisson(rate=init_rate), label="src")
+
+        sim.run(simtime)
+
+        pop_src.set(rate=[1, 100])
+
+        sim.run(simtime)
+
+        sim.end()
+
+    def test_poisson_multi_run_change_rate(self):
+        self.runsafe(self.poisson_multi_run_change_rate)

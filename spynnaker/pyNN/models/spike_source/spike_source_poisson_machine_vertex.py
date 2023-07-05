@@ -411,6 +411,9 @@ class SpikeSourcePoissonMachineVertex(
         data_items = list()
         data_items.append([int(self.__rate_changed)])
         data_items.append([0])
+        # In order to allow changes in rate between runs track the data size
+        # for the case where all rates are different and use that
+        data_size = 2
         n_items = 0
         data = self._app_vertex.data
         ids = self.vertex_slice.get_raster_ids()
@@ -421,14 +424,16 @@ class SpikeSourcePoissonMachineVertex(
                  _u3232_to_uint64(item['starts']),
                  _u3232_to_uint64(item['durations']))
                 )[0]
-            data_items.extend([[count], [len(items)], [0],
-                               numpy.ravel(items).view("uint32")])
+            data_to_add = [[count], [len(items)], [0],
+                           numpy.ravel(items).view("uint32")]
+            data_items.extend(data_to_add)
             n_items += 1
+            data_size += count * (3 + len(data_to_add[-1]))
         data_items[1] = [n_items]
         data_to_write = numpy.concatenate(data_items)
         spec.reserve_memory_region(
             region=self.POISSON_SPIKE_SOURCE_REGIONS.EXPANDER_REGION,
-            size=len(data_to_write) * BYTES_PER_WORD, label='Expander')
+            size=data_size * BYTES_PER_WORD, label='Expander')
         spec.switch_write_focus(
             self.POISSON_SPIKE_SOURCE_REGIONS.EXPANDER_REGION)
         spec.write_array(data_to_write)
