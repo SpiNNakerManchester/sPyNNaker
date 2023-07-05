@@ -4,6 +4,7 @@
 [![Documentation Status](https://readthedocs.org/projects/spynnaker/badge/?version=master)](https://spynnaker.readthedocs.io/en/master/?badge=master)
 [![Coverage Status](https://coveralls.io/repos/github/SpiNNakerManchester/sPyNNaker/badge.svg?branch=master)](https://coveralls.io/github/SpiNNakerManchester/sPyNNaker?branch=master)
 
+
 sPyNNaker - PyNN Simulations on SpiNNaker Hardware
 ==================================================
 This package provides common code for PyNN implementations for SpiNNaker.
