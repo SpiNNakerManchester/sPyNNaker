@@ -29,7 +29,7 @@ def do_run():
         p.external_devices.ArbitraryFPGADevice(
             2000, fpga_link_id=12, fpga_id=1,
             board_address="127.0.0.0",
-            label="bacon")
+            label="src_1")
         )
 
     src_2 = p.Population(
@@ -37,10 +37,10 @@ def do_run():
         p.external_devices.ArbitraryFPGADevice(
             2000, fpga_link_id=11, fpga_id=1,
             board_address="127.0.4.8",
-            label="bacon")
+            label="src_2")
         )
 
-    tgt = p.Population(1, p.IF_curr_exp())
+    tgt = p.Population(1, p.IF_curr_exp(), label="tgt")
     p.Projection(src_1, tgt, p.AllToAllConnector())
     p.Projection(src_2, tgt, p.AllToAllConnector())
 
