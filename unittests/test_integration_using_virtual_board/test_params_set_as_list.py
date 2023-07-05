@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pyNN.random import RandomDistribution, NumpyRNG
+from pyNN.random import RandomDistribution
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
@@ -33,7 +33,7 @@ def do_run(nNeurons):
     v_rest = list()
     v_thresh = list()
 
-    for atom in range(0, nNeurons):
+    for _ in range(0, nNeurons):
         cm.append(0.25)
         i_off.append(0.0)
         tau_m.append(10.0)
@@ -44,8 +44,7 @@ def do_run(nNeurons):
         v_rest.append(-65.0)
         v_thresh.append(-64.4)
 
-    gbar_na_distr = RandomDistribution('normal', (20.0, 2.0),
-                                       rng=NumpyRNG(seed=85524))
+    gbar_na_distr = RandomDistribution('normal', (20.0, 2.0))
 
     cell_params_lif = {'cm': cm, 'i_offset': i_off, 'tau_m': tau_m,
                        'tau_refrac': tau_re, 'tau_syn_E': tau_syn_e,
@@ -66,7 +65,7 @@ def do_run(nNeurons):
     injectionConnection = [(0, 0, weight_to_spike, delay)]
     spikeArray = {'spike_times': [[0]]}
     populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
-                                    label='pop_1'))
+                                    label='pop_1', seed=85524))
     populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
                                     label='inputSpikes_1'))
 
@@ -99,10 +98,8 @@ class ParamsSetAsList(BaseTestCase):
     # NO unittest_setup() as sim.setup is called
 
     def test_run(self):
-        nNeurons = 225  # number of neurons in each population
-        do_run(nNeurons)
+        do_run(225)  # number of neurons in each population
 
 
 if __name__ == '__main__':
-    nNeurons = 225  # number of neurons in each population
-    do_run(nNeurons)
+    do_run(225)  # number of neurons in each population

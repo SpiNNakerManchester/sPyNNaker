@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections.abc import Iterable
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import (
@@ -21,8 +22,7 @@ from spinn_front_end_common.utilities.constants import (
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from .abstract_connector import AbstractConnector
-from data_specification.enums.data_type import DataType
-from collections.abc import Iterable
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
@@ -141,7 +141,8 @@ class PoolDenseConnector(AbstractConnector):
             pip_slices = tuple(
                 slice(pip_start, pip_end + 1) for pip_start, pip_end in zip(
                     pre_in_post_start, pre_in_post_end))
-            post_slices = post_vertex_slice.slices
+            # TODO check this is correct
+            post_slices = post_vertex_slice.dimension
             return all_weights[pip_slices + post_slices].flatten()
         elif isinstance(self.__weights, RandomDistribution):
             n_weights = self.__get_n_sub_weights(

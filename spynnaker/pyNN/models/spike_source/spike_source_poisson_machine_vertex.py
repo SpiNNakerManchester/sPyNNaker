@@ -16,7 +16,7 @@ from enum import IntEnum
 import numpy
 
 from spinnman.model.enums import ExecutableType
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.interface.simulation import simulation_utilities
@@ -306,6 +306,8 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
+        # if we are here, the rates have changed!
+        self.__rate_changed = True
 
         # write setup data
         spec.reserve_memory_region(
@@ -411,7 +413,7 @@ class SpikeSourcePoissonMachineVertex(
         data_items.append([0])
         n_items = 0
         data = self._app_vertex.data
-        ids = self.vertex_slice.get_raster_ids(self.app_vertex.atoms_shape)
+        ids = self.vertex_slice.get_raster_ids()
         for (start, stop, item) in data.iter_ranges_by_ids(ids):
             count = stop - start
             items = numpy.dstack(

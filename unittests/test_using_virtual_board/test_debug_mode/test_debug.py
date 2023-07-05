@@ -62,7 +62,6 @@ class TestDebug(BaseTestCase):
             # ??? used by MachineExecuteDataSpecification but not called ???
             # write_network_specification_report
             network_specification_file_name,
-            # write_provenance_data
             "data.sqlite3",
             # write_tag_allocation_reports
             reports_names._TAGS_FILENAME,

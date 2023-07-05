@@ -423,7 +423,7 @@ class SpikeSourcePoissonVertex(
     def get_neurons_recording(self, name, vertex_slice):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
-        return vertex_slice.get_raster_ids(self.atoms_shape)
+        return vertex_slice.get_raster_ids()
 
     def max_spikes_per_ts(self):
         ts_per_second = SpynnakerDataView.get_simulation_time_step_per_s()

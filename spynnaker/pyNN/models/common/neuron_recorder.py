@@ -17,7 +17,7 @@ import math
 import numpy
 from spinn_utilities.log import FormatAdapter
 from pacman.model.resources.variable_sdram import VariableSDRAM
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
@@ -230,11 +230,10 @@ class NeuronRecorder(object):
         split_array = numpy.array_split(existence, splits)
         return max([numpy.sum(s) for s in split_array])
 
-    def neurons_recording(self, variable, vertex_slice, atoms_shape):
+    def neurons_recording(self, variable, vertex_slice):
         """
         :param str variable:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param tuple(int) atoms_shape:
         :rtype: None or iterable(int)
         """
         if variable not in self.__sampling_rates:
@@ -242,10 +241,10 @@ class NeuronRecorder(object):
         if self.__sampling_rates[variable] == 0:
             return []
         if self.__indexes[variable] is None:
-            return vertex_slice.get_raster_ids(atoms_shape)
+            return vertex_slice.get_raster_ids()
         all_set = set(self.__indexes[variable])
-        slice_set = set(vertex_slice.get_raster_ids(atoms_shape))
-        local_list = list(all_set.intersection(slice_set))
+        ids = set(vertex_slice.get_raster_ids())
+        local_list = list(all_set.intersection(ids))
         local_list.sort()
         return local_list
 
@@ -1118,7 +1117,7 @@ class NeuronRecorder(object):
                 return False
         return True
 
-    def get_generator_data(self, vertex_slice=None, atoms_shape=None):
+    def get_generator_data(self, vertex_slice=None):
         """
         Get the recorded data as a generatable data set.
 
@@ -1126,10 +1125,6 @@ class NeuronRecorder(object):
             The slice to generate the data for, or `None` to generate for
             all neurons (assuming all the same, otherwise error)
         :type vertex_slice: ~pacman.model.graphs.common.Slice or None
-        :param atoms_shape:
-            The shape of the atoms in the vertex;
-            if `vertex_slice` is not `None`, atoms_shape must be not `None`
-        :type atoms_shape: tuple(int) or None
         :rtype: numpy.ndarray
         """
         n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)
@@ -1145,11 +1140,10 @@ class NeuronRecorder(object):
                 data.extend([0, 0])
             else:
                 data.extend(self.__get_generator_indices(
-                    variable, vertex_slice, atoms_shape))
+                    variable, vertex_slice))
         return numpy.array(data, dtype="uint32")
 
-    def __get_generator_indices(
-            self, variable, vertex_slice=None, atoms_shape=None):
+    def __get_generator_indices(self, variable, vertex_slice=None):
         """
         Get the indices of the variables to record in run-length-encoded form.
         """
@@ -1160,12 +1154,6 @@ class NeuronRecorder(object):
             return [_REPEAT_PER_NEURON, 1,
                     _REPEAT_PER_NEURON_RECORDED | _RECORDED_FLAG]
 
-        # This must be non-global data, so we need a slice
-        if vertex_slice is None or atoms_shape is None:
-            raise ValueError(
-                "The parameters vertex_slice and atoms_shape must both not be"
-                " None")
-
         # Generate a run-length-encoded list
         # Initially there are no items, but this will be updated
         # Also keep track of the number recorded, also 0 initially
@@ -1173,7 +1161,7 @@ class NeuronRecorder(object):
         n_items = 0
 
         # Go through the indices and ids, assuming both are in order (they are)
-        id_iter = iter(enumerate(vertex_slice.get_raster_ids(atoms_shape)))
+        id_iter = iter(enumerate(vertex_slice.get_raster_ids()))
         index_iter = iter(index)
         # Keep the id and the position in the id list (as this is a RLE)
         next_id, i = next(id_iter, (None, 0))
