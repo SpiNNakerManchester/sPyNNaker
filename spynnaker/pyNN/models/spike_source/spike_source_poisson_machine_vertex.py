@@ -95,8 +95,9 @@ def get_expander_rates_bytes(n_atoms, n_rates):
     :param int n_rates: How many rates to account for
     :rtype: int
     """
-    return ((n_atoms * PARAMS_WORDS_PER_NEURON) +
-            (n_rates * PARAMS_WORDS_PER_RATE) + 1) * BYTES_PER_WORD
+    return ((n_atoms * EXPANDER_WORDS_PER_NEURON) +
+            (n_rates * PARAMS_WORDS_PER_RATE) +
+            EXPANDER_HEADER_WORDS) * BYTES_PER_WORD
 
 
 def get_sdram_edge_params_bytes(vertex_slice):
@@ -139,7 +140,7 @@ PARAMS_WORDS_PER_RATE = 6
 EXPANDER_WORDS_PER_NEURON = PARAMS_WORDS_PER_NEURON + 1
 
 # uint32_t n_items
-EXPANDER_HEADER_WORDS = 1
+EXPANDER_HEADER_WORDS = 2
 
 # The size of each weight to be stored for SDRAM transfers
 SDRAM_EDGE_PARAMS_BYTES_PER_WEIGHT = BYTES_PER_SHORT
@@ -411,9 +412,6 @@ class SpikeSourcePoissonMachineVertex(
         data_items = list()
         data_items.append([int(self.__rate_changed)])
         data_items.append([0])
-        # In order to allow changes in rate between runs track the data size
-        # for the case where all rates are different and use that
-        data_size = 2
         n_items = 0
         data = self._app_vertex.data
         ids = self.vertex_slice.get_raster_ids()
@@ -424,16 +422,14 @@ class SpikeSourcePoissonMachineVertex(
                  _u3232_to_uint64(item['starts']),
                  _u3232_to_uint64(item['durations']))
                 )[0]
-            data_to_add = [[count], [len(items)], [0],
-                           numpy.ravel(items).view("uint32")]
-            data_items.extend(data_to_add)
+            data_items.extend([[count], [len(items)], [0],
+                               numpy.ravel(items).view("uint32")])
             n_items += 1
-            data_size += count * (3 + len(data_to_add[-1]))
         data_items[1] = [n_items]
         data_to_write = numpy.concatenate(data_items)
         spec.reserve_memory_region(
             region=self.POISSON_SPIKE_SOURCE_REGIONS.EXPANDER_REGION,
-            size=data_size * BYTES_PER_WORD, label='Expander')
+            size=get_expander_rates_bytes(n_atoms, n_rates), label='Expander')
         spec.switch_write_focus(
             self.POISSON_SPIKE_SOURCE_REGIONS.EXPANDER_REGION)
         spec.write_array(data_to_write)
