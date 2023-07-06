@@ -55,7 +55,7 @@ def _locate_expander_rerun_targets(bitfield_targets):
             executable_type=ExecutableType.SYSTEM)
         # Write the region to USER1, as that is the best we can do
         txrx = SpynnakerDataView.get_transceiver()
-        txrx.write_user(1, placement.x, placement.y, placement.p,
+        txrx.write_user(placement.x, placement.y, placement.p, 1,
                         placement.vertex.connection_generator_region)
     return new_cores
 

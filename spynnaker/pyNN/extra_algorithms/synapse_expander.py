@@ -84,7 +84,7 @@ def _plan_expansion():
                 expanded_pop_vertices.append((vertex, placement))
                 # Write the region to USER1, as that is the best we can do
                 txrx = SpynnakerDataView.get_transceiver()
-                txrx.write_user(1, placement.x, placement.y, placement.p,
+                txrx.write_user(placement.x, placement.y, placement.p, 1,
                                 vertex.connection_generator_region)
                 max_data = max(max_data, vertex.max_gen_data)
                 max_bit_field = max(max_bit_field, vertex.bit_field_size)
