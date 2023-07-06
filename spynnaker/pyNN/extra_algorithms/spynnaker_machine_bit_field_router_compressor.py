@@ -21,8 +21,6 @@ from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import (
         machine_bit_field_ordered_covering_compressor,
         machine_bit_field_pair_router_compressor)
-from spinn_front_end_common.utilities.helpful_functions import (
-    write_address_to_user1)
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -56,9 +54,9 @@ def _locate_expander_rerun_targets(bitfield_targets):
             placement.x, placement.y, placement.p,
             executable_type=ExecutableType.SYSTEM)
         # Write the region to USER1, as that is the best we can do
-        write_address_to_user1(
-            placement.x, placement.y, placement.p,
-            placement.vertex.connection_generator_region)
+        txrx = SpynnakerDataView.get_transceiver()
+        txrx.write_user(placement.x, placement.y, placement.p, 1,
+                        placement.vertex.connection_generator_region)
     return new_cores
 
 
