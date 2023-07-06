@@ -13,8 +13,7 @@
 # limitations under the License.
 
 from enum import Enum
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 # Hashes of the current sources currently supported
@@ -92,7 +91,8 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         :param parameters: the parameters to set
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def get_parameters(self):
         """
         The parameters of the current source.
@@ -101,7 +101,8 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         """
         # TODO: Wrong naming for a property!
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def get_parameter_types(self):
         """
         The parameter types for the current source.
@@ -110,7 +111,8 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         """
         # TODO: Wrong naming for a property!
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def current_source_id(self):
         """
         The ID of the current source.

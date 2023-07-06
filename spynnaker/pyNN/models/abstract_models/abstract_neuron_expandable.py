@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.require_subclass import require_subclass
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 
@@ -43,7 +42,8 @@ class AbstractNeuronExpandable(object, metaclass=AbstractBase):
         :rtype: bool
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def neuron_generator_region(self):
         """
         The region containing the parameters of neuron expansion.

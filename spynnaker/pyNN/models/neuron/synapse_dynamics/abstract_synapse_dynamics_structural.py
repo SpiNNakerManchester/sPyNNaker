@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractproperty, abstractmethod)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
@@ -72,7 +71,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         :param SynapseInformation synapse_info:
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def f_rew(self):
         """
         The frequency of rewiring.
@@ -80,7 +80,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         :rtype: float
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def s_max(self):
         """
         The maximum number of synapses.
@@ -88,7 +89,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def with_replacement(self):
         """
         Whether to allow replacement when creating synapses.
@@ -96,13 +98,15 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         :rtype: bool
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def seed(self):
         """
         The seed to control the randomness.
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def initial_weight(self):
         """
         The weight of a formed connection.
@@ -110,7 +114,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         :rtype: float
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def initial_delay(self):
         """
         The delay of a formed connection.
@@ -118,7 +123,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         :rtype: float or (float, float)
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def partner_selection(self):
         """
         The partner selection rule.
@@ -126,7 +132,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         :rtype: AbstractPartnerSelection
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def formation(self):
         """
         The formation rule.
@@ -134,7 +141,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         :rtype: AbstractFormation
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def elimination(self):
         """
         The elimination rule.

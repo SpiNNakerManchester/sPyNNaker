@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from enum import Enum
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 class SendType(Enum):
@@ -41,7 +41,8 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
     """
     __slots__ = ()
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def device_control_partition_id(self):
         """
         A partition ID to give to an outgoing edge partition that will
@@ -50,7 +51,8 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
         :rtype: str
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def device_control_key(self):
         """
         The key that must be sent to the device to control it.
@@ -58,7 +60,8 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def device_control_uses_payload(self):
         """
         Whether the control of the device accepts an arbitrary valued
@@ -67,7 +70,8 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
         :rtype: bool
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def device_control_min_value(self):
         """
         The minimum value to send to the device.
@@ -75,7 +79,8 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
         :rtype: float
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def device_control_max_value(self):
         """
         The maximum value to send to the device.
@@ -83,7 +88,8 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
         :rtype: float
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def device_control_timesteps_between_sending(self):
         """
         The number of timesteps between sending commands to the device.
@@ -92,7 +98,8 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def device_control_send_type(self):
         """
         The type of data to be sent.

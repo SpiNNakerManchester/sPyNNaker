@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.require_subclass import require_subclass
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 
@@ -48,7 +47,8 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
         :rtype: bool
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def connection_generator_region(self):
         """
         The region ID containing the parameters of synaptic expansion.
@@ -65,7 +65,8 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
             Where the data is on the machine
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def max_gen_data(self):
         """
         The maximum amount of synaptic data to be generated.
@@ -74,7 +75,8 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def bit_field_size(self):
         """
         The amount of bit field data to be generated.

@@ -32,15 +32,14 @@ _population_parameters: Dict[str, Any] = {
 class AbstractPyNNNeuronModel(AbstractPyNNModel):
     __slots__ = ("__model", )
 
+    #: Population parameters for neuron models.
+    default_population_parameters = _population_parameters
+
     def __init__(self, model: AbstractNeuronImpl):
         """
         :param AbstractNeuronImpl model: The model implementation
         """
         self.__model = model
-
-    @property
-    def default_population_parameters(self) -> Dict[str, Any]:
-        return _population_parameters
 
     @property
     def _model(self) -> AbstractNeuronImpl:

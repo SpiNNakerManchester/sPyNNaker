@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from spinn_utilities.overrides import overrides
-from spinn_utilities.abstract_base import abstractproperty, abstractmethod
+from spinn_utilities.abstract_base import abstractmethod
 
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -42,7 +42,8 @@ class PopulationMachineSynapses(
     # This MUST stay empty to allow mixing with other things with slots
     __slots__ = ()
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _app_vertex(self):
         """
         The application vertex of the machine vertex.
@@ -53,7 +54,8 @@ class PopulationMachineSynapses(
         :rtype: AbstractPopulationVertex
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _vertex_slice(self):
         """
         The slice of the application vertex atoms on this machine vertex.
@@ -64,7 +66,8 @@ class PopulationMachineSynapses(
         :rtype: ~pacman.model.graphs.common.Slice
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _synaptic_matrices(self):
         """
         The object holding synaptic matrices.
@@ -72,7 +75,8 @@ class PopulationMachineSynapses(
         :rtype: SynapticMatrices
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _synapse_regions(self):
         """
         The identifiers of synaptic regions.
@@ -80,7 +84,8 @@ class PopulationMachineSynapses(
         :rtype: .SynapseRegions
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _max_atoms_per_core(self):
         """
         The maximum number of atoms on any core targeted by these synapses.

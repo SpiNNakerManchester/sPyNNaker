@@ -14,9 +14,10 @@
 from spinn_utilities.overrides import overrides
 from spinn_utilities.helpful_functions import is_singleton
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.utilities.utility_calls import get_field_based_keys
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import HasCustomAtomKeyMap
-from pacman.utilities.utility_calls import get_field_based_keys
+from spynnaker.pyNN.models.common.parameter_holder import ParameterHolder
 
 
 class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
@@ -154,7 +155,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             "This Population does not support the initialization of state"
             " variables")
 
-    def get_current_state_values(self, names, selector=None):
+    def get_current_state_values(
+            self, names, selector=None) -> ParameterHolder:
         """
         Get the current values of a state variable for the whole Population
         or a subset if the selector is used.

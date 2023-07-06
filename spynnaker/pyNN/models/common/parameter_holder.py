@@ -11,8 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import (
+    Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple,
+    Union, cast)
+from typing_extensions import TypeAlias
 from pyNN.random import RandomDistribution
 from spinn_utilities.helpful_functions import is_singleton
+_BaseValueType: TypeAlias = Union[List[int], List[float]]
 
 
 class ParameterHolder(object):
@@ -34,7 +39,11 @@ class ParameterHolder(object):
         # A selector to use if requested
         "__selector")
 
-    def __init__(self, data_items_to_return, get_call, selector=None):
+    def __init__(
+            self, data_items_to_return: Union[str, Sequence[str]],
+            get_call: Callable[[str, Any], Union[
+                _BaseValueType, RandomDistribution]],
+            selector=None):
         """
         :param data_items_to_return: A list of data fields to be returned
         :type data_items_to_return: list(str) or tuple(str)
@@ -47,10 +56,11 @@ class ParameterHolder(object):
         """
         self.__data_items_to_return = data_items_to_return
         self.__get_call = get_call
-        self.__data_items = None
+        self.__data_items: Optional[Dict[str, _BaseValueType]] = None
         self.__selector = selector
 
-    def _safe_read_values(self, parameter):
+    def _safe_read_values(self, parameter: str) -> Union[
+            _BaseValueType, int, float]:
         values = self.__get_call(parameter, self.__selector)
 
         # The values must be a single item, a list or a random distribution;
@@ -66,7 +76,7 @@ class ParameterHolder(object):
             return values[0]
         return values
 
-    def _get_data_items(self):
+    def _get_data_items(self) -> Dict[str, _BaseValueType]:
         """
         Merges the parameters and values in to the final data items
 
@@ -78,8 +88,10 @@ class ParameterHolder(object):
 
         # If there is just one item to return, return the values stored
         if is_singleton(self.__data_items_to_return):
-            self.__data_items = self._safe_read_values(
-                self.__data_items_to_return)
+            self.__data_items = {
+                cast(str, self.__data_items_to_return):
+                self._safe_read_values(
+                    self.__data_items_to_return)}
             return self.__data_items
 
         # If there are multiple items to return, form a list
@@ -89,50 +101,50 @@ class ParameterHolder(object):
 
         return self.__data_items
 
-    def __getitem__(self, s):
+    def __getitem__(self, s: str) -> Union[List[int], List[float]]:
         data = self._get_data_items()
         return data[s]
 
-    def __len__(self):
+    def __len__(self) -> int:
         data = self._get_data_items()
         return len(data)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         data = self._get_data_items()
         return iter(data)
 
-    def __str__(self):
+    def __str__(self) -> str:
         data = self._get_data_items()
         return data.__str__()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         data = self._get_data_items()
         return data.__repr__()
 
-    def __contains__(self, item):
+    def __contains__(self, item: str) -> bool:
         data = self._get_data_items()
         return item in data
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str):
         data = self._get_data_items()
         return getattr(data, name)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         data = self._get_data_items()
         return data == other
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         data = self._get_data_items()
         return hash(data)
 
-    def keys(self):
+    def keys(self) -> Iterable[str]:
         data = self._get_data_items()
         return data.keys()
 
-    def values(self):
+    def values(self) -> Iterable[_BaseValueType]:
         data = self._get_data_items()
-        return data.items()
+        return data.values()
 
-    def items(self):
+    def items(self) -> Iterable[Tuple[str, _BaseValueType]]:
         data = self._get_data_items()
         return data.items()

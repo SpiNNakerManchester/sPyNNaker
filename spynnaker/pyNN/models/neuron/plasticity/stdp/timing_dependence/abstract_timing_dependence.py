@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractHasParameterNames)
 
@@ -35,7 +34,8 @@ class AbstractTimingDependence(
         :rtype: bool
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def vertex_executable_suffix(self):
         """
         The suffix to be appended to the vertex executable for this rule.
@@ -43,7 +43,8 @@ class AbstractTimingDependence(
         :rtype: str
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def pre_trace_n_bytes(self):
         """
         The number of bytes used by the pre-trace of the rule per neuron.
@@ -59,7 +60,8 @@ class AbstractTimingDependence(
         :rtype: int
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def n_weight_terms(self):
         """
         The number of weight terms expected by this timing rule.
@@ -81,7 +83,8 @@ class AbstractTimingDependence(
             weight scale
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def synaptic_structure(self):
         """
         The synaptic structure of the plastic part of the rows.

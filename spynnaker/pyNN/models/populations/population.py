@@ -16,8 +16,12 @@ import logging
 import numpy
 import os
 import inspect
+from typing import (
+    Any, Dict, Iterable, Iterator, Optional, Sequence, Type, Union)
+from typing_extensions import TypeAlias
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
+from pyNN.space import BaseStructure
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
@@ -34,6 +38,9 @@ from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 
 logger = FormatAdapter(logging.getLogger(__file__))
+_CellType: TypeAlias = Union[AbstractPyNNModel, PopulationApplicationVertex]
+_CellTypeArg: TypeAlias = Union[Type[AbstractPyNNModel], _CellType]
+_ParamDict: TypeAlias = Dict[str, Any]
 
 
 # Not in the class so pylint doesn't get confused about abstractness of methods
@@ -58,8 +65,12 @@ class Population(PopulationBase):
         "__vertex")
 
     def __init__(
-            self, size, cellclass, cellparams=None, structure=None,
-            initial_values=None, label=None, additional_parameters=None,
+            self, size: int, cellclass: _CellTypeArg,
+            cellparams: Optional[_ParamDict] = None,
+            structure: Optional[BaseStructure] = None,
+            initial_values: Optional[Dict[str, float]] = None,
+            label: Optional[str] = None,
+            additional_parameters: Optional[_ParamDict] = None,
             **additional_kwargs):
         """
         :param int size: The number of neurons in the population
@@ -83,13 +94,15 @@ class Population(PopulationBase):
         # pylint: disable=too-many-arguments
 
         # Deal with the kwargs!
-        additional = dict()
+        additional: _ParamDict = dict()
         if additional_parameters is not None:
             additional.update(additional_parameters)
         if additional_kwargs:
             additional.update(additional_kwargs)
 
         # build our initial objects
+        self.__celltype: _CellType
+        self.__vertex: PopulationApplicationVertex
         model = self.__create_model(cellclass, cellparams)
         size = self.__roundsize(size, label)
         self.__create_vertex(model, size, label, additional)
@@ -99,7 +112,7 @@ class Population(PopulationBase):
         # structure should be a valid Space.py structure type.
         # generation of positions is deferred until needed.
         self.__structure = structure
-        self.__positions = None
+        self.__positions: Optional[numpy.ndarray] = None
         if isinstance(self.__vertex, SupportsStructure):
             self.__vertex.set_structure(structure)
 
@@ -110,7 +123,7 @@ class Population(PopulationBase):
         if size is None:
             size = self.__vertex.n_atoms
         self.__size = size
-        self.__annotations = dict()
+        self.__annotations: Dict[str, Any] = dict()
 
         # things for pynn demands
         self.__first_id, self.__last_id = SpynnakerDataView.add_population(
@@ -121,21 +134,21 @@ class Population(PopulationBase):
             for variable, value in initial_values.items():
                 self.__vertex.set_initial_state_values(variable, value)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[PopulationView]:
         """
         Iterate over local cells.
         """
         for _id in range(self.__size):
             yield IDMixin(self, _id)
 
-    def __getitem__(self, index_or_slice):
+    def __getitem__(self, index_or_slice) -> PopulationView:
         if isinstance(index_or_slice, int):
             return IDMixin(self, index_or_slice)
         else:
             return PopulationView(
                 self, index_or_slice, label=f"view over {self.label}")
 
-    def all(self):
+    def all(self) -> Iterable[PopulationView]:
         """
         Iterator over cell IDs on all MPI nodes.
 
@@ -145,7 +158,7 @@ class Population(PopulationBase):
             yield IDMixin(self, _id)
 
     @property
-    def annotations(self):
+    def annotations(self) -> Dict[str, Any]:
         """
         The annotations given by the end user.
 
@@ -154,26 +167,31 @@ class Population(PopulationBase):
         return self.__annotations
 
     @property
-    def celltype(self):
+    def celltype(self) -> _CellType:
         """
         Implements the PyNN expected `celltype` property.
 
-        :return: The cell type this property has been set to
-        :rtype: AbstractPyNNModel
+        :return:
+            The cell type this property has been set to, or the vertex if it
+            was directly instantiated.
+        :rtype: AbstractPyNNModel or PopulationApplicationVertex
         """
         return self.__celltype
 
-    def can_record(self, variable):
+    def can_record(self, variable: str) -> bool:
         """
         Determine whether `variable` can be recorded from this population.
 
         :param str variable: The variable to answer the question about
         :rtype: bool
         """
-        return variable in self.__vertex.get_recordable_variables(variable)
+        return variable in self.__vertex.get_recordable_variables()
 
     @overrides(PopulationBase.record, extend_doc=False)
-    def record(self, variables, to_file=None, sampling_interval=None):
+    def record(
+            self, variables: Union[str, Sequence[str]],
+            to_file: Optional[Union[str]] = None,
+            sampling_interval: Optional[int] = None):
         """
         Record the specified variable or variables for all cells in the
         Population or view.
@@ -192,7 +210,7 @@ class Population(PopulationBase):
         self.__recorder.record(
             variables, to_file, sampling_interval, indexes=None)
 
-    def sample(self, n, rng=None):
+    def sample(self, n: int, rng: Optional[NumpyRNG] = None) -> PopulationView:
         """
         Randomly sample `n` cells from the Population, and return a
         PopulationView object.
@@ -295,7 +313,7 @@ class Population(PopulationBase):
             context["structure"] = self.structure.describe(template=None)
         return descriptions.render(engine, template, context)
 
-    def _end(self):
+    def _end(self) -> None:
         """
         Do final steps at the end of the simulation.
         """
@@ -368,7 +386,7 @@ class Population(PopulationBase):
         with NeoBufferDatabase() as db:
             return db.get_spike_counts(self.__recorder.recording_label)
 
-    def find_units(self, variable):
+    def find_units(self, variable: str) -> str:
         """
         Get the units of a variable.
 
@@ -381,21 +399,14 @@ class Population(PopulationBase):
     def set(self, **parameters):
         """
         Set one or more parameters for every cell in the population.
+        For example::
 
-        ``parameter`` can be a dict, in which case ``value`` should not be
-        supplied, or a string giving the parameter name, in which case
-        ``value`` is the parameter value. ``value`` can be a numeric value, or
-        list of such (e.g. for setting spike times)::
-
-            p._set("tau_m", 20.0).
-            p._set({'tau_m':20, 'v_rest':-65})
+            p.set(tau_m=20.0).
 
         :param parameters:
-            the parameter to set or dictionary of parameters to set
-        :type parameters:
-            str or dict(str, int or float or list(int) or list(float))
-        :param value: the value of the parameter to set.
-        :type value: int or float or list(int) or list(float)
+            The parameters to set and the values to set them to.
+            The type of each parameter depends on the parameter; it's often a
+            float, but not always.
         :raises SimulatorRunningException: If `sim.run` is currently running
         :raises SimulatorNotSetupException: If called before `sim.setup`
         :raises SimulatorShutdownException: If called after `sim.end`
@@ -750,7 +761,9 @@ class Population(PopulationBase):
         self.__recorder.cache_data()
 
     @staticmethod
-    def __create_model(cell_class, cell_params):
+    def __create_model(
+            cell_class: _CellTypeArg,
+            cell_params: Optional[_ParamDict]) -> _CellType:
         """
         :param cell_class: The implementation of the individual neurons.
         :type cell_class: type or AbstractPyNNModel or ApplicationVertex
@@ -760,19 +773,23 @@ class Population(PopulationBase):
         :type cell_params: dict(str,object) or None
         :rtype: ApplicationVertex or AbstractPyNNModel
         """
-        model = cell_class
         if inspect.isclass(cell_class):
             if cell_params is None:
                 model = cell_class()
             else:
                 model = cell_class(**cell_params)
+            assert isinstance(model, AbstractPyNNModel)
         elif cell_params:
             raise ConfigurationException(
                 "cell_class is an instance which includes params so "
                 "cell_params must be None")
+        else:
+            model = cell_class
         return model
 
-    def __create_vertex(self, model, size, label, additional_parameters):
+    def __create_vertex(
+            self, model: _CellType, size: int, label: Optional[str],
+            additional_parameters: _ParamDict):
         """
         :param model: The implementation of the individual neurons.
         :type model: ApplicationVertex or AbstractPyNNModel
@@ -789,14 +806,14 @@ class Population(PopulationBase):
             if size is not None and size <= 0:
                 raise ConfigurationException(
                     "A population cannot have a negative or zero size.")
-            population_parameters = dict(model.default_population_parameters)
+            # pylint: disable=protected-access
+            parameters = model._get_default_population_parameters()
             if additional_parameters:
                 # check that the additions are suitable. report wrong ones
                 # and ignore
-                population_parameters = self.__process_additional_params(
-                    additional_parameters, population_parameters)
-            self.__vertex = model.create_vertex(
-                size, label, **population_parameters)
+                parameters = self.__process_additional_params(
+                    additional_parameters, parameters)
+            self.__vertex = model.create_vertex(size, label, **parameters)
             assert isinstance(self.__vertex, PopulationApplicationVertex)
 
         # Use a provided application vertex directly
@@ -821,7 +838,9 @@ class Population(PopulationBase):
                 " PopulationApplicationVertex")
 
     @staticmethod
-    def create(cellclass, cellparams=None, n=1):
+    def create(
+            cellclass: _CellTypeArg, cellparams: Optional[_ParamDict] = None,
+            n: int = 1) -> 'Population':
         """
         Pass through method to the constructor defined by PyNN.
         Create ``n`` cells all of the same type.
@@ -838,7 +857,8 @@ class Population(PopulationBase):
 
     @staticmethod
     def __process_additional_params(
-            additional_parameters, population_parameters):
+            additional_parameters: _ParamDict,
+            population_parameters: _ParamDict) -> _ParamDict:
         """
         Essential method for allowing things like splitter objects at
         population level.

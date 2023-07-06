@@ -14,8 +14,7 @@
 
 from collections.abc import Iterable
 import numpy
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import (
@@ -404,7 +403,8 @@ class SynapseDynamicsStructuralCommon(
             (type(self.elimination) ==
              type(synapse_dynamics.elimination)))
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def connections(self):
         """
         Initial connectivity as defined via connector.

@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractHasParameterNames)
 
@@ -26,7 +25,8 @@ class AbstractPartnerSelection(
 
     __slots__ = ()
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def vertex_executable_suffix(self):
         """
         The suffix to be appended to the vertex executable for this rule.

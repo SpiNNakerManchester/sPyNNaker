@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional, Type, TYPE_CHECKING
 from typing_extensions import TypeGuard
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
@@ -33,12 +33,12 @@ class _Dynamics:
     """
     Holds late-initialized class references.
     """
-    _Structural: Optional[type[AbstractSynapseDynamicsStructural]] = None
-    _STDP: Optional[type[SynapseDynamicsSTDP]] = None
-    _Neuromodulation: Optional[type[SynapseDynamicsNeuromodulation]] = None
+    _Structural: Optional[Type[AbstractSynapseDynamicsStructural]] = None
+    _STDP: Optional[Type[SynapseDynamicsSTDP]] = None
+    _Neuromodulation: Optional[Type[SynapseDynamicsNeuromodulation]] = None
 
     @classmethod
-    def Structural(cls) -> type[AbstractSynapseDynamicsStructural]:
+    def Structural(cls) -> Type[AbstractSynapseDynamicsStructural]:
         if cls._Structural is None:
             # Avoid import loop by postponing this import
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -47,7 +47,7 @@ class _Dynamics:
         return cls._Structural
 
     @classmethod
-    def STDP(cls) -> type[SynapseDynamicsSTDP]:
+    def STDP(cls) -> Type[SynapseDynamicsSTDP]:
         if cls._STDP is None:
             # Avoid import loop by postponing this import
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -56,7 +56,7 @@ class _Dynamics:
         return cls._STDP
 
     @classmethod
-    def Neuromodulation(cls) -> type[SynapseDynamicsNeuromodulation]:
+    def Neuromodulation(cls) -> Type[SynapseDynamicsNeuromodulation]:
         if cls._Neuromodulation is None:
             # Avoid import loop by postponing this import
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (

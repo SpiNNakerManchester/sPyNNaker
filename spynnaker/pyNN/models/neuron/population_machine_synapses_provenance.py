@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ctypes
-from spinn_utilities.abstract_base import abstractproperty
+from spinn_utilities.abstract_base import abstractmethod
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 
@@ -67,7 +67,8 @@ class PopulationMachineSynapsesProvenance(object):
     LATE_SPIKES = "Late spikes"
     MAX_LATE_SPIKE = "Max late spike"
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _app_vertex(self):
         """
         The application vertex of the machine vertex.

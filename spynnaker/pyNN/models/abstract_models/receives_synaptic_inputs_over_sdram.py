@@ -11,14 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs import AbstractSupportsSDRAMEdges
 from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
 
 
-@add_metaclass(AbstractBase)
-class ReceivesSynapticInputsOverSDRAM(AbstractSupportsSDRAMEdges):
+class ReceivesSynapticInputsOverSDRAM(
+        AbstractSupportsSDRAMEdges, metaclass=AbstractBase):
     """
     An object that receives synaptic inputs over SDRAM.
 
@@ -34,7 +33,8 @@ class ReceivesSynapticInputsOverSDRAM(AbstractSupportsSDRAMEdges):
     # The size of each input in bytes
     N_BYTES_PER_INPUT = BYTES_PER_SHORT
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def weight_scales(self):
         """
         A list of scale factors to be applied to weights that get passed
@@ -43,7 +43,8 @@ class ReceivesSynapticInputsOverSDRAM(AbstractSupportsSDRAMEdges):
         :rtype: list(int)
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def n_bytes_for_transfer(self):
         """
         The number of bytes to be sent over the channel.  This will be

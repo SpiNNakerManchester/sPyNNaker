@@ -14,7 +14,7 @@
 
 import math
 import numpy
-from spinn_utilities.abstract_base import abstractmethod, abstractproperty
+from spinn_utilities.abstract_base import abstractmethod
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from .abstract_has_parameter_names import AbstractHasParameterNames
 
@@ -75,7 +75,8 @@ class AbstractSDRAMSynapseDynamics(
         :rtype: int
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def pad_to_length(self):
         """
         The amount each row should pad to, or `None` if not specified.

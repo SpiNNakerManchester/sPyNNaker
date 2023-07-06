@@ -14,7 +14,7 @@
 import ctypes
 from typing import NamedTuple
 
-from spinn_utilities.abstract_base import abstractproperty, abstractmethod
+from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 
 from pacman.utilities.utility_calls import get_field_based_keys
@@ -68,7 +68,8 @@ class PopulationMachineNeurons(
     # This MUST stay empty to allow mixing with other things with slots
     __slots__ = ()
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _app_vertex(self):
         """
         The application vertex of the machine vertex.
@@ -79,7 +80,8 @@ class PopulationMachineNeurons(
         :rtype: AbstractPopulationVertex
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _vertex_slice(self):
         """
         The slice of the application vertex atoms on this machine vertex.
@@ -90,7 +92,8 @@ class PopulationMachineNeurons(
         :rtype: ~pacman.model.graphs.common.Slice
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _slice_index(self):
         """
         The index of the slice of this vertex in the list of slices.
@@ -98,7 +101,8 @@ class PopulationMachineNeurons(
         :rtype: int
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _key(self):
         """
         The key for spikes.
@@ -117,7 +121,8 @@ class PopulationMachineNeurons(
         :param int key: The key to be set
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _neuron_regions(self):
         """
         The region identifiers for the neuron regions.
@@ -125,7 +130,8 @@ class PopulationMachineNeurons(
         :rtype: .NeuronRegions
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _neuron_data(self):
         """
         The neuron data handler.
@@ -133,7 +139,8 @@ class PopulationMachineNeurons(
         :rtype: NeuronData
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _max_atoms_per_core(self):
         """
         The maximum number of atoms on a core, used for neuron data transfer.

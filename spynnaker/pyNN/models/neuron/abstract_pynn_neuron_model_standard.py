@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
+from .abstract_pynn_neuron_model import (
+    AbstractPyNNNeuronModel, _population_parameters as APNM_default_params)
 from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 from spinn_utilities.overrides import overrides
 
-_population_parameters = dict(
-    AbstractPyNNNeuronModel.default_population_parameters)
+_population_parameters = dict(APNM_default_params)
 _population_parameters["n_steps_per_timestep"] = 1
 
 

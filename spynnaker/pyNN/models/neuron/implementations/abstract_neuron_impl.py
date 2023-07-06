@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 class AbstractNeuronImpl(object, metaclass=AbstractBase):
@@ -23,23 +22,26 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
     __slots__ = ()
 
-    @abstractproperty
-    def model_name(self):
+    @property
+    @abstractmethod
+    def model_name(self) -> str:
         """
         The name of the model.
 
         :rtype: str
         """
 
-    @abstractproperty
-    def binary_name(self):
+    @property
+    @abstractmethod
+    def binary_name(self) -> str:
         """
         The name of the binary executable of this implementation.
 
         :rtype: str
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def structs(self):
         """
         A list of structures used by the implementation.
@@ -48,7 +50,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_global_weight_scale(self):
+    def get_global_weight_scale(self) -> int:
         """
         Get the weight scaling required by this model.
 
@@ -56,7 +58,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_n_synapse_types(self):
+    def get_n_synapse_types(self) -> int:
         """
         Get the number of synapse types supported by the model.
 
@@ -64,7 +66,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_synapse_id_by_target(self, target):
+    def get_synapse_id_by_target(self, target) -> int:
         """
         Get the ID of a synapse given the name.
 
@@ -89,7 +91,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_recordable_units(self, variable):
+    def get_recordable_units(self, variable: str) -> str:
         """
         Get the units of the given variable that can be recorded.
 
@@ -106,7 +108,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def is_recordable(self, variable):
+    def is_recordable(self, variable: str) -> bool:
         """
         Determine if the given variable can be recorded.
 
@@ -115,7 +117,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_recordable_variable_index(self, variable):
+    def get_recordable_variable_index(self, variable: str) -> int:
         """
         Get the index of the variable in the list of variables that can be
         recorded.
@@ -144,7 +146,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_units(self, variable):
+    def get_units(self, variable: str) -> str:
         """
         Get the units of the given variable.
 
@@ -152,8 +154,9 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         :rtype: str
         """
 
-    @abstractproperty
-    def is_conductance_based(self):
+    @property
+    @abstractmethod
+    def is_conductance_based(self) -> bool:
         """
         Whether the model uses conductance.
 

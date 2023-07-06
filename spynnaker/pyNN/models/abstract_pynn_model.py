@@ -148,17 +148,18 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         """
         return name in cls.default_parameters
 
-    @property
-    @abstractmethod
-    def default_population_parameters(self) -> Dict[str, Any]:
-        """
-        The default values for the parameters at the population level.
-        These are parameters that can be passed in to the Population
-        constructor in addition to the standard PyNN options.
+    #: The default values for the parameters at the population level.
+    #: These are parameters that can be passed in to the Population
+    #: constructor in addition to the standard PyNN options.
+    default_population_parameters: Dict[str, Any] = {}
 
-        :rtype: dict(str, Any)
+    @classmethod
+    def _get_default_population_parameters(cls) -> Dict[str, Any]:
         """
-        raise NotImplementedError
+        Get the default population parameters.
+        Slightly contorted to allow for overriding class variables.
+        """
+        return dict(cls.default_population_parameters)
 
     @abstractmethod
     def create_vertex(

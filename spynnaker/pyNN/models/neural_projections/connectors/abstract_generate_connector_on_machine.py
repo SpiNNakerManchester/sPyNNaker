@@ -14,7 +14,7 @@
 
 from enum import Enum
 import numpy
-from spinn_utilities.abstract_base import abstractproperty, AbstractBase
+from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from spynnaker.pyNN.models.neural_projections.connectors import (
@@ -147,7 +147,8 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_params_size_in_bytes(delays)
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def gen_connector_id(self):
         """
         The ID of the connection generator on the machine.

@@ -16,8 +16,7 @@
 import logging
 import numpy
 from pyNN.random import RandomDistribution
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
@@ -51,7 +50,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :rtype: str
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def changes_during_run(self):
         """
         Whether the synapses change during a run.
@@ -59,7 +59,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :rtype: bool
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def weight(self):
         """
         The weight of connections.
@@ -89,7 +90,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
                            self, delay, new_delay)
         return new_delay
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def delay(self):
         """
         The delay of connections.
@@ -97,7 +99,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :rtype: float
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def is_combined_core_capable(self):
         """
         Whether the synapse dynamics can run on a core combined with

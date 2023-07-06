@@ -13,8 +13,7 @@
 # limitations under the License.
 
 import logging
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 
@@ -52,7 +51,8 @@ class PopulationBase(object, metaclass=AbstractBase):
                        "local_cells just returns all_cells")
         return self.all_cells
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def all_cells(self):
         """
         An array containing the cell IDs of all neurons in the
@@ -432,7 +432,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         _this_is_wholly_deprecated(
             "Use set(parametername=value_array) instead.", kwargs)
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _vertex(self):
         """
         The underlying application vertex.
@@ -440,7 +441,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _recorder(self):
         """
         The recorder of the population.

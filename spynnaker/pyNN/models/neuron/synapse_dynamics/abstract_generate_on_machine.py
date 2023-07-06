@@ -13,8 +13,7 @@
 # limitations under the License.
 
 from enum import Enum
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractproperty, abstractmethod)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 class MatrixGeneratorID(Enum):
@@ -39,7 +38,8 @@ class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
         """
         return True
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def gen_matrix_id(self):
         """
         The ID of the on-machine matrix generator.
@@ -58,7 +58,8 @@ class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
         :rtype: ~numpy.ndarray(uint32)
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def gen_matrix_params_size_in_bytes(self):
         """
         The size of the parameters of the matrix generator in bytes.
