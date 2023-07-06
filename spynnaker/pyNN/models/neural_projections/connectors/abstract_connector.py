@@ -52,7 +52,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
         "_delays",
         "__min_delay",
         "__n_clipped_delays",
-        "_rng",
         "__safe",
         "__space",
         "__verbose",
@@ -60,24 +59,19 @@ class AbstractConnector(object, metaclass=AbstractBase):
         "__param_seeds",
         "__synapse_info"]
 
-    def __init__(self, safe=True, callback=None, verbose=False, rng=None):
+    def __init__(self, safe=True, callback=None, verbose=False):
         """
         :param bool safe: if True, check that weights and delays have valid
             values. If False, this check is skipped. (NB: SpiNNaker always
             checks.)
         :param callable callback: Ignored
         :param bool verbose:
-        :param rng:
-            Seeded random number generator, or None to make one when needed
-        :type rng: ~pyNN.random.NumpyRNG or None
         """
         if callback is not None:
             warn_once(logger, "sPyNNaker ignores connector callbacks.")
         self.__safe = safe
         self.__space = None
         self.__verbose = verbose
-
-        self._rng = rng
 
         self.__n_clipped_delays = numpy.int64(0)
         self.__min_delay = 0
@@ -98,7 +92,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         :param SynapseInformation synapse_info: the synapse info
         """
-        self._rng = (self._rng or NumpyRNG())
         self.__min_delay = SpynnakerDataView.get_simulation_time_step_ms()
 
     def _get_delay_minimum(self, delays, n_connections, synapse_info):
@@ -106,8 +99,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the minimum delay given a float or RandomDistribution.
 
         :param delays: the delays
-        :type delays: ~numpy.ndarray or ~spynnaker.pyNN.RandomDistribution
-            or int or float
+        :type delays: ~spynnaker.pyNN.RandomDistribution or int or float or str
         :param int n_connections: how many connections
         """
         if isinstance(delays, RandomDistribution):
@@ -132,7 +124,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the maximum delay given a float or RandomDistribution.
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
+        :type delays: ~pyNN.random.RandomDistribution or int or float or str
         :param int n_connections:
         """
         if isinstance(delays, RandomDistribution):
@@ -178,7 +170,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the variance of the delays.
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
+        :type delays: ~~pyNN.random.RandomDistribution or int or float of str
         :rtype: float
         """
         if isinstance(delays, RandomDistribution):
@@ -200,8 +192,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         max_delay given given a float, RandomDistribution or list of delays.
 
         :param delays:
-        :type delays: ~numpy.ndarray or spynnaker.pyNN.RandomDistribution
-            or int or float
+        :type delays: spynnaker.pyNN.RandomDistribution or int or float or str
         :param int n_total_connections:
         :param int n_connections:
         :param float min_delay:
@@ -248,7 +239,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         (inclusive) if both specified (otherwise all connections).
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
+        :type delays: ~pyNN.random.RandomDistribution or int or float or str
         :param int n_post_atoms:
         :param SynapseInformation synapse_info:
         :param min_delay:
@@ -273,7 +264,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the mean of the weights.
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
+        :type weights: ~pyNN.random.RandomDistribution or int or float or str
         :rtype: float
         """
         if isinstance(weights, RandomDistribution):
@@ -292,7 +283,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the maximum of the weights.
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
+        :type weights: ~pyNN.random.RandomDistribution or int or float or str
         :param int n_connections:
         :rtype: float
         """
@@ -335,7 +326,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the variance of the weights.
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
+        :type weights: ~pyNN.random.RandomDistribution or int or float or str
         :rtype: float
         """
         if isinstance(weights, RandomDistribution):
@@ -381,7 +372,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def _generate_random_values(
             self, values, n_connections, post_vertex_slice):
         """
-        :param ~pyNN.random.NumpyRNG values:
+        :param ~pyNN.random.RandomDistribution values:
         :param int n_connections:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :rtype: ~numpy.ndarray
@@ -404,7 +395,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
             synapse_info):
         """
         :param values:
-        :type values: ~pyNN.random.NumpyRNG or int or float or str or callable
+        :type values: ~pyNN.random.RandomDistribution or int or float or str
+            or callable
         :param int n_connections:
         :param ~pacman.model.graphs.common.Slice post_slice:
         :param SynapseInformation synapse_info:
