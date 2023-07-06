@@ -29,7 +29,7 @@ from pacman.operations.partition_algorithms import splitter_partitioner
 from spinn_front_end_common.interface.ds import (
     DataSpecificationGenerator, DsSqlliteDatabase)
 from spinn_front_end_common.interface.interface_functions import (
-    execute_application_data_specs)
+    load_application_data_specs)
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices,\
     SynapseRegions
@@ -165,10 +165,10 @@ def test_write_data_spec():
     ds_db = DsSqlliteDatabase()
     spec = DataSpecificationGenerator(0, 0, 3, post_vertex, ds_db)
     synaptic_matrices.write_synaptic_data(spec, post_vertex_slice, references)
-    writer.set_dsg_targets(ds_db)
+    writer.set_ds_database(ds_db)
 
     writer.set_transceiver(_MockTransceiverinOut())
-    execute_application_data_specs()
+    load_application_data_specs()
 
     report_folder = mkdtemp()
     try:
@@ -483,7 +483,7 @@ def test_pop_based_master_pop_table_standard(
     # Generate the data
     db = DsSqlliteDatabase()
     spec = DataSpecificationGenerator(1, 2, 3, post_mac_vertex, db)
-    writer.set_dsg_targets(db)
+    writer.set_ds_database(db)
 
     regions = SynapseRegions(
         synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
