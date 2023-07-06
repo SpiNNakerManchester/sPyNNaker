@@ -85,9 +85,8 @@ def _plan_expansion():
                     executable_type=ExecutableType.SYSTEM)
                 expanded_placements.append(placement)
                 # Write the region to USER1, as that is the best we can do
-                txrx.write_user_1(
-                    placement.x, placement.y, placement.p,
-                    vertex.connection_generator_region)
+                txrx.write_user(placement.x, placement.y, placement.p, 1,
+                                vertex.connection_generator_region)
                 max_data = max(max_data, vertex.max_gen_data)
                 max_bit_field = max(max_bit_field, vertex.bit_field_size)
 

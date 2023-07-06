@@ -76,9 +76,8 @@ def _plan_expansion():
                     neuron_bin, placement.x, placement.y, placement.p,
                     executable_type=ExecutableType.SYSTEM)
                 # Write the region to USER1, as that is the best we can do
-                txrx.write_user_1(
-                    placement.x, placement.y, placement.p,
-                    vertex.neuron_generator_region)
+                txrx.write_user(placement.x, placement.y, placement.p, 1,
+                                vertex.neuron_generator_region)
 
     return expander_cores, expanded_pop_vertices
 
