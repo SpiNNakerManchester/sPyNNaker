@@ -348,19 +348,33 @@ class SynapseDynamicsSTDP(
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
 
+        # Get the fixed data
+        # Old branch
         dendritic_delays = (
             connections["delay"] * self.__dendritic_delay_fraction)
+        axonal_delays = (
+            connections["delay"] * (1.0 - self.__dendritic_delay_fraction))
 
         # Get the fixed data
         fixed_plastic = (
             ((dendritic_delays.astype("uint16") & 0xFF) <<
-             # master code commented out
-             # (connections["delay"].astype("uint16") <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
+            ((axonal_delays.astype("uint16") & 0xF) <<
+             (4 + n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype("uint16")
              << n_neuron_id_bits) |
             ((connections["target"].astype("uint16") -
               post_vertex_slice.lo_atom) & neuron_id_mask))
+
+        # Master
+        # fixed_plastic = (
+        #     (connections["delay"].astype("uint16") <<
+        #      (n_neuron_id_bits + n_synapse_type_bits)) |
+        #     (connections["synapse_type"].astype("uint16")
+        #      << n_neuron_id_bits) |
+        #     ((connections["target"].astype("uint16") -
+        #       post_vertex_slice.lo_atom) & neuron_id_mask))
+
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
             fixed_plastic.view(dtype="uint8").reshape((-1, 2)),
@@ -469,7 +483,7 @@ class SynapseDynamicsSTDP(
             n_half_words += 1
             half_word = 0
         pp_half_words = numpy.concatenate([
-            pp[:size * n_half_words * BYTES_PER_SHORT].view("uint16")[
+            pp[:size * n_half_words * BYTES_PER_SHORT].view("int16")[
                 half_word::n_half_words]
             for pp, size in zip(pp_without_headers, fp_size)])
 

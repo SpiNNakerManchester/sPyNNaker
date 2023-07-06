@@ -79,3 +79,13 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         :param str variable: The name of the variable
         """
         return self.__units[variable]
+
+    @property
+    def uses_eprop(self):
+        """
+        Says whether the component is an eprop model (default false)
+
+        :rtype: bool
+
+        """
+        return False

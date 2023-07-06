@@ -357,3 +357,7 @@ class NeuronModelEPropAdaptive(AbstractStandardNeuronComponent):
         self.__number_of_cues = new_value
 
     # TODO: setters for "globals" like target rate, eta, etc.
+
+    @overrides(AbstractStandardNeuronComponent.uses_eprop)
+    def uses_eprop(self):
+        return True

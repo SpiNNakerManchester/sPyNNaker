@@ -299,3 +299,7 @@ class NeuronModelLeftRightReadout(AbstractStandardNeuronComponent):
         self.__window_size = new_value
 
     # TODO: Check setters for all parameters
+
+    @overrides(AbstractStandardNeuronComponent.uses_eprop)
+    def uses_eprop(self):
+        return True
