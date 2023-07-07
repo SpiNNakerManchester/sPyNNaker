@@ -17,11 +17,11 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_SHORT, BYTES_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    get_exp_lut_array)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    AbstractTimingDependence)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
-    SynapseStructureWeightOnly)
+    get_exp_lut_array, get_min_lut_value)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
+    import AbstractTimingDependence
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
+    import SynapseStructureWeightOnly
 
 
 class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
@@ -202,3 +202,20 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
         return self.__PARAM_NAMES
+
+    @overrides(AbstractTimingDependence.minimum_delta)
+    def minimum_delta(self, max_stdp_spike_delta):
+        ts = SpynnakerDataView.get_simulation_time_step_ms()
+
+        # The minimums for potentiation
+        min_decayed_r1 = get_min_lut_value(self.__tau_plus_data)
+        min_decayed_r1_o2 = min_decayed_r1 * get_min_lut_value(
+            self.__tau_y_data, ts, max_stdp_spike_delta)
+
+        # The minimums for depression
+        min_decayed_o1 = get_min_lut_value(self.__tau_minus_data)
+        min_decayed_o1_r2 = min_decayed_o1 * get_min_lut_value(
+            self.__tau_x_data, ts, max_stdp_spike_delta)
+
+        return [[min_decayed_r1, min_decayed_r1_o2],
+                [min_decayed_o1, min_decayed_o1_r2]]

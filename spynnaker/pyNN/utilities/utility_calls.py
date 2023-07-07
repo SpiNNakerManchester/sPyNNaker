@@ -27,6 +27,8 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.safe_eval import SafeEval
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.logger_utils import warn_once
+
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
@@ -47,6 +49,8 @@ CAP_RANDOM_FOR_MARS_64 = 0x7FFFFFFF
 N_RANDOM_NUMBERS = 4
 ARBITRARY_Y = 13031301
 MARS_C_MAX = 698769068
+
+FLOAT_GCD_TOLERANCE = DataType.S1615.decode_from_int(1)
 
 STATS_BY_NAME = {
     'binomial': RandomStatsBinomialImpl(),
@@ -387,6 +391,45 @@ def get_n_bits(n_values):
     if n_values == 1:
         return 1
     return int(math.ceil(math.log2(n_values)))
+
+
+def float_gcd(a, b):
+    """
+    Floating point gcd of two values
+
+    :param float a: first input
+    :param float b: second input
+    :return: the gcd of the two values (to a specified tolerance)
+    :rtype: float
+    """
+    if (a < b):
+        # pylint: disable-next=arguments-out-of-order
+        return float_gcd(b, a)
+
+    # base case
+    if (abs(b) < FLOAT_GCD_TOLERANCE):
+        return a
+    else:
+        return (float_gcd(b, a - math.floor(a / b) * b))
+
+
+def float_gcd_of_array(input_array):
+    """
+    Work out the floating point gcd of an array of numbers
+
+    :param numpy.float(array) input: the input array
+    :return: the floating point gcd of the array
+    :rtype: float
+    """
+    if len(input_array) == 1:
+        return input_array[0]
+
+    gcd = float_gcd(input_array[0], input_array[1])
+
+    for i in range(2, len(input_array)):
+        gcd = float_gcd(gcd, input_array[i])
+
+    return gcd
 
 
 def moved_in_v6(old_location, _):

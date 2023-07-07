@@ -32,7 +32,7 @@ class PopulationSynapsesMachineVertexLead(
 
     __slots__ = [
         "__synaptic_matrices",
-        "__ring_buffer_shifts",
+        "__min_weights",
         "__weight_scales",
         "__structural_sz",
         "__synapse_references",
@@ -41,9 +41,8 @@ class PopulationSynapsesMachineVertexLead(
 
     def __init__(
             self, sdram, label, app_vertex,
-            vertex_slice, ring_buffer_shifts, weight_scales,
-            structural_sz, synapse_references, max_atoms_per_core,
-            synaptic_matrices):
+            vertex_slice, min_weights, weight_scales, structural_sz,
+            synapse_references, max_atoms_per_core, synaptic_matrices):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex
@@ -52,10 +51,12 @@ class PopulationSynapsesMachineVertexLead(
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
+        :param list(float) min_weights:
+            The computed minimum weights to be used in the simulation
         """
         super(PopulationSynapsesMachineVertexLead, self).__init__(
             sdram, label, app_vertex, vertex_slice)
-        self.__ring_buffer_shifts = ring_buffer_shifts
+        self.__min_weights = min_weights
         self.__weight_scales = weight_scales
         self.__structural_sz = structural_sz
         self.__synapse_references = synapse_references
@@ -98,7 +99,7 @@ class PopulationSynapsesMachineVertexLead(
         self._write_common_data_spec(spec, rec_regions)
 
         self._write_synapse_data_spec(
-            spec, self.__ring_buffer_shifts,
+            spec, self.__min_weights,
             self.__weight_scales, self.__structural_sz)
 
         # Write information about SDRAM

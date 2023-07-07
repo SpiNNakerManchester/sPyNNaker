@@ -41,14 +41,11 @@
  * \param[in] address: the absolute address in SRAM where the weight parameters
  *      are stored.
  * \param[in] n_synapse_types: The number of synapse types
- * \param[in] ring_buffer_to_input_buffer_left_shifts: how much a value needs
- *      to be shifted in the left direction to support comprises with fixed
- *      point arithmetic
+ * \param[in] min_weights: The value of the weight of the LSB of the weight
  * \return the end of the weight region as an absolute SDRAM memory address.
  */
 address_t weight_initialise(
-        address_t address, uint32_t n_synapse_types,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts);
+        address_t address, uint32_t n_synapse_types, REAL *min_weights);
 
 /*!
  * \brief Gets the initial weight state.

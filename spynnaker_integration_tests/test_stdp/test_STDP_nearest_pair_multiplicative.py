@@ -18,7 +18,7 @@ import numpy
 import unittest
 
 
-class TestSTDPNearestPairAdditive(BaseTestCase):
+class TestSTDPNearestPairMultiplicative(BaseTestCase):
 
     def potentiation_and_depression(self):
         p.setup(1)
@@ -126,14 +126,17 @@ class TestSTDPNearestPairAdditive(BaseTestCase):
 
         # print("Pre neuron spikes at: {}".format(pre_spikes))
         # print("Post-neuron spikes at: {}".format(post_spikes))
-        target_spikes = [1014,  1032, 1053]
-        self.assertListEqual(list(post_spikes), target_spikes)
         # print("Potentiation time differences: {}".format(potentiation_times))
         # print("Depression time differences: {}".format(depression_times))
         # print("Potentiation: {}".format(potentiations))
         # print("Depressions: {}".format(depressions))
         # print("New weight exact: {}".format(new_weight_exact))
         # print("New weight SpiNNaker: {}".format(weights))
+
+        target_spikes = [1014, 1032, 1053]
+        self.assertListEqual(list(post_spikes), target_spikes)
+
+        print("weights, new_weight_exact: ", weights[0], new_weight_exact)
 
         self.assertTrue(numpy.allclose(
                         weights[0], new_weight_exact, atol=0.001))

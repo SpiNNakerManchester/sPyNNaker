@@ -255,6 +255,12 @@ class SynapseDynamicsStructuralSTDP(
         w_max = super().get_weight_maximum(connector, synapse_info)
         return max(w_max, self.__initial_weight)
 
+    @overrides(SynapseDynamicsSTDP.get_weight_minimum)
+    def get_weight_minimum(self, connector, weight_random_sigma, synapse_info):
+        w_min = super().get_weight_minimum(
+            connector, weight_random_sigma, synapse_info)
+        return min(w_min, self.__initial_weight)
+
     @overrides(SynapseDynamicsSTDP.get_delay_maximum)
     def get_delay_maximum(self, connector, synapse_info):
         d_m = super().get_delay_maximum(connector, synapse_info)

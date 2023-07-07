@@ -319,6 +319,15 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
                 numpy.array(all_pre_ids, dtype='uint32'),
                 numpy.array(all_delays), numpy.array(all_weights))
 
+    @overrides(AbstractConnector.set_projection_information)
+    def set_projection_information(self, synapse_info):
+        AbstractConnector.set_projection_information(self, synapse_info)
+        # now we want to tell the synapse_info about weights and delays
+        if self._krn_weights is not None:
+            synapse_info.weights = self._krn_weights.flatten()
+        if self._krn_delays is not None:
+            synapse_info.delays = self._krn_delays
+
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         # Use the kernel delays if user has supplied them
@@ -378,6 +387,16 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
         return self._get_weight_maximum(
             synapse_info.weights, n_conns, synapse_info)
+
+    @overrides(AbstractConnector.get_weight_minimum)
+    def get_weight_minimum(self, weights, weight_random_sigma, synapse_info):
+        # Use the kernel weights if user has supplied them
+        if self._krn_weights is not None:
+            return super(KernelConnector, self).get_weight_minimum(
+                self._krn_weights, weight_random_sigma, synapse_info)
+
+        return super(KernelConnector, self).get_weight_minimum(
+            weights, weight_random_sigma, synapse_info)
 
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(self, weights, synapse_info):

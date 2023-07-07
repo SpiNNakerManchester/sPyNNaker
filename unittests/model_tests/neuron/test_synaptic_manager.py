@@ -180,7 +180,8 @@ def test_write_data_spec():
 
         # Check that all the connections have the right weight and delay
         assert len(connections_1) == post_vertex_slice.n_atoms
-        assert all([conn["weight"] == 1.5 for conn in connections_1])
+        assert all([numpy.isclose(conn["weight"], 1.5, atol=0.001)
+                    for conn in connections_1])
         assert all([conn["delay"] == 1.0 for conn in connections_1])
 
         connections_2 = numpy.concatenate(
@@ -191,7 +192,8 @@ def test_write_data_spec():
 
         # Check that all the connections have the right weight and delay
         assert len(connections_2) == post_vertex_slice.n_atoms
-        assert all([conn["weight"] == 2.5 for conn in connections_2])
+        assert all([numpy.isclose(conn["weight"], 2.5, atol=0.001)
+                    for conn in connections_2])
         assert all([conn["delay"] == 2.0 for conn in connections_2])
 
         connections_3 = numpy.concatenate(
@@ -202,7 +204,8 @@ def test_write_data_spec():
 
         # Check that all the connections have the right weight and delay
         assert len(connections_3) == 90
-        assert all([conn["weight"] == 4.5 for conn in connections_3])
+        assert all([numpy.isclose(conn["weight"], 4.5, atol=0.001)
+                    for conn in connections_3])
         assert all([conn["delay"] == 4.0 for conn in connections_3])
 
         connections_4 = numpy.concatenate(
@@ -215,7 +218,8 @@ def test_write_data_spec():
         assert len(connections_4) == len(from_list_list)
         list_weights = [values[2] for values in from_list_list]
         list_delays = [values[3] for values in from_list_list]
-        assert all(list_weights == connections_4["weight"])
+        assert numpy.allclose(
+            list_weights, connections_4["weight"], atol=0.001)
         assert all(list_delays == connections_4["delay"])
     finally:
         shutil.rmtree(report_folder, ignore_errors=True)
@@ -227,7 +231,8 @@ def test_set_synapse_dynamics():
     post_app_model = IFCurrExpBase()
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", spikes_per_second=None,
-        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+        ring_buffer_sigma=None, min_weights=None, weight_random_sigma=None,
+        max_stdp_spike_delta=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
         seed=None, n_colour_bits=None, rb_left_shifts=None)
 
@@ -338,7 +343,8 @@ def test_set_synapse_dynamics():
     # Try starting again to get a couple more combinations
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", spikes_per_second=None,
-        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+        ring_buffer_sigma=None, min_weights=None, weight_random_sigma=None,
+        max_stdp_spike_delta=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
         seed=None, n_colour_bits=None, rb_left_shifts=None)
 
@@ -361,7 +367,8 @@ def test_set_synapse_dynamics():
     # One more time!
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", spikes_per_second=None,
-        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+        ring_buffer_sigma=None, min_weights=None, weight_random_sigma=None,
+        max_stdp_spike_delta=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
         seed=None, n_colour_bits=None, rb_left_shifts=None)
 
@@ -399,7 +406,8 @@ def test_set_synapse_dynamics():
     # OK, just one more, honest
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", spikes_per_second=None,
-        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+        ring_buffer_sigma=None, min_weights=None, weight_random_sigma=None,
+        max_stdp_spike_delta=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
         seed=None, n_colour_bits=None, rb_left_shifts=None)
     post_app_vertex.synapse_dynamics = static_struct

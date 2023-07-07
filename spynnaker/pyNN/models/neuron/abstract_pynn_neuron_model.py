@@ -25,7 +25,8 @@ _population_parameters = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
     "incoming_spike_buffer_size": None, "drop_late_spikes": None,
     "splitter": None, "seed": None, "n_colour_bits": None,
-    "rb_left_shifts": None
+    "min_weights": None, "weight_random_sigma": 2,
+    "max_stdp_spike_delta": 50, "rb_left_shifts": None
 }
 
 
@@ -49,7 +50,8 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     def create_vertex(
             self, n_neurons, label, spikes_per_second, ring_buffer_sigma,
             incoming_spike_buffer_size, drop_late_spikes, splitter, seed,
-            n_colour_bits, rb_left_shifts):
+            n_colour_bits, min_weights, weight_random_sigma,
+            max_stdp_spike_delta, rb_left_shifts):
         """
         :param float spikes_per_second:
         :param float ring_buffer_sigma:
@@ -67,7 +69,8 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         return AbstractPopulationVertex(
             n_neurons, label, max_atoms, spikes_per_second, ring_buffer_sigma,
             incoming_spike_buffer_size, self.__model, self, drop_late_spikes,
-            splitter, seed, n_colour_bits, rb_left_shifts)
+            splitter, seed, n_colour_bits, min_weights, weight_random_sigma,
+            max_stdp_spike_delta, rb_left_shifts)
 
     @property
     @overrides(AbstractPyNNModel.name)

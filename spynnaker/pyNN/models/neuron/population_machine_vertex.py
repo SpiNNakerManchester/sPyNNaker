@@ -89,7 +89,7 @@ class PopulationMachineVertex(
         "__synaptic_matrices",
         "__neuron_data",
         "__key",
-        "__ring_buffer_shifts",
+        "__min_weights",
         "__weight_scales",
         "__structural_sz",
         "__slice_index",
@@ -174,8 +174,8 @@ class PopulationMachineVertex(
 
     def __init__(
             self, sdram, label, app_vertex, vertex_slice, slice_index,
-            ring_buffer_shifts, weight_scales,
-            structural_sz, max_atoms_per_core, synaptic_matrices, neuron_data):
+            min_weights, weight_scales, structural_sz, max_atoms_per_core,
+            synaptic_matrices, neuron_data):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex
@@ -186,8 +186,8 @@ class PopulationMachineVertex(
             The slice of the population that this implements
         :param int slice_index:
             The index of the slice in the ordered list of slices
-        :param list(int) ring_buffer_shifts:
-            The shifts to apply to convert ring buffer values to S1615 values
+        :param list(float) min_weights:
+            The computed minimum weights to be used in the simulation
         :param list(int) weight_scales:
             The scaling to apply to weights to store them in the synapses
         :param int structural_sz: The size of the structural data
@@ -203,7 +203,7 @@ class PopulationMachineVertex(
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__key = None
         self.__slice_index = slice_index
-        self.__ring_buffer_shifts = ring_buffer_shifts
+        self.__min_weights = min_weights
         self.__weight_scales = weight_scales
         self.__structural_sz = structural_sz
         self.__max_atoms_per_core = max_atoms_per_core
@@ -319,11 +319,11 @@ class PopulationMachineVertex(
             self.vertex_slice))
         self._write_common_data_spec(spec, rec_regions)
 
-        self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
+        self._write_neuron_data_spec(spec, self.__min_weights)
 
         self._write_synapse_data_spec(
-            spec, self.__ring_buffer_shifts,
-            self.__weight_scales, self.__structural_sz)
+            spec, self.__min_weights, self.__weight_scales,
+            self.__structural_sz)
 
         # End the writing of this specification:
         spec.end_specification()
@@ -337,7 +337,7 @@ class PopulationMachineVertex(
 
         if self.__regenerate_synapse_data:
             self._write_synapse_data_spec(
-                spec, self.__ring_buffer_shifts,
+                spec, self.__min_weights,
                 self.__weight_scales, self.__structural_sz)
             self.__regenerate_synapse_data = False
 

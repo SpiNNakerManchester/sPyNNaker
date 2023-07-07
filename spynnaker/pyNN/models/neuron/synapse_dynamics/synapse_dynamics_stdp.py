@@ -21,7 +21,7 @@ from spinn_front_end_common.utilities.constants import (
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
     SynapticConfigurationException, InvalidParameterType)
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits, float_gcd
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
@@ -495,6 +495,37 @@ class SynapseDynamicsSTDP(
         # The maximum weight is the largest that it could be set to from
         # the weight dependence
         return max(w_max, self.__weight_dependence.weight_maximum)
+
+    @overrides(AbstractPlasticSynapseDynamics.get_weight_minimum)
+    def get_weight_minimum(self, connector, weight_random_sigma, synapse_info):
+        w_min = super().get_weight_minimum(
+            connector, weight_random_sigma, synapse_info)
+        # The minimum weight is the largest that it could be set to from
+        # the weight dependence
+        return min(w_min, self.__weight_dependence.weight_minimum)
+
+    def __get_weight_min_delta(self, max_stdp_spike_delta):
+        """ Get the minimum non-zero weight change
+
+        :param float max_stdp_spike_delta: The maximum expected time between
+            spikes in milliseconds
+        """
+        return self.__weight_dependence.weight_change_minimum(
+            self.__timing_dependence.minimum_delta(max_stdp_spike_delta))
+
+    @overrides(AbstractPlasticSynapseDynamics.calculate_min_weight)
+    def calculate_min_weight(self, min_weights, max_stdp_spike_delta,
+                             weight_scale, conn_weight_min, synapse_type):
+        min_delta = self.__get_weight_min_delta(max_stdp_spike_delta)
+        print("min_delta ", min_delta)
+        min_delta *= weight_scale
+        print("scaled ", min_delta, synapse_type, conn_weight_min, min_weights)
+        if min_delta is not None and min_delta != 0:
+            # This also depends on the earlier calculated minimum
+            min_delta = float_gcd(min_delta, conn_weight_min)
+            min_weights[synapse_type] = min(
+                min_weights[synapse_type], min_delta)
+        return min_weights
 
     @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)
     def get_parameter_names(self):

@@ -16,7 +16,8 @@ import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
+from spynnaker.pyNN.utilities.utility_calls import (
+    create_mars_kiss_seeds, float_gcd)
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .synapse_dynamics_structural_common import (
@@ -247,6 +248,12 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         w_m = super().get_weight_maximum(connector, synapse_info)
         return max(w_m, self.__initial_weight)
 
+    @overrides(SynapseDynamicsStatic.get_weight_minimum)
+    def get_weight_minimum(self, connector, weight_random_sigma, synapse_info):
+        w_min = super().get_weight_minimum(
+            connector, weight_random_sigma, synapse_info)
+        return min(w_min, self.__initial_weight)
+
     @overrides(SynapseDynamicsStatic.get_delay_maximum)
     def get_delay_maximum(self, connector, synapse_info):
         d_m = super().get_delay_maximum(connector, synapse_info)
@@ -260,6 +267,18 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
     @overrides(SynapseDynamicsStatic.get_delay_variance)
     def get_delay_variance(self, connector, delays, synapse_info):
         return 0.0
+
+    @overrides(SynapseDynamicsStatic.calculate_min_weight)
+    def calculate_min_weight(self, min_weights, max_stdp_spike_delta,
+                             weight_scale, conn_weight_min, synapse_type):
+        weight_min = self.__initial_weight
+        weight_min *= weight_scale
+        if weight_min != 0:
+            weight_min = float_gcd(min_weights[synapse_type],
+                                   weight_min)
+            min_weights[synapse_type] = min(
+                min_weights[synapse_type], weight_min)
+        return min_weights
 
     @overrides(_Common.get_seeds)
     def get_seeds(self, app_vertex=None):

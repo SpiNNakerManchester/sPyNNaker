@@ -33,7 +33,7 @@ typedef struct neuromodulated_synapse_t {
 
 typedef struct nm_update_state_t {
     accum weight;
-    uint32_t weight_shift;
+    REAL min_weight;
     update_state_t eligibility_state;
 } nm_update_state_t;
 
@@ -74,7 +74,7 @@ static int16_lut *tau_c_lookup;
 
 static int16_lut *tau_d_lookup;
 
-static uint32_t *nm_weight_shift;
+static REAL *nm_min_weight;
 
 extern uint32_t skipped_synapses;
 
@@ -85,10 +85,13 @@ extern uint32_t skipped_synapses;
 
 static inline nm_update_state_t get_nm_update_state(
         neuromodulated_synapse_t synapse, index_t synapse_type) {
-    accum s1615_weight = kbits(synapse.weight << nm_weight_shift[synapse_type]);
+    uint64_t mw = (uint64_t) bitsk(nm_min_weight[synapse_type]);
+    uint64_t w = (uint64_t) (synapse.weight);
+
+    accum s1615_weight = kbits((int_k_t) mw * w);
     nm_update_state_t update_state = {
         .weight=s1615_weight,
-        .weight_shift=nm_weight_shift[synapse_type],
+        .min_weight=nm_min_weight[synapse_type],
         .eligibility_state=synapse_structure_get_update_state(
                 synapse.eligibility_synapse, synapse_type)
     };
@@ -102,7 +105,7 @@ static inline nm_final_state_t get_nm_final_state(
     update_state.weight = kbits(MIN(bitsk(update_state.weight),
             bitsk(nm_params.max_weight)));
     nm_final_state_t final_state = {
-        .weight=(weight_t) (bitsk(update_state.weight) >> update_state.weight_shift),
+        .weight=(weight_t) (bitsk(update_state.weight) / bitsk(update_state.min_weight)),
         .final_state=synapse_structure_get_final_state(
                 update_state.eligibility_state)
     };
@@ -275,10 +278,10 @@ static inline nm_final_state_t izhikevich_neuromodulation_plasticity_update_syna
 
 bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        REAL *min_weights) {
 
-    if (!synapse_dynamics_stdp_init(&address, &params, n_synapse_types,
-                ring_buffer_to_input_buffer_left_shifts)) {
+    if (!synapse_dynamics_stdp_init(
+            &address, &params, n_synapse_types, min_weights)) {
         return false;
     }
 
@@ -296,14 +299,14 @@ bool synapse_dynamics_initialise(
     tau_c_lookup = maths_copy_int16_lut(&lut_address);
     tau_d_lookup = maths_copy_int16_lut(&lut_address);
 
-    // Store weight shifts
-    nm_weight_shift = spin1_malloc(sizeof(uint32_t) * n_synapse_types);
-    if (nm_weight_shift == NULL) {
-        log_error("Could not initialise weight region data");
+    // Store min weights
+    nm_min_weight = spin1_malloc(sizeof(REAL) * n_synapse_types);
+    if (nm_min_weight == NULL) {
+        log_error("Could not initialise min weight region data");
         return NULL;
     }
     for (uint32_t s = 0; s < n_synapse_types; s++) {
-        nm_weight_shift[s] = ring_buffer_to_input_buffer_left_shifts[s];
+        nm_min_weight[s] = min_weights[s];
     }
 
     return true;
@@ -315,10 +318,10 @@ bool synapse_dynamics_initialise(
 void synapse_dynamics_print_plastic_synapses(
         synapse_row_plastic_data_t *plastic_region_data,
         synapse_row_fixed_part_t *fixed_region,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        accum *min_weights) {
     __use(plastic_region_data);
     __use(fixed_region);
-    __use(ring_buffer_to_input_buffer_left_shifts);
+    __use(min_weights);
 
 #if LOG_LEVEL >= LOG_DEBUG
     // Extract separate arrays of weights (from plastic region),
@@ -344,8 +347,7 @@ void synapse_dynamics_print_plastic_synapses(
         weight_t weight = synapse_structure_get_final_weight(final_state);
 
         log_debug("%08x [%3d: (w: %5u (=", control_word, i, weight);
-        synapses_print_weight(
-                weight, ring_buffer_to_input_buffer_left_shifts[synapse_type]);
+        synapses_print_weight(weight, min_weights[synapse_type]);
         log_debug("nA) d: %2u, n = %3u)] - {%08x %08x}\n",
                 synapse_row_sparse_delay(control_word, synapse_type_index_bits, synapse_delay_mask),
                 synapse_row_sparse_index(control_word, synapse_index_mask),

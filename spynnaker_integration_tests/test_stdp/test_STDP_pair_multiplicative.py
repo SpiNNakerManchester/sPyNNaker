@@ -69,9 +69,9 @@ def post_spike_same_time():
         pre_spikes, post_spikes, initial_weight, plastic_delay, min_weight,
         max_weight, a_plus, a_minus, tau_plus, tau_minus)
 
-    print(weights_1)
-    print(weights_2)
-    print(new_weight_exact)
+#     print(weights_1)
+#     print(weights_2)
+#     print(new_weight_exact)
 
     assert len(weights_1) == 1
     assert len(weights_2) == 1
@@ -170,7 +170,7 @@ def potentiation_and_depression():
     assert numpy.allclose(weights, new_weight_exact, rtol=0.001)
 
 
-class TestSTDPPairAdditive(BaseTestCase):
+class TestSTDPPairMultiplicative(BaseTestCase):
 
     def test_potentiation_and_depression(self):
         self.runsafe(potentiation_and_depression)
