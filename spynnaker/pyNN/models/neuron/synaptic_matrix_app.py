@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,16 +15,18 @@ import numpy
 
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
-from .generator_data import GeneratorData
-from .synapse_io import read_all_synapses, convert_to_connections, get_synapses
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
+from .generator_data import GeneratorData
+from .synapse_io import read_all_synapses, convert_to_connections, get_synapses
 
 
 class SynapticMatrixApp(object):
-    """ The synaptic matrix (and delay matrix if applicable) for an incoming
-        app edge
+    """
+    The synaptic matrix (and delay matrix if applicable) for an incoming
+    application edge.
     """
 
     # pylint: disable=unused-private-member
@@ -79,9 +81,9 @@ class SynapticMatrixApp(object):
             The region where synaptic matrices are stored
         :param int all_syn_block_sz:
             The space available for all synaptic matrices on the core
-        :param _AppKeyInfo app_key_info:
+        :param AppKeyInfo app_key_info:
             Application-level routing key information for undelayed vertices
-        :param _AppKeyInfo delay_app_key_info:
+        :param AppKeyInfo delay_app_key_info:
             Application-level routing key information for delayed vertices
         :param list(float) weight_scales:
             Weight scale for each synapse edge
@@ -123,25 +125,27 @@ class SynapticMatrixApp(object):
         return (max_row_length * self.__app_edge.pre_vertex.n_atoms *
                 (self.__app_edge.n_delay_stages + 1))
 
-    def reserve_matrices(self, block_addr, poptable):
-        """ Allocate the master pop table entries for the blocks
+    def reserve_matrices(self, block_addr, pop_table):
+        """
+        Allocate the master pop table entries for the blocks.
 
         :param int block_addr: Where the allocation can start from
-        :param MasterPopTableAsBinarySearch poptable:
+        :param MasterPopTableAsBinarySearch pop_table:
             The master population table
         :return: Where the next allocation can start from
         :rtype: int
         """
-        block_addr = self.__reserve_app_matrix(block_addr, poptable)
-        block_addr = self.__reserve_delay_app_matrix(block_addr, poptable)
+        block_addr = self.__reserve_app_matrix(block_addr, pop_table)
+        block_addr = self.__reserve_delay_app_matrix(block_addr, pop_table)
         return block_addr
 
-    def __reserve_app_matrix(self, block_addr, poptable):
-        """ Reserve space for the matrix in the master pop table
+    def __reserve_app_matrix(self, block_addr, pop_table):
+        """
+        Reserve space for the matrix in the master pop table.
 
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param MasterPopTableAsBinarySearch poptable:
+        :param MasterPopTableAsBinarySearch pop_table:
             The master population table
         :return: The updated block address
         :rtype: int
@@ -152,7 +156,7 @@ class SynapticMatrixApp(object):
 
         # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.undelayed_max_n_synapses == 0:
-            self.__index = poptable.add_invalid_application_entry(
+            self.__index = pop_table.add_invalid_application_entry(
                 self.__app_key_info.key_and_mask,
                 self.__app_key_info.core_mask, self.__app_key_info.core_shift,
                 self.__app_key_info.n_neurons,
@@ -160,8 +164,8 @@ class SynapticMatrixApp(object):
             return block_addr
 
         # Write a matrix for the whole application vertex
-        block_addr = poptable.get_next_allowed_address(block_addr)
-        self.__index = poptable.add_application_entry(
+        block_addr = pop_table.get_next_allowed_address(block_addr)
+        self.__index = pop_table.add_application_entry(
             block_addr,  self.__max_row_info.undelayed_max_words,
             self.__app_key_info.key_and_mask, self.__app_key_info.core_mask,
             self.__app_key_info.core_shift, self.__app_key_info.n_neurons,
@@ -170,12 +174,13 @@ class SynapticMatrixApp(object):
         block_addr = self.__next_addr(block_addr, self.__matrix_size)
         return block_addr
 
-    def __reserve_delay_app_matrix(self, block_addr, poptable):
-        """ Reserve space in the master pop table for a delayed matrix
+    def __reserve_delay_app_matrix(self, block_addr, pop_table):
+        """
+        Reserve space in the master pop table for a delayed matrix.
 
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param MasterPopTableAsBinarySearch poptable:
+        :param MasterPopTableAsBinarySearch pop_table:
             The master population table
         :return: The updated block address
         :rtype: int
@@ -186,7 +191,7 @@ class SynapticMatrixApp(object):
 
         # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.delayed_max_n_synapses == 0:
-            self.__delay_index = poptable.add_invalid_application_entry(
+            self.__delay_index = pop_table.add_invalid_application_entry(
                 self.__delay_app_key_info.key_and_mask,
                 self.__delay_app_key_info.core_mask,
                 self.__delay_app_key_info.core_shift,
@@ -195,8 +200,8 @@ class SynapticMatrixApp(object):
             return block_addr
 
         # Write a matrix for the whole application vertex
-        block_addr = poptable.get_next_allowed_address(block_addr)
-        self.__delay_index = poptable.add_application_entry(
+        block_addr = pop_table.get_next_allowed_address(block_addr)
+        self.__delay_index = pop_table.add_application_entry(
             block_addr, self.__max_row_info.delayed_max_words,
             self.__delay_app_key_info.key_and_mask,
             self.__delay_app_key_info.core_mask,
@@ -208,7 +213,8 @@ class SynapticMatrixApp(object):
         return block_addr
 
     def __next_addr(self, block_addr, size):
-        """ Get the next address after a block, checking it is in range
+        """
+        Get the next address after a block, checking it is in range.
 
         :param int block_addr: The address of the start of the block
         :param int size: The size of the block in bytes
@@ -220,35 +226,55 @@ class SynapticMatrixApp(object):
         next_addr = block_addr + size
         if next_addr > self.__all_syn_block_sz:
             raise ValueError(
-                f"Too much synaptic memory has been written: "
+                "Too much synaptic memory has been written: "
                 f"{next_addr} of {self.__all_syn_block_sz} ")
         return next_addr
 
-    def write_matrix(self, spec, post_vertex_slice):
-        """ Write a synaptic matrix from host
+    def append_matrix(
+            self, post_vertex_slice, data_to_write, block_addr):
+        """
+        Append a synaptic matrix from be written from host.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The specification to write to
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of the post-vertex the matrix is for
+        :param list data_to_write: List to append the data to write to
+        :param int block_addr: The amount of data written so far
+        :return: The amount of data written after this data has been written
+        :rtype: int
         """
         row_data, delay_row_data = self.__get_row_data(post_vertex_slice)
         self.__update_connection_holders(
             row_data, delay_row_data, post_vertex_slice)
         if self.__syn_mat_offset is not None:
-            spec.set_write_pointer(self.__syn_mat_offset)
-            spec.write_array(row_data)
+            block_addr = self.__get_padding(
+                data_to_write, self.__syn_mat_offset, block_addr)
+            data_to_write.append(row_data)
+            block_addr += self.__matrix_size
         if self.__delay_syn_mat_offset is not None:
-            spec.set_write_pointer(self.__delay_syn_mat_offset)
-            spec.write_array(delay_row_data)
+            block_addr = self.__get_padding(
+                data_to_write, self.__delay_syn_mat_offset, block_addr)
+            data_to_write.append(delay_row_data)
+            block_addr += self.__delay_matrix_size
+        return block_addr
+
+    def __get_padding(self, data_to_write, expected_offset, block_addr):
+        if expected_offset < block_addr:
+            raise ValueError(
+                "The block address is already beyond where is expected!:"
+                f" {expected_offset} expected, {block_addr} found.")
+        if expected_offset > block_addr:
+            padding = (expected_offset - block_addr) // BYTES_PER_WORD
+            data_to_write.append(numpy.zeros(padding, dtype="uint32"))
+            return block_addr + (padding * BYTES_PER_WORD)
+        return block_addr
 
     def __get_row_data(self, post_vertex_slice):
-        """ Generate the row data for a synaptic matrix from the description
+        """
+        Generate the row data for a synaptic matrix from the description.
 
         :return: The data and the delayed data
         :rtype: tuple(~numpy.ndarray or None, ~numpy.ndarray or None)
         """
-
         # Get the actual connections
         post_slices =\
             self.__app_edge.post_vertex.splitter.get_in_coming_slices()
@@ -274,14 +300,15 @@ class SynapticMatrixApp(object):
                 self.__synapse_info)
         if self.__app_edge.delay_edge is None and len(delayed_row_data) != 0:
             raise ValueError(
-                f"Found delayed source IDs but no delay "
+                "Found delayed source IDs but no delay "
                 f"edge for {self.__app_edge.label}")
 
         return row_data, delayed_row_data
 
     def __update_connection_holders(
             self, data, delayed_data, post_vertex_slice):
-        """ Fill in connections in the connection holders as they are created
+        """
+        Fill in connections in the connection holders as they are created.
 
         :param ~numpy.ndarray data: The row data created
         :param ~numpy.ndarray delayed_data: The delayed row data created
@@ -300,7 +327,8 @@ class SynapticMatrixApp(object):
                     self.__max_row_info, self.__max_atoms_per_core))
 
     def get_generator_data(self):
-        """ Prepare to write a matrix using an on-chip generator
+        """
+        Prepare to write a matrix using an on-chip generator.
 
         :return: The data to generate with
         :rtype: GeneratorData
@@ -314,12 +342,13 @@ class SynapticMatrixApp(object):
             max_pre_atoms_per_core, self.__max_atoms_per_core)
 
     def get_connections(self, placement):
-        """ Get the connections for this matrix from the machine
+        """
+        Get the connections for this matrix from the machine.
 
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
         :return: A list of arrays of connections, each with dtype
-            AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+            :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
         :rtype: ~numpy.ndarray
         """
         synapses_address = locate_memory_region_for_placement(
@@ -327,7 +356,8 @@ class SynapticMatrixApp(object):
         return self.__read_connections(placement, synapses_address)
 
     def read_generated_connection_holders(self, placement):
-        """ Read any pre-run connection holders after data has been generated
+        """
+        Read any pre-run connection holders after data has been generated.
 
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
@@ -340,13 +370,15 @@ class SynapticMatrixApp(object):
                     holder.add_connections(connections)
 
     def __read_connections(self, placement, synapses_address):
-        """ Read connections from an address on the machine
+        """
+        Read connections from an address on the machine.
 
-        :param Placement placement: Where the matrix is on the machine
+        :param ~pacman.model.placements.Placement placement:
+            Where the matrix is on the machine
         :param int synapses_address:
             The base address of the synaptic matrix region
         :return: A list of arrays of connections, each with dtype
-            AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+            :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
         :rtype: ~numpy.ndarray
         """
         connections = list()
@@ -375,7 +407,8 @@ class SynapticMatrixApp(object):
         return connections
 
     def __get_block(self, placement, synapses_address):
-        """ Get a block of data for undelayed synapses
+        """
+        Get a block of data for undelayed synapses.
 
         :param Placement placement: Where the matrix is on the machine
         :param int synapses_address:
@@ -388,9 +421,11 @@ class SynapticMatrixApp(object):
         return block
 
     def __get_delayed_block(self, placement, synapses_address):
-        """ Get a block of data for delayed synapses
+        """
+        Get a block of data for delayed synapses.
 
-        :param Placement placement: Where the matrix is on the machine
+        :param ~pacman.model.placements.Placement placement:
+            Where the matrix is on the machine
         :param int synapses_address:
             The base address of the synaptic matrix region
         :rtype: bytearray
@@ -401,9 +436,10 @@ class SynapticMatrixApp(object):
         return block
 
     def get_index(self):
-        """ Get the index in the master population table of the matrix
+        """
+        Get the index in the master population table of the matrix.
 
-        :param ~pacman.model.graph.machine.MachineVertex m_vertex:
+        :param ~pacman.model.graphs.machine.MachineVertex m_vertex:
             The source machine vertex
         :rtype: int
         """

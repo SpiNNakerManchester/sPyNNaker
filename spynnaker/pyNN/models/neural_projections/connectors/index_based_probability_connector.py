@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ from numpy import (
     arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
     hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
     minimum, e, pi)
+from pyNN.random import NumpyRNG
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 from spynnaker.pyNN.utilities import utility_calls
@@ -34,14 +35,16 @@ _index_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2,
 
 class IndexBasedProbabilityConnector(AbstractConnector,
                                      AbstractGenerateConnectorOnHost):
-    """ Make connections using a probability distribution which varies\
-        dependent upon the indices of the pre- and post-populations.
+    """
+    Make connections using a probability distribution which varies
+    dependent upon the indices of the pre- and post-populations.
     """
 
     __slots = [
         "__allow_self_connections",
         "__index_expression",
-        "__probs"]
+        "__probs",
+        "__rng"]
 
     def __init__(
             self, index_expression, allow_self_connections=True, rng=None,
@@ -49,8 +52,10 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         """
         :param str index_expression:
             the right-hand side of a valid python expression for
-            probability, involving the indices of the pre and post populations,
-            that can be parsed by eval(), that computes a probability dist;
+            probability, involving the indices of the pre- and
+            post-populations,
+            that can be parsed by `eval()`, that computes a probability
+            distribution;
             the indices will be given as variables ``i`` and ``j`` when the
             expression is evaluated.
         :param bool allow_self_connections:
@@ -74,7 +79,7 @@ class IndexBasedProbabilityConnector(AbstractConnector,
             CSV file
         """
         super().__init__(safe, callback, verbose)
-        self._rng = rng
+        self.__rng = rng or NumpyRNG()
         self.__index_expression = index_expression
         self.__allow_self_connections = allow_self_connections
         self.__probs = None
@@ -154,7 +159,7 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         probs = self.__probs[:, post_vertex_slice.as_slice].reshape(-1)
 
         n_items = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
-        items = self._rng.next(n_items)
+        items = self.__rng.next(n_items)
 
         # If self connections are not allowed, remove the possibility of self
         # connections by setting the probability to a value of infinity
@@ -180,14 +185,14 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         return block
 
     def __repr__(self):
-        return "IndexBasedProbabilityConnector({})".format(
-            self.__index_expression)
+        return f"IndexBasedProbabilityConnector({self.__index_expression})"
 
     @property
     def allow_self_connections(self):
-        """ If the connector is used to connect a Population to itself, this\
-            flag determines whether a neuron is allowed to connect to itself,\
-            or only to other neurons in the Population.
+        """
+        When the connector is used to connect a Population to itself, this
+        flag determines whether a neuron is allowed to connect to itself,
+        or only to other neurons in the Population.
 
         :rtype: bool
         """
@@ -199,9 +204,10 @@ class IndexBasedProbabilityConnector(AbstractConnector,
 
     @property
     def index_expression(self):
-        """ The right-hand side of a valid python expression for probability,\
-            involving the indices of the pre and post populations, that can\
-            be parsed by eval(), that computes a probability dist.
+        """
+        The right-hand side of a valid python expression for probability,
+        involving the indices of the pre- and post-populations, that can
+        be parsed by `eval()`, that computes a probability distribution.
 
         :rtype: str
         """

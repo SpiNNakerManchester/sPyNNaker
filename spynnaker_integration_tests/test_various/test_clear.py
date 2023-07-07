@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -75,6 +75,39 @@ class TestClearData(BaseTestCase):
             repr(spikes[0]))
         v = neo.segments[0].filter(name='v')[0]
         self.assertEqual(10, v.size)
+        sim.end()
+
+    def test_clear_previous_segment(self):
+        sim.setup(timestep=1.0)
+        sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
+
+        pop_1 = sim.Population(1, sim.IF_curr_exp(), label="pop_1")
+        input_pop = sim.Population(
+            1, sim.SpikeSourceArray(spike_times=[0, 10, 20]), label="input")
+        sim.Projection(input_pop, pop_1, sim.OneToOneConnector(),
+                       synapse_type=sim.StaticSynapse(weight=5, delay=1))
+        pop_1.record(["spikes", "v"])
+        sim.run(20)
+        sim.reset()
+        sim.run(20)
+        neo = pop_1.get_data(variables=["spikes", "v"], clear=True)
+        spikes = neo.segments[0].spiketrains
+        self.assertEqual(
+            '<SpikeTrain(array([ 7., 14.]) * ms, [0.0 ms, 20.0 ms])>',
+            repr(spikes[0]))
+        spikes = neo.segments[1].spiketrains
+        self.assertEqual(
+            '<SpikeTrain(array([ 7., 14.]) * ms, [0.0 ms, 20.0 ms])>',
+            repr(spikes[0]))
+        neo = pop_1.get_data(variables=["spikes", "v"], clear=True)
+        spikes = neo.segments[0].spiketrains
+        self.assertEqual(
+            '<SpikeTrain(array([], dtype=float64) * ms, [20.0 ms, 20.0 ms])>',
+            repr(spikes[0]))
+        spikes = neo.segments[1].spiketrains
+        self.assertEqual(
+            '<SpikeTrain(array([], dtype=float64) * ms, [20.0 ms, 20.0 ms])>',
+            repr(spikes[0]))
         sim.end()
 
     def test_rewires(self):

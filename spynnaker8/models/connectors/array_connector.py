@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,8 +17,9 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class ArrayConnector(_BaseClass):
-    """ Make connections using an array of integers based on the IDs\
-        of the neurons in the pre- and post-populations.
+    """
+    Make connections using an array of integers based on the IDs
+    of the neurons in the pre- and post-populations.
 
     .. deprecated:: 6.0
         Use

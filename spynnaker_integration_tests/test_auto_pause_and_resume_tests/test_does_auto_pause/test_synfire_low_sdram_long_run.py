@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,11 +23,11 @@ from spynnaker_integration_tests.scripts import SynfireRunner
 
 n_neurons = 200  # number of neurons in each population
 runtime = 3000
-neurons_per_core = n_neurons / 2
+neurons_per_core = 9
 synfire_run = SynfireRunner()
 
 
-class TestVeryLow(BaseTestCase):
+class TestDoesAutoPause(BaseTestCase):
     """
     tests the run is split buy auto pause resume
     """
@@ -37,12 +37,11 @@ class TestVeryLow(BaseTestCase):
             synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                                run_times=[runtime])
             spikes = synfire_run.get_output_pop_spikes_numpy()
-            # CB Currently eight but could change
+
+            # CB Currently six but could change
             # Needs to be larger than 1000 timesteps version
-            # Number of auto-pause-resume cycles (7) determined by experiment
             self.assert_logs_messages(
-                lc.records, "*** Running simulation... ***", 'INFO', 2,
-                allow_more=True)
+                lc.records, "*** Running simulation... ***", 'INFO', 6)
 
         self.assertEqual(158, len(spikes))
         spike_checker.synfire_spike_checker(spikes, n_neurons)

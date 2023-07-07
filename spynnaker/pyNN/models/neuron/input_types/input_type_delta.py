@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from .abstract_input_type import AbstractInputType
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -22,7 +22,8 @@ TIME_STEP = "time_step"
 
 
 class InputTypeDelta(AbstractInputType):
-    """ The delta input type
+    """
+    The delta input type.
     """
     __slots__ = []
 

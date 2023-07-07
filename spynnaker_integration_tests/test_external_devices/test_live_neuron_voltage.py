@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,7 @@ from spynnaker.pyNN.external_devices_models import AbstractEthernetTranslator
 from spynnaker.pyNN.external_devices_models\
     .abstract_multicast_controllable_device import (
         AbstractMulticastControllableDevice, SendType)
-from data_specification.enums.data_type import DataType
+from spinn_front_end_common.interface.ds import DataType
 import decimal
 import numpy
 from collections import defaultdict

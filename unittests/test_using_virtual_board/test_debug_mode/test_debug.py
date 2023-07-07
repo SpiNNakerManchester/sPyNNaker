@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -62,7 +62,6 @@ class TestDebug(BaseTestCase):
             # ??? used by MachineExecuteDataSpecification but not called ???
             # write_network_specification_report
             network_specification_file_name,
-            # write_provenance_data
             "data.sqlite3",
             # write_tag_allocation_reports
             reports_names._TAGS_FILENAME,

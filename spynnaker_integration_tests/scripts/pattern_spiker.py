@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -57,7 +57,8 @@ class PatternSpiker(object):
         if v_rec_indexes is None:
             v_rec_indexes = range(len(v[0]))
         else:
-            actual_indexes = list(v.channel_index.index)
+            actual_indexes = list(v.annotations["channel_names"])
+
             if missing:
                 v_rec_indexes = [index for index in v_rec_indexes
                                  if index in actual_indexes]
@@ -145,3 +146,4 @@ if __name__ == '__main__':
     ps.check(pop, simtime,
              spike_rate=spike_rate, spike_rec_indexes=spike_rec_indexes,
              v_rate=v_rate, v_rec_indexes=v_rec_indexes, is_view=False)
+    sim.end()

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,7 @@ from spynnaker.pyNN.models.neuron.builds import (
     IFCurrExpCa2Adaptive,
     IFCurrDualExpBase as IF_curr_dual_exp,
     IzkCondExpBase as Izhikevich_cond,
+    IzkCondDualExpBase as Izhikevich_cond_dual,
     IFCurrExpSEMDBase as IF_curr_exp_sEMD)
 
 # Variable rate poisson
@@ -36,6 +37,7 @@ __all__ = [
     # sPyNNaker models not currently part of full pyNN
     'IFCurDelta', 'IFCurrExpCa2Adaptive', 'IFCondExpStoc',
     'Izhikevich_cond', 'IF_curr_dual_exp', 'IF_curr_exp_sEMD',
+    'Izhikevich_cond_dual',
 
     # Neuromodulation synapse dynamics (Mantas Mikaitis)
     'Neuromodulation',

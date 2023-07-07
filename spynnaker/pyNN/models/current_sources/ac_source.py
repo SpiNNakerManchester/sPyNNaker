@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
 
 import numpy
 from spinn_utilities.overrides import overrides
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
@@ -22,9 +22,9 @@ from .abstract_current_source import AbstractCurrentSource, CurrentSourceIDs
 
 
 class ACSource(AbstractCurrentSource):
-    """ AC current source (i.e. sine wave) turned on at "start" and off at
-        "stop", given (y-)offset, amplitude, frequency and phase
-
+    """
+    AC current source (i.e. sine wave) turned on at "start" and off at
+    "stop", given (y-)offset, amplitude, frequency and phase.
     """
     __slots__ = [
         "__start",
@@ -38,6 +38,14 @@ class ACSource(AbstractCurrentSource):
 
     def __init__(self, start=0.0, stop=0.0, amplitude=0.0, offset=0.0,
                  frequency=0.0, phase=0.0):
+        """
+        :param float start:
+        :param float stop:
+        :param float amplitude:
+        :param float offset:
+        :param float frequency:
+        :param float phase:
+        """
         # There's probably no need to actually store these as you can't
         # access them directly in pynn anyway
         time_convert_ms = SpynnakerDataView.get_simulation_time_step_per_ms()
@@ -66,23 +74,18 @@ class ACSource(AbstractCurrentSource):
 
         super().__init__()
 
+    @overrides(AbstractCurrentSource.set_parameters)
     def set_parameters(self, **parameters):
-        """ Set the current source parameters
-
-        :param parameters: the parameters to set
-        """
         for key, value in parameters.items():
             if key not in self.__parameters.keys():
                 # throw an exception
-                msg = "{} is not a parameter of {}".format(key, self)
-                raise SpynnakerException(msg)
+                raise SpynnakerException(f"{key} is not a parameter of {self}")
+            if key == 'frequency':
+                self.__parameters[key] = self._get_frequency(value)
+            elif key == 'phase':
+                self.__parameters[key] = self._get_phase(value)
             else:
-                if key == 'frequency':
-                    self.__parameters[key] = self._get_frequency(value)
-                elif key == 'phase':
-                    self.__parameters[key] = self._get_phase(value)
-                else:
-                    self.__parameters[key] = value
+                self.__parameters[key] = value
 
         # Parameters have been set, so if multi-run then it will have been
         # injected already; if not then it can just be ignored
@@ -93,40 +96,25 @@ class ACSource(AbstractCurrentSource):
     @property
     @overrides(AbstractCurrentSource.get_parameters)
     def get_parameters(self):
-        """ Get the parameters of the current source
-
-        :rtype dict(str, Any)
-        """
         return self.__parameters
 
     @property
     @overrides(AbstractCurrentSource.get_parameter_types)
     def get_parameter_types(self):
-        """ Get the parameters of the current source
-
-        :rtype dict(str, Any)
-        """
         return self.__parameter_types
 
     @property
     @overrides(AbstractCurrentSource.current_source_id)
     def current_source_id(self):
-        """ The ID of the current source.
-
-        :rtype: int
-        """
         return CurrentSourceIDs.AC_SOURCE.value
 
     @overrides(AbstractCurrentSource.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self):
-        """ The sdram usage of the current source.
-
-        :rtype: int
-        """
         return len(self.__parameters) * BYTES_PER_WORD
 
     def _get_frequency(self, frequency):
-        """ Convert frequency to radian-friendly value.
+        """
+        Convert frequency to radian-friendly value.
 
         :rtype: float
         """
@@ -135,7 +123,8 @@ class ACSource(AbstractCurrentSource):
         return (frequency * 2 * numpy.pi) / 1000.0
 
     def _get_phase(self, phase):
-        """ Convert phase to radian-friendly value.
+        """
+        Convert phase to radian-friendly value.
 
         :rtype: float
         """

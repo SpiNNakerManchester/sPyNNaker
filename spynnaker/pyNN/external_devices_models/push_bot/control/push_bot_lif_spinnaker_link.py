@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,9 +18,10 @@ from spynnaker.pyNN.models.defaults import default_initial_values
 
 
 class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
-    """ Control module for a PushBot connected to a SpiNNaker Link
+    """
+    Control module for a PushBot connected to a SpiNNaker Link.
 
-    :param ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol protocol:
+    :param MunichIoSpiNNakerLinkProtocol protocol:
         How to talk to the bot.
     :param iterable(AbstractMulticastControllableDevice) devices:
         The devices on the bot that we are interested in.

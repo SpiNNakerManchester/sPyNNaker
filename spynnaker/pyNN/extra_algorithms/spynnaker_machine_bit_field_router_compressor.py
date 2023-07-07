@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,16 +16,13 @@ import logging
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinnman.model import ExecutableTargets
-from spinnman.model.enums import CPUState
+from spinnman.model.enums import CPUState, ExecutableType
 from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import (
         machine_bit_field_ordered_covering_compressor,
         machine_bit_field_pair_router_compressor)
-from spinn_front_end_common.utilities.helpful_functions import (
-    write_address_to_user1)
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
@@ -37,13 +34,13 @@ _RERUN_IOBUF_NAME_PATTERN = "rerun_of_synaptic_expander_on_{}_{}_{}.txt"
 
 
 def _locate_expander_rerun_targets(bitfield_targets):
-    """ removes host based cores for synaptic matrix regeneration
+    """
+    Removes host based cores for synaptic matrix regeneration.
 
     :param ~.ExecutableTargets bitfield_targets: the cores that were used
     :return: new targets for synaptic expander
     :rtype: ~.ExecutableTargets
     """
-
     # locate expander executable path
     expander_executable_path = SpynnakerDataView.get_executable_path(
         SYNAPSE_EXPANDER_APLX)
@@ -57,9 +54,9 @@ def _locate_expander_rerun_targets(bitfield_targets):
             placement.x, placement.y, placement.p,
             executable_type=ExecutableType.SYSTEM)
         # Write the region to USER1, as that is the best we can do
-        write_address_to_user1(
-            placement.x, placement.y, placement.p,
-            placement.vertex.connection_generator_region)
+        txrx = SpynnakerDataView.get_transceiver()
+        txrx.write_user(placement.x, placement.y, placement.p, 1,
+                        placement.vertex.connection_generator_region)
     return new_cores
 
 
@@ -79,7 +76,8 @@ def __machine_expandables(cores):
 
 def _rerun_synaptic_cores(
         synaptic_expander_rerun_cores, needs_sync_barrier):
-    """ reruns the synaptic expander
+    """
+    Reruns the synaptic expander.
 
     :param ~.ExecutableTargets synaptic_expander_rerun_cores:
         the cores to rerun the synaptic matrix generator for
@@ -96,8 +94,8 @@ def _rerun_synaptic_cores(
 
 
 def spynnaker_machine_bitfield_ordered_covering_compressor():
-    """ entrance for routing table compression with bit field
-
+    """
+    Perform routing table compression using ordered coverings with bit fields.
     """
     compressor_executable_targets = \
         machine_bit_field_ordered_covering_compressor()
@@ -111,8 +109,8 @@ def spynnaker_machine_bitfield_ordered_covering_compressor():
 
 
 def spynnaker_machine_bitField_pair_router_compressor():
-    """ entrance for routing table compression with bit field
-
+    """
+    Perform routing table compression using pairs with bit fields.
     """
     compressor_executable_targets = \
         machine_bit_field_pair_router_compressor()

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,8 @@ from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 
 class SynapseProvenance(ctypes.LittleEndianStructure):
-    """ Provenance items from synapse processing
+    """
+    Provenance items from synapse processing.
     """
     _fields_ = [
         # A count of presynaptic events.
@@ -46,7 +47,8 @@ class SynapseProvenance(ctypes.LittleEndianStructure):
 
 
 class PopulationMachineSynapsesProvenance(object):
-    """ Mix-in to add synapse provenance gathering without other synapse things
+    """
+    Mix-in to add synapse provenance gathering without other synapse things.
     """
 
     # This MUST stay empty to allow mixing with other things with slots
@@ -67,23 +69,25 @@ class PopulationMachineSynapsesProvenance(object):
 
     @abstractproperty
     def _app_vertex(self):
-        """ The application vertex of the machine vertex.
+        """
+        The application vertex of the machine vertex.
 
-        :note: This is likely to be available via the MachineVertex.
+        .. note::
+            This is likely to be available via the
+            :py:class:`~pacman.model.graphs.machine.MachineVertex`.
 
         :rtype: AbstractPopulationVertex
         """
 
     def _parse_synapse_provenance(self, label,  x, y, p, provenance_data):
-        """ Extract and yield synapse provenance
+        """
+        Extract and yield synapse provenance.
 
         :param str label: The label of the node
         :param int x: x coordinate of the chip where this core
         :param int y: y coordinate of the core where this core
         :param int p: virtual id of the core
         :param list(int) provenance_data: A list of data items to interpret
-        :return: a list of provenance data items
-        :rtype: iterator of ProvenanceDataItem
         """
         synapse_prov = SynapseProvenance(*provenance_data)
 

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -237,3 +237,25 @@ class TestPoissonSpikeSource(BaseTestCase):
 
     def test_poisson_live_rates(self):
         self.runsafe(self.poisson_live_rates)
+
+    def poisson_multi_run_change_rate(self):
+
+        n_p = 2
+        sim.setup(timestep=1.0)
+
+        simtime = 1000
+
+        init_rate = [50, 50]
+        pop_src = sim.Population(
+            n_p, sim.SpikeSourcePoisson(rate=init_rate), label="src")
+
+        sim.run(simtime)
+
+        pop_src.set(rate=[1, 100])
+
+        sim.run(simtime)
+
+        sim.end()
+
+    def test_poisson_multi_run_change_rate(self):
+        self.runsafe(self.poisson_multi_run_change_rate)

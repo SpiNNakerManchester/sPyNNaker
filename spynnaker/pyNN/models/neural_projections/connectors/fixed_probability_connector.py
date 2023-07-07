@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,12 +15,13 @@
 import math
 import numpy
 import logging
+from pyNN.random import NumpyRNG
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
-from data_specification.enums.data_type import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import (
-    get_probable_maximum_selected, get_probable_minimum_selected)
+    get_probable_maximum_selected, get_probable_minimum_selected, check_rng)
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
@@ -35,13 +36,14 @@ N_GEN_PARAMS = 6
 
 class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
                                 AbstractGenerateConnectorOnHost):
-    """ For each pair of pre-post cells, the connection probability is \
-        constant.
+    """
+    For each pair of pre-post cells, the connection probability is constant.
     """
 
     __slots__ = [
         "__allow_self_connections",
-        "_p_connect"]
+        "_p_connect",
+        "__rng"]
 
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,
@@ -61,7 +63,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             Whether to output extra information about the connectivity to a
             CSV file
         :param rng:
-            Seeded random number generator, or None to make one when needed
+            Seeded random number generator, or `None` to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
         :param callable callback:
             if given, a callable that display a progress bar on the terminal.
@@ -74,16 +76,16 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         if p_connect == 1.0:
             p_connect = float(DataType.U032.max)
             logger.warning(
-                "Probability of 1.0 in the FixedProbabilityConnector will use"
-                f" {p_connect} instead.  If this is a problem, use the"
-                " AllToAllConnector instead.")
+                "Probability of 1.0 in the FixedProbabilityConnector will use "
+                "{} instead.  If this is a problem, use the AllToAllConnector "
+                "instead.", p_connect)
         if not 0.0 <= p_connect < 1.0:
             raise ConfigurationException(
                 "The probability must be >= 0 and < 1")
         super().__init__(safe, callback, verbose)
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
-        self._rng = rng
+        self.__rng = rng
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
@@ -142,9 +144,10 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
+        rng = self.__rng or NumpyRNG()
         # pylint: disable=too-many-arguments
         n_items = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
-        items = self._rng.next(n_items)
+        items = rng.next(n_items)
 
         # If self connections are not allowed, remove possibility the self
         # connections by setting them to a value of infinity
@@ -169,7 +172,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         return block
 
     def __repr__(self):
-        return "FixedProbabilityConnector({})".format(self._p_connect)
+        return f"FixedProbabilityConnector({self._p_connect})"
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
@@ -198,3 +201,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             raise ConfigurationException(
                 "The probability must be between 0 and 1 (inclusive)")
         self._p_connect = new_value
+
+    @overrides(AbstractConnector.validate_connection)
+    def validate_connection(self, application_edge, synapse_info):
+        if self.generate_on_machine(synapse_info.weights, synapse_info.delays):
+            check_rng(self.__rng, "FixedProbabilityConnector")

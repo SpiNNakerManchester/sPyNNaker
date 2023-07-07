@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,7 +35,8 @@ class PopulationMachineSynapses(
         AbstractSupportsBitFieldRoutingCompression,
         AbstractSynapseExpandable,
         HasSynapses, allow_derivation=True):
-    """ Mix-in for machine vertices that contain synapses
+    """
+    Mix-in for machine vertices that contain synapses.
     """
 
     # This MUST stay empty to allow mixing with other things with slots
@@ -43,51 +44,60 @@ class PopulationMachineSynapses(
 
     @abstractproperty
     def _app_vertex(self):
-        """ The application vertex of the machine vertex.
+        """
+        The application vertex of the machine vertex.
 
-        :note: This is likely to be available via the MachineVertex.
+        .. note::
+            This is likely to be available via the MachineVertex.
 
         :rtype: AbstractPopulationVertex
         """
 
     @abstractproperty
     def _vertex_slice(self):
-        """ The slice of the application vertex atoms on this machine vertex.
+        """
+        The slice of the application vertex atoms on this machine vertex.
 
-        :note: This is likely to be available via the MachineVertex.
+        .. note::
+            This is likely to be available via the MachineVertex.
 
         :rtype: ~pacman.model.graphs.common.Slice
         """
 
     @abstractproperty
     def _synaptic_matrices(self):
-        """ The object holding synaptic matrices
+        """
+        The object holding synaptic matrices.
 
         :rtype: SynapticMatrices
         """
 
     @abstractproperty
     def _synapse_regions(self):
-        """ The identifiers of synaptic regions
+        """
+        The identifiers of synaptic regions.
 
         :rtype: .SynapseRegions
         """
 
     @abstractproperty
     def _max_atoms_per_core(self):
-        """ The maximum number of atoms on any core targetted by these synapses
+        """
+        The maximum number of atoms on any core targeted by these synapses.
 
         :rtype: int
         """
 
     @abstractmethod
     def set_do_synapse_regeneration(self):
-        """ Indicates that synaptic data regeneration is required
+        """
+        Indicates that synaptic data regeneration is required.
         """
 
     @property
     def _synapse_references(self):
-        """ The references to synapse regions.  Override to provide these.
+        """
+        The references to synapse regions.  Override to provide these.
 
         :rtype: .SynapseRegions
         """
@@ -112,7 +122,8 @@ class PopulationMachineSynapses(
     def _write_synapse_data_spec(
             self, spec, ring_buffer_shifts, weight_scales,
             structural_sz):
-        """ Write the data specification for the synapse data
+        """
+        Write the data specification for the synapse data.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
@@ -124,7 +135,6 @@ class PopulationMachineSynapses(
         :param int structural_sz: The size of the structural data
         :param int n_neuron_bits: The number of bits to use for neuron ids
         """
-
         # Write the synapse parameters
         self._write_synapse_parameters(spec, ring_buffer_shifts)
 
@@ -168,7 +178,8 @@ class PopulationMachineSynapses(
                 reference=self._synapse_references.structural_dynamics)
 
     def _write_synapse_parameters(self, spec, ring_buffer_shifts):
-        """ Write the synapse parameters data region
+        """
+        Write the synapse parameters data region.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
@@ -215,14 +226,16 @@ class PopulationMachineSynapses(
 
     def get_connections_from_machine(
             self, placement, app_edge, synapse_info):
-        """ Get the connections from the machine for this vertex.
+        """
+        Get the connections from the machine for this vertex.
 
-        :param ~pacman.model.placement.Placement placements:
+        :param ~pacman.model.placements.Placement placements:
             Where the connection data is on the machine
         :param ProjectionApplicationEdge app_edge:
             The edge for which the data is being read
         :param SynapseInformation synapse_info:
             The specific projection within the edge
+        :rtype: ~numpy.ndarray
         """
         return self._synaptic_matrices.get_connections_from_machine(
             placement, app_edge, synapse_info)

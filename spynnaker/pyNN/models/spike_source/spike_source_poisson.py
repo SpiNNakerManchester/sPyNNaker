@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,7 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.classproperty import classproperty
 
 _population_parameters = {
-    "seed": None,  "max_rate": None, "splitter": None,
+    "seed": None, "max_rate": None, "splitter": None,
     "n_colour_bits": None}
 
 # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
@@ -45,6 +45,14 @@ class SpikeSourcePoisson(AbstractPyNNModel):
                additional_arguments=default_population_parameters.keys())
     def create_vertex(
             self, n_neurons, label, seed, max_rate, splitter, n_colour_bits):
+        """
+        :param float seed:
+        :param float max_rate:
+        :param splitter:
+        :type splitter:
+            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
+        :param int n_colour_bits:
+        """
         # pylint: disable=arguments-differ
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return SpikeSourcePoissonVertex(

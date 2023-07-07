@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,7 +29,8 @@ from .spif_devices import (
 class SPIFOutputDevice(
         ApplicationFPGAVertex, PopulationApplicationVertex,
         AbstractSendMeMulticastCommandsVertex):
-    """ Output (only) to a SPIF device
+    """
+    Output (only) to a SPIF device.
     """
 
     __slots__ = ["__incoming_partition", "__create_database"]
@@ -68,7 +69,8 @@ class SPIFOutputDevice(
                 self.__incoming_partition.identifier)
 
     def _get_set_key_payload(self):
-        """ Get the payload for the command to set the router key
+        """
+        Get the payload for the command to set the router key.
         """
         r_infos = SpynnakerDataView.get_routing_infos()
         return r_infos.get_first_key_from_pre_vertex(
@@ -76,7 +78,8 @@ class SPIFOutputDevice(
             self.__incoming_partition.identifier)
 
     def _get_set_mask_payload(self):
-        """ Get the payload for the command to set the router mask
+        """
+        Get the payload for the command to set the router mask.
         """
         r_infos = SpynnakerDataView.get_routing_infos()
         return r_infos.get_routing_info_from_pre_vertex(

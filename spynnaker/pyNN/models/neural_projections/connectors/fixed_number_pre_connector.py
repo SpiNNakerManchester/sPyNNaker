@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +13,7 @@
 # limitations under the License.
 import math
 import numpy
+from pyNN.random import NumpyRNG
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
@@ -26,8 +27,9 @@ from .abstract_generate_connector_on_host import (
 
 class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
                               AbstractGenerateConnectorOnHost):
-    """ Connects a fixed number of pre-synaptic neurons selected at random,\
-        to all post-synaptic neurons.
+    """
+    Connects a fixed number of pre-synaptic neurons selected at random,
+    to all post-synaptic neurons.
     """
 
     __slots__ = [
@@ -35,7 +37,8 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         "__n_pre",
         "__pre_neurons",
         "__pre_neurons_set",
-        "__with_replacement"]
+        "__with_replacement",
+        "__rng"]
 
     def __init__(
             self, n, allow_self_connections=True, safe=True, verbose=False,
@@ -61,7 +64,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
             pre-synaptic neuron has been connected to a post-neuron, it
             can't be connected again.
         :param rng:
-            Seeded random number generator, or None to make one when needed
+            Seeded random number generator, or `None` to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
         :param callable callback:
             if given, a callable that display a progress bar on the terminal.
@@ -70,7 +73,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
                 Not supported by sPyNNaker.
         """
         # :param ~pyNN.space.Space space:
-        # a Space object, needed if you wish to specify distance-dependent\
+        # a Space object, needed if you wish to specify distance-dependent
         # weights or delays - not implemented
         super().__init__(safe, callback, verbose)
         # We absolutely require an integer at this point!
@@ -79,7 +82,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         self.__with_replacement = with_replacement
         self.__pre_neurons_set = False
         self.__pre_neurons = None
-        self._rng = rng
+        self.__rng = rng
 
     def set_projection_information(self, synapse_info):
         super().set_projection_information(synapse_info)
@@ -114,6 +117,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         :param SynapseInformation synapse_info:
         :rtype: list(~numpy.ndarray)
         """
+        rng = self.__rng or NumpyRNG()
         # If we haven't set the array up yet, do it now
         if not self.__pre_neurons_set:
             self.__pre_neurons = [None] * synapse_info.n_post_neurons
@@ -121,9 +125,9 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
 
             # if verbose open a file to output the connectivity
             if self.verbose:
-                filename = synapse_info.pre_population.label + \
-                    '_to_' + synapse_info.post_population.label + \
-                    '_fixednumberpre-conn.csv'
+                filename = "{}_to_{}_fixednumberpre-conn.csv".format(
+                    synapse_info.pre_population.label,
+                    synapse_info.post_population.label)
                 with open(filename, 'w', encoding="utf-8") as file_handle:
                     numpy.savetxt(file_handle,
                                   [(synapse_info.n_pre_neurons,
@@ -146,11 +150,11 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
                             synapse_info.n_pre_neurons) if n != m]
 
                     # Now use this list in the random choice
-                    self.__pre_neurons[m] = self._rng.choice(
+                    self.__pre_neurons[m] = rng.choice(
                         no_self_pre_neurons, self.__n_pre,
                         self.__with_replacement)
                 else:
-                    self.__pre_neurons[m] = self._rng.choice(
+                    self.__pre_neurons[m] = rng.choice(
                         synapse_info.n_pre_neurons, self.__n_pre,
                         self.__with_replacement)
 
@@ -243,7 +247,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         return block
 
     def __repr__(self):
-        return "FixedNumberPreConnector({})".format(self.__n_pre)
+        return f"FixedNumberPreConnector({self.__n_pre})"
 
     @property
     def allow_self_connections(self):
@@ -270,3 +274,8 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         return 3 * BYTES_PER_WORD
+
+    @overrides(AbstractConnector.validate_connection)
+    def validate_connection(self, application_edge, synapse_info):
+        if self.generate_on_machine(synapse_info.weights, synapse_info.delays):
+            utility_calls.check_rng(self.__rng, "FixedNumberPreConnector")

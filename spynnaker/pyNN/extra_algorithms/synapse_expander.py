@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,28 +15,25 @@ import logging
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_front_end_common.utilities.system_control_logic import \
-    run_system_application
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spinnman.model.enums import ExecutableType
+from spinn_front_end_common.utilities.system_control_logic import (
+    run_system_application)
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
-from spinn_front_end_common.utilities.helpful_functions import (
-    write_address_to_user1)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def synapse_expander():
-    """ Run the synapse expander.
+    """
+    Run the synapse expander.
 
     .. note::
         Needs to be done after data has been loaded.
-
     """
-
     # Find the places where the synapse expander and delay receivers should run
     expander_cores, expanded_pop_vertices, max_data, max_bf = _plan_expansion()
 
@@ -59,11 +56,13 @@ def synapse_expander():
 
 
 def _plan_expansion():
-    """ Plan the expansion of synapses and set up the regions using USER1
+    """
+    Plan the expansion of synapses and set up the regions using USER1.
 
     :return: The places to load the synapse expander and delay expander
         executables, and the target machine vertices to read synapses back from
-    :rtype: (ExecutableTargets, list(MachineVertex, Placement))
+    :rtype:
+        tuple(~.ExecutableTargets, list(tuple(~.MachineVertex, ~.Placement)))
     """
     synapse_bin = SpynnakerDataView.get_executable_path(SYNAPSE_EXPANDER_APLX)
     expander_cores = ExecutableTargets()
@@ -84,9 +83,9 @@ def _plan_expansion():
                     executable_type=ExecutableType.SYSTEM)
                 expanded_pop_vertices.append((vertex, placement))
                 # Write the region to USER1, as that is the best we can do
-                write_address_to_user1(
-                    placement.x, placement.y, placement.p,
-                    vertex.connection_generator_region)
+                txrx = SpynnakerDataView.get_transceiver()
+                txrx.write_user(placement.x, placement.y, placement.p, 1,
+                                vertex.connection_generator_region)
                 max_data = max(max_data, vertex.max_gen_data)
                 max_bit_field = max(max_bit_field, vertex.bit_field_size)
 
@@ -94,12 +93,11 @@ def _plan_expansion():
 
 
 def _fill_in_connection_data(expanded_pop_vertices):
-    """ Once expander has run, fill in the connection data
+    """
+    Once expander has run, fill in the connection data.
 
-    :param list(MachineVertex, Placement) expanded_pop_vertices:
+    :param list(tuple(~.MachineVertex, ~.Placement)) expanded_pop_vertices:
         List of machine vertices to read data from
-
-    :rtype: None
     """
     for vertex, placement in expanded_pop_vertices:
         vertex.read_generated_connection_holders(placement)

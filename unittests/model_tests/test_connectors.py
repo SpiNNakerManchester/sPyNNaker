@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -95,7 +95,7 @@ def test_connectors(
         synapse_info = SynapseInformation(
             connector=None, pre_population=MockPopulation(n_pre, "Pre"),
             post_population=MockPopulation(n_post, "Post"),
-            prepop_is_view=False, postpop_is_view=False, rng=None,
+            prepop_is_view=False, postpop_is_view=False,
             synapse_dynamics=None, synapse_type=None, receptor_type=None,
             synapse_type_from_dynamics=False,
             weights=weight, delays=delay)

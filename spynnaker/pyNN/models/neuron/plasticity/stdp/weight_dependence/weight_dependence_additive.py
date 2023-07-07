@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
@@ -23,7 +23,8 @@ _SPACE_PER_SYNAPSE_TYPE = 4 * BYTES_PER_WORD
 
 class WeightDependenceAdditive(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
-    """ An additive weight dependence STDP rule.
+    """
+    An additive weight dependence STDP rule.
     """
 
     __slots__ = [
@@ -43,7 +44,8 @@ class WeightDependenceAdditive(
 
     @property
     def w_min(self):
-        """ :math:`w^{min}`
+        """
+        :math:`w^{min}`
 
         :rtype: float
         """
@@ -51,7 +53,8 @@ class WeightDependenceAdditive(
 
     @property
     def w_max(self):
-        """ :math:`w^{max}`
+        """
+        :math:`w^{max}`
 
         :rtype: float
         """
@@ -69,7 +72,8 @@ class WeightDependenceAdditive(
 
     @property
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
@@ -110,8 +114,9 @@ class WeightDependenceAdditive(
 
     @property
     def weight_maximum(self):
-        """ The maximum weight that will ever be set in a synapse as a result\
-            of this rule
+        """
+        The maximum weight that will ever be set in a synapse as a result
+        of this rule.
 
         :rtype: float
         """

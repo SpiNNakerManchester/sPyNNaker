@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,16 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
--r requirements.txt
-SpiNNakerTestBase == 1!6.0.1
-flake8
-coverage >= 4.4, < 5.0
-# pytest will be brought in by pytest-cov
-pytest-cov
-pytest-timeout
-pytest-forked
-pytest-progress
-sphinx >= 4
-testfixtures
-mock
-graphviz
+APP = $(notdir $(CURDIR))
+
+NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_izh_impl.h
+INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_conductance.h
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard.h
+THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_static.h
+SYNAPSE_TYPE_H = $(NEURON_DIR)/neuron/synapse_types/synapse_types_dual_excitatory_exponential_impl.h
+
+include ../neuron_build.mk

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
 import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
-from data_specification.enums.data_type import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
@@ -39,7 +39,8 @@ LOOKUP_TAU_D_SHIFT = 2
 
 class SynapseDynamicsNeuromodulation(
         AbstractPlasticSynapseDynamics, AbstractGenerateOnMachine):
-    """ Synapses that target a neuromodulation receptor
+    """
+    Synapses that target a neuromodulation receptor.
     """
 
     __slots__ = [
@@ -139,14 +140,14 @@ class SynapseDynamicsNeuromodulation(
         if hasattr(self, key):
             return getattr(self, key)
         raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(type(self), key))
+            f"Type {type(self)} does not have parameter {key}")
 
     @overrides(AbstractPlasticSynapseDynamics.set_value)
     def set_value(self, key, value):
         if hasattr(self, key):
             setattr(self, key, value)
         raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(type(self), key))
+            f"Type {type(self)} does not have parameter {key}")
 
     @overrides(AbstractPlasticSynapseDynamics
                .get_n_words_for_plastic_connections)

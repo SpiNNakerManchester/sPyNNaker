@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,28 +17,32 @@ from spinn_utilities.abstract_base import (
 
 
 class AbstractElimination(object, metaclass=AbstractBase):
-    """ An elimination rule
+    """
+    A synaptic connection elimination rule.
     """
 
     __slots__ = ()
 
     @abstractproperty
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
 
     @abstractmethod
     def get_parameters_sdram_usage_in_bytes(self):
-        """ Get the amount of SDRAM used by the parameters of this rule
+        """
+        Get the amount of SDRAM used by the parameters of this rule.
 
         :rtype: int
         """
 
     @abstractmethod
     def write_parameters(self, spec, weight_scale):
-        """ Write the parameters of the rule to the spec
+        """
+        Write the parameters of the rule to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
         :param float weight_scale:
@@ -46,7 +50,8 @@ class AbstractElimination(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_parameter_names(self):
-        """ Return the names of the parameters supported by this rule
+        """
+        Return the names of the parameters supported by this rule.
 
         :rtype: iterable(str)
         """

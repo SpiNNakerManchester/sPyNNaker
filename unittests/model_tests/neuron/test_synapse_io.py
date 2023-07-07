@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -56,7 +56,10 @@ def test_get_allowed_row_length(
         dynamics = dynamics_class()
 
     synapse_information = SynapseInformation(
-        None, None, None, False, False, None, None, dynamics, 0, None, False)
+        connector=None, pre_population=None, post_population=None,
+        prepop_is_view=False, postpop_is_view=False, synapse_dynamics=dynamics,
+        synapse_type_from_dynamics=False, synapse_type=None,
+        receptor_type=None, weights=0, delays=None)
     in_edge = ProjectionApplicationEdge(None, None, synapse_information)
     if exception is not None:
         with pytest.raises(exception) as exc_info:

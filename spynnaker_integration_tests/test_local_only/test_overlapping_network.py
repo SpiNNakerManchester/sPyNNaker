@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
 import pyNN.spiNNaker as p
 import numpy
 from pyNN.space import Grid2D
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetTranslator, AbstractMulticastControllableDevice)
 from spinnaker_testbase.base_test_case import BaseTestCase

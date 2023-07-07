@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,7 @@
 # limitations under the License.
 import numpy
 from spinn_utilities.overrides import overrides
-from data_specification.enums.data_type import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from pyNN.random import RandomDistribution
 from .abstract_connector import AbstractConnector
@@ -40,8 +40,9 @@ def shape2word(sw, sh):
 class KernelConnector(AbstractGenerateConnectorOnMachine,
                       AbstractGenerateConnectorOnHost):
     """
-    Where the pre- and post-synaptic populations are considered as a 2D\
-    array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
+    Where the pre- and post-synaptic populations are considered as a 2D
+    array. Connect every post(row, column) neuron to many
+    pre(row, column, kernel)
     through a (kernel) set of weights and/or delays.
 
     .. admonition:: TODO
@@ -57,38 +58,38 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             safe=True, space=None, verbose=False, callback=None):
         """
         :param shape_pre:
-            2D shape of the pre population (rows/height, cols/width, usually
+            2D shape of the pre-population (rows/height, columns/width, usually
             the input image shape)
         :type shape_pre: list(int) or tuple(int,int)
         :param shape_post:
-            2D shape of the post population (rows/height, cols/width)
+            2D shape of the post-population (rows/height, columns/width)
         :type shape_post: list(int) or tuple(int,int)
         :param shape_kernel:
-            2D shape of the kernel (rows/height, cols/width)
+            2D shape of the kernel (rows/height, columns/width)
         :type shape_kernel: list(int) or tuple(int,int)
         :param weight_kernel: (optional)
             2D matrix of size shape_kernel describing the weights
-        :type weight_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG
+        :type weight_kernel: ~numpy.ndarray or ~pyNN.random.RandomDistribution
             or int or float or list(int) or list(float) or None
         :param delay_kernel: (optional)
             2D matrix of size shape_kernel describing the delays
-        :type delay_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG
+        :type delay_kernel: ~numpy.ndarray or ~pyNN.random.RandomDistribution
             or int or float or list(int) or list(float) or None
         :param shape_common: (optional)
-            2D shape of common coordinate system (for both pre and post,
+            2D shape of common coordinate system (for both pre- and post-,
             usually the input image sizes)
         :type shape_common: list(int) or tuple(int,int) or None
         :param pre_sample_steps_in_post: (optional)
-            Sampling steps/jumps for pre pop <=> (stepX, stepY)
+            Sampling steps/jumps for pre-population <=> (stepX, stepY)
         :type pre_sample_steps_in_post: None or list(int) or tuple(int,int)
         :param pre_start_coords_in_post: (optional)
-            Starting row/col for pre sampling <=> (offX, offY)
+            Starting row/column for pre-population sampling <=> (offX, offY)
         :type pre_start_coords_in_post: None or list(int) or tuple(int,int)
         :param post_sample_steps_in_pre: (optional)
-            Sampling steps/jumps for post pop <=> (stepX, stepY)
+            Sampling steps/jumps for post-population <=> (stepX, stepY)
         :type post_sample_steps_in_pre: None or list(int) or tuple(int,int)
         :param post_start_coords_in_pre: (optional)
-            Starting row/col for post sampling <=> (offX, offY)
+            Starting row/column for post-population sampling <=> (offX, offY)
         :type post_start_coords_in_pre: None or list(int) or tuple(int,int)
         :param bool safe:
             Whether to check that weights and delays have valid values.
@@ -161,7 +162,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         self._post_as_pre = {}
 
     def __to_post_coords(self, post_vertex_slice):
-        """ Get a list of possible post-slice coordinates.
+        """
+        Get a list of possible post-slice coordinates.
 
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
@@ -171,7 +173,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return numpy.divmod(post, self._post_w)
 
     def __map_to_pre_coords(self, post_r, post_c):
-        """ Get a map from post to pre coords.
+        """
+        Get a map from post to pre-population coordinates.
 
         :param ~numpy.ndarray post_r: rows
         :param ~numpy.ndarray post_c: columns
@@ -181,7 +184,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
                 self._post_start_w + post_c * self._post_step_w)
 
     def __post_as_pre(self, post_vertex_slice):
-        """ Write post coords as pre coords.
+        """
+        Write post-population coordinates as pre-population coordinates.
 
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
@@ -195,7 +199,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return self._post_as_pre[str(post_vertex_slice)]
 
     def __pre_as_post(self, pre_r, pre_c):
-        """ Write pre coords as post coords.
+        """
+        Write pre-population coordinates as post-population coordinates.
 
         :param int pre_r: row
         :param int pre_c: column
@@ -206,15 +211,18 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return (r, c)
 
     def __get_kernel_vals(self, vals):
-        """ Convert kernel values given into the correct format.
+        """
+        Convert kernel values given into the correct format.
 
         :param vals:
-        :type vals: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray
-            or ConvolutionKernel
+        :type vals: int or float or ~pyNN.random.RandomDistribution
+            or ~numpy.ndarray or ConvolutionKernel
         :rtype: ~numpy.ndarray
         """
         if vals is None:
             return None
+        if isinstance(vals, list):
+            vals = numpy.asarray(vals)
         krn_size = self._kernel_h * self._kernel_w
         krn_shape = (self._kernel_h, self._kernel_w)
         if isinstance(vals, RandomDistribution):
@@ -226,22 +234,23 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
                 vals.shape[HEIGHT] == self._kernel_h and
                 vals.shape[WIDTH] == self._kernel_w):
             return vals.view(ConvolutionKernel)
-        # TODO: make this error more descriptive?
         raise SpynnakerException(
             "Error generating KernelConnector values; if you have supplied "
             "weight and/or delay kernel then ensure they are the same size "
-            "as specified by the shape kernel values.")
+            "as specified by the shape kernel values (height: "
+            f"{self._kernel_h} and width: {self._kernel_w}).")
 
     def __compute_statistics(
             self, weights, delays, post_vertex_slice, n_pre_neurons):
-        """ Compute the relevant information required for the connections.
+        """
+        Compute the relevant information required for the connections.
 
         :param weights:
-        :type weights: int or float or ~pyNN.random.NumpyRNG or
+        :type weights: int or float or ~pyNN.random.RandomDistribution or
             ~numpy.ndarray or ConvolutionKernel
         :param delays:
-        :type delays: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray
-            or ConvolutionKernel
+        :type delays: int or float or ~pyNN.random.RandomDistribution or
+            ~numpy.ndarray or ConvolutionKernel
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         """
         # If __compute_statistics is called more than once, there's
@@ -389,8 +398,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             weights, synapse_info)
 
     def __repr__(self):
-        return "KernelConnector(shape_kernel[{},{}])".format(
-            self._kernel_w, self._kernel_h)
+        return \
+            f"KernelConnector(shape_kernel[{self._kernel_w},{self._kernel_h}])"
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(

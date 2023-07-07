@@ -4,7 +4,7 @@
 -- you may not use this file except in compliance with the License.
 -- You may obtain a copy of the License at
 --
---     http://www.apache.org/licenses/LICENSE-2.0
+--     https://www.apache.org/licenses/LICENSE-2.0
 --
 -- Unless required by applicable law or agreed to in writing, software
 -- distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,7 +33,6 @@ CREATE TABLE IF NOT EXISTS recording (
     t_start float NOT NULL,
     sampling_interval_ms float,
     units TEXT,
-    atoms_shape TEXT,
     n_colour_bits INT);
 
 CREATE UNIQUE INDEX IF NOT EXISTS recording_sanity
@@ -41,7 +40,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS recording_sanity
 
 CREATE VIEW IF NOT EXISTS recording_view AS
     SELECT rec_id, variable, label, data_type, buffered_type, t_start,
-        sampling_interval_ms, pop_size, units, atoms_shape, n_colour_bits
+        sampling_interval_ms, pop_size, units, n_colour_bits
     FROM population NATURAL JOIN recording;
 
 CREATE TABLE IF NOT EXISTS segment(

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +20,8 @@ SYN_REGION_UNUSED = 0xFFFFFFFF
 
 
 class GeneratorData(object):
-    """ Data for each connection of the synapse generator.
+    """
+    Data for each connection of the synapse generator.
     """
     __slots__ = [
         "__data"
@@ -83,7 +84,8 @@ class GeneratorData(object):
 
     @property
     def size(self):
-        """ The size of the generated data in bytes
+        """
+        The size of the generated data, in bytes.
 
         :rtype: int
         """
@@ -91,7 +93,8 @@ class GeneratorData(object):
 
     @property
     def gen_data(self):
-        """ The data to be written for this connection
+        """
+        The data to be written for this connection.
 
         :rtype: list(~numpy.ndarray(~numpy.uint32))
         """

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,13 +13,13 @@
 # limitations under the License.
 
 import logging
-import neo
 import numpy
 from spinn_utilities.ranged.abstract_sized import AbstractSized
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 
 logger = FormatAdapter(logging.getLogger(__file__))
 _SELECTIVE_RECORDED_MSG = (
@@ -29,7 +29,6 @@ _SELECTIVE_RECORDED_MSG = (
 
 
 class DataPopulation(object):
-
     __slots__ = [
         "__database_file",
         "__label",
@@ -53,11 +52,10 @@ class DataPopulation(object):
         if clear:
             logger.warning("Ignoring clear as supported in this mode")
         if isinstance(io, str):
-            io = neo.get_io(io)
-
+            io = get_neo_io(io)
         data = self.get_data(variables)
         # write the neo block to the file
-        io.write(data)
+        io.write(bl=data)
 
     @overrides(Population.describe)
     def describe(self, template=None, engine=None):
@@ -147,7 +145,6 @@ class DataPopulation(object):
 
     def __getitem__(self, index_or_slice):
         """
-
         :param selector: a slice or numpy mask array.
             The mask array should either be a boolean array (ideally) of the
             same size as the parent,

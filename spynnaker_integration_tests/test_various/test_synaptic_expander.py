@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,6 @@ from spinnman.exceptions import SpiNNManCoresNotInStateException
 import functools
 from spinnaker_testbase import BaseTestCase
 import numpy
-from pyNN.random import NumpyRNG
 from collections import defaultdict
 import math
 
@@ -28,22 +27,21 @@ def run_script():
 
     inp = p.Population(10, p.SpikeSourceArray(spike_times=[1.0]),
                        label="SpikeSourceArray")
-    out = p.Population(10, p.IF_curr_exp(), label="IF_curr_exp")
+    out = p.Population(10, p.IF_curr_exp(), label="IF_curr_exp", seed=1235)
     out.record("spikes")
 
-    rng = NumpyRNG(seed=1235)
     param_projections = [
         (1.0, 1.0),
-        (p.RandomDistribution("uniform", low=1.0, high=10.0, rng=rng), 2.0),
+        (p.RandomDistribution("uniform", low=1.0, high=10.0), 2.0),
         (3.0, 17.0),
-        (4.0, p.RandomDistribution("normal", mu=22.0, sigma=10.0, rng=rng)),
+        (4.0, p.RandomDistribution("normal", mu=22.0, sigma=10.0)),
         (5.0, p.RandomDistribution(
             "normal_clipped", mu=22.0, sigma=10.0,
-            low=5.0, high=32.0, rng=rng)),
+            low=5.0, high=32.0)),
         (6.0, p.RandomDistribution(
             "normal_clipped_to_boundary", mu=12.0, sigma=5.0,
-            low=6.0, high=16.0, rng=rng)),
-        (7.0, p.RandomDistribution("exponential", beta=2.0, rng=rng)),
+            low=6.0, high=16.0)),
+        (7.0, p.RandomDistribution("exponential", beta=5.0)),
     ]
     connectors = [
         (p.OneToOneConnector, functools.partial(check_one_to_one, 10)),

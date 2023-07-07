@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,25 +39,28 @@ PUSH_BOT_MOTOR_WITHOUT_UART_MASK = 0x7C0
 PUSH_BOT_MOTOR_UART_SHIFT = 0 + _OFFSET_TO_I
 
 
-def _munich_key(instr, format_bit=0, device=0):
-    return ((instr << _OFFSET_TO_I) | (format_bit << _OFFSET_TO_F) |
-            (device << _OFFSET_TO_D))
+def _munich_key(instr_id, dim=0, format_bit=0):
+    return ((instr_id << _OFFSET_TO_I) | (format_bit << _OFFSET_TO_F) |
+            (dim << _OFFSET_TO_D))
 
 
 def get_munich_i(key):
-    """ Get the instruction field from the key.
+    """
+    Get the instruction field from the key.
     """
     return key & _I_MASK
 
 
 def get_munich_f(key):
-    """ Get the format field from the key.
+    """
+    Get the format field from the key.
     """
     return key & _F_MASK
 
 
 def get_munich_d(key):
-    """ Get the device field from the key.
+    """
+    Get the device field from the key.
     """
     return key & _D_MASK
 
@@ -271,7 +274,9 @@ class RetinaPayload(Enum):
 
 
 class MUNICH_MODES(Enum):
-    """types of modes supported by this protocol"""
+    """
+    Types of modes supported by this protocol.
+    """
     RESET_TO_DEFAULT = 0
     PUSH_BOT = 1
     SPOMNIBOT = 2
@@ -281,7 +286,8 @@ class MUNICH_MODES(Enum):
 
 
 class MunichIoSpiNNakerLinkProtocol(object):
-    """ Provides Multicast commands for the Munich SpiNNaker-Link protocol
+    """
+    Provides Multicast commands for the Munich SpiNNaker-Link protocol.
     """
     __slots__ = ["__instance_key", "__mode", "__uart_id"]
 
@@ -295,9 +301,8 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def __init__(self, mode, instance_key=None, uart_id=0):
         """
-        :param mode: The mode of operation of the protocol
-        :type modes:
-            ~spynnaker.pyNN.protocols.MUNICH_MODES
+        :param ~spynnaker.pyNN.protocols.MUNICH_MODES mode:
+            The mode of operation of the protocol
         :param instance_key: The optional instance key to use
         :type instance_key: int or None
         :param int uart_id: The ID of the UART when needed
@@ -333,13 +338,15 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     @staticmethod
     def sent_mode_command():
-        """ True if the mode command has ever been requested by any instance
+        """
+        True if the mode command has ever been requested by any instance.
         """
         return MunichIoSpiNNakerLinkProtocol.__sent_mode_command
 
     @property
     def instance_key(self):
-        """ The key of this instance of the protocol
+        """
+        The key of this instance of the protocol.
 
         :rtype: int
         """
@@ -652,7 +659,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
         if self.__mode is not MUNICH_MODES.PUSH_BOT:
             raise ConfigurationException(
                 "The mode you configured is not the PushBot, and so this "
-                "message is invalid for mode {}".format(self.__mode))
+                f"message is invalid for mode {self.__mode}")
 
     @property
     def push_bot_laser_config_total_period_key(self):
@@ -837,7 +844,8 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def set_retina_transmission(
             self, retina_key=RetinaKey.NATIVE_128_X_128,
             retina_payload=None, time=None):
-        """ Set the retina transmission key
+        """
+        Set the retina transmission key.
 
         :param RetinaKey retina_key: the new key for the retina
         :param retina_payload:
@@ -848,6 +856,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         :return: the command to send
         :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
         """
+        retina_key_value = 0
+        if retina_key is not None:
+            retina_key_value = retina_key.value
 
         if retina_key == RetinaKey.FIXED_KEY and retina_payload is None:
             retina_payload = RetinaPayload.EVENTS_IN_PAYLOAD
@@ -863,5 +874,5 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
         return MultiCastCommand(
             key=self.set_retina_transmission_key,
-            payload=retina_key.value | retina_payload.value,
+            payload=retina_key_value | retina_payload.value,
             time=time)

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
 import numpy
 from collections import defaultdict
 from spinn_utilities.overrides import overrides
-from data_specification.enums.data_type import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -27,8 +27,23 @@ from .abstract_local_only import AbstractLocalOnly
 
 
 class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
-    """ A convolution synapse dynamics that can process spikes with only DTCM
     """
+    A convolution synapse dynamics that can process spikes with only DTCM.
+    """
+
+    __slots__ = ["__delay"]
+
+    def __init__(self, delay=None):
+        """
+        :param float delay:
+            The delay used in the connection; by default 1 time step
+        """
+        self.__delay = delay
+        if delay is None:
+            self.__delay = SpynnakerDataView.get_simulation_time_step_ms()
+        elif not isinstance(delay, (float, int)):
+            raise SynapticConfigurationException(
+                "Only single value delays are supported")
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics):
@@ -68,6 +83,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractLocalOnly.write_parameters)
     def write_parameters(self, spec, region, machine_vertex, weight_scales):
+        app_vertex = machine_vertex.app_vertex
 
         # Get all the incoming vertices and keys so we can sort
         routing_info = SpynnakerDataView.get_routing_infos()
@@ -82,12 +98,22 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
                 continue
             seen_pre_vertices.add(app_edge.pre_vertex)
 
+            delay_vertex = None
+            if self.__delay > app_vertex.splitter.max_support_delay():
+                # pylint: disable=protected-access
+                delay_vertex = incoming._projection_edge.delay_edge.pre_vertex
+
             # Keep track of all the same source squares, so they can be
             # merged; this will make sure the keys line up!
             edges_for_source = defaultdict(list)
-            for pre_m_vertex in app_edge.pre_vertex.machine_vertices:
-                r_info = routing_info.get_routing_info_from_pre_vertex(
-                    pre_m_vertex, SPIKE_PARTITION_ID)
+            pre_splitter = app_edge.pre_vertex.splitter
+            for pre_m_vertex in pre_splitter.get_out_going_vertices(
+                    SPIKE_PARTITION_ID):
+                r_info = self.__get_rinfo(
+                    routing_info, pre_m_vertex, delay_vertex)
+                if r_info is None:
+                    raise SynapticConfigurationException(
+                        f"Missing r_info for {pre_m_vertex}")
                 vertex_slice = pre_m_vertex.vertex_slice
                 key = (app_edge.pre_vertex, vertex_slice)
                 edges_for_source[key].append((pre_m_vertex, r_info))
@@ -131,10 +157,19 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         key = (key_a | key_b) & mask
         return key, mask
 
+    def __get_rinfo(self, routing_info, source, delay_vertex):
+        if delay_vertex is None:
+            return routing_info.get_routing_info_from_pre_vertex(
+                source, SPIKE_PARTITION_ID)
+        delay_source = delay_vertex.splitter.get_machine_vertex(
+            source.vertex_slice)
+        return routing_info.get_routing_info_from_pre_vertex(
+            delay_source, SPIKE_PARTITION_ID)
+
     @property
     @overrides(AbstractLocalOnly.delay)
     def delay(self):
-        return SpynnakerDataView.get_simulation_time_step_ms()
+        return self.__delay
 
     @property
     @overrides(AbstractLocalOnly.weight)
@@ -176,7 +211,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_mean_positive_weight(self, incoming_projection):
         # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
-        pos_weights = conn.weights[conn.weights > 0]
+        weights = conn.weights
+        if isinstance(weights, (int, float)):
+            return weights
+        pos_weights = weights[weights > 0]
         if not len(pos_weights):
             return 0
         return numpy.mean(pos_weights)
@@ -185,7 +223,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_mean_negative_weight(self, incoming_projection):
         # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
-        neg_weights = conn.weights[conn.weights < 0]
+        weights = conn.weights
+        if isinstance(weights, (int, float)):
+            return weights
+        neg_weights = weights[weights < 0]
         if not len(neg_weights):
             return 0
         return numpy.mean(neg_weights)
@@ -194,7 +235,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_variance_positive_weight(self, incoming_projection):
         # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
-        pos_weights = conn.weights[conn.weights > 0]
+        weights = conn.weights
+        if isinstance(weights, (int, float)):
+            return 0
+        pos_weights = weights[weights > 0]
         if not len(pos_weights):
             return 0
         return numpy.var(pos_weights)
@@ -203,7 +247,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_variance_negative_weight(self, incoming_projection):
         # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
-        neg_weights = conn.weights[conn.weights < 0]
+        weights = conn.weights
+        if isinstance(weights, (int, float)):
+            return 0
+        neg_weights = weights[weights < 0]
         if not len(neg_weights):
             return 0
         return numpy.var(neg_weights)

@@ -6,7 +6,7 @@
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
-*     http://www.apache.org/licenses/LICENSE-2.0
+*     https://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,12 +27,12 @@
 *
 * This is the documentation of the part of sPyNNaker, implemented in C, that
 * is actually deployed onto SpiNNaker to execute. The
-* [Python parts](http://spinnakermanchester.github.io/sPyNNaker/python/)
+* [Python parts](https://spinnakermanchester.github.io/sPyNNaker/python/)
 * of the sPyNNaker package are responsible for the user interface, data
 * preparation, execution planning, and runtime control.
 *
 * Note that this code depends on
-* [SpiNNFrontEndCommon](http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/)
+* [SpiNNFrontEndCommon](https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/)
 * for many support functions.
 *
 * @section neuron Neuron Simulation Implementation

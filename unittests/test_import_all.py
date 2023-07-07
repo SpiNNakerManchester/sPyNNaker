@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,9 +33,7 @@ class ImportAllModule(unittest.TestCase):
             package_loader.load_module("spinnman", remove_pyc_files=True)
             package_loader.load_module("pacman", remove_pyc_files=True)
             package_loader.load_module(
-                "data_specification", remove_pyc_files=True)
-            package_loader.load_module(
-                "spalloc", remove_pyc_files=True)
+                "spalloc_client", remove_pyc_files=True)
             package_loader.load_module(
                 "spinn_front_end_common", remove_pyc_files=True)
             # Test the files

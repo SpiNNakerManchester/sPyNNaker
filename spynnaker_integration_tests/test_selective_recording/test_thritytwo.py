@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,6 +43,6 @@ class TestSampling(BaseTestCase):
         for i in range(32, 40):
             self.assertEqual(0, len(spikes[i]))
         v = neo.segments[0].filter(name='v')[0]
-        self.assertEqual(32, len(v.channel_index.index))
+        self.assertEqual(32, len(v.annotations["channel_names"]))
         self.assertEqual(32, len(v[0]))
         sim.end()

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,6 +40,7 @@ def do_run():
     sim.reset()
     sim.run(20)
     second_spikes = pop_1.spinnaker_get_data("spikes")
+    sim.end()
 
     return first_spikes, second_spikes
 

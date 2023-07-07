@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,19 +21,32 @@ module.
 """
 
 import os
+# TODO: switch to packaging.version
 from distutils.version import StrictVersion as Version  # pylint: disable=all
 import pyNN
 
+# The version of PyNN that we really want
+_TARGET_PYNN_VERSION = "0.9"
+
 
 def version_satisfies(module, requirement):
-    """ Perform a version check. This code could be smarter...
+    """
+    Perform a version check. This code could be smarter...
+
+    :param ~types.ModuleType module:
+    :param str requirement:
+    :return: Whether the module's version satisfies the given requirement
+    :rtype: bool
     """
     return Version(module.__version__) >= Version(requirement)
 
 
 def install_sPyNNaker_into(module):
-    """ Do the actual installation by creating a package within the given\
-        module's implementation. This is very nasty!
+    """
+    Do the actual installation by creating a package within the given
+    module's implementation. This is very nasty!
+
+    :param ~types.ModuleType module:
     """
     spinnaker_dir = os.path.join(os.path.dirname(module.__file__), "spiNNaker")
     if not os.path.exists(spinnaker_dir):
@@ -49,14 +62,16 @@ def install_sPyNNaker_into(module):
 
 
 def setup_pynn():
-    # Perform the installation
-    install_sPyNNaker_into(pyNN)
+    # Check the version and blow up if it isn't there
+    if not version_satisfies(pyNN, _TARGET_PYNN_VERSION):
+        raise NotImplementedError(
+            f"PyNN version {pyNN.__version__} found; "
+            f"sPyNNaker requires PyNN version {_TARGET_PYNN_VERSION}")
+
+    # Perform the installation unless we're on READTHEDOCS
+    if os.environ.get('READTHEDOCS', 'False') != 'True':
+        install_sPyNNaker_into(pyNN)
 
 
-# Check the version; we really want PyNN 0.9
-if not version_satisfies(pyNN, "0.9"):
-    raise NotImplementedError(
-        f"PyNN version {pyNN.__version__} found; "
-        f"sPyNNaker requires PyNN version 0.9")
-
-setup_pynn()
+if __name__ == "__main__":
+    setup_pynn()

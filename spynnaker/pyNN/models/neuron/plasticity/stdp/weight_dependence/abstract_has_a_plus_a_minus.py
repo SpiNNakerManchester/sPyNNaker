@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,8 @@ from spinn_utilities.abstract_base import AbstractBase
 
 
 class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
-    r""" An object that has :math:`A^+` and :math:`A^-` properties.
+    """
+    An object that has :math:`A^+` and :math:`A^-` properties.
     """
     __slots__ = [
         '__a_plus',
@@ -28,7 +29,8 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
         self.__a_minus = None
 
     def set_a_plus_a_minus(self, a_plus, a_minus):
-        """ Set the values of :math:`A^+` and :math:`A^-`.
+        """
+        Set the values of :math:`A^+` and :math:`A^-`.
 
         :param float a_plus: :math:`A^+`
         :param float a_minus: :math:`A^-`
@@ -38,7 +40,8 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
 
     @property
     def A_plus(self):
-        """ Settable model parameter: :math:`A^+`
+        """
+        Settable model parameter: :math:`A^+`
 
         :rtype: float
         """
@@ -50,7 +53,8 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
 
     @property
     def A_minus(self):
-        """ Settable model parameter: :math:`A^-`
+        """
+        Settable model parameter: :math:`A^-`
 
         :rtype: float
         """
