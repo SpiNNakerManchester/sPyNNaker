@@ -14,14 +14,14 @@
 import ctypes
 from dataclasses import dataclass
 
-from data_specification.enums import DataType
-
 from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 from spinn_utilities.overrides import overrides
 
 from pacman.utilities.utility_calls import get_field_based_keys
 
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
@@ -170,7 +170,8 @@ class PopulationMachineNeurons(
                 x, y, p, "Latest_Send_time", neuron_prov.latest_send)
 
     def _write_neuron_data_spec(self, spec, min_weights):
-        """ Write the data specification of the neuron data
+        """
+        Write the data specification of the neuron data.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
@@ -207,7 +208,8 @@ class PopulationMachineNeurons(
             spec, self._vertex_slice, self._neuron_regions, False)
 
     def _write_neuron_core_parameters(self, spec, min_weights):
-        """ Write the neuron parameters region
+        """
+        Write the neuron parameters region.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to

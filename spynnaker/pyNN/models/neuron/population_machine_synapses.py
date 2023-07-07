@@ -14,8 +14,7 @@
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 
-from data_specification.enums import DataType
-
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.abstract_models import (
@@ -123,7 +122,8 @@ class PopulationMachineSynapses(
 
     def _write_synapse_data_spec(
             self, spec, min_weights, weight_scales, structural_sz):
-        """ Write the data specification for the synapse data
+        """
+        Write the data specification for the synapse data.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
@@ -178,7 +178,8 @@ class PopulationMachineSynapses(
                 reference=self._synapse_references.structural_dynamics)
 
     def _write_synapse_parameters(self, spec, min_weights):
-        """ Write the synapse parameters data region
+        """
+        Write the synapse parameters data region.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to

@@ -353,9 +353,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         """
         app_vertex = self.governed_app_vertex
         neuron_vertex = PopulationNeuronsMachineVertex(
-            sdram, neuron_label, app_vertex,
-            vertex_slice, index, min_weights, weight_scales, neuron_data,
-            atoms_per_core)
+            sdram,
+            f"{label}_Neurons:{vertex_slice.lo_atom}-{vertex_slice.hi_atom}",
+            app_vertex, vertex_slice, index, min_weights, weight_scales,
+            neuron_data, atoms_per_core)
         app_vertex.remember_machine_vertex(neuron_vertex)
         self.__neuron_vertices.append(neuron_vertex)
 
@@ -398,9 +399,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # Do the lead synapse core
         lead_synapse_vertex = PopulationSynapsesMachineVertexLead(
-            lead_synapse_core_sdram, "{}(0)".format(syn_label),
-            self._governed_app_vertex, vertex_slice, min_weights,
-            weight_scales, structural_sz, synapse_references, atoms_per_core,
+            lead_synapse_core_sdram, f"{syn_label}(0)",
+            self.governed_app_vertex, vertex_slice, min_weights, weight_scales,
+            structural_sz, synapse_references, atoms_per_core,
             synaptic_matrices)
         self.governed_app_vertex.remember_machine_vertex(lead_synapse_vertex)
         self.__synapse_vertices.append(lead_synapse_vertex)

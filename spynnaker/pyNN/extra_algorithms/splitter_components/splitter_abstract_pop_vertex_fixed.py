@@ -194,22 +194,17 @@ class SplitterAbstractPopulationVertexFixed(
             self, vertex_slice, sdram, label,
             structural_sz, min_weights, weight_scales, index,
             max_atoms_per_core, synaptic_matrices, neuron_data):
-        # if self.__min_weights is None:
-        #     app_vertex = self._governed_app_vertex
-        #     self.__min_weights = app_vertex.get_min_weights()
-        #     self.__weight_scales = app_vertex.get_weight_scales(
-        #         self.__min_weights)
-
         # If using local-only create a local-only vertex
         s_dynamics = self.governed_app_vertex.synapse_dynamics
         if isinstance(s_dynamics, AbstractLocalOnly):
             return PopulationMachineLocalOnlyCombinedVertex(
-                sdram, label, self.governed_app_vertex, vertex_slice, index,
+                sdram, label,
+                self.governed_app_vertex, vertex_slice, index,
                 min_weights, weight_scales, neuron_data, max_atoms_per_core)
 
         # Otherwise create a normal vertex
         return PopulationMachineVertex(
-            sdram, label, self._governed_app_vertex,
+            sdram, label, self.governed_app_vertex,
             vertex_slice, index, min_weights, weight_scales,
             structural_sz, max_atoms_per_core, synaptic_matrices, neuron_data)
 

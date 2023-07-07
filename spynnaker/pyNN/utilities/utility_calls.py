@@ -27,7 +27,6 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.safe_eval import SafeEval
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.logger_utils import warn_once
-
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.random_stats import (

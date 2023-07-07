@@ -1468,7 +1468,8 @@ class AbstractPopulationVertex(
         return self.__neuron_recorder.get_max_variable_sdram_usage(n_neurons)
 
     def get_synapse_variable_sdram(self, vertex_slice):
-        """ Get the amount of SDRAM per timestep used by synapse parts
+        """
+        Get the amount of SDRAM per timestep used by synapse parts.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of neurons to get the size of
@@ -1481,7 +1482,8 @@ class AbstractPopulationVertex(
         return self.__synapse_recorder.get_variable_sdram_usage(vertex_slice)
 
     def get_max_synapse_variable_sdram(self, n_neurons):
-        """ Get the amount of SDRAM per timestep used by synapse parts
+        """
+        Get the amount of SDRAM per timestep used by synapse parts.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of neurons to get the size of
@@ -1494,7 +1496,8 @@ class AbstractPopulationVertex(
         return self.__synapse_recorder.get_max_variable_sdram_usage(n_neurons)
 
     def get_neuron_constant_sdram(self, n_atoms, neuron_regions):
-        """ Get the amount of fixed SDRAM used by neuron parts
+        """
+        Get the amount of fixed SDRAM used by neuron parts.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of neurons to get the size of
@@ -1608,6 +1611,72 @@ class AbstractPopulationVertex(
     def n_colour_bits(self):
         return self.__n_colour_bits
 
+    def get_max_delay(self, max_ring_buffer_bits):
+        """
+        Get the maximum delay and whether a delay extension is needed
+        for a given maximum number of ring buffer bits.
+
+        :param int max_ring_buffer_bits:
+            The maximum number of bits that can be used for the ring buffer
+            identifier (i.e. delay, synapse type, neuron index)
+        :return:
+            Tuple of the maximum delay supported on the core and whether
+            a delay extension is needed to support delays
+        :rtype: tuple(int, bool)
+        """
+        # Find the maximum delay from incoming synapses
+        max_delay_ms = 0
+        for proj in self.incoming_projections:
+            # pylint: disable=protected-access
+            s_info = proj._synapse_information
+            proj_max_delay = s_info.synapse_dynamics.get_delay_maximum(
+                s_info.connector, s_info)
+            max_delay_ms = max(max_delay_ms, proj_max_delay)
+        max_delay_steps = math.ceil(
+            max_delay_ms / SpynnakerDataView.get_simulation_time_step_ms())
+        max_delay_bits = get_n_bits(max_delay_steps)
+
+        # Find the maximum possible delay
+        n_atom_bits = self.get_n_atom_bits()
+        n_synapse_bits = get_n_bits(
+            self.neuron_impl.get_n_synapse_types())
+        n_delay_bits = max_ring_buffer_bits - (n_atom_bits + n_synapse_bits)
+
+        # Pick the smallest between the two, so that not too many bits are used
+        final_n_delay_bits = min(n_delay_bits, max_delay_bits)
+        return 2 ** final_n_delay_bits, max_delay_bits > final_n_delay_bits
+
+    def get_n_atom_bits(self):
+        """
+        :rtype: int
+        """
+        field_sizes = [
+            min(max_atoms, n) for max_atoms, n in zip(
+                self.get_max_atoms_per_dimension_per_core(), self.atoms_shape)]
+        return get_n_bits_for_fields(field_sizes)
+
+    def can_generate_on_machine(self):
+        """
+        Determine if the parameters of this vertex can be generated on the
+        machine
+
+        :rtype: bool
+        """
+
+        # Check that all the structs can actually be generated
+        for struct in self.__neuron_impl.structs:
+            if not struct.is_generatable:
+                # If this is false, we can't generate anything on machine
+                return False
+
+        if (not _all_gen(self.__parameters) or
+                not _all_gen(self.__state_variables)):
+            return False
+
+        _check_random_dists(self.__parameters)
+        _check_random_dists(self.__state_variables)
+        return True
+
     @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self):
         synapse_names = list(self.__neuron_impl.get_synapse_targets())
@@ -1615,7 +1684,6 @@ class AbstractPopulationVertex(
             for i, weight in enumerate(self.__min_weights):
                 db.insert_app_vertex(
                     self.label, synapse_names[i], "min_weight", weight)
-
             for (weight, r_weight) in self.__weight_provenance:
                 proj_info = self.__weight_provenance[weight, r_weight]
                 for i, (_proj, s_info) in enumerate(proj_info):
