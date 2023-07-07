@@ -31,13 +31,14 @@ def setup_configs():
     setup is called.
     """
     clear_cfg_files(False)
-    add_spinnaker_cfg()  # This add its dependencies too
+    # Board type setup done later
+    add_spinnaker_cfg(board_type=None)  # This add its dependencies too
     set_cfg_files(
         config_file=CONFIG_FILE_NAME,
         default=os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))
 
 
-def unittest_setup():
+def unittest_setup(*, board_type=None):
     """
     Does all the steps that may be required before a unit-test.
 
@@ -50,12 +51,26 @@ def unittest_setup():
     .. note::
          This file should only be called from sPyNNaker tests
          that do not call `sim.setup`
+
+    :param board_type: Value to say how to confuire the system.
+        This includes defining what a VirtualMachine would be
+        Can be 1 for Spin1 boards, 2 for Spin2 boards or
+        None if the test do not depend on knowing the board type.
+    :type board_type: None or int
     """
     clear_cfg_files(True)
-    add_spynnaker_cfg()
     SpynnakerDataWriter.mock()
+    add_spynnaker_cfg(board_type)
 
 
-def add_spynnaker_cfg():
-    add_spinnaker_cfg()  # This add its dependencies too
+def add_spynnaker_cfg(board_type):
+    """
+
+    :param board_type: Value to say how to confuire the system.
+        This includes defining what a VirtualMachine would be
+        Can be 1 for Spin1 boards, 2 for Spin2 boards or
+        None if the test do not depend on knowing the board type.
+    :type board_type: None or int
+    """
     add_default_cfg(os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))
+    add_spinnaker_cfg(board_type)  # This add its dependencies too
