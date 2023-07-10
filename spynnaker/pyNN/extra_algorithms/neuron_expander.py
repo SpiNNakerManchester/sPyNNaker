@@ -17,7 +17,7 @@ from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model.enums import ExecutableType
 from spinnman.model import ExecutableTargets
-from spinnman.model.enums import CPUState
+from spinnman.model.enums import CPUState, UserRegister
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -76,8 +76,9 @@ def _plan_expansion():
                     neuron_bin, placement.x, placement.y, placement.p,
                     executable_type=ExecutableType.SYSTEM)
                 # Write the region to USER1, as that is the best we can do
-                txrx.write_user(placement.x, placement.y, placement.p, 1,
-                                vertex.neuron_generator_region)
+                txrx.write_user(
+                    placement.x, placement.y, placement.p, UserRegister.USER_1,
+                    vertex.neuron_generator_region)
 
     return expander_cores, expanded_pop_vertices
 

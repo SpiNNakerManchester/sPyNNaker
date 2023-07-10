@@ -17,7 +17,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model.enums import ExecutableType
 from spinnman.model import ExecutableTargets
-from spinnman.model.enums import CPUState
+from spinnman.model.enums import CPUState, UserRegister
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -85,8 +85,9 @@ def _plan_expansion():
                     executable_type=ExecutableType.SYSTEM)
                 expanded_placements.append(placement)
                 # Write the region to USER1, as that is the best we can do
-                txrx.write_user(placement.x, placement.y, placement.p, 1,
-                                vertex.connection_generator_region)
+                txrx.write_user(
+                    placement.x, placement.y, placement.p, UserRegister.USER_1,
+                    vertex.connection_generator_region)
                 max_data = max(max_data, vertex.max_gen_data)
                 max_bit_field = max(max_bit_field, vertex.bit_field_size)
 

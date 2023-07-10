@@ -16,7 +16,7 @@ import logging
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinnman.model import ExecutableTargets
-from spinnman.model.enums import CPUState, ExecutableType
+from spinnman.model.enums import CPUState, ExecutableType, UserRegister
 from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import (
         machine_bit_field_ordered_covering_compressor,
@@ -55,8 +55,9 @@ def _locate_expander_rerun_targets(bitfield_targets):
             placement.x, placement.y, placement.p,
             executable_type=ExecutableType.SYSTEM)
         # Write the region to USER1, as that is the best we can do
-        txrx.write_user(placement.x, placement.y, placement.p, 1,
-                        placement.vertex.connection_generator_region)
+        txrx.write_user(
+            placement.x, placement.y, placement.p, UserRegister.USER_1,
+            placement.vertex.connection_generator_region)
     return new_cores
 
 

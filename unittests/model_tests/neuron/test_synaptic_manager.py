@@ -69,8 +69,8 @@ class _MockTransceiverinOut(Transceiver):
         return 0
 
     @overrides(Transceiver.write_memory)
-    def write_memory(self, x, y, base_address, data, n_bytes=None, offset=0,
-                     cpu=0, is_filename=False, get_sum=False):
+    def write_memory(self, x, y, base_address, data, *,
+                     n_bytes=None, offset=0, cpu=0, get_sum=False):
         if data is None:
             return
         if isinstance(data, int):
@@ -83,11 +83,11 @@ class _MockTransceiverinOut(Transceiver):
         return CPUInfo(x=1, y=2, p=3, cpu_data=bytes(bs), offset=0)
 
     @overrides(Transceiver.read_memory)
-    def read_memory(self, x, y, base_address, length, cpu=0):
+    def read_memory(self, x, y, base_address, length, *, cpu=0):
         return self._data_to_read[base_address:base_address + length]
 
     @overrides(Transceiver.read_word)
-    def read_word(self, x, y, base_address, cpu=0):
+    def read_word(self, x, y, base_address, *, cpu=0):
         datum, = struct.unpack("<I", self.read_memory(x, y, base_address, 4))
         return datum
 
