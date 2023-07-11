@@ -17,12 +17,15 @@ Plotting tools to be used together with
 https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/utility/plotting.py
 """
 
+from types import ModuleType
 from neo import SpikeTrain, Block, Segment, AnalogSignal
 import numpy as np
 import quantities
+plt: ModuleType
 try:
     from pyNN.utility.plotting import repeat
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot  # type: ignore[import]
+    plt = matplotlib.pyplot
     _matplotlib_missing = False
 except ImportError:
     _matplotlib_missing = True

@@ -13,16 +13,17 @@
 # limitations under the License.
 
 import numpy
+from typing import Optional
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 try:
-    import csa
-    _csa_found = (True, ImportError)
-except ImportError as _ex:
+    import csa  # type: ignore[import]
+    _csa_import_error: Optional[ImportError] = None
+except ImportError as __ex:
     # Importing csa causes problems with readthedocs so allowing it to fail
-    _csa_found = (False, _ex)
+    _csa_import_error = __ex
 
 
 class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
@@ -62,9 +63,8 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             want to actually use this class.
         """
         super().__init__(safe, callback, verbose)
-        found, ex = _csa_found
-        if not found:
-            raise ex
+        if _csa_import_error:
+            raise _csa_import_error
         self.__cset = cset
 
         # Storage for full connection sets
@@ -101,7 +101,7 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
         # use CSA to cross the range of this vertex's neurons with the cset
         pair_list = csa.cross(
-            range(0, synapse_info.n_pre_neurons),
+            range(synapse_info.n_pre_neurons),
             range(post_vertex_slice.lo_atom, post_vertex_slice.hi_atom+1)) \
             * self.__full_cset
 
