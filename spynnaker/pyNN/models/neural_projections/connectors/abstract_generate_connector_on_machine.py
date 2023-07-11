@@ -149,7 +149,7 @@ class AbstractGenerateConnectorOnMachine(
 
     @property
     @abstractmethod
-    def gen_connector_id(self):
+    def gen_connector_id(self) -> int:
         """
         The ID of the connection generator on the machine.
 

@@ -11,13 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import numpy
+from typing import List, Tuple
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
+
+from pacman.model.graphs.common import Slice
+from pacman.model.placements import Placement
 
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.abstract_models import (
     AbstractSupportsBitFieldRoutingCompression)
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
@@ -25,9 +31,13 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, HasSynapses)
 
+from .abstract_population_vertex import AbstractPopulationVertex
 from .population_machine_synapses_provenance import (
     PopulationMachineSynapsesProvenance)
 from .synaptic_matrices import SynapseRegions
+from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+from spynnaker.pyNN.models.neural_projections import (
+    ProjectionApplicationEdge, SynapseInformation)
 
 
 class PopulationMachineSynapses(
@@ -44,7 +54,7 @@ class PopulationMachineSynapses(
 
     @property
     @abstractmethod
-    def _app_vertex(self):
+    def _app_vertex(self) -> AbstractPopulationVertex:
         """
         The application vertex of the machine vertex.
 
@@ -53,10 +63,11 @@ class PopulationMachineSynapses(
 
         :rtype: AbstractPopulationVertex
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def _vertex_slice(self):
+    def _vertex_slice(self) -> Slice:
         """
         The slice of the application vertex atoms on this machine vertex.
 
@@ -65,42 +76,47 @@ class PopulationMachineSynapses(
 
         :rtype: ~pacman.model.graphs.common.Slice
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def _synaptic_matrices(self):
+    def _synaptic_matrices(self) -> SynapticMatrices:
         """
         The object holding synaptic matrices.
 
         :rtype: SynapticMatrices
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def _synapse_regions(self):
+    def _synapse_regions(self) -> SynapseRegions:
         """
         The identifiers of synaptic regions.
 
         :rtype: .SynapseRegions
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def _max_atoms_per_core(self):
+    def _max_atoms_per_core(self) -> int:
         """
         The maximum number of atoms on any core targeted by these synapses.
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def set_do_synapse_regeneration(self):
+    def set_do_synapse_regeneration(self) -> None:
         """
         Indicates that synaptic data regeneration is required.
         """
+        raise NotImplementedError
 
     @property
-    def _synapse_references(self):
+    def _synapse_references(self) -> SynapseRegions:
         """
         The references to synapse regions.  Override to provide these.
 
@@ -110,13 +126,14 @@ class PopulationMachineSynapses(
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                bit_field_base_address)
-    def bit_field_base_address(self, placement):
+    def bit_field_base_address(self, placement: Placement) -> int:
         return locate_memory_region_for_placement(
             placement=placement, region=self._synapse_regions.bitfield_filter)
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                regeneratable_sdram_blocks_and_sizes)
-    def regeneratable_sdram_blocks_and_sizes(self, placement):
+    def regeneratable_sdram_blocks_and_sizes(
+            self, placement: Placement) -> List[Tuple[int, int]]:
         synaptic_matrix_base_address = locate_memory_region_for_placement(
             placement=placement, region=self._synapse_regions.synaptic_matrix)
         return [(
@@ -125,8 +142,9 @@ class PopulationMachineSynapses(
             self._synaptic_matrices.on_chip_generated_matrix_size)]
 
     def _write_synapse_data_spec(
-            self, spec, ring_buffer_shifts, weight_scales,
-            structural_sz):
+            self, spec: DataSpecificationGenerator,
+            ring_buffer_shifts: List[int], weight_scales: List[int],
+            structural_sz: int):
         """
         Write the data specification for the synapse data.
 
@@ -136,9 +154,7 @@ class PopulationMachineSynapses(
             The shifts to apply to convert ring buffer values to S1615 values
         :param list(int) weight_scales:
             The scaling to apply to weights to store them in the synapses
-        :param int all_syn_block_sz: The maximum size of the synapses in bytes
         :param int structural_sz: The size of the structural data
-        :param int n_neuron_bits: The number of bits to use for neuron ids
         """
         # Write the synapse parameters
         self._write_synapse_parameters(spec, ring_buffer_shifts)
@@ -182,7 +198,9 @@ class PopulationMachineSynapses(
                 size=4, label='synapseDynamicsStructuralParams',
                 reference=self._synapse_references.structural_dynamics)
 
-    def _write_synapse_parameters(self, spec, ring_buffer_shifts):
+    def _write_synapse_parameters(
+            self, spec: DataSpecificationGenerator,
+            ring_buffer_shifts: List[int]):
         """
         Write the synapse parameters data region.
 
@@ -217,20 +235,21 @@ class PopulationMachineSynapses(
         spec.write_array(ring_buffer_shifts)
 
     @overrides(AbstractSynapseExpandable.gen_on_machine)
-    def gen_on_machine(self):
+    def gen_on_machine(self) -> bool:
         return self._synaptic_matrices.gen_on_machine
 
     @overrides(AbstractSynapseExpandable.read_generated_connection_holders)
-    def read_generated_connection_holders(self, placement):
+    def read_generated_connection_holders(self, placement: Placement):
         self._synaptic_matrices.read_generated_connection_holders(placement)
 
     @property
     @overrides(AbstractSynapseExpandable.connection_generator_region)
-    def connection_generator_region(self):
+    def connection_generator_region(self) -> int:
         return self._synapse_regions.connection_builder
 
     def get_connections_from_machine(
-            self, placement, app_edge, synapse_info):
+            self, placement: Placement, app_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation) -> numpy.ndarray:
         """
         Get the connections from the machine for this vertex.
 
@@ -247,10 +266,10 @@ class PopulationMachineSynapses(
 
     @property
     @overrides(AbstractSynapseExpandable.max_gen_data)
-    def max_gen_data(self):
+    def max_gen_data(self) -> int:
         return self._synaptic_matrices.max_gen_data
 
     @property
     @overrides(AbstractSynapseExpandable.bit_field_size)
-    def bit_field_size(self):
+    def bit_field_size(self) -> int:
         return self._synaptic_matrices.bit_field_size

@@ -15,7 +15,7 @@ from __future__ import annotations
 import logging
 import math
 import re
-from typing import Dict, List, Optional, Tuple, Union, TYPE_CHECKING
+from typing import Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING
 import numpy
 import pyNN
 from pyNN.random import NumpyRNG, RandomDistribution
@@ -533,7 +533,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 synapse_info.pre_population.label,
                 synapse_info.post_population.label,
                 self.__class__.__name__, "Times_synaptic_delays_got_clipped",
-                ncd),
+                ncd)
             if ncd > 0:
                 db.insert_report(
                     f"The delays in the connector {self.__class__.__name__} "
@@ -601,8 +601,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     def get_connected_vertices(
             self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
-            target_vertex: ApplicationVertex) -> List[
-                Tuple[MachineVertex, List[AbstractVertex]]]:
+            target_vertex: ApplicationVertex) -> Sequence[
+                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
         """
         Get the machine vertices that are connected to each other with
         this connector

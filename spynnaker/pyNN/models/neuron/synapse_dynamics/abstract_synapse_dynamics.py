@@ -12,15 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+from __future__ import annotations
 import logging
 import numpy
+from typing import Any, List, Optional, Sequence, Tuple, TYPE_CHECKING
 from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
+from pacman.model.graphs import AbstractVertex
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.machine import MachineVertex
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.exceptions import InvalidParameterType
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections.connectors import (
+        AbstractConnector)
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -33,7 +41,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def merge(self, synapse_dynamics):
+    def merge(self, synapse_dynamics: AbstractSynapseDynamics
+              ) -> AbstractSynapseDynamics:
         """
         Merge with the given synapse_dynamics and return the result, or
         error if merge is not possible.
@@ -41,34 +50,38 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param AbstractSynapseDynamics synapse_dynamics:
         :rtype: AbstractSynapseDynamics
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_vertex_executable_suffix(self):
+    def get_vertex_executable_suffix(self) -> str:
         """
         Get the executable suffix for a vertex for this dynamics.
 
         :rtype: str
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def changes_during_run(self):
+    def changes_during_run(self) -> bool:
         """
         Whether the synapses change during a run.
 
         :rtype: bool
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def weight(self):
+    def weight(self) -> float:
         """
         The weight of connections.
 
         :rtype: float
         """
+        raise NotImplementedError
 
-    def _round_delay(self, delay):
+    def _round_delay(self, delay):  # FIXME type
         """
         Round the delays to multiples of full timesteps.
 
@@ -92,24 +105,26 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def delay(self):
+    def delay(self) -> float:
         """
         The delay of connections.
 
         :rtype: float
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def is_combined_core_capable(self):
+    def is_combined_core_capable(self) -> bool:
         """
         Whether the synapse dynamics can run on a core combined with
         the neuron, or if a separate core is needed.
 
         :rtype: bool
         """
+        raise NotImplementedError
 
-    def get_value(self, key):
+    def get_value(self, key: str) -> Any:
         """
         Get a property.
 
@@ -121,7 +136,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         raise InvalidParameterType(
             f"Type {type(self)} does not have parameter {key}")
 
-    def set_value(self, key, value):
+    def set_value(self, key: str, value: Any):
         """
         Set a property.
 
@@ -136,16 +151,17 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             raise InvalidParameterType(
                 f"Type {type(self)} does not have parameter {key}")
 
-    def get_delay_maximum(self, connector, synapse_info):
+    def get_delay_maximum(
+            self, connector: AbstractConnector,
+            synapse_info: SynapseInformation) -> Optional[int]:
         """
         Get the maximum delay for the synapses.
-
-        :param AbstractConnector connector:
-        :param ~numpy.ndarray delays:
         """
         return connector.get_delay_maximum(synapse_info)
 
-    def get_delay_minimum(self, connector, synapse_info):
+    def get_delay_minimum(
+            self, connector: AbstractConnector,
+            synapse_info: SynapseInformation) -> Optional[int]:
         """
         Get the minimum delay for the synapses.
         This will support the filtering of the undelayed edge
@@ -157,7 +173,9 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return connector.get_delay_minimum(synapse_info)
 
-    def get_delay_variance(self, connector, delays, synapse_info):
+    def get_delay_variance(
+            self, connector: AbstractConnector, delays: numpy.ndarray,
+            synapse_info: SynapseInformation) -> float:
         """
         Get the variance in delay for the synapses.
 
@@ -166,7 +184,9 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return connector.get_delay_variance(delays, synapse_info)
 
-    def get_weight_mean(self, connector, synapse_info):
+    def get_weight_mean(
+            self, connector: AbstractConnector,
+            synapse_info: SynapseInformation) -> float:
         """
         Get the mean weight for the synapses.
 
@@ -175,7 +195,9 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return connector.get_weight_mean(synapse_info.weights, synapse_info)
 
-    def get_weight_maximum(self, connector, synapse_info):
+    def get_weight_maximum(
+            self, connector: AbstractConnector,
+            synapse_info: SynapseInformation) -> float:
         """
         Get the maximum weight for the synapses.
 
@@ -184,7 +206,9 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return connector.get_weight_maximum(synapse_info)
 
-    def get_weight_variance(self, connector, weights, synapse_info):
+    def get_weight_variance(
+            self, connector: AbstractConnector, weights: numpy.ndarray,
+            synapse_info: SynapseInformation) -> float:
         """
         Get the variance in weight for the synapses.
 
@@ -193,7 +217,9 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return connector.get_weight_variance(weights, synapse_info)
 
-    def get_provenance_data(self, pre_population_label, post_population_label):
+    def get_provenance_data(
+            self, pre_population_label: str,
+            post_population_label: str) -> List[Any]:
         """
         Get the provenance data from this synapse dynamics object.
 
@@ -206,7 +232,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         # TODO: is this a meaningful method any more; if so, what does it do?
         return []
 
-    def get_synapse_id_by_target(self, target):
+    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         """
         Get the index of the synapse type based on the name, or `None`
         if the name is not found.
@@ -217,7 +243,11 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         # pylint: disable=unused-argument
         return None
 
-    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+    def get_connected_vertices(
+            self, s_info: SynapseInformation,
+            source_vertex: ApplicationVertex,
+            target_vertex: ApplicationVertex) -> Sequence[
+                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
         """
         Get the machine vertices that are connected to each other with
         this connector.
@@ -239,7 +269,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             s_info, source_vertex, target_vertex)
 
     @property
-    def absolute_max_atoms_per_core(self):
+    def absolute_max_atoms_per_core(self) -> int:
         """
         The absolute maximum number of atoms per core supported by this
         synapse dynamics object.

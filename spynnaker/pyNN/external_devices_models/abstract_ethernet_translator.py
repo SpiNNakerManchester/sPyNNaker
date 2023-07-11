@@ -33,3 +33,4 @@ class AbstractEthernetTranslator(object, metaclass=AbstractBase):
         :type multicast_packet:
             ~spinnman.messages.eieio.data_messages.AbstractDataElement
         """
+        raise NotImplementedError

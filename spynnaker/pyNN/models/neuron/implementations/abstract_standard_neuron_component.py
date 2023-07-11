@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Dict, List
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.ranged import RangeDictionary
+from spynnaker.pyNN.utilities.struct import Struct
 
 
 class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
@@ -23,7 +26,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         "__structs",
         "__units")
 
-    def __init__(self, structs, units):
+    def __init__(self, structs: List[Struct], units: Dict[str, str]):
         """
         :param list(Struct) structs: The structures of the component
         :param dict units: The units to use for each parameter
@@ -32,7 +35,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         self.__units = units
 
     @property
-    def structs(self):
+    def structs(self) -> List[Struct]:
         """
         The structures of the component.  If there are multiple structures,
         the order is how they will appear in memory; where there are
@@ -46,16 +49,17 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         return self.__structs
 
     @abstractmethod
-    def add_parameters(self, parameters):
+    def add_parameters(self, parameters: RangeDictionary):
         """
         Add the initial values of the parameters to the parameter holder.
 
         :param ~spinn_utilities.ranged.RangeDictionary parameters:
             A holder of the parameters
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def add_state_variables(self, state_variables):
+    def add_state_variables(self, state_variables: RangeDictionary):
         """
         Add the initial values of the state variables to the state
         variables holder.
@@ -63,8 +67,9 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         :param ~spinn_utilities.ranged.RangeDictionary state_variables:
             A holder of the state variables
         """
+        raise NotImplementedError
 
-    def has_variable(self, variable):
+    def has_variable(self, variable: str) -> bool:
         """
         Determine if this component has a variable by the given name.
 
@@ -73,7 +78,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         """
         return variable in self.__units
 
-    def get_units(self, variable):
+    def get_units(self, variable: str) -> str:
         """
         Get the units of the given variable.
 

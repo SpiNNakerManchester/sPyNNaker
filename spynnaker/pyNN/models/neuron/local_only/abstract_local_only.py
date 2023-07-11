@@ -11,10 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import List
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.machine import MachineVertex
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
+from spynnaker.pyNN.models.projection import Projection
 
 
 class AbstractLocalOnly(AbstractSynapseDynamics):
@@ -23,7 +27,8 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     """
 
     @abstractmethod
-    def get_parameters_usage_in_bytes(self, n_atoms, incoming_projections):
+    def get_parameters_usage_in_bytes(
+            self, n_atoms: int, incoming_projections: List[Projection]) -> int:
         """
         Get the size of the parameters in bytes.
 
@@ -33,9 +38,12 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
             list(~spynnaker.pyNN.models.projection.Projection)
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def write_parameters(self, spec, region, machine_vertex, weight_scales):
+    def write_parameters(
+            self, spec: DataSpecificationGenerator, region: int,
+            machine_vertex: MachineVertex, weight_scales: List[float]) -> None:
         """
         Write the parameters to the data specification for a vertex.
 
@@ -46,9 +54,10 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
             The machine vertex being targeted
         :param list(float) weight_scales: Scale factors to apply to the weights
         """
+        raise NotImplementedError
 
     @property
-    def absolute_max_atoms_per_core(self):
+    def absolute_max_atoms_per_core(self) -> int:
         """
         The absolute maximum number of atoms per core.
 
@@ -64,5 +73,5 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
 
     @property
     @overrides(AbstractSynapseDynamics.is_combined_core_capable)
-    def is_combined_core_capable(self):
+    def is_combined_core_capable(self) -> bool:
         return True

@@ -29,10 +29,11 @@ class AbstractHasDelayStages(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def n_delay_stages(self):
+    def n_delay_stages(self) -> int:
         """
         The maximum number of delay stages required by any connection
         out of this delay extension vertex.
 
         :rtype: int
         """
+        raise NotImplementedError

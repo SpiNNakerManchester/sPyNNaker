@@ -43,72 +43,79 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def device_control_partition_id(self):
+    def device_control_partition_id(self) -> str:
         """
         A partition ID to give to an outgoing edge partition that will
         control this device.
 
         :rtype: str
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def device_control_key(self):
+    def device_control_key(self) -> int:
         """
         The key that must be sent to the device to control it.
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def device_control_uses_payload(self):
+    def device_control_uses_payload(self) -> bool:
         """
         Whether the control of the device accepts an arbitrary valued
         payload, the value of which will change the devices behaviour.
 
         :rtype: bool
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def device_control_min_value(self):
+    def device_control_min_value(self) -> float:
         """
         The minimum value to send to the device.
 
         :rtype: float
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def device_control_max_value(self):
+    def device_control_max_value(self) -> float:
         """
         The maximum value to send to the device.
 
         :rtype: float
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def device_control_timesteps_between_sending(self):
+    def device_control_timesteps_between_sending(self) -> int:
         """
         The number of timesteps between sending commands to the device.
         This defines the "sampling interval" for the device.
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def device_control_send_type(self):
+    def device_control_send_type(self) -> SendType:
         """
         The type of data to be sent.
 
         :rtype: SendType
         """
+        raise NotImplementedError
 
     @property
-    def device_control_scaling_factor(self):  # pragma: no cover
+    def device_control_scaling_factor(self) -> int:  # pragma: no cover
         """
         The scaling factor used to send the payload to this device.
 
@@ -117,7 +124,7 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
         return 1
 
     @property
-    def device_control_first_send_timestep(self):
+    def device_control_first_send_timestep(self) -> int:
         """
         The first timestep that the device should send in (0 by default).
 

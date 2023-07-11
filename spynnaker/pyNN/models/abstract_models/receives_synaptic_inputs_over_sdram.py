@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Sequence
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs import AbstractSupportsSDRAMEdges
 from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
@@ -35,17 +36,18 @@ class ReceivesSynapticInputsOverSDRAM(
 
     @property
     @abstractmethod
-    def weight_scales(self):
+    def weight_scales(self) -> Sequence[int]:
         """
         A list of scale factors to be applied to weights that get passed
         over SDRAM, one for each synapse type.
 
         :rtype: list(int)
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def n_bytes_for_transfer(self):
+    def n_bytes_for_transfer(self) -> int:
         """
         The number of bytes to be sent over the channel.  This will be
         calculated using the above numbers, but also rounded up to a number
@@ -53,3 +55,4 @@ class ReceivesSynapticInputsOverSDRAM(
 
         :rtype: int
         """
+        raise NotImplementedError

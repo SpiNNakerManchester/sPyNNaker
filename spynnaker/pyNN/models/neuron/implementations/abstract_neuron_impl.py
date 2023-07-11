@@ -30,6 +30,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
         :rtype: str
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -39,6 +40,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
         :rtype: str
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -48,6 +50,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
         :rtype: list(Struct)
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_global_weight_scale(self) -> int:
@@ -56,6 +59,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_n_synapse_types(self) -> int:
@@ -64,6 +68,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_synapse_id_by_target(self, target) -> int:
@@ -73,6 +78,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         :param str target: The name of the synapse
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_synapse_targets(self):
@@ -81,6 +87,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
         :rtype: list(str)
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_recordable_variables(self):
@@ -89,6 +96,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
         :rtype: list(str)
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_recordable_units(self, variable: str) -> str:
@@ -97,6 +105,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
         :param str variable: The name of the variable
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_recordable_data_types(self):
@@ -106,6 +115,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         :return: dictionary of name of variable to data type of variable
         :rtype: dict(str,~data_specification.enums.DataType)
         """
+        raise NotImplementedError
 
     @abstractmethod
     def is_recordable(self, variable: str) -> bool:
@@ -115,6 +125,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         :param str variable: The name of the variable
         :rtype: bool
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_recordable_variable_index(self, variable: str) -> int:
@@ -125,6 +136,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         :param str variable: The name of the variable
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
     def add_parameters(self, parameters):
@@ -134,6 +146,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         :param ~spinn_utilities.ranged.RangeDictionary parameters:
             A holder of the parameters
         """
+        raise NotImplementedError
 
     @abstractmethod
     def add_state_variables(self, state_variables):
@@ -144,6 +157,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         :param ~spinn_utilities.ranged.RangeDictionary state_variables:
             A holder of the state variables
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_units(self, variable: str) -> str:
@@ -153,6 +167,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         :param str variable: The name of the variable
         :rtype: str
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -162,3 +177,4 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
         :rtype: bool
         """
+        raise NotImplementedError

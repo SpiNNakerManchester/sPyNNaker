@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
@@ -22,45 +24,52 @@ class AbstractRandomStats(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def cdf(self, dist, v):
+    def cdf(self, dist: RandomDistribution, v: float) -> float:
         """
         Return the cumulative distribution function value for the value `v`.
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def ppf(self, dist, p):
+    def ppf(self, dist: RandomDistribution, p: float) -> float:
         """
         Return the percent point function value for the probability `p`.
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def mean(self, dist):
+    def mean(self, dist: RandomDistribution) -> float:
         """
         Return the mean of the distribution.
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def std(self, dist):
+    def std(self, dist: RandomDistribution) -> float:
         """
         Return the standard deviation of the distribution.
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def var(self, dist):
+    def var(self, dist: RandomDistribution) -> float:
         """
         Return the variance of the distribution.
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def high(self, distribution):
+    def high(self, distribution: RandomDistribution) -> Optional[float]:
         """
         Return the high cut-off value of the distribution, or `None` if the
         distribution is unbounded.
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def low(self, distribution):
+    def low(self, distribution: RandomDistribution) -> Optional[float]:
         """
         Return the low cut-off value of the distribution, or `None` if the
         distribution is unbounded.
         """
+        raise NotImplementedError

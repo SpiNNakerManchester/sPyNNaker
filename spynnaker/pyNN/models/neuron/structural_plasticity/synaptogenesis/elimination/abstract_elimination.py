@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractHasParameterNames)
 
@@ -26,26 +27,30 @@ class AbstractElimination(AbstractHasParameterNames, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def vertex_executable_suffix(self):
+    def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_parameters_sdram_usage_in_bytes(self):
+    def get_parameters_sdram_usage_in_bytes(self) -> int:
         """
         Get the amount of SDRAM used by the parameters of this rule.
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def write_parameters(self, spec, weight_scale):
+    def write_parameters(
+            self, spec: DataSpecificationGenerator, weight_scale: float):
         """
         Write the parameters of the rule to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
         :param float weight_scale:
         """
+        raise NotImplementedError

@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ctypes
+from typing import Sequence
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+from .abstract_population_vertex import AbstractPopulationVertex
 
 
 class SynapseProvenance(ctypes.LittleEndianStructure):
@@ -69,7 +71,7 @@ class PopulationMachineSynapsesProvenance(object):
 
     @property
     @abstractmethod
-    def _app_vertex(self):
+    def _app_vertex(self) -> AbstractPopulationVertex:
         """
         The application vertex of the machine vertex.
 
@@ -79,8 +81,11 @@ class PopulationMachineSynapsesProvenance(object):
 
         :rtype: AbstractPopulationVertex
         """
+        raise NotImplementedError
 
-    def _parse_synapse_provenance(self, label,  x, y, p, provenance_data):
+    def _parse_synapse_provenance(
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
         """
         Extract and yield synapse provenance.
 

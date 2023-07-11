@@ -11,8 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from typing import List, Tuple, Union, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.application import ApplicationVertex
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
+        .partner_selection import AbstractPartnerSelection
+    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
+        .formation import AbstractFormation
+    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
+        .elimination import AbstractElimination
+    from spynnaker.pyNN.models.projection import Projection
+    from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 
 
 class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
@@ -22,7 +35,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_structural_parameters_sdram_usage_in_bytes(
-            self, incoming_projections, n_neurons):
+            self, incoming_projections: List[Projection],
+            n_neurons: int) -> int:
         """
         Get the size of the structural parameters.
 
@@ -39,11 +53,13 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         :raises PacmanInvalidParameterException:
             If the parameters make no sense.
         """
+        raise NotImplementedError
 
     @abstractmethod
     def write_structural_parameters(
-            self, spec, region, weight_scales, app_vertex, vertex_slice,
-            synaptic_matrices):
+            self, spec: DataSpecificationGenerator, region: int,
+            weight_scales: List[float], app_vertex: ApplicationVertex,
+            vertex_slice: Slice, synaptic_matrices: SynapticMatrices):
         """
         Write structural plasticity parameters.
 
@@ -58,6 +74,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         :param SynapticMatrices synaptic_matrices:
             The synaptic matrices for this vertex
         """
+        raise NotImplementedError
 
     @abstractmethod
     def set_connections(
@@ -70,33 +87,37 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         :param ProjectionApplicationEdge app_edge:
         :param SynapseInformation synapse_info:
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def f_rew(self):
+    def f_rew(self) -> float:
         """
         The frequency of rewiring.
 
         :rtype: float
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def s_max(self):
+    def s_max(self) -> int:
         """
         The maximum number of synapses.
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def with_replacement(self):
+    def with_replacement(self) -> bool:
         """
         Whether to allow replacement when creating synapses.
 
         :rtype: bool
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -104,65 +125,74 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         """
         The seed to control the randomness.
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def initial_weight(self):
+    def initial_weight(self) -> float:
         """
         The weight of a formed connection.
 
         :rtype: float
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def initial_delay(self):
+    def initial_delay(self) -> Union[float, Tuple[float, float]]:
         """
         The delay of a formed connection.
 
         :rtype: float or (float, float)
         """
+        # FIXME type
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def partner_selection(self):
+    def partner_selection(self) -> AbstractPartnerSelection:
         """
         The partner selection rule.
 
         :rtype: AbstractPartnerSelection
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def formation(self):
+    def formation(self) -> AbstractFormation:
         """
         The formation rule.
 
         :rtype: AbstractFormation
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def elimination(self):
+    def elimination(self) -> AbstractElimination:
         """
         The elimination rule.
 
         :rtype: AbstractElimination
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def check_initial_delay(self, max_delay_ms):
+    def check_initial_delay(self, max_delay_ms: int):
         """
         Check that delays can be done without delay extensions.
 
         :param int max_delay_ms: The maximum delay supported, in milliseconds
         :raises Exception: if the delay is out of range
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_max_rewires_per_ts(self):
+    def get_max_rewires_per_ts(self) -> int:
         """
         Get the max number of rewires per timestep.
 
         :rtype: int
         """
+        raise NotImplementedError

@@ -14,6 +14,7 @@
 
 from enum import Enum
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+import numpy
 
 
 class MatrixGeneratorID(Enum):
@@ -28,7 +29,7 @@ class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
     """
     __slots__ = ()
 
-    def generate_on_machine(self):
+    def generate_on_machine(self) -> bool:
         """
         Determines if this instance should be generated on the machine.
 
@@ -40,29 +41,33 @@ class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def gen_matrix_id(self):
+    def gen_matrix_id(self) -> int:
         """
         The ID of the on-machine matrix generator.
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
     def gen_matrix_params(
-            self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
-            synapse_info, max_row_info, max_pre_atoms_per_core,
-            max_post_atoms_per_core):
+            self, synaptic_matrix_offset: int, delayed_matrix_offset: int,
+            # FIXME types
+            app_edge, synapse_info, max_row_info, max_pre_atoms_per_core,
+            max_post_atoms_per_core) -> numpy.ndarray:
         """
         Any parameters required by the matrix generator.
 
         :rtype: ~numpy.ndarray(uint32)
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def gen_matrix_params_size_in_bytes(self):
+    def gen_matrix_params_size_in_bytes(self) -> int:
         """
         The size of the parameters of the matrix generator in bytes.
 
         :rtype: int
         """
+        raise NotImplementedError

@@ -11,15 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from six import add_metaclass
+import numpy
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pacman.model.placements import Placement
+from spynnaker.pyNN.models.neural_projections import (
+    ProjectionApplicationEdge, SynapseInformation)
 
 
-@add_metaclass(AbstractBase)
-class HasSynapses(object):
+class HasSynapses(object, metaclass=AbstractBase):
     @abstractmethod
     def get_connections_from_machine(
-            self, placement, app_edge, synapse_info):
+            self, placement: Placement, app_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation) -> numpy.ndarray:
         """
         Get the connections from the machine for this vertex.
 
@@ -31,3 +34,4 @@ class HasSynapses(object):
             The specific projection within the edge
         :rtype: ~numpy.ndarray
         """
+        raise NotImplementedError

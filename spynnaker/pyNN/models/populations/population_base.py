@@ -13,11 +13,20 @@
 # limitations under the License.
 
 import logging
+from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
+from pyNN.space import BaseStructure
+import neo
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union, final
+from typing_extensions import TypeAlias
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
+from pacman.model.graphs.application import ApplicationVertex
+from spynnaker.pyNN.models.recorder import Recorder
+from .assembly import Assembly
 
 logger = FormatAdapter(logging.getLogger(__name__))
+_Variables: TypeAlias = Union[str, List[str], Tuple[str, ...]]
 
 
 def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
@@ -40,7 +49,7 @@ class PopulationBase(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @property
-    def local_cells(self):
+    def local_cells(self) -> Sequence[int]:
         """
         An array containing the cell IDs of those neurons in the
         Population that exist on the local MPI node.
@@ -53,15 +62,16 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def all_cells(self):
+    def all_cells(self) -> Sequence[int]:
         """
         An array containing the cell IDs of all neurons in the
         Population (all MPI nodes).
 
         :rtype: list(int)
         """
+        raise NotImplementedError
 
-    def __add__(self, other):
+    def __add__(self, other: 'PopulationBase') -> Assembly:
         """
         A Population / PopulationView can be added to another
         Population, PopulationView or Assembly, returning an Assembly.
@@ -74,7 +84,9 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         # TODO: support assemblies
         _we_dont_do_this_now(other)  # pragma: no cover
+        raise NotImplementedError
 
+    @final
     def getSpikes(self, *args, **kwargs):  # pylint: disable=unused-argument
         """
         .. deprecated:: 5.0
@@ -86,8 +98,10 @@ class PopulationBase(object, metaclass=AbstractBase):
         return self.get_data("spikes")
 
     @abstractmethod
-    def get_data(self, variables='all', gather=True, clear=False,
-                 annotations=None):
+    def get_data(
+            self, variables: _Variables = 'all',
+            gather: bool = True, clear: bool = False,
+            annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
         """
         Return a Neo Block containing the data(spikes, state variables)
         recorded from the Population.
@@ -111,7 +125,9 @@ class PopulationBase(object, metaclass=AbstractBase):
         :type annotations: None or dict(str, ...)
         :rtype: ~neo.core.Block
         """
+        raise NotImplementedError
 
+    @final
     def get_gsyn(self, *args, **kwargs):  # pylint: disable=unused-argument
         """
         .. deprecated:: 5.0
@@ -124,7 +140,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         return self.get_data(['gsyn_exc', 'gsyn_inh'])
 
     @abstractmethod
-    def get_spike_counts(self, gather=True):
+    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
         """
         Returns a dict containing the number of spikes for each neuron.
 
@@ -141,7 +157,9 @@ class PopulationBase(object, metaclass=AbstractBase):
 
         :rtype: dict(int, int)
         """
+        raise NotImplementedError
 
+    @final
     def get_v(self, *args, **kwargs):  # pylint: disable=unused-argument
         """
         .. deprecated:: 5.0
@@ -153,7 +171,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         return self.get_data("v")
 
     @abstractmethod
-    def inject(self, current_source):
+    def inject(self, current_source: NeuronCurrentSource):
         """
         Connect a current source to all cells in the Population.
 
@@ -161,21 +179,24 @@ class PopulationBase(object, metaclass=AbstractBase):
         :type current_source:
             ~pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource
         """
+        raise NotImplementedError
 
-    def is_local(self,
-                 id):  # pylint: disable=unused-argument, redefined-builtin
+    @final
+    def is_local(self, id: int) -> bool:  # @ReservedAssignment
         """
         Indicates whether the cell with the given ID exists on the
         local MPI node.
 
         :rtype: bool
         """
+        # pylint: disable=unused-argument, redefined-builtin
         logger.warning("local calls do not really make sense on sPyNNaker so "
                        "is_local always returns True")
         return True
 
     @property
-    def local_size(self):
+    @final
+    def local_size(self) -> int:
         """
         The number of cells in the population on the local MPI node.
 
@@ -185,6 +206,11 @@ class PopulationBase(object, metaclass=AbstractBase):
                        "is_local always returns size")
         return len(self)
 
+    @abstractmethod
+    def __len__(self) -> int:
+        raise NotImplementedError
+
+    @final
     def meanSpikeCount(self, *args, **kwargs):
         """
         .. deprecated:: 5.0
@@ -254,8 +280,9 @@ class PopulationBase(object, metaclass=AbstractBase):
         _we_dont_do_this_now()  # pragma: no cover
 
     @abstractmethod
-    def write_data(self, io, variables='all', gather=True, clear=False,
-                   annotations=None):
+    def write_data(self, io, variables: _Variables = 'all',
+                   gather: bool = True, clear: bool = False,
+                   annotations: Optional[Dict[str, Any]] = None):
         """
         Write recorded data to file, using one of the file formats
         supported by Neo.
@@ -283,7 +310,9 @@ class PopulationBase(object, metaclass=AbstractBase):
         :type annotations: None or dict(str, ...)
         """
         # pylint: disable=too-many-arguments
+        raise NotImplementedError
 
+    @final
     def printSpikes(self, filename, gather=True):
         """
         .. deprecated:: 5.0
@@ -301,6 +330,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             'Call transfered to write_data(file, "spikes", gatherer) instead.')
         self.write_data(filename, 'spikes', gather=True)
 
+    @final
     def print_gsyn(self, filename, gather=True):
         """
         .. deprecated:: 5.0
@@ -318,6 +348,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             'write_data(file, ["gsyn_exc", "gsyn_inh"], gatherer) instead.')
         self.write_data(filename, ['gsyn_exc', 'gsyn_inh'], gather=True)
 
+    @final
     def print_v(self, filename, gather=True):
         """
         .. deprecated:: 5.0
@@ -346,7 +377,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         _we_dont_do_this_now()  # pragma: no cover
 
     @abstractmethod
-    def record(self, variables, to_file=None, sampling_interval=None):
+    def record(self, variables: _Variables, to_file=None,
+               sampling_interval=None):
         """
         Record the specified variable or variables for all cells in the
         Population or view.
@@ -361,7 +393,9 @@ class PopulationBase(object, metaclass=AbstractBase):
         :param int sampling_interval: a value in milliseconds, and an integer
             multiple of the simulation timestep.
         """
+        raise NotImplementedError
 
+    @final
     def record_gsyn(self, sampling_interval=1, to_file=None):
         """
         .. deprecated:: 5.0
@@ -378,6 +412,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             ['gsyn_exc', 'gsyn_inh'], to_file=to_file,
             sampling_interval=sampling_interval)
 
+    @final
     def record_v(self, sampling_interval=1, to_file=None):
         """
         .. deprecated:: 5.0
@@ -393,6 +428,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             'v', to_file=to_file,
             sampling_interval=sampling_interval)
 
+    @final
     def rset(self, *args, **kwargs):
         """
         .. deprecated:: 5.0
@@ -410,9 +446,10 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         # TODO:
         _we_dont_do_this_now(file)  # pragma: no cover
+        raise NotImplementedError
 
     @property
-    def structure(self):
+    def structure(self) -> BaseStructure:
         """
         The spatial structure of the parent Population.
 
@@ -423,7 +460,9 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         # TODO: support neuron positions and spaces
         _we_dont_do_this_now()  # pragma: no cover
+        raise NotImplementedError
 
+    @final
     def tset(self, **kwargs):
         """
         .. deprecated:: 5.0
@@ -434,21 +473,23 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def _vertex(self):
+    def _vertex(self) -> ApplicationVertex:
         """
         The underlying application vertex.
 
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def _recorder(self):
+    def _recorder(self) -> Recorder:
         """
         The recorder of the population.
 
         :rtype: ~Recorder
         """
+        raise NotImplementedError
 
     @staticmethod
     def _check_params(gather, annotations=None):

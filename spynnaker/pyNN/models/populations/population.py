@@ -17,7 +17,7 @@ import numpy
 import os
 import inspect
 from typing import (
-    Any, Dict, Iterable, Iterator, Optional, Sequence, Type, Union)
+    Any, Dict, Iterable, Iterator, Optional, Type, Union)
 from typing_extensions import TypeAlias
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
@@ -30,7 +30,7 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.recorder import Recorder
-from .population_base import PopulationBase
+from .population_base import PopulationBase, _Variables
 from .population_view import PopulationView, IDMixin
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
@@ -189,7 +189,7 @@ class Population(PopulationBase):
 
     @overrides(PopulationBase.record, extend_doc=False)
     def record(
-            self, variables: Union[str, Sequence[str]],
+            self, variables: _Variables,
             to_file: Optional[Union[str]] = None,
             sampling_interval: Optional[int] = None):
         """
@@ -229,7 +229,8 @@ class Population(PopulationBase):
             label=f"Random sample size {n} from {self.label}")
 
     @overrides(PopulationBase.write_data, extend_doc=False)
-    def write_data(self, io, variables='all', gather=True, clear=False,
+    def write_data(self, io, variables: _Variables = 'all',
+                   gather=True, clear=False,
                    annotations=None):
         """
         Write recorded data to file, using one of the file formats
@@ -325,7 +326,8 @@ class Population(PopulationBase):
 
     @overrides(PopulationBase.get_data, extend_doc=False)
     def get_data(
-            self, variables='all', gather=True, clear=False, annotations=None):
+            self, variables: _Variables = 'all',
+            gather=True, clear=False, annotations=None):
         """
         Return a Neo Block containing the data (spikes, state variables)
         recorded from the Assembly.

@@ -110,3 +110,4 @@ class PushBotEthernetDevice(
         :param MunichIoSpiNNakerLinkProtocol command_protocol:
             The protocol to use for this device
         """
+        raise NotImplementedError

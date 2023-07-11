@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import List, Tuple
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pacman.model.graphs.common import Slice
 
 
 class HasShapeKeyFields(object, metaclass=AbstractBase):
@@ -23,7 +25,8 @@ class HasShapeKeyFields(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def get_shape_key_fields(self, vertex_slice):
+    def get_shape_key_fields(
+            self, vertex_slice: Slice) -> List[Tuple[int, int, int, int]]:
         """
         Get the fields to be used for each dimension in the shape of the
         given source vertex slice, as a list of start, size, mask, shift
@@ -33,3 +36,4 @@ class HasShapeKeyFields(object, metaclass=AbstractBase):
             The slice of the source vertex
         :rtype: list(tuple(int, int, int, int))
         """
+        raise NotImplementedError

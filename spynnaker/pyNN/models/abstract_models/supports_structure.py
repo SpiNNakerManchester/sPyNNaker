@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pyNN.space import BaseStructure
 
 
 class SupportsStructure(object, metaclass=AbstractBase):
@@ -20,9 +21,10 @@ class SupportsStructure(object, metaclass=AbstractBase):
     """
 
     @abstractmethod
-    def set_structure(self, structure):
+    def set_structure(self, structure: BaseStructure):
         """
         Set the structure of the object.
 
         :param ~pynn.space.BaseStructure structure: The structure to set
         """
+        raise NotImplementedError

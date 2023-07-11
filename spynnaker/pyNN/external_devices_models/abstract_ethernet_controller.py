@@ -29,6 +29,7 @@ class AbstractEthernetController(object, metaclass=AbstractBase):
 
         :rtype: AbstractEthernetTranslator
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_external_devices(self):
@@ -37,6 +38,7 @@ class AbstractEthernetController(object, metaclass=AbstractBase):
 
         :rtype: iterable(AbstractMulticastControllableDevice)
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_outgoing_partition_ids(self):
@@ -45,3 +47,4 @@ class AbstractEthernetController(object, metaclass=AbstractBase):
 
         :rtype: list(str)
         """
+        raise NotImplementedError

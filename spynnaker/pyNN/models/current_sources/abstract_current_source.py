@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from enum import Enum
+from typing import Any, Dict
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
@@ -84,46 +85,52 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         return self.__population
 
     @abstractmethod
-    def set_parameters(self, **parameters):
+    def set_parameters(self, **parameters: Any):
         """
         Set the current source parameters.
 
         :param parameters: the parameters to set
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def get_parameters(self):
+    def get_parameters(self) -> Dict[str, Any]:
         """
         The parameters of the current source.
 
         :rtype: dict(str, Any)
         """
         # TODO: Wrong naming for a property!
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def get_parameter_types(self):
+    def get_parameter_types(self) -> Dict[str, Any]:
         """
         The parameter types for the current source.
 
         :rtype: dict(str, Any)
         """
         # TODO: Wrong naming for a property!
+        # FIXME: Is the type correct?
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def current_source_id(self):
+    def current_source_id(self) -> int:
         """
         The ID of the current source.
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_sdram_usage_in_bytes(self):
+    def get_sdram_usage_in_bytes(self) -> int:
         """
         The SDRAM usage in bytes of the current source.
 
         :rtype: int
         """
+        raise NotImplementedError

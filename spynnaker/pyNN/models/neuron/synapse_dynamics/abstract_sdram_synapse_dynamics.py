@@ -14,7 +14,9 @@
 
 import math
 import numpy
+from typing import List
 from spinn_utilities.abstract_base import abstractmethod
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from .abstract_has_parameter_names import AbstractHasParameterNames
 
@@ -32,16 +34,18 @@ class AbstractSDRAMSynapseDynamics(
                               ("weight", "float64"), ("delay", "float64")]
 
     @abstractmethod
-    def is_same_as(self, synapse_dynamics):
+    def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:
         """
         Determines if this synapse dynamics is the same as another.
 
         :param AbstractSynapseDynamics synapse_dynamics:
         :rtype: bool
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
+    def get_parameters_sdram_usage_in_bytes(
+            self, n_neurons: int, n_synapse_types: int) -> int:
         """
         Get the SDRAM usage of the synapse dynamics parameters in bytes.
 
@@ -49,10 +53,12 @@ class AbstractSDRAMSynapseDynamics(
         :param int n_synapse_types:
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def write_parameters(self, spec, region, global_weight_scale,
-                         synapse_weight_scales):
+    def write_parameters(
+            self, spec: DataSpecificationGenerator, region: int,
+            global_weight_scale: float, synapse_weight_scales: List[float]):
         """
         Write the synapse parameters to the spec.
 
@@ -64,9 +70,10 @@ class AbstractSDRAMSynapseDynamics(
             The total weight scale applied to each synapse including the global
             weight scale
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_max_synapses(self, n_words):
+    def get_max_synapses(self, n_words: int) -> int:
         """
         Get the maximum number of synapses that can be held in the given
         number of words.
@@ -74,16 +81,19 @@ class AbstractSDRAMSynapseDynamics(
         :param int n_words: The number of words the synapses must fit in
         :rtype: int
         """
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def pad_to_length(self):
+    def pad_to_length(self) -> int:
         """
         The amount each row should pad to, or `None` if not specified.
         """
+        raise NotImplementedError
 
     def convert_per_connection_data_to_rows(
-            self, connection_row_indices, n_rows, data, max_n_synapses):
+            self, connection_row_indices: numpy.ndarray, n_rows: int,
+            data: numpy.ndarray, max_n_synapses: int) -> List[numpy.ndarray]:
         """
         Converts per-connection data generated from connections into
         row-based data to be returned from get_synaptic_data.
@@ -102,7 +112,8 @@ class AbstractSDRAMSynapseDynamics(
             data[connection_row_indices == i][:max_n_synapses].reshape(-1)
             for i in range(n_rows)]
 
-    def get_n_items(self, rows, item_size):
+    def get_n_items(
+            self, rows: numpy.ndarray, item_size: int) -> numpy.ndarray:
         """
         Get the number of items in each row as 4-byte values, given the
         item size.
@@ -115,7 +126,7 @@ class AbstractSDRAMSynapseDynamics(
             int(math.ceil(float(row.size) / float(item_size)))
             for row in rows], dtype="uint32").reshape((-1, 1))
 
-    def get_words(self, rows):
+    def get_words(self, rows: numpy.ndarray) -> List[numpy.ndarray]:
         """
         Convert the row data to words.
 

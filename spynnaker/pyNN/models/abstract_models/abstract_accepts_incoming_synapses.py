@@ -12,10 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+import numpy
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.require_subclass import require_subclass
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationVertex
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+        AbstractSynapseDynamics)
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
+    from spynnaker.pyNN.extra_algorithms.splitter_components import (
+        AbstractSpynnakerSplitterDelay)
 
 
 @require_subclass(ApplicationVertex)
@@ -30,24 +40,28 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def get_synapse_id_by_target(self, target):
+    def get_synapse_id_by_target(self, target: str) -> int:
         """
         Get the ID of a synapse given the name.
 
         :param str target: The name of the synapse
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def set_synapse_dynamics(self, synapse_dynamics):
+    def set_synapse_dynamics(self, synapse_dynamics: AbstractSynapseDynamics):
         """
         Set the synapse dynamics of this vertex.
 
         :param AbstractSynapseDynamics synapse_dynamics:
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_connections_from_machine(self, app_edge, synapse_info):
+    def get_connections_from_machine(
+            self, app_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation) -> numpy.ndarray:
         """
         Get the connections from the machine post-run.
 
@@ -57,14 +71,16 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
             The specific projection within the edge
         :rtype: ~numpy.ndarray
         """
+        raise NotImplementedError
 
     @abstractmethod
     def clear_connection_cache(self):
         """
         Clear the connection data stored in the vertex so far.
         """
+        raise NotImplementedError
 
-    def verify_splitter(self, splitter):
+    def verify_splitter(self, splitter: AbstractSpynnakerSplitterDelay):
         """
         Check that the splitter implements the API(s) expected by the
         SynapticMatrices
@@ -78,8 +94,8 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         """
         # Delayed import to avoid cicular dependency
         from spynnaker.pyNN.extra_algorithms.splitter_components import (
-            AbstractSpynnakerSplitterDelay)
-        if not isinstance(splitter, AbstractSpynnakerSplitterDelay):
+            AbstractSpynnakerSplitterDelay as DelaySplitter)
+        if not isinstance(splitter, DelaySplitter):
             raise PacmanConfigurationException(
                 "The splitter needs to be an instance of "
                 "----------------AbstractSpynnakerSplitterDelay")
