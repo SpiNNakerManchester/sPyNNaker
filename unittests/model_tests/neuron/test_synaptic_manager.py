@@ -21,6 +21,7 @@ import pytest
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import load_config, set_config
 from spinnman.model import CPUInfo
+from spinnman.processes.get_cpu_info_process import _INFO_PATTERN
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
 from pacman.operations.routing_info_allocator_algorithms import (
@@ -80,7 +81,8 @@ class _MockTransceiverinOut(Transceiver):
     @overrides(Transceiver.get_cpu_information_from_core)
     def get_cpu_information_from_core(self, x, y, p):
         bs = bytearray(128)
-        return CPUInfo(x=1, y=2, p=3, cpu_data=bytes(bs), offset=0)
+        cpu_data = _INFO_PATTERN.unpack_from(bytes(bs), 0)
+        return CPUInfo(x=1, y=2, p=3, cpu_data=cpu_data)
 
     @overrides(Transceiver.read_memory)
     def read_memory(self, x, y, base_address, length, *, cpu=0):
