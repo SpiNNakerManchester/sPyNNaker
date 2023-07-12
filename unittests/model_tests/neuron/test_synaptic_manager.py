@@ -109,7 +109,6 @@ def test_write_data_spec():
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
 
-    load_config()
     set_config("Machine", "enable_advanced_monitor_support", "False")
     set_config("Java", "use_java", "False")
 
