@@ -13,13 +13,14 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import List, Optional, Type, TYPE_CHECKING
+from typing import List, Optional, Type, cast, TYPE_CHECKING
 from typing_extensions import TypeGuard
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
         AbstractSynapseDynamics, AbstractSynapseDynamicsStructural,
@@ -168,7 +169,8 @@ class ProjectionApplicationEdge(
         """
         if self.__delay_edge is None:
             return 0
-        return self.__delay_edge.pre_vertex.n_delay_stages
+        return cast(DelayExtensionVertex,
+                    self.__delay_edge.pre_vertex).n_delay_stages
 
     @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self) -> None:

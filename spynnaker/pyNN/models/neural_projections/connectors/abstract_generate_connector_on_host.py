@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List
+from typing import List, Tuple
 from numpy import ndarray
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.common import Slice
@@ -25,7 +25,7 @@ class AbstractGenerateConnectorOnHost(object, metaclass=AbstractBase):
     """
 
     # Mix-in class, so don't add anything here!
-    __slots__ = ()
+    __slots__: Tuple[str, ...] = ()
 
     @abstractmethod
     def create_synaptic_block(

@@ -14,16 +14,21 @@
 from enum import IntEnum
 import os
 import ctypes
+from typing import List
 
 from spinn_utilities.overrides import overrides
+from pacman.model.placements import Placement
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
+from .abstract_population_vertex import AbstractPopulationVertex
 
 
 class LocalOnlyProvenance(ctypes.LittleEndianStructure):
@@ -192,7 +197,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
         return self.__max_atoms_per_core
 
     @staticmethod
-    def __get_binary_file_name(app_vertex):
+    def __get_binary_file_name(app_vertex: AbstractPopulationVertex):
         """
         Get the local binary filename for this vertex.  Static because at
         the time this is needed, the local app_vertex is not set.
@@ -239,18 +244,19 @@ class PopulationMachineLocalOnlyCombinedVertex(
                     " the .spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
-    def get_recorded_region_ids(self):
-        ids = self._app_vertex.neuron_recorder.recorded_ids_by_slice(
+    def get_recorded_region_ids(self) -> List[int]:
+        ids = self._pop_vertex.neuron_recorder.recorded_ids_by_slice(
             self.vertex_slice)
-        ids.extend(self._app_vertex.synapse_recorder.recorded_ids_by_slice(
+        ids.extend(self._pop_vertex.synapse_recorder.recorded_ids_by_slice(
             self.vertex_slice))
         return ids
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(self, spec, placement):
-        rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
+    def generate_data_specification(
+            self, spec: DataSpecificationGenerator, placement: Placement):
+        rec_regions = self._pop_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
-        rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(
+        rec_regions.extend(self._pop_vertex.synapse_recorder.get_region_sizes(
             self.vertex_slice))
         self._write_common_data_spec(spec, rec_regions)
 
@@ -258,29 +264,30 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
         self.__write_local_only_data(spec)
 
-        self._app_vertex.synapse_dynamics.write_parameters(
-            spec, self.REGIONS.LOCAL_ONLY_PARAMS, self,
-            self.__weight_scales)
+        # Should be true for all concrete synapse dynamics
+        if isinstance(self._pop_vertex.synapse_dynamics, AbstractLocalOnly):
+            self._pop_vertex.synapse_dynamics.write_parameters(
+                spec, self.REGIONS.LOCAL_ONLY_PARAMS, self,
+                self.__weight_scales)
 
         # End the writing of this specification:
         spec.end_specification()
 
-    def __write_local_only_data(self, spec):
+    def __write_local_only_data(self, spec: DataSpecificationGenerator):
         spec.reserve_memory_region(
             self.REGIONS.LOCAL_ONLY, self.LOCAL_ONLY_SIZE, "local_only")
         spec.switch_write_focus(self.REGIONS.LOCAL_ONLY)
         log_n_max_atoms = get_n_bits(self._max_atoms_per_core)
         log_n_synapse_types = get_n_bits(
-            self._app_vertex.neuron_impl.get_n_synapse_types())
+            self._pop_vertex.neuron_impl.get_n_synapse_types())
         # Find the maximum delay
-        # pylint: disable=protected-access
-        max_delay = self._app_vertex.splitter.max_support_delay()
+        max_delay = self._pop_vertex.splitter.max_support_delay()
 
         spec.write_value(log_n_max_atoms)
         spec.write_value(log_n_synapse_types)
         spec.write_value(get_n_bits(max_delay))
-        spec.write_value(self._app_vertex.incoming_spike_buffer_size)
-        spec.write_value(int(self._app_vertex.drop_late_spikes))
+        spec.write_value(self._pop_vertex.incoming_spike_buffer_size)
+        spec.write_value(int(self._pop_vertex.drop_late_spikes))
 
     @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
@@ -336,7 +343,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
                     "of neurons per core.")
 
             if prov.n_spikes_dropped > 0:
-                if self._app_vertex.drop_late_spikes:
+                if self._pop_vertex.drop_late_spikes:
                     db.insert_report(
                         f"On {label}, {prov.n_spikes_dropped} packets were "
                         "dropped from the input buffer, because they arrived "

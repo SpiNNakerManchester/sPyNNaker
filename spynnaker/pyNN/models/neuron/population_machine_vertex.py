@@ -14,11 +14,21 @@
 from enum import IntEnum
 import os
 import ctypes
+from typing import List, Optional, Sequence
 
 from spinn_utilities.overrides import overrides
+from pacman.model.resources import AbstractSDRAM
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.common import Slice
+from pacman.model.placements import Placement
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
+from spinn_front_end_common.interface.ds import (
+    DataSpecificationGenerator, DataSpecificationReloader)
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+from .abstract_population_vertex import AbstractPopulationVertex
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
@@ -148,9 +158,12 @@ class PopulationMachineVertex(
         4: "PROCESS_PLASTIC_SYNAPSES"}
 
     def __init__(
-            self, sdram, label, app_vertex, vertex_slice, slice_index,
-            ring_buffer_shifts, weight_scales,
-            structural_sz, max_atoms_per_core, synaptic_matrices, neuron_data):
+            self, sdram: AbstractSDRAM, label: str,
+            app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
+            slice_index: int, ring_buffer_shifts: Sequence[int],
+            weight_scales: Sequence[int], structural_sz: int,
+            max_atoms_per_core: int, synaptic_matrices: SynapticMatrices,
+            neuron_data: NeuronData):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex
@@ -176,7 +189,7 @@ class PopulationMachineVertex(
             NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS +
             SpikeProcessingProvenance.N_ITEMS + MainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
-        self.__key = None
+        self.__key: Optional[int] = None
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
@@ -189,36 +202,37 @@ class PopulationMachineVertex(
 
     @property
     @overrides(PopulationMachineNeurons._slice_index)
-    def _slice_index(self):
+    def _slice_index(self) -> int:
         return self.__slice_index
 
     @property
     @overrides(PopulationMachineNeurons._key)
-    def _key(self):
+    def _key(self) -> int:
+        assert self.__key is not None, "key not yet set"
         return self.__key
 
     @overrides(PopulationMachineNeurons._set_key)
-    def _set_key(self, key):
+    def _set_key(self, key: int):
         self.__key = key
 
     @property
     @overrides(PopulationMachineNeurons._neuron_regions)
-    def _neuron_regions(self):
+    def _neuron_regions(self) -> NeuronRegions:
         return self.NEURON_REGIONS
 
     @property
     @overrides(PopulationMachineNeurons._neuron_data)
-    def _neuron_data(self):
+    def _neuron_data(self) -> NeuronData:
         return self.__neuron_data
 
     @property
     @overrides(PopulationMachineSynapses._synapse_regions)
-    def _synapse_regions(self):
+    def _synapse_regions(self) -> SynapseRegions:
         return self.SYNAPSE_REGIONS
 
     @property
     @overrides(PopulationMachineSynapses._synaptic_matrices)
-    def _synaptic_matrices(self):
+    def _synaptic_matrices(self) -> SynapticMatrices:
         return self.__synaptic_matrices
 
     @property
@@ -227,7 +241,7 @@ class PopulationMachineVertex(
         return self.__max_atoms_per_core
 
     @staticmethod
-    def __get_binary_file_name(app_vertex):
+    def __get_binary_file_name(app_vertex: AbstractPopulationVertex) -> str:
         """
         Get the local binary filename for this vertex.  Static because at
         the time this is needed, the local `app_vertex` is not set.
@@ -244,7 +258,8 @@ class PopulationMachineVertex(
 
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(
-            self, label, x, y, p, provenance_data):
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
         syn_offset = NeuronProvenance.N_ITEMS
         proc_offset = syn_offset + SynapseProvenance.N_ITEMS
         end_proc_offset = proc_offset + SpikeProcessingProvenance.N_ITEMS
@@ -279,18 +294,19 @@ class PopulationMachineVertex(
                     " the .spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
-    def get_recorded_region_ids(self):
-        ids = self._app_vertex.neuron_recorder.recorded_ids_by_slice(
+    def get_recorded_region_ids(self) -> List[int]:
+        ids = self._pop_vertex.neuron_recorder.recorded_ids_by_slice(
             self.vertex_slice)
-        ids.extend(self._app_vertex.synapse_recorder.recorded_ids_by_slice(
+        ids.extend(self._pop_vertex.synapse_recorder.recorded_ids_by_slice(
             self.vertex_slice))
         return ids
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(self, spec, placement):
-        rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
+    def generate_data_specification(
+            self, spec: DataSpecificationGenerator, placement: Placement):
+        rec_regions = self._pop_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
-        rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(
+        rec_regions.extend(self._pop_vertex.synapse_recorder.get_region_sizes(
             self.vertex_slice))
         self._write_common_data_spec(spec, rec_regions)
 
@@ -305,7 +321,8 @@ class PopulationMachineVertex(
 
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
-    def regenerate_data_specification(self, spec, placement):
+    def regenerate_data_specification(
+            self, spec: DataSpecificationReloader, placement: Placement):
         if self.__regenerate_neuron_data:
             self._rewrite_neuron_data_spec(spec)
             self.__regenerate_neuron_data = False
@@ -320,16 +337,17 @@ class PopulationMachineVertex(
         spec.end_specification()
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
-    def reload_required(self):
+    def reload_required(self) -> bool:
         return self.__regenerate_neuron_data or self.__regenerate_synapse_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
-    def set_reload_required(self, new_value):
+    def set_reload_required(self, new_value: bool):
         # These are set elsewhere once data is generated
         pass
 
     def _parse_spike_processing_provenance(
-            self, label, x, y, p, provenance_data):
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
         """
         Extract and yield spike processing provenance.
 
@@ -368,7 +386,7 @@ class PopulationMachineVertex(
                 prov.n_late_packets)
 
             if prov.n_late_packets > 0:
-                if self._app_vertex.drop_late_spikes:
+                if self._pop_vertex.drop_late_spikes:
                     db.insert_report(
                         f"On {label}, {prov.n_late_packets} packets were "
                         f"dropped from the input buffer, because they "
@@ -389,15 +407,15 @@ class PopulationMachineVertex(
                 prov.max_size_input_buffer)
 
     @overrides(PopulationMachineNeurons.set_do_neuron_regeneration)
-    def set_do_neuron_regeneration(self):
+    def set_do_neuron_regeneration(self) -> None:
         self.__regenerate_neuron_data = True
         self.__neuron_data.reset_generation()
 
     @overrides(PopulationMachineSynapses.set_do_synapse_regeneration)
-    def set_do_synapse_regeneration(self):
+    def set_do_synapse_regeneration(self) -> None:
         self.__regenerate_synapse_data = True
 
-    @overrides(PopulationMachineCommon.get_n_keys_for_partition)
-    def get_n_keys_for_partition(self, partition_id):
-        n_colours = 2 ** self._app_vertex.n_colour_bits
+    @overrides(MachineVertex.get_n_keys_for_partition)
+    def get_n_keys_for_partition(self, partition_id: str) -> int:
+        n_colours = 2 ** self._pop_vertex.n_colour_bits
         return self._vertex_slice.n_atoms * n_colours

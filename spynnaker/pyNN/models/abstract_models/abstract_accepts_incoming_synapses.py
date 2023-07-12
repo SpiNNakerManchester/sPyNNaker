@@ -74,7 +74,7 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def clear_connection_cache(self):
+    def clear_connection_cache(self) -> None:
         """
         Clear the connection data stored in the vertex so far.
         """

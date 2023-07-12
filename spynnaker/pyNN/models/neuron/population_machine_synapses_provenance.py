@@ -13,9 +13,7 @@
 # limitations under the License.
 import ctypes
 from typing import Sequence
-from spinn_utilities.abstract_base import abstractmethod
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
-from .abstract_population_vertex import AbstractPopulationVertex
 
 
 class SynapseProvenance(ctypes.LittleEndianStructure):
@@ -68,20 +66,6 @@ class PopulationMachineSynapsesProvenance(object):
     SYNAPSES_SKIPPED = "Skipped synapses"
     LATE_SPIKES = "Late spikes"
     MAX_LATE_SPIKE = "Max late spike"
-
-    @property
-    @abstractmethod
-    def _app_vertex(self) -> AbstractPopulationVertex:
-        """
-        The application vertex of the machine vertex.
-
-        .. note::
-            This is likely to be available via the
-            :py:class:`~pacman.model.graphs.machine.MachineVertex`.
-
-        :rtype: AbstractPopulationVertex
-        """
-        raise NotImplementedError
 
     def _parse_synapse_provenance(
             self, label: str, x: int, y: int, p: int,

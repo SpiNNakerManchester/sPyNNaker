@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import List, Union, cast
 from spinn_utilities.overrides import overrides
 from spinn_utilities.helpful_functions import is_singleton
 from pacman.model.graphs.application import ApplicationVertex
@@ -32,7 +33,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     __slots__ = ()
 
     @staticmethod
-    def _as_list(names):
+    def _as_list(names: Union[str, List[str]]) -> List[str]:
         """
         Normalise the input to a list.
 
@@ -41,8 +42,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :rtype: list(str)
         """
         if is_singleton(names):
-            return [names]
-        return names
+            return [cast(str, names)]
+        return cast(List[str], names)
 
     @staticmethod
     def _check_names(names, allowed, type_of_thing):

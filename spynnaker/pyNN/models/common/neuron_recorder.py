@@ -15,6 +15,7 @@ import itertools
 import logging
 import math
 import numpy
+from typing import List
 from spinn_utilities.log import FormatAdapter
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from spinn_front_end_common.interface.ds import DataType
@@ -484,7 +485,7 @@ class NeuronRecorder(object):
                    for index in range(
                        vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
 
-    def recorded_ids_by_slice(self, vertex_slice):
+    def recorded_ids_by_slice(self, vertex_slice) -> List[int]:
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: list(int)

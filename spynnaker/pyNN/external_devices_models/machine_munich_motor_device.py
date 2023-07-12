@@ -189,7 +189,7 @@ class MachineMunichMotorDevice(
         self.reserve_provenance_data_region(spec)
 
     @overrides(MachineVertex.get_n_keys_for_partition)
-    def get_n_keys_for_partition(self, partition_id):
+    def get_n_keys_for_partition(self, partition_id: str) -> int:
         if partition_id == self.MOTOR_PARTITION_ID:
             return self._MOTOR_N_KEYS
         return super().get_n_keys_for_partition(partition_id)

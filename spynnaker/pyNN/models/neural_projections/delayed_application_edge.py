@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import List, Optional
 from pacman.model.graphs.application import ApplicationEdge
+from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.models.neural_projections import SynapseInformation
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 
 class DelayedApplicationEdge(ApplicationEdge):
@@ -20,8 +25,11 @@ class DelayedApplicationEdge(ApplicationEdge):
         "__undelayed_edge")
 
     def __init__(
-            self, pre_vertex, post_vertex, synapse_information, undelayed_edge,
-            label=None):
+            self, pre_vertex: DelayExtensionVertex,
+            post_vertex: AbstractPopulationVertex,
+            synapse_information: SynapseInformation,
+            undelayed_edge: ProjectionApplicationEdge,
+            label: Optional[str] = None):
         """
         :param DelayExtensionVertex pre_vertex:
             The delay extension at the start of the edge
@@ -38,26 +46,26 @@ class DelayedApplicationEdge(ApplicationEdge):
         """
         super().__init__(pre_vertex, post_vertex, label=label)
         if hasattr(synapse_information, '__iter__'):
-            self.__synapse_information = synapse_information
+            self.__synapse_information = list(synapse_information)
         else:
             self.__synapse_information = [synapse_information]
         self.__undelayed_edge = undelayed_edge
 
     @property
-    def synapse_information(self):
+    def synapse_information(self) -> List[SynapseInformation]:
         """
         :rtype: list(SynapseInformation)
         """
         return self.__synapse_information
 
-    def add_synapse_information(self, synapse_information):
+    def add_synapse_information(self, synapse_information: SynapseInformation):
         """
         :param SynapseInformation synapse_information:
         """
         self.__synapse_information.append(synapse_information)
 
     @property
-    def undelayed_edge(self):
+    def undelayed_edge(self) -> ProjectionApplicationEdge:
         """
         The edge for projections without extended delays.
 

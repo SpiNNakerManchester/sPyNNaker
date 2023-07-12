@@ -282,9 +282,12 @@ class AbstractPopulationVertex(
 
         self.__neuron_impl = neuron_impl
         self.__pynn_model = pynn_model
-        self.__parameters = RangeDictionary(n_neurons)
+        # FIXME type
+        self.__parameters: RangeDictionary[None] = RangeDictionary(n_neurons)
         self.__neuron_impl.add_parameters(self.__parameters)
-        self.__initial_state_variables = RangeDictionary(n_neurons)
+        # FIXME type
+        self.__initial_state_variables: RangeDictionary[None] = \
+            RangeDictionary(n_neurons)
         self.__neuron_impl.add_state_variables(self.__initial_state_variables)
         self.__state_variables = self.__initial_state_variables.copy()
         self.__n_colour_bits = n_colour_bits
@@ -505,10 +508,11 @@ class AbstractPopulationVertex(
 
         :rtype: int
         """
+        assert self.__incoming_spike_buffer_size is not None
         return self.__incoming_spike_buffer_size
 
     @property
-    def parameters(self) -> RangeDictionary:
+    def parameters(self) -> RangeDictionary[None]:
         """
         The parameters of the neurons in the population.
 
@@ -517,7 +521,7 @@ class AbstractPopulationVertex(
         return self.__parameters
 
     @property
-    def state_variables(self) -> RangeDictionary:
+    def state_variables(self) -> RangeDictionary[None]:
         """
         The state variables of the neuron in the population.
 
@@ -526,7 +530,7 @@ class AbstractPopulationVertex(
         return self.__state_variables
 
     @property
-    def initial_state_variables(self) -> RangeDictionary:
+    def initial_state_variables(self) -> RangeDictionary[None]:
         """
         The initial values of the state variables of the neurons.
 
@@ -763,7 +767,7 @@ class AbstractPopulationVertex(
             names, self.__read_current_state_variable, selector)
 
     @overrides(PopulationApplicationVertex.set_current_state_values)
-    def set_current_state_values(self, name, value, selector=None):
+    def set_current_state_values(self, name: str, value, selector=None):
         self._check_variables([name], set(self.__state_variables.keys()))
         # If we have run, and not reset, we need to read the values back
         # so that we don't overwrite all the state.  Note that a reset will
@@ -775,7 +779,7 @@ class AbstractPopulationVertex(
             selector, value)
 
     @overrides(PopulationApplicationVertex.get_state_variables)
-    def get_state_variables(self):
+    def get_state_variables(self) -> Iterable[str]:
         return self.__pynn_model.default_initial_values.keys()
 
     @overrides(PopulationApplicationVertex.get_units)
@@ -801,7 +805,7 @@ class AbstractPopulationVertex(
             *self.__synapse_recorder.get_recordable_variables()]
 
     @overrides(PopulationApplicationVertex.get_buffer_data_type)
-    def get_buffer_data_type(self, name):
+    def get_buffer_data_type(self, name: str) -> None:
         if self.__neuron_recorder.is_recordable(name):
             return self.__neuron_recorder.get_buffer_data_type(name)
         if self.__synapse_recorder.is_recordable(name):
@@ -1372,7 +1376,7 @@ class AbstractPopulationVertex(
                 n_provenance))
         sdram.add_cost(
             common_regions.profile,
-            get_profile_region_size(self.__n_profile_samples))
+            get_profile_region_size(self.__n_profile_samples or 0))
         return sdram
 
     def get_neuron_variable_sdram(self, vertex_slice: Slice) -> int:

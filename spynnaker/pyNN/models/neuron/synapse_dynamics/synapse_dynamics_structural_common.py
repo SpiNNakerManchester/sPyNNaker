@@ -16,6 +16,7 @@ from __future__ import annotations
 import numpy
 from typing import (
     Dict, Iterable, List, Optional, Sequence, Tuple, TYPE_CHECKING)
+from typing_extensions import TypeAlias
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
@@ -30,13 +31,19 @@ from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from pacman.model.graphs.abstract_edge import AbstractEdge
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        SynapseInformation)
     from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
     from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
     from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
+
+_PopIndexType: TypeAlias = Dict[
+    Tuple[AbstractPopulationVertex, SynapseInformation], int]
+_SubpopIndexType: TypeAlias = Dict[
+    Tuple[AbstractPopulationVertex, SynapseInformation, int], int]
 
 #: Default value for frequency of rewiring
 DEFAULT_F_REW = 10 ** 4.0
@@ -214,8 +221,7 @@ class SynapseDynamicsStructuralCommon(
             structural_projections: Iterable[Projection],
             weight_scales: Dict[AbstractSynapseType, float],
             synaptic_matrices: SynapticMatrices) -> Tuple[
-                Dict[Tuple[AbstractPopulationVertex, SynapseInformation], int],
-                int, int]:
+                _PopIndexType, _SubpopIndexType, _SubpopIndexType]:
         """
         :param ~data_specification.DataSpecificationGenerator spec:
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
@@ -231,10 +237,10 @@ class SynapseDynamicsStructuralCommon(
         :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
         """
         spec.comment("Writing pre-population info")
-        pop_index: Dict[None, None] = dict()
+        pop_index: _PopIndexType = dict()
         routing_info = SpynnakerDataView.get_routing_infos()
-        subpop_index: Dict[None, None] = dict()
-        lo_atom_index: Dict[None, None] = dict()
+        subpop_index: _SubpopIndexType = dict()
+        lo_atom_index: _SubpopIndexType = dict()
         index = 0
         for proj in structural_projections:
             spec.comment(f"Writing pre-population info for {proj.label}")
@@ -292,9 +298,9 @@ class SynapseDynamicsStructuralCommon(
         return pop_index, subpop_index, lo_atom_index
 
     def __write_post_to_pre_table(
-            self, spec: DataSpecificationGenerator, pop_index: int,
-            subpop_index: int, lo_atom_index: int,
-            app_vertex: ApplicationVertex, vertex_slice: Slice):
+            self, spec: DataSpecificationGenerator, pop_index: _PopIndexType,
+            subpop_index: _SubpopIndexType, lo_atom_index: _SubpopIndexType,
+            app_vertex: AbstractPopulationVertex, vertex_slice: Slice):
         """
         Post to pre table is basically the transpose of the synaptic matrix.
 
@@ -424,7 +430,9 @@ class SynapseDynamicsStructuralCommon(
 
     @property
     @abstractmethod
-    def connections(self) -> dict:  # FIXME type
+    def connections(self) -> Dict[Tuple[AbstractPopulationVertex, int], List[
+            Tuple[numpy.ndarray, AbstractEdge,  # FIXME right edge type
+                  SynapseInformation]]]:
         """
         Initial connectivity as defined via connector.
 

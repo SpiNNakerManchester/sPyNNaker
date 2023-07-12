@@ -12,10 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy
+from numpy import ndarray
+from typing import Dict, List, Optional, Tuple, Union
+from typing_extensions import TypeAlias
+from pyNN.random import RandomDistribution
+from pyNN.space import Space
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.common import Slice
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from pyNN.random import RandomDistribution
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_generate_connector_on_machine import (
@@ -26,9 +31,11 @@ from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 8
+_TwoD: TypeAlias = Union[List[int], Tuple[int, int]]
+_Kernel: TypeAlias = Union[ndarray, RandomDistribution]
 
 
-class ConvolutionKernel(numpy.ndarray):
+class ConvolutionKernel(ndarray):
     pass
 
 
@@ -49,13 +56,31 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
         Should these include `allow_self_connections` and `with_replacement`?
     """
+    __slots__ = (
+        "_kernel_w", "_kernel_h",
+        "_hlf_k_w", "_hlf_k_h",
+        "_pre_w", "_pre_h",
+        "_post_w", "_post_h",
+        "_pre_start_w", "_pre_start_h",
+        "_post_start_w", "_post_start_h",
+        "_pre_step_w", "_pre_step_h",
+        "_post_step_w", "_post_step_h",
+        "_krn_weights", "_krn_delays", "_shape_common",
+        "_common_w", "_common_h",
+        "_shape_pre", "_shape_post",
+        "_post_as_pre")
 
     def __init__(
-            self, shape_pre, shape_post, shape_kernel, weight_kernel=None,
-            delay_kernel=None, shape_common=None,
-            pre_sample_steps_in_post=None, pre_start_coords_in_post=None,
-            post_sample_steps_in_pre=None, post_start_coords_in_pre=None,
-            safe=True, space=None, verbose=False, callback=None):
+            self, shape_pre: _TwoD, shape_post: _TwoD, shape_kernel: _TwoD,
+            weight_kernel: Optional[_Kernel] = None,
+            delay_kernel: Optional[_Kernel] = None,
+            shape_common: Optional[_TwoD] = None,
+            pre_sample_steps_in_post: Optional[_TwoD] = None,
+            pre_start_coords_in_post: Optional[_TwoD] = None,
+            post_sample_steps_in_pre: Optional[_TwoD] = None,
+            post_start_coords_in_pre: Optional[_TwoD] = None,
+            safe: bool = True, space: Optional[Space] = None,
+            verbose: bool = False, callback: None = None):
         """
         :param shape_pre:
             2D shape of the pre-population (rows/height, columns/width, usually
@@ -159,9 +184,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         self._shape_post = shape_post
 
         # Create storage for later
-        self._post_as_pre = {}
+        self._post_as_pre: Dict[str, Tuple[ndarray, ndarray]] = {}
 
-    def __to_post_coords(self, post_vertex_slice):
+    def __to_post_coords(
+            self, post_vertex_slice: Slice) -> Tuple[ndarray, ndarray]:
         """
         Get a list of possible post-slice coordinates.
 

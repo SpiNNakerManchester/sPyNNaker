@@ -218,7 +218,7 @@ class SpikeSourcePoissonVertex(
                 if len(duration_set) != len(rate_set):
                     raise ValueError("Each rate must have its own duration")
 
-        self.__data = RangeDictionary(n_neurons)
+        self.__data: RangeDictionary[float] = RangeDictionary(n_neurons)
         self.__data["rates"] = RangedList(
             n_neurons, rates,
             use_list_as_value=not hasattr(rates[0], "__len__"))

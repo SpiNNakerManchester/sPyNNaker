@@ -17,6 +17,7 @@ from typing import (
 from typing_extensions import TypeAlias
 from pyNN.random import RandomDistribution
 from spinn_utilities.helpful_functions import is_singleton
+from spinn_utilities.ranged.abstract_sized import Selector
 _BaseValueType: TypeAlias = Union[List[int], List[float]]
 
 
@@ -41,9 +42,9 @@ class ParameterHolder(object):
 
     def __init__(
             self, data_items_to_return: Union[str, Sequence[str]],
-            get_call: Callable[[str, Any], Union[
+            get_call: Callable[[str, Selector], Union[
                 _BaseValueType, RandomDistribution]],
-            selector=None):
+            selector: Selector = None):
         """
         :param data_items_to_return: A list of data fields to be returned
         :type data_items_to_return: list(str) or tuple(str)
@@ -88,15 +89,14 @@ class ParameterHolder(object):
 
         # If there is just one item to return, return the values stored
         if is_singleton(self.__data_items_to_return):
+            key = cast(str, self.__data_items_to_return)
             self.__data_items = {
-                cast(str, self.__data_items_to_return):
-                self._safe_read_values(
-                    self.__data_items_to_return)}
+                key: cast(_BaseValueType, self._safe_read_values(key))}
             return self.__data_items
 
         # If there are multiple items to return, form a list
         self.__data_items = {
-            param: self._safe_read_values(param)
+            param: cast(_BaseValueType, self._safe_read_values(param))
             for param in self.__data_items_to_return}
 
         return self.__data_items

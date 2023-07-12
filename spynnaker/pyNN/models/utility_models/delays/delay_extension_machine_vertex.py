@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from enum import IntEnum
+from typing import cast
 
 from spinnman.model.enums import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
@@ -24,6 +25,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from .delay_extension_vertex import DelayExtensionVertex
 
 
 class DelayExtensionMachineVertex(
@@ -230,10 +232,11 @@ class DelayExtensionMachineVertex(
                     ".spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(MachineVertex.get_n_keys_for_partition)
-    def get_n_keys_for_partition(self, partition_id):
+    def get_n_keys_for_partition(self, partition_id: str) -> int:
         n_keys = super().get_n_keys_for_partition(partition_id)
-        n_colours = 2 ** self.app_vertex.n_colour_bits
-        return n_keys * self.app_vertex.n_delay_stages * n_colours
+        v = cast(DelayExtensionVertex, self.app_vertex)
+        n_colours = 2 ** v.n_colour_bits
+        return n_keys * v.n_delay_stages * n_colours
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):

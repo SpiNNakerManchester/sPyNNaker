@@ -14,8 +14,12 @@
 from enum import IntEnum
 import os
 import ctypes
+from typing import Sequence
 
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.common import Slice
+from pacman.model.resources import AbstractSDRAM
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
@@ -27,6 +31,8 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
+from .abstract_population_vertex import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 
 # Size of SDRAM params = 1 word for address + 1 word for size
 # + 1 word for n_neurons + 1 word for n_synapse_types
@@ -103,9 +109,11 @@ class PopulationNeuronsMachineVertex(
         0: "TIMER_NEURONS"}
 
     def __init__(
-            self, sdram, label, app_vertex, vertex_slice, slice_index,
-            ring_buffer_shifts, weight_scales,
-            neuron_data, max_atoms_per_core):
+            self, sdram: AbstractSDRAM, label: str,
+            app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
+            slice_index: int,
+            ring_buffer_shifts: Sequence[int], weight_scales: Sequence[int],
+            neuron_data: NeuronData, max_atoms_per_core: int):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex
@@ -182,7 +190,7 @@ class PopulationNeuronsMachineVertex(
         self.__sdram_partition = sdram_partition
 
     @staticmethod
-    def __get_binary_file_name(app_vertex):
+    def __get_binary_file_name(app_vertex: AbstractPopulationVertex):
         """
         Get the local binary filename for this vertex.  Static because at
         the time this is needed, the local app_vertex is not set.
@@ -218,13 +226,13 @@ class PopulationNeuronsMachineVertex(
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self):
-        ids = self._app_vertex.neuron_recorder.recorded_ids_by_slice(
+        ids = self._pop_vertex.neuron_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         return ids
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
-        rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
+        rec_regions = self._pop_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
         self._write_common_data_spec(spec, rec_regions)
 
@@ -281,7 +289,7 @@ class PopulationNeuronsMachineVertex(
     def n_bytes_for_transfer(self):
         return self.get_n_bytes_for_transfer(
             self.__max_atoms_per_core,
-            self._app_vertex.neuron_impl.get_n_synapse_types())
+            self._pop_vertex.neuron_impl.get_n_synapse_types())
 
     @overrides(ReceivesSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge):
@@ -296,7 +304,7 @@ class PopulationNeuronsMachineVertex(
         self.__regenerate_data = True
         self.__neuron_data.reset_generation()
 
-    @overrides(PopulationMachineCommon.get_n_keys_for_partition)
-    def get_n_keys_for_partition(self, partition_id):
-        n_colours = 2 ** self._app_vertex.n_colour_bits
+    @overrides(MachineVertex.get_n_keys_for_partition)
+    def get_n_keys_for_partition(self, partition_id: str) -> int:
+        n_colours = 2 ** self._pop_vertex.n_colour_bits
         return self._vertex_slice.n_atoms * n_colours

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy
-from typing import List, Tuple
+from typing import List, Sequence, Tuple
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
 
@@ -23,7 +23,7 @@ from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.abstract_models import (
     AbstractSupportsBitFieldRoutingCompression)
-from spinn_front_end_common.interface.ds import DataSpecificationGenerator
+from spinn_front_end_common.interface.ds import DataSpecificationBase
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
@@ -54,7 +54,7 @@ class PopulationMachineSynapses(
 
     @property
     @abstractmethod
-    def _app_vertex(self) -> AbstractPopulationVertex:
+    def _pop_vertex(self) -> AbstractPopulationVertex:
         """
         The application vertex of the machine vertex.
 
@@ -142,8 +142,8 @@ class PopulationMachineSynapses(
             self._synaptic_matrices.on_chip_generated_matrix_size)]
 
     def _write_synapse_data_spec(
-            self, spec: DataSpecificationGenerator,
-            ring_buffer_shifts: List[int], weight_scales: List[int],
+            self, spec: DataSpecificationBase,
+            ring_buffer_shifts: Sequence[int], weight_scales: Sequence[int],
             structural_sz: int):
         """
         Write the data specification for the synapse data.
@@ -165,8 +165,8 @@ class PopulationMachineSynapses(
             spec, self._vertex_slice, self._synapse_references)
 
         # Write any synapse dynamics
-        synapse_dynamics = self._app_vertex.synapse_dynamics
-        synapse_dynamics_sz = self._app_vertex.get_synapse_dynamics_size(
+        synapse_dynamics = self._pop_vertex.synapse_dynamics
+        synapse_dynamics_sz = self._pop_vertex.get_synapse_dynamics_size(
             self._vertex_slice.n_atoms)
         if synapse_dynamics_sz > 0:
             spec.reserve_memory_region(
@@ -175,7 +175,7 @@ class PopulationMachineSynapses(
                 reference=self._synapse_references.synapse_dynamics)
             synapse_dynamics.write_parameters(
                 spec, self._synapse_regions.synapse_dynamics,
-                self._app_vertex.weight_scale, weight_scales)
+                self._pop_vertex.weight_scale, weight_scales)
         elif self._synapse_references.synapse_dynamics is not None:
             # If there is a reference for this region, we have to create it!
             spec.reserve_memory_region(
@@ -189,7 +189,7 @@ class PopulationMachineSynapses(
                 reference=self._synapse_references.structural_dynamics)
             synapse_dynamics.write_structural_parameters(
                 spec, self._synapse_regions.structural_dynamics,
-                weight_scales, self._app_vertex, self._vertex_slice,
+                weight_scales, self._pop_vertex, self._vertex_slice,
                 self._synaptic_matrices)
         elif self._synapse_references.structural_dynamics is not None:
             # If there is a reference for this region, we have to create it!
@@ -199,8 +199,8 @@ class PopulationMachineSynapses(
                 reference=self._synapse_references.structural_dynamics)
 
     def _write_synapse_parameters(
-            self, spec: DataSpecificationGenerator,
-            ring_buffer_shifts: List[int]):
+            self, spec: DataSpecificationBase,
+            ring_buffer_shifts: Sequence[int]):
         """
         Write the synapse parameters data region.
 
@@ -212,7 +212,7 @@ class PopulationMachineSynapses(
         # Reserve space
         spec.reserve_memory_region(
             region=self._synapse_regions.synapse_params,
-            size=self._app_vertex.get_synapse_params_size(),
+            size=self._pop_vertex.get_synapse_params_size(),
             label='SynapseParams',
             reference=self._synapse_references.synapse_params)
 
@@ -220,8 +220,8 @@ class PopulationMachineSynapses(
         n_neurons = self._max_atoms_per_core
         # We only count neuron synapse types here, as this is related to
         # the ring buffers
-        n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
-        max_delay = self._app_vertex.splitter.max_support_delay()
+        n_synapse_types = self._pop_vertex.neuron_impl.get_n_synapse_types()
+        max_delay = self._pop_vertex.splitter.max_support_delay()
 
         # Write synapse parameters
         spec.switch_write_focus(self._synapse_regions.synapse_params)
@@ -230,8 +230,8 @@ class PopulationMachineSynapses(
         spec.write_value(get_n_bits(n_neurons))
         spec.write_value(get_n_bits(n_synapse_types))
         spec.write_value(get_n_bits(max_delay))
-        spec.write_value(int(self._app_vertex.drop_late_spikes))
-        spec.write_value(self._app_vertex.incoming_spike_buffer_size)
+        spec.write_value(int(self._pop_vertex.drop_late_spikes))
+        spec.write_value(self._pop_vertex.incoming_spike_buffer_size)
         spec.write_array(ring_buffer_shifts)
 
     @overrides(AbstractSynapseExpandable.gen_on_machine)

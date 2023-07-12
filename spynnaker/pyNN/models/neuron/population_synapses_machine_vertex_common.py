@@ -13,7 +13,7 @@
 # limitations under the License.
 from enum import IntEnum
 import ctypes
-from typing import Iterable, Optional, Sequence, cast
+from typing import Iterable, Optional, Sequence
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
@@ -170,10 +170,6 @@ class PopulationSynapsesMachineVertexCommon(
         self.__neuron_vertex = None
         self.__partition_id = None
 
-    @property
-    def __apv(self):
-        return cast(AbstractPopulationVertex, self._app_vertex)
-
     def set_sdram_partition(
             self, sdram_partition: SourceSegmentedSDRAMMachinePartition):
         """
@@ -201,7 +197,7 @@ class PopulationSynapsesMachineVertexCommon(
         self.__partition_id = partition_id
 
     @staticmethod
-    def __get_binary_file_name(app_vertex):
+    def __get_binary_file_name(app_vertex: AbstractPopulationVertex):
         """
         Get the local binary filename for this vertex.  Static because at
         the time this is needed, the local `app_vertex` is not set.
@@ -215,7 +211,7 @@ class PopulationSynapsesMachineVertexCommon(
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self) -> Iterable[int]:
-        ids = self.__apv.synapse_recorder.recorded_ids_by_slice(
+        ids = self._pop_vertex.synapse_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         assert ids is not None
         return ids
@@ -339,7 +335,7 @@ class PopulationSynapsesMachineVertexCommon(
                 x, y, p, self.N_LATE_SPIKES_NAME, prov.n_late_packets)
             if prov.n_late_packets == 0:
                 pass
-            elif self.__apv.drop_late_spikes:
+            elif self._pop_vertex.drop_late_spikes:
                 db.insert_report(
                     f"On {label}, {prov.n_late_packets} packets (maximum of "
                     f" {prov.max_spikes_overflow} per time step) were dropped "

@@ -46,7 +46,7 @@ class PopulationSynapsesMachineVertexShared(
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
-        rec_regions = self._app_vertex.synapse_recorder.get_region_sizes(
+        rec_regions = self._pop_vertex.synapse_recorder.get_region_sizes(
             self.vertex_slice)
         self._write_common_data_spec(spec, rec_regions)
 
