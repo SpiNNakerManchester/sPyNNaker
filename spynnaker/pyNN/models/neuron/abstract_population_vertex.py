@@ -1709,7 +1709,7 @@ class _Stats(object):
         pre_vertex = proj._projection_edge.pre_vertex
         if isinstance(pre_vertex, AbstractMaxSpikes):
             rate = pre_vertex.max_spikes_per_second()
-            if rate != 0:
+            if rate > 0:
                 spikes_per_second = rate
             spikes_per_tick = pre_vertex.max_spikes_per_ts()
         return spikes_per_tick, spikes_per_second

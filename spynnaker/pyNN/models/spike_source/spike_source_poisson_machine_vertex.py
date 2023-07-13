@@ -21,7 +21,7 @@ from spinn_utilities.overrides import overrides
 from spinnman.model.enums import ExecutableType
 from pacman.model.graphs import AbstractEdgePartition
 from pacman.model.graphs.machine import (
-    MachineVertex, AbstractSDRAMPartition)
+    MachineVertex, AbstractSDRAMPartition, SDRAMMachineEdge)
 from pacman.model.graphs.common import Slice
 from pacman.model.resources import AbstractSDRAM
 from pacman.model.placements import Placement
@@ -233,11 +233,9 @@ class SpikeSourcePoissonMachineVertex(
 
     def __init__(
             self, sdram: AbstractSDRAM, is_recording: bool,
-            label: Optional[str] = None,
-            app_vertex: Optional[SpikeSourcePoissonVertex] = None,
-            vertex_slice: Optional[Slice] = None):
+            label: Optional[str], app_vertex: SpikeSourcePoissonVertex,
+            vertex_slice: Slice):
         # pylint: disable=too-many-arguments
-        assert app_vertex is not None, "must supply application vertex"
         super().__init__(
             label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__is_recording = is_recording
@@ -306,11 +304,11 @@ class SpikeSourcePoissonMachineVertex(
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractMaxSpikes.max_spikes_per_second)
-    def max_spikes_per_second(self) -> int:
+    def max_spikes_per_second(self) -> float:
         return self._pop_vertex.max_rate
 
     @overrides(AbstractMaxSpikes.max_spikes_per_ts)
-    def max_spikes_per_ts(self) -> int:
+    def max_spikes_per_ts(self) -> float:
         return self._pop_vertex.max_spikes_per_ts()
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
@@ -578,16 +576,16 @@ class SpikeSourcePoissonMachineVertex(
                 n_rates, = _ONE_WORD.unpack_from(byte_array, offset)
                 # Skip the count and index
                 offset += PARAMS_WORDS_PER_NEURON * BYTES_PER_WORD
-                rates = list()
+                rates: List[float] = list()
                 for _ in range(n_rates):
                     rate_int = _ONE_WORD.unpack_from(byte_array, offset)[0]
                     rates.append(rate_int / DataType.S1615.scale)
                     # Skip the start and duration as they can't change
                     offset += PARAMS_WORDS_PER_RATE * BYTES_PER_WORD
-                self._pop_vertex.rates.set_value_by_id(i, rates)
+                self._pop_vertex.rates.set_value_by_id(i, numpy.array(rates))
 
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
-    def sdram_requirement(self, sdram_machine_edge):
+    def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge):
         if isinstance(sdram_machine_edge.post_vertex,
                       ReceivesSynapticInputsOverSDRAM):
             return sdram_machine_edge.post_vertex.n_bytes_for_transfer

@@ -11,10 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Optional, Sequence, Union
+import numpy
+from numpy.typing import NDArray
+from spinn_utilities.classproperty import classproperty
 from spinn_utilities.overrides import overrides
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-from spinn_utilities.classproperty import classproperty
 
 _population_parameters = {"seed": None, "splitter": None}
 
@@ -24,18 +28,26 @@ DEFAULT_MAX_ATOMS_PER_CORE = 500
 class SpikeSourcePoissonVariable(AbstractPyNNModel):
     default_population_parameters = _population_parameters
 
-    def __init__(self, rates, starts, durations=None):
+    def __init__(
+            self, rates: Union[Sequence[float], NDArray[numpy.floating], None],
+            starts: Union[Sequence[int], NDArray[numpy.integer]],
+            durations: Union[
+                Sequence[int], NDArray[numpy.integer], None] = None):
         self._rates = rates
         self._starts = starts
         self._durations = durations
 
     @classproperty
-    def absolute_max_atoms_per_core(cls):  # pylint: disable=no-self-argument
+    def absolute_max_atoms_per_core(  # pylint: disable=no-self-argument
+            cls) -> int:
         return DEFAULT_MAX_ATOMS_PER_CORE
 
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=default_population_parameters.keys())
-    def create_vertex(self, n_neurons, label, seed, splitter):
+    def create_vertex(
+            self, n_neurons: int, label: str, seed: Optional[int],
+            splitter: Optional[AbstractSplitterCommon]
+            ) -> SpikeSourcePoissonVertex:
         """
         :param float seed:
         :param splitter:
