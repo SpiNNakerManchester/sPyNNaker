@@ -20,6 +20,7 @@ import os
 import math
 import neo
 import numpy
+from numpy.typing import NDArray
 from math import isnan
 from pyNN.random import RandomDistribution
 from typing import List, Tuple
@@ -167,8 +168,11 @@ def read_in_data_from_file(
     return result[numpy.lexsort((times, atom_ids))]
 
 
-def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
-                          min_time=0, max_time=float('inf'), split_value="\t"):
+def read_spikes_from_file(
+        file_path: str,
+        min_atom: float = 0, max_atom: float = float('inf'),
+        min_time: float = 0, max_time: float = float('inf'),
+        split_value: str = "\t") -> NDArray[numpy.integer]:
     """
     Read spikes from a file formatted as::
 
@@ -185,7 +189,7 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     :type max_time: float or int
     :param str split_value: the pattern to split by
     :return:
-        a numpy array with max_atom elements each of which is a list of
+        a numpy array with up to max_atom elements each of which is a list of
         spike times.
     :rtype: numpy.ndarray(int, int)
     """
