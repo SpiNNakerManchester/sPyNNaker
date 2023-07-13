@@ -520,7 +520,7 @@ class NeuronRecorder(object):
             if variable in self.__per_timestep_recording)
         return variables
 
-    def _compute_rate(self, sampling_interval: Optional[int]) -> int:
+    def _compute_rate(self, sampling_interval: Optional[float]) -> int:
         """
         Convert a sampling interval into a rate.
         Remember, machine time step is in nanoseconds
@@ -572,7 +572,7 @@ class NeuronRecorder(object):
                 "All indexes larger than population size")
 
     def __check_per_timestep_params(
-            self, variable: str, sampling_interval: Optional[int],
+            self, variable: str, sampling_interval: Optional[float],
             indexes: Optional[Collection[int]]):
         """
         Check if certain parameters have been provided for a per-timestep
@@ -591,7 +591,7 @@ class NeuronRecorder(object):
                 "on the whole population")
 
     def __check_events_per_core_params(
-            self, variable: str, sampling_interval: Optional[int],
+            self, variable: str, sampling_interval: Optional[float],
             indexes: Optional[Collection[int]]):
         """
         Check if certain parameters have been provided for an
@@ -610,7 +610,7 @@ class NeuronRecorder(object):
                 "on the whole population")
 
     def _turn_off_recording(
-            self, variable: str, sampling_interval: Optional[int],
+            self, variable: str, sampling_interval: Optional[float],
             remove_indexes: Optional[Collection[int]]):
         """
         :param str variable:
@@ -689,7 +689,7 @@ class NeuronRecorder(object):
             f"sampling_intervals for {variable} on one population.")
 
     def _turn_on_recording(
-            self, variable: str, sampling_interval: Optional[int],
+            self, variable: str, sampling_interval: Optional[float],
             indexes: Optional[Collection[int]]):
         """
         :param str variable:
@@ -733,7 +733,7 @@ class NeuronRecorder(object):
             self.__indexes[variable] = sorted(indices)
 
     def set_recording(self, variable: str, new_state: bool,
-                      sampling_interval: Optional[int] = None,
+                      sampling_interval: Optional[float] = None,
                       indexes: Optional[Collection[int]] = None):
         """
         :param str variable: PyNN variable name

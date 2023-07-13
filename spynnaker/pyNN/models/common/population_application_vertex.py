@@ -11,14 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List, Union, cast
+from typing import (
+    Container, Iterable, List, Optional, Sequence, Tuple, Union, cast)
+from typing_extensions import TypeAlias
 from spinn_utilities.overrides import overrides
 from spinn_utilities.helpful_functions import is_singleton
+from spinn_utilities.ranged.abstract_sized import Selector
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.common import Slice
+from pacman.model.routing_info import RoutingInfo
 from pacman.utilities.utility_calls import get_field_based_keys
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import HasCustomAtomKeyMap
+from spinn_front_end_common.interface.ds import DataType
 from spynnaker.pyNN.models.common.parameter_holder import ParameterHolder
+from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
+from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
+
+#: :meta private:
+Names: TypeAlias = Union[str, Iterable[str]]
+#: :meta private:
+Values: TypeAlias = Union[float, Sequence[float]]
 
 
 class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
@@ -33,7 +47,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     __slots__ = ()
 
     @staticmethod
-    def _as_list(names: Union[str, List[str]]) -> List[str]:
+    def _as_list(names: Names) -> List[str]:
         """
         Normalise the input to a list.
 
@@ -43,10 +57,11 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         if is_singleton(names):
             return [cast(str, names)]
-        return cast(List[str], names)
+        return list(cast(Iterable[str], names))
 
     @staticmethod
-    def _check_names(names, allowed, type_of_thing):
+    def _check_names(names: Names, allowed: Container[str],
+                     type_of_thing: str):
         """
         Check the list of names are allowed or not.
 
@@ -61,7 +76,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
                 raise KeyError(f"{name} is not a recognized {type_of_thing}")
 
     @staticmethod
-    def _check_parameters(names, allowed):
+    def _check_parameters(names: Names, allowed: Container[str]):
         """
         Check that parameters are allowed.
 
@@ -72,7 +87,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         PopulationApplicationVertex._check_names(names, allowed, "parameter")
 
     @staticmethod
-    def _check_variables(names, allowed):
+    def _check_variables(names: Names, allowed: Container[str]):
         """
         Check that state variables are allowed.
 
@@ -82,7 +97,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         PopulationApplicationVertex._check_names(names, allowed, "variable")
 
-    def get_parameter_values(self, names, selector=None):
+    def get_parameter_values(
+            self, names: Names, selector: Selector = None) -> ParameterHolder:
         """
         Get the values of a parameter or parameters for the whole
         Population or a subset if the selector is used.
@@ -99,7 +115,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         raise KeyError(
             "This Population does not support the reading of parameters")
 
-    def set_parameter_values(self, name, value, selector=None):
+    def set_parameter_values(
+            self, name: str, value: Values, selector: Selector = None):
         """
         Set the values of a parameter for the whole Population or a subset
         if the selector is used.
@@ -114,7 +131,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         raise KeyError(
             "This Population does not support the setting of parameters")
 
-    def get_parameters(self):
+    def get_parameters(self) -> List[str]:
         """
         Get the names of all the parameters that can be obtained
 
@@ -122,7 +139,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         return []
 
-    def get_initial_state_values(self, names, selector=None):
+    def get_initial_state_values(
+            self, names: Names, selector: Selector = None) -> ParameterHolder:
         """
         Get the initial values of a state variable for the whole Population
         or a subset if the selector is used.
@@ -140,7 +158,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             "This Population does not support the reading of state"
             " variables")
 
-    def set_initial_state_values(self, name, value, selector=None):
+    def set_initial_state_values(
+            self, name: str, value: Values, selector: Selector = None):
         """
         Set the initial values of a state variable for the whole Population
         or a subset if the selector is used.
@@ -157,7 +176,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             " variables")
 
     def get_current_state_values(
-            self, names, selector=None) -> ParameterHolder:
+            self, names: Names, selector: Selector = None) -> ParameterHolder:
         """
         Get the current values of a state variable for the whole Population
         or a subset if the selector is used.
@@ -175,7 +194,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             "This Population does not support the reading of state"
             " variables")
 
-    def set_current_state_values(self, name, value, selector=None):
+    def set_current_state_values(
+            self, name: str, value: Values, selector: Selector = None):
         """
         Set the current values of a state variable for the whole Population
         or a subset if the selector is used.
@@ -191,7 +211,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             "This Population does not support the setting of state"
             " variables")
 
-    def get_state_variables(self):
+    def get_state_variables(self) -> List[str]:
         """
         Get a list of supported state variables.
 
@@ -199,7 +219,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         return []
 
-    def get_units(self, name):
+    def get_units(self, name: str) -> str:
         """
         Get the units of the given parameter or state variable.
 
@@ -211,7 +231,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         raise KeyError(f"The units for {name} cannot be found")
 
     @property
-    def conductance_based(self):
+    def conductance_based(self) -> bool:
         """
         Whether the vertex models post-synaptic inputs as
         currents or conductance.
@@ -227,7 +247,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     # If get_recordable_variables implemented other recording methods must
     # be too
 
-    def get_recordable_variables(self):
+    def get_recordable_variables(self) -> List[str]:
         """
         Get a list of the names and types of things that can be recorded.
 
@@ -237,7 +257,9 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         return []
 
-    def set_recording(self, name, sampling_interval=None, indices=None):
+    def set_recording(
+            self, name: str, sampling_interval: Optional[float] = None,
+            indices: Optional[List[int]] = None):
         """
         Set a variable recording.
 
@@ -257,7 +279,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"{type(self)} has recording variables so should implement "
             f"set_recording")
 
-    def set_not_recording(self, name, indices=None):
+    def set_not_recording(
+            self, name: str, indices: Optional[List[int]] = None):
         """
         Set a variable not recording.
 
@@ -274,7 +297,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"{type(self)} has recording variables so should implement "
             f"set_not_recording")
 
-    def get_recording_variables(self):
+    def get_recording_variables(self) -> List[str]:
         """
         Get a list of variables that are currently being recorded.
 
@@ -286,7 +309,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"{type(self)} has recording variables so should implement "
             f"get_recording_variables")
 
-    def get_buffer_data_type(self, name):
+    def get_buffer_data_type(self, name: str) -> BufferDataType:
         """
         Get the type of data recorded by the buffer manager.
 
@@ -304,7 +327,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"{type(self)} has recording variables so should implement "
             f"get_recording_variables")
 
-    def get_sampling_interval_ms(self, name):
+    def get_sampling_interval_ms(self, name: str) -> float:
         """
         Get the sampling interval of the recording for the given variable.
 
@@ -320,7 +343,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"{type(self)} has recording variables so should implement "
             f"get_recording_variables")
 
-    def get_data_type(self, name):
+    def get_data_type(self, name: str) -> Optional[DataType]:
         """
         Get the type data returned by a recording of the variable.
 
@@ -337,7 +360,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"{type(self)} has recording variables so should implement "
             f"get_data_type")
 
-    def get_recording_region(self, name):
+    def get_recording_region(self, name: str) -> int:
         """
         Gets the recording region for the named variable.
 
@@ -351,7 +374,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"{type(self)} has recording variables so should implement "
             f"get_recording_region")
 
-    def get_neurons_recording(self, name, vertex_slice):
+    def get_neurons_recording(
+            self, name: str, vertex_slice: Slice) -> Optional[Iterable[int]]:
         """
         Gets the neurons being recorded on the core with this slice.
 
@@ -373,7 +397,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
     # end of recording methods
 
-    def inject(self, current_source, selector=None):
+    def inject(self, current_source: AbstractCurrentSource,
+               selector: Selector = None):
         """
         Inject a current source into this population.
 
@@ -391,7 +416,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             "This Population doesn't support injection")
 
     @property
-    def n_colour_bits(self):
+    def n_colour_bits(self) -> int:
         """
         The number of colour bits sent by this vertex.
 
@@ -402,12 +427,15 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         return 0
 
     @overrides(HasCustomAtomKeyMap.get_atom_key_map)
-    def get_atom_key_map(self, pre_vertex, partition_id, routing_info):
+    def get_atom_key_map(
+            self, pre_vertex: MachineVertex, partition_id: str,
+            routing_info: RoutingInfo) -> Iterable[Tuple[int, int]]:
         base_key = routing_info.get_first_key_from_pre_vertex(
             pre_vertex, partition_id)
         # This might happen if there are no edges
         if base_key is None:
             base_key = 0
         vertex_slice = pre_vertex.vertex_slice
+        assert vertex_slice is not None
         keys = get_field_based_keys(base_key, vertex_slice, self.n_colour_bits)
         return enumerate(keys, vertex_slice.lo_atom)

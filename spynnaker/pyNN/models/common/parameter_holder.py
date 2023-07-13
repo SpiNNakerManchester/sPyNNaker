@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple,
+    Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple,
     Union, cast)
 from typing_extensions import TypeAlias
 from pyNN.random import RandomDistribution
@@ -41,7 +41,7 @@ class ParameterHolder(object):
         "__selector")
 
     def __init__(
-            self, data_items_to_return: Union[str, Sequence[str]],
+            self, data_items_to_return: Union[str, Iterable[str]],
             get_call: Callable[[str, Selector], Union[
                 _BaseValueType, RandomDistribution]],
             selector: Selector = None):
@@ -55,7 +55,11 @@ class ParameterHolder(object):
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         :type selector: None or slice or int or list(bool) or list(int)
         """
-        self.__data_items_to_return = data_items_to_return
+        self.__data_items_to_return: Union[str, Tuple[str, ...]]
+        if is_singleton(data_items_to_return):
+            self.__data_items_to_return = cast(str, data_items_to_return)
+        else:
+            self.__data_items_to_return = tuple(data_items_to_return)
         self.__get_call = get_call
         self.__data_items: Optional[Dict[str, _BaseValueType]] = None
         self.__selector = selector
