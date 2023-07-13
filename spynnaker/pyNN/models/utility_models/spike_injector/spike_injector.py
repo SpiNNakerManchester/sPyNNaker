@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
 from spinn_utilities.overrides import overrides
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from .spike_injector_vertex import SpikeInjectorVertex
 
@@ -32,8 +34,10 @@ class SpikeInjector(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=_population_parameters.keys())
     def create_vertex(
-            self, n_neurons, label, port, virtual_key,
-            reserve_reverse_ip_tag, splitter):
+            self, n_neurons: int, label: str,
+            port: Optional[int], virtual_key: Optional[int],
+            reserve_reverse_ip_tag: Optional[bool],
+            splitter: Optional[AbstractSplitterCommon]) -> SpikeInjectorVertex:
         """
         :param int port:
         :param int virtual_key:

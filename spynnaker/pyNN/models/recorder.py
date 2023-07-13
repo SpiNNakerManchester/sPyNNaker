@@ -13,7 +13,7 @@
 # limitations under the License.
 from datetime import datetime
 import logging
-import neo
+import neo  # type: ignore[import]
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
