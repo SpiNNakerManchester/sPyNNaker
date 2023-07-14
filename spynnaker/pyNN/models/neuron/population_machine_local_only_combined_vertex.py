@@ -14,7 +14,7 @@
 from enum import IntEnum
 import os
 import ctypes
-from typing import List
+from typing import List, cast
 
 from spinn_utilities.overrides import overrides
 from pacman.model.placements import Placement
@@ -29,6 +29,8 @@ from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
 from .abstract_population_vertex import AbstractPopulationVertex
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    AbstractSpynnakerSplitterDelay)
 
 
 class LocalOnlyProvenance(ctypes.LittleEndianStructure):
@@ -281,7 +283,8 @@ class PopulationMachineLocalOnlyCombinedVertex(
         log_n_synapse_types = get_n_bits(
             self._pop_vertex.neuron_impl.get_n_synapse_types())
         # Find the maximum delay
-        max_delay = self._pop_vertex.splitter.max_support_delay()
+        max_delay = cast(AbstractSpynnakerSplitterDelay,
+                         self._pop_vertex.splitter).max_support_delay()
 
         spec.write_value(log_n_max_atoms)
         spec.write_value(log_n_synapse_types)

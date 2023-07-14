@@ -325,7 +325,7 @@ class AbstractPopulationVertex(
 
         # Set up for profiling
         self.__n_profile_samples = get_config_int(
-            "Reports", "n_profile_samples")
+            "Reports", "n_profile_samples") or 0
 
         # Set up for incoming
         self.__incoming_projections: Dict[
@@ -560,7 +560,7 @@ class AbstractPopulationVertex(
         return self.__neuron_impl
 
     @property
-    def n_profile_samples(self) -> Optional[int]:
+    def n_profile_samples(self) -> int:
         """
         The maximum number of profile samples to report.
 

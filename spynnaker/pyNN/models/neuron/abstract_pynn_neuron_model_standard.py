@@ -53,7 +53,7 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             model_name, binary, neuron_model, input_type, synapse_type,
             threshold_type, additional_input_type))
 
-    @overrides(AbstractPyNNNeuronModel.create_vertex,
+    @overrides(AbstractPyNNNeuronModel.create_vertex,  # type: ignore[has-type]
                additional_arguments={"n_steps_per_timestep"})
     def create_vertex(
             self, n_neurons, label, spikes_per_second,

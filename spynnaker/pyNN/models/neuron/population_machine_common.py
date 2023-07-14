@@ -114,6 +114,12 @@ class PopulationMachineCommon(
         return cast(AbstractPopulationVertex, self._app_vertex)
 
     @property
+    def vertex_slice(self) -> Slice:
+        v_slice = super().vertex_slice
+        assert v_slice is not None
+        return v_slice
+
+    @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
     def _provenance_region_id(self) -> int:
         return self.__regions.provenance
