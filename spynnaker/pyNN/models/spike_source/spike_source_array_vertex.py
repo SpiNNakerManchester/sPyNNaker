@@ -30,30 +30,41 @@ from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.common.types import Names
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from spynnaker.pyNN.models.common import ParameterHolder
+from spynnaker.pyNN.models.common.types import Spikes
 from .spike_source_array_machine_vertex import SpikeSourceArrayMachineVertex
 if TYPE_CHECKING:
-    from .spike_source_array import Spikes, SpikeSourceArray
+    from .spike_source_array import SpikeSourceArray
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 # Cutoff to warn too many spikes sent at one time
 TOO_MANY_SPIKES = 100
 
-_SingleList: TypeAlias = Union[Sequence[int], NDArray[numpy.integer]]
-_DoubleList: TypeAlias = Union[Sequence[Sequence[int]], NDArray[numpy.integer]]
+_Number: TypeAlias = Union[int, float]
+
+_SingleList: TypeAlias = Union[
+    Sequence[_Number], NDArray[numpy.integer]]
+_DoubleList: TypeAlias = Union[
+    Sequence[Sequence[_Number]], NDArray[numpy.integer]]
 
 
 def _is_double_list(value: Spikes) -> TypeGuard[_DoubleList]:
-    return bool(len(value)) and hasattr(value[0], "__len__")
+    return not isinstance(value, (float, int)) and bool(len(value)) and \
+        hasattr(value[0], "__len__")
 
 
 def _is_single_list(value: Spikes) -> TypeGuard[_SingleList]:
     # USE _is_double_list first!
-    return bool(len(value))
+    return not isinstance(value, (float, int)) and bool(len(value))
+
+
+def _is_singleton(value: Spikes) -> TypeGuard[_Number]:
+    return isinstance(value, (float, int))
 
 
 def _as_numpy_ticks(
@@ -70,6 +81,8 @@ def _send_buffer_times(
         return [_as_numpy_ticks(times, time_step) for times in spike_times]
     elif _is_single_list(spike_times):
         return _as_numpy_ticks(spike_times, time_step)
+    elif _is_singleton(spike_times):
+        return _as_numpy_ticks([spike_times], time_step)
     else:
         return []
 
@@ -143,6 +156,8 @@ class SpikeSourceArrayVertex(
             self._check_density_double_list(spike_times)
         elif _is_single_list(spike_times):
             self._check_density_single_list(spike_times)
+        elif _is_singleton(spike_times):
+            pass
         else:
             logger.warning("SpikeSourceArray has no spike times")
 
@@ -236,6 +251,8 @@ class SpikeSourceArrayVertex(
             self._check_spikes_double_list(spike_times)
         elif _is_single_list(spike_times):
             self._to_early_spikes_single_list(spike_times)
+        elif _is_singleton(spike_times):
+            self._to_early_spikes_single_list([spike_times])
         else:
             # in case of empty list do not check
             pass
@@ -249,7 +266,7 @@ class SpikeSourceArrayVertex(
 
     @overrides(PopulationApplicationVertex.get_parameter_values)
     def get_parameter_values(
-            self, names: str, selector: Selector = None) -> ParameterHolder:
+            self, names: Names, selector: Selector = None) -> ParameterHolder:
         self._check_parameters(names, {"spike_times"})
         return ParameterHolder(names, self.__read_parameter, selector)
 

@@ -15,7 +15,7 @@
 import logging
 import math
 from typing import (
-    Any, Collection, Dict, List, Optional, Sequence, Sized, Tuple, Union, cast)
+    Any, Dict, List, Optional, Sequence, Sized, Tuple, Union, cast)
 from typing_extensions import TypeGuard
 import numpy
 from numpy.typing import NDArray
@@ -39,8 +39,9 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import MultiSpikeRecorder
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
-from spynnaker.pyNN.models.common import ParameterHolder
+from spynnaker.pyNN.models.common import (
+    ParameterHolder, PopulationApplicationVertex)
+from spynnaker.pyNN.models.common.types import Names
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
@@ -285,9 +286,11 @@ class SpikeSourcePoissonVertex(
         self.__structure: Optional[BaseStructure] = None
 
         if self.__is_variable_rate:
-            self.__allowed_parameters = {"rates", "durations", "starts"}
+            self.__allowed_parameters = frozenset(
+                {"rates", "durations", "starts"})
         else:
-            self.__allowed_parameters = {"rate", "duration", "start"}
+            self.__allowed_parameters = frozenset(
+                {"rate", "duration", "start"})
 
         self.__last_rate_read_time: Optional[float] = None
 
@@ -356,7 +359,7 @@ class SpikeSourcePoissonVertex(
         return f"{name}s"
 
     @overrides(PopulationApplicationVertex.get_parameter_values)
-    def get_parameter_values(self, names: Sequence[str], selector=None):
+    def get_parameter_values(self, names: Names, selector=None):
         self._check_parameters(names, self.__allowed_parameters)
         return ParameterHolder(names, self.__read_parameter, selector)
 
@@ -384,8 +387,8 @@ class SpikeSourcePoissonVertex(
                 selector, numpy.array([value]), use_list_as_value=True)
 
     @overrides(PopulationApplicationVertex.get_parameters)
-    def get_parameters(self) -> Collection[str]:
-        return self.__allowed_parameters
+    def get_parameters(self) -> List[str]:
+        return list(self.__allowed_parameters)
 
     @overrides(PopulationApplicationVertex.get_units)
     def get_units(self, name: str) -> str:

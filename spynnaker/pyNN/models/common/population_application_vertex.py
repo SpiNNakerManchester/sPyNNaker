@@ -11,9 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import (
-    Container, Iterable, List, Optional, Sequence, Tuple, Union, cast)
-from typing_extensions import TypeAlias
+from typing import Container, Iterable, List, Optional, Tuple, cast
 from spinn_utilities.overrides import overrides
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged.abstract_sized import Selector
@@ -28,11 +26,7 @@ from spinn_front_end_common.interface.ds import DataType
 from spynnaker.pyNN.models.common.parameter_holder import ParameterHolder
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
-
-#: :meta private:
-Names: TypeAlias = Union[str, Iterable[str]]
-#: :meta private:
-Values: TypeAlias = Union[float, Sequence[float]]
+from .types import Names, Values
 
 
 class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):

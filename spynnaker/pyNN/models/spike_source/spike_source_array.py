@@ -12,18 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy
-from numpy.typing import NDArray
-from typing import Optional, Sequence, Union
-from typing_extensions import TypeAlias
+from typing import Optional
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+from spynnaker.pyNN.models.common.types import Spikes
 from .spike_source_array_vertex import SpikeSourceArrayVertex
-
-#: :meta private:
-Spikes: TypeAlias = Union[
-    Sequence[int], Sequence[Sequence[int]], NDArray[numpy.integer]]
 
 
 class SpikeSourceArray(AbstractPyNNModel):

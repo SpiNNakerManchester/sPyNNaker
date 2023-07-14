@@ -75,7 +75,7 @@ from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
 from spynnaker.pyNN.utilities.struct import StructRepeat
 from spynnaker.pyNN.models.common import (
     ParameterHolder, PopulationApplicationVertex)
-from spynnaker.pyNN.models.common.population_application_vertex import Names
+from spynnaker.pyNN.models.common.types import Names, Values
 from spynnaker.pyNN.models.common.param_generator_data import (
     MAX_PARAMS_BYTES, is_param_generatable)
 from spynnaker.pyNN.exceptions import SpynnakerException
@@ -728,8 +728,7 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.set_parameter_values)
     def set_parameter_values(
-            self, name: str, value: Union[float, Sequence[float]],
-            selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None):
         # If we have run, and not reset, we need to read the values back
         # so that we don't overwrite the state.  Note that a reset will
         # then make this a waste, but we can't see the future...
@@ -761,8 +760,7 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.set_initial_state_values)
     def set_initial_state_values(
-            self, name: str, value: Union[float, Sequence[float]],
-            selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None):
         self._check_variables([name], set(self.__state_variables.keys()))
         if not SpynnakerDataView.is_ran_last():
             self.__state_variables[name].set_value_by_selector(
@@ -789,8 +787,7 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.set_current_state_values)
     def set_current_state_values(
-            self, name: str, value: Union[float, Sequence[float]],
-            selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None):
         self._check_variables([name], set(self.__state_variables.keys()))
         # If we have run, and not reset, we need to read the values back
         # so that we don't overwrite all the state.  Note that a reset will
