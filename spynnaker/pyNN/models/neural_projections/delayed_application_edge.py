@@ -11,12 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List, Optional
+from __future__ import annotations
+from collections.abc import Iterable
+from typing import List, Optional, TYPE_CHECKING
 from pacman.model.graphs.application import ApplicationEdge
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
-from spynnaker.pyNN.models.neural_projections import SynapseInformation
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.utility_models.delays import (
+        DelayExtensionVertex)
+    from spynnaker.pyNN.models.neural_projections import (
+        SynapseInformation, ProjectionApplicationEdge)
 
 
 class DelayedApplicationEdge(ApplicationEdge):
@@ -45,7 +49,7 @@ class DelayedApplicationEdge(ApplicationEdge):
             The edge label
         """
         super().__init__(pre_vertex, post_vertex, label=label)
-        if hasattr(synapse_information, '__iter__'):
+        if isinstance(synapse_information, Iterable):
             self.__synapse_information = list(synapse_information)
         else:
             self.__synapse_information = [synapse_information]

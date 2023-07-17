@@ -1,4 +1,4 @@
-# Copyright (c) 2017 The University of Manchester
+# Copyright (c) 2023 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .abstract_standard_neuron_component import (
-    AbstractStandardNeuronComponent, ModelParameter)
-from .abstract_neuron_impl import AbstractNeuronImpl
-from .neuron_impl_standard import NeuronImplStandard
-from .ranged_dict_vertex_slice import RangedDictVertexSlice
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent)
 
-__all__ = [
-    "AbstractNeuronImpl", "AbstractStandardNeuronComponent",
-    "ModelParameter", "NeuronImplStandard", "RangedDictVertexSlice"]
+
+class NeuronModel(AbstractStandardNeuronComponent):
+    # pylint: disable=abstract-method
+    """
+    A component of a neuron that is the model of the soma.
+    """
+    __slots__ = ()
+
+    # No further common methods or properties

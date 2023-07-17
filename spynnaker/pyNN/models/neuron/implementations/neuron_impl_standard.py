@@ -11,12 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Optional
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from .abstract_neuron_impl import AbstractNeuronImpl
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
+from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
+from spynnaker.pyNN.models.neuron.input_types import AbstractInputType
+from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
+from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
+from spynnaker.pyNN.models.neuron.additional_inputs import (
+    AbstractAdditionalInput)
 
 # The size of the n_steps_per_timestep parameter
 _N_STEPS_PER_TIMESTEP_SIZE = 1 * BYTES_PER_WORD
@@ -59,8 +66,11 @@ class NeuronImplStandard(AbstractNeuronImpl):
         'gsyn_inh': "uS"}
 
     def __init__(
-            self, model_name, binary, neuron_model, input_type,
-            synapse_type, threshold_type, additional_input_type=None):
+            self, model_name: str, binary: str,
+            neuron_model: NeuronModel, input_type: AbstractInputType,
+            synapse_type: AbstractSynapseType,
+            threshold_type: AbstractThresholdType,
+            additional_input_type: Optional[AbstractAdditionalInput] = None):
         """
         :param str model_name:
         :param str binary:
@@ -87,7 +97,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
             self.__components.append(self.__additional_input_type)
 
     @property
-    def n_steps_per_timestep(self):
+    def n_steps_per_timestep(self) -> int:
         return self.__n_steps_per_timestep
 
     @n_steps_per_timestep.setter

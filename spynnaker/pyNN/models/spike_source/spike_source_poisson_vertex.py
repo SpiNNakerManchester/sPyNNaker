@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import logging
 import math
 from typing import (
-    Any, Dict, List, Optional, Sequence, Sized, Tuple, Union, cast)
+    Any, Dict, List, Optional, Sequence, Sized, Tuple, Union,
+    cast, TYPE_CHECKING)
 from typing_extensions import TypeGuard
 import numpy
 from numpy.typing import NDArray
@@ -46,9 +47,10 @@ from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
     get_sdram_edge_params_bytes, get_expander_rates_bytes, get_params_bytes)
-from .spike_source_poisson import SpikeSourcePoisson
-from .spike_source_poisson_variable import SpikeSourcePoissonVariable
-from spynnaker.pyNN.models.projection import Projection
+if TYPE_CHECKING:
+    from .spike_source_poisson import SpikeSourcePoisson
+    from .spike_source_poisson_variable import SpikeSourcePoissonVariable
+    from spynnaker.pyNN.models.projection import Projection
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

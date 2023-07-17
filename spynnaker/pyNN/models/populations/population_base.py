@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import logging
-from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
 from pyNN.space import BaseStructure
 import neo
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union, final
+from typing import (
+    Any, Dict, List, Optional, Sequence, Tuple, Union, final,
+    TYPE_CHECKING)
 from typing_extensions import TypeAlias
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
@@ -24,6 +25,8 @@ from spinn_utilities.logger_utils import warn_once
 from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.models.recorder import Recorder
 from .assembly import Assembly
+if TYPE_CHECKING:
+    from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _Variables: TypeAlias = Union[str, List[str], Tuple[str, ...]]

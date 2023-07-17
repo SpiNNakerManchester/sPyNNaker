@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged import RangeDictionary
 from spinn_front_end_common.interface.ds import DataType
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from .abstract_additional_input import AbstractAdditionalInput
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -30,7 +32,8 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         "__i_ca2",
         "__i_alpha")
 
-    def __init__(self, tau_ca2, i_ca2, i_alpha):
+    def __init__(self, tau_ca2: ModelParameter, i_ca2: ModelParameter,
+                 i_alpha: ModelParameter):
         r"""
         :param tau_ca2: :math:`\tau_{\mathrm{Ca}^{+2}}`
         :type tau_ca2: float or iterable(float) or
@@ -54,17 +57,17 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         self.__i_alpha = i_alpha
 
     @overrides(AbstractAdditionalInput.add_parameters)
-    def add_parameters(self, parameters):
-        parameters[TAU_CA2] = self.__tau_ca2
-        parameters[I_ALPHA] = self.__i_alpha
+    def add_parameters(self, parameters: RangeDictionary[float]):
+        parameters[TAU_CA2] = self._convert(self.__tau_ca2)
+        parameters[I_ALPHA] = self._convert(self.__i_alpha)
         parameters[TIME_STEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractAdditionalInput.add_state_variables)
-    def add_state_variables(self, state_variables):
-        state_variables[I_CA2] = self.__i_ca2
+    def add_state_variables(self, state_variables: RangeDictionary[float]):
+        state_variables[I_CA2] = self._convert(self.__i_ca2)
 
     @property
-    def tau_ca2(self):
+    def tau_ca2(self) -> ModelParameter:
         r"""
         Settable model parameter: :math:`\tau_{\mathrm{Ca}^{+2}}`
 
@@ -73,7 +76,7 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         return self.__tau_ca2
 
     @property
-    def i_ca2(self):
+    def i_ca2(self) -> ModelParameter:
         r"""
         Settable model parameter: :math:`I_{\mathrm{Ca}^{+2}}`
 
@@ -82,7 +85,7 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         return self.__i_ca2
 
     @property
-    def i_alpha(self):
+    def i_alpha(self) -> ModelParameter:
         r"""
         Settable model parameter: :math:`I_{\alpha}`
 

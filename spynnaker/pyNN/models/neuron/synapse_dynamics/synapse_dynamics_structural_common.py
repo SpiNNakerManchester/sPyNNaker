@@ -40,10 +40,10 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
     from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
 
-_PopIndexType: TypeAlias = Dict[
-    Tuple[AbstractPopulationVertex, SynapseInformation], int]
-_SubpopIndexType: TypeAlias = Dict[
-    Tuple[AbstractPopulationVertex, SynapseInformation, int], int]
+    _PopIndexType: TypeAlias = Dict[
+        Tuple[AbstractPopulationVertex, SynapseInformation], int]
+    _SubpopIndexType: TypeAlias = Dict[
+        Tuple[AbstractPopulationVertex, SynapseInformation, int], int]
 
 #: Default value for frequency of rewiring
 DEFAULT_F_REW = 10 ** 4.0

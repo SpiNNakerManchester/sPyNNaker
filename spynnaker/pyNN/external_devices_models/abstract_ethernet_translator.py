@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinnman.messages.eieio.data_messages import AbstractDataElement
 
 
 class AbstractEthernetTranslator(object, metaclass=AbstractBase):
@@ -24,7 +25,7 @@ class AbstractEthernetTranslator(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def translate_control_packet(self, multicast_packet):
+    def translate_control_packet(self, multicast_packet: AbstractDataElement):
         """
         Translate a multicast packet received over Ethernet and send
         appropriate messages to the external device.

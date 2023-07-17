@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional, cast
 from spinn_utilities.overrides import overrides
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from .abstract_pynn_neuron_model import (
     AbstractPyNNNeuronModel, _population_parameters as APNM_default_params)
 from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
@@ -56,16 +57,23 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
     @overrides(AbstractPyNNNeuronModel.create_vertex,  # type: ignore[has-type]
                additional_arguments={"n_steps_per_timestep"})
     def create_vertex(
-            self, n_neurons, label, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size,
-            n_steps_per_timestep, drop_late_spikes, splitter, seed,
-            n_colour_bits):
+            self, n_neurons: int, label: str, *,
+            spikes_per_second: Optional[float],
+            ring_buffer_sigma: Optional[float],
+            incoming_spike_buffer_size: Optional[int],
+            drop_late_spikes: Optional[bool],
+            splitter: Optional[AbstractSplitterCommon],
+            seed: Optional[int], n_colour_bits: Optional[int],
+            n_steps_per_timestep: int = 1):
         """
         :param int n_steps_per_timestep:
         """
         # pylint: disable=arguments-differ
-        self._model.n_steps_per_timestep = n_steps_per_timestep
+        cast(NeuronImplStandard,
+             self._model).n_steps_per_timestep = n_steps_per_timestep
         return super().create_vertex(
-            n_neurons, label, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size, drop_late_spikes,
-            splitter, seed, n_colour_bits)
+            n_neurons, label, spikes_per_second=spikes_per_second,
+            ring_buffer_sigma=ring_buffer_sigma,
+            incoming_spike_buffer_size=incoming_spike_buffer_size,
+            drop_late_spikes=drop_late_spikes,
+            splitter=splitter, seed=seed, n_colour_bits=n_colour_bits)

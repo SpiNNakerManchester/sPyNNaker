@@ -12,13 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+from typing import Iterable, List, Optional, Sequence, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.model.routing_info import BaseKeyAndMask
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from spinn_front_end_common.abstract_models import (
     AbstractVertexWithEdgeToDependentVertices, HasCustomAtomKeyMap)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from .abstract_ethernet_controller import AbstractEthernetController
+from .abstract_multicast_controllable_device import (
+    AbstractMulticastControllableDevice)
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
+    from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
+    from .abstract_ethernet_translator import AbstractEthernetTranslator
 
 
 class ExternalDeviceLifControlVertex(
@@ -40,11 +49,18 @@ class ExternalDeviceLifControlVertex(
     _DEFAULT_COMMAND_MASK = 0xFFFFFFFF
 
     def __init__(
-            self, devices, create_edges, max_atoms_per_core, neuron_impl,
-            pynn_model, translator=None, spikes_per_second=None, label=None,
-            ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-            drop_late_spikes=None, splitter=None, seed=None,
-            n_colour_bits=None):
+            self, devices: Sequence[AbstractMulticastControllableDevice],
+            create_edges: bool, max_atoms_per_core: int,
+            neuron_impl: AbstractNeuronImpl,
+            pynn_model: AbstractPyNNNeuronModel,
+            translator: Optional[AbstractEthernetTranslator] = None,
+            spikes_per_second: Optional[float] = None,
+            label: Optional[str] = None,
+            ring_buffer_sigma: Optional[float] = None,
+            incoming_spike_buffer_size: Optional[int] = None,
+            drop_late_spikes: bool = False,
+            splitter: Optional[AbstractSplitterCommon] = None,
+            seed: Optional[int] = None, n_colour_bits: Optional[int] = None):
         """
         :param list(AbstractMulticastControllableDevice) devices:
             The AbstractMulticastControllableDevice instances to be controlled
@@ -70,7 +86,8 @@ class ExternalDeviceLifControlVertex(
         """
         # pylint: disable=too-many-arguments
         super().__init__(
-            len(devices), label, max_atoms_per_core,
+            len(devices), f"ext_dev{devices}" if label is None else label,
+            max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model, drop_late_spikes, splitter, seed,
             n_colour_bits)
@@ -85,23 +102,27 @@ class ExternalDeviceLifControlVertex(
         self.__message_translator = translator
 
         # Add the edges to the devices if required
-        self.__dependent_vertices = devices if create_edges else []
+        self.__dependent_vertices = tuple(devices) if create_edges else ()
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.dependent_vertices)
-    def dependent_vertices(self):
+    def dependent_vertices(self) -> Sequence[
+            AbstractMulticastControllableDevice]:
         return self.__dependent_vertices
 
     @overrides(AbstractVertexWithEdgeToDependentVertices
                .edge_partition_identifiers_for_dependent_vertex)
-    def edge_partition_identifiers_for_dependent_vertex(self, vertex):
+    def edge_partition_identifiers_for_dependent_vertex(
+            self, vertex) -> Iterable[str]:
+        # TODO What is the type of vertex?
         return [vertex.device_control_partition_id]
 
     @overrides(AbstractEthernetController.get_external_devices)
-    def get_external_devices(self):
+    def get_external_devices(self) -> Iterable[
+            AbstractMulticastControllableDevice]:
         return self.__devices.values()
 
     @overrides(AbstractEthernetController.get_message_translator)
-    def get_message_translator(self):
+    def get_message_translator(self) -> AbstractEthernetTranslator:
         if self.__message_translator is None:
             raise ConfigurationException(
                 "This population was not given a translator, and so cannot be"
@@ -110,17 +131,19 @@ class ExternalDeviceLifControlVertex(
         return self.__message_translator
 
     @overrides(AbstractEthernetController.get_outgoing_partition_ids)
-    def get_outgoing_partition_ids(self):
+    def get_outgoing_partition_ids(self) -> List[str]:
         return list(self.__devices.keys())
 
     @overrides(HasCustomAtomKeyMap.get_atom_key_map)
-    def get_atom_key_map(self, pre_vertex, partition_id, routing_info):
+    def get_atom_key_map(
+            self, pre_vertex, partition_id: str, routing_info) -> List[
+                Tuple[int, int]]:
         index = self.__indices[partition_id]
         device = self.__devices[partition_id]
         return [(index, device.device_control_key)]
 
     @overrides(AbstractPopulationVertex.get_fixed_key_and_mask)
-    def get_fixed_key_and_mask(self, partition_id):
+    def get_fixed_key_and_mask(self, partition_id: str):
         return BaseKeyAndMask(
             self.__devices[partition_id].device_control_key,
             self._DEFAULT_COMMAND_MASK)

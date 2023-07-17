@@ -11,11 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import math
 import numpy
 import logging
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from pyNN.random import NumpyRNG
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
@@ -29,7 +29,8 @@ from .abstract_generate_connector_on_machine import (
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
-from spynnaker.pyNN.models.neural_projections import SynapseInformation
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

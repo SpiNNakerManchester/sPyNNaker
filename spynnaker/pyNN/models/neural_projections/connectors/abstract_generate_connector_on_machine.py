@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 from enum import Enum
 import numpy
+from typing import TYPE_CHECKING
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
@@ -27,8 +28,9 @@ from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.utilities.utility_calls import check_rng
-from spynnaker.pyNN.models.neural_projections import SynapseInformation
-from .connection_types import WD
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
+    from .connection_types import WD
 
 
 # Hashes of the connection generators supported by the synapse expander

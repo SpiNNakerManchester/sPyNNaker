@@ -12,10 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, List
+from numpy import floating
+from numpy.typing import NDArray
+from typing import Dict, Iterable, List, Union
+from typing_extensions import TypeAlias
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spinn_utilities.ranged import RangeDictionary
+from spinn_utilities.ranged import RangeDictionary, RangedList
+from spynnaker.pyNN.random_distribution import RandomDistribution
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from spynnaker.pyNN.utilities.struct import Struct
+
+#: The type of parameters to a neuron model.
+ModelParameter: TypeAlias = Union[
+    float, Iterable[float], RandomDistribution, NDArray[floating]]
 
 
 class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
@@ -49,7 +58,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         return self.__structs
 
     @abstractmethod
-    def add_parameters(self, parameters: RangeDictionary):
+    def add_parameters(self, parameters: RangeDictionary[float]):
         """
         Add the initial values of the parameters to the parameter holder.
 
@@ -59,7 +68,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def add_state_variables(self, state_variables: RangeDictionary):
+    def add_state_variables(self, state_variables: RangeDictionary[float]):
         """
         Add the initial values of the state variables to the state
         variables holder.
@@ -85,3 +94,14 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         :param str variable: The name of the variable
         """
         return self.__units[variable]
+
+    @staticmethod
+    def _convert(value: ModelParameter) -> Union[float, RangedList[float]]:
+        """
+        Converts a model parameter into a form that can be ingested by a
+        RangeDictionary.
+        """
+        if isinstance(value, float):
+            return value
+        # TODO: Is this correct? Without this, things will only handle floats
+        return SpynnakerRangedList(None, value)

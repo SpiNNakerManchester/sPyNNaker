@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Optional
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
@@ -20,7 +21,8 @@ class ExternalCochleaDevice(
     __slots__ = ()
 
     def __init__(
-            self, n_neurons, spinnaker_link, label=None, board_address=None):
+            self, n_neurons: int, spinnaker_link: int,
+            label: Optional[str] = None, board_address: Optional[str] = None):
         """
         :param int n_neurons: Number of neurons
         :param int spinnaker_link:

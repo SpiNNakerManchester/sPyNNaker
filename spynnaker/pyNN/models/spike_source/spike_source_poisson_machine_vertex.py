@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 from enum import IntEnum
 import numpy
 import struct
 from typing import (
-    Iterable, List, Optional, Sequence, Sized, TypeVar, Union, cast)
+    Iterable, List, Optional, Sequence, Sized, TypeVar, Union,
+    cast, TYPE_CHECKING)
 
 from spinn_utilities.overrides import overrides
 from spinnman.model.enums import ExecutableType
@@ -56,7 +58,8 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID)
-from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
+if TYPE_CHECKING:
+    from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
 
 #: :meta private:
 T = TypeVar("T")
@@ -245,7 +248,7 @@ class SpikeSourcePoissonMachineVertex(
 
     @property
     def _pop_vertex(self) -> SpikeSourcePoissonVertex:
-        return cast(SpikeSourcePoissonVertex, self.app_vertex)
+        return cast('SpikeSourcePoissonVertex', self.app_vertex)
 
     def set_sdram_partition(self, sdram_partition: AbstractSDRAMPartition):
         self.__sdram_partition = sdram_partition

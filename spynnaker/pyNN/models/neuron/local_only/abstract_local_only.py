@@ -11,14 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List
+from __future__ import annotations
+from typing import List, TYPE_CHECKING
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
-from spynnaker.pyNN.models.projection import Projection
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.projection import Projection
 
 
 class AbstractLocalOnly(AbstractSynapseDynamics):

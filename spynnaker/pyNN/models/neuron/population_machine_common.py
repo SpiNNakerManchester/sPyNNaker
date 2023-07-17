@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Mapping, NamedTuple, Sequence, cast
+from __future__ import annotations
+from typing import Mapping, NamedTuple, Sequence, cast, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from spinnman.model.enums import ExecutableType
 from pacman.model.graphs.machine import MachineVertex
@@ -37,8 +38,8 @@ from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.profiling import (
     AbstractHasProfileData, ProfileData)
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
-
-from .abstract_population_vertex import AbstractPopulationVertex
+if TYPE_CHECKING:
+    from .abstract_population_vertex import AbstractPopulationVertex
 
 
 class CommonRegions(NamedTuple):
@@ -111,7 +112,7 @@ class PopulationMachineCommon(
 
     @property
     def _pop_vertex(self) -> AbstractPopulationVertex:
-        return cast(AbstractPopulationVertex, self._app_vertex)
+        return cast('AbstractPopulationVertex', self._app_vertex)
 
     @property
     def vertex_slice(self) -> Slice:

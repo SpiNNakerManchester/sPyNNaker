@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 from enum import IntEnum
 import os
 import ctypes
-from typing import List, cast
+from typing import List, cast, TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 from pacman.model.placements import Placement
@@ -29,8 +30,9 @@ from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
 from .abstract_population_vertex import AbstractPopulationVertex
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    AbstractSpynnakerSplitterDelay)
+if TYPE_CHECKING:
+    from spynnaker.pyNN.extra_algorithms.splitter_components import (
+        AbstractSpynnakerSplitterDelay)
 
 
 class LocalOnlyProvenance(ctypes.LittleEndianStructure):
@@ -275,6 +277,10 @@ class PopulationMachineLocalOnlyCombinedVertex(
         # End the writing of this specification:
         spec.end_specification()
 
+    def __splitter(self) -> AbstractSpynnakerSplitterDelay:
+        return cast('AbstractSpynnakerSplitterDelay',
+                    self._pop_vertex.splitter)
+
     def __write_local_only_data(self, spec: DataSpecificationGenerator):
         spec.reserve_memory_region(
             self.REGIONS.LOCAL_ONLY, self.LOCAL_ONLY_SIZE, "local_only")
@@ -283,8 +289,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
         log_n_synapse_types = get_n_bits(
             self._pop_vertex.neuron_impl.get_n_synapse_types())
         # Find the maximum delay
-        max_delay = cast(AbstractSpynnakerSplitterDelay,
-                         self._pop_vertex.splitter).max_support_delay()
+        max_delay = self.__splitter().max_support_delay()
 
         spec.write_value(log_n_max_atoms)
         spec.write_value(log_n_synapse_types)

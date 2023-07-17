@@ -11,14 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import numpy
-from typing import cast
+from typing import cast, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.utilities.utility_calls import get_field_based_keys
 from spinn_front_end_common.utility_models import (
     ReverseIPTagMulticastSourceMachineVertex)
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
-from .spike_source_array_vertex import SpikeSourceArrayVertex
+if TYPE_CHECKING:
+    from .spike_source_array_vertex import SpikeSourceArrayVertex
 
 
 class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
@@ -28,7 +30,7 @@ class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
 
     @property
     def _pop_vertex(self) -> SpikeSourceArrayVertex:
-        return cast(SpikeSourceArrayVertex, self.app_vertex)
+        return cast('SpikeSourceArrayVertex', self.app_vertex)
 
     @overrides(
         ReverseIPTagMulticastSourceMachineVertex.get_n_keys_for_partition)

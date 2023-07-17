@@ -11,8 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spynnaker.pyNN.models.projection import Projection
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.projection import Projection
 
 
 class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):

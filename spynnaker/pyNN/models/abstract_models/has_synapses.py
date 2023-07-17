@@ -11,18 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import numpy
+from __future__ import annotations
+from numpy.typing import NDArray
+from typing import TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.placements import Placement
-from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, SynapseInformation)
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
 
 
 class HasSynapses(object, metaclass=AbstractBase):
     @abstractmethod
     def get_connections_from_machine(
             self, placement: Placement, app_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation) -> numpy.ndarray:
+            synapse_info: SynapseInformation) -> NDArray:
         """
         Get the connections from the machine for this vertex.
 

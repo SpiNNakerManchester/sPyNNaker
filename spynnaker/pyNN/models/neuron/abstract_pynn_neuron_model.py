@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from spinn_utilities.overrides import overrides
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
@@ -48,9 +49,13 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=_population_parameters.keys())
     def create_vertex(
-            self, n_neurons, label, spikes_per_second, ring_buffer_sigma,
-            incoming_spike_buffer_size, drop_late_spikes, splitter, seed,
-            n_colour_bits):
+            self, n_neurons: int, label: str, *,
+            spikes_per_second: Optional[float],
+            ring_buffer_sigma: Optional[float],
+            incoming_spike_buffer_size: Optional[int],
+            drop_late_spikes: Optional[bool],
+            splitter: Optional[AbstractSplitterCommon],
+            seed: Optional[int], n_colour_bits: Optional[int]):
         """
         :param float spikes_per_second:
         :param float ring_buffer_sigma:
@@ -59,15 +64,15 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         :param splitter:
         :type splitter:
             ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
-        :param float seed:
+        :param int seed:
         :param int n_colour_bits:
         """
         # pylint: disable=arguments-differ
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return AbstractPopulationVertex(
             n_neurons, label, max_atoms, spikes_per_second, ring_buffer_sigma,
-            incoming_spike_buffer_size, self.__model, self, drop_late_spikes,
-            splitter, seed, n_colour_bits)
+            incoming_spike_buffer_size, self.__model, self,
+            drop_late_spikes or False, splitter, seed, n_colour_bits)
 
     @property
     @overrides(AbstractPyNNModel.name)

@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged import RangeDictionary
 from spinn_front_end_common.interface.ds import DataType
 from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent)
+    AbstractStandardNeuronComponent, ModelParameter)
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
+from .neuron_model import NeuronModel
 
 V = "v"
 V_REST = "v_rest"
@@ -30,7 +33,7 @@ TIMESTEP = "timestep"
 REFRACT_TIMER = "refract_timer"
 
 
-class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
+class NeuronModelLeakyIntegrateAndFire(NeuronModel):
     """
     Classic leaky integrate and fire neuron model.
     """
@@ -44,7 +47,10 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
         "__tau_refrac")
 
     def __init__(
-            self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac):
+            self, v_init: Optional[ModelParameter], v_rest: ModelParameter,
+            tau_m: ModelParameter, cm: ModelParameter,
+            i_offset: ModelParameter, v_reset: ModelParameter,
+            tau_refrac: ModelParameter):
         r"""
         :param v_init: :math:`V_{init}`
         :type v_init: float or iterable(float) or
@@ -93,22 +99,22 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
         self.__tau_refrac = tau_refrac
 
     @overrides(AbstractStandardNeuronComponent.add_parameters)
-    def add_parameters(self, parameters):
-        parameters[V_REST] = self.__v_rest
-        parameters[TAU_M] = self.__tau_m
-        parameters[CM] = self.__cm
-        parameters[I_OFFSET] = self.__i_offset
-        parameters[V_RESET] = self.__v_reset
-        parameters[TAU_REFRAC] = self.__tau_refrac
+    def add_parameters(self, parameters: RangeDictionary[float]):
+        parameters[V_REST] = self._convert(self.__v_rest)
+        parameters[TAU_M] = self._convert(self.__tau_m)
+        parameters[CM] = self._convert(self.__cm)
+        parameters[I_OFFSET] = self._convert(self.__i_offset)
+        parameters[V_RESET] = self._convert(self.__v_reset)
+        parameters[TAU_REFRAC] = self._convert(self.__tau_refrac)
         parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractStandardNeuronComponent.add_state_variables)
-    def add_state_variables(self, state_variables):
-        state_variables[V] = self.__v_init
+    def add_state_variables(self, state_variables: RangeDictionary[float]):
+        state_variables[V] = self._convert(self.__v_init)
         state_variables[REFRACT_TIMER] = 0
 
     @property
-    def v_init(self):
+    def v_init(self) -> ModelParameter:
         """
         Settable model parameter: :math:`V_{init}`
 
@@ -117,7 +123,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
         return self.__v_init
 
     @property
-    def v_rest(self):
+    def v_rest(self) -> ModelParameter:
         """
         Settable model parameter: :math:`V_{rest}`
 
@@ -126,7 +132,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
         return self.__v_rest
 
     @property
-    def tau_m(self):
+    def tau_m(self) -> ModelParameter:
         r"""
         Settable model parameter: :math:`\tau_{m}`
 
@@ -135,7 +141,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
         return self.__tau_m
 
     @property
-    def cm(self):
+    def cm(self) -> ModelParameter:
         """
         Settable model parameter: :math:`C_m`
 
@@ -144,7 +150,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
         return self.__cm
 
     @property
-    def i_offset(self):
+    def i_offset(self) -> ModelParameter:
         """
         Settable model parameter: :math:`I_{offset}`
 
@@ -153,7 +159,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
         return self.__i_offset
 
     @property
-    def v_reset(self):
+    def v_reset(self) -> ModelParameter:
         """
         Settable model parameter: :math:`V_{reset}`
 
@@ -162,7 +168,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
         return self.__v_reset
 
     @property
-    def tau_refrac(self):
+    def tau_refrac(self) -> ModelParameter:
         r"""
         Settable model parameter: :math:`\tau_{refrac}`
 

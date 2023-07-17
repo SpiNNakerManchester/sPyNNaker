@@ -43,7 +43,8 @@ MAX_RING_BUFFER_BITS = 14
 
 
 class SplitterAbstractPopulationVertexFixed(
-        AbstractSplitterCommon, AbstractSpynnakerSplitterDelay):
+        AbstractSplitterCommon[AbstractPopulationVertex],
+        AbstractSpynnakerSplitterDelay):
     """
     Handles the splitting of the :py:class:`AbstractPopulationVertex`
     using fixed slices.
@@ -62,7 +63,7 @@ class SplitterAbstractPopulationVertexFixed(
         self.__expect_delay_extension = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
-    def set_governed_app_vertex(self, app_vertex):
+    def set_governed_app_vertex(self, app_vertex: AbstractPopulationVertex):
         super().set_governed_app_vertex(app_vertex)
         if not isinstance(app_vertex, AbstractPopulationVertex):
             raise PacmanConfigurationException(

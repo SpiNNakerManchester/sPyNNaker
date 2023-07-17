@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import ctypes
 import numpy
-from typing import List, NamedTuple, Sequence, Set, Union, cast
+from typing import List, NamedTuple, Sequence, Set, Union, cast, TYPE_CHECKING
 
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
@@ -35,9 +36,10 @@ from spynnaker.pyNN.models.abstract_models import AbstractNeuronExpandable
 from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.utilities.utility_calls import convert_to
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
-from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+    from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
 
 
 class NeuronProvenance(ctypes.LittleEndianStructure):

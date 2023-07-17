@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged import RangeDictionary
 from spinn_front_end_common.interface.ds import DataType
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from .abstract_threshold_type import AbstractThresholdType
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -38,7 +40,8 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         "__tau_th",
         "__v_thresh")
 
-    def __init__(self, du_th, tau_th, v_thresh):
+    def __init__(self, du_th: ModelParameter, tau_th: ModelParameter,
+                 v_thresh: ModelParameter):
         r"""
         :param du_th: :math:`du_{thresh}`
         :type du_th: float or iterable(float) or
@@ -62,32 +65,32 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         self.__v_thresh = v_thresh
 
     @overrides(AbstractThresholdType.add_parameters)
-    def add_parameters(self, parameters):
-        parameters[DU_TH] = self.__du_th
-        parameters[TAU_TH] = self.__tau_th
-        parameters[V_THRESH] = self.__v_thresh
+    def add_parameters(self, parameters: RangeDictionary[float]):
+        parameters[DU_TH] = self._convert(self.__du_th)
+        parameters[TAU_TH] = self._convert(self.__tau_th)
+        parameters[V_THRESH] = self._convert(self.__v_thresh)
         parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractThresholdType.add_state_variables)
-    def add_state_variables(self, state_variables):
+    def add_state_variables(self, state_variables: RangeDictionary[float]):
         pass
 
     @property
-    def v_thresh(self):
+    def v_thresh(self) -> ModelParameter:
         """
         :math:`V_{thresh}`
         """
         return self.__v_thresh
 
     @property
-    def du_th(self):
+    def du_th(self) -> ModelParameter:
         """
         :math:`du_{thresh}`
         """
         return self.__du_th
 
     @property
-    def tau_th(self):
+    def tau_th(self) -> ModelParameter:
         r"""
         :math:`\tau_{thresh}`
         """
