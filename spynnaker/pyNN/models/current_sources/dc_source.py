@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Dict, Mapping
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
-from .abstract_current_source import AbstractCurrentSource, CurrentSourceIDs
+from .abstract_current_source import (
+    AbstractCurrentSource, CurrentSourceIDs, CurrentParameter)
 
 
 class DCSource(AbstractCurrentSource):
@@ -31,7 +33,7 @@ class DCSource(AbstractCurrentSource):
         "__parameters",
         "__parameter_types")
 
-    def __init__(self, amplitude=0.0, start=0.0, stop=0.0):
+    def __init__(self, amplitude=0.0, start=0.0, stop=0.0) -> None:
         """
         :param float amplitude:
         :param float start:
@@ -43,23 +45,24 @@ class DCSource(AbstractCurrentSource):
         self.__start = start
         self.__stop = stop
 
-        self.__parameter_types = dict()
-        self.__parameter_types['amplitude'] = DataType.S1615
-        # Anything associated with timing needs to be an integer on the machine
-        self.__parameter_types['start'] = DataType.UINT32
-        self.__parameter_types['stop'] = DataType.UINT32
+        self.__parameter_types = {
+            'amplitude': DataType.S1615,
+            # Anything associated with timing needs to be an integer on
+            # the machine
+            'start': DataType.UINT32,
+            'stop': DataType.UINT32}
 
-        self.__parameters = dict()
-        self.__parameters['amplitude'] = self.__amplitude
-        # Convert to integers i.e. timesteps
         time_convert_ms = SpynnakerDataView.get_simulation_time_step_per_ms()
-        self.__parameters['start'] = self.__start * time_convert_ms
-        self.__parameters['stop'] = self.__stop * time_convert_ms
+        self.__parameters: Dict[str, CurrentParameter] = {
+            'amplitude': self.__amplitude,
+            # Convert to integers i.e. timesteps
+            'start': int(self.__start * time_convert_ms),
+            'stop': int(self.__stop * time_convert_ms)}
 
         super().__init__()
 
     @overrides(AbstractCurrentSource.set_parameters)
-    def set_parameters(self, **parameters):
+    def set_parameters(self, **parameters: CurrentParameter):
         for key, value in parameters.items():
             if key not in self.__parameters.keys():
                 # throw an exception
@@ -74,19 +77,19 @@ class DCSource(AbstractCurrentSource):
 
     @property
     @overrides(AbstractCurrentSource.get_parameters)
-    def get_parameters(self):
+    def get_parameters(self) -> Mapping[str, CurrentParameter]:
         return self.__parameters
 
     @property
     @overrides(AbstractCurrentSource.get_parameter_types)
-    def get_parameter_types(self):
+    def get_parameter_types(self) -> Mapping[str, DataType]:
         return self.__parameter_types
 
     @property
     @overrides(AbstractCurrentSource.current_source_id)
-    def current_source_id(self):
+    def current_source_id(self) -> int:
         return CurrentSourceIDs.DC_SOURCE.value
 
     @overrides(AbstractCurrentSource.get_sdram_usage_in_bytes)
-    def get_sdram_usage_in_bytes(self):
+    def get_sdram_usage_in_bytes(self) -> int:
         return len(self.__parameters) * BYTES_PER_WORD

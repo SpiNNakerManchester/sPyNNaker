@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import numpy
+from numpy import uint8
+from numpy.typing import NDArray
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
@@ -30,7 +32,8 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         "__array_dims",
         "__n_total_connections")
 
-    def __init__(self, array, safe=True, callback=None, verbose=False):
+    def __init__(self, array: NDArray[uint8],
+                 safe=True, callback=None, verbose=False):
         """
         :param array:
             An explicit boolean matrix that specifies the connections

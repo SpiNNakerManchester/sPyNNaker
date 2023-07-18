@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import List, Optional, Union, TYPE_CHECKING
+from typing import List, Optional, Sequence, Union, TYPE_CHECKING
 import numpy
 from spinn_utilities.config_holder import get_config_bool
 from spynnaker.pyNN.models.neural_projections.connectors import (
@@ -23,6 +23,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.populations import Population, PopulationView
     from spynnaker.pyNN.models.neuron import ConnectionHolder
+    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+        AbstractSynapseDynamics)
 
 
 class SynapseInformation(object):
@@ -44,8 +46,11 @@ class SynapseInformation(object):
         "__pre_run_connection_holders",
         "__synapse_type_from_dynamics")
 
-    def __init__(self, connector, pre_population, post_population,
-                 prepop_is_view, postpop_is_view, synapse_dynamics,
+    def __init__(self, connector: AbstractConnector,
+                 pre_population: Union[Population, PopulationView],
+                 post_population: Union[Population, PopulationView],
+                 prepop_is_view: bool, postpop_is_view: bool,
+                 synapse_dynamics: AbstractSynapseDynamics,
                  synapse_type, receptor_type, synapse_type_from_dynamics,
                  weights=None, delays=None):
         """
@@ -83,7 +88,7 @@ class SynapseInformation(object):
         self.__synapse_type_from_dynamics = synapse_type_from_dynamics
 
         # Make a list of holders to be updated
-        self.__pre_run_connection_holders = list()
+        self.__pre_run_connection_holders: List[ConnectionHolder] = list()
 
     @property
     def connector(self) -> AbstractConnector:
@@ -232,7 +237,7 @@ class SynapseInformation(object):
             not self.prepop_is_view and not self.postpop_is_view)
 
     @property
-    def pre_run_connection_holders(self) -> List[ConnectionHolder]:
+    def pre_run_connection_holders(self) -> Sequence[ConnectionHolder]:
         """
         The list of connection holders to be filled in before run.
 

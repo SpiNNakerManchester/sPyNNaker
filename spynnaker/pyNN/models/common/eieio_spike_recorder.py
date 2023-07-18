@@ -26,24 +26,24 @@ class EIEIOSpikeRecorder(object):
     """
     __slots__ = ("__record", )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.__record = False
 
     @property
-    def record(self):
+    def record(self) -> bool:
         """
         :rtype: bool
         """
         return self.__record
 
     @record.setter
-    def record(self, new_state):
+    def record(self, new_state: bool):
         """
         Old method assumed to be spikes.
         """
         self.__record = bool(new_state)
 
-    def set_recording(self, new_state, sampling_interval=None):
+    def set_recording(self, new_state: bool, sampling_interval=None):
         """
         :param bool new_state:
         :param None sampling_interval: not supported functionality

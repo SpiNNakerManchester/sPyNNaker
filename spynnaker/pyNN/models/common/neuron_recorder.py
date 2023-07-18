@@ -15,6 +15,7 @@ import itertools
 import logging
 import math
 import numpy
+from numpy import float64, uint8, uint16, uint32
 from numpy.typing import NDArray
 from types import MappingProxyType
 from typing import (
@@ -124,9 +125,12 @@ class NeuronRecorder(object):
 
     def __init__(
             self, allowed_variables: List[str],
-            data_types: Dict[str, DataType], bitfield_variables,
-            n_neurons, per_timestep_variables, per_timestep_datatypes,
-            events_per_core_variables, events_per_core_datatypes):
+            data_types: Mapping[str, DataType],
+            bitfield_variables: Sequence[str],
+            n_neurons: int, per_timestep_variables: Sequence[str],
+            per_timestep_datatypes: Mapping[str, DataType],
+            events_per_core_variables: Sequence[str],
+            events_per_core_datatypes: Mapping[str, DataType]):
         """
         :param list(str) allowed_variables:
         :param dict(str,~data_specification.enums.DataType) data_types:
@@ -154,7 +158,7 @@ class NeuronRecorder(object):
         self.__events_per_core_variables = events_per_core_variables
         self.__events_per_core_datatypes = events_per_core_datatypes
         self.__events_per_core_recording: Set[str] = set()
-        self.__events_per_ts = dict()
+        self.__events_per_ts: Dict[str, int] = dict()
         self.__events_per_ts[self.MAX_REWIRES] = 0  # record('all')
 
         # Get info on variables like these
@@ -253,11 +257,11 @@ class NeuronRecorder(object):
         return sorted(all_set & ids)
 
     def _convert_placement_matrix_data(
-            self, row_data: NDArray, n_rows: int, data_row_length: int,
-            n_neurons: int, data_type: DataType) -> NDArray:
+            self, row_data: NDArray[uint8], n_rows: int, data_row_length: int,
+            n_neurons: int, data_type: DataType) -> NDArray[float64]:
         surplus_bytes = self._N_BYTES_FOR_TIMESTAMP
-        var_data = (row_data[:, surplus_bytes:].reshape(
-            n_rows * data_row_length))
+        var_data = row_data[:, surplus_bytes:].reshape(
+            n_rows * data_row_length)
         placement_data = data_type.decode_array(var_data).reshape(
             n_rows, n_neurons)
         return placement_data
@@ -265,12 +269,13 @@ class NeuronRecorder(object):
     @staticmethod
     def _process_missing_data(
             missing_str: str, placement: Placement, expected_rows: int,
-            n_neurons: int, times: NDArray, sampling_rate: int, label: str,
-            placement_data: NDArray, region: int):
+            n_neurons: int, times: NDArray[uint32], sampling_rate: int,
+            label: str, placement_data: NDArray[float64], region: int
+            ) -> NDArray[float64]:
         missing_str += f"({placement.x}, {placement.y}, {placement.p}); "
         # Start the fragment for this slice empty
         fragment = numpy.empty((expected_rows, n_neurons))
-        for i in range(0, expected_rows):
+        for i in range(expected_rows):
             time = i * sampling_rate
             # Check if there is data for this time step
             local_indexes = numpy.where(times == time)
@@ -282,14 +287,15 @@ class NeuronRecorder(object):
                     "Population {} has multiple recorded data for time {}"
                     " in region {} ", label, time, region)
             else:
-                # Set row to nan
+                # Set row to NaN
                 fragment[i] = numpy.full(n_neurons, numpy.nan)
         return fragment
 
     def _get_placement_matrix_data(
             self, vertex: MachineVertex, region: int, expected_rows: int,
             missing_str: str, sampling_rate: int, label: str,
-            data_type: DataType, n_per_timestep: int) -> Optional[NDArray]:
+            data_type: DataType, n_per_timestep: int) -> Optional[
+                NDArray[float64]]:
         """
         Processes a placement for matrix data.
 
@@ -318,14 +324,13 @@ class NeuronRecorder(object):
 
         # If there is no data, return empty for all timesteps
         if record_length == 0:
-            return numpy.zeros((expected_rows, n_per_timestep),
-                               dtype="float64")
+            return numpy.zeros((expected_rows, n_per_timestep), dtype=float64)
 
         # There is one column for time and one for each neuron recording
         data_row_length = n_per_timestep * data_type.size
         full_row_length = data_row_length + self._N_BYTES_FOR_TIMESTAMP
         n_rows = record_length // full_row_length
-        row_data = numpy.asarray(record_raw, dtype="uint8").reshape(
+        row_data = numpy.asarray(record_raw, dtype=uint8).reshape(
             n_rows, full_row_length)
         placement_data = self._convert_placement_matrix_data(
             row_data, n_rows, data_row_length, n_per_timestep, data_type)
@@ -338,7 +343,7 @@ class NeuronRecorder(object):
         time_bytes = (
             row_data[:, 0: self._N_BYTES_FOR_TIMESTAMP].reshape(
                 n_rows * self._N_BYTES_FOR_TIMESTAMP))
-        times = time_bytes.view("<i4").reshape(n_rows, 1)
+        times: NDArray[uint32] = time_bytes.view("<i4").reshape(n_rows, 1)
 
         # process data from core for missing data
         placement_data = self._process_missing_data(
@@ -1066,7 +1071,7 @@ class NeuronRecorder(object):
         return ceil_bytes // self._N_BYTES_PER_INDEX
 
     def __add_indices(
-            self, data: List[NDArray], variable: str, rate: int,
+            self, data: List[NDArray[uint32]], variable: str, rate: int,
             n_recording: int, vertex_slice: Slice):
         """
         :param list(~numpy.ndarray) data:
@@ -1077,9 +1082,9 @@ class NeuronRecorder(object):
         """
         n_indices = self.__ceil_n_indices(vertex_slice.n_atoms)
         if rate == 0:
-            data.append(numpy.zeros(n_indices, dtype="uint16").view("uint32"))
+            data.append(numpy.zeros(n_indices, dtype=uint16).view(uint32))
         elif (indexes := self.__indexes.get(variable)) is None:
-            data.append(numpy.arange(n_indices, dtype="uint16").view("uint32"))
+            data.append(numpy.arange(n_indices, dtype=uint16).view(uint32))
         else:
             local_index = 0
             local_indexes: List[int] = list()
@@ -1091,24 +1096,24 @@ class NeuronRecorder(object):
                     # write to one beyond recording range
                     local_indexes.append(n_recording)
             data.append(
-                numpy.array(local_indexes, dtype="uint16").view("uint32"))
+                numpy.array(local_indexes, dtype=uint16).view(uint32))
 
-    def _get_data(self, vertex_slice: Slice) -> NDArray[numpy.uint32]:
+    def _get_data(self, vertex_slice: Slice) -> NDArray[uint32]:
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: ~numpy.ndarray
         """
         # There is no data here for per-timestep variables by design
-        data: List[NDArray[numpy.uint32]] = list()
+        data: List[NDArray[uint32]] = list()
         for variable in self.__sampling_rates:
             rate, n_recording = self._rate_and_count_per_slice(
                 variable, vertex_slice)
             if variable in self.__bitfield_variables:
-                data.append(numpy.array([rate, n_recording], dtype="uint32"))
+                data.append(numpy.array([rate, n_recording], dtype=uint32))
             else:
                 dtype = self.__data_types[variable]
                 data.append(numpy.array(
-                    [rate, n_recording, dtype.size], dtype="uint32"))
+                    [rate, n_recording, dtype.size], dtype=uint32))
             self.__add_indices(data, variable, rate, n_recording, vertex_slice)
 
         return numpy.concatenate(data)
@@ -1137,8 +1142,7 @@ class NeuronRecorder(object):
         return True
 
     def get_generator_data(
-            self, vertex_slice: Optional[Slice] = None
-            ) -> NDArray[numpy.uint32]:
+            self, vertex_slice: Optional[Slice] = None) -> NDArray[uint32]:
         """
         Get the recorded data as a generatable data set.
 
@@ -1162,7 +1166,7 @@ class NeuronRecorder(object):
             else:
                 data.extend(self.__get_generator_indices(
                     variable, vertex_slice))
-        return numpy.array(data, dtype="uint32")
+        return numpy.array(data, dtype=uint32)
 
     def __get_generator_indices(
             self, variable: str,
@@ -1230,4 +1234,4 @@ class NeuronRecorder(object):
 
         data[0] = n_recorded
         data[1] = n_items
-        return numpy.array(data, dtype="uint32")
+        return numpy.array(data, dtype=uint32)

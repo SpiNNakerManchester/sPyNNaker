@@ -11,10 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 from enum import Enum
-from typing import Any, Dict
+from typing import Mapping, Optional, Sequence, Union, TYPE_CHECKING
+from typing_extensions import TypeAlias
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_front_end_common.interface.ds import DataType
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.populations import Population, PopulationBase
+    from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
+        AbstractPopulationVertex)
+
+#: General type of parameters to current sources.
+#: Individual parameters will only be one of these!
+CurrentParameter: TypeAlias = Union[int, float, Sequence[int], Sequence[float]]
 
 
 # Hashes of the current sources currently supported
@@ -37,11 +47,11 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         "__app_vertex",
         "__population")
 
-    def __init__(self):
-        self.__app_vertex = None
-        self.__population = None
+    def __init__(self) -> None:
+        self.__app_vertex: Optional[AbstractPopulationVertex] = None
+        self.__population: Optional[Population] = None
 
-    def inject_into(self, cells):
+    def inject_into(self, cells: PopulationBase):
         """
         Inject this source into the specified population cells.
 
@@ -50,7 +60,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         # Call the population method to pass the source in
         cells.inject(self)
 
-    def set_app_vertex(self, vertex):
+    def set_app_vertex(self, vertex: AbstractPopulationVertex):
         """
         Set the application vertex associated with the current source.
 
@@ -59,7 +69,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         self.__app_vertex = vertex
 
     @property
-    def app_vertex(self):
+    def app_vertex(self) -> Optional[AbstractPopulationVertex]:
         """
         The application vertex associated with the current source.
 
@@ -67,7 +77,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         """
         return self.__app_vertex
 
-    def set_population(self, population):
+    def set_population(self, population: Population):
         """
         Set the population associated with the current source.
 
@@ -76,7 +86,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         self.__population = population
 
     @property
-    def population(self):
+    def population(self) -> Optional[Population]:
         """
         The population associated with the current source.
 
@@ -85,7 +95,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         return self.__population
 
     @abstractmethod
-    def set_parameters(self, **parameters: Any):
+    def set_parameters(self, **parameters: CurrentParameter):
         """
         Set the current source parameters.
 
@@ -95,7 +105,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> Mapping[str, CurrentParameter]:
         """
         The parameters of the current source.
 
@@ -106,11 +116,11 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def get_parameter_types(self) -> Dict[str, Any]:
+    def get_parameter_types(self) -> Mapping[str, DataType]:
         """
         The parameter types for the current source.
 
-        :rtype: dict(str, Any)
+        :rtype: dict(str, ~.DataType)
         """
         # TODO: Wrong naming for a property!
         # FIXME: Is the type correct?

@@ -12,13 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+from typing import Optional, TYPE_CHECKING
 from pacman.model.graphs.application import ApplicationEdge
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.utility_models.delays import (
+        DelayExtensionVertex)
 
 
 class DelayAfferentApplicationEdge(ApplicationEdge):
     __slots__ = ()
 
-    def __init__(self, pre_vertex, delay_vertex, label=None):
+    def __init__(self, pre_vertex: AbstractPopulationVertex,
+                 delay_vertex: DelayExtensionVertex,
+                 label: Optional[str] = None):
         """
         :param AbstractPopulationVertex pre_vertex:
         :param DelayExtensionVertex delay_vertex:
