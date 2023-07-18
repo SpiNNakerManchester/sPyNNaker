@@ -1,7 +1,7 @@
 These pages document the python code for the sPyNNaker_ module
 which is part of the SpiNNaker_ Project.
 
-This code depends on SpiNNUtils_, SpiNNMachine_, SpiNNMan_, PACMAN_, DataSpecification_, SpiNNFrontEndCommon_
+This code depends on SpiNNUtils_, SpiNNMachine_, SpiNNMan_, PACMAN_, SpiNNFrontEndCommon_
 (Combined_documentation_).
 
 .. _SpiNNaker: https://apt.cs.manchester.ac.uk/projects/SpiNNaker
