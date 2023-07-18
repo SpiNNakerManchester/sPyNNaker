@@ -60,7 +60,7 @@ def do_run(sender_board):
             chip.n_user_processors - 1
             for chip in machine.get_chips_by_ethernet(eth.x, eth.y))
         receiver_pop = sim.Population(
-            sim.IF_curr_exp.absolute_max_atoms_per_core,
+            sim.IF_curr_exp.absolute_max_atoms_per_core * core_count,
             sim.IF_curr_exp(), label=f"Receiver_{eth.x}_{eth.y}")
         receiver_pop.record("spikes")
         receiver_pops.append(receiver_pop)
