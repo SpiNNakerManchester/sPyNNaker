@@ -10,7 +10,6 @@ This code depends on SpiNNUtils_, SpiNNMachine_, SpiNNMan_, PACMAN_, DataSpecifi
 .. _SpiNNMachine: https://spinnmachine.readthedocs.io
 .. _SpiNNMan: https://spinnman.readthedocs.io
 .. _PACMAN: https://pacman.readthedocs.io
-.. _DataSpecification: https://dataspecification.readthedocs.io
 .. _SpiNNFrontEndCommon: https://spinnfrontendcommon.readthedocs.io
 .. _Combined_documentation: https://spinnakermanchester.readthedocs.io
 
