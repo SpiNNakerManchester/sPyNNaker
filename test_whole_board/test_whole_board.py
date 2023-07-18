@@ -190,16 +190,14 @@ SPALLOC_URL = "https://spinnaker.cs.man.ac.uk/spalloc"
 SPALLOC_USERNAME = "jenkins"
 SPALLOC_PASSWORD = os.getenv("SPALLOC_PASSWORD")
 SPALLOC_MACHINE = "SpiNNaker1M"
-WIDTH = 2
-HEIGHT = 2
 
 
 @pytest.mark.parametrize("x,y,b", BOARDS)
 def test_run(x, y, b):
     test_dir = os.path.dirname(__file__)
     client = SpallocClient(SPALLOC_URL, SPALLOC_USERNAME, SPALLOC_PASSWORD)
-    job = client.create_job_rect_at_board(
-        WIDTH, HEIGHT, physical=(x, y, b), machine_name=SPALLOC_MACHINE)
+    job = client.create_job_board(
+        physical=(x, y, b), machine_name=SPALLOC_MACHINE)
     # Wait 30 seconds for the state to change before giving up
     job.wait_for_state_change(SpallocState.UNKNOWN)
     if job.get_state() == SpallocState.QUEUED:
