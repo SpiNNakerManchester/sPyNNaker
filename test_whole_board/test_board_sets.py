@@ -95,7 +95,7 @@ def test_run(x, y, b):
     test_dir = os.path.dirname(__file__)
     client = SpallocClient(SPALLOC_URL, SPALLOC_USERNAME, SPALLOC_PASSWORD)
     job = client.create_job_rect_at_board(
-        WIDTH, HEIGHT, physical=(x, y, b), machine_name=SPALLOC_MACHINE)
+        WIDTH, HEIGHT, triad=(x, y, b), machine_name=SPALLOC_MACHINE)
     # Wait 30 seconds for the state to change before giving up
     job.wait_for_state_change(SpallocState.UNKNOWN)
     if job.get_state() == SpallocState.QUEUED:
