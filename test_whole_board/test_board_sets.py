@@ -19,6 +19,8 @@ import traceback
 import sys
 
 import pyNN.spiNNaker as sim
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    SplitterAbstractPopulationVertexNeuronsSynapses)
 from spinnman.spalloc import SpallocClient, SpallocState
 
 
@@ -32,12 +34,18 @@ SPALLOC_PASSWORD = os.getenv("SPALLOC_PASSWORD")
 SPALLOC_MACHINE = "SpiNNaker1M"
 WIDTH = 1
 HEIGHT = 1
-WEIGHT_TOTAL = 2.0
+WEIGHT = 2.0
+POISSON_RATE = 1
 FIXED_PROB = 0.1
+MAX_POISSONS = 500
+MAX_NEURONS = 256
 
 
 def do_run(sender_board):
-    sim.setup(1.0)
+    sim.setup(1.0, n_boards_required=3)
+    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, MAX_NEURONS)
+    sim.set_number_of_neurons_per_core(sim.SpikeSourcePoisson, MAX_POISSONS)
+
     machine = sim.get_machine()
 
     eth_chips = list(machine.ethernet_connected_chips)
@@ -47,35 +55,39 @@ def do_run(sender_board):
     # Create sender population big enough to fill a board
     core_count = sum(
         chip.n_user_processors - 1
-        for chip in machine.get_chips_by_ethernet(sender.x, sender.y))
+        for chip in machine.get_chips_by_ethernet(sender.x, sender.y)) - 1
+    print(f"{core_count} cores for Poisson")
     sender_pop = sim.Population(
-        sim.SpikeSourcePoisson.absolute_max_atoms_per_core * core_count,
-        sim.SpikeSourcePoisson(rate=10), label="Sender")
-    weight = WEIGHT_TOTAL / (sender_pop.size * FIXED_PROB)
+        MAX_POISSONS * core_count,
+        sim.SpikeSourcePoisson(rate=POISSON_RATE), label="Sender")
 
     # Create and connect receivers
     receiver_pops = list()
     for eth in receivers:
-        core_count = sum(
+        max_cores_per_chip = min(
             chip.n_user_processors - 1
-            for chip in machine.get_chips_by_ethernet(eth.x, eth.y))
+            for chip in machine.get_chips_by_ethernet(eth.x, eth.y)) - 1
+        max_cores_per_chip = min(max_cores_per_chip - 1, 14)
+        n_chips = sum(1 for _ in machine.get_chips_by_ethernet(eth.x, eth.y))
         receiver_pop = sim.Population(
-            sim.IF_curr_exp.absolute_max_atoms_per_core * core_count,
-            sim.IF_curr_exp(), label=f"Receiver_{eth.x}_{eth.y}")
+            MAX_NEURONS * n_chips,
+            sim.IF_curr_exp(), label=f"Receiver_{eth.x}_{eth.y}",
+            splitter=SplitterAbstractPopulationVertexNeuronsSynapses(
+                max_cores_per_chip))
         receiver_pop.record("spikes")
         receiver_pops.append(receiver_pop)
 
         sim.Projection(
             sender_pop, receiver_pop,
             sim.FixedProbabilityConnector(FIXED_PROB),
-            sim.StaticSynapse(weight=weight))
+            sim.StaticSynapse(weight=WEIGHT))
 
     # Run and get results
-    sim.run(1000)
+    sim.run(5000)
     all_spikes = list()
     for receiver_pop in receiver_pops:
         spikes = receiver_pop.get_data("spikes").segments[0].spiketrains
-        all_spikes.append(receiver_pop, spikes)
+        all_spikes.append((receiver_pop, spikes))
     sim.end()
 
     # Check there are some spikes for every receiver
