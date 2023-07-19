@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
--e git+https://github.com/SpiNNakerManchester/SpiNNUtils.git@master#egg=SpiNNUtilities
--e git+https://github.com/SpiNNakerManchester/SpiNNMachine.git@master#egg=SpiNNMachine
--e git+https://github.com/SpiNNakerManchester/SpiNNMan.git@master#egg=spinnman
--e git+https://github.com/SpiNNakerManchester/PACMAN.git@master#egg=spinnaker-pacman
--e git+https://github.com/SpiNNakerManchester/spalloc.git@master#egg=spalloc
--e git+https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@master#egg=spinnfrontendcommon
+-e git+https://github.com/SpiNNakerManchester/SpiNNUtils.git@7.0.0#egg=SpiNNUtilities
+-e git+https://github.com/SpiNNakerManchester/SpiNNMachine.git@7.0.0#egg=SpiNNMachine
+-e git+https://github.com/SpiNNakerManchester/SpiNNMan.git@7.0.0#egg=spinnman
+-e git+https://github.com/SpiNNakerManchester/PACMAN.git@7.0.0#egg=spinnaker-pacman
+-e git+https://github.com/SpiNNakerManchester/spalloc.git@7.0.0#egg=spalloc
+-e git+https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@7.0.0#egg=spinnfrontendcommon
