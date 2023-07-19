@@ -199,12 +199,16 @@ def test_run(x, y, b):
     job = client.create_job_board(
         triad=(x, y, b), machine_name=SPALLOC_MACHINE)
     # Wait 30 seconds for the state to change before giving up
+    # Wait for not queued for up to 30 seconds
     job.wait_for_state_change(SpallocState.QUEUED)
+    # If queued or destroyed skip test
     if job.get_state() == SpallocState.QUEUED:
         job.destroy("Queued")
-        pytest.skip(f"Board {x}, {y}, {b} is in use")
+        pytest.skip(f"Some boards starting at {x}, {y}, {b} is in use")
     elif job.get_state() == SpallocState.DESTROYED:
-        pytest.skip(f"Board {x}, {y}, {b} could not be allocated")
+        pytest.skip(f"Boards {x}, {y}, {b} could not be allocated")
+    # Actually wait for ready now (as might be powering on)
+    job.wait_until_ready()
     with job:
         with tempfile.TemporaryDirectory(
                 prefix=f"{x}_{y}_{b}", dir=test_dir) as tmpdir:
