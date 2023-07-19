@@ -16,20 +16,21 @@ import logging
 from pyNN.space import BaseStructure
 import neo
 from typing import (
-    Any, Dict, List, Optional, Sequence, Tuple, Union, final,
+    Any, Dict, Optional, Sequence, final,
     TYPE_CHECKING)
-from typing_extensions import TypeAlias
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.models.recorder import Recorder
 from .assembly import Assembly
+from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
+    AbstractPopulationVertex)
 if TYPE_CHECKING:
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
+    from spynnaker.pyNN.models.common.types import Names
 
 logger = FormatAdapter(logging.getLogger(__name__))
-_Variables: TypeAlias = Union[str, List[str], Tuple[str, ...]]
 
 
 def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
@@ -102,8 +103,8 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_data(
-            self, variables: _Variables = 'all',
-            gather: bool = True, clear: bool = False,
+            self, variables: Names = 'all',
+            gather: bool = True, clear: bool = False, *,
             annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
         """
         Return a Neo Block containing the data(spikes, state variables)
@@ -283,7 +284,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         _we_dont_do_this_now()  # pragma: no cover
 
     @abstractmethod
-    def write_data(self, io, variables: _Variables = 'all',
+    def write_data(self, io, variables: Names = 'all',
                    gather: bool = True, clear: bool = False,
                    annotations: Optional[Dict[str, Any]] = None):
         """
@@ -380,7 +381,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         _we_dont_do_this_now()  # pragma: no cover
 
     @abstractmethod
-    def record(self, variables: _Variables, to_file=None,
+    def record(self, variables: Names, to_file=None,
                sampling_interval=None):
         """
         Record the specified variable or variables for all cells in the
@@ -483,6 +484,12 @@ class PopulationBase(object, metaclass=AbstractBase):
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
         raise NotImplementedError
+
+    @property
+    @final
+    def _apv(self) -> Optional[AbstractPopulationVertex]:
+        v = self._vertex
+        return v if isinstance(v, AbstractPopulationVertex) else None
 
     @property
     @abstractmethod

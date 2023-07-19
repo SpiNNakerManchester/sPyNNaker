@@ -504,7 +504,7 @@ class NeoCsv(object):
             block, int(segment_number_st), rec_datetime)
 
     def _insert_empty_block(self, pop_label, description, size, first_id, dt,
-                            simulator, annotations=None):
+                            simulator, annotations=None) -> neo.Block:
         """
         Creates and empty Neo block object with just metadata.
 
@@ -567,7 +567,7 @@ class NeoCsv(object):
                 csv_writer.writerow([str(key), str(value)])
         csv_writer.writerow([])
 
-    def __read_empty_block(self, csv_reader):
+    def __read_empty_block(self, csv_reader) -> neo.Block:
         """
         Reads block metadata and uses it to create an empty block.
 

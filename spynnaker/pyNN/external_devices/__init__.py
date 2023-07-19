@@ -221,7 +221,7 @@ def EthernetControlPopulation(
     """
     # pylint: disable=protected-access, too-many-arguments, global-statement
     population = Population(n_neurons, model, label=label)
-    vertex = population._vertex
+    vertex = population._apv
     aec = vertex
     if not isinstance(aec, AbstractEthernetController):
         raise TypeError(

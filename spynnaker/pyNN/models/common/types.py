@@ -13,14 +13,16 @@
 # limitations under the License.
 import numpy
 from numpy.typing import NDArray
-from typing import Iterable, Sequence, Union
+from typing import List, Sequence, Tuple, Union
 from typing_extensions import TypeAlias
+from spynnaker.pyNN.random_distribution import RandomDistribution
 
 #: Type of names of parameters and state variables.
-Names: TypeAlias = Union[str, Iterable[str]]
+Names: TypeAlias = Union[str, List[str], Tuple[str, ...]]
 
 #: Type of normal values of parameters and state variables.
-Values: TypeAlias = Union[float, Sequence[float], NDArray[numpy.floating]]
+Values: TypeAlias = Union[
+    float, Sequence[float], NDArray[numpy.floating], RandomDistribution]
 
 #: Type of spikes in spike sources.
 Spikes: TypeAlias = Union[

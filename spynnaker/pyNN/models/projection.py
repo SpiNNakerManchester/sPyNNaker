@@ -119,13 +119,13 @@ class Projection(object):
                 " synaptic projections")
 
         # sort out synapse type
-        synaptic_type = post_vertex.get_synapse_id_by_target(receptor_type)
-        synapse_type_from_dynamics = False
-        if synaptic_type is None:
-            synaptic_type = synapse_dynamics.get_synapse_id_by_target(
+        synapse_id = post_vertex.get_synapse_id_by_target(receptor_type)
+        synapse_id_from_dynamics = False
+        if synapse_id is None:
+            synapse_id = synapse_dynamics.get_synapse_id_by_target(
                 receptor_type)
-            synapse_type_from_dynamics = True
-        if synaptic_type is None:
+            synapse_id_from_dynamics = True
+        if synapse_id is None:
             raise ConfigurationException(
                 f"Synapse target {receptor_type} not found "
                 f"in {post_synaptic_population.label}")
@@ -143,7 +143,7 @@ class Projection(object):
         self.__synapse_information = SynapseInformation(
             connector, pre_synaptic_population, post_synaptic_population,
             pre_is_view, post_is_view, synapse_dynamics,
-            synaptic_type, receptor_type, synapse_type_from_dynamics,
+            synapse_id, receptor_type, synapse_id_from_dynamics,
             synapse_dynamics.weight, synapse_dynamics.delay)
 
         # Set projection information in connector

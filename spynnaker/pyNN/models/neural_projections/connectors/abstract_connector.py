@@ -37,6 +37,7 @@ from .connection_types import WD, is_scalar
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
     from spynnaker.pyNN.models.projection import Projection
+    from spynnaker.pyNN.models.populations import Population, PopulationView
 
 # global objects
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -521,6 +522,13 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         return self._clip_delays(delays)
 
+    @staticmethod
+    def __pop_label(pop: Union[Population, PopulationView]) -> str:
+        lbl = pop.label
+        if lbl is None:
+            raise ValueError("unlabelled population")
+        return lbl
+
     def get_provenance_data(self, synapse_info: SynapseInformation):
         """
         :param SynapseInformation synapse_info:
@@ -530,8 +538,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         with ProvenanceWriter() as db:
             # pylint: disable=expression-not-assigned
             db.insert_connector(
-                synapse_info.pre_population.label,
-                synapse_info.post_population.label,
+                self.__pop_label(synapse_info.pre_population),
+                self.__pop_label(synapse_info.post_population),
                 self.__class__.__name__, "Times_synaptic_delays_got_clipped",
                 ncd)
             if ncd > 0:

@@ -21,6 +21,8 @@ import os
 import quantities
 import struct
 import re
+import neo  # type: ignore[import]
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from spinn_front_end_common.interface.ds import DataType
@@ -36,7 +38,10 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import SPIKES
 from spynnaker.pyNN.utilities.neo_csv import NeoCsv
+from spynnaker.pyNN.models.common.types import Names as ConcreteNames
 
+#: :meta private:
+Names = Optional[ConcreteNames]
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
@@ -386,7 +391,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         with self.transaction() as cursor:
             return self.__get_recording_variables(pop_label, cursor)
 
-    def __get_recording_variables(self, pop_label, cursor):
+    def __get_recording_variables(
+            self, pop_label: str, cursor) -> Tuple[str, ...]:
         """
         :param ~sqlite3.Cursor cursor:
         :param str pop_label: The label for the population of interest
@@ -400,7 +406,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         Even if there is no data
         :rtype: list(str)
         """
-        results = []
+        results: List[str] = []
         for row in cursor.execute(
                 """
                 SELECT variable
@@ -409,7 +415,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 GROUP BY variable
                 """, (pop_label,)):
             results.append(str(row["variable"], 'utf-8'))
-        return results
+        return tuple(results)
 
     def get_recording_metadeta(self, pop_label, variable):
         """
@@ -1018,7 +1024,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     cursor, rec_id, view_indexes, buffered_type,
                     n_colour_bits, variable)[0]
 
-    def get_spike_counts(self, pop_label, view_indexes=None):
+    def get_spike_counts(
+            self, pop_label: str,
+            view_indexes: Optional[Sequence[int]] = None) -> Dict[int, int]:
         with self.transaction() as cursor:
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
@@ -1135,7 +1143,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 n_colour_bits, variable)
             self._csv_spike_data(csv_writer, spikes, indexes)
 
-    def __get_empty_block(self, cursor, pop_label, annotations):
+    def __get_empty_block(self, cursor, pop_label, annotations) -> neo.Block:
         """
         :param str pop_label: The label for the population of interest
 
@@ -1164,7 +1172,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             pop_label, description, pop_size, first_id, dt, simulator,
             annotations)
 
-    def get_empty_block(self, pop_label, annotations=None):
+    def get_empty_block(self, pop_label: str, annotations=None) -> neo.Block:
         """
         Creates a block with just metadata but not data segments.
 
@@ -1191,7 +1199,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         with self.transaction() as cursor:
             return self.__get_empty_block(cursor, pop_label, annotations)
 
-    def get_full_block(self, pop_label, variables, view_indexes, annotations):
+    def get_full_block(
+            self, pop_label: str, variables,
+            view_indexes: Optional[Sequence[int]],
+            annotations: Optional[Dict[str, Any]]) -> neo.Block:
         """
         Creates a block with metadata and data for this segment.
         Any previous segments will be empty.
@@ -1220,7 +1231,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             return block
 
     def csv_segment(
-            self,  csv_file, pop_label, variables, view_indexes=None):
+            self, csv_file, pop_label, variables: Names, view_indexes=None):
         """
         Writes the data including metadata to a CSV file.
 
@@ -1253,9 +1264,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 self._csv_segment_metadata(
                     csv_writer, segment_number, rec_datetime)
 
-                variables = self.__clean_variables(
-                    variables, pop_label, cursor)
-                for variable in variables:
+                for variable in self.__clean_variables(
+                        variables, pop_label, cursor):
                     self.__read_and_csv_data(
                         cursor, pop_label, variable, csv_writer,
                         view_indexes, t_stop)
@@ -1315,16 +1325,21 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self.__add_segment(
                 cursor, block, pop_label, variables, view_indexes)
 
-    def __clean_variables(self, variables, pop_label, cursor):
-        if isinstance(variables, str):
-            variables = [variables]
-        if 'all' in variables:
-            variables = None
+    def __clean_variables(
+            self, variables: Names, pop_label, cursor) -> Tuple[str, ...]:
         if variables is None:
-            variables = self.__get_recording_variables(pop_label, cursor)
-        return variables
+            vs: Tuple[str, ...] = ("all", )
+        elif isinstance(variables, str):
+            vs = (variables, )
+        else:
+            vs = tuple(variables)
+        if 'all' in vs:
+            return self.__get_recording_variables(pop_label, cursor)
+        else:
+            return vs
 
-    def __add_segment(self, cursor, block, pop_label, variables, view_indexes):
+    def __add_segment(
+            self, cursor, block, pop_label, variables: Names, view_indexes):
         """
         Adds a segment to the block.
 
@@ -1351,8 +1366,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         segment = self._insert_empty_segment(
             block, segment_number, rec_datetime)
 
-        variables = self.__clean_variables(variables, pop_label, cursor)
-        for variable in variables:
+        for variable in self.__clean_variables(variables, pop_label, cursor):
             self.__add_data(
                 cursor, pop_label, variable, segment, view_indexes, t_stop)
 

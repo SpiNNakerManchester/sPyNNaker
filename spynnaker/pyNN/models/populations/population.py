@@ -11,17 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import logging
 import numpy
+from numpy.typing import NDArray
 import os
 import inspect
 from typing import (
-    Any, Dict, Iterable, Iterator, Optional, Type, Union)
+    Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Type,
+    Union, overload, TYPE_CHECKING)
 from typing_extensions import TypeAlias
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
 from pyNN.space import BaseStructure
+from neo.io.baseio import BaseIO  # type: ignore[import]
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
@@ -30,12 +33,17 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.recorder import Recorder
-from .population_base import PopulationBase, _Variables
+from .population_base import PopulationBase
 from .population_view import PopulationView, IDMixin
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
+if TYPE_CHECKING:
+    from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
+    from spynnaker.pyNN.models.common.types import Names, Values
+    from spynnaker.pyNN.models.common.parameter_holder import ParameterHolder
+    __Values: TypeAlias = Values  # Stupid PyDev!
 
 logger = FormatAdapter(logging.getLogger(__file__))
 _CellType: TypeAlias = Union[AbstractPyNNModel, PopulationApplicationVertex]
@@ -65,7 +73,7 @@ class Population(PopulationBase):
         "__vertex")
 
     def __init__(
-            self, size: int, cellclass: _CellTypeArg,
+            self, size: Union[int, float, None], cellclass: _CellTypeArg,
             cellparams: Optional[_ParamDict] = None,
             structure: Optional[BaseStructure] = None,
             initial_values: Optional[Dict[str, float]] = None,
@@ -104,8 +112,8 @@ class Population(PopulationBase):
         self.__celltype: _CellType
         self.__vertex: PopulationApplicationVertex
         model = self.__create_model(cellclass, cellparams)
-        size = self.__roundsize(size, label)
-        self.__create_vertex(model, size, label, additional)
+        realsize = self.__roundsize(size, label)
+        self.__create_vertex(model, realsize, label, additional)
         self.__recorder = Recorder(population=self, vertex=self.__vertex)
 
         # Internal structure now supported 23 November 2014 ADR
@@ -120,9 +128,9 @@ class Population(PopulationBase):
         SpynnakerDataView.add_vertex(self.__vertex)
 
         # initialise common stuff
-        if size is None:
-            size = self.__vertex.n_atoms
-        self.__size = size
+        if realsize is None:
+            realsize = self.__vertex.n_atoms
+        self.__size = realsize
         self.__annotations: Dict[str, Any] = dict()
 
         # things for pynn demands
@@ -189,7 +197,7 @@ class Population(PopulationBase):
 
     @overrides(PopulationBase.record, extend_doc=False)
     def record(
-            self, variables: _Variables,
+            self, variables: Names,
             to_file: Optional[Union[str]] = None,
             sampling_interval: Optional[int] = None):
         """
@@ -229,9 +237,9 @@ class Population(PopulationBase):
             label=f"Random sample size {n} from {self.label}")
 
     @overrides(PopulationBase.write_data, extend_doc=False)
-    def write_data(self, io, variables: _Variables = 'all',
+    def write_data(self, io: Union[str, BaseIO], variables: Names = 'all',
                    gather=True, clear=False,
-                   annotations=None):
+                   annotations: Optional[Dict[str, Any]] = None):
         """
         Write recorded data to file, using one of the file formats
         supported by Neo.
@@ -326,8 +334,9 @@ class Population(PopulationBase):
 
     @overrides(PopulationBase.get_data, extend_doc=False)
     def get_data(
-            self, variables: _Variables = 'all',
-            gather=True, clear=False, annotations=None):
+            self, variables: Names = 'all',
+            gather=True, clear=False, *,
+            annotations: Optional[Dict[str, Any]] = None):
         """
         Return a Neo Block containing the data (spikes, state variables)
         recorded from the Assembly.
@@ -357,7 +366,9 @@ class Population(PopulationBase):
         return self.__recorder.extract_neo_block(
             variables, None, clear, annotations)
 
-    def spinnaker_get_data(self, variable, as_matrix=False, view_indexes=None):
+    def spinnaker_get_data(
+            self, variable: str, as_matrix: bool = False,
+            view_indexes: Optional[Sequence[int]] = None):
         """
         Public accessor for getting data as a numpy array, instead of
         the Neo-based object
@@ -398,7 +409,7 @@ class Population(PopulationBase):
         """
         return self.__vertex.get_units(variable)
 
-    def set(self, **parameters):
+    def set(self, **parameters: Values):
         """
         Set one or more parameters for every cell in the population.
         For example::
@@ -417,7 +428,7 @@ class Population(PopulationBase):
         for parameter, value in parameters.items():
             self.__vertex.set_parameter_values(parameter, value)
 
-    def initialize(self, **kwargs):
+    def initialize(self, **kwargs: Values):
         """
         Set initial values of state variables, e.g. the membrane potential.
         Values passed to ``initialize()`` may be:
@@ -448,7 +459,7 @@ class Population(PopulationBase):
             self.__vertex.set_initial_state_values(variable, value)
 
     @property
-    def initial_values(self):
+    def initial_values(self) -> ParameterHolder:
         """
         The initial values of the state variables.
 
@@ -463,7 +474,7 @@ class Population(PopulationBase):
         return self.__vertex.get_initial_state_values(
             self.__vertex.get_state_variables())
 
-    def set_state(self, **kwargs):
+    def set_state(self, **kwargs: Values):
         """
         Set current values of state variables, e.g. the membrane potential.
         Values passed to ``set_state()`` may be:
@@ -492,7 +503,7 @@ class Population(PopulationBase):
             self.__vertex.set_current_state_values(variable, value)
 
     @property
-    def current_values(self):
+    def current_values(self) -> ParameterHolder:
         """
         Get the current values of the state variables.
 
@@ -506,7 +517,7 @@ class Population(PopulationBase):
             self.__vertex.get_state_variables())
 
     @property
-    def positions(self):
+    def positions(self) -> NDArray[numpy.floating]:
         """
         The position array for structured populations.
 
@@ -522,30 +533,28 @@ class Population(PopulationBase):
         return self.__positions.T
 
     @positions.setter
-    def positions(self, positions):
+    def positions(self, positions: NDArray[numpy.floating]):
         """
         Sets all the positions in the population.
         """
         self.__positions = positions
 
     @property
-    def all_cells(self):
+    def all_cells(self) -> List[IDMixin]:
         """
         :rtype: list(IDMixin)
         """
         return [IDMixin(self, _id) for _id in range(self.__size)]
 
     @property
-    def position_generator(self):
+    def position_generator(self) -> Callable[[int], NDArray[numpy.floating]]:
         """
         :rtype: callable((int), ~numpy.ndarray)
         """
-        def gen(i):
-            return self.positions[:, i]
-        return gen
+        return lambda i: self.positions[:, i]
 
     @property
-    def first_id(self):
+    def first_id(self) -> int:
         """
         The ID of the first member of the population.
 
@@ -554,7 +563,7 @@ class Population(PopulationBase):
         return self.__first_id
 
     @property
-    def last_id(self):
+    def last_id(self) -> int:
         """
         The ID of the last member of the population.
 
@@ -563,21 +572,19 @@ class Population(PopulationBase):
         return self.__last_id
 
     @property
-    def _vertex(self):
-        """
-        :rtype: ~pacman.model.graphs.application.ApplicationVertex
-        """
+    @overrides(PopulationBase._vertex)
+    def _vertex(self) -> PopulationApplicationVertex:
         return self.__vertex
 
     @property
-    def _recorder(self):
+    def _recorder(self) -> Recorder:
         """
         :rtype: Recorder
         """
         return self.__recorder
 
     @property
-    def conductance_based(self):
+    def conductance_based(self) -> bool:
         """
         Whether the population uses conductance inputs
 
@@ -585,7 +592,8 @@ class Population(PopulationBase):
         """
         return self.__vertex.conductance_based
 
-    def get(self, parameter_names, gather=True, simplify=True):
+    def get(self, parameter_names: Names,
+            gather=True, simplify=True) -> ParameterHolder:
         """
         Get the values of a parameter for every local cell in the population.
 
@@ -606,6 +614,15 @@ class Population(PopulationBase):
 
         return self.__vertex.get_parameter_values(parameter_names)
 
+    @overload
+    def id_to_index(self, id: int) -> int:  # @ReservedAssignment
+        ...
+
+    @overload
+    def id_to_index(
+            self, id: Iterable[int]) -> Sequence[int]:  # @ReservedAssignment
+        ...
+
     def id_to_index(self, id):  # @ReservedAssignment
         """
         Given the ID(s) of cell(s) in the Population, return its (their)
@@ -625,7 +642,15 @@ class Population(PopulationBase):
                     f"id should be in the range [{self.__first_id},"
                     f"{self.__last_id}], actually {id}")
             return int(id - self.__first_id)  # assume IDs are consecutive
-        return id - self.__first_id
+        return numpy.array(id) - self.__first_id
+
+    @overload
+    def index_to_id(self, index: int) -> int:
+        ...
+
+    @overload
+    def index_to_id(self, index: Iterable[int]) -> Sequence[int]:
+        ...
 
     def index_to_id(self, index):
         """
@@ -643,7 +668,7 @@ class Population(PopulationBase):
                     f"{self.__last_id - self.__first_id}], actually {index}")
             return int(index + self.__first_id)
         # this assumes IDs are consecutive
-        return index + self.__first_id
+        return numpy.array(index) + self.__first_id
 
     def id_to_local_index(self, cell_id):
         """
@@ -661,7 +686,7 @@ class Population(PopulationBase):
         # TODO: Need __getitem__
         _we_dont_do_this_now(cell_id)
 
-    def inject(self, current_source):
+    def inject(self, current_source: NeuronCurrentSource):
         """
         Connect a current source to all cells in the Population.
 
@@ -671,39 +696,28 @@ class Population(PopulationBase):
         # Pass this into the vertex
         self.__vertex.inject(current_source, [n for n in range(self.__size)])
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         Get the total number of cells in the population.
         """
         return self.__size
 
     @property
-    def label(self):
+    def label(self) -> str:
         """
         The label of the population.
 
         :rtype: str
         """
-        return self.__vertex.label
+        return self.__vertex.label or ""  # Should never be empty
 
     @label.setter
-    def label(self, label):
+    def label(self, label: str):
         raise NotImplementedError(
             "As label is used as an ID it can not be changed")
 
     @property
-    def local_size(self):
-        """
-        The number of local cells.
-
-        Defined by
-        https://neuralensemble.org/docs/PyNN/reference/populations.html
-        """
-        # Doesn't make much sense on SpiNNaker
-        return self.__size
-
-    @property
-    def structure(self):
+    def structure(self) -> Optional[BaseStructure]:
         """
         The structure for the population.
 
@@ -712,7 +726,8 @@ class Population(PopulationBase):
         return self.__structure
 
     # NON-PYNN API CALL
-    def add_placement_constraint(self, x, y, p=None):
+    def add_placement_constraint(
+            self, x: int, y: int, p: Optional[int] = None):
         """
         Add a placement constraint.
 
@@ -726,7 +741,7 @@ class Population(PopulationBase):
         self.__vertex.set_fixed_location(x, y, p)
 
     # NON-PYNN API CALL
-    def set_max_atoms_per_core(self, max_atoms_per_core):
+    def set_max_atoms_per_core(self, max_atoms_per_core: int):
         """
         Supports the setting of this population's max atoms per
         dimension per core.
@@ -738,17 +753,19 @@ class Population(PopulationBase):
         :raises SimulatorShutdownException: If called after `sim.end`
         """
         SpynnakerDataView.check_user_can_act()
-        cap = self.celltype.absolute_max_atoms_per_core
-        if numpy.prod(max_atoms_per_core) > cap:
-            raise SpynnakerException(
-                f"Set the max_atoms_per_core to {max_atoms_per_core} blocked "
-                f"as the current limit for the model is {cap}")
+        ct = self.celltype
+        if isinstance(ct, AbstractPyNNModel):
+            cap = ct.absolute_max_atoms_per_core
+            if numpy.prod(max_atoms_per_core) > cap:
+                raise SpynnakerException(
+                    f"Set the max_atoms_per_core to {max_atoms_per_core} "
+                    f"blocked as the current limit for the model is {cap}")
         self.__vertex.set_max_atoms_per_dimension_per_core(max_atoms_per_core)
         # state that something has changed in the population
         SpynnakerDataView.set_requires_mapping()
 
     @property
-    def size(self):
+    def size(self) -> int:
         """
         The number of neurons in the population.
 
@@ -756,7 +773,7 @@ class Population(PopulationBase):
         """
         return self.__vertex.n_atoms
 
-    def _cache_data(self):
+    def _cache_data(self) -> None:
         """
         Store data for later extraction.
         """
@@ -790,7 +807,7 @@ class Population(PopulationBase):
         return model
 
     def __create_vertex(
-            self, model: _CellType, size: int, label: Optional[str],
+            self, model: _CellType, size: Optional[int], label: Optional[str],
             additional_parameters: _ParamDict):
         """
         :param model: The implementation of the individual neurons.
@@ -879,7 +896,9 @@ class Population(PopulationBase):
         return population_parameters
 
     @staticmethod
-    def __roundsize(size, label):
+    def __roundsize(
+            size: Union[int, float, None],
+            label: Optional[str]) -> Optional[int]:
         # External device population can have a size of None so accept for now
         if size is None or isinstance(size, int):
             return size

@@ -14,7 +14,9 @@
 
 from __future__ import annotations
 from typing import List, Optional, Sequence, Union, TYPE_CHECKING
-import numpy
+from typing_extensions import TypeAlias
+from numpy import float64
+from numpy.typing import NDArray
 from spinn_utilities.config_holder import get_config_bool
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector, AbstractGenerateConnectorOnMachine, OneToOneConnector)
@@ -25,6 +27,8 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron import ConnectionHolder
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
         AbstractSynapseDynamics)
+    _Weights: TypeAlias = Union[float, List[float], NDArray[float64]]
+    _Delays: TypeAlias = Union[float, List[float], NDArray[float64]]
 
 
 class SynapseInformation(object):
@@ -32,6 +36,7 @@ class SynapseInformation(object):
     Contains the synapse information including the connector, synapse type
     and synapse dynamics.
     """
+    # Made by a Projection
     __slots__ = (
         "__connector",
         "__pre_population",
@@ -51,8 +56,10 @@ class SynapseInformation(object):
                  post_population: Union[Population, PopulationView],
                  prepop_is_view: bool, postpop_is_view: bool,
                  synapse_dynamics: AbstractSynapseDynamics,
-                 synapse_type, receptor_type, synapse_type_from_dynamics,
-                 weights=None, delays=None):
+                 synapse_type: int, receptor_type: str,
+                 synapse_type_from_dynamics: bool,
+                 weights: Optional[_Weights] = None,
+                 delays: Optional[_Delays] = None):
         """
         :param AbstractConnector connector:
             The connector connected to the synapse
@@ -167,7 +174,8 @@ class SynapseInformation(object):
     @property
     def synapse_type(self) -> int:
         """
-        The type of the synapse.
+        The type of the synapse. An index into the set of synapse types
+        supported by a neuron.
 
         :rtype: int
         """
@@ -183,7 +191,7 @@ class SynapseInformation(object):
         return self.__receptor_type
 
     @property
-    def weights(self) -> Optional[Union[float, List[float], numpy.ndarray]]:
+    def weights(self) -> Optional[_Weights]:
         """
         The synaptic weights (if any).
 
@@ -192,7 +200,7 @@ class SynapseInformation(object):
         return self.__weights
 
     @property
-    def delays(self) -> Optional[Union[float, List[float], numpy.ndarray]]:
+    def delays(self) -> Optional[_Delays]:
         """
         The total synaptic delays (if any).
 
