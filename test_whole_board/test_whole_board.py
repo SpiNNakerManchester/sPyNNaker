@@ -198,6 +198,7 @@ def test_run(x, y, b):
     client = SpallocClient(SPALLOC_URL, SPALLOC_USERNAME, SPALLOC_PASSWORD)
     job = client.create_job_board(
         triad=(x, y, b), machine_name=SPALLOC_MACHINE)
+    job.launch_keepalive_task()
     # Wait 30 seconds for the state to change before giving up
     # Wait for not queued for up to 30 seconds
     job.wait_for_state_change(SpallocState.QUEUED)
