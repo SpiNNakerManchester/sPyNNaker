@@ -97,7 +97,7 @@ def test_run(x, y, b):
     job = client.create_job_rect_at_board(
         WIDTH, HEIGHT, triad=(x, y, b), machine_name=SPALLOC_MACHINE)
     # Wait 30 seconds for the state to change before giving up
-    job.wait_for_state_change(SpallocState.UNKNOWN)
+    job.wait_for_state_change(SpallocState.QUEUED)
     if job.get_state() == SpallocState.QUEUED:
         job.destroy("Queued")
         pytest.skip(f"Some boards starting at {x}, {y}, {b} is in use")
