@@ -180,7 +180,7 @@ class PopulationMachineCommon(
         spec.write_array(get_recording_header_array(rec_regions))
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
-    def get_binary_file_name(self):
+    def get_binary_file_name(self) -> str:
         return self.__binary_file_name
 
     @overrides(MachineVertex.get_n_keys_for_partition)

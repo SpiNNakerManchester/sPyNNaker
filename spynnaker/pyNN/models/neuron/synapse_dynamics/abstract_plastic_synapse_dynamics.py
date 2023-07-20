@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import numpy
+from numpy.typing import NDArray
+from typing import Tuple
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.common import Slice
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
@@ -41,7 +43,7 @@ class AbstractPlasticSynapseDynamics(
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
             post_vertex_slice, n_synapse_types, max_n_synapses,
-            max_atoms_per_core):
+            max_atoms_per_core) -> Tuple[NDArray, NDArray, NDArray, NDArray]:
         """
         Get the fixed-plastic data, and plastic-plastic data for each row, and
         lengths for the fixed_plastic and plastic-plastic parts of each row.

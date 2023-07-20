@@ -16,7 +16,7 @@ import logging
 from pyNN.space import BaseStructure
 import neo
 from typing import (
-    Any, Dict, Optional, Sequence, final,
+    Any, Dict, Optional, Sequence, Union, final,
     TYPE_CHECKING)
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
@@ -29,6 +29,7 @@ from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
 if TYPE_CHECKING:
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
     from spynnaker.pyNN.models.common.types import Names
+    from .population_view import IDMixin
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -53,7 +54,7 @@ class PopulationBase(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @property
-    def local_cells(self) -> Sequence[int]:
+    def local_cells(self) -> Sequence[IDMixin]:
         """
         An array containing the cell IDs of those neurons in the
         Population that exist on the local MPI node.
@@ -66,7 +67,7 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def all_cells(self) -> Sequence[int]:
+    def all_cells(self) -> Sequence[IDMixin]:
         """
         An array containing the cell IDs of all neurons in the
         Population (all MPI nodes).
@@ -75,7 +76,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def __add__(self, other: 'PopulationBase') -> Assembly:
+    def __add__(self, other: PopulationBase) -> Assembly:
         """
         A Population / PopulationView can be added to another
         Population, PopulationView or Assembly, returning an Assembly.
@@ -284,7 +285,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         _we_dont_do_this_now()  # pragma: no cover
 
     @abstractmethod
-    def write_data(self, io, variables: Names = 'all',
+    def write_data(self, io: Union[str, neo.baseio.BaseIO],
+                   variables: Names = 'all',
                    gather: bool = True, clear: bool = False,
                    annotations: Optional[Dict[str, Any]] = None):
         """
@@ -317,7 +319,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @final
-    def printSpikes(self, filename, gather=True):
+    def printSpikes(self, filename: str, gather=True):
         """
         .. deprecated:: 5.0
             Use ``write_data(file, 'spikes')`` instead.
@@ -335,7 +337,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         self.write_data(filename, 'spikes', gather=True)
 
     @final
-    def print_gsyn(self, filename, gather=True):
+    def print_gsyn(self, filename: str, gather=True):
         """
         .. deprecated:: 5.0
             Use ``write_data(file, ['gsyn_exc', 'gsyn_inh'])`` instead.
@@ -353,7 +355,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         self.write_data(filename, ['gsyn_exc', 'gsyn_inh'], gather=True)
 
     @final
-    def print_v(self, filename, gather=True):
+    def print_v(self, filename: str, gather=True):
         """
         .. deprecated:: 5.0
             Use ``write_data(file, 'v')`` instead.

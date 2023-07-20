@@ -55,9 +55,10 @@ class AbstractConnector(object, metaclass=AbstractBase):
     """
     # pylint: disable=unused-argument
 
-    NUMPY_SYNAPSES_DTYPE = [("source", "uint32"), ("target", "uint16"),
-                            ("weight", "float64"), ("delay", "float64"),
-                            ("synapse_type", "uint8")]
+    NUMPY_SYNAPSES_DTYPE = numpy.dtype(
+        [("source", "uint32"), ("target", "uint16"),
+         ("weight", "float64"), ("delay", "float64"),
+         ("synapse_type", "uint8")])
 
     __slots__ = (
         "_delays",

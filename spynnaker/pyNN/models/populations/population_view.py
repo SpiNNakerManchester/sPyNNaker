@@ -199,7 +199,7 @@ class PopulationView(PopulationBase):
         return self.__mask
 
     @property
-    def all_cells(self) -> List['IDMixin']:
+    def all_cells(self) -> Sequence['IDMixin']:
         """
         An array containing the cell IDs of all neurons in the
         Population (all MPI nodes).

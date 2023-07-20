@@ -11,13 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
+from typing import Sequence, cast, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.common import Slice
+from pacman.model.resources import AbstractSDRAM
+from pacman.model.placements import Placement
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification)
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from .population_synapses_machine_vertex_common import (
     PopulationSynapsesMachineVertexCommon)
 from .population_machine_synapses_provenance import (
     PopulationMachineSynapsesProvenance)
+if TYPE_CHECKING:
+    from .abstract_population_vertex import AbstractPopulationVertex
+    from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapseRegions
 
 
 class PopulationSynapsesMachineVertexShared(
@@ -31,7 +40,9 @@ class PopulationSynapsesMachineVertexShared(
     __slots__ = ("__synapse_references", )
 
     def __init__(
-            self, sdram, label, app_vertex, vertex_slice, synapse_references):
+            self, sdram: AbstractSDRAM, label: str,
+            app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
+            synapse_references: SynapseRegions):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex
@@ -45,14 +56,17 @@ class PopulationSynapsesMachineVertexShared(
         self.__synapse_references = synapse_references
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(self, spec, placement):
+    def generate_data_specification(
+            self, spec: DataSpecificationGenerator, placement: Placement):
         rec_regions = self._pop_vertex.synapse_recorder.get_region_sizes(
             self.vertex_slice)
         self._write_common_data_spec(spec, rec_regions)
 
         # Write references to shared regions
         for reg, ref in zip(self.SYNAPSE_REGIONS, self.__synapse_references):
-            spec.reference_memory_region(reg, ref)
+            if ref is not None:
+                # Ignore a region if there's no target reference
+                spec.reference_memory_region(cast(int, reg), ref)
 
         # Write information about SDRAM
         self._write_sdram_edge_spec(spec)
@@ -64,6 +78,8 @@ class PopulationSynapsesMachineVertexShared(
         spec.end_specification()
 
     @overrides(PopulationSynapsesMachineVertexCommon._parse_synapse_provenance)
-    def _parse_synapse_provenance(self, label, x, y, p, provenance_data):
+    def _parse_synapse_provenance(
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
         return PopulationMachineSynapsesProvenance._parse_synapse_provenance(
             self, label, x, y, p, provenance_data)

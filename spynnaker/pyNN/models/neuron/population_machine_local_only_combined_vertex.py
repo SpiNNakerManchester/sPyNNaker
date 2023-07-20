@@ -15,7 +15,7 @@ from __future__ import annotations
 from enum import IntEnum
 import os
 import ctypes
-from typing import List, cast, TYPE_CHECKING
+from typing import List, Optional, Sequence, cast, TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 from pacman.model.placements import Placement
@@ -30,6 +30,9 @@ from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
 from .abstract_population_vertex import AbstractPopulationVertex
+from pacman.model.resources.abstract_sdram import AbstractSDRAM
+from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+from pacman.model.graphs.common.slice import Slice
 if TYPE_CHECKING:
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
         AbstractSpynnakerSplitterDelay)
@@ -133,9 +136,11 @@ class PopulationMachineLocalOnlyCombinedVertex(
         2: "INCOMING_SPIKE"}
 
     def __init__(
-            self, sdram, label, app_vertex, vertex_slice, slice_index,
-            ring_buffer_shifts, weight_scales, neuron_data,
-            max_atoms_per_core):
+            self, sdram: AbstractSDRAM, label: str,
+            app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
+            slice_index: int, ring_buffer_shifts: List[int],
+            weight_scales: List[int], neuron_data: NeuronData,
+            max_atoms_per_core: int):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex
@@ -163,7 +168,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
             NeuronProvenance.N_ITEMS +
             LocalOnlyProvenance.N_ITEMS + MainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
-        self.__key = None
+        self.__key: Optional[int] = None
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
@@ -173,35 +178,37 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     @property
     @overrides(PopulationMachineNeurons._slice_index)
-    def _slice_index(self):
+    def _slice_index(self) -> int:
         return self.__slice_index
 
     @property
     @overrides(PopulationMachineNeurons._key)
-    def _key(self):
+    def _key(self) -> int:
+        if self.__key is None:
+            raise KeyError("'_key' not yet set")
         return self.__key
 
     @overrides(PopulationMachineNeurons._set_key)
-    def _set_key(self, key):
+    def _set_key(self, key: int):
         self.__key = key
 
     @property
     @overrides(PopulationMachineNeurons._neuron_regions)
-    def _neuron_regions(self):
+    def _neuron_regions(self) -> NeuronRegions:
         return self.NEURON_REGIONS
 
     @property
     @overrides(PopulationMachineNeurons._neuron_data)
-    def _neuron_data(self):
+    def _neuron_data(self) -> NeuronData:
         return self.__neuron_data
 
     @property
     @overrides(PopulationMachineNeurons._max_atoms_per_core)
-    def _max_atoms_per_core(self):
+    def _max_atoms_per_core(self) -> int:
         return self.__max_atoms_per_core
 
     @staticmethod
-    def __get_binary_file_name(app_vertex: AbstractPopulationVertex):
+    def __get_binary_file_name(app_vertex: AbstractPopulationVertex) -> str:
         """
         Get the local binary filename for this vertex.  Static because at
         the time this is needed, the local app_vertex is not set.
@@ -217,7 +224,9 @@ class PopulationMachineLocalOnlyCombinedVertex(
         return name + app_vertex.synapse_executable_suffix + ext
 
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
-    def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
+    def parse_extra_provenance_items(
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
         proc_offset = NeuronProvenance.N_ITEMS
         end_proc_offset = proc_offset + LocalOnlyProvenance.N_ITEMS
         self._parse_neuron_provenance(
@@ -305,15 +314,16 @@ class PopulationMachineLocalOnlyCombinedVertex(
         spec.end_specification()
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
-    def reload_required(self):
+    def reload_required(self) -> bool:
         return self.__regenerate_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
-    def set_reload_required(self, new_value):
+    def set_reload_required(self, new_value: bool):
         self.__regenerate_data = new_value
 
     def _parse_local_only_provenance(
-            self, label, x, y, p, provenance_data):
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
         """
         Extract and yield local-only provenance.
 
@@ -366,5 +376,5 @@ class PopulationMachineLocalOnlyCombinedVertex(
                         ".spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(PopulationMachineNeurons.set_do_neuron_regeneration)
-    def set_do_neuron_regeneration(self):
+    def set_do_neuron_regeneration(self) -> None:
         self.__regenerate_data = True

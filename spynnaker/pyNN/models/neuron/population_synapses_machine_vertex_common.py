@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 from enum import IntEnum
 import ctypes
-from typing import Iterable, Optional, Sequence
+from typing import Iterable, Optional, Sequence, TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
@@ -32,7 +33,10 @@ from spynnaker.pyNN.models.abstract_models import (
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_synapses import SynapseRegions
 from .population_machine_synapses_provenance import SynapseProvenance
-from .abstract_population_vertex import AbstractPopulationVertex
+if TYPE_CHECKING:
+    from .abstract_population_vertex import AbstractPopulationVertex
+    from .population_neurons_machine_vertex import (
+        PopulationNeuronsMachineVertex)
 
 # Size of SDRAM params = 1 word for address + 1 word for size
 #  + 1 word for time to send
@@ -167,8 +171,8 @@ class PopulationSynapsesMachineVertexCommon(
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__sdram_partition: Optional[
             SourceSegmentedSDRAMMachinePartition] = None
-        self.__neuron_vertex = None
-        self.__partition_id = None
+        self.__neuron_vertex: Optional[PopulationNeuronsMachineVertex] = None
+        self.__partition_id: Optional[str] = None
 
     def set_sdram_partition(
             self, sdram_partition: SourceSegmentedSDRAMMachinePartition):
@@ -185,7 +189,9 @@ class PopulationSynapsesMachineVertexCommon(
                 "Trying to set SDRAM partition more than once")
         self.__sdram_partition = sdram_partition
 
-    def set_neuron_vertex_and_partition_id(self, neuron_vertex, partition_id):
+    def set_neuron_vertex_and_partition_id(
+            self, neuron_vertex: PopulationNeuronsMachineVertex,
+            partition_id: str):
         """
         Set the neuron vertex and partition ID for the case with a
         self-connection.
@@ -227,10 +233,12 @@ class PopulationSynapsesMachineVertexCommon(
         send_size = self.__sdram_partition.get_sdram_size_of_region_for(self)
         base_addr = self.__sdram_partition.get_sdram_base_address_for(self)
         assert base_addr is not None
+
         spec.reserve_memory_region(
             region=self.REGIONS.SDRAM_EDGE_PARAMS,
             size=SDRAM_PARAMS_SIZE, label="SDRAM Params")
         spec.switch_write_focus(self.REGIONS.SDRAM_EDGE_PARAMS)
+
         spec.write_value(base_addr)
         spec.write_value(send_size)
         spec.write_value(get_config_int(
@@ -247,21 +255,25 @@ class PopulationSynapsesMachineVertexCommon(
             region=self.REGIONS.KEY_REGION, size=KEY_CONFIG_SIZE,
             label="Key Config")
         spec.switch_write_focus(self.REGIONS.KEY_REGION)
+
         if self.__neuron_vertex is None:
             # No Key = make sure it doesn't match; i.e. spike & 0x0 != 0x1
-            spec.write_value(1)
-            spec.write_value(0)
-            spec.write_value(0)
-            spec.write_value(0)
+            spec.write_value(1)  # key
+            spec.write_value(0)  # mask
+            spec.write_value(0)  # inv_mask
+            spec.write_value(0)  # n_colour_bits
+            spec.write_value(0)  # is_self_projection
         else:
+            assert self.__partition_id is not None
             routing_info = SpynnakerDataView.get_routing_infos()
             r_info = routing_info.get_routing_info_from_pre_vertex(
                 self.__neuron_vertex, self.__partition_id)
+            assert r_info is not None
             spec.write_value(r_info.key)
             spec.write_value(r_info.mask)
             spec.write_value(~r_info.mask & 0xFFFFFFFF)
-            spec.write_value(self._app_vertex.n_colour_bits)
-            spec.write_value(int(self._app_vertex.self_projection is not None))
+            spec.write_value(self._pop_vertex.n_colour_bits)
+            spec.write_value(int(self._pop_vertex.self_projection is not None))
 
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge) -> int:
