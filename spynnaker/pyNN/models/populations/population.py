@@ -19,7 +19,7 @@ import os
 import inspect
 from typing import (
     Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Type,
-    Union, overload, TYPE_CHECKING)
+    Union, final, overload, TYPE_CHECKING)
 from typing_extensions import TypeAlias
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
@@ -109,7 +109,7 @@ class Population(PopulationBase):
             additional.update(additional_kwargs)
 
         # build our initial objects
-        self.__celltype: _CellType
+        self.__celltype: AbstractPyNNModel
         self.__vertex: PopulationApplicationVertex
         model = self.__create_model(cellclass, cellparams)
         realsize = self.__roundsize(size, label)
@@ -175,14 +175,14 @@ class Population(PopulationBase):
         return self.__annotations
 
     @property
-    def celltype(self) -> _CellType:
+    def celltype(self) -> AbstractPyNNModel:
         """
         Implements the PyNN expected `celltype` property.
 
         :return:
             The cell type this property has been set to, or the vertex if it
             was directly instantiated.
-        :rtype: AbstractPyNNModel or PopulationApplicationVertex
+        :rtype: AbstractPyNNModel
         """
         return self.__celltype
 
@@ -806,6 +806,50 @@ class Population(PopulationBase):
             model = cell_class
         return model
 
+    def __create_vertex_from_model(
+            self, model: AbstractPyNNModel, size: Optional[int],
+            label: Optional[str], additional_parameters: _ParamDict):
+        """
+        Worker for :meth:`__create_vertex` to handle the case where we really
+        have a model.
+        """
+        self.__celltype = model
+        # pylint: disable=protected-access
+        if size is not None and size <= 0:
+            raise ConfigurationException(
+                "A population cannot have a negative or zero size.")
+        parameters = model._get_default_population_parameters()
+        if additional_parameters:
+            # check that the additions are suitable. report wrong ones
+            # and ignore
+            parameters = self.__process_additional_params(
+                additional_parameters, parameters)
+        # Mypy otherwise says the type is Any, no help at all there!
+        create_vertex: Callable[
+            [Optional[int], Optional[str]],
+            PopulationApplicationVertex] = model.create_vertex
+        self.__vertex = create_vertex(size, label, **parameters)
+
+    def __init_with_supplied_vertex(
+            self, model: PopulationApplicationVertex, size: Optional[int],
+            label: Optional[str], additional_parameters: _ParamDict):
+        """
+        Worker for :meth:`__create_vertex` to handle the case where we have a
+        user-supplied vertex.
+        """
+        if additional_parameters:
+            raise ConfigurationException(
+                "Cannot accept additional parameters "
+                f"{additional_parameters} when the cell is a vertex")
+        # Use a synthetic model
+        self.__celltype = _VertexHolder(model)
+        self.__vertex = model
+        if size is not None and size != self.__vertex.n_atoms:
+            raise ConfigurationException(
+                "Vertex size does not match Population size")
+        if label is not None:
+            self.__vertex.set_label(label)
+
     def __create_vertex(
             self, model: _CellType, size: Optional[int], label: Optional[str],
             additional_parameters: _ParamDict):
@@ -819,36 +863,15 @@ class Population(PopulationBase):
             Additional parameters to pass to the vertex creation function.
         :type additional_parameters: dict(str, ...)
         """
-        self.__celltype = model
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):
-            if size is not None and size <= 0:
-                raise ConfigurationException(
-                    "A population cannot have a negative or zero size.")
-            # pylint: disable=protected-access
-            parameters = model._get_default_population_parameters()
-            if additional_parameters:
-                # check that the additions are suitable. report wrong ones
-                # and ignore
-                parameters = self.__process_additional_params(
-                    additional_parameters, parameters)
-            self.__vertex = model.create_vertex(size, label, **parameters)
-            assert isinstance(self.__vertex, PopulationApplicationVertex)
+            self.__create_vertex_from_model(
+                model, size, label, additional_parameters)
 
         # Use a provided application vertex directly
         elif isinstance(model, PopulationApplicationVertex):
-            if additional_parameters:
-                raise ConfigurationException(
-                    "Cannot accept additional parameters "
-                    f"{additional_parameters} when the cell is a vertex")
-            self.__vertex = model
-            if size is None:
-                size = self.__vertex.n_atoms
-            elif size != self.__vertex.n_atoms:
-                raise ConfigurationException(
-                    "Vertex size does not match Population size")
-            if label is not None:
-                self.__vertex.set_label(label)
+            self.__init_with_supplied_vertex(
+                model, size, label, additional_parameters)
 
         # Fail on anything else
         else:
@@ -912,3 +935,26 @@ class Population(PopulationBase):
         raise ConfigurationException(
             f"Size of a population with label {label} must be an int,"
             f" received {size}")
+
+
+@final
+class _VertexHolder(AbstractPyNNModel):
+    """
+    A simplistic model that just holds its supplied vertex.
+    It has nothing to configure.
+    """
+    __slots__ = ("__vertex", )
+    default_population_parameters = {}
+
+    def __init__(self, vertex: PopulationApplicationVertex):
+        self.__vertex = vertex
+
+    @property
+    def vertex(self):
+        return self.__vertex
+
+    @overrides(AbstractPyNNModel.create_vertex)
+    def create_vertex(
+            self, n_neurons: int, label: str) -> PopulationApplicationVertex:
+        # The parameters are ignored; the vertex already exists
+        return self.__vertex

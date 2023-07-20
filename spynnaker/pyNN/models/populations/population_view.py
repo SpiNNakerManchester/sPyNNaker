@@ -19,7 +19,7 @@ from numpy.typing import NDArray
 import os
 from typing import (
     Any, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple, Union,
-    cast, overload, TYPE_CHECKING)
+    overload, TYPE_CHECKING)
 from typing_extensions import TypeAlias
 from spinn_utilities.log import FormatAdapter
 from pyNN import descriptions
@@ -154,7 +154,7 @@ class PopulationView(PopulationBase):
 
         :rtype: AbstractPyNNModel
         """
-        return cast(AbstractPyNNModel, self.__parent.celltype)
+        return self.__parent.celltype
 
     @property
     def initial_values(self) -> ParameterHolder:

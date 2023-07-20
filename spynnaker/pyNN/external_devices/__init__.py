@@ -21,7 +21,7 @@ PushBot (https://spinnakermanchester.github.io/docs/push_bot/).
     accuracy to gain performance.
 """
 import os
-from typing import Optional
+from typing import Optional, Tuple
 from spinn_utilities.socket_address import SocketAddress
 from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.abstract_models import (
@@ -63,6 +63,7 @@ from spynnaker.pyNN.models.utility_models.spike_injector import (
     SpikeInjector as ExternalDeviceSpikeInjector)
 from spynnaker.pyNN import protocols
 from spynnaker.pyNN.spinnaker import SpiNNaker
+from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 
 # useful functions
@@ -182,6 +183,24 @@ def register_database_notification_request(
 __ethernet_control_connection: Optional[EthernetControlConnection] = None
 
 
+def __vtx(population: Population) -> Tuple[
+        AbstractPopulationVertex, AbstractEthernetController, str]:
+    vertex = population._vertex  # pylint: disable=protected-access
+    if isinstance(vertex, AbstractPopulationVertex):
+        v = vertex
+    else:
+        raise TypeError(
+            "Vertex must be an instance of AbstractPopulationVertex")
+    if isinstance(vertex, AbstractEthernetController):
+        c = vertex
+    else:
+        raise TypeError(
+            "Vertex must be an instance of AbstractEthernetController")
+    if vertex.label is None:
+        raise ValueError("Vertex must be labelled")
+    return v, c, vertex.label
+
+
 def EthernetControlPopulation(
         n_neurons: int, model: _CellTypeArg, label: Optional[str] = None,
         local_host: Optional[str] = None, local_port: Optional[int] = None,
@@ -219,27 +238,23 @@ def EthernetControlPopulation(
     :rtype: ~spynnaker.pyNN.models.populations.Population
     :raises TypeError: If an invalid model class is used.
     """
-    # pylint: disable=protected-access, too-many-arguments, global-statement
+    # pylint: disable=too-many-arguments, global-statement
     population = Population(n_neurons, model, label=label)
-    vertex = population._apv
-    aec = vertex
-    if not isinstance(aec, AbstractEthernetController):
-        raise TypeError(
-            "Vertex must be an instance of AbstractEthernetController")
+    vertex, aec, vertex_label = __vtx(population)
     translator = aec.get_message_translator()
     live_packet_gather_label = "EthernetControlReceiver"
     global __ethernet_control_connection
     if __ethernet_control_connection is None:
         __ethernet_control_connection = EthernetControlConnection(
-            translator, vertex.label, live_packet_gather_label, local_host,
+            translator, vertex_label, live_packet_gather_label, local_host,
             local_port)
         Plugins.add_database_socket_address(
             __ethernet_control_connection.local_ip_address,
             __ethernet_control_connection.local_port, database_ack_port_num)
     else:
-        __ethernet_control_connection.add_translator(vertex.label, translator)
+        __ethernet_control_connection.add_translator(vertex_label, translator)
     devices_with_commands = [
-        device for device in vertex.get_external_devices()
+        device for device in aec.get_external_devices()
         if isinstance(device, AbstractSendMeMulticastCommandsVertex)]
     if devices_with_commands:
         ethernet_command_connection = EthernetCommandConnection(
@@ -255,7 +270,7 @@ def EthernetControlPopulation(
         payload_as_time_stamps=False, use_payload_prefix=False,
         label=live_packet_gather_label)
     Plugins.update_live_packet_gather_tracker(
-        vertex, params, vertex.get_outgoing_partition_ids())
+        vertex, params, aec.get_outgoing_partition_ids())
     return population
 
 
