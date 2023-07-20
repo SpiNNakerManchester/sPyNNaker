@@ -540,7 +540,9 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
         }
 
 #if LOG_LEVEL >= LOG_DEBUG
-		// if timer is getting low, don't do next DMA and instead flush spike buffer
+        // NOTE: this code is left over from previous testing; it's left
+        //       here in case there's any interest in testing again using it
+		// If timer is getting low, don't do next DMA and instead flush spike buffer
 		// originally 6657 clock cycles from the end of the interval was used
 		if (tc[T1_COUNT] < 6657) {
 				uint cpsr = spin1_int_disable();
@@ -728,15 +730,15 @@ void spike_processing_get_and_reset_pipeline_restarts_this_tick(void) {
 	pipeline_restarts = 0;
 }
 
-uint32_t spike_processing_get_pipeline_deactivation_time(){
+uint32_t spike_processing_get_pipeline_deactivation_time(void) {
 	return spike_pipeline_deactivation_time;
 }
 
 // FLUSHED SPIKES
-uint32_t spike_processing_get_total_flushed_spikes(){
+uint32_t spike_processing_get_total_flushed_spikes(void) {
 	return total_flushed_spikes;
 }
 
-uint32_t spike_processing_get_max_flushed_spikes(){
+uint32_t spike_processing_get_max_flushed_spikes(void) {
 	return max_flushed_spikes;
 }

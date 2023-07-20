@@ -37,23 +37,6 @@ struct spike_processing_provenance {
     uint32_t n_packets_dropped_from_lateness;
     //! The maximum size of the input buffer
     uint32_t max_filled_input_buffer_size;
-//    //! SpiNNCer-related provenance
-//    //! The maximum number of spikes in a tick
-//    uint32_t max_spikes_in_a_tick;
-//    //! The maximum number of DMAs in a tick
-//    uint32_t max_dmas_in_a_tick;
-//    //! The maximum number of pipeline restarts
-//    uint32_t max_pipeline_restarts;
-//    //! Was the timer callback completed?
-//    uint32_t timer_callback_completed;
-//#if LOG_LEVEL >= LOG_DEBUG
-//    //! Was the spike pipeline deactivated?
-//    uint32_t spike_pipeline_deactivated;
-//    //! The maximum number of flushed spikes in one step
-//    uint32_t max_flushed_spikes;
-//    //! Thet total number of flushed spikes
-//    uint32_t total_flushed_spikes;
-//#endif
 };
 
 //! \brief Initialise the spike processing system

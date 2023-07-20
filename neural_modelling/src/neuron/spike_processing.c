@@ -26,8 +26,6 @@
 #include <common/in_spikes.h>
 #include <recording.h>
 
-//extern bool timer_callback_active;
-
 //! DMA buffer structure combines the row read from SDRAM with information
 //! about the read.
 typedef struct dma_buffer {
@@ -295,27 +293,6 @@ static inline void start_dma_loop(void) {
             dma_busy = true;
         }
     }
-
-//#if LOG_LEVEL >= LOG_DEBUG
-//    // if timer is getting low, don't do next DMA and instead flush spike buffer
-//    // originally 6657 clock cycles from the end of the interval was used
-//    if (tc[T1_COUNT] < 6657) {
-//    	    uint cpsr = spin1_int_disable();
-//    	    uint32_t spikes_remaining = in_spikes_flush_buffer();
-//    	    timer_callback_active = true;
-//    	    spin1_mode_restore(cpsr);
-//
-//    	    if (spikes_remaining > 0){
-//    	    	total_flushed_spikes += spikes_remaining;
-//
-//    	    	if (spikes_remaining > max_flushed_spikes){
-//    	    		max_flushed_spikes = spikes_remaining;
-//    	    	}
-//
-////    	    	log_debug("--------At time: %u, flushed spikes: %u", time, spikes_remaining);
-//    	    }
-//    }
-//#endif
 }
 
 //! \brief Called when a multicast packet is received
@@ -323,7 +300,6 @@ static inline void start_dma_loop(void) {
 //! \param[in] unused: Only specified to match API
 static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
     p_per_ts_struct.packets_this_time_step += 1;
-//    spikes_this_time_step += 1;
     if (in_spikes_add_spike(key)) {
         start_dma_loop();
     }
@@ -334,7 +310,6 @@ static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
 //! \param[in] payload: the payload of the packet. The count.
 static void multicast_packet_pl_received_callback(uint key, uint payload) {
     p_per_ts_struct.packets_this_time_step += 1;
-//    spikes_this_time_step += 1;
 
     // cycle through the packet insertion
     bool added = false;
@@ -352,7 +327,6 @@ static void multicast_packet_pl_received_callback(uint key, uint payload) {
 static void dma_complete_callback(UNUSED uint unused, UNUSED uint tag) {
 
     // increment the dma complete count for provenance generation
-//    dmas_this_time_step++;
     dma_complete_count++;
 
     // Get pointer to current buffer
@@ -423,9 +397,6 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
     // Reset the counters as this is a new process
     dma_n_rewires = 0;
     dma_n_spikes = 0;
-
-    // Increment counter for spike processing pipeline restarts
-//    pipeline_restarts++;
 
     if (buffer_being_read < N_DMA_BUFFERS) {
         // If the DMA buffer is full of valid data, attempt to reuse it on the
@@ -500,15 +471,6 @@ void spike_processing_store_provenance(struct spike_processing_provenance *prov)
     prov->n_rewires = n_successful_rewires;
     prov->n_packets_dropped_from_lateness = count_input_buffer_packets_late;
     prov->max_filled_input_buffer_size = biggest_fill_size_of_input_buffer;
-//    prov->max_spikes_in_a_tick = max_spikes_in_a_tick;
-//    prov->max_dmas_in_a_tick = max_dmas_in_a_tick;
-//    prov->max_pipeline_restarts = max_pipeline_restarts;
-//    prov->timer_callback_completed = timer_callback_completed;
-//#if LOG_LEVEL >= LOG_DEBUG
-//    prov->spike_pipeline_deactivated = spike_pipeline_deactivation_time;
-//    prov->max_flushed_spikes = max_flushed_spikes;
-//    prov->total_flushed_spikes = total_flushed_spikes;
-//#endif
 }
 
 bool spike_processing_do_rewiring(int number_of_rewires) {

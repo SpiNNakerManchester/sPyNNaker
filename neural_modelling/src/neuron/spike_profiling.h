@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef _SPIKE_PROFILING_H_
+#define _SPIKE_PROFILING_H_
+
 #include <stdfix-full-iso.h>
 
 typedef struct spike_holder_t {
@@ -81,15 +84,19 @@ static inline accum spike_profiling_get_spike_holder_as_accum(
 	return x.acc;
 }
 
-//static inline void spike_profiling_print_spikes_from_spike_holder(
-//        struct spike_holder_t spikes_orig) {
-//	io_printf(IO_BUF, "Spikes from input: a %u, b %u, c %u, d %u \n",
-//			spikes_orig.spikes_a, spikes_orig.spikes_b, spikes_orig.spikes_c,
-//			spikes_orig.spikes_d);
-//}
-//
-//static inline void spike_profiling_print_spikes_from_int(int32_t output) {
-//	io_printf(IO_BUF, "Spikes from output: a %d, b %d, c %d, d %d \n",
-//			(output & 0xFF), (output >> 8 & 0xFF), (output >> 16 & 0xFF),
-//			(output >> 24 & 0xFF));
-//}
+#if LOG_LEVEL >= LOG_DEBUG
+static inline void spike_profiling_print_spikes_from_spike_holder(
+        struct spike_holder_t spikes_orig) {
+	io_printf(IO_BUF, "Spikes from input: a %u, b %u, c %u, d %u \n",
+			spikes_orig.spikes_a, spikes_orig.spikes_b, spikes_orig.spikes_c,
+			spikes_orig.spikes_d);
+}
+
+static inline void spike_profiling_print_spikes_from_int(int32_t output) {
+	io_printf(IO_BUF, "Spikes from output: a %d, b %d, c %d, d %d \n",
+			(output & 0xFF), (output >> 8 & 0xFF), (output >> 16 & 0xFF),
+			(output >> 24 & 0xFF));
+}
+#endif
+
+#endif // _SPIKE_PROFILING_H_

@@ -61,6 +61,7 @@ extern uint32_t late_spikes;
 //! The maximum lateness of a spike
 extern uint32_t max_late_spike;
 
+
 //! \brief Print the weight of a synapse
 //! \param[in] weight: the weight to print in synapse-row form
 //! \param[in] left_shift: the shift to use when decoding
