@@ -20,6 +20,7 @@ import os
 import math
 import neo
 import numpy
+from numpy import uint32
 from numpy.typing import NDArray
 from math import isnan
 from pyNN.random import RandomDistribution
@@ -29,6 +30,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.safe_eval import SafeEval
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.logger_utils import warn_once
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
@@ -109,7 +111,7 @@ def convert_param_to_numpy(param, no_atoms):
     return numpy.array(param, dtype="float")
 
 
-def convert_to(value, data_type):
+def convert_to(value, data_type: DataType) -> uint32:
     """
     Convert a value to a given data type.
 
@@ -117,7 +119,7 @@ def convert_to(value, data_type):
     :param ~data_specification.enums.DataType data_type:
         The data type to convert to
     :return: The converted data as a numpy data type
-    :rtype: ~numpy.ndarray(int32)
+    :rtype: numpy.uint32
     """
     return numpy.round(data_type.encode_as_int(value)).astype(
         data_type.struct_encoding)

@@ -153,7 +153,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
     def get_delay_maximum(
             self, connector: AbstractConnector,
-            synapse_info: SynapseInformation) -> Optional[int]:
+            synapse_info: SynapseInformation) -> Optional[float]:
         """
         Get the maximum delay for the synapses.
         """
@@ -161,7 +161,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
     def get_delay_minimum(
             self, connector: AbstractConnector,
-            synapse_info: SynapseInformation) -> Optional[int]:
+            synapse_info: SynapseInformation) -> Optional[float]:
         """
         Get the minimum delay for the synapses.
         This will support the filtering of the undelayed edge
@@ -169,7 +169,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         happen first before this can be utilised fully.
 
         :param AbstractConnector connector: connector
-        :param ~numpy.ndarray synapse_info: synapse info
+        :param SynapseInformation synapse_info: synapse info
         """
         return connector.get_delay_minimum(synapse_info)
 
@@ -181,6 +181,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
         :param AbstractConnector connector:
         :param ~numpy.ndarray delays:
+        :param SynapseInformation synapse_info:
         """
         return connector.get_delay_variance(delays, synapse_info)
 
@@ -191,7 +192,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         Get the mean weight for the synapses.
 
         :param AbstractConnector connector:
-        :param ~numpy.ndarray weights:
+        :param SynapseInformation synapse_info:
         """
         return connector.get_weight_mean(synapse_info.weights, synapse_info)
 
@@ -202,7 +203,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         Get the maximum weight for the synapses.
 
         :param AbstractConnector connector:
-        :param ~numpy.ndarray weights:
+        :param SynapseInformation synapse_info:
         """
         return connector.get_weight_maximum(synapse_info)
 
@@ -214,6 +215,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
         :param AbstractConnector connector:
         :param ~numpy.ndarray weights:
+        :param SynapseInformation synapse_info:
         """
         return connector.get_weight_variance(weights, synapse_info)
 

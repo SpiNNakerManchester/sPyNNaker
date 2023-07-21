@@ -13,13 +13,18 @@
 # limitations under the License.
 
 import numpy
+from numpy import uint32
+from numpy.typing import NDArray
+from typing import List, Optional
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 
 class AllToAllConnector(AbstractGenerateConnectorOnMachine,
@@ -54,14 +59,14 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
         self.__allow_self_connections = allow_self_connections
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, synapse_info):
+    def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
         return self._get_delay_maximum(
             synapse_info.delays,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info)
 
     @overrides(AbstractConnector.get_delay_minimum)
-    def get_delay_minimum(self, synapse_info):
+    def get_delay_minimum(self, synapse_info: SynapseInformation) -> float:
         return self._get_delay_minimum(
             synapse_info.delays,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
@@ -69,8 +74,9 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_post_atoms, synapse_info, min_delay=None,
-            max_delay=None):
+            self, n_post_atoms: int, synapse_info: SynapseInformation,
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
         if min_delay is None or max_delay is None:
             return n_post_atoms
 
@@ -80,18 +86,20 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
             n_post_atoms, min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
+    def get_n_connections_to_post_vertex_maximum(
+            self, synapse_info: SynapseInformation) -> int:
         return synapse_info.n_pre_neurons
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, synapse_info):
+    def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
         n_conns = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
         return self._get_weight_maximum(
             synapse_info.weights, n_conns, synapse_info)
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
+            self, post_slices: List[Slice], post_vertex_slice: Slice,
+            synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         n_connections = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
         if not self.__allow_self_connections:
             n_connections -= post_vertex_slice.n_atoms
@@ -125,28 +133,28 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
         return "AllToAllConnector()"
 
     @property
-    def allow_self_connections(self):
+    def allow_self_connections(self) -> bool:
         """
         :rtype: bool
         """
         return self.__allow_self_connections
 
     @allow_self_connections.setter
-    def allow_self_connections(self, new_value):
+    def allow_self_connections(self, new_value: bool):
         self.__allow_self_connections = new_value
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
-    def gen_connector_id(self):
+    def gen_connector_id(self) -> int:
         return ConnectorIDs.ALL_TO_ALL_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(self):
+    def gen_connector_params(self) -> NDArray[uint32]:
         return numpy.array([
-            int(self.__allow_self_connections)], dtype="uint32")
+            int(self.__allow_self_connections)], dtype=uint32)
 
     @property
     @overrides(
         AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
-    def gen_connector_params_size_in_bytes(self):
+    def gen_connector_params_size_in_bytes(self) -> int:
         return BYTES_PER_WORD

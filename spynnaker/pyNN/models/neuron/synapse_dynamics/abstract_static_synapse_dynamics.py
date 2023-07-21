@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from numpy import ndarray
+from numpy.typing import NDArray
+from typing import List, Tuple
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.common import Slice
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
@@ -39,9 +40,10 @@ class AbstractStaticSynapseDynamics(
 
     @abstractmethod
     def get_static_synaptic_data(
-            self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, max_n_synapses,
-            max_atoms_per_core):
+            self, connections: NDArray, connection_row_indices: NDArray,
+            n_rows: int, post_vertex_slice: Slice, n_synapse_types: int,
+            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
+                List[NDArray], NDArray]:
         """
         Get the fixed-fixed data for each row, and lengths for the
         fixed-fixed parts of each row.
@@ -66,11 +68,10 @@ class AbstractStaticSynapseDynamics(
         :return: (ff_data, ff_size)
         :rtype: tuple(list(~numpy.ndarray), ~numpy.ndarray)
         """
-        # FIXME types
         raise NotImplementedError
 
     @abstractmethod
-    def get_n_static_words_per_row(self, ff_size: ndarray) -> ndarray:
+    def get_n_static_words_per_row(self, ff_size: NDArray) -> NDArray:
         """
         Get the number of bytes to be read per row for the static data
         given the size that was written to each row.
@@ -81,7 +82,7 @@ class AbstractStaticSynapseDynamics(
         raise NotImplementedError
 
     @abstractmethod
-    def get_n_synapses_in_rows(self, ff_size: ndarray) -> ndarray:
+    def get_n_synapses_in_rows(self, ff_size: NDArray) -> NDArray:
         """
         Get the number of synapses in the rows with sizes `ff_size`.
 
@@ -93,8 +94,8 @@ class AbstractStaticSynapseDynamics(
     @abstractmethod
     def read_static_synaptic_data(
             self, post_vertex_slice: Slice, n_synapse_types: int,
-            ff_size: ndarray, ff_data: ndarray,
-            max_atoms_per_core: int) -> ndarray:
+            ff_size: NDArray, ff_data: List[NDArray],
+            max_atoms_per_core: int) -> NDArray:
         """
         Read the connections from the words of data in `ff_data`.
 

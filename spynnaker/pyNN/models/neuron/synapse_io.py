@@ -14,9 +14,10 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import numpy
-from numpy import uint32
+from numpy import integer, uint32
 from numpy.typing import NDArray
 from typing import List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
+# from typing_extensions import reveal_type  # FIXME
 
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -37,7 +38,7 @@ if TYPE_CHECKING:
         ProjectionApplicationEdge, SynapseInformation)
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
         AbstractSynapseDynamics)
-    _RowData: TypeAlias = NDArray[uint32]
+    _RowData: TypeAlias = numpy.ndarray  # 2D
     _ConnectionsArray: TypeAlias = NDArray[numpy.void]
 
 _N_HEADER_WORDS = 3
@@ -121,7 +122,7 @@ def get_max_row_info(
 
     # delay point where delay extensions start
     min_delay_for_delay_extension = (
-        max_delay_supported + numpy.finfo(numpy.double).tiny)
+        max_delay_supported + numpy.finfo(numpy.double).tiny).item()
 
     # row length for the non-delayed synaptic matrix
     max_undelayed_n_synapses = synapse_info.connector \
@@ -347,7 +348,6 @@ def _get_row_data(
     :rtype: ~numpy.ndarray
     """
     # pylint: disable=too-many-arguments
-    row_ids = range(n_rows)
     if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics):
         # Get the static data
         ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
@@ -355,15 +355,15 @@ def _get_row_data(
             n_synapse_types, max_row_n_synapses, max_atoms_per_core)
 
         # Blank the plastic data
-        fp_data = [numpy.zeros(0, dtype=uint32) for _ in range(n_rows)]
-        pp_data = [numpy.zeros(0, dtype=uint32) for _ in range(n_rows)]
-        fp_size = [numpy.zeros(1, dtype=uint32) for _ in range(n_rows)]
-        pp_size = [numpy.zeros(1, dtype=uint32) for _ in range(n_rows)]
+        fp_data = numpy.zeros((n_rows, 0), dtype=uint32)
+        pp_data = numpy.zeros((n_rows, 0), dtype=uint32)
+        fp_size = numpy.zeros((n_rows, 1), dtype=uint32)
+        pp_size = numpy.zeros((n_rows, 1), dtype=uint32)
     else:
         assert isinstance(synapse_dynamics, AbstractPlasticSynapseDynamics)
         # Blank the static data
-        ff_data = [numpy.zeros(0, dtype=uint32) for _ in row_ids]
-        ff_size = [numpy.zeros(1, dtype=uint32) for _ in row_ids]
+        ff_data = [numpy.zeros(0, dtype=uint32) for _ in range(n_rows)]
+        ff_size = numpy.zeros((n_rows, 1), dtype=uint32)
 
         # Get the plastic data
         fp_data, pp_data, fp_size, pp_size = \
@@ -374,7 +374,7 @@ def _get_row_data(
     # Add some padding
     row_lengths = [
         pp_data[i].size + fp_data[i].size + ff_data[i].size
-        for i in row_ids]
+        for i in range(n_rows)]
     padding = [
         numpy.zeros(max_row_n_words - row_length, dtype=uint32)
         for row_length in row_lengths]
@@ -571,8 +571,7 @@ def _read_static_data(
 def _parse_plastic_data(
         row_data: _RowData,
         dynamics: AbstractPlasticSynapseDynamics) -> Tuple[
-            NDArray[numpy.integer], List[_RowData],
-            NDArray[numpy.integer], List[_RowData]]:
+            NDArray[uint32], List[_RowData], NDArray[uint32], List[_RowData]]:
     """
     Parse plastic synapses from raw row data.
 
@@ -661,7 +660,7 @@ def _rescale_connections(
 
 
 def _convert_delayed_data(
-        n_synapses: NDArray[uint32], n_pre_atoms: int,
+        n_synapses: NDArray[integer], n_pre_atoms: int,
         delayed_connections: _ConnectionsArray,
         post_vertex_max_delay_ticks: int) -> _ConnectionsArray:
     """

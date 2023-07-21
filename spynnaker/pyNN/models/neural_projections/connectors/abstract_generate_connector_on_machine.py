@@ -14,6 +14,8 @@
 from __future__ import annotations
 from enum import Enum
 import numpy
+from numpy import uint32
+from numpy.typing import NDArray
 from typing import TYPE_CHECKING
 from spinn_utilities.abstract_base import abstractmethod, AbstractBase
 from spinn_utilities.overrides import overrides
@@ -99,7 +101,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_id(weights)
 
-    def gen_weights_params(self, weights: WD) -> numpy.ndarray:
+    def gen_weights_params(self, weights: WD) -> NDArray[uint32]:
         """
         Get the parameters of the weight generator on the machine.
 
@@ -129,7 +131,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_id(delays)
 
-    def gen_delay_params(self, delays: WD) -> numpy.ndarray:
+    def gen_delay_params(self, delays: WD) -> NDArray[uint32]:
         """
         Get the parameters of the delay generator on the machine.
 
@@ -159,7 +161,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         raise NotImplementedError
 
-    def gen_connector_params(self) -> numpy.ndarray:
+    def gen_connector_params(self) -> NDArray[uint32]:
         """
         Get the parameters of the on machine generation.
 

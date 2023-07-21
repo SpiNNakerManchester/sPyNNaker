@@ -17,6 +17,8 @@ import math
 import re
 from typing import Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING
 import numpy
+from numpy import float64, uint32, uint16, uint8
+from numpy.typing import NDArray
 import pyNN
 from pyNN.random import NumpyRNG, RandomDistribution
 
@@ -56,9 +58,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
     # pylint: disable=unused-argument
 
     NUMPY_SYNAPSES_DTYPE = numpy.dtype(
-        [("source", "uint32"), ("target", "uint16"),
-         ("weight", "float64"), ("delay", "float64"),
-         ("synapse_type", "uint8")])
+        [("source", uint32), ("target", uint16),
+         ("weight", float64), ("delay", float64),
+         ("synapse_type", uint8)])
 
     __slots__ = (
         "_delays",
@@ -162,7 +164,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_delay_maximum(
-            self, synapse_info: SynapseInformation) -> Optional[int]:
+            self, synapse_info: SynapseInformation) -> Optional[float]:
         """
         Get the maximum delay specified by the user in ms, or `None` if
         unbounded.
@@ -174,7 +176,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_delay_minimum(
-            self, synapse_info: SynapseInformation) -> Optional[int]:
+            self, synapse_info: SynapseInformation) -> Optional[float]:
         """
         Get the minimum delay specified by the user in ms, or `None` if
         unbounded.
@@ -251,8 +253,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[int] = None,
-            max_delay: Optional[int] = None) -> int:
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
         """
         Get the maximum number of connections from any
         neuron in the pre vertex to the neurons in the post_vertex_slice,
@@ -264,9 +266,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param int n_post_atoms:
         :param SynapseInformation synapse_info:
         :param min_delay:
-        :type min_delay: int or None
+        :type min_delay: float or None
         :param max_delay:
-        :type max_delay: int or None
+        :type max_delay: float or None
         :rtype: int
         """
         raise NotImplementedError
@@ -378,7 +380,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         return bool(regexpr.match(d_expression))
 
     def _get_distances(self, values: str,
-                       synapse_info: SynapseInformation) -> numpy.ndarray:
+                       synapse_info: SynapseInformation) -> NDArray[float64]:
         if self.__space is None:
             raise ValueError(
                 f"Weights or delays are distance-dependent "
@@ -395,7 +397,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     def _generate_random_values(
             self, values: RandomDistribution, n_connections: int,
-            post_vertex_slice: Slice) -> numpy.ndarray:
+            post_vertex_slice: Slice) -> NDArray[float64]:
         """
         :param ~pyNN.random.RandomDistribution values:
         :param int n_connections:
@@ -412,13 +414,13 @@ class AbstractConnector(object, metaclass=AbstractBase):
             values.name, parameters_pos=None, rng=new_rng,
             **values.parameters)
         if n_connections == 1:
-            return numpy.array([copy_rd.next(1)], dtype="float64")
+            return numpy.array([copy_rd.next(1)], dtype=float64)
         return copy_rd.next(n_connections)
 
     def _generate_values(
             self, values: WD, sources: numpy.ndarray, targets: numpy.ndarray,
             n_connections: int, post_slice: Slice,
-            synapse_info: SynapseInformation) -> numpy.ndarray:
+            synapse_info: SynapseInformation) -> NDArray[float64]:
         """
         :param values:
         :type values: ~pyNN.random.RandomDistribution or int or float or str
@@ -444,7 +446,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
                 # At this point we need to now get the values corresponding to
                 # the distances between connections in "sources" and "targets"
-                eval_values = numpy.zeros(n_connections, dtype="float64")
+                eval_values = numpy.zeros(n_connections, dtype=float64)
                 for i in range(n_connections):
                     # get the distance for this source and target pair
                     dist = self.__space.distances(
@@ -462,7 +464,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
             return values(d)
         elif is_scalar(values):
-            return numpy.repeat([values], n_connections).astype("float64")
+            return numpy.repeat([values], n_connections).astype(float64)
         raise SpynnakerException(f"Unrecognised values {values}")
 
     def _generate_weights(

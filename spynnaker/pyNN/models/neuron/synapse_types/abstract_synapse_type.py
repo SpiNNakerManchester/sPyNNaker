@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Iterable
+from typing import Iterable, Optional
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
@@ -36,7 +36,7 @@ class AbstractSynapseType(
         raise NotImplementedError
 
     @abstractmethod
-    def get_synapse_id_by_target(self, target: int) -> int:  # FIXME check arg
+    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         """
         Get the ID of a synapse given the name.
 

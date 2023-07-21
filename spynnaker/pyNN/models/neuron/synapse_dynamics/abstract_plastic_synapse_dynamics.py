@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy
+from numpy import integer, uint32
 from numpy.typing import NDArray
-from typing import Tuple
+from typing import List, Tuple
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.common import Slice
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
@@ -41,9 +41,12 @@ class AbstractPlasticSynapseDynamics(
 
     @abstractmethod
     def get_plastic_synaptic_data(
-            self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, max_n_synapses,
-            max_atoms_per_core) -> Tuple[NDArray, NDArray, NDArray, NDArray]:
+            self, connections: NDArray,
+            connection_row_indices: NDArray[integer], n_rows: int,
+            post_vertex_slice: Slice, n_synapse_types: int,
+            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
+                NDArray[uint32], NDArray[uint32], NDArray[uint32],
+                NDArray[uint32]]:
         """
         Get the fixed-plastic data, and plastic-plastic data for each row, and
         lengths for the fixed_plastic and plastic-plastic parts of each row.
@@ -71,12 +74,11 @@ class AbstractPlasticSynapseDynamics(
             tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,
             ~numpy.ndarray)
         """
-        # FIXME types
         raise NotImplementedError
 
     @abstractmethod
     def get_n_plastic_plastic_words_per_row(
-            self, pp_size: numpy.ndarray) -> int:
+            self, pp_size: NDArray[uint32]) -> NDArray[integer]:
         """
         Get the number of plastic plastic words to be read from each row.
 
@@ -86,7 +88,7 @@ class AbstractPlasticSynapseDynamics(
 
     @abstractmethod
     def get_n_fixed_plastic_words_per_row(
-            self, fp_size: numpy.ndarray) -> int:
+            self, fp_size: NDArray[uint32]) -> NDArray[integer]:
         """
         Get the number of fixed plastic words to be read from each row.
 
@@ -96,7 +98,8 @@ class AbstractPlasticSynapseDynamics(
 
     @abstractmethod
     def get_n_synapses_in_rows(
-            self, pp_size: numpy.ndarray, fp_size: numpy.ndarray):
+            self, pp_size: NDArray[uint32],
+            fp_size: NDArray[uint32]) -> NDArray[integer]:
         """
         Get the number of synapses in each of the rows with plastic sizes
         `pp_size` and `fp_size`.
@@ -104,15 +107,14 @@ class AbstractPlasticSynapseDynamics(
         :param ~numpy.ndarray pp_size:
         :param ~numpy.ndarray fp_size:
         """
-        # FIXME return type
         raise NotImplementedError
 
     @abstractmethod
     def read_plastic_synaptic_data(
             self, post_vertex_slice: Slice, n_synapse_types: int,
-            pp_size: numpy.ndarray, pp_data: numpy.ndarray,
-            fp_size: numpy.ndarray, fp_data: numpy.ndarray,
-            max_atoms_per_core: int) -> numpy.ndarray:
+            pp_size: NDArray[uint32], pp_data: List[NDArray[uint32]],
+            fp_size: NDArray[uint32], fp_data: List[NDArray[uint32]],
+            max_atoms_per_core: int) -> NDArray:
         """
         Read the connections indicated in the connection indices from the
         data in `pp_data` and `fp_data`.

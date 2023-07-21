@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from collections.abc import Container
 import ctypes
 import numpy
 from typing import List, NamedTuple, Sequence, Set, Union, cast, TYPE_CHECKING
 
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged.abstract_sized import Selector
 
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
@@ -299,6 +301,11 @@ class PopulationMachineNeurons(
         # Write the keys
         spec.write_array(keys)
 
+    def __in_selector(self, n: int, selector: Selector) -> bool:
+        if isinstance(selector, Container):
+            return n in selector
+        return n == selector
+
     def _write_current_source_parameters(
             self, spec: DataSpecificationBase):
         n_atoms = self._vertex_slice.n_atoms
@@ -348,7 +355,8 @@ class PopulationMachineNeurons(
 
                 # Only use IDs that are on this core
                 for n in range(lo_atom, hi_atom + 1):
-                    if n in current_source_id_list[current_source]:
+                    if self.__in_selector(
+                            n, current_source_id_list[current_source]):
                         # I think this is now right, but test it more...
                         neuron_current_sources[n-lo_atom][0] += 1
                         neuron_current_sources[n-lo_atom].append(cs_id)
@@ -379,24 +387,25 @@ class PopulationMachineNeurons(
                 cs_id = current_source.current_source_id
                 for key, value in current_source.get_parameters.items():
                     # StepCurrentSource currently handled with arrays
-                    if (cs_id == CurrentSourceIDs.STEP_CURRENT_SOURCE.value):
-                        n_params = len(current_source.get_parameters[key])
+                    if cs_id == CurrentSourceIDs.STEP_CURRENT_SOURCE.value:
+                        assert isinstance(value, Sequence)
+                        n_params = len(value)
                         spec.write_value(n_params)
                         for n_p in range(n_params):
                             value_convert = convert_to(
-                                value[n_p], cs_data_types[key]).view("uint32")
+                                value[n_p], cs_data_types[key]).item()
                             spec.write_value(data=value_convert)
                     # All other sources have single-valued params
                     else:
-                        if hasattr(value, "__getitem__"):
+                        if isinstance(value, Sequence):
                             for m in range(len(value)):
                                 value_convert = convert_to(
                                     value[m],
-                                    cs_data_types[key]).view("uint32")
+                                    cs_data_types[key]).item()
                                 spec.write_value(data=value_convert)
                         else:
                             value_convert = convert_to(
-                                value, cs_data_types[key]).view("uint32")
+                                value, cs_data_types[key]).item()
                             spec.write_value(data=value_convert)
 
     def __get_current_sources(self) -> List[AbstractCurrentSource]:
@@ -408,7 +417,8 @@ class PopulationMachineNeurons(
         current_sources: Set[AbstractCurrentSource] = set()
         for app_current_source in app_current_sources:
             for n in range(lo_atom, hi_atom + 1):
-                if n in current_source_id_list[app_current_source]:
+                if self.__in_selector(
+                        n, current_source_id_list[app_current_source]):
                     current_sources.add(app_current_source)
 
         # Sort the current sources into current_source_id order

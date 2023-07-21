@@ -14,11 +14,13 @@
 from __future__ import annotations
 import math
 import numpy
+from numpy.typing import NDArray
 import logging
-from typing import Optional, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING
 from pyNN.random import NumpyRNG
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+from pacman.model.graphs.common import Slice
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import (
@@ -145,7 +147,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
+            self, post_slices: List[Slice], post_vertex_slice: Slice,
+            synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         rng = self.__rng or NumpyRNG()
         n_items = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
         items = rng.next(n_items)
@@ -181,7 +184,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         return ConnectorIDs.FIXED_PROBABILITY_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(self) -> numpy.ndarray:
+    def gen_connector_params(self) -> NDArray:
         return numpy.array([
             int(self.__allow_self_connections),
             DataType.U032.encode_as_int(self._p_connect)], dtype="uint32")
@@ -204,6 +207,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         self._p_connect = new_value
 
     @overrides(AbstractConnector.validate_connection)
-    def validate_connection(self, application_edge, synapse_info):
+    def validate_connection(
+            self, application_edge, synapse_info: SynapseInformation):
         if self.generate_on_machine(synapse_info.weights, synapse_info.delays):
             check_rng(self.__rng, "FixedProbabilityConnector")
