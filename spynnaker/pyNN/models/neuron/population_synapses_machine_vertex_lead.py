@@ -28,7 +28,7 @@ from .population_synapses_machine_vertex_common import (
 if TYPE_CHECKING:
     from .abstract_population_vertex import AbstractPopulationVertex
     from spynnaker.pyNN.models.neuron.synaptic_matrices import (
-        SynapseRegions, SynapticMatrices)
+        SynapseRegions, SynapseRegionReferences, SynapticMatrices)
 
 
 class PopulationSynapsesMachineVertexLead(
@@ -54,7 +54,7 @@ class PopulationSynapsesMachineVertexLead(
             self, sdram: AbstractSDRAM, label: str,
             app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
             ring_buffer_shifts: Sequence[int], weight_scales: Sequence[int],
-            structural_sz: int, synapse_references: SynapseRegions,
+            structural_sz: int, synapse_references: SynapseRegionReferences,
             max_atoms_per_core: int, synaptic_matrices: SynapticMatrices):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
@@ -89,7 +89,7 @@ class PopulationSynapsesMachineVertexLead(
 
     @property
     @overrides(PopulationMachineSynapses._synapse_references)
-    def _synapse_references(self) -> SynapseRegions:
+    def _synapse_references(self) -> SynapseRegionReferences:
         return self.__synapse_references
 
     @property

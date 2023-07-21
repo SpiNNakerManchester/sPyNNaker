@@ -490,8 +490,8 @@ class SpikeSourcePoissonVertex(
         """
         variable_sdram = self.__spike_recorder.get_sdram_usage_in_bytes(
             vertex_slice.n_atoms, self.max_spikes_per_ts())
-        constant_sdram = ConstantSDRAM(
-            variable_sdram.per_timestep * OVERFLOW_TIMESTEPS_FOR_SDRAM)
+        constant_sdram = ConstantSDRAM(math.ceil(
+            variable_sdram.per_timestep * OVERFLOW_TIMESTEPS_FOR_SDRAM))
         return variable_sdram + constant_sdram
 
     @overrides(LegacyPartitionerAPI.get_sdram_used_by_atoms)

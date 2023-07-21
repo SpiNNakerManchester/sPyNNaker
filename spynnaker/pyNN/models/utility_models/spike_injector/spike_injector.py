@@ -34,10 +34,11 @@ class SpikeInjector(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=_population_parameters.keys())
     def create_vertex(
-            self, n_neurons: int, label: str,
-            port: Optional[int], virtual_key: Optional[int],
-            reserve_reverse_ip_tag: Optional[bool],
-            splitter: Optional[AbstractSplitterCommon]) -> SpikeInjectorVertex:
+            self, n_neurons: int, label: str, *,
+            port: Optional[int] = None, virtual_key: Optional[int] = None,
+            reserve_reverse_ip_tag: bool = False,
+            splitter: Optional[AbstractSplitterCommon] = None
+            ) -> SpikeInjectorVertex:
         """
         :param int port:
         :param int virtual_key:

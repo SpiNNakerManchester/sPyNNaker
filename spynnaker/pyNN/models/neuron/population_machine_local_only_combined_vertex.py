@@ -139,7 +139,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
             self, sdram: AbstractSDRAM, label: str,
             app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
             slice_index: int, ring_buffer_shifts: List[int],
-            weight_scales: List[int], neuron_data: NeuronData,
+            weight_scales: List[float], neuron_data: NeuronData,
             max_atoms_per_core: int):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:

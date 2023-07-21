@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 import numpy
-from typing import List, Sequence, Tuple, TYPE_CHECKING
+from typing import List, Sequence, Tuple, cast, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
 
@@ -27,7 +27,7 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural)
+    AbstractSynapseDynamicsStructural, AbstractSDRAMSynapseDynamics)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, HasSynapses)
@@ -35,7 +35,9 @@ from spynnaker.pyNN.models.abstract_models import (
 from .abstract_population_vertex import AbstractPopulationVertex
 from .population_machine_synapses_provenance import (
     PopulationMachineSynapsesProvenance)
-from .synaptic_matrices import SynapseRegions
+from .synaptic_matrices import SynapseRegions, SynapseRegionReferences
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    AbstractSpynnakerSplitterDelay)
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
     from spynnaker.pyNN.models.neural_projections import (
@@ -118,13 +120,13 @@ class PopulationMachineSynapses(
         raise NotImplementedError
 
     @property
-    def _synapse_references(self) -> SynapseRegions:
+    def _synapse_references(self) -> SynapseRegionReferences:
         """
         The references to synapse regions.  Override to provide these.
 
-        :rtype: .SynapseRegions
+        :rtype: .SynapseRegionReferences
         """
-        return SynapseRegions()
+        return SynapseRegionReferences()
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                bit_field_base_address)
@@ -171,6 +173,7 @@ class PopulationMachineSynapses(
         synapse_dynamics_sz = self._pop_vertex.get_synapse_dynamics_size(
             self._vertex_slice.n_atoms)
         if synapse_dynamics_sz > 0:
+            assert isinstance(synapse_dynamics, AbstractSDRAMSynapseDynamics)
             spec.reserve_memory_region(
                 region=self._synapse_regions.synapse_dynamics,
                 size=synapse_dynamics_sz, label='synapseDynamicsParams',
@@ -223,7 +226,9 @@ class PopulationMachineSynapses(
         # We only count neuron synapse types here, as this is related to
         # the ring buffers
         n_synapse_types = self._pop_vertex.neuron_impl.get_n_synapse_types()
-        max_delay = self._pop_vertex.splitter.max_support_delay()
+        splitter = cast(AbstractSpynnakerSplitterDelay,
+                        self._pop_vertex.splitter)
+        max_delay = splitter.max_support_delay()
 
         # Write synapse parameters
         spec.switch_write_focus(self._synapse_regions.synapse_params)

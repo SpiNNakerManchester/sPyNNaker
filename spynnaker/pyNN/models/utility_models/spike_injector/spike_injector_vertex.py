@@ -51,19 +51,19 @@ class SpikeInjectorVertex(
     def __init__(
             self, n_neurons: int, label: str,
             port: Optional[int], virtual_key: Optional[int],
-            reserve_reverse_ip_tag: Optional[bool],
+            reserve_reverse_ip_tag: bool,
             splitter: Optional[AbstractSplitterCommon]):
         # pylint: disable=too-many-arguments
         super().__init__(
             n_keys=n_neurons, label=label, receive_port=port,
             virtual_key=virtual_key,
-            reserve_reverse_ip_tag=reserve_reverse_ip_tag or False,
+            reserve_reverse_ip_tag=reserve_reverse_ip_tag,
             injection_partition_id=SPIKE_PARTITION_ID,
             splitter=splitter)
 
         # Set up for recording
         self.__spike_recorder = EIEIOSpikeRecorder()
-        self.__structure = None
+        self.__structure: Optional[BaseStructure] = None
 
     @overrides(SupportsStructure.set_structure)
     def set_structure(self, structure: BaseStructure):

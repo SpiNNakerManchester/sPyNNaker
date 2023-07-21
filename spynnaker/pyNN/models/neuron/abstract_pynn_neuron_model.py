@@ -50,12 +50,12 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
                additional_arguments=_population_parameters.keys())
     def create_vertex(
             self, n_neurons: int, label: str, *,
-            spikes_per_second: Optional[float],
-            ring_buffer_sigma: Optional[float],
-            incoming_spike_buffer_size: Optional[int],
-            drop_late_spikes: Optional[bool],
-            splitter: Optional[AbstractSplitterCommon],
-            seed: Optional[int], n_colour_bits: Optional[int]):
+            spikes_per_second: Optional[float] = None,
+            ring_buffer_sigma: Optional[float] = None,
+            incoming_spike_buffer_size: Optional[int] = None,
+            drop_late_spikes: Optional[bool] = None,
+            splitter: Optional[AbstractSplitterCommon] = None,
+            seed: Optional[int] = None, n_colour_bits: Optional[int] = None):
         """
         :param float spikes_per_second:
         :param float ring_buffer_sigma:

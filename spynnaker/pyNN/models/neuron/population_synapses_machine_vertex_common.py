@@ -14,7 +14,7 @@
 from __future__ import annotations
 from enum import IntEnum
 import ctypes
-from typing import Iterable, Optional, Sequence, TYPE_CHECKING
+from typing import Optional, Sequence, TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
@@ -31,7 +31,7 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
 from .population_machine_common import CommonRegions, PopulationMachineCommon
-from .population_machine_synapses import SynapseRegions
+from .synaptic_matrices import SynapseRegions
 from .population_machine_synapses_provenance import SynapseProvenance
 if TYPE_CHECKING:
     from .abstract_population_vertex import AbstractPopulationVertex
@@ -216,7 +216,7 @@ class PopulationSynapsesMachineVertexCommon(
         return "synapses" + app_vertex.synapse_executable_suffix + ".aplx"
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
-    def get_recorded_region_ids(self) -> Iterable[int]:
+    def get_recorded_region_ids(self) -> Sequence[int]:
         ids = self._pop_vertex.synapse_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         assert ids is not None

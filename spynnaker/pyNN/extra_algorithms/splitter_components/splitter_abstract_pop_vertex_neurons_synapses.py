@@ -39,8 +39,9 @@ from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
-    import (SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
-            SynapseRegions)
+    import (SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE)
+from spynnaker.pyNN.models.neuron.synaptic_matrices import (
+    SynapseRegionReferences)
 from spynnaker.pyNN.utilities.constants import (
     SYNAPSE_SDRAM_PARTITION_ID, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
@@ -368,9 +369,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         :param int atoms_per_core: The maximum atoms per core
         :return: References to the synapse regions that can be used by a shared
             synapse core, and the basic label for the synapse cores
-        :rtype: tuple(SynapseRegions, str)
+        :rtype: tuple(SynapseRegionReferences, str)
         """
-        synapse_references = SynapseRegions(
+        synapse_references = SynapseRegionReferences(
             *SpynnakerDataView.get_next_ds_references(7))
         syn_label = (
             f"{label}_Synapses:{vertex_slice.lo_atom}-{vertex_slice.hi_atom}")
@@ -401,7 +402,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         :param int s_index: The index of the synapse core (0 is the lead core)
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of neurons on the neuron core
-        :param SynapseRegions synapse_references:
+        :param SynapseRegionReferences synapse_references:
             References to the synapse regions
         :param ~pacman.model.resources.AbstractSDRAM shared_synapse_sdram:
         :param feedback_partition:

@@ -16,9 +16,13 @@ import logging
 from time import sleep
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.external_devices_models import AbstractEthernetTranslator
 from spynnaker.pyNN.protocols import (
     MunichIoEthernetProtocol, munich_io_spinnaker_link_protocol)
+from .push_bot_wifi_connection import PushBotWIFIConnection
+from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
+    MunichIoSpiNNakerLinkProtocol)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -38,7 +42,8 @@ class PushBotTranslator(AbstractEthernetTranslator):
         "__protocol",
         "__pushbot_wifi_connection")
 
-    def __init__(self, protocol, pushbot_wifi_connection):
+    def __init__(self, protocol: MunichIoSpiNNakerLinkProtocol,
+                 pushbot_wifi_connection: PushBotWIFIConnection):
         """
         :param MunichIoEthernetProtocol protocol:
             The instance of the PushBot protocol to get keys from
@@ -49,7 +54,7 @@ class PushBotTranslator(AbstractEthernetTranslator):
         self.__pushbot_wifi_connection = pushbot_wifi_connection
 
     @overrides(AbstractEthernetTranslator.translate_control_packet)
-    def translate_control_packet(self, multicast_packet):
+    def translate_control_packet(self, multicast_packet: MultiCastCommand):
         # pylint: disable=too-many-statements, too-many-branches
         key = multicast_packet.key
 

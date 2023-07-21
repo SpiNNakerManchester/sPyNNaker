@@ -14,9 +14,9 @@
 
 import math
 import numpy
-from typing import List
+from typing import List, Sequence
 from spinn_utilities.abstract_base import abstractmethod
-from spinn_front_end_common.interface.ds import DataSpecificationGenerator
+from spinn_front_end_common.interface.ds import DataSpecificationBase
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from .abstract_has_parameter_names import AbstractHasParameterNames
 
@@ -57,8 +57,9 @@ class AbstractSDRAMSynapseDynamics(
 
     @abstractmethod
     def write_parameters(
-            self, spec: DataSpecificationGenerator, region: int,
-            global_weight_scale: float, synapse_weight_scales: List[float]):
+            self, spec: DataSpecificationBase, region: int,
+            global_weight_scale: float,
+            synapse_weight_scales: Sequence[float]):
         """
         Write the synapse parameters to the spec.
 

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Tuple, Union, TYPE_CHECKING
+from typing import Iterable, List, Tuple, Union, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationVertex
@@ -35,7 +35,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_structural_parameters_sdram_usage_in_bytes(
-            self, incoming_projections: List[Projection],
+            self, incoming_projections: Iterable[Projection],
             n_neurons: int) -> int:
         """
         Get the size of the structural parameters.

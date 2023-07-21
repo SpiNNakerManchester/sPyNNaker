@@ -32,9 +32,9 @@ class SpikeSourceArray(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=default_population_parameters.keys())
     def create_vertex(
-            self, n_neurons: int, label: str,
-            splitter: Optional[AbstractSplitterCommon],
-            n_colour_bits: Optional[int]) -> SpikeSourceArrayVertex:
+            self, n_neurons: int, label: str, *,
+            splitter: Optional[AbstractSplitterCommon] = None,
+            n_colour_bits: Optional[int] = None) -> SpikeSourceArrayVertex:
         """
         :param splitter:
         :type splitter:

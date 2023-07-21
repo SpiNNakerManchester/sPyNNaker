@@ -56,6 +56,19 @@ class SynapseRegions(NamedTuple):
     """
     Indices of regions of synapse-implementing binaries.
     """
+    synapse_params: int
+    pop_table: int
+    synaptic_matrix: int
+    synapse_dynamics: int
+    structural_dynamics: int
+    bitfield_filter: int
+    connection_builder: int
+
+
+class SynapseRegionReferences(NamedTuple):
+    """
+    Indices of regions of synapse-implementing binaries.
+    """
     synapse_params: Optional[int] = None
     pop_table: Optional[int] = None
     synaptic_matrix: Optional[int] = None
@@ -217,6 +230,8 @@ class SynapticMatrices(object):
             SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
             (self.__n_synapse_types * DataType.U3232.size))
 
+        assert self.__regions.synaptic_matrix is not None
+
         # For each incoming machine vertex, reserve pop table space
         for proj in self.__app_vertex.incoming_projections:
             # pylint: disable=protected-access
@@ -287,7 +302,7 @@ class SynapticMatrices(object):
             The spec to write to
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of the post-vertex the matrix is for
-        :param SynapseRegions references:
+        :param SynapseRegionReferences references:
             Regions which are referenced; each region which is not referenced
             can be `None`.
         """

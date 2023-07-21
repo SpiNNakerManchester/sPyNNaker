@@ -52,10 +52,10 @@ class SpikeSourcePoisson(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=default_population_parameters.keys())
     def create_vertex(
-            self, n_neurons: int, label: str,
-            seed: Optional[int], max_rate: Optional[float],
-            splitter: Optional[AbstractSplitterCommon],
-            n_colour_bits: Optional[int]):
+            self, n_neurons: int, label: str, *,
+            seed: Optional[int] = None, max_rate: Optional[float] = None,
+            splitter: Optional[AbstractSplitterCommon] = None,
+            n_colour_bits: Optional[int] = None):
         """
         :param float seed:
         :param float max_rate:

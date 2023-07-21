@@ -15,6 +15,8 @@
 from __future__ import annotations
 from typing import Iterable, List, Optional, Sequence, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.application import (
+    ApplicationVertex, ApplicationVirtualVertex)
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from spinn_front_end_common.abstract_models import (
@@ -102,11 +104,19 @@ class ExternalDeviceLifControlVertex(
         self.__message_translator = translator
 
         # Add the edges to the devices if required
-        self.__dependent_vertices = tuple(devices) if create_edges else ()
+        self.__dependent_vertices = (
+            self.__dependents(devices) if create_edges else ())
+
+    @staticmethod
+    def __dependents(
+            devices: Sequence[AbstractMulticastControllableDevice]) -> Tuple[
+                ApplicationVirtualVertex, ...]:
+        return tuple(
+            dev for dev in devices
+            if isinstance(dev, ApplicationVirtualVertex))
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.dependent_vertices)
-    def dependent_vertices(self) -> Sequence[
-            AbstractMulticastControllableDevice]:
+    def dependent_vertices(self) -> Iterable[ApplicationVertex]:
         return self.__dependent_vertices
 
     @overrides(AbstractVertexWithEdgeToDependentVertices

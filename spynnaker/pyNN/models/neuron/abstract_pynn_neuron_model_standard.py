@@ -58,12 +58,12 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
                additional_arguments={"n_steps_per_timestep"})
     def create_vertex(
             self, n_neurons: int, label: str, *,
-            spikes_per_second: Optional[float],
-            ring_buffer_sigma: Optional[float],
-            incoming_spike_buffer_size: Optional[int],
-            drop_late_spikes: Optional[bool],
-            splitter: Optional[AbstractSplitterCommon],
-            seed: Optional[int], n_colour_bits: Optional[int],
+            spikes_per_second: Optional[float] = None,
+            ring_buffer_sigma: Optional[float] = None,
+            incoming_spike_buffer_size: Optional[int] = None,
+            drop_late_spikes: Optional[bool] = None,
+            splitter: Optional[AbstractSplitterCommon] = None,
+            seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
             n_steps_per_timestep: int = 1):
         """
         :param int n_steps_per_timestep:

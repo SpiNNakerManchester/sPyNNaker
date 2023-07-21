@@ -32,8 +32,8 @@ from .abstract_population_vertex import AbstractPopulationVertex
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
-from .population_machine_synapses import (
-    SynapseRegions, PopulationMachineSynapses)
+from .synaptic_matrices import SynapseRegions
+from .population_machine_synapses import PopulationMachineSynapses
 from .population_machine_synapses_provenance import SynapseProvenance
 
 

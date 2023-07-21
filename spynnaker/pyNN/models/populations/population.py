@@ -824,11 +824,8 @@ class Population(PopulationBase):
             # and ignore
             parameters = self.__process_additional_params(
                 additional_parameters, parameters)
-        # Mypy otherwise says the type is Any, no help at all there!
-        create_vertex: Callable[
-            [Optional[int], Optional[str]],
-            PopulationApplicationVertex] = model.create_vertex
-        self.__vertex = create_vertex(size, label, **parameters)
+        self.__vertex = model.create_vertex(
+            size or 1, label or f"{model.name} vertex", **parameters)
 
     def __init_with_supplied_vertex(
             self, model: PopulationApplicationVertex, size: Optional[int],

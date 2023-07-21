@@ -145,7 +145,9 @@ class SynapseDynamicsStructuralCommon(
             dynamics.elimination.write_parameters(
                 spec, weight_scales[proj._synapse_information.synapse_type])
 
-    def __get_structural_projections(self, incoming_projections):
+    def __get_structural_projections(
+            self, incoming_projections: Iterable[Projection]
+            ) -> List[Projection]:
         """
         :param list(Projection) incoming_projections:
             Projections to filter to structural only
@@ -370,7 +372,7 @@ class SynapseDynamicsStructuralCommon(
     @overrides(AbstractSynapseDynamicsStructural.
                get_structural_parameters_sdram_usage_in_bytes)
     def get_structural_parameters_sdram_usage_in_bytes(
-            self, incoming_projections: List[Projection],
+            self, incoming_projections: Iterable[Projection],
             n_neurons: int) -> int:
         # Work out how many sub-edges we will end up with, as this is used
         # for key_atom_info
