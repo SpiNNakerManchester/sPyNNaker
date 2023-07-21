@@ -19,7 +19,7 @@ import numpy
 import pytest
 
 from spinn_utilities.overrides import overrides
-from spinn_utilities.config_holder import load_config, set_config
+from spinn_utilities.config_holder import set_config
 from spinnman.model import CPUInfo
 from spinnman.processes.get_cpu_info_process import _INFO_PATTERN
 from spinnman.transceiver import Transceiver
