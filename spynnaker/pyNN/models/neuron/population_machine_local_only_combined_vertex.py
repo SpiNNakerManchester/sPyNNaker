@@ -15,6 +15,8 @@ from __future__ import annotations
 from enum import IntEnum
 import os
 import ctypes
+from numpy import floating
+from numpy.typing import NDArray
 from typing import List, Optional, Sequence, cast, TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
@@ -138,8 +140,8 @@ class PopulationMachineLocalOnlyCombinedVertex(
     def __init__(
             self, sdram: AbstractSDRAM, label: str,
             app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
-            slice_index: int, ring_buffer_shifts: List[int],
-            weight_scales: List[float], neuron_data: NeuronData,
+            slice_index: int, ring_buffer_shifts: Sequence[int],
+            weight_scales: NDArray[floating], neuron_data: NeuronData,
             max_atoms_per_core: int):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:

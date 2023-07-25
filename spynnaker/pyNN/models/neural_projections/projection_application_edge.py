@@ -176,3 +176,13 @@ class ProjectionApplicationEdge(
     def get_local_provenance_data(self) -> None:
         for synapse_info in self.synapse_information:
             synapse_info.connector.get_provenance_data(synapse_info)
+
+    @property
+    @overrides(ApplicationEdge.pre_vertex)
+    def pre_vertex(self) -> AbstractPopulationVertex:
+        return cast(AbstractPopulationVertex, super().pre_vertex)
+
+    @property
+    @overrides(ApplicationEdge.post_vertex)
+    def post_vertex(self) -> AbstractPopulationVertex:
+        return cast(AbstractPopulationVertex, super().post_vertex)

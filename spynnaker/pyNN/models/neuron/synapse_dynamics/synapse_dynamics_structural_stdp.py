@@ -62,7 +62,8 @@ class SynapseDynamicsStructuralSTDP(
         # The formation rule
         "__formation",
         # The elimination rule
-        "__elimination")
+        "__elimination",
+        "__with_replacement")
 
     def __init__(
             self, partner_selection, formation, elimination,
@@ -267,8 +268,8 @@ class SynapseDynamicsStructuralSTDP(
     def get_delay_variance(self, connector, delays, synapse_info):
         return 0.0
 
-    @overrides(SynapseDynamicsStructuralCommon.get_seeds)
-    def get_seeds(self, app_vertex=None):
+    @overrides(SynapseDynamicsStructuralCommon._get_seeds)
+    def _get_seeds(self, app_vertex=None):
         if app_vertex:
             if app_vertex not in self.__seeds.keys():
                 self.__seeds[app_vertex] = (

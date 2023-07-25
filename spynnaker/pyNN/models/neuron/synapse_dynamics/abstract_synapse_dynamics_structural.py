@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, List, Tuple, Union, TYPE_CHECKING
+from numpy import floating
+from numpy.typing import NDArray
+from typing import Iterable, Tuple, Union, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.common import Slice
-from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
@@ -26,12 +27,16 @@ if TYPE_CHECKING:
         .elimination import AbstractElimination
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
 
 
 class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     """
     Base class for synapse dynamics that structural plasticity understands.
     """
+    __slots__ = ()
 
     @abstractmethod
     def get_structural_parameters_sdram_usage_in_bytes(
@@ -58,7 +63,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     @abstractmethod
     def write_structural_parameters(
             self, spec: DataSpecificationGenerator, region: int,
-            weight_scales: List[float], app_vertex: ApplicationVertex,
+            weight_scales: NDArray[floating],
+            app_vertex: AbstractPopulationVertex,
             vertex_slice: Slice, synaptic_matrices: SynapticMatrices):
         """
         Write structural plasticity parameters.
@@ -78,7 +84,9 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @abstractmethod
     def set_connections(
-            self, connections, post_vertex_slice, app_edge, synapse_info):
+            self, connections: NDArray, post_vertex_slice: Slice,
+            app_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation):
         """
         Set connections for structural plasticity.
 

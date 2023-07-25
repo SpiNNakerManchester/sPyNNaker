@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from numpy import floating
+from numpy.typing import NDArray
 from typing import List, Sequence, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
@@ -53,7 +55,8 @@ class PopulationSynapsesMachineVertexLead(
     def __init__(
             self, sdram: AbstractSDRAM, label: str,
             app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
-            ring_buffer_shifts: Sequence[int], weight_scales: Sequence[int],
+            ring_buffer_shifts: Sequence[int],
+            weight_scales: NDArray[floating],
             structural_sz: int, synapse_references: SynapseRegionReferences,
             max_atoms_per_core: int, synaptic_matrices: SynapticMatrices):
         """

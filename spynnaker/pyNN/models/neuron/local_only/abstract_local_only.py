@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, TYPE_CHECKING
+from numpy import floating
+from numpy.typing import NDArray
+from typing import Iterable, TYPE_CHECKING
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
@@ -30,7 +32,8 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
 
     @abstractmethod
     def get_parameters_usage_in_bytes(
-            self, n_atoms: int, incoming_projections: List[Projection]) -> int:
+            self, n_atoms: int,
+            incoming_projections: Iterable[Projection]) -> int:
         """
         Get the size of the parameters in bytes.
 
@@ -45,7 +48,8 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     @abstractmethod
     def write_parameters(
             self, spec: DataSpecificationGenerator, region: int,
-            machine_vertex: MachineVertex, weight_scales: List[float]) -> None:
+            machine_vertex: MachineVertex,
+            weight_scales: NDArray[floating]) -> None:
         """
         Write the parameters to the data specification for a vertex.
 

@@ -26,7 +26,8 @@ from .population_machine_synapses_provenance import (
     PopulationMachineSynapsesProvenance)
 if TYPE_CHECKING:
     from .abstract_population_vertex import AbstractPopulationVertex
-    from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapseRegions
+    from spynnaker.pyNN.models.neuron.synaptic_matrices import (
+        SynapseRegionReferences)
 
 
 class PopulationSynapsesMachineVertexShared(
@@ -42,7 +43,7 @@ class PopulationSynapsesMachineVertexShared(
     def __init__(
             self, sdram: AbstractSDRAM, label: str,
             app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
-            synapse_references: SynapseRegions):
+            synapse_references: SynapseRegionReferences):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex

@@ -380,14 +380,14 @@ class Projection(object):
     # -----------------------------------------------------------------
 
     @property
-    def _synapse_information(self):
+    def _synapse_information(self) -> SynapseInformation:
         """
         :rtype: SynapseInformation
         """
         return self.__synapse_information
 
     @property
-    def _projection_edge(self):
+    def _projection_edge(self) -> ProjectionApplicationEdge:
         """
         :rtype: ProjectionApplicationEdge
         """

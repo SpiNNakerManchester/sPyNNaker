@@ -1449,7 +1449,7 @@ class AbstractPopulationVertex(
 
     def get_neuron_constant_sdram(
             self, n_atoms: int,
-            neuron_regions: NeuronRegions) -> AbstractSDRAM:
+            neuron_regions: NeuronRegions) -> MultiRegionSDRAM:
         """
         Get the amount of fixed SDRAM used by neuron parts.
 
@@ -1497,7 +1497,7 @@ class AbstractPopulationVertex(
         return self.__incoming_projections[source_vertex]
 
     @property
-    def incoming_poisson_projections(self) -> Iterable[Projection]:
+    def incoming_poisson_projections(self) -> Sequence[Projection]:
         """
         The projections that target this population vertex which
         originate from a Poisson source.

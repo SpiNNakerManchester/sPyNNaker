@@ -15,7 +15,7 @@
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
-from typing import List, Optional
+from typing import Sequence, Optional
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -98,7 +98,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices: List[Slice], post_vertex_slice: Slice,
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
             synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         n_connections = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
         if not self.__allow_self_connections:

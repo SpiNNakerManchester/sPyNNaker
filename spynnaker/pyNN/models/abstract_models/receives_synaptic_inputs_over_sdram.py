@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Sequence
+from numpy import floating
+from numpy.typing import NDArray
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs import AbstractSupportsSDRAMEdges
 from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
@@ -36,7 +37,7 @@ class ReceivesSynapticInputsOverSDRAM(
 
     @property
     @abstractmethod
-    def weight_scales(self) -> Sequence[int]:
+    def weight_scales(self) -> NDArray[floating]:
         """
         A list of scale factors to be applied to weights that get passed
         over SDRAM, one for each synapse type.

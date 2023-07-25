@@ -16,7 +16,7 @@ import math
 import numpy
 from numpy.typing import NDArray
 import logging
-from typing import List, Optional, TYPE_CHECKING
+from typing import Optional, Sequence, TYPE_CHECKING
 from pyNN.random import NumpyRNG
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
@@ -147,7 +147,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices: List[Slice], post_vertex_slice: Slice,
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
             synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         rng = self.__rng or NumpyRNG()
         n_items = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms

@@ -14,6 +14,8 @@
 from enum import IntEnum
 import os
 import ctypes
+from numpy import floating
+from numpy.typing import NDArray
 from typing import List, Optional, Sequence
 
 from spinn_utilities.overrides import overrides
@@ -161,7 +163,7 @@ class PopulationMachineVertex(
             self, sdram: AbstractSDRAM, label: str,
             app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
             slice_index: int, ring_buffer_shifts: Sequence[int],
-            weight_scales: Sequence[int], structural_sz: int,
+            weight_scales: NDArray[floating], structural_sz: int,
             max_atoms_per_core: int, synaptic_matrices: SynapticMatrices,
             neuron_data: NeuronData):
         """

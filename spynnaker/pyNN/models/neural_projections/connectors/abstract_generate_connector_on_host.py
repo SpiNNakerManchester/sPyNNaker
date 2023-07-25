@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Tuple, TYPE_CHECKING
+from typing import Sequence, Tuple, TYPE_CHECKING
 from numpy.typing import NDArray
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.common import Slice
@@ -30,7 +30,7 @@ class AbstractGenerateConnectorOnHost(object, metaclass=AbstractBase):
 
     @abstractmethod
     def create_synaptic_block(
-            self, post_slices: List[Slice], post_vertex_slice: Slice,
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
             synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         """
         Create a synaptic block from the data.

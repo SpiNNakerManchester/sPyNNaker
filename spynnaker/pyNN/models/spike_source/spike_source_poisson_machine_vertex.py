@@ -14,6 +14,7 @@
 from __future__ import annotations
 from enum import IntEnum
 import numpy
+from numpy import uint16, uint32
 import struct
 from typing import (
     Iterable, List, Optional, Sequence, Sized, TypeVar, Union,
@@ -60,6 +61,9 @@ from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID)
 if TYPE_CHECKING:
     from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
+    from spynnaker.pyNN.models.neural_projections.connectors import (
+        AbstractGenerateConnectorOnHost)
 
 #: :meta private:
 T = TypeVar("T")
@@ -333,6 +337,12 @@ class SpikeSourcePoissonMachineVertex(
         # end spec
         spec.end_specification()
 
+    @staticmethod
+    def __conn(synapse_info: SynapseInformation
+               ) -> AbstractGenerateConnectorOnHost:
+        return cast(
+            'AbstractGenerateConnectorOnHost', synapse_info.connector)
+
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(
             self, spec: DataSpecificationGenerator, placement: Placement):
@@ -406,18 +416,18 @@ class SpikeSourcePoissonMachineVertex(
 
             # If we are here, the connector must be one-to-one so create
             # the synapses and then store the scaled weights
-            connections = synapse_info.connector.create_synaptic_block(
-                None, self.vertex_slice, synapse_type, synapse_info)
+            connections = self.__conn(synapse_info).create_synaptic_block(
+                (), self.vertex_slice, synapse_type, synapse_info)
             weight_scales = (
                 next(iter(cast(AbstractEdgePartition,
                                self.__sdram_partition).edges))
                 .post_vertex.weight_scales)
             weights = connections["weight"] * weight_scales[synapse_type]
-            weights = numpy.rint(numpy.abs(weights)).astype("uint16")
+            weights = numpy.rint(numpy.abs(weights)).astype(uint16)
             if len(weights) % 2 != 0:
-                padding = numpy.array([0], dtype="uint16")
+                padding = numpy.array([0], dtype=uint16)
                 weights = numpy.concatenate((weights, padding))
-            spec.write_array(weights.view("uint32"))
+            spec.write_array(weights.view(uint32))
 
         # End-of-Spec:
         spec.end_specification()
@@ -456,7 +466,7 @@ class SpikeSourcePoissonMachineVertex(
                  _u3232_to_uint64(item['durations']))
                 )[0]
             data_items.extend([[count], [len(items)], [0],
-                               numpy.ravel(items).view("uint32")])
+                               numpy.ravel(items).view(uint32)])
             n_items += 1
         data_items[1] = [n_items]
         data_to_write = numpy.concatenate(data_items)

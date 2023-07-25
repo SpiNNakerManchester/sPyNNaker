@@ -232,7 +232,6 @@ class PopulationSynapsesMachineVertexCommon(
         assert self.__sdram_partition is not None
         send_size = self.__sdram_partition.get_sdram_size_of_region_for(self)
         base_addr = self.__sdram_partition.get_sdram_base_address_for(self)
-        assert base_addr is not None
 
         spec.reserve_memory_region(
             region=self.REGIONS.SDRAM_EDGE_PARAMS,

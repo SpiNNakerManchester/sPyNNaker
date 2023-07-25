@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-import numpy
+from numpy import floating
+from numpy.typing import NDArray
 from typing import List, Sequence, Tuple, cast, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
@@ -147,8 +148,8 @@ class PopulationMachineSynapses(
 
     def _write_synapse_data_spec(
             self, spec: DataSpecificationBase,
-            ring_buffer_shifts: Sequence[int], weight_scales: Sequence[int],
-            structural_sz: int):
+            ring_buffer_shifts: Sequence[int],
+            weight_scales: NDArray[floating], structural_sz: int):
         """
         Write the data specification for the synapse data.
 
@@ -256,7 +257,7 @@ class PopulationMachineSynapses(
 
     def get_connections_from_machine(
             self, placement: Placement, app_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation) -> numpy.ndarray:
+            synapse_info: SynapseInformation) -> NDArray:
         """
         Get the connections from the machine for this vertex.
 

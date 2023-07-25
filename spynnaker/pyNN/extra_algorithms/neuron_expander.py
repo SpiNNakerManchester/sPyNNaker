@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+from typing import List, Tuple
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model.enums import ExecutableType
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState, UserRegister
+from pacman.model.placements import Placement
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -27,7 +29,7 @@ from spynnaker.pyNN.models.abstract_models import (
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def neuron_expander():
+def neuron_expander() -> None:
     """
     Run the neuron expander.
 
@@ -42,15 +44,16 @@ def neuron_expander():
         expander_app_id = SpynnakerDataView.get_new_id()
         run_system_application(
             expander_cores, expander_app_id,
-            get_config_bool("Reports", "write_expander_iobuf"),
-            None, [CPUState.FINISHED], False,
+            get_config_bool("Reports", "write_expander_iobuf") or False,
+            None, frozenset({CPUState.FINISHED}), False,
             "neuron_expander_on_{}_{}_{}.txt", progress_bar=progress,
             logger=logger)
 
     _fill_in_initial_data(expanded_pop_vertices)
 
 
-def _plan_expansion():
+def _plan_expansion() -> Tuple[
+        ExecutableTargets, List[Tuple[AbstractNeuronExpandable, Placement]]]:
     """
     Plan the expansion of neurons and set up the regions using USER1.
 
@@ -60,7 +63,8 @@ def _plan_expansion():
     txrx = SpynnakerDataView.get_transceiver()
 
     expander_cores = ExecutableTargets()
-    expanded_pop_vertices = list()
+    expanded_pop_vertices: List[
+        Tuple[AbstractNeuronExpandable, Placement]] = list()
 
     progress = ProgressBar(
         SpynnakerDataView.get_n_placements(),
@@ -83,7 +87,8 @@ def _plan_expansion():
     return expander_cores, expanded_pop_vertices
 
 
-def _fill_in_initial_data(expanded_pop_vertices):
+def _fill_in_initial_data(expanded_pop_vertices: List[
+        Tuple[AbstractNeuronExpandable, Placement]]):
     """
     Once expander has run, fill in the connection data.
 

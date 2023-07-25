@@ -14,7 +14,9 @@
 
 import math
 import numpy
-from typing import List, Sequence
+from numpy import floating, float64, uint32
+from numpy.typing import NDArray
+from typing import List
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
@@ -30,8 +32,9 @@ class AbstractSDRAMSynapseDynamics(
     __slots__ = ()
 
     #: Type model of the basic configuration data of a connector
-    NUMPY_CONNECTORS_DTYPE = [("source", "uint32"), ("target", "uint32"),
-                              ("weight", "float64"), ("delay", "float64")]
+    NUMPY_CONNECTORS_DTYPE = numpy.dtype(
+        [("source", uint32), ("target", uint32),
+         ("weight", float64), ("delay", float64)])
 
     @abstractmethod
     def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:
@@ -59,7 +62,7 @@ class AbstractSDRAMSynapseDynamics(
     def write_parameters(
             self, spec: DataSpecificationBase, region: int,
             global_weight_scale: float,
-            synapse_weight_scales: Sequence[float]):
+            synapse_weight_scales: NDArray[floating]):
         """
         Write the synapse parameters to the spec.
 
@@ -93,8 +96,8 @@ class AbstractSDRAMSynapseDynamics(
         raise NotImplementedError
 
     def convert_per_connection_data_to_rows(
-            self, connection_row_indices: numpy.ndarray, n_rows: int,
-            data: numpy.ndarray, max_n_synapses: int) -> List[numpy.ndarray]:
+            self, connection_row_indices: NDArray, n_rows: int,
+            data: NDArray, max_n_synapses: int) -> List[NDArray]:
         """
         Converts per-connection data generated from connections into
         row-based data to be returned from get_synaptic_data.
@@ -114,7 +117,7 @@ class AbstractSDRAMSynapseDynamics(
             for i in range(n_rows)]
 
     def get_n_items(
-            self, rows: numpy.ndarray, item_size: int) -> numpy.ndarray:
+            self, rows: NDArray, item_size: int) -> NDArray[uint32]:
         """
         Get the number of items in each row as 4-byte values, given the
         item size.
@@ -125,9 +128,9 @@ class AbstractSDRAMSynapseDynamics(
         """
         return numpy.array([
             int(math.ceil(float(row.size) / float(item_size)))
-            for row in rows], dtype="uint32").reshape((-1, 1))
+            for row in rows], dtype=uint32).reshape((-1, 1))
 
-    def get_words(self, rows: numpy.ndarray) -> List[numpy.ndarray]:
+    def get_words(self, rows: NDArray) -> List[NDArray[uint32]]:
         """
         Convert the row data to words.
 
@@ -136,5 +139,5 @@ class AbstractSDRAMSynapseDynamics(
         """
         words = [numpy.pad(
             row, (0, (4 - (row.size % 4)) & 0x3), mode="constant",
-            constant_values=0).view("uint32") for row in rows]
+            constant_values=0).view(uint32) for row in rows]
         return words

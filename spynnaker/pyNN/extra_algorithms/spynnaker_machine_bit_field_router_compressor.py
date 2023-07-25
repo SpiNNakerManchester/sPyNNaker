@@ -13,10 +13,13 @@
 # limitations under the License.
 
 import logging
+from typing import Iterable, cast
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
+from spinn_machine import CoreSubsets
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState, ExecutableType, UserRegister
+from pacman.model.placements import Placement
 from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import (
         machine_bit_field_ordered_covering_compressor,
@@ -33,7 +36,8 @@ logger = FormatAdapter(logging.getLogger(__name__))
 _RERUN_IOBUF_NAME_PATTERN = "rerun_of_synaptic_expander_on_{}_{}_{}.txt"
 
 
-def _locate_expander_rerun_targets(bitfield_targets):
+def _locate_expander_rerun_targets(
+        bitfield_targets: ExecutableTargets) -> ExecutableTargets:
     """
     Removes host based cores for synaptic matrix regeneration.
 
@@ -57,11 +61,12 @@ def _locate_expander_rerun_targets(bitfield_targets):
         # Write the region to USER1, as that is the best we can do
         txrx.write_user(
             placement.x, placement.y, placement.p, UserRegister.USER_1,
-            placement.vertex.connection_generator_region)
+            cast(AbstractSynapseExpandable,
+                 placement.vertex).connection_generator_region)
     return new_cores
 
 
-def __machine_expandables(cores):
+def __machine_expandables(cores: CoreSubsets) -> Iterable[Placement]:
     """
     :param ~.CoreSubsets cores:
     :rtype: iterable(~.Placement)
@@ -76,7 +81,8 @@ def __machine_expandables(cores):
 
 
 def _rerun_synaptic_cores(
-        synaptic_expander_rerun_cores, needs_sync_barrier):
+        synaptic_expander_rerun_cores: ExecutableTargets,
+        needs_sync_barrier: bool):
     """
     Reruns the synaptic expander.
 
@@ -89,12 +95,12 @@ def _rerun_synaptic_cores(
         expander_app_id = SpynnakerDataView.get_new_id()
         run_system_application(
             synaptic_expander_rerun_cores, expander_app_id,
-            get_config_bool("Reports", "write_expander_iobuf"),
-            None, [CPUState.FINISHED], needs_sync_barrier,
+            get_config_bool("Reports", "write_expander_iobuf") or False,
+            None, frozenset({CPUState.FINISHED}), needs_sync_barrier,
             _RERUN_IOBUF_NAME_PATTERN)
 
 
-def spynnaker_machine_bitfield_ordered_covering_compressor():
+def spynnaker_machine_bitfield_ordered_covering_compressor() -> None:
     """
     Perform routing table compression using ordered coverings with bit fields.
     """
@@ -109,7 +115,7 @@ def spynnaker_machine_bitfield_ordered_covering_compressor():
     _rerun_synaptic_cores(expander_chip_cores, True)
 
 
-def spynnaker_machine_bitField_pair_router_compressor():
+def spynnaker_machine_bitField_pair_router_compressor() -> None:
     """
     Perform routing table compression using pairs with bit fields.
     """

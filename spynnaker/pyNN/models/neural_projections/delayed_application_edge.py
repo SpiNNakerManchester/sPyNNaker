@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 from collections.abc import Iterable
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional, Union, TYPE_CHECKING
 from pacman.model.graphs.application import ApplicationEdge
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
@@ -31,7 +31,8 @@ class DelayedApplicationEdge(ApplicationEdge):
     def __init__(
             self, pre_vertex: DelayExtensionVertex,
             post_vertex: AbstractPopulationVertex,
-            synapse_information: SynapseInformation,
+            synapse_information: Union[
+                SynapseInformation, Iterable[SynapseInformation]],
             undelayed_edge: ProjectionApplicationEdge,
             label: Optional[str] = None):
         """

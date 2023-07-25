@@ -14,6 +14,8 @@
 from enum import IntEnum
 import os
 import ctypes
+from numpy import floating
+from numpy.typing import NDArray
 from typing import List, Optional, Sequence
 
 from spinn_utilities.overrides import overrides
@@ -115,8 +117,8 @@ class PopulationNeuronsMachineVertex(
     def __init__(
             self, sdram: AbstractSDRAM, label: str,
             app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
-            slice_index: int,
-            ring_buffer_shifts: Sequence[int], weight_scales: Sequence[int],
+            slice_index: int, ring_buffer_shifts: Sequence[int],
+            weight_scales: NDArray[floating],
             neuron_data: NeuronData, max_atoms_per_core: int):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
@@ -255,10 +257,8 @@ class PopulationNeuronsMachineVertex(
             region=self.REGIONS.SDRAM_EDGE_PARAMS,
             size=SDRAM_PARAMS_SIZE, label="SDRAM Params")
         spec.switch_write_focus(self.REGIONS.SDRAM_EDGE_PARAMS)
-        base_address = self.__sdram_partition.get_sdram_base_address_for(self)
-        if base_address is None:
-            raise ValueError("no base address set for SDRAM partition")
-        spec.write_value(base_address)
+        spec.write_value(
+            self.__sdram_partition.get_sdram_base_address_for(self))
         spec.write_value(self.n_bytes_for_transfer)
         spec.write_value(len(self.__sdram_partition.pre_vertices))
 
@@ -285,7 +285,7 @@ class PopulationNeuronsMachineVertex(
 
     @property
     @overrides(ReceivesSynapticInputsOverSDRAM.weight_scales)
-    def weight_scales(self) -> Sequence[int]:
+    def weight_scales(self) -> NDArray[floating]:
         return self.__weight_scales
 
     @staticmethod
