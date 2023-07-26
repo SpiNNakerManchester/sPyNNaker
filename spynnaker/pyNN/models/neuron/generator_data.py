@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import numpy
+from typing import Optional
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 # Address to indicate that the synaptic region is unused
@@ -28,7 +29,8 @@ class GeneratorData(object):
     BASE_SIZE = 11 * BYTES_PER_WORD
 
     def __init__(
-            self, synaptic_matrix_offset, delayed_synaptic_matrix_offset,
+            self, synaptic_matrix_offset: Optional[int],
+            delayed_synaptic_matrix_offset: Optional[int],
             app_edge, synapse_information, max_row_info,
             max_pre_atoms_per_core, max_post_atoms_per_core):
         # Offsets are used in words in the generator, but only

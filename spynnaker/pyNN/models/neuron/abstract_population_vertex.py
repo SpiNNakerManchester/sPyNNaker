@@ -21,7 +21,7 @@ import operator
 from functools import reduce
 from collections import defaultdict
 from typing import (
-    Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
+    Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
     cast, TYPE_CHECKING)
 
 from pyNN.space import Grid2D, Grid3D, BaseStructure
@@ -37,8 +37,8 @@ from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import AbstractSDRAM, MultiRegionSDRAM
 from pacman.utilities.utility_calls import get_n_bits_for_fields, get_n_bits
-from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.model.graphs.common import Slice
+from pacman.exceptions import PacmanConfigurationException
 from spinn_front_end_common.abstract_models import (
     AbstractCanReset)
 from spinn_front_end_common.utilities.constants import (
@@ -97,6 +97,8 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
     from spynnaker.pyNN.models.neural_projections import (
         SynapseInformation, ProjectionApplicationEdge)
+    from spynnaker.pyNN.extra_algorithms.splitter_components import (
+        SplitterAbstractPopulationVertex)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -232,8 +234,8 @@ class AbstractPopulationVertex(
             ring_buffer_sigma: Optional[float],
             incoming_spike_buffer_size: Optional[int],
             neuron_impl: AbstractNeuronImpl,
-            pynn_model: AbstractPyNNNeuronModel,
-            drop_late_spikes: bool, splitter: Optional[AbstractSplitterCommon],
+            pynn_model: AbstractPyNNNeuronModel, drop_late_spikes: bool,
+            splitter: Optional[SplitterAbstractPopulationVertex],
             seed: Optional[int], n_colour_bits: Optional[int]):
         """
         :param int n_neurons: The number of neurons in the population
@@ -255,8 +257,7 @@ class AbstractPopulationVertex(
         :param AbstractPyNNNeuronModel pynn_model:
             The PyNN neuron model that this vertex is working on behalf of.
         :param splitter: splitter object
-        :type splitter:
-            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
+        :type splitter: SplitterAbstractPopulationVertex or None
         :param seed:
             The Population seed, used to ensure the same random generation
             on each run.
@@ -353,6 +354,29 @@ class AbstractPopulationVertex(
         self.__read_initial_values = False
         self.__have_read_initial_values = False
         self.__last_parameter_read_time: Optional[float] = None
+
+    @property  # type: ignore[override]
+    def splitter(self) -> SplitterAbstractPopulationVertex:
+        s = self._splitter
+        if s is None:
+            raise PacmanConfigurationException(
+                f"The splitter object on {self._label} has not yet been set.")
+        return cast('SplitterAbstractPopulationVertex', s)
+
+    @splitter.setter
+    def splitter(self, splitter: SplitterAbstractPopulationVertex):
+        if self._splitter == splitter:
+            return
+        if self._splitter is not None:
+            raise PacmanConfigurationException(
+                f"The splitter object on {self._label} has already been set, "
+                "it cannot be reset. Please fix and try again.")
+        if not isinstance(splitter, SplitterAbstractPopulationVertex):
+            raise PacmanConfigurationException(
+                f"The splitter object on {self._label} must be set to one "
+                "capable of handling an AbstractPopulationVertex.")
+        self._splitter = cast(Any, splitter)
+        splitter.set_governed_app_vertex(self)
 
     @overrides(PopulationApplicationVertex.get_max_atoms_per_core)
     def get_max_atoms_per_core(self) -> int:

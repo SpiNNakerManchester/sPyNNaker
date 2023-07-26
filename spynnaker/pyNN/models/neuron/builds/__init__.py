@@ -12,6 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+These are particular configurations of neuron model components. Each of them
+is either supported or explicitly not supported.
+
+*Others are possible* but might require an unknown amount of work to get
+running on SpiNNaker.
+"""
+
 from .eif_cond_alpha_isfa_ista import EIFConductanceAlphaPopulation
 from .hh_cond_exp import HHCondExp
 from .if_cond_alpha import IFCondAlpha

@@ -11,13 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from typing import Any, Dict, Optional, cast
+from __future__ import annotations
+from typing import Any, Dict, Optional, cast, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
-from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from .abstract_pynn_neuron_model import (
     AbstractPyNNNeuronModel, _population_parameters as APNM_default_params)
 from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron.additional_inputs import (
+        AbstractAdditionalInput)
+    from spynnaker.pyNN.models.neuron.input_types import AbstractInputType
+    from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
+    from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
+    from spynnaker.pyNN.models.neuron.threshold_types import (
+        AbstractThresholdType)
+    from .abstract_population_vertex import AbstractPopulationVertex
+    from spynnaker.pyNN.extra_algorithms.splitter_components import (
+        SplitterAbstractPopulationVertex)
 
 _population_parameters: Dict[str, Any] = dict(APNM_default_params)
 _population_parameters["n_steps_per_timestep"] = 1
@@ -34,12 +44,14 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
     default_population_parameters = _population_parameters
 
     def __init__(
-            self, model_name, binary, neuron_model, input_type,
-            synapse_type, threshold_type, additional_input_type=None):
+            self, model_name: str, binary: str, neuron_model: NeuronModel,
+            input_type: AbstractInputType, synapse_type: AbstractSynapseType,
+            threshold_type: AbstractThresholdType,
+            additional_input_type: Optional[AbstractAdditionalInput] = None):
         """
         :param str model_name: Name of the model.
         :param str binary: Name of the implementation executable.
-        :param AbstractPyNNNeuronModel neuron_model:
+        :param NeuronModel neuron_model:
             The model of the neuron soma
         :param AbstractInputType input_type: The model of synaptic input types
         :param AbstractSynapseType synapse_type:
@@ -62,9 +74,9 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             ring_buffer_sigma: Optional[float] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: Optional[bool] = None,
-            splitter: Optional[AbstractSplitterCommon] = None,
+            splitter: Optional[SplitterAbstractPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
-            n_steps_per_timestep: int = 1):
+            n_steps_per_timestep: int = 1) -> AbstractPopulationVertex:
         """
         :param int n_steps_per_timestep:
         """

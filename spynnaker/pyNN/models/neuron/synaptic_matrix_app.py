@@ -418,7 +418,6 @@ class SynapticMatrixApp(object):
         connections = list()
 
         splitter = self.__app_edge.post_vertex.splitter
-        assert isinstance(splitter, AbstractSpynnakerSplitterDelay)
         vertex_slice = placement.vertex.vertex_slice
         assert vertex_slice is not None
         if self.__syn_mat_offset is not None:

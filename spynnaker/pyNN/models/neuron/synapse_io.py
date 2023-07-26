@@ -17,7 +17,6 @@ import numpy
 from numpy import integer, uint32
 from numpy.typing import NDArray
 from typing import List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
-# from typing_extensions import reveal_type  # FIXME
 
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -29,9 +28,6 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractStaticSynapseDynamics, AbstractSDRAMSynapseDynamics,
     AbstractPlasticSynapseDynamics)
 from .master_pop_table import MasterPopTableAsBinarySearch
-from spynnaker.pyNN.extra_algorithms.splitter_components.\
-    abstract_spynnaker_splitter_delay import (
-        AbstractSpynnakerSplitterDelay)
 if TYPE_CHECKING:
     from typing_extensions import TypeAlias
     from spynnaker.pyNN.models.neural_projections import (
@@ -75,12 +71,6 @@ class MaxRowInfo(object):
     delayed_max_words: int
 
 
-def __max_delay(edge: ProjectionApplicationEdge) -> int:
-    splitter = edge.post_vertex.splitter
-    assert isinstance(splitter, AbstractSpynnakerSplitterDelay)
-    return splitter.max_support_delay()
-
-
 def get_maximum_delay_supported_in_ms(post_vertex_max_delay_ticks: int) -> int:
     """
     Get the maximum delay supported by the synapse representation
@@ -114,7 +104,7 @@ def get_max_row_info(
         If the synapse information can't be represented
     """
     max_delay_supported = get_maximum_delay_supported_in_ms(
-        __max_delay(in_edge))
+        in_edge.post_vertex.splitter.max_support_delay())
     max_delay = max_delay_supported * (n_delay_stages + 1)
     pad_to_length: Optional[int] = None
     if isinstance(synapse_info.synapse_dynamics, AbstractSDRAMSynapseDynamics):
@@ -259,7 +249,7 @@ def get_synapses(
     """
     # pylint: disable=too-many-arguments
     # Get delays in timesteps
-    max_delay = __max_delay(app_edge)
+    max_delay = app_edge.post_vertex.splitter.max_support_delay()
 
     # Convert delays to timesteps
     connections["delay"] = numpy.rint(

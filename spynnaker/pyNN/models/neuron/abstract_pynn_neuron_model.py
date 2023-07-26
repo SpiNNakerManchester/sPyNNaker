@@ -13,11 +13,12 @@
 # limitations under the License.
 from typing import Any, Dict, Optional
 from spinn_utilities.overrides import overrides
-from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    SplitterAbstractPopulationVertex)
 
 # The maximum atoms per core is the master population table row length to
 # make it easier when all-to-all-connector is used
@@ -54,16 +55,16 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             ring_buffer_sigma: Optional[float] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: Optional[bool] = None,
-            splitter: Optional[AbstractSplitterCommon] = None,
-            seed: Optional[int] = None, n_colour_bits: Optional[int] = None):
+            splitter: Optional[SplitterAbstractPopulationVertex] = None,
+            seed: Optional[int] = None,
+            n_colour_bits: Optional[int] = None) -> AbstractPopulationVertex:
         """
         :param float spikes_per_second:
         :param float ring_buffer_sigma:
         :param int incoming_spike_buffer_size:
         :param bool drop_late_spikes:
         :param splitter:
-        :type splitter:
-            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
+        :type splitter: SplitterAbstractPopulationVertex or None
         :param int seed:
         :param int n_colour_bits:
         """

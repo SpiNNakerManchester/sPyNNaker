@@ -227,9 +227,7 @@ class PopulationMachineSynapses(
         # We only count neuron synapse types here, as this is related to
         # the ring buffers
         n_synapse_types = self._pop_vertex.neuron_impl.get_n_synapse_types()
-        splitter = cast(AbstractSpynnakerSplitterDelay,
-                        self._pop_vertex.splitter)
-        max_delay = splitter.max_support_delay()
+        max_delay = self._pop_vertex.splitter.max_support_delay()
 
         # Write synapse parameters
         spec.switch_write_focus(self._synapse_regions.synapse_params)

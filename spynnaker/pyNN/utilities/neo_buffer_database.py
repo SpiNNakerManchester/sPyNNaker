@@ -1448,15 +1448,13 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             population, sampling_interval_ms, data_type,
             buffered_data_type, units, n_colour_bits)
         region = app_vertex.get_recording_region(variable)
-        machine_vertices = (
-            app_vertex.splitter.machine_vertices_for_recording(
-                variable))
+        machine_vertices = app_vertex.splitter.machine_vertices_for_recording(
+            variable)
         for vertex in machine_vertices:
             placement = SpynnakerDataView.get_placement_of_vertex(
                 vertex)
             region_id = self._get_region_id(
-                cursor, placement.x, placement.y, placement.p,
-                region)
+                cursor, placement.x, placement.y, placement.p, region)
             vertex_slice = vertex.vertex_slice
             neurons = app_vertex.get_neurons_recording(
                 variable, vertex_slice)

@@ -18,7 +18,6 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationVirtualVertex)
 from pacman.model.routing_info import BaseKeyAndMask
-from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from spinn_front_end_common.abstract_models import (
     AbstractVertexWithEdgeToDependentVertices, HasCustomAtomKeyMap)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -30,6 +29,8 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
     from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
     from .abstract_ethernet_translator import AbstractEthernetTranslator
+    from spynnaker.pyNN.extra_algorithms.splitter_components import (
+        SplitterAbstractPopulationVertex)
 
 
 class ExternalDeviceLifControlVertex(
@@ -61,7 +62,7 @@ class ExternalDeviceLifControlVertex(
             ring_buffer_sigma: Optional[float] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: bool = False,
-            splitter: Optional[AbstractSplitterCommon] = None,
+            splitter: Optional[SplitterAbstractPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None):
         """
         :param list(AbstractMulticastControllableDevice) devices:
@@ -82,8 +83,7 @@ class ExternalDeviceLifControlVertex(
         :param float ring_buffer_sigma:
         :param int incoming_spike_buffer_size:
         :param splitter: splitter from application vertices to machine vertices
-        :type splitter:
-            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
+        :type splitter: SplitterAbstractPopulationVertex or None
         :param int n_colour_bits: The number of colour bits to use
         """
         # pylint: disable=too-many-arguments
@@ -122,8 +122,8 @@ class ExternalDeviceLifControlVertex(
     @overrides(AbstractVertexWithEdgeToDependentVertices
                .edge_partition_identifiers_for_dependent_vertex)
     def edge_partition_identifiers_for_dependent_vertex(
-            self, vertex) -> Iterable[str]:
-        # TODO What is the type of vertex?
+            self, vertex: ApplicationVertex) -> Iterable[str]:
+        assert isinstance(vertex, AbstractMulticastControllableDevice)
         return [vertex.device_control_partition_id]
 
     @overrides(AbstractEthernetController.get_external_devices)

@@ -11,10 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 from enum import Enum
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-import numpy
+from numpy import uint32
+from numpy.typing import NDArray
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
+    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
 
 
 class MatrixGeneratorID(Enum):
@@ -52,9 +58,10 @@ class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
     @abstractmethod
     def gen_matrix_params(
             self, synaptic_matrix_offset: int, delayed_matrix_offset: int,
-            # FIXME types
-            app_edge, synapse_info, max_row_info, max_pre_atoms_per_core,
-            max_post_atoms_per_core) -> numpy.ndarray:
+            app_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation, max_row_info: MaxRowInfo,
+            max_pre_atoms_per_core: int, max_post_atoms_per_core: int
+            ) -> NDArray[uint32]:
         """
         Any parameters required by the matrix generator.
 

@@ -11,9 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import numpy
+from numpy import uint32
+from numpy.typing import NDArray
 from pyNN.standardmodels.synapses import StaticSynapse
+from typing import TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.data import SpynnakerDataView
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
@@ -23,6 +26,10 @@ from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
+    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
 
 
 class SynapseDynamicsStatic(
@@ -185,14 +192,16 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
     def gen_matrix_params(
-            self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
-            synapse_info, max_row_info, max_pre_atoms_per_core,
-            max_post_atoms_per_core):
+            self, synaptic_matrix_offset: int, delayed_matrix_offset: int,
+            app_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation, max_row_info: MaxRowInfo,
+            max_pre_atoms_per_core: int,
+            max_post_atoms_per_core: int) -> NDArray[uint32]:
         vertex = app_edge.post_vertex
         n_synapse_type_bits = get_n_bits(
             vertex.neuron_impl.get_n_synapse_types())
         n_synapse_index_bits = get_n_bits(max_post_atoms_per_core)
-        max_delay = app_edge.post_vertex.splitter.max_support_delay()
+        max_delay = vertex.splitter.max_support_delay()
         max_delay_bits = get_n_bits(max_delay)
         return numpy.array([
             synaptic_matrix_offset, delayed_matrix_offset,
@@ -201,7 +210,7 @@ class SynapseDynamicsStatic(
             n_synapse_index_bits, app_edge.n_delay_stages + 1,
             max_delay, max_delay_bits, app_edge.pre_vertex.n_atoms,
             max_pre_atoms_per_core],
-            dtype=numpy.uint32)
+            dtype=uint32)
 
     @property
     @overrides(AbstractGenerateOnMachine.
