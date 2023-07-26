@@ -239,7 +239,7 @@ class PopulationMachineVertex(
 
     @property
     @overrides(PopulationMachineSynapses._max_atoms_per_core)
-    def _max_atoms_per_core(self):
+    def _max_atoms_per_core(self) -> int:
         return self.__max_atoms_per_core
 
     @staticmethod

@@ -203,7 +203,7 @@ class PopulationSynapsesMachineVertexCommon(
         self.__partition_id = partition_id
 
     @staticmethod
-    def __get_binary_file_name(app_vertex: AbstractPopulationVertex):
+    def __get_binary_file_name(app_vertex: AbstractPopulationVertex) -> str:
         """
         Get the local binary filename for this vertex.  Static because at
         the time this is needed, the local `app_vertex` is not set.

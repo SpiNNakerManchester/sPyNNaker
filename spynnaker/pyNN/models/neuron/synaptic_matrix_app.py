@@ -13,9 +13,9 @@
 # limitations under the License.
 from __future__ import annotations
 import numpy
-from numpy import uint32
+from numpy import floating, uint32
 from numpy.typing import NDArray
-from typing import List, Optional, Sequence, Tuple, cast, TYPE_CHECKING
+from typing import List, Optional, Tuple, cast, TYPE_CHECKING
 from pacman.model.graphs.common import Slice
 from pacman.model.placements import Placement
 from spinn_front_end_common.utilities.helpful_functions import (
@@ -29,8 +29,6 @@ from .synapse_io import read_all_synapses, convert_to_connections, get_synapses
 from .abstract_population_vertex import AbstractPopulationVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnHost)
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    AbstractSpynnakerSplitterDelay)
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
@@ -86,7 +84,8 @@ class SynapticMatrixApp(object):
             app_edge: ProjectionApplicationEdge, n_synapse_types: int,
             synaptic_matrix_region: int, max_atoms_per_core: int,
             all_syn_block_sz: int, app_key_info: AppKeyInfo,
-            delay_app_key_info: AppKeyInfo, weight_scales: Sequence[float]):
+            delay_app_key_info: Optional[AppKeyInfo],
+            weight_scales: NDArray[floating]):
         """
         :param SynapseInformation synapse_info:
             The projection synapse information
@@ -348,7 +347,6 @@ class SynapticMatrixApp(object):
             The machine edge the connections are for
         """
         post_splitter = self.__app_edge.post_vertex.splitter
-        assert isinstance(post_splitter, AbstractSpynnakerSplitterDelay)
         post_vertex_max_delay_ticks = post_splitter.max_support_delay()
         for conn_holder in self.__synapse_info.pre_run_connection_holders:
             conn_holder.add_connections(read_all_synapses(
@@ -365,9 +363,9 @@ class SynapticMatrixApp(object):
         :return: The data to generate with
         :rtype: GeneratorData
         """
-        pre_vertex = self.__app_edge.pre_vertex
-        max_pre_atoms_per_core = min(pre_vertex.n_atoms,
-                                     pre_vertex.get_max_atoms_per_core())
+        max_pre_atoms_per_core = min(
+            self.__app_edge.pre_vertex.n_atoms,
+            self.__app_edge.pre_vertex.get_max_atoms_per_core())
         return GeneratorData(
             self.__syn_mat_offset, self.__delay_syn_mat_offset,
             self.__app_edge, self.__synapse_info, self.__max_row_info,
@@ -421,22 +419,21 @@ class SynapticMatrixApp(object):
         vertex_slice = placement.vertex.vertex_slice
         assert vertex_slice is not None
         if self.__syn_mat_offset is not None:
-            block = self.__get_block(placement, synapses_address)
             connections.append(convert_to_connections(
                 self.__synapse_info, vertex_slice,
                 self.__app_edge.pre_vertex.n_atoms,
                 self.__max_row_info.undelayed_max_words,
-                self.__n_synapse_types, self.__weight_scales, block,
-                False, splitter.max_support_delay(),
-                self.__max_atoms_per_core))
+                self.__n_synapse_types, self.__weight_scales,
+                self.__get_block(placement, synapses_address), False,
+                splitter.max_support_delay(), self.__max_atoms_per_core))
 
         if self.__delay_syn_mat_offset is not None:
-            block = self.__get_delayed_block(placement, synapses_address)
             connections.append(convert_to_connections(
                 self.__synapse_info, vertex_slice,
                 self.__app_edge.pre_vertex.n_atoms,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
-                self.__weight_scales, block, True,
+                self.__weight_scales,
+                self.__get_delayed_block(placement, synapses_address), True,
                 splitter.max_support_delay(), self.__max_atoms_per_core))
 
         return connections

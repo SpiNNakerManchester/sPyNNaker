@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from abc import abstractmethod
 from enum import Enum
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
 from typing import TYPE_CHECKING
-from spinn_utilities.abstract_base import abstractmethod, AbstractBase
+from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from spynnaker.pyNN.models.neural_projections.connectors import (

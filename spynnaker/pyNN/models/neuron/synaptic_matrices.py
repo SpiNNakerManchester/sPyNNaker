@@ -12,12 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from dataclasses import dataclass
 import numpy
-from typing import NamedTuple, Optional
+from numpy import floating, uint32
+from numpy.typing import NDArray
+from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple
 
-from pacman.model.routing_info import BaseKeyAndMask
+from pacman.model.graphs.common import Slice
+from pacman.model.placements import Placement
+from pacman.model.routing_info import (
+    AppVertexRoutingInfo, BaseKeyAndMask)
 from pacman.utilities.utility_calls import allocator_bits_needed
-from spinn_front_end_common.interface.ds import DataType
+from spinn_front_end_common.interface.ds import (
+    DataType, DataSpecificationBase)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.master_pop_table import (
@@ -29,6 +36,10 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region, get_bitfield_key_map_data,
     write_bitfield_init_data)
+from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
+    AbstractPopulationVertex)
+from spynnaker.pyNN.models.neural_projections import (
+    ProjectionApplicationEdge, SynapseInformation)
 
 # 1 for synaptic matrix region
 # 1 for master pop region
@@ -76,6 +87,34 @@ class SynapseRegionReferences(NamedTuple):
     structural_dynamics: Optional[int] = None
     bitfield_filter: Optional[int] = None
     connection_builder: Optional[int] = None
+
+
+@dataclass(frozen=True)
+class AppKeyInfo(object):
+    """
+    An object which holds an application key and mask along with the other
+    details.
+    """
+
+    #: The application-level key
+    app_key: int
+    #: The application-level mask
+    app_mask: int
+    #: The mask to get the core from the key
+    core_mask: int
+    #: The shift to get the core from the key
+    core_shift: int
+    #: The neurons in each core (except possibly the last)
+    n_neurons: int
+    #: The number of colour bits sent
+    n_colour_bits: int
+
+    @property
+    def key_and_mask(self) -> BaseKeyAndMask:
+        """
+        The key and mask as an object.
+        """
+        return BaseKeyAndMask(self.app_key, self.app_mask)
 
 
 class SynapticMatrices(object):
@@ -126,8 +165,9 @@ class SynapticMatrices(object):
         "__max_gen_data")
 
     def __init__(
-            self, app_vertex, regions, max_atoms_per_core, weight_scales,
-            all_syn_block_sz):
+            self, app_vertex: AbstractPopulationVertex,
+            regions: SynapseRegions, max_atoms_per_core: int,
+            weight_scales: NDArray[floating], all_syn_block_sz: int):
         """
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
         :param SynapseRegions regions: The synapse regions to use
@@ -143,7 +183,9 @@ class SynapticMatrices(object):
         self.__all_syn_block_sz = all_syn_block_sz
 
         # Map of (app_edge, synapse_info) to SynapticMatrixApp
-        self.__matrices = dict()
+        self.__matrices: Dict[
+            Tuple[ProjectionApplicationEdge, SynapseInformation],
+            SynapticMatrixApp] = dict()
 
         # Store locations of synaptic data and generated data
         self.__host_generated_block_addr = 0
@@ -153,16 +195,16 @@ class SynapticMatrices(object):
         self.__gen_on_machine = False
         self.__data_generated = False
         self.__max_gen_data = 0
-        self.__on_host_matrices = None
-        self.__on_machine_matrices = None
-        self.__generated_data = None
+        self.__on_host_matrices: List[SynapticMatrixApp] = []
+        self.__on_machine_matrices: List[SynapticMatrixApp] = []
+        self.__generated_data: Optional[NDArray[uint32]] = None
         self.__generated_data_size = 0
-        self.__master_pop_data = None
+        self.__master_pop_data: Optional[NDArray[uint32]] = None
         self.__bit_field_size = 0
-        self.__bit_field_key_map = None
+        self.__bit_field_key_map: Optional[NDArray[uint32]] = None
 
     @property
-    def max_gen_data(self):
+    def max_gen_data(self) -> int:
         """
         The maximum amount of data to be generated for the synapses.
 
@@ -171,7 +213,7 @@ class SynapticMatrices(object):
         return self.__max_gen_data
 
     @property
-    def bit_field_size(self):
+    def bit_field_size(self) -> int:
         """
         The size of the bit field data.
 
@@ -180,7 +222,7 @@ class SynapticMatrices(object):
         return self.__bit_field_size
 
     @property
-    def host_generated_block_addr(self):
+    def host_generated_block_addr(self) -> int:
         """
         The address within the synaptic region after the last block
         written by the on-host synaptic generation, i.e. the start of
@@ -192,7 +234,7 @@ class SynapticMatrices(object):
         return self.__host_generated_block_addr
 
     @property
-    def on_chip_generated_matrix_size(self):
+    def on_chip_generated_matrix_size(self) -> int:
         """
         The size of the space used by the generated matrix, i.e. the
         space that can be overwritten provided the synapse expander
@@ -203,7 +245,7 @@ class SynapticMatrices(object):
         return (self.__on_chip_generated_block_addr -
                 self.__host_generated_block_addr)
 
-    def generate_data(self):
+    def generate_data(self) -> None:
         # If the data has already been generated, stop
         if self.__data_generated:
             return
@@ -223,14 +265,12 @@ class SynapticMatrices(object):
         # Set up other lists
         self.__on_host_matrices = list()
         self.__on_machine_matrices = list()
-        generated_data = list()
+        generated_data: List[NDArray[uint32]] = list()
 
         # Keep on-machine generated blocks together at the end
         self.__generated_data_size = (
             SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
             (self.__n_synapse_types * DataType.U3232.size))
-
-        assert self.__regions.synaptic_matrix is not None
 
         # For each incoming machine vertex, reserve pop table space
         for proj in self.__app_vertex.incoming_projections:
@@ -270,7 +310,7 @@ class SynapticMatrices(object):
             self.__generated_data = numpy.concatenate(generated_data)
         else:
             self.__gen_on_machine = True
-            self.__generated_data = numpy.zeros(0, dtype="uint32")
+            self.__generated_data = numpy.zeros(0, dtype=uint32)
 
         self.__on_chip_generated_block_addr = block_addr
 
@@ -285,7 +325,9 @@ class SynapticMatrices(object):
         self.__generated_data_size += (
             len(self.__bit_field_key_map) * BYTES_PER_WORD)
 
-    def __write_pop_table(self, spec, poptable_ref=None):
+    def __write_pop_table(self, spec: DataSpecificationBase,
+                          poptable_ref: Optional[int] = None):
+        assert self.__master_pop_data is not None
         master_pop_table_sz = len(self.__master_pop_data) * BYTES_PER_WORD
         spec.reserve_memory_region(
             region=self.__regions.pop_table, size=master_pop_table_sz,
@@ -294,7 +336,8 @@ class SynapticMatrices(object):
         spec.write_array(self.__master_pop_data)
 
     def write_synaptic_data(
-            self, spec, post_vertex_slice, references):
+            self, spec: DataSpecificationBase, post_vertex_slice: Slice,
+            references: SynapseRegionReferences):
         """
         Write the synaptic data for all incoming projections.
 
@@ -314,7 +357,7 @@ class SynapticMatrices(object):
 
         # Get the on-host data to be written
         block_addr = 0
-        data_to_write = list()
+        data_to_write: List[NDArray[uint32]] = list()
         for matrix in self.__on_host_matrices:
             block_addr = matrix.append_matrix(
                 post_vertex_slice, data_to_write, block_addr)
@@ -336,7 +379,8 @@ class SynapticMatrices(object):
             references.bitfield_filter)
 
     def __write_synapse_expander_data_spec(
-            self, spec, post_vertex_slice, connection_builder_ref=None):
+            self, spec: DataSpecificationBase, post_vertex_slice: Slice,
+            connection_builder_ref: Optional[int] = None):
         """
         Write the data spec for the synapse expander.
 
@@ -354,6 +398,8 @@ class SynapticMatrices(object):
                     size=4, label="ConnectorBuilderRegion",
                     reference=connection_builder_ref)
             return
+
+        assert self.__bit_field_key_map is not None
 
         spec.reserve_memory_region(
             region=self.__regions.connection_builder,
@@ -391,7 +437,8 @@ class SynapticMatrices(object):
         spec.write_array(self.__bit_field_key_map)
 
     def __get_app_key_and_mask(
-            self, r_info, n_stages, max_atoms_per_core, n_colour_bits):
+            self, r_info: AppVertexRoutingInfo, n_stages: int,
+            max_atoms_per_core: int, n_colour_bits: int) -> AppKeyInfo:
         """
         Get a key and mask for an incoming application vertex as a whole.
 
@@ -403,37 +450,40 @@ class SynapticMatrices(object):
         """
         # Find the part that is just for the core
         mask_size = r_info.n_bits_atoms
-        core_mask = (2 ** allocator_bits_needed(
-            len(r_info.vertex.splitter.get_out_going_vertices(
-                SPIKE_PARTITION_ID)))) - 1
         pre = r_info.vertex
+        core_mask = (2 ** allocator_bits_needed(
+            len(pre.splitter.get_out_going_vertices(SPIKE_PARTITION_ID)))) - 1
         n_atoms = min(max_atoms_per_core, pre.n_atoms)
 
-        return AppKeyInfo(r_info.key, r_info.mask, core_mask,
-                          mask_size, n_atoms * n_stages, n_colour_bits)
+        return AppKeyInfo(
+            app_key=r_info.key, app_mask=r_info.mask, core_mask=core_mask,
+            core_shift=mask_size, n_neurons=n_atoms * n_stages,
+            n_colour_bits=n_colour_bits)
 
-    def __app_key_and_mask(self, app_edge):
+    def __app_key_and_mask(
+            self, app_edge: ProjectionApplicationEdge) -> Optional[AppKeyInfo]:
         """
         Get a key and mask for an incoming application vertex as a whole.
 
-        :param PopulationApplicationEdge app_edge:
+        :param ProjectionApplicationEdge app_edge:
             The application edge to get the key and mask of
         """
         routing_info = SpynnakerDataView.get_routing_infos()
         r_info = routing_info.get_routing_info_from_pre_vertex(
             app_edge.pre_vertex, SPIKE_PARTITION_ID)
-        if r_info is None:
+        if not isinstance(r_info, AppVertexRoutingInfo):
             return None
         return self.__get_app_key_and_mask(
             r_info, 1, app_edge.pre_vertex.get_max_atoms_per_core(),
             app_edge.pre_vertex.n_colour_bits)
 
-    def __delay_app_key_and_mask(self, app_edge):
+    def __delay_app_key_and_mask(
+            self, app_edge: ProjectionApplicationEdge) -> Optional[AppKeyInfo]:
         """
         Get a key and mask for a whole incoming delayed application
         vertex, or return `None` if no delay edge exists.
 
-        :param PopulationApplicationEdge app_edge:
+        :param ProjectionApplicationEdge app_edge:
             The application edge to get the key and mask of
         """
         delay_edge = app_edge.delay_edge
@@ -442,6 +492,8 @@ class SynapticMatrices(object):
         routing_info = SpynnakerDataView.get_routing_infos()
         r_info = routing_info.get_routing_info_from_pre_vertex(
             delay_edge.pre_vertex, SPIKE_PARTITION_ID)
+        if not isinstance(r_info, AppVertexRoutingInfo):
+            return None
 
         # We use the app_edge pre-vertex max atoms here as the delay vertex
         # is split according to this
@@ -450,7 +502,9 @@ class SynapticMatrices(object):
             app_edge.pre_vertex.get_max_atoms_per_core(),
             app_edge.pre_vertex.n_colour_bits)
 
-    def get_connections_from_machine(self, placement, app_edge, synapse_info):
+    def get_connections_from_machine(
+            self, placement: Placement, app_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation) -> Sequence[NDArray]:
         """
         Get the synaptic connections from the machine.
 
@@ -462,12 +516,12 @@ class SynapticMatrices(object):
             The synapse information of the projection
         :return: A list of arrays of connections, each with dtype
             :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
-        :rtype: ~numpy.ndarray
+        :rtype: list(~numpy.ndarray)
         """
         matrix = self.__matrices[app_edge, synapse_info]
         return matrix.get_connections(placement)
 
-    def read_generated_connection_holders(self, placement):
+    def read_generated_connection_holders(self, placement: Placement):
         """
         Fill in any pre-run connection holders for data which is generated
         on the machine, after it has been generated.
@@ -479,7 +533,7 @@ class SynapticMatrices(object):
             matrix.read_generated_connection_holders(placement)
 
     @property
-    def gen_on_machine(self):
+    def gen_on_machine(self) -> bool:
         """
         Whether any matrices need to be generated on the machine.
 
@@ -487,7 +541,8 @@ class SynapticMatrices(object):
         """
         return self.__gen_on_machine
 
-    def get_index(self, app_edge, synapse_info):
+    def get_index(self, app_edge: ProjectionApplicationEdge,
+                  synapse_info: SynapseInformation) -> int:
         """
         Get the index of an incoming projection in the population table.
 
@@ -498,45 +553,3 @@ class SynapticMatrices(object):
         """
         matrix = self.__matrices[app_edge, synapse_info]
         return matrix.get_index()
-
-
-class AppKeyInfo(object):
-    """
-    An object which holds an application key and mask along with the other
-    details.
-    """
-
-    __slots__ = (
-        "app_key",
-        "app_mask",
-        "core_mask",
-        "core_shift",
-        "n_neurons",
-        "n_colour_bits")
-
-    def __init__(self, app_key, app_mask, core_mask, core_shift, n_neurons,
-                 n_colour_bits):
-        """
-        :param int app_key: The application-level key
-        :param int app_mask: The application-level mask
-        :param int core_mask: The mask to get the core from the key
-        :param int core_shift: The shift to get the core from the key
-        :param int n_neurons:
-            The neurons in each core (except possibly the last)
-        :param int n_colour_bits: The number of colour bits sent
-        """
-        self.app_key = app_key
-        self.app_mask = app_mask
-        self.core_mask = core_mask
-        self.core_shift = core_shift
-        self.n_neurons = n_neurons
-        self.n_colour_bits = n_colour_bits
-
-    @property
-    def key_and_mask(self):
-        """
-        The key and mask as an object.
-
-        :rtype: ~pacman.model.routing_info.BaseKeyAndMask
-        """
-        return BaseKeyAndMask(self.app_key, self.app_mask)

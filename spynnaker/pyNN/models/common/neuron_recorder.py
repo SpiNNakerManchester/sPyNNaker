@@ -27,7 +27,7 @@ from pacman.model.graphs.common import Slice
 from pacman.model.resources import AbstractSDRAM, VariableSDRAM
 from pacman.model.placements import Placement
 from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationGenerator)
+    DataType, DataSpecificationBase)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
@@ -781,7 +781,7 @@ class NeuronRecorder(object):
                 self.__per_timestep_variables)]
 
     def write_neuron_recording_region(
-            self, spec: DataSpecificationGenerator,
+            self, spec: DataSpecificationBase,
             neuron_recording_region: int, vertex_slice: Slice):
         """
         Recording data specification.

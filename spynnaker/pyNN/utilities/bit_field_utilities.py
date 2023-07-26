@@ -14,9 +14,13 @@
 
 import math
 import numpy
+from numpy import uint32
+from numpy.typing import NDArray
+from typing import Iterable
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.projection import Projection
 
 #: number of elements
 #  key, n atoms, atoms_per_core, pointer to bitfield
@@ -89,7 +93,8 @@ def get_sdram_for_keys(incoming_projections):
     return sdram
 
 
-def get_bitfield_key_map_data(incoming_projections):
+def get_bitfield_key_map_data(
+        incoming_projections: Iterable[Projection]) -> NDArray[uint32]:
     """
     Get data for the key map region.
 
@@ -116,10 +121,10 @@ def get_bitfield_key_map_data(incoming_projections):
                 sources.append([delay_key, n_delay_atoms])
 
     if not sources:
-        return numpy.array([], dtype="uint32")
+        return numpy.array([], dtype=uint32)
 
     # Make keys and atoms, ordered by keys
-    key_map = numpy.array(sources, dtype="uint32")
+    key_map = numpy.array(sources, dtype=uint32)
     key_map = key_map[numpy.argsort(key_map[:, 0])]
 
     # get the number of atoms per item

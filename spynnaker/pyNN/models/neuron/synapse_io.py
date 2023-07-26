@@ -14,9 +14,9 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import numpy
-from numpy import integer, uint32
+from numpy import floating, integer, uint32
 from numpy.typing import NDArray
-from typing import List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
+from typing import List, Optional, Tuple, Union, TYPE_CHECKING
 
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -206,7 +206,7 @@ def _get_allowed_row_length(
 def get_synapses(
         connections: _ConnectionsArray, synapse_info: SynapseInformation,
         n_delay_stages: int, n_synapse_types: int,
-        weight_scales: Sequence[float], app_edge: ProjectionApplicationEdge,
+        weight_scales: NDArray[floating], app_edge: ProjectionApplicationEdge,
         post_vertex_slice: Slice, max_row_info: MaxRowInfo,
         gen_undelayed: bool, gen_delayed: bool,
         max_atoms_per_core: int) -> Tuple[_RowData, _RowData]:
@@ -381,7 +381,7 @@ def _get_row_data(
 def convert_to_connections(
         synapse_info: SynapseInformation, post_vertex_slice: Slice,
         n_pre_atoms: int, max_row_length: int, n_synapse_types: int,
-        weight_scales: Sequence[float], data: Union[bytes, NDArray],
+        weight_scales: NDArray[floating], data: Union[bytes, NDArray],
         delayed: bool, post_vertex_max_delay_ticks: int,
         max_atoms_per_core: int) -> _ConnectionsArray:
     """
@@ -448,7 +448,7 @@ def convert_to_connections(
 def read_all_synapses(
         data: NDArray[uint32], delayed_data: NDArray[uint32],
         synapse_info: SynapseInformation, n_synapse_types: int,
-        weight_scales: Sequence[float], post_vertex_slice: Slice,
+        weight_scales: NDArray[floating], post_vertex_slice: Slice,
         n_pre_atoms: int, post_vertex_max_delay_ticks: int,
         max_row_info: MaxRowInfo, max_atoms_per_core: int
         ) -> _ConnectionsArray:
@@ -632,7 +632,7 @@ def _read_plastic_data(
 
 
 def _rescale_connections(
-        connections: _ConnectionsArray, weight_scales: Sequence[float],
+        connections: _ConnectionsArray, weight_scales: NDArray[floating],
         synapse_info: SynapseInformation) -> _ConnectionsArray:
     """
     Scale the connection data into machine values.

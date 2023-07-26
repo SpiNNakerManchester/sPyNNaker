@@ -56,8 +56,8 @@ class PopulationSynapsesMachineVertexLead(
             self, sdram: AbstractSDRAM, label: str,
             app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
             ring_buffer_shifts: Sequence[int],
-            weight_scales: NDArray[floating],
-            structural_sz: int, synapse_references: SynapseRegionReferences,
+            weight_scales: NDArray[floating], structural_sz: int,
+            synapse_references: SynapseRegionReferences,
             max_atoms_per_core: int, synaptic_matrices: SynapticMatrices):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:

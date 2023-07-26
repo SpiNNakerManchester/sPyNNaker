@@ -13,8 +13,16 @@
 # limitations under the License.
 
 import numpy
-from typing import Optional
+from numpy import uint32
+from numpy.typing import NDArray
+from typing import Optional, Sequence, Tuple, Union, cast
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.models.neural_projections import (
+    ProjectionApplicationEdge, SynapseInformation)
+from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+from spynnaker.pyNN.models.populations import Population, PopulationView
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractGenerateConnectorOnMachine)
 
 # Address to indicate that the synaptic region is unused
 SYN_REGION_UNUSED = 0xFFFFFFFF
@@ -31,8 +39,9 @@ class GeneratorData(object):
     def __init__(
             self, synaptic_matrix_offset: Optional[int],
             delayed_synaptic_matrix_offset: Optional[int],
-            app_edge, synapse_information, max_row_info,
-            max_pre_atoms_per_core, max_post_atoms_per_core):
+            app_edge: ProjectionApplicationEdge,
+            synapse_information: SynapseInformation, max_row_info: MaxRowInfo,
+            max_pre_atoms_per_core: int, max_post_atoms_per_core: int):
         # Offsets are used in words in the generator, but only
         # if the values are valid
         if synaptic_matrix_offset is not None:
@@ -45,21 +54,16 @@ class GeneratorData(object):
             delayed_synaptic_matrix_offset = SYN_REGION_UNUSED
 
         # Take care of Population views
-        pre_lo = 0
-        pre_hi = synapse_information.n_pre_neurons - 1
-        if synapse_information.prepop_is_view:
-            indexes = synapse_information.pre_population._indexes
-            pre_lo = indexes[0]
-            pre_hi = indexes[-1]
-        post_lo = 0
-        post_hi = synapse_information.n_post_neurons - 1
-        if synapse_information.postpop_is_view:
-            indexes = synapse_information.post_population._indexes
-            post_lo = indexes[0]
-            post_hi = indexes[-1]
+        pre_lo, pre_hi = self.__view_range(
+            synapse_information.pre_population,
+            synapse_information.n_pre_neurons - 1)
+        post_lo, post_hi = self.__view_range(
+            synapse_information.post_population,
+            synapse_information.n_post_neurons - 1)
 
         # Get objects needed for the next bit
-        connector = synapse_information.connector
+        connector = cast(AbstractGenerateConnectorOnMachine,
+                         synapse_information.connector)
         synapse_dynamics = synapse_information.synapse_dynamics
 
         # Create the data needed
@@ -71,7 +75,7 @@ class GeneratorData(object):
                 connector.gen_connector_id,
                 connector.gen_weights_id(synapse_information.weights),
                 connector.gen_delays_id(synapse_information.delays)
-                ], dtype=numpy.uint32),
+                ], dtype=uint32),
             synapse_dynamics.gen_matrix_params(
                 synaptic_matrix_offset, delayed_synaptic_matrix_offset,
                 app_edge, synapse_information, max_row_info,
@@ -80,8 +84,18 @@ class GeneratorData(object):
             connector.gen_weights_params(synapse_information.weights),
             connector.gen_delay_params(synapse_information.delays)]
 
+    @staticmethod
+    def __view_range(
+            pop: Union[Population, PopulationView],
+            size: int) -> Tuple[int, int]:
+        if isinstance(pop, PopulationView):
+            idx = pop._indexes  # pylint: disable=protected-access
+            return idx[0], idx[-1]
+        else:
+            return 0, size
+
     @property
-    def size(self):
+    def size(self) -> int:
         """
         The size of the generated data, in bytes.
 
@@ -90,7 +104,7 @@ class GeneratorData(object):
         return sum(len(i) for i in self.__data) * BYTES_PER_WORD
 
     @property
-    def gen_data(self):
+    def gen_data(self) -> Sequence[NDArray[uint32]]:
         """
         The data to be written for this connection.
 

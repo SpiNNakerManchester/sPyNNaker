@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+import numpy
 from numpy import floating
 from numpy.typing import NDArray
-from typing import List, Sequence, Tuple, cast, TYPE_CHECKING
+from typing import List, Sequence, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
 
@@ -37,8 +38,6 @@ from .abstract_population_vertex import AbstractPopulationVertex
 from .population_machine_synapses_provenance import (
     PopulationMachineSynapsesProvenance)
 from .synaptic_matrices import SynapseRegions, SynapseRegionReferences
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    AbstractSpynnakerSplitterDelay)
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
     from spynnaker.pyNN.models.neural_projections import (
@@ -267,8 +266,9 @@ class PopulationMachineSynapses(
             The specific projection within the edge
         :rtype: ~numpy.ndarray
         """
-        return self._synaptic_matrices.get_connections_from_machine(
-            placement, app_edge, synapse_info)
+        return numpy.concatenate(
+            self._synaptic_matrices.get_connections_from_machine(
+                placement, app_edge, synapse_info))
 
     @property
     @overrides(AbstractSynapseExpandable.max_gen_data)
