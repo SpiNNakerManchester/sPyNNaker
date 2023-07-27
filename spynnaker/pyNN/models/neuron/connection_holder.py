@@ -19,6 +19,7 @@ from numpy.typing import NDArray
 from typing import (
     Callable, Iterator, List, Optional, Sequence, Tuple, Union)
 from typing_extensions import TypeAlias
+from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
 
 _ItemType: TypeAlias = numpy.floating
 _Items: TypeAlias = Union[Tuple[NDArray[_ItemType], ...], NDArray[_ItemType]]
@@ -61,7 +62,7 @@ class ConnectionHolder(object):
     def __init__(
             self, data_items_to_return: Optional[Sequence[int]], as_list: bool,
             n_pre_atoms: int, n_post_atoms: int,
-            connections: Optional[List[NDArray]] = None,
+            connections: Optional[List[ConnectionsArray]] = None,
             fixed_values: Optional[List[Tuple[str, int]]] = None,
             notify: Optional[Callable[['ConnectionHolder'], None]] = None):
         """
@@ -102,7 +103,7 @@ class ConnectionHolder(object):
         self.__notify = notify
         self.__fixed_values = fixed_values
 
-    def add_connections(self, connections: NDArray):
+    def add_connections(self, connections: ConnectionsArray):
         """
         Add connections to the holder to be returned.
 
@@ -115,7 +116,7 @@ class ConnectionHolder(object):
         self.__connections.append(connections)
 
     @property
-    def connections(self) -> List[NDArray]:
+    def connections(self) -> List[ConnectionsArray]:
         """
         The connections stored.
 
@@ -156,7 +157,7 @@ class ConnectionHolder(object):
 
         # Join all the connections that have been added (probably over multiple
         # sub-vertices of a population)
-        connections: NDArray = numpy.concatenate(self.__connections)
+        connections: ConnectionsArray = numpy.concatenate(self.__connections)
 
         # If there are additional fixed values, merge them in
         if self.__fixed_values:

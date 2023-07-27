@@ -13,22 +13,27 @@
 # limitations under the License.
 
 import numpy
+from numpy import integer, uint32
+from numpy.typing import NDArray
+from typing import Tuple
 
 
-def _calculate_stdp_times(pre_spikes, post_spikes, plastic_delay):
+def _calculate_stdp_times(
+        pre_spikes: NDArray[integer], post_spikes: NDArray[integer],
+        plastic_delay: int) -> Tuple[NDArray[integer], NDArray[integer]]:
     """
     :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
     """
     # If no post spikes, no changes
     if len(post_spikes) == 0:
-        return numpy.zeros(0), numpy.zeros(0)
+        return numpy.zeros(0, dtype=uint32), numpy.zeros(0, dtype=uint32)
 
     # Get the spikes and time differences that will be considered by
     # the simulation (as the last pre-spike will be considered differently)
     last_pre_spike_delayed = pre_spikes[-1] - plastic_delay
     considered_post_spikes = post_spikes[post_spikes < last_pre_spike_delayed]
     if len(considered_post_spikes) == 0:
-        return numpy.zeros(0), numpy.zeros(0)
+        return numpy.zeros(0, dtype=uint32), numpy.zeros(0, dtype=uint32)
     potentiation_time_diff = numpy.ravel(numpy.subtract.outer(
         considered_post_spikes + plastic_delay, pre_spikes[:-1]))
     potentiation_times = (
@@ -40,8 +45,10 @@ def _calculate_stdp_times(pre_spikes, post_spikes, plastic_delay):
 
 
 def calculate_spike_pair_additive_stdp_weight(
-        pre_spikes, post_spikes, initial_weight, plastic_delay,
-        a_plus, a_minus, tau_plus, tau_minus):
+        pre_spikes: NDArray[integer], post_spikes: NDArray[integer],
+        initial_weight: float, plastic_delay: int,
+        a_plus: float, a_minus: float,
+        tau_plus: float, tau_minus: float) -> float:
     """
     Calculates the expected STDP weight for SpikePair Additive STDP.
 
@@ -71,8 +78,11 @@ def calculate_spike_pair_additive_stdp_weight(
 
 
 def calculate_spike_pair_multiplicative_stdp_weight(
-        pre_spikes, post_spikes, initial_weight, plastic_delay, min_weight,
-        max_weight, a_plus, a_minus, tau_plus, tau_minus):
+        pre_spikes: NDArray[integer], post_spikes: NDArray[integer],
+        initial_weight: float, plastic_delay: int,
+        min_weight: float, max_weight: float,
+        a_plus: float, a_minus: float,
+        tau_plus: float, tau_minus: float) -> float:
     """
     Calculates the expected STDP weight for SpikePair Multiplicative STDP.
 

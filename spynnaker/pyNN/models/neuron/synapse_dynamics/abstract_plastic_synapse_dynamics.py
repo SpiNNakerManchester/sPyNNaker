@@ -18,6 +18,7 @@ from typing import List, Tuple
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.common import Slice
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
 
 
 class AbstractPlasticSynapseDynamics(
@@ -41,7 +42,7 @@ class AbstractPlasticSynapseDynamics(
 
     @abstractmethod
     def get_plastic_synaptic_data(
-            self, connections: NDArray,
+            self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
             post_vertex_slice: Slice, n_synapse_types: int,
             max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
@@ -69,7 +70,7 @@ class AbstractPlasticSynapseDynamics(
         :param int n_synapse_types: The number of synapse types
         :param int max_n_synapses: The maximum number of synapses to generate
         :param int max_atoms_per_core: The maximum number of atoms on a core
-        :return: (fp_data, pp_data, fp_size, pp_size)
+        :return: (fp_data (2D), pp_data (2D), fp_size (1D), pp_size (1D))
         :rtype:
             tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,
             ~numpy.ndarray)
@@ -114,7 +115,7 @@ class AbstractPlasticSynapseDynamics(
             self, post_vertex_slice: Slice, n_synapse_types: int,
             pp_size: NDArray[uint32], pp_data: List[NDArray[uint32]],
             fp_size: NDArray[uint32], fp_data: List[NDArray[uint32]],
-            max_atoms_per_core: int) -> NDArray:
+            max_atoms_per_core: int) -> ConnectionsArray:
         """
         Read the connections indicated in the connection indices from the
         data in `pp_data` and `fp_data`.

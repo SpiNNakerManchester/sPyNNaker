@@ -14,6 +14,7 @@
 
 from spinn_utilities.overrides import overrides
 from .abstract_partner_selection import AbstractPartnerSelection
+from spinn_front_end_common.interface.ds import DataSpecificationBase
 
 
 class LastNeuronSelection(AbstractPartnerSelection):
@@ -40,7 +41,7 @@ class LastNeuronSelection(AbstractPartnerSelection):
         return 4
 
     @overrides(AbstractPartnerSelection.write_parameters)
-    def write_parameters(self, spec):
+    def write_parameters(self, spec: DataSpecificationBase):
         spec.write_value(self.__spike_buffer_size)
 
     @overrides(AbstractPartnerSelection.get_parameter_names)

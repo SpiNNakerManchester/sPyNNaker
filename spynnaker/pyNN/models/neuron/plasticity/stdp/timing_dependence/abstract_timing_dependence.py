@@ -25,8 +25,14 @@ class AbstractTimingDependence(
     """
     An STDP timing dependence rule.
     """
+    __slots__ = ("__synapse_structure", )
 
-    __slots__ = ()
+    def __init__(self, synapse_structure: AbstractSynapseStructure):
+        """
+        :param synapse_structure:
+            The synaptic structure of the plastic part of the rows.
+        """
+        self.__synapse_structure = synapse_structure
 
     @abstractmethod
     def is_same_as(
@@ -95,11 +101,30 @@ class AbstractTimingDependence(
         raise NotImplementedError
 
     @property
-    @abstractmethod
     def synaptic_structure(self) -> AbstractSynapseStructure:
         """
         The synaptic structure of the plastic part of the rows.
 
         :rtype: AbstractSynapseStructure
+        """
+        return self.__synapse_structure
+
+    @property
+    @abstractmethod
+    def A_plus(self):
+        r"""
+        :math:`A^+`
+
+        :rtype: float
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def A_minus(self):
+        r"""
+        :math:`A^-`
+
+        :rtype: float
         """
         raise NotImplementedError

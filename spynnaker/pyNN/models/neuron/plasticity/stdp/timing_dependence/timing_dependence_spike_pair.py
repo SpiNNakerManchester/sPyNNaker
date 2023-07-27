@@ -28,7 +28,6 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
     A basic timing dependence STDP rule.
     """
     __slots__ = (
-        "__synapse_structure",
         "__tau_minus",
         "__tau_minus_data",
         "__tau_plus",
@@ -38,19 +37,19 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
     __PARAM_NAMES = ('tau_plus', 'tau_minus')
 
     def __init__(
-            self, tau_plus=20.0, tau_minus=20.0, A_plus=0.01, A_minus=0.01):
+            self, tau_plus: float = 20.0, tau_minus: float = 20.0,
+            A_plus: float = 0.01, A_minus: float = 0.01):
         r"""
         :param float tau_plus: :math:`\tau_+`
         :param float tau_minus: :math:`\tau_-`
         :param float A_plus: :math:`A^+`
         :param float A_minus: :math:`A^-`
         """
+        super().__init__(SynapseStructureWeightOnly())
         self.__tau_plus = tau_plus
         self.__tau_minus = tau_minus
         self.__a_plus = A_plus
         self.__a_minus = A_minus
-
-        self.__synapse_structure = SynapseStructureWeightOnly()
 
         # provenance data
         ts = SpynnakerDataView.get_simulation_time_step_ms()
@@ -148,15 +147,6 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
         spec.write_array(self.__tau_minus_data)
-
-    @property
-    def synaptic_structure(self):
-        """
-        The synaptic structure of the plastic part of the rows.
-
-        :rtype: AbstractSynapseStructure
-        """
-        return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):

@@ -14,9 +14,9 @@
 
 import math
 import numpy
-from numpy import floating, float64, uint32
+from numpy import floating, integer, uint32
 from numpy.typing import NDArray
-from typing import List
+from typing import List, Optional
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
@@ -30,11 +30,6 @@ class AbstractSDRAMSynapseDynamics(
     """
 
     __slots__ = ()
-
-    #: Type model of the basic configuration data of a connector
-    NUMPY_CONNECTORS_DTYPE = numpy.dtype(
-        [("source", uint32), ("target", uint32),
-         ("weight", float64), ("delay", float64)])
 
     @abstractmethod
     def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:
@@ -89,14 +84,14 @@ class AbstractSDRAMSynapseDynamics(
 
     @property
     @abstractmethod
-    def pad_to_length(self) -> int:
+    def pad_to_length(self) -> Optional[int]:
         """
         The amount each row should pad to, or `None` if not specified.
         """
         raise NotImplementedError
 
     def convert_per_connection_data_to_rows(
-            self, connection_row_indices: NDArray, n_rows: int,
+            self, connection_row_indices: NDArray[integer], n_rows: int,
             data: NDArray, max_n_synapses: int) -> List[NDArray]:
         """
         Converts per-connection data generated from connections into
@@ -117,7 +112,7 @@ class AbstractSDRAMSynapseDynamics(
             for i in range(n_rows)]
 
     def get_n_items(
-            self, rows: NDArray, item_size: int) -> NDArray[uint32]:
+            self, rows: List[NDArray], item_size: int) -> NDArray[uint32]:
         """
         Get the number of items in each row as 4-byte values, given the
         item size.
@@ -130,7 +125,7 @@ class AbstractSDRAMSynapseDynamics(
             int(math.ceil(float(row.size) / float(item_size)))
             for row in rows], dtype=uint32).reshape((-1, 1))
 
-    def get_words(self, rows: NDArray) -> List[NDArray[uint32]]:
+    def get_words(self, rows: List[NDArray]) -> List[NDArray[uint32]]:
         """
         Convert the row data to words.
 

@@ -11,20 +11,36 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
+from typing import Dict, Optional, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from .abstract_synapse_dynamics_structural import (
-    AbstractSynapseDynamicsStructural)
+    AbstractSynapseDynamicsStructural, InitialDelay)
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_common import (
     DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
-    DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
+    DEFAULT_S_MAX, SynapseDynamicsStructuralCommon, ConnectionsInfo)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
+        partner_selection.abstract_partner_selection import \
+        AbstractPartnerSelection
+    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
+        formation.abstract_formation import AbstractFormation
+    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
+        elimination.abstract_elimination import AbstractElimination
+    from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.\
+        abstract_timing_dependence import AbstractTimingDependence
+    from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
+        abstract_weight_dependence import AbstractWeightDependence
+    from .abstract_plastic_synapse_dynamics import (
+        AbstractPlasticSynapseDynamics)
 
 
 class SynapseDynamicsStructuralSTDP(
@@ -66,14 +82,20 @@ class SynapseDynamicsStructuralSTDP(
         "__with_replacement")
 
     def __init__(
-            self, partner_selection, formation, elimination,
-            timing_dependence=None, weight_dependence=None,
-            voltage_dependence=None, dendritic_delay_fraction=1.0,
-            f_rew=DEFAULT_F_REW, initial_weight=DEFAULT_INITIAL_WEIGHT,
-            initial_delay=DEFAULT_INITIAL_DELAY, s_max=DEFAULT_S_MAX,
-            with_replacement=True, seed=None,
-            weight=StaticSynapse.default_parameters['weight'], delay=None,
-            backprop_delay=True):
+            self, partner_selection: AbstractPartnerSelection,
+            formation: AbstractFormation, elimination: AbstractElimination,
+            timing_dependence: AbstractTimingDependence,
+            weight_dependence: AbstractWeightDependence,
+            voltage_dependence: None = None,
+            dendritic_delay_fraction: float = 1.0,
+            f_rew: float = DEFAULT_F_REW,
+            initial_weight: float = DEFAULT_INITIAL_WEIGHT,
+            initial_delay: InitialDelay = DEFAULT_INITIAL_DELAY,
+            s_max: int = DEFAULT_S_MAX,
+            with_replacement: bool = True, seed: Optional[int] = None,
+            weight: float = StaticSynapse.default_parameters['weight'],
+            delay: Optional[float] = None,
+            backprop_delay: bool = True):
         """
         :param AbstractPartnerSelection partner_selection:
             The partner selection rule
@@ -123,18 +145,18 @@ class SynapseDynamicsStructuralSTDP(
         self.__s_max = s_max
         self.__with_replacement = with_replacement
         self.__seed = seed
-        self.__connections = dict()
+        self.__connections: ConnectionsInfo = dict()
 
         self.__rng = numpy.random.RandomState(seed)
-        self.__seeds = dict()
+        self.__seeds: Dict[object, Tuple[int, ...]] = dict()
 
-    @overrides(SynapseDynamicsSTDP.merge)
-    def merge(self, synapse_dynamics):
+    @overrides(AbstractPlasticSynapseDynamics.merge)
+    def merge(self, synapse_dynamics) -> SynapseDynamicsStructuralSTDP:
         # If dynamics is Neuromodulation, merge with other neuromodulation,
         # and then return ourselves, as neuromodulation can't be used by
         # itself
         if isinstance(synapse_dynamics, SynapseDynamicsNeuromodulation):
-            super().merge_neuromodulation(synapse_dynamics)
+            self._merge_neuromodulation(synapse_dynamics)
             return self
         # If other is structural, check structural matches
         if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
@@ -153,7 +175,7 @@ class SynapseDynamicsStructuralSTDP(
         # If everything matches, return ourselves as supreme!
         return self
 
-    def set_projection_parameter(self, param, value):
+    def set_projection_parameter(self, param: str, value):
         """
         :param str param:
         :param value:
@@ -166,8 +188,8 @@ class SynapseDynamicsStructuralSTDP(
         else:
             raise ValueError(f"Unknown parameter {param}")
 
-    @overrides(SynapseDynamicsSTDP.is_same_as)
-    def is_same_as(self, synapse_dynamics):
+    @overrides(AbstractPlasticSynapseDynamics.is_same_as)
+    def is_same_as(self, synapse_dynamics) -> bool:
         if (isinstance(synapse_dynamics, SynapseDynamicsSTDP) and
                 not super().is_same_as(synapse_dynamics)):
             return False
@@ -175,14 +197,15 @@ class SynapseDynamicsStructuralSTDP(
             self, synapse_dynamics)
 
     @overrides(SynapseDynamicsSTDP.get_vertex_executable_suffix)
-    def get_vertex_executable_suffix(self):
+    def get_vertex_executable_suffix(self) -> str:
         return (super().get_vertex_executable_suffix() +
                 SynapseDynamicsStructuralCommon.get_vertex_executable_suffix(
                     self))
 
     @overrides(AbstractSynapseDynamicsStructural.set_connections)
     def set_connections(
-            self, connections, post_vertex_slice, app_edge, synapse_info):
+            self, connections: ConnectionsArray, post_vertex_slice, app_edge,
+            synapse_info):
         if not isinstance(synapse_info.synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
             return
@@ -190,7 +213,7 @@ class SynapseDynamicsStructuralSTDP(
             (app_edge.post_vertex, post_vertex_slice.lo_atom), [])
         collector.append((connections, app_edge, synapse_info))
 
-    @overrides(SynapseDynamicsSTDP.get_parameter_names)
+    @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)
     def get_parameter_names(self):
         yield from super().get_parameter_names()
         yield from SynapseDynamicsStructuralCommon.get_parameter_names(self)
@@ -242,14 +265,14 @@ class SynapseDynamicsStructuralSTDP(
 
     @property
     @overrides(SynapseDynamicsStructuralCommon.connections)
-    def connections(self):
+    def connections(self) -> ConnectionsInfo:
         return self.__connections
 
-    @overrides(SynapseDynamicsSTDP.get_weight_mean)
+    @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)
     def get_weight_mean(self, connector, synapse_info):
         return self.get_weight_maximum(connector, synapse_info)
 
-    @overrides(SynapseDynamicsSTDP.get_weight_maximum)
+    @overrides(AbstractPlasticSynapseDynamics.get_weight_maximum)
     def get_weight_maximum(self, connector, synapse_info):
         w_max = super().get_weight_maximum(connector, synapse_info)
         return max(w_max, self.__initial_weight)

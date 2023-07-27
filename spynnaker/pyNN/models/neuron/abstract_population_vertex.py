@@ -23,6 +23,7 @@ from collections import defaultdict
 from typing import (
     Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
     cast, TYPE_CHECKING)
+from typing_extensions import TypeGuard
 
 from pyNN.space import Grid2D, Grid3D, BaseStructure
 from pyNN.random import RandomDistribution
@@ -60,7 +61,7 @@ from spynnaker.pyNN.utilities.constants import (
     POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSDRAMSynapseDynamics, AbstractSynapseDynamicsStructural,
+    AbstractSynapseDynamics, AbstractSynapseDynamicsStructural,
     AbstractSupportsSignedWeights)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.models.neuron.population_machine_common import (
@@ -87,13 +88,15 @@ from .generator_data import GeneratorData
 from .synaptic_matrices import SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
+from spynnaker.pyNN.models.neuron.synapse_dynamics.\
+    abstract_sdram_synapse_dynamics import (
+        AbstractSDRAMSynapseDynamics)
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
     from spynnaker.pyNN.models.projection import Projection
-    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-        AbstractSynapseDynamics)
     from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
-    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+    from spynnaker.pyNN.models.neuron.synapse_io import (
+        MaxRowInfo, ConnectionsArray)
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
     from spynnaker.pyNN.models.neural_projections import (
         SynapseInformation, ProjectionApplicationEdge)
@@ -167,6 +170,10 @@ def _check_random_dists(rd):
             for _start, _stop, val in rd[key].iter_ranges():
                 if isinstance(val, RandomDistribution):
                     check_rng(val.rng, f"RandomDistribution for {key}")
+
+
+def _is_structural(dynamics) -> TypeGuard[AbstractSynapseDynamicsStructural]:
+    return isinstance(dynamics, AbstractSynapseDynamicsStructural)
 
 
 class AbstractPopulationVertex(
@@ -338,7 +345,9 @@ class AbstractPopulationVertex(
         self.__self_projection: Optional[Projection] = None
 
         # Keep track of the synapse dynamics for the vertex overall
-        self.__synapse_dynamics = SynapseDynamicsStatic()
+        self.__synapse_dynamics: Union[
+            AbstractLocalOnly, AbstractSDRAMSynapseDynamics] = \
+            SynapseDynamicsStatic()
 
         self.__structure: Optional[BaseStructure] = None
 
@@ -446,8 +455,6 @@ class AbstractPopulationVertex(
 
         :rtype: bool
         """
-        if self.__synapse_dynamics is None:
-            return True
         return self.__synapse_dynamics.is_combined_core_capable
 
     @property
@@ -465,12 +472,12 @@ class AbstractPopulationVertex(
         return 1
 
     @property
-    def synapse_dynamics(self) -> Optional[AbstractSynapseDynamics]:
+    def synapse_dynamics(self) -> AbstractSynapseDynamics:
         """
         The synapse dynamics used by the synapses e.g. plastic or static.
         Settable.
 
-        :rtype: AbstractSynapseDynamics or None
+        :rtype: AbstractSynapseDynamics
         """
         return self.__synapse_dynamics
 
@@ -486,8 +493,11 @@ class AbstractPopulationVertex(
         :param AbstractSynapseDynamics synapse_dynamics:
             The synapse dynamics to set
         """
-        self.__synapse_dynamics = self.__synapse_dynamics.merge(
-            synapse_dynamics)
+        merged = self.__synapse_dynamics.merge(synapse_dynamics)
+        assert isinstance(merged, (
+            AbstractLocalOnly, AbstractSDRAMSynapseDynamics)), \
+            f"unhandled type of merged synapse dynamics: {type(merged)}"
+        self.__synapse_dynamics = merged
 
     def add_incoming_projection(self, projection: Projection):
         """
@@ -1190,14 +1200,14 @@ class AbstractPopulationVertex(
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, app_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation) -> NDArray:
+            synapse_info: SynapseInformation) -> ConnectionsArray:
         # If we already have connections cached, return them
         if (app_edge, synapse_info) in self.__connection_cache:
             return self.__connection_cache[app_edge, synapse_info]
 
         # Start with something in the list so that concatenate works
         connections = [numpy.zeros(
-                0, dtype=AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)]
+                0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)]
         progress = ProgressBar(
             len(self.machine_vertices),
             f"Getting synaptic data between {app_edge.pre_vertex.label} "
@@ -1230,7 +1240,7 @@ class AbstractPopulationVertex(
         """
         if isinstance(self.__synapse_dynamics, AbstractLocalOnly):
             return self.__synapse_dynamics.get_parameters_usage_in_bytes(
-                self.incoming_projections)
+                n_atoms, self.incoming_projections)
 
         return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
             n_atoms, self.__neuron_impl.get_n_synapse_types())
@@ -1243,8 +1253,7 @@ class AbstractPopulationVertex(
             The number of atoms in the slice
         :rtype: int
         """
-        if not isinstance(
-                self.__synapse_dynamics, AbstractSynapseDynamicsStructural):
+        if not _is_structural(self.__synapse_dynamics):
             return 0
 
         return self.__synapse_dynamics\
@@ -1453,8 +1462,7 @@ class AbstractPopulationVertex(
             The slice of neurons to get the size of
         :rtype: int
         """
-        if isinstance(self.__synapse_dynamics,
-                      AbstractSynapseDynamicsStructural):
+        if _is_structural(self.__synapse_dynamics):
             self.__synapse_recorder.set_max_rewires_per_ts(
                 self.__synapse_dynamics.get_max_rewires_per_ts())
         return self.__synapse_recorder.get_variable_sdram_usage(vertex_slice)
@@ -1465,8 +1473,7 @@ class AbstractPopulationVertex(
 
         :rtype: int
         """
-        if isinstance(self.__synapse_dynamics,
-                      AbstractSynapseDynamicsStructural):
+        if _is_structural(self.__synapse_dynamics):
             self.__synapse_recorder.set_max_rewires_per_ts(
                 self.__synapse_dynamics.get_max_rewires_per_ts())
         return self.__synapse_recorder.get_max_variable_sdram_usage(n_neurons)

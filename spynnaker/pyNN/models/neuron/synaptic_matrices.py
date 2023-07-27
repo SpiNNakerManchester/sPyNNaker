@@ -515,7 +515,7 @@ class SynapticMatrices(object):
         :param SynapseInformation synapse_info:
             The synapse information of the projection
         :return: A list of arrays of connections, each with dtype
-            :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
+            :py:attr:`~.AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
         :rtype: list(~numpy.ndarray)
         """
         matrix = self.__matrices[app_edge, synapse_info]

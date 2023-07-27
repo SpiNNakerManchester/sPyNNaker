@@ -14,12 +14,12 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import numpy
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.require_subclass import require_subclass
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationVertex
 if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
         AbstractSynapseDynamics)
     from spynnaker.pyNN.models.neural_projections import (
@@ -61,7 +61,7 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
     @abstractmethod
     def get_connections_from_machine(
             self, app_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation) -> numpy.ndarray:
+            synapse_info: SynapseInformation) -> ConnectionsArray:
         """
         Get the connections from the machine post-run.
 

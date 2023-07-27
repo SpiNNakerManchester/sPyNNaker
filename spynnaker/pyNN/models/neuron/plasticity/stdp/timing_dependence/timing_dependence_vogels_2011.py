@@ -31,7 +31,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     """
     __slots__ = (
         "__alpha",
-        "__synapse_structure",
         "__tau",
         "__tau_data",
         "__a_plus",
@@ -39,20 +38,19 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     __PARAM_NAMES = ('alpha', 'tau')
     default_parameters = {'tau': 20.0}
 
-    def __init__(self, alpha, tau=default_parameters['tau'],
-                 A_plus=0.01, A_minus=0.01):
+    def __init__(self, alpha: float, tau: float = default_parameters['tau'],
+                 A_plus: float = 0.01, A_minus: float = 0.01):
         r"""
         :param float alpha: :math:`\alpha`
         :param float tau: :math:`\tau`
         :param float A_plus: :math:`A^+`
         :param float A_minus: :math:`A^-`
         """
+        super().__init__(SynapseStructureWeightOnly())
         self.__alpha = alpha
         self.__tau = tau
         self.__a_plus = A_plus
         self.__a_minus = A_minus
-
-        self.__synapse_structure = SynapseStructureWeightOnly()
 
         self.__tau_data = get_exp_lut_array(
             SpynnakerDataView.get_simulation_time_step_ms(), self.__tau)
@@ -149,15 +147,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
         # Write lookup table
         spec.write_array(self.__tau_data)
-
-    @property
-    def synaptic_structure(self):
-        """
-        The synaptic structure of the plastic part of the rows.
-
-        :rtype: AbstractSynapseStructure
-        """
-        return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):

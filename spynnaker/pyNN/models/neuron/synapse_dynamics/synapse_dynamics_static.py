@@ -13,11 +13,12 @@
 # limitations under the License.
 from __future__ import annotations
 import numpy
-from numpy import uint32
+from numpy import uint8, uint32, integer
 from numpy.typing import NDArray
 from pyNN.standardmodels.synapses import StaticSynapse
-from typing import TYPE_CHECKING
+from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.data import SpynnakerDataView
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
@@ -27,9 +28,11 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 if TYPE_CHECKING:
+    from .abstract_synapse_dynamics import AbstractSynapseDynamics
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
-    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+    from spynnaker.pyNN.models.neuron.synapse_io import (
+        ConnectionsArray, MaxRowInfo)
 
 
 class SynapseDynamicsStatic(
@@ -47,8 +50,10 @@ class SynapseDynamicsStatic(
         # delay of connections
         "__delay")
 
-    def __init__(self, weight=StaticSynapse.default_parameters['weight'],
-                 delay=None, pad_to_length=None):
+    def __init__(
+            self, weight: float = StaticSynapse.default_parameters['weight'],
+            delay: Optional[float] = None,
+            pad_to_length: Optional[int] = None):
         """
         :param float weight:
         :param delay: Use ``None`` to get the simulator default minimum delay.
@@ -62,7 +67,8 @@ class SynapseDynamicsStatic(
         self.__pad_to_length = pad_to_length
 
     @overrides(AbstractStaticSynapseDynamics.merge)
-    def merge(self, synapse_dynamics):
+    def merge(self, synapse_dynamics: AbstractSynapseDynamics
+              ) -> AbstractSynapseDynamics:
         # Neuromodulation shouldn't be used without STDP
         if isinstance(synapse_dynamics, SynapseDynamicsNeuromodulation):
             raise SynapticConfigurationException(
@@ -74,16 +80,17 @@ class SynapseDynamicsStatic(
         return synapse_dynamics
 
     @overrides(AbstractStaticSynapseDynamics.is_same_as)
-    def is_same_as(self, synapse_dynamics):
+    def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:
         return isinstance(synapse_dynamics, SynapseDynamicsStatic)
 
     @overrides(AbstractStaticSynapseDynamics.get_vertex_executable_suffix)
-    def get_vertex_executable_suffix(self):
+    def get_vertex_executable_suffix(self) -> str:
         return ""
 
     @overrides(AbstractStaticSynapseDynamics.
                get_parameters_sdram_usage_in_bytes)
-    def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
+    def get_parameters_sdram_usage_in_bytes(
+            self, n_neurons, n_synapse_types) -> int:
         return 0
 
     @overrides(AbstractStaticSynapseDynamics.write_parameters)
@@ -94,7 +101,7 @@ class SynapseDynamicsStatic(
 
     @overrides(
         AbstractStaticSynapseDynamics.get_n_words_for_static_connections)
-    def get_n_words_for_static_connections(self, n_connections):
+    def get_n_words_for_static_connections(self, n_connections: int) -> int:
         if (self.__pad_to_length is not None and
                 n_connections < self.__pad_to_length):
             n_connections = self.__pad_to_length
@@ -102,31 +109,32 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractStaticSynapseDynamics.get_static_synaptic_data)
     def get_static_synaptic_data(
-            self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, max_n_synapses,
-            max_atoms_per_core):
+            self, connections: ConnectionsArray,
+            connection_row_indices: NDArray[integer], n_rows: int,
+            post_vertex_slice: Slice, n_synapse_types: int,
+            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
+                List[NDArray], NDArray]:
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
         n_synapse_type_bits = get_n_bits(n_synapse_types)
 
         fixed_fixed = (
-            ((numpy.rint(numpy.abs(connections["weight"])).astype("uint32") &
+            ((numpy.rint(numpy.abs(connections["weight"])).astype(uint32) &
               0xFFFF) << 16) |
-            (connections["delay"].astype("uint32") <<
+            (connections["delay"].astype(uint32) <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
-            (connections["synapse_type"].astype(
-                "uint32") << n_neuron_id_bits) |
+            (connections["synapse_type"].astype(uint32) << n_neuron_id_bits) |
             ((connections["target"] - post_vertex_slice.lo_atom) &
              neuron_id_mask))
         fixed_fixed_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
-            fixed_fixed.view(dtype="uint8").reshape((-1, BYTES_PER_WORD)),
+            fixed_fixed.view(uint8).reshape((-1, BYTES_PER_WORD)),
             max_n_synapses)
         ff_size = self.get_n_items(fixed_fixed_rows, BYTES_PER_WORD)
         if self.__pad_to_length is not None:
             # Pad the data
             fixed_fixed_rows = self._pad_row(fixed_fixed_rows, BYTES_PER_WORD)
-        ff_data = [fixed_row.view("uint32") for fixed_row in fixed_fixed_rows]
+        ff_data = [fixed_row.view(uint32) for fixed_row in fixed_fixed_rows]
 
         return ff_data, ff_size
 
@@ -136,24 +144,20 @@ class SynapseDynamicsStatic(
         :param int no_bytes_per_connection:
         :rtype: list(~numpy.ndarray)
         """
-        padded_rows = []
-        for row in rows:  # Row elements are (individual) bytes
-            padded_rows.append(
-                numpy.concatenate((
-                    row, numpy.zeros(numpy.clip(
-                        no_bytes_per_connection * self.__pad_to_length -
-                        row.size, 0, None)).astype(
-                            dtype="uint8"))).view(dtype="uint8"))
-
-        return padded_rows
+        return [
+            numpy.concatenate([
+                row, numpy.zeros(numpy.clip(
+                    no_bytes_per_connection * self.__pad_to_length -
+                    row.size, 0, None)).astype(dtype=uint8)]).view(uint8)
+            for row in rows]  # Row elements are (individual) bytes
 
     @overrides(AbstractStaticSynapseDynamics.get_n_static_words_per_row)
-    def get_n_static_words_per_row(self, ff_size):
+    def get_n_static_words_per_row(self, ff_size: NDArray) -> NDArray:
         # The sizes are in words, so just return them
         return ff_size
 
     @overrides(AbstractStaticSynapseDynamics.get_n_synapses_in_rows)
-    def get_n_synapses_in_rows(self, ff_size):
+    def get_n_synapses_in_rows(self, ff_size: NDArray) -> NDArray:
         # Each word is a synapse and sizes are in words, so just return them
         return ff_size
 
@@ -178,7 +182,7 @@ class SynapseDynamicsStatic(
         return connections
 
     @overrides(AbstractStaticSynapseDynamics.get_parameter_names)
-    def get_parameter_names(self):
+    def get_parameter_names(self) -> Iterable[str]:
         return ('weight', 'delay')
 
     @overrides(AbstractStaticSynapseDynamics.get_max_synapses)

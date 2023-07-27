@@ -23,7 +23,7 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationGenerator)
+    DataType, DataSpecificationBase)
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
@@ -32,18 +32,26 @@ from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from pacman.model.graphs.abstract_edge import AbstractEdge
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neural_projections import (
         SynapseInformation)
     from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
     from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+    from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge)
 
     _PopIndexType: TypeAlias = Dict[
         Tuple[AbstractPopulationVertex, SynapseInformation], int]
     _SubpopIndexType: TypeAlias = Dict[
         Tuple[AbstractPopulationVertex, SynapseInformation, int], int]
+
+#: :meta private:
+ConnectionsInfo: TypeAlias = Dict[
+    Tuple[AbstractPopulationVertex, int],
+    List[Tuple[ConnectionsArray, ProjectionApplicationEdge,
+               SynapseInformation]]]
 
 #: Default value for frequency of rewiring
 DEFAULT_F_REW = 10 ** 4.0
@@ -109,7 +117,7 @@ class SynapseDynamicsStructuralCommon(
 
     @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters)
     def write_structural_parameters(
-            self, spec: DataSpecificationGenerator, region: int,
+            self, spec: DataSpecificationBase, region: int,
             weight_scales: NDArray[numpy.floating],
             app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
             synaptic_matrices: SynapticMatrices):
@@ -172,7 +180,7 @@ class SynapseDynamicsStructuralCommon(
         return structural_projections
 
     def __write_common_rewiring_data(
-            self, spec: DataSpecificationGenerator,
+            self, spec: DataSpecificationBase,
             app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
             n_pre_pops: int):
         """
@@ -224,7 +232,7 @@ class SynapseDynamicsStructuralCommon(
         spec.write_value(data=n_pre_pops)
 
     def __write_prepopulation_info(
-            self, spec: DataSpecificationGenerator,
+            self, spec: DataSpecificationBase,
             app_vertex: ApplicationVertex,
             structural_projections: Iterable[Projection],
             weight_scales: NDArray[numpy.floating],
@@ -308,7 +316,7 @@ class SynapseDynamicsStructuralCommon(
         return pop_index, subpop_index, lo_atom_index
 
     def __write_post_to_pre_table(
-            self, spec: DataSpecificationGenerator, pop_index: _PopIndexType,
+            self, spec: DataSpecificationBase, pop_index: _PopIndexType,
             subpop_index: _SubpopIndexType, lo_atom_index: _SubpopIndexType,
             app_vertex: AbstractPopulationVertex, vertex_slice: Slice):
         """
@@ -420,7 +428,7 @@ class SynapseDynamicsStructuralCommon(
         return name
 
     def is_same_as(
-            self, synapse_dynamics: SynapseDynamicsStructuralCommon) -> bool:
+            self, synapse_dynamics: AbstractSynapseDynamicsStructural) -> bool:
         """
         :param SynapseDynamicsStructuralCommon synapse_dynamics:
         :rtype: bool
@@ -440,9 +448,7 @@ class SynapseDynamicsStructuralCommon(
 
     @property
     @abstractmethod
-    def connections(self) -> Dict[Tuple[AbstractPopulationVertex, int], List[
-            Tuple[NDArray, AbstractEdge,  # FIXME right edge type
-                  SynapseInformation]]]:
+    def connections(self) -> ConnectionsInfo:
         """
         Initial connectivity as defined via connector.
 

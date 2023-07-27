@@ -14,11 +14,13 @@
 from __future__ import annotations
 from numpy import floating
 from numpy.typing import NDArray
-from typing import Iterable, Tuple, Union, TYPE_CHECKING
+from typing import Iterable, Optional, Tuple, Union, TYPE_CHECKING
+from typing_extensions import TypeAlias
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.common import Slice
-from spinn_front_end_common.interface.ds import DataSpecificationGenerator
+from spinn_front_end_common.interface.ds import DataSpecificationBase
 if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
         .partner_selection import AbstractPartnerSelection
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
@@ -30,6 +32,9 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
+
+#: :meta private:
+InitialDelay: TypeAlias = Union[float, Tuple[float, float]]
 
 
 class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
@@ -62,7 +67,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @abstractmethod
     def write_structural_parameters(
-            self, spec: DataSpecificationGenerator, region: int,
+            self, spec: DataSpecificationBase, region: int,
             weight_scales: NDArray[floating],
             app_vertex: AbstractPopulationVertex,
             vertex_slice: Slice, synaptic_matrices: SynapticMatrices):
@@ -84,7 +89,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @abstractmethod
     def set_connections(
-            self, connections: NDArray, post_vertex_slice: Slice,
+            self, connections: ConnectionsArray, post_vertex_slice: Slice,
             app_edge: ProjectionApplicationEdge,
             synapse_info: SynapseInformation):
         """
@@ -129,7 +134,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def seed(self):
+    def seed(self) -> Optional[int]:
         """
         The seed to control the randomness.
         """
@@ -147,13 +152,12 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def initial_delay(self) -> Union[float, Tuple[float, float]]:
+    def initial_delay(self) -> InitialDelay:
         """
         The delay of a formed connection.
 
         :rtype: float or (float, float)
         """
-        # FIXME type
         raise NotImplementedError
 
     @property

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spinn_front_end_common.interface.ds import DataSpecificationGenerator
+from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractHasParameterNames)
 
@@ -46,7 +46,7 @@ class AbstractPartnerSelection(
         raise NotImplementedError
 
     @abstractmethod
-    def write_parameters(self, spec: DataSpecificationGenerator):
+    def write_parameters(self, spec: DataSpecificationBase):
         """
         Write the parameters of the rule to the spec.
 

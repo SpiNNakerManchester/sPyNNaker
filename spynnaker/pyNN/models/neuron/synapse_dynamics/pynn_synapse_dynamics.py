@@ -14,6 +14,9 @@
 
 
 class PyNNSynapseDynamics(object):
+    """
+    This class is deprecated.
+    """
     __slots__ = ("__slow", )
 
     def __init__(self, slow=None, fast=None):

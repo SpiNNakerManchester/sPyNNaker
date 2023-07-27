@@ -35,7 +35,12 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
         AbstractSynapseDynamics)
     _RowData: TypeAlias = numpy.ndarray  # 2D
-    _ConnectionsArray: TypeAlias = NDArray[numpy.void]
+
+#: Type of connections. The dtype is actually
+#: :py:attr:`~.AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE` but we cannot
+#: currently express that in the overall array type due to Numpy typing
+#: limitations.
+ConnectionsArray: TypeAlias = NDArray[numpy.void]
 
 _N_HEADER_WORDS = 3
 # There are 16 slots, one per time step
@@ -204,7 +209,7 @@ def _get_allowed_row_length(
 
 
 def get_synapses(
-        connections: _ConnectionsArray, synapse_info: SynapseInformation,
+        connections: ConnectionsArray, synapse_info: SynapseInformation,
         n_delay_stages: int, n_synapse_types: int,
         weight_scales: NDArray[floating], app_edge: ProjectionApplicationEdge,
         post_vertex_slice: Slice, max_row_info: MaxRowInfo,
@@ -315,7 +320,7 @@ def get_synapses(
 
 
 def _get_row_data(
-        connections: _ConnectionsArray, row_indices: NDArray[numpy.integer],
+        connections: ConnectionsArray, row_indices: NDArray[numpy.integer],
         n_rows: int, post_vertex_slice: Slice, n_synapse_types: int,
         synapse_dynamics: AbstractSynapseDynamics, max_row_n_synapses: int,
         max_row_n_words: int, max_atoms_per_core: int) -> _RowData:
@@ -383,7 +388,7 @@ def convert_to_connections(
         n_pre_atoms: int, max_row_length: int, n_synapse_types: int,
         weight_scales: NDArray[floating], data: Union[bytes, NDArray],
         delayed: bool, post_vertex_max_delay_ticks: int,
-        max_atoms_per_core: int) -> _ConnectionsArray:
+        max_atoms_per_core: int) -> ConnectionsArray:
     """
     Read the synapses for a given projection synapse information
     object out of the given data and convert to connection data
@@ -408,13 +413,13 @@ def convert_to_connections(
     :param int max_atoms_per_core:
         The maximum number of atoms on a core
     :return: The connections read from the data; the dtype is
-        :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
+        :py:attr:`~.AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
     :rtype: ~numpy.ndarray
     """
     # If there is no data, return nothing
     if data is None or not len(data):
         return numpy.zeros(
-            0, dtype=AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+            0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
 
     # Translate the data into rows
     row_data = numpy.frombuffer(data, dtype="<u4").reshape(
@@ -435,7 +440,7 @@ def convert_to_connections(
     # There might still be no connections if the row was all padding
     if not connections.size:
         return numpy.zeros(
-            0, dtype=AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+            0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
 
     # Convert 0 delays to max delays
     connections["delay"][connections["delay"] == 0] = (
@@ -451,7 +456,7 @@ def read_all_synapses(
         weight_scales: NDArray[floating], post_vertex_slice: Slice,
         n_pre_atoms: int, post_vertex_max_delay_ticks: int,
         max_row_info: MaxRowInfo, max_atoms_per_core: int
-        ) -> _ConnectionsArray:
+        ) -> ConnectionsArray:
     """
     Read the synapses for a given projection synapse information
     object out of the given delayed and undelayed data.
@@ -476,10 +481,10 @@ def read_all_synapses(
     :param int max_atoms_per_core:
         The maximum number of atoms on a core
     :return: The connections read from the data; the dtype is
-        :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
+        :py:attr:`~.AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
     :rtype: ~numpy.ndarray
     """
-    connections: List[_ConnectionsArray] = []
+    connections: List[ConnectionsArray] = []
     max_row_length = max_row_info.undelayed_max_words
     delayed_max_row_length = max_row_info.delayed_max_words
     connections.append(convert_to_connections(
@@ -523,7 +528,7 @@ def _read_static_data(
         dynamics: AbstractStaticSynapseDynamics, post_vertex_slice: Slice,
         n_pre_atoms: int, n_synapse_types: int, row_data: _RowData,
         delayed: bool, post_vertex_max_delay_ticks: int,
-        max_atoms_per_core: int) -> _ConnectionsArray:
+        max_atoms_per_core: int) -> ConnectionsArray:
     """
     Read static data from row data.
 
@@ -540,12 +545,12 @@ def _read_static_data(
     :param int post_vertex_max_delay_ticks: post vertex delay maximum
     :param int max_atoms_per_core: The maximum number of atoms on a core
     :return: the connections read with dtype
-        :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
+        :py:attr:`~.AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
     :rtype: list(~numpy.ndarray)
     """
     if row_data is None or not row_data.size:
         return numpy.zeros(
-            0, dtype=AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+            0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
     ff_size, ff_data = _parse_static_data(row_data, dynamics)
     connections = dynamics.read_static_synaptic_data(
         post_vertex_slice, n_synapse_types, ff_size, ff_data,
@@ -594,7 +599,7 @@ def _read_plastic_data(
         dynamics: AbstractPlasticSynapseDynamics, post_vertex_slice: Slice,
         n_pre_atoms: int, n_synapse_types: int, row_data: _RowData,
         delayed: bool, post_vertex_max_delay_ticks: int,
-        max_atoms_per_core: int) -> _ConnectionsArray:
+        max_atoms_per_core: int) -> ConnectionsArray:
     """
     Read plastic data from raw data.
 
@@ -611,12 +616,12 @@ def _read_plastic_data(
     :param int post_vertex_max_delay_ticks: post vertex delay maximum
     :param int max_atoms_per_core: The maximum number of atoms on a core
     :return: the connections read with dtype
-        :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
+        :py:attr:`~.AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
     :rtype: list(~numpy.ndarray)
     """
     if row_data is None or not row_data.size:
         return numpy.zeros(
-            0, dtype=AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+            0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
     pp_size, pp_data, fp_size, fp_data = _parse_plastic_data(
         row_data, dynamics)
     connections = dynamics.read_plastic_synaptic_data(
@@ -632,8 +637,8 @@ def _read_plastic_data(
 
 
 def _rescale_connections(
-        connections: _ConnectionsArray, weight_scales: NDArray[floating],
-        synapse_info: SynapseInformation) -> _ConnectionsArray:
+        connections: ConnectionsArray, weight_scales: NDArray[floating],
+        synapse_info: SynapseInformation) -> ConnectionsArray:
     """
     Scale the connection data into machine values.
 
@@ -651,8 +656,8 @@ def _rescale_connections(
 
 def _convert_delayed_data(
         n_synapses: NDArray[integer], n_pre_atoms: int,
-        delayed_connections: _ConnectionsArray,
-        post_vertex_max_delay_ticks: int) -> _ConnectionsArray:
+        delayed_connections: ConnectionsArray,
+        post_vertex_max_delay_ticks: int) -> ConnectionsArray:
     """
     Take the delayed_connections and convert the source ids and delay
     values back to global values.
@@ -661,7 +666,7 @@ def _convert_delayed_data(
     :param int n_pre_atoms: number of atoms in the pre-vertex
     :param ~numpy.ndarray delayed_connections:
         The connections to convert of dtype
-        :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
+        :py:attr:`~.AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
     :param int post_vertex_max_delay_ticks: post vertex delay maximum
     :return: The converted connection with the same dtype
     :rtype: ~numpy.ndarray

@@ -15,6 +15,7 @@
 from __future__ import annotations
 import logging
 import numpy
+from numpy import float64, uint32
 from typing import Any, List, Optional, Sequence, Tuple, TYPE_CHECKING
 from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
@@ -39,6 +40,11 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     """
 
     __slots__ = ()
+
+    #: Type model of the basic configuration data of a connector
+    NUMPY_CONNECTORS_DTYPE = numpy.dtype(
+        [("source", uint32), ("target", uint32),
+         ("weight", float64), ("delay", float64)])
 
     @abstractmethod
     def merge(self, synapse_dynamics: AbstractSynapseDynamics
@@ -81,7 +87,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def _round_delay(self, delay):  # FIXME type
+    def _round_delay(self, delay) -> int:  # FIXME type
         """
         Round the delays to multiples of full timesteps.
 
@@ -92,7 +98,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         if isinstance(delay, RandomDistribution):
             return delay
-        if isinstance(delay, str):
+        if isinstance(delay, int):
             return delay
         new_delay = (
                 numpy.rint(numpy.array(delay) *
