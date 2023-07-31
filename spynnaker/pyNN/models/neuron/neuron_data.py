@@ -308,7 +308,6 @@ class NeuronData(object):
         """
         address = locate_memory_region_for_placement(placement, region)
         vertex_slice = placement.vertex.vertex_slice
-        assert vertex_slice is not None
         data_size = self.__app_vertex.get_sdram_usage_for_neuron_params(
             vertex_slice.n_atoms)
         block = SpynnakerDataView.read_memory(

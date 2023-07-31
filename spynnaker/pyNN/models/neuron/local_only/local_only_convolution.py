@@ -67,12 +67,13 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         # Store the n_incoming to avoid recalcaultion
         self.__cached_n_incoming = dict()
 
-        self.__delay = delay
         if delay is None:
             self.__delay = SpynnakerDataView.get_simulation_time_step_ms()
         elif not isinstance(delay, (float, int)):
             raise SynapticConfigurationException(
                 "Only single value delays are supported")
+        else:
+            self.__delay = float(delay)
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics):

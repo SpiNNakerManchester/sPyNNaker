@@ -71,12 +71,12 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         self.__array_dims = dims
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, synapse_info):
+    def get_delay_maximum(self, synapse_info: SynapseInformation):
         return self._get_delay_maximum(
             synapse_info.delays, len(self.__array), synapse_info)
 
     @overrides(AbstractConnector.get_delay_minimum)
-    def get_delay_minimum(self, synapse_info):
+    def get_delay_minimum(self, synapse_info: SynapseInformation):
         return self._get_delay_minimum(
             synapse_info.delays, len(self.__array), synapse_info)
 

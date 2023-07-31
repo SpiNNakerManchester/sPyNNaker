@@ -300,7 +300,6 @@ class SynapseDynamicsStructuralCommon(
                     m_vertex, SPIKE_PARTITION_ID)
                 assert r_info is not None
                 vertex_slice = m_vertex.vertex_slice
-                assert vertex_slice is not None
                 spec.write_value(r_info.key)
                 spec.write_value(r_info.mask)
                 spec.write_value(cast(AbstractPopulationVertex,

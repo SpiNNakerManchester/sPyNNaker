@@ -430,6 +430,5 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         if base_key is None:
             base_key = 0
         vertex_slice = pre_vertex.vertex_slice
-        assert vertex_slice is not None
         keys = get_field_based_keys(base_key, vertex_slice, self.n_colour_bits)
         return enumerate(keys, vertex_slice.lo_atom)

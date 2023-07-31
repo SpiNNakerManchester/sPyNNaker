@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import numpy
-from typing import Optional
+from numpy.typing import NDArray
+from typing import List, Optional, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.common import Slice
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
@@ -24,6 +26,9 @@ try:
 except ImportError as __ex:
     # Importing csa causes problems with readthedocs so allowing it to fail
     _csa_import_error = __ex
+if TYPE_CHECKING:
+    from csa.connset import CSet  # type: ignore[import]
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 
 class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
@@ -41,7 +46,7 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         "__full_connection_set",
         "__full_cset")
 
-    def __init__(self, cset, safe=True, callback=None, verbose=False):
+    def __init__(self, cset: CSet, safe=True, callback=None, verbose=False):
         """
         :param csa.connset.CSet cset:
             A description of the connection set between populations
@@ -68,24 +73,26 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         self.__cset = cset
 
         # Storage for full connection sets
-        self.__full_connection_set = None
-        self.__full_cset = None
+        self.__full_connection_set: Optional[List[CSet]] = None
+        self.__full_cset: Optional[List[CSet]] = None
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, synapse_info):
+    def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
         n_conns_max = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
         # we can probably look at the array and do better than this?
         return self._get_delay_maximum(
             synapse_info.delays, n_conns_max, synapse_info)
 
     @overrides(AbstractConnector.get_delay_minimum)
-    def get_delay_minimum(self, synapse_info):
+    def get_delay_minimum(self, synapse_info: SynapseInformation) -> float:
         n_conns_max = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
         # we can probably look at the array and do better than this?
         return self._get_delay_minimum(
             synapse_info.delays, n_conns_max, synapse_info)
 
-    def _get_n_connections(self, post_vertex_slice, synapse_info):
+    def _get_n_connections(
+            self, post_vertex_slice: Slice,
+            synapse_info: SynapseInformation) -> Tuple[int, CSet]:
         """
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param SynapseInformation synapse_info:
@@ -102,7 +109,7 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         # use CSA to cross the range of this vertex's neurons with the cset
         pair_list = csa.cross(
             range(synapse_info.n_pre_neurons),
-            range(post_vertex_slice.lo_atom, post_vertex_slice.hi_atom+1)) \
+            range(post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)) \
             * self.__full_cset
 
         if self.verbose:
@@ -116,29 +123,30 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_post_atoms, synapse_info, min_delay=None,
-            max_delay=None):
+            self, n_post_atoms: int, synapse_info: SynapseInformation,
+            min_delay: float, max_delay: float) -> int:
         n_connections_max = n_post_atoms
-
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_connections_max, min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
+    def get_n_connections_to_post_vertex_maximum(
+            self, synapse_info: SynapseInformation) -> int:
         n_connections_max = synapse_info.n_pre_neurons
         return n_connections_max
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, synapse_info):
+    def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
         n_conns_max = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
         return self._get_weight_maximum(
             synapse_info.weights, n_conns_max, synapse_info)
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
+            self, post_slices, post_vertex_slice: Slice, synapse_type: int,
+            synapse_info: SynapseInformation) -> NDArray:
         n_connections, pair_list = self._get_n_connections(
             post_vertex_slice, synapse_info)
 
@@ -165,7 +173,7 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         block["synapse_type"] = synapse_type
         return block
 
-    def show_connection_set(self, n_pre_neurons, n_post_neurons):
+    def show_connection_set(self, n_pre_neurons: int, n_post_neurons: int):
         """
         :param int n_pre_neurons:
         :param int n_post_neurons:

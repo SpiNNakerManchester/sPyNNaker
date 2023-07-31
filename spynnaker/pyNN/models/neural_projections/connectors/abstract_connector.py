@@ -28,7 +28,7 @@ from spinn_utilities.safe_eval import SafeEval
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
-from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -37,7 +37,8 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .connection_types import WD, is_scalar
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neural_projections import SynapseInformation
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.populations import Population, PopulationView
 
@@ -253,8 +254,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float, max_delay: float) -> int:
         """
         Get the maximum number of connections from any
         neuron in the pre vertex to the neurons in the post_vertex_slice,
@@ -265,10 +265,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :type delays: ~pyNN.random.RandomDistribution or int or float or str
         :param int n_post_atoms:
         :param SynapseInformation synapse_info:
-        :param min_delay:
-        :type min_delay: float or None
-        :param max_delay:
-        :type max_delay: float or None
+        :param float min_delay:
+        :param float max_delay:
         :rtype: int
         """
         raise NotImplementedError
@@ -673,7 +671,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             f"Size of {label} must be an int, received {size}")
 
     def validate_connection(
-            self, application_edge: ApplicationEdge,
+            self, application_edge: ProjectionApplicationEdge,
             synapse_info: SynapseInformation):
         """
         Checks that the edge supports the connector.  By default this does

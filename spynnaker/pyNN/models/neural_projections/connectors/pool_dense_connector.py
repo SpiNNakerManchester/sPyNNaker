@@ -16,16 +16,23 @@
 
 from collections.abc import Iterable
 import numpy
+from numpy import integer, floating, float64
+from numpy.typing import ArrayLike, NDArray
+from pyNN.random import RandomDistribution
+from typing import Optional, Sequence, Tuple, Union, cast, overload
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
-from pyNN.random import RandomDistribution
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from .abstract_connector import AbstractConnector
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from spynnaker.pyNN.models.neural_projections import (
+    ProjectionApplicationEdge, SynapseInformation)
 
 
 _DIMENSION_SIZE = (2 * BYTES_PER_WORD) + (6 * BYTES_PER_SHORT)
@@ -52,10 +59,12 @@ class PoolDenseConnector(AbstractConnector):
         "__positive_receptor_type",
         "__negative_receptor_type")
 
-    def __init__(self, weights, pool_shape=None, pool_stride=None,
-                 positive_receptor_type="excitatory",
-                 negative_receptor_type="inhibitory", safe=True,
-                 verbose=False, callback=None):
+    def __init__(self, weights: ArrayLike,
+                 pool_shape: Union[int, Tuple[int], None] = None,
+                 pool_stride: Union[int, Tuple[int], None] = None,
+                 positive_receptor_type: str = "excitatory",
+                 negative_receptor_type: str = "inhibitory",
+                 safe=True, verbose=False, callback=None):
         """
         :param weights:
             The synaptic strengths. Can be:
@@ -99,35 +108,37 @@ class PoolDenseConnector(AbstractConnector):
         self.__negative_receptor_type = negative_receptor_type
 
     @property
-    def positive_receptor_type(self):
+    def positive_receptor_type(self) -> str:
         """
         :rtype: str
         """
         return self.__positive_receptor_type
 
     @property
-    def negative_receptor_type(self):
+    def negative_receptor_type(self) -> str:
         """
         :rtype: str
         """
         return self.__negative_receptor_type
 
     @property
-    def weights(self):
+    def weights(self) -> NDArray:
         """
         :rtype: ~numpy.ndarray
         """
         return self.__weights
 
     def __decode_weights(
-            self, pre_shape, post_shape, pre_vertex_slice, post_vertex_slice):
+            self, pre_shape: Tuple[int, ...], post_shape: Tuple[int, ...],
+            pre_vertex_slice: Slice, post_vertex_slice: Slice
+            ) -> NDArray[float64]:
         if isinstance(self.__weights, (int, float)):
             n_weights = self.__get_n_sub_weights(
                 pre_vertex_slice, post_vertex_slice.n_atoms)
-            return numpy.full(n_weights, self.__weights, dtype="float64")
+            return numpy.full(n_weights, self.__weights, dtype=float64)
         elif isinstance(self.__weights, Iterable):
             pre_in_post_shape = tuple(self.__get_pre_in_post_shape(pre_shape))
-            all_weights = numpy.array(self.__weights, dtype="float64").reshape(
+            all_weights = numpy.array(self.__weights, dtype=float64).reshape(
                 pre_in_post_shape + post_shape)
             pre_in_post_start = self.__pre_as_post(pre_vertex_slice.start)
             pre_in_post_end = self.__pre_as_post(pre_vertex_slice.end)
@@ -140,57 +151,75 @@ class PoolDenseConnector(AbstractConnector):
         elif isinstance(self.__weights, RandomDistribution):
             n_weights = self.__get_n_sub_weights(
                 pre_vertex_slice, post_vertex_slice.n_atoms)
-            return numpy.array(self.__weights.next(n_weights), dtype="float64")
+            return numpy.array(self.__weights.next(n_weights), dtype=float64)
         else:
             raise SynapticConfigurationException(
                 f"Unknown weights ({self.__weights})")
 
+    @overload
     @staticmethod
-    def __to_nd_shape(shape, n_dims, param_name):
+    def __to_nd_shape(shape: None, n_dims: int, param_name: str) -> None:
+        ...
+
+    @overload
+    @staticmethod
+    def __to_nd_shape(shape: Union[int, Tuple[int, ...]], n_dims: int,
+                      param_name: str) -> NDArray[integer]:
+        ...
+
+    @staticmethod
+    def __to_nd_shape(shape, n_dims: int, param_name: str) -> Optional[
+            NDArray[integer]]:
         if shape is None:
             return None
         if numpy.isscalar(shape):
-            return numpy.array([shape] * n_dims, dtype='int')
+            return numpy.array([shape] * n_dims, dtype=int)
         elif len(shape) == n_dims:
-            return numpy.array(shape, dtype='int')
+            return numpy.array(shape, dtype=int)
         raise SynapticConfigurationException(
             f"{param_name} must be an int or a tuple(int) with {n_dims}"
             " dimensions")
 
-    @staticmethod
+    @classmethod
     def get_post_pool_shape(
-            pre_shape, pool_shape=None, pool_stride=None):
-        pool_shape = PoolDenseConnector.__to_nd_shape(
+            cls, pre_shape: Tuple[int, ...],
+            pool_shape: Union[int, Tuple[int, ...], None] = None,
+            pool_stride: Union[int, Tuple[int, ...], None] = None) -> NDArray:
+        real_pool_shape = cls.__to_nd_shape(
             pool_shape, len(pre_shape), "pool_shape")
-        pool_stride = PoolDenseConnector.__to_nd_shape(
+        real_pool_stride = cls.__to_nd_shape(
             pool_stride, len(pre_shape), "pool_stride")
-        if pool_stride is None:
-            pool_stride = pool_shape
+        if real_pool_stride is None:
+            real_pool_stride = real_pool_shape
         shape = numpy.array(pre_shape)
-        if pool_shape is not None:
-            post_pool_shape = shape - (pool_shape - 1)
-            shape = (post_pool_shape // pool_stride) + 1
+        if real_pool_shape is not None:
+            post_pool_shape = shape - (real_pool_shape - 1)
+            shape = (post_pool_shape // real_pool_stride) + 1
         return shape
 
-    def __get_pre_in_post_shape(self, pre_shape):
+    def __get_pre_in_post_shape(self, pre_shape: Tuple[int, ...]) -> NDArray:
         return self.get_post_pool_shape(
             pre_shape, self.__pool_shape, self.__pool_stride)
 
-    def __get_n_weights(self, pre_shape, post_shape):
+    def __get_n_weights(
+            self, pre_shape: Tuple[int, ...],
+            post_shape: Tuple[int, ...]) -> NDArray:
         """
         Get the expected number of weights.
         """
         shape = self.__get_pre_in_post_shape(pre_shape)
         return numpy.prod(shape) * numpy.prod(post_shape)
 
-    def __get_n_sub_weights(self, pre_vertex_slice, n_post_atoms):
+    def __get_n_sub_weights(
+            self, pre_vertex_slice: Slice, n_post_atoms: int) -> int:
         pre_in_post_start = self.__pre_as_post(pre_vertex_slice.start)
         pre_in_post_end = self.__pre_as_post(pre_vertex_slice.end)
         return (numpy.prod((pre_in_post_end - pre_in_post_start) + 1) *
                 n_post_atoms)
 
     @overrides(AbstractConnector.validate_connection)
-    def validate_connection(self, application_edge, synapse_info):
+    def validate_connection(
+            self, application_edge: ProjectionApplicationEdge, synapse_info):
         pre = application_edge.pre_vertex
         post = application_edge.post_vertex
         if len(pre.atoms_shape) != 2:
@@ -219,17 +248,17 @@ class PoolDenseConnector(AbstractConnector):
                 f" {self.__negative_receptor_type}")
 
     @overrides(AbstractConnector.get_delay_minimum)
-    def get_delay_minimum(self, synapse_info):
-        return synapse_info.delays
+    def get_delay_minimum(self, synapse_info: SynapseInformation) -> float:
+        return cast(float, synapse_info.delays)
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, synapse_info):
-        return synapse_info.delays
+    def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
+        return cast(float, synapse_info.delays)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_post_atoms, synapse_info, min_delay=None,
-            max_delay=None):
+            self, n_post_atoms: int, synapse_info: SynapseInformation,
+            min_delay=None, max_delay=None) -> int:
         if min_delay is not None and max_delay is not None:
             delay = synapse_info.delays
             if min_delay > delay or max_delay < delay:
@@ -238,19 +267,20 @@ class PoolDenseConnector(AbstractConnector):
         return n_post_atoms
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
+    def get_n_connections_to_post_vertex_maximum(
+            self, synapse_info: SynapseInformation) -> int:
         # Every post connects to every pre
         return synapse_info.n_pre_neurons
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, synapse_info):
+    def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
         if isinstance(self.__weights, Iterable):
             return numpy.amax(numpy.abs(self.__weights))
         n_conns = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
         return super()._get_weight_maximum(
             self.__weights, n_conns, synapse_info)
 
-    def __pre_as_post(self, pre_coords):
+    def __pre_as_post(self, pre_coords: ArrayLike) -> NDArray:
         """
         Write pre coordinates as post coordinates.
 
@@ -263,7 +293,8 @@ class PoolDenseConnector(AbstractConnector):
             coords //= self.__pool_stride
         return coords
 
-    def local_only_n_bytes(self, incoming_slices, n_post_atoms):
+    def local_only_n_bytes(
+            self, incoming_slices: Sequence[Slice], n_post_atoms: int) -> int:
         """
         :param iterable(~pacman.model.graphs.common.Slice) incoming_slices:
         :param int n_post_atoms:
@@ -274,13 +305,17 @@ class PoolDenseConnector(AbstractConnector):
         n_weights = [n + 1 if n % 2 != 0 else n for n in n_weights]
         n_dims = [len(s.shape) for s in incoming_slices]
 
-        return ((sum(n_dims) * _DIMENSION_SIZE) +
-                (sum(n_weights) * BYTES_PER_SHORT) +
-                (len(incoming_slices) * _CONN_SIZE))
+        return int(
+            (sum(n_dims) * _DIMENSION_SIZE) +
+            (sum(n_weights) * BYTES_PER_SHORT) +
+            (len(incoming_slices) * _CONN_SIZE))
 
     def write_local_only_data(
-            self, spec, app_edge, pre_vertex_slice, post_vertex_slice,
-            key, mask, n_colour_bits, weight_scales):
+            self, spec: DataSpecificationGenerator,
+            app_edge: ProjectionApplicationEdge,
+            pre_vertex_slice: Slice, post_vertex_slice: Slice,
+            key: int, mask: int, n_colour_bits: int,
+            weight_scales: NDArray[floating]):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
         :param ~pacman.model.graphs.application.ApplicationEdge app_edge:
@@ -322,7 +357,9 @@ class PoolDenseConnector(AbstractConnector):
         dim_info = numpy.zeros(n_dims, dtype=_DIM_DTYPE)
         if self.__pool_stride is not None:
             stride = self.__to_nd_shape(self.__pool_stride, n_dims, "")
-            dim_info["recip_pool_stride"] = [self.__recip(p) for p in stride]
+            dim_info["recip_pool_stride"] = [
+                self.__recip(p)
+                for p in stride]  # pylint: disable=not-an-iterable
         else:
             dim_info["recip_pool_stride"] = self.__recip(1)
         if isinstance(app_edge.pre_vertex, HasShapeKeyFields):
@@ -362,7 +399,7 @@ class PoolDenseConnector(AbstractConnector):
 
         # Encode weights with weight scaling
         if len(weights) % 2 != 0:
-            weights = numpy.concatenate((weights, [0]))
+            weights = numpy.concatenate((weights, numpy.zeros(1)))
         neg_weights = weights < 0
         pos_weights = weights > 0
         weights[neg_weights] *= weight_scales[neg_synapse_type]
@@ -370,7 +407,8 @@ class PoolDenseConnector(AbstractConnector):
         final_weights = numpy.round(weights).astype(numpy.int16)
         spec.write_array(final_weights.view(numpy.uint32))
 
-    def __recip(self, v):
+    @staticmethod
+    def __recip(v: float) -> float:
         """
         Compute the reciprocal of a number as an signed 1-bit integer,
         14-bit fractional fixed point number, encoded in an integer.

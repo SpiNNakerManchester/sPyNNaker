@@ -346,7 +346,6 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(
             self, spec: DataSpecificationGenerator, placement: Placement):
-        assert self.vertex_slice is not None
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
         # if we are here, the rates have changed!
         self.__rate_changed = True
@@ -439,7 +438,6 @@ class SpikeSourcePoissonMachineVertex(
         :param ~data_specification.DataSpecification spec:
             the data specification writer
         """
-        assert self.vertex_slice is not None
         spec.comment(
             f"\nWriting Rates for {self.vertex_slice.n_atoms} "
             "poisson sources:\n")
@@ -486,7 +484,6 @@ class SpikeSourcePoissonMachineVertex(
         :param ~data_specification.DataSpecification spec:
             the data specification writer
         """
-        assert self.vertex_slice is not None
         spec.comment(
             f"\nWriting parameters for {self.vertex_slice.n_atoms} "
             "Poisson sources:\n")

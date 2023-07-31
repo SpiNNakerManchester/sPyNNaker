@@ -417,7 +417,6 @@ class SynapticMatrixApp(object):
 
         splitter = self.__app_edge.post_vertex.splitter
         vertex_slice = placement.vertex.vertex_slice
-        assert vertex_slice is not None
         if self.__syn_mat_offset is not None:
             connections.append(convert_to_connections(
                 self.__synapse_info, vertex_slice,
