@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List, Sequence
+from __future__ import annotations
+from typing import List, Sequence, TYPE_CHECKING, cast
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import get_config_bool
 from pacman.model.graphs.application import (
@@ -21,6 +22,9 @@ from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
+if TYPE_CHECKING:
+    from spynnaker.pyNN.extra_algorithms.splitter_components import (
+        SplitterDelayVertexSlice)
 
 _DELAY_PARAM_HEADER_WORDS = 9
 
@@ -80,6 +84,10 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
         :rtype: int
         """
         return self.__partition.pre_vertex.n_atoms
+
+    @property
+    def _delay_splitter(self) -> SplitterDelayVertexSlice:
+        return cast(SplitterDelayVertexSlice, self._splitter)
 
     @property
     def drop_late_spikes(self) -> bool:

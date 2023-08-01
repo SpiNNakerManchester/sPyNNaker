@@ -17,7 +17,7 @@ import os
 import ctypes
 from numpy import floating
 from numpy.typing import NDArray
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, cast
 
 from spinn_utilities.overrides import overrides
 from pacman.model.placements import Placement
@@ -177,6 +177,10 @@ class PopulationMachineLocalOnlyCombinedVertex(
         self.__regenerate_data = False
 
     @property
+    def _vertex_slice(self) -> Slice:
+        return self.vertex_slice
+
+    @property
     @overrides(PopulationMachineNeurons._slice_index)
     def _slice_index(self) -> int:
         return self.__slice_index
@@ -206,6 +210,11 @@ class PopulationMachineLocalOnlyCombinedVertex(
     @overrides(PopulationMachineNeurons._max_atoms_per_core)
     def _max_atoms_per_core(self) -> int:
         return self.__max_atoms_per_core
+
+    @property
+    def __synapse_dynamics(self) -> AbstractLocalOnly:
+        # Precondition for construction of this class instance
+        return cast(AbstractLocalOnly, self._pop_vertex.synapse_dynamics)
 
     @staticmethod
     def __get_binary_file_name(app_vertex: AbstractPopulationVertex) -> str:
@@ -277,11 +286,9 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
         self.__write_local_only_data(spec)
 
-        # Should be true for all concrete synapse dynamics
-        if isinstance(self._pop_vertex.synapse_dynamics, AbstractLocalOnly):
-            self._pop_vertex.synapse_dynamics.write_parameters(
-                spec, self.REGIONS.LOCAL_ONLY_PARAMS, self,
-                self.__weight_scales)
+        self.__synapse_dynamics.write_parameters(
+            spec, self.REGIONS.LOCAL_ONLY_PARAMS, self,
+            self.__weight_scales)
 
         # End the writing of this specification:
         spec.end_specification()

@@ -570,7 +570,7 @@ class SpikeSourcePoissonMachineVertex(
                 self.__poisson_rate_region_address(placement))
 
             # get size of poisson params
-            n_atoms = self._vertex_slice.n_atoms
+            n_atoms = self.vertex_slice.n_atoms
             n_rates = n_atoms * self._pop_vertex.max_n_rates
             size_of_region = get_rates_bytes(n_atoms, n_rates)
 
@@ -581,8 +581,8 @@ class SpikeSourcePoissonMachineVertex(
 
             # For each atom, read the number of rates and the rate parameters
             offset = 0
-            for i in range(self._vertex_slice.lo_atom,
-                           self._vertex_slice.hi_atom + 1):
+            for i in range(self.vertex_slice.lo_atom,
+                           self.vertex_slice.hi_atom + 1):
                 n_rates, = _ONE_WORD.unpack_from(byte_array, offset)
                 # Skip the count and index
                 offset += PARAMS_WORDS_PER_NEURON * BYTES_PER_WORD
@@ -604,4 +604,4 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id: str) -> int:
-        return self._vertex_slice.n_atoms << self._pop_vertex.n_colour_bits
+        return self.vertex_slice.n_atoms << self._pop_vertex.n_colour_bits

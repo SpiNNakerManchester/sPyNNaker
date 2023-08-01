@@ -203,6 +203,10 @@ class PopulationMachineVertex(
         self.__regenerate_synapse_data = False
 
     @property
+    def _vertex_slice(self) -> Slice:
+        return self.vertex_slice
+
+    @property
     @overrides(PopulationMachineNeurons._slice_index)
     def _slice_index(self) -> int:
         return self.__slice_index
@@ -420,4 +424,4 @@ class PopulationMachineVertex(
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id: str) -> int:
         n_colours = 2 ** self._pop_vertex.n_colour_bits
-        return self._vertex_slice.n_atoms * n_colours
+        return self.vertex_slice.n_atoms * n_colours

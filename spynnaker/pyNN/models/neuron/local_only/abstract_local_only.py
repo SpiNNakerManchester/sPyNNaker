@@ -17,12 +17,13 @@ from numpy.typing import NDArray
 from typing import Iterable, TYPE_CHECKING
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
+    from spynnaker.pyNN.models.neuron import (
+        PopulationMachineLocalOnlyCombinedVertex)
 
 
 class AbstractLocalOnly(AbstractSynapseDynamics):
@@ -48,7 +49,7 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     @abstractmethod
     def write_parameters(
             self, spec: DataSpecificationGenerator, region: int,
-            machine_vertex: MachineVertex,
+            machine_vertex: PopulationMachineLocalOnlyCombinedVertex,
             weight_scales: NDArray[floating]) -> None:
         """
         Write the parameters to the data specification for a vertex.
