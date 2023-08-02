@@ -22,7 +22,7 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
 from spinnman.model import CPUInfo
 from spinnman.processes.get_cpu_info_process import _INFO_PATTERN
-from spinnman.transceiver.transceiver import Transceiver
+from spinnman.transceiver.mockable_transceiver import MockableTransceiver
 from pacman.model.placements import Placement
 from pacman.operations.routing_info_allocator_algorithms import (
     ZonedRoutingInfoAllocator)
@@ -60,16 +60,14 @@ from spynnaker.pyNN.utilities import constants
 import pyNN.spiNNaker as p
 
 
-class _MockTransceiverinOut(Transceiver):
-    def __init__(self):
-        pass
+class _MockTransceiverinOut(MockableTransceiver):
 
-    @overrides(Transceiver.malloc_sdram)
+    @overrides(MockableTransceiver.malloc_sdram)
     def malloc_sdram(self, x, y, size, app_id, tag=None):
         self._data_to_read = bytearray(size)
         return 0
 
-    @overrides(Transceiver.write_memory)
+    @overrides(MockableTransceiver.write_memory)
     def write_memory(self, x, y, base_address, data, n_bytes=None, offset=0,
                      cpu=0, is_filename=False, get_sum=False):
         if data is None:
@@ -78,24 +76,21 @@ class _MockTransceiverinOut(Transceiver):
             data = struct.Struct("<I").pack(data)
         self._data_to_read[base_address:base_address + len(data)] = data
 
-    @overrides(Transceiver.get_cpu_information_from_core)
+    @overrides(MockableTransceiver.get_cpu_information_from_core)
     def get_cpu_information_from_core(self, x, y, p):
         bs = bytearray(128)
         cpu_data = _INFO_PATTERN.unpack_from(bytes(bs), 0)
         return CPUInfo(x=1, y=2, p=3, cpu_data=cpu_data)
 
-    @overrides(Transceiver.read_memory)
+    @overrides(MockableTransceiver.read_memory)
     def read_memory(self, x, y, base_address, length, cpu=0):
         return self._data_to_read[base_address:base_address + length]
 
-    @overrides(Transceiver.read_word)
+    @overrides(MockableTransceiver.read_word)
     def read_word(self, x, y, base_address, cpu=0):
         datum, = struct.unpack("<I", self.read_memory(x, y, base_address, 4))
         return datum
 
-    @overrides(Transceiver.close)
-    def close(self):
-        pass
 
 
 def say_false(self, weights, delays):
