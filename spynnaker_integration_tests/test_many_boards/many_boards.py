@@ -15,6 +15,7 @@ import time
 from unittest import SkipTest
 from spinn_utilities.config_holder import get_config_bool
 from spinn_front_end_common.interface.provenance import GlobalProvenance
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import ConfigurationException
 import pyNN.spiNNaker as sim
 from spynnaker_integration_tests.scripts import check_data
@@ -56,7 +57,8 @@ class ManyBoards(BaseTestCase):
         for i, chip in enumerate(machine.ethernet_connected_chips):
             if i >= self.n_boards:
                 break
-            offset = machine.BOARD_48_CHIPS[i % 48]
+            version = SpynnakerDataView.get_machine_version()
+            offset = version.expected_xys[i % 48]
             x = chip.x + offset[0]
             y = chip.y + offset[1]
             # safety code in case there is a hole in the board
