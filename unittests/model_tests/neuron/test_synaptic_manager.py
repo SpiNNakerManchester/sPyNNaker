@@ -19,7 +19,7 @@ import numpy
 import pytest
 
 from spinn_utilities.overrides import overrides
-from spinn_utilities.config_holder import load_config, set_config
+from spinn_utilities.config_holder import set_config
 from spinnman.model import CPUInfo
 from spinnman.processes.get_cpu_info_process import _INFO_PATTERN
 from spinnman.transceiver import Transceiver
@@ -104,11 +104,11 @@ def say_false(self, weights, delays):
 
 def test_write_data_spec():
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = SpynnakerDataWriter.mock()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
 
-    load_config()
     set_config("Machine", "enable_advanced_monitor_support", "False")
     set_config("Java", "use_java", "False")
 
@@ -442,6 +442,7 @@ def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
         n_pre_neurons, neurons_per_core, max_delay):
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = SpynnakerDataWriter.mock()
 
     # Build a from list connector with the delays we want
