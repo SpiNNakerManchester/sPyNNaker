@@ -922,7 +922,7 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.get_neurons_recording)
     def get_neurons_recording(
-            self, name: str, vertex_slice: Slice) -> Optional[Iterable[int]]:
+            self, name: str, vertex_slice: Slice) -> Optional[Collection[int]]:
         if self.__neuron_recorder.is_recordable(name):
             return self.__neuron_recorder.neurons_recording(
                 name, vertex_slice)

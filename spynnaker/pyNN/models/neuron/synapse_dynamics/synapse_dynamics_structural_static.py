@@ -16,6 +16,7 @@ import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
 from typing import Any, Dict, Iterable, Optional, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
@@ -288,7 +289,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         return 0.0
 
     @overrides(_Common._get_seeds)
-    def _get_seeds(self, app_vertex=None):
+    def _get_seeds(self, app_vertex=None) -> Tuple[int, ...]:
         if app_vertex:
             if app_vertex not in self.__seeds.keys():
                 self.__seeds[app_vertex] = (
@@ -302,14 +303,16 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         # Never generate structural connections on the machine
         return False
 
-    @overrides(SynapseDynamicsStatic.get_connected_vertices)
-    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+    @overrides(AbstractSynapseDynamics.get_connected_vertices)
+    def get_connected_vertices(
+            self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
+            target_vertex: ApplicationVertex):
         # Things change, so assume all connected
         return [(m_vertex, [source_vertex])
                 for m_vertex in target_vertex.splitter.get_in_coming_vertices(
                     SPIKE_PARTITION_ID)]
 
     @property
-    @overrides(SynapseDynamicsStatic.is_combined_core_capable)
+    @overrides(AbstractSynapseDynamics.is_combined_core_capable)
     def is_combined_core_capable(self):
         return False

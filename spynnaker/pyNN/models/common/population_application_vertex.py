@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Container, Iterable, List, Optional, Tuple, cast
+from typing import Collection, Container, Iterable, List, Optional, Tuple, cast
 from spinn_utilities.overrides import overrides
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged.abstract_sized import Selector
@@ -369,7 +369,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"get_recording_region")
 
     def get_neurons_recording(
-            self, name: str, vertex_slice: Slice) -> Optional[Iterable[int]]:
+            self, name: str, vertex_slice: Slice) -> Optional[Collection[int]]:
         """
         Gets the neurons being recorded on the core with this slice.
 

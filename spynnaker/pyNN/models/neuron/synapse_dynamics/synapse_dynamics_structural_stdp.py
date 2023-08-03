@@ -16,6 +16,7 @@ import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
 from typing import Dict, Optional, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from .abstract_synapse_dynamics_structural import (
@@ -27,6 +28,7 @@ from .synapse_dynamics_structural_common import (
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
+from .abstract_synapse_dynamics import AbstractSynapseDynamics
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
         partner_selection.abstract_partner_selection import \
@@ -39,6 +41,7 @@ if TYPE_CHECKING:
         abstract_timing_dependence import AbstractTimingDependence
     from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
         abstract_weight_dependence import AbstractWeightDependence
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
     from .abstract_plastic_synapse_dynamics import (
         AbstractPlasticSynapseDynamics)
 
@@ -205,7 +208,7 @@ class SynapseDynamicsStructuralSTDP(
     @overrides(AbstractSynapseDynamicsStructural.set_connections)
     def set_connections(
             self, connections: ConnectionsArray, post_vertex_slice, app_edge,
-            synapse_info):
+            synapse_info: SynapseInformation):
         if not isinstance(synapse_info.synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
             return
@@ -220,47 +223,47 @@ class SynapseDynamicsStructuralSTDP(
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.f_rew)
-    def f_rew(self):
+    def f_rew(self) -> float:
         return self.__f_rew
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.s_max)
-    def s_max(self):
+    def s_max(self) -> int:
         return self.__s_max
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.with_replacement)
-    def with_replacement(self):
+    def with_replacement(self) -> bool:
         return self.__with_replacement
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.seed)
-    def seed(self):
+    def seed(self) -> Optional[int]:
         return self.__seed
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.initial_weight)
-    def initial_weight(self):
+    def initial_weight(self) -> float:
         return self.__initial_weight
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.initial_delay)
-    def initial_delay(self):
+    def initial_delay(self) -> InitialDelay:
         return self.__initial_delay
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.partner_selection)
-    def partner_selection(self):
+    def partner_selection(self) -> AbstractPartnerSelection:
         return self.__partner_selection
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.formation)
-    def formation(self):
+    def formation(self) -> AbstractFormation:
         return self.__formation
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.elimination)
-    def elimination(self):
+    def elimination(self) -> AbstractElimination:
         return self.__elimination
 
     @property
@@ -269,22 +272,27 @@ class SynapseDynamicsStructuralSTDP(
         return self.__connections
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)
-    def get_weight_mean(self, connector, synapse_info):
+    def get_weight_mean(self, connector, synapse_info: SynapseInformation):
+        # Claim the mean is the maximum, a massive but safe overestimation
         return self.get_weight_maximum(connector, synapse_info)
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_maximum)
-    def get_weight_maximum(self, connector, synapse_info):
+    def get_weight_maximum(self, connector, synapse_info: SynapseInformation):
         w_max = super().get_weight_maximum(connector, synapse_info)
         return max(w_max, self.__initial_weight)
 
     @overrides(SynapseDynamicsSTDP.get_delay_maximum)
-    def get_delay_maximum(self, connector, synapse_info):
+    def get_delay_maximum(self, connector, synapse_info: SynapseInformation):
         d_m = super().get_delay_maximum(connector, synapse_info)
+        if d_m is None:
+            return self.__initial_delay
         return max(d_m, self.__initial_delay)
 
     @overrides(SynapseDynamicsSTDP.get_delay_minimum)
-    def get_delay_minimum(self, connector, synapse_info):
+    def get_delay_minimum(self, connector, synapse_info: SynapseInformation):
         d_m = super().get_delay_minimum(connector, synapse_info)
+        if d_m is None:
+            return self.__initial_delay
         return min(d_m, self.__initial_delay)
 
     @overrides(SynapseDynamicsSTDP.get_delay_variance)
@@ -292,7 +300,7 @@ class SynapseDynamicsStructuralSTDP(
         return 0.0
 
     @overrides(SynapseDynamicsStructuralCommon._get_seeds)
-    def _get_seeds(self, app_vertex=None):
+    def _get_seeds(self, app_vertex=None) -> Tuple[int, ...]:
         if app_vertex:
             if app_vertex not in self.__seeds.keys():
                 self.__seeds[app_vertex] = (
@@ -302,18 +310,20 @@ class SynapseDynamicsStructuralSTDP(
             return create_mars_kiss_seeds(self.__rng)
 
     @overrides(SynapseDynamicsSTDP.generate_on_machine)
-    def generate_on_machine(self):
+    def generate_on_machine(self) -> bool:
         # Never generate structural connections on the machine
         return False
 
-    @overrides(SynapseDynamicsSTDP.get_connected_vertices)
-    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+    @overrides(AbstractSynapseDynamics.get_connected_vertices)
+    def get_connected_vertices(
+            self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
+            target_vertex: ApplicationVertex):
         # Things change, so assume all connected
         return [(m_vertex, [source_vertex])
                 for m_vertex in target_vertex.splitter.get_in_coming_vertices(
                     SPIKE_PARTITION_ID)]
 
     @property
-    @overrides(SynapseDynamicsSTDP.is_combined_core_capable)
-    def is_combined_core_capable(self):
+    @overrides(AbstractSynapseDynamics.is_combined_core_capable)
+    def is_combined_core_capable(self) -> bool:
         return False

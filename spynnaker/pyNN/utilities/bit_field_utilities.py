@@ -16,11 +16,13 @@ import math
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
-from typing import Iterable
+from typing import Iterable, Optional
+from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.projection import Projection
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 #: number of elements
 #  key, n atoms, atoms_per_core, pointer to bitfield
@@ -34,7 +36,8 @@ FILTER_HEADER_WORDS = 2
 BIT_IN_A_WORD = 32.0
 
 
-def _unique_edges(projections):
+def _unique_edges(projections: Iterable[Projection]) -> Iterable[
+        ProjectionApplicationEdge]:
     """
     Get the unique application edges of a collection of projections.
 
@@ -50,7 +53,8 @@ def _unique_edges(projections):
             yield edge
 
 
-def get_sdram_for_bit_field_region(incoming_projections):
+def get_sdram_for_bit_field_region(
+        incoming_projections: Iterable[Projection]) -> int:
     """
     The SDRAM for the bit field filter region.
 
@@ -73,7 +77,7 @@ def get_sdram_for_bit_field_region(incoming_projections):
     return sdram
 
 
-def get_sdram_for_keys(incoming_projections):
+def get_sdram_for_keys(incoming_projections: Iterable[Projection]) -> int:
     """
     Gets the space needed for keys.
 
@@ -132,7 +136,8 @@ def get_bitfield_key_map_data(
 
 
 def write_bitfield_init_data(
-        spec, bit_field_region, n_bit_field_bytes, bit_field_region_ref=None):
+        spec: DataSpecificationBase, bit_field_region: int,
+        n_bit_field_bytes: int, bit_field_region_ref: Optional[int] = None):
     """
     Writes the initialisation data needed for the bitfield generator.
 

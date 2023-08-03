@@ -14,6 +14,7 @@
 
 import logging
 from time import sleep
+from typing import Optional
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utility_models import MultiCastCommand
@@ -27,7 +28,9 @@ from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def _signed_int(uint_value):
+def _signed_int(uint_value: Optional[int]) -> int:
+    if uint_value is None:
+        return 0
     if uint_value > (2 ** 31):
         return uint_value - (2 ** 32)
     return uint_value
@@ -71,7 +74,7 @@ class PushBotTranslator(AbstractEthernetTranslator):
             self.__pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.set_retina_transmission(
                     munich_io_spinnaker_link_protocol.GET_RETINA_PAYLOAD_VALUE(
-                        multicast_packet.payload)))
+                        multicast_packet.payload or 0)))
             self.__pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.enable_retina())
 

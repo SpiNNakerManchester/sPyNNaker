@@ -239,7 +239,7 @@ class NeuronRecorder(object):
 
     def neurons_recording(
             self, variable: str,
-            vertex_slice: Slice) -> Optional[Iterable[int]]:
+            vertex_slice: Slice) -> Optional[Collection[int]]:
         """
         :param str variable:
         :param ~pacman.model.graphs.common.Slice vertex_slice:

@@ -14,12 +14,14 @@
 
 import math
 import numpy
+from numpy import uint16, uint32
+from numpy.typing import NDArray
 
 # Default value of fixed-point one for STDP
 STDP_FIXED_POINT_ONE = (1 << 11)
 
 
-def float_to_fixed(value):
+def float_to_fixed(value: float) -> int:
     """
     :param float value:
     :rtype: int
@@ -27,9 +29,10 @@ def float_to_fixed(value):
     return int(round(float(value) * STDP_FIXED_POINT_ONE))
 
 
-def get_exp_lut_array(time_step, time_constant, shift=0):
+def get_exp_lut_array(time_step: float, time_constant: float,
+                      shift: int = 0) -> NDArray[uint32]:
     """
-    :param int time_step:
+    :param float time_step:
     :param float time_constant:
     :param int shift:
     :rtype: ~numpy.ndarray
@@ -41,12 +44,12 @@ def get_exp_lut_array(time_step, time_constant, shift=0):
     # Compute the size of the array, which must be a multiple of 2
     size = math.log(STDP_FIXED_POINT_ONE) / l_ambda
     size, extra = divmod(size / (1 << shift), 2)
-    size = ((int(size) + (extra > 0)) * 2)
+    size = (int(size) + (extra > 0)) * 2
 
     # Fill out the values in the array
     a = numpy.exp((numpy.arange(size) << shift) * -l_ambda)
     a = numpy.floor(a * STDP_FIXED_POINT_ONE)
 
     # Concatenate with the header
-    header = numpy.array([len(a), shift], dtype="uint16")
-    return numpy.concatenate((header, a.astype("uint16"))).view("uint32")
+    header = numpy.array([len(a), shift], dtype=uint16)
+    return numpy.concatenate((header, a.astype(uint16))).view(uint32)

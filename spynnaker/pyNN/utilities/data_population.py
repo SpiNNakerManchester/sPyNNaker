@@ -11,15 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import logging
 import numpy
-from spinn_utilities.ranged.abstract_sized import AbstractSized
+from numpy import floating
+from numpy.typing import NDArray
+from typing import Any, Dict, Optional, Sequence, Union, TYPE_CHECKING
+import neo  # type: ignore[import]
+from spinn_utilities.ranged.abstract_sized import AbstractSized, Selector
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
+from spynnaker.pyNN.models.common.types import Names
+if TYPE_CHECKING:
+    from .neo_buffer_database import Annotations
 
 logger = FormatAdapter(logging.getLogger(__file__))
 _SELECTIVE_RECORDED_MSG = (
@@ -35,7 +42,7 @@ class DataPopulation(object):
         "_indexes",
         "_size")
 
-    def __init__(self, database_file, label, indexes=None):
+    def __init__(self, database_file: str, label: str, indexes=None):
         self.__label = label
         self.__database_file = database_file
         # getting size right away also check the inputs or fails fast
@@ -45,8 +52,9 @@ class DataPopulation(object):
         self._indexes = indexes
 
     @overrides(Population.write_data)
-    def write_data(self, io, variables='all', gather=True, clear=False,
-                   annotations=None):
+    def write_data(self, io: Union[str, neo.baseio.BaseIO],
+                   variables: Names = 'all', gather: bool = True,
+                   clear: bool = False, annotations: Annotations = None):
         # pylint: disable=protected-access
         Population._check_params(gather, annotations)
         if clear:
@@ -58,7 +66,7 @@ class DataPopulation(object):
         io.write(bl=data)
 
     @overrides(Population.describe)
-    def describe(self, template=None, engine=None):
+    def describe(self, template=None, engine=None) -> Any:
         if template is not None:
             logger.warning("Ignoring template as supported in this mode")
         if engine is not None:
@@ -69,7 +77,9 @@ class DataPopulation(object):
 
     @overrides(Population.get_data)
     def get_data(
-            self, variables='all', gather=True, clear=False, annotations=None):
+            self, variables: Names = 'all',
+            gather=True, clear: bool = False,
+            annotations: Annotations = None) -> neo.Block:
         # pylint: disable=protected-access
         Population._check_params(gather, annotations)
         if clear:
@@ -79,7 +89,9 @@ class DataPopulation(object):
                 self.__label, variables, self._indexes, annotations)
 
     @overrides(Population.spinnaker_get_data)
-    def spinnaker_get_data(self, variable, as_matrix=False, view_indexes=None):
+    def spinnaker_get_data(
+            self, variable: str, as_matrix: bool = False,
+            view_indexes: Optional[Sequence[int]] = None) -> NDArray[floating]:
         if view_indexes:
             return self[view_indexes].spinnaker_get_data(variable, as_matrix)
         with NeoBufferDatabase(self.__database_file) as db:
@@ -87,31 +99,31 @@ class DataPopulation(object):
                 self.__label, variable, as_matrix, self._indexes)
 
     @overrides(Population.get_spike_counts)
-    def get_spike_counts(self, gather=True):
+    def get_spike_counts(self, gather=True) -> Dict[int, int]:
         # pylint: disable=protected-access
         Population._check_params(gather)
         with NeoBufferDatabase(self.__database_file) as db:
             return db.get_spike_counts(self.__label, self._indexes)
 
     @overrides(Population.find_units)
-    def find_units(self, variable):
+    def find_units(self, variable: str) -> Optional[str]:
         with NeoBufferDatabase(self.__database_file) as db:
             (_, _, units) = db.get_recording_metadeta(self.__label, variable)
         return units
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self._size
 
     @property
-    def label(self):
+    def label(self) -> str:
         return self.__label
 
     @property
-    def local_size(self):
+    def local_size(self) -> int:
         return self._size
 
     @property
-    def size(self):
+    def size(self) -> int:
         return self._size
 
     @overrides(Population.id_to_index)
@@ -143,7 +155,7 @@ class DataPopulation(object):
         # this assumes IDs are consecutive
         return index + first_id
 
-    def __getitem__(self, index_or_slice):
+    def __getitem__(self, index_or_slice: Selector) -> DataPopulation:
         """
         :param selector: a slice or numpy mask array.
             The mask array should either be a boolean array (ideally) of the
@@ -172,7 +184,7 @@ class DataPopulation(object):
         return DataPopulation(self.__database_file, self.__label, indexes)
 
     @overrides(Population.mean_spike_count)
-    def mean_spike_count(self, gather=True):
+    def mean_spike_count(self, gather=True) -> float:
         Population._check_params(gather)  # pylint: disable=protected-access
         counts = self.get_spike_counts()
         return sum(counts.values()) / len(counts)
