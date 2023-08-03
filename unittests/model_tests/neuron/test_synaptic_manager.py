@@ -19,8 +19,9 @@ import numpy
 import pytest
 
 from spinn_utilities.overrides import overrides
-from spinn_utilities.config_holder import load_config, set_config
+from spinn_utilities.config_holder import set_config
 from spinnman.model import CPUInfo
+from spinnman.processes.get_cpu_info_process import _INFO_PATTERN
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
 from pacman.operations.routing_info_allocator_algorithms import (
@@ -80,7 +81,8 @@ class _MockTransceiverinOut(Transceiver):
     @overrides(Transceiver.get_cpu_information_from_core)
     def get_cpu_information_from_core(self, x, y, p):
         bs = bytearray(128)
-        return CPUInfo(x=1, y=2, p=3, cpu_data=bytes(bs), offset=0)
+        cpu_data = _INFO_PATTERN.unpack_from(bytes(bs), 0)
+        return CPUInfo(x=1, y=2, p=3, cpu_data=cpu_data)
 
     @overrides(Transceiver.read_memory)
     def read_memory(self, x, y, base_address, length, cpu=0):
@@ -102,11 +104,11 @@ def say_false(self, weights, delays):
 
 def test_write_data_spec():
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = SpynnakerDataWriter.mock()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
 
-    load_config()
     set_config("Machine", "enable_advanced_monitor_support", "False")
     set_config("Java", "use_java", "False")
 
@@ -440,6 +442,7 @@ def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
         n_pre_neurons, neurons_per_core, max_delay):
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = SpynnakerDataWriter.mock()
 
     # Build a from list connector with the delays we want
