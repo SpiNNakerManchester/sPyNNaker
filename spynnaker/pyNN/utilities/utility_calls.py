@@ -20,7 +20,7 @@ import os
 import math
 import neo
 import numpy
-from numpy import uint32
+from numpy import uint32, floating
 from numpy.typing import NDArray
 from math import isnan
 from pyNN.random import RandomDistribution
@@ -66,7 +66,7 @@ STATS_BY_NAME = {
     'vonmises': RandomStatsVonmisesImpl()}
 
 
-def check_directory_exists_and_create_if_not(filename):
+def check_directory_exists_and_create_if_not(filename: str):
     """
     Create a parent directory for a file if it doesn't exist.
 
@@ -77,7 +77,7 @@ def check_directory_exists_and_create_if_not(filename):
         os.makedirs(directory)
 
 
-def convert_param_to_numpy(param, no_atoms):
+def convert_param_to_numpy(param, no_atoms: int) -> NDArray[floating]:
     """
     Convert parameters into numpy arrays.
 
@@ -94,12 +94,12 @@ def convert_param_to_numpy(param, no_atoms):
         # that it is an array
         param_value = param.next(n=no_atoms)
         if hasattr(param_value, '__iter__'):
-            return numpy.array(param_value, dtype="float")
-        return numpy.array([param_value], dtype="float")
+            return numpy.array(param_value, dtype=floating)
+        return numpy.array([param_value], dtype=floating)
 
     # Deal with a single value by exploding to multiple values
     if not hasattr(param, '__iter__'):
-        return numpy.array([param] * no_atoms, dtype="float")
+        return numpy.array([param] * no_atoms, dtype=floating)
 
     # Deal with multiple values, but not the correct number of them
     if len(param) != no_atoms:
@@ -108,7 +108,7 @@ def convert_param_to_numpy(param, no_atoms):
             " the vertex")
 
     # Deal with the correct number of multiple values
-    return numpy.array(param, dtype="float")
+    return numpy.array(param, dtype=floating)
 
 
 def convert_to(value, data_type: DataType) -> uint32:
@@ -126,7 +126,8 @@ def convert_to(value, data_type: DataType) -> uint32:
 
 
 def read_in_data_from_file(
-        file_path, min_atom, max_atom, min_time, max_time, extra=False):
+        file_path: str, min_atom: int, max_atom: int,
+        min_time: float, max_time: float, extra: bool = False) -> NDArray:
     """
     Read in a file of data values where the values are in a format of::
 
@@ -143,21 +144,21 @@ def read_in_data_from_file(
     :return: a numpy array of (time stamp, atom ID, data value)
     :rtype: ~numpy.ndarray(tuple(float, int, float))
     """
-    times = list()
-    atom_ids = list()
-    data_items = list()
+    times: List[float] = []
+    atom_ids: List[int] = []
+    data_items: List[float] = []
     evaluator = SafeEval()
     with open(file_path, 'r', encoding="utf-8") as f:
         for line in f.readlines():
             if line.startswith('#'):
                 continue
             if extra:
-                time, neuron_id, data_value, extra = line.split("\t")
+                time_s, neuron_id_s, data_value_s, _extra = line.split("\t")
             else:
-                time, neuron_id, data_value = line.split("\t")
-            time = float(evaluator.eval(time))
-            neuron_id = int(evaluator.eval(neuron_id))
-            data_value = float(evaluator.eval(data_value))
+                time_s, neuron_id_s, data_value_s = line.split("\t")
+            time = float(evaluator.eval(time_s))
+            neuron_id = int(evaluator.eval(neuron_id_s))
+            data_value = float(evaluator.eval(data_value_s))
             if (min_atom <= neuron_id < max_atom and
                     min_time <= time < max_time):
                 times.append(time)
@@ -167,7 +168,7 @@ def read_in_data_from_file(
                 print(f"failed to enter {neuron_id}:{time}")
 
     result = numpy.dstack((atom_ids, times, data_items))[0]
-    return result[numpy.lexsort((times, atom_ids))]
+    return result[numpy.lexsort(result.T[1::-1])]
 
 
 def read_spikes_from_file(

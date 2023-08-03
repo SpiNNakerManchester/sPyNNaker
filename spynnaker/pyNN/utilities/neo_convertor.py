@@ -13,13 +13,19 @@
 # limitations under the License.
 
 import quantities
+from quantities import UnitTime
 import numpy as np
+from numpy.typing import NDArray
+from neo import AnalogSignal, Block, SpikeTrain
+from typing import List, Optional, Sequence
 
 # needed as dealing with quantities
 # pylint: disable=c-extension-no-member
 
 
-def convert_analog_signal(signal_array, time_unit=quantities.ms):
+def convert_analog_signal(
+        signal_array: AnalogSignal,
+        time_unit: UnitTime = quantities.ms) -> NDArray:
     """
     Converts part of a NEO object into told spynnaker7 format.
 
@@ -40,7 +46,7 @@ def convert_analog_signal(signal_array, time_unit=quantities.ms):
     return np.column_stack((neurons, all_times, values))
 
 
-def convert_data(data, name, run=0):
+def convert_data(data: Block, name: str, run: int = 0) -> NDArray:
     """
     Converts the data into a numpy array in the format ID, time, value.
 
@@ -63,7 +69,8 @@ def convert_data(data, name, run=0):
         data.segments[run].filter(name=name)[0])
 
 
-def convert_data_list(data, name, runs=None):
+def convert_data_list(data: Block, name: str,
+                      runs: Optional[Sequence[int]] = None) -> List[NDArray]:
     """
     Converts the data into a list of numpy arrays in the format ID, time,
     value.
@@ -76,15 +83,15 @@ def convert_data_list(data, name, runs=None):
     :type runs: list(int) or None
     :rtype: list(~numpy.ndarray)
     """
-    results = []
     if runs is None:
         runs = range(len(data.segments))
-    for run in runs:
-        results.append(convert_data(data, name, run=run))
-    return results
+    return [
+        convert_data(data, name, run=run)
+        for run in runs]
 
 
-def convert_v_list(data, runs=None):
+def convert_v_list(
+        data: Block, runs: Optional[Sequence[int]] = None) -> List[NDArray]:
     """
     Converts the voltage into a list numpy array one per segment (all
     runs) in the format ID, time, value.
@@ -98,7 +105,8 @@ def convert_v_list(data, runs=None):
     return convert_data_list(data, "v", runs=runs)
 
 
-def convert_gsyn_exc_list(data, runs=None):
+def convert_gsyn_exc_list(
+        data: Block, runs: Optional[Sequence[int]] = None) -> List[NDArray]:
     """
     Converts the gsyn_exc into a list numpy array one per segment (all
     runs) in the format ID, time, value.
@@ -113,7 +121,8 @@ def convert_gsyn_exc_list(data, runs=None):
     return convert_data_list(data, "gsyn_exc", runs=runs)
 
 
-def convert_gsyn_inh_list(data, runs=None):
+def convert_gsyn_inh_list(
+        data: Block, runs: Optional[Sequence[int]] = None) -> List[NDArray]:
     """
     Converts the gsyn_inh into a list numpy array one per segment (all
     runs) in the format ID, time, value.
@@ -128,7 +137,7 @@ def convert_gsyn_inh_list(data, runs=None):
     return convert_data_list(data, "gsyn_inh", runs=runs)
 
 
-def convert_gsyn(gsyn_exc, gsyn_inh):
+def convert_gsyn(gsyn_exc: Block, gsyn_inh: Block) -> NDArray:
     """
     Converts two neo objects into the spynnaker7 format.
 
@@ -164,7 +173,7 @@ def convert_gsyn(gsyn_exc, gsyn_inh):
     return np.column_stack((neurons, all_times, exc_np, inh_np))
 
 
-def convert_spiketrains(spiketrains):
+def convert_spiketrains(spiketrains: List[SpikeTrain]) -> NDArray:
     """
     Converts a list of spiketrains into spynnaker7 format.
 
@@ -181,7 +190,7 @@ def convert_spiketrains(spiketrains):
     return np.column_stack((neurons, spikes))
 
 
-def convert_spikes(neo, run=0):
+def convert_spikes(neo: Block, run: int = 0) -> NDArray:
     """
     Extracts the spikes for run one from a Neo Object.
 
@@ -196,7 +205,7 @@ def convert_spikes(neo, run=0):
     return convert_spiketrains(neo.segments[run].spiketrains)
 
 
-def count_spiketrains(spiketrains):
+def count_spiketrains(spiketrains: SpikeTrain) -> int:
     """
     Help function to count the number of spikes in a list of spiketrains.
 
@@ -207,7 +216,7 @@ def count_spiketrains(spiketrains):
     return sum(map(len, spiketrains))
 
 
-def count_spikes(neo):
+def count_spikes(neo: Block) -> int:
     """
     Help function to count the number of spikes in a list of spiketrains.
 
