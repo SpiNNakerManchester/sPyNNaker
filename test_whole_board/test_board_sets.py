@@ -22,20 +22,22 @@ import pyNN.spiNNaker as sim
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterAbstractPopulationVertexNeuronsSynapses)
 from spinnman.spalloc import SpallocClient, SpallocState
+from unittest.case import SkipTest
 
 
-BOARDS = [(bx, by, bb)
+BOARDS = [(bx, by, bb, ss)
           for bx in range(20)
           for by in range(20)
-          for bb in range(3)]
+          for bb in range(3)
+          for ss in range(3)]
 SPALLOC_URL = "https://spinnaker.cs.man.ac.uk/spalloc"
 SPALLOC_USERNAME = "jenkins"
 SPALLOC_PASSWORD = os.getenv("SPALLOC_PASSWORD")
 SPALLOC_MACHINE = "SpiNNaker1M"
 WIDTH = 1
 HEIGHT = 1
-WEIGHT = 2.0
 POISSON_RATE = 1
+WEIGHT = 2.0
 FIXED_PROB = 0.1
 MAX_POISSONS = 500
 MAX_NEURONS = 256
@@ -49,6 +51,9 @@ def do_run(sender_board):
     machine = sim.get_machine()
 
     eth_chips = list(machine.ethernet_connected_chips)
+    if len(eth_chips) <= sender_board:
+        raise SkipTest(
+            f"Not enough boards in this set for sender {sender_board}")
     sender = eth_chips[sender_board]
     receivers = [e for i, e in enumerate(eth_chips) if i != sender_board]
 
@@ -96,30 +101,24 @@ def do_run(sender_board):
             assert len(s), f"No spikes for {receiver_pop.label}:{i}"
 
 
-def run():
-    do_run(sender_board=0)
-    do_run(sender_board=1)
-    do_run(sender_board=2)
-
-
-@pytest.mark.parametrize("x,y,b", BOARDS)
-def test_run(x, y, b):
+@pytest.mark.parametrize("x,y,b,s", BOARDS)
+def test_run(x, y, b, s):
     test_dir = os.path.dirname(__file__)
     client = SpallocClient(SPALLOC_URL, SPALLOC_USERNAME, SPALLOC_PASSWORD)
     job = client.create_job_rect_at_board(
         WIDTH, HEIGHT, triad=(x, y, b), machine_name=SPALLOC_MACHINE)
-    job.launch_keepalive_task()
-    # Wait for not queued for up to 30 seconds
-    job.wait_for_state_change(SpallocState.QUEUED)
-    # If queued or destroyed skip test
-    if job.get_state() == SpallocState.QUEUED:
-        job.destroy("Queued")
-        pytest.skip(f"Some boards starting at {x}, {y}, {b} is in use")
-    elif job.get_state() == SpallocState.DESTROYED:
-        pytest.skip(f"Boards {x}, {y}, {b} could not be allocated")
-    # Actually wait for ready now (as might be powering on)
-    job.wait_until_ready()
     with job:
+        job.launch_keepalive_task()
+        # Wait for not queued for up to 30 seconds
+        job.wait_for_state_change(SpallocState.QUEUED)
+        # If queued or destroyed skip test
+        if job.get_state() == SpallocState.QUEUED:
+            job.destroy("Queued")
+            pytest.skip(f"Some boards starting at {x}, {y}, {b} is in use")
+        elif job.get_state() == SpallocState.DESTROYED:
+            pytest.skip(f"Boards {x}, {y}, {b} could not be allocated")
+        # Actually wait for ready now (as might be powering on)
+        job.wait_until_ready()
         with tempfile.TemporaryDirectory(
                 prefix=f"{x}_{y}_{b}", dir=test_dir) as tmpdir:
             os.chdir(tmpdir)
@@ -128,15 +127,16 @@ def test_run(x, y, b):
                 f.write("spalloc_server = None\n")
                 f.write(f"machine_name = {job.get_root_host()}\n")
                 f.write("version = 5\n")
-            run()
+            do_run(s)
 
 
 if __name__ == "__main__":
     for b_x, b_y, b_b in BOARDS:
-        print("", file=sys.stderr,)
-        print(f"************* Testing {b_x}, {b_y}, {b_b} *****************",
-              file=sys.stderr)
-        try:
-            test_run(b_x, b_y, b_b)
-        except Exception:
-            traceback.print_exc()
+        for s_s in [0, 1, 2]:
+            print("", file=sys.stderr,)
+            print(f"************ Testing {b_x}, {b_y}, {b_b} ****************",
+                  file=sys.stderr)
+            try:
+                test_run(b_x, b_y, b_b, s_s)
+            except Exception:
+                traceback.print_exc()
