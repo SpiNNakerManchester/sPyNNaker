@@ -22,7 +22,7 @@ from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 CONFIG_FILE_NAME = "spynnaker.cfg"
 
 
-def setup_configs():
+def setup_configs() -> None:
     """
     Sets up the configurations including the users configuration file.
 
@@ -37,7 +37,7 @@ def setup_configs():
         default=os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))
 
 
-def unittest_setup():
+def unittest_setup() -> None:
     """
     Does all the steps that may be required before a unit-test.
 
@@ -56,6 +56,6 @@ def unittest_setup():
     SpynnakerDataWriter.mock()
 
 
-def add_spynnaker_cfg():
+def add_spynnaker_cfg() -> None:
     add_spinnaker_cfg()  # This add its dependencies too
     add_default_cfg(os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))

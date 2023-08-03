@@ -20,11 +20,13 @@ from neo import __version__ as neo_version
 import os
 from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
+from typing import Collection, Optional, Union, cast
+from typing_extensions import Literal
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import get_config_bool, get_config_str
 from spinn_utilities.overrides import overrides
-
+from pacman.model.routing_tables import MulticastRoutingTables
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.interface.provenance import (
@@ -32,9 +34,11 @@ from spinn_front_end_common.interface.provenance import (
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
+from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.extra_algorithms import (
@@ -62,11 +66,14 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     Main interface for the sPyNNaker implementation of PyNN 0.8/0.9.
     """
 
-    __slots__ = ()
+    __slots__ = ("__recorders", )
 
     def __init__(
-            self, time_scale_factor, min_delay,
-            n_chips_required=None, n_boards_required=None, timestep=0.1):
+            self, time_scale_factor: Optional[int],
+            min_delay: Union[float, None, Literal["auto"]],
+            n_chips_required: Optional[int] = None,
+            n_boards_required: Optional[int] = None,
+            timestep: Optional[float] = 0.1):
         """
         :param time_scale_factor:
             multiplicative factor to the machine time step
@@ -95,7 +102,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             min_delay = timestep
 
         # pynn demanded objects
-        self.__recorders = set()
+        self.__recorders: Collection[Recorder] = set()
 
         # main pynn interface inheritance
         pynn_control.BaseState.__init__(self)
@@ -110,7 +117,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
         super().__init__(SpynnakerDataWriter)
 
-        self._data_writer.set_n_required(n_boards_required, n_chips_required)
+        self.__writer.set_n_required(n_boards_required, n_chips_required)
         # set up machine targeted data
         self._set_up_timings(timestep, min_delay, time_scale_factor)
 
@@ -121,7 +128,12 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             db.insert_version("neo_version", neo_version)
             db.insert_version("lazyarray_version", lazyarray_version)
 
-    def _clear_and_run(self, run_time, sync_time=0.0):
+    @property
+    def __writer(self) -> SpynnakerDataWriter:
+        return cast(SpynnakerDataWriter, self._data_writer)
+
+    def _clear_and_run(self, run_time: Union[int, float],
+                       sync_time: float = 0.0):
         """
         Clears the projections and Run the model created.
 
@@ -135,13 +147,13 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # extra post prerun algorithms
         self.__flush_post_vertex_caches()
 
-        super(SpiNNaker, self).run(run_time, sync_time)
+        super(SpiNNaker, self).run(int(run_time), sync_time)
         # extra post run algorithms
         self.__flush_post_vertex_caches()
 
-    def __flush_post_vertex_caches(self):
+    def __flush_post_vertex_caches(self) -> None:
         # pylint: disable=protected-access
-        for projection in self._data_writer.iterate_projections():
+        for projection in self.__writer.iterate_projections():
             projection._clear_cache()
 
     def run(self, run_time, sync_time=0.0):
@@ -175,13 +187,13 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         Reset the state of the current network to time t = 0.
         """
-        if not self._data_writer.is_ran_last():
-            if not self._data_writer.is_ran_ever():
+        if not self.__writer.is_ran_last():
+            if not self.__writer.is_ran_ever():
                 logger.error("Ignoring the reset before the run")
             else:
                 logger.error("Ignoring the repeated reset call")
             return
-        for population in self._data_writer.iterate_populations():
+        for population in self.__writer.iterate_populations():
             population._cache_data()  # pylint: disable=protected-access
 
         # Call superclass implementation
@@ -247,7 +259,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :return: the machine time step
         :rtype: float
         """
-        return self._data_writer.get_simulation_time_step_ms()
+        return self.__writer.get_simulation_time_step_ms()
 
     @dt.setter
     def dt(self, _):
@@ -267,7 +279,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :return: the current runtime already executed
         :rtype: float
         """
-        return self._data_writer.get_current_run_time_ms()
+        return self.__writer.get_current_run_time_ms()
 
     @property
     def segment_counter(self):
@@ -277,7 +289,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :return: the segment counter
         :rtype: int
         """
-        return self._data_writer.get_segment_counter()
+        return self.__writer.get_segment_counter()
 
     @segment_counter.setter
     def segment_counter(self, _):
@@ -290,7 +302,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             "We do not support externally altering the segment counter")
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         The name of the simulator. Used to ensure PyNN recording neo
         blocks are correctly labelled.
@@ -301,7 +313,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return _version._NAME  # pylint: disable=protected-access
 
     @property
-    def recorders(self):
+    def recorders(self) -> Collection[Recorder]:
         """
         The recorders, used by the PyNN state object.
 
@@ -311,35 +323,38 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return self.__recorders
 
     @recorders.setter
-    def recorders(self, new_value):
+    def recorders(self, new_value: Collection[Recorder]):
         """
         Setter for the internal recorders object
 
         :param new_value: the new value for the recorder
         """
-        self.__recorders = new_value
+        self.__recorders = set(new_value)
 
-    def _set_up_timings(self, timestep, min_delay, time_scale_factor):
+    def _set_up_timings(
+            self, timestep: Optional[float], min_delay: Union[
+                int, float, None],
+            time_scale_factor: Optional[int]):
         """
         :param timestep: machine_time_Step in milliseconds
         :type timestep: float or None
         :param min_delay:
-        :type min_delay: int or None
+        :type min_delay: int or float or None
         :param time_scale_factor:
         :type time_scale_factor: int or None
         """
         # Get the standard values
         if timestep is None:
-            self._data_writer.set_up_timings_and_delay(
+            self.__writer.set_up_timings_and_delay(
                 timestep, time_scale_factor, min_delay)
         else:
-            self._data_writer.set_up_timings_and_delay(
+            self.__writer.set_up_timings_and_delay(
                 math.ceil(timestep * MICRO_TO_MILLISECOND_CONVERSION),
                 time_scale_factor, min_delay)
 
         # Check the combination of machine time step and time scale factor
-        if (self._data_writer.get_simulation_time_step_ms() *
-                self._data_writer.get_time_scale_factor() < 1):
+        if (self.__writer.get_simulation_time_step_ms() *
+                self.__writer.get_time_scale_factor() < 1):
             if not get_config_bool(
                     "Mode", "violate_1ms_wall_clock_restriction"):
                 raise ConfigurationException(
@@ -363,21 +378,16 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             logger.warning(
                 "****************************************************")
 
-    @staticmethod
-    def _count_unique_keys(commands):
-        unique_keys = {command.key for command in commands}
-        return len(unique_keys)
-
-    def stop(self):
+    def stop(self) -> None:
         # pylint: disable=protected-access
         FecTimer.start_category(TimerCategory.SHUTTING_DOWN)
-        for population in self._data_writer.iterate_populations():
+        for population in self.__writer.iterate_populations():
             population._end()
 
         super().stop()
 
     @staticmethod
-    def register_binary_search_path(search_path):
+    def register_binary_search_path(search_path: str):
         """
         Register an additional binary search path for executables.
 
@@ -390,7 +400,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         moved_in_v7_warning("register_binary_search_path is now a View method")
         SpynnakerDataView.register_binary_search_path(search_path)
 
-    def _execute_spynnaker_ordered_covering_compressor(self):
+    def _execute_spynnaker_ordered_covering_compressor(self) -> None:
         with FecTimer("Spynnaker machine bitfield ordered covering compressor",
                       TimerWork.COMPRESSING) as timer:
             if timer.skip_if_virtual_board():
@@ -398,9 +408,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             spynnaker_machine_bitfield_ordered_covering_compressor()
             # pylint: disable=attribute-defined-outside-init
             self._multicast_routes_loaded = True
-            return None
+            return
 
-    def _execute_spynnaker_pair_compressor(self):
+    def _execute_spynnaker_pair_compressor(self) -> None:
         with FecTimer("Spynnaker machine bitfield pair router compressor",
                       TimerWork.COMPRESSING) as timer:
             if timer.skip_if_virtual_board():
@@ -408,53 +418,56 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             spynnaker_machine_bitField_pair_router_compressor()
             # pylint: disable=attribute-defined-outside-init
             self._multicast_routes_loaded = True
-            return None
+            return
 
     @overrides(AbstractSpinnakerBase._do_delayed_compression)
-    def _do_delayed_compression(self, name, compressed):
+    def _do_delayed_compression(
+            self, name: str, compressed: Optional[MulticastRoutingTables]
+            ) -> Optional[MulticastRoutingTables]:
         if name == "SpynnakerMachineBitFieldOrderedCoveringCompressor":
-            return self._execute_spynnaker_ordered_covering_compressor()
-
-        if name == "SpynnakerMachineBitFieldPairRouterCompressor":
-            return self._execute_spynnaker_pair_compressor()
+            self._execute_spynnaker_ordered_covering_compressor()
+            return None
+        elif name == "SpynnakerMachineBitFieldPairRouterCompressor":
+            self._execute_spynnaker_pair_compressor()
+            return None
 
         return AbstractSpinnakerBase._do_delayed_compression(
             self, name, compressed)
 
-    def _execute_write_neo_metadata(self):
+    def _execute_write_neo_metadata(self) -> None:
         with FecTimer("Write Neo Metadata", TimerWork.OTHER):
             with NeoBufferDatabase() as db:
                 db.write_segment_metadata()
                 db.write_metadata()
 
     @overrides(AbstractSpinnakerBase._do_write_metadata)
-    def _do_write_metadata(self):
+    def _do_write_metadata(self) -> None:
         self._execute_write_neo_metadata()
         super()._do_write_metadata()
 
-    def _execute_synapse_expander(self):
+    def _execute_synapse_expander(self) -> None:
         with FecTimer("Synapse expander", TimerWork.SYNAPSE) as timer:
             if timer.skip_if_virtual_board():
                 return
             synapse_expander()
 
-    def _execute_neuron_expander(self):
+    def _execute_neuron_expander(self) -> None:
         with FecTimer("Neuron expander", TimerWork.SYNAPSE) as timer:
             if timer.skip_if_virtual_board():
                 return
             neuron_expander()
 
-    def _execute_finish_connection_holders(self):
+    def _execute_finish_connection_holders(self) -> None:
         with FecTimer("Finish connection holders", TimerWork.OTHER):
             finish_connection_holders()
 
     @overrides(AbstractSpinnakerBase._do_extra_load_algorithms)
-    def _do_extra_load_algorithms(self):
+    def _do_extra_load_algorithms(self) -> None:
         self._execute_neuron_expander()
         self._execute_synapse_expander()
         self._execute_finish_connection_holders()
 
-    def _report_write_network_graph(self):
+    def _report_write_network_graph(self) -> None:
         with FecTimer("SpYNNakerNeuronGraphNetworkSpecificationReport",
                       TimerWork.REPORT) as timer:
             if timer.skip_if_cfg_false("Reports", "write_network_graph"):
@@ -463,15 +476,15 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @overrides(AbstractSpinnakerBase._do_extra_mapping_algorithms,
                extend_doc=False)
-    def _do_extra_mapping_algorithms(self):
+    def _do_extra_mapping_algorithms(self) -> None:
         self._report_write_network_graph()
 
     @overrides(AbstractSpinnakerBase._do_provenance_reports)
-    def _do_provenance_reports(self):
+    def _do_provenance_reports(self) -> None:
         AbstractSpinnakerBase._do_provenance_reports(self)
         self._report_redundant_packet_count()
 
-    def _report_redundant_packet_count(self):
+    def _report_redundant_packet_count(self) -> None:
         with FecTimer("Redundant packet count report",
                       TimerWork.REPORT) as timer:
             if timer.skip_if_cfg_false(
@@ -480,13 +493,13 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             redundant_packet_count_report()
 
     @overrides(AbstractSpinnakerBase._execute_splitter_selector)
-    def _execute_splitter_selector(self):
+    def _execute_splitter_selector(self) -> None:
         with FecTimer("Spynnaker splitter selector", TimerWork.OTHER):
             spynnaker_splitter_selector()
 
     @overrides(AbstractSpinnakerBase._execute_delay_support_adder,
                extend_doc=False)
-    def _execute_delay_support_adder(self):
+    def _execute_delay_support_adder(self) -> None:
         """
         Runs, times and logs the DelaySupportAdder if required.
         """
@@ -497,16 +510,15 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             if name == "DelaySupportAdder":
                 d_vertices, d_edges = delay_support_adder()
                 for vertex in d_vertices:
-                    self._data_writer.add_vertex(vertex)
+                    self.__writer.add_vertex(vertex)
                 for edge in d_edges:
-                    self._data_writer.add_edge(
-                        edge, constants.SPIKE_PARTITION_ID)
+                    self.__writer.add_edge(edge, constants.SPIKE_PARTITION_ID)
                 return
             raise ConfigurationException(
                 f"Unexpected cfg setting delay_support_adder: {name}")
 
     @overrides(AbstractSpinnakerBase._execute_buffer_extractor)
-    def _execute_buffer_extractor(self):
+    def _execute_buffer_extractor(self) -> None:
         super()._execute_buffer_extractor()
         if not get_config_bool("Machine", "virtual_board"):
             with NeoBufferDatabase() as db:
