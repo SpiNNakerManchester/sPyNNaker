@@ -26,6 +26,8 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.populations import Population
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
+    SpikeSourcePoissonVertex)
 
 
 class SpynnakerExternalDevicePluginManager(object):
@@ -190,10 +192,11 @@ class SpynnakerExternalDevicePluginManager(object):
         :param str partition_id:
             The partition ID to activate live output to.
         """
-        device_vertex = device
         # pylint: disable=protected-access
         if isinstance(device, Population):
-            device_vertex = device._vertex
+            device_vertex: ApplicationVertex = device._vertex
+        else:
+            device_vertex = device
         SpynnakerExternalDevicePluginManager.add_edge(
             population._vertex, device_vertex, partition_id)
 
@@ -254,6 +257,8 @@ class SpynnakerExternalDevicePluginManager(object):
         """
         # pylint: disable=too-many-arguments, protected-access
         vertex = poisson_population._vertex
+        if not isinstance(vertex, SpikeSourcePoissonVertex):
+            raise TypeError("population must contain a SpikeSourcePoisson")
         control_label = f"{vertex.label}{control_label_extension}"
         controller = ReverseIpTagMultiCastSource(
             n_keys=vertex.n_atoms, label=control_label,

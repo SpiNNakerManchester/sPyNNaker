@@ -13,11 +13,12 @@
 # limitations under the License.
 
 import numpy
-from numpy import uint32, integer
+from numpy import uint8, uint32, integer
 from numpy.typing import NDArray
 from enum import Enum
 from pyNN.random import RandomDistribution
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+from typing_extensions import TypeAlias
 from spinn_utilities.helpful_functions import is_singleton
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.interface.ds import DataType
@@ -28,6 +29,10 @@ from spynnaker.pyNN.models.common.param_generator_data import (
     type_has_generator)
 from spinn_utilities.ranged.abstract_list import AbstractList
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
+
+#: The type of values used populate structure instances
+ValueMap: TypeAlias = Mapping[str, Union[int, float, AbstractList[float]]]
+
 
 REPEAT_PER_NEURON_FLAG = 0xFFFFFFFF
 
@@ -114,7 +119,7 @@ class Struct(object):
         size_in_bytes = array_size * datatype.itemsize
         return (size_in_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
 
-    def get_data(self, values: Dict[str, Union[int, float, AbstractList]],
+    def get_data(self, values: ValueMap,
                  vertex_slice: Optional[Slice] = None) -> NDArray[uint32]:
         """
         Get a numpy array of uint32 of data for the given values.
@@ -147,19 +152,18 @@ class Struct(object):
         for data_type, name in self.__fields:
             if name in values:
                 all_vals = values[name]
-
                 if is_singleton(all_vals):
                     # If there is just one value for everything, use it
                     # everywhere
                     data[name] = convert_to(all_vals, data_type)
-                elif self.__repeat_type == StructRepeat.GLOBAL:
+                    continue
+                assert isinstance(all_vals, AbstractList)
+                if self.__repeat_type == StructRepeat.GLOBAL:
                     # If there is a ranged list for global struct,
                     # we might need to read a single value
-                    assert isinstance(all_vals, AbstractList)
                     data[name] = convert_to(
                         all_vals.get_single_value_all(), data_type)
                 else:
-                    assert isinstance(all_vals, AbstractList)
                     assert vertex_slice is not None
                     self.__get_data_for_slice(
                         data, all_vals, name, data_type, vertex_slice)
@@ -174,12 +178,12 @@ class Struct(object):
         overflow = (n_items * self.numpy_dtype.itemsize) % BYTES_PER_WORD
         if overflow != 0:
             data = numpy.pad(
-                data.view("uint8"), (0, BYTES_PER_WORD - overflow), "constant")
+                data.view(uint8), (0, BYTES_PER_WORD - overflow), "constant")
 
         return data.view(uint32)
 
     def __get_data_for_slice(
-            self, data: NDArray, all_vals: AbstractList, name: str,
+            self, data: NDArray, all_vals: AbstractList[float], name: str,
             data_type: DataType, vertex_slice: Slice):
         """
         Get the data for a single value from a vertex slice.
@@ -201,7 +205,7 @@ class Struct(object):
             data_pos += n_values
 
     def get_generator_data(
-            self, values: RangeDictionary,
+            self, values: ValueMap,
             vertex_slice: Optional[Slice] = None) -> NDArray[uint32]:
         """
         Get a numpy array of uint32 of data to generate the given values.
@@ -261,7 +265,7 @@ class Struct(object):
 
     def __gen_data_one_for_all(
             self, data: List[int], gen_data: List[NDArray[uint32]],
-            values: RangeDictionary, name: str):
+            values: ValueMap, name: str):
         """
         Generate data with a single value for all neurons.
         """
@@ -291,7 +295,7 @@ class Struct(object):
 
     def __gen_data_for_slice(
             self, data: List[int], gen_data: List[NDArray[uint32]],
-            values: RangeDictionary, name: str, vertex_slice: Slice):
+            values: ValueMap, name: str, vertex_slice: Slice):
         """
         Generate data with different values for each neuron.
         """
@@ -307,6 +311,7 @@ class Struct(object):
                 data.append(param_generator_id(vals))
                 gen_data.append(param_generator_params(vals))
             else:
+                assert isinstance(vals, AbstractList)
                 # Store where to update with the number of items and
                 # set to 0 to start
                 n_items_index = len(data)

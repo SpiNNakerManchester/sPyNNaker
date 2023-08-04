@@ -33,7 +33,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class NeoCsv(object):
-    # pylint: disable=c-extension-no-member
+    # pylint: disable=c-extension-no-member, no-member
 
     _POPULATION = "population"
     _DESCRIPTION = "description"
@@ -138,7 +138,7 @@ class NeoCsv(object):
             row = next(csv_reader)
         return numpy.asarray(rows, dtype=float64)
 
-    def _csv_indexes(self, indexes: List[int], csv_writer: CSVWriter):
+    def __csv_indexes(self, indexes: NDArray[integer], csv_writer: CSVWriter):
         """
         Writes the indexes for which there could be data to the CSV.
 
@@ -215,7 +215,7 @@ class NeoCsv(object):
             segment.spiketrains.append(spiketrain)
 
     def _csv_spike_data(self, csv_writer: CSVWriter, spikes: NDArray,
-                        indexes: List[int]):
+                        indexes: NDArray[integer]):
         """
         Writes the spikes to the CSV file.
 
@@ -223,7 +223,7 @@ class NeoCsv(object):
         :param ~numpy.ndarray spikes:
         :param list(int) indexes: The indexes for which there could be data
         """
-        self._csv_indexes(indexes, csv_writer)
+        self.__csv_indexes(indexes, csv_writer)
         csv_writer.writerows(spikes)
         csv_writer.writerow([])
 
@@ -265,7 +265,7 @@ class NeoCsv(object):
         :param units: the units of the recorded value
         :type units: quantities.quantity.Quantity or str
         """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
+        # pylint: disable=too-many-arguments
         block = segment.block
 
         first_id: int = block.annotations[self._FIRST_ID]
@@ -287,7 +287,7 @@ class NeoCsv(object):
 
     def _csv_matrix_data(
             self, csv_writer: CSVWriter, signal_array: NDArray,
-            indexes: List[int]):
+            indexes: NDArray[integer]):
         """
         Writes data to a CSV file.
 
@@ -295,8 +295,7 @@ class NeoCsv(object):
         :param ~numpy.ndarray signal_array: the raw signal data
         :param list(int) indexes: The indexes for the data
         """
-        # pylint: disable=no-member, c-extension-no-member
-        self._csv_indexes(indexes, csv_writer)
+        self.__csv_indexes(indexes, csv_writer)
         csv_writer.writerows(signal_array)
         csv_writer.writerow([])
 
@@ -329,7 +328,6 @@ class NeoCsv(object):
         :param list[~quantities.Quantity] formation_times:
         :param list[str] formation_labels:
         """
-        # pylint: disable=no-member, c-extension-no-member
         formation_event_array = Event(
             times=formation_times,
             labels=formation_labels,
@@ -350,7 +348,6 @@ class NeoCsv(object):
         :param list[~quantities.Quantity] elimination_times:
         :param list[str] elimination_labels:
         """
-        # pylint: disable=no-member, c-extension-no-member
         elimination_event_array = Event(
             times=elimination_times,
             labels=elimination_labels,
@@ -369,7 +366,6 @@ class NeoCsv(object):
         :param ~numpy.ndarray event_array: the raw "event" data
         :param str variable: the variable name
         """
-        # pylint: disable=no-member, c-extension-no-member
         formation_times: List[Quantity] = []
         formation_labels: List[str] = []
         elimination_times: List[Quantity] = []
@@ -381,12 +377,10 @@ class NeoCsv(object):
             post_id = int(event_array[i][2])
             if event_array[i][3] == 1:
                 formation_times.append(event_time)
-                formation_labels.append(
-                    str(pre_id) + "_" + str(post_id) + "_formation")
+                formation_labels.append(f"{pre_id}_{post_id}_formation")
             else:
                 elimination_times.append(event_time)
-                elimination_labels.append(
-                    str(pre_id) + "_" + str(post_id) + "_elimination")
+                elimination_labels.append(f"{pre_id}_{post_id}_elimination")
 
         self._insert_formation_events(
             segment, variable, formation_times, formation_labels)
@@ -400,10 +394,8 @@ class NeoCsv(object):
         :param ~csv.writer csv_writer: Open CSV writer to write to
         :param ~numpy.ndarray event_array: the raw "event" data
         """
-        # pylint: disable=no-member, c-extension-no-member
-
-        formation = []
-        elimination = []
+        formation: List[Tuple[Quantity, str]] = []
+        elimination: List[Tuple[Quantity, str]] = []
 
         for i in range(len(event_array)):
             event_time = event_array[i][0] * ms
@@ -411,12 +403,10 @@ class NeoCsv(object):
             post_id = int(event_array[i][2])
             if event_array[i][3] == 1:
                 formation.append(
-                    [event_time,
-                     str(pre_id) + "_" + str(post_id) + "_formation"])
+                    (event_time, f"{pre_id}_{post_id}_formation"))
             else:
                 elimination.append(
-                    [event_time,
-                     str(pre_id) + "_" + str(post_id) + "_elimination"])
+                    (event_time, f"{pre_id}_{post_id}_elimination"))
 
         csv_writer.writerow([self._FORMATION])
         csv_writer.writerows(formation)
@@ -568,7 +558,7 @@ class NeoCsv(object):
             block.annotate(**annotations)
         return block
 
-    def _csv_block_metadat(
+    def _csv_block_metadata(
             self, csv_writer: CSVWriter, pop_label: str, t_stop: float,
             pop_size: int, first_id: int, description: str,
             annotations: Annotations):
@@ -583,7 +573,7 @@ class NeoCsv(object):
         :type annotations: None or dict(str, ...)
         """
         csv_writer.writerow([self._POPULATION, pop_label])
-        csv_writer.writerow([self._DESCRIPTION, f"\"{description}\""])
+        csv_writer.writerow([self._DESCRIPTION, f'"{description}"'])
 
         csv_writer.writerow([self._SIZE, pop_size])
         csv_writer.writerow([self._FIRST_ID, first_id])

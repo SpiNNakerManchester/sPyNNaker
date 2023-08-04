@@ -335,7 +335,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     self._string(row["description"]))
         raise ConfigurationException(f"No metadata for {pop_label}")
 
-    def get_population_metdadata(self, pop_label: str) -> Tuple[int, int, str]:
+    def get_population_metadata(self, pop_label: str) -> Tuple[int, int, str]:
         """
         Gets the metadata for the population with this label
 
@@ -448,7 +448,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             results.append(self._string(row["variable"]))
         return tuple(results)
 
-    def get_recording_metadeta(self, pop_label: str, variable: str) -> Tuple[
+    def get_recording_metadata(self, pop_label: str, variable: str) -> Tuple[
             Optional[DataType], float, Optional[str]]:
         """
         Gets the metadata ID for this population and recording label
@@ -469,11 +469,11 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If the recording metadata not setup correctly
         """
         with self.transaction() as cursor:
-            info = self.__get_recording_metadeta(cursor, pop_label, variable)
+            info = self.__get_recording_metadata(cursor, pop_label, variable)
             (_, datatype, _, _, sampling_interval_ms, _, units, _) = info
             return (datatype, sampling_interval_ms, units)
 
-    def __get_recording_metadeta(
+    def __get_recording_metadata(
             self, cursor: Cursor, pop_label: str, variable: str) -> Tuple[
                 int, Optional[DataType], BufferDataType, float, float, int,
                 Optional[str], int]:
@@ -1072,7 +1072,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self.__get_segment_info(cursor)
             (rec_id, data_type, buffered_type, _, sampling_interval_ms,
              pop_size, _, n_colour_bits) = \
-                self.__get_recording_metadeta(cursor, pop_label, variable)
+                self.__get_recording_metadata(cursor, pop_label, variable)
             if buffered_type == BufferDataType.MATRIX:
                 assert data_type is not None
                 return self.__get_recorded_pynn7(
@@ -1093,7 +1093,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
             (rec_id, _, buffered_type, _, _, pop_size, _, n_colour_bits) = \
-                self.__get_recording_metadeta(cursor, pop_label, SPIKES)
+                self.__get_recording_metadata(cursor, pop_label, SPIKES)
             if view_indexes is None:
                 view_indexes = range(pop_size)
 
@@ -1128,7 +1128,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
          pop_size, units, n_colour_bits) = \
-            self.__get_recording_metadeta(cursor, pop_label, variable)
+            self.__get_recording_metadata(cursor, pop_label, variable)
 
         if buffer_type == BufferDataType.MATRIX:
             assert data_type is not None
@@ -1180,7 +1180,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
          pop_size, units, n_colour_bits) = \
-            self.__get_recording_metadeta(cursor, pop_label, variable)
+            self.__get_recording_metadata(cursor, pop_label, variable)
 
         if buffer_type == BufferDataType.MATRIX:
             assert data_type is not None
@@ -1362,7 +1362,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 _, _, _, dt, _ = self.__get_segment_info(cursor)
                 pop_size, first_id, description = \
                     self.__get_population_metadata(cursor, pop_label)
-                self._csv_block_metadat(
+                self._csv_block_metadata(
                     csv_writer, pop_label, dt, pop_size, first_id, description,
                     annotations)
 

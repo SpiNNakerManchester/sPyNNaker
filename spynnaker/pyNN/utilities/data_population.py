@@ -47,7 +47,7 @@ class DataPopulation(object):
         self.__database_file = database_file
         # getting size right away also check the inputs or fails fast
         with NeoBufferDatabase(self.__database_file) as db:
-            size = db.get_population_metdadata(label)[0]
+            size = db.get_population_metadata(label)[0]
         self._size = size
         self._indexes = indexes
 
@@ -72,7 +72,7 @@ class DataPopulation(object):
         if engine is not None:
             logger.warning("Ignoring engine as supported in this mode")
         with NeoBufferDatabase(self.__database_file) as db:
-            _, _, description = db.get_population_metdadata(self.label)
+            _, _, description = db.get_population_metadata(self.label)
             return description
 
     @overrides(Population.get_data)
@@ -108,7 +108,7 @@ class DataPopulation(object):
     @overrides(Population.find_units)
     def find_units(self, variable: str) -> Optional[str]:
         with NeoBufferDatabase(self.__database_file) as db:
-            (_, _, units) = db.get_recording_metadeta(self.__label, variable)
+            (_, _, units) = db.get_recording_metadata(self.__label, variable)
         return units
 
     def __len__(self) -> int:
@@ -131,7 +131,7 @@ class DataPopulation(object):
         # pylint: disable=redefined-builtin
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
-            _, first_id, _ = db.get_population_metdadata(self.__label)
+            _, first_id, _ = db.get_population_metadata(self.__label)
         last_id = self._size + first_id
         if not numpy.iterable(id):
             if not first_id <= id <= last_id:
@@ -145,7 +145,7 @@ class DataPopulation(object):
     def index_to_id(self, index):
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
-            _, first_id, _ = db.get_population_metdadata(self.__label)
+            _, first_id, _ = db.get_population_metadata(self.__label)
         if not numpy.iterable(index):
             if index >= self._size:
                 raise ValueError(
