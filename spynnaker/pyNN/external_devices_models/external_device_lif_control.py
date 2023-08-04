@@ -111,9 +111,5 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             self._devices, self._create_edges, max_atoms, self._model, self,
             self._translator, spikes_per_second, label, ring_buffer_sigma,
             incoming_spike_buffer_size, drop_late_spikes, splitter, seed,
-<<<<<<< HEAD
-            n_colour_bits, rb_left_shifts)
-=======
             n_colour_bits, min_weights, weight_random_sigma,
-            max_stdp_spike_delta)
->>>>>>> refs/heads/weight_scale
+            max_stdp_spike_delta, rb_left_shifts)
