@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import numpy
 from numpy import ndarray, integer, uint32, floating
 from numpy.typing import NDArray
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union, TYPE_CHECKING
 from typing_extensions import TypeAlias
 from pyNN.random import RandomDistribution
 from pyNN.space import Space
@@ -30,14 +31,15 @@ from .abstract_generate_connector_on_machine import (
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spynnaker.pyNN.models.neural_projections.synapse_information import (
-    SynapseInformation, _Weights, _Delays)
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections.synapse_information import (
+        SynapseInformation, _Weights, _Delays)
+    _TwoD: TypeAlias = Union[List[int], Tuple[int, int]]
+    _Kernel: TypeAlias = Union[
+        float, int, List[float], NDArray[floating], RandomDistribution]
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 8
-_TwoD: TypeAlias = Union[List[int], Tuple[int, int]]
-_Kernel: TypeAlias = Union[
-    float, int, List[float], NDArray[floating], RandomDistribution]
 
 
 class ConvolutionKernel(ndarray):

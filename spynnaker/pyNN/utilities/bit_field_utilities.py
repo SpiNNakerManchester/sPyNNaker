@@ -11,18 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import math
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
-from typing import Iterable, Optional
+from typing import Iterable, Optional, TYPE_CHECKING
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.projection import Projection
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.projection import Projection
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge)
 
 #: number of elements
 #  key, n atoms, atoms_per_core, pointer to bitfield

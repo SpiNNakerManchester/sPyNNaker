@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
 from dataclasses import dataclass
 import numpy
 from numpy import floating, integer, int64, uint32
 from numpy.typing import NDArray
-from typing import Dict, List, Optional, Sequence, Tuple, Union, cast
+from typing import (
+    Dict, List, Optional, Sequence, Tuple, Union, cast, TYPE_CHECKING)
 from typing_extensions import TypeGuard
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractVertex
@@ -29,9 +31,10 @@ from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spynnaker.pyNN.models.neural_projections import SynapseInformation
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamics)
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
+    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+        AbstractSynapseDynamics)
 
 # Indices of the source and target in the connection list array
 _SOURCE = 0

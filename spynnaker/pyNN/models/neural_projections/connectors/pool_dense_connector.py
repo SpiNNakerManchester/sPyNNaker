@@ -14,12 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
 from collections.abc import Iterable
 import numpy
 from numpy import integer, floating, float64
 from numpy.typing import ArrayLike, NDArray
 from pyNN.random import RandomDistribution
-from typing import Optional, Sequence, Tuple, Union, cast, overload
+from typing import (
+    Optional, Sequence, Tuple, Union, cast, overload, TYPE_CHECKING)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import (
@@ -31,8 +33,9 @@ from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
-from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, SynapseInformation)
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
 
 
 _DIMENSION_SIZE = (2 * BYTES_PER_WORD) + (6 * BYTES_PER_SHORT)

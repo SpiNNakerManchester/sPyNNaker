@@ -29,8 +29,8 @@ from .abstract_generate_connector_on_machine import (
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spynnaker.pyNN.models.neural_projections import SynapseInformation
 if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
     from spynnaker.pyNN.models.populations import PopulationView
 
 _expr_context = SafeEval(

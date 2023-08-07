@@ -124,7 +124,10 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: float, max_delay: float) -> int:
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
+        if min_delay is None or max_delay is None:
+            raise ValueError("min_delay and max_delay must be supplied")
         n_connections_max = n_post_atoms
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,

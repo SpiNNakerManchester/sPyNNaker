@@ -14,12 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
 from collections.abc import Sequence
 import numpy
 from numpy import floating, float64, integer, int16, uint16, uint32, bool_
 from numpy.typing import NDArray
 from typing import (
-    List, Optional, Sequence as TSequence, Tuple, Union, cast, overload)
+    List, Optional, Sequence as TSequence, Tuple, Union,
+    cast, overload, TYPE_CHECKING)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
@@ -35,8 +37,9 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
-from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, SynapseInformation)
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
 
 #: The number of 32-bit words in the source_key_info struct
 SOURCE_KEY_INFO_WORDS = 7

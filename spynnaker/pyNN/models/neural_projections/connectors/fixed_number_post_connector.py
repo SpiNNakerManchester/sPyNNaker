@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import math
 import numpy
 from numpy import integer, uint32
 from numpy.typing import NDArray
 from pyNN.random import NumpyRNG
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -27,7 +28,8 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
-from spynnaker.pyNN.models.neural_projections import SynapseInformation
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 N_GEN_PARAMS = 8
 

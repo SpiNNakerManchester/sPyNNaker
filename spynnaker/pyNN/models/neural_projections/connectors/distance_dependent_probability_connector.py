@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
 import math
 import numpy
 from numpy import (
@@ -20,7 +21,7 @@ from numpy import (
     minimum, e, pi, floating)
 from numpy.typing import NDArray
 from pyNN.random import NumpyRNG
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 from pacman.model.graphs.common import Slice
@@ -29,7 +30,8 @@ from spynnaker.pyNN.utilities.utility_calls import (
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
-from spynnaker.pyNN.models.neural_projections import SynapseInformation
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 # support for arbitrary expression for the distance dependence
 _d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,

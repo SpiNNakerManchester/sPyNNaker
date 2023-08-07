@@ -11,14 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 from numpy import integer, uint32
 from numpy.typing import NDArray
-from typing import List, Tuple
+from typing import List, Tuple, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.common import Slice
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
-from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
 
 
 class AbstractPlasticSynapseDynamics(

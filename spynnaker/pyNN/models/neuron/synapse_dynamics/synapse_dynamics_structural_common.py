@@ -47,11 +47,11 @@ if TYPE_CHECKING:
     _SubpopIndexType: TypeAlias = Dict[
         Tuple[AbstractPopulationVertex, SynapseInformation, int], int]
 
-#: :meta private:
-ConnectionsInfo: TypeAlias = Dict[
-    Tuple[AbstractPopulationVertex, int],
-    List[Tuple[ConnectionsArray, ProjectionApplicationEdge,
-               SynapseInformation]]]
+    #: :meta private:
+    ConnectionsInfo: TypeAlias = Dict[
+        Tuple[AbstractPopulationVertex, int],
+        List[Tuple[ConnectionsArray, ProjectionApplicationEdge,
+                   SynapseInformation]]]
 
 #: Default value for frequency of rewiring
 DEFAULT_F_REW = 10 ** 4.0

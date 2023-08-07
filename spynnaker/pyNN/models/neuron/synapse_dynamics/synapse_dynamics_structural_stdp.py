@@ -24,11 +24,11 @@ from .abstract_synapse_dynamics_structural import (
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_common import (
     DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
-    DEFAULT_S_MAX, SynapseDynamicsStructuralCommon, ConnectionsInfo)
+    DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
+from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
         partner_selection.abstract_partner_selection import \
@@ -42,8 +42,8 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
         abstract_weight_dependence import AbstractWeightDependence
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
-    from .abstract_plastic_synapse_dynamics import (
-        AbstractPlasticSynapseDynamics)
+    from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
+    from .synapse_dynamics_structural_common import ConnectionsInfo
 
 
 class SynapseDynamicsStructuralSTDP(

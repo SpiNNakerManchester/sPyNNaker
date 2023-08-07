@@ -23,11 +23,11 @@ from spinn_utilities.logger_utils import warn_once
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.types import Names
     from spynnaker.pyNN.models.populations import Population
     from spynnaker.pyNN.models.common import PopulationApplicationVertex
+    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
     _IoDest: TypeAlias = Union[str, neo.baseio.BaseIO, None]
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -152,6 +152,12 @@ class Recorder(object):
             self.turn_on_record(
                 variable, sampling_interval, to_file, indexes)
 
+    @property
+    def __apv(self) -> Optional[AbstractPopulationVertex]:
+        from spynnaker.pyNN.models.neuron import (
+            AbstractPopulationVertex as APV)
+        return self.__vertex if isinstance(self.__vertex, APV) else None
+
     def turn_on_record(
             self, variable: str, sampling_interval: Optional[int] = None,
             to_file: _IoDest = None,
@@ -192,8 +198,9 @@ class Recorder(object):
                     "input. You will receive current measurements instead.")
 
         # Tell the vertex to record
-        if isinstance(self.__vertex, AbstractPopulationVertex):
-            self.__vertex.set_recording(variable, sampling_interval, indexes)
+        apv = self.__apv
+        if apv is not None:
+            apv.set_recording(variable, sampling_interval, indexes)
 
     @property
     def recording_label(self) -> str:
@@ -208,9 +215,10 @@ class Recorder(object):
         :param indexes:
         :type indexes: list or None
         """
-        if isinstance(self.__vertex, AbstractPopulationVertex):
-            for variable in self.__vertex.get_recordable_variables():
-                self.__vertex.set_not_recording(variable, indexes)
+        apv = self.__apv
+        if apv is not None:
+            for variable in apv.get_recordable_variables():
+                apv.set_not_recording(variable, indexes)
 
     def extract_neo_block(
             self, variables: Names, view_indexes: Optional[Sequence[int]],

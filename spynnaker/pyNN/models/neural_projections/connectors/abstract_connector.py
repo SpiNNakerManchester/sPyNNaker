@@ -254,12 +254,15 @@ class AbstractConnector(object, metaclass=AbstractBase):
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: float, max_delay: float) -> int:
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
         """
         Get the maximum number of connections from any
         neuron in the pre vertex to the neurons in the post_vertex_slice,
         for connections with a delay between min_delay and max_delay
         (inclusive) if both specified (otherwise all connections).
+
+        Not all concrete connectors support omitting the delay range.
 
         :param delays:
         :type delays: ~pyNN.random.RandomDistribution or int or float or str

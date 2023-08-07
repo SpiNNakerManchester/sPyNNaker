@@ -12,16 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
 import numpy
 from numpy import uint8
 from numpy.typing import NDArray
-from typing import Sequence, Optional
+from typing import Sequence, Optional, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
-from spynnaker.pyNN.models.neural_projections import SynapseInformation
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 
 class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
