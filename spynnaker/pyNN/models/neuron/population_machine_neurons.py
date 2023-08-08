@@ -383,9 +383,9 @@ class PopulationMachineNeurons(
             # Now loop over the current sources and write the data required
             # for each type of current source
             for current_source in current_sources:
-                cs_data_types = current_source.get_parameter_types
+                cs_data_types = current_source.parameter_types
                 cs_id = current_source.current_source_id
-                for key, value in current_source.get_parameters.items():
+                for key, value in current_source.parameters.items():
                     # StepCurrentSource currently handled with arrays
                     if cs_id == CurrentSourceIDs.STEP_CURRENT_SOURCE.value:
                         assert isinstance(value, Sequence)

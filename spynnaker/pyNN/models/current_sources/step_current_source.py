@@ -96,13 +96,13 @@ class StepCurrentSource(AbstractCurrentSource):
                 m_vertex.set_reload_required(True)
 
     @property
-    @overrides(AbstractCurrentSource.get_parameters)
-    def get_parameters(self) -> Mapping[str, CurrentParameter]:
+    @overrides(AbstractCurrentSource.parameters)
+    def parameters(self) -> Mapping[str, CurrentParameter]:
         return self.__parameters
 
     @property
-    @overrides(AbstractCurrentSource.get_parameter_types)
-    def get_parameter_types(self) -> Mapping[str, DataType]:
+    @overrides(AbstractCurrentSource.parameter_types)
+    def parameter_types(self) -> Mapping[str, DataType]:
         return self.__parameter_types
 
     @property

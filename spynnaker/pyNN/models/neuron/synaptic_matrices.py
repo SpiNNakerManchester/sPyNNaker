@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 from dataclasses import dataclass
 import numpy
 from numpy import floating, uint32
 from numpy.typing import NDArray
-from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple
+from typing import (
+    Dict, List, NamedTuple, Optional, Sequence, Tuple, TYPE_CHECKING)
 
 from pacman.model.graphs.common import Slice
 from pacman.model.placements import Placement
@@ -36,10 +37,11 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region, get_bitfield_key_map_data,
     write_bitfield_init_data)
-from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
-    AbstractPopulationVertex)
-from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, SynapseInformation)
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
+        AbstractPopulationVertex)
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
 
 # 1 for synaptic matrix region
 # 1 for master pop region

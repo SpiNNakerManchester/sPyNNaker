@@ -15,7 +15,7 @@ from __future__ import annotations
 import numpy
 from numpy import floating, uint32
 from numpy.typing import NDArray
-from typing import List, Optional, Tuple, cast, TYPE_CHECKING
+from typing import List, Optional, Tuple, TYPE_CHECKING
 from pacman.model.graphs.common import Slice
 from pacman.model.placements import Placement
 from spinn_front_end_common.utilities.helpful_functions import (
@@ -26,7 +26,6 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from .generator_data import GeneratorData
 from .synapse_io import read_all_synapses, convert_to_connections, get_synapses
-from .abstract_population_vertex import AbstractPopulationVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnHost)
 if TYPE_CHECKING:
@@ -110,10 +109,8 @@ class SynapticMatrixApp(object):
         self.__max_atoms_per_core = max_atoms_per_core
 
         # Calculate the max row info for this edge
-        self.__max_row_info = cast(
-            AbstractPopulationVertex,
-            self.__app_edge.post_vertex).get_max_row_info(
-                synapse_info, max_atoms_per_core, app_edge)
+        self.__max_row_info = self.__app_edge.post_vertex.get_max_row_info(
+            synapse_info, max_atoms_per_core, app_edge)
 
         self.__all_syn_block_sz = all_syn_block_sz
         self.__app_key_info = app_key_info

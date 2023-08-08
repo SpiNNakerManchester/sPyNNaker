@@ -11,18 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
-from typing import Optional, Sequence, Tuple, Union, cast
+from typing import Optional, Sequence, Tuple, Union, cast, TYPE_CHECKING
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, SynapseInformation)
-from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
-from spynnaker.pyNN.models.populations import Population, PopulationView
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
+    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+    from spynnaker.pyNN.models.populations import Population, PopulationView
 
 # Address to indicate that the synaptic region is unused
 SYN_REGION_UNUSED = 0xFFFFFFFF

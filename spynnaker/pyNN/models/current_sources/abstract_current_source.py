@@ -105,25 +105,22 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def get_parameters(self) -> Mapping[str, CurrentParameter]:
+    def parameters(self) -> Mapping[str, CurrentParameter]:
         """
         The parameters of the current source.
 
         :rtype: dict(str, Any)
         """
-        # TODO: Wrong naming for a property!
         raise NotImplementedError
 
     @property
     @abstractmethod
-    def get_parameter_types(self) -> Mapping[str, DataType]:
+    def parameter_types(self) -> Mapping[str, DataType]:
         """
         The parameter types for the current source.
 
         :rtype: dict(str, ~.DataType)
         """
-        # TODO: Wrong naming for a property!
-        # FIXME: Is the type correct?
         raise NotImplementedError
 
     @property

@@ -24,9 +24,9 @@ from spinn_utilities.logger_utils import warn_once
 from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.models.recorder import Recorder
 from .assembly import Assembly
-from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
-    AbstractPopulationVertex)
 if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
+        AbstractPopulationVertex)
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
     from spynnaker.pyNN.models.common.types import Names
     from .population_view import IDMixin
@@ -490,8 +490,10 @@ class PopulationBase(object, metaclass=AbstractBase):
     @property
     @final
     def _apv(self) -> Optional[AbstractPopulationVertex]:
+        from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
+            AbstractPopulationVertex as APV)
         v = self._vertex
-        return v if isinstance(v, AbstractPopulationVertex) else None
+        return v if isinstance(v, APV) else None
 
     @property
     @abstractmethod

@@ -78,7 +78,7 @@ class DataPopulation(object):
     @overrides(Population.get_data)
     def get_data(
             self, variables: Names = 'all',
-            gather=True, clear: bool = False,
+            gather=True, clear: bool = False, *,
             annotations: Annotations = None) -> neo.Block:
         # pylint: disable=protected-access
         Population._check_params(gather, annotations)
