@@ -376,7 +376,7 @@ class AbstractPopulationVertex(
     def splitter(self, splitter: SplitterAbstractPopulationVertex):
         if self._splitter == splitter:
             return
-        if self._splitter is not None:
+        if self.has_splitter:
             raise PacmanConfigurationException(
                 f"The splitter object on {self._label} has already been set, "
                 "it cannot be reset. Please fix and try again.")
