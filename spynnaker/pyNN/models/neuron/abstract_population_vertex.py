@@ -380,7 +380,10 @@ class AbstractPopulationVertex(
             raise PacmanConfigurationException(
                 f"The splitter object on {self._label} has already been set, "
                 "it cannot be reset. Please fix and try again.")
-        if not isinstance(splitter, SplitterAbstractPopulationVertex):
+        # Circularity
+        from spynnaker.pyNN.extra_algorithms.splitter_components import (
+            SplitterAbstractPopulationVertex as ValidSplitter)
+        if not isinstance(splitter, ValidSplitter):
             raise PacmanConfigurationException(
                 f"The splitter object on {self._label} must be set to one "
                 "capable of handling an AbstractPopulationVertex.")
