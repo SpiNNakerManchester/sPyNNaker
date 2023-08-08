@@ -57,35 +57,40 @@ def do_run(sender_board):
     sender = eth_chips[sender_board]
     receivers = [e for i, e in enumerate(eth_chips) if i != sender_board]
 
-    # Create sender population big enough to fill a board
-    core_count = sum(
-        chip.n_user_processors - 1
-        for chip in machine.get_chips_by_ethernet(sender.x, sender.y)) - 1
-    print(f"{core_count} cores for Poisson")
-    sender_pop = sim.Population(
-        MAX_POISSONS * core_count,
-        sim.SpikeSourcePoisson(rate=POISSON_RATE), label="Sender")
+    # Fill sender board with senders
+    sender_pops = list()
+    for chip in machine.get_chips_by_ethernet(sender.x, sender.y):
+        n_cores = chip.n_user_processors - 1
+        if chip == sender:
+            n_cores -= 1
+        sender_pop = sim.Population(
+            MAX_POISSONS * n_cores, sim.SpikeSourcePoisson(rate=POISSON_RATE),
+            label=f"Sender_{chip.x}_{chip.y}")
+        sender_pop.add_placement_constraint(chip.x, chip.y)
+        sender_pops.append(sender_pop)
 
     # Create and connect receivers
     receiver_pops = list()
     for eth in receivers:
-        max_cores_per_chip = min(
-            chip.n_user_processors - 1
-            for chip in machine.get_chips_by_ethernet(eth.x, eth.y)) - 1
-        max_cores_per_chip = min(max_cores_per_chip - 1, 14)
-        n_chips = sum(1 for _ in machine.get_chips_by_ethernet(eth.x, eth.y))
-        receiver_pop = sim.Population(
-            MAX_NEURONS * n_chips,
-            sim.IF_curr_exp(), label=f"Receiver_{eth.x}_{eth.y}",
-            splitter=SplitterAbstractPopulationVertexNeuronsSynapses(
-                max_cores_per_chip))
-        receiver_pop.record("spikes")
-        receiver_pops.append(receiver_pop)
+        for chip in machine.get_chips_by_ethernet(eth.x, eth.y):
+            n_cores = chip.n_user_processors - 1
+            if chip == eth:
+                n_cores -= 1
+            max_cores = min(n_cores - 1, 14)
+            receiver_pop = sim.Population(
+                MAX_NEURONS,
+                sim.IF_curr_exp(), label=f"Receiver_{chip.x}_{chip.y}",
+                splitter=SplitterAbstractPopulationVertexNeuronsSynapses(
+                    max_cores))
+            receiver_pop.add_placement_constraint(chip.x, chip.y)
+            receiver_pop.record("spikes")
+            receiver_pops.append(receiver_pop)
 
-        sim.Projection(
-            sender_pop, receiver_pop,
-            sim.FixedProbabilityConnector(FIXED_PROB),
-            sim.StaticSynapse(weight=WEIGHT))
+            for sender_pop in sender_pops:
+                sim.Projection(
+                    sender_pop, receiver_pop,
+                    sim.FixedProbabilityConnector(FIXED_PROB),
+                    sim.StaticSynapse(weight=WEIGHT))
 
     # Run and get results
     sim.run(5000)
