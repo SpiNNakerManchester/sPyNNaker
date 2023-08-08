@@ -227,8 +227,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(
     def w_fb(self, w_fb):
         self.__w_fb = w_fb
 
-    # TODO: check whether any further parmeters need setters
-
     @overrides(AbstractStandardNeuronComponent.uses_eprop)
+    @property
     def uses_eprop(self):
         return True
