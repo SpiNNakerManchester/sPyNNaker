@@ -61,6 +61,12 @@ class DelayedApplicationEdge(ApplicationEdge):
         return cast(DelayExtensionVertex, super().pre_vertex)
 
     @property
+    def post_vertex(self) -> AbstractPopulationVertex:
+        from spynnaker.pyNN.models.neuron import (
+            AbstractPopulationVertex as APV)
+        return cast(APV, super().post_vertex)
+
+    @property
     def synapse_information(self) -> List[SynapseInformation]:
         """
         :rtype: list(SynapseInformation)

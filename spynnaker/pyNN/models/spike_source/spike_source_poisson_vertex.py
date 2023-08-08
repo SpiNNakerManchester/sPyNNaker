@@ -309,8 +309,9 @@ class SpikeSourcePoissonVertex(
         """
         Get the rates.
 
-        :rtype: spinn_utilities.ranged.RangedList
+        :rtype: ~spinn_utilities.ranged.RangedList
         """
+        # UGH! Mypy has been defeated!
         return cast(Any, self.__data["rates"])
 
     def add_outgoing_projection(self, projection: Projection):

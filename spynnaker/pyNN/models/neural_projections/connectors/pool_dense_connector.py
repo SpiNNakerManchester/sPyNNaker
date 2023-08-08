@@ -249,22 +249,30 @@ class PoolDenseConnector(AbstractConnector):
             raise ConfigurationException(
                 "The post population doesn't have a synaptic receptor type of"
                 f" {self.__negative_receptor_type}")
+        if not isinstance(synapse_info.delays, float):
+            raise ConfigurationException(
+                "The PoolDenseConnector only supports simple uniform delays")
+
+    @staticmethod
+    def __delay(synapse_info: SynapseInformation) -> float:
+        # Checked by validate_connection above
+        return cast(float, synapse_info.delays)
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info: SynapseInformation) -> float:
-        return cast(float, synapse_info.delays)
+        return self.__delay(synapse_info)
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
-        return cast(float, synapse_info.delays)
+        return self.__delay(synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay=None, max_delay=None) -> int:
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
         if min_delay is not None and max_delay is not None:
-            delay = synapse_info.delays
-            if min_delay > delay or max_delay < delay:
+            if not (min_delay <= self.__delay(synapse_info) <= max_delay):
                 return 0
         # Every pre connects to every post
         return n_post_atoms

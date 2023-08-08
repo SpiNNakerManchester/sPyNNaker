@@ -294,13 +294,18 @@ class ConvolutionConnector(AbstractConnector):
             raise ConfigurationException(
                 "The ConvolutionConnector only supports simple uniform delays")
 
+    @staticmethod
+    def __delay(synapse_info: SynapseInformation) -> float:
+        # Checked by validate_connection above
+        return cast(float, synapse_info.delays)
+
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info: SynapseInformation) -> float:
-        return cast(float, synapse_info.delays)
+        return self.__delay(synapse_info)
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
-        return cast(float, synapse_info.delays)
+        return self.__delay(synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -308,8 +313,7 @@ class ConvolutionConnector(AbstractConnector):
             min_delay: Optional[float] = None,
             max_delay: Optional[float] = None) -> int:
         if min_delay is not None and max_delay is not None:
-            delay = cast(float, synapse_info.delays)
-            if min_delay > delay or max_delay < delay:
+            if not (min_delay <= self.__delay(synapse_info) <= max_delay):
                 return 0
         w, h = self.__kernel_weights.shape
         return numpy.clip(w * h, 0, n_post_atoms)

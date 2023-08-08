@@ -1373,15 +1373,12 @@ class AbstractPopulationVertex(
 
         connector = cast(
             AbstractGenerateConnectorOnMachine, synapse_info.connector)
-        dynamics = synapse_info.synapse_dynamics
-        gen_size = sum((
-            GeneratorData.BASE_SIZE,
-            connector.gen_delay_params_size_in_bytes(synapse_info.delays),
-            connector.gen_weight_params_size_in_bytes(synapse_info.weights),
-            connector.gen_connector_params_size_in_bytes,
-            dynamics.gen_matrix_params_size_in_bytes
-        ))
-        return gen_size
+        return (
+            GeneratorData.BASE_SIZE
+            + connector.gen_delay_params_size_in_bytes(synapse_info.delays)
+            + connector.gen_weight_params_size_in_bytes(synapse_info.weights)
+            + connector.gen_connector_params_size_in_bytes
+            + synapse_info.synapse_dynamics.gen_matrix_params_size_in_bytes)
 
     @property
     def synapse_executable_suffix(self) -> str:

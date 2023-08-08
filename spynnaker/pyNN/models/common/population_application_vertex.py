@@ -11,9 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Collection, Container, Iterable, List, Optional, Tuple, cast
+from typing import Collection, Container, Iterable, List, Optional, Tuple
 from spinn_utilities.overrides import overrides
-from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged.abstract_sized import Selector
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
@@ -49,9 +48,9 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :type names: str or list
         :rtype: list(str)
         """
-        if is_singleton(names):
-            return [cast(str, names)]
-        return list(cast(Iterable[str], names))
+        if isinstance(names, str):
+            return [names]
+        return list(names)
 
     @staticmethod
     def _check_names(names: Names, allowed: Container[str],

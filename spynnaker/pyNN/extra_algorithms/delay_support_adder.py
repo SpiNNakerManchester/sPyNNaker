@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import math
-from typing import Dict, List, Sequence, Tuple, cast
+from typing import Dict, List, Sequence, Tuple
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import (
     ApplicationEdge, ApplicationEdgePartition)
@@ -77,8 +77,7 @@ class _DelaySupportAdder(object):
                 DelayExtensionVertex):
             self._app_to_delay_map[vertex.partition] = vertex
             for edge in vertex.outgoing_edges:
-                self._delay_post_edge_map[vertex, cast(
-                    AbstractPopulationVertex, edge.post_vertex)] = edge
+                self._delay_post_edge_map[vertex, edge.post_vertex] = edge
         progress.update(1)
 
         # go through all partitions.
@@ -123,19 +122,18 @@ class _DelaySupportAdder(object):
         :param ProjectionApplicationEdge app_edge:
             the undelayed application edge this is associated with.
         """
-        post_vertex = cast(AbstractPopulationVertex, app_edge.post_vertex)
         # check for post edge
         delayed_edge = self._delay_post_edge_map.get(
-            (delay_app_vertex, post_vertex), None)
+            (delay_app_vertex, app_edge.post_vertex), None)
         if delayed_edge is None:
             delay_edge = DelayedApplicationEdge(
-                delay_app_vertex, post_vertex,
+                delay_app_vertex, app_edge.post_vertex,
                 app_edge.synapse_information,
                 label=(f"{app_edge.pre_vertex.label}_delayed_"
-                       f"to_{post_vertex.label}"),
+                       f"to_{app_edge.post_vertex.label}"),
                 undelayed_edge=app_edge)
             self._delay_post_edge_map[
-                (delay_app_vertex, post_vertex)] = delay_edge
+                (delay_app_vertex, app_edge.post_vertex)] = delay_edge
             self._new_edges.append(delay_edge)
             app_edge.delay_edge = delay_edge
             delay_app_vertex.add_outgoing_edge(delay_edge)

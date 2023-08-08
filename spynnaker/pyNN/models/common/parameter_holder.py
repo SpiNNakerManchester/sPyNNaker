@@ -56,8 +56,8 @@ class ParameterHolder(object):
         :type selector: None or slice or int or list(bool) or list(int)
         """
         self.__data_items_to_return: Union[str, Tuple[str, ...]]
-        if is_singleton(data_items_to_return):
-            self.__data_items_to_return = cast(str, data_items_to_return)
+        if isinstance(data_items_to_return, str):
+            self.__data_items_to_return = data_items_to_return
         else:
             self.__data_items_to_return = tuple(data_items_to_return)
         self.__get_call = get_call
