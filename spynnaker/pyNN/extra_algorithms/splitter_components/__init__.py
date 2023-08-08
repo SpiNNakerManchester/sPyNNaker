@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
-from .spynnaker_splitter_partitioner import spynnaker_splitter_partitioner
 from .spynnaker_splitter_selector import spynnaker_splitter_selector
 from .splitter_abstract_pop_vertex_fixed import (
     SplitterAbstractPopulationVertexFixed)
@@ -26,8 +25,7 @@ from .abstract_supports_one_to_one_sdram_input import (
 
 __all__ = [
     'AbstractSpynnakerSplitterDelay', 'SplitterAbstractPopulationVertexFixed',
-    'SplitterDelayVertexSlice', 'spynnaker_splitter_partitioner',
-    'spynnaker_splitter_selector',
+    'SplitterDelayVertexSlice', 'spynnaker_splitter_selector',
     'SplitterAbstractPopulationVertexNeuronsSynapses',
     'SplitterPoissonDelegate', 'AbstractSupportsOneToOneSDRAMInput',
     'SplitterAbstractPopulationVertexFixed']
