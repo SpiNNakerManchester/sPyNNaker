@@ -356,7 +356,7 @@ class NeuronModelEPropAdaptive(AbstractStandardNeuronComponent):
     def number_of_cues(self, new_value):
         self.__number_of_cues = new_value
 
-    @overrides(AbstractStandardNeuronComponent.uses_eprop)
     @property
+    @overrides(AbstractStandardNeuronComponent.uses_eprop)
     def uses_eprop(self):
         return True

@@ -298,7 +298,7 @@ class NeuronModelLeftRightReadout(AbstractStandardNeuronComponent):
     def window_size(self, new_value):
         self.__window_size = new_value
 
-    @overrides(AbstractStandardNeuronComponent.uses_eprop)
     @property
+    @overrides(AbstractStandardNeuronComponent.uses_eprop)
     def uses_eprop(self):
         return True

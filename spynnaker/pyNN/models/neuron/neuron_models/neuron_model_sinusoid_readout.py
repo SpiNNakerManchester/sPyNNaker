@@ -227,7 +227,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(
     def w_fb(self, w_fb):
         self.__w_fb = w_fb
 
-    @overrides(AbstractStandardNeuronComponent.uses_eprop)
     @property
+    @overrides(AbstractStandardNeuronComponent.uses_eprop)
     def uses_eprop(self):
         return True
