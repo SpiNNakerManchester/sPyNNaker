@@ -180,9 +180,15 @@ class ProjectionApplicationEdge(
     @property
     @overrides(ApplicationEdge.pre_vertex)
     def pre_vertex(self) -> AbstractPopulationVertex:
-        return cast(AbstractPopulationVertex, super().pre_vertex)
+        # Circularity
+        from spynnaker.pyNN.models.neuron import (
+            AbstractPopulationVertex as APV)
+        return cast(APV, super().pre_vertex)
 
     @property
     @overrides(ApplicationEdge.post_vertex)
     def post_vertex(self) -> AbstractPopulationVertex:
-        return cast(AbstractPopulationVertex, super().post_vertex)
+        # Circularity
+        from spynnaker.pyNN.models.neuron import (
+            AbstractPopulationVertex as APV)
+        return cast(APV, super().post_vertex)
