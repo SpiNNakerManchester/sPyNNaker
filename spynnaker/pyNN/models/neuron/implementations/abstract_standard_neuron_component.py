@@ -83,7 +83,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
     @property
     def uses_eprop(self):
         """
-        Says whether the component is an eprop model (default false)
+        Says whether the component is an e-prop model (default false)
 
         :rtype: bool
 
