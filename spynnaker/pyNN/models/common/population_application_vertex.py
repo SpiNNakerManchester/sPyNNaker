@@ -28,6 +28,7 @@ from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
 from .types import Names, Values
 
 
+# pylint: disable=abstract-method
 class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     """
     A vertex that can be used in a Population.
