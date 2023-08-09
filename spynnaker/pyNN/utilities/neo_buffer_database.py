@@ -83,7 +83,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     @staticmethod
     def _string(value: _SqliteTypes) -> str:
-        if isinstance(value, bytes):
+        if isinstance(value, (bytes, memoryview)):
             return str(value, 'utf-8')
         else:
             return str(value)

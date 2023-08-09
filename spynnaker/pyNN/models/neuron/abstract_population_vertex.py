@@ -68,6 +68,8 @@ from spynnaker.pyNN.models.neuron.population_machine_common import (
     CommonRegions)
 from spynnaker.pyNN.models.neuron.population_machine_neurons import (
     NeuronRegions)
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    NUMPY_CONNECTORS_DTYPE)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.utility_calls import (
@@ -95,8 +97,9 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
-    from spynnaker.pyNN.models.neuron.synapse_io import (
-        MaxRowInfo, ConnectionsArray)
+    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray)
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
     from spynnaker.pyNN.models.neural_projections import (
         SynapseInformation, ProjectionApplicationEdge)
@@ -1209,8 +1212,7 @@ class AbstractPopulationVertex(
             return self.__connection_cache[app_edge, synapse_info]
 
         # Start with something in the list so that concatenate works
-        connections = [numpy.zeros(
-                0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)]
+        connections = [numpy.zeros(0, dtype=NUMPY_CONNECTORS_DTYPE)]
         progress = ProgressBar(
             len(self.machine_vertices),
             f"Getting synaptic data between {app_edge.pre_vertex.label} "

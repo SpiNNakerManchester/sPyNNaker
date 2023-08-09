@@ -797,7 +797,8 @@ class Population(PopulationBase):
                 model = cell_class()
             else:
                 model = cell_class(**cell_params)
-            assert isinstance(model, AbstractPyNNModel)
+            assert isinstance(model, (
+                AbstractPyNNModel, PopulationApplicationVertex))
         elif cell_params:
             raise ConfigurationException(
                 "cell_class is an instance which includes params so "

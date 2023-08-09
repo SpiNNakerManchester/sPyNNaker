@@ -680,7 +680,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         sdram.merge(self._apv.get_neuron_constant_sdram(
             n_atoms, PopulationNeuronsMachineVertex.NEURON_REGIONS))
         sdram.add_cost(
-            PopulationNeuronsMachineVertex.REGIONS.SDRAM_EDGE_PARAMS.value,
+            PopulationNeuronsMachineVertex.REGIONS.SDRAM_EDGE_PARAMS,
             NEURONS_SDRAM_PARAMS_SIZE)
         sdram.nest(
             len(PopulationNeuronsMachineVertex.REGIONS), variable_sdram)

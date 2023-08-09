@@ -42,7 +42,8 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
         abstract_weight_dependence import AbstractWeightDependence
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
-    from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray)
     from .synapse_dynamics_structural_common import ConnectionsInfo
 
 

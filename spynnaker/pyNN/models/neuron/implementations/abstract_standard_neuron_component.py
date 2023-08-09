@@ -21,6 +21,7 @@ from spinn_utilities.ranged import RangeDictionary, RangedList
 from spynnaker.pyNN.random_distribution import RandomDistribution
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from spynnaker.pyNN.utilities.struct import Struct
+import numpy
 
 #: The type of parameters to a neuron model.
 ModelParameter: TypeAlias = Union[
@@ -101,7 +102,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         Converts a model parameter into a form that can be ingested by a
         RangeDictionary.
         """
-        if isinstance(value, float):
-            return value
+        if isinstance(value, (float, int, numpy.integer, numpy.floating)):
+            return float(value)
         # TODO: Is this correct? Without this, things will only handle floats
         return SpynnakerRangedList(None, value)

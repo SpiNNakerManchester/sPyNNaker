@@ -19,7 +19,8 @@ from numpy.typing import NDArray
 from typing import (
     Callable, Iterator, List, Optional, Sequence, Tuple, Union)
 from typing_extensions import TypeAlias
-from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    ConnectionsArray)
 
 _ItemType: TypeAlias = numpy.floating
 _Items: TypeAlias = Union[Tuple[NDArray[_ItemType], ...], NDArray[_ItemType]]

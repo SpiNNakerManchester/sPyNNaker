@@ -19,7 +19,8 @@ from spinn_utilities.require_subclass import require_subclass
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationVertex
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray)
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
         AbstractSynapseDynamics)
     from spynnaker.pyNN.models.neural_projections import (

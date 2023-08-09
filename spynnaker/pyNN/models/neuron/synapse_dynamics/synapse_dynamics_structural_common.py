@@ -38,7 +38,8 @@ if TYPE_CHECKING:
         SynapseInformation)
     from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
     from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
-    from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray)
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge)
 

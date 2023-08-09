@@ -47,7 +47,8 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
         elimination.abstract_elimination import (
             AbstractElimination)
-    from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray)
     from .synapse_dynamics_structural_common import ConnectionsInfo
 
 

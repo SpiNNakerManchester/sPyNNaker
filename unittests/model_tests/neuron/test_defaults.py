@@ -89,14 +89,14 @@ def test_abstract():
     class BaseClass(object, metaclass=AbstractBase):
 
         @property
-        @abstractmethod
         @staticmethod
+        @abstractmethod
         def default_parameters():
             pass
 
         @property
-        @abstractmethod
         @staticmethod
+        @abstractmethod
         def default_initial_values():
             pass
 

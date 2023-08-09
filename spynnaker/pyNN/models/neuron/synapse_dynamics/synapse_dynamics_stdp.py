@@ -25,6 +25,8 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
     SynapticConfigurationException, InvalidParameterType)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    NUMPY_CONNECTORS_DTYPE)
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
@@ -34,7 +36,8 @@ from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
     abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray)
     from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.\
         abstract_timing_dependence import AbstractTimingDependence
     from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
@@ -482,7 +485,7 @@ class SynapseDynamicsSTDP(
             for pp, size in zip(pp_without_headers, fp_size)])
 
         connections = numpy.zeros(
-            data_fixed.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
+            data_fixed.size, dtype=NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, fp_size[i]) for i in range(len(fp_size))])
         connections["target"] = (

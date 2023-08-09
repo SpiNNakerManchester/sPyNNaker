@@ -15,8 +15,7 @@
 from __future__ import annotations
 import logging
 import numpy
-from numpy import float64, uint32
-from typing import Any, List, Optional, Sequence, Tuple, TYPE_CHECKING
+from typing import Any, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
 from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
@@ -26,6 +25,8 @@ from pacman.model.graphs.machine import MachineVertex
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.exceptions import InvalidParameterType
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    NUMPY_CONNECTORS_DTYPE as CONNECTOR_DTYPE)
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections.connectors import (
         AbstractConnector)
@@ -42,9 +43,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     __slots__ = ()
 
     #: Type model of the basic configuration data of a connector
-    NUMPY_CONNECTORS_DTYPE = numpy.dtype(
-        [("source", uint32), ("target", uint32),
-         ("weight", float64), ("delay", float64)])
+    NUMPY_CONNECTORS_DTYPE = CONNECTOR_DTYPE
 
     @abstractmethod
     def merge(self, synapse_dynamics: AbstractSynapseDynamics
@@ -87,7 +86,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def _round_delay(self, delay) -> int:  # FIXME type
+    def _round_delay(
+            self, delay: Union[int, float, RandomDistribution]) -> int:
         """
         Round the delays to multiples of full timesteps.
 

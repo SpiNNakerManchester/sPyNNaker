@@ -198,9 +198,7 @@ class Recorder(object):
                     "input. You will receive current measurements instead.")
 
         # Tell the vertex to record
-        apv = self.__apv
-        if apv is not None:
-            apv.set_recording(variable, sampling_interval, indexes)
+        self.__vertex.set_recording(variable, sampling_interval, indexes)
 
     @property
     def recording_label(self) -> str:

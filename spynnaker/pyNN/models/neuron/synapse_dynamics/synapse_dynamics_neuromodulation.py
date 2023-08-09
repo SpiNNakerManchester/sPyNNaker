@@ -24,6 +24,8 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
     SynapticConfigurationException, InvalidParameterType)
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    NUMPY_CONNECTORS_DTYPE)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     STDP_FIXED_POINT_ONE, get_exp_lut_array)
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
@@ -32,8 +34,9 @@ from .abstract_generate_on_machine import (
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
-    from spynnaker.pyNN.models.neuron.synapse_io import (
-        MaxRowInfo, ConnectionsArray)
+    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray)
 
 # The targets of neuromodulation
 NEUROMODULATION_TARGETS = {
@@ -235,7 +238,7 @@ class SynapseDynamicsNeuromodulation(
             fp_size: NDArray[integer], fp_data: List[NDArray[uint32]],
             max_atoms_per_core) -> ConnectionsArray:
         data = numpy.concatenate(fp_data)
-        connections = numpy.zeros(data.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
+        connections = numpy.zeros(data.size, dtype=NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, fp_size[i]) for i in range(len(fp_size))])
         connections["target"] = (data & 0xFFFF) + post_vertex_slice.lo_atom

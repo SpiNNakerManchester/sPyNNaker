@@ -252,7 +252,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
     def set_recording(
             self, name: str, sampling_interval: Optional[float] = None,
-            indices: Optional[List[int]] = None):
+            indices: Optional[Collection[int]] = None):
         """
         Set a variable recording.
 

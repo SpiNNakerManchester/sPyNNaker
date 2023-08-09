@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from collections.abc import Sequence as Seq
 import logging
 import math
 from typing import (
@@ -75,7 +76,8 @@ DURATION_FOREVER = 0xFFFFFFFF
 
 def _is_list_of_lists(value: Any) -> TypeGuard[
         Sequence[Sequence[Union[int, float]]]]:
-    return isinstance(value, Sequence) and isinstance(value[0], Sequence)
+    return isinstance(value, (Seq, numpy.ndarray)) and isinstance(
+        value[0], (Seq, numpy.ndarray))
 
 
 def _normalize_rates(

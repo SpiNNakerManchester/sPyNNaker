@@ -63,9 +63,9 @@ REDUNDANCY_BY_CORE: Final = f"""
 REDUNDANCY_SUMMARY: Final = """
     CREATE VIEW IF NOT EXISTS redundancy_summary AS
     SELECT SUM(total), MAX(total), MIN(total), AVG(total),
-        SUM(redunant), MAX(redunant), MIN(redunant), AVG(redunant),
+        SUM(redundant), MAX(redundant), MIN(redundant), AVG(redundant),
         MAX(percent), MIN(percent), AVG(percent),
-        SUM(redunant) * 100.0 / SUM(total) as global_percent
+        SUM(redundant) * 100.0 / SUM(total) as global_percent
     FROM redundancy_by_core
     """
 

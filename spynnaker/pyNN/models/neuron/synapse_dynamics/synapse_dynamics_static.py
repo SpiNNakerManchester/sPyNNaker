@@ -20,6 +20,8 @@ from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    NUMPY_CONNECTORS_DTYPE)
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
@@ -31,8 +33,9 @@ if TYPE_CHECKING:
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
-    from spynnaker.pyNN.models.neuron.synapse_io import (
-        ConnectionsArray, MaxRowInfo)
+    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray)
 
 
 class SynapseDynamicsStatic(
@@ -170,7 +173,7 @@ class SynapseDynamicsStatic(
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
 
         data = numpy.concatenate(ff_data)
-        connections = numpy.zeros(data.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
+        connections = numpy.zeros(data.size, dtype=NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, ff_size[i]) for i in range(len(ff_size))])
         connections["target"] = (

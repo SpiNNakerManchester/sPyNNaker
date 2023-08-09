@@ -20,7 +20,8 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.synapse_io import ConnectionsArray
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray)
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
         .partner_selection import AbstractPartnerSelection
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\

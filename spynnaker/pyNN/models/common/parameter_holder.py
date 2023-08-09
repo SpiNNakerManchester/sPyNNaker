@@ -31,6 +31,8 @@ class ParameterHolder(object):
         # A list of items of data that are to be present in each element
         "__data_items_to_return",
 
+        "__single_key",
+
         # Function call to get the values
         "__get_call",
 
@@ -58,8 +60,10 @@ class ParameterHolder(object):
         self.__data_items_to_return: Union[str, Tuple[str, ...]]
         if isinstance(data_items_to_return, str):
             self.__data_items_to_return = data_items_to_return
+            self.__single_key: Optional[str] = data_items_to_return
         else:
             self.__data_items_to_return = tuple(data_items_to_return)
+            self.__single_key = None
         self.__get_call = get_call
         self.__data_items: Optional[Dict[str, _BaseValueType]] = None
         self.__selector = selector
@@ -105,40 +109,58 @@ class ParameterHolder(object):
 
         return self.__data_items
 
-    def __getitem__(self, s: str) -> Union[List[int], List[float]]:
+    def __getitem__(self, s):
         data = self._get_data_items()
+        if self.__single_key is not None:
+            return data[self.__single_key][s]
         return data[s]
 
     def __len__(self) -> int:
         data = self._get_data_items()
+        if self.__single_key is not None:
+            return len(data[self.__single_key])
         return len(data)
 
-    def __iter__(self) -> Iterator[str]:
+    def __iter__(self) -> Iterator:
         data = self._get_data_items()
+        if self.__single_key is not None:
+            return iter(data[self.__single_key])
         return iter(data)
 
     def __str__(self) -> str:
         data = self._get_data_items()
-        return data.__str__()
+        if self.__single_key is not None:
+            return str(data[self.__single_key])
+        return str(data)
 
     def __repr__(self) -> str:
         data = self._get_data_items()
-        return data.__repr__()
+        if self.__single_key is not None:
+            return repr(data[self.__single_key])
+        return repr(data)
 
     def __contains__(self, item: str) -> bool:
         data = self._get_data_items()
+        if self.__single_key is not None:
+            return item in data[self.__single_key]
         return item in data
 
     def __getattr__(self, name: str):
         data = self._get_data_items()
+        if self.__single_key is not None:
+            return getattr(data[self.__single_key], name)
         return getattr(data, name)
 
     def __eq__(self, other: Any) -> bool:
         data = self._get_data_items()
+        if self.__single_key is not None:
+            return data[self.__single_key] == other
         return data == other
 
     def __hash__(self) -> int:
         data = self._get_data_items()
+        if self.__single_key is not None:
+            return hash(data[self.__single_key])
         return hash(data)
 
     def keys(self) -> Iterable[str]:

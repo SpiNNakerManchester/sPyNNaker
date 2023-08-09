@@ -42,7 +42,7 @@ _TARGET = 1
 _FIRST_PARAM = 2
 
 
-def __is_sequential(value) -> TypeGuard[Union[List, NDArray]]:
+def _is_sequential(value) -> TypeGuard[Union[List, NDArray]]:
     return isinstance(value, (list, numpy.ndarray))
 
 
@@ -123,7 +123,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
         if self.__delays is None:
-            if __is_sequential(synapse_info.delays):
+            if _is_sequential(synapse_info.delays):
                 return float(numpy.max(synapse_info.delays))
             return self._get_delay_maximum(
                 synapse_info.delays, len(self.__targets), synapse_info)
@@ -133,7 +133,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info: SynapseInformation) -> float:
         if self.__delays is None:
-            if __is_sequential(synapse_info.delays):
+            if _is_sequential(synapse_info.delays):
                 return float(numpy.min(synapse_info.delays))
             return self._get_delay_minimum(
                 synapse_info.delays, len(self.__targets), synapse_info)
@@ -144,7 +144,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def get_delay_variance(
             self, delays, synapse_info: SynapseInformation) -> float:
         if self.__delays is None:
-            if __is_sequential(synapse_info.delays):
+            if _is_sequential(synapse_info.delays):
                 return float(numpy.var(synapse_info.delays))
             return AbstractConnector.get_delay_variance(
                 self, delays, synapse_info)
@@ -203,7 +203,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         delays_handled = False
         if (min_delay is not None and max_delay is not None and
                 (self.__delays is not None or
-                 __is_sequential(synapse_info.delays))):
+                 _is_sequential(synapse_info.delays))):
             delays = synapse_info.delays if self.__delays is None \
                 else self.__delays
             mask = ((delays >= min_delay) & (delays <= max_delay))
@@ -264,7 +264,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def get_weight_mean(
             self, weights, synapse_info: SynapseInformation) -> float:
         if self.__weights is None:
-            if __is_sequential(synapse_info.weights):
+            if _is_sequential(synapse_info.weights):
                 return float(numpy.mean(synapse_info.weights))
             return AbstractConnector.get_weight_mean(
                 self, weights, synapse_info)
@@ -274,7 +274,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
         if self.__weights is None:
-            if __is_sequential(synapse_info.weights):
+            if _is_sequential(synapse_info.weights):
                 return float(numpy.amax(synapse_info.weights))
             return self._get_weight_maximum(
                 synapse_info.weights, len(self.__targets), synapse_info)
@@ -285,7 +285,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def get_weight_variance(
             self, weights, synapse_info: SynapseInformation) -> float:
         if self.__weights is None:
-            if __is_sequential(synapse_info.weights):
+            if _is_sequential(synapse_info.weights):
                 return float(numpy.var(synapse_info.weights))
             return AbstractConnector.get_weight_variance(
                 self, weights, synapse_info)
@@ -307,7 +307,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         block["target"] = self.__targets[indices]
         # check that conn_list has weights, if not then use the value passed in
         if self.__weights is None:
-            if __is_sequential(synapse_info.weights):
+            if _is_sequential(synapse_info.weights):
                 block["weight"] = numpy.array(synapse_info.weights)[indices]
             else:
                 block["weight"] = self._generate_weights(
@@ -317,7 +317,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             block["weight"] = self.__weights[indices]
         # check that conn_list has delays, if not then use the value passed in
         if self.__delays is None:
-            if __is_sequential(synapse_info.delays):
+            if _is_sequential(synapse_info.delays):
                 block["delay"] = numpy.array(synapse_info.delays)[indices]
             else:
                 block["delay"] = self._generate_delays(

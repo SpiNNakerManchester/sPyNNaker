@@ -35,7 +35,8 @@ if TYPE_CHECKING:
     from .population import Population
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
     from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.common.population_application_vertex import (
+        PopulationApplicationVertex)
     from spynnaker.pyNN.models.common import ParameterHolder
     from spynnaker.pyNN.models.common.types import Names, Values
     from spynnaker.pyNN.models.recorder import Recorder
@@ -659,11 +660,8 @@ class PopulationView(PopulationBase):
 
     @property
     @overrides(PopulationBase._vertex)
-    def _vertex(self) -> AbstractPopulationVertex:
-        apv = self._apv
-        if apv is None:
-            raise ValueError("cannot obtain vertex; not neural population")
-        return apv
+    def _vertex(self) -> PopulationApplicationVertex:
+        return self.__vertex
 
     @property
     @overrides(PopulationBase._recorder)
