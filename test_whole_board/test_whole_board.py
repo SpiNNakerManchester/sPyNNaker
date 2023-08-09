@@ -17,6 +17,8 @@ import tempfile
 import os
 import traceback
 import sys
+import logging
+from shutil import rmtree
 
 import pyNN.spiNNaker as sim
 from spinnman.spalloc import SpallocClient, SpallocState
@@ -54,6 +56,10 @@ class WholeBoardTest(object):
           (4, 0), (5, 1), (6, 2), (7, 3)]
     dl = list(ur)
     dl.reverse()
+
+    def __init__(self):
+        self.to_allocate = None
+        self.targets = None
 
     def find_a_placement(self):
         for count in range(17, 0, -1):
@@ -198,37 +204,40 @@ def test_run(x, y, b):
     client = SpallocClient(SPALLOC_URL, SPALLOC_USERNAME, SPALLOC_PASSWORD)
     job = client.create_job_board(
         triad=(x, y, b), machine_name=SPALLOC_MACHINE)
-    job.launch_keepalive_task()
-    # Wait 30 seconds for the state to change before giving up
-    # Wait for not queued for up to 30 seconds
-    job.wait_for_state_change(SpallocState.QUEUED)
-    # If queued or destroyed skip test
-    if job.get_state() == SpallocState.QUEUED:
-        job.destroy("Queued")
-        pytest.skip(f"Some boards starting at {x}, {y}, {b} is in use")
-    elif job.get_state() == SpallocState.DESTROYED:
-        pytest.skip(f"Boards {x}, {y}, {b} could not be allocated")
-    # Actually wait for ready now (as might be powering on)
-    job.wait_until_ready()
     with job:
-        with tempfile.TemporaryDirectory(
-                prefix=f"{x}_{y}_{b}", dir=test_dir) as tmpdir:
-            os.chdir(tmpdir)
-            with open("spynnaker.cfg", "w", encoding="utf-8") as f:
-                f.write("[Machine]\n")
-                f.write("spalloc_server = None\n")
-                f.write(f"machine_name = {job.get_root_host()}\n")
-                f.write("version = 5\n")
-            test = WholeBoardTest()
-            test.do_run()
+        job.launch_keepalive_task()
+        # Wait for not queued for up to 30 seconds
+        state = job.get_state(wait_for_change=True)
+        # If queued or destroyed skip test
+        if state == SpallocState.QUEUED:
+            job.destroy("Queued")
+            pytest.skip(f"Some boards starting at {x}, {y}, {b} is in use")
+        elif state == SpallocState.DESTROYED:
+            pytest.skip(f"Boards {x}, {y}, {b} could not be allocated")
+        # Actually wait for ready now (as might be powering on)
+        job.wait_until_ready()
+        tmpdir = tempfile.mkdtemp(prefix=f"{x}_{y}_{b}", dir=test_dir)
+        os.chdir(tmpdir)
+        with open("spynnaker.cfg", "w", encoding="utf-8") as f:
+            f.write("[Machine]\n")
+            f.write("spalloc_server = None\n")
+            f.write(f"machine_name = {job.get_root_host()}\n")
+            f.write("version = 5\n")
+        test = WholeBoardTest()
+        test.do_run()
+        # If no errors we will get here and we can remove the tree;
+        # then only error folders will be left
+        rmtree(tmpdir)
 
 
 if __name__ == "__main__":
-    for x, y, b in BOARDS:
+    logging.basicConfig(level=logging.DEBUG)
+    main_boards = [(0, 0, 0)]
+    for b_x, b_y, b_b in main_boards:
         print("", file=sys.stderr,)
-        print(f"*************** Testing {x}, {y}, {b} *******************",
+        print(f"************** Testing {b_x}, {b_y}, {b_b} ******************",
               file=sys.stderr)
         try:
-            test_run(x, y, b)
+            test_run(b_x, b_y, b_b)
         except Exception:
             traceback.print_exc()

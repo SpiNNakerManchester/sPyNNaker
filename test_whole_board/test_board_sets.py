@@ -17,6 +17,7 @@ import tempfile
 import os
 import traceback
 import sys
+import logging
 from shutil import rmtree
 
 import pyNN.spiNNaker as sim
@@ -24,7 +25,6 @@ from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterAbstractPopulationVertexNeuronsSynapses)
 from spinnman.spalloc import SpallocClient, SpallocState
 from unittest.case import SkipTest
-import logging
 
 
 BOARDS = [(bx, by, bb, ss)
