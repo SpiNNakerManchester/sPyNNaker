@@ -17,12 +17,14 @@ import tempfile
 import os
 import traceback
 import sys
+from shutil import rmtree
 
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterAbstractPopulationVertexNeuronsSynapses)
 from spinnman.spalloc import SpallocClient, SpallocState
 from unittest.case import SkipTest
+import logging
 
 
 BOARDS = [(bx, by, bb, ss)
@@ -115,29 +117,34 @@ def test_run(x, y, b, s):
     with job:
         job.launch_keepalive_task()
         # Wait for not queued for up to 30 seconds
-        job.wait_for_state_change(SpallocState.QUEUED)
+        state = job.get_state(wait_for_change=True)
         # If queued or destroyed skip test
-        if job.get_state() == SpallocState.QUEUED:
+        if state == SpallocState.QUEUED:
             job.destroy("Queued")
             pytest.skip(f"Some boards starting at {x}, {y}, {b} is in use")
-        elif job.get_state() == SpallocState.DESTROYED:
+        elif state == SpallocState.DESTROYED:
             pytest.skip(f"Boards {x}, {y}, {b} could not be allocated")
         # Actually wait for ready now (as might be powering on)
         job.wait_until_ready()
-        with tempfile.TemporaryDirectory(
-                prefix=f"{x}_{y}_{b}", dir=test_dir) as tmpdir:
-            os.chdir(tmpdir)
-            with open("spynnaker.cfg", "w", encoding="utf-8") as f:
-                f.write("[Machine]\n")
-                f.write("spalloc_server = None\n")
-                f.write(f"machine_name = {job.get_root_host()}\n")
-                f.write("version = 5\n")
-            do_run(s)
+        tmpdir = tempfile.mkdtemp(prefix=f"{x}_{y}_{b}", dir=test_dir)
+        os.chdir(tmpdir)
+        with open("spynnaker.cfg", "w", encoding="utf-8") as f:
+            f.write("[Machine]\n")
+            f.write("spalloc_server = None\n")
+            f.write(f"machine_name = {job.get_root_host()}\n")
+            f.write("version = 5\n")
+        do_run(s)
+        # If no errors we will get here and we can remove the tree;
+        # then only error folders will be left
+        rmtree(tmpdir)
 
 
 if __name__ == "__main__":
-    for b_x, b_y, b_b in BOARDS:
-        for s_s in [0, 1, 2]:
+    logging.basicConfig(level=logging.DEBUG)
+    main_boards = [(0, 0, 0)]
+    main_sets = [0]
+    for b_x, b_y, b_b in main_boards:
+        for s_s in main_sets:
             print("", file=sys.stderr,)
             print(f"************ Testing {b_x}, {b_y}, {b_b} ****************",
                   file=sys.stderr)
