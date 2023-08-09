@@ -61,6 +61,7 @@ class Population(PopulationBase):
     """
     PyNN 0.9 population object.
     """
+    # pylint: disable=redefined-builtin
     __slots__ = (
         "__annotations",
         "__celltype",

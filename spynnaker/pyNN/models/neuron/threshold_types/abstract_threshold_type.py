@@ -17,6 +17,7 @@ from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 
 
+# pylint: disable=abstract-method
 class AbstractThresholdType(
         AbstractStandardNeuronComponent, metaclass=AbstractBase):
     """

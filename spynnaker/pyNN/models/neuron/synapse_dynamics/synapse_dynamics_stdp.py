@@ -152,6 +152,7 @@ class SynapseDynamicsSTDP(
                     " edges to the same population")
 
             if self.__neuromodulation is not None:
+                # pylint: disable=protected-access
                 synapse_dynamics._merge_neuromodulation(self.__neuromodulation)
 
             # If STDP part matches, return the other, as it might also be

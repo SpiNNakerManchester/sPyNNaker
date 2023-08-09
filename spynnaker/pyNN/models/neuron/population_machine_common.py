@@ -56,6 +56,7 @@ class CommonRegions(NamedTuple):
     recording: int
 
 
+# pylint: disable=abstract-method
 class PopulationMachineCommon(
         MachineVertex,
         ProvidesProvenanceDataFromMachineImpl,

@@ -14,6 +14,7 @@
 from pacman.model.graphs import AbstractSupportsSDRAMEdges
 
 
+# pylint: disable=abstract-method
 class SendsSynapticInputsOverSDRAM(AbstractSupportsSDRAMEdges):
     """
     A marker interface for an object that sends synaptic inputs over SDRAM.
