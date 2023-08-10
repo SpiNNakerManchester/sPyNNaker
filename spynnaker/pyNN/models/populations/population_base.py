@@ -16,7 +16,7 @@ import logging
 from pyNN.space import BaseStructure
 import neo
 from typing import (
-    Any, Dict, Optional, Sequence, Union, final,
+    Any, Dict, Optional, Sequence, Tuple, Union, final,
     TYPE_CHECKING)
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
@@ -484,6 +484,14 @@ class PopulationBase(object, metaclass=AbstractBase):
         The underlying application vertex.
 
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def _view_range(self) -> Tuple[int, int]:
+        """
+        The range of neuron IDs supported.
         """
         raise NotImplementedError
 

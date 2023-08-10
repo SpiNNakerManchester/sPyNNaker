@@ -15,7 +15,7 @@ from __future__ import annotations
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
-from typing import Optional, Sequence, Tuple, Union, cast, TYPE_CHECKING
+from typing import Optional, Sequence, cast, TYPE_CHECKING
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
@@ -23,7 +23,6 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
-    from spynnaker.pyNN.models.populations import Population, PopulationView
 
 # Address to indicate that the synaptic region is unused
 SYN_REGION_UNUSED = 0xFFFFFFFF
@@ -55,12 +54,9 @@ class GeneratorData(object):
             delayed_synaptic_matrix_offset = SYN_REGION_UNUSED
 
         # Take care of Population views
-        pre_lo, pre_hi = self.__view_range(
-            synapse_information.pre_population,
-            synapse_information.n_pre_neurons - 1)
-        post_lo, post_hi = self.__view_range(
-            synapse_information.post_population,
-            synapse_information.n_post_neurons - 1)
+        # pylint: disable=protected-access
+        pre_lo, pre_hi = synapse_information.pre_population._view_range
+        post_lo, post_hi = synapse_information.post_population._view_range
 
         # Get objects needed for the next bit
         connector = cast(AbstractGenerateConnectorOnMachine,
@@ -84,16 +80,6 @@ class GeneratorData(object):
             connector.gen_connector_params(),
             connector.gen_weights_params(synapse_information.weights),
             connector.gen_delay_params(synapse_information.delays)]
-
-    @staticmethod
-    def __view_range(
-            pop: Union[Population, PopulationView],
-            size: int) -> Tuple[int, int]:
-        if isinstance(pop, PopulationView):
-            idx = pop._indexes  # pylint: disable=protected-access
-            return idx[0], idx[-1]
-        else:
-            return 0, size
 
     @property
     def size(self) -> int:

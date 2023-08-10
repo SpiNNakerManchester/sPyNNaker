@@ -668,6 +668,16 @@ class PopulationView(PopulationBase):
     def _recorder(self) -> Recorder:
         return self.__recorder
 
+    @property
+    @overrides(PopulationBase._view_range)
+    def _view_range(self) -> Tuple[int, int]:
+        indices = self.__indexes
+        return indices[0], indices[-1]
+
+    @property
+    def _is_contiguous(self) -> bool:
+        return len(self.__indexes) == 2
+
     def __eq__(self, other) -> bool:
         if not isinstance(other, PopulationView):
             return False

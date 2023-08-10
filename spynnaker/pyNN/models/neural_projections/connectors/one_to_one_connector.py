@@ -31,7 +31,6 @@ from .abstract_generate_connector_on_host import (
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
-    from spynnaker.pyNN.models.populations import PopulationView
 
 _expr_context = SafeEval(
     math, numpy, numpy.arccos, numpy.arcsin, numpy.arctan, numpy.arctan2,
@@ -165,29 +164,19 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     def gen_connector_params_size_in_bytes(self) -> int:
         return 0
 
-    @staticmethod
-    def __popview(pop) -> PopulationView:
-        return pop
-
     @overrides(AbstractGenerateConnectorOnMachine.get_connected_vertices)
     def get_connected_vertices(
             self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
                 Tuple[MachineVertex, Sequence[MachineVertex]]]:
-        pre_lo = 0
-        pre_hi = source_vertex.n_atoms - 1
-        post_lo = 0
-        post_hi = target_vertex.n_atoms - 1
+        pre_lo, pre_hi = 0, source_vertex.n_atoms - 1
+        post_lo, post_hi = 0, target_vertex.n_atoms - 1
         if s_info.prepop_is_view:
-            pre_view = self.__popview(s_info.pre_population)
             # pylint: disable=protected-access
-            pre_lo = pre_view._indexes[0]
-            pre_hi = pre_view._indexes[-1]
+            pre_lo, pre_hi = s_info.pre_population._view_range
         if s_info.postpop_is_view:
-            post_view = self.__popview(s_info.post_population)
             # pylint: disable=protected-access
-            post_lo = post_view._indexes[0]
-            post_hi = post_view._indexes[-1]
+            post_lo, post_hi = s_info.post_population._view_range
 
         src_splitter = source_vertex.splitter
         return [(t_vert,

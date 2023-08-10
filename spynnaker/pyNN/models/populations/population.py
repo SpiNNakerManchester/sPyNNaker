@@ -18,8 +18,8 @@ from numpy.typing import NDArray
 import os
 import inspect
 from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Type,
-    Union, final, overload, TYPE_CHECKING)
+    Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple,
+    Type, Union, final, overload, TYPE_CHECKING)
 from typing_extensions import TypeAlias
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
@@ -583,6 +583,11 @@ class Population(PopulationBase):
         :rtype: Recorder
         """
         return self.__recorder
+
+    @property
+    @overrides(PopulationBase._view_range)
+    def _view_range(self) -> Tuple[int, int]:
+        return 0, self.size - 1
 
     @property
     def conductance_based(self) -> bool:
