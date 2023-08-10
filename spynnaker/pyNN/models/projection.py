@@ -204,7 +204,7 @@ class Projection(object):
                 f"Unexpected parameter type {type(param)}. "
                 "Expected Population")
         # Check whether the array is contiguous or not
-        if not param._is_contiguous():  # pylint: disable=protected-access
+        if not param._is_contiguous:  # pylint: disable=protected-access
             raise NotImplementedError(
                 "Projections over views only work on contiguous arrays, "
                 "e.g. view = pop[n:m], not view = pop[n,m]")
