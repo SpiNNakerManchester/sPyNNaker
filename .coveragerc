@@ -14,3 +14,12 @@
 
 [run]
 branch = True
+
+[report]
+# Coverage should ignore overloads; they're not real code
+exclude_lines =
+    @overload
+    \.\.\.$
+    raise\s+NotImplementedError
+    if\s+TYPE_CHECKING:
+    #\s*(pragma|PRAGMA)[:\s]?\s*(no|NO)\s*(cover|COVER)
