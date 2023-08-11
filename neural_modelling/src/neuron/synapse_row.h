@@ -89,7 +89,7 @@
 #define _SYNAPSE_ROW_H_
 
 #include <common/neuron-typedefs.h>
-//#include <round.h>
+#include <round.h>
 
 //! how many bits the synapse weight will take
 #ifndef SYNAPSE_WEIGHT_BITS
@@ -252,6 +252,7 @@ static inline input_t synapse_row_convert_weight_to_input(
     uint64_t w = (uint64_t) (weight);
 
     return kbits((int_k_t) (mw * w));
+	// This should work but seems to lead to UNDEF errors?
 //	return MULT_ROUND_NEAREST_ACCUM(bitsk(weight), min_weight);
 }
 
