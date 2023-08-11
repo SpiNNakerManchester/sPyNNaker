@@ -20,7 +20,7 @@
 #define _INPUT_TYPE_CONDUCTANCE_H_
 
 #include "input_type.h"
-//#include "round.h"
+#include "round.h"
 
 //! Conductance input parameters
 struct input_type_params_t {
@@ -76,11 +76,11 @@ static inline void input_type_convert_excitatory_input_to_current(
         state_t membrane_voltage) {
     for (int i=0; i < NUM_EXCITATORY_RECEPTORS; i++) {
         // accum = accum * (accum - accum)
-        exc_input[i] = exc_input[i] *
-                (input_type->V_rev_E - membrane_voltage);
+//        exc_input[i] = exc_input[i] *
+//                (input_type->V_rev_E - membrane_voltage);
         // RTN accum
-//        exc_input[i] = MULT_ROUND_NEAREST_ACCUM(exc_input[i],
-//                (input_type->V_rev_E - membrane_voltage));
+        exc_input[i] = MULT_ROUND_NEAREST_ACCUM(exc_input[i],
+                (input_type->V_rev_E - membrane_voltage));
     }
 }
 
