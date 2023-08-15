@@ -32,8 +32,8 @@ from spinn_front_end_common.interface.ds import (
 from spinn_front_end_common.interface.interface_functions import (
     load_application_data_specs)
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
-from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices,\
-    SynapseRegions
+from spynnaker.pyNN.models.neuron.synaptic_matrices import (
+    SynapticMatrices, SynapseRegions)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
     SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic,
