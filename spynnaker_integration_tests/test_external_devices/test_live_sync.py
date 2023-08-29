@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
 from spinn_utilities.exceptions import SimulatorShutdownException
 import pyNN.spiNNaker as p
 from time import sleep
