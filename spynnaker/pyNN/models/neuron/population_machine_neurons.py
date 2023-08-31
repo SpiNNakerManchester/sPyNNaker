@@ -129,6 +129,14 @@ class PopulationMachineNeurons(
         """
         raise NotImplementedError
 
+    @property
+    @abstractmethod
+    def _has_key(self) -> bool:
+        """
+        Whether a key has been defined.
+        """
+        raise NotImplementedError
+
     @abstractmethod
     def _set_key(self, key: int) -> None:
         """
@@ -265,7 +273,7 @@ class PopulationMachineNeurons(
         # Write whether the key is to be used, and then the key, or 0 if it
         # isn't to be used
         keys: Union[numpy.ndarray, List[int]]
-        if self._key is None:
+        if not self._has_key:
             spec.write_value(data=0)
             keys = [0] * n_atoms
         else:

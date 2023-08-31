@@ -217,6 +217,11 @@ class PopulationMachineVertex(
         assert self.__key is not None, "key not yet set"
         return self.__key
 
+    @property
+    @overrides(PopulationMachineNeurons._has_key)
+    def _has_key(self) -> bool:
+        return self.__key is not None
+
     @overrides(PopulationMachineNeurons._set_key)
     def _set_key(self, key: int):
         self.__key = key
