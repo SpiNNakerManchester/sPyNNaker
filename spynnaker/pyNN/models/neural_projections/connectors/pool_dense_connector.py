@@ -17,7 +17,7 @@
 from __future__ import annotations
 from collections.abc import Iterable
 import numpy
-from numpy import integer, floating, float64
+from numpy import integer, floating, float64, uint16, uint32
 from numpy.typing import ArrayLike, NDArray
 from pyNN.random import RandomDistribution
 from typing import (
@@ -41,10 +41,10 @@ if TYPE_CHECKING:
 _DIMENSION_SIZE = (2 * BYTES_PER_WORD) + (6 * BYTES_PER_SHORT)
 _KEY_INFO_SIZE = 3 * BYTES_PER_WORD
 _CONN_SIZE = _KEY_INFO_SIZE + (3 * BYTES_PER_WORD) + (2 * BYTES_PER_SHORT)
-_DIM_DTYPE = [("mask", "uint32"), ("shift", "uint32"), ("pre_start", "uint16"),
-              ("pre_in_post_start", "uint16"), ("pre_in_post_end", "uint16"),
-              ("pre_in_post_shape", "uint16"), ("recip_pool_stride", "uint16"),
-              ("_PADDING", "uint16")]
+_DIM_DTYPE = [("mask", uint32), ("shift", uint32), ("pre_start", uint16),
+              ("pre_in_post_start", uint16), ("pre_in_post_end", uint16),
+              ("pre_in_post_shape", uint16), ("recip_pool_stride", uint16),
+              ("_PADDING", uint16)]
 
 
 class PoolDenseConnector(AbstractConnector):
@@ -403,7 +403,7 @@ class PoolDenseConnector(AbstractConnector):
         dim_info["pre_in_post_end"] = self.__pre_as_post(start + size)
         dim_info["pre_in_post_shape"] = (
             dim_info["pre_in_post_end"] - dim_info["pre_in_post_start"] + 1)
-        spec.write_array(dim_info.view(numpy.uint32))
+        spec.write_array(dim_info.view(uint32))
 
         # Work out which weights are for this connection
         weights = self.__decode_weights(
@@ -424,7 +424,7 @@ class PoolDenseConnector(AbstractConnector):
         weights[neg_weights] *= weight_scales[neg_synapse_type]
         weights[pos_weights] *= weight_scales[pos_synapse_type]
         final_weights = numpy.round(weights).astype(numpy.int16)
-        spec.write_array(final_weights.view(numpy.uint32))
+        spec.write_array(final_weights.view(uint32))
 
     @staticmethod
     def __recip(v: float) -> float:

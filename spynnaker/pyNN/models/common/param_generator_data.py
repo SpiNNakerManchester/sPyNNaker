@@ -116,7 +116,7 @@ def param_generator_params(values: _ParamType) -> NDArray[uint32]:
     """
     if numpy.isscalar(values):
         return numpy.array(
-            [DataType.S1615.encode_as_int(cast(float, values))]).view(uint32)
+            [DataType.S1615.encode_as_int(cast(float, values))], dtype=uint32)
 
     if isinstance(values, RandomDistribution):
         parameters = (
@@ -128,7 +128,7 @@ def param_generator_params(values: _ParamType) -> NDArray[uint32]:
             for param in parameters if param is not None)
         params = [
             DataType.S1615.encode_as_int(param) for param in parameters]
-        return numpy.array(params).view(uint32)
+        return numpy.array(params, dtype=uint32)
 
     raise ValueError(f"Unexpected value {values}")
 
