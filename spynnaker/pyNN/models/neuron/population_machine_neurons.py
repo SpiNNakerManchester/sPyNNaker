@@ -219,8 +219,10 @@ class PopulationMachineNeurons(
         """
         # Get and store the key
         routing_info = SpynnakerDataView.get_routing_infos()
-        self._set_key(routing_info.get_first_key_from_pre_vertex(
-            cast(AbstractVertex, self), SPIKE_PARTITION_ID) or 0)
+        key = routing_info.get_first_key_from_pre_vertex(
+            cast(AbstractVertex, self), SPIKE_PARTITION_ID)
+        if key is not None:
+            self._set_key(key)
 
         # Write the neuron core parameters
         self._write_neuron_core_parameters(spec, ring_buffer_shifts)
