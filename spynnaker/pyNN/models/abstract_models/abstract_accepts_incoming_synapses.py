@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.require_subclass import require_subclass
 from pacman.exceptions import PacmanConfigurationException
@@ -41,7 +41,7 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def get_synapse_id_by_target(self, target: str) -> int:
+    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         """
         Get the ID of a synapse given the name.
 

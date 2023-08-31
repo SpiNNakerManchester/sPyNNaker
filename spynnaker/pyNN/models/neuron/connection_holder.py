@@ -61,14 +61,14 @@ class ConnectionHolder(object):
     )
 
     def __init__(
-            self, data_items_to_return: Optional[Sequence[int]], as_list: bool,
+            self, data_items_to_return: Optional[Sequence[str]], as_list: bool,
             n_pre_atoms: int, n_post_atoms: int,
             connections: Optional[List[ConnectionsArray]] = None,
             fixed_values: Optional[List[Tuple[str, int]]] = None,
             notify: Optional[Callable[['ConnectionHolder'], None]] = None):
         """
         :param data_items_to_return: A list of data fields to be returned
-        :type data_items_to_return: list(int) or tuple(int) or None
+        :type data_items_to_return: list(str) or tuple(str) or None
         :param bool as_list:
             True if the data will be returned as a list, False if it is to be
             returned as a matrix (or series of matrices)

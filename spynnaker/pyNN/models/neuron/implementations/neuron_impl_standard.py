@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional
+from typing import Mapping, Optional, Sequence
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from .abstract_neuron_impl import AbstractNeuronImpl
@@ -24,6 +24,7 @@ from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
 from spynnaker.pyNN.models.neuron.additional_inputs import (
     AbstractAdditionalInput)
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
 
 # The size of the n_steps_per_timestep parameter
 _N_STEPS_PER_TIMESTEP_SIZE = 1 * BYTES_PER_WORD
@@ -106,81 +107,80 @@ class NeuronImplStandard(AbstractNeuronImpl):
 
     @property
     @overrides(AbstractNeuronImpl.model_name)
-    def model_name(self):
+    def model_name(self) -> str:
         return self.__model_name
 
     @property
     @overrides(AbstractNeuronImpl.binary_name)
-    def binary_name(self):
+    def binary_name(self) -> str:
         return self.__binary
 
     @property
     @overrides(AbstractNeuronImpl.structs)
-    def structs(self):
+    def structs(self) -> Sequence[Struct]:
         structs = [_STEPS_PER_TIMESTEP_STRUCT]
         structs.extend(s for c in self.__components for s in c.structs)
         return structs
 
     @overrides(AbstractNeuronImpl.get_global_weight_scale)
-    def get_global_weight_scale(self):
+    def get_global_weight_scale(self) -> float:
         return self.__input_type.get_global_weight_scale()
 
     @overrides(AbstractNeuronImpl.get_n_synapse_types)
-    def get_n_synapse_types(self):
+    def get_n_synapse_types(self) -> int:
         return self.__synapse_type.get_n_synapse_types()
 
     @overrides(AbstractNeuronImpl.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target):
+    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         return self.__synapse_type.get_synapse_id_by_target(target)
 
     @overrides(AbstractNeuronImpl.get_synapse_targets)
-    def get_synapse_targets(self):
+    def get_synapse_targets(self) -> Sequence[str]:
         return self.__synapse_type.get_synapse_targets()
 
     @overrides(AbstractNeuronImpl.get_recordable_variables)
-    def get_recordable_variables(self):
+    def get_recordable_variables(self) -> Sequence[str]:
         return self._RECORDABLES
 
     @overrides(AbstractNeuronImpl.get_recordable_units)
-    def get_recordable_units(self, variable):
+    def get_recordable_units(self, variable: str) -> str:
         return self._RECORDABLE_UNITS[variable]
 
     @overrides(AbstractNeuronImpl.get_recordable_data_types)
-    def get_recordable_data_types(self):
+    def get_recordable_data_types(self) -> Mapping[str, DataType]:
         return self._RECORDABLE_DATA_TYPES
 
     @overrides(AbstractNeuronImpl.is_recordable)
-    def is_recordable(self, variable):
+    def is_recordable(self, variable: str) -> bool:
         return variable in self._RECORDABLES
 
     @overrides(AbstractNeuronImpl.get_recordable_variable_index)
-    def get_recordable_variable_index(self, variable):
+    def get_recordable_variable_index(self, variable: str) -> int:
         return self._RECORDABLES.index(variable)
 
     @overrides(AbstractNeuronImpl.add_parameters)
-    def add_parameters(self, parameters):
+    def add_parameters(self, parameters: RangeDictionary):
         parameters[_STEPS_PER_TIMESTEP] = self.__n_steps_per_timestep
         for component in self.__components:
             component.add_parameters(parameters)
 
     @overrides(AbstractNeuronImpl.add_state_variables)
-    def add_state_variables(self, state_variables):
+    def add_state_variables(self, state_variables: RangeDictionary):
         for component in self.__components:
             component.add_state_variables(state_variables)
 
     @overrides(AbstractNeuronImpl.get_units)
-    def get_units(self, variable):
+    def get_units(self, variable: str) -> str:
         for component in self.__components:
             if component.has_variable(variable):
                 return component.get_units(variable)
 
         raise KeyError(
-            f"The parameter {variable} does not exist in this input "
-            "conductance component")
+            f"The parameter {variable} does not exist in this neuron model")
 
     @property
     @overrides(AbstractNeuronImpl.is_conductance_based)
-    def is_conductance_based(self):
+    def is_conductance_based(self) -> bool:
         return isinstance(self.__input_type, InputTypeConductance)
 
     def __getitem__(self, key):

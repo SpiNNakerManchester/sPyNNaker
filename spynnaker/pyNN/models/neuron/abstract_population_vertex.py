@@ -1005,7 +1005,7 @@ class AbstractPopulationVertex(
         }
         return context
 
-    def get_synapse_id_by_target(self, target: str) -> int:
+    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         """
         Get the id of synapse using its target name.
 

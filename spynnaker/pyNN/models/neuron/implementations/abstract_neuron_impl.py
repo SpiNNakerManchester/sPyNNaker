@@ -11,8 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from typing import Mapping, Optional, Sequence
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.ranged import RangeDictionary
+from spinn_front_end_common.interface.ds import DataType
+from spynnaker.pyNN.utilities.struct import Struct
 
 
 class AbstractNeuronImpl(object, metaclass=AbstractBase):
@@ -44,7 +47,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def structs(self):
+    def structs(self) -> Sequence[Struct]:
         """
         A list of structures used by the implementation.
 
@@ -53,11 +56,11 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_global_weight_scale(self) -> int:
+    def get_global_weight_scale(self) -> float:
         """
         Get the weight scaling required by this model.
 
-        :rtype: int
+        :rtype: float
         """
         raise NotImplementedError
 
@@ -71,7 +74,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_synapse_id_by_target(self, target) -> int:
+    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         """
         Get the ID of a synapse given the name.
 
@@ -81,7 +84,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_synapse_targets(self):
+    def get_synapse_targets(self) -> Sequence[str]:
         """
         Get the target names of the synapse type.
 
@@ -90,7 +93,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_recordable_variables(self):
+    def get_recordable_variables(self) -> Sequence[str]:
         """
         Get the names of the variables that can be recorded in this model.
 
@@ -108,7 +111,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_recordable_data_types(self):
+    def get_recordable_data_types(self) -> Mapping[str, DataType]:
         """
         Get the data type of the variables that can be recorded.
 
@@ -139,7 +142,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def add_parameters(self, parameters):
+    def add_parameters(self, parameters: RangeDictionary):
         """
         Add the initial values of the parameters to the parameter holder.
 
@@ -149,7 +152,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def add_state_variables(self, state_variables):
+    def add_state_variables(self, state_variables: RangeDictionary):
         """
         Add the initial values of the state variables to the state
         variables holder.

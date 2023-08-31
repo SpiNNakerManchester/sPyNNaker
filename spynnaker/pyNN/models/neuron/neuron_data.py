@@ -14,7 +14,7 @@
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
-from typing import Iterator, MutableMapping, Optional, Tuple
+from typing import Iterator, MutableMapping, Optional, Tuple, cast
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged import RangeDictionary, RangedList
 from pacman.model.graphs.common import Slice
@@ -79,7 +79,7 @@ class NeuronData(object):
 
     def __init__(self, app_vertex: AbstractPopulationVertex):
         self.__app_vertex = app_vertex
-        self.__neuron_data = None
+        self.__neuron_data: Optional[NDArray[uint32]] = None
         self.__neuron_recording_data: Optional[NDArray[uint32]] = None
         self.__generation_done = False
         self.__gen_on_machine = False
@@ -315,10 +315,11 @@ class NeuronData(object):
         offset = 0
         for struct in self.__app_vertex.neuron_impl.structs:
             if struct.repeat_type == StructRepeat.GLOBAL:
-                struct.read_data(block, results, offset)
+                struct.read_data(block, cast(RangeDictionary, results), offset)
                 offset += struct.get_size_in_whole_words() * BYTES_PER_WORD
             else:
-                struct.read_data(block, results, offset, vertex_slice)
+                struct.read_data(block, cast(RangeDictionary, results), offset,
+                                 vertex_slice)
                 offset += (
                     struct.get_size_in_whole_words(vertex_slice.n_atoms) *
                     BYTES_PER_WORD)

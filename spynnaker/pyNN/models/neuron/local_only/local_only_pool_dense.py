@@ -213,21 +213,27 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         # We don't have a weight here, it is in the connector
         return 0
 
+    @staticmethod
+    def __get_synapse_type(proj: Projection, target: str) -> int:
+        edge = proj._projection_edge  # pylint: disable=protected-access
+        synapse_type = edge.post_vertex.get_synapse_id_by_target(target)
+        # Checked during connection validation, assumed constant
+        assert synapse_type is not None
+        return synapse_type
+
     @overrides(AbstractSupportsSignedWeights.get_positive_synapse_index)
     def get_positive_synapse_index(
             self, incoming_projection: Projection) -> int:
-        # pylint: disable=protected-access
-        post = incoming_projection._projection_edge.post_vertex
-        conn = self.__connector(incoming_projection)
-        return post.get_synapse_id_by_target(conn.positive_receptor_type)
+        return self.__get_synapse_type(
+            incoming_projection,
+            self.__connector(incoming_projection).positive_receptor_type)
 
     @overrides(AbstractSupportsSignedWeights.get_negative_synapse_index)
     def get_negative_synapse_index(
             self, incoming_projection: Projection) -> int:
-        # pylint: disable=protected-access
-        post = incoming_projection._projection_edge.post_vertex
-        conn = self.__connector(incoming_projection)
-        return post.get_synapse_id_by_target(conn.negative_receptor_type)
+        return self.__get_synapse_type(
+            incoming_projection,
+            self.__connector(incoming_projection).negative_receptor_type)
 
     @overrides(AbstractSupportsSignedWeights.get_maximum_positive_weight)
     def get_maximum_positive_weight(

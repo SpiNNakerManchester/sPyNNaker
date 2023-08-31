@@ -321,6 +321,14 @@ class PoolDenseConnector(AbstractConnector):
             (sum(n_weights) * BYTES_PER_SHORT) +
             (len(incoming_slices) * _CONN_SIZE))
 
+    @staticmethod
+    def __get_synapse_type(
+            app_edge: ProjectionApplicationEdge, target: str) -> int:
+        synapse_type = app_edge.post_vertex.get_synapse_id_by_target(target)
+        # Checked during validation, assumed constant
+        assert synapse_type is not None
+        return synapse_type
+
     def write_local_only_data(
             self, spec: DataSpecificationGenerator,
             app_edge: ProjectionApplicationEdge,
@@ -350,10 +358,10 @@ class PoolDenseConnector(AbstractConnector):
         spec.write_value(n_weights, data_type=DataType.UINT32)
 
         # Write synapse information
-        pos_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
-            self.__positive_receptor_type)
-        neg_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
-            self.__negative_receptor_type)
+        pos_synapse_type = self.__get_synapse_type(
+            app_edge, self.__positive_receptor_type)
+        neg_synapse_type = self.__get_synapse_type(
+            app_edge, self.__negative_receptor_type)
         spec.write_value(pos_synapse_type, data_type=DataType.UINT16)
         spec.write_value(neg_synapse_type, data_type=DataType.UINT16)
 
