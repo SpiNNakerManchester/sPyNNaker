@@ -20,6 +20,7 @@
  */
 
 #include <common-typedefs.h>
+#include <debug.h>
 
 typedef enum type {
     S1615,
@@ -64,5 +65,10 @@ static type_info type_writers[] = {
 };
 
 static type_info *get_type_writer(type t) {
+	if (t < 0 || t >= sizeof(type_writers) / sizeof(*type_writers)) {
+		// Bogus index is bad! And otherwise hard to debug!
+		log_error("type id=%u is outside sane range", t);
+		rt_error(RTE_SWERR);
+	}
     return &type_writers[t];
 }
