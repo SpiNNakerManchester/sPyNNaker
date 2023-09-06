@@ -36,9 +36,11 @@ from pacman.model.routing_info.vertex_routing_info import VertexRoutingInfo
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron import (
-        AbstractPopulationVertex, PopulationMachineLocalOnlyCombinedVertex)
+        PopulationMachineLocalOnlyCombinedVertex)
     from spynnaker.pyNN.models.utility_models.delays import (
         DelayExtensionVertex)
+    from spynnaker.pyNN.models.common.population_application_vertex import (
+        PopulationApplicationVertex)
 
 
 class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
@@ -115,7 +117,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         # Get all the incoming vertices and keys so we can sort
         incoming_info: List[
             Tuple[Projection, Slice, Tuple[int, int], int]] = []
-        seen_pre_vertices: Set[AbstractPopulationVertex] = set()
+        seen_pre_vertices: Set[PopulationApplicationVertex] = set()
         for incoming in app_vertex.incoming_projections:
             app_edge = incoming._projection_edge
             pre_vertex = app_edge.pre_vertex
@@ -132,7 +134,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             # Keep track of all the same source squares, so they can be
             # merged; this will make sure the keys line up!
             edges_for_source: Dict[
-                Tuple[AbstractPopulationVertex, Slice],
+                Tuple[PopulationApplicationVertex, Slice],
                 List[VertexRoutingInfo]] = defaultdict(list)
             for pre_m_vertex in pre_vertex.splitter.get_out_going_vertices(
                     SPIKE_PARTITION_ID):

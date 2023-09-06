@@ -16,7 +16,8 @@ from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 from pacman.model.graphs.application import ApplicationEdge
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.common.population_application_vertex import (
+        PopulationApplicationVertex)
     from spynnaker.pyNN.models.utility_models.delays import (
         DelayExtensionVertex)
 
@@ -24,11 +25,11 @@ if TYPE_CHECKING:
 class DelayAfferentApplicationEdge(ApplicationEdge):
     __slots__ = ()
 
-    def __init__(self, pre_vertex: AbstractPopulationVertex,
+    def __init__(self, pre_vertex: PopulationApplicationVertex,
                  delay_vertex: DelayExtensionVertex,
                  label: Optional[str] = None):
         """
-        :param AbstractPopulationVertex pre_vertex:
+        :param PopulationApplicationVertex pre_vertex:
         :param DelayExtensionVertex delay_vertex:
         :param str label:
         """

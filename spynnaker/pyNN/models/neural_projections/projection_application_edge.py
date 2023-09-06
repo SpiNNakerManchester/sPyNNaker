@@ -21,6 +21,8 @@ from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.models.common.population_application_vertex import (
+    PopulationApplicationVertex)
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
         AbstractSynapseDynamics, AbstractSynapseDynamicsStructural,
@@ -179,11 +181,8 @@ class ProjectionApplicationEdge(
 
     @property
     @overrides(ApplicationEdge.pre_vertex)
-    def pre_vertex(self) -> AbstractPopulationVertex:
-        # Circularity
-        from spynnaker.pyNN.models.neuron import (
-            AbstractPopulationVertex as APV)
-        return cast(APV, super().pre_vertex)
+    def pre_vertex(self) -> PopulationApplicationVertex:
+        return cast('PopulationApplicationVertex', super().pre_vertex)
 
     @property
     @overrides(ApplicationEdge.post_vertex)

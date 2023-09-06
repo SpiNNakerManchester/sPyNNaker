@@ -42,11 +42,13 @@ if TYPE_CHECKING:
         ConnectionsArray)
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge)
+    from spynnaker.pyNN.models.common.population_application_vertex import (
+        PopulationApplicationVertex)
 
     _PopIndexType: TypeAlias = Dict[
-        Tuple[AbstractPopulationVertex, SynapseInformation], int]
+        Tuple[PopulationApplicationVertex, SynapseInformation], int]
     _SubpopIndexType: TypeAlias = Dict[
-        Tuple[AbstractPopulationVertex, SynapseInformation, int], int]
+        Tuple[PopulationApplicationVertex, SynapseInformation, int], int]
 
     #: :meta private:
     ConnectionsInfo: TypeAlias = Dict[

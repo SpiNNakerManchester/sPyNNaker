@@ -45,6 +45,8 @@ if TYPE_CHECKING:
         DelayExtensionVertex)
     from spynnaker.pyNN.models.neuron import (
         PopulationMachineLocalOnlyCombinedVertex)
+    from spynnaker.pyNN.models.common.population_application_vertex import (
+        PopulationApplicationVertex)
 
 
 class Source(NamedTuple):
@@ -229,7 +231,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         sources_for_target = self.__cached_2d_overlaps.get(app_vertex)
         if sources_for_target is None:
             key_cache: Dict[
-                Tuple[AbstractPopulationVertex, Slice], Source] = {}
+                Tuple[PopulationApplicationVertex, Slice], Source] = {}
             seen_pre_vertices = set()
             sources_for_target = defaultdict(list)
             for incoming in app_vertex.incoming_projections:
@@ -250,7 +252,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     def __get_rinfo_for_sources(
             self,
-            key_cache: Dict[Tuple[AbstractPopulationVertex, Slice], Source],
+            key_cache: Dict[Tuple[PopulationApplicationVertex, Slice], Source],
             srcs: Sequence[MachineVertex], incoming: Projection,
             app_edge: ProjectionApplicationEdge,
             app_vertex: AbstractPopulationVertex) -> Iterable[Source]:
