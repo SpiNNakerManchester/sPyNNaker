@@ -90,7 +90,8 @@ def do_run(sender_board):
             for sender_pop in sender_pops:
                 sim.Projection(
                     sender_pop, receiver_pop,
-                    sim.FixedProbabilityConnector(FIXED_PROB),
+                    sim.FixedTotalNumberConnector(
+                        sender_pop.size * receiver_pop.size * FIXED_PROB),
                     sim.StaticSynapse(weight=WEIGHT))
 
     # Run and get results
