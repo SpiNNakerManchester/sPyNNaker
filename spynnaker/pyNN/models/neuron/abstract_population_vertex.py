@@ -23,7 +23,7 @@ from collections import defaultdict
 from typing import (
     Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
     cast, TYPE_CHECKING)
-from typing_extensions import TypeGuard
+from typing_extensions import TypeAlias, TypeGuard
 
 from pyNN.space import Grid2D, Grid3D, BaseStructure
 from pyNN.random import RandomDistribution
@@ -105,8 +105,14 @@ if TYPE_CHECKING:
         SynapseInformation, ProjectionApplicationEdge)
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
         SplitterAbstractPopulationVertex)
+    from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
+        SpikeSourceArrayVertex)
+    _APVKey: TypeAlias = Union[
+        'AbstractPopulationVertex', SpikeSourcePoissonVertex,
+        SpikeSourceArrayVertex]
 
 logger = FormatAdapter(logging.getLogger(__name__))
+
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
@@ -340,7 +346,7 @@ class AbstractPopulationVertex(
 
         # Set up for incoming
         self.__incoming_projections: Dict[
-            AbstractPopulationVertex, List[Projection]] = defaultdict(list)
+            _APVKey, List[Projection]] = defaultdict(list)
         self.__incoming_poisson_projections: List[Projection] = list()
         self.__max_row_info: Dict[
             Tuple[ProjectionApplicationEdge, SynapseInformation, int],
@@ -1519,8 +1525,7 @@ class AbstractPopulationVertex(
             yield from proj_list
 
     def get_incoming_projections_from(
-            self, source_vertex: AbstractPopulationVertex
-            ) -> Iterable[Projection]:
+            self, source_vertex: _APVKey) -> Iterable[Projection]:
         """
         The projections that target this population vertex from
         the given source.

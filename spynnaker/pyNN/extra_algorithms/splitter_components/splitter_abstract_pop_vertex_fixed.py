@@ -43,6 +43,10 @@ from spynnaker.pyNN.models.neuron.population_machine_common import (
     PopulationMachineCommon)
 from .splitter_abstract_pop_vertex import SplitterAbstractPopulationVertex
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
+    SpikeSourcePoissonVertex)
+from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
+    SpikeSourceArrayVertex)
 
 # The maximum number of bits for the ring buffer index that are likely to
 # fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
@@ -117,7 +121,9 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
         pre_vertex = source_vertex
         if isinstance(source_vertex, DelayExtensionVertex):
             pre_vertex = source_vertex.source_vertex
-        if not isinstance(pre_vertex, AbstractPopulationVertex):
+        if not isinstance(pre_vertex, (
+                AbstractPopulationVertex, SpikeSourcePoissonVertex,
+                SpikeSourceArrayVertex)):
             return []
 
         # Use the real pre-vertex to get the projections
