@@ -15,8 +15,6 @@
 import pytest
 import tempfile
 import os
-import traceback
-import sys
 import logging
 import numpy
 from shutil import rmtree
