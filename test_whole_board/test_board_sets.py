@@ -18,6 +18,7 @@ import os
 import traceback
 import sys
 import logging
+import numpy
 from shutil import rmtree
 
 import pyNN.spiNNaker as sim
@@ -98,14 +99,15 @@ def do_run(sender_board):
     sim.run(5000)
     all_spikes = list()
     for receiver_pop in receiver_pops:
-        spikes = receiver_pop.get_data("spikes").segments[0].spiketrains
+        spikes = receiver_pop.spinnaker_get_data("spikes")
         all_spikes.append((receiver_pop, spikes))
     sim.end()
 
     # Check there are some spikes for every receiver
     for receiver_pop, spikes in all_spikes:
-        for i, s in enumerate(spikes):
-            assert len(s), f"No spikes for {receiver_pop.label}:{i}"
+        jumps = numpy.where(numpy.diff(spikes[:, 0]) > 1)[0]
+        assert len(jumps) == 0, \
+            f"No spikes for {receiver_pop.label}:{spikes[:,0][jumps] + 1}"
 
 
 @pytest.mark.parametrize("x,y,b,s", BOARDS)
@@ -133,6 +135,9 @@ def test_run(x, y, b, s):
             f.write("spalloc_server = None\n")
             f.write(f"machine_name = {job.get_root_host()}\n")
             f.write("version = 5\n")
+            f.write("\n")
+            f.write("[Reports]\n")
+            f.write("read_provenance_data = False")
         do_run(s)
         # If no errors we will get here and we can remove the tree;
         # then only error folders will be left
@@ -141,14 +146,4 @@ def test_run(x, y, b, s):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    main_boards = [(0, 0, 0)]
-    main_sets = [0]
-    for b_x, b_y, b_b in main_boards:
-        for s_s in main_sets:
-            print("", file=sys.stderr,)
-            print(f"************ Testing {b_x}, {b_y}, {b_b} ****************",
-                  file=sys.stderr)
-            try:
-                test_run(b_x, b_y, b_b, s_s)
-            except Exception:
-                traceback.print_exc()
+    do_run(0)
