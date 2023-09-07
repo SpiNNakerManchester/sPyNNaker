@@ -99,12 +99,12 @@ class ProjectionApplicationEdge(
         "__is_neuromodulation")
 
     def __init__(
-            self, pre_vertex: AbstractPopulationVertex,
+            self, pre_vertex: PopulationApplicationVertex,
             post_vertex: AbstractPopulationVertex,
             synapse_information: SynapseInformation,
             label: Optional[str] = None):
         """
-        :param AbstractPopulationVertex pre_vertex:
+        :param PopulationApplicationVertex pre_vertex:
         :param AbstractPopulationVertex post_vertex:
         :param SynapseInformation synapse_information:
             The synapse information on this edge
@@ -130,9 +130,9 @@ class ProjectionApplicationEdge(
         is_neuromodulation = are_dynamics_neuromodulation(dynamics)
         if is_neuromodulation != self.__is_neuromodulation:
             raise SynapticConfigurationException(
-                "Cannot mix neuromodulated and non-neuromodulated synapses"
-                f" between the same source Population {self._pre_vertex} and"
-                f" target Population {self._post_vertex}")
+                "Cannot mix neuromodulated and non-neuromodulated synapses "
+                f"between the same source Population {self._pre_vertex} and "
+                f"target Population {self._post_vertex}")
         self.__synapse_information.append(synapse_information)
 
     @property
@@ -182,12 +182,9 @@ class ProjectionApplicationEdge(
     @property
     @overrides(ApplicationEdge.pre_vertex)
     def pre_vertex(self) -> PopulationApplicationVertex:
-        return cast('PopulationApplicationVertex', super().pre_vertex)
+        return cast(PopulationApplicationVertex, super().pre_vertex)
 
     @property
     @overrides(ApplicationEdge.post_vertex)
     def post_vertex(self) -> AbstractPopulationVertex:
-        # Circularity
-        from spynnaker.pyNN.models.neuron import (
-            AbstractPopulationVertex as APV)
-        return cast(APV, super().post_vertex)
+        return cast('AbstractPopulationVertex', super().post_vertex)

@@ -14,7 +14,7 @@
 from __future__ import annotations
 import logging
 from typing import (
-    Iterator, List, Optional, Set, Type, Union, TYPE_CHECKING)
+    Iterator, List, Optional, Set, Tuple, Type, Union, TYPE_CHECKING)
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.data import FecDataView
 from spynnaker import _version
@@ -233,7 +233,7 @@ class SpynnakerDataView(FecDataView):
     @classmethod
     def set_number_of_neurons_per_dimension_per_core(
             cls, neuron_type: Type[AbstractPyNNModel],
-            max_permitted: Union[int, tuple, None]):
+            max_permitted: Union[int, Tuple[int, ...], None]):
         """
         Sets a ceiling on the number of neurons of a given type that can be
         placed on a single core for each dimension.

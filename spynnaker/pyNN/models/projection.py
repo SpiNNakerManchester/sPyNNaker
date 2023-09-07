@@ -125,8 +125,7 @@ class Projection(object):
             space = PyNNSpace()
         connector.set_space(space)
 
-        pre_vertex = cast(AbstractPopulationVertex,
-                          pre_synaptic_population._vertex)
+        pre_vertex = pre_synaptic_population._vertex
         post_vertex = cast(AbstractPopulationVertex,
                            post_synaptic_population._vertex)
 

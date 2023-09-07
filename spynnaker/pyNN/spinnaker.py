@@ -132,13 +132,13 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     def __writer(self) -> SpynnakerDataWriter:
         return cast(SpynnakerDataWriter, self._data_writer)
 
-    def _clear_and_run(self, run_time: Union[int, float],
+    def _clear_and_run(self, run_time: Union[int, float, None],
                        sync_time: float = 0.0):
         """
         Clears the projections and Run the model created.
 
         :param run_time: the time (in milliseconds) to run the simulation for
-        :type run_time: float or int
+        :type run_time: float or int or None
         :param float sync_time:
             If not 0, this specifies that the simulation should pause after
             this duration.  The continue_simulation() method must then be
@@ -147,7 +147,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # extra post prerun algorithms
         self.__flush_post_vertex_caches()
 
-        super(SpiNNaker, self).run(int(run_time), sync_time)
+        rt = None if run_time is None else int(run_time)
+        super(SpiNNaker, self).run(rt, sync_time)
         # extra post run algorithms
         self.__flush_post_vertex_caches()
 
@@ -156,7 +157,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         for projection in self.__writer.iterate_projections():
             projection._clear_cache()
 
-    def run(self, run_time, sync_time=0.0):
+    def run(self, run_time: Optional[float], sync_time: float = 0.0):
         """
         Run the simulation for a span of simulation time.
 
@@ -164,7 +165,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         self._clear_and_run(run_time, sync_time)
 
-    def run_until(self, tstop):
+    def run_until(self, tstop: float):
         """
         Run the simulation until the given simulation time.
 
@@ -173,7 +174,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # Build data
         self._clear_and_run(tstop - self.t)
 
-    def clear(self):
+    def clear(self) -> None:
         """
         Clear the current recordings and reset the simulation.
         """
@@ -183,7 +184,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # Stop any currently running SpiNNaker application
         self.stop()
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Reset the state of the current network to time t = 0.
         """
@@ -200,7 +201,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         AbstractSpinnakerBase.reset(self)
 
     @property
-    def state(self):
+    def state(self) -> 'SpiNNaker':
         """
         Used to bypass the dual level object.
 
@@ -210,7 +211,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return self
 
     @property
-    def mpi_rank(self):
+    def mpi_rank(self) -> int:
         """
         The MPI rank of the simulator.
 
@@ -231,7 +232,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
 
     @property
-    def num_processes(self):
+    def num_processes(self) -> int:
         """
         The number of MPI worker processes.
 
@@ -252,7 +253,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
 
     @property
-    def dt(self):
+    def dt(self) -> float:
         """
         The simulation time step in milliseconds.
 
@@ -272,7 +273,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             "We do not support setting dt/ time step except during setup")
 
     @property
-    def t(self):
+    def t(self) -> float:
         """
         The current simulation time in milliseconds.
 
@@ -282,7 +283,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return self.__writer.get_current_run_time_ms()
 
     @property
-    def segment_counter(self):
+    def segment_counter(self) -> int:
         """
         The number of the current recording segment being generated.
 
