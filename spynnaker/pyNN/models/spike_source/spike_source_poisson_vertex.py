@@ -269,7 +269,7 @@ class SpikeSourcePoissonVertex(
         self.__rng = numpy.random.RandomState(seed)
 
         self.__n_profile_samples = get_config_int(
-            "Reports", "n_profile_samples") or 0
+            "Reports", "n_profile_samples")
 
         # Prepare for recording, and to get spikes
         self.__spike_recorder = MultiSpikeRecorder()
@@ -300,7 +300,7 @@ class SpikeSourcePoissonVertex(
 
         if n_colour_bits is None:
             n_colour_bits = get_config_int("Simulation", "n_colour_bits")
-        self.__n_colour_bits = 0 if n_colour_bits is None else n_colour_bits
+        self.__n_colour_bits = n_colour_bits
 
     @overrides(SupportsStructure.set_structure)
     def set_structure(self, structure: BaseStructure):

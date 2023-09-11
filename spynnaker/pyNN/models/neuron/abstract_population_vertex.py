@@ -311,7 +311,7 @@ class AbstractPopulationVertex(
         self.__state_variables = self.__initial_state_variables.copy()
         if n_colour_bits is None:
             self.__n_colour_bits = get_config_int(
-                "Simulation", "n_colour_bits") or 0
+                "Simulation", "n_colour_bits")
         else:
             self.__n_colour_bits = n_colour_bits
 
@@ -337,7 +337,7 @@ class AbstractPopulationVertex(
 
         # Set up for profiling
         self.__n_profile_samples = get_config_int(
-            "Reports", "n_profile_samples") or 0
+            "Reports", "n_profile_samples")
 
         # Set up for incoming
         self.__incoming_projections: Dict[
@@ -561,7 +561,6 @@ class AbstractPopulationVertex(
 
         :rtype: int
         """
-        assert self.__incoming_spike_buffer_size is not None
         return self.__incoming_spike_buffer_size
 
     @property
@@ -946,7 +945,7 @@ class AbstractPopulationVertex(
         return self.__neuron_impl.get_global_weight_scale()
 
     @property
-    def ring_buffer_sigma(self) -> Optional[float]:
+    def ring_buffer_sigma(self) -> float:
         """
         :rtype: float
         """
@@ -957,7 +956,7 @@ class AbstractPopulationVertex(
         self.__ring_buffer_sigma = ring_buffer_sigma
 
     @property
-    def spikes_per_second(self) -> Optional[float]:
+    def spikes_per_second(self) -> float:
         """
         :rtype: float
         """
@@ -1146,8 +1145,8 @@ class AbstractPopulationVertex(
 
         :rtype: list(int)
         """
-        stats = _Stats(self.__neuron_impl, self.__spikes_per_second or 0.0,
-                       self.__ring_buffer_sigma or 0.0)
+        stats = _Stats(self.__neuron_impl, self.__spikes_per_second,
+                       self.__ring_buffer_sigma)
 
         for proj in self.incoming_projections:
             # pylint: disable=protected-access

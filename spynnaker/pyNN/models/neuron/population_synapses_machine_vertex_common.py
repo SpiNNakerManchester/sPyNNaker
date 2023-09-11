@@ -241,7 +241,7 @@ class PopulationSynapsesMachineVertexCommon(
         spec.write_value(base_addr)
         spec.write_value(send_size)
         spec.write_value(get_config_int(
-            "Simulation", "transfer_overhead_clocks") or 200)
+            "Simulation", "transfer_overhead_clocks"))
 
     def _write_key_spec(self, spec: DataSpecificationGenerator):
         """

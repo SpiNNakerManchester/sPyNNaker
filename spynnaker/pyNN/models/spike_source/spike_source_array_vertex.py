@@ -132,7 +132,7 @@ class SpikeSourceArrayVertex(
         # Do colouring
         if n_colour_bits is None:
             self.__n_colour_bits = get_config_int(
-                "Simulation", "n_colour_bits") or 0
+                "Simulation", "n_colour_bits")
         else:
             self.__n_colour_bits = n_colour_bits
 
