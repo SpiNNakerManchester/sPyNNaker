@@ -16,6 +16,7 @@ import logging
 import os
 from typing import Dict, Tuple, Type, TypeVar, TYPE_CHECKING
 from spinn_utilities.config_holder import get_config_str
+from spinn_utilities.config_holder import get_config_str_or_none
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import ApplicationVertex
@@ -60,7 +61,7 @@ def spynnaker_neuron_graph_network_specification_report() -> None:
     # create holders for data
     dot_diagram, exeNotFoundExn = _get_diagram(_GRAPH_TITLE)
 
-    graph_format = get_config_str("Reports", "network_graph_format")
+    graph_format = get_config_str_or_none("Reports", "network_graph_format")
     if graph_format is None:
         graph_format = _GRAPH_FORMAT
         if (SpynnakerDataView.get_n_vertices() +
