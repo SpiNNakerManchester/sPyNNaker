@@ -72,16 +72,18 @@ class MaxRowInfo(object):
     delayed_max_words: int
 
 
-def get_maximum_delay_supported_in_ms(post_vertex_max_delay_ticks: int) -> int:
+def get_maximum_delay_supported_in_ms(
+        post_vertex_max_delay_ticks: int) -> float:
     """
     Get the maximum delay supported by the synapse representation
-    before extensions are required, or `None` if any delay is supported.
+    before extensions are required.
 
     :param int post_vertex_max_delay_ticks: post vertex max delay
-    :rtype: int
+    :return: Maximum delay, in milliseconds.
+    :rtype: float
     """
-    return int(post_vertex_max_delay_ticks *
-               SpynnakerDataView.get_simulation_time_step_ms())
+    return (post_vertex_max_delay_ticks *
+            SpynnakerDataView.get_simulation_time_step_ms())
 
 
 def get_max_row_info(
