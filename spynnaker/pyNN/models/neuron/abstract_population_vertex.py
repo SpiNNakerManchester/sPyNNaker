@@ -286,15 +286,17 @@ class AbstractPopulationVertex(
         else:
             self.__incoming_spike_buffer_size = incoming_spike_buffer_size
 
-        self.__ring_buffer_sigma = ring_buffer_sigma
-        if self.__ring_buffer_sigma is None:
+        if ring_buffer_sigma is None:
             self.__ring_buffer_sigma = get_config_float(
                 "Simulation", "ring_buffer_sigma")
+        else:
+            self.__ring_buffer_sigma = ring_buffer_sigma
 
-        self.__spikes_per_second = spikes_per_second
-        if self.__spikes_per_second is None:
+        if spikes_per_second is None:
             self.__spikes_per_second = get_config_float(
                 "Simulation", "spikes_per_second")
+        else:
+            self.__spikes_per_second = spikes_per_second
 
         self.__drop_late_spikes = drop_late_spikes
         if self.__drop_late_spikes is None:
