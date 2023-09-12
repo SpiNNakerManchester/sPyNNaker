@@ -15,7 +15,6 @@ from __future__ import annotations
 import logging
 import os
 from typing import Dict, Tuple, Type, TypeVar, TYPE_CHECKING
-from spinn_utilities.config_holder import get_config_str
 from spinn_utilities.config_holder import get_config_str_or_none
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
