@@ -22,7 +22,8 @@ from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
 
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.config_holder import get_config_bool, get_config_str
+from spinn_utilities.config_holder import (
+    get_config_bool, get_config_str_or_none)
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -514,7 +515,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         Runs, times and logs the DelaySupportAdder if required.
         """
-        name = get_config_str("Mapping", "delay_support_adder")
+        name = get_config_str_or_none("Mapping", "delay_support_adder")
         if name is None:
             return
         with FecTimer("DelaySupportAdder", TimerWork.OTHER):
