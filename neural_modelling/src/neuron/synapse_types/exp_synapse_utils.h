@@ -60,11 +60,8 @@ static inline void decay_and_init(exp_state_t *state, exp_params_t *params,
 //! \param[in,out] exp_param: The parameter to shape
 static inline void exp_shaping(exp_state_t *exp_param) {
     // decay value according to decay constant
-//	exp_param->synaptic_input_value =
-//			decay_s1615(exp_param->synaptic_input_value, exp_param->decay);
-	// RTN testing
     exp_param->synaptic_input_value =
-            MULT_ROUND_NEAREST_ACCUM(exp_param->synaptic_input_value,
+            MULT_ROUND_STOCHASTIC_ACCUM(exp_param->synaptic_input_value,
                     exp_param->decay);
 }
 
@@ -73,9 +70,6 @@ static inline void exp_shaping(exp_state_t *exp_param) {
 //! \param[in,out] parameter: the parameter to update
 //! \param[in] input: the input to add.
 static inline void add_input_exp(exp_state_t *parameter, input_t input) {
-//    parameter->synaptic_input_value = parameter->synaptic_input_value +
-//			decay_s1615(input, parameter->init);
-    // RTN testing
     parameter->synaptic_input_value = parameter->synaptic_input_value +
-            MULT_ROUND_NEAREST_ACCUM(input, parameter->init);
+            MULT_ROUND_STOCHASTIC_ACCUM(input, parameter->init);
 }
