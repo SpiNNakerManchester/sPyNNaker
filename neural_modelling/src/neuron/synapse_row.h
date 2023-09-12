@@ -247,6 +247,12 @@ static inline weight_t synapse_row_sparse_weight(uint32_t x) {
 //! \return the actual input weight for the model
 static inline input_t synapse_row_convert_weight_to_input(
         weight_t weight, REAL min_weight) {
+//    // Simply doing weight * min_weight adds unnecessary compiler instructions
+//    uint64_t mw = (uint64_t) bitsk(min_weight);
+//    uint64_t w = (uint64_t) (weight);
+//
+//    return kbits((int_k_t) (mw * w));
+
 	// Stochastic rounding requires accums so convert weight to appropriate
 	// value before multiplying
 	return MULT_ROUND_STOCHASTIC_ACCUM(kbits(weight << 15), min_weight);
