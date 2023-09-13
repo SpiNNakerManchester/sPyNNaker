@@ -254,7 +254,7 @@ class PopulationMachineSynapses(
 
     def get_connections_from_machine(
             self, placement: Placement, app_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation) -> NDArray:
+            synapse_info: SynapseInformation) -> Sequence[NDArray]:
         """
         Get the connections from the machine for this vertex.
 
@@ -264,11 +264,10 @@ class PopulationMachineSynapses(
             The edge for which the data is being read
         :param SynapseInformation synapse_info:
             The specific projection within the edge
-        :rtype: ~numpy.ndarray
+        :rtype: list(~numpy.ndarray)
         """
-        return numpy.concatenate(
-            self._synaptic_matrices.get_connections_from_machine(
-                placement, app_edge, synapse_info))
+        return self._synaptic_matrices.get_connections_from_machine(
+            placement, app_edge, synapse_info)
 
     @property
     @overrides(AbstractSynapseExpandable.max_gen_data)
