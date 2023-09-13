@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-import numpy
 from numpy import floating
 from numpy.typing import NDArray
 from typing import List, Sequence, Tuple, TYPE_CHECKING
