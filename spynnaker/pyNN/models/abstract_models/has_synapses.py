@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 from numpy.typing import NDArray
-from typing import TYPE_CHECKING
+from typing import Sequence, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.placements import Placement
 if TYPE_CHECKING:
@@ -25,7 +25,7 @@ class HasSynapses(object, metaclass=AbstractBase):
     @abstractmethod
     def get_connections_from_machine(
             self, placement: Placement, app_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation) -> NDArray:
+            synapse_info: SynapseInformation) -> Sequence[NDArray]:
         """
         Get the connections from the machine for this vertex.
 
@@ -35,6 +35,6 @@ class HasSynapses(object, metaclass=AbstractBase):
             The edge for which the data is being read
         :param SynapseInformation synapse_info:
             The specific projection within the edge
-        :rtype: ~numpy.ndarray
+        :rtype: list(~numpy.ndarray)
         """
         raise NotImplementedError

@@ -251,20 +251,10 @@ class PopulationMachineSynapses(
     def connection_generator_region(self) -> int:
         return self._synapse_regions.connection_builder
 
+    @overrides(HasSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, placement: Placement, app_edge: ProjectionApplicationEdge,
             synapse_info: SynapseInformation) -> Sequence[NDArray]:
-        """
-        Get the connections from the machine for this vertex.
-
-        :param ~pacman.model.placements.Placement placements:
-            Where the connection data is on the machine
-        :param ProjectionApplicationEdge app_edge:
-            The edge for which the data is being read
-        :param SynapseInformation synapse_info:
-            The specific projection within the edge
-        :rtype: list(~numpy.ndarray)
-        """
         return self._synaptic_matrices.get_connections_from_machine(
             placement, app_edge, synapse_info)
 
