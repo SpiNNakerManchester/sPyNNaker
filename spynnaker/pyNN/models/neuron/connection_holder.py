@@ -12,18 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import collections
 import numpy
 from numpy.lib.recfunctions import merge_arrays
 from numpy.typing import NDArray
 from typing import (
-    Callable, Iterator, List, Optional, Sequence, Tuple, Union)
-from typing_extensions import TypeAlias
+    Any, Callable, Iterator, List, Optional, Sequence, Tuple, Union)
+from typing_extensions import TypeAlias, TypeGuard
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     ConnectionsArray)
 
 _ItemType: TypeAlias = numpy.floating
 _Items: TypeAlias = Union[Tuple[NDArray[_ItemType], ...], NDArray[_ItemType]]
+
+
+def _is_listable(value: Any) -> TypeGuard[Sequence[Any]]:
+    return hasattr(value, "__len__")
 
 
 class ConnectionHolder(object):
@@ -200,12 +203,13 @@ class ConnectionHolder(object):
                     connections[order][self.__data_items_to_return[0]]
 
             # Return in a format which can be understood by a FromListConnector
-            items: List[NDArray[_ItemType]] = []
+            items: List[Any] = []
+            # NB: The types in here are all wrong, but that's
             for data_item in data_items:
-                data_item_list = data_item
-                if isinstance(data_item_list, collections.abc.Sequence):
-                    data_item_list = list(data_item)
-                items.append(data_item_list)
+                if _is_listable(data_item):
+                    items.append(list(data_item))
+                else:
+                    items.append(data_item)
             self.__data_items = tuple(items)
 
         else:
