@@ -21,6 +21,8 @@ from typing import List, Optional, Sequence, cast
 
 from spinn_utilities.overrides import overrides
 from pacman.model.placements import Placement
+from pacman.model.graphs.common import Slice
+from pacman.model.resources import AbstractSDRAM
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -33,9 +35,7 @@ from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
 from .abstract_population_vertex import AbstractPopulationVertex
-from pacman.model.resources.abstract_sdram import AbstractSDRAM
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
-from pacman.model.graphs.common.slice import Slice
 
 
 class LocalOnlyProvenance(ctypes.LittleEndianStructure):
