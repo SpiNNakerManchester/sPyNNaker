@@ -27,8 +27,8 @@ class TestIFCurrDeltaSTDP(BaseTestCase):
 
         # Spikes set so the calculated weights for each STDP projection
         # should be identical
-        spike_times1 = [[1,27,55], [1,27,55]]
-        spike_times2 = [[1,33,59], [1,33,59]]
+        spike_times1 = [[1, 27, 55], [1, 27, 55]]
+        spike_times2 = [[1, 33, 59], [1, 33, 59]]
         training_times = [28]
         save_spike_times = [90]
         runtime = save_spike_times[-1] + 10
@@ -123,8 +123,8 @@ class TestIFCurrDeltaSTDP(BaseTestCase):
 
         # Spikes set so the calculated weights for each STDP projection
         # should be identical
-        spike_times1 = [[1,27,51], [1,27,51]]
-        spike_times2 = [[1,33,60], [1,33,60]]
+        spike_times1 = [[1, 27, 51], [1, 27, 51]]
+        spike_times2 = [[1, 33, 60], [1, 33, 60]]
         training_times = [28]
         save_spike_times = [90]
         runtime = save_spike_times[-1] + 10
