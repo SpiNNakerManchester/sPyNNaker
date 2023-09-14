@@ -676,7 +676,11 @@ class PopulationView(PopulationBase):
 
     @property
     def _is_contiguous(self) -> bool:
-        return len(self.__indexes) == 2
+        cont = range(self.__indexes[0], self.__indexes[-1] + 1)
+        # self.__indexes is likely a range too so test direct first
+        if self.__indexes == cont:
+            return True
+        return tuple(self.__indexes) == tuple(cont)
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, PopulationView):
