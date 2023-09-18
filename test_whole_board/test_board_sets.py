@@ -109,12 +109,12 @@ def do_run(sender_board):
             f"No spikes for {receiver_pop.label}:{spikes[:,0][jumps] + 1}"
 
 
-@pytest.mark.parametrize("x,y,b,s", BOARDS)
-def test_run(x, y, b, s):
+@pytest.mark.parametrize("x,y,s", BOARDS)
+def test_run(x, y, s):
     test_dir = os.path.dirname(__file__)
     client = SpallocClient(SPALLOC_URL, SPALLOC_USERNAME, SPALLOC_PASSWORD)
     job = client.create_job_rect_at_board(
-        WIDTH, HEIGHT, triad=(x, y, b), machine_name=SPALLOC_MACHINE)
+        WIDTH, HEIGHT, triad=(x, y, 0), machine_name=SPALLOC_MACHINE)
     with job:
         job.launch_keepalive_task()
         # Wait for not queued for up to 30 seconds
@@ -122,12 +122,12 @@ def test_run(x, y, b, s):
         # If queued or destroyed skip test
         if state == SpallocState.QUEUED:
             job.destroy("Queued")
-            pytest.skip(f"Some boards starting at {x}, {y}, {b} is in use")
+            pytest.skip(f"Some boards starting at {x}, {y}, 0 is in use")
         elif state == SpallocState.DESTROYED:
-            pytest.skip(f"Boards {x}, {y}, {b} could not be allocated")
+            pytest.skip(f"Boards {x}, {y}, 0 could not be allocated")
         # Actually wait for ready now (as might be powering on)
         job.wait_until_ready()
-        tmpdir = tempfile.mkdtemp(prefix=f"{x}_{y}_{b}", dir=test_dir)
+        tmpdir = tempfile.mkdtemp(prefix=f"{x}_{y}_0", dir=test_dir)
         os.chdir(tmpdir)
         with open("spynnaker.cfg", "w", encoding="utf-8") as f:
             f.write("[Machine]\n")
