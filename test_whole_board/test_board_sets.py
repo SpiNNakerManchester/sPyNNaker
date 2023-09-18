@@ -26,10 +26,9 @@ from spinnman.spalloc import SpallocClient, SpallocState
 from unittest.case import SkipTest
 
 
-BOARDS = [(bx, by, bb, ss)
+BOARDS = [(bx, by, ss)
           for bx in range(20)
           for by in range(20)
-          for bb in range(3)
           for ss in range(3)]
 SPALLOC_URL = "https://spinnaker.cs.man.ac.uk/spalloc"
 SPALLOC_USERNAME = "jenkins"
