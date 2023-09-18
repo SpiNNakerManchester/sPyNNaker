@@ -166,26 +166,6 @@ static inline post_event_window_t post_events_next(
     return window;
 }
 
-
-//! \brief Advance a post-synaptic event window to the next (delayed) event
-//! \param[in] window: The window to advance
-//! \param[in] delayed_time: The delayed time
-//! \return the advanced window
-static inline post_event_window_t post_events_next_delayed(
-        post_event_window_t window, uint32_t delayed_time) {
-
-    // Update previous time and increment next time
-    window.prev_time = delayed_time;
-    window.prev_trace = *window.next_trace++;
-
-    // Go onto next event
-    window.next_time++;
-
-    // Decrement remaining events
-    window.num_events--;
-    return window;
-}
-
 //---------------------------------------
 //! \brief Add a post-synaptic event to the history
 //! \param[in] time: the time of the event

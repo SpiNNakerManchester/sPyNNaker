@@ -126,13 +126,13 @@ static inline final_state_t plasticity_update_synapse(
 					last_pre_trace, post_window.prev_time, post_window.prev_trace,
 					current_state);
 
-            pre_window = post_events_next_delayed(pre_window, delayed_pre_time);
+            pre_window = post_events_next(pre_window);
 
         }
 
 
         // Go onto next event
-        post_window = post_events_next_delayed(post_window, delayed_post_time);
+        post_window = post_events_next(post_window);
     }
 
     // **************
@@ -168,7 +168,7 @@ static inline final_state_t plasticity_update_synapse(
 				last_pre_trace, fwd_post_window.prev_time, fwd_post_window.prev_trace,
 				current_state);
 
-    	fwd_post_window = post_events_next_delayed(fwd_post_window, delayed_mf_time);
+    	fwd_post_window = post_events_next(fwd_post_window);
     }
 
     // **************
