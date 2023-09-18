@@ -194,7 +194,7 @@ def test_get_connected():
     # pylint: disable=protected-access
     pre_pop._vertex = pre_vertex
     post_pop._vertex = post_vertex
-    s_info = SynapseInformation(None, pre_pop, post_pop, False, False, None,
+    s_info = SynapseInformation(None, pre_pop, post_pop, False, False,
                                 None, 1, None, None, 1.0, 1.0)
     connected = connector.get_connected_vertices(
         s_info, pre_vertex, post_vertex)
