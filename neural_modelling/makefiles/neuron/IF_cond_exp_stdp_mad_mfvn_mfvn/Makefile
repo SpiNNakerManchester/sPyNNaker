@@ -14,15 +14,15 @@
 
 APP = $(notdir $(CURDIR))
 
-NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_lif_t_last_impl.h
+NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.h
 INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_conductance.h
 NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard.h
 THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_static.h
 SYNAPSE_TYPE_H = $(NEURON_DIR)/neuron/synapse_types/synapse_types_exponential_impl.h
-SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/stdp/synapse_dynamics_stdp_mad_pfpc_impl.c
-TIMING_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_pfpc_impl.c
-TIMING_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_pfpc_impl.h
-WEIGHT_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_pfpc_impl.c
-WEIGHT_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_pfpc_impl.h
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/stdp/synapse_dynamics_stdp_mad_mfvn_impl.c
+TIMING_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_mfvn_impl.c
+TIMING_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_mfvn_impl.h
+WEIGHT_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_mfvn_impl.c
+WEIGHT_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_mfvn_impl.h
 
 include ../neural_build.mk

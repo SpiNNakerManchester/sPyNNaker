@@ -19,7 +19,6 @@ MODELS = IF_curr_exp \
          IF_curr_exp_dual \
          IZK_cond_exp_dual \
          IF_curr_delta \
-         IF_cond_exp_cerebellum \
          IF_curr_exp_ca2_adaptive
 
 ifneq ($(SPYNNAKER_DEBUG), DEBUG)

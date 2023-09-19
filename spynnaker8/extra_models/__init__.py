@@ -33,10 +33,7 @@ from spynnaker.pyNN.models.neuron.builds import (
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
 from spynnaker.pyNN.utilities.utility_calls import moved_in_v7
 
-# ICub VOR imports
-from spynnaker.pyNN.models.neuron.builds.if_cond_exp_cerebellum import \
-    IFCondExpCerebellum
-# Cerebellum Plasticity
+# ICub VOR imports - Cerebellum Plasticity
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependencePFPC as TimingDependencePFPC)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
@@ -50,7 +47,6 @@ __all__ = [
     # sPyNNaker 8 models
     'IFCurDelta', 'IFCurrExpCa2Adaptive', 'IFCondExpStoc',
     'Izhikevich_cond', 'IF_curr_dual_exp', 'IF_curr_exp_sEMD',
-    "IFCondExpCerebellum",  # ICub VOR neuron model
 
     # Neuromodulation synapse dynamics (Mantas Mikaitis)
     'Neuromodulation',

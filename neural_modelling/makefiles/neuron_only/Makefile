@@ -23,7 +23,6 @@ MODELS = IF_curr_exp_neuron\
          IF_curr_delta_neuron\
          IF_curr_alpha_neuron\
          IF_cond_exp_stoc_neuron\
-         IF_cond_exp_cerebellum_neuron\
          external_device_lif_control_neuron
 
 all:
