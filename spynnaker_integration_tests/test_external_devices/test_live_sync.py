@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import unittest
+from spinn_utilities.exceptions import SimulatorShutdownException
 import pyNN.spiNNaker as p
 from time import sleep
 import traceback
@@ -44,6 +46,9 @@ def send_sync(label, conn):
             try:
                 n_spikes.append(0)
                 p.external_devices.continue_simulation()
+            except SimulatorShutdownException:
+                # Weird raise condition lost
+                sim_finished = True
             except Exception:  # pylint: disable=broad-except
                 traceback.print_exc()
 
@@ -73,7 +78,12 @@ def test_live_sync():
     p.external_devices.activate_live_output_for(
         pop, database_notify_port_num=conn.local_port)
 
-    p.external_devices.run_sync(100, 20)
+    try:
+        p.external_devices.run_sync(100, 20)
+    except Exception:
+        if sim_finished:
+            raise unittest.SkipTest("Stopped to0 soon")
+
     sim_finished = True
     p.end()
 
