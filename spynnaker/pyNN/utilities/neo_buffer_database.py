@@ -96,19 +96,18 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         .. note::
             The database must be writable for this to work!
         """
-        with self.transaction() as cursor:
-            # t_stop intentionally left None to show no run data
-            cursor.execute(
-                """
-                INSERT INTO segment
-                    (simulation_time_step_ms, segment_number, rec_datetime,
-                     dt, simulator)
-                 VALUES (?, ?, ?, ?, ?)
-                """, [SpynnakerDataView.get_simulation_time_step_ms(),
-                      SpynnakerDataView.get_segment_counter(),
-                      datetime.now(),
-                      SpynnakerDataView.get_simulation_time_step_ms(),
-                      SpynnakerDataView.get_sim_name()])
+        # t_stop intentionally left None to show no run data
+        self._execute(
+            """
+            INSERT INTO segment
+                (simulation_time_step_ms, segment_number, rec_datetime,
+                 dt, simulator)
+             VALUES (?, ?, ?, ?, ?)
+            """, [SpynnakerDataView.get_simulation_time_step_ms(),
+                  SpynnakerDataView.get_segment_counter(),
+                  datetime.now(),
+                  SpynnakerDataView.get_simulation_time_step_ms(),
+                  SpynnakerDataView.get_sim_name()])
 
     def write_t_stop(self):
         """
@@ -121,18 +120,16 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             The database must be writable for this to work!
         """
         t_stop = SpynnakerDataView.get_current_run_time_ms()
-        with self.transaction() as cursor:
-            cursor.execute(
-                """
-                UPDATE segment
-                SET t_stop = ?
-                """, (t_stop, ))
+        self._execute(
+            """
+            UPDATE segment
+            SET t_stop = ?
+            """, (t_stop, ))
 
-    def __get_segment_info(self, cursor):
+    def __get_segment_info(self):
         """
         Gets the metadata for the segment.
 
-        :param ~sqlite3.Cursor cursor:
         :return: segment number, record time, last run time recorded,
             simulator timestep in ms, simulator name
         :rtype: tuple(int, ~datetime.datetime, float, float, str)
@@ -140,7 +137,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        for row in cursor.execute(
+        for row in self._execute(
                 """
                 SELECT segment_number, rec_datetime, t_stop, dt, simulator
                 FROM segment
@@ -158,18 +155,17 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         raise ConfigurationException(
             "No recorded data. Did the simulation run?")
 
-    def __get_simulation_time_step_ms(self, cursor):
+    def __get_simulation_time_step_ms(self):
         """
         The simulation time step, in milliseconds.
 
         The value that would be/have been returned by
         SpynnakerDataView.get_simulation_time_step_ms()
 
-        :param ~sqlite3.Cursor cursor:
         :rtype: float
         :return: The timestep
         """
-        for row in cursor.execute(
+        for row in self._execute(
                 """
                 SELECT simulation_time_step_ms
                 FROM segment
@@ -178,8 +174,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             return row["simulation_time_step_ms"]
         raise ConfigurationException("No segment data")
 
-    def __get_population_id(
-            self, cursor, pop_label, population):
+    def __get_population_id(self, pop_label, population):
         """
         Gets an ID for this population label.
         Will create a new population if required.
@@ -187,7 +182,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         For speed does not verify the additional fields if a record already
         exists.
 
-        :param ~sqlite3.Cursor cursor:
         :param str pop_label: The label for the population of interest
 
             .. note::
@@ -199,24 +193,24 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             the population to record for
         :return: The ID
         """
-        for row in cursor.execute(
+        for row in self._execute(
                 """
                 SELECT pop_id FROM population
                 WHERE label = ?
                 LIMIT 1
                 """, (pop_label,)):
             return row["pop_id"]
-        cursor.execute(
+        self._execute(
             """
             INSERT INTO population
             (label, first_id, description, pop_size)
             VALUES (?, ?, ?, ?)
             """, (pop_label, population.first_id, population.describe(),
                   population.size))
-        return cursor.lastrowid
+        return self._lastrowid
 
     def __get_recording_id(
-            self, cursor, pop_label, variable, population,
+            self, pop_label, variable, population,
             sampling_interval_ms, data_type, buffered_type, units,
             n_colour_bits):
         """
@@ -226,7 +220,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         For speed does not verify the additional fields if a record already
         exists.
 
-        :param ~sqlite3.Cursor cursor:
         :param str pop_label: The label for the population of interest
 
             .. note::
@@ -248,19 +241,19 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param int n_colour_bits:
         :return: The ID
         """
-        for row in cursor.execute(
+        for row in self._execute(
                 """
                 SELECT rec_id FROM recording_view
                 WHERE label = ? AND variable = ?
                 LIMIT 1
                 """, (pop_label, variable)):
             return row["rec_id"]
-        pop_id = self.__get_population_id(cursor, pop_label, population)
+        pop_id = self.__get_population_id(pop_label, population)
         if data_type:
             data_type_name = data_type.name
         else:
             data_type_name = None
-        cursor.execute(
+        self._execute(
             """
             INSERT INTO recording
             (pop_id, variable, data_type, buffered_type, t_start,
@@ -268,13 +261,12 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             VALUES (?, ?, ?, ?, 0, ?, ?, ?)
             """, (pop_id, variable, data_type_name, str(buffered_type),
                   sampling_interval_ms, units, n_colour_bits))
-        return cursor.lastrowid
+        return self._lastrowid
 
-    def __get_population_metadata(self, cursor, pop_label):
+    def __get_population_metadata(self, pop_label):
         """
         Gets the metadata for the population with this label
 
-        :param ~sqlite3.Cursor cursor:
         :param str pop_label: The label for the population of interest
 
             .. note::
@@ -288,7 +280,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        for row in cursor.execute(
+        for row in self._execute(
                 """
                 SELECT pop_size, first_id, description
                 FROM population
@@ -316,8 +308,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        with self.transaction() as cursor:
-            return self.__get_population_metadata(cursor, pop_label)
+        return self.__get_population_metadata(pop_label)
 
     def get_recording_populations(self):
         """
@@ -333,13 +324,12 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :rtype: list(str)
         """
         results = []
-        with self.transaction() as cursor:
-            for row in cursor.execute(
-                    """
-                    SELECT label
-                    FROM population
-                    """):
-                results.append(str(row["label"], 'utf-8'))
+        for row in self._execute(
+                """
+                SELECT label
+                FROM population
+                """):
+            results.append(str(row["label"], 'utf-8'))
         return results
 
     def get_population(self, pop_label):
@@ -383,12 +373,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         :return: List of variable names
         """
-        with self.transaction() as cursor:
-            return self.__get_recording_variables(pop_label, cursor)
+        return self.__get_recording_variables(pop_label)
 
-    def __get_recording_variables(self, pop_label, cursor):
+    def __get_recording_variables(self, pop_label):
         """
-        :param ~sqlite3.Cursor cursor:
         :param str pop_label: The label for the population of interest
 
             .. note::
@@ -401,7 +389,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :rtype: list(str)
         """
         results = []
-        for row in cursor.execute(
+        for row in self._execute(
                 """
                 SELECT variable
                 FROM recording_view
@@ -431,17 +419,15 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        with self.transaction() as cursor:
-            info = self.__get_recording_metadeta(cursor, pop_label, variable)
-            (_, datatype, _, _, sampling_interval_ms, _, units) = info
-            return (datatype, sampling_interval_ms, units)
+        info = self.__get_recording_metadeta(pop_label, variable)
+        (_, datatype, _, _, sampling_interval_ms, _, units) = info
+        return (datatype, sampling_interval_ms, units)
 
-    def __get_recording_metadeta(self, cursor, pop_label, variable):
+    def __get_recording_metadeta(self, pop_label, variable):
         """
         Gets the metadata id for this population and recording label
         combination.
 
-        :param ~sqlite3.Cursor cursor:
         :param str pop_label: The label for the population of interest
 
             .. note::
@@ -459,7 +445,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        for row in cursor.execute(
+        for row in self._execute(
                 """
                 SELECT rec_id,  data_type, buffered_type,  t_start,
                        sampling_interval_ms, pop_size, units, n_colour_bits
@@ -483,15 +469,14 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         raise ConfigurationException(
             f"No metadata for {variable} on {pop_label}")
 
-    def __get_region_metadata(self, cursor, rec_id):
+    def __get_region_metadata(self, rec_id):
         """
-        :param ~sqlite3.Cursor cursor:
         :param int rec_id:
         :return:
             region_id, neurons, vertex_slice, selective_recording, base_key
         :rtype: iterable(tuple(int, ~numpy.ndarray, Slice, bool, int))
         """
-        rows = list(cursor.execute(
+        rows = list(self._execute(
             """
             SELECT region_id, recording_neurons_st, vertex_slice, base_key
             FROM region_metadata
@@ -515,12 +500,11 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             index += 1
 
     def __get_spikes_by_region(
-            self, cursor, region_id, neurons, simulation_time_step_ms,
+            self, region_id, neurons, simulation_time_step_ms,
             selective_recording, spike_times, spike_ids):
         """
         Adds spike data for this region to the lists.
 
-        :param ~sqlite3.Cursor cursor:
         :param int region_id: Region data came from
         :param array(int) neurons: mapping of local ID to global ID
         :param float simulation_time_step_ms:
@@ -535,7 +519,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         n_bytes = n_words * BYTES_PER_WORD
         n_words_with_timestamp = n_words + 1
 
-        record_raw = self._read_contents(cursor, region_id)
+        record_raw = self._read_contents(region_id)
 
         if len(record_raw) == 0:
             return
@@ -560,36 +544,34 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             spike_ids.extend(indices)
             spike_times.extend(times)
 
-    def __get_neuron_spikes(self, cursor, rec_id):
+    def __get_neuron_spikes(self, rec_id):
         """
         Gets the spikes for this population/recording ID.
 
-        :param ~sqlite3.Cursor cursor:
         :param int rec_id:
         :return: numpy array of spike IDs and spike times, all IDs recording
         :rtype: tuple(~numpy.ndarray, list(int))
         """
         spike_times = list()
         spike_ids = list()
-        simulation_time_step_ms = self.__get_simulation_time_step_ms(cursor)
+        simulation_time_step_ms = self.__get_simulation_time_step_ms()
         indexes = []
         for region_id, neurons, _, selective_recording, _, _ in \
-                self.__get_region_metadata(cursor, rec_id):
+                self.__get_region_metadata(rec_id):
             indexes.extend(neurons)
             self.__get_spikes_by_region(
-                cursor, region_id, neurons, simulation_time_step_ms,
+                region_id, neurons, simulation_time_step_ms,
                 selective_recording, spike_times, spike_ids)
 
         result = numpy.column_stack((spike_ids, spike_times))
         return result[numpy.lexsort((spike_times, spike_ids))], indexes
 
     def __get_eieio_spike_by_region(
-            self, cursor, region_id, simulation_time_step_ms, base_key,
+            self, region_id, simulation_time_step_ms, base_key,
             vertex_slice, n_colour_bits, results):
         """
         Adds spike data for this region to the list.
 
-        :param ~sqlite3.Cursor cursor:
         :param int region_id: Region data came from
         :param float simulation_time_step_ms:
         :param int base_key:
@@ -598,7 +580,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :return: all recording indexes spikes or not
         :rtype: list(int)
         """
-        spike_data = self._read_contents(cursor, region_id)
+        spike_data = self._read_contents(region_id)
 
         number_of_bytes_written = len(spike_data)
         offset = 0
@@ -630,27 +612,26 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         return slice_ids
 
-    def __get_eieio_spikes(self, cursor, rec_id, n_colour_bits):
+    def __get_eieio_spikes(self, rec_id, n_colour_bits):
         """
         Gets the spikes for this population/recording ID.
 
-        :param ~sqlite3.Cursor cursor:
         :param int rec_id:
         :param int n_colour_bits:
         :return: numpy array of spike IDs and spike times, all IDs recording
         :rtype: tuple(~numpy.ndarray, list(int))
         """
-        simulation_time_step_ms = self.__get_simulation_time_step_ms(cursor)
+        simulation_time_step_ms = self.__get_simulation_time_step_ms()
         results = []
         indexes = []
 
         for region_id, _, vertex_slice, selective_recording, base_key, _ in \
-                self.__get_region_metadata(cursor, rec_id):
+                self.__get_region_metadata(rec_id):
             if selective_recording:
                 raise NotImplementedError(
                     "Unable to handle selective recording")
             indexes.extend(self.__get_eieio_spike_by_region(
-                cursor, region_id, simulation_time_step_ms,
+                region_id, simulation_time_step_ms,
                 base_key, vertex_slice, n_colour_bits, results))
 
         if not results:
@@ -659,12 +640,11 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         return result[numpy.lexsort((result[:, 1], result[:, 0]))], indexes
 
     def __get_multi_spikes_by_region(
-            self, cursor, region_id, neurons, simulation_time_step_ms,
+            self, region_id, neurons, simulation_time_step_ms,
             spike_times, spike_ids):
         """
         Adds spike data for this region to the lists.
 
-        :param ~sqlite3.Cursor cursor:
         :param int region_id: Region data came from
         :param ~numpy.ndarray neurons:
         :param float simulation_time_step_ms:
@@ -673,7 +653,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :return: all recording indexes spikes or not
         :rtype: list(int)
         """
-        raw_data = self._read_contents(cursor, region_id)
+        raw_data = self._read_contents(region_id)
 
         n_words = int(math.ceil(len(neurons) / BITS_PER_WORD))
         n_bytes_per_block = n_words * BYTES_PER_WORD
@@ -697,11 +677,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             spike_ids.append(indices)
             spike_times.append(times)
 
-    def __get_multi_spikes(self, cursor, rec_id):
+    def __get_multi_spikes(self, rec_id):
         """
         Gets the spikes for this population/recording ID.
 
-        :param ~sqlite3.Cursor cursor:
         :param int rec_id:
         :return: numpy array of spike IDs and spike times, all IDs recording
         :rtype: tuple(~numpy.ndarray, list(int))
@@ -709,15 +688,15 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         spike_times = list()
         spike_ids = list()
         indexes = []
-        simulation_time_step_ms = self.__get_simulation_time_step_ms(cursor)
+        simulation_time_step_ms = self.__get_simulation_time_step_ms()
         for region_id, neurons, _, selective_recording, _, _ in \
-                self.__get_region_metadata(cursor, rec_id):
+                self.__get_region_metadata(rec_id):
             if selective_recording:
                 raise NotImplementedError(
                     "Unable to handle selective recording")
             indexes.extend(neurons)
             self.__get_multi_spikes_by_region(
-                cursor, region_id, neurons, simulation_time_step_ms,
+                region_id, neurons, simulation_time_step_ms,
                 spike_times, spike_ids)
 
         if not spike_ids:
@@ -749,12 +728,11 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                            variable, missing_list)
         return indexes
 
-    def __get_spikes(self, cursor, rec_id, view_indexes, buffer_type,
+    def __get_spikes(self, rec_id, view_indexes, buffer_type,
                      n_colour_bits, variable):
         """
         Gets the data as a Numpy array for one population and variable.
 
-        :param ~sqlite3.Cursor cursor:
         :param int rec_id:
         :param list(int) view_indexes:
         :param buffer_type:
@@ -766,12 +744,12 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :rtype: tuple(~numpy.ndarray, list(int))
         """
         if buffer_type == BufferDataType.NEURON_SPIKES:
-            spikes, data_indexes = self.__get_neuron_spikes(cursor, rec_id)
+            spikes, data_indexes = self.__get_neuron_spikes(rec_id)
         elif buffer_type == BufferDataType.EIEIO_SPIKES:
             spikes, data_indexes = self.__get_eieio_spikes(
-                cursor, rec_id, n_colour_bits)
+                rec_id, n_colour_bits)
         elif buffer_type == BufferDataType.MULTI_SPIKES:
-            spikes, data_indexes = self.__get_multi_spikes(cursor, rec_id)
+            spikes, data_indexes = self.__get_multi_spikes(rec_id)
         else:
             raise NotImplementedError(buffer_type)
 
@@ -786,12 +764,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         return spikes, indexes
 
-    def __get_matrix_data_by_region(
-            self, cursor, region_id, neurons, data_type):
+    def __get_matrix_data_by_region(self, region_id, neurons, data_type):
         """
         Extracts data for this region.
 
-        :param ~sqlite3.Cursor cursor:
         :param int region_id: Region data came from
         :param array(int) neurons: mapping of local ID to global ID
         :param DataType data_type: type of data to extract
@@ -799,7 +775,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
         """
         # for buffering output info is taken form the buffer manager
-        record_raw = self._read_contents(cursor, region_id)
+        record_raw = self._read_contents(region_id)
         record_length = len(record_raw)
 
         # There is one column for time and one for each neuron recording
@@ -821,11 +797,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         return times, placement_data
 
     def __get_matrix_data(
-            self, cursor, rec_id, data_type, view_indexes, pop_size, variable):
+            self, rec_id, data_type, view_indexes, pop_size, variable):
         """
         Gets the matrix data  for this population/recording ID.
 
-        :param ~sqlite3.Cursor cursor:
         :param int rec_id:
         :param DataType data_type: type of data to extract
         :param view_indexes:
@@ -842,14 +817,14 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         indexes = []
 
         for region_id, neurons, _, _, _, index in \
-                self.__get_region_metadata(cursor, rec_id):
+                self.__get_region_metadata(rec_id):
             if neurons is not None:
                 pop_neurons.extend(neurons)
             else:
                 indexes.append(index)
                 neurons = [index]
             times, data = self.__get_matrix_data_by_region(
-                cursor, region_id, neurons, data_type)
+                region_id, neurons, data_type)
             if signal_array is None:
                 signal_array = data
                 pop_times = times
@@ -884,12 +859,11 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         return signal_array, indexes
 
     def __get_rewires_by_region(
-            self, cursor, region_id, vertex_slice, rewire_values,
+            self, region_id, vertex_slice, rewire_values,
             rewire_postids, rewire_preids, rewire_times, sampling_interval_ms):
         """
         Extracts rewires data for this region and adds it to the lists.
 
-        :param ~sqlite3.Cursor cursor:
         :param int region_id: Region data came from
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             slice of this region
@@ -898,7 +872,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param list(int) rewire_preids:
         :param list(int) rewire_times:
         """
-        record_raw = self._read_contents(cursor, region_id)
+        record_raw = self._read_contents(region_id)
         if len(record_raw) > 0:
             raw_data = (
                 numpy.asarray(record_raw, dtype="uint8").view(
@@ -925,11 +899,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         rewire_preids.extend(pre_ids)
         rewire_times.extend(record_time)
 
-    def __get_rewires(self, cursor, rec_id, sampling_interval_ms):
+    def __get_rewires(self, rec_id, sampling_interval_ms):
         """
         Extracts rewires data for this region.
 
-        :param ~sqlite3.Cursor cursor:
         :param int rec_id:
         :return: (rewire_values, rewire_postids, rewire_preids, rewire_times)
         :rtype: ~numpy.ndarray(tuple(int, int, int, int))
@@ -940,13 +913,12 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         rewire_preids = list()
 
         for region_id, _, vertex_slice, _, _, _ in \
-                self.__get_region_metadata(cursor, rec_id):
+                self.__get_region_metadata(rec_id):
             # as no neurons for "rewires" selective_recording will be true
 
             self.__get_rewires_by_region(
-                cursor, region_id, vertex_slice, rewire_values,
-                rewire_postids, rewire_preids, rewire_times,
-                sampling_interval_ms)
+                region_id, vertex_slice, rewire_values, rewire_postids,
+                rewire_preids, rewire_times, sampling_interval_ms)
 
             if len(rewire_values) == 0:
                 return numpy.zeros((0, 4), dtype="float")
@@ -957,12 +929,11 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             (rewire_values, rewire_postids, rewire_preids, rewire_times))]
 
     def __get_recorded_pynn7(
-            self, cursor, rec_id, data_type, sampling_interval_ms,
+            self, rec_id, data_type, sampling_interval_ms,
             as_matrix, view_indexes, pop_size, variable):
         """
         Get recorded data in PyNN 0.7 format. Must not be spikes.
 
-        :param ~sqlite3.Cursor cursor:
         :param int rec_id:
         :param DataType data_type: type of data to extract
         :param float sampling_interval_ms:
@@ -975,7 +946,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :rtype: ~numpy.ndarray
         """
         data, indexes = self.__get_matrix_data(
-            cursor, rec_id, data_type, view_indexes, pop_size, variable)
+            rec_id, data_type, view_indexes, pop_size, variable)
 
         if as_matrix:
             return data
@@ -999,47 +970,43 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     "Only one type of data at a time is supported")
             variable = variable[0]
 
-        with self.transaction() as cursor:
-            # called to trigger the virtual data warning if applicable
-            self.__get_segment_info(cursor)
-            (rec_id, data_type, buffered_type, _, sampling_interval_ms,
-             pop_size, _, n_colour_bits) = \
-                self.__get_recording_metadeta(cursor, pop_label, variable)
-            if buffered_type == BufferDataType.MATRIX:
-                return self.__get_recorded_pynn7(
-                    cursor, rec_id, data_type, sampling_interval_ms,
-                    as_matrix, view_indexes, pop_size, variable)
-            # NO BufferedDataType.REWIRES get_spike will go boom
-            else:
-                if as_matrix:
-                    logger.warning("Ignoring as matrix for {}", variable)
-                return self.__get_spikes(
-                    cursor, rec_id, view_indexes, buffered_type,
-                    n_colour_bits, variable)[0]
+        # called to trigger the virtual data warning if applicable
+        self.__get_segment_info()
+        (rec_id, data_type, buffered_type, _, sampling_interval_ms,
+         pop_size, _, n_colour_bits) = \
+            self.__get_recording_metadeta(pop_label, variable)
+        if buffered_type == BufferDataType.MATRIX:
+            return self.__get_recorded_pynn7(
+                rec_id, data_type, sampling_interval_ms,
+                as_matrix, view_indexes, pop_size, variable)
+        # NO BufferedDataType.REWIRES get_spike will go boom
+        else:
+            if as_matrix:
+                logger.warning("Ignoring as matrix for {}", variable)
+            return self.__get_spikes(
+                rec_id, view_indexes, buffered_type,
+                n_colour_bits, variable)[0]
 
     def get_spike_counts(self, pop_label, view_indexes=None):
-        with self.transaction() as cursor:
-            # called to trigger the virtual data warning if applicable
-            self.__get_segment_info(cursor)
-            (rec_id, _, buffered_type, _, _, pop_size, _, n_colour_bits) = \
-                self.__get_recording_metadeta(cursor, pop_label, SPIKES)
-            if view_indexes is None:
-                view_indexes = range(pop_size)
+        # called to trigger the virtual data warning if applicable
+        self.__get_segment_info()
+        (rec_id, _, buffered_type, _, _, pop_size, _, n_colour_bits) = \
+            self.__get_recording_metadeta(pop_label, SPIKES)
+        if view_indexes is None:
+            view_indexes = range(pop_size)
 
-            # get_spike will go boom if buffered_type not spikes
-            spikes = self.__get_spikes(
-                cursor, rec_id, view_indexes, buffered_type,
-                n_colour_bits, SPIKES)[0]
+        # get_spike will go boom if buffered_type not spikes
+        spikes = self.__get_spikes(
+            rec_id, view_indexes, buffered_type, n_colour_bits, SPIKES)[0]
         counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
                                 minlength=pop_size)
         return {i: counts[i] for i in view_indexes}
 
     def __add_data(
-            self, cursor, pop_label, variable, segment, view_indexes, t_stop):
+            self, pop_label, variable, segment, view_indexes, t_stop):
         """
         Gets the data as a Numpy array for one population and variable.
 
-        :param ~sqlite3.Cursor cursor:
         :param str pop_label: The label for the population of interest
 
             .. note::
@@ -1057,11 +1024,11 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
          pop_size, units, n_colour_bits) = \
-            self.__get_recording_metadeta(cursor, pop_label, variable)
+            self.__get_recording_metadeta(pop_label, variable)
 
         if buffer_type == BufferDataType.MATRIX:
             signal_array, indexes = self.__get_matrix_data(
-                cursor, rec_id, data_type, view_indexes, pop_size, variable)
+                rec_id, data_type, view_indexes, pop_size, variable)
             sampling_rate = 1000/sampling_interval_ms * quantities.Hz
             t_start = t_start * quantities.ms
             self._insert_matrix_data(
@@ -1071,26 +1038,23 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             if view_indexes is not None:
                 raise SpynnakerException(
                     f"{variable} can not be extracted using a view")
-            event_array = self.__get_rewires(
-                cursor, rec_id, sampling_interval_ms)
+            event_array = self.__get_rewires(rec_id, sampling_interval_ms)
             self._insert_neo_rewirings(segment, event_array, variable)
         else:
             if view_indexes is None:
                 view_indexes = range(pop_size)
             spikes, indexes = self.__get_spikes(
-                cursor, rec_id, view_indexes, buffer_type,
-                n_colour_bits, variable)
+                rec_id, view_indexes, buffer_type, n_colour_bits, variable)
             sampling_rate = 1000 / sampling_interval_ms * quantities.Hz
             self._insert_spike_data(
                 view_indexes, segment, spikes, t_start, t_stop,
                 sampling_rate)
 
-    def __read_and_csv_data(self, cursor, pop_label, variable, csv_writer,
+    def __read_and_csv_data(self, pop_label, variable, csv_writer,
                             view_indexes, t_stop):
         """
         Reads the data for one variable and adds it to the CSV file.
 
-        :param ~sqlite3.Cursor cursor:
         :param str pop_label: The label for the population of interest
 
             .. note::
@@ -1106,14 +1070,14 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
          pop_size, units, n_colour_bits) = \
-            self.__get_recording_metadeta(cursor, pop_label, variable)
+            self.__get_recording_metadeta(pop_label, variable)
 
         if buffer_type == BufferDataType.MATRIX:
             self._csv_variable_metdata(
                 csv_writer, self._MATRIX, variable, t_start, t_stop,
                 sampling_interval_ms, units)
             signal_array, indexes = self.__get_matrix_data(
-                cursor, rec_id, data_type, view_indexes, pop_size, variable)
+                rec_id, data_type, view_indexes, pop_size, variable)
             self._csv_matrix_data(csv_writer, signal_array, indexes)
         elif buffer_type == BufferDataType.REWIRES:
             self._csv_variable_metdata(
@@ -1122,19 +1086,17 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             if view_indexes is not None:
                 raise SpynnakerException(
                     f"{variable} can not be extracted using a view")
-            event_array = self.__get_rewires(
-                cursor, rec_id, sampling_interval_ms)
+            event_array = self.__get_rewires(rec_id, sampling_interval_ms)
             self._csv_rewirings(csv_writer, event_array)
         else:
             self._csv_variable_metdata(
                 csv_writer, self._SPIKES, variable, t_start, t_stop,
                 sampling_interval_ms, units)
             spikes, indexes = self.__get_spikes(
-                cursor, rec_id, view_indexes, buffer_type,
-                n_colour_bits, variable)
+                rec_id, view_indexes, buffer_type, n_colour_bits, variable)
             self._csv_spike_data(csv_writer, spikes, indexes)
 
-    def __get_empty_block(self, cursor, pop_label, annotations):
+    def __get_empty_block(self, pop_label, annotations):
         """
         :param str pop_label: The label for the population of interest
 
@@ -1146,8 +1108,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param variables:
             One or more variable names or `None` for all available
         :type variables: str, list(str) or None
-        :param view_indexes: List of neurons IDs to include or `None` for all
-        :type view_indexes: None or list(int)
         :param annotations: annotations to put on the neo block
         :type annotations: None or dict(str, ...)
         :return: The Neo block
@@ -1156,9 +1116,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        _, _, _, dt, simulator = self.__get_segment_info(cursor)
+        _, _, _, dt, simulator = self.__get_segment_info()
         pop_size, first_id, description = \
-            self.__get_population_metadata(cursor, pop_label)
+            self.__get_population_metadata(pop_label)
         return self._insert_empty_block(
             pop_label, description, pop_size, first_id, dt, simulator,
             annotations)
@@ -1187,8 +1147,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        with self.transaction() as cursor:
-            return self.__get_empty_block(cursor, pop_label, annotations)
+        return self.__get_empty_block(pop_label, annotations)
 
     def get_full_block(self, pop_label, variables, view_indexes, annotations):
         """
@@ -1212,11 +1171,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :return: The Neo block
         :rtype: ~neo.core.Block
         """
-        with self.transaction() as cursor:
-            block = self.__get_empty_block(cursor, pop_label, annotations)
-            self.__add_segment(
-                cursor, block, pop_label, variables, view_indexes)
-            return block
+        block = self.__get_empty_block(pop_label, annotations)
+        self.__add_segment(block, pop_label, variables, view_indexes)
+        return block
 
     def csv_segment(
             self,  csv_file, pop_label, variables, view_indexes=None):
@@ -1246,18 +1203,15 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"',
                                     quoting=csv.QUOTE_MINIMAL)
 
-            with self.transaction() as cursor:
-                segment_number, rec_datetime, t_stop, _, _ = \
-                    self.__get_segment_info(cursor)
-                self._csv_segment_metadata(
-                    csv_writer, segment_number, rec_datetime)
+            segment_number, rec_datetime, t_stop, _, _ = \
+                self.__get_segment_info()
+            self._csv_segment_metadata(
+                csv_writer, segment_number, rec_datetime)
 
-                variables = self.__clean_variables(
-                    variables, pop_label, cursor)
-                for variable in variables:
-                    self.__read_and_csv_data(
-                        cursor, pop_label, variable, csv_writer,
-                        view_indexes, t_stop)
+            variables = self.__clean_variables(variables, pop_label)
+            for variable in variables:
+                self.__read_and_csv_data(
+                    pop_label, variable, csv_writer, view_indexes, t_stop)
 
     def csv_block_metadata(self, csv_file, pop_label, annotations=None):
         """
@@ -1282,13 +1236,12 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"',
                                     quoting=csv.QUOTE_MINIMAL)
 
-            with self.transaction() as cursor:
-                _, _, _, dt, _ = self.__get_segment_info(cursor)
-                pop_size, first_id, description = \
-                    self.__get_population_metadata(cursor, pop_label)
-                self._csv_block_metadat(
-                    csv_writer, pop_label, dt, pop_size, first_id, description,
-                    annotations)
+            _, _, _, dt, _ = self.__get_segment_info()
+            pop_size, first_id, description = \
+                self.__get_population_metadata(pop_label)
+            self._csv_block_metadat(
+                csv_writer, pop_label, dt, pop_size, first_id, description,
+                annotations)
 
     def add_segment(self, block, pop_label, variables, view_indexes=None):
         """
@@ -1310,24 +1263,21 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        with self.transaction() as cursor:
-            self.__add_segment(
-                cursor, block, pop_label, variables, view_indexes)
+        self.__add_segment(block, pop_label, variables, view_indexes)
 
-    def __clean_variables(self, variables, pop_label, cursor):
+    def __clean_variables(self, variables, pop_label):
         if isinstance(variables, str):
             variables = [variables]
         if 'all' in variables:
             variables = None
         if variables is None:
-            variables = self.__get_recording_variables(pop_label, cursor)
+            variables = self.__get_recording_variables(pop_label)
         return variables
 
-    def __add_segment(self, cursor, block, pop_label, variables, view_indexes):
+    def __add_segment(self, block, pop_label, variables, view_indexes):
         """
         Adds a segment to the block.
 
-        :param ~sqlite3.Cursor cursor:
         :param  ~neo.core.Block block:
         :param str pop_label: The label for the population of interest
 
@@ -1346,14 +1296,14 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If the recording metadata not setup correctly
         """
         segment_number, rec_datetime, t_stop, _, _ = \
-            self.__get_segment_info(cursor)
+            self.__get_segment_info()
         segment = self._insert_empty_segment(
             block, segment_number, rec_datetime)
 
-        variables = self.__clean_variables(variables, pop_label, cursor)
+        variables = self.__clean_variables(variables, pop_label)
         for variable in variables:
             self.__add_data(
-                cursor, pop_label, variable, segment, view_indexes, t_stop)
+                pop_label, variable, segment, view_indexes, t_stop)
 
     def clear_data(self, pop_label, variables):
         """
@@ -1372,36 +1322,35 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param list(str) variables: names of variable to get data for
         """
         t_start = SpynnakerDataView.get_current_run_time_ms()
-        with self.transaction() as cursor:
-            variables = self.__clean_variables(variables, pop_label, cursor)
-            for variable in variables:
-                cursor.execute(
-                    """
-                    UPDATE recording SET
-                        t_start = ?
-                    WHERE rec_id in
-                        (SELECT rec_id
-                        FROM recording_view
-                        WHERE label = ? AND variable = ?)
-                    """, (t_start, pop_label, variable))
-                cursor.execute(
-                    """
-                    UPDATE region SET
-                        content = CAST('' AS BLOB), content_len = 0,
-                        fetches = 0, append_time = NULL
-                    WHERE region_id in
-                        (SELECT region_id
-                        FROM region_metadata NATURAL JOIN recording_view
-                        WHERE label = ? AND variable = ?)
-                    """, (pop_label, variable))
-                cursor.execute(
-                    """
-                    DELETE FROM region_extra
-                    WHERE region_id in
-                        (SELECT region_id
-                        FROM region_metadata NATURAL JOIN recording_view
-                        WHERE label = ? AND variable = ?)
-                    """, (pop_label, variable))
+        variables = self.__clean_variables(variables, pop_label)
+        for variable in variables:
+            self._execute(
+                """
+                UPDATE recording SET
+                    t_start = ?
+                WHERE rec_id in
+                    (SELECT rec_id
+                    FROM recording_view
+                    WHERE label = ? AND variable = ?)
+                """, (t_start, pop_label, variable))
+            self._execute(
+                """
+                UPDATE region SET
+                    content = CAST('' AS BLOB), content_len = 0,
+                    fetches = 0, append_time = NULL
+                WHERE region_id in
+                    (SELECT region_id
+                    FROM region_metadata NATURAL JOIN recording_view
+                    WHERE label = ? AND variable = ?)
+                """, (pop_label, variable))
+            self._execute(
+                """
+                DELETE FROM region_extra
+                WHERE region_id in
+                    (SELECT region_id
+                    FROM region_metadata NATURAL JOIN recording_view
+                    WHERE label = ? AND variable = ?)
+                """, (pop_label, variable))
 
     def write_metadata(self):
         """
@@ -1410,13 +1359,12 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         .. note::
             The database must be writable for this to work!
         """
-        with self.transaction() as cursor:
-            for population in SpynnakerDataView.iterate_populations():
-                # pylint: disable=protected-access
-                for variable in population._vertex.get_recording_variables():
-                    self.__write_metadata(cursor, population, variable)
+        for population in SpynnakerDataView.iterate_populations():
+            # pylint: disable=protected-access
+            for variable in population._vertex.get_recording_variables():
+                self.__write_metadata(population, variable)
 
-    def __write_metadata(self, cursor, population, variable):
+    def __write_metadata(self, population, variable):
         # pylint: disable=protected-access
         app_vertex = population._vertex
         buffered_data_type = \
@@ -1429,9 +1377,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         units = app_vertex.get_units(variable)
         n_colour_bits = app_vertex.n_colour_bits
         rec_id = self.__get_recording_id(
-            cursor, app_vertex.label, variable,
-            population, sampling_interval_ms, data_type,
-            buffered_data_type, units, n_colour_bits)
+            app_vertex.label, variable, population, sampling_interval_ms,
+            data_type, buffered_data_type, units, n_colour_bits)
         region = app_vertex.get_recording_region(variable)
         machine_vertices = (
             app_vertex.splitter.machine_vertices_for_recording(
@@ -1440,8 +1387,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             placement = SpynnakerDataView.get_placement_of_vertex(
                 vertex)
             region_id = self._get_region_id(
-                cursor, placement.x, placement.y, placement.p,
-                region)
+                placement.x, placement.y, placement.p, region)
             vertex_slice = vertex.vertex_slice
             neurons = app_vertex.get_neurons_recording(
                 variable, vertex_slice)
@@ -1456,7 +1402,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 base_key = vertex.get_virtual_key()
             else:
                 base_key = None
-            cursor.execute(
+            self._execute(
                 """
                 INSERT INTO region_metadata
                 (rec_id, region_id, recording_neurons_st,
