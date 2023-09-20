@@ -120,13 +120,15 @@ static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *par
 static inline void lif_neuron_closed_form(
         neuron_t *neuron, REAL V_prev, input_t input_this_timestep) {
     // accum = accum * accum + accum
-    REAL alpha = MULT_ROUND_STOCHASTIC_ACCUM(
-        input_this_timestep, neuron->R_membrane) + neuron->V_rest;
+//    REAL alpha = MULT_ROUND_STOCHASTIC_ACCUM(
+//        input_this_timestep, neuron->R_membrane) + neuron->V_rest;
+    REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
 
     // update membrane voltage
     // accum -  (ufract * (accum - accum))
-    neuron->V_membrane = alpha - MULT_ROUND_STOCHASTIC_ACCUM(
-        neuron->exp_TC, (alpha - V_prev));
+//    neuron->V_membrane = alpha - MULT_ROUND_STOCHASTIC_ACCUM(
+//        neuron->exp_TC, (alpha - V_prev));
+    neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev));
 }
 
 //! \brief primary function called in timer loop after synaptic updates
