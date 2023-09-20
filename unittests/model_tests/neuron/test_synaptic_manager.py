@@ -166,7 +166,8 @@ def test_write_data_spec():
 
     with DsSqlliteDatabase() as ds_db:
         spec = DataSpecificationGenerator(0, 0, 3, post_vertex, ds_db)
-        synaptic_matrices.write_synaptic_data(spec, post_vertex_slice, references)
+        synaptic_matrices.write_synaptic_data(
+            spec, post_vertex_slice, references)
 
     writer.set_transceiver(_MockTransceiverinOut())
     load_application_data_specs()
