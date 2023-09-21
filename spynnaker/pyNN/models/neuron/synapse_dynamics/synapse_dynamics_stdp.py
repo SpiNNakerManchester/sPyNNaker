@@ -510,8 +510,8 @@ class SynapseDynamicsSTDP(
         :param float max_stdp_spike_delta: The maximum expected time between
             spikes in milliseconds
         """
-        return self.__weight_dependence.weight_change_minimum(
-            self.__timing_dependence.minimum_delta(max_stdp_spike_delta))
+        return abs(self.__weight_dependence.weight_change_minimum(
+            self.__timing_dependence.minimum_delta(max_stdp_spike_delta)))
 
     @overrides(AbstractPlasticSynapseDynamics.calculate_min_weight)
     def calculate_min_weight(self, min_weights, max_stdp_spike_delta,
