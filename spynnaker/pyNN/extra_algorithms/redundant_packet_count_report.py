@@ -87,8 +87,8 @@ def redundant_packet_count_report():
 
 def _create_views():
     with ProvenanceWriter() as db:
-        db._execute(REDUNDANCY_BY_CORE)
-        db._execute(REDUNDANCY_SUMMARY)
+        db.execute(REDUNDANCY_BY_CORE)
+        db.execute(REDUNDANCY_SUMMARY)
 
 
 def _write_report(output):
