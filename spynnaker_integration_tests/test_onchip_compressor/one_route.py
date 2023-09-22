@@ -13,7 +13,7 @@
 # limitations under the License.
 import math
 from unittest import SkipTest
-from spinn_front_end_common.interface.provenance import GlobalProvenance
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import ConfigurationException
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
@@ -79,7 +79,7 @@ def do_one_run():
                     receptor_type="inhibitory")
 
     sim.run(1)
-    with GlobalProvenance() as db:
+    with SpynnakerDataView.get_global_database() as db:
         t = db.get_timer_provenance("Routing table loader")
     assert t == "", "Routing table loader should not have run"
     sim.end()
