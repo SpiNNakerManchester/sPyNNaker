@@ -13,7 +13,7 @@
 # limitations under the License.
 import ctypes
 from spinn_utilities.abstract_base import abstractproperty
-from spinn_front_end_common.interface.provenance import ProvenanceWriter
+from spynnaker.pyNN.data import SpynnakerDataView
 
 
 class SynapseProvenance(ctypes.LittleEndianStructure):
@@ -91,7 +91,7 @@ class PopulationMachineSynapsesProvenance(object):
         """
         synapse_prov = SynapseProvenance(*provenance_data)
 
-        with ProvenanceWriter() as db:
+        with SpynnakerDataView.get_provenance_writer() as db:
             db.insert_core(
                 x, y, p, self.TOTAL_PRE_SYNAPTIC_EVENT_NAME,
                 synapse_prov.n_pre_synaptic_events)

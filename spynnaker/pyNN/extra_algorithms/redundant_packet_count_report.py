@@ -15,8 +15,6 @@ import os
 import logging
 
 from spinn_utilities.log import FormatAdapter
-from spinn_front_end_common.interface.provenance import (
-    ProvenanceReader, ProvenanceWriter)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 
@@ -86,13 +84,13 @@ def redundant_packet_count_report():
 
 
 def _create_views():
-    with ProvenanceWriter() as db:
+    with SpynnakerDataView.get_provenance_writer() as db:
         db.execute(REDUNDANCY_BY_CORE)
         db.execute(REDUNDANCY_SUMMARY)
 
 
 def _write_report(output):
-    with ProvenanceReader() as db:
+    with SpynnakerDataView.get_provenance_reader() as db:
         for data in db.run_query("select * from redundancy_by_core"):
             (_, _, _, source, _, filtered, invalid, _,
              redundant, total, percent) = data

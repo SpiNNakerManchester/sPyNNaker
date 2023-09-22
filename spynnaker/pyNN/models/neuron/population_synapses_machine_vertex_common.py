@@ -17,7 +17,6 @@ import ctypes
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.config_holder import get_config_int
-from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -292,7 +291,7 @@ class PopulationSynapsesMachineVertexCommon(
         """
         prov = SpikeProcessingFastProvenance(*provenance_data)
 
-        with ProvenanceWriter() as db:
+        with SpynnakerDataView.get_provenance_writer() as db:
             db.insert_core(
                 x, y, p, self.INPUT_BUFFER_FULL_NAME,
                 prov.n_buffer_overflows)

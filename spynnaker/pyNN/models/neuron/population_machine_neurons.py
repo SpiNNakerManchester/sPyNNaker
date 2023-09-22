@@ -19,7 +19,6 @@ from spinn_utilities.overrides import overrides
 
 from pacman.utilities.utility_calls import get_field_based_keys
 
-from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
@@ -158,7 +157,7 @@ class PopulationMachineNeurons(
         :param list(int) provenance_data: A list of data items to interpret
         """
         neuron_prov = NeuronProvenance(*provenance_data)
-        with ProvenanceWriter() as db:
+        with SpynnakerDataView.get_provenance_writer() as db:
             db.insert_core(
                 x, y, p, "Last_timer_tic_the_core_ran_to",
                 neuron_prov.current_timer_tick)

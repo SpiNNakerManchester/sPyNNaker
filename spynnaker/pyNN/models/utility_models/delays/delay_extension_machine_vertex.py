@@ -19,7 +19,7 @@ from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
+    ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -126,7 +126,7 @@ class DelayExtensionMachineVertex(
          n_sat, n_bad_neuron, n_bad_keys, n_late_spikes, max_bg,
          n_bg_overloads) = provenance_data
 
-        with ProvenanceWriter() as db:
+        with SpynnakerDataView.get_provenance_writer() as db:
             db.insert_core(
                 x, y, p, self.COUNT_SATURATION_NAME, n_sat)
             if n_sat != 0:

@@ -22,7 +22,7 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification)
 from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
+    ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
@@ -120,7 +120,7 @@ class MachineMunichMotorDevice(
             self, label, x, y, p, provenance_data):
         n_buffer_overflows, = provenance_data
 
-        with ProvenanceWriter() as db:
+        with SpynnakerDataView.get_provenance_writer() as db:
             db.insert_core(x, y, p, self.INPUT_BUFFER_FULL_NAME,
                            n_buffer_overflows)
             if n_buffer_overflows > 0:

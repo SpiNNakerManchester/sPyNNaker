@@ -22,7 +22,6 @@ from pyNN.random import NumpyRNG, RandomDistribution
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
@@ -493,7 +492,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         # Convert to native Python integer; provenance system assumption
         ncd = self.__n_clipped_delays.item()
-        with ProvenanceWriter() as db:
+        with SpynnakerDataView.get_provenance_writer() as db:
             # pylint: disable=expression-not-assigned
             db.insert_connector(
                 synapse_info.pre_population.label,

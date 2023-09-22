@@ -18,7 +18,7 @@ import ctypes
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
-from spinn_front_end_common.interface.provenance import ProvenanceWriter
+from spynnaker.pyNN.data import SpynnakerDataView
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
@@ -259,7 +259,7 @@ class PopulationMachineVertex(
 
         main_prov = MainProvenance(*provenance_data[-MainProvenance.N_ITEMS:])
 
-        with ProvenanceWriter() as db:
+        with SpynnakerDataView.get_provenance_writer() as db:
             db.insert_core(
                 x, y, p, self.BACKGROUND_MAX_QUEUED_NAME,
                 main_prov.max_background_queued)
@@ -343,7 +343,7 @@ class PopulationMachineVertex(
         """
         prov = SpikeProcessingProvenance(*provenance_data)
 
-        with ProvenanceWriter() as db:
+        with SpynnakerDataView.get_provenance_writer() as db:
             db.insert_core(
                 x, y, p, self.INPUT_BUFFER_FULL_NAME,
                 prov.n_buffer_overflows)

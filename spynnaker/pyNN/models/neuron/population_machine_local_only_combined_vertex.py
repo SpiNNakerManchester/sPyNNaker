@@ -19,7 +19,6 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
@@ -218,7 +217,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
             label, x, y, p, provenance_data[proc_offset:end_proc_offset])
 
         main_prov = MainProvenance(*provenance_data[-MainProvenance.N_ITEMS:])
-        with ProvenanceWriter() as db:
+        with SpynnakerDataView.get_provenance_writer() as db:
             db.insert_core(
                 x, y, p, self.BACKGROUND_MAX_QUEUED_NAME,
                 main_prov.max_background_queued)
@@ -313,7 +312,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
         """
         prov = LocalOnlyProvenance(*provenance_data)
 
-        with ProvenanceWriter() as db:
+        with SpynnakerDataView.get_provenance_writer() as db:
             db.insert_core(
                 x, y, p, self.MAX_SPIKES_PER_TIME_STEP_NAME,
                 prov.max_spikes_per_timestep)

@@ -18,7 +18,6 @@ import ctypes
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
-from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
@@ -206,7 +205,7 @@ class PopulationNeuronsMachineVertex(
         neuron_prov = NeuronMainProvenance(
             *provenance_data[-NeuronMainProvenance.N_ITEMS:])
 
-        with ProvenanceWriter() as db:
+        with SpynnakerDataView.get_provenance_writer() as db:
             db.insert_core(x, y, p, "Timer tick overruns",
                            neuron_prov.n_timer_overruns)
             if neuron_prov.n_timer_overruns > 0:
