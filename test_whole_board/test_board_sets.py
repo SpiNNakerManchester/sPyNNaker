@@ -17,6 +17,7 @@ import tempfile
 import os
 import logging
 import numpy
+from time import sleep
 from shutil import rmtree
 
 import pyNN.spiNNaker as sim
@@ -117,6 +118,7 @@ def test_run(x, y, s):
     with job:
         job.launch_keepalive_task()
         # Wait for not queued for up to 30 seconds
+        sleep(1.0)
         state = job.get_state(wait_for_change=True)
         # If queued or destroyed skip test
         if state == SpallocState.QUEUED:
