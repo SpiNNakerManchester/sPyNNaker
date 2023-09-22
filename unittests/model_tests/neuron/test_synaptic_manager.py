@@ -164,7 +164,9 @@ def test_write_data_spec():
         weight_scales=[32, 32], all_syn_block_sz=10000)
     synaptic_matrices.generate_data()
 
-    with DsSqlliteDatabase() as ds_db:
+    ds_database = DsSqlliteDatabase()
+    writer.set_ds_database(ds_database)
+    with ds_database as ds_db:
         spec = DataSpecificationGenerator(0, 0, 3, post_vertex, ds_db)
         synaptic_matrices.write_synaptic_data(
             spec, post_vertex_slice, references)

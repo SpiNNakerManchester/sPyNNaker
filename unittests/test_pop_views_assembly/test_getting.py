@@ -18,7 +18,7 @@ import pickle
 import numpy
 import pytest
 import shutil
-from spinn_front_end_common.utilities.base_database import BaseDatabase
+from spinn_front_end_common.data import FecDataView
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 import pyNN.spiNNaker as sim
@@ -37,7 +37,7 @@ _ALL_DATA = "all_data.sqlite3"
 
 
 def copy_db(data_file):
-    run_buffer = BaseDatabase.default_database_file()
+    run_buffer = FecDataView.get_buffer_database().get_path()
     my_dir = os.path.dirname(os.path.abspath(__file__))
     my_buffer = os.path.join(my_dir, data_file)
     shutil.copyfile(my_buffer, run_buffer)

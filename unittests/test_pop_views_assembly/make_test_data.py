@@ -15,7 +15,7 @@
 import numpy
 import os
 import shutil
-from spinn_front_end_common.utilities.base_database import BaseDatabase
+from spinn_front_end_common.data import FecDataView
 from spynnaker.pyNN.utilities import neo_convertor
 import pyNN.spiNNaker as sim
 
@@ -66,7 +66,7 @@ def make_data(do_view):
         numpy.savetxt(my_packets, packets, delimiter=",")
     sim.end()
 
-    run_buffer = BaseDatabase.default_database_file()
+    run_buffer = FecDataView.get_buffer_database().get_path()
     my_dir = os.path.dirname(os.path.abspath(__file__))
     if do_view:
         my_buffer = os.path.join(my_dir, "view_data.sqlite3")
@@ -102,7 +102,7 @@ def make_rewires():
 
     num_elims = len(elimination_events.times)
 
-    run_buffer = BaseDatabase.default_database_file()
+    run_buffer = FecDataView.get_buffer_database().get_path()
     my_dir = os.path.dirname(os.path.abspath(__file__))
     my_labels = os.path.join(my_dir, "rewiring_labels.txt")
 
