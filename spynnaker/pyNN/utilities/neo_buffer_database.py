@@ -72,7 +72,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             This allows to override that (mainly for clear)
         """
         if database_file is None:
-            database_file = self.default_database_file()
             if read_only is None:
                 read_only = False
         else:

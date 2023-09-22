@@ -269,7 +269,7 @@ class Recorder(object):
         if variables:
             segment_number = SpynnakerDataView.get_segment_counter()
             self.__data_cache[segment_number] = \
-                NeoBufferDatabase.default_database_file()
+                SpynnakerDataView.get_buffer_database().get_path()
 
     def __append_current_segment(self, block, variables, view_indexes, clear):
         """
