@@ -14,11 +14,9 @@
 
 import os
 import numpy
-import unittest
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import SynfireRunner
-from spinn_front_end_common.interface.provenance import ProvenanceReader
 from spinn_front_end_common.utilities.report_functions import EnergyReport
 from spynnaker.pyNN.data import SpynnakerDataView
 import sqlite3
@@ -36,7 +34,7 @@ synfire_run = SynfireRunner()
 
 class TestPowerMonitoring(BaseTestCase):
     def query_provenance(self, query, *args):
-        prov_file = ProvenanceReader.get_last_run_database_path()
+        prov_file = SpynnakerDataView.get_provenance_reader().get_path()
         with sqlite3.connect(prov_file) as prov_db:
             prov_db.row_factory = sqlite3.Row
             return list(prov_db.execute(query, args))
@@ -63,8 +61,5 @@ class TestPowerMonitoring(BaseTestCase):
             num_chips = row["the_value"]
         self.assertIsNotNone(num_chips, "power provenance was not written")
 
-    @unittest.skip(
-        "https://github.com/SpiNNakerManchester/"
-        "SpiNNFrontEndCommon/issues/866")
     def test_power_monitoring(self):
         self.runsafe(self.do_run)
