@@ -89,8 +89,8 @@ def _get_edge_chips(machine):
 
 def _find_missing(bigger, smaller):
     # Find where there are more of a given neuron id
-    bigger_count = numpy.bincount(bigger[:, 0])
-    smaller_count = numpy.bincount(smaller[:, 0])
+    bigger_count = numpy.bincount(bigger[:, 0].astype(numpy.int32))
+    smaller_count = numpy.bincount(smaller[:, 0].astype(numpy.int32))
     n_missing = bigger_count - smaller_count
     neurons_with_missing = numpy.where(n_missing > 0)[0]
     missing = dict()
