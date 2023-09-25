@@ -35,7 +35,6 @@ WIDTH = 2
 HEIGHT = 2
 POISSON_RATE = 100
 WEIGHT = 100.0
-MAX_POISSONS = 256
 MAX_NEURONS = 256
 
 
@@ -85,13 +84,33 @@ def _get_edge_chips(machine):
     return edge_chips
 
 
+def _find_missing(bigger, smaller):
+    # Find where there are more of a given neuron id
+    bigger_count = numpy.bincount(bigger[:, 0])
+    smaller_count = numpy.bincount(smaller[:, 0])
+    n_missing = bigger_count - smaller_count
+    neurons_with_missing = numpy.where(n_missing > 0)[0]
+    missing = dict()
+    for n in neurons_with_missing:
+        # Compare the timestamps of the neurons
+        b = bigger[bigger[:, 0] == n][:, 1]
+        s = smaller[smaller[:, 0] == n][:, 1]
+        missing_times = numpy.setdiff1d(b, s)
+        if len(missing_times) > 10:
+            missing_times = f"{missing_times[:10]} (truncated)"
+        missing[n] = missing_times
+    if len(missing) > 10:
+        missing = f"{len(missing)} neurons are missing data"
+    return missing
+
+
 def edge_test():
 
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), "Starting")
 
     sim.setup(1.0, n_boards_required=12)
     sim.set_number_of_neurons_per_core(sim.IF_curr_delta, MAX_NEURONS)
-    sim.set_number_of_neurons_per_core(sim.SpikeSourcePoisson, MAX_POISSONS)
+    sim.set_number_of_neurons_per_core(sim.SpikeSourcePoisson, MAX_NEURONS)
 
     machine = sim.get_machine()
     edge_chips = _get_edge_chips(machine)
@@ -99,7 +118,7 @@ def edge_test():
     pops = dict()
     for chip, target_xys in edge_chips:
         source = sim.Population(
-            MAX_POISSONS, sim.SpikeSourcePoisson(rate=POISSON_RATE),
+            MAX_NEURONS, sim.SpikeSourcePoisson(rate=POISSON_RATE),
             label=f"Sender_{chip.x}_{chip.y}")
         source.record("spikes")
         source.add_placement_constraint(chip.x, chip.y)
@@ -126,13 +145,25 @@ def edge_test():
             source_pop.spinnaker_get_data("spikes"), axis=0)
         # Eliminate spikes that happened in the last timer tick
         source_spikes = source_spikes[source_spikes[:, 1] != 4999]
+        # Add one to the source spike times to account for delay in targets
+        source_spikes[:, 1] = source_spikes[:, 1] + 1
         for target_pop in target_pops:
             target_spikes = target_pop.spinnaker_get_data("spikes")
-            if not numpy.all(source_spikes[:, 0] == target_spikes[:, 0]):
+            if (len(source_spikes) > len(target_spikes)):
+                missing = _find_missing(source_spikes, target_spikes)
+                print("Mismatch in sources and targets for"
+                      f" {source_pop.label}->{target_pop.label}: {missing}")
+                success = False
+            elif (len(source_spikes) < len(target_spikes)):
+                missing = _find_missing(target_spikes, source_spikes)
+                print("Mismatch in targets and sources for"
+                      f" {source_pop.label}->{target_pop.label}: {missing}")
+                success = False
+            elif not numpy.all(source_spikes[:, 0] == target_spikes[:, 0]):
                 print("Mismatch in sources and targets for"
                       f" {source_pop.label}->{target_pop.label}")
                 success = False
-            if not numpy.all(source_spikes[:, 1] < target_spikes[:, 1]):
+            elif not numpy.all(source_spikes[:, 1] == target_spikes[:, 1]):
                 print("Mismatch in sources and targets for"
                       f" {source_pop.label}->{target_pop.label}")
                 success = False
@@ -153,9 +184,11 @@ def test_run(x, y):
         # If queued or destroyed skip test
         if state == SpallocState.QUEUED:
             job.destroy("Queued")
-            pytest.skip(f"Some boards starting at {x}, {y}, 0 is in use")
+            pytest.skip(f"Some boards starting at {x}, {y}, 0 are in use"
+                        f" on job {job}")
         elif state == SpallocState.DESTROYED:
-            pytest.skip(f"Boards {x}, {y}, 0 could not be allocated")
+            pytest.skip(
+                f"Boards {x}, {y}, 0 could not be allocated on job {job}")
         # Actually wait for ready now (as might be powering on)
         job.wait_until_ready()
         tmpdir = tempfile.mkdtemp(prefix=f"{x}_{y}_0", dir=test_dir)
@@ -167,7 +200,6 @@ def test_run(x, y):
             f.write("version = 5\n")
             f.write("\n")
             f.write("[Reports]\n")
-            f.write("read_provenance_data = False\n")
             f.write("reports_enabled = False\n")
             f.write("write_routing_table_reports = False\n")
             f.write("write_routing_tables_from_machine_reports = False\n")

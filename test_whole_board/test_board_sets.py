@@ -44,7 +44,7 @@ MAX_POISSONS = 500
 MAX_NEURONS = 256
 
 
-def do_run(sender_board):
+def do_run(sender_board, job, x, y):
     sim.setup(1.0, n_boards_required=3)
     sim.set_number_of_neurons_per_core(sim.IF_curr_exp, MAX_NEURONS)
     sim.set_number_of_neurons_per_core(sim.SpikeSourcePoisson, MAX_POISSONS)
@@ -54,7 +54,8 @@ def do_run(sender_board):
     eth_chips = list(machine.ethernet_connected_chips)
     if len(eth_chips) <= sender_board:
         raise SkipTest(
-            f"Not enough boards in this set for sender {sender_board}")
+            f"Not enough boards in this set for sender {sender_board}"
+            f" on boards {x}, {y} of job {job}")
     sender = eth_chips[sender_board]
     receivers = [e for i, e in enumerate(eth_chips) if i != sender_board]
 
@@ -123,9 +124,11 @@ def test_run(x, y, s):
         # If queued or destroyed skip test
         if state == SpallocState.QUEUED:
             job.destroy("Queued")
-            pytest.skip(f"Some boards starting at {x}, {y}, 0 is in use")
+            pytest.skip(f"Some boards starting at {x}, {y}, 0 are in use"
+                        f" on job {job}")
         elif state == SpallocState.DESTROYED:
-            pytest.skip(f"Boards {x}, {y}, 0 could not be allocated")
+            pytest.skip(
+                f"Boards {x}, {y}, 0 could not be allocated on job {job}")
         # Actually wait for ready now (as might be powering on)
         job.wait_until_ready()
         tmpdir = tempfile.mkdtemp(prefix=f"{x}_{y}_0", dir=test_dir)
@@ -150,7 +153,7 @@ def test_run(x, y, s):
             f.write("write_data_speed_up_reports = False\n")
             f.write("write_router_info_report = False\n")
             f.write("write_network_specification_report = False\n")
-        do_run(s)
+        do_run(s, job, x, y)
         # If no errors we will get here and we can remove the tree;
         # then only error folders will be left
         rmtree(tmpdir)
@@ -158,4 +161,4 @@ def test_run(x, y, s):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    do_run(0)
+    do_run(0, None, None, None)

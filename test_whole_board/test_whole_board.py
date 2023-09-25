@@ -213,9 +213,11 @@ def test_run(x, y, b):
         # If queued or destroyed skip test
         if state == SpallocState.QUEUED:
             job.destroy("Queued")
-            pytest.skip(f"Some boards starting at {x}, {y}, {b} is in use")
+            pytest.skip(f"Some boards starting at {x}, {y}, {b} are in use"
+                        f" on job {job}")
         elif state == SpallocState.DESTROYED:
-            pytest.skip(f"Boards {x}, {y}, {b} could not be allocated")
+            pytest.skip(
+                f"Boards {x}, {y}, {b} could not be allocated on job {job}")
         # Actually wait for ready now (as might be powering on)
         job.wait_until_ready()
         tmpdir = tempfile.mkdtemp(prefix=f"{x}_{y}_{b}", dir=test_dir)
