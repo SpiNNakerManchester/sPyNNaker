@@ -25,8 +25,11 @@ from spinnman.spalloc import SpallocClient, SpallocState
 
 
 BOARDS = [(bx, by)
-          for bx in range(20)
-          for by in range(20)]
+          for bx in range(0, 20, 2)
+          for by in range(0, 20, 2)]
+BOARDS += [(bx, by)
+           for bx in range(1, 20, 2)
+           for by in range(1, 20, 2)]
 SPALLOC_URL = "https://spinnaker.cs.man.ac.uk/spalloc"
 SPALLOC_USERNAME = "jenkins"
 SPALLOC_PASSWORD = os.getenv("SPALLOC_PASSWORD")
