@@ -216,6 +216,10 @@ def test_run(x, y):
             f.write("write_data_speed_up_reports = False\n")
             f.write("write_router_info_report = False\n")
             f.write("write_network_specification_report = False\n")
+            f.write("write_provenance = False\n")
+            f.write("read_graph_provenance_data = False\n")
+            f.write("read_placements_provenance_data = False\n")
+            f.write("read_profile_data = False\n")
         edge_test()
         # If no errors we will get here and we can remove the tree;
         # then only error folders will be left
