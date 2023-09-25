@@ -26,8 +26,7 @@ from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from spinn_front_end_common.interface.ds import DataType
 from pacman.model.graphs.common import MDSlice
 from pacman.utilities.utility_calls import get_field_based_index
-from spinn_front_end_common.interface.buffer_management.storage_objects \
-    import BufferDatabase
+from spinn_front_end_common.utilities.data_database import DataDatabase
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -40,7 +39,7 @@ from spynnaker.pyNN.utilities.neo_csv import NeoCsv
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class NeoBufferDatabase(BufferDatabase, NeoCsv):
+class NeoBufferDatabase(DataDatabase, NeoCsv):
     """
     Extra support for Neo on top of the Database for SQLite 3.
 
