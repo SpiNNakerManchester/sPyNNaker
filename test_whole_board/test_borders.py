@@ -178,7 +178,8 @@ def test_run(x, y):
     test_dir = os.path.dirname(__file__)
     client = SpallocClient(SPALLOC_URL, SPALLOC_USERNAME, SPALLOC_PASSWORD)
     job = client.create_job_rect_at_board(
-        WIDTH, HEIGHT, triad=(x, y, 0), machine_name=SPALLOC_MACHINE)
+        WIDTH, HEIGHT, triad=(x, y, 0), machine_name=SPALLOC_MACHINE,
+        max_dead_boards=3)
     with job:
         job.launch_keepalive_task()
         # Wait for not queued for up to 30 seconds
