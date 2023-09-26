@@ -23,7 +23,6 @@ import os
 import quantities
 import struct
 import re
-from sqlite3 import Cursor
 import neo  # type: ignore[import]
 from typing import (
     Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
@@ -770,7 +769,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         return numpy.array(indexes)
 
     def __get_spikes(
-            self, Cursor, rec_id: int, view_indexes: ViewIndices,
+            self, rec_id: int, view_indexes: ViewIndices,
             buffer_type: BufferDataType, n_colour_bits: int,
             variable: str) -> Tuple[NDArray, NDArray[integer]]:
         """
