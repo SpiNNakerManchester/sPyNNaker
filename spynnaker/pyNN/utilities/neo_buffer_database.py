@@ -1340,7 +1340,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         else:
             vs = tuple(variables)
         if 'all' in vs:
-            return self.__get_recording_variables(pop_label)
+            return self.get_recording_variables(pop_label)
         else:
             return vs
 
