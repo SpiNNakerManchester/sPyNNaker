@@ -88,9 +88,9 @@ def redundant_packet_count_report() -> None:
 
 
 def _create_views() -> None:
-    with ProvenanceWriter() as db, db.transaction() as cur:
-        cur.execute(REDUNDANCY_BY_CORE)
-        cur.execute(REDUNDANCY_SUMMARY)
+    with ProvenanceWriter() as db:
+        db.execute(REDUNDANCY_BY_CORE)
+        db.execute(REDUNDANCY_SUMMARY)
 
 
 def _write_report(output: TextIO):
