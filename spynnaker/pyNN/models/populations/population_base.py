@@ -26,11 +26,6 @@ def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
     raise NotImplementedError("sPyNNaker does not currently do this")
 
 
-def _this_is_wholly_deprecated(msg, *args):  # pylint: disable=unused-argument
-    # pragma: no cover
-    raise NotImplementedError(msg)
-
-
 class PopulationBase(object, metaclass=AbstractBase):
     r"""
     Shared methods between :py:class:`Population`\ s and
@@ -75,16 +70,6 @@ class PopulationBase(object, metaclass=AbstractBase):
         # TODO: support assemblies
         _we_dont_do_this_now(other)  # pragma: no cover
 
-    def getSpikes(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """
-        .. deprecated:: 5.0
-            Use ``get_data('spikes')`` instead.
-        """
-        logger.warning(
-            'getSpikes is deprecated. Call transfered to get_data("spikes") '
-            'without additional arguments')
-        return self.get_data("spikes")
-
     @abstractmethod
     def get_data(self, variables='all', gather=True, clear=False,
                  annotations=None):
@@ -112,17 +97,6 @@ class PopulationBase(object, metaclass=AbstractBase):
         :rtype: ~neo.core.Block
         """
 
-    def get_gsyn(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """
-        .. deprecated:: 5.0
-            Use ``get_data(['gsyn_exc', 'gsyn_inh'])`` instead.
-        """
-        logger.warning(
-            'get_gsyn is deprecated. '
-            'Call transfered to get_data(["gsyn_exc", "gsyn_inh"]) '
-            'without additional arguments')
-        return self.get_data(['gsyn_exc', 'gsyn_inh'])
-
     @abstractmethod
     def get_spike_counts(self, gather=True):
         """
@@ -141,16 +115,6 @@ class PopulationBase(object, metaclass=AbstractBase):
 
         :rtype: dict(int, int)
         """
-
-    def get_v(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """
-        .. deprecated:: 5.0
-            Use ``get_data('v')`` instead.
-        """
-        logger.warning(
-            'getSpikes is deprecated. '
-            'Call transfered to get_data("v") without additional arguments')
-        return self.get_data("v")
 
     @abstractmethod
     def inject(self, current_source):
@@ -184,16 +148,6 @@ class PopulationBase(object, metaclass=AbstractBase):
         logger.warning("local calls do not really make sense on sPyNNaker so "
                        "is_local always returns size")
         return len(self)
-
-    def meanSpikeCount(self, *args, **kwargs):
-        """
-        .. deprecated:: 5.0
-            Use ``mean_spike_count()`` instead.
-        """
-        logger.warning(
-            'meanSpikeCount is deprecated. '
-            'Call transfered to mean_spike_count with additional arguements')
-        return self.mean_spike_count(*args, **kwargs)
 
     def mean_spike_count(self, gather=True):
         """
@@ -284,57 +238,6 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         # pylint: disable=too-many-arguments
 
-    def printSpikes(self, filename, gather=True):
-        """
-        .. deprecated:: 5.0
-            Use ``write_data(file, 'spikes')`` instead.
-
-        .. note::
-            Method signature is the PyNN0.7 one
-        """
-        if not gather:
-            warn_once(
-                logger, "sPyNNaker only supports gather=True. We will run "
-                "as if gather was set to True.")
-        logger.warning(
-            'printSpikes is deprecated. '
-            'Call transfered to write_data(file, "spikes", gatherer) instead.')
-        self.write_data(filename, 'spikes', gather=True)
-
-    def print_gsyn(self, filename, gather=True):
-        """
-        .. deprecated:: 5.0
-            Use ``write_data(file, ['gsyn_exc', 'gsyn_inh'])`` instead.
-
-        .. note::
-            Method signature is the PyNN0.7 one
-        """
-        if not gather:
-            warn_once(
-                logger, "sPyNNaker only supports gather=True. We will run "
-                "as if gather was set to True.")
-        logger.warning(
-            'print_gsyn is deprecated. Call transfered to '
-            'write_data(file, ["gsyn_exc", "gsyn_inh"], gatherer) instead.')
-        self.write_data(filename, ['gsyn_exc', 'gsyn_inh'], gather=True)
-
-    def print_v(self, filename, gather=True):
-        """
-        .. deprecated:: 5.0
-            Use ``write_data(file, 'v')`` instead.
-
-        .. note::
-            Method signature is the PyNN0.7 one
-        """
-        if not gather:
-            warn_once(
-                logger, "sPyNNaker only supports gather=True. We will run "
-                "as if gather was set to True.")
-        logger.warning(
-            'print_v is deprecated. '
-            'Call transfered to write_data(file, "v", gatherer) instead.')
-        self.write_data(filename, 'v', gather=True)
-
     def receptor_types(self):
         """
         .. note::
@@ -362,45 +265,6 @@ class PopulationBase(object, metaclass=AbstractBase):
             multiple of the simulation timestep.
         """
 
-    def record_gsyn(self, sampling_interval=1, to_file=None):
-        """
-        .. deprecated:: 5.0
-            Use ``record(['gsyn_exc', 'gsyn_inh'])`` instead.
-
-        .. note::
-            Method signature is the PyNN 0.7 one
-            with the extra non-PyNN `sampling_interval` and `indexes`
-        """
-        logger.warning(
-            'record_gsyn is deprecated. Call transfered to '
-            'record(["gsyn_exc", "gsyn_inh"], tofile) instead.')
-        return self.record(
-            ['gsyn_exc', 'gsyn_inh'], to_file=to_file,
-            sampling_interval=sampling_interval)
-
-    def record_v(self, sampling_interval=1, to_file=None):
-        """
-        .. deprecated:: 5.0
-            Use ``record('v')`` instead.
-
-        .. note::
-            Method signature is the PyNN 0.7 one
-            with the extra non-PyNN `sampling_interval` and `indexes`
-        """
-        logger.warning('record_v is deprecated. '
-                       'Call transfered to record(["v"], .....) instead.')
-        return self.record(
-            'v', to_file=to_file,
-            sampling_interval=sampling_interval)
-
-    def rset(self, *args, **kwargs):
-        """
-        .. deprecated:: 5.0
-            Use ``set(parametername=rand_distr)`` instead.
-        """
-        _this_is_wholly_deprecated(
-            " Use set(parametername=rand_distr) instead.", args, kwargs)
-
     def save_positions(self, file):  # pylint: disable=redefined-builtin
         """
         Save positions to file. The output format is index x y z
@@ -423,14 +287,6 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         # TODO: support neuron positions and spaces
         _we_dont_do_this_now()  # pragma: no cover
-
-    def tset(self, **kwargs):
-        """
-        .. deprecated:: 5.0
-            Use ``set(parametername=value_array)`` instead.
-        """
-        _this_is_wholly_deprecated(
-            "Use set(parametername=value_array) instead.", kwargs)
 
     @abstractproperty
     def _vertex(self):
