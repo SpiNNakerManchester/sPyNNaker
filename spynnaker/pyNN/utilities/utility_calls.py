@@ -389,47 +389,6 @@ def get_n_bits(n_values):
     return int(math.ceil(math.log2(n_values)))
 
 
-def moved_in_v6(old_location, _):
-    """
-    Tells the users that old code is no longer implemented.
-
-    :param str old_location: old import
-    :raise: NotImplementedError
-    """
-    raise NotImplementedError(f"Old import: {old_location}")
-
-
-def moved_in_v7(old_location, new_location):
-    """
-    Warns the users that they are using an old import.
-
-    In version 8 this will be upgraded to a exception and then later removed
-
-    :param str old_location: old import
-    :param str new_location: new import
-    :raise NotImplementedError: if in CONTINUOUS_INTEGRATION
-    """
-    if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-        raise NotImplementedError(f"Old import: {old_location}")
-    logger.warning("File {} moved to {}. Please fix your imports. "
-                   "In version 8 this will fail completely.",
-                   old_location, new_location)
-
-
-def moved_in_v7_warning(message):
-    """
-    Warns the user that they are using old code.
-
-    In version 8 this will be upgraded to a exception and then later removed
-
-    :param str message:
-    :raise NotImplementedError: if in CONTINUOUS_INTEGRATION
-    """
-    if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-        raise NotImplementedError(message)
-    logger.warning("{} In version 8 old call will fail completely.", message)
-
-
 def get_time_to_write_us(n_bytes, n_cores):
     """
     Determine how long a write of a given number of bytes will take in us.
