@@ -160,10 +160,10 @@ def test_write_data_spec():
         weight_scales=[32, 32], all_syn_block_sz=10000)
     synaptic_matrices.generate_data()
 
-    ds_db = DsSqlliteDatabase()
-    spec = DataSpecificationGenerator(0, 0, 3, post_vertex, ds_db)
-    synaptic_matrices.write_synaptic_data(spec, post_vertex_slice, references)
-    writer.set_ds_database(ds_db)
+    with DsSqlliteDatabase() as ds_db:
+        spec = DataSpecificationGenerator(0, 0, 3, post_vertex, ds_db)
+        synaptic_matrices.write_synaptic_data(
+            spec, post_vertex_slice, references)
 
     writer.set_transceiver(_MockTransceiverinOut())
     load_application_data_specs()
@@ -472,26 +472,26 @@ def test_pop_based_master_pop_table_standard(
     post_vertex_slice = post_mac_vertex.vertex_slice
 
     # Generate the data
-    db = DsSqlliteDatabase()
-    spec = DataSpecificationGenerator(1, 2, 3, post_mac_vertex, db)
-    writer.set_ds_database(db)
+    with DsSqlliteDatabase() as db:
+        spec = DataSpecificationGenerator(1, 2, 3, post_mac_vertex, db)
 
-    regions = SynapseRegions(
-        synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
-        bitfield_filter=8,
-        synaptic_matrix=1, pop_table=3, connection_builder=4)
-    references = SynapseRegions(
-        synapse_params=None, synapse_dynamics=None, structural_dynamics=None,
-        bitfield_filter=None,
-        synaptic_matrix=None, pop_table=None, connection_builder=None)
-    synaptic_matrices = SynapticMatrices(
-        post_pop._vertex, regions, max_atoms_per_core=neurons_per_core,
-        weight_scales=[32, 32], all_syn_block_sz=10000000)
-    synaptic_matrices.generate_data()
-    synaptic_matrices.write_synaptic_data(spec, post_vertex_slice, references)
+        regions = SynapseRegions(
+            synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
+            bitfield_filter=8,
+            synaptic_matrix=1, pop_table=3, connection_builder=4)
+        references = SynapseRegions(
+            synapse_params=None, synapse_dynamics=None,
+            structural_dynamics=None, bitfield_filter=None,
+            synaptic_matrix=None, pop_table=None, connection_builder=None)
+        synaptic_matrices = SynapticMatrices(
+            post_pop._vertex, regions, max_atoms_per_core=neurons_per_core,
+            weight_scales=[32, 32], all_syn_block_sz=10000000)
+        synaptic_matrices.generate_data()
+        synaptic_matrices.write_synaptic_data(
+            spec, post_vertex_slice, references)
 
-    # Read the population table and check entries
-    info = list(db.get_region_pointers_and_content(1, 2, 3))
+        # Read the population table and check entries
+        info = list(db.get_region_pointers_and_content(1, 2, 3))
     region, _, region_data = info[1]
     assert region == 3
     mpop_data = numpy.frombuffer(region_data, dtype="uint8").view("uint32")
