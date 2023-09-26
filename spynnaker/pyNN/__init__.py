@@ -384,6 +384,7 @@ def end(_=True):
     __simulator.write_on_end = []
     __simulator.stop()
 
+
 def list_standard_models():
     """
     Return a list of all the StandardCellType classes available for this

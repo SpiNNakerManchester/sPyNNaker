@@ -17,7 +17,6 @@ import logging
 import numpy
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
-from pyNN import common as pynn_common
 from pyNN.recording.files import StandardTextFile
 from pyNN.space import Space as PyNNSpace
 from spinn_utilities.logger_utils import warn_once
