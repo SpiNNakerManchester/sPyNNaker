@@ -56,7 +56,6 @@ class SplitterAbstractPopulationVertex(
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self) -> None:
-        super().reset_called()
         self._max_delay = None
         self.__slices = None
 
