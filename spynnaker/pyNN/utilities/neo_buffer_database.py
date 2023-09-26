@@ -500,18 +500,14 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :rtype: iterable(tuple(int, ~numpy.ndarray, Slice, bool, int, int))
         """
         index = 0
-        # Need a new cursor here to allow the result set to persist until the
-        # end of the iteration. This is NOT well documented in the Python
-        # documentation for the sqlite3 package!
-        # See: https://stackoverflow.com/a/50078982/301832
-        # The underlying SQLite API uses result sets, not cursors.
-        for row in self.execute(
+        # Need to put the rows in a list to get them to persist.
+        for row in list(self.execute(
                 """
                 SELECT region_id, recording_neurons_st, vertex_slice, base_key
                 FROM region_metadata
                 WHERE rec_id = ?
                 ORDER BY region_metadata_id
-                """, (rec_id,)):
+                """, (rec_id,))):
             vertex_slice = MDSlice.from_string(
                 self._string(row["vertex_slice"]))
             recording_neurons_st = row["recording_neurons_st"]
