@@ -104,26 +104,26 @@ class SynapseDynamicsStatic(
         n_synapse_type_bits = get_n_bits(n_synapse_types)
 
         # Branch
-        # fixed_fixed = (
-        #     ((numpy.rint(connections["weight"]).astype("uint16") &
-        #       0xFFFF).astype("uint32") << 16) |
-        #     ((connections["delay"].astype("uint32") & 0xFF) <<
-        #      (n_neuron_id_bits + n_synapse_type_bits)) |
-        #     (connections["synapse_type"].astype(
-        #         "uint32") << n_neuron_id_bits) |
-        #     ((connections["target"] - post_vertex_slice.lo_atom) &
-        #      neuron_id_mask))
-
-        # Master
         fixed_fixed = (
-            ((numpy.rint(numpy.abs(connections["weight"])).astype("uint32") &
-              0xFFFF) << 16) |
-            (connections["delay"].astype("uint32") <<
+            ((numpy.rint(connections["weight"]).astype("uint16") &
+              0xFFFF).astype("uint32") << 16) |
+            ((connections["delay"].astype("uint32") & 0xFF) <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype(
                 "uint32") << n_neuron_id_bits) |
             ((connections["target"] - post_vertex_slice.lo_atom) &
              neuron_id_mask))
+
+        # Master
+        # fixed_fixed = (
+        #     ((numpy.rint(numpy.abs(connections["weight"])).astype("uint32") &
+        #       0xFFFF) << 16) |
+        #     (connections["delay"].astype("uint32") <<
+        #      (n_neuron_id_bits + n_synapse_type_bits)) |
+        #     (connections["synapse_type"].astype(
+        #         "uint32") << n_neuron_id_bits) |
+        #     ((connections["target"] - post_vertex_slice.lo_atom) &
+        #      neuron_id_mask))
 
         fixed_fixed_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
@@ -182,15 +182,15 @@ class SynapseDynamicsStatic(
         connections["target"] = (
             (data & neuron_id_mask) + post_vertex_slice.lo_atom)
         # branch
-        # connections["weight"] = ((data >> 16) & 0xFFFF).astype("int16")
-        # connections["delay"] = (data >> (n_neuron_id_bits +
-        #                                  n_synapse_type_bits)) & 0xFF
-        # connections["delay"][connections["delay"] == 0] = 16
+        connections["weight"] = ((data >> 16) & 0xFFFF).astype("int16")
+        connections["delay"] = (data >> (n_neuron_id_bits +
+                                         n_synapse_type_bits)) & 0xFF
+        connections["delay"][connections["delay"] == 0] = 16
 
         # master
-        connections["weight"] = (data >> 16) & 0xFFFF
-        connections["delay"] = (data & 0xFFFF) >> (
-            n_neuron_id_bits + n_synapse_type_bits)
+        # connections["weight"] = (data >> 16) & 0xFFFF
+        # connections["delay"] = (data & 0xFFFF) >> (
+        #     n_neuron_id_bits + n_synapse_type_bits)
 
         return connections
 
