@@ -40,7 +40,8 @@ class EthernetControlConnection(LiveEventConnection):
             local_host=local_host, local_port=local_port)
         self.__translators = dict()
         self.__translators[label] = translator
-        self.add_receive_callback(label, self._translate, translate_key=False)
+        self.add_receive_live_callback(
+            label, self._translate, translate_key=False)
 
     def add_translator(self, label, translator):
         """
@@ -52,7 +53,8 @@ class EthernetControlConnection(LiveEventConnection):
         """
         super().add_receive_label(label)
         self.__translators[label] = translator
-        self.add_receive_callback(label, self._translate, translate_key=False)
+        self.add_receive_live_callback(
+            label, self._translate, translate_key=False)
 
     def _translate(self, label, key, payload=None):
         translator = self.__translators[label]

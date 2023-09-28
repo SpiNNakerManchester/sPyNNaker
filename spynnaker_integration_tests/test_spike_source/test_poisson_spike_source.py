@@ -211,7 +211,9 @@ class TestPoissonSpikeSource(BaseTestCase):
         conn.add_init_callback(pop_label, init)
         conn.add_pause_stop_callback(pop_label, stop)
         with self.assertRaises(ConfigurationException):
-            conn.add_receive_callback(pop_label, stop)
+            conn.add_receive_live_callback(pop_label, stop)
+        with self.assertRaises(ConfigurationException):
+            conn.add_receive_time_callback(pop_label, stop)
         sim.external_devices.add_database_socket_address(
             conn.local_ip_address, conn.local_port, None)
         sim.external_devices.add_poisson_live_rate_control(pop)

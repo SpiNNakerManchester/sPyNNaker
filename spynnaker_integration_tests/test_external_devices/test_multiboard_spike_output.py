@@ -57,7 +57,7 @@ class TestMultiBoardSpikeOutput(BaseTestCase):
             e.activate_live_output_for(
                 pop, database_notify_port_num=live_output.local_port)
         for label in labels:
-            live_output.add_receive_callback(
+            live_output.add_receive_time_callback(
                 label, TestMultiBoardSpikeOutput.spike_receiver)
 
         p.run(250)

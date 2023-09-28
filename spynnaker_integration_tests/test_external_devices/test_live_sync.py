@@ -68,7 +68,7 @@ def test_live_sync():
     global n_spikes
     conn = SpynnakerLiveSpikesConnection(
         receive_labels=["ssa"], local_port=None)
-    conn.add_receive_callback("ssa", recv)
+    conn.add_receive_time_callback("ssa", recv)
     conn.add_start_resume_callback("ssa", send_sync)
     conn.add_pause_stop_callback("ssa", stop)
 

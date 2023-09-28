@@ -104,7 +104,7 @@ def live_neuron_voltage():
         devices_2, create_edges, translator_2)
     conn = p.external_devices.SpynnakerLiveSpikesConnection(
         receive_labels=["stim"], local_port=None)
-    conn.add_receive_callback("stim", spike_receiver)
+    conn.add_receive_time_callback("stim", spike_receiver)
     stim = p.Population(1, p.SpikeSourceArray(range(0, 1000, 100)),
                         label="stim")
     p.external_devices.activate_live_output_for(

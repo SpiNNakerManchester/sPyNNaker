@@ -57,7 +57,7 @@ class PushBotRetinaViewer():
         self.__sim = sim
         self.__conn = sim.external_devices.SpynnakerLiveSpikesConnection(
             receive_labels=[label], local_port=None)
-        self.__conn.add_receive_callback(label, self.__recv)
+        self.__conn.add_receive_time_callback(label, self.__recv)
 
     @property
     def port(self):
