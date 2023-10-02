@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import unittest
-from unittest import SkipTest
 from spynnaker.pyNN.exceptions import ConfigurationException
 import pyNN.spiNNaker as p
+from spynnaker.pyNN.data import SpynnakerDataView
 import spynnaker.pyNN.external_devices as e
 from spinnaker_testbase import BaseTestCase
 
@@ -35,8 +35,8 @@ class TestMultiBoardSpikeOutput(BaseTestCase):
             machine = p.get_machine()
         except ConfigurationException as oops:
             if "Failure to detect machine of " in str(oops):
-                raise SkipTest(
-                    "You Need at least 3 boards to run this test") from oops
+                SpynnakerDataView.raise_skiptest(
+                    "You Need at least 3 boards to run this test", oops)
 
         labels = list()
         pops = list()
