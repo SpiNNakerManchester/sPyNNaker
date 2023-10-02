@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import time
-from unittest import SkipTest
 from spinn_utilities.config_holder import get_config_bool
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import ConfigurationException
@@ -43,9 +42,9 @@ class ManyBoards(BaseTestCase):
             machine = sim.get_machine()
         except ConfigurationException as oops:
             if "Failure to detect machine " in str(oops):
-                raise SkipTest(
-                    "You Need at least {} boards to run this test".format(
-                        self.n_boards)) from oops
+                SpynnakerDataView.raise_skiptest(
+                    f"You Need at least {self.n_boards} boards for this test",
+                    oops)
             raise oops
 
         input_spikes = list(range(0, self.simtime - 100, 10))
