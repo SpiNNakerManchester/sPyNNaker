@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
 from spinn_utilities.exceptions import SimulatorShutdownException
 import pyNN.spiNNaker as p
 from time import sleep
 import traceback
+from spynnaker.pyNN.data import SpynnakerDataView
 
 from spynnaker.pyNN.external_devices import SpynnakerLiveSpikesConnection
 
@@ -82,7 +82,7 @@ def test_live_sync():
         p.external_devices.run_sync(100, 20)
     except Exception:
         if sim_finished:
-            raise unittest.SkipTest("Stopped to0 soon")
+            SpynnakerDataView.raise_skiptest("Stopped too soon")
 
     sim_finished = True
     p.end()
