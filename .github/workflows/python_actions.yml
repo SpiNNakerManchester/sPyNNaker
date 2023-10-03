@@ -30,13 +30,13 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9, "3.10", "3.11"]
+        python-version: [3.8, 3.9, "3.10", "3.11"]
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Checkout SupportScripts
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
@@ -56,7 +56,7 @@ jobs:
       uses: ./support/actions/install-spinn-deps
       with:
         repositories: >
-          SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
+          SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
           SpiNNFrontEndCommon TestBase
         install: true
 
@@ -81,12 +81,12 @@ jobs:
         coveralls-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Lint with flake8
-      run: flake8 ${{ env.BASE_PKG }} spynnaker8 unittests spynnaker_integration_tests
+      run: flake8 ${{ env.BASE_PKG }} unittests spynnaker_integration_tests
 
     - name: Lint with pylint
       uses: ./support/actions/pylint
       with:
-        package: ${{ env.BASE_PKG }} spynnaker8
+        package: ${{ env.BASE_PKG }}
         language: en_GB
 
   validate:
@@ -97,9 +97,9 @@ jobs:
         python-version: ["3.8"]
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Checkout SupportScripts
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
@@ -118,7 +118,7 @@ jobs:
       uses: ./support/actions/install-spinn-deps
       with:
         repositories: >
-          SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
+          SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
           SpiNNFrontEndCommon TestBase
         install: true
     - name: Install matplotlib

@@ -22,7 +22,8 @@ from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
 
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.config_holder import get_config_bool, get_config_str
+from spinn_utilities.config_holder import (
+    get_config_bool, get_config_str_or_none)
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -48,11 +49,10 @@ from spynnaker.pyNN.extra_algorithms.\
 from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    spynnaker_splitter_partitioner, spynnaker_splitter_selector)
+    spynnaker_splitter_selector)
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
-from spynnaker.pyNN.utilities.utility_calls import (
-    moved_in_v7_warning)
+
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -193,7 +193,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         Used to bypass the dual level object.
 
         :return: the SpiNNaker object
-        :rtype: ~spynnaker8.spinnaker.SpiNNaker
+        :rtype: ~spynnaker.pyNN.SpiNNaker
         """
         return self
 
@@ -384,7 +384,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :param str search_path: absolute search path for binaries
         """
         # pylint: disable=protected-access
-        moved_in_v7_warning("register_binary_search_path is now a View method")
         SpynnakerDataView.register_binary_search_path(search_path)
 
     def _execute_spynnaker_ordered_covering_compressor(self):
@@ -488,7 +487,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         Runs, times and logs the DelaySupportAdder if required.
         """
-        name = get_config_str("Mapping", "delay_support_adder")
+        name = get_config_str_or_none("Mapping", "delay_support_adder")
         if name is None:
             return
         with FecTimer("DelaySupportAdder", TimerWork.OTHER):
@@ -502,14 +501,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 return
             raise ConfigurationException(
                 f"Unexpected cfg setting delay_support_adder: {name}")
-
-    @overrides(AbstractSpinnakerBase._execute_splitter_partitioner)
-    def _execute_splitter_partitioner(self):
-        if self._data_writer.get_n_vertices() == 0:
-            return
-        with FecTimer("SpynnakerSplitterPartitioner", TimerWork.OTHER):
-            n_chips_in_graph = spynnaker_splitter_partitioner()
-            self._data_writer.set_n_chips_in_graph(n_chips_in_graph)
 
     @overrides(AbstractSpinnakerBase._execute_buffer_extractor)
     def _execute_buffer_extractor(self):

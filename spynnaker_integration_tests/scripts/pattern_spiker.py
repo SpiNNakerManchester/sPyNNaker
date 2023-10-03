@@ -57,7 +57,8 @@ class PatternSpiker(object):
         if v_rec_indexes is None:
             v_rec_indexes = range(len(v[0]))
         else:
-            actual_indexes = list(v.channel_index.index)
+            actual_indexes = list(v.annotations["channel_names"])
+
             if missing:
                 v_rec_indexes = [index for index in v_rec_indexes
                                  if index in actual_indexes]

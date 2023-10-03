@@ -24,7 +24,6 @@ class ImportAllModule(unittest.TestCase):
     def test_import_all(self):
         if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
             package_loader.load_module("spynnaker", remove_pyc_files=False)
-            package_loader.load_module("spynnaker8", remove_pyc_files=False)
         else:
             # Do a full stack cleanup
             package_loader.load_module(
@@ -33,11 +32,8 @@ class ImportAllModule(unittest.TestCase):
             package_loader.load_module("spinnman", remove_pyc_files=True)
             package_loader.load_module("pacman", remove_pyc_files=True)
             package_loader.load_module(
-                "data_specification", remove_pyc_files=True)
-            package_loader.load_module(
                 "spalloc_client", remove_pyc_files=True)
             package_loader.load_module(
                 "spinn_front_end_common", remove_pyc_files=True)
             # Test the files
             package_loader.load_module("spynnaker", remove_pyc_files=True)
-            package_loader.load_module("spynnaker8", remove_pyc_files=True)

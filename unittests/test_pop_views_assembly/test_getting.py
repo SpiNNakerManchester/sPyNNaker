@@ -80,13 +80,12 @@ class TestGetting(BaseTestCase):
         assert N_NEURONS == len(spiketrains)
 
         #  gather False has not effect testing that here
-        neo = pop.get_data("spikes", gather=False)
+        neo = pop.get_data(["spikes", "v"], gather=False)
         spikes = neo_convertor.convert_spikes(neo)
         assert numpy.array_equal(spikes, self.spikes_expected)
         spiketrains = neo.segments[0].spiketrains
         assert N_NEURONS == len(spiketrains)
 
-        neo = pop.get_v()
         v = neo.segments[0].filter(name='v')[0].magnitude
         assert numpy.array_equal(v,  self.v_expected)
 
@@ -168,7 +167,8 @@ class TestGetting(BaseTestCase):
         v = neo.segments[0].filter(name='v')[0].magnitude
         target = self.v_expected[:, 1:3]
         assert numpy.array_equal(
-            [1, 2], neo.segments[0].filter(name='v')[0].channel_index.index)
+            [1, 2],
+            neo.segments[0].filter(name='v')[0].annotations["channel_names"])
         assert v.shape == target.shape
         assert numpy.array_equal(v,  target)
 
@@ -186,7 +186,7 @@ class TestGetting(BaseTestCase):
         view = pop[1:4]
         assert {1: 2, 2: 3, 3: 3} == view.get_spike_counts()
 
-        assert 2.2222222222222223 == pop.meanSpikeCount()
+        assert 2.2222222222222223 == pop.mean_spike_count()
         assert 2.6666666666666665 == view.mean_spike_count()
 
         sim.end()
@@ -204,13 +204,7 @@ class TestGetting(BaseTestCase):
             spikes = neo_convertor.convert_spikes(neo)
             assert numpy.array_equal(spikes, self.spikes_expected)
 
-        pop.printSpikes("spikes.pkl")
-        with open("spikes.pkl", "rb") as pkl:
-            neo = pickle.load(pkl)
-            spikes = neo_convertor.convert_spikes(neo)
-            assert numpy.array_equal(spikes, self.spikes_expected)
-
-        pop.print_v("v.pkl")
+        pop.write_data("v.pkl", 'v')
         with open("v.pkl", "rb") as pkl:
             neo = pickle.load(pkl)
             v = neo.segments[0].filter(name='v')[0].magnitude
