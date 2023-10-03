@@ -55,8 +55,6 @@ def install_sPyNNaker_into(module):
     spinnaker_init = os.path.join(spinnaker_dir, "__init__.py")
     with open(spinnaker_init, "w", encoding="utf-8") as spinn_file:
         spinn_file.write("from spynnaker.pyNN import *\n")
-        # To revert back to spynnaker8 use this line instead of the above
-        # spinn_file.write("from spynnaker8 import *\n")
 
     print(f"Created {spinnaker_init} to point to spynnaker.pyNN")
 

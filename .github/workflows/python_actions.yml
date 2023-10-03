@@ -34,9 +34,9 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Checkout SupportScripts
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
@@ -81,12 +81,12 @@ jobs:
         coveralls-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Lint with flake8
-      run: flake8 ${{ env.BASE_PKG }} spynnaker8 unittests spynnaker_integration_tests
+      run: flake8 ${{ env.BASE_PKG }} unittests spynnaker_integration_tests
 
     - name: Lint with pylint
       uses: ./support/actions/pylint
       with:
-        package: ${{ env.BASE_PKG }} spynnaker8
+        package: ${{ env.BASE_PKG }}
         language: en_GB
 
   validate:
@@ -97,9 +97,9 @@ jobs:
         python-version: ["3.8"]
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Checkout SupportScripts
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
