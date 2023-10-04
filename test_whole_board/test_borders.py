@@ -38,18 +38,26 @@ WEIGHT = 100.0
 MAX_NEURONS = 256
 
 
-def _add_edge_chip(machine, x, y, edge_chips):
+def _add_edge_chip(machine, x, y, link, edge_chips):
     if not machine.is_chip_at(x, y):
         return
     chip = machine.get_chip_at(x, y)
-    target_xys = list()
-    for lnk in chip.router.links:
-        target = machine.get_chip_at(lnk.destination_x, lnk.destination_y)
-        if (target.nearest_ethernet_x != chip.nearest_ethernet_x or
-                target.nearest_ethernet_y != chip.nearest_ethernet_y):
-            target_xys.append((target.x, target.y))
-    if target_xys:
-        edge_chips.append((chip, target_xys))
+    lnk = chip.router.get_link(link)
+    if lnk is None:
+        return
+    tg = machine.get_chip_at(lnk.destination_x, lnk.destination_y)
+    if tg is not None:
+        t00 = machine.get_chip_at(
+                tg.nearest_ethernet_x, tg.nearest_ethernet_y)
+        (tlx, tly) = machine.get_local_xy(tg)
+        l00 = machine.get_chip_at(
+                chip.nearest_ethernet_x, chip.nearest_ethernet_y)
+        (lx, ly) = machine.get_local_xy(chip)
+        r_link = (link + 3) % 6
+        source_label = f"Sender_{x}_{y}_{link}_({lx}_{ly}_{l00.ip_address})"
+        target_label = f"Target_{tg.x}_{tg.y}_{r_link}_({tlx}_{tly}"\
+            + f"_{t00.ip_address})"
+        edge_chips.append((chip, source_label, tg, target_label))
 
 
 def _get_edge_chips(machine):
@@ -71,13 +79,13 @@ def _get_edge_chips(machine):
             for _ in range(4):
                 c_x = (x + ex) % machine.width
                 c_y = (y + ey) % machine.height
-                _add_edge_chip(machine, c_x, c_y, edge_chips)
+                _add_edge_chip(machine, c_x, c_y, edge_chips, l1)
                 if i % 2 == 1:
                     x += dx
                     y += dy
                 c_x = (x + ex) % machine.width
                 c_y = (y + ey) % machine.height
-                _add_edge_chip(machine, c_x, c_y, edge_chips)
+                _add_edge_chip(machine, c_x, c_y, edge_chips, l2)
                 if i % 2 == 0:
                     x += dx
                     y += dy
@@ -115,58 +123,56 @@ def edge_test():
     machine = sim.get_machine()
     edge_chips = _get_edge_chips(machine)
 
-    pops = dict()
-    for chip, target_xys in edge_chips:
+    pops = list()
+    for chip, source_label, target_chip, target_label in edge_chips:
         source = sim.Population(
             MAX_NEURONS, sim.SpikeSourcePoisson(rate=POISSON_RATE),
-            label=f"Sender_{chip.x}_{chip.y}")
+            label=source_label)
         source.record("spikes")
         source.add_placement_constraint(chip.x, chip.y)
 
-        target_pops = list()
-        for x, y in target_xys:
-            target = sim.Population(
-                MAX_NEURONS, sim.IF_curr_delta(tau_refrac=0.0),
-                label=f"Target_{chip.x}_{chip.y}->{x}_{y}")
-            target.record("spikes")
-            target.add_placement_constraint(x, y)
-            target_pops.append(target)
+        target = sim.Population(
+            MAX_NEURONS, sim.IF_curr_delta(tau_refrac=0.0),
+            label=target_label)
+        target.record("spikes")
+        target.add_placement_constraint(target_chip.x, target_chip.y)
 
-            sim.Projection(source, target, sim.OneToOneConnector(),
-                           sim.StaticSynapse(weight=WEIGHT))
-        pops[source] = target_pops
+        sim.Projection(source, target, sim.OneToOneConnector(),
+                       sim.StaticSynapse(weight=WEIGHT))
+        pops.append((source, target))
 
     # Run and get results
     sim.run(5000)
 
     success = True
-    for source_pop, target_pops in pops.items():
+    for source_pop, target_pop in pops:
         source_spikes = numpy.unique(
             source_pop.spinnaker_get_data("spikes"), axis=0)
         # Eliminate spikes that happened in the last timer tick
         source_spikes = source_spikes[source_spikes[:, 1] != 4999]
         # Add one to the source spike times to account for delay in targets
         source_spikes[:, 1] = source_spikes[:, 1] + 1
-        for target_pop in target_pops:
-            target_spikes = target_pop.spinnaker_get_data("spikes")
-            if (len(source_spikes) > len(target_spikes)):
-                missing = _find_missing(source_spikes, target_spikes)
-                print("Mismatch in sources and targets for"
-                      f" {source_pop.label}->{target_pop.label}: {missing}")
-                success = False
-            elif (len(source_spikes) < len(target_spikes)):
-                missing = _find_missing(target_spikes, source_spikes)
-                print("Mismatch in targets and sources for"
-                      f" {source_pop.label}->{target_pop.label}: {missing}")
-                success = False
-            elif not numpy.all(source_spikes[:, 0] == target_spikes[:, 0]):
-                print("Mismatch in sources and targets for"
-                      f" {source_pop.label}->{target_pop.label}")
-                success = False
-            elif not numpy.all(source_spikes[:, 1] == target_spikes[:, 1]):
-                print("Mismatch in sources and targets for"
-                      f" {source_pop.label}->{target_pop.label}")
-                success = False
+
+        # Compare with the target spikes
+        target_spikes = target_pop.spinnaker_get_data("spikes")
+        if (len(source_spikes) > len(target_spikes)):
+            missing = _find_missing(source_spikes, target_spikes)
+            print("Mismatch in sources and targets for"
+                  f" {source_pop.label}->{target_pop.label}: {missing}")
+            success = False
+        elif (len(source_spikes) < len(target_spikes)):
+            missing = _find_missing(target_spikes, source_spikes)
+            print("Mismatch in targets and sources for"
+                  f" {source_pop.label}->{target_pop.label}: {missing}")
+            success = False
+        elif not numpy.all(source_spikes[:, 0] == target_spikes[:, 0]):
+            print("Mismatch in sources and targets for"
+                  f" {source_pop.label}->{target_pop.label}")
+            success = False
+        elif not numpy.all(source_spikes[:, 1] == target_spikes[:, 1]):
+            print("Mismatch in sources and targets for"
+                  f" {source_pop.label}->{target_pop.label}")
+            success = False
     assert success, "Something failed - see above for details"
 
 
@@ -176,7 +182,7 @@ def test_run(x, y):
     client = SpallocClient(SPALLOC_URL, SPALLOC_USERNAME, SPALLOC_PASSWORD)
     job = client.create_job_rect_at_board(
         WIDTH, HEIGHT, triad=(x, y, 0), machine_name=SPALLOC_MACHINE,
-        max_dead_boards=3)
+        max_dead_boards=1)
     with job:
         job.launch_keepalive_task()
         # Wait for not queued for up to 30 seconds
@@ -191,7 +197,10 @@ def test_run(x, y):
             pytest.skip(
                 f"Boards {x}, {y}, 0 could not be allocated on job {job}")
         # Actually wait for ready now (as might be powering on)
-        job.wait_until_ready()
+        job.wait_until_ready(n_retries=3)
+        print(job.get_connections())
+        while job.get_root_host() is None:
+            time.sleep(0.5)
         tmpdir = tempfile.mkdtemp(prefix=f"{x}_{y}_0", dir=test_dir)
         os.chdir(tmpdir)
         with open("spynnaker.cfg", "w", encoding="utf-8") as f:
