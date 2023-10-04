@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import math
-from unittest import SkipTest
 from spynnaker.pyNN.exceptions import ConfigurationException
 import pyNN.spiNNaker as sim
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterAbstractPopulationVertexFixed)
 
@@ -28,8 +28,8 @@ def find_good_chip(machine, n_target):
                 if chip.n_user_processors > n_target:
                     print(chip.n_user_processors)
                     return (x, y)
-    raise SkipTest("No Chip found with You Need at least {} user processors"
-                   .format(n_target))
+    SpynnakerDataView.raise_skiptest(
+        f"No Chip found with at least {n_target} user processors")
 
 
 def do_bitfield_run():
@@ -43,9 +43,8 @@ def do_bitfield_run():
         machine = sim.get_machine()
     except ConfigurationException as oops:
         if "Failure to detect machine " in str(oops):
-            raise SkipTest(
-                "You Need at least {} boards to run this test".format(
-                    n_boards)) from oops
+            SpynnakerDataView.raise_skiptest(
+                f"You Need at least {n_boards} boards to run this test", oops)
         raise oops
     target_x, target_y = find_good_chip(machine, n_target)
 
