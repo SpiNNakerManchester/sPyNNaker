@@ -78,6 +78,10 @@ class _MockTransceiverinOut(Transceiver):
             data = struct.Struct("<I").pack(data)
         self._data_to_read[base_address:base_address + len(data)] = data
 
+    @overrides(Transceiver.get_region_base_address)
+    def get_region_base_address(self, x, y, p):
+        return 0
+
     @overrides(Transceiver.get_cpu_information_from_core)
     def get_cpu_information_from_core(self, x, y, p):
         bs = bytearray(128)
