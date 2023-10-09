@@ -82,12 +82,6 @@ class _MockTransceiverinOut(Transceiver):
     def get_region_base_address(self, x, y, p):
         return 0
 
-    @overrides(Transceiver.get_cpu_information_from_core)
-    def get_cpu_information_from_core(self, x, y, p):
-        bs = bytearray(128)
-        cpu_data = _INFO_PATTERN.unpack_from(bytes(bs), 0)
-        return CPUInfo(x=1, y=2, p=3, cpu_data=cpu_data)
-
     @overrides(Transceiver.read_memory)
     def read_memory(self, x, y, base_address, length, cpu=0):
         return self._data_to_read[base_address:base_address + length]
