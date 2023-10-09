@@ -20,8 +20,6 @@ import pytest
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
-from spinnman.model import CPUInfo
-from spinnman.processes.get_cpu_info_process import _INFO_PATTERN
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
 from pacman.operations.routing_info_allocator_algorithms import (
