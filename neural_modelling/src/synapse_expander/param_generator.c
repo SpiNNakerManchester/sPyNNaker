@@ -29,6 +29,7 @@
 #include "param_generators/param_generator_normal_clipped.h"
 #include "param_generators/param_generator_normal_clipped_to_boundary.h"
 #include "param_generators/param_generator_exponential.h"
+#include "param_generators/param_generator_exponential_clipped.h"
 
 //! The "hashes" for parameter generators
 enum {
@@ -44,6 +45,8 @@ enum {
     NORMAL_CLIPPED_BOUNDARY,
     //! A parameter that is an exponentially-distributed random variable
     EXPONENTIAL,
+	//! A parameter that is a clipped-exponentially-distributed random variable
+	EXPONENTIAL_CLIPPED,
     //! The number of known generators
     N_PARAM_GENERATORS
 };
@@ -101,7 +104,11 @@ static const struct param_generator_info param_generators[] = {
     {EXPONENTIAL,
             param_generator_exponential_initialize,
             param_generator_exponential_generate,
-            param_generator_exponential_free}
+            param_generator_exponential_free},
+	{EXPONENTIAL_CLIPPED,
+			param_generator_exponential_clipped_initialize,
+			param_generator_exponential_clipped_generate,
+			param_generator_exponential_clipped_free}
 };
 
 param_generator_t param_generator_init(uint32_t hash, void **in_region) {
