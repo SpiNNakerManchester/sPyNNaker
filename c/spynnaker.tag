@@ -9950,6 +9950,7 @@
     <includes id="param__generator__normal__clipped_8h" name="param_generator_normal_clipped.h" local="yes" imported="no">param_generators/param_generator_normal_clipped.h</includes>
     <includes id="param__generator__normal__clipped__to__boundary_8h" name="param_generator_normal_clipped_to_boundary.h" local="yes" imported="no">param_generators/param_generator_normal_clipped_to_boundary.h</includes>
     <includes id="param__generator__exponential_8h" name="param_generator_exponential.h" local="yes" imported="no">param_generators/param_generator_exponential.h</includes>
+    <includes id="param__generator__exponential__clipped_8h" name="param_generator_exponential_clipped.h" local="yes" imported="no">param_generators/param_generator_exponential_clipped.h</includes>
     <class kind="struct">param_generator_info</class>
     <class kind="struct">param_generator</class>
     <member kind="enumvalue">
@@ -9986,6 +9987,12 @@
       <name>EXPONENTIAL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
       <anchor>a5d76b81b0ad4c19007a781d4edb8181faa6055a3a8ab1aed0594419b51d9ec15e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>EXPONENTIAL_CLIPPED</name>
+      <anchorfile>param__generator_8c.html</anchorfile>
+      <anchor>a5d76b81b0ad4c19007a781d4edb8181faf2695167689db2a433e28e813f6d88f3</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
@@ -10104,6 +10111,43 @@
       <name>param_generator_exponential_generate</name>
       <anchorfile>param__generator__exponential_8h.html</anchorfile>
       <anchor>a0b7052da706984ea9afd03182b04db9e</anchor>
+      <arglist>(void *generator)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>param_generator_exponential_clipped.h</name>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
+    <filename>param__generator__exponential__clipped_8h.html</filename>
+    <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <class kind="struct">param_generator_exponential_clipped_params</class>
+    <class kind="struct">param_generator_exponential_clipped</class>
+    <member kind="define">
+      <type>#define</type>
+      <name>MAX_REDRAWS</name>
+      <anchorfile>param__generator__exponential__clipped_8h.html</anchorfile>
+      <anchor>a47fa28c0ff86570b51eb712e1c37a9bd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void *</type>
+      <name>param_generator_exponential_clipped_initialize</name>
+      <anchorfile>param__generator__exponential__clipped_8h.html</anchorfile>
+      <anchor>ab8780fa58f53712b58f8a6388ddce6d1</anchor>
+      <arglist>(void **region)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>param_generator_exponential_clipped_free</name>
+      <anchorfile>param__generator__exponential__clipped_8h.html</anchorfile>
+      <anchor>ab8a81a5dc3ed66df57d4ea72b4f737f4</anchor>
+      <arglist>(void *generator)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static accum</type>
+      <name>param_generator_exponential_clipped_generate</name>
+      <anchorfile>param__generator__exponential__clipped_8h.html</anchorfile>
+      <anchor>a5a9bb4416af96291978f81160ab26d3c</anchor>
       <arglist>(void *generator)</arglist>
     </member>
   </compound>
@@ -12461,6 +12505,16 @@
     <name>param_generator_exponential</name>
     <filename>param__generator__exponential_8h.html</filename>
     <anchor>structparam__generator__exponential</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>param_generator_exponential_clipped</name>
+    <filename>param__generator__exponential__clipped_8h.html</filename>
+    <anchor>structparam__generator__exponential__clipped</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>param_generator_exponential_clipped_params</name>
+    <filename>param__generator__exponential__clipped_8h.html</filename>
+    <anchor>structparam__generator__exponential__clipped__params</anchor>
   </compound>
   <compound kind="struct">
     <name>param_generator_exponential_params</name>
