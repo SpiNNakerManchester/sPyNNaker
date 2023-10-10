@@ -42,6 +42,8 @@ def run_script():
             "normal_clipped_to_boundary", mu=12.0, sigma=5.0,
             low=6.0, high=16.0)),
         (7.0, p.RandomDistribution("exponential", beta=5.0)),
+        (8.0, p.RandomDistribution(
+            "exponential_clipped", beta=2.0, low=0, high=3.0)),
     ]
     connectors = [
         (p.OneToOneConnector, functools.partial(check_one_to_one, 10)),
