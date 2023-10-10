@@ -15,7 +15,11 @@
 import pyNN.random
 from pyNN.random import NumpyRNG
 from typing import Optional
+from pyNN.random import available_distributions
 # This file is to work around a Sphinx bug
+
+if "exponential_clipped" not in available_distributions:
+    available_distributions["exponential_clipped"] = ('beta', 'low', 'high')
 
 
 class RandomDistribution(pyNN.random.RandomDistribution):

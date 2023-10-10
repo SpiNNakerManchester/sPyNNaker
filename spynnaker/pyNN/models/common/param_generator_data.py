@@ -63,11 +63,9 @@ PARAM_TYPE_BY_NAME = {
     "normal": 2,
     "normal_clipped": 3,
     "normal_clipped_to_boundary": 4,
-    "exponential": 5
+    "exponential": 5,
+    "exponential_clipped": 6
 }
-
-#: ID for the convolution kernel generator.
-PARAM_TYPE_KERNEL = 6
 
 _ParamType: TypeAlias = Union[int, float, RandomDistribution]
 
