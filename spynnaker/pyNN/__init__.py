@@ -186,7 +186,7 @@ __all__ = [
     'Projection',
     'get_current_time', 'create', 'connect', 'get_time_step', 'get_min_delay',
     'get_max_delay', 'initialize', 'list_standard_models', 'name',
-    'record', 'record_v', 'record_gsyn', "get_machine"]
+    'record', "get_machine"]
 
 
 class __PynnOperations(TypedDict, total=False):
@@ -423,41 +423,6 @@ def end(_=True) -> None:
         population.write_data(io, variables)
     __simulator.write_on_end = []
     __simulator.stop()
-
-
-def record_v(source: PopulationBase, filename: str):
-    """
-    Deprecated method for getting voltage.
-    This is not documented in the public facing API.
-
-    .. deprecated:: 5.0
-
-    :param source: the population / view / assembly to record
-    :type source: ~spynnaker.pyNN.models.populations.Population or
-        ~spynnaker.pyNN.models.populations.PopulationView
-    :param str filename: the neo file to write to
-    """
-    logger.warning(
-        "Using record_v is deprecated.  Use record('v') function instead")
-    record(['v'], source, filename)
-
-
-def record_gsyn(source: PopulationBase, filename: str):
-    """
-    Deprecated method for getting both types of gsyn.
-    This is not documented in the public facing API
-
-    .. deprecated:: 5.0
-
-    :param source: the population / view / assembly to record
-    :type source: ~spynnaker.pyNN.models.populations.Population or
-        ~spynnaker.pyNN.models.populations.PopulationView
-    :param str filename: the neo file to write to
-    """
-    logger.warning(
-        "Using record_gsyn is deprecated.  Use record('gsyn_exc') and/or"
-        " record('gsyn_inh') function instead")
-    record(['gsyn_exc', 'gsyn_inh'], source, filename)
 
 
 def list_standard_models() -> List[str]:
