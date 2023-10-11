@@ -43,7 +43,8 @@ class TestAllow(BaseTestCase):
             # no check of gsyn as the system overloads
         # System intentional overload so may error
         except SpinnmanTimeoutException as ex:
-            SpynnakerDataView.raise_skiptest(parent=ex)
+            SpynnakerDataView.raise_skiptest(
+                "Overload caused timeout", parent=ex)
 
     def test_allow(self):
         self.runsafe(self.allow)
