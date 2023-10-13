@@ -229,7 +229,8 @@ class Struct(object):
             # We want the data generated "per neuron" regardless of how many -
             # there must be a single value for this to work
             if vertex_slice is None:
-                self.__gen_data_one_for_all(data, gen_data, values, name)
+                self.__gen_data_one_for_all(data, gen_data, values, name,
+                                            n_repeats)
 
             # If we know the array size, the values can vary per neuron
             else:
@@ -246,7 +247,7 @@ class Struct(object):
         # Make it one
         return numpy.concatenate(all_data)
 
-    def __gen_data_one_for_all(self, data, gen_data, values, name):
+    def __gen_data_one_for_all(self, data, gen_data, values, name, n_repeats):
         """
         Generate data with a single value for all neurons.
         """
@@ -254,9 +255,8 @@ class Struct(object):
         # that one sub-set covers all neurons)
         data.append(1)
 
-        # How many times to repeat the next bit (once for each neuron
-        # which is determined at execution time)
-        data.append(REPEAT_PER_NEURON_FLAG)
+        # How many times to repeat the next bit
+        data.append(n_repeats)
 
         # Get the value to write, of which there can only be one
         # (or else there will be an error here ;)

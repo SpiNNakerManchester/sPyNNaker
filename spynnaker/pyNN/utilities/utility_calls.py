@@ -32,7 +32,8 @@ from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
     RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
     RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
-    RandomStatsVonmisesImpl, RandomStatsBinomialImpl)
+    RandomStatsVonmisesImpl, RandomStatsBinomialImpl,
+    RandomStatsExponentialClippedImpl)
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_SECOND_CONVERSION)
 from spynnaker.pyNN.utilities.constants import WRITE_BANDWIDTH_BYTES_PER_SECOND
@@ -52,6 +53,7 @@ STATS_BY_NAME = {
     'binomial': RandomStatsBinomialImpl(),
     'gamma': RandomStatsGammaImpl(),
     'exponential': RandomStatsExponentialImpl(),
+    'exponential_clipped': RandomStatsExponentialClippedImpl(),
     'lognormal': RandomStatsLogNormalImpl(),
     'normal': RandomStatsNormalImpl(),
     'normal_clipped': RandomStatsNormalClippedImpl(),
