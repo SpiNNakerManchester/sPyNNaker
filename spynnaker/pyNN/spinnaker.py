@@ -48,8 +48,7 @@ from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_selector)
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
-from spynnaker.pyNN.utilities.utility_calls import (
-    moved_in_v7_warning)
+
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -190,7 +189,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         Used to bypass the dual level object.
 
         :return: the SpiNNaker object
-        :rtype: ~spynnaker8.spinnaker.SpiNNaker
+        :rtype: ~spynnaker.pyNN.SpiNNaker
         """
         return self
 
@@ -381,7 +380,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :param str search_path: absolute search path for binaries
         """
         # pylint: disable=protected-access
-        moved_in_v7_warning("register_binary_search_path is now a View method")
         SpynnakerDataView.register_binary_search_path(search_path)
 
     def _execute_write_neo_metadata(self):

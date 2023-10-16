@@ -32,7 +32,8 @@ from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
     RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
     RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
-    RandomStatsVonmisesImpl, RandomStatsBinomialImpl)
+    RandomStatsVonmisesImpl, RandomStatsBinomialImpl,
+    RandomStatsExponentialClippedImpl)
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_SECOND_CONVERSION)
 from spynnaker.pyNN.utilities.constants import WRITE_BANDWIDTH_BYTES_PER_SECOND
@@ -52,6 +53,7 @@ STATS_BY_NAME = {
     'binomial': RandomStatsBinomialImpl(),
     'gamma': RandomStatsGammaImpl(),
     'exponential': RandomStatsExponentialImpl(),
+    'exponential_clipped': RandomStatsExponentialClippedImpl(),
     'lognormal': RandomStatsLogNormalImpl(),
     'normal': RandomStatsNormalImpl(),
     'normal_clipped': RandomStatsNormalClippedImpl(),
@@ -387,47 +389,6 @@ def get_n_bits(n_values):
     if n_values == 1:
         return 1
     return int(math.ceil(math.log2(n_values)))
-
-
-def moved_in_v6(old_location, _):
-    """
-    Tells the users that old code is no longer implemented.
-
-    :param str old_location: old import
-    :raise: NotImplementedError
-    """
-    raise NotImplementedError(f"Old import: {old_location}")
-
-
-def moved_in_v7(old_location, new_location):
-    """
-    Warns the users that they are using an old import.
-
-    In version 8 this will be upgraded to a exception and then later removed
-
-    :param str old_location: old import
-    :param str new_location: new import
-    :raise NotImplementedError: if in CONTINUOUS_INTEGRATION
-    """
-    if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-        raise NotImplementedError(f"Old import: {old_location}")
-    logger.warning("File {} moved to {}. Please fix your imports. "
-                   "In version 8 this will fail completely.",
-                   old_location, new_location)
-
-
-def moved_in_v7_warning(message):
-    """
-    Warns the user that they are using old code.
-
-    In version 8 this will be upgraded to a exception and then later removed
-
-    :param str message:
-    :raise NotImplementedError: if in CONTINUOUS_INTEGRATION
-    """
-    if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-        raise NotImplementedError(message)
-    logger.warning("{} In version 8 old call will fail completely.", message)
 
 
 def get_time_to_write_us(n_bytes, n_cores):

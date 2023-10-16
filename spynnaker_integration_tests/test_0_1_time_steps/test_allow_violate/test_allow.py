@@ -14,9 +14,9 @@
 
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import SynfireRunner
+from spynnaker.pyNN.data import SpynnakerDataView
 import spynnaker.spike_checker as spike_checker
 from spinnman.exceptions import SpinnmanTimeoutException
-from unittest import SkipTest
 
 n_neurons = 10  # number of neurons in each population
 runtime = 50
@@ -43,7 +43,8 @@ class TestAllow(BaseTestCase):
             # no check of gsyn as the system overloads
         # System intentional overload so may error
         except SpinnmanTimeoutException as ex:
-            raise SkipTest() from ex
+            SpynnakerDataView.raise_skiptest(
+                "Overload caused timeout", parent=ex)
 
     def test_allow(self):
         self.runsafe(self.allow)
