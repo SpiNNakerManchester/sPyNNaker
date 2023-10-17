@@ -257,9 +257,10 @@ class SpikeSourcePoissonVertex(
         self.__data: RangeDictionary[
             Union[NDArray[numpy.floating], NDArray[numpy.integer]]
             ] = RangeDictionary(n_neurons)
-        self.__data["rates"] = RangedList(
+        rates_list = RangedList(
             n_neurons, _rates,
             use_list_as_value=not _is_list_of_lists(_rates))
+        self.__data["rates"] = rates_list
         self.__data["starts"] = RangedList(
             n_neurons, _starts,
             use_list_as_value=not _is_list_of_lists(_starts))
@@ -279,9 +280,7 @@ class SpikeSourcePoissonVertex(
             self.__max_rate = numpy.amax(all_rates) if len(all_rates) else 0
         else:
             self.__max_rate = max_rate
-        self.__max_n_rates = max(
-            len(r)
-            for r in self.__data["rates"])  # pylint: disable=not-an-iterable
+        self.__max_n_rates = max(len(r) for r in rates_list)
 
         # Keep track of how many outgoing projections exist
         self.__outgoing_projections: List[Projection] = list()
