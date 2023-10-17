@@ -30,11 +30,9 @@ class SpynnakerRangedList(RangedList):
 
         return super().listness_check(value)
 
-    @staticmethod
     @overrides(RangedList.as_list)
-    def as_list(value, size, ids=None):
-
+    def as_list(self, value, size, ids=None):
         if isinstance(value, RandomDistribution):
             return value.next(n=size)
 
-        return RangedList.as_list(value, size, ids)
+        return super().as_list(value, size, ids)
