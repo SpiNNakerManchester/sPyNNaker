@@ -23,14 +23,12 @@ class SpynnakerRangedList(RangedList):
     :py:class:`~spinn_utilities.ranged.RangedList`.
     """
 
-    @staticmethod
-    @overrides(RangedList.is_list)
-    def is_list(value, size):
-
+    @overrides(RangedList.listness_check)
+    def listness_check(self, value):
         if isinstance(value, RandomDistribution):
             return True
 
-        return RangedList.is_list(value, size)
+        return super().listness_check(value)
 
     @staticmethod
     @overrides(RangedList.as_list)
