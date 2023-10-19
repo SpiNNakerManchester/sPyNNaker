@@ -164,7 +164,7 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
-        ids = numpy.where(self.__mask[:, post_vertex_slice.as_slice])
+        ids = numpy.where(self.__mask[:, post_vertex_slice.get_raster_ids()])
         n_connections = len(ids[0])
 
         block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
