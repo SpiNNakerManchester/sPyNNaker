@@ -67,7 +67,7 @@ class _MockTransceiverinOut(MockableTransceiver):
         return 0
 
     @overrides(MockableTransceiver.write_memory)
-    def write_memory(self, x, y, base_address, data, n_bytes=None, offset=0,
+    def write_memory(self, x, y, base_address, data, *, n_bytes=None, offset=0,
                      cpu=0, is_filename=False, get_sum=False):
         if data is None:
             return
