@@ -164,13 +164,13 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
-        ids = numpy.where(self.__mask[:, post_vertex_slice.get_raster_ids()])
+        raster_ids = post_vertex_slice.get_raster_ids()
+        ids = numpy.where(self.__mask[:, raster_ids])
         n_connections = len(ids[0])
 
         block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = ids[0] % synapse_info.n_pre_neurons
-        block["target"] = (
-            (ids[1] % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
+        block["target"] = raster_ids[ids[1]]
         block["weight"] = self._generate_weights(
             block["source"], block["target"], n_connections, post_vertex_slice,
             synapse_info)

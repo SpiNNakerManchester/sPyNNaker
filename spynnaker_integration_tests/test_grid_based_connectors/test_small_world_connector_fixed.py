@@ -148,17 +148,23 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
     def run_1_core(self):
         spikes, weights = do_run([6,6], 6)
 
+
+        single_connected = self.directly_connected(weights)
+        for spike_train in spikes:
+            print(spike_train[0].magnitude)
+        print(single_connected)
+
         # Not sure checking spike len is telling us much
         for spike_train, first in zip(spikes, self.FIRSTS):
             self.assertEqual(first, spike_train[0].magnitude)
 
-        single_connected = self.directly_connected(weights)
         self.assertDictEqual(self.S_DICT, single_connected)
 
     def run_many_core_2_2(self):
         spikes, weights = do_run([2,2], 6)
 
         single_connected = self.directly_connected(weights)
+        print(single_connected)
         self.assertDictEqual(self.S_DICT, single_connected)
 
         # Not sure checking spike len is telling us much

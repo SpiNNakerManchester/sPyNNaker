@@ -1054,20 +1054,27 @@ class NeuronRecorder(object):
         """
         n_indices = self.__ceil_n_indices(vertex_slice.n_atoms)
         if rate == 0:
+            # Not recording anything so all indices are 0
             data.append(numpy.zeros(n_indices, dtype="uint16").view("uint32"))
         elif self.__indexes[variable] is None:
+            # Recording everything so indices are identity
             data.append(numpy.arange(n_indices, dtype="uint16").view("uint32"))
         else:
             indexes = self.__indexes[variable]
             local_index = 0
             local_indexes = list()
-            for index in range(n_indices):
-                if index + vertex_slice.lo_atom in indexes:
+            # Add indices based on the raster ids
+            for index in vertex_slice.get_raster_ids():
+                if index in indexes:
+                    # Recording so write the local index to record to
                     local_indexes.append(local_index)
                     local_index += 1
                 else:
-                    # write to one beyond recording range
+                    # Not recording so write to one beyond recording range
                     local_indexes.append(n_recording)
+            # Any extra indices should be filled in
+            for _ in range(index, n_indices):
+                local_indexes.append(n_recording)
             data.append(
                 numpy.array(local_indexes, dtype="uint16").view("uint32"))
 
