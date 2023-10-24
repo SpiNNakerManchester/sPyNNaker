@@ -48,7 +48,7 @@ class SplitterPoissonDelegate(SplitterFixedLegacy):
 
     @overrides(SplitterFixedLegacy.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
-        AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
+        SplitterFixedLegacy.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, SpikeSourcePoissonVertex):
             raise PacmanConfigurationException(
                 f"The vertex {app_vertex} cannot be supported by the "
