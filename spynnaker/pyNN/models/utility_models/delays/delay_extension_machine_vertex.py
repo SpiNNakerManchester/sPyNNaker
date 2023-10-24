@@ -280,7 +280,7 @@ class DelayExtensionMachineVertex(
                 break
 
         self.write_delay_parameters(
-            spec, self._vertex_slice, key, incoming_key, incoming_mask)
+            spec, self.vertex_slice, key, incoming_key, incoming_mask)
 
         # End-of-Spec:
         spec.end_specification()
