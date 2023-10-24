@@ -14,7 +14,6 @@
 
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
-from spynnaker.pyNN.utilities import neo_convertor
 
 
 def do_run(m_size, n_atoms_side):
@@ -130,7 +129,7 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
               34: {32, 33, 34, 35, 20, 21, 22, 23, 26, 27, 28, 29},
               35: {33, 34, 35, 21, 22, 23, 27, 28, 29}}
 
-    FIRSTS = [ 4, 11, 11, 16, 16, 21,
+    FIRSTS = [4, 11, 11, 16, 16, 21,
               11, 11, 11, 16, 16, 21,
               11, 11, 11, 16, 16, 21,
               16, 16, 16, 16, 17, 21,
@@ -146,8 +145,7 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
         return singles
 
     def run_1_core(self):
-        spikes, weights = do_run([6,6], 6)
-
+        spikes, weights = do_run([6, 6], 6)
 
         single_connected = self.directly_connected(weights)
         for spike_train in spikes:
@@ -161,7 +159,7 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
         self.assertDictEqual(self.S_DICT, single_connected)
 
     def run_many_core_2_2(self):
-        spikes, weights = do_run([2,2], 6)
+        spikes, weights = do_run([2, 2], 6)
 
         single_connected = self.directly_connected(weights)
         print(single_connected)
@@ -171,9 +169,8 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
         for spike_train, first in zip(spikes, self.FIRSTS):
             self.assertAlmostEqual(first, spike_train[0].magnitude, delta=1)
 
-
     def run_many_core_3_3(self):
-        spikes, weights = do_run([3,3], 6)
+        spikes, weights = do_run([3, 3], 6)
         # Not sure checking spike len is telling us much
         for spike_train, first in zip(spikes, self.FIRSTS):
             self.assertAlmostEqual(first, spike_train[0].magnitude, delta=1)
