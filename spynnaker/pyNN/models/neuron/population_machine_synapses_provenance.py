@@ -67,18 +67,6 @@ class PopulationMachineSynapsesProvenance(object):
     LATE_SPIKES = "Late spikes"
     MAX_LATE_SPIKE = "Max late spike"
 
-    @abstractproperty
-    def _app_vertex(self):
-        """
-        The application vertex of the machine vertex.
-
-        .. note::
-            This is likely to be available via the
-            :py:class:`~pacman.model.graphs.machine.MachineVertex`.
-
-        :rtype: AbstractPopulationVertex
-        """
-
     def _parse_synapse_provenance(self, label,  x, y, p, provenance_data):
         """
         Extract and yield synapse provenance.
