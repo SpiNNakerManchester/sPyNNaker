@@ -12,9 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from typing import TYPE_CHECKING
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractSupportsSDRAMEdges
 from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
+if TYPE_CHECKING:
+    from pacman.model.graphs.machine import SDRAMMachineEdge
 
 
 @add_metaclass(AbstractBase)
@@ -52,3 +57,8 @@ class ReceivesSynapticInputsOverSDRAM(AbstractSupportsSDRAMEdges):
 
         :rtype: int
         """
+
+    @abstractmethod
+    @overrides(AbstractSupportsSDRAMEdges.sdram_requirement)
+    def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge) -> int:
+        raise NotImplementedError
