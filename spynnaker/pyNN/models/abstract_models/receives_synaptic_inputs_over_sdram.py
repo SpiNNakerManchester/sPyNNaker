@@ -17,9 +17,8 @@ from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractSupportsSDRAMEdges
+from pacman.model.graphs.machine import SDRAMMachineEdge
 from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
-if TYPE_CHECKING:
-    from pacman.model.graphs.machine import SDRAMMachineEdge
 
 
 @add_metaclass(AbstractBase)

@@ -16,8 +16,7 @@ from typing import TYPE_CHECKING
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractSupportsSDRAMEdges
-if TYPE_CHECKING:
-    from pacman.model.graphs.machine import SDRAMMachineEdge
+from pacman.model.graphs.machine import SDRAMMachineEdge
 
 
 class SendsSynapticInputsOverSDRAM(AbstractSupportsSDRAMEdges):
