@@ -86,17 +86,16 @@ def get_pop_info(key):
     return get_pop_info(pop_key)
 ```
 
-When the source and target are linear Populations, the mapping between the row
-index above and the pre-neuron index is simply the identity. When the source and
-/ or the target are multi-dimensional, the mapping is more complicated.  The
-trick then is to re-order the rows so that row index computed on the receiving
-core is correct.
+When the source and target are 1D Populations, the mapping between the row
+index above and the pyNN neuron index in the pre-Population is simply the
+identity. When the source and / or the target are multi-dimensional, the mapping
+is more complicated.  The trick then is to re-order the rows so that row index computed on the receiving core is correct, as shown in the diagram below.
 
 ![Row mappings in 1D and 2D as described in the preceeding text](RowsIn1DAnd2D.png "Rows in 1D and 2D")
 
 In addition to this, we also have to split the information on each synaptic
-row into the appropriate target cores.  Again, for simple linear mapping this
-is a one-to-one value.  For a n-dimensional target though, the splitting is
+row into the appropriate target cores.  Again, for simple 1D Populations this
+is the identity function.  For an n-dimensional target though, the splitting is
 again more complicated, but again can be calculated so that the final indices
 in the row are those of neurons on the local core with no further calculation
 required when the key is received.  Note that the values generated here are
