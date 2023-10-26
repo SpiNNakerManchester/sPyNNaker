@@ -33,7 +33,10 @@ here is that each dimension must be exactly divisible by the number of neurons
 per core in that dimension.  For example, a Population with size (10, 10) in 2
 dimensions (so having 100 neurons) can be split into (5, 5) neurons per core
 made up of rectangles (in this case squares) of neurons (0,0 - 5,5),
-(0,6 - 5,10), (6,0 - 10,5) and (6,6 - 10,10).
+(0,6 - 5,10), (6,0 - 10,5) and (6,6 - 10,10).  Another example is shown in the
+image.
+
+![2D Neurons And Keys as described in the preceeding text](2DNeuronsAndKeys.png "2D Neurons and Keys")
 
 Population Keys
 ---------------
@@ -58,14 +61,30 @@ Synaptic Mapping
 ----------------
 When a key is received, the receiving vertex should not have to process it. The
 aim is that the rows are ordered such that the key can be used to say which row
-of the synaptic table to look at by simple calculation.  The calculation for the
-row index from the key is:
-`(core_n * neurons_per_core) + core_neuron`
+of the synaptic table to look at by simple calculation.  This makes use of a few
+variables: `core_n` and `core_neuron` can be determined from
+the received key (`core_n` from the `core index` part and `core_neuron` from
+the`neuron index` part.  The `neurons_per_core` can be stored on the core
+using the `population key`, and so can be looked up on key reception.  This is
+shown below.
 
-The values of `core_n` and `core_neuron` can be determined from the received
-key (`core_n` from the `core index` part and `core_neuron` from the
-`neuron index` part.  The `neurons_per_core` can be stored on the core
-using the `population key`, and so can be looked up on key reception.
+```
+pop_info = get_pop_info(key)
+core_n = get_core_n_from_key(key, pop_info)
+core_neuron = get_core_neuron_from_key(key, pop_info)
+row_index = (core_n * pop_info.neurons_per_core) + core_neuron
+
+def get_core_n_from_key(key, pop_info):
+    return (key >> pop_info.core_shift) & pop_info.core_mask
+
+def get_core_neuron_from_key(key, pop_info):
+    return key & pop_info.neuron_mask
+
+def get_pop_info(key):
+    pop_key = (key >> pop_shift) & pop_mask
+    // Find the info for the given population in a table
+    return get_pop_info(pop_key)
+```
 
 When the source and target are linear Populations, the mapping between the row
 index above and the pre-neuron index is simply one-to-one. When the source and
@@ -80,7 +99,9 @@ row into the appropriate target cores.  Again, for simple linear mapping this
 is a one-to-one value.  For a n-dimensional target though, the splitting is
 again more complicated, but again can be calculated so that the final indices
 in the row are those of neurons on the local core with no further calculation
-required when the key is received.
+required when the key is received.  Note that the values generated here are
+generally done per target core, so the calculation can leverage on that a bit
+more.
 
 #### To `row index` from `pre-neuron index`
 `full_size[n]`: The full size of the Population in the n'th dimension
