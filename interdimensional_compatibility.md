@@ -87,12 +87,12 @@ def get_pop_info(key):
 ```
 
 When the source and target are linear Populations, the mapping between the row
-index above and the pre-neuron index is simply one-to-one. When the source and
-target have the same number of dimensions, neurons-per-core and size, the same
-is true.  When the source and target differ in any of these aspects, the mapping
-is more complicated.  The trick then is to calculate the row index from each
-pre-neuron index so that the information for that pre-neuron can be stored in
-at the appropriate row index.
+index above and the pre-neuron index is simply the identity. When the source and
+/ or the target are multi-dimensional, the mapping is more complicated.  The
+trick then is to re-order the rows so that row index computed on the receiving
+core is correct.
+
+![Row mappings in 1D and 2D as described in the preceeding text](RowsIn1DAnd2D.png "Rows in 1D and 2D")
 
 In addition to this, we also have to split the information on each synaptic
 row into the appropriate target cores.  Again, for simple linear mapping this
