@@ -42,8 +42,9 @@ typedef struct {
 typedef struct {
     accum weight;        //!< The current weight
 
-    //! The shift to use when multiplying
-    uint32_t weight_shift;
+    REAL min_weight;         //!< The min weight
+    REAL min_weight_recip;         //!< The min weight
+
     //! Reference to the configuration data
     const plasticity_weight_region_data_t *weight_region;
 } weight_state_t;
@@ -51,6 +52,12 @@ typedef struct {
 #include "weight_one_term.h"
 
 //---------------------------------------
+// Externals
+//---------------------------------------
+extern plasticity_weight_region_data_t *plasticity_weight_region_data;
+
+//---------------------------------------
+
 // Weight dependance functions
 //---------------------------------------
 /*!
@@ -62,12 +69,18 @@ typedef struct {
 static inline weight_state_t weight_get_initial(
         weight_t weight, index_t synapse_type) {
     extern plasticity_weight_region_data_t *plasticity_weight_region_data;
-    extern uint32_t *weight_shift;
+    extern REAL *min_weight;
+    extern REAL *min_weight_recip;
 
-    accum s1615_weight = kbits(weight << weight_shift[synapse_type]);
+    uint64_t mw = (uint64_t) bitsk(min_weight[synapse_type]);
+    uint64_t w = (uint64_t) (weight);
+
+    accum s1615_weight = kbits((int_k_t) mw * w);
+
     return (weight_state_t) {
         .weight = s1615_weight,
-        .weight_shift = weight_shift[synapse_type],
+        .min_weight = min_weight[synapse_type],
+		.min_weight_recip = min_weight_recip[synapse_type],
         .weight_region = &plasticity_weight_region_data[synapse_type]
     };
 }
@@ -84,7 +97,9 @@ static inline weight_state_t weight_one_term_apply_depression(
             state.weight_region->a2_minus;
 
     // Multiply scale by depression and subtract
+    // **NOTE** using standard STDP fixed-point format handles format conversion
     state.weight -= mul_accum_fixed(scale, depression);
+
     return state;
 }
 //---------------------------------------
@@ -101,6 +116,7 @@ static inline weight_state_t weight_one_term_apply_potentiation(
     // Multiply scale by potentiation and add
     // **NOTE** using standard STDP fixed-point format handles format conversion
     state.weight += mul_accum_fixed(scale, potentiation);
+
     return state;
 }
 //---------------------------------------
@@ -110,7 +126,7 @@ static inline weight_state_t weight_one_term_apply_potentiation(
  * \return The new weight.
  */
 static inline weight_t weight_get_final(weight_state_t state) {
-    return (weight_t) (bitsk(state.weight) >> state.weight_shift);
+    return (weight_t) (state.weight * state.min_weight_recip);
 }
 
 static inline void weight_decay(weight_state_t *state, int32_t decay) {

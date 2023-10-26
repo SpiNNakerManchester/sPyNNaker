@@ -33,7 +33,7 @@
 //! \return Whether the initialisation succeeded.
 bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts);
+        REAL *min_weights);
 
 //! \brief Process the dynamics of the synapses
 //! \param[in,out] plastic_region_data: Where the plastic data is
@@ -62,7 +62,7 @@ void synapse_dynamics_process_post_synaptic_event(
 void synapse_dynamics_print_plastic_synapses(
         synapse_row_plastic_data_t *plastic_region_data,
         synapse_row_fixed_part_t *fixed_region,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts);
+        REAL *min_weights);
 
 //! \brief Get the counters for plastic pre synaptic events based on (if
 //!     the model was compiled with SYNAPSE_BENCHMARK parameter) or returns 0

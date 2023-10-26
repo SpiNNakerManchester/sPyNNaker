@@ -50,11 +50,11 @@ static uint32_t n_neurons_peak;
 //! The number of synapse types
 static uint32_t n_synapse_types;
 
+//! Minimum weight value
+static REAL *min_weights;
+
 //! The mask of the colour
 static uint32_t colour_mask;
-
-//! Amount to left shift the ring buffer by to make it an input
-static uint32_t *ring_buffer_to_input_left_shifts;
 
 //! The address where the actual neuron parameters start
 static void *saved_neuron_params_address;
@@ -72,7 +72,7 @@ struct neuron_core_parameters {
     uint32_t n_neurons_peak;
     uint32_t n_colour_bits;
     uint32_t n_synapse_types;
-    uint32_t ring_buffer_shifts[];
+    REAL min_weights[];
     // Following this struct in memory (as it can't be expressed in C) is:
     // uint32_t neuron_keys[n_neurons_to_simulate];
 };
@@ -120,22 +120,20 @@ bool neuron_initialise(
     // Get colour details
     colour_mask = (1 << params->n_colour_bits) - 1;
 
-    // Set up ring buffer left shifts
-    uint32_t ring_buffer_bytes = n_synapse_types * sizeof(uint32_t);
-    ring_buffer_to_input_left_shifts = spin1_malloc(ring_buffer_bytes);
-    if (ring_buffer_to_input_left_shifts == NULL) {
-        log_error("Not enough memory to allocate ring buffer");
+    // Set up min weights
+    uint32_t min_weights_bytes = n_synapse_types * sizeof(REAL);
+    min_weights = spin1_malloc(min_weights_bytes);
+    if (min_weights == NULL) {
+        log_error("Not enough memory to allocate min_weights");
         return false;
     }
 
-    // read in ring buffer to input left shifts
-    spin1_memcpy(
-            ring_buffer_to_input_left_shifts, params->ring_buffer_shifts,
-            ring_buffer_bytes);
+    // read in min_weights
+    spin1_memcpy(min_weights, params->min_weights, min_weights_bytes);
 
-    // The key list comes after the ring buffer shifts
+    // The key list comes after the min weights
     uint32_t *neuron_keys_sdram =
-            (uint32_t *) &params->ring_buffer_shifts[n_synapse_types];
+            (uint32_t *) &params->min_weights[n_synapse_types];
     uint32_t neuron_keys_size = n_neurons * sizeof(uint32_t);
     neuron_keys = spin1_malloc(neuron_keys_size);
     if (neuron_keys == NULL) {
@@ -205,7 +203,7 @@ void neuron_transfer(weight_t *syns) { // EXPORTED
     uint32_t synapse_index = 0;
     uint32_t ring_buffer_index = 0;
     for (uint32_t s_i = n_synapse_types; s_i > 0; s_i--) {
-        uint32_t rb_shift = ring_buffer_to_input_left_shifts[synapse_index];
+        REAL min_weight = min_weights[synapse_index];
         uint32_t neuron_index = 0;
         for (uint32_t n_i = n_neurons_peak; n_i > 0; n_i--) {
             weight_t value = syns[ring_buffer_index];
@@ -215,7 +213,7 @@ void neuron_transfer(weight_t *syns) { // EXPORTED
                     rt_error(RTE_SWERR);
                 }
                 input_t val_to_add = synapse_row_convert_weight_to_input(
-                        value, rb_shift);
+                        value, min_weight);
                 neuron_impl_add_inputs(synapse_index, neuron_index, val_to_add);
             }
             syns[ring_buffer_index] = 0;

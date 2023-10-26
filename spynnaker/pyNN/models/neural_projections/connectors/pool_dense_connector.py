@@ -257,6 +257,16 @@ class PoolDenseConnector(AbstractConnector):
         return super(PoolDenseConnector, self)._get_weight_maximum(
             self.__weights, n_conns, synapse_info)
 
+    @overrides(AbstractConnector.get_weight_minimum)
+    def get_weight_minimum(self, weights, weight_random_sigma, synapse_info):
+        # Use the kernel weights if user has supplied them
+        if self.__weights is not None:
+            return super(PoolDenseConnector, self).get_weight_minimum(
+                self.__weights, weight_random_sigma, synapse_info)
+
+        return super(PoolDenseConnector, self).get_weight_minimum(
+            weights, weight_random_sigma, synapse_info)
+
     def __pre_as_post(self, pre_coords):
         """
         Write pre coordinates as post coordinates.

@@ -28,8 +28,7 @@
 
 bool synapse_dynamics_initialise(
         UNUSED address_t address, UNUSED uint32_t n_neurons,
-        UNUSED uint32_t n_synapse_types,
-        UNUSED uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        UNUSED uint32_t n_synapse_types, UNUSED REAL *min_weights) {
     return true;
 }
 
@@ -52,7 +51,7 @@ bool synapse_dynamics_process_plastic_synapses(
 void synapse_dynamics_print_plastic_synapses(
         UNUSED synapse_row_plastic_data_t *plastic_region_data,
         UNUSED synapse_row_fixed_part_t *fixed_region,
-        UNUSED uint32_t *ring_buffer_to_input_left_shifts) {
+        UNUSED REAL *min_weights) {
 }
 
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(void) {

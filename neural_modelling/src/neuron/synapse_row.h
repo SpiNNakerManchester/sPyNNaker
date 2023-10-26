@@ -233,18 +233,15 @@ static inline weight_t synapse_row_sparse_weight(uint32_t x) {
 
 //! \brief Converts a weight stored in a synapse row to an input
 //! \param[in] weight: the weight to convert in synapse-row form
-//! \param[in] left_shift: the shift to use when decoding
+//! \param[in] min_weight: the minimum weight to use in the conversion
 //! \return the actual input weight for the model
 static inline input_t synapse_row_convert_weight_to_input(
-        weight_t weight, uint32_t left_shift) {
-    union {
-        int_k_t input_type;
-        s1615 output_type;
-    } converter;
+        weight_t weight, REAL min_weight) {
+    // Simply doing weight * min_weight adds unnecessary compiler instructions
+    uint64_t mw = (uint64_t) bitsk(min_weight);
+    uint64_t w = (uint64_t) (weight);
 
-    converter.input_type = (int_k_t) (weight) << left_shift;
-
-    return converter.output_type;
+    return kbits((int_k_t) (mw * w));
 }
 
 //! \brief Get the index of the ring buffer for a given timestep, synapse type

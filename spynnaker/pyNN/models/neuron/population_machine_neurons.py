@@ -19,7 +19,9 @@ from spinn_utilities.overrides import overrides
 
 from pacman.utilities.utility_calls import get_field_based_keys
 
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
@@ -167,14 +169,14 @@ class PopulationMachineNeurons(
             db.insert_core(
                 x, y, p, "Latest_Send_time", neuron_prov.latest_send)
 
-    def _write_neuron_data_spec(self, spec, ring_buffer_shifts):
+    def _write_neuron_data_spec(self, spec, min_weights):
         """
         Write the data specification of the neuron data.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param list(int) ring_buffer_shifts:
-            The shifts to apply to convert ring buffer values to S1615 values
+        :param list(float) min_weights:
+            The computed minimum weights to be used in the simulation
         """
         # Get and store the key
         routing_info = SpynnakerDataView.get_routing_infos()
@@ -182,7 +184,7 @@ class PopulationMachineNeurons(
             self, SPIKE_PARTITION_ID))
 
         # Write the neuron core parameters
-        self._write_neuron_core_parameters(spec, ring_buffer_shifts)
+        self._write_neuron_core_parameters(spec, min_weights)
 
         # Write the current source parameters
         self._write_current_source_parameters(spec)
@@ -197,8 +199,6 @@ class PopulationMachineNeurons(
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param list(int) ring_buffer_shifts:
-            The shifts to apply to convert ring buffer values to S1615 values
         """
         # Write the current source parameters
         self._write_current_source_parameters(spec)
@@ -207,14 +207,14 @@ class PopulationMachineNeurons(
         self._neuron_data.write_data(
             spec, self._vertex_slice, self._neuron_regions, False)
 
-    def _write_neuron_core_parameters(self, spec, ring_buffer_shifts):
+    def _write_neuron_core_parameters(self, spec, min_weights):
         """
         Write the neuron parameters region.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param list(int) ring_buffer_shifts:
-            The shifts to apply to convert ring buffer values to S1615 values
+        :param list(float) min_weights:
+            The computed minimum weights to be used in the simulation
         """
         # pylint: disable=too-many-arguments
         n_atoms = self._vertex_slice.n_atoms
@@ -257,12 +257,14 @@ class PopulationMachineNeurons(
         # Write the number of colour bits
         spec.write_value(self._app_vertex.n_colour_bits)
 
-        # Write the ring buffer data
+        # Write the min weights data
         # This is only the synapse types that need a ring buffer i.e. not
         # those stored in synapse dynamics
         n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
         spec.write_value(n_synapse_types)
-        spec.write_array(ring_buffer_shifts)
+        # Write the minimum weights
+        for min_w in min_weights:
+            spec.write_value(min_w, data_type=DataType.S1615)
 
         # Write the keys
         spec.write_array(keys)

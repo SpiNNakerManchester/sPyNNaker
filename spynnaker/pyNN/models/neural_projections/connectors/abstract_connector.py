@@ -272,6 +272,52 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return abs(weights)
         raise SpynnakerException("Unrecognised weight format")
 
+    def get_weight_minimum(self, weights, weight_random_sigma, synapse_info):
+        """ Get the minimum of the weights.
+
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
+            or list(int) or list(float)
+        :param int weight_random_sigma: The number of standard deviations from
+            the mean to allow for when using a random distribution
+        :rtype: float
+        """
+        if isinstance(weights, RandomDistribution):
+            mean_weight = utility_calls.get_mean(weights)
+            weight_sd = math.sqrt(utility_calls.get_variance(weights))
+            if mean_weight < 0:
+                min_weight = mean_weight + (weight_sd * weight_random_sigma)
+                if min_weight > 0:
+                    min_weight = -min_weight
+                high = utility_calls.high(weights)
+                if high is None:
+                    return abs(min_weight)
+                return abs(max(min_weight, high))
+            else:
+                min_weight = mean_weight - (weight_sd * weight_random_sigma)
+                low = utility_calls.low(weights)
+                if low is None:
+                    return abs(min_weight)
+                if min_weight < 0:
+                    min_weight = abs(min_weight)
+                return abs(min(min_weight, low))
+
+        elif isinstance(weights, str):
+            d = self._get_distances(weights, synapse_info)
+            return numpy.min(_expr_context.eval(weights, d=d))
+        elif numpy.isscalar(weights):
+            return abs(weights)
+        elif hasattr(weights, "__getitem__"):
+            # Have to assume here that the list of weights that has been
+            # provided has different (non-zero) values in it.  In order to
+            # represent these correctly, it's the greatest common divisor
+            # across the array of weights that we need
+            non_zero_weights = numpy.abs(weights)[
+                numpy.nonzero(numpy.abs(weights))]
+            if len(non_zero_weights) == 0:
+                return 0.0
+            return utility_calls.float_gcd_of_array(non_zero_weights)
+        raise SpynnakerException("Unrecognised weight format")
+
     def _get_weight_maximum(self, weights, n_connections, synapse_info):
         """
         Get the maximum of the weights.
@@ -302,6 +348,14 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
+        elif hasattr(weights, "__getitem__"):
+            # Have to assume here that the list of weights that has been
+            # provided has different (non-zero) values in it.
+            non_zero_weights = numpy.abs(weights)[
+                numpy.nonzero(numpy.abs(weights))]
+            if len(non_zero_weights) == 0:
+                return 0.0
+            return numpy.max(non_zero_weights)
         raise SpynnakerException("Unrecognised weight format")
 
     @abstractmethod

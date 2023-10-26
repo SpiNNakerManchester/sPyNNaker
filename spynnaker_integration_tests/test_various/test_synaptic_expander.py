@@ -101,7 +101,7 @@ def run_script():
 
 def check_params(param, result):
     if not isinstance(param, p.RandomDistribution):
-        assert all(param == value for value in result)
+        assert numpy.allclose(result, param, atol=0.01)
     else:
         # Check the values are "random" (yes I know they might be the same,
         # but the chances are quite small!)

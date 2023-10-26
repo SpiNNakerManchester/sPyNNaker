@@ -198,3 +198,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
         return self.__PARAM_NAMES
+
+    @overrides(AbstractTimingDependence.minimum_delta)
+    def minimum_delta(self, max_stdp_spike_delta):
+        # This rule always has a delta of 1
+        return [1.0, 1.0]

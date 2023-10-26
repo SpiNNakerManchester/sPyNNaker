@@ -104,10 +104,10 @@ static inline final_state_t plasticity_update_synapse(
 
 bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        REAL *min_weights) {
 
-    if (!synapse_dynamics_stdp_init(&address, &params, n_synapse_types,
-                ring_buffer_to_input_buffer_left_shifts)) {
+    if (!synapse_dynamics_stdp_init(
+            &address, &params, n_synapse_types, min_weights)) {
         return false;
     }
 
@@ -125,10 +125,10 @@ bool synapse_dynamics_initialise(
 void synapse_dynamics_print_plastic_synapses(
         synapse_row_plastic_data_t *plastic_region_data,
         synapse_row_fixed_part_t *fixed_region,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        accum *min_weights) {
     __use(plastic_region_data);
     __use(fixed_region);
-    __use(ring_buffer_to_input_buffer_left_shifts);
+    __use(min_weights);
 
 #if LOG_LEVEL >= LOG_DEBUG
     // Extract separate arrays of weights (from plastic region),
@@ -154,8 +154,7 @@ void synapse_dynamics_print_plastic_synapses(
         weight_t weight = synapse_structure_get_final_weight(final_state);
 
         log_debug("%08x [%3d: (w: %5u (=", control_word, i, weight);
-        synapses_print_weight(
-                weight, ring_buffer_to_input_buffer_left_shifts[synapse_type]);
+        synapses_print_weight(weight, min_weights[synapse_type]);
         log_debug("nA) d: %2u, n = %3u)] - {%08x %08x}\n",
                 synapse_row_sparse_delay(control_word, synapse_type_index_bits, synapse_delay_mask),
                 synapse_row_sparse_index(control_word, synapse_index_mask),
@@ -178,7 +177,6 @@ static inline index_t sparse_axonal_delay(uint32_t x) {
 #endif
 }
 
-//---------------------------------------
 void synapse_dynamics_process_post_synaptic_event(
         uint32_t time, index_t neuron_index) {
     log_debug("Adding post-synaptic event to trace at time:%u", time);

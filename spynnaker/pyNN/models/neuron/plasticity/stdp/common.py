@@ -50,3 +50,39 @@ def get_exp_lut_array(time_step, time_constant, shift=0):
     # Concatenate with the header
     header = numpy.array([len(a), shift], dtype="uint16")
     return numpy.concatenate((header, a.astype("uint16"))).view("uint32")
+
+
+def _get_last_non_zero_value(values):
+    """ Get the last non-zero value (rescaled) from a LUT array
+    """
+    # Either the ultimate or penultimate value must be non-zero as generated
+    # from the above function
+    if values[-1] != 0:
+        return values[-1] / STDP_FIXED_POINT_ONE
+    return values[-2] / STDP_FIXED_POINT_ONE
+
+
+def get_min_lut_value(
+        exp_lut_array, time_step=None, max_stdp_spike_delta=None):
+    """ Get the smallest non-zero value of an exponential lookup array,\
+        or None if no such value
+
+    :param numpy.ndarray exp_lut_array: The lookup array
+    :param float time_step: The time step in milliseconds
+    :param float max_stdp_spike_delta: The maximum expected difference between
+        spike times in milliseconds
+    :rtype: float
+    """
+    values = exp_lut_array.view("uint16")
+
+    # If there isn't a time step and a limit
+    if time_step is None or max_stdp_spike_delta is None:
+        return _get_last_non_zero_value(values)
+
+    # If there is a time step and limit, use it to work out which value
+    pos = int(math.ceil(max_stdp_spike_delta / time_step)) + 1
+    if pos >= len(values):
+        return _get_last_non_zero_value(values)
+
+    # Make sure we haven't just picked the last value which happens to be 0
+    return _get_last_non_zero_value(values[:pos])

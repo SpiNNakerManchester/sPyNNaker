@@ -48,8 +48,8 @@ static uint32_t ring_buffer_size;
 //! Ring buffer mask
 static uint32_t ring_buffer_mask;
 
-//! Amount to left shift the ring buffer by to make it an input
-static uint32_t *ring_buffer_to_input_left_shifts;
+// The minimum weight value, and the reciprocal of these minimum values
+static REAL *min_weights;
 
 //! \brief Number of bits needed for the synapse type and index
 //! \details
@@ -137,8 +137,9 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
         io_printf(IO_BUF, "%08x [%3d: (w: %5u (=",
                 synapse, i, synapse_row_sparse_weight(synapse));
         synapses_print_weight(synapse_row_sparse_weight(synapse),
-                ring_buffer_to_input_left_shifts[synapse_type]);
-        io_printf(IO_BUF, "nA) d: %2u, %d, n = %3u)] - {%08x %08x}\n",
+                min_weights[synapse_type]);
+        log_debug(
+                "nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
                 synapse_row_sparse_delay(synapse, synapse_type_index_bits,
                         synapse_delay_mask),
                 synapse_type,
@@ -152,14 +153,14 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
         synapse_row_plastic_data_t *plastic_data =
                 synapse_row_plastic_region(synaptic_row);
         synapse_dynamics_print_plastic_synapses(
-                plastic_data, fixed_region, ring_buffer_to_input_left_shifts);
+                plastic_data, fixed_region, min_weights);
     }
 
     io_printf(IO_BUF, "----------------------------------------\n");
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-//! \brief Print the contents of the ring buffers.
+//! \brief Print the contents of the ring buffers.  // equivalent min_weight function?
 //! \details Only does anything when debugging.
 //! \param[in] time: The current timestamp
 static inline void print_ring_buffers(uint32_t time) {
@@ -187,7 +188,7 @@ static inline void print_ring_buffers(uint32_t time) {
                         d + time, t, n, synapse_type_index_bits,
                         synapse_index_bits, synapse_delay_mask);
                 synapses_print_weight(ring_buffers[ring_buffer_index],
-                        ring_buffer_to_input_left_shifts[t]);
+                        min_weights[t]);
             }
             io_printf(IO_BUF, "\n");
         }
@@ -262,15 +263,14 @@ struct synapse_params {
     uint32_t log_max_delay;
     uint32_t drop_late_packets;
     uint32_t incoming_spike_buffer_size;
-    uint32_t ring_buffer_shifts[];
+    REAL min_weights_recip[]; // this is min_weight followed by the reciprocals
 };
 
 /* INTERFACE FUNCTIONS */
 bool synapses_initialise(
         address_t synapse_params_address,
         uint32_t *n_neurons_out, uint32_t *n_synapse_types_out,
-        weight_t **ring_buffers_out,
-        uint32_t **ring_buffer_to_input_buffer_left_shifts,
+        weight_t **ring_buffers_out, REAL **min_weights_out,
         bool* clear_input_buffers_of_late_packets_init,
         uint32_t *incoming_spike_buffer_size) {
     struct synapse_params *params = (struct synapse_params *) synapse_params_address;
@@ -285,20 +285,17 @@ bool synapses_initialise(
     uint32_t log_n_synapse_types = params->log_n_synapse_types;
     uint32_t log_max_delay = params->log_max_delay;
 
-    // Set up ring buffer left shifts
-    ring_buffer_to_input_left_shifts =
-            spin1_malloc(n_synapse_types * sizeof(uint32_t));
-    if (ring_buffer_to_input_left_shifts == NULL) {
-        log_error("Not enough memory to allocate ring buffer");
+    // Set up min_weights
+    uint32_t min_weights_bytes = 2 * n_synapse_types * sizeof(REAL);
+    min_weights = spin1_malloc(min_weights_bytes);
+    if (min_weights == NULL) {
+        log_error("Not enough memory to allocate min weights");
         return false;
     }
 
-    // read in ring buffer to input left shifts
-    spin1_memcpy(
-            ring_buffer_to_input_left_shifts, params->ring_buffer_shifts,
-            n_synapse_types * sizeof(uint32_t));
-    *ring_buffer_to_input_buffer_left_shifts =
-            ring_buffer_to_input_left_shifts;
+    // read in min_weights and reciprocals
+    spin1_memcpy(min_weights, params->min_weights_recip, min_weights_bytes);
+	*min_weights_out = min_weights;
 
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
@@ -328,7 +325,7 @@ bool synapses_initialise(
     }
     *ring_buffers_out = ring_buffers;
 
-    log_info("Ready to process synapses for %u neurons with %u synapse types",
+    log_debug("Ready to process synapses for %u neurons with %u synapse types",
             n_neurons, n_synapse_types);
 
     return true;

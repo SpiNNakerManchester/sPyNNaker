@@ -37,9 +37,9 @@
 //! Number of inhibitory receptors
 #define NUM_INHIBITORY_RECEPTORS 1
 
-#include <neuron/decay.h>
 #include <debug.h>
 #include "synapse_types.h"
+#include <neuron/decay.h>
 
 //---------------------------------------
 // Synapse parameters
@@ -160,16 +160,14 @@ static inline void add_input_alpha(alpha_state_t *a_params, input_t input) {
 static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index, synapse_types_t *parameters,
         input_t input) {
-    if (input > ZERO) {
-        switch (synapse_type_index) {
-        case EXCITATORY:
-            add_input_alpha(&parameters->exc, input);
-            break;
-        case INHIBITORY:
-            add_input_alpha(&parameters->inh, input);
-            break;
-        }
-    }
+	switch (synapse_type_index) {
+	case EXCITATORY:
+		add_input_alpha(&parameters->exc, input);
+		break;
+	case INHIBITORY:
+		add_input_alpha(&parameters->inh, input);
+		break;
+	}
 }
 
 //! \brief extracts the excitatory input buffers from the buffers available
@@ -221,7 +219,7 @@ static inline const char *synapse_types_get_type_char(
 //! \param[in] parameters: the pointer to the parameters to print
 static inline void synapse_types_print_input(
         synapse_types_t *parameters) {
-    io_printf(IO_BUF, "%12.6k - %12.6k",
+    log_debug("%12.6k - %12.6k",
             parameters->exc.lin_buff * parameters->exc.exp_buff,
             parameters->inh.lin_buff * parameters->inh.exp_buff);
 }

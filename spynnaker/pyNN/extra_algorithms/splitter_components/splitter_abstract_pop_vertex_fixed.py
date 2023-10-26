@@ -82,8 +82,8 @@ class SplitterAbstractPopulationVertexFixed(
         max_atoms_per_core = min(
             app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
 
-        ring_buffer_shifts = app_vertex.get_ring_buffer_shifts()
-        weight_scales = app_vertex.get_weight_scales(ring_buffer_shifts)
+        min_weights = app_vertex.get_min_weights()
+        weight_scales = app_vertex.get_weight_scales(min_weights)
         all_syn_block_sz = app_vertex.get_synapses_size(
             max_atoms_per_core)
         structural_sz = app_vertex.get_structural_dynamics_size(
@@ -103,7 +103,7 @@ class SplitterAbstractPopulationVertexFixed(
             label = f"{app_vertex.label}{vertex_slice}"
             machine_vertex = self.create_machine_vertex(
                 vertex_slice, sdram, label,
-                structural_sz, ring_buffer_shifts, weight_scales,
+                structural_sz, min_weights, weight_scales,
                 index, max_atoms_per_core, synaptic_matrices, neuron_data)
             self.governed_app_vertex.remember_machine_vertex(machine_vertex)
 
@@ -152,7 +152,7 @@ class SplitterAbstractPopulationVertexFixed(
 
     def create_machine_vertex(
             self, vertex_slice, sdram, label,
-            structural_sz, ring_buffer_shifts, weight_scales, index,
+            structural_sz, min_weights, weight_scales, index,
             max_atoms_per_core, synaptic_matrices, neuron_data):
         # If using local-only create a local-only vertex
         s_dynamics = self.governed_app_vertex.synapse_dynamics
@@ -160,13 +160,12 @@ class SplitterAbstractPopulationVertexFixed(
             return PopulationMachineLocalOnlyCombinedVertex(
                 sdram, label,
                 self.governed_app_vertex, vertex_slice, index,
-                ring_buffer_shifts, weight_scales, neuron_data,
-                max_atoms_per_core)
+                min_weights, weight_scales, neuron_data, max_atoms_per_core)
 
         # Otherwise create a normal vertex
         return PopulationMachineVertex(
             sdram, label, self.governed_app_vertex,
-            vertex_slice, index, ring_buffer_shifts, weight_scales,
+            vertex_slice, index, min_weights, weight_scales,
             structural_sz, max_atoms_per_core, synaptic_matrices, neuron_data)
 
     def get_sdram_used_by_atoms(

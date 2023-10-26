@@ -122,6 +122,20 @@ class WeightDependenceAdditive(
         """
         return self.__w_max
 
+    @property
+    def weight_minimum(self):
+        """ The minimum weight that will ever be set in a synapse as a result\
+            of this rule
+
+        :rtype: float
+        """
+        return self.__w_min
+
+    @overrides(AbstractWeightDependence.weight_change_minimum)
+    def weight_change_minimum(self, min_delta):
+        pot, dep = min_delta
+        return min(pot * self.A_plus, dep * self.A_minus)
+
     @overrides(AbstractWeightDependence.get_parameter_names)
     def get_parameter_names(self):
         return self.__PARAM_NAMES
