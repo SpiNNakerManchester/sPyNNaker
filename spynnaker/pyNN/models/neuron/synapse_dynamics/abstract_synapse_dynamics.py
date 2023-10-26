@@ -138,7 +138,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         Get the maximum delay for the synapses.
 
         :param AbstractConnector connector:
-        :param ~numpy.ndarray delays:
+        :param SynapseInformation synapse_info:
         """
         return connector.get_delay_maximum(synapse_info)
 
@@ -159,6 +159,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         Get the variance in delay for the synapses.
 
         :param AbstractConnector connector:
+        :param SynapseInformation synapse_info:
         :param ~numpy.ndarray delays:
         """
         return connector.get_delay_variance(delays, synapse_info)
@@ -168,7 +169,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         Get the mean weight for the synapses.
 
         :param AbstractConnector connector:
-        :param ~numpy.ndarray weights:
+        :param SynapseInformation synapse_info:
         """
         return connector.get_weight_mean(synapse_info.weights, synapse_info)
 
@@ -177,9 +178,20 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         Get the maximum weight for the synapses.
 
         :param AbstractConnector connector:
-        :param ~numpy.ndarray weights:
+        :param SynapseInformation synapse_info:
         """
         return connector.get_weight_maximum(synapse_info)
+
+    def get_weight_minimum(self, connector, weight_random_sigma, synapse_info):
+        """ Get the minimum weight for the synapses
+
+        :param AbstractConnector connector:
+        :param float weight_random_sigma:
+        :param SynapseInformation synapse_info:
+        """
+        # pylint: disable=too-many-arguments
+        return connector.get_weight_minimum(
+            synapse_info.weights, weight_random_sigma, synapse_info)
 
     def get_weight_variance(self, connector, weights, synapse_info):
         """
@@ -213,6 +225,22 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         # pylint: disable=unused-argument
         return None
+
+    def calculate_min_weight(self, min_weights, max_stdp_spike_delta,
+                             weight_scale, conn_weight_min, synapse_type):
+        """ Do any further calculations required to work out the minimum
+            weight value used on the machine.
+
+        :param list min_weights: the current minimum weights
+        :param int max_stdp_spike_delta: the max time between spikes
+        :param float weight_scale: the amount to scale the weights, from input
+        :param float conn_weight_min: the weight minimum from the connector
+        :param int synapse_type: the synapse ID for which to calculate the min
+        :rtype: list
+        """
+        # pylint: disable=unused-argument
+        # By default no further calculation is required
+        return min_weights
 
     def get_connected_vertices(self, s_info, source_vertex, target_vertex):
         """

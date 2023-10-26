@@ -61,15 +61,14 @@ extern uint32_t late_spikes;
 //! The maximum lateness of a spike
 extern uint32_t max_late_spike;
 
-
 //! \brief Print the weight of a synapse
 //! \param[in] weight: the weight to print in synapse-row form
-//! \param[in] left_shift: the shift to use when decoding
+//! \param[in] min_weight: the minimum weight to use in the conversion
 static inline void synapses_print_weight(
-        weight_t weight, uint32_t left_shift) {
+        weight_t weight, REAL min_weight) {
     if (weight != 0) {
         io_printf(IO_BUF, "%12.6k",
-                synapse_row_convert_weight_to_input(weight, left_shift));
+                synapse_row_convert_weight_to_input(weight, min_weight));
     } else {
         io_printf(IO_BUF, "      ");
     }
@@ -91,8 +90,7 @@ static inline void synapses_print_weight(
 bool synapses_initialise(
         address_t synapse_params_address,
         uint32_t *n_neurons, uint32_t *n_synapse_types,
-        weight_t **ring_buffers,
-        uint32_t **ring_buffer_to_input_buffer_left_shifts,
+        weight_t **ring_buffers, REAL **min_weights,
         bool* clear_input_buffers_of_late_packets_init,
         uint32_t *incoming_spike_buffer_size);
 

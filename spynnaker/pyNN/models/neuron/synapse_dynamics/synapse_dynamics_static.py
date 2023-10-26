@@ -22,6 +22,7 @@ from .abstract_generate_on_machine import (
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.utilities.constants import DELAY_MASK
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
@@ -106,7 +107,7 @@ class SynapseDynamicsStatic(
         fixed_fixed = (
             ((numpy.rint(numpy.abs(connections["weight"])).astype("uint32") &
               0xFFFF) << 16) |
-            (connections["delay"].astype("uint32") <<
+            ((connections["delay"].astype("uint32") & DELAY_MASK) <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype(
                 "uint32") << n_neuron_id_bits) |
@@ -169,8 +170,9 @@ class SynapseDynamicsStatic(
         connections["target"] = (
             (data & neuron_id_mask) + post_vertex_slice.lo_atom)
         connections["weight"] = (data >> 16) & 0xFFFF
-        connections["delay"] = (data & 0xFFFF) >> (
-            n_neuron_id_bits + n_synapse_type_bits)
+        connections["delay"] = (data >> (n_neuron_id_bits +
+                                         n_synapse_type_bits)) & DELAY_MASK
+        connections["delay"][connections["delay"] == 0] = 16
 
         return connections
 

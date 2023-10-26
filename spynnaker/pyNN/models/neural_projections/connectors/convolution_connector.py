@@ -281,6 +281,16 @@ class ConvolutionConnector(AbstractConnector):
     def get_weight_maximum(self, synapse_info):
         return numpy.amax(self.__kernel_weights)
 
+    @overrides(AbstractConnector.get_weight_minimum)
+    def get_weight_minimum(self, weights, weight_random_sigma, synapse_info):
+        # Use the kernel weights if user has supplied them
+        if self.__kernel_weights is not None:
+            return super(ConvolutionConnector, self).get_weight_minimum(
+                self.__kernel_weights, weight_random_sigma, synapse_info)
+
+        return super(ConvolutionConnector, self).get_weight_minimum(
+            weights, weight_random_sigma, synapse_info)
+
     @overrides(AbstractConnector.get_connected_vertices)
     def get_connected_vertices(self, s_info, source_vertex, target_vertex):
         pre_vertices = numpy.array(

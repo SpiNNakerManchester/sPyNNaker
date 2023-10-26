@@ -60,7 +60,7 @@ class PopulationNeuronsMachineVertex(
     __slots__ = [
         "__key",
         "__sdram_partition",
-        "__ring_buffer_shifts",
+        "__min_weights",
         "__weight_scales",
         "__slice_index",
         "__neuron_data",
@@ -105,8 +105,7 @@ class PopulationNeuronsMachineVertex(
 
     def __init__(
             self, sdram, label, app_vertex, vertex_slice, slice_index,
-            ring_buffer_shifts, weight_scales,
-            neuron_data, max_atoms_per_core):
+            min_weights, weight_scales, neuron_data, max_atoms_per_core):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex
@@ -117,8 +116,8 @@ class PopulationNeuronsMachineVertex(
             The slice of the population that this implements
         :param int slice_index:
             The index of the slice in the ordered list of slices
-        :param list(int) ring_buffer_shifts:
-            The shifts to apply to convert ring buffer values to S1615 values
+        :param list(float) min_weights:
+            The computed minimum weights to be used in the simulation
         :param list(int) weight_scales:
             The scaling to apply to weights to store them in the synapses
         :param NeuronData neuron_data:
@@ -133,7 +132,7 @@ class PopulationNeuronsMachineVertex(
         self.__key = None
         self.__sdram_partition = None
         self.__slice_index = slice_index
-        self.__ring_buffer_shifts = ring_buffer_shifts
+        self.__min_weights = min_weights
         self.__weight_scales = weight_scales
         self.__neuron_data = neuron_data
         self.__max_atoms_per_core = max_atoms_per_core
@@ -229,7 +228,7 @@ class PopulationNeuronsMachineVertex(
             self.vertex_slice)
         self._write_common_data_spec(spec, rec_regions)
 
-        self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
+        self._write_neuron_data_spec(spec, self.__min_weights)
 
         # Write information about SDRAM
         spec.reserve_memory_region(

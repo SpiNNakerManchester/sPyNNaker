@@ -41,7 +41,7 @@ static bool current_source_noisy_init(uint32_t n_noisy_sources, uint32_t *next) 
 	for (uint32_t n_noisy=0; n_noisy < n_noisy_sources; n_noisy++) {
 		noisy_source[n_noisy] = spin1_malloc(sizeof(noisy_current_source_t));
 		if (noisy_source[n_noisy] == NULL) {
-			log_error("Unable to allocate DC source parameters - out of DTCM");
+			log_error("Unable to allocate noisy source parameters - out of DTCM");
 			return false;
 		}
 		*next += sizeof(noisy_current_source_t) / 4;

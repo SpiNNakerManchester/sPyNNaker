@@ -14,6 +14,7 @@
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.abstract_models import (
@@ -120,15 +121,14 @@ class PopulationMachineSynapses(
             self._synaptic_matrices.on_chip_generated_matrix_size)]
 
     def _write_synapse_data_spec(
-            self, spec, ring_buffer_shifts, weight_scales,
-            structural_sz):
+            self, spec, min_weights, weight_scales, structural_sz):
         """
         Write the data specification for the synapse data.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param list(int) ring_buffer_shifts:
-            The shifts to apply to convert ring buffer values to S1615 values
+        :param list(float) min_weights:
+            The computed minimum weights to be used in the simulation
         :param list(int) weight_scales:
             The scaling to apply to weights to store them in the synapses
         :param int all_syn_block_sz: The maximum size of the synapses in bytes
@@ -136,7 +136,7 @@ class PopulationMachineSynapses(
         :param int n_neuron_bits: The number of bits to use for neuron ids
         """
         # Write the synapse parameters
-        self._write_synapse_parameters(spec, ring_buffer_shifts)
+        self._write_synapse_parameters(spec, min_weights)
 
         # Write the synaptic matrices
         self._synaptic_matrices.generate_data()
@@ -177,14 +177,14 @@ class PopulationMachineSynapses(
                 size=4, label='synapseDynamicsStructuralParams',
                 reference=self._synapse_references.structural_dynamics)
 
-    def _write_synapse_parameters(self, spec, ring_buffer_shifts):
+    def _write_synapse_parameters(self, spec, min_weights):
         """
         Write the synapse parameters data region.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param list(int) ring_buffer_shifts:
-            The shifts to apply to convert ring buffer values to S1615 values
+        :param list(float) min_weights:
+            The computed minimum weights to be used in the simulation
         """
         # Reserve space
         spec.reserve_memory_region(
@@ -209,7 +209,11 @@ class PopulationMachineSynapses(
         spec.write_value(get_n_bits(max_delay))
         spec.write_value(int(self._app_vertex.drop_late_spikes))
         spec.write_value(self._app_vertex.incoming_spike_buffer_size)
-        spec.write_array(ring_buffer_shifts)
+        # Write the minimum weights and the reciprocals (no machine division)
+        for min_w in min_weights:
+            spec.write_value(min_w, data_type=DataType.S1615)
+        for min_w in min_weights:
+            spec.write_value(1 / min_w, data_type=DataType.S1615)
 
     @overrides(AbstractSynapseExpandable.gen_on_machine)
     def gen_on_machine(self):

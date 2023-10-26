@@ -35,7 +35,7 @@ class TestOneToOneConnector(BaseTestCase):
         sim.end()
         for pre, post, w, d in conns:
             assert pre == post
-            assert w == weight
+            assert numpy.allclose(w, weight, rtol=0.0001)
             assert d == delay
 
     def do_one_to_one_conductance_test(

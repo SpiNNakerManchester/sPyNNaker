@@ -42,6 +42,20 @@ class SpikeProcessingProvenance(ctypes.LittleEndianStructure):
         ("n_late_packets", ctypes.c_uint32),
         # The maximum size of the spike input buffer during simulation
         ("max_size_input_buffer", ctypes.c_uint32)
+        # # Custom provenance from SpiNNCer - max spikes in a tick
+        # ("max_spikes_in_a_tick", ctypes.c_uint32),
+        # # max dmas in a tick
+        # ("max_dmas_in_a_tick", ctypes.c_uint32),
+        # # max pipeline restarts
+        # ("max_pipeline_restarts", ctypes.c_uint32),
+        # # timer callback completed?
+        # ("timer_callback_completed", ctypes.c_uint32),
+        # # spikes pipeline activated?
+        # ("spikes_pipeline_activated", ctypes.c_uint32),
+        # # Max flushed spikes in a timestep
+        # ("max_flushed_spikes", ctypes.c_uint32),
+        # # Total flushed spikes
+        # ("total_flushed_spikes", ctypes.c_uint32)
     ]
 
     N_ITEMS = len(_fields_)
@@ -75,7 +89,7 @@ class PopulationMachineVertex(
         "__synaptic_matrices",
         "__neuron_data",
         "__key",
-        "__ring_buffer_shifts",
+        "__min_weights",
         "__weight_scales",
         "__structural_sz",
         "__slice_index",
@@ -91,6 +105,15 @@ class PopulationMachineVertex(
     MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME = "Max_filled_size_input_buffer"
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
+    # # Custom provenance from SpiNNCer
+    # MAX_SPIKES_IN_A_TICK = "Maximum number of spikes in a timer tick"
+    # MAX_DMAS_IN_A_TICK = "Maximum number of DMAs in a timer tick"
+    # MAX_PIPELINE_RESTARTS = "Maximum pipeline restarts"
+    # TIMER_CALLBACK_COMPLETED = "Was the timer callback completed?"
+    # SPIKES_PIPELINE_ACTIVATED = "Was the spikes pipeline activated?"
+    # # Flushed spikes
+    # MAX_FLUSHED_SPIKES = "Maximum number of spikes flushed in a timer tick"
+    # TOTAL_FLUSHED_SPIKES = "Total number of spikes flushed"
 
     class REGIONS(Enum):
         """
@@ -151,8 +174,8 @@ class PopulationMachineVertex(
 
     def __init__(
             self, sdram, label, app_vertex, vertex_slice, slice_index,
-            ring_buffer_shifts, weight_scales,
-            structural_sz, max_atoms_per_core, synaptic_matrices, neuron_data):
+            min_weights, weight_scales, structural_sz, max_atoms_per_core,
+            synaptic_matrices, neuron_data):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex
@@ -163,8 +186,8 @@ class PopulationMachineVertex(
             The slice of the population that this implements
         :param int slice_index:
             The index of the slice in the ordered list of slices
-        :param list(int) ring_buffer_shifts:
-            The shifts to apply to convert ring buffer values to S1615 values
+        :param list(float) min_weights:
+            The computed minimum weights to be used in the simulation
         :param list(int) weight_scales:
             The scaling to apply to weights to store them in the synapses
         :param int structural_sz: The size of the structural data
@@ -180,7 +203,7 @@ class PopulationMachineVertex(
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__key = None
         self.__slice_index = slice_index
-        self.__ring_buffer_shifts = ring_buffer_shifts
+        self.__min_weights = min_weights
         self.__weight_scales = weight_scales
         self.__structural_sz = structural_sz
         self.__max_atoms_per_core = max_atoms_per_core
@@ -296,11 +319,11 @@ class PopulationMachineVertex(
             self.vertex_slice))
         self._write_common_data_spec(spec, rec_regions)
 
-        self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
+        self._write_neuron_data_spec(spec, self.__min_weights)
 
         self._write_synapse_data_spec(
-            spec, self.__ring_buffer_shifts,
-            self.__weight_scales, self.__structural_sz)
+            spec, self.__min_weights, self.__weight_scales,
+            self.__structural_sz)
 
         # End the writing of this specification:
         spec.end_specification()
@@ -314,7 +337,7 @@ class PopulationMachineVertex(
 
         if self.__regenerate_synapse_data:
             self._write_synapse_data_spec(
-                spec, self.__ring_buffer_shifts,
+                spec, self.__min_weights,
                 self.__weight_scales, self.__structural_sz)
             self.__regenerate_synapse_data = False
 
@@ -389,6 +412,50 @@ class PopulationMachineVertex(
             db.insert_core(
                 x, y, p, self.MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME,
                 prov.max_size_input_buffer)
+
+            # # SpiNNCer
+            # db.insert_core(
+            #     x, y, p, self.MAX_SPIKES_IN_A_TICK,
+            #     prov.max_spikes_in_a_tick)
+            # if prov.max_spikes_in_a_tick > 200:
+            #     db.insert_report(
+            #         f"Max number of spikes for {label} was "
+            #         f"{prov.max_spikes_in_a_tick}. Empirically, we "
+            #         f"can deal with ~200 for real time performance using a "
+            #         f"1.0 ms timestep.")
+            #
+            # db.insert_core(
+            #     x, y, p, self.MAX_DMAS_IN_A_TICK,
+            #     prov.max_dmas_in_a_tick)
+            #
+            # db.insert_core(
+            #     x, y, p, self.MAX_PIPELINE_RESTARTS,
+            #     prov.max_pipeline_restarts)
+            #
+            # db.insert_core(
+            #     x, y, p, self.TIMER_CALLBACK_COMPLETED,
+            #     prov.timer_callback_completed)
+            #
+            # db.insert_core(
+            #     x, y, p, self.SPIKES_PIPELINE_ACTIVATED,
+            #     prov.spikes_pipeline_activated)
+            #
+            # # FLUSHED SPIKES
+            # db.insert_core(
+            #     x, y, p, self.MAX_FLUSHED_SPIKES,
+            #     prov.max_flushed_spikes)
+            # if prov.max_flushed_spikes > 0:
+            #     db.insert_report(
+            #         f"Max number of flushed spikes for {label} was "
+            #         f"was {prov.max_flushed_spikes}.")
+            #
+            # db.insert_core(
+            #     x, y, p, self.TOTAL_FLUSHED_SPIKES,
+            #     prov.total_flushed_spikes)
+            # if prov.total_flushed_spikes > 0:
+            #     db.insert_report(
+            #         f"Total number of flushed spikes for {label} was "
+            #         f"{prov.total_flushed_spikes}.")
 
     @overrides(PopulationMachineNeurons.set_do_neuron_regeneration)
     def set_do_neuron_regeneration(self):

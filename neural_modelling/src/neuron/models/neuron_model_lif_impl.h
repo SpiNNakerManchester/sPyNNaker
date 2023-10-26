@@ -20,6 +20,7 @@
 #define _NEURON_MODEL_LIF_CURR_IMPL_H_
 
 #include "neuron_model.h"
+#include "round.h"
 
 //! definition for LIF neuron parameters
 struct neuron_params_t {
@@ -118,9 +119,15 @@ static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *par
 //! \param[in] input_this_timestep: The input to apply
 static inline void lif_neuron_closed_form(
         neuron_t *neuron, REAL V_prev, input_t input_this_timestep) {
+    // accum = accum * accum + accum
+//    REAL alpha = MULT_ROUND_STOCHASTIC_ACCUM(
+//        input_this_timestep, neuron->R_membrane) + neuron->V_rest;
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
 
     // update membrane voltage
+    // accum -  (ufract * (accum - accum))
+//    neuron->V_membrane = alpha - MULT_ROUND_STOCHASTIC_ACCUM(
+//        neuron->exp_TC, (alpha - V_prev));
     neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev));
 }
 
@@ -157,7 +164,7 @@ static inline state_t neuron_model_state_update(
         }
         // Get the input in nA
         input_t input_this_timestep =
-                total_exc - total_inh + external_bias + neuron->I_offset + current_offset;
+                total_exc - total_inh - external_bias + neuron->I_offset + current_offset;
 
         lif_neuron_closed_form(
                 neuron, neuron->V_membrane, input_this_timestep);
@@ -189,20 +196,20 @@ static inline state_t neuron_model_get_membrane_voltage(const neuron_t *neuron) 
 }
 
 static inline void neuron_model_print_state_variables(const neuron_t *neuron) {
-	log_info("V membrane    = %11.4k mv", neuron->V_membrane);
-	log_info("Refract timer = %u timesteps", neuron->refract_timer);
+	log_debug("V membrane    = %11.4k mv", neuron->V_membrane);
+	log_debug("Refract timer = %u timesteps", neuron->refract_timer);
 }
 
 static inline void neuron_model_print_parameters(const neuron_t *neuron) {
-    log_info("V reset       = %11.4k mv", neuron->V_reset);
-    log_info("V rest        = %11.4k mv", neuron->V_rest);
+    log_debug("V reset       = %11.4k mv", neuron->V_reset);
+    log_debug("V rest        = %11.4k mv", neuron->V_rest);
 
-    log_info("I offset      = %11.4k nA", neuron->I_offset);
-    log_info("R membrane    = %11.4k Mohm", neuron->R_membrane);
+    log_debug("I offset      = %11.4k nA", neuron->I_offset);
+    log_debug("R membrane    = %11.4k Mohm", neuron->R_membrane);
 
-    log_info("exp(-ms/(RC)) = %11.4k [.]", neuron->exp_TC);
+    log_debug("exp(-ms/(RC)) = %11.4k [.]", neuron->exp_TC);
 
-    log_info("T refract     = %u timesteps", neuron->T_refract);
+    log_debug("T refract     = %u timesteps", neuron->T_refract);
 }
 
 

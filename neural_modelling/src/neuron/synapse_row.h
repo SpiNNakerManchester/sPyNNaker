@@ -89,11 +89,21 @@
 #define _SYNAPSE_ROW_H_
 
 #include <common/neuron-typedefs.h>
+#include <round.h>
 
 //! how many bits the synapse weight will take
 #ifndef SYNAPSE_WEIGHT_BITS
 #define SYNAPSE_WEIGHT_BITS 16
 #endif
+
+//! how many bits the synapse delay will take
+#ifndef SYNAPSE_DELAY_BITS
+#define SYNAPSE_DELAY_BITS 6
+#endif
+
+// Create some masks based on the number of bits
+//! the mask for the synapse delay in the row
+#define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
 
 #ifdef SYNAPSE_WEIGHTS_SIGNED
 //! Define the type of the weights
@@ -233,18 +243,19 @@ static inline weight_t synapse_row_sparse_weight(uint32_t x) {
 
 //! \brief Converts a weight stored in a synapse row to an input
 //! \param[in] weight: the weight to convert in synapse-row form
-//! \param[in] left_shift: the shift to use when decoding
+//! \param[in] min_weight: the minimum weight to use in the conversion
 //! \return the actual input weight for the model
 static inline input_t synapse_row_convert_weight_to_input(
-        weight_t weight, uint32_t left_shift) {
-    union {
-        int_k_t input_type;
-        s1615 output_type;
-    } converter;
+        weight_t weight, REAL min_weight) {
+//    // Simply doing weight * min_weight adds unnecessary compiler instructions
+//    uint64_t mw = (uint64_t) bitsk(min_weight);
+//    uint64_t w = (uint64_t) (weight);
+//
+//    return kbits((int_k_t) (mw * w));
 
-    converter.input_type = (int_k_t) (weight) << left_shift;
-
-    return converter.output_type;
+	// Stochastic rounding requires accums so convert weight to appropriate
+	// value before multiplying
+	return MULT_ROUND_STOCHASTIC_ACCUM(kbits(weight << 15), min_weight);
 }
 
 //! \brief Get the index of the ring buffer for a given timestep, synapse type

@@ -13,9 +13,10 @@
 # limitations under the License.
 
 import logging
+import sys
 import math
 import numpy
-from scipy import special  # @UnresolvedImport
+# from scipy import special  # @UnresolvedImport
 import operator
 from functools import reduce
 from collections import defaultdict
@@ -30,10 +31,14 @@ from spinn_utilities.ranged import RangeDictionary
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
+
 from pacman.model.resources import MultiRegionSDRAM
 from pacman.utilities.utility_calls import get_n_bits_for_fields, get_n_bits
+
 from spinn_front_end_common.abstract_models import (
     AbstractCanReset)
+from spinn_front_end_common.interface.provenance import (
+    AbstractProvidesLocalProvenanceData)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.interface.profiling.profile_utils import (
@@ -43,18 +48,15 @@ from spinn_front_end_common.interface.buffer_management\
     .recording_utilities import (
        get_recording_header_size, get_recording_data_constant_size)
 from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
+    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import NeuronRecorder
 from spynnaker.pyNN.models.abstract_models import (
-    AbstractAcceptsIncomingSynapses, AbstractMaxSpikes, HasSynapses,
-    SupportsStructure)
-from spynnaker.pyNN.utilities.constants import (
-    POSSION_SIGMA_SUMMATION_LIMIT)
-from spynnaker.pyNN.utilities.running_stats import RunningStats
+    AbstractAcceptsIncomingSynapses, HasSynapses, SupportsStructure)
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.utilities.utility_calls import float_gcd
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSDRAMSynapseDynamics, AbstractSynapseDynamicsStructural,
-    AbstractSupportsSignedWeights)
+    AbstractSDRAMSynapseDynamics, AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 from spynnaker.pyNN.utilities.utility_calls import (
@@ -144,10 +146,10 @@ def _check_random_dists(rd):
 
 class AbstractPopulationVertex(
         PopulationApplicationVertex, AbstractAcceptsIncomingSynapses,
-        AbstractCanReset, SupportsStructure):
-    """
-    Underlying vertex model for Neural Populations.
-    Not actually abstract.
+        AbstractCanReset, SupportsStructure,
+        AbstractProvidesLocalProvenanceData):
+    """ Underlying vertex model for Neural Populations.\
+        Not actually abstract.
     """
 
     __slots__ = [
@@ -165,6 +167,7 @@ class AbstractPopulationVertex(
         "__ring_buffer_sigma",
         "__spikes_per_second",
         "__drop_late_spikes",
+        "__rb_left_shifts",
         "__incoming_projections",
         "__incoming_poisson_projections",
         "__synapse_dynamics",
@@ -173,6 +176,12 @@ class AbstractPopulationVertex(
         "__current_sources",
         "__current_source_id_list",
         "__structure",
+        "__weight_scales",
+        "__min_weights",
+        "__min_weights_auto",
+        "__weight_random_sigma",
+        "__max_stdp_spike_delta",
+        "__weight_provenance",
         "__rng",
         "__pop_seed",
         "__core_seeds",
@@ -198,14 +207,15 @@ class AbstractPopulationVertex(
     _SYNAPSE_BASE_N_CPU_CYCLES = 10
 
     # Elements before the start of global parameters
-    # 1. has key, 2. key, 3. n atoms, 4. n_atoms_peak 5. n_colour_bits
+    # 1 has key 2 n atoms 3 n_atoms_peak 4 n_colour_bits 5 n_synapse_types
     CORE_PARAMS_BASE_SIZE = 5 * BYTES_PER_WORD
 
     def __init__(
             self, n_neurons, label, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model, drop_late_spikes, splitter, seed,
-            n_colour_bits):
+            n_colour_bits, min_weights, weight_random_sigma,
+            max_stdp_spike_delta, rb_left_shifts):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
@@ -232,6 +242,12 @@ class AbstractPopulationVertex(
             The Population seed, used to ensure the same random generation
             on each run.
         :param int n_colour_bits: The number of colour bits to use
+        :param min_weights: minimum weight list
+        :type min_weights: float array or None
+        :param weight_random_sigma: sigma value when using random weights
+        :type weight_random_sigma: float or None
+        :param max_stdp_spike_delta: the maximum expected spike time difference
+        :type max_stdp_spike_delta: float or None
         """
         # pylint: disable=too-many-arguments
         super().__init__(label, max_atoms_per_core, splitter)
@@ -259,6 +275,8 @@ class AbstractPopulationVertex(
         if self.__drop_late_spikes is None:
             self.__drop_late_spikes = get_config_bool(
                 "Simulation", "drop_late_spikes")
+
+        self.__rb_left_shifts = rb_left_shifts
 
         self.__neuron_impl = neuron_impl
         self.__pynn_model = pynn_model
@@ -305,6 +323,32 @@ class AbstractPopulationVertex(
         self.__synapse_dynamics = SynapseDynamicsStatic()
 
         self.__structure = None
+
+        # Store (local) weight scales
+        self.__weight_scales = None
+
+        # Read the minimum weight if not set; this might *still* be None,
+        # meaning "auto calculate"; the number of weights needs to match
+        # the number of synapse types
+        self.__min_weights = min_weights
+        self.__min_weights_auto = True
+        if self.__min_weights is not None:
+            self.__min_weights_auto = False
+            n_synapse_types = self.__neuron_impl.get_n_synapse_types()
+            if len(self.__min_weights) != n_synapse_types:
+                raise SynapticConfigurationException(
+                    "The number of minimum weights provided ({} - {}) does not"
+                    " match the number of synapse types ({})".format(
+                        len(self.__min_weights), self.__min_weights,
+                        n_synapse_types))
+
+        # Get the other minimum weight configuration parameters
+        self.__weight_random_sigma = weight_random_sigma
+        self.__max_stdp_spike_delta = max_stdp_spike_delta
+
+        # Store weight provenance information mapping from
+        # (real weight, represented weight) -> projections
+        self.__weight_provenance = defaultdict(list)
 
         # An RNG for use in synaptic generation
         self.__rng = numpy.random.RandomState(seed)
@@ -555,6 +599,16 @@ class AbstractPopulationVertex(
         :rtype: bool
         """
         return self.__drop_late_spikes
+
+    @property
+    def rb_left_shifts(self):
+        """ ring buffer left shifts (for use by user)
+        :rtype: bool
+        """
+        return self.__rb_left_shifts
+
+    def set_rb_left_shifts(self, rb_left_shifts):
+        self.__rb_left_shifts = rb_left_shifts
 
     def get_sdram_usage_for_core_neuron_params(self, n_atoms):
         """
@@ -889,6 +943,14 @@ class AbstractPopulationVertex(
         Flush the cache of connection information; needed for a second run.
         """
         self.__connection_cache.clear()
+        if SpynnakerDataView.get_requires_mapping():
+            self.__reset_min_weights()
+
+    def __reset_min_weights(self):
+        """ Reset min_weights if set to auto-calculate
+        """
+        if self.__min_weights_auto:
+            self.__min_weights = None
 
     def describe(self):
         """
@@ -971,92 +1033,35 @@ class AbstractPopulationVertex(
             # generation
             self.__tell_neuron_vertices_to_regenerate()
 
-    @staticmethod
-    def _ring_buffer_expected_upper_bound(
-            weight_mean, weight_std_dev, spikes_per_second,
-            n_synapses_in, sigma):
+    # TODO: The upcoming functions replace the ring_buffer bound calculations
+    # and use minimum weights instead; it may be that a mixture of the two
+    # methods is necessary in the long run
+    def __get_closest_weight(self, value):
+        """ Get the best representation of the weight so that both weight and
+            1 / w work
+
+        :param float value: value to get the closest weight of
         """
-        Provides expected upper bound on accumulated values in a ring
-        buffer element.
+        if abs(value) < 1.0:
+            return DataType.S1615.closest_representable_value(value)
+        return 1 / (
+            DataType.S1615.closest_representable_value_above(1 / value))
 
-        Requires an assessment of maximum Poisson input rate.
+    def __calculate_min_weights(self):
+        """ Calculate the minimum weights required to best represent all the
+            possible weights coming into this vertex
 
-        Assumes knowledge of mean and SD of weight distribution, fan-in
-        and timestep.
+        :param list(~.Projection) incoming_projections: incoming proj to vertex
 
-        All arguments should be assumed real values except n_synapses_in
-        which will be an integer.
-
-        :param float weight_mean: Mean of weight distribution (in either nA or
-            microSiemens as required)
-        :param float weight_std_dev: SD of weight distribution
-        :param float spikes_per_second: Maximum expected Poisson rate in Hz
-        :param int machine_timestep: in us
-        :param int n_synapses_in: No of connected synapses
-        :param float sigma: How many SD above the mean to go for upper bound;
-            a good starting choice is 5.0. Given length of simulation we can
-            set this for approximate number of saturation events.
-        :rtype: float
+        :return: list of minimum weights
+        :rtype: list(float)
         """
-        # E[ number of spikes ] in a timestep
-        average_spikes_per_timestep = (
-            float(n_synapses_in * spikes_per_second) /
-            SpynnakerDataView.get_simulation_time_step_per_s())
+        # Initialise to a maximum value
+        min_weights = [sys.maxsize for _ in range(
+            self.__neuron_impl.get_n_synapse_types())]
 
-        # Exact variance contribution from inherent Poisson variation
-        poisson_variance = average_spikes_per_timestep * (weight_mean ** 2)
-
-        # Upper end of range for Poisson summation required below
-        # upper_bound needs to be an integer
-        upper_bound = int(round(average_spikes_per_timestep +
-                                POSSION_SIGMA_SUMMATION_LIMIT *
-                                math.sqrt(average_spikes_per_timestep)))
-
-        # Closed-form exact solution for summation that gives the variance
-        # contributed by weight distribution variation when modulated by
-        # Poisson PDF.  Requires scipy.special for gamma and incomplete gamma
-        # functions. Beware: incomplete gamma doesn't work the same as
-        # Mathematica because (1) it's regularised and needs a further
-        # multiplication and (2) it's actually the complement that is needed
-        # i.e. 'gammaincc']
-
-        weight_variance = 0.0
-
-        if weight_std_dev > 0:
-            # pylint: disable=no-member
-            lngamma = special.gammaln(1 + upper_bound)
-            gammai = special.gammaincc(
-                1 + upper_bound, average_spikes_per_timestep)
-
-            big_ratio = (math.log(average_spikes_per_timestep) * upper_bound -
-                         lngamma)
-
-            if -701.0 < big_ratio < 701.0 and big_ratio != 0.0:
-                log_weight_variance = (
-                    -average_spikes_per_timestep +
-                    math.log(average_spikes_per_timestep) +
-                    2.0 * math.log(weight_std_dev) +
-                    math.log(math.exp(average_spikes_per_timestep) * gammai -
-                             math.exp(big_ratio)))
-                weight_variance = math.exp(log_weight_variance)
-
-        # upper bound calculation -> mean + n * SD
-        return ((average_spikes_per_timestep * weight_mean) +
-                (sigma * math.sqrt(poisson_variance + weight_variance)))
-
-    def get_ring_buffer_shifts(self):
-        """
-        Get the shift of the ring buffers for transfer of values into the
-        input buffers for this model.
-
-        :param incoming_projections:
-            The projections to consider in the calculations
-        :type incoming_projections:
-            list(~spynnaker.pyNN.models.projection.Projection)
-        :rtype: list(int)
-        """
-        stats = _Stats(self.__neuron_impl, self.__spikes_per_second,
-                       self.__ring_buffer_sigma)
+        # Get the (global) weight_scale from the input_type in the neuron_impl
+        weight_scale = self.__neuron_impl.get_global_weight_scale()
 
         for proj in self.incoming_projections:
             # pylint: disable=protected-access
@@ -1064,52 +1069,146 @@ class AbstractPopulationVertex(
             # Skip if this is a synapse dynamics synapse type
             if synapse_info.synapse_type_from_dynamics:
                 continue
-            stats.add_projection(proj)
 
-        n_synapse_types = self.__neuron_impl.get_n_synapse_types()
-        max_weights = numpy.zeros(n_synapse_types)
-        for synapse_type in range(n_synapse_types):
-            max_weights[synapse_type] = stats.get_max_weight(synapse_type)
+            synapse_dynamics = synapse_info.synapse_dynamics
+            connector = synapse_info.connector
+            conn_weight_min = synapse_dynamics.get_weight_minimum(
+                connector, self.__weight_random_sigma, synapse_info)
+            if conn_weight_min == 0:
+                conn_weight_min = DataType.S1615.decode_from_int(1)
+            conn_weight_min *= weight_scale
 
-        # Convert these to powers; we could use int.bit_length() for this if
-        # they were integers, but they aren't...
-        max_weight_powers = (
-            0 if w <= 0 else int(math.ceil(max(0, math.log2(w))))
-            for w in max_weights)
+            # If local-only then deal with both positive and negative index
+            if isinstance(synapse_dynamics, AbstractLocalOnly):
+                s_type_pos = synapse_dynamics.get_positive_synapse_index(proj)
+                s_type_neg = synapse_dynamics.get_negative_synapse_index(proj)
+                if not numpy.isnan(conn_weight_min):
+                    for s_type in [s_type_pos, s_type_neg]:
+                        if min_weights[s_type] != sys.maxsize:
+                            conn_weight_min = float_gcd(
+                                min_weights[s_type], conn_weight_min)
+                        min_weights[s_type] = min(
+                            min_weights[s_type], conn_weight_min)
 
-        # If 2^max_weight_power equals the max weight, we have to add another
-        # power, as range is 0 - (just under 2^max_weight_power)!
-        max_weight_powers = (
-            w + 1 if (2 ** w) <= a else w
-            for w, a in zip(max_weight_powers, max_weights))
+                        # Do any remaining calculations in the synapse dynamics
+                        min_weights = synapse_dynamics.calculate_min_weight(
+                            min_weights, self.__max_stdp_spike_delta,
+                            weight_scale, conn_weight_min, s_type)
+            else:
+                synapse_type = synapse_info.synapse_type
+                if not numpy.isnan(conn_weight_min):
+                    if min_weights[synapse_type] != sys.maxsize:
+                        conn_weight_min = float_gcd(
+                            min_weights[synapse_type], conn_weight_min)
+                    min_weights[synapse_type] = min(
+                        min_weights[synapse_type], conn_weight_min)
 
-        return list(max_weight_powers)
+                # Do any remaining calculations in the synapse dynamics
+                min_weights = synapse_dynamics.calculate_min_weight(
+                    min_weights, self.__max_stdp_spike_delta,
+                    weight_scale, conn_weight_min, synapse_type)
 
-    @staticmethod
-    def __get_weight_scale(ring_buffer_to_input_left_shift):
+        # Convert values to their closest representable value to ensure
+        # that division works for the minimum value
+        min_weights = [self.__get_closest_weight(m)
+                       if m != sys.maxsize else 0 for m in min_weights]
+
+        # The minimum weight shouldn't be 0 unless set above (and then it
+        # doesn't matter that we use the min as there are no weights); so
+        # set the weight to the smallest representable value if 0
+        min_weights = [m if m > 0 else DataType.S1615.decode_from_int(1)
+                       for m in min_weights]
+
+        # Now check that the maximum weight isn't too big
+        for proj in self.incoming_projections:
+            # pylint: disable-next=protected-access
+            synapse_info = proj._synapse_information
+            synapse_type = synapse_info.synapse_type
+            connector = synapse_info.connector
+            synapse_dynamics = synapse_info.synapse_dynamics
+
+            weight_max = synapse_dynamics.get_weight_maximum(
+                connector, synapse_info)
+            weight_max *= weight_scale
+
+            weight_scale_limit = float(DataType.S1615.scale)
+            if weight_scale_limit * min_weights[synapse_type] < weight_max:
+                max_weight = self.__get_closest_weight(weight_max)
+                min_weights[synapse_type] = max_weight / weight_scale_limit
+
+        self.__check_weights(min_weights, weight_scale)
+
+        return min_weights
+
+    def __check_weights(
+            self, min_weights, weight_scale):
+        """ Warn the user about weights that can't be represented properly
+            where possible
+
+        :param ~numpy.ndarray min_weights: Minimum weights per synapse type
+        :param float weight_scale: The weight_scale from the synapse input_type
         """
-        Return the amount to scale the weights by to convert them from
-        floating point values to 16-bit fixed point numbers which can be
-        shifted left by ring_buffer_to_input_left_shift to produce an
-        s1615 fixed point number.
+        for proj in self.incoming_projections:
+            # pylint: disable-next=protected-access
+            synapse_info = proj._synapse_information
+            weights = synapse_info.weights
+            synapse_type = synapse_info.synapse_type
+            min_weight = min_weights[synapse_type]
+            if not isinstance(weights, str):
+                if numpy.isscalar(weights):
+                    self.__check_weight(
+                        min_weight, weights, weight_scale, proj, synapse_info)
+                elif hasattr(weights, "__getitem__"):
+                    for w in weights:
+                        self.__check_weight(
+                            min_weight, w, weight_scale, proj, synapse_info)
 
-        :param int ring_buffer_to_input_left_shift:
-        :rtype: float
+    def __check_weight(
+            self, min_weight, weight, weight_scale, projection,
+            synapse_info):
+        """ Warn the user about a weight that can't be represented properly
+            where possible
+
+        :param float min_weight: Minimum weight value
+        :param float weight: weight value being checked
+        :param float weight_scale: The weight_scale from the synapse input_type
+        :param ~.Projection projection: The projection
+        :param ~.SynapseInformation synapse_info: The synapse information
         """
-        return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
+        r_weight = weight * weight_scale / min_weight
+        r_weight = (DataType.UINT16.closest_representable_value(
+            r_weight) * min_weight) / weight_scale
+        if weight != r_weight:
+            self.__weight_provenance[weight, r_weight].append(
+                (projection, synapse_info))
 
-    def get_weight_scales(self, ring_buffer_shifts):
+    def get_min_weights(self):
+        """ Calculate the minimum weights required to best represent all the
+            possible weights coming into this vertex
+
+        :return: list of minimum weights
+        :rtype: list(float)
         """
-        Get the weight scaling to apply to weights in synapses.
+        if self.__min_weights is None:
+            self.__min_weights = self.__calculate_min_weights()
+        else:
+            weight_scale = self.__neuron_impl.get_global_weight_scale()
+            self.__check_weights(
+                self.__min_weights, weight_scale)
 
-        :param list(int) ring_buffer_shifts:
-            The shifts to convert to weight scales
+        return self.__min_weights
+
+    def get_weight_scales(self, min_weights):
+        """ Get the weight scaling to apply to weights in synapses
+
+        :param list(int) min_weights:
+            The min weights to convert to weight scales
         :rtype: list(int)
         """
         weight_scale = self.__neuron_impl.get_global_weight_scale()
-        return numpy.array([
-            self.__get_weight_scale(r) * weight_scale
-            for r in ring_buffer_shifts])
+        self.__weight_scales = numpy.array(
+            [(1 / w) * weight_scale if w != 0 else 0 for w in min_weights])
+        return self.__weight_scales
 
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
@@ -1143,8 +1242,8 @@ class AbstractPopulationVertex(
         """
         # This will only hold ring buffer scaling for the neuron synapse
         # types
-        return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
-                (BYTES_PER_WORD * self.__neuron_impl.get_n_synapse_types()))
+        return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES + (
+            BYTES_PER_WORD * 2 * self.__neuron_impl.get_n_synapse_types()))
 
     def get_synapse_dynamics_size(self, n_atoms):
         """
@@ -1578,125 +1677,154 @@ class AbstractPopulationVertex(
         _check_random_dists(self.__state_variables)
         return True
 
+    @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
+    def get_local_provenance_data(self):
+        synapse_names = list(self.__neuron_impl.get_synapse_targets())
+        with ProvenanceWriter() as db:
+            for i, weight in enumerate(self.__min_weights):
+                db.insert_app_vertex(
+                    self.label, synapse_names[i], "min_weight", weight)
+            for (weight, r_weight) in self.__weight_provenance:
+                proj_info = self.__weight_provenance[weight, r_weight]
+                for i, (_proj, s_info) in enumerate(proj_info):
+                    db.insert_connector(
+                        s_info.pre_population.label,
+                        s_info.post_population.label,
+                        s_info.connector.__class__.__name__,
+                        "weight_representation",
+                        weight == r_weight
+                        )
 
-class _Stats(object):
-    """
-    Object to keep hold of and process statistics for ring buffer scaling.
-    """
-    __slots__ = [
-        "w_scale",
-        "w_scale_sq",
-        "n_synapse_types",
-        "running_totals",
-        "delay_running_totals",
-        "total_weights",
-        "biggest_weight",
-        "rate_stats",
-        "steps_per_second",
-        "default_spikes_per_second",
-        "ring_buffer_sigma"
-    ]
+                    if (weight != r_weight):
+                        db.insert_report(
+                            "Weight of {} could not be represented precisely;"
+                            " a weight of {} was used instead".format(
+                                weight, r_weight))
 
-    def __init__(
-            self, neuron_impl, default_spikes_per_second, ring_buffer_sigma):
-        self.w_scale = neuron_impl.get_global_weight_scale()
-        self.w_scale_sq = self.w_scale ** 2
-        n_synapse_types = neuron_impl.get_n_synapse_types()
-
-        self.running_totals = [
-            RunningStats() for _ in range(n_synapse_types)]
-        self.delay_running_totals = [
-            RunningStats() for _ in range(n_synapse_types)]
-        self.total_weights = numpy.zeros(n_synapse_types)
-        self.biggest_weight = numpy.zeros(n_synapse_types)
-        self.rate_stats = [RunningStats() for _ in range(n_synapse_types)]
-
-        self.steps_per_second = (
-            SpynnakerDataView.get_simulation_time_step_per_s())
-        self.default_spikes_per_second = default_spikes_per_second
-        self.ring_buffer_sigma = ring_buffer_sigma
-
-    def add_projection(self, proj):
-        # pylint: disable=protected-access
-        s_dynamics = proj._synapse_information.synapse_dynamics
-        if isinstance(s_dynamics, AbstractSupportsSignedWeights):
-            self.__add_signed_projection(proj)
-        else:
-            self.__add_unsigned_projection(proj)
-
-    def __add_signed_projection(self, proj):
-        # pylint: disable=protected-access
-        s_info = proj._synapse_information
-        connector = s_info.connector
-        s_dynamics = s_info.synapse_dynamics
-
-        n_conns = connector.get_n_connections_to_post_vertex_maximum(s_info)
-        d_var = s_dynamics.get_delay_variance(connector, s_info.delays, s_info)
-
-        s_type_pos = s_dynamics.get_positive_synapse_index(proj)
-        w_mean_pos = s_dynamics.get_mean_positive_weight(proj)
-        w_var_pos = s_dynamics.get_variance_positive_weight(proj)
-        w_max_pos = s_dynamics.get_maximum_positive_weight(proj)
-        self.__add_details(
-            proj, s_type_pos, n_conns, w_mean_pos, w_var_pos, w_max_pos, d_var)
-
-        s_type_neg = s_dynamics.get_negative_synapse_index(proj)
-        w_mean_neg = -s_dynamics.get_mean_negative_weight(proj)
-        w_var_neg = -s_dynamics.get_variance_negative_weight(proj)
-        w_max_neg = -s_dynamics.get_minimum_negative_weight(proj)
-        self.__add_details(
-            proj, s_type_neg, n_conns, w_mean_neg, w_var_neg, w_max_neg, d_var)
-
-    def __add_unsigned_projection(self, proj):
-        # pylint: disable=protected-access
-        s_info = proj._synapse_information
-        s_type = s_info.synapse_type
-        s_dynamics = s_info.synapse_dynamics
-        connector = s_info.connector
-
-        n_conns = connector.get_n_connections_to_post_vertex_maximum(s_info)
-        w_mean = s_dynamics.get_weight_mean(connector, s_info)
-        w_var = s_dynamics.get_weight_variance(
-            connector, s_info.weights, s_info)
-        w_max = s_dynamics.get_weight_maximum(connector, s_info)
-        d_var = s_dynamics.get_delay_variance(connector, s_info.delays, s_info)
-        self.__add_details(proj, s_type, n_conns, w_mean, w_var, w_max, d_var)
-
-    def __add_details(
-            self, proj, s_type, n_conns, w_mean, w_var, w_max, d_var):
-        self.running_totals[s_type].add_items(
-            w_mean * self.w_scale, w_var * self.w_scale_sq, n_conns)
-        self.biggest_weight[s_type] = max(
-            self.biggest_weight[s_type], w_max * self.w_scale)
-        self.delay_running_totals[s_type].add_items(0.0, d_var, n_conns)
-
-        spikes_per_tick, spikes_per_second = self.__pre_spike_stats(proj)
-        self.rate_stats[s_type].add_items(spikes_per_second, 0, n_conns)
-        self.total_weights[s_type] += spikes_per_tick * (w_max * n_conns)
-
-    def __pre_spike_stats(self, proj):
-        spikes_per_tick = max(
-            1.0, self.default_spikes_per_second / self.steps_per_second)
-        spikes_per_second = self.default_spikes_per_second
-        # pylint: disable=protected-access
-        pre_vertex = proj._projection_edge.pre_vertex
-        if isinstance(pre_vertex, AbstractMaxSpikes):
-            rate = pre_vertex.max_spikes_per_second()
-            if rate != 0:
-                spikes_per_second = rate
-            spikes_per_tick = pre_vertex.max_spikes_per_ts()
-        return spikes_per_tick, spikes_per_second
-
-    def get_max_weight(self, s_type):
-        if self.delay_running_totals[s_type].variance == 0.0:
-            return max(self.total_weights[s_type], self.biggest_weight[s_type])
-
-        stats = self.running_totals[s_type]
-        rates = self.rate_stats[s_type]
-        # pylint: disable=protected-access
-        w_max = AbstractPopulationVertex._ring_buffer_expected_upper_bound(
-            stats.mean, stats.standard_deviation, rates.mean,
-            stats.n_items, self.ring_buffer_sigma)
-        w_max = min(w_max, self.total_weights[s_type])
-        w_max = max(w_max, self.biggest_weight[s_type])
-        return w_max
+# not sure anything after this point is used any more?
+# class _Stats(object):
+#     """ Object to keep hold of and process statistics for ring buffer scaling
+#     """
+#     __slots__ = [
+#         "w_scale",
+#         "w_scale_sq",
+#         "n_synapse_types",
+#         "running_totals",
+#         "delay_running_totals",
+#         "total_weights",
+#         "biggest_weight",
+#         "rate_stats",
+#         "steps_per_second",
+#         "default_spikes_per_second",
+#         "ring_buffer_sigma"
+#     ]
+#
+#     def __init__(
+#             self, neuron_impl, default_spikes_per_second, ring_buffer_sigma):
+#         self.w_scale = neuron_impl.get_global_weight_scale()
+#         self.w_scale_sq = self.w_scale ** 2
+#         n_synapse_types = neuron_impl.get_n_synapse_types()
+#
+#         self.running_totals = [
+#             RunningStats() for _ in range(n_synapse_types)]
+#         self.delay_running_totals = [
+#             RunningStats() for _ in range(n_synapse_types)]
+#         self.total_weights = numpy.zeros(n_synapse_types)
+#         self.biggest_weight = numpy.zeros(n_synapse_types)
+#         self.rate_stats = [RunningStats() for _ in range(n_synapse_types)]
+#
+#         self.steps_per_second = (
+#             SpynnakerDataView.get_simulation_time_step_per_s())
+#         self.default_spikes_per_second = default_spikes_per_second
+#         self.ring_buffer_sigma = ring_buffer_sigma
+#
+#     def add_projection(self, proj):
+#         # pylint: disable=protected-access
+#         s_dynamics = proj._synapse_information.synapse_dynamics
+#         if isinstance(s_dynamics, AbstractSupportsSignedWeights):
+#             self.__add_signed_projection(proj)
+#         else:
+#             self.__add_unsigned_projection(proj)
+#
+#     def __add_signed_projection(self, proj):
+#         # pylint: disable=protected-access
+#         s_info = proj._synapse_information
+#         connector = s_info.connector
+#         s_dynamics = s_info.synapse_dynamics
+#
+#         n_conns = connector.get_n_connections_to_post_vertex_maximum(s_info)
+#         d_var = s_dynamics.get_delay_variance(
+#             connector, s_info.delays, s_info)
+#
+#         s_type_pos = s_dynamics.get_positive_synapse_index(proj)
+#         w_mean_pos = s_dynamics.get_mean_positive_weight(proj)
+#         w_var_pos = s_dynamics.get_variance_positive_weight(proj)
+#         w_max_pos = s_dynamics.get_maximum_positive_weight(proj)
+#         self.__add_details(
+#             proj, s_type_pos, n_conns, w_mean_pos, w_var_pos, w_max_pos,
+#             d_var)
+#
+#         s_type_neg = s_dynamics.get_negative_synapse_index(proj)
+#         w_mean_neg = -s_dynamics.get_mean_negative_weight(proj)
+#         w_var_neg = -s_dynamics.get_variance_negative_weight(proj)
+#         w_max_neg = -s_dynamics.get_minimum_negative_weight(proj)
+#         self.__add_details(
+#             proj, s_type_neg, n_conns, w_mean_neg, w_var_neg, w_max_neg,
+#             d_var)
+#
+#     def __add_unsigned_projection(self, proj):
+#         # pylint: disable=protected-access
+#         s_info = proj._synapse_information
+#         s_type = s_info.synapse_type
+#         s_dynamics = s_info.synapse_dynamics
+#         connector = s_info.connector
+#
+#         n_conns = connector.get_n_connections_to_post_vertex_maximum(s_info)
+#         w_mean = s_dynamics.get_weight_mean(connector, s_info)
+#         w_var = s_dynamics.get_weight_variance(
+#             connector, s_info.weights, s_info)
+#         w_max = s_dynamics.get_weight_maximum(connector, s_info)
+#         d_var = s_dynamics.get_delay_variance(
+#             connector, s_info.delays, s_info)
+#         self.__add_details(
+#             proj, s_type, n_conns, w_mean, w_var, w_max, d_var)
+#
+#     def __add_details(
+#             self, proj, s_type, n_conns, w_mean, w_var, w_max, d_var):
+#         self.running_totals[s_type].add_items(
+#             w_mean * self.w_scale, w_var * self.w_scale_sq, n_conns)
+#         self.biggest_weight[s_type] = max(
+#             self.biggest_weight[s_type], w_max * self.w_scale)
+#         self.delay_running_totals[s_type].add_items(0.0, d_var, n_conns)
+#
+#         spikes_per_tick, spikes_per_second = self.__pre_spike_stats(proj)
+#         self.rate_stats[s_type].add_items(spikes_per_second, 0, n_conns)
+#         self.total_weights[s_type] += spikes_per_tick * (w_max * n_conns)
+#
+#     def __pre_spike_stats(self, proj):
+#         spikes_per_tick = max(
+#             1.0, self.default_spikes_per_second / self.steps_per_second)
+#         spikes_per_second = self.default_spikes_per_second
+#         # pylint: disable=protected-access
+#         pre_vertex = proj._projection_edge.pre_vertex
+#         if isinstance(pre_vertex, AbstractMaxSpikes):
+#             rate = pre_vertex.max_spikes_per_second()
+#             if rate != 0:
+#                 spikes_per_second = rate
+#             spikes_per_tick = pre_vertex.max_spikes_per_ts()
+#         return spikes_per_tick, spikes_per_second
+#
+#     def get_max_weight(self, s_type):
+#         if self.delay_running_totals[s_type].variance == 0.0:
+#             return max(
+#                 self.total_weights[s_type], self.biggest_weight[s_type])
+#
+#         stats = self.running_totals[s_type]
+#         rates = self.rate_stats[s_type]
+#         # pylint: disable=protected-access
+#         w_max = AbstractPopulationVertex._ring_buffer_expected_upper_bound(
+#             stats.mean, stats.standard_deviation, rates.mean,
+#             stats.n_items, self.ring_buffer_sigma)
+#         w_max = min(w_max, self.total_weights[s_type])
+#         w_max = max(w_max, self.biggest_weight[s_type])
+#         return w_max

@@ -79,3 +79,19 @@ class AbstractWeightDependence(object, metaclass=AbstractBase):
 
         :rtype: float
         """
+
+    @abstractproperty
+    def weight_minimum(self):
+        """ The minimum weight that will ever be set in a synapse as a result\
+            of this rule
+
+        :rtype: float
+        """
+
+    @abstractmethod
+    def weight_change_minimum(self, min_delta):
+        """ The minimum non-zero change in weight that will occur
+
+        :param list min_delta: The minimum delta values from the timing rules
+        :rtype: float
+        """

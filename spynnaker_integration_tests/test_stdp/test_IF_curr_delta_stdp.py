@@ -114,7 +114,7 @@ class TestIFCurrDeltaSTDP(BaseTestCase):
 
         sim.end()
 
-        self.assertTrue(numpy.allclose(weights_exc, weights_inh, rtol=0.001))
+        self.assertTrue(numpy.allclose(weights_exc, weights_inh, rtol=0.01))
 
     def nearest_pair_additive_delta(self):
         timestep = 1
@@ -210,7 +210,7 @@ class TestIFCurrDeltaSTDP(BaseTestCase):
 
         sim.end()
 
-        self.assertTrue(numpy.allclose(weights_exc, weights_inh, rtol=0.001))
+        self.assertTrue(numpy.allclose(weights_exc, weights_inh, rtol=0.01))
 
     def test_mad_pair_additive_delta(self):
         self.runsafe(self.mad_pair_additive_delta)

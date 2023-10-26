@@ -155,7 +155,6 @@ bool population_table_load_bitfields(filter_region_t *filter_region) {
              return false;
          }
          uint32_t useful = !(filters[mp_i].merged || filters[mp_i].all_ones);
-
          if (useful) {
              // Try to allocate all the bitfields for this entry
              uint32_t n_words = get_bit_field_size(filters[mp_i].n_atoms);
@@ -337,5 +336,3 @@ bool population_table_get_next_address(spike_t *spike, pop_table_lookup_result_t
 
     return is_valid;
 }
-
-//! \}

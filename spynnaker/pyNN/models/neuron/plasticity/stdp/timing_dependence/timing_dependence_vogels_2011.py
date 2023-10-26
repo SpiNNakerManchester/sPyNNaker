@@ -22,7 +22,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightOnly)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    float_to_fixed, get_exp_lut_array)
+    float_to_fixed, get_exp_lut_array, get_min_lut_value)
 
 
 class TimingDependenceVogels2011(AbstractTimingDependence):
@@ -163,3 +163,9 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
         return self.__PARAM_NAMES
+
+    @overrides(AbstractTimingDependence.minimum_delta)
+    def minimum_delta(self, max_stdp_spike_delta):
+        ts = SpynnakerDataView.get_simulation_time_step_ms()
+        min_tau = get_min_lut_value(self.__tau_data, ts, max_stdp_spike_delta)
+        return [min_tau - self.__alpha, min_tau]

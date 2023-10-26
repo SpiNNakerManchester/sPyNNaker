@@ -164,7 +164,6 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 static void neuron_impl_load_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons,
 		address_t save_initial_state) {
-
     // Read the number of steps per timestep
     n_steps_per_timestep = address[next++];
     if (n_steps_per_timestep == 0) {
@@ -252,6 +251,8 @@ static void neuron_impl_do_timestep_update(
         additional_input_t *additional_inputs = &additional_input_array[neuron_index];
         synapse_types_t *the_synapse_type = &synapse_types_array[neuron_index];
 
+//        bool spike = false;
+
         // Loop however many times requested; do this in reverse for efficiency,
         // and because the index doesn't actually matter
         for (uint32_t i_step = n_steps_per_timestep; i_step > 0; i_step--) {
@@ -265,26 +266,25 @@ static void neuron_impl_do_timestep_update(
             input_t inh_values[NUM_INHIBITORY_RECEPTORS];
             input_t *inh_syn_values =
                     synapse_types_get_inhibitory_input(inh_values, the_synapse_type);
-
             // Call functions to obtain exc_input and inh_input
             input_t *exc_input_values = input_type_get_input_value(
                     exc_syn_values, input_types, NUM_EXCITATORY_RECEPTORS);
             input_t *inh_input_values = input_type_get_input_value(
                     inh_syn_values, input_types, NUM_INHIBITORY_RECEPTORS);
 
-            // Sum g_syn contributions from all receptors for recording
-            REAL total_exc = ZERO;
-            REAL total_inh = ZERO;
-
-            for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++) {
-                total_exc += exc_input_values[i];
-            }
-            for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++) {
-                total_inh += inh_input_values[i];
-            }
-
             // Do recording if on the first step
             if (i_step == n_steps_per_timestep) {
+				// Sum g_syn contributions from all receptors for recording
+				REAL total_exc = ZERO;
+				REAL total_inh = ZERO;
+
+				for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++) {
+					total_exc += exc_input_values[i];
+				}
+				for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++) {
+					total_inh += inh_input_values[i];
+				}
+
                 neuron_recording_record_accum(
                         V_RECORDING_INDEX, neuron_index, soma_voltage);
                 neuron_recording_record_accum(
@@ -319,6 +319,8 @@ static void neuron_impl_do_timestep_update(
             // If spike occurs, communicate to relevant parts of model
             if (spike_now) {
 
+//                spike = true;
+
                 // Call relevant model-based functions
                 // Tell the neuron model
                 neuron_model_has_spiked(this_neuron);
@@ -340,6 +342,14 @@ static void neuron_impl_do_timestep_update(
     #if LOG_LEVEL >= LOG_DEBUG
         neuron_model_print_state_variables(this_neuron);
     #endif // LOG_LEVEL >= LOG_DEBUG
+
+//        if (spike) {
+//            // Record the spike
+//            neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
+//
+//            // Send the spike
+//            send_spike(timer_count, time, neuron_index);
+//        }
     }
 }
 

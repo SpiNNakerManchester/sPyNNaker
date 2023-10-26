@@ -48,29 +48,20 @@ static bool current_source_step_init(
 		step_cs_amps = spin1_malloc(n_step_current_sources * sizeof(uint32_t*));
 		step_cs_amp_last = spin1_malloc(n_step_current_sources * sizeof(REAL));
 		step_cs_index = spin1_malloc(n_step_current_sources * sizeof(uint32_t));
-		if (step_cs_amp_last == NULL) {
-			log_error("Unable to allocate step current source amp last - out of DTCM");
-			return false;
-		}
-		if (step_cs_index == NULL) {
-			log_error("Unable to allocate step current source index - out of DTCM");
-			return false;
-		}
 	}
+
 	for (uint32_t n_step=0; n_step < n_step_current_sources; n_step++) {
 		uint32_t arr_len = (uint32_t) cs_address[*next];
 		uint32_t struct_size = (arr_len + 1) * sizeof(uint32_t);
 		step_cs_times[n_step] = spin1_malloc(struct_size);
 		if (step_cs_times[n_step] == NULL) {
-			log_error("Unable to allocate step current source times - out of DTCM",
-			        "struct_size is %u next %u n_step %u)", struct_size, *next, n_step);
+			log_error("Unable to allocate step current source times - out of DTCM");
 			return false;
 		}
 
 		step_cs_amps[n_step] = spin1_malloc(struct_size);
 		if (step_cs_amps[n_step] == NULL) {
-			log_error("Unable to allocate step current source amplitudes - out of DTCM",
-			        "(struct_size is %u next %u n_step %u)", struct_size, *next, n_step);
+			log_error("Unable to allocate step current source amplitudes - out of DTCM");
 			return false;
 		}
 

@@ -40,7 +40,7 @@ static bool current_source_ac_init(uint32_t n_ac_sources, uint32_t *next) {
 	for (uint32_t n_ac=0; n_ac < n_ac_sources; n_ac++) {
 		ac_source[n_ac] = spin1_malloc(sizeof(ac_source_t));
 		if (ac_source[n_ac] == NULL) {
-			log_error("Unable to allocate DC source parameters - out of DTCM");
+			log_error("Unable to allocate AC source parameters - out of DTCM");
 			return false;
 		}
 		*next += sizeof(ac_source_t) / 4;

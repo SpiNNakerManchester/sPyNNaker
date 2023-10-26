@@ -209,8 +209,29 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
 
         # Work out the ring buffer shifts based on all incoming things
-        rb_shifts = app_vertex.get_ring_buffer_shifts()
-        weight_scales = app_vertex.get_weight_scales(rb_shifts)
+        # (code from spinncer_update branch)
+
+        # rb_shifts = None
+        # if (hasattr(app_vertex, "rb_left_shifts") and
+        #         app_vertex.rb_left_shifts is not None):
+        #     print("=" * 80)
+        #     print("Using given values for RB left shifts.")
+        #     rb_shifts = app_vertex.rb_left_shifts
+        #     print("RB left shifts for {:20}".format(app_vertex.label),
+        #           "=", rb_shifts)
+        #     print("-" * 80)
+        # else:
+        #     print("=" * 80)
+        #     print("Computing RB left shifts for", app_vertex.label)
+        #     rb_shifts = app_vertex.get_ring_buffer_shifts()
+        #     print("RB left shifts for {:20}".format(app_vertex.label),
+        #           "=", rb_shifts)
+        #
+        # weight_scales = app_vertex.get_weight_scales(rb_shifts)
+
+        # Work out the minimum weights based on all incoming things
+        min_weights = app_vertex.get_min_weights()
+        weight_scales = app_vertex.get_weight_scales(min_weights)
 
         # We add the SDRAM edge SDRAM to the neuron resources so it is
         # accounted for within the placement
@@ -249,7 +270,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
             # Create the neuron vertex for the slice
             neuron_vertex = self.__add_neuron_core(
-                vertex_slice, neuron_sdram, label, index, rb_shifts,
+                vertex_slice, neuron_sdram, label, index, min_weights,
                 weight_scales, neuron_data, atoms_per_core)
             chip_counter.add_core(neuron_sdram)
 
@@ -262,7 +283,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             synapse_references, syn_label, feedback_partition = \
                 self.__add_lead_synapse_core(
                     vertex_slice, structural_sz, lead_synapse_core_sdram,
-                    label, rb_shifts, weight_scales, synapse_vertices,
+                    label, min_weights, weight_scales, synapse_vertices,
                     neuron_vertex, atoms_per_core,
                     synaptic_matrices)
             chip_counter.add_core(lead_synapse_core_sdram)
@@ -313,7 +334,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.__neuromodulators.add(proj._projection_edge.pre_vertex)
 
     def __add_neuron_core(
-            self, vertex_slice, sdram, label, index, rb_shifts,
+            self, vertex_slice, sdram, label, index, min_weights,
             weight_scales, neuron_data, atoms_per_core):
         """
         Add a neuron core for for a slice of neurons.
@@ -323,9 +344,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         :param ~pacman.model.resources.MultiRegionSDRAM sdram:
         :param str label: The name to give the core
         :param int index: The index of the slice in the ordered list of slices
-        :param list(int) rb_shifts:
-            The computed ring-buffer shift values to use to get the weights
-            back to S1615 values
+        :param list(float) min_weights:
+            The computed minimum weights to be used in the simulation
         :param list(int) weight_scales:
             The scale to apply to weights to encode them in the 16-bit synapses
         :return: The neuron vertex created and the resources used
@@ -335,7 +355,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         neuron_vertex = PopulationNeuronsMachineVertex(
             sdram,
             f"{label}_Neurons:{vertex_slice.lo_atom}-{vertex_slice.hi_atom}",
-            app_vertex, vertex_slice, index, rb_shifts, weight_scales,
+            app_vertex, vertex_slice, index, min_weights, weight_scales,
             neuron_data, atoms_per_core)
         app_vertex.remember_machine_vertex(neuron_vertex)
         self.__neuron_vertices.append(neuron_vertex)
@@ -344,7 +364,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     def __add_lead_synapse_core(
             self, vertex_slice, structural_sz, lead_synapse_core_sdram, label,
-            rb_shifts, weight_scales, synapse_vertices, neuron_vertex,
+            min_weights, weight_scales, synapse_vertices, neuron_vertex,
             atoms_per_core, synaptic_matrices):
         """
         Add the first synapse core for a neuron core.  This core will
@@ -358,9 +378,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             The SDRAM that will be used by the synapse core to handle a given
             set of projections
         :param str label: The name to give the core
-        :param list(int) rb_shifts:
-            The computed ring-buffer shift values to use to get the weights
-            back to S1615 values
+        :param list(float) min_weights:
+            The computed minimum weights to be used in the simulation
         :param list(int) weight_scales:
             The scale to apply to weights to encode them in the 16-bit synapses
         :param synapse_vertices: A list to add the core to
@@ -381,7 +400,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # Do the lead synapse core
         lead_synapse_vertex = PopulationSynapsesMachineVertexLead(
             lead_synapse_core_sdram, f"{syn_label}(0)",
-            self.governed_app_vertex, vertex_slice, rb_shifts, weight_scales,
+            self.governed_app_vertex, vertex_slice, min_weights, weight_scales,
             structural_sz, synapse_references, atoms_per_core,
             synaptic_matrices)
         self.governed_app_vertex.remember_machine_vertex(lead_synapse_vertex)

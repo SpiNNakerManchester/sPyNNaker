@@ -17,6 +17,7 @@ from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
+
 # Six words per synapse type
 _SPACE_PER_SYNAPSE_TYPE = 6 * BYTES_PER_WORD
 
@@ -150,6 +151,7 @@ class WeightDependenceAdditiveTriplet(
                 data_type=DataType.S1615)
 
     @property
+    @overrides(AbstractWeightDependence.weight_maximum)
     def weight_maximum(self):
         """
         The maximum weight that will ever be set in a synapse as a result
@@ -158,6 +160,18 @@ class WeightDependenceAdditiveTriplet(
         :rtype: float
         """
         return self.__w_max
+
+    @property
+    @overrides(AbstractWeightDependence.weight_minimum)
+    def weight_minimum(self):
+        return self.__w_min
+
+    @overrides(AbstractWeightDependence.weight_change_minimum)
+    def weight_change_minimum(self, min_delta):
+        (a2_plus, a3_plus), (a2_minus, a3_minus) = min_delta
+        min_pot = a2_plus * self.A_plus + a3_plus * self.__a3_plus
+        min_dep = a2_minus * self.A_minus + a3_minus * self.__a3_minus
+        return min(min_pot, min_dep)
 
     @overrides(AbstractWeightDependence.get_parameter_names)
     def get_parameter_names(self):
