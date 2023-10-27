@@ -173,7 +173,13 @@ with no further calculation required when the key is received.  Note that the
 values generated here are generally done per target core, so the calculation can
 leverage on that a bit more.
 
-#### From `PyNN neuron index` to `row index` for source Population neurons
+#### From `PyNN neuron index` to `neuron index` and `row index`
+The code below calculates first the neuron index and then the row index given a
+PyNN neuron index.  This can then be used both to calculate the source
+Population row index and the target Population neuron index on each core.  Note
+that when calculating for a specific target Population core, the core indexes
+can be pre-computed for the core to save computing it for each neuron index
+of the core.
 
 ```
 # Work out the position of the neuron in each dimension
@@ -209,9 +215,6 @@ for n in n_dimensions:
 # Work out the row index from the above and the neurons per core
 row_index = (core_index * neurons_per_core) + neuron_index
 ```
-
-#### From `PyNN neuron index` to `neuron index` for target Population neurons
-
 
 Multidimensional Connectors
 ---------------------------
