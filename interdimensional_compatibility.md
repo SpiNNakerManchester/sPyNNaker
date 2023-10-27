@@ -153,7 +153,7 @@ def get_neuron_index_from_key(key, pop_info):
 def get_pop_info(key):
     pop_key = (key >> pop_shift) & pop_mask
     // Find the info for the given population in a table
-    return get_pop_info(pop_key)
+    return read_pop_info(pop_key)
 ```
 
 When the source and target Populations are 1D, the mapping between the row
