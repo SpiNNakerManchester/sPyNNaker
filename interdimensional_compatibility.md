@@ -184,30 +184,30 @@ for n in n_dimensions:
     remainder -= neuron_pos[n] * last_size
     last_size = full_size[n]
 
-# Work out which core the pre-neuron is on in each dimension
+# Work out which core the neuron is on in each dimension
 for n in n_dimensions:
     core_index[n] = neuron_pos[n] / neurons_per_core[n]
 
-# Work out the raster-index of the core
-raster_core_index = 0;
+# Work out the core index
+core_index = 0;
 last_size = 0;
 for n in n_dimensions:
-    raster_core_index = (raster_core_index * last_size) + core_index[n]
+    core_index = (core_index * last_size) + core_index[n]
     last_size = cores_per_size[n]
 
-# Work out which index the pre-neuron is on the core in each dimension
+# Work out the neuron index on this core in each dimension
 for n in n_dimensions:
     neuron_index[n] = neuron_pos[n] - (neurons_per_core[n] * core_index[n])
 
-# Work out the raster-index of the pre-neuron on the core
-raster_neuron_index = 0
+# Work out the neuron index on this core
+neuron_index = 0
 last_size = 0
 for n in n_dimensions:
-    raster_neuron_index = (raster_neuron_index * last_size) + neuron_index[n]
+    neuron_index = (neuron_index * last_size) + neuron_index[n]
     last_size = neurons_per_core[n]
 
-# Work out the row index from the above and the neurons-per-core
-row_index = (raster_core_index * total_neurons_per_core) + raster_neuron_index
+# Work out the row index from the above and the neurons per core
+row_index = (core_index * neurons_per_core) + neuron_index
 ```
 
 #### From `PyNN neuron index` to `neuron index` for target Population neurons
