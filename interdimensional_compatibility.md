@@ -1,7 +1,81 @@
 Interdimensional Compatibility
 ==============================
 
-The software has been enhanced to support multi-dimensional vertices, and the
+Terminology
+-----------
+The following terms and "variable names" (i.e. the names of variables in
+pseudocode examples) are used in this document.  Note these are written as
+variable names here with underscores in the names, but might also appear without
+the undescore in text.
+
+`PyNN`: Python Neural Network API.  See
+[https://neuralensemble.org/PyNN/](https://neuralensemble.org/PyNN/).
+
+`Population`: A group of neurons, as defined by PyNN.
+
+`Projection`: A sender-receiver relationship of spikes between Populations,
+as defined in PyNN.
+
+`source_population`: The sender of spikes; the pre-Population of a Projection.
+
+`target_population`: The receiver of spikes; the post-Population of a
+Projection.
+
+`pynn_neuron_index`: The index of the neuron within a Population.  This
+is always a single index even when the Population has multiple dimensions.
+
+`n_dimensions`: The number of dimensions of a Population e.g. 2 = 2D.
+
+`full_size[n]`: The full size of a Population in the n'th dimension e.g. a
+2D Population with width 3 and height 4 will have `full_size[0] = 3` and
+`full_size[1] = 4`.
+
+`neuron_pos[n]`: The global position of the neuron in the Population in the
+n'th dimension e.g. a neuron at position (1, 2) in a 2D Population will have
+`neuron_pos[0] = 1` and `neuron_pos[1] = 2`.
+
+`neurons_per_core`: The total number of neurons per SpiNNaker core.
+
+`neurons_per_core[n]`: The number of neurons per SpiNNaker core in the n'th
+dimension.
+
+`cores_per_size[n]`: The number of cores of the Population in the n'th
+dimension; this is a shorthand for `full_size[n] / neurons_per_core[n]`
+(which must be an integer value by design).
+
+`core_index`: The index of a core in a list of all cores; for multi-dimensional
+Populations, this is a raster scan of the cores.
+
+`core_index[n]`: The core index in the n'th dimension.
+
+`neuron_index`: The index of the neuron in a list of all neurons on a core; for
+multi-dimensional vertices, this is generally a raster scan of the cores.
+
+`neuron_index[n]`: The local neuron index in the n'th dimension.
+
+`key`: The SpiNNaker routing key used to send a spike to other cores and
+received from other cores.  The key is determined by the source Population and
+is unique for each neuron.
+
+`population_key`: The part of a key that is shared by all keys for a
+Population (see below for more details).  This is unique to a Population.
+
+`pop_info`: A receiver of spikes stores a table of Population information for
+each of the source Populations against the population key.  This includes things
+like the neurons per core, the position of the population key, the position and
+size of the core index in the key and the position and size of the neuron index
+in the key (see below).
+
+`synaptic_row`: A row listing the target neuron indexes on a core of a target
+Population, with a row for each source PyNN neuron index.
+
+`row_index`: The index of a synaptic row in the list of all synaptic rows as it
+appears on a core of a target Population.  Note that the row index may not be
+the same as the source PyNN neuron index (see later for details).
+
+Introduction
+------------
+The software has been enhanced to support multi-dimensional Populations, and the
 communication between these vertices which might have different dimensionality.
 The order of the neurons in a Population with more than one dimension have been
 chosen to be a [Raster Scan](https://en.wikipedia.org/wiki/Raster_scan) of the
@@ -24,7 +98,7 @@ core, a 30 neuron Population will be divided into 3 cores made up of neurons
 (0-9), (10-19) and (20-29), where a 25 neuron Population will be divided into 3
 cores also but made up of neurons (0-9), (10-19) and (20-24), so there will only
 be 5 neurons on the last core.  By default, the number of neurons per core is
-256.
+256 for a neuron Population.
 
 When a multi-dimensional Population is split over multiple cores, it will
 generally be split into hyper-rectangles i.e. n-dimensional rectangles, where
@@ -33,15 +107,16 @@ here is that each dimension must be exactly divisible by the number of neurons
 per core in that dimension.  For example, a Population with size (10, 10) in 2
 dimensions (so having 100 neurons) can be split into (5, 5) neurons per core
 made up of rectangles (in this case squares) of neurons (0,0 - 5,5),
-(0,6 - 5,10), (6,0 - 10,5) and (6,6 - 10,10).  Another example is shown in the
-image.
+(0,6 - 5,10), (6,0 - 10,5) and (6,6 - 10,10).  It is not possible to split this
+same Population into (3, 3) neurons per core.  Another example is shown in the
+image below.
 
 ![2D Neurons And Keys as described in the preceeding text](2DNeuronsAndKeys.png "2D Neurons and Keys")
 
-Population Keys
----------------
-When a neuron in a Population spikes, it sends a key that represents the index
-of the neuron in the Population.  Each Population is given a Population-level
+Spike Keys
+----------
+When a neuron in a Population spikes, it sends a key that is unique for each
+neuron in the Population.  Each Population is given a Population-level
 key, and then each core is given a core index within the Population.  These
 are assigned in bit fields in the overall key so that they can be added
 together, along with the neuron index on the core, to make the full key.
@@ -50,34 +125,29 @@ This is shown below.
 `|Population key|Core index|Neuron index|`
 
 The neuron index is a raster scan of the neurons on the core regardless of the
-dimensionality of the Population, in the same way that the Population neuron
-indices are a raster scan of the neurons of the Population through the
+dimensionality of the Population, in the same way that the PyNN neuron indexes
+are a raster scan of the neurons of the Population through the
 dimensions.  As the key structure is always the same regardless of the
 dimensionality, the Populations can communicate even if their dimensionalities
-do not match.  The trick is then to ensure that the synaptic information is
-organised to perform the correct mapping when the key is received.
+do not match.  The trick is then to ensure that the synaptic rows are
+organised to send the spikes to the correct neuron indexes.
 
 Synaptic Mapping
 ----------------
-When a key is received, the receiving vertex should not have to process it. The
+When a key is received, the receiving core should not have to process it. The
 aim is that the rows are ordered such that the key can be used to say which row
-of the synaptic table to look at by simple calculation.  This makes use of a few
-variables: `core_n` and `core_neuron` can be determined from
-the received key (`core_n` from the `core index` part and `core_neuron` from
-the`neuron index` part.  The `neurons_per_core` can be stored on the core
-using the `population key`, and so can be looked up on key reception.  This is
-shown below.
+index of the synaptic rows to look at by simple calculation.
 
 ```
 pop_info = get_pop_info(key)
-core_n = get_core_n_from_key(key, pop_info)
-core_neuron = get_core_neuron_from_key(key, pop_info)
+core_index = get_core_index_from_key(key, pop_info)
+neuron_index = get_neuron_index_from_key(key, pop_info)
 row_index = (core_n * pop_info.neurons_per_core) + core_neuron
 
-def get_core_n_from_key(key, pop_info):
+def get_core_index_from_key(key, pop_info):
     return (key >> pop_info.core_shift) & pop_info.core_mask
 
-def get_core_neuron_from_key(key, pop_info):
+def get_neuron_index_from_key(key, pop_info):
     return key & pop_info.neuron_mask
 
 def get_pop_info(key):
@@ -86,46 +156,28 @@ def get_pop_info(key):
     return get_pop_info(pop_key)
 ```
 
-When the source and target are 1D Populations, the mapping between the row
-index above and the pyNN neuron index in the pre-Population is simply the
+When the source and target Populations are 1D, the mapping between the row
+index and the pyNN neuron index of the source Population is simply the
 identity. When the source and / or the target are multi-dimensional, the mapping
-is more complicated.  The trick then is to re-order the rows so that row index computed on the receiving core is correct, as shown in the diagram below.
+is more complicated.  The trick then is to re-order the rows so that row index
+computed on the receiving core is correct, as shown in the diagram below.
 
 ![Row mappings in 1D and 2D as described in the preceeding text](RowsIn1DAnd2D.png "Rows in 1D and 2D")
 
-In addition to this, we also have to split the information on each synaptic
-row into the appropriate target cores.  Again, for simple 1D Populations this
-is the identity function.  For an n-dimensional target though, the splitting is
-again more complicated, but again can be calculated so that the final indices
-in the row are those of neurons on the local core with no further calculation
-required when the key is received.  Note that the values generated here are
-generally done per target core, so the calculation can leverage on that a bit
-more.
+In addition to this, we also have to split the neuron indexes on each synaptic
+row into the appropriate target Population cores.  Again, for 1D Populations
+this is the identity function.  For an n-dimensional target though, the
+splitting is again more complicated, but again can be calculated so that the
+final neuron indexes in the synaptic row are those of neurons on the local core
+with no further calculation required when the key is received.  Note that the
+values generated here are generally done per target core, so the calculation can
+leverage on that a bit more.
 
-#### To `row index` from `pre-neuron index`
-`full_size[n]`: The full size of the Population in the n'th dimension
-
-`neurons_per_core[n]`: The number of neurons per core in the n'th dimension
-
-`total_neurons_per_core`: The total number of neurons per core
-
-`cores_per_size[n]`: The number of cores of the Population in the n'th
-dimension; this is a shorthand for `full_size[n] / neurons_per_core[n]`
-(which must be an integer value by design).
-
-`neuron_pos[n]`: The global position of the neuron in the n'th dimension
-
-`core_index[n]`: The core index in the n'th dimension.
-
-`raster_core_index`: The core index after core rasterization.
-
-`neuron_index[n]`: The local neuron index in the n'th dimension.
-
-`raster_neuron_index`: The local neuron index after rasterization.
+#### From `PyNN neuron index` to `row index` for source Population neurons
 
 ```
 # Work out the position of the neuron in each dimension
-remainder = pre_neuron_index
+remainder = pynn_neuron_index
 last_size = 1
 for n in n_dimensions:
     neuron_pos[n] = remainder // last_size
@@ -158,7 +210,7 @@ for n in n_dimensions:
 row_index = (raster_core_index * total_neurons_per_core) + raster_neuron_index
 ```
 
-#### To `local neuron index` from `population neuron index`
+#### From `PyNN neuron index` to `neuron index` for target Population neurons
 
 
 Multidimensional Connectors
