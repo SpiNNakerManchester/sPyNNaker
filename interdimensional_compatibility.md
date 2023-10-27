@@ -30,13 +30,13 @@ is always a single index even when the Population has multiple dimensions.
 2D Population with width 3 and height 4 will have `full_size[0] = 3` and
 `full_size[1] = 4`.
 
-`neuron_pos[n]`: The global position of the neuron in the Population in the
+`pynn_neuron_indexes[n]`: The position of the neuron in the Population in the
 n'th dimension e.g. a neuron at position (1, 2) in a 2D Population will have
-`neuron_pos[0] = 1` and `neuron_pos[1] = 2`.
+`pynn_neuron_indexes[0] = 1` and `pynn_neuron_indexes[1] = 2`.
 
 `neurons_per_core`: The total number of neurons per SpiNNaker core.
 
-`neurons_per_core[n]`: The number of neurons per SpiNNaker core in the n'th
+`neurons_per_cores[n]`: The number of neurons per SpiNNaker core in the n'th
 dimension.
 
 `cores_per_size[n]`: The number of cores of the Population in the n'th
@@ -46,12 +46,12 @@ dimension; this is a shorthand for `full_size[n] / neurons_per_core[n]`
 `core_index`: The index of a core in a list of all cores; for multi-dimensional
 Populations, this is a raster scan of the cores.
 
-`core_index[n]`: The core index in the n'th dimension.
+`core_indexes[n]`: The core index in the n'th dimension.
 
 `neuron_index`: The index of the neuron in a list of all neurons on a core; for
-multi-dimensional vertices, this is generally a raster scan of the cores.
+multi-dimensional vertices, this is a raster scan of the neurons on the core.
 
-`neuron_index[n]`: The local neuron index in the n'th dimension.
+`neuron_indexes[n]`: The local neuron index in the n'th dimension.
 
 `key`: The SpiNNaker routing key used to send a spike to other cores and
 received from other cores.  The key is determined by the source Population and
@@ -180,31 +180,31 @@ leverage on that a bit more.
 remainder = pynn_neuron_index
 last_size = 1
 for n in n_dimensions:
-    neuron_pos[n] = remainder // last_size
-    remainder -= neuron_pos[n] * last_size
+    pynn_neuron_indexes[n] = remainder // last_size
+    remainder -= pynn_neuron_indexes[n] * last_size
     last_size = full_size[n]
 
 # Work out which core the neuron is on in each dimension
 for n in n_dimensions:
-    core_index[n] = neuron_pos[n] / neurons_per_core[n]
+    core_indexes[n] = pynn_neuron_indexes[n] / neurons_per_cores[n]
 
 # Work out the core index
 core_index = 0;
 last_size = 0;
 for n in n_dimensions:
-    core_index = (core_index * last_size) + core_index[n]
+    core_index = (core_index * last_size) + core_indexes[n]
     last_size = cores_per_size[n]
 
 # Work out the neuron index on this core in each dimension
 for n in n_dimensions:
-    neuron_index[n] = neuron_pos[n] - (neurons_per_core[n] * core_index[n])
+    neuron_indexes[n] = pynn_neuron_indexes[n] - (neurons_per_cores[n] * core_indexes[n])
 
 # Work out the neuron index on this core
 neuron_index = 0
 last_size = 0
 for n in n_dimensions:
-    neuron_index = (neuron_index * last_size) + neuron_index[n]
-    last_size = neurons_per_core[n]
+    neuron_index = (neuron_index * last_size) + neuron_indexes[n]
+    last_size = neurons_per_cores[n]
 
 # Work out the row index from the above and the neurons per core
 row_index = (core_index * neurons_per_core) + neuron_index
