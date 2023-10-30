@@ -364,8 +364,8 @@ void set_spike_source_rate(uint32_t sub_id, unsigned long accum rate) {
 
     REAL rate_per_tick = kbits(
             (__U64(bitsk(rate)) * __U64(bitsulr(ssp_params.seconds_per_tick))) >> 32);
-    log_debug("Setting rate of %u to %kHz (%k per tick)",
-            sub_id, rate, rate_per_tick);
+    log_debug("At time %u setting rate of %u to %k Hz (%k per tick)",
+            time, sub_id, (accum) rate, rate_per_tick);
     spike_source_t *spike_source = &source[sub_id];
 
     if (rate_per_tick >= ssp_params.slow_rate_per_tick_cutoff) {
@@ -417,7 +417,8 @@ static inline void set_spike_source_details(uint32_t id, bool rate_changed) {
     log_debug("Source %u is at index %u", id, index);
     source_details details = source_data[id]->details[index];
     if (rate_changed) {
-        log_debug("Setting rate of %u to %k at %u", id, (s1615) details.rate, time);
+        log_debug("At time %u setting rate of %u to %k",
+        		time, id, (s1615) details.rate);
         set_spike_source_rate(id, details.rate);
     }
     spike_source_t *p = &(source[id]);
@@ -881,7 +882,10 @@ static void process_fast_source(index_t s_id, spike_source_t *source) {
             if (ssp_params.has_key) {
                 // Send spikes
                 const uint32_t spike_key = keys[s_id] | colour;
-                send_spike_mc_payload(spike_key, num_spikes);
+                for (uint32_t n_spike = 0; n_spike < num_spikes; n_spike++) {
+                	send_spike_mc(spike_key);
+                }
+//                send_spike_mc_payload(spike_key, num_spikes);
             } else if (sdram_inputs->address != 0) {
                 input_this_timestep[sdram_inputs->offset + s_id] +=
                      sdram_inputs->weights[s_id] * num_spikes;
@@ -918,7 +922,10 @@ static void process_slow_source(index_t s_id, spike_source_t *source) {
             if (ssp_params.has_key) {
                 // Send package
                 const uint32_t spike_key = keys[s_id] | colour;
-                send_spike_mc_payload(spike_key, count);
+                for (uint32_t n_spike = 0; n_spike < count; n_spike++) {
+                	send_spike_mc(spike_key);
+                }
+//                send_spike_mc_payload(spike_key, count);
             } else if (sdram_inputs->address != 0) {
                 input_this_timestep[sdram_inputs->offset + s_id] +=
                     sdram_inputs->weights[s_id] * count;
@@ -1028,7 +1035,13 @@ static void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
 //! \param[in] key: Received multicast key
 //! \param[in] payload: Received multicast payload
 static void multicast_packet_callback(uint key, uint payload) {
+
+//	log_info("multicast packet callback SSP key %u payload %u time %u",
+//			key, payload, time);
+
     uint32_t id = key & ssp_params.set_rate_neuron_id_mask;
+
+//    log_info("id value is %u mask %u", id, ssp_params.set_rate_neuron_id_mask);
     if ((id < ssp_params.first_source_id) ||
             (id - ssp_params.first_source_id >= ssp_params.n_spike_sources)) {
         return;

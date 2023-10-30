@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from enum import Enum
 import os
 import ctypes
@@ -19,6 +20,10 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.neuron.neuron_models import (
+    NeuronModelLeftRightReadout)
+from spynnaker.pyNN.utilities import constants
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
@@ -296,6 +301,17 @@ class PopulationMachineVertex(
             self.vertex_slice))
         self._write_common_data_spec(spec, rec_regions)
 
+        # Set the poisson key for eprop left-right
+        routing_info = SpynnakerDataView.get_routing_infos()
+        # pylint: disable=protected-access
+        if isinstance(self._app_vertex._pynn_model._model.neuron_model,
+                      NeuronModelLeftRightReadout):
+            poisson_key = routing_info.get_first_key_from_pre_vertex(
+                placement.vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
+            # pylint: disable=protected-access
+            self._app_vertex._pynn_model._model.neuron_model.set_poisson_key(
+                poisson_key)
+
         self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
 
         self._write_synapse_data_spec(
@@ -402,4 +418,18 @@ class PopulationMachineVertex(
     @overrides(PopulationMachineCommon.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id):
         n_colours = 2 ** self._app_vertex.n_colour_bits
-        return self._vertex_slice.n_atoms * n_colours
+        if partition_id == constants.LIVE_POISSON_CONTROL_PARTITION_ID:
+            n_keys = 0
+            # Seems like overkill, there should be a simpler way to do this
+            partitions = (
+                SpynnakerDataView.
+                get_outgoing_edge_partitions_starting_at_vertex(
+                    self._app_vertex))
+            for partition in partitions:
+                if partition.identifier == (
+                        constants.LIVE_POISSON_CONTROL_PARTITION_ID):
+                    for edge in partition.edges:
+                        n_keys += edge.post_vertex.n_atoms
+            return n_keys * n_colours
+        else:
+            return self._vertex_slice.n_atoms * n_colours

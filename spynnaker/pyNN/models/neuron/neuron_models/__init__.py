@@ -15,6 +15,12 @@
 from .neuron_model_izh import NeuronModelIzh
 from .neuron_model_leaky_integrate_and_fire import (
     NeuronModelLeakyIntegrateAndFire)
+from .neuron_model_eprop_adaptive import NeuronModelEPropAdaptive
+from .neuron_model_sinusoid_readout import (
+    NeuronModelLeakyIntegrateAndFireSinusoidReadout)
+from .neuron_model_left_right_readout import NeuronModelLeftRightReadout
 
-__all__ = ["NeuronModelIzh",
-           "NeuronModelLeakyIntegrateAndFire"]
+__all__ = ["NeuronModelIzh", "NeuronModelLeakyIntegrateAndFire",
+           "NeuronModelEPropAdaptive",
+           "NeuronModelLeakyIntegrateAndFireSinusoidReadout",
+           "NeuronModelLeftRightReadout"]

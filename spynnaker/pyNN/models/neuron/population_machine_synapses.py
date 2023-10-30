@@ -206,7 +206,10 @@ class PopulationMachineSynapses(
         spec.write_value(n_synapse_types)
         spec.write_value(get_n_bits(n_neurons))
         spec.write_value(get_n_bits(n_synapse_types))
-        spec.write_value(get_n_bits(max_delay))
+        if self._app_vertex.neuron_impl.neuron_model.uses_eprop:
+            spec.write_value(1)
+        else:
+            spec.write_value(get_n_bits(max_delay))
         spec.write_value(int(self._app_vertex.drop_late_spikes))
         spec.write_value(self._app_vertex.incoming_spike_buffer_size)
         spec.write_array(ring_buffer_shifts)

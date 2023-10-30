@@ -67,6 +67,8 @@ from spynnaker.pyNN.models.common.param_generator_data import (
     MAX_PARAMS_BYTES, is_param_generatable)
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
+# from spynnaker.pyNN.models.neuron.neuron_models import (
+#     NeuronModelLeftRightReadout)
 from .population_machine_neurons import PopulationMachineNeurons
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
@@ -957,6 +959,10 @@ class AbstractPopulationVertex(
     def __repr__(self):
         return self.__str__()
 
+    @property
+    def _pynn_model(self):
+        return self.__pynn_model
+
     @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self):
         # Reset state variables
@@ -1082,6 +1088,14 @@ class AbstractPopulationVertex(
         max_weight_powers = (
             w + 1 if (2 ** w) <= a else w
             for w, a in zip(max_weight_powers, max_weights))
+
+        # TODO: check this EPROP (from synaptic_manager)
+        # fix weight shift so we can scale eligibility trace calculations
+        # accordingly.
+        max_weight_powers = (2  # if w >= 1 else w
+                             for w in max_weight_powers)
+
+        # Not entirely sure why but eprop also had signed weights stuff...
 
         return list(max_weight_powers)
 

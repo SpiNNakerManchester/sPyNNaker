@@ -40,7 +40,7 @@ static update_state_t synapse_structure_get_update_state(
 //! \param[in] state: the update state
 //! \return the final state
 static final_state_t synapse_structure_get_final_state(
-        update_state_t state);
+        update_state_t state, REAL reg_error);
 
 //! \brief Get the final weight from the final state
 //! \param[in] final_state: the final state

@@ -95,10 +95,24 @@
 #define SYNAPSE_WEIGHT_BITS 16
 #endif
 
+//! how many bits the synapse delay will take
+//#ifndef SYNAPSE_DELAY_BITS
+//#define SYNAPSE_DELAY_BITS 8
+//#endif
+
+//// Create some masks based on the number of bits
+////! the mask for the synapse delay in the row
+//#define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
+
+//! should this go somewhere else, perhaps in the models that use it?
+#define SYNAPSE_WEIGHTS_SIGNED true
+
+// Define the type of the weights
 #ifdef SYNAPSE_WEIGHTS_SIGNED
 //! Define the type of the weights
 typedef __int_t(SYNAPSE_WEIGHT_BITS) weight_t;
 #else
+//io_printf(IO_BUF, "Using signed weights!! \n ");
 //! Define the type of the weights
 typedef __uint_t(SYNAPSE_WEIGHT_BITS) weight_t;
 #endif
