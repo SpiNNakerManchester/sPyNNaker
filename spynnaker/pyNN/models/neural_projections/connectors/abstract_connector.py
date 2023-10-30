@@ -659,3 +659,48 @@ class AbstractConnector(object, metaclass=AbstractBase):
         global_to_raster = numpy.concatenate(
             [s.get_raster_ids() for s in slices])
         return numpy.argsort(global_to_raster)
+
+    def _get_row_indices(self, source_vertex_indices, source_vertex):
+        """ Get the index of the rows in the source vertex.
+
+        :param numpy.ndarray source_vertex_indices:
+            The source vertex indices to convert
+        :param ApplicationVertex source_vertex:
+            The source vertex that the indices are part of
+        """
+        atoms_shape = source_vertex.atoms_shape
+        n_dims = len(atoms_shape)
+        if n_dims == 1:
+            return source_vertex_indices
+        atoms_per_core = source_vertex.get_max_atoms_per_dimension_per_core()
+        remainders = numpy.array(source_vertex_indices)
+        cum_per_core = 1
+        cum_cores_per_dim = 1
+        core_index = numpy.zeros(len(source_vertex_indices))
+        atom_index = numpy.zeros(len(source_vertex_indices))
+        for n in range(n_dims):
+            # Work out the global index in this dimension
+            global_index_d = remainders % atoms_shape[n]
+
+            # Work out the core index in this dimension
+            core_index_d = global_index_d // atoms_per_core[n]
+
+            # Update the core index by multiplying the current value by the
+            # last dimension size and then add the current dimension value
+            core_index += core_index_d * cum_cores_per_dim
+
+            # Work out the atom index on the core in this dimension
+            atom_index_d = global_index_d - (atoms_per_core[n] * core_index_d)
+
+            # Update the atom index by multiplying the current value by the
+            # last dimension size and then add the current dimension value
+            atom_index += atom_index_d * cum_per_core
+
+            # Update the remainders for next time based on the values in
+            # this dimension, and save the sizes for this dimension
+            remainders = remainders // atoms_shape[n]
+            cum_per_core *= atoms_per_core[n]
+            cum_cores_per_dim *= atoms_shape[n] / atoms_per_core[n]
+
+        return ((core_index * source_vertex.get_max_atoms_per_core()) +
+                atom_index)
