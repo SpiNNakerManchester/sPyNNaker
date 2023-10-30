@@ -207,7 +207,7 @@ for n in n_dimensions:
 
 # Work out the neuron index on this core
 neuron_index = 0
-cum_per_core = 0
+cum_per_core = 1
 for n in n_dimensions:
     neuron_index += cum_per_core * neuron_indexes[n]
     cum_per_core *= neurons_per_cores[n]
