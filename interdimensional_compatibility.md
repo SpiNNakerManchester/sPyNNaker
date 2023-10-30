@@ -196,10 +196,10 @@ for n in n_dimensions:
 
 # Work out the core index
 core_index = 0;
-last_size = 0;
+cum_cores_per_size = 1;
 for n in n_dimensions:
-    core_index = (core_index * last_size) + core_indexes[n]
-    last_size = cores_per_size[n]
+    core_index += cum_cores_per_size * core_indexes[n]
+    cum_cores_per_size *= cores_per_size[n]
 
 # Work out the neuron index on this core in each dimension
 for n in n_dimensions:
@@ -207,10 +207,10 @@ for n in n_dimensions:
 
 # Work out the neuron index on this core
 neuron_index = 0
-last_size = 0
+cum_per_core = 0
 for n in n_dimensions:
-    neuron_index = (neuron_index * last_size) + neuron_indexes[n]
-    last_size = neurons_per_cores[n]
+    neuron_index += cum_per_core * neuron_indexes[n]
+    cum_per_core *= neurons_per_cores[n]
 
 # Work out the row index from the above and the neurons per core
 row_index = (core_index * neurons_per_core) + neuron_index
