@@ -219,9 +219,10 @@ class SpikeSourcePoissonVertex(
                     raise ValueError("Each rate must have its own duration")
 
         self.__data = RangeDictionary(n_neurons)
-        self.__data["rates"] = RangedList(
+        rates_list = RangedList(
             n_neurons, rates,
             use_list_as_value=not hasattr(rates[0], "__len__"))
+        self.__data["rates"] = rates_list
         self.__data["starts"] = RangedList(
             n_neurons, starts,
             use_list_as_value=not hasattr(starts[0], "__len__"))
@@ -242,7 +243,7 @@ class SpikeSourcePoissonVertex(
             self.__max_rate = numpy.amax(all_rates)
         elif max_rate is None:
             self.__max_rate = 0
-        self.__max_n_rates = max(len(r) for r in self.__data["rates"])
+        self.__max_n_rates = max(len(r) for r in rates_list)
 
         # Keep track of how many outgoing projections exist
         self.__outgoing_projections = list()

@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__version__ = "1!7.1.1"
-__version_month__ = "TBD"
-__version_year__ = "TBD"
-__version_day__ = "TBD"
-__version_name__ = "Post_HBP"
+APP = $(notdir $(CURDIR))
 
-_NAME = f"sPyNNaker_under_version({__version__}-{__version_name__})"
+NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.h
+INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_delta.h
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard.h
+THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_static.h
+SYNAPSE_TYPE_H = $(NEURON_DIR)/neuron/synapse_types/synapse_types_delta_impl.h
+ADDITIONAL_INPUT_H = $(NEURON_DIR)/neuron/additional_inputs/additional_input_ca2_adaptive_impl.h
+
+include ../neuron_build.mk
