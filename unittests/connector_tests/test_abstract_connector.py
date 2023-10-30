@@ -16,6 +16,7 @@ from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 
+
 class SimpleVertex(ApplicationVertex):
 
     def __init__(self, max_atoms_per_core, atoms_shape):
