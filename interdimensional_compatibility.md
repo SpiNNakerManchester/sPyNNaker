@@ -186,15 +186,13 @@ of the core.
 ```
 # Work out the position of the neuron in each dimension
 remainder = pynn_neuron_index
-last_size = 1
 for n in n_dimensions:
-    pynn_neuron_indexes[n] = remainder // last_size
-    remainder -= pynn_neuron_indexes[n] * last_size
-    last_size = full_size[n]
+    pynn_neuron_indexes[n] = remainder % full_size[n]
+    remainder = remainder[n] // full_size[n]
 
 # Work out which core the neuron is on in each dimension
 for n in n_dimensions:
-    core_indexes[n] = pynn_neuron_indexes[n] / neurons_per_cores[n]
+    core_indexes[n] = pynn_neuron_indexes[n] // neurons_per_cores[n]
 
 # Work out the core index
 core_index = 0;
