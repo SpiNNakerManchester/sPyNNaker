@@ -109,6 +109,15 @@ class SynapseInformation(object):
         return self.__post_population
 
     @property
+    def pre_vertex(self):
+        """
+        The vertex sending spikes to the synapse.
+
+        :rtype: ApplicationVertex
+        """
+        return self.__pre_population._vertex
+
+    @property
     def n_pre_neurons(self):
         """
         The number of neurons in the pre-population.

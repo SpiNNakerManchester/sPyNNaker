@@ -161,14 +161,13 @@ class SynapseDynamicsNeuromodulation(
     @overrides(AbstractPlasticSynapseDynamics.get_plastic_synaptic_data)
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, max_n_synapses,
-            max_atoms_per_core):
+            n_synapse_types, max_n_synapses, max_atoms_per_core):
         # pylint: disable=too-many-arguments
         weights = numpy.rint(
             numpy.abs(connections["weight"]) * STDP_FIXED_POINT_ONE)
         fixed_plastic = (
             ((weights.astype("uint32") & 0xFFFF) << 16) |
-            ((connections["target"] - post_vertex_slice.lo_atom)) & 0xFFFF)
+            (connections["target"] & 0xFFFF))
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
             fixed_plastic.view(dtype="uint8").reshape((-1, BYTES_PER_WORD)),
@@ -210,13 +209,13 @@ class SynapseDynamicsNeuromodulation(
 
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
-            self, post_vertex_slice, n_synapse_types, pp_size, pp_data,
-            fp_size, fp_data, max_atoms_per_core):
+            self, n_synapse_types, pp_size, pp_data, fp_size, fp_data,
+            max_atoms_per_core):
         data = numpy.concatenate(fp_data)
         connections = numpy.zeros(data.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, fp_size[i]) for i in range(len(fp_size))])
-        connections["target"] = (data & 0xFFFF) + post_vertex_slice.lo_atom
+        connections["target"] = data & 0xFFFF
         connections["weight"] = (data >> 16) & 0xFFFF
         connections["delay"] = 1
         return connections

@@ -169,8 +169,10 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         n_connections = len(ids[0])
 
         block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = ids[0] % synapse_info.n_pre_neurons
-        block["target"] = raster_ids[ids[1]]
+        block["source"] = synapse_info.pre_vertex.get_key_ordered_indices(
+            ids[0] % synapse_info.n_pre_neurons)
+        block["target"] = post_vertex_slice.get_relative_indices(
+            raster_ids[ids[1]])
         block["weight"] = self._generate_weights(
             block["source"], block["target"], n_connections, post_vertex_slice,
             synapse_info)
