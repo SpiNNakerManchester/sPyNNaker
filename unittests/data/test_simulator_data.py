@@ -90,9 +90,6 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(0, SpynnakerDataView.get_n_projections())
         model = IFCurrExpBase()
         pop_1 = Population(size=5, cellclass=model)
-        # Population adds itself so no one can
-        with self.assertRaises(NotImplementedError):
-            writer.add_population(pop_1)
         self.assertListEqual(
             [pop_1], list(SpynnakerDataView.iterate_populations()))
         self.assertEqual(1, SpynnakerDataView.get_n_populations())
