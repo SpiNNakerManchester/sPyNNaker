@@ -558,13 +558,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def verbose(self, new_value):
         self.__verbose = new_value
 
-    def use_direct_matrix(self, synapse_info):
-        """
-        :param SynapseInformation synapse_info:
-        :rtype: bool
-        """
-        return False
-
     def get_connected_vertices(self, s_info, source_vertex, target_vertex):
         """
         Get the machine vertices that are connected to each other with
