@@ -23,6 +23,7 @@ from .abstract_generate_connector_on_machine import (
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 8
@@ -498,3 +499,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
         # Otherwise, they do
         return True
+
+    @overrides(AbstractConnector.validate_connection)
+    def validate_connection(self, application_edge, synapse_info):
+        pre = application_edge.pre_vertex
+        post = application_edge.post_vertex
+        if len(pre.atoms_shape) != 1 or len(post.atoms_shape) != 1:
+            raise ConfigurationException(
+                "The Kernel Connector is designed to work with 1D vertices")
