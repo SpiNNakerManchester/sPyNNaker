@@ -70,7 +70,7 @@ class PopulationMachineNeurons(
     __slots__ = []
 
     @abstractproperty
-    def _app_vertex(self):
+    def app_vertex(self):
         """
         The application vertex of the machine vertex.
 
@@ -81,7 +81,7 @@ class PopulationMachineNeurons(
         """
 
     @abstractproperty
-    def _vertex_slice(self):
+    def vertex_slice(self):
         """
         The slice of the application vertex atoms on this machine vertex.
 
@@ -189,7 +189,7 @@ class PopulationMachineNeurons(
 
         # Write the other parameters
         self._neuron_data.write_data(
-            spec, self._vertex_slice, self._neuron_regions)
+            spec, self.vertex_slice, self._neuron_regions)
 
     def _rewrite_neuron_data_spec(self, spec):
         """
@@ -205,7 +205,7 @@ class PopulationMachineNeurons(
 
         # Write the other parameters after forcing a regeneration
         self._neuron_data.write_data(
-            spec, self._vertex_slice, self._neuron_regions, False)
+            spec, self.vertex_slice, self._neuron_regions, False)
 
     def _write_neuron_core_parameters(self, spec, ring_buffer_shifts):
         """
@@ -217,12 +217,12 @@ class PopulationMachineNeurons(
             The shifts to apply to convert ring buffer values to S1615 values
         """
         # pylint: disable=too-many-arguments
-        n_atoms = self._vertex_slice.n_atoms
+        n_atoms = self.vertex_slice.n_atoms
         spec.comment(
             f"\nWriting Neuron Parameters for {n_atoms} Neurons:\n")
 
         # Reserve and switch to the memory region
-        params_size = self._app_vertex.get_sdram_usage_for_core_neuron_params(
+        params_size = self.app_vertex.get_sdram_usage_for_core_neuron_params(
             n_atoms)
         spec.reserve_memory_region(
             region=self._neuron_regions.core_params, size=params_size,
@@ -235,14 +235,14 @@ class PopulationMachineNeurons(
             spec.write_value(data=0)
             keys = [0] * n_atoms
         else:
-            n_colour_bits = self._app_vertex.n_colour_bits
+            n_colour_bits = self.app_vertex.n_colour_bits
             spec.write_value(data=1)
             # Quick and dirty way to avoid using field based keys in cases
             # which use grids but not local-only neuron models
-            if isinstance(self._app_vertex.synapse_dynamics,
+            if isinstance(self.app_vertex.synapse_dynamics,
                           AbstractLocalOnly):
                 keys = get_field_based_keys(
-                    self._key, self._vertex_slice, n_colour_bits)
+                    self._key, self.vertex_slice, n_colour_bits)
             else:
                 # keys are consecutive from the base value
                 keys = [self._key + (nn << n_colour_bits)
@@ -255,12 +255,12 @@ class PopulationMachineNeurons(
         spec.write_value(data=2**get_n_bits(self._max_atoms_per_core))
 
         # Write the number of colour bits
-        spec.write_value(self._app_vertex.n_colour_bits)
+        spec.write_value(self.app_vertex.n_colour_bits)
 
         # Write the ring buffer data
         # This is only the synapse types that need a ring buffer i.e. not
         # those stored in synapse dynamics
-        n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
+        n_synapse_types = self.app_vertex.neuron_impl.get_n_synapse_types()
         spec.write_value(n_synapse_types)
         spec.write_array(ring_buffer_shifts)
 
@@ -269,25 +269,25 @@ class PopulationMachineNeurons(
 
     def _write_current_source_parameters(self, spec):
         # pylint: disable=too-many-arguments
-        n_atoms = self._vertex_slice.n_atoms
-        lo_atom = self._vertex_slice.lo_atom
-        hi_atom = self._vertex_slice.hi_atom
+        n_atoms = self.vertex_slice.n_atoms
+        lo_atom = self.vertex_slice.lo_atom
+        hi_atom = self.vertex_slice.hi_atom
 
         spec.comment(
             f"\nWriting Current Source Parameters for {n_atoms} Neurons:\n")
 
         # Reserve and switch to the current source region
-        params_size = self._app_vertex.\
+        params_size = self.app_vertex.\
             get_sdram_usage_for_current_source_params(
-                self._vertex_slice.n_atoms)
+                self.vertex_slice.n_atoms)
         spec.reserve_memory_region(
             region=self._neuron_regions.current_source_params,
             size=params_size, label='CurrentSourceParams')
         spec.switch_write_focus(self._neuron_regions.current_source_params)
 
         # Get the current sources from the app vertex
-        app_current_sources = self._app_vertex.current_sources
-        current_source_id_list = self._app_vertex.current_source_id_list
+        app_current_sources = self.app_vertex.current_sources
+        current_source_id_list = self.app_vertex.current_source_id_list
 
         # Work out which current sources are on this core
         current_sources = set()
@@ -407,8 +407,8 @@ class PopulationMachineNeurons(
     def read_generated_initial_values(self, placement):
         # Only do this if we actually need the data now i.e. if someone has
         # requested that the data be read before calling run
-        if self._app_vertex.read_initial_values:
+        if self.app_vertex.read_initial_values:
 
             # If we do decide to read now, we can also copy the initial values
             self._neuron_data.read_data(placement, self._neuron_regions)
-            self._app_vertex.copy_initial_state_variables(self._vertex_slice)
+            self.app_vertex.copy_initial_state_variables(self.vertex_slice)
