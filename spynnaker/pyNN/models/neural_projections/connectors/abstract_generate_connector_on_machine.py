@@ -50,36 +50,30 @@ class AbstractGenerateConnectorOnMachine(
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(self, application_edge, synapse_info):
         # If we can't generate on machine, we must be able to generate on host
-        if not self.generate_on_machine(
-                synapse_info.weights, synapse_info.delays):
+        if not self.generate_on_machine(synapse_info):
             if not isinstance(self, AbstractGenerateConnectorOnHost):
                 raise SynapticConfigurationException(
                     "The parameters of this connection do not allow it to be"
                     " generated on the machine, but the connector cannot"
                     " be generated on host!")
 
-    def generate_on_machine(self, weights, delays):
+    def generate_on_machine(self, synapse_info):
         """
         Determine if this instance can generate on the machine.
 
         Default implementation returns True if the weights and delays can
         be generated on the machine
 
-        :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.RandomDistribution
-            or int or float or list(int) or list(float)
-        :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.RandomDistribution
-            or int or float or list(int) or list(float)
+        :param SynapseInformation synapse_info: The synapse information
         :rtype: bool
         """
-        if (not is_param_generatable(weights) or
-                not is_param_generatable(delays)):
+        if (not is_param_generatable(synapse_info.weights) or
+                not is_param_generatable(synapse_info.delays)):
             return False
-        if isinstance(weights, RandomDistribution):
-            check_rng(weights.rng, "RandomDistribution in weight")
-        if isinstance(delays, RandomDistribution):
-            check_rng(delays.rng, "RandomDistribution in delay")
+        if isinstance(synapse_info.weights, RandomDistribution):
+            check_rng(synapse_info.weights.rng, "RandomDistribution in weight")
+        if isinstance(synapse_info.delays, RandomDistribution):
+            check_rng(synapse_info.delays.rng, "RandomDistribution in delay")
         return True
 
     def gen_weights_id(self, weights):

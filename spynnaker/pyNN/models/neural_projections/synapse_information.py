@@ -14,9 +14,9 @@
 
 from spinn_utilities.config_holder import get_config_bool
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine, OneToOneConnector)
+    AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine, SynapseDynamicsStatic)
+    AbstractGenerateOnMachine)
 
 
 class SynapseInformation(object):
@@ -118,6 +118,15 @@ class SynapseInformation(object):
         return self.__pre_population._vertex
 
     @property
+    def post_vertex(self):
+        """
+        The vertex hosting the synapse.
+
+        :rtype: ApplicationVertex
+        """
+        return self.__post_population._vertex
+
+    @property
     def n_pre_neurons(self):
         """
         The number of neurons in the pre-population.
@@ -215,7 +224,7 @@ class SynapseInformation(object):
             return False
         connector_gen = (
             isinstance(self.connector, AbstractGenerateConnectorOnMachine) and
-            self.connector.generate_on_machine(self.weights, self.delays))
+            self.connector.generate_on_machine(self))
         synapse_gen = (
             isinstance(self.synapse_dynamics, AbstractGenerateOnMachine) and
             self.synapse_dynamics.generate_on_machine())

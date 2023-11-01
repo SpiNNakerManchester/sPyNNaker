@@ -204,5 +204,5 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(self, application_edge, synapse_info):
-        if self.generate_on_machine(synapse_info.weights, synapse_info.delays):
+        if self.generate_on_machine(synapse_info):
             check_rng(self.__rng, "FixedProbabilityConnector")
