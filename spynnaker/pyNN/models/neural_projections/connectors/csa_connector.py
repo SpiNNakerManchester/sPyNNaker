@@ -98,10 +98,11 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                 range(synapse_info.n_post_neurons)) * self.__cset]
 
         # use CSA to cross the range of this vertex's neurons with the cset
-        pair_list = csa.cross(
-            range(0, synapse_info.n_pre_neurons),
-            range(post_vertex_slice.lo_atom, post_vertex_slice.hi_atom+1)) \
-            * self.__full_cset
+        pair_list = (
+            csa.cross(
+                range(synapse_info.n_pre_neurons),
+                list(int(x) for x in post_vertex_slice.get_raster_ids()))
+            * self.__full_cset)
 
         if self.verbose:
             print('full cset: ', self.__full_cset)
@@ -152,8 +153,10 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
         # source and target are the pre_neurons and post_neurons in pair_list
-        block["source"] = [x[0] for x in pair_list]
-        block["target"] = [x[1] for x in pair_list]
+        block["source"] = synapse_info.pre_vertex.get_key_ordered_indices(
+            numpy.array([x[0] for x in pair_list]))
+        block["target"] = post_vertex_slice.get_relative_indices(
+            numpy.array([x[1] for x in pair_list]))
         block["weight"] = self._generate_weights(
             block["source"], block["target"], n_connections, post_vertex_slice,
             synapse_info)

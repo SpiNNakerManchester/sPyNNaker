@@ -223,8 +223,8 @@ class ArrayConnectorTest(BaseTestCase):
             [(int(i), int(j)) for i, j in proj.get([], "list")])
         p.end()
 
-        assert numpy.array_equal(numpy.sort(random_conns, axis=1),
-                                 numpy.sort(conns, axis=1))
+        assert numpy.array_equal(numpy.sort(random_conns, axis=0),
+                                 numpy.sort(conns, axis=0))
 
 
     def test_3d_to_1d_array(self):
