@@ -120,12 +120,8 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         pre_neurons = []
         post_neurons = []
         n_connections = 0
-        pre_lo = 0
-        pre_hi = synapse_info.n_pre_neurons - 1
-        post_lo = post_vertex_slice.lo_atom
-        post_hi = post_vertex_slice.hi_atom
-        for i in range(pre_lo, pre_hi+1):
-            for j in range(post_lo, post_hi+1):
+        for i in range(synapse_info.n_pre_neurons):
+            for j in post_vertex_slice.get_raster_ids():
                 if self.__array[i, j] == 1:
                     pre_neurons.append(i)
                     post_neurons.append(j)
@@ -134,8 +130,10 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         # Feed the arrays calculated above into the block structure
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = pre_neurons
-        block["target"] = post_neurons
+        block["source"] = synapse_info.pre_vertex.get_key_ordered_indices(
+            numpy.array(pre_neurons))
+        block["target"] = post_vertex_slice.get_relative_indices(
+            numpy.array(post_neurons))
         block["weight"] = self._generate_weights(
             block["source"], block["target"], n_connections, post_vertex_slice,
             synapse_info)
