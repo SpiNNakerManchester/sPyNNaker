@@ -124,3 +124,8 @@ class TestOneToOneConnector(BaseTestCase):
         self.do_one_to_one_nd_test(
             (2, 3), 6 * 9, sim.Grid2D(6 / 9),
             (3, 3), 3 * 6, sim.Grid2D(3 / 6))
+
+    def test_2d_to_1d(self):
+        self.do_one_to_one_nd_test(
+            (2, 3), 8 * 6, sim.Grid2D(8 / 6),
+            8, 8 * 6, None)
