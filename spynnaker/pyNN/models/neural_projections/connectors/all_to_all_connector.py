@@ -98,12 +98,15 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         n_connections = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
-        if not self.__allow_self_connections:
+        no_self = (
+            not self.__allow_self_connections and
+            synapse_info.pre_population == synapse_info.post_population)
+        if no_self:
             n_connections -= post_vertex_slice.n_atoms
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
 
-        if not self.__allow_self_connections:
+        if no_self:
             n_atoms = synapse_info.n_pre_neurons
             sources = numpy.where(numpy.diag(
                 numpy.repeat(1, n_atoms)) == 0)[0]
@@ -121,9 +124,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
                 synapse_info.n_pre_neurons)
 
         # pylint: disable=protected-access
-        pre_raster_to_core = self._get_raster_to_core(
-            self._get_pre_slices(synapse_info.pre_population._vertex))
-        block["source"] = pre_raster_to_core[sources]
+        block["source"] = sources
         block["target"] = targets
 
         block["weight"] = self._generate_weights(

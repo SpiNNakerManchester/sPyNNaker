@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import numpy
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 
@@ -109,3 +109,66 @@ class TestAllToAllConnector(BaseTestCase):
 
     def test_using_population_views(self):
         self.runsafe(self.using_population_views)
+
+    def do_all_to_all_nd_test(
+            self, neurons_per_core_pre, pre_size, pre_shape,
+            neurons_per_core_post, post_size, post_shape):
+        sim.setup(1.0)
+        pre = sim.Population(
+            pre_size, sim.IF_curr_exp(), structure=pre_shape)
+        pre.set_max_atoms_per_core(neurons_per_core_pre)
+        post = sim.Population(
+            post_size, sim.IF_curr_exp(), structure=post_shape)
+        post.set_max_atoms_per_core(neurons_per_core_post)
+        proj = sim.Projection(
+            pre, post, sim.AllToAllConnector(),
+            sim.StaticSynapse(weight=1.0, delay=1.0))
+        sim.run(0)
+        conns = set((int(i), int(j)) for i, j in proj.get([], "list"))
+        sim.end()
+
+        for i in range(pre_size):
+            for j in range(post_size):
+                assert (i, j) in conns
+
+    def test_3d_to_1d(self):
+        self.do_all_to_all_nd_test(
+            (3, 2, 4), 9 * 4 * 8, sim.Grid3D(9 / 4, 9 / 8),
+            11, 100, None)
+
+    def test_2d(self):
+        self.do_all_to_all_nd_test((3, 5), 9 * 10, sim.Grid2D(9 / 10),
+                                   (2, 4), 6 * 8, sim.Grid2D(6 / 8))
+
+    def test_1d_to_2d(self):
+        self.do_all_to_all_nd_test(6, 90, None,
+                                   (3, 4), 9 * 8, sim.Grid2D(9 / 8))
+
+    def do_all_to_all_nd_self_test(
+            self, neurons_per_core, size, shape, self_connect):
+        sim.setup(1.0)
+        pop = sim.Population(
+            size, sim.IF_curr_exp(), structure=shape)
+        pop.set_max_atoms_per_core(neurons_per_core)
+        proj = sim.Projection(
+            pop, pop, sim.AllToAllConnector(
+                allow_self_connections=self_connect),
+            sim.StaticSynapse(weight=1.0, delay=1.0))
+        sim.run(0)
+        conns = set((int(i), int(j)) for i, j in proj.get([], "list"))
+        sim.end()
+
+        for i in range(size):
+            for j in range(size):
+                if not self_connect and i == j:
+                    assert (i, j) not in conns
+                else:
+                    assert (i, j) in conns
+
+    def test_3d_no_self_connect(self):
+        self.do_all_to_all_nd_self_test(
+            (2, 3, 4), 6 * 6 * 8, sim.Grid3D(6 / 6, 6 / 8), self_connect=False)
+
+    def test_2d_self_connect(self):
+        self.do_all_to_all_nd_self_test(
+            (3, 5), 6 * 15, sim.Grid2D(6 / 15), self_connect=True)
