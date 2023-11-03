@@ -43,9 +43,27 @@ class CSAConnectorTest(BaseTestCase):
 
         assert numpy.array_equal(numpy.sort(full_cset, axis=0),
                                  numpy.sort(conns, axis=0))
+        return conns
 
-    def test_1d(self):
-        self.do_csa_nd_test(4, 25, None, 6, 35, None, csa.oneToOne)
+    def test_1d_one_to_one(self):
+        conns = self.do_csa_nd_test(4, 25, None, 6, 35, None, csa.oneToOne)
+        assert all(i == j for (i, j) in conns)
+
+    def test_1d_from_list(self):
+        conns = self.do_csa_nd_test(
+            4, 10, None, 6, 10, None, [(i, i + 1 % 10) for i in range(10)])
+        assert all(j == i + 1 % 10 for (i, j) in conns)
+
+    def test_1d_random(self):
+        conns = self.do_csa_nd_test(
+            4, 10, None, 6, 10, None, csa.random(0.05))
+        assert len(conns) > 0
+
+    def test_1d_block_random(self):
+        conns = self.do_csa_nd_test(
+            3, 10, None, 4, 10, None,
+            csa.block(2, 5) * csa.random(0.5) * csa.random(0.3))
+        assert len(conns) > 0
 
     def test_2d(self):
         self.do_csa_nd_test(
