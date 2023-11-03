@@ -297,7 +297,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         return ConnectorIDs.FIXED_NUMBER_POST_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(self):
+    def gen_connector_params(self, synapse_info):
         return numpy.array([
             int(self.__allow_self_connections),
             int(self.__with_replacement),

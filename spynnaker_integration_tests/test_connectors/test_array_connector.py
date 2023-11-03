@@ -226,7 +226,6 @@ class ArrayConnectorTest(BaseTestCase):
         assert numpy.array_equal(numpy.sort(random_conns, axis=0),
                                  numpy.sort(conns, axis=0))
 
-
     def test_3d_to_1d_array(self):
         self.do_array_nd_test((5, 2, 1), 10 * 6 * 4, p.Grid3D(10 / 6, 10 / 4),
                               12, 40, None)

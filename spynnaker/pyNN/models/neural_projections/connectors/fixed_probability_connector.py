@@ -180,7 +180,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         return ConnectorIDs.FIXED_PROBABILITY_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(self):
+    def gen_connector_params(self, synapse_info):
         return numpy.array([
             int(self.__allow_self_connections),
             DataType.U032.encode_as_int(self._p_connect)], dtype="uint32")

@@ -74,4 +74,3 @@ class CSAConnectorTest(BaseTestCase):
         self.do_csa_nd_test(
             (1, 4, 3), 4 * 4 * 6, p.Grid3D(4 / 4, 4 / 6),
             30, 96, None, csa.block(4, 4) * csa.random(0.5))
-

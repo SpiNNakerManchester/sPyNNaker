@@ -144,10 +144,11 @@ class AbstractGenerateConnectorOnMachine(
         :rtype: int
         """
 
-    def gen_connector_params(self):
+    def gen_connector_params(self, synapse_info):
         """
         Get the parameters of the on machine generation.
 
+        :param SynapseInformation synapse_info: The synaptic information
         :rtype: ~numpy.ndarray(uint32)
         """
         # pylint: disable=unused-argument

@@ -76,7 +76,7 @@ class GeneratorData(object):
             synaptic_matrix_offset, delayed_synaptic_matrix_offset, app_edge,
             synapse_information, max_row_info, max_pre_atoms_per_core,
             max_post_atoms_per_core))
-        self.__data.append(connector.gen_connector_params())
+        self.__data.append(connector.gen_connector_params(synapse_information))
         self.__data.append(connector.gen_weights_params(
             synapse_information.weights))
         self.__data.append(connector.gen_delay_params(

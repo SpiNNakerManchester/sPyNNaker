@@ -431,7 +431,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return ConnectorIDs.KERNEL_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(self):
+    def gen_connector_params(self, synapse_info):
         data = numpy.array([
             shape2word(self._common_w, self._common_h),
             shape2word(self._pre_w, self._pre_h),

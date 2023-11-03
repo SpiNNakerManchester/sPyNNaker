@@ -166,7 +166,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         return ConnectorIDs.ONE_TO_ONE_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(self):
+    def gen_connector_params(self, synapse_info):
         return numpy.array([], dtype="uint32")
 
     @property
