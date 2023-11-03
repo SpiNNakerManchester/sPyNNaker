@@ -115,6 +115,7 @@ class SynapseInformation(object):
 
         :rtype: ApplicationVertex
         """
+        # pylint: disable=protected-access
         return self.__pre_population._vertex
 
     @property
@@ -124,6 +125,7 @@ class SynapseInformation(object):
 
         :rtype: ApplicationVertex
         """
+        # pylint: disable=protected-access
         return self.__post_population._vertex
 
     @property

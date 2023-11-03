@@ -127,10 +127,12 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         if synapse_info.prepop_is_view or synapse_info.postpop_is_view:
             # If a view, we only keep things that are in the view
             if synapse_info.prepop_is_view:
+                # pylint: disable=protected-access
                 pre_lo = synapse_info.pre_population._indexes[0]
                 pre_hi = synapse_info.pre_population._indexes[-1]
                 atom_filter &= (pre_atoms <= pre_hi & pre_atoms >= pre_lo)
             if synapse_info.postpop_is_view:
+                # pylint: disable=protected-access
                 post_lo = synapse_info.post_population._indexes[0]
                 post_hi = synapse_info.post_population._indexes[-1]
                 atom_filter &= (post_atoms <= post_hi & post_atoms >= post_lo)

@@ -330,7 +330,7 @@ def get_synapses(
         undelayed_row_indices = undelayed_connections["source"]
         row_data = _get_row_data(
             undelayed_connections, undelayed_row_indices,
-            app_edge.pre_vertex.n_atoms, post_vertex_slice, n_synapse_types,
+            app_edge.pre_vertex.n_atoms, n_synapse_types,
             synapse_info.synapse_dynamics,
             max_row_info.undelayed_max_n_synapses,
             max_row_info.undelayed_max_words, max_atoms_per_core)
@@ -358,7 +358,7 @@ def get_synapses(
         # Get the data
         delayed_row_data = _get_row_data(
             delayed_connections, delayed_row_indices,
-            app_edge.pre_vertex.n_atoms * n_delay_stages, post_vertex_slice,
+            app_edge.pre_vertex.n_atoms * n_delay_stages,
             n_synapse_types, synapse_info.synapse_dynamics,
             max_row_info.delayed_max_n_synapses,
             max_row_info.delayed_max_words, max_atoms_per_core)
@@ -369,9 +369,8 @@ def get_synapses(
 
 
 def _get_row_data(
-        connections, row_indices, n_rows, post_vertex_slice,
-        n_synapse_types, synapse_dynamics, max_row_n_synapses,
-        max_row_n_words, max_atoms_per_core):
+        connections, row_indices, n_rows, n_synapse_types, synapse_dynamics,
+        max_row_n_synapses, max_row_n_words, max_atoms_per_core):
     """
     :param ~numpy.ndarray connections:
         The connections to convert; the dtype is
@@ -380,8 +379,6 @@ def _get_row_data(
         The row into which each connection should go; same length as
         connections
     :param int n_rows: The total number of rows
-    :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        The slice of the post vertex to get the data for
     :param int n_synapse_types: The number of synapse types allowed
     :param AbstractSynapseDynamics synapse_dynamics:
         The synapse dynamics of the synapses
