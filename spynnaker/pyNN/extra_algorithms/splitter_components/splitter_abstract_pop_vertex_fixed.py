@@ -289,7 +289,6 @@ class SplitterAbstractPopulationVertexFixed(
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):
-        super(SplitterAbstractPopulationVertexFixed, self).reset_called()
         self.__slices = None
         self.__max_delay = None
         self.__expect_delay_extension = None

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 from spinn_utilities.helpful_functions import is_singleton
 from pacman.model.graphs.application import ApplicationVertex
@@ -408,3 +409,9 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         vertex_slice = pre_vertex.vertex_slice
         keys = get_keys(base_key, vertex_slice, self.n_colour_bits)
         return zip(vertex_slice.get_raster_ids(), keys)
+
+    @property
+    @abstractmethod
+    @overrides(ApplicationVertex.n_atoms)
+    def n_atoms(self) -> int:
+        raise NotImplementedError
