@@ -185,7 +185,10 @@ class DistanceDependentProbabilityConnector(
 
         # If self connections are not allowed, remove the possibility of
         # self connections by setting them to a value of infinity
-        if not self.__allow_self_connections:
+        no_self = (
+            not self.__allow_self_connections and
+            synapse_info.pre_population == synapse_info.post_population)
+        if no_self:
             items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
 
         present = items < probs

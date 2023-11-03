@@ -45,10 +45,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     array. Connect every post(row, column) neuron to many
     pre(row, column, kernel)
     through a (kernel) set of weights and/or delays.
-
-    .. admonition:: TODO
-
-        Should these include `allow_self_connections` and `with_replacement`?
     """
 
     def __init__(

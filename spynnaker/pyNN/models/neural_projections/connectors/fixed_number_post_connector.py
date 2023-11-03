@@ -92,7 +92,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
                 "with_replacement=False and n > n_post_neurons")
         if (not self.__with_replacement and
                 not self.__allow_self_connections and
-                self.__n_post == synapse_info.n_post_neurons):
+                self.__n_post == synapse_info.n_post_neurons and
+                synapse_info.pre_population is synapse_info.post_population):
             raise SpynnakerException(
                 "FixedNumberPostConnector will not work when "
                 "with_replacement=False, allow_self_connections=False "
@@ -298,8 +299,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(self, synapse_info):
+        allow_self = (
+            self.__allow_self_connections or
+            synapse_info.pre_population != synapse_info.post_population)
         return numpy.array([
-            int(self.__allow_self_connections),
+            int(allow_self),
             int(self.__with_replacement),
             self.__n_post], dtype="uint32")
 

@@ -87,7 +87,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
                 "with_replacement=False and n > n_pre * n_post")
         if (not self.__with_replacement and
                 not self.__allow_self_connections and
-                self.__num_synapses == n_pairs):
+                self.__num_synapses == n_pairs and
+                synapse_info.pre_population == synapse_info.post_population):
             raise SpynnakerException(
                 "FixedNumberPostConnector will not work when "
                 "with_replacement=False, allow_self_connections=False "
@@ -265,8 +266,11 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(self, synapse_info):
+        allow_self = (
+            self.__allow_self_connections or
+            synapse_info.pre_population != synapse_info.post_population)
         return numpy.array([
-            int(self.__allow_self_connections),
+            int(allow_self),
             int(self.__with_replacement),
             self.__num_synapses], dtype=numpy.uint32)
 
