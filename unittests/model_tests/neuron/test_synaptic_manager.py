@@ -89,7 +89,7 @@ class _MockTransceiverinOut(MockableTransceiver):
         return datum
 
 
-def say_false(self, weights, delays):
+def say_false(self, *args, **kwargs):
     return False
 
 
