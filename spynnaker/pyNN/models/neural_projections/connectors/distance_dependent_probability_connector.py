@@ -193,13 +193,13 @@ class DistanceDependentProbabilityConnector(
 
         present = items < probs
         ids = numpy.where(present)[0]
-        n_connections = numpy.sum(present)
+        n_connections = len(ids)
 
         block = numpy.zeros(
             n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = (ids // post_vertex_slice.n_atoms)
-        block["target"] = (
-            (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
+        block["source"] = synapse_info.pre_vertex.get_key_ordered_indices(
+            ids // post_vertex_slice.n_atoms)
+        block["target"] = ids % post_vertex_slice.n_atoms
         block["weight"] = self._generate_weights(
             block["source"], block["target"], n_connections, post_vertex_slice,
             synapse_info)
