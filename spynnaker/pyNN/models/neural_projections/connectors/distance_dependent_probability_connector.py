@@ -179,7 +179,7 @@ class DistanceDependentProbabilityConnector(
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
-        probs = self.__probs[:, post_vertex_slice.as_slice].reshape(-1)
+        probs = self.__probs[:, post_vertex_slice.get_raster_ids()].reshape(-1)
         n_items = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
         items = self.__rng.next(n_items)
 
