@@ -258,7 +258,7 @@ def _get_allowed_row_length(n_words, dynamics, in_edge, n_synapses):
 
 def get_synapses(
         connections, synapse_info, n_delay_stages, n_synapse_types,
-        weight_scales, app_edge, post_vertex_slice, max_row_info,
+        weight_scales, app_edge, max_row_info,
         gen_undelayed, gen_delayed, max_atoms_per_core):
     """
     Get the synapses as an array of words for non-delayed synapses and
