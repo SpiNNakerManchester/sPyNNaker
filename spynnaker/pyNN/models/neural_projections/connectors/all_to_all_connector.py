@@ -157,8 +157,9 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(self):
-        return numpy.array([
-            int(self.__allow_self_connections)], dtype="uint32")
+        allow_self = (self.__allow_self_connections or
+            synapse_info.pre_population != synapse_info.post_population)
+        return numpy.array([int(allow_self)], dtype="uint32")
 
     @property
     @overrides(
