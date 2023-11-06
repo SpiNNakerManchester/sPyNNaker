@@ -193,11 +193,8 @@ def test_get_connected():
     post_slices = [Slice(0, 2), Slice(3, 5), Slice(6, 9)]
     pre_vertex = MockAppVertex(pre_slices)
     post_vertex = MockAppVertex(post_slices)
-    pre_pop = MockPopulation(10, "Pre")
-    post_pop = MockPopulation(10, "Post")
-    # pylint: disable=protected-access
-    pre_pop._vertex = pre_vertex
-    post_pop._vertex = post_vertex
+    pre_pop = MockPopulation(10, "Pre", pre_vertex)
+    post_pop = MockPopulation(10, "Post", post_vertex)
     s_info = SynapseInformation(None, pre_pop, post_pop, False, False,
                                 None, 1, None, None, 1.0, 1.0)
     connected = connector.get_connected_vertices(

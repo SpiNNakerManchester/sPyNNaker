@@ -87,10 +87,8 @@ def test_connector(
             assert extra_params[:, i].shape == (len(clist), )
 
     # Check weights and delays are used or ignored as expected
-    pre_pop = MockPopulation(10, "Pre")
     pre_slice = Slice(0, 9)
-    # pylint: disable=protected-access
-    pre_pop._vertex = MockAppVertex([pre_slice])
+    pre_pop = MockPopulation(10, "Pre", MockAppVertex([pre_slice]))
     post_slice = Slice(0, 9)
     synapse_info = SynapseInformation(
         connector=None, pre_population=pre_pop,
