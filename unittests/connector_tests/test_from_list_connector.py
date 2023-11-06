@@ -131,9 +131,13 @@ def test_connector_split():
             block = connector.create_synaptic_block(
                 post_slices, post_slice, 1, synapse_info)
             for target in block["target"]:
-                assert post_slice.lo_atom <= target <= post_slice.hi_atom
+                # The target should be one of the post-vertex-indexed atoms
+                assert 0 <= target <= post_slice.n_atoms
             for item in block:
-                has_block.add((item["source"], item["target"]))
+                has_block.add((
+                    item["source"],
+                    post_slice.get_raster_indices(
+                        numpy.array([item["target"]]))[0]))
 
         # Check each connection has a place
         for source, target in zip(sources, targets):
