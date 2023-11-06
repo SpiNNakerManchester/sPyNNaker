@@ -172,6 +172,10 @@ class MockAppVertex(object):
     def __init__(self, slices):
         self.splitter = MockSplitter(slices, self)
 
+    def get_key_ordered_indices(self, indices):
+        # All of them are 1D so this is good enough
+        return indices
+
 
 class MockMachineVertex(object):
 
