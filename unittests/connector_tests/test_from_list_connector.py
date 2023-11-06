@@ -71,8 +71,7 @@ def test_connector(
             assert extra_params[:, i].shape == (len(clist), )
 
     # Check weights and delays are used or ignored as expected
-    pre_pop = MockPopulation(10, "Pre")
-    pre_pop._vertex = MockAppVertex([Slice(0, 9)])
+    pre_pop = MockPopulation(10, "Pre", MockAppVertex([Slice(0, 9)]))
     post_slice = Slice(0, 9)
     synapse_info = SynapseInformation(
             connector=None, pre_population=pre_pop,
@@ -117,8 +116,8 @@ def test_connector_split():
     connector = MockFromListConnector(connection_list)
     weight = 1.0
     delay = 1.0
-    pre_pop = MockPopulation(n_sources, "Pre")
-    pre_pop._vertex = MockAppVertex([Slice(0, n_sources - 1)])
+    pre_pop = MockPopulation(n_sources, "Pre",
+                             MockAppVertex([Slice(0, n_sources - 1)]))
     synapse_info = SynapseInformation(
         connector=None, pre_population=pre_pop,
         post_population=MockPopulation(n_targets, "Post"),
