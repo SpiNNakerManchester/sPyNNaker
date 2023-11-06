@@ -123,8 +123,14 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
                 self.__init_callback_wrapper, init_callback))
 
     @overrides(LiveEventConnection.add_receive_callback)
-    def add_receive_callback(self, label, live_event_callback, *,
-                             translate_key=False, for_times=False):
+    def add_receive_callback(
+            self, label, live_event_callback, translate_key=False):
+        raise ConfigurationException(
+            "SpynnakerPoissonControlPopulation can't receive data")
+
+    @overrides(LiveEventConnection.add_receive_no_time_callback)
+    def add_receive_no_time_callback(
+            self, label, live_event_callback, translate_key=True):
         raise ConfigurationException(
             "SpynnakerPoissonControlPopulation can't receive data")
 
