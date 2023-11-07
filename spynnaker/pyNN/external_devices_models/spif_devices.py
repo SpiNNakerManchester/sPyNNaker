@@ -315,28 +315,40 @@ class SpiNNFPGARegister(IntEnum):
     #: peripheral to SpiNNaker
     START = 17
 
-    def cmd(self, payload=None):
+    #: The base of the keys that can be sent out of SpiNNaker (up to 6)
+    XP_KEY_BASE = 32
+
+    #: The base of the masks that can be sent out of SpiNNake (up to 6)
+    XP_MASK_BASE = 48
+
+    def cmd(self, payload=None, index=0):
         """
         Make a command to send to the FPGA to set a register value.
 
         :param payload:
             The payload to use in the command, or `None` for no payload
         :type payload: int or None
+        :param int index:
+            The index of the register to send to when there are multiple
+            registers starting from a base
         :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
         """
         return MultiCastCommand(
-            _LC_KEY + self.value, payload, time=None, repeat=_REPEATS,
+            _LC_KEY + self.value + index, payload, time=None, repeat=_REPEATS,
             delay_between_repeats=_DELAY_BETWEEN_REPEATS)
 
-    def delayed_command(self, get_payload):
+    def delayed_command(self, get_payload, index=0):
         """
         Make a command to send to the FPGA to set a register value,
         where the value itself is currently unknown.
 
-        :param callable()->int get_payload:
-            A function to call to get the payload later
+        :param callable(int)->int get_payload:
+            A function to call to get the payload later, passing in the index
+        :param int index:
+            The index of the register to send to when there are multiple
+            registers starting from a base
         :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
         """
         return _DelayedMultiCastCommand(
-            _LC_KEY + self.value, get_payload, repeat=_REPEATS,
+            _LC_KEY + self.value + index, get_payload(index), repeat=_REPEATS,
             delay_between_repeats=_DELAY_BETWEEN_REPEATS)

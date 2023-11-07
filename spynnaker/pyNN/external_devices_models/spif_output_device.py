@@ -25,6 +25,9 @@ from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SpiNNFPGARegister)
 
+# The maximum number of partitions that can be supported.
+N_OUTGOING = 6
+
 
 class SPIFOutputDevice(
         ApplicationFPGAVertex, PopulationApplicationVertex,
@@ -33,7 +36,7 @@ class SPIFOutputDevice(
     Output (only) to a SPIF device.
     """
 
-    __slots__ = ["__incoming_partition", "__create_database"]
+    __slots__ = ["__incoming_partitions", "__create_database"]
 
     def __init__(self, board_address=None, chip_coords=None, label=None,
                  create_database=True, database_notify_host=None,
@@ -44,7 +47,7 @@ class SPIFOutputDevice(
                 SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address,
                 chip_coords),
             label=label)
-        self.__incoming_partition = None
+        self.__incoming_partitions = list()
         # Force creation of the database, to be used in the read side of things
         if create_database:
             set_config("Database", "create_database", "True")
@@ -58,44 +61,48 @@ class SPIFOutputDevice(
         # Ignore non-spike partitions
         if partition.identifier != SPIKE_PARTITION_ID:
             return
-        if self.__incoming_partition is not None:
+        if len(self.__incoming_partitions) >= N_OUTGOING:
             raise ValueError(
-                "Only one outgoing connection is supported per spif device"
-                f" (existing partition: {self.__incoming_partition}")
-        self.__incoming_partition = partition
+                f"Only {N_OUTGOING} outgoing connections are supported per"
+                " spif device (existing partitions:"
+                f" {self.__incoming_partitions}")
+        self.__incoming_partitions.append(partition)
         if self.__create_database:
             SpynnakerDataView.add_live_output_vertex(
-                self.__incoming_partition.pre_vertex,
-                self.__incoming_partition.identifier)
+                partition.pre_vertex, partition.identifier)
 
-    def _get_set_key_payload(self):
+    def _get_set_key_payload(self, index):
         """
         Get the payload for the command to set the router key.
+
+        :param int index: The index of key to get
         """
         r_infos = SpynnakerDataView.get_routing_infos()
         return r_infos.get_first_key_from_pre_vertex(
-            self.__incoming_partition.pre_vertex,
-            self.__incoming_partition.identifier)
+            self.__incoming_partitions[index].pre_vertex,
+            self.__incoming_partitions[index].identifier)
 
-    def _get_set_mask_payload(self):
+    def _get_set_mask_payload(self, index):
         """
         Get the payload for the command to set the router mask.
+
+        :param int index: The index of the mask to get
         """
         r_infos = SpynnakerDataView.get_routing_infos()
         return r_infos.get_routing_info_from_pre_vertex(
-            self.__incoming_partition.pre_vertex,
-            self.__incoming_partition.identifier).mask
+            self.__incoming_partitions[index].pre_vertex,
+            self.__incoming_partitions[index].identifier).mask
 
     @property
     def start_resume_commands(self):
         # The commands here are delayed, as at the time of providing them,
         # we don't know the key or mask of the incoming link...
-        return [
-            SpiNNFPGARegister.P_KEY.delayed_command(
-                self._get_set_key_payload),
-            SpiNNFPGARegister.P_MASK.delayed_command(
-                self._get_set_mask_payload)
-        ]
+        commands = list()
+        for i in range(len(self.__incoming_partitions)):
+            commands.append(SpiNNFPGARegister.XP_KEY_BASE.delayed_command(
+                self._get_set_key_payload, i))
+            commands.append(SpiNNFPGARegister.XP_MASK_BASE.delayed_command(
+                self._get_set_mask_payload, i))
 
     @property
     def pause_stop_commands(self):
