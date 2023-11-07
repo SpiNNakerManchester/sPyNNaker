@@ -307,8 +307,8 @@ class PopulationMachineNeurons(
                 cs_id = current_source.current_source_id
 
                 # Only use IDs that are on this core
-                for n, i in enumerate(self.vertex_slice().get_raster_ids()):
-                    if (n in current_source_id_list[current_source]):
+                for i, n in enumerate(self.vertex_slice.get_raster_ids()):
+                    if n in current_source_id_list[current_source]:
                         # I think this is now right, but test it more...
                         neuron_current_sources[i][0] += 1
                         neuron_current_sources[i].append(cs_id)
@@ -321,7 +321,7 @@ class PopulationMachineNeurons(
 
             # Now loop over the neurons on this core and write the current
             # source ID and index for sources attached to each neuron
-            for n in self.vertex_slice.get_raster_ids():
+            for n in self.vertex_slice.n_atoms:
                 n_current_sources = neuron_current_sources[n][0]
                 spec.write_value(n_current_sources)
                 if n_current_sources != 0:

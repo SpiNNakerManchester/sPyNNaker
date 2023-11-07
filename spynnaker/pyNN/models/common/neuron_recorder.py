@@ -488,7 +488,7 @@ class NeuronRecorder(object):
         if self.__indexes[variable] is None:
             return True
         indexes = self.__indexes[variable]
-        return numpy.isin(vertex_slice.get_raster_ids(), indexes)
+        return any(numpy.isin(vertex_slice.get_raster_ids(), indexes))
 
     def recorded_ids_by_slice(self, vertex_slice):
         """
@@ -1074,7 +1074,7 @@ class NeuronRecorder(object):
                     # Not recording so write to one beyond recording range
                     local_indexes.append(n_recording)
             # Any extra indices should be filled in
-            for _ in range(index, n_indices):
+            for _ in range(len(local_indexes), n_indices):
                 local_indexes.append(n_recording)
             data.append(
                 numpy.array(local_indexes, dtype="uint16").view("uint32"))
@@ -1168,7 +1168,7 @@ class NeuronRecorder(object):
         id_iter = iter(enumerate(vertex_slice.get_raster_ids()))
         index_iter = iter(index)
         # Keep the id and the position in the id list (as this is a RLE)
-        next_id, i = next(id_iter, (None, 0))
+        i, next_id = next(id_iter, (0, None))
         next_index = next(index_iter, None)
         last_recorded = i
         n_recorded = 0

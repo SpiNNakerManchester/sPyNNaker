@@ -79,8 +79,10 @@ class TestFromListConnectorMixed(BaseTestCase):
             [(int(i), int(j)) for i, j in proj.get([], "list")])
         sim.end()
 
-        assert numpy.array_equal(numpy.sort(conns),
-                                 numpy.sort(numpy.array(random_conns)))
+        c1 = numpy.sort(conns)
+        c2 = numpy.sort(random_conns)
+
+        assert numpy.array_equal(c1, c2)
 
     def test_list_3d_to_1d(self):
         self.do_list_nd_run(

@@ -32,8 +32,7 @@ def test_2d_1d():
         v=0.0,
     )
 
-    pynn.set_number_of_neurons_per_core(pynn.IF_curr_exp, (16, 16))
-    pynn.set_number_of_neurons_per_core(pynn.SpikeSourceArray, (16, 16))
+    pynn.set_number_of_neurons_per_core(pynn.SpikeSourceArray, (3, 3))
 
     kernel = np.array(((2.0,),))
 
@@ -65,6 +64,7 @@ def test_2d_1d():
         neuron_type,
         label='Convolutional neurons',
         structure=Grid2D(output_width / output_height))
+    conv_neurons.set_max_atoms_per_core((output_width, output_height))
     conv_neurons.record("spikes")
 
     pynn.Projection(input_neurons, conv_neurons, connector, pynn.Convolution())
@@ -73,6 +73,7 @@ def test_2d_1d():
         num_output_neurons,
         neuron_type,
         label='Merge neurons')
+    merge_neurons.set_max_atoms_per_core(num_output_neurons)
     merge_neurons.record("spikes")
 
     pynn.Projection(

@@ -90,13 +90,18 @@ def do_run():
     WIDTH = 512
     HEIGHT = 260
 
-    # Creates 512 neurons per core
+    # Creates 512 neurons per virtual core
     SUB_WIDTH = 16
     SUB_HEIGHT = 16
 
+    # Creates  neurons per real core
+    SUB_WIDTH_POP = 4
+    SUB_HEIGHT_POP = 32
+
     # Set the number of neurons per core to a rectangle
     # (creates 512 neurons per core)
-    p.set_number_of_neurons_per_core(p.IF_curr_exp, (SUB_WIDTH, SUB_HEIGHT))
+    p.set_number_of_neurons_per_core(p.IF_curr_exp,
+                                     (SUB_WIDTH_POP, SUB_HEIGHT_POP))
     spif_dev = p.external_devices.SPIFRetinaDevice(
             pipe=0, width=WIDTH, height=HEIGHT, sub_width=SUB_WIDTH,
             sub_height=SUB_HEIGHT, input_x_shift=X_SHIFT,
