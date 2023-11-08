@@ -103,6 +103,15 @@ class SPIFRegister(IntEnum):
     #: The filter mask base register (8 filters per pipe)
     FL_MASK_BASE = 176
 
+    # The distiller key base register (6 distillers)
+    DIST_KEY_BASE = 208
+
+    # The distiller key mask register (6 distillers)
+    DIST_MASK_BASE = 224
+
+    # The distiller key shift register (6 distillers)
+    DIST_SHIFT_BASE = 240
+
     def cmd(self, payload=None, index=0):
         """
         Make a command to send to a SPIF device to set a register value.
@@ -118,6 +127,21 @@ class SPIFRegister(IntEnum):
         return MultiCastCommand(
             _RC_KEY + self.value + index, payload, time=None, repeat=_REPEATS,
             delay_between_repeats=_DELAY_BETWEEN_REPEATS)
+
+    def delayed_command(self, get_payload, index=0):
+        """ Make a command to send to a SPIF device to set a register value,
+            where the value itself is currently unknown
+
+        :param func()->int get_payload:
+            A function to call to get the payload later
+        :param int index:
+            The index of the register to use when using a multi-indexed
+            register (default is 0 which works for all registers)
+        :rtype: MultiCastCommand
+        """
+        return _DelayedMultiCastCommand(
+            _RC_KEY + self.value + index, get_payload, repeat=_REPEATS,
+            delay_between_repeats=_DELAY_BETWEEN_REPEATS, index=index)
 
 
 def set_mapper_key(pipe, key):
@@ -254,28 +278,82 @@ def set_input_route(pipe, index, route):
     return SPIFRegister.IR_ROUTE_BASE.cmd(route, (pipe * N_INPUTS) + index)
 
 
+def set_distiller_key(index, key):
+    """ Get a command to set the key of the distiller of the output via SPIF.
+        This tells SPIF which bits to put at the top of the 32-bit output for
+        each spike received on the given distiller channel, defined by the
+        peripheral routes in the SpiNNaker FPGA.
+
+    :param int index: The index of the channel to set (0-5)
+    :param int key: The key to set
+    :rtype: MulticastCommand
+    """
+    return SPIFRegister.DIST_KEY_BASE.cmd(key, index)
+
+
+def set_distiller_mask(index, mask):
+    """ Get a command to set the mask of the distiller of the output via SPIF.
+        This tells SPIF which bits to use from the key in the 32-bit output for
+        each spike received on the given distiller channel, defined by the
+        peripheral routes in the SpiNNaker FPGA.
+
+    :param int index: The index of the channel to set (0-5)
+    :param int mask: The mask to set
+    :rtype: MulticastCommand
+    """
+    return SPIFRegister.DIST_MASK_BASE.cmd(mask, index)
+
+
+def set_distiller_mask_delayed(index, mask_func):
+    """ Get a command to set the mask of the distiller of the output via SPIF.
+        This tells SPIF which bits to use from the key in the 32-bit output for
+        each spike received on the given distiller channel, defined by the
+        peripheral routes in the SpiNNaker FPGA.
+
+    :param int index: The index of the channel to set (0-5)
+    :param func(int)->int mask_func:
+        The function to call to set the mask - takes index as argument
+    :rtype: MulticastCommand
+    """
+    return SPIFRegister.DIST_MASK_BASE.delayed_command(mask_func, index)
+
+
+def set_distiller_shift(index, shift):
+    """ Get a command to set the shift of the distiller of the output via SPIF.
+        This tells SPIF how much to shift the key after masking but before
+        applying the distiller key.
+
+    :param int index: The index of the channel to set (0-5)
+    :param int shift: The shift to set
+    :rtype: MulticastCommand
+    """
+    return SPIFRegister.DIST_SHIFT_BASE.cmd(shift, index)
+
+
 class _DelayedMultiCastCommand(MultiCastCommand):
     """
     A command where the getting of the payload is delayed.
     """
-    __slots__ = ["__get_payload"]
+    __slots__ = ["__get_payload", "__index"]
 
-    def __init__(self, key, get_payload, repeat, delay_between_repeats):
+    def __init__(self, key, get_payload, repeat, delay_between_repeats, index):
         """
         :param int key: The key to send
-        :param callable()->int get_payload:
+        :param callable(int)->int get_payload:
             A function to call that returns a payload
         :param int repeat: The number of times to repeat the command
         :param int delay_between_repeats: The delay between the repeats
+        :param int index: The index to pass to get_payload when called
         """
         super().__init__(
             key, repeat=repeat, delay_between_repeats=delay_between_repeats)
         self.__get_payload = get_payload
+        self.__index = index
 
     @property
     @overrides(MultiCastCommand.payload)
     def payload(self):
-        return self.__get_payload()
+        return self.__get_payload(self.__index)
 
     @property
     @overrides(MultiCastCommand.is_payload)
@@ -289,9 +367,11 @@ class SpiNNFPGARegister(IntEnum):
     """
 
     #: The base key which identifies packets to send out to the peripheral
+    # (deprecated - use XP_KEY_0)
     P_KEY = 2
 
     #: The mask which identifies packets to send out to the peripheral
+    # (deprecated - use XP_MASK_0)
     P_MASK = 3
 
     #: The base key which identifies packets to write to the FPGA registers
@@ -315,28 +395,86 @@ class SpiNNFPGARegister(IntEnum):
     #: peripheral to SpiNNaker
     START = 17
 
-    def cmd(self, payload=None):
+    #: The base of the keys that can be sent out of SpiNNaker (up to 6)
+    XP_KEY_BASE = 32
+
+    #: The base of the masks that can be sent out of SpiNNake (up to 6)
+    XP_MASK_BASE = 48
+
+    def cmd(self, payload=None, index=0):
         """
         Make a command to send to the FPGA to set a register value.
 
         :param payload:
             The payload to use in the command, or `None` for no payload
         :type payload: int or None
+        :param int index:
+            The index of the register to send to when there are multiple
+            registers starting from a base
         :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
         """
         return MultiCastCommand(
-            _LC_KEY + self.value, payload, time=None, repeat=_REPEATS,
+            _LC_KEY + self.value + index, payload, time=None, repeat=_REPEATS,
             delay_between_repeats=_DELAY_BETWEEN_REPEATS)
 
-    def delayed_command(self, get_payload):
+    def delayed_command(self, get_payload, index=0):
         """
         Make a command to send to the FPGA to set a register value,
         where the value itself is currently unknown.
 
-        :param callable()->int get_payload:
-            A function to call to get the payload later
+        :param callable(int)->int get_payload:
+            A function to call to get the payload later, passing in the index
+        :param int index:
+            The index of the register to send to when there are multiple
+            registers starting from a base
         :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
         """
         return _DelayedMultiCastCommand(
-            _LC_KEY + self.value, get_payload, repeat=_REPEATS,
-            delay_between_repeats=_DELAY_BETWEEN_REPEATS)
+            _LC_KEY + self.value + index, get_payload, repeat=_REPEATS,
+            delay_between_repeats=_DELAY_BETWEEN_REPEATS, index=index)
+
+
+def set_xp_key(index, key):
+    """ Get a command to set the key of the output via the FPGA.
+        This tells the FPGA to route this key to the external device.
+
+    :param int index: The index of the channel to set (0-5)
+    :param int key: The key to set
+    :rtype: MulticastCommand
+    """
+    return SpiNNFPGARegister.XP_KEY_BASE.cmd(key, index)
+
+
+def set_xp_key_delayed(index, key_func):
+    """ Get a command to set the key of the output via the FPGA later.
+        This tells the FPGA to route this key to the external device.
+
+    :param int index: The index of the channel to set (0-5)
+    :param callable(int)->int key_func: The function to call to get the key
+    :rtype: MulticastCommand
+    """
+    return SpiNNFPGARegister.XP_KEY_BASE.delayed_command(key_func, index)
+
+
+def set_xp_mask(index, mask):
+    """ Get a command to set the mask the output via the FPGA.
+        This tells the FPGA to route keys after using this mask to the external
+        device.
+
+    :param int index: The index of the channel to set (0-5)
+    :param int mask: The mask to set
+    :rtype: MulticastCommand
+    """
+    return SpiNNFPGARegister.XP_MASK_BASE.cmd(mask, index)
+
+
+def set_xp_mask_delayed(index, mask_func):
+    """ Get a command to set the mask of the output via the FPGA later.
+        This tells the FPGA to route keys after using this mask to the external
+        device.
+
+    :param int index: The index of the channel to set (0-5)
+    :param callable(int)->int mask_func: The function to call to get the mask
+    :rtype: MulticastCommand
+    """
+    return SpiNNFPGARegister.XP_MASK_BASE.delayed_command(mask_func, index)
