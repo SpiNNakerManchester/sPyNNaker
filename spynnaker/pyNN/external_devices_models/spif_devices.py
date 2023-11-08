@@ -258,24 +258,26 @@ class _DelayedMultiCastCommand(MultiCastCommand):
     """
     A command where the getting of the payload is delayed.
     """
-    __slots__ = ["__get_payload"]
+    __slots__ = ["__get_payload", "__index"]
 
-    def __init__(self, key, get_payload, repeat, delay_between_repeats):
+    def __init__(self, key, get_payload, repeat, delay_between_repeats, index):
         """
         :param int key: The key to send
-        :param callable()->int get_payload:
+        :param callable(int)->int get_payload:
             A function to call that returns a payload
         :param int repeat: The number of times to repeat the command
         :param int delay_between_repeats: The delay between the repeats
+        :param int index: The index to pass to get_payload when called
         """
         super().__init__(
             key, repeat=repeat, delay_between_repeats=delay_between_repeats)
         self.__get_payload = get_payload
+        self.__index = index
 
     @property
     @overrides(MultiCastCommand.payload)
     def payload(self):
-        return self.__get_payload()
+        return self.__get_payload(self.__index)
 
     @property
     @overrides(MultiCastCommand.is_payload)
@@ -350,5 +352,5 @@ class SpiNNFPGARegister(IntEnum):
         :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
         """
         return _DelayedMultiCastCommand(
-            _LC_KEY + self.value + index, get_payload(index), repeat=_REPEATS,
-            delay_between_repeats=_DELAY_BETWEEN_REPEATS)
+            _LC_KEY + self.value + index, get_payload, repeat=_REPEATS,
+            delay_between_repeats=_DELAY_BETWEEN_REPEATS, index=index)
