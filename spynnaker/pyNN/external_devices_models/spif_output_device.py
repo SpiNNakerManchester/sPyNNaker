@@ -26,7 +26,6 @@ from .spif_devices import (
     set_distiller_key, set_distiller_mask,
     set_distiller_mask_delayed, set_distiller_shift,
     set_xp_key_delayed, set_xp_mask_delayed)
-from pacman.utilities.utility_calls import is_power_of_2
 
 # The maximum number of partitions that can be supported.
 N_OUTGOING = 6
@@ -111,6 +110,14 @@ class SPIFOutputDevice(
         # pylint: disable=protected-access
         self.__output_key_and_mask[population._vertex] = (key, mask)
 
+    def __is_power_of_2(self, v):
+        """ Determine if a value is a power of 2.
+
+        :param int v: The value to test
+        :rtype: bool
+        """
+        return (v & (v - 1) == 0) and (v != 0)
+
     @overrides(ApplicationFPGAVertex.add_incoming_edge)
     def add_incoming_edge(self, edge, partition):
         if len(self.__incoming_partitions) >= N_OUTGOING:
@@ -122,7 +129,7 @@ class SPIFOutputDevice(
         # won't be correct
         max_atoms = partition.pre_vertex.get_max_atoms_per_core()
         if max_atoms < partition.pre_vertex.n_atoms:
-            if not is_power_of_2(max_atoms):
+            if not self.__is_power_of_2(max_atoms):
                 raise ValueError(
                     "The incoming vertex will be split into units of"
                     f" {max_atoms}, which means that the keys won't be"
