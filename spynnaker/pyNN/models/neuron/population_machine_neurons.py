@@ -321,7 +321,7 @@ class PopulationMachineNeurons(
 
             # Now loop over the neurons on this core and write the current
             # source ID and index for sources attached to each neuron
-            for n in self.vertex_slice.n_atoms:
+            for n in range(self.vertex_slice.n_atoms):
                 n_current_sources = neuron_current_sources[n][0]
                 spec.write_value(n_current_sources)
                 if n_current_sources != 0:
