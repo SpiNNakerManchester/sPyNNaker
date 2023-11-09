@@ -1158,54 +1158,38 @@ class NeuronRecorder(object):
             return [_REPEAT_PER_NEURON, 1,
                     _REPEAT_PER_NEURON_RECORDED | _RECORDED_FLAG]
 
+        # Find slice-relative indices in the index
+        indices = numpy.intersect1d(
+            vertex_slice.get_raster_ids(), index, return_indices=True)[1]
+
+        # Split the indices into consecutive ranges
+        ranges = numpy.split(
+            indices, numpy.where(numpy.diff(indices) > 1)[0] + 1)
+
         # Generate a run-length-encoded list
         # Initially there are no items, but this will be updated
         # Also keep track of the number recorded, also 0 initially
         data = [0, 0]
         n_items = 0
 
-        # Go through the indices and ids, assuming both are in order (they are)
-        id_iter = iter(enumerate(vertex_slice.get_raster_ids()))
-        index_iter = iter(index)
-        # Keep the id and the position in the id list (as this is a RLE)
-        i, next_id = next(id_iter, (0, None))
-        next_index = next(index_iter, None)
-        last_recorded = i
+        last_index = 0
         n_recorded = 0
-        while next_id is not None and next_index is not None:
-
-            # Find the next index to be recorded
-            while (next_id is not None and next_index is not None and
-                   next_id != next_index):
-                if next_index < next_id:
-                    next_index = next(index_iter, None)
-                elif next_id < next_index:
-                    next_id, i = next(id_iter, (None, i + 1))
-
-            # If we have moved the index onward, mark not recorded
-            if i != last_recorded:
-                data.append((i - last_recorded) | _NOT_RECORDED_FLAG)
+        for r in ranges:
+            # Add the last non-recorded range
+            if r[0] > last_index:
+                data.append((r[0] - last_index) | _NOT_RECORDED_FLAG)
                 n_items += 1
 
-            if next_id is not None and next_index is not None:
-                start_i = i
+            # Add this recorded range
+            data.append(((r[-1] - r[0]) + 1) | _RECORDED_FLAG)
+            n_items += 1
+            n_recorded += (r[-1] - r[0]) + 1
+            last_index = r[-1] + 1
 
-                # Find the next index not recorded
-                while (next_id is not None and next_index is not None and
-                       next_id == next_index):
-                    next_index = next(index_iter, None)
-                    next_id, i = next(id_iter, (None, i + 1))
-
-                # Add the count of things to be recorded
-                data.append((i - start_i) | _RECORDED_FLAG)
-                n_recorded += (i - start_i)
-                last_recorded = i
-                n_items += 1
-
-        # If there are more items in the vertex slice, they must be
-        # non-recorded items
-        if next_id is not None:
-            data.append((vertex_slice.n_atoms - i) | _NOT_RECORDED_FLAG)
+        # Add the final range if needed
+        if last_index < vertex_slice.n_atoms:
+            data.append((vertex_slice.n_atoms - last_index) |
+                        _NOT_RECORDED_FLAG)
             n_items += 1
 
         data[0] = n_recorded
