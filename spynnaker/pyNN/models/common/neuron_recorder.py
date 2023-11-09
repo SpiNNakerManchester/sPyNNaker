@@ -1162,6 +1162,11 @@ class NeuronRecorder(object):
         indices = numpy.intersect1d(
             vertex_slice.get_raster_ids(), index, return_indices=True)[1]
 
+        # If there is no overlap, nothing is recorded
+        if len(indices) == 0:
+            return [_REPEAT_PER_NEURON, 1,
+                    _REPEAT_PER_NEURON_RECORDED | _NOT_RECORDED_FLAG]
+
         # Split the indices into consecutive ranges
         ranges = numpy.split(
             indices, numpy.where(numpy.diff(indices) > 1)[0] + 1)
