@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Iterable
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
 from pacman.model.graphs.application import (
