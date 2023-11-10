@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import numpy
+import logging
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
@@ -20,6 +21,8 @@ from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
+logger = logging.getLogger(__name__)
 
 # Indices of the source and target in the connection list array
 _SOURCE = 0
@@ -123,7 +126,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             mapping[s.get_raster_ids()] = i
         return mapping
 
-    def _split_connections(self, n_atoms, post_slices):
+    def _split_connections(self, n_pre_atoms, n_post_atoms, post_slices):
         """
         :param list(~pacman.model.graphs.common.Slice) post_slices:
         """
@@ -136,11 +139,15 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             self.__split_conn_list = {}
             return True
 
+        input_filter = numpy.logical_and(
+            self.__targets < n_post_atoms, self.__sources < n_pre_atoms)
+
         self.__split_post_slices = list(post_slices)
-        m_vertex_mapping = self.__id_to_m_vertex_index(n_atoms, post_slices)
+        m_vertex_mapping = self.__id_to_m_vertex_index(
+            n_post_atoms, post_slices)
 
         # Get which index of the fromlist is on which vertex
-        target_vertices = m_vertex_mapping[self.__targets]
+        target_vertices = m_vertex_mapping[self.__targets[input_filter]]
 
         # Get how many on each vertex there are
         index_count = numpy.bincount(
@@ -264,7 +271,9 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
-        self._split_connections(synapse_info.n_post_neurons, post_slices)
+        self._split_connections(
+            synapse_info.n_pre_neurons, synapse_info.n_post_neurons,
+            post_slices)
         post_lo = post_vertex_slice.lo_atom
         if post_lo not in self.__split_conn_list:
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
@@ -446,8 +455,12 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         pre_mapping = self.__id_to_m_vertex_index(
             s_info.n_pre_neurons, pre_slices)
 
-        target_vertices = post_mapping[self.__targets]
-        source_vertices = pre_mapping[self.__sources]
+        input_filter = numpy.logical_and(
+            self.__targets < target_vertex.n_atoms,
+            self.__sources < source_vertex.n_atoms)
+
+        target_vertices = post_mapping[self.__targets[input_filter]]
+        source_vertices = pre_mapping[self.__sources[input_filter]]
 
         # Join the groups from both axes
         n_bins = (len(pre_slices), len(post_slices))
@@ -488,11 +501,11 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def validate_connection(self, application_edge, synapse_info):
         out_of_range_targets = self.__targets >= synapse_info.n_post_neurons
         if any(out_of_range_targets):
-            raise ValueError(
+            logger.warning(
                 "Some targets are out of range:"
                 f" {self.__conn_list[out_of_range_targets]}")
         out_of_range_sources = self.__sources >= synapse_info.n_pre_neurons
         if any(out_of_range_sources):
-            raise ValueError(
+            logger.warning(
                 "Some sources are out of range:"
                 f" {self.__conn_list[out_of_range_sources]}")
