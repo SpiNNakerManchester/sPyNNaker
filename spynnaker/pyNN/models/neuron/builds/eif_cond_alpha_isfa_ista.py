@@ -16,6 +16,7 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import defaults, default_initial_values
 
 
+# pylint: disable=wrong-spelling-in-docstring
 @defaults
 class EIFConductanceAlphaPopulation(object):
     """

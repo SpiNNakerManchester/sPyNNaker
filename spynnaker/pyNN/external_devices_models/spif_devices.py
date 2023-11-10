@@ -132,7 +132,7 @@ class SPIFRegister(IntEnum):
         """ Make a command to send to a SPIF device to set a register value,
             where the value itself is currently unknown
 
-        :param func()->int get_payload:
+        :param callable()->int get_payload:
             A function to call to get the payload later
         :param int index:
             The index of the register to use when using a multi-indexed
@@ -311,7 +311,7 @@ def set_distiller_mask_delayed(index, mask_func):
         peripheral routes in the SpiNNaker FPGA.
 
     :param int index: The index of the channel to set (0-5)
-    :param func(int)->int mask_func:
+    :param callable(int)->int mask_func:
         The function to call to set the mask - takes index as argument
     :rtype: MulticastCommand
     """
