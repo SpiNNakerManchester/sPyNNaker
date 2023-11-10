@@ -113,14 +113,11 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
             targets = numpy.array([sources[
                 ((n_atoms * i) + (n_atoms - 1)) - j]
                 for j in range(n_atoms) for i in range(n_atoms - 1)])
-            targets += post_vertex_slice.lo_atom
         else:
             sources = numpy.repeat(numpy.arange(
                 0, synapse_info.n_pre_neurons), post_vertex_slice.n_atoms)
             targets = numpy.tile(
-                numpy.arange(
-                    post_vertex_slice.lo_atom,
-                    post_vertex_slice.lo_atom + post_vertex_slice.n_atoms),
+                numpy.arange(0, post_vertex_slice.n_atoms),
                 synapse_info.n_pre_neurons)
 
         # pylint: disable=protected-access
