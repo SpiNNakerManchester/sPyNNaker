@@ -71,7 +71,7 @@ def test_connector(
             assert extra_params[:, i].shape == (len(clist), )
 
     # Check weights and delays are used or ignored as expected
-    pre_pop = MockPopulation(10, "Pre", MockAppVertex([Slice(0, 9)]))
+    pre_pop = MockPopulation(10, "Pre", MockAppVertex(10, [Slice(0, 9)]))
     post_slice = Slice(0, 9)
     synapse_info = SynapseInformation(
             connector=None, pre_population=pre_pop,
@@ -93,8 +93,9 @@ class MockFromListConnector(FromListConnector):
             conn_list, safe=safe, verbose=verbose, column_names=column_names)
         self._split_count = 0
 
-    def _split_connections(self, n_atoms, post_slices):
-        split = super()._split_connections(n_atoms, post_slices)
+    def _split_connections(self, n_pre_atoms, n_post_atoms, post_slices):
+        split = super()._split_connections(
+            n_pre_atoms, n_post_atoms, post_slices)
         if split:
             self._split_count += 1
         return split
@@ -116,8 +117,8 @@ def test_connector_split():
     connector = MockFromListConnector(connection_list)
     weight = 1.0
     delay = 1.0
-    pre_pop = MockPopulation(n_sources, "Pre",
-                             MockAppVertex([Slice(0, n_sources - 1)]))
+    pre_pop = MockPopulation(
+        n_sources, "Pre", MockAppVertex(n_sources, [Slice(0, n_sources - 1)]))
     synapse_info = SynapseInformation(
         connector=None, pre_population=pre_pop,
         post_population=MockPopulation(n_targets, "Post"),
@@ -172,8 +173,9 @@ class MockSplitter(object):
 
 class MockAppVertex(object):
 
-    def __init__(self, slices):
+    def __init__(self, n_atoms, slices):
         self.splitter = MockSplitter(slices, self)
+        self.n_atoms = n_atoms
 
     def get_key_ordered_indices(self, indices):
         # All of them are 1D so this is good enough
@@ -194,8 +196,8 @@ def test_get_connected():
     connector = FromListConnector(pairs)
     pre_slices = [Slice(0, 3), Slice(4, 6), Slice(7, 9)]
     post_slices = [Slice(0, 2), Slice(3, 5), Slice(6, 9)]
-    pre_vertex = MockAppVertex(pre_slices)
-    post_vertex = MockAppVertex(post_slices)
+    pre_vertex = MockAppVertex(10, pre_slices)
+    post_vertex = MockAppVertex(10, post_slices)
     pre_pop = MockPopulation(10, "Pre", pre_vertex)
     post_pop = MockPopulation(10, "Post", post_vertex)
     s_info = SynapseInformation(None, pre_pop, post_pop, False, False,
