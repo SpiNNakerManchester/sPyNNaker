@@ -15,14 +15,15 @@
 import numpy
 import logging
 from spinn_utilities.overrides import overrides
+from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 # Indices of the source and target in the connection list array
 _SOURCE = 0
@@ -502,10 +503,10 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         out_of_range_targets = self.__targets >= synapse_info.n_post_neurons
         if any(out_of_range_targets):
             logger.warning(
-                "Some targets are out of range:"
-                f" {self.__conn_list[out_of_range_targets]}")
+                "Some targets are out of range: {}",
+                self.__conn_list[out_of_range_targets])
         out_of_range_sources = self.__sources >= synapse_info.n_pre_neurons
         if any(out_of_range_sources):
             logger.warning(
-                "Some sources are out of range:"
-                f" {self.__conn_list[out_of_range_sources]}")
+                "Some sources are out of range: {}",
+                self.__conn_list[out_of_range_sources])
