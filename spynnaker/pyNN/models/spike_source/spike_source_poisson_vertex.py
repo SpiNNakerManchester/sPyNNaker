@@ -257,7 +257,7 @@ class SpikeSourcePoissonVertex(
         self.__data: RangeDictionary[
             Union[NDArray[numpy.floating], NDArray[numpy.integer]]
             ] = RangeDictionary(n_neurons)
-        rates_list = RangedList(
+        rates_list: RangedList = RangedList(
             n_neurons, _rates,
             use_list_as_value=not _is_list_of_lists(_rates))
         self.__data["rates"] = rates_list
