@@ -19,6 +19,7 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
 
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
 from pacman.model.placements import Placement
 
 from spinn_front_end_common.utilities.helpful_functions import (
@@ -70,15 +71,8 @@ class PopulationMachineSynapses(
 
     @property
     @abstractmethod
-    def _vertex_slice(self) -> Slice:
-        """
-        The slice of the application vertex atoms on this machine vertex.
-
-        .. note::
-            This is likely to be available via the MachineVertex.
-
-        :rtype: ~pacman.model.graphs.common.Slice
-        """
+    @overrides(MachineVertex.vertex_slice)
+    def vertex_slice(self) -> Slice:
         raise NotImplementedError
 
     @property
@@ -165,12 +159,12 @@ class PopulationMachineSynapses(
         # Write the synaptic matrices
         self._synaptic_matrices.generate_data()
         self._synaptic_matrices.write_synaptic_data(
-            spec, self._vertex_slice, self._synapse_references)
+            spec, self.vertex_slice, self._synapse_references)
 
         # Write any synapse dynamics
         synapse_dynamics = self._pop_vertex.synapse_dynamics
         synapse_dynamics_sz = self._pop_vertex.get_synapse_dynamics_size(
-            self._vertex_slice.n_atoms)
+            self.vertex_slice.n_atoms)
         if synapse_dynamics_sz > 0:
             assert isinstance(synapse_dynamics, AbstractSDRAMSynapseDynamics)
             spec.reserve_memory_region(
@@ -193,7 +187,7 @@ class PopulationMachineSynapses(
                 reference=self._synapse_references.structural_dynamics)
             synapse_dynamics.write_structural_parameters(
                 spec, self._synapse_regions.structural_dynamics,
-                weight_scales, self._pop_vertex, self._vertex_slice,
+                weight_scales, self._pop_vertex, self.vertex_slice,
                 self._synaptic_matrices)
         elif self._synapse_references.structural_dynamics is not None:
             # If there is a reference for this region, we have to create it!
