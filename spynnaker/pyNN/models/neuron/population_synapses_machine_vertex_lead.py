@@ -33,7 +33,6 @@ if TYPE_CHECKING:
         SynapseRegions, SynapseRegionReferences, SynapticMatrices)
 
 
-# pylint: disable=abstract-method
 class PopulationSynapsesMachineVertexLead(
         PopulationSynapsesMachineVertexCommon,
         PopulationMachineSynapses,
