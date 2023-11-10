@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Iterable
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
 from pacman.model.graphs.application import (
@@ -177,10 +178,6 @@ class SPIFOutputDevice(
     def start_resume_commands(self):
         # The commands here are delayed, as at the time of providing them,
         # we don't know the key or mask of the incoming link...
-        #yield SpiNNFPGARegister.P_KEY.delayed_command(
-        #    self._get_set_key_payload)
-        #yield SpiNNFPGARegister.P_MASK.delayed_command(
-        #    self._get_set_mask_payload)
         commands = list()
         for i, part in enumerate(self.__incoming_partitions):
             commands.append(set_xp_key_delayed(i, self._get_set_key_payload))
