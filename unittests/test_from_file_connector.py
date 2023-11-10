@@ -88,7 +88,7 @@ def test_connector(
 
     # Check weights and delays are used or ignored as expected
     pre_slice = Slice(0, 9)
-    pre_pop = MockPopulation(10, "Pre", MockAppVertex([pre_slice]))
+    pre_pop = MockPopulation(10, "Pre", MockAppVertex(10, [pre_slice]))
     post_slice = Slice(0, 9)
     synapse_info = SynapseInformation(
         connector=None, pre_population=pre_pop,
