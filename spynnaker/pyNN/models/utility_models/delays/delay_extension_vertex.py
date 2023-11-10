@@ -87,7 +87,10 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
 
     @property
     def _delay_splitter(self) -> SplitterDelayVertexSlice:
-        return cast(SplitterDelayVertexSlice, self._splitter)
+        if TYPE_CHECKING:
+            return cast(SplitterDelayVertexSlice, self._splitter)
+        else:
+            return self._splitter
 
     @property
     def drop_late_spikes(self) -> bool:
