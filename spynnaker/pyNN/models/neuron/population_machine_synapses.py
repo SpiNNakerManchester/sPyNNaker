@@ -43,7 +43,7 @@ class PopulationMachineSynapses(
     __slots__ = []
 
     @abstractproperty
-    def _app_vertex(self):
+    def app_vertex(self):
         """
         The application vertex of the machine vertex.
 
@@ -54,7 +54,7 @@ class PopulationMachineSynapses(
         """
 
     @abstractproperty
-    def _vertex_slice(self):
+    def vertex_slice(self):
         """
         The slice of the application vertex atoms on this machine vertex.
 
@@ -141,12 +141,12 @@ class PopulationMachineSynapses(
         # Write the synaptic matrices
         self._synaptic_matrices.generate_data()
         self._synaptic_matrices.write_synaptic_data(
-            spec, self._vertex_slice, self._synapse_references)
+            spec, self.vertex_slice, self._synapse_references)
 
         # Write any synapse dynamics
-        synapse_dynamics = self._app_vertex.synapse_dynamics
-        synapse_dynamics_sz = self._app_vertex.get_synapse_dynamics_size(
-            self._vertex_slice.n_atoms)
+        synapse_dynamics = self.app_vertex.synapse_dynamics
+        synapse_dynamics_sz = self.app_vertex.get_synapse_dynamics_size(
+            self.vertex_slice.n_atoms)
         if synapse_dynamics_sz > 0:
             spec.reserve_memory_region(
                 region=self._synapse_regions.synapse_dynamics,
@@ -154,7 +154,7 @@ class PopulationMachineSynapses(
                 reference=self._synapse_references.synapse_dynamics)
             synapse_dynamics.write_parameters(
                 spec, self._synapse_regions.synapse_dynamics,
-                self._app_vertex.weight_scale, weight_scales)
+                self.app_vertex.weight_scale, weight_scales)
         elif self._synapse_references.synapse_dynamics is not None:
             # If there is a reference for this region, we have to create it!
             spec.reserve_memory_region(
@@ -168,7 +168,7 @@ class PopulationMachineSynapses(
                 reference=self._synapse_references.structural_dynamics)
             synapse_dynamics.write_structural_parameters(
                 spec, self._synapse_regions.structural_dynamics,
-                weight_scales, self._app_vertex, self._vertex_slice,
+                weight_scales, self.app_vertex, self.vertex_slice,
                 self._synaptic_matrices)
         elif self._synapse_references.structural_dynamics is not None:
             # If there is a reference for this region, we have to create it!
@@ -189,7 +189,7 @@ class PopulationMachineSynapses(
         # Reserve space
         spec.reserve_memory_region(
             region=self._synapse_regions.synapse_params,
-            size=self._app_vertex.get_synapse_params_size(),
+            size=self.app_vertex.get_synapse_params_size(),
             label='SynapseParams',
             reference=self._synapse_references.synapse_params)
 
@@ -197,8 +197,8 @@ class PopulationMachineSynapses(
         n_neurons = self._max_atoms_per_core
         # We only count neuron synapse types here, as this is related to
         # the ring buffers
-        n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
-        max_delay = self._app_vertex.splitter.max_support_delay()
+        n_synapse_types = self.app_vertex.neuron_impl.get_n_synapse_types()
+        max_delay = self.app_vertex.splitter.max_support_delay()
 
         # Write synapse parameters
         spec.switch_write_focus(self._synapse_regions.synapse_params)
@@ -207,8 +207,8 @@ class PopulationMachineSynapses(
         spec.write_value(get_n_bits(n_neurons))
         spec.write_value(get_n_bits(n_synapse_types))
         spec.write_value(get_n_bits(max_delay))
-        spec.write_value(int(self._app_vertex.drop_late_spikes))
-        spec.write_value(self._app_vertex.incoming_spike_buffer_size)
+        spec.write_value(int(self.app_vertex.drop_late_spikes))
+        spec.write_value(self.app_vertex.incoming_spike_buffer_size)
         spec.write_array(ring_buffer_shifts)
 
     @overrides(AbstractSynapseExpandable.gen_on_machine)

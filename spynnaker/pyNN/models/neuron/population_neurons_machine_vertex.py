@@ -300,4 +300,4 @@ class PopulationNeuronsMachineVertex(
     @overrides(PopulationMachineCommon.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id):
         n_colours = 2 ** self._app_vertex.n_colour_bits
-        return self._vertex_slice.n_atoms * n_colours
+        return self.vertex_slice.n_atoms * n_colours

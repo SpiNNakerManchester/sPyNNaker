@@ -44,6 +44,10 @@ rng
 PLoS
 rewirings
 analog
+stdev
+or'ed
+pn
+config
 
 # Our Python types
 ApplicationGraph
@@ -83,6 +87,7 @@ AbstractCurrentSource
 GeneratorData
 EIEIOType
 EIEIOPrefix
+RandomDistribtuion
 
 # Others' Python types
 NumpyRNG

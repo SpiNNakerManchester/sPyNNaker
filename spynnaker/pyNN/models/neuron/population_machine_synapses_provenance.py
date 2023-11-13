@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ctypes
-from spinn_utilities.abstract_base import abstractproperty
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 
@@ -66,18 +65,6 @@ class PopulationMachineSynapsesProvenance(object):
     SYNAPSES_SKIPPED = "Skipped synapses"
     LATE_SPIKES = "Late spikes"
     MAX_LATE_SPIKE = "Max late spike"
-
-    @abstractproperty
-    def _app_vertex(self):
-        """
-        The application vertex of the machine vertex.
-
-        .. note::
-            This is likely to be available via the
-            :py:class:`~pacman.model.graphs.machine.MachineVertex`.
-
-        :rtype: AbstractPopulationVertex
-        """
 
     def _parse_synapse_provenance(self, label,  x, y, p, provenance_data):
         """

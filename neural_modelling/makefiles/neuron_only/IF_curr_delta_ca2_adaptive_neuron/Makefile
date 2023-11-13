@@ -12,15 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Populations are objects that contain groups of neurons.
+APP = $(notdir $(CURDIR))
 
-.. deprecated:: 6.0
-    Use :py:mod:`spynnaker.pyNN.models.populations` instead.
-"""
+NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.h
+INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_delta.h
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard.h
+THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_static.h
+SYNAPSE_TYPE_H = $(NEURON_DIR)/neuron/synapse_types/synapse_types_delta_impl.h
+ADDITIONAL_INPUT_H = $(NEURON_DIR)/neuron/additional_inputs/additional_input_ca2_adaptive_impl.h
 
-from .assembly import Assembly
-from .population import Population
-from .population_view import PopulationView
-
-__all__ = ["Assembly", "Population", "PopulationView"]
+include ../neuron_build.mk

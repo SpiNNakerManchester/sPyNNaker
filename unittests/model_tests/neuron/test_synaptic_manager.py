@@ -19,9 +19,8 @@ import numpy
 import pytest
 
 from spinn_utilities.overrides import overrides
-from spinn_utilities.config_holder import load_config, set_config
-from spinnman.model import CPUInfo
-from spinnman.processes.get_cpu_info_process import _INFO_PATTERN
+from spinn_utilities.config_holder import set_config
+from spinnman.transceiver.mockable_transceiver import MockableTransceiver
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
 from pacman.operations.routing_info_allocator_algorithms import (
@@ -32,8 +31,8 @@ from spinn_front_end_common.interface.ds import (
 from spinn_front_end_common.interface.interface_functions import (
     load_application_data_specs)
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
-from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices,\
-    SynapseRegions
+from spynnaker.pyNN.models.neuron.synaptic_matrices import (
+    SynapticMatrices, SynapseRegions)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
     SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic,
@@ -60,42 +59,34 @@ from spynnaker.pyNN.utilities import constants
 import pyNN.spiNNaker as p
 
 
-class _MockTransceiverinOut(Transceiver):
-    def __init__(self):
-        pass
+class _MockTransceiverinOut(MockableTransceiver):
 
-    @overrides(Transceiver.malloc_sdram)
+    @overrides(MockableTransceiver.malloc_sdram)
     def malloc_sdram(self, x, y, size, app_id, tag=None):
         self._data_to_read = bytearray(size)
         return 0
 
-    @overrides(Transceiver.write_memory)
-    def write_memory(self, x, y, base_address, data, n_bytes=None, offset=0,
-                     cpu=0, is_filename=False, get_sum=False):
+    @overrides(MockableTransceiver.write_memory)
+    def write_memory(self, x, y, base_address, data, *, n_bytes=None,
+                     offset=0, cpu=0, get_sum=False):
         if data is None:
             return
         if isinstance(data, int):
             data = struct.Struct("<I").pack(data)
         self._data_to_read[base_address:base_address + len(data)] = data
 
-    @overrides(Transceiver.get_cpu_information_from_core)
-    def get_cpu_information_from_core(self, x, y, p):
-        bs = bytearray(128)
-        cpu_data = _INFO_PATTERN.unpack_from(bytes(bs), 0)
-        return CPUInfo(x=1, y=2, p=3, cpu_data=cpu_data)
+    @overrides(Transceiver.get_region_base_address)
+    def get_region_base_address(self, x, y, p):
+        return 0
 
-    @overrides(Transceiver.read_memory)
+    @overrides(MockableTransceiver.read_memory)
     def read_memory(self, x, y, base_address, length, cpu=0):
         return self._data_to_read[base_address:base_address + length]
 
-    @overrides(Transceiver.read_word)
+    @overrides(MockableTransceiver.read_word)
     def read_word(self, x, y, base_address, cpu=0):
         datum, = struct.unpack("<I", self.read_memory(x, y, base_address, 4))
         return datum
-
-    @overrides(Transceiver.close)
-    def close(self):
-        pass
 
 
 def say_false(self, weights, delays):
@@ -104,11 +95,11 @@ def say_false(self, weights, delays):
 
 def test_write_data_spec():
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = SpynnakerDataWriter.mock()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
 
-    load_config()
     set_config("Machine", "enable_advanced_monitor_support", "False")
     set_config("Java", "use_java", "False")
 
@@ -145,7 +136,7 @@ def test_write_data_spec():
             edge, constants.SPIKE_PARTITION_ID)
     splitter_partitioner()
     allocator = ZonedRoutingInfoAllocator()
-    writer.set_routing_infos(allocator.__call__([], flexible=False))
+    writer.set_routing_infos(allocator.allocate([]))
 
     post_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_vertex.vertex_slice
@@ -164,10 +155,10 @@ def test_write_data_spec():
         weight_scales=[32, 32], all_syn_block_sz=10000)
     synaptic_matrices.generate_data()
 
-    ds_db = DsSqlliteDatabase()
-    spec = DataSpecificationGenerator(0, 0, 3, post_vertex, ds_db)
-    synaptic_matrices.write_synaptic_data(spec, post_vertex_slice, references)
-    writer.set_ds_database(ds_db)
+    with DsSqlliteDatabase() as ds_db:
+        spec = DataSpecificationGenerator(0, 0, 3, post_vertex, ds_db)
+        synaptic_matrices.write_synaptic_data(
+            spec, post_vertex_slice, references)
 
     writer.set_transceiver(_MockTransceiverinOut())
     load_application_data_specs()
@@ -434,6 +425,7 @@ def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
         n_pre_neurons, neurons_per_core, max_delay):
     unittest_setup()
+    set_config("Machine", "version", 5)
     writer = SpynnakerDataWriter.mock()
 
     # Build a from list connector with the delays we want
@@ -469,32 +461,32 @@ def test_pop_based_master_pop_table_standard(
             edge, constants.SPIKE_PARTITION_ID)
     splitter_partitioner()
     allocator = ZonedRoutingInfoAllocator()
-    writer.set_routing_infos(allocator.__call__([], flexible=False))
+    writer.set_routing_infos(allocator.allocate([]))
 
     post_mac_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_mac_vertex.vertex_slice
 
     # Generate the data
-    db = DsSqlliteDatabase()
-    spec = DataSpecificationGenerator(1, 2, 3, post_mac_vertex, db)
-    writer.set_ds_database(db)
+    with DsSqlliteDatabase() as db:
+        spec = DataSpecificationGenerator(1, 2, 3, post_mac_vertex, db)
 
-    regions = SynapseRegions(
-        synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
-        bitfield_filter=8,
-        synaptic_matrix=1, pop_table=3, connection_builder=4)
-    references = SynapseRegions(
-        synapse_params=None, synapse_dynamics=None, structural_dynamics=None,
-        bitfield_filter=None,
-        synaptic_matrix=None, pop_table=None, connection_builder=None)
-    synaptic_matrices = SynapticMatrices(
-        post_pop._vertex, regions, max_atoms_per_core=neurons_per_core,
-        weight_scales=[32, 32], all_syn_block_sz=10000000)
-    synaptic_matrices.generate_data()
-    synaptic_matrices.write_synaptic_data(spec, post_vertex_slice, references)
+        regions = SynapseRegions(
+            synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
+            bitfield_filter=8,
+            synaptic_matrix=1, pop_table=3, connection_builder=4)
+        references = SynapseRegions(
+            synapse_params=None, synapse_dynamics=None,
+            structural_dynamics=None, bitfield_filter=None,
+            synaptic_matrix=None, pop_table=None, connection_builder=None)
+        synaptic_matrices = SynapticMatrices(
+            post_pop._vertex, regions, max_atoms_per_core=neurons_per_core,
+            weight_scales=[32, 32], all_syn_block_sz=10000000)
+        synaptic_matrices.generate_data()
+        synaptic_matrices.write_synaptic_data(
+            spec, post_vertex_slice, references)
 
-    # Read the population table and check entries
-    info = list(db.get_region_pointers_and_content(1, 2, 3))
+        # Read the population table and check entries
+        info = list(db.get_region_pointers_and_content(1, 2, 3))
     region, _, region_data = info[1]
     assert region == 3
     mpop_data = numpy.frombuffer(region_data, dtype="uint8").view("uint32")

@@ -50,6 +50,7 @@ class CommonRegions:
     recording: int
 
 
+# pylint: disable=abstract-method
 class PopulationMachineCommon(
         MachineVertex,
         ProvidesProvenanceDataFromMachineImpl,
@@ -168,4 +169,4 @@ class PopulationMachineCommon(
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id):
         # Colour each time slot with up to 16 colours to allow for delays
-        return self._vertex_slice.n_atoms * 16
+        return self.vertex_slice.n_atoms * 16
