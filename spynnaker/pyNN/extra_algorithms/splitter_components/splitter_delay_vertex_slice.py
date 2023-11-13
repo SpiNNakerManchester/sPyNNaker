@@ -51,22 +51,15 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
         self._machine_vertex_by_slice: Dict[
             Slice, DelayExtensionMachineVertex] = dict()
 
-    @property
-    def __vtx(self):
-        v = self.governed_app_vertex
-        if v is None:
-            raise PacmanConfigurationException("vertex not set")
-        return v
-
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(
             self, partition_id: str) -> Sequence[MachineVertex]:
-        return list(self.__vtx.machine_vertices)
+        return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(
             self, partition_id: str) -> Sequence[MachineVertex]:
-        return list(self.__vtx.machine_vertices)
+        return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
@@ -81,24 +74,24 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter: ChipCounter):
-        source_app_vertex = self.__vtx.source_vertex
+        source_app_vertex = self.governed_app_vertex.source_vertex
         slices = source_app_vertex.splitter.get_out_going_slices()
 
         # create vertices correctly
         for vertex_slice in slices:
             vertex = self.create_machine_vertex(
                 source_app_vertex, vertex_slice)
-            self.__vtx.remember_machine_vertex(vertex)
+            self.governed_app_vertex.remember_machine_vertex(vertex)
             chip_counter.add_core(vertex.sdram_required)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self) -> Sequence[Slice]:
-        other_splitter = self.__vtx.source_vertex.splitter
+        other_splitter = self.governed_app_vertex.source_vertex.splitter
         return other_splitter.get_in_coming_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self) -> Sequence[Slice]:
-        other_splitter = self.__vtx.source_vertex.splitter
+        other_splitter = self.governed_app_vertex.source_vertex.splitter
         return other_splitter.get_out_going_slices()
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
@@ -125,7 +118,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
         sdram = self.get_sdram_used_by_atoms()
 
         machine_vertex = DelayExtensionMachineVertex(
-            sdram, label, vertex_slice, self.__vtx)
+            sdram, label, vertex_slice, self.governed_app_vertex)
 
         self._machine_vertex_by_slice[vertex_slice] = machine_vertex
         return machine_vertex
@@ -138,7 +131,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
         """
         return ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
-            self.__vtx.delay_params_size() +
+            self.governed_app_vertex.delay_params_size() +
             DelayExtensionMachineVertex.get_provenance_data_size(
                 DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES))
 
