@@ -137,8 +137,7 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
             min_delay=None, max_delay=None) -> int:
-        if self.__mask is None:
-            return 0
+        assert self.__mask is not None
         # Break the array into n_post_atoms units
         split_positions = numpy.arange(
             0, synapse_info.n_post_neurons, n_post_atoms)
@@ -160,8 +159,7 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(
             self, synapse_info: SynapseInformation) -> int:
-        if not self.__mask:
-            return 0
+        assert self.__mask is not None
         return numpy.amax([
             numpy.sum(self.__mask[:, i]) for i in range(
                 synapse_info.n_post_neurons)])
