@@ -34,7 +34,22 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     __slots__ = ("__delay", "__weight")
 
     def __init__(self, delay, weight):
+        if delay is None:
+            if delay is None:
+                delay = SpynnakerDataView.get_min_delay()
+        if not isinstance(delay, (int, float, str, RandomDistribution)):
+            raise TypeError(
+                f"Unexpected type for delay: {type(delay)}. "
+                "Expected types are int, float, str and RandomDistribution")
         self.__delay = self._round_delay(delay)
+        if not isinstance(self.__delay, (int, float, str, RandomDistribution)):
+            raise TypeError(
+                f"Unexpected type for delay: {type(self.__delay)}. "
+                "Expected types are int, float, str and RandomDistribution")
+        if not isinstance(weight, (int, float, str, RandomDistribution)):
+            raise TypeError(
+                f"Unexpected type for weight: {type(weight)}. "
+                "Expected types are int, float, str and RandomDistribution")
         self.__weight = weight
 
     @abstractmethod
@@ -81,8 +96,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param delay:
         :return: Rounded delay
         """
-        if delay is None:
-            return SpynnakerDataView.get_min_delay()
         if isinstance(delay, RandomDistribution):
             return delay
         if isinstance(delay, str):
