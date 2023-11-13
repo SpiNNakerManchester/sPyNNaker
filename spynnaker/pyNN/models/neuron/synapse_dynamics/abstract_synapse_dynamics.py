@@ -37,20 +37,31 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         if delay is None:
             if delay is None:
                 delay = SpynnakerDataView.get_min_delay()
-        if not isinstance(delay, (int, float, str, RandomDistribution)):
-            raise TypeError(
-                f"Unexpected type for delay: {type(delay)}. "
-                "Expected types are int, float, str and RandomDistribution")
+        self.__check_type(delay, "delay")
         self.__delay = self._round_delay(delay)
-        if not isinstance(self.__delay, (int, float, str, RandomDistribution)):
-            raise TypeError(
-                f"Unexpected type for delay: {type(self.__delay)}. "
-                "Expected types are int, float, str and RandomDistribution")
-        if not isinstance(weight, (int, float, str, RandomDistribution)):
-            raise TypeError(
-                f"Unexpected type for weight: {type(weight)}. "
-                "Expected types are int, float, str and RandomDistribution")
+        self.__check_type(weight, "weight")
         self.__weight = weight
+
+    def __check_type(self, value, name):
+        if isinstance(value, (int, float, str, RandomDistribution)):
+            return
+        try:
+            for x in value:
+                if isinstance(x, (int, float)):
+                    # assume if first in list colelction is ok all are
+                    return
+                else:
+                    raise TypeError(
+                        f"Unexpected collection of type  {type(x)} for {name}"
+                        f"Expected types in collection are int and float")
+        except TypeError:
+            # Ok not a collection
+            pass
+        raise TypeError(
+            f"Unexpected type for {name}: {type(value)}. "
+            "Expected types are int, float, str, RandomDistribution "
+            "and collections of type int or float")
+
 
     @abstractmethod
     def merge(self, synapse_dynamics):
