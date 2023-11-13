@@ -740,7 +740,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             The SDRAM shared between cores, if this is to be included
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
-        n_record = len(self.governed_app_vertexsynapse_recordables)
+        n_record = len(self.governed_app_vertex.synapse_recordables)
         variable_sdram = \
             self.governed_app_vertex.get_max_synapse_variable_sdram(n_atoms)
         sdram = MultiRegionSDRAM()
