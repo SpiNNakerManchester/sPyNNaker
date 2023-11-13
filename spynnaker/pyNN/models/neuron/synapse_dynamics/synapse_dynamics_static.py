@@ -44,7 +44,7 @@ class SynapseDynamicsStatic(
         :type delay: float or None
         :param int pad_to_length:
         """
-        super().__init__(delay=delay, weight=weight)
+        super(AbstractStaticSynapseDynamics, self).__init__(delay=delay, weight=weight)
         self.__pad_to_length = pad_to_length
 
     @overrides(AbstractStaticSynapseDynamics.merge)

@@ -33,7 +33,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
     __slots__ = ("__delay", "__weight")
 
-    def __init(self, delay, weight):
+    def __init__(self, delay, weight):
         self.__delay = self._round_delay(delay)
         self.__weight = weight
 
@@ -63,7 +63,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :rtype: bool
         """
 
-    @abstractproperty
+    @property
     def weight(self):
         """
         The weight of connections.
@@ -96,6 +96,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
                            self, delay, new_delay)
         return new_delay
 
+    @property
     def delay(self):
         """
         The delay of connections.
