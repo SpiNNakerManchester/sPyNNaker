@@ -59,13 +59,6 @@ class SplitterAbstractPopulationVertex(
         self._max_delay = None
         self.__slices = None
 
-    @property
-    @final
-    def _apv(self) -> AbstractPopulationVertex:
-        v = self.governed_app_vertex
-        assert v is not None
-        return v
-
     @abstractmethod
     def _update_max_delay(self) -> None:
         """
@@ -91,5 +84,5 @@ class SplitterAbstractPopulationVertex(
         """
         if self.__slices is not None:
             return self.__slices
-        self.__slices = get_multidimensional_slices(self._apv)
+        self.__slices = get_multidimensional_slices(self.governed_app_vertex)
         return self.__slices
