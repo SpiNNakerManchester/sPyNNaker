@@ -15,7 +15,6 @@
 import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.data import SpynnakerDataView
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
@@ -44,7 +43,8 @@ class SynapseDynamicsStatic(
         :type delay: float or None
         :param int pad_to_length:
         """
-        super(AbstractStaticSynapseDynamics, self).__init__(delay=delay, weight=weight)
+        super(AbstractStaticSynapseDynamics, self).__init__(
+            delay=delay, weight=weight)
         self.__pad_to_length = pad_to_length
 
     @overrides(AbstractStaticSynapseDynamics.merge)
