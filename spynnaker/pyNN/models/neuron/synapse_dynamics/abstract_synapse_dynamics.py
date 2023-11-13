@@ -62,7 +62,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             "Expected types are int, float, str, RandomDistribution "
             "and collections of type int or float")
 
-
     @abstractmethod
     def merge(self, synapse_dynamics):
         """
