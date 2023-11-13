@@ -48,9 +48,9 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
         # If there is only one outgoing projection, and it is one-to-one
         # connected to the target, and the target knows what to do, leave
         # it to the target
-        if len(self.__sspv.outgoing_projections) != 1:
+        if len(self.governed_app_vertex.outgoing_projections) != 1:
             return False
-        proj = self.__sspv.outgoing_projections[0]
+        proj = self.governed_app_vertex.outgoing_projections[0]
         # pylint: disable=protected-access
         post_vertex = proj._projection_edge.post_vertex
         if not isinstance(post_vertex.splitter,
@@ -80,7 +80,7 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self) -> List[Slice]:
         if self.send_over_sdram:
-            proj = self.__sspv.outgoing_projections[0]
+            proj = self.governed_app_vertex.outgoing_projections[0]
             # pylint: disable=protected-access
             post_vertex = proj._projection_edge.post_vertex
             return list(post_vertex.splitter.get_in_coming_slices())
@@ -89,7 +89,7 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self) -> List[Slice]:
         if self.send_over_sdram:
-            proj = self.__sspv.outgoing_projections[0]
+            proj = self.governed_app_vertex.outgoing_projections[0]
             # pylint: disable=protected-access
             post_vertex = proj._projection_edge.post_vertex
             return list(post_vertex.splitter.get_out_going_slices())
