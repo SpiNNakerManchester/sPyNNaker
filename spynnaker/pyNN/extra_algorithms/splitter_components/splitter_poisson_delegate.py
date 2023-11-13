@@ -32,13 +32,6 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
     """
 
     @property
-    def __sspv(self) -> SpikeSourcePoissonVertex:
-        v = self.governed_app_vertex
-        if v is None:
-            raise PacmanConfigurationException("no app_vertex set")
-        return v
-
-    @property
     def send_over_sdram(self) -> bool:
         """
         Whether this vertex is to be sent using SDRAM.
