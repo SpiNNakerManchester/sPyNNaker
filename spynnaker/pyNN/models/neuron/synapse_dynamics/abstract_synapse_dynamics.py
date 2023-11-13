@@ -87,7 +87,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     def _round_delay(
-            self, delay: Union[int, float, RandomDistribution]) -> int:
+            self, delay: Union[int, str, float, RandomDistribution]) -> \
+            Union[int, str, float, RandomDistribution]:
         """
         Round the delays to multiples of full timesteps.
 
