@@ -98,7 +98,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         if isinstance(delay, RandomDistribution):
             return delay
-        if isinstance(delay, int):
+        if isinstance(delay, str):
             return delay
         new_delay = (
                 numpy.rint(numpy.array(delay) *
