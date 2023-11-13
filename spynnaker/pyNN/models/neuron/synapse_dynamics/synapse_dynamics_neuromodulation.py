@@ -44,7 +44,6 @@ class SynapseDynamicsNeuromodulation(
     """
 
     __slots__ = [
-        "__weight",
         "__tau_c",
         "__tau_d",
         "__tau_c_data",
@@ -54,7 +53,7 @@ class SynapseDynamicsNeuromodulation(
 
     def __init__(self, weight=StaticSynapse.default_parameters['weight'],
                  tau_c=1000.0, tau_d=200.0, w_min=0.0, w_max=1.0):
-        self.__weight = weight
+        super().__init__(delay=1, weight=weight)
         self.__tau_c = tau_c
         self.__tau_d = tau_d
         ts = SpynnakerDataView.get_simulation_time_step_ms()
@@ -259,17 +258,6 @@ class SynapseDynamicsNeuromodulation(
     @overrides(AbstractPlasticSynapseDynamics.changes_during_run)
     def changes_during_run(self):
         return False
-
-    @property
-    @overrides(AbstractPlasticSynapseDynamics.weight)
-    def weight(self):
-        return self.__weight
-
-    @property
-    @overrides(AbstractPlasticSynapseDynamics.delay)
-    def delay(self):
-        # Delay is always 1!
-        return 1
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)

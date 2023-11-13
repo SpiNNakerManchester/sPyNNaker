@@ -43,7 +43,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     __slots__ = [
         "__cached_2d_overlaps",
         "__cached_n_incoming"
-        "__delay"
     ]
 
     def __init__(self, delay=None):
@@ -51,18 +50,13 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         :param float delay:
             The delay used in the connection; by default 1 time step
         """
+        super().__init__(delay)
+
         # Store the overlaps between 2d vertices to avoid recalculation
         self.__cached_2d_overlaps = dict()
 
         # Store the n_incoming to avoid recalcaultion
         self.__cached_n_incoming = dict()
-
-        self.__delay = delay
-        if delay is None:
-            self.__delay = SpynnakerDataView.get_simulation_time_step_ms()
-        elif not isinstance(delay, (float, int)):
-            raise SynapticConfigurationException(
-                "Only single value delays are supported")
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics):
@@ -147,7 +141,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
             data.extend(s_info.connector.get_local_only_data(
                 app_edge, source.vertex_slice, source.key, source.mask,
-                app_edge.pre_vertex.n_colour_bits, self.__delay, weight_index))
+                app_edge.pre_vertex.n_colour_bits, self.delay, weight_index))
         n_weights = next_weight_index
         if next_weight_index % 2 != 0:
             n_weights += 1
@@ -229,7 +223,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         """
         routing_info = SpynnakerDataView.get_routing_infos()
         delay_vertex = None
-        if self.__delay > app_vertex.splitter.max_support_delay():
+        if self.delay > app_vertex.splitter.max_support_delay():
             # pylint: disable=protected-access
             delay_vertex = incoming._projection_edge.delay_edge.pre_vertex
 
@@ -269,17 +263,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             source.vertex_slice)
         return routing_info.get_routing_info_from_pre_vertex(
             delay_source, SPIKE_PARTITION_ID)
-
-    @property
-    @overrides(AbstractLocalOnly.delay)
-    def delay(self):
-        return self.__delay
-
-    @property
-    @overrides(AbstractLocalOnly.weight)
-    def weight(self):
-        # We don't have a weight here, it is in the connector
-        return 0
 
     @overrides(AbstractSupportsSignedWeights.get_positive_synapse_index)
     def get_positive_synapse_index(self, incoming_projection):

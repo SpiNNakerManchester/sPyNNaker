@@ -34,11 +34,7 @@ class SynapseDynamicsStatic(
 
     __slots__ = [
         # padding to add to a synaptic row for synaptic rewiring
-        "__pad_to_length",
-        # weight of connections
-        "__weight",
-        # delay of connections
-        "__delay"]
+        "__pad_to_length"]
 
     def __init__(self, weight=StaticSynapse.default_parameters['weight'],
                  delay=None, pad_to_length=None):
@@ -48,10 +44,7 @@ class SynapseDynamicsStatic(
         :type delay: float or None
         :param int pad_to_length:
         """
-        self.__weight = weight
-        if delay is None:
-            delay = SpynnakerDataView.get_min_delay()
-        self.__delay = self._round_delay(delay)
+        super().__init__(delay=delay, weight=weight)
         self.__pad_to_length = pad_to_length
 
     @overrides(AbstractStaticSynapseDynamics.merge)
@@ -217,16 +210,6 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.changes_during_run)
     def changes_during_run(self):
         return False
-
-    @property
-    @overrides(AbstractStaticSynapseDynamics.weight)
-    def weight(self):
-        return self.__weight
-
-    @property
-    @overrides(AbstractStaticSynapseDynamics.delay)
-    def delay(self):
-        return self.__delay
 
     @property
     @overrides(AbstractStaticSynapseDynamics.pad_to_length)

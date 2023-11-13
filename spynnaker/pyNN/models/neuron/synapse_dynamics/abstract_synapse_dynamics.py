@@ -31,7 +31,11 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     How do the dynamics of a synapse interact with the rest of the model.
     """
 
-    __slots__ = ()
+    __slots__ = ("__delay", "__weight")
+
+    def __init(self, delay, weight):
+        self.__delay = self._round_delay(delay)
+        self.__weight = weight
 
     @abstractmethod
     def merge(self, synapse_dynamics):
@@ -66,6 +70,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
         :rtype: float
         """
+        return self.__weight
 
     def _round_delay(self, delay):
         """
@@ -76,6 +81,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param delay:
         :return: Rounded delay
         """
+        if delay is None:
+            return SpynnakerDataView.get_min_delay()
         if isinstance(delay, RandomDistribution):
             return delay
         if isinstance(delay, str):
@@ -89,13 +96,13 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
                            self, delay, new_delay)
         return new_delay
 
-    @abstractproperty
     def delay(self):
         """
         The delay of connections.
 
         :rtype: float
         """
+        return self.__delay
 
     @abstractproperty
     def is_combined_core_capable(self):

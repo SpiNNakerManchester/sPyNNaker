@@ -22,6 +22,14 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     Processes synapses locally without the need for SDRAM.
     """
 
+    def __init__(self, delay=None):
+        """
+        :param float delay:
+            The delay used in the connection; by default 1 time step
+        """
+        # We don't have a weight here, it is in the connector
+        super().__init__(delay=delay, weight=0)
+
     @abstractmethod
     def get_parameters_usage_in_bytes(
             self, n_atoms, incoming_projections):
