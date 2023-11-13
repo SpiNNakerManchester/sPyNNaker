@@ -242,7 +242,8 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
 
     def __get_local_only_constant_sdram(
             self, n_atoms: int) -> MultiRegionSDRAM:
-        s_dynamics = cast(AbstractLocalOnly, self.governed_app_vertex.synapse_dynamics)
+        s_dynamics = cast(AbstractLocalOnly,
+                          self.governed_app_vertex.synapse_dynamics)
         sdram = MultiRegionSDRAM()
         sdram.add_cost(
             PopulationMachineLocalOnlyCombinedVertex.REGIONS.LOCAL_ONLY,

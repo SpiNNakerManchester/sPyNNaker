@@ -340,8 +340,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         neuron_vertex = PopulationNeuronsMachineVertex(
             sdram,
             f"{label}_Neurons:{vertex_slice.lo_atom}-{vertex_slice.hi_atom}",
-            self.governed_app_vertex, vertex_slice, index, rb_shifts, weight_scales,
-            neuron_data, atoms_per_core)
+            self.governed_app_vertex, vertex_slice, index, rb_shifts,
+            weight_scales, neuron_data, atoms_per_core)
         self.governed_app_vertex.remember_machine_vertex(neuron_vertex)
         self.__neuron_vertices.append(neuron_vertex)
 
@@ -454,8 +454,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         """
         # If synapse dynamics is not simply static, link the neuron vertex
         # back to the synapse vertex
-        if self.governed_app_vertex.synapse_dynamics is not None and not isinstance(
-                self.governed_app_vertex.synapse_dynamics, SynapseDynamicsStatic):
+        if self.governed_app_vertex.synapse_dynamics is not None and \
+                not isinstance(self.governed_app_vertex.synapse_dynamics,
+                               SynapseDynamicsStatic):
             if self.governed_app_vertex.self_projection is None:
                 feedback_partition = MulticastEdgePartition(
                     neuron_vertex, SPIKE_PARTITION_ID)
@@ -601,7 +602,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # Get the set of connected sources overall using the real pre-vertex
         targets: Dict[MachineVertex, OrderedSet[AbstractVertex]] = defaultdict(
             OrderedSet)
-        for proj in self.governed_app_vertex.get_incoming_projections_from(pre_vertex):
+        for proj in self.governed_app_vertex.get_incoming_projections_from(
+                pre_vertex):
             # pylint: disable=protected-access
             s_info = proj._synapse_information
             # Use the original source vertex here to ensure the actual machine
