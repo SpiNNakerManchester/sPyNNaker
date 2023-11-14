@@ -36,6 +36,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.neuron import (
     PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertexLead,
     PopulationSynapsesMachineVertexShared, NeuronProvenance, SynapseProvenance,
@@ -581,8 +582,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # If delayed get the real pre-vertex
         if isinstance(source_vertex, DelayExtensionVertex):
             pre_vertex = cast(
-                AbstractPopulationVertex, source_vertex.source_vertex)
-        elif isinstance(source_vertex, AbstractPopulationVertex):
+                PopulationApplicationVertex, source_vertex.source_vertex)
+        elif isinstance(source_vertex, PopulationApplicationVertex):
             pre_vertex = source_vertex
         else:
             raise ValueError(

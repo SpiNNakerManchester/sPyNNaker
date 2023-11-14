@@ -31,6 +31,7 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
@@ -42,8 +43,6 @@ if TYPE_CHECKING:
         ConnectionsArray)
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge)
-    from spynnaker.pyNN.models.common.population_application_vertex import (
-        PopulationApplicationVertex)
 
     _PopIndexType: TypeAlias = Dict[
         Tuple[PopulationApplicationVertex, SynapseInformation], int]
@@ -306,9 +305,7 @@ class SynapseDynamicsStructuralCommon(
                 spec.write_value(r_info.key)
                 spec.write_value(r_info.mask)
                 out_app = m_vertex.app_vertex
-                #  https://github.com/SpiNNakerManchester/sPyNNaker/issues/1413
-                if TYPE_CHECKING:
-                    out_app = cast(AbstractPopulationVertex, app_vertex)
+                assert isinstance(out_app, PopulationApplicationVertex)
                 spec.write_value(out_app.n_colour_bits)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
