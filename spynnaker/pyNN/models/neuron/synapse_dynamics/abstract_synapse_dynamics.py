@@ -142,8 +142,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         if isinstance(new_delay, float64):
             return float(new_delay)
         if isinstance(new_delay, numpy.ndarray):
-            return new_delay # .tolist()
-        raise TypeError("{tpye(new_delay)=")
+            return new_delay
+        raise TypeError(f"{type(delay)=}")
 
     def _convert_weight(self, weight: In_Types) -> Out_Types:
         """
@@ -157,7 +157,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         if isinstance(weight, (int, float)):
             return float(weight)
         new_weight = numpy.array(weight, dtype=float)
-        return new_weight #.tolist()
+        return new_weight
 
     @property
     def delay(self) -> Out_Types:
