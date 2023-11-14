@@ -97,12 +97,15 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         return self.__units[variable]
 
     @staticmethod
-    def _convert(value: ModelParameter) -> Union[float, RangedList[float]]:
+    def _convert(value: ModelParameter) -> \
+            Union[float, RangedList[float], RandomDistribution]:
         """
         Converts a model parameter into a form that can be ingested by a
         RangeDictionary.
         """
         if isinstance(value, (float, int, numpy.integer, numpy.floating)):
             return float(value)
+        if isinstance(value, RandomDistribution):
+            return value
         # TODO: Is this correct? Without this, things will only handle floats
         return SpynnakerRangedList(None, value)
