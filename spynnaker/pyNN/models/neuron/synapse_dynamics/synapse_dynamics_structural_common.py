@@ -16,7 +16,7 @@ from __future__ import annotations
 import numpy
 from numpy.typing import NDArray
 from typing import (
-    Dict, Iterable, List, Sequence, Tuple, Union, cast, TYPE_CHECKING)
+    Dict, Iterable, List, Sequence, Tuple, Union, TYPE_CHECKING)
 from typing_extensions import TypeAlias
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides

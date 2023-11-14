@@ -40,7 +40,7 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.neuron import (
     PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertexLead,
     PopulationSynapsesMachineVertexShared, NeuronProvenance, SynapseProvenance,
-    AbstractPopulationVertex, SpikeProcessingFastProvenance)
+    SpikeProcessingFastProvenance)
 from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
     SDRAM_PARAMS_SIZE as NEURONS_SDRAM_PARAMS_SIZE, NeuronMainProvenance)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
