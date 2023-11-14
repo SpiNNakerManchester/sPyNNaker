@@ -32,8 +32,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 In_Types: TypeAlias = \
     Union[int, float, str, RandomDistribution, Iterable[Union[int, float]]]
 Weight_Types = In_Types
-Delay_Out_Types: TypeAlias = \
-    Union[int, float, str, RandomDistribution, NDArray[float64]]
+Out_Types: TypeAlias = Union[float, str, RandomDistribution]
 
 
 class AbstractSynapseDynamics(object, metaclass=AbstractBase):
@@ -49,22 +48,21 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
                 delay = SpynnakerDataView.get_min_delay()
         self.__check_in_type(delay, "delay")
         self.__delay = self._round_delay(delay)
-        self.__check_delay_type(self.__delay)
+        self.__check_out_type(self.__delay, "delay")
         self.__check_in_type(weight, "weight")
-        self.__weight = weight
+        self.__weight = self._convert_weight(weight)
+        self.__check_out_type(self.__weight, "weight")
 
     def __check_in_type(self, value, name):
         if isinstance(value, (int, float, str, RandomDistribution)):
             return
         try:
             for x in value:
-                if isinstance(x, (int, float)):
-                    # assume if first in list collection is ok all are
-                    return
-                else:
+                if not isinstance(x, (int, numpy.integer, float)):
                     raise TypeError(
                         f"Unexpected collection of type  {type(x)} for {name}"
                         f"Expected types in collection are int and float")
+            return
         except TypeError:
             # Ok not a collection
             pass
@@ -73,21 +71,19 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             "Expected types are int, float, str, RandomDistribution "
             "and collections of type int or float")
 
-    def __check_delay_type(self, value):
-        if isinstance(value, (int, float, str, RandomDistribution)):
+    def __check_out_type(self, value, name):
+        if isinstance(value, (float, (str, RandomDistribution))):
             return
-        if isinstance(value, numpy.ndarray):
+        if isinstance(value, list):
             for x in value:
-                if isinstance(x, (float64)):
-                    # assume if first in list collection is ok all are
-                    return
-                else:
+                if not isinstance(x, (float)):
                     raise TypeError(
-                        f"Unexpected ndarray of type  {type(x)} for delay")
+                        f"Unexpected list of type  {type(x)} for {name}")
+            return
         raise TypeError(
-            f"Unexpected type for output data: {type(value)}. "
-            "Expected types are int, float, str, RandomDistribution "
-            "and ndarrays of type float64")
+            f"Unexpected type for output data: {type(name)} for {name} "
+            "Expected types are float, str, RandomDistribution "
+            "and list of type float")
 
     @abstractmethod
     def merge(self, synapse_dynamics):
@@ -124,7 +120,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return self.__weight
 
-    def _round_delay(self, delay: In_Types) -> Delay_Out_Types:
+    def _round_delay(self, delay: In_Types) -> Out_Types:
         """
         Round the delays to multiples of full timesteps.
 
@@ -133,9 +129,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param delay:
         :return: Rounded delay
         """
-        if isinstance(delay, RandomDistribution):
-            return delay
-        if isinstance(delay, str):
+        if isinstance(delay, (RandomDistribution, str)):
             return delay
         new_delay = (
                 numpy.rint(numpy.array(delay) *
@@ -144,10 +138,28 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         if not numpy.allclose(delay, new_delay):
             logger.warning("Rounding up delay in f{} from {} to {}",
                            self, delay, new_delay)
-        return new_delay
+        if isinstance(new_delay, float64):
+            return float(new_delay)
+        if isinstance(new_delay, numpy.ndarray):
+            return new_delay.tolist()
+        raise TypeError("{tpye(new_delay)=")
+
+    def _convert_weight(self, weight: In_Types) -> Out_Types:
+        """
+        Convert the weights if numerical to (list of) float .
+
+        :param weight:
+        :return: weight as float (if numerical)
+        """
+        if isinstance(weight, (RandomDistribution, str)):
+            return weight
+        if isinstance(weight, (int, float)):
+            return float(weight)
+        new_weight = numpy.array(weight, dtype=float)
+        return new_weight.tolist()
 
     @property
-    def delay(self) -> Delay_Out_Types:
+    def delay(self) -> Out_Types:
         """
         The delay of connections.
 
