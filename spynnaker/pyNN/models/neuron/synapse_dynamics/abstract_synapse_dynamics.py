@@ -32,7 +32,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 In_Types: TypeAlias = \
     Union[int, float, str, RandomDistribution, Iterable[Union[int, float]]]
 Weight_Types = In_Types
-Out_Types: TypeAlias = Union[float, str, RandomDistribution]
+Out_Types: TypeAlias = Union[float, str, RandomDistribution, NDArray[float64]]
 
 
 class AbstractSynapseDynamics(object, metaclass=AbstractBase):
@@ -74,14 +74,15 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     def __check_out_type(self, value, name):
         if isinstance(value, (float, (str, RandomDistribution))):
             return
-        if isinstance(value, list):
+        if isinstance(value, numpy.ndarray):
             for x in value:
-                if not isinstance(x, (float)):
+                if not isinstance(x, (float64)):
                     raise TypeError(
-                        f"Unexpected list of type  {type(x)} for {name}")
+                        f"Unexpected numpy ndarray of type {type(x)}"
+                        f" for {name}")
             return
         raise TypeError(
-            f"Unexpected type for output data: {type(name)} for {name} "
+            f"Unexpected type for output data: {type(value)} for {name} "
             "Expected types are float, str, RandomDistribution "
             "and list of type float")
 
@@ -141,7 +142,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         if isinstance(new_delay, float64):
             return float(new_delay)
         if isinstance(new_delay, numpy.ndarray):
-            return new_delay.tolist()
+            return new_delay # .tolist()
         raise TypeError("{tpye(new_delay)=")
 
     def _convert_weight(self, weight: In_Types) -> Out_Types:
@@ -156,7 +157,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         if isinstance(weight, (int, float)):
             return float(weight)
         new_weight = numpy.array(weight, dtype=float)
-        return new_weight.tolist()
+        return new_weight #.tolist()
 
     @property
     def delay(self) -> Out_Types:

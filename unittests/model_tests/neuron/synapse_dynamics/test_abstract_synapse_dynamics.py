@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from numpy import float64, array
+from numpy import float64, array, ndarray
 from pyNN.random import RandomDistribution
 import unittest
 from spynnaker.pyNN.config_setup import unittest_setup
@@ -63,52 +63,52 @@ class TestAbstractSynapseDynamics(unittest.TestCase):
         # Only some connectors support list
         synapse = SynapseDynamicsStatic(delay=[1, 2, 3], weight=[4, 5, 6])
         delay = synapse.delay
-        self.assertEqual(list, type(delay))
+        self.assertEqual(ndarray, type(delay))
         for d in delay:
-            self.assertEqual(float, type(d))
+            self.assertEqual(float64, type(d))
         weight = synapse.weight
-        self.assertEqual(list, type(weight))
+        self.assertEqual(ndarray, type(weight))
         for w in weight:
-            self.assertEqual(float, type(w))
+            self.assertEqual(float64, type(w))
 
     def test_int_array(self):
         # Only some connectors support list
         synapse = SynapseDynamicsStatic(
             delay=array([1, 2, 3]), weight=array([4, 5, 6]))
         delay = synapse.delay
-        self.assertEqual(list, type(delay))
+        self.assertEqual(ndarray, type(delay))
         for d in delay:
-            self.assertEqual(float, type(d))
+            self.assertEqual(float64, type(d))
         weight = synapse.weight
-        self.assertEqual(list, type(weight))
+        self.assertEqual(ndarray, type(weight))
         for w in weight:
-            self.assertEqual(float, type(w))
+            self.assertEqual(float64, type(w))
 
     def test_float_list(self):
         # Only some connectors support list
         synapse = SynapseDynamicsStatic(
             delay=[1.1, 2.2, 3.3], weight=[4.4, 5.5, 6.6])
         delay = synapse.delay
-        self.assertEqual(list, type(delay))
+        self.assertEqual(ndarray, type(delay))
         for d in delay:
-            self.assertEqual(float, type(d))
+            self.assertEqual(float64, type(d))
         weight = synapse.weight
-        self.assertEqual(list, type(weight))
+        self.assertEqual(ndarray, type(weight))
         for w in weight:
-            self.assertEqual(float, type(w))
+            self.assertEqual(float64, type(w))
 
     def test_float_array(self):
         # Only some connectors support list
         synapse = SynapseDynamicsStatic(
             delay=array([1.1, 2.2, 3.3]), weight=array([4.4, 5.5, 6.6]))
         delay = synapse.delay
-        self.assertEqual(list, type(delay))
+        self.assertEqual(ndarray, type(delay))
         for d in delay:
-            self.assertEqual(float, type(d))
+            self.assertEqual(float64, type(d))
         weight = synapse.weight
-        self.assertEqual(list, type(weight))
+        self.assertEqual(ndarray, type(weight))
         for w in weight:
-            self.assertEqual(float, type(w))
+            self.assertEqual(float64, type(w))
 
     def test_delay_none(self):
         synapse = SynapseDynamicsStatic(delay=None, weight=2)
