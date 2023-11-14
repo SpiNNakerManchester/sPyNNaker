@@ -338,17 +338,13 @@ class PopulationMachineNeurons(
         current_source_id_list = self._pop_vertex.current_source_id_list
 
         # Work out which current sources are on this core
-        current_sources = self.__get_current_sources()
+        current_sources = self.__get_current_sources_sorted()
 
         # Write the number of sources
         spec.write_value(len(current_sources))
 
         # Don't write anything else if there are no current sources
         if current_sources:
-            # Sort the current sources into current_source_id order
-            current_sources = sorted(
-                current_sources, key=lambda x: x.current_source_id)
-
             # Array to keep track of the number of each type of current source
             # (there are four, but they are numbered 1 to 4, so five elements)
             cs_index_array = [0, 0, 0, 0, 0]
@@ -418,7 +414,7 @@ class PopulationMachineNeurons(
                                 value, cs_data_types[key]).item()
                             spec.write_value(data=value_convert)
 
-    def __get_current_sources(self) -> List[AbstractCurrentSource]:
+    def __get_current_sources_sorted(self) -> List[AbstractCurrentSource]:
         lo_atom = self._vertex_slice.lo_atom
         hi_atom = self._vertex_slice.hi_atom
         app_current_sources = self._pop_vertex.current_sources
