@@ -15,6 +15,10 @@
 
 import logging
 import numpy
+from typing import Iterable, Optional, Union
+from typing_extensions import TypeAlias
+from numpy import float64
+from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
@@ -25,6 +29,12 @@ from spynnaker.pyNN.exceptions import InvalidParameterType
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
+In_Types: TypeAlias = \
+    Union[int, float, str, RandomDistribution, Iterable[Union[int, float]]]
+Weight_Types = In_Types
+Delay_Out_Types: TypeAlias = \
+    Union[int, float, str, RandomDistribution, NDArray[float64]]
+
 
 class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     """
@@ -33,22 +43,23 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
     __slots__ = ("__delay", "__weight")
 
-    def __init__(self, delay, weight):
+    def __init__(self, delay: Optional[In_Types], weight: In_Types):
         if delay is None:
             if delay is None:
                 delay = SpynnakerDataView.get_min_delay()
-        self.__check_type(delay, "delay")
+        self.__check_in_type(delay, "delay")
         self.__delay = self._round_delay(delay)
-        self.__check_type(weight, "weight")
+        self.__check_delay_type(self.__delay)
+        self.__check_in_type(weight, "weight")
         self.__weight = weight
 
-    def __check_type(self, value, name):
+    def __check_in_type(self, value, name):
         if isinstance(value, (int, float, str, RandomDistribution)):
             return
         try:
             for x in value:
                 if isinstance(x, (int, float)):
-                    # assume if first in list colelction is ok all are
+                    # assume if first in list collection is ok all are
                     return
                 else:
                     raise TypeError(
@@ -61,6 +72,22 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             f"Unexpected type for {name}: {type(value)}. "
             "Expected types are int, float, str, RandomDistribution "
             "and collections of type int or float")
+
+    def __check_delay_type(self, value):
+        if isinstance(value, (int, float, str, RandomDistribution)):
+            return
+        if isinstance(value, numpy.ndarray):
+            for x in value:
+                if isinstance(x, (float64)):
+                    # assume if first in list collection is ok all are
+                    return
+                else:
+                    raise TypeError(
+                        f"Unexpected ndarray of type  {type(x)} for delay")
+        raise TypeError(
+            f"Unexpected type for output data: {type(value)}. "
+            "Expected types are int, float, str, RandomDistribution "
+            "and ndarrays of type float64")
 
     @abstractmethod
     def merge(self, synapse_dynamics):
@@ -89,7 +116,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
 
     @property
-    def weight(self):
+    def weight(self) -> Weight_Types:
         """
         The weight of connections.
 
@@ -97,7 +124,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return self.__weight
 
-    def _round_delay(self, delay):
+    def _round_delay(self, delay: In_Types) -> Delay_Out_Types:
         """
         Round the delays to multiples of full timesteps.
 
@@ -120,7 +147,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         return new_delay
 
     @property
-    def delay(self):
+    def delay(self) -> Delay_Out_Types:
         """
         The delay of connections.
 
