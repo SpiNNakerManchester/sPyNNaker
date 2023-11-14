@@ -403,7 +403,7 @@ class PopulationMachineNeurons(
                         spec.write_value(n_params)
                         for n_p in range(n_params):
                             value_convert = convert_to(
-                                value[n_p], cs_data_types[key]).item()
+                                value[n_p], cs_data_types[key]).view("uint32")
                             spec.write_value(data=value_convert)
                     # All other sources have single-valued params
                     else:
