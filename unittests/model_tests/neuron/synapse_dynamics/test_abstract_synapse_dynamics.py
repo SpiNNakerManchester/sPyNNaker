@@ -122,4 +122,3 @@ class TestAbstractSynapseDynamics(unittest.TestCase):
     def test_bad_type(self):
         with self.assertRaises(TypeError):
             SynapseDynamicsStatic(delay=bytes(), weight=1)
-
