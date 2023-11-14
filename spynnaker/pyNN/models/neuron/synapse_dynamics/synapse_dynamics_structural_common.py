@@ -305,8 +305,11 @@ class SynapseDynamicsStructuralCommon(
                 vertex_slice = m_vertex.vertex_slice
                 spec.write_value(r_info.key)
                 spec.write_value(r_info.mask)
-                spec.write_value(cast(AbstractPopulationVertex,
-                                      m_vertex.app_vertex).n_colour_bits)
+                app_vertex = m_vertex.app_vertex
+                #  https://github.com/SpiNNakerManchester/sPyNNaker/issues/1413
+                if TYPE_CHECKING:
+                    app_vertex = cast(AbstractPopulationVertex, app_vertex)
+                spec.write_value(app_vertex.n_colour_bits)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
                 spec.write_value(synaptic_matrices.get_index(
