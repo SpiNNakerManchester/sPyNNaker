@@ -29,9 +29,8 @@ from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
-if TYPE_CHECKING:
-    _Kernel: TypeAlias = Union[
-        float, int, List[float], NDArray[numpy.floating], RandomDistribution]
+_Kernel: TypeAlias = Union[
+    float, int, List[float], NDArray[numpy.floating], RandomDistribution]
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 8
@@ -60,8 +59,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     """
 
     def __init__(
-            self, shape_pre, shape_post, shape_kernel, weight_kernel=None,
-            delay_kernel=None, shape_common=None,
+            self, shape_pre, shape_post, shape_kernel,
+            weight_kernel: _Kernel = None, delay_kernel: _Kernel =None,
+            shape_common=None,
             pre_sample_steps_in_post=None, pre_start_coords_in_post=None,
             post_sample_steps_in_pre=None, post_start_coords_in_pre=None,
             safe=True, space=None, verbose=False, callback=None):
@@ -219,7 +219,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         c = ((pre_c - self._pre_start_w - 1) // self._pre_step_w) + 1
         return (r, c)
 
-    def __get_kernel_vals(self, vals):
+    def __get_kernel_vals(self, vals: Union[_Kernel, Weight_Delay_Types]):
         """
         Convert kernel values given into the correct format.
 
