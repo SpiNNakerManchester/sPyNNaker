@@ -27,7 +27,8 @@ from spinn_utilities.safe_eval import SafeEval
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.neuron.synapse_dynamics import Weight_Delay_Types
+from spynnaker.pyNN.models.neural_projections.connectors.connection_types \
+    import Weight_Delay_Types
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID

@@ -18,12 +18,13 @@ import numpy
 from typing import Iterable, Optional, Union
 from typing_extensions import TypeAlias
 from numpy import float64
-from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.neural_projections.connectors.connection_types \
+    import Weight_Delay_Types
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.exceptions import InvalidParameterType
 
@@ -31,8 +32,6 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 In_Types: TypeAlias = \
     Union[int, float, str, RandomDistribution, Iterable[Union[int, float]]]
-Weight_Delay_Types: TypeAlias = \
-    Union[float, str, RandomDistribution, NDArray[float64]]
 
 
 class AbstractSynapseDynamics(object, metaclass=AbstractBase):

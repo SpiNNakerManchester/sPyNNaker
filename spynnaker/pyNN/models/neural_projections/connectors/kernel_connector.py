@@ -21,7 +21,8 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from pyNN.random import RandomDistribution
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.neuron.synapse_dynamics import Weight_Delay_Types
+from spynnaker.pyNN.models.neural_projections.connectors.connection_types \
+    import Weight_Delay_Types
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
@@ -218,7 +219,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         c = ((pre_c - self._pre_start_w - 1) // self._pre_step_w) + 1
         return (r, c)
 
-    def __get_kernel_vals(self, vals: Union[_Kernel, Weight_Delay_Types]):
+    def __get_kernel_vals(self, vals):
         """
         Convert kernel values given into the correct format.
 
