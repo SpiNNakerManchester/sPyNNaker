@@ -22,6 +22,7 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.common.param_generator_data import (
     param_generator_params, param_generator_params_size_in_bytes,
     param_generator_id, is_param_generatable)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import Weight_Delay_Types
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from pyNN.random import RandomDistribution
@@ -58,7 +59,8 @@ class AbstractGenerateConnectorOnMachine(
                     " generated on the machine, but the connector cannot"
                     " be generated on host!")
 
-    def generate_on_machine(self, weights, delays):
+    def generate_on_machine(
+            self, weights: Weight_Delay_Types, delays: Weight_Delay_Types):
         """
         Determine if this instance can generate on the machine.
 

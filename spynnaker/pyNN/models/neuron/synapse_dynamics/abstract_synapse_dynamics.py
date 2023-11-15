@@ -31,8 +31,8 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 In_Types: TypeAlias = \
     Union[int, float, str, RandomDistribution, Iterable[Union[int, float]]]
-Weight_Types = In_Types
-Out_Types: TypeAlias = Union[float, str, RandomDistribution, NDArray[float64]]
+Weight_Delay_Types: TypeAlias = \
+    Union[float, str, RandomDistribution, NDArray[float64]]
 
 
 class AbstractSynapseDynamics(object, metaclass=AbstractBase):
@@ -53,7 +53,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         self.__weight = self._convert_weight(weight)
         self.__check_out_type(self.__weight, "weight")
 
-    def __check_in_type(self, value, name):
+    def __check_in_type(self, value: In_Types, name: str):
         if isinstance(value, (int, float, str, RandomDistribution)):
             return
         try:
@@ -71,7 +71,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             "Expected types are int, float, str, RandomDistribution "
             "and collections of type int or float")
 
-    def __check_out_type(self, value, name):
+    def __check_out_type(self, value: Weight_Delay_Types, name: str):
         if isinstance(value, (float, (str, RandomDistribution))):
             return
         if isinstance(value, numpy.ndarray):
@@ -113,7 +113,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
 
     @property
-    def weight(self) -> Weight_Types:
+    def weight(self) -> Weight_Delay_Types:
         """
         The weight of connections.
 
@@ -121,7 +121,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return self.__weight
 
-    def _round_delay(self, delay: In_Types) -> Out_Types:
+    def _round_delay(self, delay: In_Types) -> Weight_Delay_Types:
         """
         Round the delays to multiples of full timesteps.
 
@@ -145,7 +145,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             return new_delay
         raise TypeError(f"{type(delay)=}")
 
-    def _convert_weight(self, weight: In_Types) -> Out_Types:
+    def _convert_weight(self, weight: In_Types) -> Weight_Delay_Types:
         """
         Convert the weights if numerical to (list of) float .
 
@@ -160,7 +160,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         return new_weight
 
     @property
-    def delay(self) -> Out_Types:
+    def delay(self) -> Weight_Delay_Types:
         """
         The delay of connections.
 

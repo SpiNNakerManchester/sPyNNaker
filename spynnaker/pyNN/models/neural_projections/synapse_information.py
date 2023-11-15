@@ -16,7 +16,7 @@ from spinn_utilities.config_holder import get_config_bool
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine, OneToOneConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine, SynapseDynamicsStatic)
+    AbstractGenerateOnMachine, SynapseDynamicsStatic, Weight_Delay_Types)
 
 
 class SynapseInformation(object):
@@ -41,7 +41,7 @@ class SynapseInformation(object):
     def __init__(self, connector, pre_population, post_population,
                  prepop_is_view, postpop_is_view, synapse_dynamics,
                  synapse_type, receptor_type, synapse_type_from_dynamics,
-                 weights=None, delays=None):
+                 weights: Weight_Delay_Types, delays: Weight_Delay_Types):
         """
         :param AbstractConnector connector:
             The connector connected to the synapse
@@ -72,6 +72,8 @@ class SynapseInformation(object):
         self.__synapse_dynamics = synapse_dynamics
         self.__synapse_type = synapse_type
         self.__receptor_type = receptor_type
+        assert (weights is not None)
+        assert (delays is not None)
         self.__weights = weights
         self.__delays = delays
         self.__synapse_type_from_dynamics = synapse_type_from_dynamics
@@ -172,20 +174,20 @@ class SynapseInformation(object):
         return self.__receptor_type
 
     @property
-    def weights(self):
+    def weights(self) -> Weight_Delay_Types:
         """
         The synaptic weights (if any).
 
-        :rtype: float or list(float) or ~numpy.ndarray(float) or None
+        :rtype: float or ~numpy.ndarray(float64) or str or RandomDistribution
         """
         return self.__weights
 
     @property
-    def delays(self):
+    def delays(self) -> Weight_Delay_Types:
         """
         The total synaptic delays (if any).
 
-        :rtype: float or list(float) or ~numpy.ndarray(float) or None
+        :rtype: float or ~numpy.ndarray(float64) or str or RandomDistribution
         """
         return self.__delays
 
