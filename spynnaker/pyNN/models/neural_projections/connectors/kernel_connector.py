@@ -13,7 +13,7 @@
 # limitations under the License.
 import numpy
 from numpy.typing import NDArray
-from typing import List, Union, TYPE_CHECKING
+from typing import List, Union
 from typing_extensions import TypeAlias
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import DataType
@@ -60,7 +60,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     def __init__(
             self, shape_pre, shape_post, shape_kernel,
-            weight_kernel: _Kernel = None, delay_kernel: _Kernel =None,
+            weight_kernel: _Kernel = None, delay_kernel: _Kernel = None,
             shape_common=None,
             pre_sample_steps_in_post=None, pre_start_coords_in_post=None,
             post_sample_steps_in_pre=None, post_start_coords_in_pre=None,

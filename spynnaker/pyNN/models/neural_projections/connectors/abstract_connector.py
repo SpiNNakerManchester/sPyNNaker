@@ -33,10 +33,6 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
-if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neural_projections import (
-        SynapseInformation)
-
 # global objects
 logger = FormatAdapter(logging.getLogger(__name__))
 _expr_context = SafeEval(
@@ -193,8 +189,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         raise self.weight_delay_type_exception(delays, synapse_info)
 
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
-            self, delays: Weight_Delay_Types, n_total_connections, n_connections,
-            min_delay, max_delay, synapse_info):
+            self, delays: Weight_Delay_Types, n_total_connections,
+            n_connections, min_delay, max_delay, synapse_info):
         """
         Get the expected number of delays that will fall within min_delay and
         max_delay given given a float, RandomDistribution or list of delays.
