@@ -21,7 +21,8 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from pyNN.random import RandomDistribution
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.types import (Delay_Types, Weight_Delay_Types, Weight_Types)
+from spynnaker.pyNN.types import (
+    Delay_Types, Weight_Delay_Types, Weight_Types)
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (

@@ -34,7 +34,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     __slots__ = []
 
-    def __init__(self, delay: Weight_Delay_In_Types =None):
+    def __init__(self, delay: Weight_Delay_In_Types = None):
         """
         :param float delay:
             The delay used in the connection; by default 1 time step

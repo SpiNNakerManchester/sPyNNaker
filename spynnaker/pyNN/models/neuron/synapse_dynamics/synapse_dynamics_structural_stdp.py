@@ -74,7 +74,7 @@ class SynapseDynamicsStructuralSTDP(
             initial_delay=DEFAULT_INITIAL_DELAY, s_max=DEFAULT_S_MAX,
             with_replacement=True, seed=None,
             weight: _In_Types = StaticSynapse.default_parameters['weight'],
-            delay: _In_Types =None, backprop_delay=True):
+            delay: _In_Types = None, backprop_delay=True):
         """
         :param AbstractPartnerSelection partner_selection:
             The partner selection rule

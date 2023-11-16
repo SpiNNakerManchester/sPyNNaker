@@ -66,8 +66,8 @@ class SynapseDynamicsSTDP(
     def __init__(
             self, timing_dependence, weight_dependence,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
-            weight: _In_Types =StaticSynapse.default_parameters['weight'],
-            delay: _In_Types =None, pad_to_length=None, backprop_delay=True):
+            weight: _In_Types = StaticSynapse.default_parameters['weight'],
+            delay: _In_Types = None, pad_to_length=None, backprop_delay=True):
         """
         :param AbstractTimingDependence timing_dependence:
         :param AbstractWeightDependence weight_dependence:

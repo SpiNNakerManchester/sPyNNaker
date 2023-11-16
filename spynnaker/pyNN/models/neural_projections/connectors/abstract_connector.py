@@ -420,7 +420,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 f"list or arrays for weight."
                 f"Please use a FromListConnector instead")
         else:
-            return SpynnakerException(f"Unrecognised weight or delay {weights}")
+            return SpynnakerException(f"Unrecognised weight {weights}")
 
     def delay_type_exception(self, delays: Delay_Types):
         """
@@ -441,7 +441,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 f"list or arrays for weight or delay."
                 f"Please use a FromListConnector instead")
         else:
-            return SpynnakerException(f"Unrecognised weight or delay {delays}")
+            return SpynnakerException(f"Unrecognised delay {delays}")
 
     def _generate_values(
             self, values: Weight_Delay_Types, sources, targets, n_connections,

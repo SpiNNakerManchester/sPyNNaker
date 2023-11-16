@@ -29,7 +29,6 @@ from spynnaker.pyNN.exceptions import InvalidParameterType
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-
 class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     """
     How do the dynamics of a synapse interact with the rest of the model.
