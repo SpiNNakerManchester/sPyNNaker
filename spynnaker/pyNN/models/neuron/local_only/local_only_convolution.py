@@ -23,6 +23,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     ConvolutionConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
+from spynnaker.pyNN.types import Weight_Delay_In_Types
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .abstract_local_only import AbstractLocalOnly
 
@@ -45,7 +46,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         "__cached_n_incoming"
     ]
 
-    def __init__(self, delay=None):
+    def __init__(self, delay: Weight_Delay_In_Types = None):
         """
         :param float delay:
             The delay used in the connection; by default 1 time step

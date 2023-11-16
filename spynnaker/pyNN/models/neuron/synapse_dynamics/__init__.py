@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .abstract_synapse_dynamics import (
-    AbstractSynapseDynamics, Weight_Delay_Types)
+from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 from .abstract_generate_on_machine import AbstractGenerateOnMachine
 from .abstract_synapse_dynamics_structural import (
@@ -45,5 +44,5 @@ __all__ = ["AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
            "SynapseDynamicsStructuralStatic",
            "SynapseDynamicsStructuralSTDP",
            # Neuromodulation
-           "SynapseDynamicsNeuromodulation", "Weight_Delay_Types",
+           "SynapseDynamicsNeuromodulation",
            "AbstractSupportsSignedWeights"]

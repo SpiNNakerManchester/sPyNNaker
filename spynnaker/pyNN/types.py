@@ -19,13 +19,19 @@ Types (and related) that are useful for implementing connectors.
 import numpy
 from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
-import pyNN
-from typing import Union
+from typing import Iterable, Optional, Union
 from typing_extensions import TypeAlias, TypeGuard
-#: The type of weights and delays provided by
-D: TypeAlias = Union[pyNN.random.RandomDistribution, int, float, str]
-Weight_Delay_Types: TypeAlias = \
+
+#: The type of weights and delays provided by Synapse / SynapseInformation
+# Combined types (where value could be either)
+Weight_Delay_Types: TypeAlias = Optional[Union[
+    int, float, str, RandomDistribution, NDArray[numpy.float64]]]
+Weight_Types: TypeAlias = Optional[Union[
+    int, float, str, RandomDistribution, NDArray[numpy.float64]]]
+Delay_Types: TypeAlias = \
     Union[float, str, RandomDistribution, NDArray[numpy.float64]]
+Weight_Delay_In_Types: TypeAlias = Optional[Union[
+    int, float, str, RandomDistribution, Iterable[Union[int, float]]]]
 
 
 def is_scalar(value: Weight_Delay_Types) -> TypeGuard[Union[int, float]]:

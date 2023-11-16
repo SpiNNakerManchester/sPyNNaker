@@ -26,8 +26,8 @@ from spinn_utilities.safe_eval import SafeEval
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.neural_projections.connectors.connection_types \
-    import Weight_Delay_Types
+from spynnaker.pyNN.types import (
+    Delay_Types, is_scalar, Weight_Delay_Types, Weight_Types)
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
@@ -99,7 +99,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         self.__min_delay = SpynnakerDataView.get_simulation_time_step_ms()
 
     def _get_delay_minimum(
-            self, delays: Weight_Delay_Types, n_connections: int,
+            self, delays: Delay_Types, n_connections: int,
             synapse_info) -> float:
         """
         Get the minimum delay given a float or RandomDistribution.
@@ -120,12 +120,12 @@ class AbstractConnector(object, metaclass=AbstractBase):
         elif isinstance(delays, str):
             d = self._get_distances(delays, synapse_info)
             return numpy.min(_expr_context.eval(delays, d=d))
-        elif numpy.isscalar(delays):
+        elif is_scalar(delays):
             return delays
         raise self.delay_type_exception(delays)
 
     def _get_delay_maximum(
-            self, delays: Weight_Delay_Types, n_connections, synapse_info):
+            self, delays: Delay_Types, n_connections, synapse_info):
         """
         Get the maximum delay given a float or RandomDistribution.
 
@@ -145,7 +145,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         elif isinstance(delays, str):
             d = self._get_distances(delays, synapse_info)
             return numpy.max(_expr_context.eval(delays, d=d))
-        elif numpy.isscalar(delays):
+        elif is_scalar(delays):
             return delays
         raise self.delay_type_exception(delays)
 
@@ -170,7 +170,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
 
     def get_delay_variance(
-            self, delays: Weight_Delay_Types, synapse_info):
+            self, delays: Delay_Types, synapse_info):
         """
         Get the variance of the delays.
 
@@ -183,12 +183,12 @@ class AbstractConnector(object, metaclass=AbstractBase):
         elif isinstance(delays, str):
             d = self._get_distances(delays, synapse_info)
             return numpy.var(_expr_context.eval(delays, d=d))
-        elif numpy.isscalar(delays):
+        elif is_scalar(delays):
             return 0.0
         raise self.delay_type_exception(delays)
 
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
-            self, delays: Weight_Delay_Types, n_total_connections,
+            self, delays: Delay_Types, n_total_connections,
             n_connections, min_delay, max_delay, synapse_info):
         """
         Get the expected number of delays that will fall within min_delay and
@@ -226,7 +226,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             prob_delayed = float(n_delayed) / float(n_total)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
                 n_total_connections, n_connections, prob_delayed)))
-        elif numpy.isscalar(delays):
+        elif is_scalar(delays):
             if min_delay <= delays <= max_delay:
                 return int(math.ceil(n_connections))
             return 0
@@ -262,7 +262,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    def get_weight_mean(self, weights: Weight_Delay_Types,  synapse_info):
+    def get_weight_mean(self, weights: Weight_Types,  synapse_info):
         """
         Get the mean of the weights.
 
@@ -275,11 +275,11 @@ class AbstractConnector(object, metaclass=AbstractBase):
         elif isinstance(weights, str):
             d = self._get_distances(weights, synapse_info)
             return numpy.mean(_expr_context.eval(weights, d=d))
-        elif numpy.isscalar(weights):
+        elif is_scalar(weights):
             return abs(weights)
         raise self.weight_type_exception(synapse_info)
 
-    def _get_weight_maximum(self, weights: Weight_Delay_Types,
+    def _get_weight_maximum(self, weights: Weight_Types,
                             n_connections, synapse_info):
         """
         Get the maximum of the weights.
@@ -308,7 +308,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         elif isinstance(weights, str):
             d = self._get_distances(weights, synapse_info)
             return numpy.max(_expr_context.eval(weights, d=d))
-        elif numpy.isscalar(weights):
+        elif is_scalar(weights):
             return abs(weights)
         raise self.weight_type_exception(weights)
 
@@ -321,7 +321,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :rtype: float
         """
 
-    def get_weight_variance(self, weights: Weight_Delay_Types, synapse_info):
+    def get_weight_variance(self, weights: Weight_Types, synapse_info):
         """
         Get the variance of the weights.
 
@@ -334,7 +334,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         elif isinstance(weights, str):
             d = self._get_distances(weights, synapse_info)
             return numpy.var(_expr_context.eval(weights, d=d))
-        elif numpy.isscalar(weights):
+        elif is_scalar(weights):
             return 0.0
         raise self.weight_type_exception(weights)
 
@@ -397,11 +397,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             f"{synapse_info.pre_population}-"
             f"{synapse_info.post_population}")
 
-    def weight_delay_type_exception(
-            self, values: Weight_Delay_Types, synapse_info):
-        pass
-
-    def weight_exception(self, weights: Weight_Delay_Types):
+    def weight_exception(self, weights: Weight_Types):
         """
         Returns an Exception explaining incorrect weight or delay type
 
@@ -426,7 +422,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         else:
             return SpynnakerException(f"Unrecognised weight or delay {weights}")
 
-    def delay_type_exception(self, delays: Weight_Delay_Types):
+    def delay_type_exception(self, delays: Delay_Types):
         """
         Returns an Exception explaining incorrect delay type
 

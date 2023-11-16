@@ -21,8 +21,8 @@ from spinn_front_end_common.utilities.constants import (
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
     SynapticConfigurationException, InvalidParameterType)
-from spynnaker.pyNN.models.neural_projections.connectors.connection_types \
-    import Weight_Delay_Types
+from spynnaker.pyNN.types import Weight_Types
+from spynnaker.pyNN.types import Weight_Delay_In_Types as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
@@ -66,8 +66,8 @@ class SynapseDynamicsSTDP(
     def __init__(
             self, timing_dependence, weight_dependence,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
-            weight=StaticSynapse.default_parameters['weight'],
-            delay=None, pad_to_length=None, backprop_delay=True):
+            weight: _In_Types =StaticSynapse.default_parameters['weight'],
+            delay: _In_Types =None, pad_to_length=None, backprop_delay=True):
         """
         :param AbstractTimingDependence timing_dependence:
         :param AbstractWeightDependence weight_dependence:
@@ -479,7 +479,7 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_variance)
     def get_weight_variance(
-            self, connector, weights: Weight_Delay_Types, synapse_info):
+            self, connector, weights: Weight_Types, synapse_info):
         # Because the weights could all be changed to the maximum, the variance
         # has to be given as no variance
         return 0.0

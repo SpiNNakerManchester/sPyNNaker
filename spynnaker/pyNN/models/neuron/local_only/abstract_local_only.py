@@ -15,6 +15,7 @@ from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
+from spynnaker.pyNN.types import Weight_Delay_In_Types
 
 
 class AbstractLocalOnly(AbstractSynapseDynamics):
@@ -22,13 +23,13 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     Processes synapses locally without the need for SDRAM.
     """
 
-    def __init__(self, delay=None):
+    def __init__(self, delay: Weight_Delay_In_Types):
         """
         :param float delay:
             The delay used in the connection; by default 1 time step
         """
         # We don't have a weight here, it is in the connector
-        super().__init__(delay=delay, weight=0)
+        super().__init__(delay=delay, weight=None)
 
     @abstractmethod
     def get_parameters_usage_in_bytes(

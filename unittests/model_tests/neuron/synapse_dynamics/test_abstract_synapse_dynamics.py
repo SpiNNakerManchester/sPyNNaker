@@ -32,7 +32,7 @@ class TestAbstractSynapseDynamics(unittest.TestCase):
     def test_int(self):
         synapse = SynapseDynamicsStatic(delay=1, weight=2)
         self.assertEqual(float, type(synapse.delay))
-        self.assertEqual(float, type(synapse.weight))
+        self.assertEqual(int, type(synapse.weight))
 
     def test_float(self):
         synapse = SynapseDynamicsStatic(delay=1.1, weight=2.2)
@@ -113,11 +113,12 @@ class TestAbstractSynapseDynamics(unittest.TestCase):
     def test_delay_none(self):
         synapse = SynapseDynamicsStatic(delay=None, weight=2)
         self.assertEqual(float, type(synapse.delay))
-        self.assertEqual(float, type(synapse.weight))
+        self.assertEqual(int, type(synapse.weight))
 
     def test_weight_none(self):
-        with self.assertRaises(TypeError):
-            SynapseDynamicsStatic(delay=1, weight=None)
+        synapse = SynapseDynamicsStatic(delay=1, weight=None)
+        self.assertEqual(float, type(synapse.delay))
+        self.assertIsNone(synapse.weight)
 
     def test_bad_type(self):
         with self.assertRaises(TypeError):

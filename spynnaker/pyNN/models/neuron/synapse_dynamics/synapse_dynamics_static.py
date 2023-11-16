@@ -20,6 +20,7 @@ from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.types import Weight_Delay_In_Types as _Weight
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
@@ -35,7 +36,8 @@ class SynapseDynamicsStatic(
         # padding to add to a synaptic row for synaptic rewiring
         "__pad_to_length"]
 
-    def __init__(self, weight=StaticSynapse.default_parameters['weight'],
+    def __init__(self,
+                 weight: _Weight = StaticSynapse.default_parameters['weight'],
                  delay=None, pad_to_length=None):
         """
         :param float weight:

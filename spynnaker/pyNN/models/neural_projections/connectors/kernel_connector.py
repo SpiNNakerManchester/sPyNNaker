@@ -21,8 +21,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from pyNN.random import RandomDistribution
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.neural_projections.connectors.connection_types \
-    import Weight_Delay_Types
+from spynnaker.pyNN.types import (Delay_Types, Weight_Delay_Types, Weight_Types)
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
@@ -250,7 +249,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             f"{self._kernel_h} and width: {self._kernel_w}).")
 
     def __compute_statistics(
-            self, weights: Weight_Delay_Types, delays: Weight_Delay_Types,
+            self, weights: Weight_Types, delays: Delay_Types,
             post_vertex_slice, n_pre_neurons):
         """
         Compute the relevant information required for the connections.
@@ -399,7 +398,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             weights, synapse_info)
 
     @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(self, weights: Weight_Delay_Types, synapse_info):
+    def get_weight_variance(self, weights: Weight_Types, synapse_info):
         # Use the kernel weights if user has supplied them
         if self._krn_weights is not None:
             return numpy.var(self._krn_weights)

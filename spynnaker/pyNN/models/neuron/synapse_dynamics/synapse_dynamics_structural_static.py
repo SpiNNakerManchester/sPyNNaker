@@ -16,8 +16,7 @@ import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.neural_projections.connectors.connection_types \
-    import Weight_Delay_Types
+from spynnaker.pyNN.types import Weight_Types
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
@@ -242,7 +241,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
 
     @overrides(SynapseDynamicsStatic.get_weight_variance)
     def get_weight_variance(
-            self, connector, weights: Weight_Delay_Types, synapse_info):
+            self, connector, weights: Weight_Types, synapse_info):
         return 0.0
 
     @overrides(SynapseDynamicsStatic.get_weight_maximum)

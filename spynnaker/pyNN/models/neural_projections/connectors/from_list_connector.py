@@ -16,8 +16,7 @@ import numpy
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.models.neural_projections.connectors.connection_types \
-    import Weight_Delay_Types
+from spynnaker.pyNN.types import Weight_Types
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
@@ -250,10 +249,10 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             return numpy.amax(numpy.abs(self.__weights))
 
     @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(self, weights: Weight_Delay_Types, synapse_info):
+    def get_weight_variance(self, weights: Weight_Types, synapse_info):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
-            if hasattr(synapse_info.weights, "__len__"):
+            if isinstance(synapse_info.weights, numpy.ndarray):
                 return numpy.var(synapse_info.weights)
             return AbstractConnector.get_weight_variance(
                 self, weights, synapse_info)
