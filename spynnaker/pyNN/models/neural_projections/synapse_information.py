@@ -73,7 +73,6 @@ class SynapseInformation(object):
         self.__synapse_dynamics = synapse_dynamics
         self.__synapse_type = synapse_type
         self.__receptor_type = receptor_type
-        assert (weights is not None)
         assert (delays is not None)
         self.__weights = weights
         self.__delays = delays
