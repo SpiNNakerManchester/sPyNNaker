@@ -354,7 +354,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     def _get_distances(self, values: str, synapse_info):
         if self.__space is None:
-            raise self.delay_type_exception(values)
+            raise self._no_space_exception(values, synapse_info)
         expand_distances = self._expand_distances(values)
 
         return self.__space.distances(
@@ -397,7 +397,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             f"{synapse_info.pre_population}-"
             f"{synapse_info.post_population}")
 
-    def weight_exception(self, weights: Weight_Types):
+    def weight_type_exception(self, weights: Weight_Types):
         """
         Returns an Exception explaining incorrect weight or delay type
 
@@ -488,7 +488,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         elif numpy.isscalar(values):
             return numpy.repeat([values], n_connections).astype("float64")
         if weights:
-            raise self.weight_exception(values)
+            raise self.weight_type_exception(values)
         else:
             raise self.delay_type_exception(values)
 
