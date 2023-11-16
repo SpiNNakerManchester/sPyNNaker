@@ -122,7 +122,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.min(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return delays
-        raise self.weight_delay_type_exception(delays, synapse_info)
+        raise self.delay_type_exception(delays)
 
     def _get_delay_maximum(
             self, delays: Weight_Delay_Types, n_connections, synapse_info):
@@ -147,7 +147,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return delays
-        raise self.weight_delay_type_exception(delays, synapse_info)
+        raise self.delay_type_exception(delays)
 
     @abstractmethod
     def get_delay_maximum(self, synapse_info):
@@ -185,7 +185,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.var(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return 0.0
-        raise self.weight_delay_type_exception(delays, synapse_info)
+        raise self.delay_type_exception(delays)
 
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
             self, delays: Weight_Delay_Types, n_total_connections,
@@ -230,7 +230,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             if min_delay <= delays <= max_delay:
                 return int(math.ceil(n_connections))
             return 0
-        raise self.weight_delay_type_exception(delays, synapse_info)
+        raise self.delay_type_exception(delays)
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
@@ -277,7 +277,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.mean(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
-        raise self.weight_delay_type_exception(weights, synapse_info)
+        raise self.weight_type_exception(synapse_info)
 
     def _get_weight_maximum(self, weights: Weight_Delay_Types,
                             n_connections, synapse_info):
@@ -310,7 +310,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
-        raise self.weight_delay_type_exception(weights, synapse_info)
+        raise self.weight_type_exception(weights)
 
     @abstractmethod
     def get_weight_maximum(self, synapse_info):
@@ -336,7 +336,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.var(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return 0.0
-        raise self.weight_delay_type_exception(weights, synapse_info)
+        raise self.weight_type_exception(weights)
 
     def _expand_distances(self, d_expression):
         """
@@ -354,7 +354,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     def _get_distances(self, values: str, synapse_info):
         if self.__space is None:
-            raise self.weight_delay_type_exception(values, synapse_info)
+            raise self.delay_type_exception(values)
         expand_distances = self._expand_distances(values)
 
         return self.__space.distances(
@@ -383,38 +383,73 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.array([copy_rd.next(1)], dtype="float64")
         return copy_rd.next(n_connections)
 
-    def weight_delay_type_exception(
-            self, values: Weight_Delay_Types, synapse_info):
+    def _no_space_exception(self, values: Weight_Delay_Types, synapse_info):
         """
-        Raises an Exception explaining incorrect weight or delay type
+        Returns a SpynnakerException about there being no space defined
 
         :param values:
+        :param synapse_info:
+        :rtype: SpynnakerException
+        """
+        return SpynnakerException(
+            f"Str Weights or delays {values} are distance-dependent "
+            f"but no space object was specified in projection "
+            f"{synapse_info.pre_population}-"
+            f"{synapse_info.post_population}")
+
+    def weight_delay_type_exception(
+            self, values: Weight_Delay_Types, synapse_info):
+        pass
+
+    def weight_exception(self, weights: Weight_Delay_Types):
+        """
+        Returns an Exception explaining incorrect weight or delay type
+
+        :param weights:
         :raises: SpynnakerException
         """
-        if isinstance(values, str):
-            if self.__space is None:
-                raise SpynnakerException(
-                    f"Str Weights or delays {values} are distance-dependent "
-                    f"but no space object was specified in projection "
-                    f"{synapse_info.pre_population}-"
-                    f"{synapse_info.post_population}")
-            else:
-                raise SpynnakerException(
-                    f"Str Weights or delays {values} not supported")
-        elif isinstance(values, numpy.ndarray):
+        if weights is None:
+            return SpynnakerException(
+                f"The Synapse used is not is not supported with a "
+                f"{(type(self))} as neither provided weights")
+        elif isinstance(weights, str):
+            return SpynnakerException(
+                f"Str Weights {weights} not supported by a {(type(self))}")
+        elif isinstance(weights, numpy.ndarray):
             # The problem is that these methods are for a MachineVertex/ core
             # while weight and delay are supplied at the application level
             # The FromList is also the one designed to handle the 2D case
-            raise SpynnakerException(
+            return SpynnakerException(
+                f"For efficiency reason {type(self)} does not supports "
+                f"list or arrays for weight."
+                f"Please use a FromListConnector instead")
+        else:
+            return SpynnakerException(f"Unrecognised weight or delay {weights}")
+
+    def delay_type_exception(self, delays: Weight_Delay_Types):
+        """
+        Returns an Exception explaining incorrect delay type
+
+        :param delays:
+        :raises: SpynnakerException
+        """
+        if isinstance(delays, str):
+            return SpynnakerException(
+                f"Str delays {delays} not supported by {(type(self))}")
+        elif isinstance(delays, numpy.ndarray):
+            # The problem is that these methods are for a MachineVertex/ core
+            # while weight and delay are supplied at the application level
+            # The FromList is also the one designed to handle the 2D case
+            return SpynnakerException(
                 f"For efficiency reason {type(self)} does not supports "
                 f"list or arrays for weight or delay."
                 f"Please use a FromListConnector instead")
         else:
-            SpynnakerException(f"Unrecognised weight or delay {values}")
+            return SpynnakerException(f"Unrecognised weight or delay {delays}")
 
     def _generate_values(
             self, values: Weight_Delay_Types, sources, targets, n_connections,
-            post_slice, synapse_info) -> NDArray[float64]:
+            post_slice, synapse_info, weights: bool) -> NDArray[float64]:
         """
         :param values:
         :type values: ~pyNN.random.RandomDistribution or int or float or str
@@ -429,7 +464,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 values, n_connections, post_slice)
         elif isinstance(values, str) or callable(values):
             if self.__space is None:
-                raise self.weight_delay_type_exception(values, synapse_info)
+                raise self._no_space_exception(values, synapse_info)
 
             expand_distances = True
             if isinstance(values, str):
@@ -456,7 +491,10 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return values(d)
         elif numpy.isscalar(values):
             return numpy.repeat([values], n_connections).astype("float64")
-        raise self.weight_delay_type_exception(values, synapse_info)
+        if weights:
+            raise self.weight_exception(values)
+        else:
+            raise self.delay_type_exception(values)
 
     def _generate_weights(
             self, sources, targets, n_connections, post_slice, synapse_info):
@@ -470,7 +508,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         weights = self._generate_values(
             synapse_info.weights, sources, targets, n_connections, post_slice,
-            synapse_info)
+            synapse_info, weights=True)
         if self.__safe:
             if not weights.size:
                 warn_once(logger, "No connection in " + str(self))
@@ -512,7 +550,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         delays = self._generate_values(
             synapse_info.delays, sources, targets, n_connections, post_slice,
-            synapse_info)
+            synapse_info, weights=False)
 
         return self._clip_delays(delays)
 
