@@ -251,7 +251,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return connector.get_weight_maximum(synapse_info)
 
-    def get_weight_variance(self, connector, weights, synapse_info):
+    def get_weight_variance(
+            self, connector, weights: Weight_Delay_Types, synapse_info):
         """
         Get the variance in weight for the synapses.
 

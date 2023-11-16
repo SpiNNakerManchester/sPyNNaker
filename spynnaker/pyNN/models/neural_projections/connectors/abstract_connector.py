@@ -18,7 +18,6 @@ import re
 import numpy
 from numpy import float64
 from numpy.typing import NDArray
-from typing import TYPE_CHECKING
 from spinn_utilities.log import FormatAdapter
 from pyNN.random import NumpyRNG, RandomDistribution
 
@@ -263,7 +262,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    def get_weight_mean(self, weights, synapse_info):
+    def get_weight_mean(self, weights: Weight_Delay_Types,  synapse_info):
         """
         Get the mean of the weights.
 
@@ -278,9 +277,10 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.mean(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
-        raise SpynnakerException("Unrecognised weight format")
+        raise self.weight_delay_type_exception(weights, synapse_info)
 
-    def _get_weight_maximum(self, weights, n_connections, synapse_info):
+    def _get_weight_maximum(self, weights: Weight_Delay_Types,
+                            n_connections, synapse_info):
         """
         Get the maximum of the weights.
 
@@ -310,7 +310,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
-        raise SpynnakerException("Unrecognised weight format")
+        raise self.weight_delay_type_exception(weights, synapse_info)
 
     @abstractmethod
     def get_weight_maximum(self, synapse_info):
@@ -321,7 +321,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :rtype: float
         """
 
-    def get_weight_variance(self, weights, synapse_info):
+    def get_weight_variance(self, weights: Weight_Delay_Types, synapse_info):
         """
         Get the variance of the weights.
 
@@ -336,7 +336,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.var(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return 0.0
-        raise SpynnakerException("Unrecognised weight format")
+        raise self.weight_delay_type_exception(weights, synapse_info)
 
     def _expand_distances(self, d_expression):
         """

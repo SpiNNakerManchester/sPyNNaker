@@ -399,7 +399,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             weights, synapse_info)
 
     @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(self, weights, synapse_info):
+    def get_weight_variance(self, weights: Weight_Delay_Types, synapse_info):
         # Use the kernel weights if user has supplied them
         if self._krn_weights is not None:
             return numpy.var(self._krn_weights)
