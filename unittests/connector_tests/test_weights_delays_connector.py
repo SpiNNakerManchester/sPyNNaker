@@ -21,6 +21,7 @@ from spynnaker.pyNN.models.neural_projections import SynapseInformation
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.exceptions import SpynnakerException
 
+
 @pytest.mark.parametrize(
     "weight, delay", [
         (1, 2.0),
