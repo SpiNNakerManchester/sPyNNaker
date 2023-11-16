@@ -1181,12 +1181,11 @@ class NeuronRecorder(object):
             return [_REPEAT_PER_NEURON, 1,
                     _REPEAT_PER_NEURON_RECORDED | _RECORDED_FLAG]
 
+        assert (vertex_slice is not None)
         # Generate a run-length-encoded list
         # Initially there are no items, but this will be updated
         # Also keep track of the number recorded, also 0 initially
         data = [0, 0]
-        if vertex_slice is None:
-            return data
         n_items = 0
 
         # Go through the indices and ids, assuming both are in order (they are)
