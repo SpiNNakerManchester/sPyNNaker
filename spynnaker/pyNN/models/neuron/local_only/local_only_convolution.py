@@ -81,7 +81,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             The delay used in the connection; by default 1 time step
         """
         super().__init__(delay)
-        if not isinstance(self.delay, (float, int)):
+        if not isinstance(self.delay, float):
             raise SynapticConfigurationException(
                 "Only single value delays are supported")
 
@@ -92,6 +92,10 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         # Store the n_incoming to avoid recalcaultion
         self.__cached_n_incoming: Dict[ProjectionApplicationEdge, int] = {}
+
+    def __delay(self) -> float:
+        # Guaranteed by check in init
+        return cast(float, self.delay)
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics) -> LocalOnlyConvolution:
@@ -178,7 +182,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
             data.extend(conn.get_local_only_data(
                 app_edge, source.vertex_slice, source.key, source.mask,
-                app_edge.pre_vertex.n_colour_bits, self.delay, weight_index))
+                app_edge.pre_vertex.n_colour_bits, self.__delay, weight_index))
         n_weights = next_weight_index
         if next_weight_index % 2 != 0:
             n_weights += 1

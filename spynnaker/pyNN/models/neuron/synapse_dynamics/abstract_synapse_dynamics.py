@@ -16,7 +16,6 @@ from __future__ import annotations
 import logging
 import numpy
 from typing import Any, List, Optional, Sequence, Tuple, TYPE_CHECKING
-from numpy import float64
 from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
@@ -48,8 +47,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     def __init__(self, delay: Weight_Delay_In_Types,
                  weight: Weight_Delay_In_Types):
         self.__check_in_type(delay, "delay")
-        if delay is None:
-            delay = SpynnakerDataView.get_min_delay()
         self.__delay = self._round_delay(delay)
         self.__check_out_delay(self.__delay, "delay")
         self.__check_in_type(weight, "weight")
@@ -83,7 +80,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             return
         if isinstance(weight, numpy.ndarray):
             for x in weight:
-                if not isinstance(x, (float64)):
+                if not isinstance(x, (numpy.float64)):
                     raise TypeError(
                         f"Unexpected numpy ndarray of type {type(x)}"
                         f" for {name}")
@@ -98,7 +95,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             return
         if isinstance(delay, numpy.ndarray):
             for x in delay:
-                if not isinstance(x, (float64)):
+                if not isinstance(x, (numpy.float64)):
                     raise TypeError(
                         f"Unexpected numpy ndarray of type {type(x)}"
                         f" for {name}")
@@ -162,6 +159,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         if isinstance(delay, (RandomDistribution, str)):
             return delay
+        if delay is None:
+            delay = SpynnakerDataView.get_min_delay()
         new_delay = (
                 numpy.rint(numpy.array(delay) *
                            SpynnakerDataView.get_simulation_time_step_per_ms())
@@ -169,7 +168,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         if not numpy.allclose(delay, new_delay):
             logger.warning("Rounding up delay in f{} from {} to {}",
                            self, delay, new_delay)
-        if isinstance(new_delay, float64):
+        if isinstance(new_delay, numpy.float64):
             return float(new_delay)
         if isinstance(new_delay, numpy.ndarray):
             return new_delay

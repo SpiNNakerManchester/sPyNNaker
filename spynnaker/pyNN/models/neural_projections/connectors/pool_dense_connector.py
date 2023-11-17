@@ -366,7 +366,9 @@ class PoolDenseConnector(AbstractConnector):
         spec.write_value(neg_synapse_type, data_type=DataType.UINT16)
 
         # Write delay
-        delay_step = (app_edge.post_vertex.synapse_dynamics.delay *
+        post_delay = app_edge.post_vertex.synapse_dynamics.delay
+        assert isinstance(post_delay, float)
+        delay_step = (post_delay *
                       SpynnakerDataView.get_simulation_time_step_per_ms())
         local_delay = (delay_step %
                        app_edge.post_vertex.splitter.max_support_delay())

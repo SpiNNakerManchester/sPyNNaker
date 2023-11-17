@@ -124,10 +124,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             seen_pre_vertices.add(pre_vertex)
 
             delay_vertex: Optional[DelayExtensionVertex] = None
-            delay_vertex = None
             if self.delay > app_vertex.splitter.max_support_delay():
-                # pylint: disable=protected-access
-                delay_vertex = incoming._projection_edge.delay_edge.pre_vertex
+                delay_edge = app_edge.delay_edge
+                assert delay_edge is not None
+                delay_vertex = delay_edge.pre_vertex
 
             # Keep track of all the same source squares, so they can be
             # merged; this will make sure the keys line up!
