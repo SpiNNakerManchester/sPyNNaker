@@ -170,7 +170,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
                 * SpynnakerDataView.get_simulation_time_step_ms())
         if not numpy.allclose(delay, new_delay):
             logger.warning("Rounding up delay in f{} from {} to {}",
-                           self, delay, new_delay)
+                           self, cast(float, delay), new_delay)
         if isinstance(new_delay, numpy.float64):
             return float(new_delay)
         if isinstance(new_delay, numpy.ndarray):
