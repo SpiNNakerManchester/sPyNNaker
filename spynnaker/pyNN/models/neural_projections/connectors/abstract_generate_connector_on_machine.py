@@ -27,13 +27,13 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.common.param_generator_data import (
     param_generator_params, param_generator_params_size_in_bytes,
     param_generator_id, is_param_generatable)
+from spynnaker.pyNN.types import (Delay_Types, Weight_Types)
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.utilities.utility_calls import check_rng
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
-    from .connection_types import WD
 
 
 # Hashes of the connection generators supported by the synapse expander
@@ -68,7 +68,8 @@ class AbstractGenerateConnectorOnMachine(
                     " generated on the machine, but the connector cannot"
                     " be generated on host!")
 
-    def generate_on_machine(self, weights: WD, delays: WD) -> bool:
+    def generate_on_machine(
+            self, weights: Weight_Types, delays: Delay_Types) -> bool:
         """
         Determine if this instance can generate on the machine.
 

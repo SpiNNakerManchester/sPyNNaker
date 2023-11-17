@@ -13,19 +13,21 @@
 # limitations under the License.
 from __future__ import annotations
 import numpy
-from numpy import ndarray, integer, uint32, floating
+from numpy import floating, integer, ndarray, uint32
 from numpy.typing import NDArray
-from typing import Dict, List, Optional, Tuple, Union, TYPE_CHECKING
-from typing_extensions import TypeAlias
 from pyNN.random import RandomDistribution
 from pyNN.space import Space
+from typing import Dict, List, Optional, Tuple, Union, TYPE_CHECKING
+from typing_extensions import TypeAlias
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from .abstract_connector import AbstractConnector, WD
+from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.types import (
+    Delay_Types, Weight_Delay_Types, Weight_Types)
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
@@ -33,10 +35,11 @@ from .abstract_generate_connector_on_host import (
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections.synapse_information import (
-        SynapseInformation, _Weights, _Delays)
+        SynapseInformation)
     _TwoD: TypeAlias = Union[List[int], Tuple[int, int]]
-    _Kernel: TypeAlias = Union[
-        float, int, List[float], NDArray[floating], RandomDistribution]
+
+_Kernel: TypeAlias = Union[
+    float, int, List[float], NDArray[numpy.floating], RandomDistribution]
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 8
@@ -248,8 +251,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         c = ((pre_c - self._pre_start_w - 1) // self._pre_step_w) + 1
         return (r, c)
 
-    def __get_kernel_vals(
-            self, vals: Optional[_Kernel]) -> Optional[ConvolutionKernel]:
+    def __get_kernel_vals(self, vals: Optional[Union[
+            _Kernel, Weight_Delay_Types]]) -> Optional[ConvolutionKernel]:
         """
         Convert kernel values given into the correct format.
 
@@ -281,8 +284,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             f"{self._kernel_h} and width: {self._kernel_w}).")
 
     def __compute_statistics(
-            self, weights: Optional[_Weights], delays: Optional[_Delays],
-            post_vertex_slice: Slice, n_pre_neurons: int) -> Tuple[
+            self, weights: Optional[Weight_Types],
+            delays: Optional[Delay_Types], post_vertex_slice: Slice,
+            n_pre_neurons: int) -> Tuple[
                 int, NDArray[uint32], NDArray[uint32], NDArray[floating],
                 NDArray[floating]]:
         """
@@ -428,8 +432,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return super().get_weight_mean(weights, synapse_info)
 
     @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(
-            self, weights: WD, synapse_info: SynapseInformation) -> float:
+    def get_weight_variance(self, weights: Weight_Types,
+                            synapse_info: SynapseInformation) -> float:
         # Use the kernel weights if user has supplied them
         if self._krn_weights is not None:
             return float(numpy.var(self._krn_weights))

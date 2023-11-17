@@ -33,6 +33,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     ConvolutionConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
+from spynnaker.pyNN.types import Weight_Delay_In_Types
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .abstract_local_only import AbstractLocalOnly
 if TYPE_CHECKING:
@@ -71,13 +72,19 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     __slots__ = (
         "__cached_2d_overlaps",
         "__cached_n_incoming"
-        "__delay")
+    )
 
-    def __init__(self, delay: Optional[float] = None):
+    def __init__(self, delay: Weight_Delay_In_Types = None):
+
         """
         :param float delay:
             The delay used in the connection; by default 1 time step
         """
+        super().__init__(delay)
+        if not isinstance(self.delay, (float, int)):
+            raise SynapticConfigurationException(
+                "Only single value delays are supported")
+
         # Store the overlaps between 2d vertices to avoid recalculation
         self.__cached_2d_overlaps: Dict[
             AbstractPopulationVertex,
@@ -85,14 +92,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         # Store the n_incoming to avoid recalcaultion
         self.__cached_n_incoming: Dict[ProjectionApplicationEdge, int] = {}
-
-        if delay is None:
-            self.__delay = SpynnakerDataView.get_simulation_time_step_ms()
-        elif not isinstance(delay, (float, int)):
-            raise SynapticConfigurationException(
-                "Only single value delays are supported")
-        else:
-            self.__delay = float(delay)
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics) -> LocalOnlyConvolution:
@@ -179,7 +178,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
             data.extend(conn.get_local_only_data(
                 app_edge, source.vertex_slice, source.key, source.mask,
-                app_edge.pre_vertex.n_colour_bits, self.__delay, weight_index))
+                app_edge.pre_vertex.n_colour_bits, self.delay, weight_index))
         n_weights = next_weight_index
         if next_weight_index % 2 != 0:
             n_weights += 1
@@ -316,16 +315,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             raise KeyError(f"unrouted source: {source}")
         return r_info
 
-    @property
-    @overrides(AbstractLocalOnly.delay)
-    def delay(self) -> float:
-        return self.__delay
-
-    @property
-    @overrides(AbstractLocalOnly.weight)
-    def weight(self) -> int:
-        # We don't have a weight here, it is in the connector
-        return 0
 
     @staticmethod
     def __connector(projection: Projection) -> ConvolutionConnector:

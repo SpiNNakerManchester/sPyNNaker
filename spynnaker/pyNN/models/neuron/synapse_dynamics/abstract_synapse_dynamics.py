@@ -16,6 +16,7 @@ from __future__ import annotations
 import logging
 import numpy
 from typing import Any, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
+from numpy import float64
 from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
@@ -23,6 +24,8 @@ from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.types import (
+    Delay_Types, Weight_Delay_In_Types, Weight_Types)
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
@@ -40,7 +43,70 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     How do the dynamics of a synapse interact with the rest of the model.
     """
 
-    __slots__ = ()
+    __slots__ = ("__delay", "__weight")
+
+    def __init__(self, delay: Weight_Delay_In_Types,
+                 weight: Weight_Delay_In_Types):
+        self.__check_in_type(delay, "delay")
+        if delay is None:
+            delay = SpynnakerDataView.get_min_delay()
+        self.__delay = self._round_delay(delay)
+        self.__check_out_delay(self.__delay, "delay")
+        self.__check_in_type(weight, "weight")
+        self.__weight = self._convert_weight(weight)
+        self.__check_out_weight(self.__weight, "weight")
+
+    def __check_in_type(self, value: Weight_Delay_In_Types, name: str):
+        if value is None:
+            return
+        if isinstance(value, (int, float, str, RandomDistribution)):
+            return
+        try:
+            for x in value:
+                if not isinstance(x, (int, numpy.integer, float)):
+                    raise TypeError(
+                        f"Unexpected collection of type  {type(x)} for {name}"
+                        f"Expected types in collection are int and float")
+            return
+        except TypeError:
+            # Ok not a collection
+            pass
+        raise TypeError(
+            f"Unexpected type for {name}: {type(value)}. "
+            "Expected types are int, float, str, RandomDistribution "
+            "and collections of type int or float")
+
+    def __check_out_weight(self, weight: Weight_Types, name: str):
+        if weight is None:
+            return
+        if isinstance(weight, (int, float, str, RandomDistribution)):
+            return
+        if isinstance(weight, numpy.ndarray):
+            for x in weight:
+                if not isinstance(x, (float64)):
+                    raise TypeError(
+                        f"Unexpected numpy ndarray of type {type(x)}"
+                        f" for {name}")
+            return
+        raise TypeError(
+            f"Unexpected type for output data: {type(weight)} for {name} "
+            "Expected types are float, str, RandomDistribution "
+            "and list of type float")
+
+    def __check_out_delay(self, delay: Delay_Types, name: str):
+        if isinstance(delay, (float, (str, RandomDistribution))):
+            return
+        if isinstance(delay, numpy.ndarray):
+            for x in delay:
+                if not isinstance(x, (float64)):
+                    raise TypeError(
+                        f"Unexpected numpy ndarray of type {type(x)}"
+                        f" for {name}")
+            return
+        raise TypeError(
+            f"Unexpected type for output data: {type(delay)} for {name} "
+            "Expected types are float, str, RandomDistribution "
+            "and list of type float")
 
     #: Type model of the basic configuration data of a connector
     NUMPY_CONNECTORS_DTYPE = CONNECTOR_DTYPE
@@ -77,18 +143,15 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @property
-    @abstractmethod
-    def weight(self) -> float:
+    def weight(self) -> Weight_Types:
         """
         The weight of connections.
 
         :rtype: float
         """
-        raise NotImplementedError
+        return self.__weight
 
-    def _round_delay(
-            self, delay: Union[int, str, float, RandomDistribution]) -> \
-            Union[int, str, float, RandomDistribution]:
+    def _round_delay(self, delay: Weight_Delay_In_Types) -> Delay_Types:
         """
         Round the delays to multiples of full timesteps.
 
@@ -97,9 +160,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param delay:
         :return: Rounded delay
         """
-        if isinstance(delay, RandomDistribution):
-            return delay
-        if isinstance(delay, str):
+        if isinstance(delay, (RandomDistribution, str)):
             return delay
         new_delay = (
                 numpy.rint(numpy.array(delay) *
@@ -108,17 +169,39 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         if not numpy.allclose(delay, new_delay):
             logger.warning("Rounding up delay in f{} from {} to {}",
                            self, delay, new_delay)
-        return new_delay
+        if isinstance(new_delay, float64):
+            return float(new_delay)
+        if isinstance(new_delay, numpy.ndarray):
+            return new_delay
+        raise TypeError(f"{type(delay)=}")
+
+    def _convert_weight(self, weight: Weight_Delay_In_Types) -> Weight_Types:
+        """
+        Convert the weights if numerical to (list of) float .
+
+        :param weight:
+        :return: weight as float (if numerical)
+        """
+        if weight is None:
+            return weight
+        if isinstance(weight, (RandomDistribution, str)):
+            return weight
+        if isinstance(weight, int):
+            return weight
+        if numpy.isscalar(weight):
+            return float(weight)
+        new_weight = numpy.array(weight, dtype=float)
+        return new_weight
+
 
     @property
-    @abstractmethod
-    def delay(self) -> float:
+    def delay(self) -> Delay_Types:
         """
         The delay of connections.
 
         :rtype: float
         """
-        raise NotImplementedError
+        return self.__delay
 
     @property
     @abstractmethod
@@ -215,7 +298,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         return connector.get_weight_maximum(synapse_info)
 
     def get_weight_variance(
-            self, connector: AbstractConnector, weights: numpy.ndarray,
+           self, connector: AbstractConnector, weights: Weight_Types,
             synapse_info: SynapseInformation) -> float:
         """
         Get the variance in weight for the synapses.

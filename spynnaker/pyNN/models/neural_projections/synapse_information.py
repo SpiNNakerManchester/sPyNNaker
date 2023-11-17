@@ -14,21 +14,17 @@
 
 from __future__ import annotations
 from typing import List, Optional, Sequence, Union, TYPE_CHECKING
-from typing_extensions import TypeAlias
-from numpy import float64
-from numpy.typing import NDArray
 from spinn_utilities.config_holder import get_config_bool
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector, AbstractGenerateConnectorOnMachine, OneToOneConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractGenerateOnMachine, SynapseDynamicsStatic)
+from spynnaker.pyNN.types import (Delay_Types, Weight_Types)
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.populations import Population, PopulationView
     from spynnaker.pyNN.models.neuron import ConnectionHolder
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
         AbstractSynapseDynamics)
-    _Weights: TypeAlias = Union[float, List[float], NDArray[float64]]
-    _Delays: TypeAlias = Union[float, List[float], NDArray[float64]]
 
 
 class SynapseInformation(object):
@@ -58,8 +54,8 @@ class SynapseInformation(object):
                  synapse_dynamics: AbstractSynapseDynamics,
                  synapse_type: int, receptor_type: str,
                  synapse_type_from_dynamics: bool,
-                 weights: Optional[_Weights] = None,
-                 delays: Optional[_Delays] = None):
+                 weights: Weight_Types = None,
+                 delays: Delay_Types = None):
         """
         :param AbstractConnector connector:
             The connector connected to the synapse
@@ -90,6 +86,7 @@ class SynapseInformation(object):
         self.__synapse_dynamics = synapse_dynamics
         self.__synapse_type = synapse_type
         self.__receptor_type = receptor_type
+        assert (delays is not None)
         self.__weights = weights
         self.__delays = delays
         self.__synapse_type_from_dynamics = synapse_type_from_dynamics
@@ -191,20 +188,20 @@ class SynapseInformation(object):
         return self.__receptor_type
 
     @property
-    def weights(self) -> Optional[_Weights]:
+    def weights(self) -> Weight_Types:
         """
         The synaptic weights (if any).
 
-        :rtype: float or list(float) or ~numpy.ndarray(float) or None
+        :rtype: float or ~numpy.ndarray(float64) or str or RandomDistribution
         """
         return self.__weights
 
     @property
-    def delays(self) -> Optional[_Delays]:
+    def delays(self) -> Delay_Types:
         """
         The total synaptic delays (if any).
 
-        :rtype: float or list(float) or ~numpy.ndarray(float) or None
+        :rtype: float or ~numpy.ndarray(float64) or str or RandomDistribution
         """
         return self.__delays
 

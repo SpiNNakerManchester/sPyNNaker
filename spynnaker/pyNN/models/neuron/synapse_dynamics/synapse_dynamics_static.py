@@ -27,6 +27,7 @@ from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.types import Weight_Delay_In_Types as _Weight
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 if TYPE_CHECKING:
@@ -47,26 +48,21 @@ class SynapseDynamicsStatic(
 
     __slots__ = (
         # padding to add to a synaptic row for synaptic rewiring
-        "__pad_to_length",
-        # weight of connections
-        "__weight",
-        # delay of connections
-        "__delay")
+        "__pad_to_length")
 
     def __init__(
-            self, weight: float = StaticSynapse.default_parameters['weight'],
+            self, weight: _Weight = StaticSynapse.default_parameters['weight'],
             delay: Optional[float] = None,
             pad_to_length: Optional[int] = None):
+
         """
         :param float weight:
         :param delay: Use ``None`` to get the simulator default minimum delay.
         :type delay: float or None
         :param int pad_to_length:
         """
-        self.__weight = weight
-        if delay is None:
-            delay = SpynnakerDataView.get_min_delay()
-        self.__delay = self._round_delay(delay)
+        super(AbstractStaticSynapseDynamics, self).__init__(
+            delay=delay, weight=weight)
         self.__pad_to_length = pad_to_length
 
     @overrides(AbstractStaticSynapseDynamics.merge)
@@ -229,16 +225,6 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.changes_during_run)
     def changes_during_run(self):
         return False
-
-    @property
-    @overrides(AbstractStaticSynapseDynamics.weight)
-    def weight(self):
-        return self.__weight
-
-    @property
-    @overrides(AbstractStaticSynapseDynamics.delay)
-    def delay(self):
-        return self.__delay
 
     @property
     @overrides(AbstractStaticSynapseDynamics.pad_to_length)

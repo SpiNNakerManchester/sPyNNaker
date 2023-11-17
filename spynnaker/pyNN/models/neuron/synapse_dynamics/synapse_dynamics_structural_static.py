@@ -19,6 +19,7 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.types import Weight_Types
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
@@ -268,7 +269,8 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         return self.get_weight_maximum(connector, synapse_info)
 
     @overrides(SynapseDynamicsStatic.get_weight_variance)
-    def get_weight_variance(self, connector, weights, synapse_info):
+    def get_weight_variance(
+            self, connector, weights: Weight_Types, synapse_info):
         return 0.0
 
     @overrides(SynapseDynamicsStatic.get_weight_maximum)

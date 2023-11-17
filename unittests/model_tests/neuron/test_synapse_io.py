@@ -59,7 +59,7 @@ def test_get_allowed_row_length(
         connector=None, pre_population=None, post_population=None,
         prepop_is_view=False, postpop_is_view=False, synapse_dynamics=dynamics,
         synapse_type_from_dynamics=False, synapse_type=None,
-        receptor_type=None, weights=0, delays=None)
+        receptor_type=None, weights=0, delays=1)
     in_edge = ProjectionApplicationEdge(None, None, synapse_information)
     if exception is not None:
         with pytest.raises(exception) as exc_info:

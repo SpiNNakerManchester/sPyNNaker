@@ -20,6 +20,7 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
+from spynnaker.pyNN.types import Weight_Delay_In_Types
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron import (
@@ -30,6 +31,14 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     """
     Processes synapses locally without the need for SDRAM.
     """
+
+    def __init__(self, delay: Weight_Delay_In_Types):
+        """
+        :param float delay:
+            The delay used in the connection; by default 1 time step
+        """
+        # We don't have a weight here, it is in the connector
+        super().__init__(delay=delay, weight=None)
 
     @abstractmethod
     def get_parameters_usage_in_bytes(

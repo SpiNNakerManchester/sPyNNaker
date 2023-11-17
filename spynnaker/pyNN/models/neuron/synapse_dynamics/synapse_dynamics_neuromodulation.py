@@ -28,6 +28,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     STDP_FIXED_POINT_ONE, get_exp_lut_array)
+from spynnaker.pyNN.types import Weight_Delay_In_Types as _Weight
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
@@ -57,7 +58,6 @@ class SynapseDynamicsNeuromodulation(
     """
 
     __slots__ = (
-        "__weight",
         "__tau_c",
         "__tau_d",
         "__tau_c_data",
@@ -66,7 +66,7 @@ class SynapseDynamicsNeuromodulation(
         "__w_max")
 
     def __init__(
-            self, weight: float = StaticSynapse.default_parameters['weight'],
+            self, weight: _Weight = StaticSynapse.default_parameters['weight'],
             tau_c: float = 1000.0, tau_d: float = 200.0,
             w_min: float = 0.0, w_max: float = 1.0):
         self.__weight = weight
@@ -286,18 +286,6 @@ class SynapseDynamicsNeuromodulation(
     def changes_during_run(self) -> bool:
         return False
 
-    @property
-    @overrides(AbstractPlasticSynapseDynamics.weight)
-    def weight(self):
-        return self.__weight
-
-    @property
-    @overrides(AbstractPlasticSynapseDynamics.delay)
-    def delay(self) -> float:
-        # Delay is always 1!
-        return 1
-
-    @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
     def pad_to_length(self) -> None:
         return None

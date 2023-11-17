@@ -18,6 +18,7 @@ from typing import Dict, Optional, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.types import Weight_Delay_In_Types as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural, InitialDelay)
@@ -97,8 +98,8 @@ class SynapseDynamicsStructuralSTDP(
             initial_delay: InitialDelay = DEFAULT_INITIAL_DELAY,
             s_max: int = DEFAULT_S_MAX,
             with_replacement: bool = True, seed: Optional[int] = None,
-            weight: float = StaticSynapse.default_parameters['weight'],
-            delay: Optional[float] = None,
+            weight: _In_Types = StaticSynapse.default_parameters['weight'],
+            delay: _In_Types = None,
             backprop_delay: bool = True):
         """
         :param AbstractPartnerSelection partner_selection:

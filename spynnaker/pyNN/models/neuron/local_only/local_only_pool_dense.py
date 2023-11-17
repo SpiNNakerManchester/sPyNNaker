@@ -30,6 +30,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     PoolDenseConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
+from spynnaker.pyNN.types import Weight_Delay_In_Types
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .abstract_local_only import AbstractLocalOnly
 from pacman.model.routing_info.vertex_routing_info import VertexRoutingInfo
@@ -48,20 +49,17 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     A convolution synapse dynamics that can process spikes with only DTCM.
     """
 
-    __slots__ = ("__delay", )
+    __slots__ = ()
 
-    def __init__(self, delay: Optional[float] = None):
+    def __init__(self, delay: Weight_Delay_In_Types = None):
         """
         :param float delay:
             The delay used in the connection; by default 1 time step
         """
-        if delay is None:
-            self.__delay = SpynnakerDataView.get_simulation_time_step_ms()
-        elif not isinstance(delay, (float, int)):
+        super().__init__(delay)
+        if not isinstance(delay, (float, int)):
             raise SynapticConfigurationException(
                 "Only single value delays are supported")
-        else:
-            self.__delay = delay
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics) -> LocalOnlyPoolDense:
@@ -126,10 +124,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             seen_pre_vertices.add(pre_vertex)
 
             delay_vertex: Optional[DelayExtensionVertex] = None
-            if self.__delay > app_vertex.splitter.max_support_delay():
-                delay_edge = app_edge.delay_edge
-                if delay_edge is not None:
-                    delay_vertex = delay_edge.pre_vertex
+            delay_vertex = None
+            if self.delay > app_vertex.splitter.max_support_delay():
+                # pylint: disable=protected-access
+                delay_vertex = incoming._projection_edge.delay_edge.pre_vertex
 
             # Keep track of all the same source squares, so they can be
             # merged; this will make sure the keys line up!
@@ -203,17 +201,6 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             raise SynapticConfigurationException(
                 f"Missing r_info for {source}")
         return r_info
-
-    @property
-    @overrides(AbstractLocalOnly.delay)
-    def delay(self) -> float:
-        return self.__delay
-
-    @property
-    @overrides(AbstractLocalOnly.weight)
-    def weight(self) -> int:
-        # We don't have a weight here, it is in the connector
-        return 0
 
     @staticmethod
     def __get_synapse_type(proj: Projection, target: str) -> int:

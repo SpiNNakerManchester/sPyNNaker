@@ -19,9 +19,8 @@ from typing import Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING
 import numpy
 from numpy import float64, uint32, uint16, uint8
 from numpy.typing import NDArray
-import pyNN
 from pyNN.random import NumpyRNG, RandomDistribution
-
+from pyNN.space import Space
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
@@ -32,10 +31,11 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.types import (
+    Delay_Types, is_scalar, Weight_Delay_Types, Weight_Types)
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from .connection_types import WD, is_scalar
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
@@ -86,7 +86,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if callback is not None:
             warn_once(logger, "sPyNNaker ignores connector callbacks.")
         self.__safe = safe
-        self.__space: Optional[pyNN.space.Space] = None
+        self.__space: Optional[Space] = None
         self.__verbose = verbose
 
         self.__n_clipped_delays = numpy.int64(0)
@@ -94,7 +94,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         self.__param_seeds: Dict[Tuple[int, int], int] = dict()
         self.__synapse_info: Optional[SynapseInformation] = None
 
-    def set_space(self, space: pyNN.space.Space):
+    def set_space(self, space: Space):
         """
         Set the space object (allowed after instantiation).
 
@@ -111,7 +111,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         self.__min_delay = SpynnakerDataView.get_simulation_time_step_ms()
 
     def _get_delay_minimum(
-            self, delays: WD, n_connections: int,
+            self, delays: Delay_Types, n_connections: int,
             synapse_info: SynapseInformation) -> float:
         """
         Get the minimum delay given a float or RandomDistribution.
@@ -134,11 +134,10 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.min(_expr_context.eval(delays, d=d))
         elif is_scalar(delays):
             return delays
-        raise SpynnakerException(
-            f"Unrecognised delay format: {type(delays)}")
+        raise self.delay_type_exception(delays)
 
     def _get_delay_maximum(
-            self, delays: WD, n_connections: int,
+            self, delays: Delay_Types, n_connections: int,
             synapse_info: SynapseInformation) -> float:
         """
         Get the maximum delay given a float or RandomDistribution.
@@ -161,7 +160,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(delays, d=d))
         elif is_scalar(delays):
             return delays
-        raise SpynnakerException(f"Unrecognised delay format: {type(delays)}")
+        raise self.delay_type_exception(delays)
 
     @abstractmethod
     def get_delay_maximum(
@@ -187,8 +186,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def get_delay_variance(
-            self, delays: WD, synapse_info: SynapseInformation) -> float:
+    def get_delay_variance(self, delays: Delay_Types,
+                           synapse_info: SynapseInformation) -> float:
         """
         Get the variance of the delays.
 
@@ -203,11 +202,11 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.var(_expr_context.eval(delays, d=d))
         elif is_scalar(delays):
             return 0.0
-        raise SpynnakerException("Unrecognised delay format")
+        raise self.delay_type_exception(delays)
 
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
-            self, delays: WD, n_total_connections: int, n_connections: int,
-            min_delay: float, max_delay: float,
+            self, delays: Delay_Types, n_total_connections: int,
+            n_connections: int, min_delay: float, max_delay: float,
             synapse_info: SynapseInformation) -> int:
         """
         Get the expected number of delays that will fall within min_delay and
@@ -249,7 +248,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             if min_delay <= delays <= max_delay:
                 return int(math.ceil(n_connections))
             return 0
-        raise SpynnakerException("Unrecognised delay format")
+        raise self.delay_type_exception(delays)
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
@@ -286,8 +285,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def get_weight_mean(
-            self, weights: WD, synapse_info: SynapseInformation) -> float:
+    def get_weight_mean(self, weights: Weight_Types,
+                        synapse_info: SynapseInformation) -> float:
         """
         Get the mean of the weights.
 
@@ -302,10 +301,10 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.mean(_expr_context.eval(weights, d=d))
         elif is_scalar(weights):
             return abs(weights)
-        raise SpynnakerException("Unrecognised weight format")
+        raise self.weight_type_exception(synapse_info)
 
     def _get_weight_maximum(
-            self, weights: WD, n_connections: int,
+            self, weights: Weight_Types, n_connections: int,
             synapse_info: SynapseInformation) -> float:
         """
         Get the maximum of the weights.
@@ -336,7 +335,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(weights, d=d))
         elif is_scalar(weights):
             return abs(weights)
-        raise SpynnakerException("Unrecognised weight format")
+        raise self.weight_type_exception(weights)
 
     @abstractmethod
     def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
@@ -348,8 +347,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def get_weight_variance(
-            self, weights: WD, synapse_info: SynapseInformation) -> float:
+    def get_weight_variance(self, weights: Weight_Types,
+                            synapse_info: SynapseInformation) -> float:
         """
         Get the variance of the weights.
 
@@ -364,7 +363,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.var(_expr_context.eval(weights, d=d))
         elif is_scalar(weights):
             return 0.0
-        raise SpynnakerException("Unrecognised weight format")
+        raise self.weight_type_exception(weights)
 
     def _expand_distances(self, d_expression: str) -> bool:
         """
@@ -383,12 +382,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def _get_distances(self, values: str,
                        synapse_info: SynapseInformation) -> NDArray[float64]:
         if self.__space is None:
-            raise ValueError(
-                f"Weights or delays are distance-dependent "
-                f"but no space object was specified in projection "
-                f"{synapse_info.pre_population}-"
-                f"{synapse_info.post_population}")
-
+           raise self._no_space_exception(values, synapse_info)
         expand_distances = self._expand_distances(values)
 
         return self.__space.distances(
@@ -418,10 +412,71 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.array([copy_rd.next(1)], dtype=float64)
         return copy_rd.next(n_connections)
 
+    def _no_space_exception(self, values: Weight_Delay_Types, synapse_info):
+        """
+        Returns a SpynnakerException about there being no space defined
+
+        :param values:
+        :param synapse_info:
+        :rtype: SpynnakerException
+        """
+        return SpynnakerException(
+            f"Str Weights or delays {values} are distance-dependent "
+            f"but no space object was specified in projection "
+            f"{synapse_info.pre_population}-"
+            f"{synapse_info.post_population}")
+
+    def weight_type_exception(self, weights: Weight_Types):
+        """
+        Returns an Exception explaining incorrect weight or delay type
+
+        :param weights:
+        :raises: SpynnakerException
+        """
+        if weights is None:
+            return SpynnakerException(
+                f"The Synapse used is not is not supported with a "
+                f"{(type(self))} as neither provided weights")
+        elif isinstance(weights, str):
+            return SpynnakerException(
+                f"Str Weights {weights} not supported by a {(type(self))}")
+        elif isinstance(weights, numpy.ndarray):
+            # The problem is that these methods are for a MachineVertex/ core
+            # while weight and delay are supplied at the application level
+            # The FromList is also the one designed to handle the 2D case
+            return SpynnakerException(
+                f"For efficiency reason {type(self)} does not supports "
+                f"list or arrays for weight."
+                f"Please use a FromListConnector instead")
+        else:
+            return SpynnakerException(f"Unrecognised weight {weights}")
+
+    def delay_type_exception(self, delays: Delay_Types):
+        """
+        Returns an Exception explaining incorrect delay type
+
+        :param delays:
+        :raises: SpynnakerException
+        """
+        if isinstance(delays, str):
+            return SpynnakerException(
+                f"Str delays {delays} not supported by {(type(self))}")
+        elif isinstance(delays, numpy.ndarray):
+            # The problem is that these methods are for a MachineVertex/ core
+            # while weight and delay are supplied at the application level
+            # The FromList is also the one designed to handle the 2D case
+            return SpynnakerException(
+                f"For efficiency reason {type(self)} does not supports "
+                f"list or arrays for weight or delay."
+                f"Please use a FromListConnector instead")
+        else:
+            return SpynnakerException(f"Unrecognised delay {delays}")
+
     def _generate_values(
-            self, values: WD, sources: numpy.ndarray, targets: numpy.ndarray,
-            n_connections: int, post_slice: Slice,
-            synapse_info: SynapseInformation) -> NDArray[float64]:
+            self, values: Weight_Delay_Types, sources: numpy.ndarray,
+            targets: numpy.ndarray, n_connections: int, post_slice: Slice,
+            synapse_info: SynapseInformation,
+            weights: bool) -> NDArray[float64]:
         """
         :param values:
         :type values: ~pyNN.random.RandomDistribution or int or float or str
@@ -436,10 +491,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 values, n_connections, post_slice)
         elif isinstance(values, str) or callable(values):
             if self.__space is None:
-                raise SpynnakerException(
-                    "No space object specified in projection "
-                    f"{synapse_info.pre_population}-"
-                    f"{synapse_info.post_population}")
+                raise self._no_space_exception(values, synapse_info)
 
             expand_distances = True
             if isinstance(values, str):
@@ -466,7 +518,10 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return values(d)
         elif is_scalar(values):
             return numpy.repeat([values], n_connections).astype(float64)
-        raise SpynnakerException(f"Unrecognised values {values}")
+        if weights:
+            raise self.weight_type_exception(values)
+        else:
+            raise self.delay_type_exception(values)
 
     def _generate_weights(
             self, sources: numpy.ndarray, targets: numpy.ndarray,
@@ -482,7 +537,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         weights = self._generate_values(
             synapse_info.weights, sources, targets, n_connections, post_slice,
-            synapse_info)
+            synapse_info, weights=True)
         if self.__safe:
             if not weights.size:
                 warn_once(logger, "No connection in " + str(self))
@@ -493,7 +548,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
                     f"{synapse_info.post_population.label}")
         return numpy.abs(weights)
 
-    def _clip_delays(self, delays: numpy.ndarray) -> numpy.ndarray:
+    def _clip_delays(self, delays: NDArray[float64]) -> NDArray[float64]:
         """
         Clip delay values, keeping track of how many have been clipped.
 
@@ -522,7 +577,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         delays = self._generate_values(
             synapse_info.delays, sources, targets, n_connections, post_slice,
-            synapse_info)
+            synapse_info, weights=False)
 
         return self._clip_delays(delays)
 
@@ -567,7 +622,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         self.__safe = new_value
 
     @property
-    def space(self) -> Optional[pyNN.space.Space]:
+    def space(self) -> Optional[Space]:
         """
         The space object (may be updated after instantiation).
 
@@ -576,7 +631,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         return self.__space
 
     @space.setter
-    def space(self, new_value: pyNN.space.Space):
+    def space(self, new_value: Space):
         """
         Set the space object (allowed after instantiation).
 
