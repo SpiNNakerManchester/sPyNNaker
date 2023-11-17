@@ -315,7 +315,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             raise KeyError(f"unrouted source: {source}")
         return r_info
 
-
     @staticmethod
     def __connector(projection: Projection) -> ConvolutionConnector:
         # pylint: disable=protected-access
