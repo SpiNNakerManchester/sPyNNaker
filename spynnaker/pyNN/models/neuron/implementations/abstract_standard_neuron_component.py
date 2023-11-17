@@ -14,11 +14,11 @@
 
 from numpy import floating
 from numpy.typing import NDArray
+from pyNN.random import RandomDistribution
 from typing import Dict, Iterable, List, Union
 from typing_extensions import TypeAlias
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ranged import RangeDictionary, RangedList
-from spynnaker.pyNN.random_distribution import RandomDistribution
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from spynnaker.pyNN.utilities.struct import Struct
 import numpy
