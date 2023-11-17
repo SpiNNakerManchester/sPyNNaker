@@ -16,6 +16,7 @@ import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.types import Weight_Delay_In_Types as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
@@ -72,8 +73,8 @@ class SynapseDynamicsStructuralSTDP(
             f_rew=DEFAULT_F_REW, initial_weight=DEFAULT_INITIAL_WEIGHT,
             initial_delay=DEFAULT_INITIAL_DELAY, s_max=DEFAULT_S_MAX,
             with_replacement=True, seed=None,
-            weight=StaticSynapse.default_parameters['weight'], delay=None,
-            backprop_delay=True):
+            weight: _In_Types = StaticSynapse.default_parameters['weight'],
+            delay: _In_Types = None, backprop_delay=True):
         """
         :param AbstractPartnerSelection partner_selection:
             The partner selection rule

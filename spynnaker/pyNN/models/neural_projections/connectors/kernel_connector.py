@@ -12,17 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy
+from numpy.typing import NDArray
+from typing import List, Union
+from typing_extensions import TypeAlias
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from pyNN.random import RandomDistribution
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.types import (
+    Delay_Types, Weight_Delay_Types, Weight_Types)
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
+_Kernel: TypeAlias = Union[
+    float, int, List[float], NDArray[numpy.floating], RandomDistribution]
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 8
@@ -51,8 +59,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     """
 
     def __init__(
-            self, shape_pre, shape_post, shape_kernel, weight_kernel=None,
-            delay_kernel=None, shape_common=None,
+            self, shape_pre, shape_post, shape_kernel,
+            weight_kernel: _Kernel = None, delay_kernel: _Kernel = None,
+            shape_common=None,
             pre_sample_steps_in_post=None, pre_start_coords_in_post=None,
             post_sample_steps_in_pre=None, post_start_coords_in_pre=None,
             safe=True, space=None, verbose=False, callback=None):
@@ -210,7 +219,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         c = ((pre_c - self._pre_start_w - 1) // self._pre_step_w) + 1
         return (r, c)
 
-    def __get_kernel_vals(self, vals):
+    def __get_kernel_vals(self, vals: Union[_Kernel, Weight_Delay_Types]):
         """
         Convert kernel values given into the correct format.
 
@@ -241,7 +250,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             f"{self._kernel_h} and width: {self._kernel_w}).")
 
     def __compute_statistics(
-            self, weights, delays, post_vertex_slice, n_pre_neurons):
+            self, weights: Weight_Types, delays: Delay_Types,
+            post_vertex_slice, n_pre_neurons):
         """
         Compute the relevant information required for the connections.
 
@@ -389,7 +399,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             weights, synapse_info)
 
     @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(self, weights, synapse_info):
+    def get_weight_variance(self, weights: Weight_Types, synapse_info):
         # Use the kernel weights if user has supplied them
         if self._krn_weights is not None:
             return numpy.var(self._krn_weights)

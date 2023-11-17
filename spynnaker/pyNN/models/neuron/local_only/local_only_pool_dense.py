@@ -22,6 +22,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     PoolDenseConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
+from spynnaker.pyNN.types import Weight_Delay_In_Types
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .abstract_local_only import AbstractLocalOnly
 
@@ -31,19 +32,17 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     A convolution synapse dynamics that can process spikes with only DTCM.
     """
 
-    __slots__ = ["__delay"]
+    __slots__ = []
 
-    def __init__(self, delay=None):
+    def __init__(self, delay: Weight_Delay_In_Types = None):
         """
         :param float delay:
             The delay used in the connection; by default 1 time step
         """
-        self.__delay = delay
-        if delay is None:
-            self.__delay = SpynnakerDataView.get_simulation_time_step_ms()
-        elif not isinstance(delay, (float, int)):
+        if delay is not None and not isinstance(self.delay, (float, int)):
             raise SynapticConfigurationException(
                 "Only single value delays are supported")
+        super().__init__(delay)
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics):
@@ -99,7 +98,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             seen_pre_vertices.add(app_edge.pre_vertex)
 
             delay_vertex = None
-            if self.__delay > app_vertex.splitter.max_support_delay():
+            if self.delay > app_vertex.splitter.max_support_delay():
                 # pylint: disable=protected-access
                 delay_vertex = incoming._projection_edge.delay_edge.pre_vertex
 
@@ -165,17 +164,6 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             source.vertex_slice)
         return routing_info.get_routing_info_from_pre_vertex(
             delay_source, SPIKE_PARTITION_ID)
-
-    @property
-    @overrides(AbstractLocalOnly.delay)
-    def delay(self):
-        return self.__delay
-
-    @property
-    @overrides(AbstractLocalOnly.weight)
-    def weight(self):
-        # We don't have a weight here, it is in the connector
-        return 0
 
     @overrides(AbstractSupportsSignedWeights.get_positive_synapse_index)
     def get_positive_synapse_index(self, incoming_projection):

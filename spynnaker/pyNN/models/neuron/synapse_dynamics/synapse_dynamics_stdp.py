@@ -21,6 +21,8 @@ from spinn_front_end_common.utilities.constants import (
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
     SynapticConfigurationException, InvalidParameterType)
+from spynnaker.pyNN.types import Weight_Types
+from spynnaker.pyNN.types import Weight_Delay_In_Types as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
@@ -58,18 +60,14 @@ class SynapseDynamicsSTDP(
         "__neuromodulation",
         # padding to add to a synaptic row for synaptic rewiring
         "__pad_to_length",
-        # Weight of connections formed by connector
-        "__weight",
-        # Delay of connections formed by connector
-        "__delay",
         # Whether to use back-propagation delay or not
         "__backprop_delay"]
 
     def __init__(
             self, timing_dependence, weight_dependence,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
-            weight=StaticSynapse.default_parameters['weight'],
-            delay=None, pad_to_length=None, backprop_delay=True):
+            weight: _In_Types = StaticSynapse.default_parameters['weight'],
+            delay: _In_Types = None, pad_to_length=None, backprop_delay=True):
         """
         :param AbstractTimingDependence timing_dependence:
         :param AbstractWeightDependence weight_dependence:
@@ -89,7 +87,7 @@ class SynapseDynamicsSTDP(
         if voltage_dependence is not None:
             raise NotImplementedError(
                 "Voltage dependence has not been implemented")
-
+        super().__init__(delay=delay, weight=weight)
         self.__timing_dependence = timing_dependence
         self.__weight_dependence = weight_dependence
         # move data from timing to weight dependence; that's where we need it
@@ -97,10 +95,6 @@ class SynapseDynamicsSTDP(
             timing_dependence.A_plus, timing_dependence.A_minus)
         self.__dendritic_delay_fraction = float(dendritic_delay_fraction)
         self.__pad_to_length = pad_to_length
-        self.__weight = weight
-        if delay is None:
-            delay = SpynnakerDataView.get_min_delay()
-        self.__delay = self._round_delay(delay)
         self.__backprop_delay = backprop_delay
         self.__neuromodulation = None
 
@@ -484,7 +478,8 @@ class SynapseDynamicsSTDP(
         return self.get_weight_maximum(connector, synapse_info)
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_variance)
-    def get_weight_variance(self, connector, weights, synapse_info):
+    def get_weight_variance(
+            self, connector, weights: Weight_Types, synapse_info):
         # Because the weights could all be changed to the maximum, the variance
         # has to be given as no variance
         return 0.0
@@ -578,16 +573,6 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.changes_during_run)
     def changes_during_run(self):
         return True
-
-    @property
-    @overrides(AbstractPlasticSynapseDynamics.weight)
-    def weight(self):
-        return self.__weight
-
-    @property
-    @overrides(AbstractPlasticSynapseDynamics.delay)
-    def delay(self):
-        return self.__delay
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.is_combined_core_capable)
