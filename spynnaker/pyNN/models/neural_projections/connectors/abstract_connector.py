@@ -382,7 +382,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def _get_distances(self, values: str,
                        synapse_info: SynapseInformation) -> NDArray[float64]:
         if self.__space is None:
-           raise self._no_space_exception(values, synapse_info)
+            raise self._no_space_exception(values, synapse_info)
         expand_distances = self._expand_distances(values)
 
         return self.__space.distances(

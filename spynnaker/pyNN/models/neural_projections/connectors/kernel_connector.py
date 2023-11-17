@@ -396,8 +396,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             synapse_info.delays, n_conns, synapse_info)
 
     @overrides(AbstractConnector.get_delay_variance)
-    def get_delay_variance(
-            self, delays: WD, synapse_info: SynapseInformation) -> float:
+    def get_delay_variance(self, delays: Delay_Types,
+                           synapse_info: SynapseInformation) -> float:
         if self._krn_delays is not None:
             return float(numpy.var(self._krn_delays))
         return super().get_delay_variance(delays, synapse_info)
@@ -424,8 +424,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             synapse_info.weights, n_conns, synapse_info)
 
     @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(
-            self, weights: WD, synapse_info: SynapseInformation) -> float:
+    def get_weight_mean(self, weights: Weight_Types,
+                        synapse_info: SynapseInformation) -> float:
         # Use the kernel weights if user has supplied them
         if self._krn_weights is not None:
             return float(numpy.mean(self._krn_weights))

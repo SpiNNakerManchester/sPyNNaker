@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import List, Optional, Sequence, Union, TYPE_CHECKING
+from typing import List, Sequence, TYPE_CHECKING, Union
 from spinn_utilities.config_holder import get_config_bool
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector, AbstractGenerateConnectorOnMachine, OneToOneConnector)

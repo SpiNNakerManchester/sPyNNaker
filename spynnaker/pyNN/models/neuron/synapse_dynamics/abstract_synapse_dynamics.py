@@ -15,7 +15,7 @@
 from __future__ import annotations
 import logging
 import numpy
-from typing import Any, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
+from typing import Any, List, Optional, Sequence, Tuple, TYPE_CHECKING
 from numpy import float64
 from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
@@ -192,7 +192,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             return float(weight)
         new_weight = numpy.array(weight, dtype=float)
         return new_weight
-
 
     @property
     def delay(self) -> Delay_Types:

@@ -19,7 +19,6 @@ from pyNN.standardmodels.synapses import StaticSynapse
 from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
-from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE)
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics

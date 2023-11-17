@@ -93,7 +93,7 @@ class AbstractGenerateConnectorOnMachine(
             check_rng(delays.rng, "RandomDistribution in delay")
         return True
 
-    def gen_weights_id(self, weights: WD) -> int:
+    def gen_weights_id(self, weights: Weight_Types) -> int:
         """
         Get the id of the weight generator on the machine.
 
@@ -103,7 +103,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_id(weights)
 
-    def gen_weights_params(self, weights: WD) -> NDArray[uint32]:
+    def gen_weights_params(self, weights: Weight_Types) -> NDArray[uint32]:
         """
         Get the parameters of the weight generator on the machine.
 
@@ -123,7 +123,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_params_size_in_bytes(weights)
 
-    def gen_delays_id(self, delays: WD) -> int:
+    def gen_delays_id(self, delays: Delay_Types) -> int:
         """
         Get the id of the delay generator on the machine.
 
@@ -133,7 +133,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_id(delays)
 
-    def gen_delay_params(self, delays: WD) -> NDArray[uint32]:
+    def gen_delay_params(self, delays: Delay_Types) -> NDArray[uint32]:
         """
         Get the parameters of the delay generator on the machine.
 
@@ -143,7 +143,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_params(delays)
 
-    def gen_delay_params_size_in_bytes(self, delays: WD) -> int:
+    def gen_delay_params_size_in_bytes(self, delays: Delay_Types) -> int:
         """
         The size of the delay parameters in bytes.
 
