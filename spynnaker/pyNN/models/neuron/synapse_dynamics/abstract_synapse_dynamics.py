@@ -15,7 +15,7 @@
 from __future__ import annotations
 import logging
 import numpy
-from typing import Any, List, Optional, Sequence, Tuple, TYPE_CHECKING
+from typing import Any, cast, List, Optional, Sequence, Tuple, TYPE_CHECKING
 from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
@@ -29,6 +29,7 @@ from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE as CONNECTOR_DTYPE)
+from spynnaker.pyNN.types import is_scalar
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections.connectors import (
         AbstractConnector)
@@ -161,8 +162,10 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             return delay
         if delay is None:
             delay = SpynnakerDataView.get_min_delay()
+        # Note the cast is just to say trust use the delay will work
+        # If not numpy will raise an exception
         new_delay = (
-                numpy.rint(numpy.array(delay) *
+                numpy.rint(numpy.array(cast(float, delay)) *
                            SpynnakerDataView.get_simulation_time_step_per_ms())
                 * SpynnakerDataView.get_simulation_time_step_ms())
         if not numpy.allclose(delay, new_delay):
@@ -187,7 +190,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             return weight
         if isinstance(weight, int):
             return weight
-        if numpy.isscalar(weight):
+        if is_scalar(weight):
             return float(weight)
         new_weight = numpy.array(weight, dtype=float)
         return new_weight
