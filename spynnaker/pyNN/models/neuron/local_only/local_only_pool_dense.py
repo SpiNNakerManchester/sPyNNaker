@@ -61,6 +61,11 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             raise SynapticConfigurationException(
                 "Only single value delays are supported")
 
+    @property
+    def _delay(self) -> float:
+        # Guaranteed by check in init
+        return cast(float, self.delay)
+
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics) -> LocalOnlyPoolDense:
         if not isinstance(synapse_dynamics, LocalOnlyPoolDense):
@@ -124,7 +129,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             seen_pre_vertices.add(pre_vertex)
 
             delay_vertex: Optional[DelayExtensionVertex] = None
-            if self.delay > app_vertex.splitter.max_support_delay():
+            if self._delay > app_vertex.splitter.max_support_delay():
                 delay_edge = app_edge.delay_edge
                 assert delay_edge is not None
                 delay_vertex = delay_edge.pre_vertex

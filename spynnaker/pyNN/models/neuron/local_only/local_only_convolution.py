@@ -81,9 +81,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             The delay used in the connection; by default 1 time step
         """
         super().__init__(delay)
-        if not isinstance(self.delay, float):
-            raise SynapticConfigurationException(
-                "Only single value delays are supported")
 
         # Store the overlaps between 2d vertices to avoid recalculation
         self.__cached_2d_overlaps: Dict[
@@ -93,7 +90,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         # Store the n_incoming to avoid recalcaultion
         self.__cached_n_incoming: Dict[ProjectionApplicationEdge, int] = {}
 
-    def __delay(self) -> float:
+    @property
+    def _delay(self) -> float:
         # Guaranteed by check in init
         return cast(float, self.delay)
 
@@ -182,7 +180,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
             data.extend(conn.get_local_only_data(
                 app_edge, source.vertex_slice, source.key, source.mask,
-                app_edge.pre_vertex.n_colour_bits, self.__delay, weight_index))
+                app_edge.pre_vertex.n_colour_bits, self._delay, weight_index))
         n_weights = next_weight_index
         if next_weight_index % 2 != 0:
             n_weights += 1
@@ -270,7 +268,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         :rtype: list(Source)
         """
         delay_vertex: Optional[DelayExtensionVertex] = None
-        if self.__delay > app_vertex.splitter.max_support_delay():
+        if self._delay > app_vertex.splitter.max_support_delay():
             # pylint: disable=protected-access
             delay_edge = incoming._projection_edge.delay_edge
             assert delay_edge is not None
