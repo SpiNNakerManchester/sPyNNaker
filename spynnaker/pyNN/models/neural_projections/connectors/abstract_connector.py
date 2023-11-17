@@ -53,15 +53,12 @@ class AbstractConnector(object, metaclass=AbstractBase):
                             ("synapse_type", "uint8")]
 
     __slots__ = [
-        "_delays",
         "__min_delay",
         "__n_clipped_delays",
         "__safe",
         "__space",
         "__verbose",
-        "_weights",
-        "__param_seeds",
-        "__synapse_info"]
+        "__param_seeds"]
 
     def __init__(self, safe=True, callback=None, verbose=False):
         """
@@ -80,7 +77,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
         self.__n_clipped_delays = numpy.int64(0)
         self.__min_delay = 0
         self.__param_seeds = dict()
-        self.__synapse_info = None
 
     def set_space(self, space):
         """
@@ -600,15 +596,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param ~pyNN.space.Space new_value:
         """
         self.__space = new_value
-
-    @property
-    def synapse_info(self):
-        """
-        The synapse_info object (may be updated after instantiation).
-
-        :rtype: synapse_info or None
-        """
-        return self.__synapse_info
 
     @property
     def verbose(self):
