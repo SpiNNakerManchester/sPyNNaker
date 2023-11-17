@@ -22,7 +22,7 @@ def get_mock(parameter, selector):
     if parameter == "bar":
         return [4, 5, 6]
     else:
-        pop = 1/0
+        raise NotImplementedError
 
 
 class TestParamHolder(unittest.TestCase):
