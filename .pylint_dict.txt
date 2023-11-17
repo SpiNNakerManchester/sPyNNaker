@@ -56,11 +56,14 @@ ApplicationVertex
 MachineVertex
 AbstractPopulationVertex
 ApplicationEdge
+DataType
 MachineEdge
 ProjectionApplicationEdge
 DelayedApplicationEdge
+DelayExtensionVertex
 ApplicationEdgePartition
 SourceSegmentedSDRAMMachinePartition
+SynapseRegionReferences
 PopulationBase
 PopulationView
 IDMixin
