@@ -144,9 +144,9 @@ static inline void add_input_alpha(alpha_state_t *a_params, input_t input) {
 	a_params->exp_buff =
 			decay_s1615(a_params->exp_buff, a_params->decay) + ONE;
 
-    a_params->lin_buff =
-            (a_params->lin_buff + (input * a_params->dt_divided_by_tau_sqr))
-            * (ONE - kdivk(ONE, a_params->exp_buff));
+	REAL exp_temp = ONE - kdivk(ONE, a_params->exp_buff);
+    a_params->lin_buff = (a_params->lin_buff + (
+    		input * a_params->dt_divided_by_tau_sqr)) * exp_temp;
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
@@ -221,7 +221,7 @@ static inline const char *synapse_types_get_type_char(
 //! \param[in] parameters: the pointer to the parameters to print
 static inline void synapse_types_print_input(
         synapse_types_t *parameters) {
-    io_printf(IO_BUF, "%12.6k - %12.6k",
+    log_debug("%12.6k - %12.6k",
             parameters->exc.lin_buff * parameters->exc.exp_buff,
             parameters->inh.lin_buff * parameters->inh.exp_buff);
 }

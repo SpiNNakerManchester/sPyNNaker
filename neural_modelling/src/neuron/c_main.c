@@ -37,7 +37,13 @@
 #include "c_main_common.h"
 #include "regions.h"
 #include "profile_tags.h"
+//#include "spike_profiling.h"
 #include "spike_processing.h"
+
+//struct spike_holder_t spike_counter;
+//struct spike_holder_t spike_cache;
+//struct spike_holder_t spike_counter_inh;
+//struct spike_holder_t spike_cache_inh;
 
 //! The combined provenance from synapses and neurons
 struct combined_provenance {
@@ -69,6 +75,7 @@ const struct common_priorities COMMON_PRIORITIES = {
     .dma = DMA,
     .timer = TIMER
 };
+
 
 //! From the regions, extract those that are neuron-specific
 const struct neuron_regions NEURON_REGIONS = {
@@ -153,9 +160,9 @@ static inline void process_ring_buffers(void) {
     neuron_transfer(&ring_buffers[first_index]);
 
     // Print the neuron inputs.
-    #if LOG_LEVEL >= LOG_DEBUG
-        neuron_print_inputs();
-    #endif // LOG_LEVEL >= LOG_DEBUG
+#if LOG_LEVEL >= LOG_DEBUG
+	neuron_print_inputs();
+#endif // LOG_LEVEL >= LOG_DEBUG
 }
 
 //! \brief Background activities called from timer
@@ -179,6 +186,18 @@ void background_callback(uint timer_count, uint local_time) {
 //!            executed since start of simulation
 //! \param[in] unused: unused parameter kept for API consistency
 void timer_callback(uint timer_count, UNUSED uint unused) {
+
+//    // Get number of spikes in last tick, and reset spike counter
+//    spike_processing_get_and_reset_spikes_this_tick();
+//    spike_processing_get_and_reset_dmas_this_tick();
+//    spike_processing_get_and_reset_pipeline_restarts_this_tick();
+//
+//    // cache and flush spike counters
+//	spike_profiling_cache_and_flush_spike_holder(&spike_counter,
+//			&spike_cache);
+//	spike_profiling_cache_and_flush_spike_holder(&spike_counter_inh,
+//			&spike_cache_inh);
+
     // Disable interrupts to stop DMAs and MC getting in the way of this bit
     uint32_t state = spin1_int_disable();
 

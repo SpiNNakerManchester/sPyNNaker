@@ -19,6 +19,7 @@ from pacman.model.resources import MultiRegionSDRAM
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.utilities.algorithm_utilities\
     .partition_algorithm_utilities import get_multidimensional_slices
+from pacman.utilities.utility_calls import get_n_bits_for_fields
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex,
     PopulationMachineLocalOnlyCombinedVertex, LocalOnlyProvenance)
@@ -35,6 +36,8 @@ from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 
 # The maximum number of bits for the ring buffer index that are likely to
@@ -76,13 +79,46 @@ class SplitterAbstractPopulationVertexFixed(
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
         app_vertex = self.governed_app_vertex
+
+        # Do some checks to make sure everything is likely to fit
+        field_sizes = [
+            min(max_atoms, n) for max_atoms, n in zip(
+                app_vertex.get_max_atoms_per_dimension_per_core(),
+                app_vertex.atoms_shape)]
+        n_atom_bits = get_n_bits_for_fields(field_sizes)
+        n_synapse_types = app_vertex.neuron_impl.get_n_synapse_types()
+        if (n_atom_bits + get_n_bits(n_synapse_types) +
+                get_n_bits(self.max_support_delay())) > MAX_RING_BUFFER_BITS:
+            raise SynapticConfigurationException(
+                "The combination of the number of neurons per core ({}), "
+                "the number of synapse types ({}), and the maximum delay per "
+                "core ({}) will require too much DTCM.  Please reduce one or "
+                "more of these values.".format(
+                    field_sizes, n_synapse_types, self.max_support_delay()))
+
         app_vertex.synapse_recorder.add_region_offset(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
 
         max_atoms_per_core = min(
             app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
 
-        ring_buffer_shifts = app_vertex.get_ring_buffer_shifts()
+        ring_buffer_shifts = None
+        app_vertex = self._governed_app_vertex
+        if (hasattr(app_vertex, "rb_left_shifts") and
+                app_vertex.rb_left_shifts is not None):
+            print("=" * 80)
+            print("Using given values for RB left shifts.")
+            ring_buffer_shifts = app_vertex.rb_left_shifts
+            print("RB left shifts for {:20}".format(app_vertex.label),
+                  "=", ring_buffer_shifts)
+            print("-" * 80)
+        else:
+            print("=" * 80)
+            print("Computing RB left shifts for", app_vertex.label)
+            ring_buffer_shifts = app_vertex.get_ring_buffer_shifts()
+            print("RB left shifts for {:20}".format(app_vertex.label),
+                  "=", ring_buffer_shifts)
+
         weight_scales = app_vertex.get_weight_scales(ring_buffer_shifts)
         all_syn_block_sz = app_vertex.get_synapses_size(
             max_atoms_per_core)

@@ -827,6 +827,17 @@ class Population(PopulationBase):
                 "Model must be either an AbstractPyNNModel or a"
                 " PopulationApplicationVertex")
 
+        # Getting custom RB LS
+        if (additional_parameters is not None and
+                "rb_left_shifts" in additional_parameters.keys()):
+            rb_left_shifts = additional_parameters['rb_left_shifts']
+        else:
+            rb_left_shifts = None
+
+        # Setting custom RB LS
+        if rb_left_shifts is not None:
+            self.__vertex.set_rb_left_shifts(rb_left_shifts)
+
     @staticmethod
     def create(cellclass, cellparams=None, n=1):
         """

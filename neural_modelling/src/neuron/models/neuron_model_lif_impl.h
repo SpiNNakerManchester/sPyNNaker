@@ -20,6 +20,7 @@
 #define _NEURON_MODEL_LIF_CURR_IMPL_H_
 
 #include "neuron_model.h"
+#include "round.h"
 
 //! definition for LIF neuron parameters
 struct neuron_params_t {
@@ -118,10 +119,16 @@ static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *par
 //! \param[in] input_this_timestep: The input to apply
 static inline void lif_neuron_closed_form(
         neuron_t *neuron, REAL V_prev, input_t input_this_timestep) {
-    REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
+    // accum = accum * accum + accum
+//    REAL alpha = (input_this_timestep * neuron->R_membrane) + neuron->V_rest;
+    REAL alpha = MULT_ROUND_NEAREST_ACCUM(
+        input_this_timestep, neuron->R_membrane) + neuron->V_rest;
 
     // update membrane voltage
-    neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev));
+    // accum -  (ufract * (accum - accum))
+//    neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev));
+    neuron->V_membrane = alpha - MULT_ROUND_NEAREST_ACCUM(
+        neuron->exp_TC, (alpha - V_prev));
 }
 
 //! \brief primary function called in timer loop after synaptic updates
@@ -157,7 +164,7 @@ static inline state_t neuron_model_state_update(
         }
         // Get the input in nA
         input_t input_this_timestep =
-                total_exc - total_inh + external_bias + neuron->I_offset + current_offset;
+                total_exc - total_inh - external_bias + neuron->I_offset + current_offset;
 
         lif_neuron_closed_form(
                 neuron, neuron->V_membrane, input_this_timestep);

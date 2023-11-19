@@ -165,6 +165,7 @@ class AbstractPopulationVertex(
         "__ring_buffer_sigma",
         "__spikes_per_second",
         "__drop_late_spikes",
+        "__rb_left_shifts",
         "__incoming_projections",
         "__incoming_poisson_projections",
         "__synapse_dynamics",
@@ -205,7 +206,7 @@ class AbstractPopulationVertex(
             self, n_neurons, label, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model, drop_late_spikes, splitter, seed,
-            n_colour_bits):
+            n_colour_bits, rb_left_shifts):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
@@ -259,6 +260,8 @@ class AbstractPopulationVertex(
         if self.__drop_late_spikes is None:
             self.__drop_late_spikes = get_config_bool(
                 "Simulation", "drop_late_spikes")
+
+        self.__rb_left_shifts = rb_left_shifts
 
         self.__neuron_impl = neuron_impl
         self.__pynn_model = pynn_model
@@ -555,6 +558,16 @@ class AbstractPopulationVertex(
         :rtype: bool
         """
         return self.__drop_late_spikes
+
+    @property
+    def rb_left_shifts(self):
+        """ ring buffer left shifts (for use by user)
+        :rtype: bool
+        """
+        return self.__rb_left_shifts
+
+    def set_rb_left_shifts(self, rb_left_shifts):
+        self.__rb_left_shifts = rb_left_shifts
 
     def get_sdram_usage_for_core_neuron_params(self, n_atoms):
         """
@@ -1074,7 +1087,7 @@ class AbstractPopulationVertex(
         # Convert these to powers; we could use int.bit_length() for this if
         # they were integers, but they aren't...
         max_weight_powers = (
-            0 if w <= 0 else int(math.ceil(max(0, math.log2(w))))
+            0 if w <= 1 else int(math.ceil(max(0, math.log2(w))))
             for w in max_weights)
 
         # If 2^max_weight_power equals the max weight, we have to add another
@@ -1593,6 +1606,7 @@ class _Stats(object):
         "biggest_weight",
         "rate_stats",
         "steps_per_second",
+        "min_max_weight",
         "default_spikes_per_second",
         "ring_buffer_sigma"
     ]
@@ -1613,6 +1627,7 @@ class _Stats(object):
 
         self.steps_per_second = (
             SpynnakerDataView.get_simulation_time_step_per_s())
+        self.min_max_weight = numpy.ones(n_synapse_types) * 2 ** 32
         self.default_spikes_per_second = default_spikes_per_second
         self.ring_buffer_sigma = ring_buffer_sigma
 
@@ -1666,6 +1681,7 @@ class _Stats(object):
             self, proj, s_type, n_conns, w_mean, w_var, w_max, d_var):
         self.running_totals[s_type].add_items(
             w_mean * self.w_scale, w_var * self.w_scale_sq, n_conns)
+        self.min_max_weight[s_type] = min(self.min_max_weight[s_type], w_max)
         self.biggest_weight[s_type] = max(
             self.biggest_weight[s_type], w_max * self.w_scale)
         self.delay_running_totals[s_type].add_items(0.0, d_var, n_conns)
@@ -1689,14 +1705,24 @@ class _Stats(object):
 
     def get_max_weight(self, s_type):
         if self.delay_running_totals[s_type].variance == 0.0:
-            return max(self.total_weights[s_type], self.biggest_weight[s_type])
+            w_max = max(self.total_weights[s_type],
+                        self.biggest_weight[s_type])
+        else:
+            stats = self.running_totals[s_type]
+            rates = self.rate_stats[s_type]
+            # pylint: disable=protected-access
+            w_max = AbstractPopulationVertex._ring_buffer_expected_upper_bound(
+                stats.mean, stats.standard_deviation, rates.mean,
+                stats.n_items, self.ring_buffer_sigma)
+            w_max = min(w_max, self.total_weights[s_type])
+            w_max = max(w_max, self.biggest_weight[s_type])
 
-        stats = self.running_totals[s_type]
-        rates = self.rate_stats[s_type]
-        # pylint: disable=protected-access
-        w_max = AbstractPopulationVertex._ring_buffer_expected_upper_bound(
-            stats.mean, stats.standard_deviation, rates.mean,
-            stats.n_items, self.ring_buffer_sigma)
-        w_max = min(w_max, self.total_weights[s_type])
-        w_max = max(w_max, self.biggest_weight[s_type])
+        # This is to deal with very small weights that are floored to zero
+        if self.min_max_weight[s_type] != 0:
+            mmw = 2**math.floor(math.log(self.min_max_weight[s_type], 2))
+        else:                # if it is zero then can't take logs...
+            small = 1.0 / 65536.0
+            mmw = 2**math.floor(math.log(small, 2))
+        w_max = min(mmw * 2 ** 15, w_max)
+
         return w_max

@@ -67,7 +67,21 @@ class SpikeProcessingFastProvenance(ctypes.LittleEndianStructure):
         # The latest time a spike was received
         ("latest_receive", ctypes.c_uint32),
         # The maximum overflow of spikes in a time step
-        ("max_spikes_overflow", ctypes.c_uint32)
+        ("max_spikes_overflow", ctypes.c_uint32),
+        # Custom provenance from SpiNNCer - max spikes in a tick
+        ("max_spikes_in_a_tick", ctypes.c_uint32),
+        # max dmas in a tick
+        ("max_dmas_in_a_tick", ctypes.c_uint32),
+        # max pipeline restarts
+        ("max_pipeline_restarts", ctypes.c_uint32),
+        # timer callback completed?
+        ("timer_callback_completed", ctypes.c_uint32),
+        # spikes pipeline activated?
+        ("spikes_pipeline_activated", ctypes.c_uint32),
+        # Max flushed spikes in a timestep
+        ("max_flushed_spikes", ctypes.c_uint32),
+        # Total flushed spikes
+        ("total_flushed_spikes", ctypes.c_uint32)
     ]
 
     N_ITEMS = len(_fields_)
@@ -94,6 +108,16 @@ class PopulationSynapsesMachineVertexCommon(
     EARLIEST_RECEIVE = "Earliest_receive_time"
     LATEST_RECEIVE = "Latest_receive_time"
     MAX_SPIKE_OVERFLOW = "Max_spike_overflow_in_time_step"
+
+    # Custom provenance from SpiNNCer
+    MAX_SPIKES_IN_A_TICK = "Maximum number of spikes in a timer tick"
+    MAX_DMAS_IN_A_TICK = "Maximum number of DMAs in a timer tick"
+    MAX_PIPELINE_RESTARTS = "Maximum pipeline restarts"
+    TIMER_CALLBACK_COMPLETED = "Was the timer callback completed?"
+    SPIKES_PIPELINE_ACTIVATED = "Was the spikes pipeline activated?"
+    # Flushed spikes
+    MAX_FLUSHED_SPIKES = "Maximum number of spikes flushed in a timer tick"
+    TOTAL_FLUSHED_SPIKES = "Total number of spikes flushed"
 
     __slots__ = [
         "__sdram_partition",
@@ -374,3 +398,47 @@ class PopulationSynapsesMachineVertexCommon(
                 x, y, p, self.LATEST_RECEIVE, prov.latest_receive)
             db.insert_core(
                 x, y, p, self.MAX_SPIKE_OVERFLOW, prov.max_spikes_overflow)
+
+            # SpiNNCer
+            db.insert_core(
+                x, y, p, self.MAX_SPIKES_IN_A_TICK,
+                prov.max_spikes_in_a_tick)
+            if prov.max_spikes_in_a_tick > 200:
+                db.insert_report(
+                    f"Max number of spikes for {label} was "
+                    f"{prov.max_spikes_in_a_tick}. Empirically, we "
+                    f"can deal with ~200 for real time performance using a "
+                    f"1.0 ms timestep.")
+
+            db.insert_core(
+                x, y, p, self.MAX_DMAS_IN_A_TICK,
+                prov.max_dmas_in_a_tick)
+
+            db.insert_core(
+                x, y, p, self.MAX_PIPELINE_RESTARTS,
+                prov.max_pipeline_restarts)
+
+            db.insert_core(
+                x, y, p, self.TIMER_CALLBACK_COMPLETED,
+                prov.timer_callback_completed)
+
+            db.insert_core(
+                x, y, p, self.SPIKES_PIPELINE_ACTIVATED,
+                prov.spikes_pipeline_activated)
+
+            # FLUSHED SPIKES
+            db.insert_core(
+                x, y, p, self.MAX_FLUSHED_SPIKES,
+                prov.max_flushed_spikes)
+            if prov.max_flushed_spikes > 0:
+                db.insert_report(
+                    f"Max number of flushed spikes for {label} was "
+                    f"was {prov.max_flushed_spikes}.")
+
+            db.insert_core(
+                x, y, p, self.TOTAL_FLUSHED_SPIKES,
+                prov.total_flushed_spikes)
+            if prov.total_flushed_spikes > 0:
+                db.insert_report(
+                    f"Total number of flushed spikes for {label} was "
+                    f"{prov.total_flushed_spikes}.")

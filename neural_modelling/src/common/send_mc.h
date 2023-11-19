@@ -32,10 +32,10 @@ static inline void wait_for_cc(void) {
         spin1_delay_us(1);
         n_loops++;
     }
-    if (!(cc[CC_TCR] & TX_NOT_FULL_MASK)) {
-        log_error("Couldn't send spike; TCR=0x%08x\n", cc[CC_TCR]);
-        rt_error(RTE_SWERR);
-    }
+//    if (!(cc[CC_TCR] & TX_NOT_FULL_MASK)) {
+//        log_error("Couldn't send spike; TCR=0x%08x\n", cc[CC_TCR]);
+//        rt_error(RTE_SWERR);
+//    }
 }
 
 //! \brief Perform direct spike sending with hardware for speed

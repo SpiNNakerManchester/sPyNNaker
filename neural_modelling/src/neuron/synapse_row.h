@@ -95,6 +95,15 @@
 #define SYNAPSE_WEIGHT_BITS 16
 #endif
 
+//! how many bits the synapse delay will take
+#ifndef SYNAPSE_DELAY_BITS
+#define SYNAPSE_DELAY_BITS 6
+#endif
+
+// Create some masks based on the number of bits
+//! the mask for the synapse delay in the row
+#define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
+
 #ifdef SYNAPSE_WEIGHTS_SIGNED
 //! Define the type of the weights
 typedef __int_t(SYNAPSE_WEIGHT_BITS) weight_t;

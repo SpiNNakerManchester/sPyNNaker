@@ -76,7 +76,7 @@ static inline input_t additional_input_get_input_value_as_current(
     additional_input->i_ca2 *= additional_input->exp_tau_ca2;
 
     // Return the Ca2
-    return -additional_input->i_ca2;
+    return additional_input->i_ca2;
 }
 
 //! \brief Notifies the additional input type that the neuron has spiked

@@ -97,6 +97,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # pynn demanded objects
         self.__recorders = set([])
 
+        # Structured provenance_items
+        self.structured_provenance_filename = None
+
         # main pynn interface inheritance
         pynn_control.BaseState.__init__(self)
 
@@ -336,6 +339,29 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             self._data_writer.set_up_timings_and_delay(
                 math.ceil(timestep * MICRO_TO_MILLISECOND_CONVERSION),
                 time_scale_factor, min_delay)
+
+        # TODO: work out if this max_delay code is necessary or not
+        #
+        # # Sort out the maximum delay
+        # natively_supported_delay_for_models = \
+        #     constants.MAX_SUPPORTED_DELAY_TICS
+        # delay_extension_max_supported_delay = (
+        #     constants.MAX_DELAY_BLOCKS *
+        #     constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
+        # max_delay_tics_supported = \
+        #     natively_supported_delay_for_models + \
+        #     delay_extension_max_supported_delay
+        # if (max_delay is not None and max_delay * 1000.0 >
+        #         max_delay_tics_supported * machine_time_step):
+        #     raise ConfigurationException(
+        #         "Pacman does not support max delays above {} ms with the "
+        #         "current machine time step".format(
+        #             max_delay_tics_supported * self.machine_time_step_ms))
+        # if max_delay is not None:
+        #     self.__max_delay = max_delay
+        # else:
+        #     self.__max_delay = (
+        #         max_delay_tics_supported * self.machine_time_step_ms)
 
         # Check the combination of machine time step and time scale factor
         if (self._data_writer.get_simulation_time_step_ms() *

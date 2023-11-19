@@ -20,6 +20,7 @@
 #define _INPUT_TYPE_CONDUCTANCE_H_
 
 #include "input_type.h"
+//#include "round.h"
 
 //! Conductance input parameters
 struct input_type_params_t {
@@ -59,7 +60,7 @@ static inline input_t *input_type_get_input_value(
         input_t *restrict value, UNUSED input_type_t *input_type,
         uint16_t num_receptors) {
     for (int i = 0; i < num_receptors; i++) {
-        value[i] = value[i] >> 10;
+        value[i] = value[i] >> 5;
     }
     return &value[0];
 }
@@ -74,8 +75,12 @@ static inline void input_type_convert_excitatory_input_to_current(
         input_t *restrict exc_input, const input_type_t *input_type,
         state_t membrane_voltage) {
     for (int i=0; i < NUM_EXCITATORY_RECEPTORS; i++) {
+        // accum = accum * (accum - accum)
         exc_input[i] = exc_input[i] *
                 (input_type->V_rev_E - membrane_voltage);
+        // RTN accum
+//        exc_input[i] = MULT_ROUND_NEAREST_ACCUM(exc_input[i],
+//                (input_type->V_rev_E - membrane_voltage));
     }
 }
 
@@ -89,8 +94,12 @@ static inline void input_type_convert_inhibitory_input_to_current(
         input_t *restrict inh_input, const input_type_t *input_type,
         state_t membrane_voltage) {
     for (int i=0; i < NUM_INHIBITORY_RECEPTORS; i++) {
+        // accum = accum * (accum - accum)
         inh_input[i] = -inh_input[i] *
                 (input_type->V_rev_I - membrane_voltage);
+        // RTN accum
+//        inh_input[i] = MULT_ROUND_NEAREST_ACCUM(-inh_input[i],
+//                (input_type->V_rev_I - membrane_voltage));
     }
 }
 
