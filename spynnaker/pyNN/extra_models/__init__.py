@@ -34,6 +34,16 @@ from spynnaker.pyNN.models.neuron.builds import (
 # Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
 
+# ICub VOR imports - Cerebellum Plasticity
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependencePFPC as TimingDependencePFPC)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceMFVN as TimingDependenceMFVN)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependenceMFVN as WeightDependenceMFVN)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependencePFPC as WeightDependencePFPC)
+
 __all__ = [
     # sPyNNaker models not currently part of full pyNN
     'IFCurDelta', 'IFCurrExpCa2Adaptive', 'IFCondExpStoc',
@@ -48,6 +58,8 @@ __all__ = [
     'PfisterSpikeTriplet',
     'SpikeNearestPairRule',
     'RecurrentRule', 'Vogels2011Rule',
+    "TimingDependencePFPC", "WeightDependencePFPC",  # ICub VOR
+    'TimingDependenceMFVN', 'WeightDependenceMFVN',  # ICub VOR
 
     # Variable rate Poisson
     'SpikeSourcePoissonVariable']

@@ -135,4 +135,16 @@ static inline void in_spikes_clear(void) {
 static inline spike_t in_spikes_value_at_index(uint32_t index) {
     return circular_buffer_value_at_index(buffer, index);
 }
+
+#if LOG_LEVEL >= LOG_DEBUG
+// FLUSH SPIKES
+static inline uint32_t in_spikes_flush_buffer(void) {
+
+	uint32_t num_spikes_left = circular_buffer_size(buffer);
+	circular_buffer_clear(buffer);
+
+	return num_spikes_left;
+}
+#endif
+
 #endif // _IN_SPIKES_H_

@@ -66,7 +66,7 @@ def calculate_spike_pair_additive_stdp_weight(
         (depression_times / tau_minus))
 
     print("Potentiations: ", potentiation_times, potentiations)
-    print("Depressions:", depression_times, depressions)
+    print("Depressions: ", depression_times, depressions)
     return initial_weight + numpy.sum(potentiations) - numpy.sum(depressions)
 
 

@@ -39,6 +39,10 @@
 #include "profile_tags.h"
 #include "spike_processing.h"
 
+// FLUSH SPIKES
+//bool timer_callback_active = false;
+//extern volatile bool dma_busy;
+
 //! The combined provenance from synapses and neurons
 struct combined_provenance {
     struct neuron_provenance neuron_provenance;
@@ -179,7 +183,12 @@ void background_callback(uint timer_count, uint local_time) {
 //!            executed since start of simulation
 //! \param[in] unused: unused parameter kept for API consistency
 void timer_callback(uint timer_count, UNUSED uint unused) {
-    // Disable interrupts to stop DMAs and MC getting in the way of this bit
+//    // Get number of spikes in last tick, and reset spike counter
+//    spike_processing_get_and_reset_spikes_this_tick();
+//    spike_processing_get_and_reset_dmas_this_tick();
+//    spike_processing_get_and_reset_pipeline_restarts_this_tick();
+
+	// Disable interrupts to stop DMAs and MC getting in the way of this bit
     uint32_t state = spin1_int_disable();
 
     // Increment time step

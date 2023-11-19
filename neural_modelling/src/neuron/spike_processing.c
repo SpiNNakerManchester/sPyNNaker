@@ -441,14 +441,14 @@ bool spike_processing_initialise( // EXPORTED
         }
     }
     dma_busy = false;
-    clear_input_buffers_of_late_packets =
-        clear_input_buffers_of_late_packets_init;
+    clear_input_buffers_of_late_packets = clear_input_buffers_of_late_packets_init;
     next_buffer_to_fill = 0;
     buffer_being_read = N_DMA_BUFFERS;
     p_per_ts_region = packets_per_timestep_region;
 
     // Allocate incoming spike buffer
     if (!in_spikes_initialize_spike_buffer(incoming_spike_buffer_size)) {
+    	log_error("Spike buffer failed to initialise - insufficient DTCM \n");
         return false;
     }
 

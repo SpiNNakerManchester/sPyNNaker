@@ -209,7 +209,22 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
 
         # Work out the ring buffer shifts based on all incoming things
-        rb_shifts = app_vertex.get_ring_buffer_shifts()
+        rb_shifts = None
+        if (hasattr(app_vertex, "rb_left_shifts") and
+                app_vertex.rb_left_shifts is not None):
+            print("=" * 80)
+            print("Using given values for RB left shifts.")
+            rb_shifts = app_vertex.rb_left_shifts
+            print("RB left shifts for {:20}".format(app_vertex.label),
+                  "=", rb_shifts)
+            print("-" * 80)
+        else:
+            print("=" * 80)
+            print("Computing RB left shifts for", app_vertex.label)
+            rb_shifts = app_vertex.get_ring_buffer_shifts()
+            print("RB left shifts for {:20}".format(app_vertex.label),
+                  "=", rb_shifts)
+
         weight_scales = app_vertex.get_weight_scales(rb_shifts)
 
         # We add the SDRAM edge SDRAM to the neuron resources so it is

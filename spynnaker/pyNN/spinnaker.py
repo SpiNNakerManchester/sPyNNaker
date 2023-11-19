@@ -97,6 +97,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # pynn demanded objects
         self.__recorders = set([])
 
+        # Structured provenance_items
+        self.structured_provenance_filename = None
+
         # main pynn interface inheritance
         pynn_control.BaseState.__init__(self)
 

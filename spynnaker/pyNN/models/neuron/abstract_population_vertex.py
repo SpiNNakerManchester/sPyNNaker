@@ -165,6 +165,7 @@ class AbstractPopulationVertex(
         "__ring_buffer_sigma",
         "__spikes_per_second",
         "__drop_late_spikes",
+        "__rb_left_shifts",
         "__incoming_projections",
         "__incoming_poisson_projections",
         "__synapse_dynamics",
@@ -205,7 +206,7 @@ class AbstractPopulationVertex(
             self, n_neurons, label, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model, drop_late_spikes, splitter, seed,
-            n_colour_bits):
+            n_colour_bits, rb_left_shifts):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
@@ -232,6 +233,7 @@ class AbstractPopulationVertex(
             The Population seed, used to ensure the same random generation
             on each run.
         :param int n_colour_bits: The number of colour bits to use
+        :param int rb_left_shifts: The left shifts to use
         """
         # pylint: disable=too-many-arguments
         super().__init__(label, max_atoms_per_core, splitter)
@@ -259,6 +261,8 @@ class AbstractPopulationVertex(
         if self.__drop_late_spikes is None:
             self.__drop_late_spikes = get_config_bool(
                 "Simulation", "drop_late_spikes")
+
+        self.__rb_left_shifts = rb_left_shifts
 
         self.__neuron_impl = neuron_impl
         self.__pynn_model = pynn_model
@@ -555,6 +559,17 @@ class AbstractPopulationVertex(
         :rtype: bool
         """
         return self.__drop_late_spikes
+
+    @property
+    def rb_left_shifts(self):
+        """ ring buffer left shifts (for use by user)
+
+        :rtype: bool
+        """
+        return self.__rb_left_shifts
+
+    def set_rb_left_shifts(self, rb_left_shifts):
+        self.__rb_left_shifts = rb_left_shifts
 
     def get_sdram_usage_for_core_neuron_params(self, n_atoms):
         """

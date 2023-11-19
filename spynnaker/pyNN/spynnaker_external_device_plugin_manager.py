@@ -24,6 +24,7 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.populations import Population
+from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 
 
 class SpynnakerExternalDevicePluginManager(object):
@@ -185,8 +186,10 @@ class SpynnakerExternalDevicePluginManager(object):
         # pylint: disable=protected-access
         if isinstance(device, Population):
             device_vertex = device._vertex
-        SpynnakerExternalDevicePluginManager.add_edge(
+        edge = SpynnakerExternalDevicePluginManager.add_edge(
             population._vertex, device_vertex, partition_id)
+        if isinstance(device_vertex, SpikeSourcePoissonVertex):
+            device_vertex.set_live_poisson_control_edge(edge)
 
     @staticmethod
     def update_live_packet_gather_tracker(

@@ -1,0 +1,156 @@
+/*
+ * Copyright (c) 2017-2021 The University of Manchester
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef _TIMING_PFPC_IMPL_H_
+#define _TIMING_PFPC_IMPL_H_
+
+// PF-PC STDP rules as defined by e.g. Luque et al 2019
+// https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006298
+
+//---------------------------------------
+// Typedefines
+//---------------------------------------
+typedef int16_t post_trace_t;
+typedef int16_t pre_trace_t;
+
+#include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h>
+#include "timing.h"
+#include <neuron/plasticity/stdp/weight_dependence/weight_one_term.h>
+
+// Include debug header for log_info etc
+#include <debug.h>
+
+// Include generic plasticity maths functions
+#include <neuron/plasticity/stdp/maths.h>
+#include <neuron/plasticity/stdp/stdp_typedefs.h>
+
+//---------------------------------------
+// Macros
+//---------------------------------------
+// Exponential decay lookup parameters
+#define TAU_PLUS_TIME_SHIFT 0
+
+//---------------------------------------
+// Timing dependence inline functions
+//---------------------------------------
+static inline post_trace_t timing_get_initial_post_trace(void) {
+    return 0;
+}
+
+static inline post_trace_t timing_decay_post(
+        uint32_t time, uint32_t last_time, post_trace_t last_trace) {
+    extern int16_lut *exp_sin_lookup;
+    // Get time since last spike
+    uint32_t delta_time = time - last_time;
+
+    // Decay previous o1 and o2 traces
+    return (post_trace_t) STDP_FIXED_MUL_16X16(last_trace,
+            maths_lut_exponential_decay(delta_time, exp_sin_lookup));
+}
+
+//---------------------------------------
+static inline post_trace_t timing_add_post_spike(
+        uint32_t time, uint32_t last_time, post_trace_t last_trace) {
+    use(time);
+    use(last_time);
+    use(&last_trace);
+
+//	if (print_plasticity){
+//		io_printf(IO_BUF,
+//				"Adding climbing fibre spike to post-event history (stored on neuron\n");
+//	}
+
+    // Add energy caused by new spike to trace
+    // **NOTE** o2 trace is pre-multiplied by a3_plus
+    int32_t new_o1_trace = 0; //decayed_o1_trace + STDP_FIXED_POINT_ONE;
+
+    // Return new pre- synaptic event with decayed trace values with energy
+    // for new spike added
+    return (post_trace_t) new_o1_trace;
+}
+
+//---------------------------------------
+static inline pre_trace_t timing_add_pre_spike(
+        uint32_t time, uint32_t last_time, pre_trace_t last_trace) {
+    use(time);
+    use(last_time);
+    use(&last_trace);
+
+    return (pre_trace_t) 0; //new_r1_trace;
+}
+
+//---------------------------------------
+static inline update_state_t timing_apply_pre_spike(
+        uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
+        pre_trace_t last_pre_trace, uint32_t last_post_time,
+        post_trace_t last_post_trace, update_state_t previous_state) {
+    use(time);
+    use(&trace);
+    use(last_pre_time);
+    use(last_post_time);
+    use(&last_pre_trace);
+    use(&last_post_trace);
+
+    // Here we will potentiate by the fixed amount alpha
+//    if (print_plasticity){
+//    	io_printf(IO_BUF, "    This is where we'll do potentiation\n");
+//    }
+
+    return weight_one_term_apply_potentiation(previous_state, 0);
+}
+
+//---------------------------------------
+static inline update_state_t timing_apply_post_spike(
+        uint32_t time, post_trace_t trace, uint32_t last_pre_time,
+        pre_trace_t last_pre_trace, uint32_t last_post_time,
+        post_trace_t last_post_trace, update_state_t previous_state) {
+    use(time);
+    use(&trace);
+    use(last_pre_time);
+    use(last_post_time);
+    use(&last_pre_trace);
+    use(&last_post_trace);
+    extern int16_lut *exp_sin_lookup;
+
+    // This is where we lookup the value of e^(-x) * sin(x)^20
+
+    // Get time of event relative to last pre-synaptic event
+    uint32_t time_since_last_pre = last_pre_time; //time - last_pre_time;
+
+//    if (print_plasticity){
+//    	io_printf(IO_BUF, "            delta t = %u,    ", time_since_last_pre);
+//    }
+
+    if (time_since_last_pre < 255){
+        int32_t multiplier = maths_lut_exponential_decay_time_shifted(
+                time_since_last_pre, TAU_PLUS_TIME_SHIFT, exp_sin_lookup);
+
+//        if (print_plasticity){
+//        	io_printf(IO_BUF, "multiplier: %k (fixed = %u)\n", multiplier << 4, multiplier);
+//        }
+
+        return weight_one_term_apply_depression(previous_state, multiplier);
+    }
+
+//    if (print_plasticity){
+//    	io_printf(IO_BUF, "            delta t = %u,    ", time_since_last_pre);
+//    	io_printf(IO_BUF, "        out of LUT range (do nothing)");
+//    }
+
+    return previous_state;
+}
+
+#endif // _TIMING_PFPC_IMPL_H_

@@ -26,6 +26,8 @@
 #include <debug.h>
 #include <wfi.h>
 
+extern bool timer_callback_active;
+
 //! DMA buffer structure combines the row read from SDRAM with information
 //! about the read.
 typedef struct dma_buffer {
@@ -113,6 +115,21 @@ static uint32_t earliest_spike_received_time = 0;
 
 //! The maximum number of spikes left at the end of a time step
 static uint32_t max_spikes_overflow = 0;
+
+static uint32_t max_spikes_in_a_tick;
+static uint32_t max_dmas_in_a_tick;
+//static uint32_t dma_complete_count;
+static uint32_t max_pipeline_restarts;
+static uint32_t timer_callback_completed = 0;
+static uint32_t spikes_this_time_step = 0;
+static uint32_t dmas_this_time_step = 0;
+static uint32_t pipeline_restarts = 0;
+
+//#if LOG_LEVEL >= LOG_DEBUG
+static uint32_t spike_pipeline_deactivation_time = 0;
+static uint32_t max_flushed_spikes = 0;
+static uint32_t total_flushed_spikes = 0;
+//#endif
 
 //! The number of packets received this time step for recording
 static struct {
@@ -522,6 +539,26 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
             // wait_for_interrupt();
         }
 
+#if LOG_LEVEL >= LOG_DEBUG
+        // NOTE: this code is left over from previous testing; it's left
+        //       here in case there's any interest in testing again using it
+		// If timer is getting low, don't do next DMA and instead flush spike buffer
+		// originally 6657 clock cycles from the end of the interval was used
+		if (tc[T1_COUNT] < 6657) {
+				uint cpsr = spin1_int_disable();
+				uint32_t spikes_remaining = in_spikes_flush_buffer();
+				timer_callback_active = true;
+				spin1_mode_restore(cpsr);
+				if (spikes_remaining > 0){
+					total_flushed_spikes += spikes_remaining;
+
+					if (spikes_remaining > max_flushed_spikes){
+						max_flushed_spikes = spikes_remaining;
+					}
+				}
+		}
+#endif
+
         // If the timer has gone off, that takes precedence
         if (is_end_of_time_step()) {
             clear_end_of_time_step();
@@ -550,12 +587,16 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
                 break;
             }
             dma_complete_count++;
+            dmas_this_time_step++;
             if (dma_in_progress) {
                 read_synaptic_row(spike, &result);
             }
 
             // Process the row we already have while the DMA progresses
             process_current_row(time, dma_in_progress);
+
+            // Increment counter for spike processing pipeline restarts
+            pipeline_restarts++;
 
         }
 
@@ -578,6 +619,7 @@ static inline void check_times(void) {
 void multicast_packet_received_callback(uint key, UNUSED uint unused) {
     log_debug("Received spike %x", key);
     p_per_ts_struct.packets_this_time_step++;
+    spikes_this_time_step += 1;
     in_spikes_add_spike(key);
     check_times();
 }
@@ -588,6 +630,7 @@ void multicast_packet_received_callback(uint key, UNUSED uint unused) {
 void multicast_packet_pl_received_callback(uint key, uint payload) {
     log_debug("Received spike %x with payload %d", key, payload);
     p_per_ts_struct.packets_this_time_step++;
+    spikes_this_time_step += 1;
 
     // cycle through the packet insertion
     for (uint count = payload; count > 0; count--) {
@@ -656,4 +699,46 @@ void spike_processing_fast_store_provenance(
     prov->earliest_receive = earliest_spike_received_time;
     prov->latest_receive = latest_spike_received_time;
     prov->max_spikes_overflow = max_spikes_overflow;
+    prov->max_spikes_in_a_tick = max_spikes_in_a_tick;
+    prov->max_dmas_in_a_tick = max_dmas_in_a_tick;
+    prov->max_pipeline_restarts = max_pipeline_restarts;
+    prov->timer_callback_completed = timer_callback_completed;
+    prov->spike_pipeline_deactivated = spike_pipeline_deactivation_time;
+    prov->max_flushed_spikes = max_flushed_spikes;
+    prov->total_flushed_spikes = total_flushed_spikes;
+}
+
+// Custom provenance from SpiNNCer
+void spike_processing_get_and_reset_spikes_this_tick(void ) {
+	if (spikes_this_time_step > max_spikes_in_a_tick) {
+		max_spikes_in_a_tick = spikes_this_time_step;
+	}
+	spikes_this_time_step = 0;
+}
+
+void spike_processing_get_and_reset_dmas_this_tick(void) {
+	if (dmas_this_time_step > max_dmas_in_a_tick){
+		max_dmas_in_a_tick = dmas_this_time_step;
+	}
+	dmas_this_time_step = 0;
+}
+
+void spike_processing_get_and_reset_pipeline_restarts_this_tick(void) {
+	if (pipeline_restarts > max_pipeline_restarts) {
+		max_pipeline_restarts = pipeline_restarts;
+	}
+	pipeline_restarts = 0;
+}
+
+uint32_t spike_processing_get_pipeline_deactivation_time(void) {
+	return spike_pipeline_deactivation_time;
+}
+
+// FLUSHED SPIKES
+uint32_t spike_processing_get_total_flushed_spikes(void) {
+	return total_flushed_spikes;
+}
+
+uint32_t spike_processing_get_max_flushed_spikes(void) {
+	return max_flushed_spikes;
 }

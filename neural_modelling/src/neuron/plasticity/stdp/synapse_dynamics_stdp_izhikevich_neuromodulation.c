@@ -42,6 +42,16 @@ typedef struct nm_final_state_t {
     final_state_t final_state;
 } nm_final_state_t;
 
+//! \brief The type of history data of pre-events
+//!
+//! This data is stored in SDRAM in the plastic part of the synaptic matrix
+typedef struct {
+    //! The event time
+    uint32_t prev_time;
+    //! The event trace
+    pre_trace_t prev_trace;
+} pre_event_history_t;
+
 struct synapse_row_plastic_data_t {
     union {
         struct {

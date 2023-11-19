@@ -143,3 +143,5 @@ class ProjectionApplicationEdge(
     def get_local_provenance_data(self):
         for synapse_info in self.synapse_information:
             synapse_info.connector.get_provenance_data(synapse_info)
+            if are_dynamics_stdp(synapse_info.synapse_dynamics):
+                synapse_info.synapse_dynamics.get_provenance_data(synapse_info)

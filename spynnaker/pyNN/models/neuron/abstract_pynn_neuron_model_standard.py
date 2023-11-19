@@ -58,7 +58,7 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             self, n_neurons, label, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size,
             n_steps_per_timestep, drop_late_spikes, splitter, seed,
-            n_colour_bits):
+            n_colour_bits, rb_left_shifts):
         """
         :param int n_steps_per_timestep:
         """
@@ -67,4 +67,4 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
         return super().create_vertex(
             n_neurons, label, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size, drop_late_spikes,
-            splitter, seed, n_colour_bits)
+            splitter, seed, n_colour_bits, rb_left_shifts)

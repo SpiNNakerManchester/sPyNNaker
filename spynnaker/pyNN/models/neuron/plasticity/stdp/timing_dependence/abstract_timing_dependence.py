@@ -91,3 +91,9 @@ class AbstractTimingDependence(object, metaclass=AbstractBase):
 
         :rtype: iterable(str)
         """
+
+    def get_provenance_data(self, synapse_info):
+        """ Get any provenance data
+        :param SynapseInformation synapse_info
+        """
+        # pylint: disable=unused-argument

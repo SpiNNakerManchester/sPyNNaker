@@ -24,7 +24,7 @@
 #include <neuron/plasticity/stdp/stdp_typedefs.h>
 #include <neuron/synapse_row.h>
 
-#include <debug.h>
+//#include <debug.h>
 
 //---------------------------------------
 // Structures

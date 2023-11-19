@@ -84,6 +84,7 @@ static inline post_event_history_t *post_events_init_buffers(
         uint32_t n_neurons) {
     post_event_history_t *post_event_history =
             spin1_malloc(n_neurons * sizeof(post_event_history_t));
+
     // Check allocations succeeded
     if (post_event_history == NULL) {
         log_error("Unable to allocate global STDP structures - Out of DTCM: Try "
@@ -111,6 +112,7 @@ static inline post_event_history_t *post_events_init_buffers(
 static inline post_event_window_t post_events_get_window_delayed(
         const post_event_history_t *events, uint32_t begin_time,
         uint32_t end_time) {
+
     // Start at end event - beyond end of post-event history
     const uint32_t count = events->count_minus_one + 1;
     const uint32_t *end_event_time = events->times + count;

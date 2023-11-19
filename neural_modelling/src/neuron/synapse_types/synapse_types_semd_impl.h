@@ -199,30 +199,30 @@ static inline const char *synapse_types_get_type_char(
 //!     are controlled from the synapses.c print_inputs() method.
 //! \param[in] parameters: the parameters to print
 static inline void synapse_types_print_input(synapse_types_t *parameters) {
-    log_info("%12.6k + %12.6k - %12.6k",
+    log_debug("%12.6k + %12.6k - %12.6k",
             parameters->exc.synaptic_input_value,
             parameters->exc2.synaptic_input_value,
             parameters->inh.synaptic_input_value);
-    log_info("multiplicator = %11.4k\n", parameters->multiplicator);
-    log_info("exc2_old      = %11.4k\n", parameters->exc2_old);
+    log_debug("multiplicator = %11.4k\n", parameters->multiplicator);
+    log_debug("exc2_old      = %11.4k\n", parameters->exc2_old);
 }
 
 //! \brief printer call
 //! \param[in] parameters: the pointer to the parameters to print
 static inline void synapse_types_print_parameters(synapse_types_t *parameters) {
-    log_info("exc_decay  = %11.4k\n", parameters->exc.decay);
-    log_info("exc_init   = %11.4k\n", parameters->exc.init);
-    log_info("exc2_decay = %11.4k\n", parameters->exc2.decay);
-    log_info("exc2_init  = %11.4k\n", parameters->exc2.init);
-    log_info("inh_decay  = %11.4k\n", parameters->inh.decay);
-    log_info("inh_init   = %11.4k\n", parameters->inh.init);
-    log_info("gsyn_excitatory_initial_value = %11.4k\n",
+    log_debug("exc_decay  = %11.4k\n", parameters->exc.decay);
+    log_debug("exc_init   = %11.4k\n", parameters->exc.init);
+    log_debug("exc2_decay = %11.4k\n", parameters->exc2.decay);
+    log_debug("exc2_init  = %11.4k\n", parameters->exc2.init);
+    log_debug("inh_decay  = %11.4k\n", parameters->inh.decay);
+    log_debug("inh_init   = %11.4k\n", parameters->inh.init);
+    log_debug("gsyn_excitatory_initial_value = %11.4k\n",
             parameters->exc.synaptic_input_value);
-    log_info("gsyn_excitatory2_initial_value = %11.4k\n",
+    log_debug("gsyn_excitatory2_initial_value = %11.4k\n",
             parameters->exc2.synaptic_input_value);
-    log_info("gsyn_inhibitory_initial_value = %11.4k\n",
+    log_debug("gsyn_inhibitory_initial_value = %11.4k\n",
             parameters->inh.synaptic_input_value);
-    log_info("scaling_factor = %11.4k\n", parameters->scaling_factor);
+    log_debug("scaling_factor = %11.4k\n", parameters->scaling_factor);
 }
 
 #endif  // _SYNAPSE_TYPES_SEMD_IMPL_H_

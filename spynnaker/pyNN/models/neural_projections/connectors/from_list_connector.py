@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import numpy
+from pyNN.random import RandomDistribution
+
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
@@ -88,6 +90,9 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         if self.__delays is None:
+            # TODO: is this still allowed?
+            if isinstance(synapse_info.delays, RandomDistribution):
+                return synapse_info.delays.parameters['high']
             if hasattr(synapse_info.delays, "__len__"):
                 return numpy.max(synapse_info.delays)
             return self._get_delay_maximum(
