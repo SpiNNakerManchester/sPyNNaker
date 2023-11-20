@@ -57,7 +57,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             The delay used in the connection; by default 1 time step
         """
         super().__init__(delay)
-        if not isinstance(delay, (float, int)):
+        if not isinstance(self.delay, (float, int)):
             raise SynapticConfigurationException(
                 "Only single value delays are supported")
 
