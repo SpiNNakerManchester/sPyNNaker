@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ctypes
+from typing import Sequence
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 
@@ -51,7 +52,7 @@ class PopulationMachineSynapsesProvenance(object):
     """
 
     # This MUST stay empty to allow mixing with other things with slots
-    __slots__ = []
+    __slots__ = ()
 
     TOTAL_PRE_SYNAPTIC_EVENT_NAME = "Total_pre_synaptic_events"
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
@@ -66,7 +67,9 @@ class PopulationMachineSynapsesProvenance(object):
     LATE_SPIKES = "Late spikes"
     MAX_LATE_SPIKE = "Max late spike"
 
-    def _parse_synapse_provenance(self, label,  x, y, p, provenance_data):
+    def _parse_synapse_provenance(
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
         """
         Extract and yield synapse provenance.
 

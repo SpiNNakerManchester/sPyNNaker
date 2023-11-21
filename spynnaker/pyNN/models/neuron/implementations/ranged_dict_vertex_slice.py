@@ -11,20 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import itertools
 import numpy
+from numpy import floating
+from numpy.typing import NDArray
+from typing import Union, cast
 from spinn_utilities.helpful_functions import is_singleton
+from spinn_utilities.ranged import RangeDictionary, RangedList
+from pacman.model.graphs.common import Slice
 
 
 class RangedDictVertexSlice(object):
     """
     A slice of a ranged dict to be used to update values.
     """
-    __slots__ = [
-        "__ranged_dict", "__vertex_slice"]
+    __slots__ = (
+        "__ranged_dict", "__vertex_slice")
 
-    def __init__(self, ranged_dict, vertex_slice):
+    def __init__(
+            self, ranged_dict: RangeDictionary[float], vertex_slice: Slice):
         """
         :param ~spinn_utilities.ranged.RangeDictionary ranged_dict:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -32,13 +38,13 @@ class RangedDictVertexSlice(object):
         self.__ranged_dict = ranged_dict
         self.__vertex_slice = vertex_slice
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> _RangedListVertexSlice:
         if not isinstance(key, str):
             raise KeyError("Key must be a string")
         return _RangedListVertexSlice(
             self.__ranged_dict[key], self.__vertex_slice)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: Union[float, NDArray[floating]]):
         ranged_list_vertex_slice = _RangedListVertexSlice(
             self.__ranged_dict[key], self.__vertex_slice)
         ranged_list_vertex_slice.set_item(value)
@@ -48,22 +54,22 @@ class _RangedListVertexSlice(object):
     """
     A slice of ranged list to be used to update values.
     """
-    __slots__ = [
-        "__ranged_list", "__vertex_slice"]
+    __slots__ = (
+        "__ranged_list", "__vertex_slice")
 
-    def __init__(self, ranged_list, vertex_slice):
+    def __init__(self, ranged_list: RangedList[float], vertex_slice: Slice):
         self.__ranged_list = ranged_list
         self.__vertex_slice = vertex_slice
 
-    def set_item(self, value):
+    def set_item(self, value: Union[float, NDArray[floating]]):
         if is_singleton(value):
             self.__ranged_list.set_value_by_slice(
                 self.__vertex_slice.lo_atom, self.__vertex_slice.hi_atom,
                 value)
         else:
-
+            values = cast(NDArray[floating], value)
             # Find the ranges where the data is the same
-            changes = numpy.nonzero(numpy.diff(value))[0] + 1
+            changes = numpy.nonzero(numpy.diff(values))[0] + 1
 
             # Go through and set the data in ranges
             start_index = 0
@@ -71,5 +77,5 @@ class _RangedListVertexSlice(object):
             for end_index in itertools.chain(
                     changes, [self.__vertex_slice.n_atoms]):
                 self.__ranged_list.set_value_by_slice(
-                    start_index + off, end_index + off, value[start_index])
+                    start_index + off, end_index + off, values[start_index])
                 start_index = end_index

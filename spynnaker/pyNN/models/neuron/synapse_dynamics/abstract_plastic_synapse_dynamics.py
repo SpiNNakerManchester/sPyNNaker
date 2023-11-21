@@ -11,9 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from numpy import integer, uint32
+from numpy.typing import NDArray
+from typing import List, Tuple
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pacman.model.graphs.common import Slice
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    ConnectionsArray)
 
 
 class AbstractPlasticSynapseDynamics(
@@ -26,19 +31,23 @@ class AbstractPlasticSynapseDynamics(
     __slots__ = ()
 
     @abstractmethod
-    def get_n_words_for_plastic_connections(self, n_connections):
+    def get_n_words_for_plastic_connections(self, n_connections: int) -> int:
         """
         Get the number of 32-bit words for `n_connections` in a single row.
 
         :param int n_connections:
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_plastic_synaptic_data(
-            self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, max_n_synapses,
-            max_atoms_per_core):
+            self, connections: ConnectionsArray,
+            connection_row_indices: NDArray[integer], n_rows: int,
+            post_vertex_slice: Slice, n_synapse_types: int,
+            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
+                NDArray[uint32], NDArray[uint32], NDArray[uint32],
+                NDArray[uint32]]:
         """
         Get the fixed-plastic data, and plastic-plastic data for each row, and
         lengths for the fixed_plastic and plastic-plastic parts of each row.
@@ -61,30 +70,37 @@ class AbstractPlasticSynapseDynamics(
         :param int n_synapse_types: The number of synapse types
         :param int max_n_synapses: The maximum number of synapses to generate
         :param int max_atoms_per_core: The maximum number of atoms on a core
-        :return: (fp_data, pp_data, fp_size, pp_size)
+        :return: (fp_data (2D), pp_data (2D), fp_size (1D), pp_size (1D))
         :rtype:
             tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,
             ~numpy.ndarray)
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_n_plastic_plastic_words_per_row(self, pp_size):
+    def get_n_plastic_plastic_words_per_row(
+            self, pp_size: NDArray[uint32]) -> NDArray[integer]:
         """
         Get the number of plastic plastic words to be read from each row.
 
         :param ~numpy.ndarray pp_size:
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_n_fixed_plastic_words_per_row(self, fp_size):
+    def get_n_fixed_plastic_words_per_row(
+            self, fp_size: NDArray[uint32]) -> NDArray[integer]:
         """
         Get the number of fixed plastic words to be read from each row.
 
         :param ~numpy.ndarray fp_size:
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_n_synapses_in_rows(self, pp_size, fp_size):
+    def get_n_synapses_in_rows(
+            self, pp_size: NDArray[uint32],
+            fp_size: NDArray[uint32]) -> NDArray[integer]:
         """
         Get the number of synapses in each of the rows with plastic sizes
         `pp_size` and `fp_size`.
@@ -92,11 +108,14 @@ class AbstractPlasticSynapseDynamics(
         :param ~numpy.ndarray pp_size:
         :param ~numpy.ndarray fp_size:
         """
+        raise NotImplementedError
 
     @abstractmethod
     def read_plastic_synaptic_data(
-            self, post_vertex_slice, n_synapse_types, pp_size, pp_data,
-            fp_size, fp_data, max_atoms_per_core):
+            self, post_vertex_slice: Slice, n_synapse_types: int,
+            pp_size: NDArray[uint32], pp_data: List[NDArray[uint32]],
+            fp_size: NDArray[uint32], fp_data: List[NDArray[uint32]],
+            max_atoms_per_core: int) -> ConnectionsArray:
         """
         Read the connections indicated in the connection indices from the
         data in `pp_data` and `fp_data`.
@@ -112,3 +131,4 @@ class AbstractPlasticSynapseDynamics(
             array with columns ``source``, ``target``, ``weight``, ``delay``
         :rtype: ~numpy.ndarray
         """
+        raise NotImplementedError

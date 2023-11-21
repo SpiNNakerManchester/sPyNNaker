@@ -45,7 +45,7 @@ class DelayedPayloadMultiCastCommand(MultiCastCommand):
 class PushBotSpiNNakerLinkRetinaDevice(
         AbstractPushBotRetinaDevice, ApplicationSpiNNakerLinkVertex,
         PopulationApplicationVertex):
-    __slots__ = ["__new_key_command"]
+    __slots__ = ("__new_key_command", )
 
     default_parameters = {'label': None, 'board_address': None,
                           'n_machine_vertices': 1}

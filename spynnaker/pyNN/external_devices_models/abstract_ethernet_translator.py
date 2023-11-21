@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_front_end_common.utility_models import MultiCastCommand
 
 
 class AbstractEthernetTranslator(object, metaclass=AbstractBase):
@@ -21,10 +22,10 @@ class AbstractEthernetTranslator(object, metaclass=AbstractBase):
     control of an external device.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     @abstractmethod
-    def translate_control_packet(self, multicast_packet):
+    def translate_control_packet(self, multicast_packet: MultiCastCommand):
         """
         Translate a multicast packet received over Ethernet and send
         appropriate messages to the external device.
@@ -33,3 +34,4 @@ class AbstractEthernetTranslator(object, metaclass=AbstractBase):
         :type multicast_packet:
             ~spinnman.messages.eieio.data_messages.AbstractDataElement
         """
+        raise NotImplementedError

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .abstract_has_parameter_names import AbstractHasParameterNames
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 from .abstract_generate_on_machine import AbstractGenerateOnMachine
@@ -32,17 +33,17 @@ from .synapse_dynamics_utils import (
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 
 
-__all__ = ["AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
+__all__ = ("AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
            "AbstractStaticSynapseDynamics", "AbstractSynapseDynamics",
            "AbstractSDRAMSynapseDynamics", "AbstractSynapseDynamicsStructural",
            "calculate_spike_pair_additive_stdp_weight",
            "calculate_spike_pair_multiplicative_stdp_weight",
            "PyNNSynapseDynamics", "SynapseDynamicsStatic",
-           "SynapseDynamicsSTDP",
+           "SynapseDynamicsSTDP", "AbstractHasParameterNames",
            # Structural plasticity
            "SynapseDynamicsStructuralCommon",
            "SynapseDynamicsStructuralStatic",
            "SynapseDynamicsStructuralSTDP",
            # Neuromodulation
            "SynapseDynamicsNeuromodulation",
-           "AbstractSupportsSignedWeights"]
+           "AbstractSupportsSignedWeights")

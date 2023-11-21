@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+from typing import List, Tuple, cast
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model.enums import ExecutableType
+from spinnman.model import ExecutableTargets
+from spinnman.model.enums import CPUState, UserRegister
+from pacman.model.placements import Placement
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
-from spinnman.model import ExecutableTargets
-from spinnman.model.enums import CPUState
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
@@ -27,7 +29,7 @@ from spynnaker.pyNN.models.abstract_models import (
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def synapse_expander():
+def synapse_expander() -> None:
     """
     Run the synapse expander.
 
@@ -35,38 +37,41 @@ def synapse_expander():
         Needs to be done after data has been loaded.
     """
     # Find the places where the synapse expander and delay receivers should run
-    expander_cores, expanded_pop_vertices, max_data, max_bf = _plan_expansion()
+    expander_cores, expanded_placements, timeout = _plan_expansion()
 
-    # Allow 1 seconds per ~1000 synapses, with minimum of 2 seconds
-    timeout = max(2.0, max_data / 1000.0)
-    # Also allow 1s per 1000 bytes of bitfields
-    timeout += max(2.0, max_bf / 1000.0)
+    if expander_cores.total_processors:
+        with ProgressBar(expander_cores.total_processors,
+                         "Expanding Synapses") as progress:
+            expander_app_id = SpynnakerDataView.get_new_id()
+            run_system_application(
+                expander_cores, expander_app_id,
+                get_config_bool("Reports", "write_expander_iobuf") or False,
+                None, frozenset({CPUState.FINISHED}), False,
+                "synapse_expander_on_{}_{}_{}.txt",
+                progress_bar=progress, logger=logger, timeout=timeout)
 
-    progress = ProgressBar(expander_cores.total_processors,
-                           "Expanding Synapses")
-    expander_app_id = SpynnakerDataView.get_new_id()
-    run_system_application(
-        expander_cores, expander_app_id,
-        get_config_bool("Reports", "write_expander_iobuf"),
-        None, [CPUState.FINISHED], False,
-        "synapse_expander_on_{}_{}_{}.txt", progress_bar=progress,
-        logger=logger, timeout=timeout)
-    progress.end()
-    _fill_in_connection_data(expanded_pop_vertices)
+    # Once expander has run, fill in the connection data.
+    if expanded_placements:
+        with ProgressBar(len(expanded_placements),
+                         "Reading generated connections") as progress:
+            for placement in progress.over(expanded_placements):
+                vertex = cast(AbstractSynapseExpandable, placement.vertex)
+                vertex.read_generated_connection_holders(placement)
 
 
-def _plan_expansion():
+def _plan_expansion() -> Tuple[ExecutableTargets, List[Placement], float]:
     """
     Plan the expansion of synapses and set up the regions using USER1.
 
     :return: The places to load the synapse expander and delay expander
-        executables, and the target machine vertices to read synapses back from
-    :rtype:
-        tuple(~.ExecutableTargets, list(tuple(~.MachineVertex, ~.Placement)))
+        executables, the target machine vertices to read synapses back from,
+        and an estimated timeout for how long the expansion should be let run.
+    :rtype: tuple(~.ExecutableTargets, list(~.Placement), float)
     """
     synapse_bin = SpynnakerDataView.get_executable_path(SYNAPSE_EXPANDER_APLX)
     expander_cores = ExecutableTargets()
-    expanded_pop_vertices = list()
+    expanded_placements = list()
+    txrx = SpynnakerDataView.get_transceiver()
 
     max_data = 0
     max_bit_field = 0
@@ -81,23 +86,16 @@ def _plan_expansion():
                 expander_cores.add_processor(
                     synapse_bin, placement.x, placement.y, placement.p,
                     executable_type=ExecutableType.SYSTEM)
-                expanded_pop_vertices.append((vertex, placement))
+                expanded_placements.append(placement)
                 # Write the region to USER1, as that is the best we can do
-                txrx = SpynnakerDataView.get_transceiver()
-                txrx.write_user(placement.x, placement.y, placement.p, 1,
-                                vertex.connection_generator_region)
+                txrx.write_user(
+                    placement.x, placement.y, placement.p, UserRegister.USER_1,
+                    vertex.connection_generator_region)
                 max_data = max(max_data, vertex.max_gen_data)
                 max_bit_field = max(max_bit_field, vertex.bit_field_size)
 
-    return expander_cores, expanded_pop_vertices, max_data, max_bit_field
-
-
-def _fill_in_connection_data(expanded_pop_vertices):
-    """
-    Once expander has run, fill in the connection data.
-
-    :param list(tuple(~.MachineVertex, ~.Placement)) expanded_pop_vertices:
-        List of machine vertices to read data from
-    """
-    for vertex, placement in expanded_pop_vertices:
-        vertex.read_generated_connection_holders(placement)
+    # Allow 1 seconds per ~1000 synapses, with minimum of 2 seconds
+    timeout = max(2.0, max_data / 1000.0)
+    # Also allow 1s per 1000 bytes of bitfields
+    timeout += max(2.0, max_bit_field / 1000.0)
+    return expander_cores, expanded_placements, timeout

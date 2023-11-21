@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 The :py:mod:`spynnaker.pyNN` package contains the front end specifications
 and implementation for the PyNN High-level API
@@ -22,7 +21,12 @@ This package contains the profile of that code for PyNN 0.9.
 
 # common imports
 import logging
+from typing import (
+    Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type,
+    TypedDict, Union, cast)
+from typing_extensions import Literal
 import numpy as __numpy
+from numpy.typing import NDArray
 from pyNN import common as pynn_common
 from pyNN.common import control as _pynn_control
 from pyNN.recording import get_io
@@ -30,12 +34,16 @@ from pyNN.random import NumpyRNG
 from pyNN.space import (
     Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure)
 from pyNN.space import distance as _pynn_distance
+from neo import Block
 
 from spinn_utilities.exceptions import SimulatorNotSetupException
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_front_end_common.utilities.exceptions import (
     ConfigurationException)
+from spinn_utilities.socket_address import SocketAddress
+
+from spinn_machine.machine import Machine
 
 from spynnaker.pyNN.random_distribution import RandomDistribution
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -44,7 +52,7 @@ from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 # connections
 # noinspection PyUnresolvedReferences
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AllToAllConnector, ArrayConnector, CSAConnector,
+    AbstractConnector, AllToAllConnector, ArrayConnector, CSAConnector,
     DistanceDependentProbabilityConnector, FixedNumberPostConnector,
     FixedNumberPreConnector, FixedProbabilityConnector,
     FromFileConnector, FromListConnector, IndexBasedProbabilityConnector,
@@ -53,6 +61,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     PoolDenseConnector)
 # synapse structures
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractStaticSynapseDynamics,
     SynapseDynamicsStatic as StaticSynapse)
 
 # plastic stuff
@@ -109,7 +118,7 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson import (
 # pops
 # noinspection PyUnresolvedReferences
 from spynnaker.pyNN.models.populations import (
-    Assembly, Population, PopulationView)
+    Assembly, Population, PopulationView, IDMixin, PopulationBase)
 
 # projection
 # noinspection PyUnresolvedReferences
@@ -179,15 +188,39 @@ __all__ = [
     'get_max_delay', 'initialize', 'list_standard_models', 'name',
     'record', "get_machine"]
 
+
+class __PynnOperations(TypedDict, total=False):
+    run: Callable[[float, Any], float]
+    run_until: Callable[[float, Any], float]
+    get_current_time: Callable[[], float]
+    get_time_step: Callable[[], float]
+    get_max_delay: Callable[[], int]
+    get_min_delay: Callable[[], int]
+    num_processes: Callable[[], int]
+    rank: Callable[[], int]
+    reset: Callable[[Dict[str, Any]], None]
+    create: Callable[
+        [Union[Type, AbstractPyNNModel], Optional[Dict[str, Any]], int],
+        Population]
+    connect: Callable[
+        [Population, Population, float, Optional[float], Optional[str], int,
+         Optional[NumpyRNG]], None]
+    record: Callable[
+        [Union[str, Sequence[str]], PopulationBase, str, Optional[float],
+         Optional[Dict[str, Any]]], Block]
+
+
 # Dynamically-extracted operations from PyNN
-__pynn = {}
+__pynn: __PynnOperations = {}
 # Cache of the simulator created by setup
-__simulator = None
+__simulator: Optional[SpiNNaker] = None
 
 
 # Patch the bugs in the PyNN documentation... Ugh!
-def distance(src_cell, tgt_cell, mask=None, scale_factor=1.0, offset=0.0,
-             periodic_boundaries=None):
+def distance(src_cell: IDMixin, tgt_cell: IDMixin,
+             mask: Optional[NDArray] = None,
+             scale_factor: float = 1.0, offset: float = 0.0,
+             periodic_boundaries=None) -> float:
     """
     Return the Euclidean distance between two cells.
 
@@ -209,11 +242,14 @@ def distance(src_cell, tgt_cell, mask=None, scale_factor=1.0, offset=0.0,
         src_cell, tgt_cell, mask, scale_factor, offset, periodic_boundaries)
 
 
-def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
-          min_delay=_pynn_control.DEFAULT_MIN_DELAY,
-          max_delay=None,
-          database_socket_addresses=None, time_scale_factor=None,
-          n_chips_required=None, n_boards_required=None, **extra_params):
+def setup(timestep: float = _pynn_control.DEFAULT_TIMESTEP,
+          min_delay: Union[float, Literal["auto"]] = (
+              _pynn_control.DEFAULT_MIN_DELAY),
+          max_delay: Optional[Union[float, Literal["auto"]]] = None,
+          database_socket_addresses: Optional[Iterable[SocketAddress]] = None,
+          time_scale_factor: Optional[int] = None,
+          n_chips_required: Optional[int] = None,
+          n_boards_required: Optional[int] = None, **extra_params) -> int:
     """
     The main method needed to be called to make the PyNN 0.8 setup.
     Needs to be called before any other function
@@ -250,7 +286,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
         if both ``n_chips_required`` and ``n_boards_required`` are used.
     """
-    # pylint: disable=global-statement
+    # pylint: disable=global-statement,too-many-arguments
     global __simulator
     # Check for "auto" values
     if timestep == "auto":
@@ -261,7 +297,6 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         logger.warning(
             "max_delay is not supported by sPyNNaker so will be ignored")
 
-    # pylint: disable=too-many-arguments
     # setup PyNN common stuff
     pynn_common.setup(timestep, min_delay, **extra_params)
 
@@ -271,6 +306,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
                        "simulator to be stopped and cleared.")
         # if already exists, kill and rebuild
         try:
+            assert __simulator is not None
             __simulator.clear()
         except Exception:  # pylint: disable=broad-except
             logger.exception("Error forcing previous simulation to clear")
@@ -295,7 +331,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     return rank()
 
 
-def name():
+def name() -> str:
     """
     Returns the name of the simulator.
 
@@ -305,9 +341,12 @@ def name():
 
 
 def Projection(
-        presynaptic_population, postsynaptic_population,
-        connector, synapse_type=None, source=None, receptor_type="excitatory",
-        space=None, label=None):
+        presynaptic_population: Population,
+        postsynaptic_population: Population,
+        connector: AbstractConnector,
+        synapse_type: Optional[AbstractStaticSynapseDynamics] = None,
+        source: None = None, receptor_type: str = "excitatory",
+        space: Optional[Space] = None, label: Optional[str] = None):
     """
     Used to support PEP 8 spelling correctly.
 
@@ -336,7 +375,7 @@ def Projection(
         space=space, label=label)
 
 
-def _create_overloaded_functions(spinnaker_simulator):
+def _create_overloaded_functions(spinnaker_simulator: SpiNNaker):
     """
     Creates functions that the main PyNN interface supports
     (given from PyNN)
@@ -362,7 +401,7 @@ def _create_overloaded_functions(spinnaker_simulator):
     __pynn["record"] = pynn_common.build_record(spinnaker_simulator)
 
 
-def end(_=True):
+def end(_=True) -> None:
     """
     Cleans up the SpiNNaker machine and software
 
@@ -377,6 +416,7 @@ def end(_=True):
     except SimulatorNotSetupException:
         logger.exception("Calling end before setup makes no sense ignoring!")
         return
+    assert __simulator is not None, "no current simulator"
     for (population, variables, filename) in \
             __simulator.write_on_end:
         io = get_io(filename)
@@ -385,21 +425,21 @@ def end(_=True):
     __simulator.stop()
 
 
-def list_standard_models():
+def list_standard_models() -> List[str]:
     """
     Return a list of all the StandardCellType classes available for this
     simulator.
 
     :rtype: list(str)
     """
-    results = list()
-    for (key, obj) in globals().items():
-        if isinstance(obj, type) and issubclass(obj, AbstractPyNNModel):
-            results.append(key)
-    return results
+    return [
+        key
+        for (key, obj) in globals().items()
+        if isinstance(obj, type) and issubclass(obj, AbstractPyNNModel)]
 
 
-def set_number_of_neurons_per_core(neuron_type, max_permitted):
+def set_number_of_neurons_per_core(
+        neuron_type: Type, max_permitted: Union[int, Tuple[int, ...], None]):
     """
     Sets a ceiling on the number of neurons of a given model that can be
     placed on a single core.
@@ -420,26 +460,29 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
         raise ConfigurationException(
             "set_number_of_neurons_per_core call now expects "
             "neuron_type as a class instead of as a str")
-    max_neurons = max_permitted
-    if is_singleton(max_permitted):
-        max_neurons = (max_permitted, )
-    for m in max_neurons:
-        # Make sure an integer value is passed in here and warn if different
-        m_int = int(m)
-        if (m_int - m) != 0:
-            logger.warning(
-                "The number of neurons per core requested {} is not an "
-                "integer; the value has been set to {}", m, m_int)
+    if max_permitted is not None:
+        if is_singleton(max_permitted):
+            max_neurons = cast('Tuple[int, ...]', (max_permitted, ))
+        else:
+            max_neurons = cast('Tuple[int, ...]', max_permitted)
+        for m in max_neurons:
+            # Make sure integer values are passed in here; warn if not
+            m_int = int(m)
+            if (m_int - m) != 0:
+                logger.warning(
+                    "The number of neurons per core requested {} is not an "
+                    "integer; the value has been set to {}", m, m_int)
 
     SpynnakerDataView.set_number_of_neurons_per_dimension_per_core(
-        neuron_type, max_neurons)
+        neuron_type, max_permitted)
 
 
 # These methods will defer to PyNN methods if a simulator exists
 
 
-def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
-            rng=None):
+def connect(pre: Population, post: Population, weight: float = 0.0,
+            delay: Optional[float] = None, receptor_type: Optional[str] = None,
+            p: int = 1, rng: Optional[NumpyRNG] = None):
     """
     Builds a projection.
 
@@ -456,7 +499,10 @@ def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
     __pynn["connect"](pre, post, weight, delay, receptor_type, p, rng)
 
 
-def create(cellclass, cellparams=None, n=1):
+def create(
+        cellclass: Union[Type, AbstractPyNNModel],
+        cellparams: Optional[Dict[str, Any]] = None,
+        n: int = 1) -> Population:
     """
     Builds a population with certain parameters.
 
@@ -470,7 +516,7 @@ def create(cellclass, cellparams=None, n=1):
     return __pynn["create"](cellclass, cellparams, n)
 
 
-def NativeRNG(seed_value):
+def NativeRNG(seed_value: Union[int, List[int], NDArray]) -> None:
     """
     Fixes the random number generator's seed.
 
@@ -480,7 +526,7 @@ def NativeRNG(seed_value):
     __numpy.random.seed(seed_value)
 
 
-def get_current_time():
+def get_current_time() -> float:
     """
     Gets the time within the simulation.
 
@@ -490,7 +536,7 @@ def get_current_time():
     return __pynn["get_current_time"]()
 
 
-def get_min_delay():
+def get_min_delay() -> int:
     """
     The minimum allowed synaptic delay; delays will be clamped to be at
     least this.
@@ -502,7 +548,7 @@ def get_min_delay():
     return __pynn["get_min_delay"]()
 
 
-def get_max_delay():
+def get_max_delay() -> int:
     """
     Part of the PyNN API but does not make sense for sPyNNaker as
     different Projection, Vertex splitter combination could have different
@@ -516,7 +562,7 @@ def get_max_delay():
         "sPyNNaker does not have a system wide max_delay")
 
 
-def get_time_step():
+def get_time_step() -> float:
     """
     The integration time step.
 
@@ -527,7 +573,7 @@ def get_time_step():
     return float(__pynn["get_time_step"]())
 
 
-def initialize(cells, **initial_values):
+def initialize(cells: PopulationBase, **initial_values):
     """
     Sets cells to be initialised to the given values.
 
@@ -540,7 +586,7 @@ def initialize(cells, **initial_values):
     pynn_common.initialize(cells, **initial_values)
 
 
-def num_processes():
+def num_processes() -> int:
     """
     The number of MPI processes.
 
@@ -554,7 +600,7 @@ def num_processes():
     return __pynn["num_processes"]()
 
 
-def rank():
+def rank() -> int:
     """
     The MPI rank of the current node.
 
@@ -568,8 +614,9 @@ def rank():
     return __pynn["rank"]()
 
 
-def record(variables, source, filename, sampling_interval=None,
-           annotations=None):
+def record(variables: Union[str, Sequence[str]], source: PopulationBase,
+           filename: str, sampling_interval: Optional[float] = None,
+           annotations: Optional[Dict[str, Any]] = None) -> Block:
     """
     Sets variables to be recorded.
 
@@ -593,7 +640,7 @@ def record(variables, source, filename, sampling_interval=None,
                             annotations)
 
 
-def reset(annotations=None):
+def reset(annotations: Optional[Dict[str, Any]] = None):
     """
     Resets the simulation to t = 0.
 
@@ -606,7 +653,7 @@ def reset(annotations=None):
     __pynn["reset"](annotations)
 
 
-def run(simtime, callbacks=None):
+def run(simtime: float, callbacks=None) -> float:
     """
     The run() function advances the simulation for a given number of
     milliseconds.
@@ -617,7 +664,7 @@ def run(simtime, callbacks=None):
     :rtype: float
     """
     SpynnakerDataView.check_user_can_act()
-    return __pynn["run"](simtime, callbacks=callbacks)
+    return __pynn["run"](simtime, callbacks)
 
 
 # left here because needs to be done, and no better place to put it
@@ -625,7 +672,7 @@ def run(simtime, callbacks=None):
 run_for = run
 
 
-def run_until(tstop):
+def run_until(tstop: float) -> float:
     """
     Run until a (simulation) time period has completed.
 
@@ -634,10 +681,10 @@ def run_until(tstop):
     :rtype: float
     """
     SpynnakerDataView.check_user_can_act()
-    return __pynn["run_until"](tstop)
+    return __pynn["run_until"](tstop, None)
 
 
-def get_machine():
+def get_machine() -> Machine:
     """
     Get the SpiNNaker machine in use.
 

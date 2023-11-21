@@ -49,7 +49,7 @@ class SPIFRetinaDevice(
     #: The number of devices in existence, to work out the key
     __n_devices = 0
 
-    __slots__ = [
+    __slots__ = (
         "__spif_mask",
         "__index_by_slice",
         "__base_key",
@@ -57,7 +57,14 @@ class SPIFRetinaDevice(
         "__input_y_mask",
         "__input_y_shift",
         "__input_x_mask",
-        "__input_x_shift"]
+        "__input_x_shift")
+
+    @classmethod
+    def __issue_device_id(cls, base_key):
+        if base_key is None:
+            base_key = cls.__n_devices
+        cls.__n_devices += 1
+        return base_key
 
     def __init__(self, pipe, width, height, sub_width, sub_height,
                  base_key=None, input_x_shift=16, input_y_shift=0,
@@ -140,21 +147,17 @@ class SPIFRetinaDevice(
         self.__index_by_slice = dict()
 
         self.__pipe = pipe
-        self.__base_key = base_key
-        if self.__base_key is None:
-            self.__base_key = SPIFRetinaDevice.__n_devices
-        SPIFRetinaDevice.__n_devices += 1
+        self.__base_key = self.__issue_device_id(base_key)
 
         # Generate the shifts and masks to convert the SPIF Ethernet inputs to
         # PYX format
         self.__input_x_mask = ((1 << x_bits) - 1) << input_x_shift
-        self.__input_x_shift = self.__unsigned(
-            input_x_shift)
+        self.__input_x_shift = self.__unsigned(input_x_shift)
         self.__input_y_mask = ((1 << y_bits) - 1) << input_y_shift
-        self.__input_y_shift = self.__unsigned(
-            input_y_shift - x_bits)
+        self.__input_y_shift = self.__unsigned(input_y_shift - x_bits)
 
-    def __unsigned(self, n):
+    @staticmethod
+    def __unsigned(n):
         return n & 0xFFFFFFFF
 
     def __incoming_fpgas(self, board_address, chip_coords):
@@ -187,8 +190,7 @@ class SPIFRetinaDevice(
 
     @overrides(Application2DFPGAVertex.get_incoming_slice_for_link)
     def get_incoming_slice_for_link(self, link, index):
-        vertex_slice = super(
-            SPIFRetinaDevice, self).get_incoming_slice_for_link(link, index)
+        vertex_slice = super().get_incoming_slice_for_link(link, index)
         self.__index_by_slice[link.fpga_link_id, vertex_slice] = index
         return vertex_slice
 
@@ -218,62 +220,57 @@ class SPIFRetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
         # Make sure everything has stopped
-        commands = [SpiNNFPGARegister.STOP.cmd()]
+        yield SpiNNFPGARegister.STOP.cmd()
 
         # Clear the counters
-        commands.append(SPIFRegister.OUT_PERIPH_PKT_CNT.cmd(0))
-        commands.append(SPIFRegister.CONFIG_PKT_CNT.cmd(0))
-        commands.append(SPIFRegister.DROPPED_PKT_CNT.cmd(0))
-        commands.append(SPIFRegister.IN_PERIPH_PKT_CNT.cmd(0))
+        yield SPIFRegister.OUT_PERIPH_PKT_CNT.cmd(0)
+        yield SPIFRegister.CONFIG_PKT_CNT.cmd(0)
+        yield SPIFRegister.DROPPED_PKT_CNT.cmd(0)
+        yield SPIFRegister.IN_PERIPH_PKT_CNT.cmd(0)
 
         # Configure the creation of packets from fields to keys using the
         # "standard" input to SPIF (X | P | Y) and convert to (Y | X)
-        commands.extend([
-            set_field_mask(self.__pipe, 0, self.__input_x_mask),
-            set_field_shift(self.__pipe, 0, self.__input_x_shift),
-            set_field_limit(self.__pipe, 0,
-                            (self._width - 1) << self._source_x_shift),
-            set_field_mask(self.__pipe, 1, self.__input_y_mask),
-            set_field_shift(self.__pipe, 1, self.__input_y_shift),
-            set_field_limit(self.__pipe, 1,
-                            (self._height - 1) << self._source_y_shift),
-            # These are unused but set them to be sure
-            set_field_mask(self.__pipe, 2, 0),
-            set_field_shift(self.__pipe, 2, 0),
-            set_field_limit(self.__pipe, 2, 0),
-            set_field_mask(self.__pipe, 3, 0),
-            set_field_shift(self.__pipe, 3, 0),
-            set_field_limit(self.__pipe, 3, 0)
-        ])
+        yield set_field_mask(self.__pipe, 0, self.__input_x_mask)
+        yield set_field_shift(self.__pipe, 0, self.__input_x_shift)
+        yield set_field_limit(self.__pipe, 0,
+                              (self._width - 1) << self._source_x_shift)
+        yield set_field_mask(self.__pipe, 1, self.__input_y_mask)
+        yield set_field_shift(self.__pipe, 1, self.__input_y_shift)
+        yield set_field_limit(self.__pipe, 1,
+                              (self._height - 1) << self._source_y_shift)
+        # These are unused but set them to be sure
+        yield set_field_mask(self.__pipe, 2, 0)
+        yield set_field_shift(self.__pipe, 2, 0)
+        yield set_field_limit(self.__pipe, 2, 0)
+        yield set_field_mask(self.__pipe, 3, 0)
+        yield set_field_shift(self.__pipe, 3, 0)
+        yield set_field_limit(self.__pipe, 3, 0)
 
         # Don't filter
-        commands.extend([
-            set_filter_mask(self.__pipe, i, 0) for i in range(N_FILTERS)
-        ])
-        commands.extend([
-            set_filter_value(self.__pipe, i, 1) for i in range(N_FILTERS)
-        ])
+        yield from (
+            set_filter_mask(self.__pipe, i, 0)
+            for i in range(N_FILTERS))
+        yield from (
+            set_filter_value(self.__pipe, i, 1)
+            for i in range(N_FILTERS))
 
         # Configure the output routing key
-        commands.append(set_mapper_key(
-            self.__pipe, self.__base_key << self._key_shift))
+        yield set_mapper_key(self.__pipe, self.__base_key << self._key_shift)
 
         # Configure the links to send packets to the 8 FPGAs using the
         # lower bits
-        commands.extend(
+        yield from (
             set_input_key(self.__pipe, i, self.__spif_key(15 - (i * 2)))
             for i in range(8))
-        commands.extend(
+        yield from (
             set_input_mask(self.__pipe, i, self.__spif_mask)
             for i in range(8))
-        commands.extend(
+        yield from (
             set_input_route(self.__pipe, i, i)
             for i in range(8))
 
         # Send the start signal
-        commands.append(SpiNNFPGARegister.START.cmd())
-
-        return commands
+        yield SpiNNFPGARegister.START.cmd()
 
     def __spif_key(self, fpga_link_id):
         x, y = self.__fpga_indices(fpga_link_id)
@@ -285,7 +282,7 @@ class SPIFRetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         # Send the stop signal
-        return [SpiNNFPGARegister.STOP.cmd()]
+        yield SpiNNFPGARegister.STOP.cmd()
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.interface.ds import DataSpecificationBase
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_elimination import AbstractElimination
 
 
@@ -21,15 +24,14 @@ class RandomByWeightElimination(AbstractElimination):
     Elimination Rule that depends on the weight of a synapse.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__prob_elim_depressed",
         "__prob_elim_potentiated",
-        "__threshold"
-    ]
+        "__threshold")
 
     def __init__(
-            self, threshold, prob_elim_depressed=0.0245,
-            prob_elim_potentiated=1.36 * 10 ** -4):
+            self, threshold: float, prob_elim_depressed: float = 0.0245,
+            prob_elim_potentiated: float = 1.36e-4):
         """
         :param float threshold:
             Below this weight is considered depression, above or equal to this
@@ -48,19 +50,20 @@ class RandomByWeightElimination(AbstractElimination):
 
     @property
     @overrides(AbstractElimination.vertex_executable_suffix)
-    def vertex_executable_suffix(self):
+    def vertex_executable_suffix(self) -> str:
         return "_weight"
 
     @overrides(AbstractElimination.get_parameters_sdram_usage_in_bytes)
-    def get_parameters_sdram_usage_in_bytes(self):
-        return 3 * 4
+    def get_parameters_sdram_usage_in_bytes(self) -> int:
+        return 3 * BYTES_PER_WORD
 
     @overrides(AbstractElimination.write_parameters)
-    def write_parameters(self, spec, weight_scale):
+    def write_parameters(
+            self, spec: DataSpecificationBase, weight_scale: float):
         spec.write_value(int(self.__prob_elim_depressed * 0xFFFFFFFF))
         spec.write_value(int(self.__prob_elim_potentiated * 0xFFFFFFFF))
         spec.write_value(self.__threshold * weight_scale)
 
     @overrides(AbstractElimination.get_parameter_names)
-    def get_parameter_names(self):
-        return ["prob_elim_depressed", "prob_elim_potentiated", "threshold"]
+    def get_parameter_names(self) -> Iterable[str]:
+        return ("prob_elim_depressed", "prob_elim_potentiated", "threshold")

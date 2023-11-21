@@ -12,11 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
 import numpy
+from numpy import uint8
+from numpy.typing import NDArray
+from typing import Sequence, Optional, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.common import Slice
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 
 class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
@@ -25,10 +32,13 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     of the neurons in the pre- and post-populations.
     """
 
-    __slots__ = [
-        "__array", "__array_dims", "__n_total_connections"]
+    __slots__ = (
+        "__array",
+        "__array_dims",
+        "__n_total_connections")
 
-    def __init__(self, array, safe=True, callback=None, verbose=False):
+    def __init__(self, array: NDArray[uint8],
+                 safe=True, callback=None, verbose=False):
         """
         :param array:
             An explicit boolean matrix that specifies the connections
@@ -63,19 +73,20 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         self.__array_dims = dims
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, synapse_info):
+    def get_delay_maximum(self, synapse_info: SynapseInformation):
         return self._get_delay_maximum(
             synapse_info.delays, len(self.__array), synapse_info)
 
     @overrides(AbstractConnector.get_delay_minimum)
-    def get_delay_minimum(self, synapse_info):
+    def get_delay_minimum(self, synapse_info: SynapseInformation):
         return self._get_delay_minimum(
             synapse_info.delays, len(self.__array), synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_post_atoms, synapse_info, min_delay=None,
-            max_delay=None):
+            self, n_post_atoms: int, synapse_info: SynapseInformation,
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
         # Break the array into n_post_atoms units
         split_positions = numpy.arange(
             0, synapse_info.n_post_neurons, n_post_atoms)
@@ -87,7 +98,7 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         # Find the maximum of the rows
         max_connections_row = max([x for y in sum_rows for x in y])
 
-        if min_delay is None and max_delay is None:
+        if min_delay is None or max_delay is None:
             return max_connections_row
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
@@ -95,7 +106,8 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             max_connections_row, min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
+    def get_n_connections_to_post_vertex_maximum(
+            self, synapse_info: SynapseInformation) -> int:
         # Max number per column is required
         max_connections_col = 0
         for j in range(self.__array_dims[1]):
@@ -110,13 +122,14 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         return max_connections_col
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, synapse_info):
+    def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
         return self._get_weight_maximum(
             synapse_info.weights, self.__n_total_connections, synapse_info)
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
+            synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         pre_neurons = []
         post_neurons = []
         n_connections = 0

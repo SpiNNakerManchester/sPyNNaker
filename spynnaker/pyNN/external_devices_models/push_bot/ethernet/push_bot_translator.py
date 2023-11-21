@@ -14,16 +14,23 @@
 
 import logging
 from time import sleep
+from typing import Optional
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.external_devices_models import AbstractEthernetTranslator
 from spynnaker.pyNN.protocols import (
     MunichIoEthernetProtocol, munich_io_spinnaker_link_protocol)
+from .push_bot_wifi_connection import PushBotWIFIConnection
+from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
+    MunichIoSpiNNakerLinkProtocol)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def _signed_int(uint_value):
+def _signed_int(uint_value: Optional[int]) -> int:
+    if uint_value is None:
+        return 0
     if uint_value > (2 ** 31):
         return uint_value - (2 ** 32)
     return uint_value
@@ -34,11 +41,12 @@ class PushBotTranslator(AbstractEthernetTranslator):
     Translates packets between PushBot Multicast packets and PushBot
     Wi-Fi Commands.
     """
-    __slots__ = [
+    __slots__ = (
         "__protocol",
-        "__pushbot_wifi_connection"]
+        "__pushbot_wifi_connection")
 
-    def __init__(self, protocol, pushbot_wifi_connection):
+    def __init__(self, protocol: MunichIoSpiNNakerLinkProtocol,
+                 pushbot_wifi_connection: PushBotWIFIConnection):
         """
         :param MunichIoEthernetProtocol protocol:
             The instance of the PushBot protocol to get keys from
@@ -49,7 +57,7 @@ class PushBotTranslator(AbstractEthernetTranslator):
         self.__pushbot_wifi_connection = pushbot_wifi_connection
 
     @overrides(AbstractEthernetTranslator.translate_control_packet)
-    def translate_control_packet(self, multicast_packet):
+    def translate_control_packet(self, multicast_packet: MultiCastCommand):
         # pylint: disable=too-many-statements, too-many-branches
         key = multicast_packet.key
 
@@ -66,7 +74,7 @@ class PushBotTranslator(AbstractEthernetTranslator):
             self.__pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.set_retina_transmission(
                     munich_io_spinnaker_link_protocol.GET_RETINA_PAYLOAD_VALUE(
-                        multicast_packet.payload)))
+                        multicast_packet.payload or 0)))
             self.__pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.enable_retina())
 

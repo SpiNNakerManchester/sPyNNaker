@@ -11,19 +11,31 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from enum import Enum
+from __future__ import annotations
+from enum import IntEnum
 import os
 import ctypes
+from numpy import floating
+from numpy.typing import NDArray
+from typing import List, Optional, Sequence, cast
 
 from spinn_utilities.overrides import overrides
+from pacman.model.placements import Placement
+from pacman.model.graphs.common import Slice
+from pacman.model.resources import AbstractSDRAM
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.interface.ds import (
+    DataSpecificationGenerator, DataSpecificationReloader)
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
+from .abstract_population_vertex import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 
 
 class LocalOnlyProvenance(ctypes.LittleEndianStructure):
@@ -65,14 +77,14 @@ class PopulationMachineLocalOnlyCombinedVertex(
     A machine vertex for PyNN Populations.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__key",
         "__ring_buffer_shifts",
         "__weight_scales",
         "__slice_index",
         "__neuron_data",
         "__max_atoms_per_core",
-        "__regenerate_data"]
+        "__regenerate_data")
 
     # log_n_neurons, log_n_synapse_types, log_max_delay, input_buffer_size,
     # clear_input_buffer
@@ -85,7 +97,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
-    class REGIONS(Enum):
+    class REGIONS(IntEnum):
         """
         Regions for populations.
         """
@@ -104,20 +116,19 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
-        system=REGIONS.SYSTEM.value,
-        provenance=REGIONS.PROVENANCE_DATA.value,
-        profile=REGIONS.PROFILING.value,
-        recording=REGIONS.RECORDING.value)
+        REGIONS.SYSTEM,
+        REGIONS.PROVENANCE_DATA,
+        REGIONS.PROFILING,
+        REGIONS.RECORDING)
 
     # Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
-        core_params=REGIONS.CORE_PARAMS.value,
-        neuron_params=REGIONS.NEURON_PARAMS.value,
-        current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
-        neuron_recording=REGIONS.NEURON_RECORDING.value,
-        neuron_builder=REGIONS.NEURON_BUILDER.value,
-        initial_values=REGIONS.INITIAL_VALUES.value
-    )
+        REGIONS.CORE_PARAMS,
+        REGIONS.NEURON_PARAMS,
+        REGIONS.CURRENT_SOURCE_PARAMS,
+        REGIONS.NEURON_RECORDING,
+        REGIONS.NEURON_BUILDER,
+        REGIONS.INITIAL_VALUES)
 
     _PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -125,9 +136,11 @@ class PopulationMachineLocalOnlyCombinedVertex(
         2: "INCOMING_SPIKE"}
 
     def __init__(
-            self, sdram, label, app_vertex, vertex_slice, slice_index,
-            ring_buffer_shifts, weight_scales, neuron_data,
-            max_atoms_per_core):
+            self, sdram: AbstractSDRAM, label: str,
+            app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
+            slice_index: int, ring_buffer_shifts: Sequence[int],
+            weight_scales: NDArray[floating], neuron_data: NeuronData,
+            max_atoms_per_core: int):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex
@@ -149,13 +162,13 @@ class PopulationMachineLocalOnlyCombinedVertex(
         :param int max_atoms_per_core:
             The maximum number of atoms per core
         """
-        super(PopulationMachineLocalOnlyCombinedVertex, self).__init__(
+        super().__init__(
             label, app_vertex, vertex_slice, sdram,
             self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS +
             LocalOnlyProvenance.N_ITEMS + MainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
-        self.__key = None
+        self.__key: Optional[int] = None
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
@@ -164,36 +177,52 @@ class PopulationMachineLocalOnlyCombinedVertex(
         self.__regenerate_data = False
 
     @property
+    def _vertex_slice(self) -> Slice:
+        return self.vertex_slice
+
+    @property
     @overrides(PopulationMachineNeurons._slice_index)
-    def _slice_index(self):
+    def _slice_index(self) -> int:
         return self.__slice_index
 
     @property
     @overrides(PopulationMachineNeurons._key)
-    def _key(self):
+    def _key(self) -> int:
+        if self.__key is None:
+            raise KeyError("'_key' not yet set")
         return self.__key
 
+    @property
+    @overrides(PopulationMachineNeurons._has_key)
+    def _has_key(self) -> bool:
+        return self.__key is not None
+
     @overrides(PopulationMachineNeurons._set_key)
-    def _set_key(self, key):
+    def _set_key(self, key: int):
         self.__key = key
 
     @property
     @overrides(PopulationMachineNeurons._neuron_regions)
-    def _neuron_regions(self):
+    def _neuron_regions(self) -> NeuronRegions:
         return self.NEURON_REGIONS
 
     @property
     @overrides(PopulationMachineNeurons._neuron_data)
-    def _neuron_data(self):
+    def _neuron_data(self) -> NeuronData:
         return self.__neuron_data
 
     @property
     @overrides(PopulationMachineNeurons._max_atoms_per_core)
-    def _max_atoms_per_core(self):
+    def _max_atoms_per_core(self) -> int:
         return self.__max_atoms_per_core
 
+    @property
+    def __synapse_dynamics(self) -> AbstractLocalOnly:
+        # Precondition for construction of this class instance
+        return cast(AbstractLocalOnly, self._pop_vertex.synapse_dynamics)
+
     @staticmethod
-    def __get_binary_file_name(app_vertex):
+    def __get_binary_file_name(app_vertex: AbstractPopulationVertex) -> str:
         """
         Get the local binary filename for this vertex.  Static because at
         the time this is needed, the local app_vertex is not set.
@@ -209,7 +238,9 @@ class PopulationMachineLocalOnlyCombinedVertex(
         return name + app_vertex.synapse_executable_suffix + ext
 
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
-    def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
+    def parse_extra_provenance_items(
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
         proc_offset = NeuronProvenance.N_ITEMS
         end_proc_offset = proc_offset + LocalOnlyProvenance.N_ITEMS
         self._parse_neuron_provenance(
@@ -240,18 +271,19 @@ class PopulationMachineLocalOnlyCombinedVertex(
                     " the .spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
-    def get_recorded_region_ids(self):
-        ids = self._app_vertex.neuron_recorder.recorded_ids_by_slice(
+    def get_recorded_region_ids(self) -> List[int]:
+        ids = self._pop_vertex.neuron_recorder.recorded_ids_by_slice(
             self.vertex_slice)
-        ids.extend(self._app_vertex.synapse_recorder.recorded_ids_by_slice(
+        ids.extend(self._pop_vertex.synapse_recorder.recorded_ids_by_slice(
             self.vertex_slice))
         return ids
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(self, spec, placement):
-        rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
+    def generate_data_specification(
+            self, spec: DataSpecificationGenerator, placement: Placement):
+        rec_regions = self._pop_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
-        rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(
+        rec_regions.extend(self._pop_vertex.synapse_recorder.get_region_sizes(
             self.vertex_slice))
         self._write_common_data_spec(spec, rec_regions)
 
@@ -259,47 +291,48 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
         self.__write_local_only_data(spec)
 
-        self._app_vertex.synapse_dynamics.write_parameters(
-            spec, self.REGIONS.LOCAL_ONLY_PARAMS.value, self,
+        self.__synapse_dynamics.write_parameters(
+            spec, self.REGIONS.LOCAL_ONLY_PARAMS, self,
             self.__weight_scales)
 
         # End the writing of this specification:
         spec.end_specification()
 
-    def __write_local_only_data(self, spec):
+    def __write_local_only_data(self, spec: DataSpecificationGenerator):
         spec.reserve_memory_region(
-            self.REGIONS.LOCAL_ONLY.value, self.LOCAL_ONLY_SIZE, "local_only")
-        spec.switch_write_focus(self.REGIONS.LOCAL_ONLY.value)
+            self.REGIONS.LOCAL_ONLY, self.LOCAL_ONLY_SIZE, "local_only")
+        spec.switch_write_focus(self.REGIONS.LOCAL_ONLY)
         log_n_max_atoms = get_n_bits(self._max_atoms_per_core)
         log_n_synapse_types = get_n_bits(
-            self._app_vertex.neuron_impl.get_n_synapse_types())
+            self._pop_vertex.neuron_impl.get_n_synapse_types())
         # Find the maximum delay
-        # pylint: disable=protected-access
-        max_delay = self._app_vertex.splitter.max_support_delay()
+        max_delay = self._pop_vertex.splitter.max_support_delay()
 
         spec.write_value(log_n_max_atoms)
         spec.write_value(log_n_synapse_types)
         spec.write_value(get_n_bits(max_delay))
-        spec.write_value(self._app_vertex.incoming_spike_buffer_size)
-        spec.write_value(int(self._app_vertex.drop_late_spikes))
+        spec.write_value(self._pop_vertex.incoming_spike_buffer_size)
+        spec.write_value(int(self._pop_vertex.drop_late_spikes))
 
     @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)
-    def regenerate_data_specification(self, spec, placement):
+    def regenerate_data_specification(
+            self, spec: DataSpecificationReloader, placement):
         self._rewrite_neuron_data_spec(spec)
 
         # close spec
         spec.end_specification()
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
-    def reload_required(self):
+    def reload_required(self) -> bool:
         return self.__regenerate_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
-    def set_reload_required(self, new_value):
+    def set_reload_required(self, new_value: bool):
         self.__regenerate_data = new_value
 
     def _parse_local_only_provenance(
-            self, label, x, y, p, provenance_data):
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
         """
         Extract and yield local-only provenance.
 
@@ -337,7 +370,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
                     "of neurons per core.")
 
             if prov.n_spikes_dropped > 0:
-                if self._app_vertex.drop_late_spikes:
+                if self._pop_vertex.drop_late_spikes:
                     db.insert_report(
                         f"On {label}, {prov.n_spikes_dropped} packets were "
                         "dropped from the input buffer, because they arrived "
@@ -352,5 +385,5 @@ class PopulationMachineLocalOnlyCombinedVertex(
                         ".spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(PopulationMachineNeurons.set_do_neuron_regeneration)
-    def set_do_neuron_regeneration(self):
+    def set_do_neuron_regeneration(self) -> None:
         self.__regenerate_data = True

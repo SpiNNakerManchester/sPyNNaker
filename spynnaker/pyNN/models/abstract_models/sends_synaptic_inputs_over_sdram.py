@@ -11,19 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from spinn_utilities.abstract_base import abstractmethod
-from spinn_utilities.overrides import overrides
 from pacman.model.graphs import AbstractSupportsSDRAMEdges
-from pacman.model.graphs.machine import SDRAMMachineEdge
 
 
+# pylint: disable=abstract-method
 class SendsSynapticInputsOverSDRAM(AbstractSupportsSDRAMEdges):
     """
     A marker interface for an object that sends synaptic inputs over SDRAM.
     """
-
-    @abstractmethod
-    @overrides(AbstractSupportsSDRAMEdges.sdram_requirement)
-    def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge) -> int:
-        raise NotImplementedError

@@ -33,7 +33,7 @@ Delay_Types: TypeAlias = \
 # These are the Types we know are coming in.
 # Most things that can be considered ints and floats will work
 Weight_Delay_In_Types: TypeAlias = Optional[Union[
-    int, float, str, RandomDistribution, Iterable[Union[int, float]]]]
+    int, float, str, RandomDistribution, Iterable[int], Iterable[float]]]
 
 
 def is_scalar(value: Weight_Delay_Types) -> TypeGuard[Union[int, float]]:

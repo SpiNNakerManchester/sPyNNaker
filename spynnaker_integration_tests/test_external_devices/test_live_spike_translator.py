@@ -14,7 +14,7 @@
 import pyNN.spiNNaker as p
 
 from spinnman.connections import ConnectionListener
-from spinnman.messages.eieio.create_eieio_data import read_eieio_data_message
+from spinnman.messages.eieio import read_eieio_data_message
 from spinnman.connections.udp_packet_connections import SCAMPConnection
 from spinnman.utilities.utility_functions import reprogram_tag
 from spinn_front_end_common.utilities.database import DatabaseConnection

@@ -11,11 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from abc import abstractmethod
 from enum import Enum
 import numpy
-from spinn_utilities.abstract_base import abstractproperty, AbstractBase
+from numpy import uint32
+from numpy.typing import NDArray
+from typing import TYPE_CHECKING
+from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.application import ApplicationEdge
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -27,6 +32,8 @@ from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.utilities.utility_calls import check_rng
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 
 # Hashes of the connection generators supported by the synapse expander
@@ -46,10 +53,12 @@ class AbstractGenerateConnectorOnMachine(
     Indicates that the connectivity can be generated on the machine.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     @overrides(AbstractConnector.validate_connection)
-    def validate_connection(self, application_edge, synapse_info):
+    def validate_connection(
+            self, application_edge: ApplicationEdge,
+            synapse_info: SynapseInformation):
         # If we can't generate on machine, we must be able to generate on host
         if not self.generate_on_machine(
                 synapse_info.weights, synapse_info.delays):
@@ -60,7 +69,7 @@ class AbstractGenerateConnectorOnMachine(
                     " be generated on host!")
 
     def generate_on_machine(
-            self, weights: Weight_Types, delays: Delay_Types):
+            self, weights: Weight_Types, delays: Delay_Types) -> bool:
         """
         Determine if this instance can generate on the machine.
 
@@ -84,7 +93,7 @@ class AbstractGenerateConnectorOnMachine(
             check_rng(delays.rng, "RandomDistribution in delay")
         return True
 
-    def gen_weights_id(self, weights):
+    def gen_weights_id(self, weights: Weight_Types) -> int:
         """
         Get the id of the weight generator on the machine.
 
@@ -94,7 +103,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_id(weights)
 
-    def gen_weights_params(self, weights):
+    def gen_weights_params(self, weights: Weight_Types) -> NDArray[uint32]:
         """
         Get the parameters of the weight generator on the machine.
 
@@ -104,7 +113,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_params(weights)
 
-    def gen_weight_params_size_in_bytes(self, weights):
+    def gen_weight_params_size_in_bytes(self, weights) -> int:
         """
         The size of the weight parameters in bytes.
 
@@ -114,7 +123,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_params_size_in_bytes(weights)
 
-    def gen_delays_id(self, delays):
+    def gen_delays_id(self, delays: Delay_Types) -> int:
         """
         Get the id of the delay generator on the machine.
 
@@ -124,7 +133,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_id(delays)
 
-    def gen_delay_params(self, delays):
+    def gen_delay_params(self, delays: Delay_Types) -> NDArray[uint32]:
         """
         Get the parameters of the delay generator on the machine.
 
@@ -134,7 +143,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_params(delays)
 
-    def gen_delay_params_size_in_bytes(self, delays):
+    def gen_delay_params_size_in_bytes(self, delays: Delay_Types) -> int:
         """
         The size of the delay parameters in bytes.
 
@@ -144,15 +153,17 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_params_size_in_bytes(delays)
 
-    @abstractproperty
-    def gen_connector_id(self):
+    @property
+    @abstractmethod
+    def gen_connector_id(self) -> int:
         """
         The ID of the connection generator on the machine.
 
         :rtype: int
         """
+        raise NotImplementedError
 
-    def gen_connector_params(self):
+    def gen_connector_params(self) -> NDArray[uint32]:
         """
         Get the parameters of the on machine generation.
 
@@ -162,7 +173,7 @@ class AbstractGenerateConnectorOnMachine(
         return numpy.zeros(0, dtype="uint32")
 
     @property
-    def gen_connector_params_size_in_bytes(self):
+    def gen_connector_params_size_in_bytes(self) -> int:
         """
         The size of the connector parameters, in bytes.
 

@@ -12,16 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.spiNNaker as p
-from spinnaker_testbase import BaseTestCase
-from spynnaker.pyNN.external_devices_models import AbstractEthernetTranslator
-from spynnaker.pyNN.external_devices_models\
-    .abstract_multicast_controllable_device import (
-        AbstractMulticastControllableDevice, SendType)
-from spinn_front_end_common.interface.ds import DataType
+from collections import defaultdict
 import decimal
 import numpy
-from collections import defaultdict
+import pyNN.spiNNaker as p
+from spinn_front_end_common.interface.ds import DataType
+from spynnaker.pyNN.external_devices_models import (
+    AbstractEthernetTranslator, AbstractMulticastControllableDevice, SendType)
+from spinnaker_testbase import BaseTestCase
 
 
 class Translator(AbstractEthernetTranslator):

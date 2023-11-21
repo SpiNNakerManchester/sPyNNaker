@@ -11,17 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from six import add_metaclass
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
-from spinn_utilities.overrides import overrides
+from numpy import floating
+from numpy.typing import NDArray
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs import AbstractSupportsSDRAMEdges
-from pacman.model.graphs.machine import SDRAMMachineEdge
 from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
 
 
-@add_metaclass(AbstractBase)
-class ReceivesSynapticInputsOverSDRAM(AbstractSupportsSDRAMEdges):
+class ReceivesSynapticInputsOverSDRAM(
+        AbstractSupportsSDRAMEdges, metaclass=AbstractBase):
     """
     An object that receives synaptic inputs over SDRAM.
 
@@ -37,17 +35,20 @@ class ReceivesSynapticInputsOverSDRAM(AbstractSupportsSDRAMEdges):
     # The size of each input in bytes
     N_BYTES_PER_INPUT = BYTES_PER_SHORT
 
-    @abstractproperty
-    def weight_scales(self):
+    @property
+    @abstractmethod
+    def weight_scales(self) -> NDArray[floating]:
         """
         A list of scale factors to be applied to weights that get passed
         over SDRAM, one for each synapse type.
 
         :rtype: list(int)
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def n_bytes_for_transfer(self):
+    @property
+    @abstractmethod
+    def n_bytes_for_transfer(self) -> int:
         """
         The number of bytes to be sent over the channel.  This will be
         calculated using the above numbers, but also rounded up to a number
@@ -55,8 +56,4 @@ class ReceivesSynapticInputsOverSDRAM(AbstractSupportsSDRAMEdges):
 
         :rtype: int
         """
-
-    @abstractmethod
-    @overrides(AbstractSupportsSDRAMEdges.sdram_requirement)
-    def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge) -> int:
         raise NotImplementedError

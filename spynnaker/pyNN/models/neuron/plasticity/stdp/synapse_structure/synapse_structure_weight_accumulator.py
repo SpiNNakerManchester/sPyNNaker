@@ -21,9 +21,9 @@ class SynapseStructureWeightAccumulator(AbstractSynapseStructure):
     __slots__ = ()
 
     @overrides(AbstractSynapseStructure.get_n_half_words_per_connection)
-    def get_n_half_words_per_connection(self):
+    def get_n_half_words_per_connection(self) -> int:
         return 2
 
     @overrides(AbstractSynapseStructure.get_weight_half_word)
-    def get_weight_half_word(self):
+    def get_weight_half_word(self) -> int:
         return 0

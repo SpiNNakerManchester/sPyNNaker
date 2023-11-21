@@ -11,12 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spynnaker.pyNN.models.projection import Projection
 
 
-@add_metaclass(AbstractBase)
-class AbstractSupportsOneToOneSDRAMInput(object):
+class AbstractSupportsOneToOneSDRAMInput(metaclass=AbstractBase):
     """
     An interface for a splitter that supports one-to-one input using
     SDRAM.  The splitter is assumed to handle the splitting on any inputs
@@ -24,7 +23,7 @@ class AbstractSupportsOneToOneSDRAMInput(object):
     """
 
     @abstractmethod
-    def handles_source_vertex(self, projection):
+    def handles_source_vertex(self, projection: Projection) -> bool:
         """
         Determine if the source vertex of the given projection is to be
         handled by the target splitter.
@@ -32,3 +31,4 @@ class AbstractSupportsOneToOneSDRAMInput(object):
         :param Projection projection: The projection to check the source of
         :rtype: bool
         """
+        raise NotImplementedError

@@ -19,16 +19,15 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
     """
     An object that has :math:`A^+` and :math:`A^-` properties.
     """
-    __slots__ = [
+    __slots__ = (
         '__a_plus',
-        '__a_minus'
-    ]
+        '__a_minus')
 
-    def __init__(self):
-        self.__a_plus = None
-        self.__a_minus = None
+    def __init__(self) -> None:
+        self.__a_plus: float = 0.0
+        self.__a_minus: float = 0.0
 
-    def set_a_plus_a_minus(self, a_plus, a_minus):
+    def set_a_plus_a_minus(self, a_plus: float, a_minus: float):
         """
         Set the values of :math:`A^+` and :math:`A^-`.
 
@@ -39,7 +38,7 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
         self.__a_minus = a_minus
 
     @property
-    def A_plus(self):
+    def A_plus(self) -> float:
         """
         Settable model parameter: :math:`A^+`
 
@@ -48,11 +47,11 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
         return self.__a_plus
 
     @A_plus.setter
-    def A_plus(self, new_value):
+    def A_plus(self, new_value: float):
         self.__a_plus = new_value
 
     @property
-    def A_minus(self):
+    def A_minus(self) -> float:
         """
         Settable model parameter: :math:`A^-`
 
@@ -61,5 +60,5 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
         return self.__a_minus
 
     @A_minus.setter
-    def A_minus(self, new_value):
+    def A_minus(self, new_value: float):
         self.__a_minus = new_value

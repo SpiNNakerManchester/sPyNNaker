@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+from typing import Optional, Union
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.data.fec_data_writer import FecDataWriter
@@ -35,17 +36,17 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
     __spy_data = _SpynnakerDataModel()
 
     @overrides(FecDataWriter._setup)
-    def _setup(self):
+    def _setup(self) -> None:
         FecDataWriter._setup(self)
         self.__spy_data._clear()
 
     @overrides(FecDataWriter._mock)
-    def _mock(self):
+    def _mock(self) -> None:
         FecDataWriter._mock(self)
         self._set_min_delay(1)
 
     @overrides(FecDataWriter._hard_reset)
-    def _hard_reset(self):
+    def _hard_reset(self) -> None:
         if not self.is_soft_reset():
             # Only increase it if this is a hard not following a soft
             self.__spy_data._segment_counter += 1
@@ -53,13 +54,15 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
         self.__spy_data._hard_reset()
 
     @overrides(FecDataWriter._soft_reset)
-    def _soft_reset(self):
+    def _soft_reset(self) -> None:
         self.__spy_data._segment_counter += 1
         FecDataWriter._soft_reset(self)
         self.__spy_data._soft_reset()
 
     def set_up_timings_and_delay(
-            self, simulation_time_step_us, time_scale_factor, min_delay):
+            self, simulation_time_step_us: Optional[int],
+            time_scale_factor: Optional[float],
+            min_delay: Optional[Union[int, float]]):
         """
         :param simulation_time_step_us:
             An explicitly specified time step for the simulation in
@@ -81,7 +84,7 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
             self.__spy_data._min_delay = None
             raise
 
-    def _set_min_delay(self, min_delay):
+    def _set_min_delay(self, min_delay: Optional[Union[int, float]]):
         """
         Sets a min delay or accepts `None` to use simulation_time_step_ms.
 
@@ -111,7 +114,7 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
 
         self.__spy_data._min_delay = min_delay
 
-    def shut_down(self):
+    def shut_down(self) -> None:
         FecDataWriter.shut_down(self)
         # Clears all previously added ceiling on the number of neurons per core
         for neuron_type in self.__spy_data._neurons_per_core_set:

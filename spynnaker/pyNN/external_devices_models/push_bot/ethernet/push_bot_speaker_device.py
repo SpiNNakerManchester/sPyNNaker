@@ -64,35 +64,28 @@ class PushBotEthernetSpeakerDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
-        commands = list()
-
         # add mode command if not done already
         if not self.protocol.sent_mode_command():
-            commands.append(self.protocol.set_mode())
+            yield self.protocol.set_mode()
 
         # device specific commands
-        commands.append(
-            self.__command_protocol.push_bot_speaker_config_total_period(
-                total_period=self.__start_total_period))
-        commands.append(
-            self.__command_protocol.push_bot_speaker_config_active_time(
-                active_time=self.__start_active_time))
+        yield self.__command_protocol.push_bot_speaker_config_total_period(
+            total_period=self.__start_total_period)
+        yield self.__command_protocol.push_bot_speaker_config_active_time(
+            active_time=self.__start_active_time)
         if self.__start_frequency is not None:
-            commands.append(self.__command_protocol.push_bot_speaker_set_tone(
-                frequency=self.__start_frequency))
+            yield self.__command_protocol.push_bot_speaker_set_tone(
+                frequency=self.__start_frequency)
         if self.__start_melody is not None:
-            commands.append(
-                self.__command_protocol.push_bot_speaker_set_melody(
-                    melody=self.__start_melody))
-        return commands
+            yield self.__command_protocol.push_bot_speaker_set_melody(
+                melody=self.__start_melody)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
-        return [
-            self.__command_protocol.push_bot_speaker_config_total_period(0),
-            self.__command_protocol.push_bot_speaker_config_active_time(0),
-            self.__command_protocol.push_bot_speaker_set_tone(0)]
+        yield self.__command_protocol.push_bot_speaker_config_total_period(0)
+        yield self.__command_protocol.push_bot_speaker_config_active_time(0)
+        yield self.__command_protocol.push_bot_speaker_set_tone(0)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

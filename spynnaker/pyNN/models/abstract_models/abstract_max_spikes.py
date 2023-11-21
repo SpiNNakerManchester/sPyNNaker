@@ -31,19 +31,15 @@ class AbstractMaxSpikes(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def max_spikes_per_ts(self):
+    def max_spikes_per_ts(self) -> float:
         """
         Get maximum expected number of spikes per timestep.
-
-        :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def max_spikes_per_second(self):
+    def max_spikes_per_second(self) -> float:
         """
         Get maximum expected number of spikes per second.
-
-        :param str variable: the variable to find units from
-        :return: the units as a string.
-        :rtype: str
         """
+        raise NotImplementedError

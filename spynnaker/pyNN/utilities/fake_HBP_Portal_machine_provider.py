@@ -16,7 +16,7 @@ from spynnaker.pyNN.exceptions import InvalidParameterType
 
 
 class FakeHBPPortalMachineProvider(object):
-    __slots__ = ["__height", "__ip_addresses", "__width"]
+    __slots__ = ("__height", "__ip_addresses", "__width")
 
     def __init__(self, n_boards, config):
         self.__ip_addresses = config.get("Machine", "machineName")

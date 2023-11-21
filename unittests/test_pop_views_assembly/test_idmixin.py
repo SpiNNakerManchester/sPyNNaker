@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy
 import pytest
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
@@ -119,7 +118,7 @@ class TestIDMixin(BaseTestCase):
         result_should_be = []
         for atom in range(n_atoms):
             if atom == set_id:
-                result_should_be.append(numpy.array(set_value))
+                result_should_be.append(set_value)
             else:
                 result_should_be.append([])
         self.assertEqual(result, result_should_be)

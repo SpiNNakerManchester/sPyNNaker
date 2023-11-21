@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import math
+from typing import Union
 
 
 class RunningStats(object):
@@ -20,14 +21,14 @@ class RunningStats(object):
     Keeps running statistics.
     From: https://www.johndcook.com/blog/skewness_kurtosis/
     """
-    __slots__ = ["__mean", "__mean_2", "__n_items"]
+    __slots__ = ("__mean", "__mean_2", "__n_items")
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.__mean = 0.0
         self.__mean_2 = 0.0
         self.__n_items = 0
 
-    def add_item(self, x):
+    def add_item(self, x: Union[int, float]):
         """
         Adds an item to the running statistics.
 
@@ -44,7 +45,7 @@ class RunningStats(object):
         self.__mean += delta_n
         self.__mean_2 += term_1
 
-    def add_items(self, mean, variance, n_items):
+    def add_items(self, mean: float, variance: float, n_items: int):
         """
         Add a bunch of items (via their statistics).
 
@@ -68,7 +69,7 @@ class RunningStats(object):
             self.__mean_2 = new_mean_2
 
     @property
-    def n_items(self):
+    def n_items(self) -> int:
         """
         The number of items seen.
 
@@ -77,7 +78,7 @@ class RunningStats(object):
         return self.__n_items
 
     @property
-    def mean(self):
+    def mean(self) -> float:
         """
         The mean of the items seen.
 
@@ -86,7 +87,7 @@ class RunningStats(object):
         return self.__mean
 
     @property
-    def variance(self):
+    def variance(self) -> float:
         """
         The variance of the items seen.
 
@@ -97,7 +98,7 @@ class RunningStats(object):
         return self.__mean_2 / (self.__n_items - 1.0)
 
     @property
-    def standard_deviation(self):
+    def standard_deviation(self) -> float:
         """
         The population standard deviation of the items seen.
 

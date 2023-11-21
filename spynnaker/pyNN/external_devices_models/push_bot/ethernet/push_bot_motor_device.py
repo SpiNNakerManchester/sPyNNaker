@@ -50,20 +50,17 @@ class PushBotEthernetMotorDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
-        commands = list()
-
         # add mode command if not done already
         if not self.protocol.sent_mode_command():
-            commands.append(self.protocol.set_mode())
+            yield self.protocol.set_mode()
 
         # device specific commands
-        commands.append(self.__command_protocol.generic_motor_enable())
-        return commands
+        yield self.__command_protocol.generic_motor_enable()
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
-        return [self.__command_protocol.generic_motor_disable()]
+        yield self.__command_protocol.generic_motor_disable()
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
