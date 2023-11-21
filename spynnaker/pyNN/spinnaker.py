@@ -132,7 +132,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     def __writer(self) -> SpynnakerDataWriter:
         return cast(SpynnakerDataWriter, self._data_writer)
 
-    def _clear_and_run(self, run_time: Union[int, float, None],
+    def _clear_and_run(self, run_time: Optional[float],
                        sync_time: float = 0.0):
         """
         Clears the projections and Run the model created.
@@ -147,8 +147,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # extra post prerun algorithms
         self.__flush_post_vertex_caches()
 
-        rt = None if run_time is None else int(run_time)
-        super(SpiNNaker, self).run(rt, sync_time)
+        super(SpiNNaker, self).run(run_time, sync_time)
         # extra post run algorithms
         self.__flush_post_vertex_caches()
 
