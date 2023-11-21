@@ -340,14 +340,6 @@ class PopulationBase(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @property
-    @final
-    def _apv(self) -> Optional[AbstractPopulationVertex]:
-        from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
-            AbstractPopulationVertex as APV)
-        v = self._vertex
-        return v if isinstance(v, APV) else None
-
-    @property
     @abstractmethod
     def _recorder(self) -> Recorder:
         """

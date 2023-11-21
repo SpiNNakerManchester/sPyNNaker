@@ -152,12 +152,6 @@ class Recorder(object):
             self.turn_on_record(
                 variable, sampling_interval, to_file, indexes)
 
-    @property
-    def __apv(self) -> Optional[AbstractPopulationVertex]:
-        from spynnaker.pyNN.models.neuron import (
-            AbstractPopulationVertex as APV)
-        return self.__vertex if isinstance(self.__vertex, APV) else None
-
     def turn_on_record(
             self, variable: str, sampling_interval: Optional[int] = None,
             to_file: _IoDest = None,
@@ -213,10 +207,8 @@ class Recorder(object):
         :param indexes:
         :type indexes: list or None
         """
-        apv = self.__apv
-        if apv is not None:
-            for variable in apv.get_recordable_variables():
-                apv.set_not_recording(variable, indexes)
+        for variable in self.__vertex.get_recordable_variables():
+            self.__vertex.set_not_recording(variable, indexes)
 
     def extract_neo_block(
             self, variables: Names, view_indexes: Optional[Sequence[int]],
