@@ -25,8 +25,6 @@ from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.models.recorder import Recorder
 from .assembly import Assembly
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
-        AbstractPopulationVertex)
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
     from spynnaker.pyNN.models.common.types import Names
     from .population_view import IDMixin
