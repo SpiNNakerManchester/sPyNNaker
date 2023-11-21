@@ -27,7 +27,6 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.types import Names
     from spynnaker.pyNN.models.populations import Population
     from spynnaker.pyNN.models.common import PopulationApplicationVertex
-    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
     _IoDest: TypeAlias = Union[str, neo.baseio.BaseIO, None]
 
 logger = FormatAdapter(logging.getLogger(__name__))
