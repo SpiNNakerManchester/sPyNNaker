@@ -76,7 +76,7 @@ class Projection(object):
             self, pre_synaptic_population: _Pop,
             post_synaptic_population: _Pop, connector: AbstractConnector,
             synapse_type: Optional[AbstractSynapseDynamics] = None,
-            source: None = None, receptor_type: Optional[str] = None,
+            source: None = None, receptor_type: str = "excitatory",
             space: Optional[PyNNSpace] = None,
             label: Optional[str] = None):
         """
@@ -134,15 +134,15 @@ class Projection(object):
                 " synaptic projections")
 
         # sort out synapse type
-        rt = receptor_type or "excitatory"
-        synapse_id = post_vertex.get_synapse_id_by_target(rt)
+        synapse_id = post_vertex.get_synapse_id_by_target(receptor_type)
         synapse_id_from_dynamics = False
         if synapse_id is None:
-            synapse_id = synapse_dynamics.get_synapse_id_by_target(rt)
+            synapse_id = synapse_dynamics.get_synapse_id_by_target(
+                receptor_type)
             synapse_id_from_dynamics = True
         if synapse_id is None:
             raise ConfigurationException(
-                f"Synapse target {rt} not found "
+                f"Synapse target {receptor_type} not found "
                 f"in {post_synaptic_population.label}")
 
         # as a from-list connector can have plastic parameters, grab those (
