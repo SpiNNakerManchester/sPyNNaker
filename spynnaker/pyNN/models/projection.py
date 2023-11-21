@@ -158,7 +158,7 @@ class Projection(object):
         self.__synapse_information = SynapseInformation(
             connector, pre_synaptic_population, post_synaptic_population,
             pre_is_view, post_is_view, synapse_dynamics,
-            synapse_id, rt, synapse_id_from_dynamics,
+            synapse_id, receptor_type, synapse_id_from_dynamics,
             synapse_dynamics.weight, synapse_dynamics.delay)
 
         # Set projection information in connector
