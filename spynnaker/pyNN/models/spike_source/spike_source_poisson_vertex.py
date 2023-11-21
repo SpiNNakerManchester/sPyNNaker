@@ -16,7 +16,7 @@ from collections.abc import Sequence as Seq
 import logging
 import math
 from typing import (
-    Any, Dict, List, Optional, Sequence, Sized, Tuple, Union,
+    Any, Collection, Dict, List, Optional, Sequence, Sized, Tuple, Union,
     cast, TYPE_CHECKING)
 from typing_extensions import TypeGuard
 import numpy
@@ -440,7 +440,8 @@ class SpikeSourcePoissonVertex(
         return []
 
     @overrides(PopulationApplicationVertex.set_not_recording)
-    def set_not_recording(self, name: str, indices=None):
+    def set_not_recording(
+            self, name: str, indices: Optional[Collection[int]] = None):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if indices is not None:

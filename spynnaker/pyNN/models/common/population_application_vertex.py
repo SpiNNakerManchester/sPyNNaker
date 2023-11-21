@@ -274,7 +274,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"set_recording")
 
     def set_not_recording(
-            self, name: str, indices: Optional[List[int]] = None):
+            self, name: str, indices: Optional[Collection[int]] = None):
         """
         Set a variable not recording.
 

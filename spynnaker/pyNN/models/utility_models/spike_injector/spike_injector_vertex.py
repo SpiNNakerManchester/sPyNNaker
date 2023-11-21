@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import List, Optional, Tuple
+from typing import Collection, List, Optional, Tuple
 import numpy
 from numpy.typing import NDArray
 from pyNN.space import Grid2D, Grid3D, BaseStructure
@@ -100,7 +100,8 @@ class SpikeInjectorVertex(
         return []
 
     @overrides(PopulationApplicationVertex.set_not_recording)
-    def set_not_recording(self, name: str, indices=None):
+    def set_not_recording(
+            self, name: str, indices: Optional[Collection[int]] = None):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if indices is not None:

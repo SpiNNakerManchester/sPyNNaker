@@ -17,7 +17,8 @@ import logging
 import numpy
 from numpy.typing import ArrayLike, NDArray
 from pyNN.space import Grid2D, Grid3D, BaseStructure
-from typing import List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
+from typing import (
+    Collection, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING)
 from typing_extensions import TypeAlias, TypeGuard
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -321,7 +322,8 @@ class SpikeSourceArrayVertex(
         SpynnakerDataView.set_requires_mapping()
 
     @overrides(PopulationApplicationVertex.set_not_recording)
-    def set_not_recording(self, name: str, indices=None):
+    def set_not_recording(
+            self, name: str, indices: Optional[Collection[int]] = None):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if indices is not None:
