@@ -127,7 +127,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             machine_vertex: PopulationMachineLocalOnlyCombinedVertex,
             weight_scales: NDArray[floating]):
         # Get incoming sources for this vertex
-        app_vertex = machine_vertex._pop_vertex
+        app_vertex = cast('AbstractPopulationVertex',
+                          machine_vertex.app_vertex)
         sources = self.__get_sources_for_target(app_vertex)
 
         size = self.get_parameters_usage_in_bytes(
