@@ -156,7 +156,8 @@ class AbstractGenerateConnectorOnMachine(
         """
         raise NotImplementedError
 
-    def gen_connector_params(self, synapse_info: SynapseInformation) -> NDArray[uint32]:
+    def gen_connector_params(
+            self, synapse_info: SynapseInformation) -> NDArray[uint32]:
         """
         Get the parameters of the on machine generation.
 

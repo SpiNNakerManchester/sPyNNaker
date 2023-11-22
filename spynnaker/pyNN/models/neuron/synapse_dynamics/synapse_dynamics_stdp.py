@@ -354,8 +354,8 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractPlasticSynapseDynamics.get_plastic_synaptic_data)
     def get_plastic_synaptic_data(
-            self, connections: ConnectionsArray, connection_row_indices, n_rows,
-            n_synapse_types, max_n_synapses, max_atoms_per_core):
+            self, connections: ConnectionsArray, connection_row_indices,
+            n_rows, n_synapse_types, max_n_synapses, max_atoms_per_core):
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1

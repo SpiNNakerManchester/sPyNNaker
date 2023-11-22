@@ -165,7 +165,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             mapping[s.get_raster_ids()] = i
         return mapping
 
-    def _split_connections(self, n_pre_atoms: int, n_post_atoms: int, 
+    def _split_connections(self, n_pre_atoms: int, n_post_atoms: int,
                            post_slices: Sequence[Slice]):
         """
         :param list(~pacman.model.graphs.common.Slice) post_slices:
@@ -542,7 +542,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                 synapse_type.set_value(name, self.__extra_params.data[:, i])
 
     @overrides(AbstractConnector.validate_connection)
-    def validate_connection(self, application_edge, 
+    def validate_connection(self, application_edge,
                             synapse_info: SynapseInformation):
         out_of_range_targets = self.__targets >= synapse_info.n_post_neurons
         if any(out_of_range_targets):

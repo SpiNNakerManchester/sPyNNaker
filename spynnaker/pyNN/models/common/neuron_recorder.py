@@ -1186,9 +1186,9 @@ class NeuronRecorder(object):
         if index is None:
             return [_REPEAT_PER_NEURON, 1,
                     _REPEAT_PER_NEURON_RECORDED | _RECORDED_FLAG]
-        
+
         assert (vertex_slice is not None)
-        
+
         # Find slice-relative indices in the index
         indices = numpy.intersect1d(
             vertex_slice.get_raster_ids(), index, return_indices=True)[1]

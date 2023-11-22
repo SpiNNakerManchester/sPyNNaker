@@ -17,7 +17,7 @@
 from __future__ import annotations
 from collections.abc import Sequence
 import numpy
-from numpy import floating, float64, integer, int16, uint16, uint32, bool_
+from numpy import floating, float64, integer, int16, uint16, uint32
 from numpy.typing import NDArray
 from typing import (
     List, Optional, Sequence as TSequence, Tuple, Union,

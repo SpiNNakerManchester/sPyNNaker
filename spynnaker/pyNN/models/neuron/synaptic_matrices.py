@@ -38,7 +38,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region, get_bitfield_key_map_data,
     write_bitfield_init_data)
-from spynnaker.pyNN.models.common.population_application_vertex import PopulationApplicationVertex
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
         AbstractPopulationVertex)
