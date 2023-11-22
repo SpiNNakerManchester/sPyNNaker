@@ -211,7 +211,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.write_array(numpy.array(source_data, dtype=numpy.uint32))
         spec.write_array(numpy.concatenate(connector_data))
 
-    def __get_sources_for_target(self, app_vertex):
+    def __get_sources_for_target(self, app_vertex: AbstractPopulationVertex):
         """
         Get all the application vertex sources that will hit the given
         application vertex.
