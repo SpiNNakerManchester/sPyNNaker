@@ -12,17 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from numpy import floating
+from numpy.typing import NDArray
+from pyNN.random import RandomDistribution
+from typing import Dict, Iterable, List, Union
+from typing_extensions import TypeAlias
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.ranged import RangeDictionary, RangedList
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
+from spynnaker.pyNN.utilities.struct import Struct
+import numpy
+
+#: The type of parameters to a neuron model.
+ModelParameter: TypeAlias = Union[
+    float, Iterable[float], RandomDistribution, NDArray[floating]]
 
 
 class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
     """
     Represents a component of a standard neural model.
     """
+    __slots__ = (
+        "__structs",
+        "__units")
 
-    __slots__ = ["__structs", "__units"]
-
-    def __init__(self, structs, units):
+    def __init__(self, structs: List[Struct], units: Dict[str, str]):
         """
         :param list(Struct) structs: The structures of the component
         :param dict units: The units to use for each parameter
@@ -31,7 +45,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         self.__units = units
 
     @property
-    def structs(self):
+    def structs(self) -> List[Struct]:
         """
         The structures of the component.  If there are multiple structures,
         the order is how they will appear in memory; where there are
@@ -45,16 +59,17 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         return self.__structs
 
     @abstractmethod
-    def add_parameters(self, parameters):
+    def add_parameters(self, parameters: RangeDictionary[float]):
         """
         Add the initial values of the parameters to the parameter holder.
 
         :param ~spinn_utilities.ranged.RangeDictionary parameters:
             A holder of the parameters
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def add_state_variables(self, state_variables):
+    def add_state_variables(self, state_variables: RangeDictionary[float]):
         """
         Add the initial values of the state variables to the state
         variables holder.
@@ -62,8 +77,9 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         :param ~spinn_utilities.ranged.RangeDictionary state_variables:
             A holder of the state variables
         """
+        raise NotImplementedError
 
-    def has_variable(self, variable):
+    def has_variable(self, variable: str) -> bool:
         """
         Determine if this component has a variable by the given name.
 
@@ -72,10 +88,24 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         """
         return variable in self.__units
 
-    def get_units(self, variable):
+    def get_units(self, variable: str) -> str:
         """
         Get the units of the given variable.
 
         :param str variable: The name of the variable
         """
         return self.__units[variable]
+
+    @staticmethod
+    def _convert(value: ModelParameter) -> \
+            Union[float, RangedList[float], RandomDistribution]:
+        """
+        Converts a model parameter into a form that can be ingested by a
+        RangeDictionary.
+        """
+        if isinstance(value, (float, int, numpy.integer, numpy.floating)):
+            return float(value)
+        if isinstance(value, RandomDistribution):
+            return value
+        # TODO: Is this correct? Without this, things will only handle floats
+        return SpynnakerRangedList(None, value)

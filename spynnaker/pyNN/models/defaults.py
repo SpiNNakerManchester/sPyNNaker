@@ -12,14 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Decorators to support default argument handling.
+"""
+
 import inspect
-from spinn_utilities.log import FormatAdapter
 import logging
+from typing import Any, Callable, Dict, FrozenSet, Iterable, List, Optional
+from spinn_utilities.log import FormatAdapter
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def _check_args(args_to_find, default_args, init_method):
+def _check_args(
+        args_to_find: FrozenSet[str], default_args: List[str],
+        init_method: Callable):
     for arg in args_to_find:
         if arg not in default_args:
             raise AttributeError(
@@ -27,7 +34,10 @@ def _check_args(args_to_find, default_args, init_method):
                 f"no default value provided in {init_method}")
 
 
-def get_dict_from_init(init_method, skip=None, include=None):
+def get_dict_from_init(
+        init_method: Callable,
+        skip: Optional[FrozenSet[str]] = None,
+        include: Optional[FrozenSet[str]] = None) -> Dict[str, Any]:
     """
     Get an argument initialisation dictionary by examining an
     ``__init__`` method or function.
@@ -58,7 +68,7 @@ def get_dict_from_init(init_method, skip=None, include=None):
                 (include is None or arg in include))}
 
 
-def default_parameters(parameters):
+def default_parameters(parameters: Iterable[str]) -> Callable:
     """
     Specifies arguments which are parameters.  Only works on the
     ``__init__`` method of a class that is additionally decorated with
@@ -96,7 +106,7 @@ def default_parameters(parameters):
     return wrap
 
 
-def default_initial_values(state_variables):
+def default_initial_values(state_variables: Iterable[str]) -> Callable:
     """
     Specifies arguments which are state variables.  Only works on the
     ``__init__`` method of a class that is additionally decorated with
@@ -134,7 +144,7 @@ def default_initial_values(state_variables):
     return wrap
 
 
-def defaults(cls):
+def defaults(cls: type) -> type:
     """
     Get the default parameters and state variables from the arguments to
     the ``__init__`` method.  This uses the decorators

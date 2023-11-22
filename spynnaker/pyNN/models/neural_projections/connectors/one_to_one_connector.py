@@ -11,19 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import numpy
+from __future__ import annotations
 import math
+import numpy
+from numpy import integer, floating, uint32
+from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
+from typing import Sequence, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.common import Slice
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
+
 _expr_context = SafeEval(
     math, numpy, numpy.arccos, numpy.arcsin, numpy.arctan, numpy.arctan2,
     numpy.ceil, numpy.cos, numpy.cosh, numpy.exp, numpy.fabs, numpy.floor,
@@ -39,9 +48,9 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     connect cell *i* in the presynaptic population to cell *i* in
     the postsynaptic population, for all *i*.
     """
-    __slots__ = []
+    __slots__ = ()
 
-    def __init__(self, safe=True, callback=None, verbose=False):
+    def __init__(self, safe=True, callback=None, verbose=False) -> None:
         """
         :param bool safe:
             If ``True``, check that weights and delays have valid values.
@@ -59,14 +68,14 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         super().__init__(safe, callback, verbose)
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, synapse_info):
+    def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
         return self._get_delay_maximum(
             synapse_info.delays,
             max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons),
             synapse_info)
 
     @overrides(AbstractConnector.get_delay_minimum)
-    def get_delay_minimum(self, synapse_info):
+    def get_delay_minimum(self, synapse_info: SynapseInformation) -> float:
         return self._get_delay_minimum(
             synapse_info.delays,
             max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons),
@@ -74,13 +83,12 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_post_atoms, synapse_info, min_delay=None,
-            max_delay=None):
-        # pylint: disable=too-many-arguments
-        if min_delay is None or max_delay is None:
-            return 1
-
+            self, n_post_atoms, synapse_info: SynapseInformation,
+            min_delay=None, max_delay=None) -> int:
         delays = synapse_info.delays
+
+        if min_delay is None or max_delay is None or delays is None:
+            return 1
 
         if isinstance(delays, str):
             d = self._get_distances(delays, synapse_info)
@@ -90,25 +98,22 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
                 return 1
             else:
                 return 0
-        if numpy.isscalar(delays):
+        if isinstance(delays, (int, float, integer, floating)):
             return int(min_delay <= delays <= max_delay)
         if isinstance(delays, RandomDistribution):
             return 1
 
         slice_min_delay = min(delays)
         slice_max_delay = max(delays)
-        if ((min_delay <= slice_max_delay <= max_delay) or
-                (min_delay <= slice_min_delay <= max_delay)):
-            return 1
-
-        return 0
+        return int((min_delay <= slice_max_delay <= max_delay) or
+                   (min_delay <= slice_min_delay <= max_delay))
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
+    def get_n_connections_to_post_vertex_maximum(self, synapse_info) -> int:
         return 1
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, synapse_info):
+    def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
         return self._get_weight_maximum(
             synapse_info.weights,
             max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons),
@@ -116,8 +121,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
-
+            self, post_slices, post_vertex_slice: Slice, synapse_type: int,
+            synapse_info: SynapseInformation) -> NDArray:
         # Get each pre_vertex id for each post_vertex id
         post_atoms = post_vertex_slice.get_raster_ids()
         pre_atoms = numpy.array(post_atoms)
@@ -164,21 +169,25 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
-    def gen_connector_id(self):
+    def gen_connector_id(self) -> int:
         return ConnectorIDs.ONE_TO_ONE_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(self, synapse_info):
+    def gen_connector_params(
+            self, synapse_info: SynapseInformation) -> NDArray[uint32]:
         return numpy.array([], dtype="uint32")
 
     @property
     @overrides(
         AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
-    def gen_connector_params_size_in_bytes(self):
+    def gen_connector_params_size_in_bytes(self) -> int:
         return 0
 
     @overrides(AbstractGenerateConnectorOnMachine.get_connected_vertices)
-    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+    def get_connected_vertices(
+            self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
+            target_vertex: ApplicationVertex) -> Sequence[
+                Tuple[MachineVertex, Sequence[MachineVertex]]]:
         src_vtxs = source_vertex.splitter.get_out_going_vertices(
             SPIKE_PARTITION_ID)
         tgt_vtxs = target_vertex.splitter.get_in_coming_vertices(
@@ -220,7 +229,9 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
                      t_vert.vertex_slice.get_raster_ids()))])
                 for t_vert in tgt_vtxs]
 
-    def __connects(self, s_vert, pre_lo, pre_hi, t_vert, post_lo, post_hi):
+    def __connects(
+            self, s_vert: MachineVertex, pre_lo: int, pre_hi: int,
+            t_vert: MachineVertex, post_lo: int, post_hi: int) -> bool:
         pre_slice = s_vert.vertex_slice
         post_slice = t_vert.vertex_slice
 

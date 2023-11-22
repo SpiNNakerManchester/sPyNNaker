@@ -12,45 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractHasParameterNames)
 
 
-class AbstractFormation(object, metaclass=AbstractBase):
+class AbstractFormation(AbstractHasParameterNames, metaclass=AbstractBase):
     """
     A synaptic connection formation rule.
     """
 
     __slots__ = ()
 
-    @abstractproperty
-    def vertex_executable_suffix(self):
+    @property
+    @abstractmethod
+    def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_parameters_sdram_usage_in_bytes(self):
+    def get_parameters_sdram_usage_in_bytes(self) -> int:
         """
         Get the amount of SDRAM used by the parameters of this rule.
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def write_parameters(self, spec):
+    def write_parameters(self, spec: DataSpecificationGenerator):
         """
         Write the parameters of the rule to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
         """
-
-    @abstractmethod
-    def get_parameter_names(self):
-        """
-        Return the names of the parameters supported by this rule.
-
-        :rtype: iterable(str)
-        """
+        raise NotImplementedError

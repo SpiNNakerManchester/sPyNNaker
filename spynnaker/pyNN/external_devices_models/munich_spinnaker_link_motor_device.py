@@ -25,7 +25,7 @@ from .machine_munich_motor_device import MachineMunichMotorDevice
 
 
 class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
-    __slots__ = []
+    __slots__ = ()
 
     def __init__(self, spinnaker_link_id, board_address=None):
         super().__init__(
@@ -43,7 +43,7 @@ class MunichMotorDevice(
     external device vertex.
     """
 
-    __slots__ = ["__dependent_vertices"]
+    __slots__ = ("__dependent_vertices", )
 
     def __init__(
             self, spinnaker_link_id, board_address=None, speed=30,

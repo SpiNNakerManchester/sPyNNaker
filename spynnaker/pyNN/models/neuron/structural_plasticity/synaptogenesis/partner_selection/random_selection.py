@@ -21,7 +21,7 @@ class RandomSelection(AbstractPartnerSelection):
     Partner selection that picks a random source neuron from all sources.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     @property
     @overrides(AbstractPartnerSelection.vertex_executable_suffix)
@@ -38,4 +38,4 @@ class RandomSelection(AbstractPartnerSelection):
 
     @overrides(AbstractPartnerSelection.get_parameter_names)
     def get_parameter_names(self):
-        return []
+        return ()

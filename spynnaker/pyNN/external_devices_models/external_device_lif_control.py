@@ -31,10 +31,10 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
     Abstract control module for the PushBot, based on the LIF neuron, but
     without spikes, and using the voltage as the output to the various devices.
     """
-    __slots__ = [
+    __slots__ = (
         "_create_edges",
         "_devices",
-        "_translator"]
+        "_translator")
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     @default_parameters({
@@ -96,7 +96,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
 
     @overrides(AbstractPyNNNeuronModelStandard.create_vertex)
     def create_vertex(
-            self, n_neurons, label, spikes_per_second,
+            self, n_neurons, label, *, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size,
             n_steps_per_timestep, drop_late_spikes, splitter, seed,
             n_colour_bits):

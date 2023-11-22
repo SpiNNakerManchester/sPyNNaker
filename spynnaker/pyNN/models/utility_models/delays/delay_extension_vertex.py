@@ -11,15 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from typing import List, Sequence, TYPE_CHECKING, cast
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import get_config_bool
-from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.application import (
+    ApplicationEdgePartition, ApplicationVertex)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
-from spynnaker.pyNN.utilities.constants import (
-    POP_TABLE_MAX_ROW_LENGTH)
+from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
+from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
+if TYPE_CHECKING:
+    from spynnaker.pyNN.extra_algorithms.splitter_components import (
+        SplitterDelayVertexSlice)
 
 _DELAY_PARAM_HEADER_WORDS = 9
 
@@ -29,14 +34,14 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
     Provide delays to incoming spikes in multiples of the maximum delays
     of a neuron (typically 16 or 32).
     """
-    __slots__ = [
-        # The parition this Delay is supporting
+    __slots__ = (
+        # The partition this Delay is supporting
         "__partition",
         "__delay_per_stage",
         "__n_delay_stages",
         "__drop_late_spikes",
         "__outgoing_edges",
-        "__n_colour_bits"]
+        "__n_colour_bits")
 
     # this maps to what master assumes
     MAX_SLOTS = 8
@@ -44,8 +49,9 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
     MAX_DTCM_AVAILABLE = 59756 - SAFETY_FACTOR
 
     def __init__(
-            self, partition, delay_per_stage, n_delay_stages, n_colour_bits,
-            label="DelayExtension"):
+            self, partition: ApplicationEdgePartition, delay_per_stage: int,
+            n_delay_stages: int, n_colour_bits: int,
+            label: str = "DelayExtension"):
         """
         :param partition: The partition that this delay is supporting
         :type partition:
@@ -64,14 +70,14 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
         self.__delay_per_stage = delay_per_stage
 
         self.__drop_late_spikes = get_config_bool(
-            "Simulation", "drop_late_spikes")
+            "Simulation", "drop_late_spikes") or False
 
-        self.__outgoing_edges = list()
+        self.__outgoing_edges: List[DelayedApplicationEdge] = list()
 
         self.__n_colour_bits = n_colour_bits
 
     @property
-    def n_atoms(self):
+    def n_atoms(self) -> int:
         """
         The number of atoms in this vertex.
 
@@ -85,25 +91,30 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
         return self.__partition.pre_vertex.atoms_shape
 
     @property
-    def drop_late_spikes(self):
+    def _delay_splitter(self) -> SplitterDelayVertexSlice:
+        if TYPE_CHECKING:
+            return cast(SplitterDelayVertexSlice, self._splitter)
+        else:
+            return self._splitter
+
+    @property
+    def drop_late_spikes(self) -> bool:
         """
         Whether to drop late spikes.
-
-        :rtype: bool
         """
         return self.__drop_late_spikes
 
     @staticmethod
-    def get_max_delay_ticks_supported(delay_ticks_at_post_vertex):
+    def get_max_delay_ticks_supported(delay_ticks_at_post_vertex: int) -> int:
         return DelayExtensionVertex.MAX_SLOTS * delay_ticks_at_post_vertex
 
     @property
     @overrides(AbstractHasDelayStages.n_delay_stages)
-    def n_delay_stages(self):
+    def n_delay_stages(self) -> int:
         return self.__n_delay_stages
 
     def set_new_n_delay_stages_and_delay_per_stage(
-            self, n_delay_stages, delay_per_stage):
+            self, n_delay_stages: int, delay_per_stage: int):
         if delay_per_stage != self.__delay_per_stage:
             raise DelayExtensionException(
                 "The delay per stage is already set to "
@@ -115,37 +126,30 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
             self.__n_delay_stages = n_delay_stages
 
     @property
-    def delay_per_stage(self):
+    def delay_per_stage(self) -> int:
         """
         The delay per stage, in timesteps.
-
-        :rtype: int
         """
         return self.__delay_per_stage
 
     @property
-    def source_vertex(self):
-        """
-        :rtype: ~pacman.model.graphs.application.ApplicationVertex
-        """
+    def source_vertex(self) -> ApplicationVertex:
         return self.__partition.pre_vertex
 
     def delay_params_size(self):
         """
         The size of the delay parameters.
-
-        :rtype: int
         """
         return BYTES_PER_WORD * _DELAY_PARAM_HEADER_WORDS
 
     @property
-    def partition(self):
+    def partition(self) -> ApplicationEdgePartition:
         """
         The partition that this delay is supporting.
         """
         return self.__partition
 
-    def add_outgoing_edge(self, edge):
+    def add_outgoing_edge(self, edge: DelayedApplicationEdge):
         """
         Add an outgoing edge to the delay extension.
 
@@ -154,16 +158,14 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
         self.__outgoing_edges.append(edge)
 
     @property
-    def outgoing_edges(self):
+    def outgoing_edges(self) -> Sequence[DelayedApplicationEdge]:
         """
         The outgoing edges from this vertex.
-
-        :rtype: list(DelayedApplicationEdge)
         """
         return self.__outgoing_edges
 
     @property
-    def n_colour_bits(self):
+    def n_colour_bits(self) -> int:
         """
         The number of bits for event colouring.
         """

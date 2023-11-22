@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.require_subclass import require_subclass
 from pacman.model.graphs.application import ApplicationVertex
 
@@ -27,11 +27,13 @@ class AbstractHasDelayStages(object, metaclass=AbstractBase):
 
     __slots__ = ()
 
-    @abstractproperty
-    def n_delay_stages(self):
+    @property
+    @abstractmethod
+    def n_delay_stages(self) -> int:
         """
         The maximum number of delay stages required by any connection
         out of this delay extension vertex.
 
         :rtype: int
         """
+        raise NotImplementedError

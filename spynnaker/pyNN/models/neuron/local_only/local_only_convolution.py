@@ -11,23 +11,45 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import numpy
 from math import ceil
+from numpy import floating
+from numpy.typing import NDArray
+from typing import (
+    Dict, Iterable, List, NamedTuple, cast,
+    TYPE_CHECKING)
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.interface.ds import DataType
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.application import ApplicationVertex
+from spinn_front_end_common.interface.ds import (
+    DataType, DataSpecificationGenerator)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_SHORT, BYTES_PER_WORD)
-from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     ConvolutionConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
+from spynnaker.pyNN.types import Weight_Delay_In_Types
 from spynnaker.pyNN.models.common.local_only_2d_common import (
     get_div_const, get_rinfo_for_source, get_sources_for_target,
     BITS_PER_SHORT, N_COLOUR_BITS_BITS, KEY_INFO_SIZE,
     get_first_and_last_slice)
 from .abstract_local_only import AbstractLocalOnly
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
+        AbstractPopulationVertex)
+    from spynnaker.pyNN.models.projection import Projection
+    from spynnaker.pyNN.models.neuron import (
+        PopulationMachineLocalOnlyCombinedVertex)
+
+
+class Source(NamedTuple):
+    projection: Projection
+    vertex_slice: Slice
+    key: int
+    mask: int
 
 
 #: Size of convolution config main bytes
@@ -42,28 +64,29 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     A convolution synapse dynamics that can process spikes with only DTCM.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__cached_sources",
-        "__delay"
-    ]
+    )
 
-    def __init__(self, delay=None):
+    def __init__(self, delay: Weight_Delay_In_Types = None):
+
         """
         :param float delay:
             The delay used in the connection; by default 1 time step
         """
-        # Store the sources to avoid recalculation
-        self.__cached_sources = dict()
+        super().__init__(delay)
 
-        self.__delay = delay
-        if delay is None:
-            self.__delay = SpynnakerDataView.get_simulation_time_step_ms()
-        elif not isinstance(delay, (float, int)):
-            raise SynapticConfigurationException(
-                "Only single value delays are supported")
+        # Store the sources to avoid recalculation
+        self.__cached_sources: Dict[ApplicationVertex, Dict[
+                ApplicationVertex, List[Source]]] = dict()
+
+    @property
+    def _delay(self) -> float:
+        # Guaranteed by check in init
+        return cast(float, self.delay)
 
     @overrides(AbstractLocalOnly.merge)
-    def merge(self, synapse_dynamics):
+    def merge(self, synapse_dynamics) -> LocalOnlyConvolution:
         if not isinstance(synapse_dynamics, LocalOnlyConvolution):
             raise SynapticConfigurationException(
                 "All targets of this Population must have a synapse_type of"
@@ -71,29 +94,28 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         return synapse_dynamics
 
     @overrides(AbstractLocalOnly.get_vertex_executable_suffix)
-    def get_vertex_executable_suffix(self):
+    def get_vertex_executable_suffix(self) -> str:
         return "_conv"
 
     @property
     @overrides(AbstractLocalOnly.changes_during_run)
-    def changes_during_run(self):
+    def changes_during_run(self) -> bool:
         return False
 
     @overrides(AbstractLocalOnly.get_parameters_usage_in_bytes)
     def get_parameters_usage_in_bytes(
-            self, n_atoms, incoming_projections):
+            self, n_atoms, incoming_projections: Iterable[Projection]) -> int:
+        # pylint: disable=protected-access
         n_bytes = 0
         kernel_bytes = 0
         connectors_seen = set()
         edges_seen = set()
         for incoming in incoming_projections:
-            # pylint: disable=protected-access
             s_info = incoming._synapse_information
             if not isinstance(s_info.connector, ConvolutionConnector):
                 raise SynapticConfigurationException(
                     "Only ConvolutionConnector can be used with a synapse type"
                     " of Convolution")
-            # pylint: disable=protected-access
             app_edge = incoming._projection_edge
             if app_edge not in edges_seen:
                 edges_seen.add(app_edge)
@@ -109,10 +131,14 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         return CONV_CONFIG_SIZE + n_bytes + kernel_bytes
 
     @overrides(AbstractLocalOnly.write_parameters)
-    def write_parameters(self, spec, region, machine_vertex, weight_scales):
+    def write_parameters(
+            self, spec: DataSpecificationGenerator, region: int,
+            machine_vertex: PopulationMachineLocalOnlyCombinedVertex,
+            weight_scales: NDArray[floating]):
+        # pylint: disable=unexpected-keyword-arg, protected-access
 
         # Get incoming sources for this vertex
-        app_vertex = machine_vertex.app_vertex
+        app_vertex = machine_vertex._pop_vertex
         sources = self.__get_sources_for_target(app_vertex)
 
         size = self.get_parameters_usage_in_bytes(
@@ -216,7 +242,9 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.write_array(
             numpy.concatenate(weight_data, dtype="int16").view("uint32"))
 
-    def __get_sources_for_target(self, app_vertex):
+    def __get_sources_for_target(
+            self, app_vertex: AbstractPopulationVertex) -> Dict[
+                ApplicationVertex, List[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.
@@ -232,78 +260,81 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self.__cached_sources[app_vertex] = sources
         return sources
 
-    @property
-    @overrides(AbstractLocalOnly.delay)
-    def delay(self):
-        return self.__delay
+    @staticmethod
+    def __connector(projection: Projection) -> ConvolutionConnector:
+        # pylint: disable=protected-access
+        return cast(ConvolutionConnector,
+                    projection._synapse_information.connector)
 
-    @property
-    @overrides(AbstractLocalOnly.weight)
-    def weight(self):
-        # We don't have a weight here, it is in the connector
-        return 0
+    @staticmethod
+    def __get_synapse_type(proj: Projection, target: str) -> int:
+        edge = proj._projection_edge  # pylint: disable=protected-access
+        synapse_type = edge.post_vertex.get_synapse_id_by_target(target)
+        # Checked during connection validation, assumed constant
+        assert synapse_type is not None
+        return synapse_type
 
     @overrides(AbstractSupportsSignedWeights.get_positive_synapse_index)
-    def get_positive_synapse_index(self, incoming_projection):
-        # pylint: disable=protected-access
-        post = incoming_projection._projection_edge.post_vertex
-        conn = incoming_projection._synapse_information.connector
-        return post.get_synapse_id_by_target(conn.positive_receptor_type)
+    def get_positive_synapse_index(
+            self, incoming_projection: Projection) -> int:
+        return self.__get_synapse_type(
+            incoming_projection,
+            self.__connector(incoming_projection).positive_receptor_type)
 
     @overrides(AbstractSupportsSignedWeights.get_negative_synapse_index)
-    def get_negative_synapse_index(self, incoming_projection):
-        # pylint: disable=protected-access
-        post = incoming_projection._projection_edge.post_vertex
-        conn = incoming_projection._synapse_information.connector
-        return post.get_synapse_id_by_target(conn.negative_receptor_type)
+    def get_negative_synapse_index(
+            self, incoming_projection: Projection) -> int:
+        return self.__get_synapse_type(
+            incoming_projection,
+            self.__connector(incoming_projection).negative_receptor_type)
 
     @overrides(AbstractSupportsSignedWeights.get_maximum_positive_weight)
-    def get_maximum_positive_weight(self, incoming_projection):
-        # pylint: disable=protected-access
-        conn = incoming_projection._synapse_information.connector
+    def get_maximum_positive_weight(
+            self, incoming_projection: Projection) -> float:
+        conn = self.__connector(incoming_projection)
         # We know the connector doesn't care about the argument
         max_weight = numpy.amax(conn.kernel_weights)
         return max_weight if max_weight > 0 else 0
 
     @overrides(AbstractSupportsSignedWeights.get_minimum_negative_weight)
-    def get_minimum_negative_weight(self, incoming_projection):
-        # pylint: disable=protected-access
-        conn = incoming_projection._synapse_information.connector
+    def get_minimum_negative_weight(
+            self, incoming_projection: Projection) -> float:
+        conn = self.__connector(incoming_projection)
         # This is different because the connector happens to support this
         min_weight = numpy.amin(conn.kernel_weights)
         return min_weight if min_weight < 0 else 0
 
     @overrides(AbstractSupportsSignedWeights.get_mean_positive_weight)
-    def get_mean_positive_weight(self, incoming_projection):
-        # pylint: disable=protected-access
-        conn = incoming_projection._synapse_information.connector
+    def get_mean_positive_weight(
+            self, incoming_projection: Projection) -> float:
+        conn = self.__connector(incoming_projection)
         pos_weights = conn.kernel_weights[conn.kernel_weights > 0]
         if not len(pos_weights):
             return 0
         return numpy.mean(pos_weights)
 
     @overrides(AbstractSupportsSignedWeights.get_mean_negative_weight)
-    def get_mean_negative_weight(self, incoming_projection):
-        # pylint: disable=protected-access
-        conn = incoming_projection._synapse_information.connector
+    def get_mean_negative_weight(
+            self, incoming_projection: Projection) -> float:
+        conn = self.__connector(incoming_projection)
         neg_weights = conn.kernel_weights[conn.kernel_weights < 0]
         if not len(neg_weights):
             return 0
         return numpy.mean(neg_weights)
 
     @overrides(AbstractSupportsSignedWeights.get_variance_positive_weight)
-    def get_variance_positive_weight(self, incoming_projection):
-        # pylint: disable=protected-access
-        conn = incoming_projection._synapse_information.connector
+    def get_variance_positive_weight(
+            self, incoming_projection: Projection) -> float:
+        conn = self.__connector(incoming_projection)
         pos_weights = conn.kernel_weights[conn.kernel_weights > 0]
         if not len(pos_weights):
             return 0
         return numpy.var(pos_weights)
 
     @overrides(AbstractSupportsSignedWeights.get_variance_negative_weight)
-    def get_variance_negative_weight(self, incoming_projection):
-        # pylint: disable=protected-access
-        conn = incoming_projection._synapse_information.connector
+    def get_variance_negative_weight(
+            self, incoming_projection: Projection) -> float:
+        conn = self.__connector(incoming_projection)
         neg_weights = conn.kernel_weights[conn.kernel_weights < 0]
         if not len(neg_weights):
             return 0

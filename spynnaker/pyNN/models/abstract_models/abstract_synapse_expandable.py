@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.require_subclass import require_subclass
-from pacman.model.graphs.machine.machine_vertex import MachineVertex
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.placements import Placement
 
 SYNAPSE_EXPANDER_APLX = "synapse_expander.aplx"
 
@@ -36,7 +36,7 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def gen_on_machine(self):
+    def gen_on_machine(self) -> bool:
         """
         True if the synapses of a the slice of this vertex should be
         generated on the machine.
@@ -47,38 +47,46 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
 
         :rtype: bool
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def connection_generator_region(self):
+    @property
+    @abstractmethod
+    def connection_generator_region(self) -> int:
         """
         The region ID containing the parameters of synaptic expansion.
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def read_generated_connection_holders(self, placement):
+    def read_generated_connection_holders(self, placement: Placement):
         """
         Fill in the connection holders.
 
         :param ~pacman.model.placements.Placement placement:
             Where the data is on the machine
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def max_gen_data(self):
+    @property
+    @abstractmethod
+    def max_gen_data(self) -> int:
         """
         The maximum amount of synaptic data to be generated.
         This is used to calculate the timeout of the execution.
 
         :rtype: int
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def bit_field_size(self):
+    @property
+    @abstractmethod
+    def bit_field_size(self) -> int:
         """
         The amount of bit field data to be generated.
         This is used to calculate the timeout of the execution.
 
         :rtype: int
         """
+        raise NotImplementedError

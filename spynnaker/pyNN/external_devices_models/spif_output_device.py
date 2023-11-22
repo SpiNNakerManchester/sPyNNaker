@@ -49,8 +49,8 @@ class SPIFOutputDevice(
     packet, but this can be controlled with the output_key_shift parameter.
     """
 
-    __slots__ = ["__incoming_partitions", "__create_database",
-                 "__output_key_shift", "__output_key_and_mask"]
+    __slots__ = ("__incoming_partitions", "__create_database",
+                 "__output_key_shift", "__output_key_and_mask")
 
     def __init__(self, board_address=None, chip_coords=None, label=None,
                  create_database=True, database_notify_host=None,
@@ -145,6 +145,7 @@ class SPIFOutputDevice(
         Get the payload for the command to set the router key.
 
         :param int index: The index of key to get
+        :rtype: int
         """
         r_infos = SpynnakerDataView.get_routing_infos()
         return r_infos.get_first_key_from_pre_vertex(
@@ -156,6 +157,7 @@ class SPIFOutputDevice(
         Get the payload for the command to set the router mask.
 
         :param int index: The index of the mask to get
+        :rtype: int
         """
         r_infos = SpynnakerDataView.get_routing_infos()
         return r_infos.get_routing_info_from_pre_vertex(
@@ -171,6 +173,7 @@ class SPIFOutputDevice(
             self.__incoming_partitions[index].identifier).mask & 0xFFFFFFFF
 
     @property
+    @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
         # The commands here are delayed, as at the time of providing them,
         # we don't know the key or mask of the incoming link...
@@ -192,9 +195,11 @@ class SPIFOutputDevice(
         return commands
 
     @property
+    @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         return []
 
     @property
+    @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self):
         return []

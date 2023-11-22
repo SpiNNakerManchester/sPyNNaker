@@ -44,6 +44,10 @@ rng
 PLoS
 rewirings
 analog
+stdev
+or'ed
+pn
+config
 
 # Our Python types
 ApplicationGraph
@@ -52,11 +56,14 @@ ApplicationVertex
 MachineVertex
 AbstractPopulationVertex
 ApplicationEdge
+DataType
 MachineEdge
 ProjectionApplicationEdge
 DelayedApplicationEdge
+DelayExtensionVertex
 ApplicationEdgePartition
 SourceSegmentedSDRAMMachinePartition
+SynapseRegionReferences
 PopulationBase
 PopulationView
 IDMixin
@@ -83,6 +90,7 @@ AbstractCurrentSource
 GeneratorData
 EIEIOType
 EIEIOPrefix
+RandomDistribtuion
 
 # Others' Python types
 NumpyRNG

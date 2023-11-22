@@ -14,13 +14,15 @@
 
 # Imports
 import sys
+from types import ModuleType
+from typing import Optional
 import numpy as np
+plt: Optional[ModuleType]
 try:
-    import matplotlib.pyplot as plt
-    matplotlib_missing = False
+    import matplotlib.pyplot  # type: ignore[import]
+    plt = matplotlib.pyplot
 except ImportError:
     plt = None
-    matplotlib_missing = True
 
 
 def _precheck(data, title):
@@ -30,7 +32,7 @@ def _precheck(data, title):
         else:
             print("NO data for " + title)
         return False
-    if matplotlib_missing:
+    if plt is None:
         if title is None:
             print("matplotlib not installed skipping plotting")
         else:
@@ -182,6 +184,6 @@ if __name__ == "__main__":
     spike_data = np.loadtxt("spikes.csv", delimiter=',')
     plot_spikes(spike_data)
     doubled_spike_data = np.loadtxt("spikes.csv", delimiter=',')
-    for doubled_spike_data_i, _i in enumerate(doubled_spike_data):
+    for _i, doubled_spike_data_i in enumerate(doubled_spike_data):
         doubled_spike_data_i[0] = doubled_spike_data[_i][0] + 5
     plot_spikes([spike_data, doubled_spike_data])

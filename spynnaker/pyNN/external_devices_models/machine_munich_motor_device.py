@@ -38,13 +38,13 @@ class MachineMunichMotorDevice(
     An Omnibot motor control device. This has a real vertex and an
     external device vertex.
     """
-    __slots__ = [
+    __slots__ = (
         "__continue_if_not_different",
         "__delay_time",
         "__delta_threshold",
         "__sample_time",
         "__speed",
-        "__update_time"]
+        "__update_time")
 
     MOTOR_PARTITION_ID = "MOTOR"
 
@@ -189,8 +189,7 @@ class MachineMunichMotorDevice(
         self.reserve_provenance_data_region(spec)
 
     @overrides(MachineVertex.get_n_keys_for_partition)
-    def get_n_keys_for_partition(self, partition_id):
+    def get_n_keys_for_partition(self, partition_id: str) -> int:
         if partition_id == self.MOTOR_PARTITION_ID:
             return self._MOTOR_N_KEYS
-        return super(MachineMunichMotorDevice, self).get_n_keys_for_partition(
-            partition_id)
+        return super().get_n_keys_for_partition(partition_id)

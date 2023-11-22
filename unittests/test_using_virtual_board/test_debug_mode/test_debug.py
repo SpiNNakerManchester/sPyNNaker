@@ -72,8 +72,10 @@ class TestDebug(BaseTestCase):
             # write_data_speed_up_report not on a virtual board
             # DataSpeedUpPacketGatherMachineVertex.REPORT_NAME
             _GRAPH_NAME,
-            # TODO why svg when default is png
-            _GRAPH_NAME + ".svg"
+            # # TODO why svg when default is png
+            # _GRAPH_NAME + ".svg"
+            # # Can't check for that; graph generation might not work because
+            # # of system configuration
             ]
         sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")

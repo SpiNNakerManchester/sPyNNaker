@@ -11,21 +11,31 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import numpy
 from math import ceil
+from numpy import floating
+from numpy.typing import NDArray
+from typing import (
+    Iterable, cast, TYPE_CHECKING)
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.interface.ds import DataType
+from spinn_front_end_common.interface.ds import (
+    DataType, DataSpecificationGenerator)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     PoolDenseConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
+from spynnaker.pyNN.types import Weight_Delay_In_Types
 from spynnaker.pyNN.models.common.local_only_2d_common import (
     get_sources_for_target, get_rinfo_for_source, BITS_PER_SHORT,
     get_div_const, N_COLOUR_BITS_BITS, KEY_INFO_SIZE, get_first_and_last_slice)
 from .abstract_local_only import AbstractLocalOnly
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.projection import Projection
+    from spynnaker.pyNN.models.neuron import (
+        PopulationMachineLocalOnlyCombinedVertex)
 
 #: Size of the source information
 SOURCE_INFO_SIZE = KEY_INFO_SIZE + BYTES_PER_WORD
@@ -43,10 +53,9 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     """
 
     __slots__ = [
-        "__cached_sources",
-        "__delay"]
+        "__cached_sources"]
 
-    def __init__(self, delay=None):
+    def __init__(self, delay: Weight_Delay_In_Types = None):
         """
         :param float delay:
             The delay used in the connection; by default 1 time step
@@ -54,15 +63,18 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         # Store the sources to avoid recalculation
         self.__cached_sources = dict()
 
-        self.__delay = delay
-        if delay is None:
-            self.__delay = SpynnakerDataView.get_simulation_time_step_ms()
-        elif not isinstance(delay, (float, int)):
+        super().__init__(delay)
+        if not isinstance(self.delay, (float, int)):
             raise SynapticConfigurationException(
                 "Only single value delays are supported")
 
+    @property
+    def _delay(self) -> float:
+        # Guaranteed by check in init
+        return cast(float, self.delay)
+
     @overrides(AbstractLocalOnly.merge)
-    def merge(self, synapse_dynamics):
+    def merge(self, synapse_dynamics) -> LocalOnlyPoolDense:
         if not isinstance(synapse_dynamics, LocalOnlyPoolDense):
             raise SynapticConfigurationException(
                 "All Projections of this Population must have a synapse_type"
@@ -70,16 +82,24 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         return synapse_dynamics
 
     @overrides(AbstractLocalOnly.get_vertex_executable_suffix)
-    def get_vertex_executable_suffix(self):
+    def get_vertex_executable_suffix(self) -> str:
         return "_pool_dense"
 
     @property
     @overrides(AbstractLocalOnly.changes_during_run)
-    def changes_during_run(self):
+    def changes_during_run(self) -> bool:
         return False
 
+    @staticmethod
+    def __connector(projection: Projection) -> PoolDenseConnector:
+        # pylint: disable=protected-access
+        return cast(PoolDenseConnector,
+                    projection._synapse_information.connector)
+
     @overrides(AbstractLocalOnly.get_parameters_usage_in_bytes)
-    def get_parameters_usage_in_bytes(self, n_atoms, incoming_projections):
+    def get_parameters_usage_in_bytes(
+            self, n_atoms: int,
+            incoming_projections: Iterable[Projection]) -> int:
         n_bytes = 0
         seen_edges = set()
         for incoming in incoming_projections:
@@ -102,9 +122,12 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         return CONFIG_SIZE + n_bytes
 
     @overrides(AbstractLocalOnly.write_parameters)
-    def write_parameters(self, spec, region, machine_vertex, weight_scales):
+    def write_parameters(
+            self, spec: DataSpecificationGenerator, region: int,
+            machine_vertex: PopulationMachineLocalOnlyCombinedVertex,
+            weight_scales: NDArray[floating]):
         # Get incoming sources for this vertex
-        app_vertex = machine_vertex.app_vertex
+        app_vertex = machine_vertex._pop_vertex
         sources = self.__get_sources_for_target(app_vertex)
 
         size = self.get_parameters_usage_in_bytes(
@@ -202,51 +225,48 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self.__cached_sources[app_vertex] = sources
         return sources
 
-    @property
-    @overrides(AbstractLocalOnly.delay)
-    def delay(self):
-        return self.__delay
-
-    @property
-    @overrides(AbstractLocalOnly.weight)
-    def weight(self):
-        # We don't have a weight here, it is in the connector
-        return 0
+    @staticmethod
+    def __get_synapse_type(proj: Projection, target: str) -> int:
+        edge = proj._projection_edge  # pylint: disable=protected-access
+        synapse_type = edge.post_vertex.get_synapse_id_by_target(target)
+        # Checked during connection validation, assumed constant
+        assert synapse_type is not None
+        return synapse_type
 
     @overrides(AbstractSupportsSignedWeights.get_positive_synapse_index)
-    def get_positive_synapse_index(self, incoming_projection):
-        # pylint: disable=protected-access
-        post = incoming_projection._projection_edge.post_vertex
-        conn = incoming_projection._synapse_information.connector
-        return post.get_synapse_id_by_target(conn.positive_receptor_type)
+    def get_positive_synapse_index(
+            self, incoming_projection: Projection) -> int:
+        return self.__get_synapse_type(
+            incoming_projection,
+            self.__connector(incoming_projection).positive_receptor_type)
 
     @overrides(AbstractSupportsSignedWeights.get_negative_synapse_index)
-    def get_negative_synapse_index(self, incoming_projection):
-        # pylint: disable=protected-access
-        post = incoming_projection._projection_edge.post_vertex
-        conn = incoming_projection._synapse_information.connector
-        return post.get_synapse_id_by_target(conn.negative_receptor_type)
+    def get_negative_synapse_index(
+            self, incoming_projection: Projection) -> int:
+        return self.__get_synapse_type(
+            incoming_projection,
+            self.__connector(incoming_projection).negative_receptor_type)
 
     @overrides(AbstractSupportsSignedWeights.get_maximum_positive_weight)
-    def get_maximum_positive_weight(self, incoming_projection):
-        # pylint: disable=protected-access
-        conn = incoming_projection._synapse_information.connector
+    def get_maximum_positive_weight(
+            self, incoming_projection: Projection) -> float:
+        conn = self.__connector(incoming_projection)
         # We know the connector doesn't care about the argument
         max_weight = numpy.amax(conn.weights)
         return max_weight if max_weight > 0 else 0
 
     @overrides(AbstractSupportsSignedWeights.get_minimum_negative_weight)
-    def get_minimum_negative_weight(self, incoming_projection):
-        # pylint: disable=protected-access
-        conn = incoming_projection._synapse_information.connector
+    def get_minimum_negative_weight(
+            self, incoming_projection: Projection) -> float:
+        conn = self.__connector(incoming_projection)
         # This is different because the connector happens to support this
         min_weight = numpy.amin(conn.weights)
         return min_weight if min_weight < 0 else 0
 
     @overrides(AbstractSupportsSignedWeights.get_mean_positive_weight)
-    def get_mean_positive_weight(self, incoming_projection):
-        # pylint: disable=protected-access
-        conn = incoming_projection._synapse_information.connector
+    def get_mean_positive_weight(
+            self, incoming_projection: Projection) -> float:
+        conn = self.__connector(incoming_projection)
         weights = conn.weights
         if isinstance(weights, (int, float)):
             return weights
@@ -256,9 +276,9 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         return numpy.mean(pos_weights)
 
     @overrides(AbstractSupportsSignedWeights.get_mean_negative_weight)
-    def get_mean_negative_weight(self, incoming_projection):
-        # pylint: disable=protected-access
-        conn = incoming_projection._synapse_information.connector
+    def get_mean_negative_weight(
+            self, incoming_projection: Projection) -> float:
+        conn = self.__connector(incoming_projection)
         weights = conn.weights
         if isinstance(weights, (int, float)):
             return weights
@@ -268,9 +288,9 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         return numpy.mean(neg_weights)
 
     @overrides(AbstractSupportsSignedWeights.get_variance_positive_weight)
-    def get_variance_positive_weight(self, incoming_projection):
-        # pylint: disable=protected-access
-        conn = incoming_projection._synapse_information.connector
+    def get_variance_positive_weight(
+            self, incoming_projection: Projection) -> float:
+        conn = self.__connector(incoming_projection)
         weights = conn.weights
         if isinstance(weights, (int, float)):
             return 0
@@ -280,9 +300,9 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         return numpy.var(pos_weights)
 
     @overrides(AbstractSupportsSignedWeights.get_variance_negative_weight)
-    def get_variance_negative_weight(self, incoming_projection):
-        # pylint: disable=protected-access
-        conn = incoming_projection._synapse_information.connector
+    def get_variance_negative_weight(
+            self, incoming_projection: Projection) -> float:
+        conn = self.__connector(incoming_projection)
         weights = conn.weights
         if isinstance(weights, (int, float)):
             return 0

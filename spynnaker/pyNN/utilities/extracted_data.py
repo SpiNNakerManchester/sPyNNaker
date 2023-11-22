@@ -21,7 +21,7 @@ class ExtractedData(object):
     """
     # @Chimp: play here to hearts content.
 
-    __slots__ = ["__data"]
+    __slots__ = ("__data", )
 
     def __init__(self):
         self.__data = defaultdict(dict)

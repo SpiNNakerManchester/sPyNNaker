@@ -20,7 +20,7 @@ import pyNN.spiNNaker as sim
 
 class TestSpikeSourceArrayVertex(unittest.TestCase):
 
-    def setUp(cls):
+    def setUp(self):
         sim.setup()
 
     def test_no_spikes(self):

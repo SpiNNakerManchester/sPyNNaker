@@ -13,7 +13,7 @@
 # limitations under the License.
 from threading import Thread, RLock
 from time import sleep
-from matplotlib import pyplot
+from matplotlib import pyplot  # type: ignore[import]
 import numpy
 import logging
 from spinn_utilities.log import FormatAdapter

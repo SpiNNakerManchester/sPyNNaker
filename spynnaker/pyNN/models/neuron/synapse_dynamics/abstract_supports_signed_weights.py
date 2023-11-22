@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.projection import Projection
 
 
 class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
@@ -20,7 +24,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
     """
 
     @abstractmethod
-    def get_positive_synapse_index(self, incoming_projection):
+    def get_positive_synapse_index(
+            self, incoming_projection: Projection) -> int:
         """
         Get the synapse type that positive weights will arrive at.
 
@@ -28,9 +33,11 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_negative_synapse_index(self, incoming_projection):
+    def get_negative_synapse_index(
+            self, incoming_projection: Projection) -> int:
         """
         Get the synapse type that negative weights will arrive at.
 
@@ -38,9 +45,11 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_maximum_positive_weight(self, incoming_projection):
+    def get_maximum_positive_weight(
+            self, incoming_projection: Projection) -> float:
         """
         Get the maximum likely positive weight.
 
@@ -51,9 +60,11 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_minimum_negative_weight(self, incoming_projection):
+    def get_minimum_negative_weight(
+            self, incoming_projection: Projection) -> float:
         """
         Get the minimum likely negative weight.
 
@@ -64,9 +75,11 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_mean_positive_weight(self, incoming_projection):
+    def get_mean_positive_weight(
+            self, incoming_projection: Projection) -> float:
         """
         Get the mean of the positive weights.
 
@@ -77,9 +90,11 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_mean_negative_weight(self, incoming_projection):
+    def get_mean_negative_weight(
+            self, incoming_projection: Projection) -> float:
         """
         Get the mean of the negative weights.
 
@@ -90,9 +105,11 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_variance_positive_weight(self, incoming_projection):
+    def get_variance_positive_weight(
+            self, incoming_projection: Projection) -> float:
         """
         Get the variance of the positive weights.
 
@@ -103,9 +120,11 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_variance_negative_weight(self, incoming_projection):
+    def get_variance_negative_weight(
+            self, incoming_projection: Projection) -> float:
         """
         Get the variance of the negative weights.
 
@@ -116,3 +135,4 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """
+        raise NotImplementedError

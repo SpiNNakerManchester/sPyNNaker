@@ -20,13 +20,17 @@ import os
 import math
 import neo
 import numpy
+from numpy import uint32, floating
+from numpy.typing import NDArray
 from math import isnan
 from pyNN.random import RandomDistribution
+from typing import List, Tuple
 from scipy.stats import binom
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.safe_eval import SafeEval
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.logger_utils import warn_once
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
@@ -64,7 +68,7 @@ STATS_BY_NAME = {
     'vonmises': RandomStatsVonmisesImpl()}
 
 
-def check_directory_exists_and_create_if_not(filename):
+def check_directory_exists_and_create_if_not(filename: str):
     """
     Create a parent directory for a file if it doesn't exist.
 
@@ -75,7 +79,7 @@ def check_directory_exists_and_create_if_not(filename):
         os.makedirs(directory)
 
 
-def convert_param_to_numpy(param, no_atoms):
+def convert_param_to_numpy(param, no_atoms: int) -> NDArray[floating]:
     """
     Convert parameters into numpy arrays.
 
@@ -92,12 +96,12 @@ def convert_param_to_numpy(param, no_atoms):
         # that it is an array
         param_value = param.next(n=no_atoms)
         if hasattr(param_value, '__iter__'):
-            return numpy.array(param_value, dtype="float")
-        return numpy.array([param_value], dtype="float")
+            return numpy.array(param_value, dtype=floating)
+        return numpy.array([param_value], dtype=floating)
 
     # Deal with a single value by exploding to multiple values
     if not hasattr(param, '__iter__'):
-        return numpy.array([param] * no_atoms, dtype="float")
+        return numpy.array([param] * no_atoms, dtype=floating)
 
     # Deal with multiple values, but not the correct number of them
     if len(param) != no_atoms:
@@ -106,10 +110,10 @@ def convert_param_to_numpy(param, no_atoms):
             " the vertex")
 
     # Deal with the correct number of multiple values
-    return numpy.array(param, dtype="float")
+    return numpy.array(param, dtype=floating)
 
 
-def convert_to(value, data_type):
+def convert_to(value, data_type: DataType) -> uint32:
     """
     Convert a value to a given data type.
 
@@ -117,14 +121,15 @@ def convert_to(value, data_type):
     :param ~data_specification.enums.DataType data_type:
         The data type to convert to
     :return: The converted data as a numpy data type
-    :rtype: ~numpy.ndarray(int32)
+    :rtype: numpy.uint32
     """
     return numpy.round(data_type.encode_as_int(value)).astype(
         data_type.struct_encoding)
 
 
 def read_in_data_from_file(
-        file_path, min_atom, max_atom, min_time, max_time, extra=False):
+        file_path: str, min_atom: int, max_atom: int,
+        min_time: float, max_time: float, extra: bool = False) -> NDArray:
     """
     Read in a file of data values where the values are in a format of::
 
@@ -141,21 +146,21 @@ def read_in_data_from_file(
     :return: a numpy array of (time stamp, atom ID, data value)
     :rtype: ~numpy.ndarray(tuple(float, int, float))
     """
-    times = list()
-    atom_ids = list()
-    data_items = list()
+    times: List[float] = []
+    atom_ids: List[int] = []
+    data_items: List[float] = []
     evaluator = SafeEval()
     with open(file_path, 'r', encoding="utf-8") as f:
         for line in f.readlines():
             if line.startswith('#'):
                 continue
             if extra:
-                time, neuron_id, data_value, extra = line.split("\t")
+                time_s, neuron_id_s, data_value_s, _extra = line.split("\t")
             else:
-                time, neuron_id, data_value = line.split("\t")
-            time = float(evaluator.eval(time))
-            neuron_id = int(evaluator.eval(neuron_id))
-            data_value = float(evaluator.eval(data_value))
+                time_s, neuron_id_s, data_value_s = line.split("\t")
+            time = float(evaluator.eval(time_s))
+            neuron_id = int(evaluator.eval(neuron_id_s))
+            data_value = float(evaluator.eval(data_value_s))
             if (min_atom <= neuron_id < max_atom and
                     min_time <= time < max_time):
                 times.append(time)
@@ -165,11 +170,14 @@ def read_in_data_from_file(
                 print(f"failed to enter {neuron_id}:{time}")
 
     result = numpy.dstack((atom_ids, times, data_items))[0]
-    return result[numpy.lexsort((times, atom_ids))]
+    return result[numpy.lexsort(result.T[1::-1])]
 
 
-def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
-                          min_time=0, max_time=float('inf'), split_value="\t"):
+def read_spikes_from_file(
+        file_path: str,
+        min_atom: float = 0, max_atom: float = float('inf'),
+        min_time: float = 0, max_time: float = float('inf'),
+        split_value: str = "\t") -> NDArray[numpy.integer]:
     """
     Read spikes from a file formatted as::
 
@@ -186,7 +194,7 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     :type max_time: float or int
     :param str split_value: the pattern to split by
     :return:
-        a numpy array with max_atom elements each of which is a list of
+        a numpy array with up to max_atom elements each of which is a list of
         spike times.
     :rtype: numpy.ndarray(int, int)
     """
@@ -342,7 +350,7 @@ def low(distribution):
     return stats.low(distribution)
 
 
-def _validate_mars_kiss_64_seed(seed):
+def _validate_mars_kiss_64_seed(seed: List[int]) -> List[int]:
     """
     Update the seed to make it compatible with the RNG algorithm.
     """
@@ -355,7 +363,7 @@ def _validate_mars_kiss_64_seed(seed):
     return seed
 
 
-def create_mars_kiss_seeds(rng):
+def create_mars_kiss_seeds(rng) -> Tuple[int, ...]:
     """
     Generates and checks that the seed values generated by the given
     random number generator or seed to a random number generator are
@@ -373,7 +381,7 @@ def create_mars_kiss_seeds(rng):
     kiss_seed = _validate_mars_kiss_64_seed([
         rng.randint(-BASE_RANDOM_FOR_MARS_64, CAP_RANDOM_FOR_MARS_64) +
         BASE_RANDOM_FOR_MARS_64 for _ in range(N_RANDOM_NUMBERS)])
-    return kiss_seed
+    return tuple(kiss_seed)
 
 
 def get_n_bits(n_values):

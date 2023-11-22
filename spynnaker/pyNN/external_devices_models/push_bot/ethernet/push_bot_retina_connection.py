@@ -38,7 +38,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
     .. note::
         This assumes a packet format of 16-bits per retina event.
     """
-    __slots__ = [
+    __slots__ = (
         "__lock",
         "__p_shift",
         "__pixel_shift",
@@ -51,7 +51,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         "__x_mask",
         "__y_mask",
         "__next_data",
-        "__ready"]
+        "__ready")
 
     def __init__(
             self, retina_injector_label, pushbot_wifi_connection,

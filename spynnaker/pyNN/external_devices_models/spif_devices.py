@@ -132,7 +132,7 @@ class SPIFRegister(IntEnum):
         """ Make a command to send to a SPIF device to set a register value,
             where the value itself is currently unknown
 
-        :param func()->int get_payload:
+        :param callable()->int get_payload:
             A function to call to get the payload later
         :param int index:
             The index of the register to use when using a multi-indexed
@@ -311,7 +311,7 @@ def set_distiller_mask_delayed(index, mask_func):
         peripheral routes in the SpiNNaker FPGA.
 
     :param int index: The index of the channel to set (0-5)
-    :param func(int)->int mask_func:
+    :param callable(int)->int mask_func:
         The function to call to set the mask - takes index as argument
     :rtype: MulticastCommand
     """
@@ -334,13 +334,15 @@ class _DelayedMultiCastCommand(MultiCastCommand):
     """
     A command where the getting of the payload is delayed.
     """
-    __slots__ = ["__get_payload", "__index"]
+    __slots__ = ("__get_payload", "__index")
 
     def __init__(self, key, get_payload, repeat, delay_between_repeats, index):
         """
         :param int key: The key to send
-        :param callable(int)->int get_payload:
-            A function to call that returns a payload
+        :param callable()->int get_payload:
+            A function to call that returns a payload.
+            May be called multiple times; should produce the same value each
+            time.
         :param int repeat: The number of times to repeat the command
         :param int delay_between_repeats: The delay between the repeats
         :param int index: The index to pass to get_payload when called

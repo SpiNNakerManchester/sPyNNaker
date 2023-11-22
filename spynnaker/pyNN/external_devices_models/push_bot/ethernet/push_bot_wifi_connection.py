@@ -46,12 +46,12 @@ class PushBotWIFIConnection(Connection, Listenable):
     """
     A connection to a PushBot via Wi-Fi.
     """
-    __slots__ = [
+    __slots__ = (
         "__local_ip_address",
         "__local_port",
         "__remote_ip_address",
         "__remote_port",
-        "__socket"]
+        "__socket")
 
     RECV_SIZE = 1 * BYTES_PER_KB
 

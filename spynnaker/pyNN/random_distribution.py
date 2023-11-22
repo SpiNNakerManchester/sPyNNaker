@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import pyNN.random
+from pyNN.random import NumpyRNG
+from typing import Optional
 from pyNN.random import available_distributions
 # This file is to work around a Sphinx bug
 
@@ -77,8 +79,8 @@ class RandomDistribution(pyNN.random.RandomDistribution):
 
     # Pylint is wrong about the super-delegation being useless
     def __init__(  # pylint: disable=useless-super-delegation
-            self, distribution, parameters_pos=None, rng=None,
-            **parameters_named):
+            self, distribution: str, parameters_pos: Optional[tuple] = None,
+            rng: Optional[NumpyRNG] = None, **parameters_named):
         """
         :param str distribution: the name of a random number distribution.
         :param parameters_pos:
