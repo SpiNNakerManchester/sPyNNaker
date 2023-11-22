@@ -36,6 +36,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron import (
         PopulationMachineLocalOnlyCombinedVertex)
+    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 #: Size of the source information
 SOURCE_INFO_SIZE = KEY_INFO_SIZE + BYTES_PER_WORD
