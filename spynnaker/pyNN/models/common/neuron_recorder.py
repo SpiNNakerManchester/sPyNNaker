@@ -212,7 +212,7 @@ class NeuronRecorder(object):
             return self.__sampling_rates[variable], n_atoms
         assert vertex_slice is not None
         count = len(numpy.intersect1d(
-            vertex_slice.get_raster_ids(), self.__indexes[variable]))
+            vertex_slice.get_raster_ids(), indices))
         if count:
             return self.__sampling_rates[variable], count
         return 0, 0
@@ -497,8 +497,7 @@ class NeuronRecorder(object):
         indices = self.__indexes.get(variable)
         if indices is None:
             return True
-        indexes = self.__indexes[variable]
-        return any(numpy.isin(vertex_slice.get_raster_ids(), indexes))
+        return any(numpy.isin(vertex_slice.get_raster_ids(), indices))
 
     def recorded_ids_by_slice(self, vertex_slice: Slice) -> List[int]:
         """

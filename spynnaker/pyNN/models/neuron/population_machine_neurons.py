@@ -14,10 +14,12 @@
 from __future__ import annotations
 import ctypes
 import numpy
-from typing import List, NamedTuple, Sequence, Union, cast, TYPE_CHECKING
+from typing import (
+    List, NamedTuple, Sequence, Union, cast, TYPE_CHECKING, Container)
 
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged.abstract_sized import Selector
 
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
@@ -298,6 +300,11 @@ class PopulationMachineNeurons(
         # Write the keys
         spec.write_array(keys)
 
+    def __in_selector(self, n: int, selector: Selector) -> bool:
+        if isinstance(selector, Container):
+            return n in selector
+        return n == selector
+
     def _write_current_source_parameters(
             self, spec: DataSpecificationBase):
         # pylint: disable=too-many-arguments
@@ -319,7 +326,8 @@ class PopulationMachineNeurons(
         current_sources = set()
         for app_current_source in app_current_sources:
             for n in self._vertex_slice.get_raster_ids():
-                if (n in current_source_id_list[app_current_source]):
+                if (self.__in_selector(
+                        n, current_source_id_list[app_current_source])):
                     current_sources.add(app_current_source)
 
         # Write the number of sources
@@ -344,7 +352,8 @@ class PopulationMachineNeurons(
 
                 # Only use IDs that are on this core
                 for i, n in enumerate(self._vertex_slice.get_raster_ids()):
-                    if n in current_source_id_list[current_source]:
+                    if self.__in_selector(
+                            n, current_source_id_list[current_source]):
                         # I think this is now right, but test it more...
                         neuron_current_sources[i][0] += 1
                         neuron_current_sources[i].append(cs_id)

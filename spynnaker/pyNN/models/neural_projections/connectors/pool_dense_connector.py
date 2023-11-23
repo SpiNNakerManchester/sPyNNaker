@@ -148,14 +148,20 @@ class PoolDenseConnector(AbstractConnector):
                 f"Unknown weights ({self.__weights})")
 
     @staticmethod
-    def __to_nd_shape(shape: Optional[Union[int, Tuple[int, ...]]],
-                      n_dims: int, param_name: str) -> Optional[
-            NDArray[integer]]:
+    def __to_nd_shape_or_none(
+            shape: Optional[Union[int, Tuple[int, ...]]], n_dims: int,
+            param_name: str) -> Optional[NDArray[integer]]:
         if shape is None:
             return None
+        return PoolDenseConnector.__to_nd_shape(shape, n_dims, param_name)
+
+    @staticmethod
+    def __to_nd_shape(shape: Union[int, Tuple[int, ...]],
+                      n_dims: int, param_name: str) -> NDArray[integer]:
         if numpy.isscalar(shape):
             return numpy.array([shape] * n_dims, dtype=int)
-        elif len(shape) == n_dims:
+        assert isinstance(shape, tuple)
+        if len(shape) == n_dims:
             return numpy.array(shape, dtype=int)
         raise SynapticConfigurationException(
             f"{param_name} must be an int or a tuple(int) with {n_dims}"
@@ -166,9 +172,9 @@ class PoolDenseConnector(AbstractConnector):
             cls, pre_shape: Tuple[int, ...],
             pool_shape: Union[int, Tuple[int, ...], None] = None,
             pool_stride: Union[int, Tuple[int, ...], None] = None) -> NDArray:
-        real_pool_shape = cls.__to_nd_shape(
+        real_pool_shape = cls.__to_nd_shape_or_none(
             pool_shape, len(pre_shape), "pool_shape")
-        real_pool_stride = cls.__to_nd_shape(
+        real_pool_stride = cls.__to_nd_shape_or_none(
             pool_stride, len(pre_shape), "pool_stride")
         if real_pool_stride is None:
             real_pool_stride = real_pool_shape
@@ -183,12 +189,12 @@ class PoolDenseConnector(AbstractConnector):
 
     def __get_n_weights(
             self, pre_shape: Tuple[int, ...],
-            post_shape: Tuple[int, ...]) -> NDArray:
+            post_n_atoms: int) -> int:
         """
         Get the expected number of weights.
         """
         shape = self.__get_pre_in_post_shape(pre_shape)
-        return numpy.prod(shape) * numpy.prod(post_shape)
+        return numpy.prod(shape) * post_n_atoms
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
@@ -203,7 +209,7 @@ class PoolDenseConnector(AbstractConnector):
 
         if isinstance(self.__weights, Iterable):
             expected_n_weights = self.__get_n_weights(
-                pre.atoms_shape, post.atoms_shape)
+                pre.atoms_shape, post.n_atoms)
             if expected_n_weights != numpy.array(self.__weights).size:
                 raise ConfigurationException(
                     f"With a source population with shape {pre.atoms_shape},"
@@ -261,7 +267,7 @@ class PoolDenseConnector(AbstractConnector):
         return super()._get_weight_maximum(
             self.__weights, n_conns, synapse_info)
 
-    def local_only_n_bytes(self, pre_shape: tuple(int),
+    def local_only_n_bytes(self, pre_shape: Tuple[int, ...],
                            n_post_atoms: int) -> int:
         """
         :param tuple(int) pre_shape:

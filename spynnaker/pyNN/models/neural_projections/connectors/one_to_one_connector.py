@@ -133,13 +133,11 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
             # If a view, we only keep things that are in the view
             if synapse_info.prepop_is_view:
                 # pylint: disable=protected-access
-                pre_lo = synapse_info.pre_population._indexes[0]
-                pre_hi = synapse_info.pre_population._indexes[-1]
+                pre_lo, pre_hi = synapse_info.pre_population._view_range
                 atom_filter &= (pre_atoms <= pre_hi & pre_atoms >= pre_lo)
             if synapse_info.postpop_is_view:
                 # pylint: disable=protected-access
-                post_lo = synapse_info.post_population._indexes[0]
-                post_hi = synapse_info.post_population._indexes[-1]
+                post_lo, post_hi = synapse_info.post_population._view_range
                 atom_filter &= (post_atoms <= post_hi & post_atoms >= post_lo)
         else:
             # If not a view we only keep things that are in the pre-population
@@ -209,12 +207,10 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
             post_hi = target_vertex.n_atoms - 1
             if s_info.prepop_is_view:
                 # pylint: disable=protected-access
-                pre_lo = s_info.pre_population._indexes[0]
-                pre_hi = s_info.pre_population._indexes[-1]
+                pre_lo, pre_hi = s_info.pre_population._view_range
             if s_info.postpop_is_view:
                 # pylint: disable=protected-access
-                post_lo = s_info.post_population._indexes[0]
-                post_hi = s_info.post_population._indexes[-1]
+                post_lo, post_hi = s_info.post_population._view_range
 
             return [(t_vert,
                      [s_vert for s_vert in src_vtxs if self.__connects(

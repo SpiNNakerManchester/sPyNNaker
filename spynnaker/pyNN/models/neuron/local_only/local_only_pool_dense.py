@@ -14,11 +14,12 @@
 from __future__ import annotations
 import numpy
 from math import ceil
-from numpy import floating
+from numpy import floating, uint32
 from numpy.typing import NDArray
 from typing import (
-    Iterable, cast, TYPE_CHECKING)
+    Dict, List, Iterable, cast, TYPE_CHECKING)
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationGenerator)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -30,7 +31,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.types import Weight_Delay_In_Types
 from spynnaker.pyNN.models.common.local_only_2d_common import (
     get_sources_for_target, get_rinfo_for_source, BITS_PER_SHORT,
-    get_div_const, N_COLOUR_BITS_BITS, KEY_INFO_SIZE, get_first_and_last_slice)
+    get_div_const, N_COLOUR_BITS_BITS, KEY_INFO_SIZE, get_first_and_last_slice,
+    Source)
 from .abstract_local_only import AbstractLocalOnly
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
@@ -62,7 +64,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             The delay used in the connection; by default 1 time step
         """
         # Store the sources to avoid recalculation
-        self.__cached_sources = dict()
+        self.__cached_sources: Dict[ApplicationVertex, Dict[
+                ApplicationVertex, List[Source]]] = dict()
 
         super().__init__(delay)
         if not isinstance(self.delay, (float, int)):
@@ -138,7 +141,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.reserve_memory_region(region, size, label="LocalOnlyPoolDense")
         spec.switch_write_focus(region)
 
-        connector_data = list()
+        connector_data: List[NDArray[uint32]] = list()
         source_data = list()
         n_connectors = 0
         for pre_vertex, source_infos in sources.items():
@@ -204,7 +207,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
                 source_data.extend(dim_data)
 
         # Write the spec
-        n_post = numpy.prod(machine_vertex.vertex_slice.shape)
+        n_post = int(numpy.prod(machine_vertex.vertex_slice.shape))
         spec.write_value(n_post, data_type=DataType.UINT32)
         spec.write_value(len(sources), data_type=DataType.UINT32)
         spec.write_value(n_connectors, data_type=DataType.UINT32)

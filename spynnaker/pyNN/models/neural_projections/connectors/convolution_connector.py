@@ -35,6 +35,7 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.models.common.local_only_2d_common import get_div_const
 from .abstract_connector import AbstractConnector
+from pacman.model.graphs.abstract_vertex import AbstractVertex
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
@@ -335,8 +336,8 @@ class ConvolutionConnector(AbstractConnector):
     def get_connected_vertices(
             self, s_info: SynapseInformation,
             source_vertex: ApplicationVertex,
-            target_vertex: ApplicationVertex) -> List[
-                Tuple[MachineVertex, List[MachineVertex]]]:
+            target_vertex: ApplicationVertex) -> Sequence[
+                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
         if not self.__filter_edges:
             return super(ConvolutionConnector, self).get_connected_vertices(
                 s_info, source_vertex, target_vertex)
@@ -404,7 +405,7 @@ class ConvolutionConnector(AbstractConnector):
 
     def get_local_only_data(
             self, app_edge: ProjectionApplicationEdge, local_delay: int,
-            delay_stage: int, weight_index: int) -> List[NDArray[uint32]]:
+            delay_stage: int, weight_index: int) -> NDArray[uint32]:
         # Get info about things
         kernel_shape = self.__kernel_weights.shape
         ps_x, ps_y = 1, 1

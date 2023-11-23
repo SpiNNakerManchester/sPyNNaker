@@ -14,13 +14,11 @@
 from __future__ import annotations
 import numpy
 from math import ceil
-from numpy import floating
+from numpy import floating, uint32
 from numpy.typing import NDArray
 from typing import (
-    Dict, Iterable, List, NamedTuple, cast,
-    TYPE_CHECKING)
+    Dict, Iterable, List, cast, TYPE_CHECKING)
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationGenerator)
@@ -28,14 +26,15 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_SHORT, BYTES_PER_WORD)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    ConvolutionConnector)
+    ConvolutionConnector, AbstractConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.types import Weight_Delay_In_Types
 from spynnaker.pyNN.models.common.local_only_2d_common import (
     get_div_const, get_rinfo_for_source, get_sources_for_target,
     BITS_PER_SHORT, N_COLOUR_BITS_BITS, KEY_INFO_SIZE,
-    get_first_and_last_slice)
+    get_first_and_last_slice, Source)
 from .abstract_local_only import AbstractLocalOnly
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
@@ -43,13 +42,6 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron import (
         PopulationMachineLocalOnlyCombinedVertex)
-
-
-class Source(NamedTuple):
-    projection: Projection
-    vertex_slice: Slice
-    key: int
-    mask: int
 
 
 #: Size of convolution config main bytes
@@ -78,7 +70,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         # Store the sources to avoid recalculation
         self.__cached_sources: Dict[ApplicationVertex, Dict[
-                ApplicationVertex, List[Source]]] = dict()
+                PopulationApplicationVertex, List[Source]]] = dict()
 
     @property
     def _delay(self) -> float:
@@ -147,10 +139,10 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.switch_write_focus(region)
 
         # Get spec for each incoming source
-        connector_weight_index = dict()
-        next_weight_index = 0
+        connector_weight_index: Dict[AbstractConnector, int] = dict()
+        next_weight_index: int = 0
         source_data = list()
-        connector_data = list()
+        connector_data: List[NDArray[uint32]] = list()
         weight_data = list()
         for pre_vertex, source_infos in sources.items():
 
@@ -158,7 +150,9 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             first_conn_index = len(connector_data)
             for source in source_infos:
                 # pylint: disable=protected-access
-                conn = source.projection._synapse_information.connector
+                conn = cast(
+                    ConvolutionConnector,
+                    source.projection._synapse_information.connector)
                 app_edge = source.projection._projection_edge
 
                 # Work out whether the connector needs a new weight index
@@ -244,15 +238,16 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     def __get_sources_for_target(
             self, app_vertex: AbstractPopulationVertex) -> Dict[
-                ApplicationVertex, List[Source]]:
+                PopulationApplicationVertex, List[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.
 
         :param AbstractPopulationVertex app_vertex: The vertex being targeted
         :return:
-            A dict of source ApplicationVertex to list of source information
-        :rtype: dict(ApplicationVertex, list(Source))
+            A dict of source PopulationApplicationVertex to list of source
+            information
+        :rtype: dict(PopulationApplicationVertex, list(Source))
         """
         sources = self.__cached_sources.get(app_vertex)
         if sources is None:
