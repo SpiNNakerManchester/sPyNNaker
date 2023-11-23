@@ -460,21 +460,15 @@ def set_number_of_neurons_per_core(
         raise ConfigurationException(
             "set_number_of_neurons_per_core call now expects "
             "neuron_type as a class instead of as a str")
+    max_neurons = None
     if max_permitted is not None:
         if is_singleton(max_permitted):
             max_neurons = cast('Tuple[int, ...]', (max_permitted, ))
         else:
             max_neurons = cast('Tuple[int, ...]', max_permitted)
-        for m in max_neurons:
-            # Make sure integer values are passed in here; warn if not
-            m_int = int(m)
-            if (m_int - m) != 0:
-                logger.warning(
-                    "The number of neurons per core requested {} is not an "
-                    "integer; the value has been set to {}", m, m_int)
 
     SpynnakerDataView.set_number_of_neurons_per_dimension_per_core(
-        neuron_type, max_permitted)
+        neuron_type, max_neurons)
 
 
 # These methods will defer to PyNN methods if a simulator exists
