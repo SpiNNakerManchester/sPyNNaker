@@ -115,14 +115,17 @@ class SPIFRetinaDevice(
             raise ConfigurationException(
                 f"Pipe {pipe} is bigger than maximum allowed {N_PIPES}")
 
-        # Fake the width if not a power of 2, as we need this for the sake
-        # of passing on to other 2D vertices
+        # The width has to be a power of 2 as otherwise the keys will not line
+        # up correctly (x is at the LSB of the key, so key then has an x
+        # field).  This is an error here as it affects the downstream
+        # population calculations also!
         if not is_power_of_2(width):
             raise ConfigurationException(
                 "The width of the SPIF retina must be a power of 2.  If the"
                 " real retina size is less than this, please round it up."
                 " This will ensure that following Populations can decode the"
-                " spikes correctly.")
+                " spikes correctly.  Note that you will also have to make the"
+                " sizes of the following Populations bigger to match!")
 
         # Call the super
         super().__init__(
