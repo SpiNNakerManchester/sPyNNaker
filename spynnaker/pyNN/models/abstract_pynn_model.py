@@ -15,9 +15,8 @@ from __future__ import annotations
 from collections import defaultdict
 import sys
 from typing import (
-    Any, Callable, Dict, FrozenSet, Optional, Sequence, Tuple, Union,
-    cast, TYPE_CHECKING)
-from typing_extensions import TypeAlias
+    Any, Callable, Dict, FrozenSet, Optional, Sequence, Tuple, cast,
+    TYPE_CHECKING)
 import numpy
 from pyNN import descriptions
 from spinn_utilities.classproperty import classproperty
@@ -29,8 +28,6 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.population_application_vertex import (
         PopulationApplicationVertex)
 
-_NAtoms: TypeAlias = Optional[Union[int, Tuple[int, ...]]]
-
 
 class AbstractPyNNModel(object, metaclass=AbstractBase):
     """
@@ -38,11 +35,12 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
     """
 
     __slots__ = ()
-    _max_atoms_per_core: Dict[type, _NAtoms] = defaultdict(lambda: None)
+    _max_atoms_per_core: Dict[type, Optional[Tuple[int, ...]]] = defaultdict(
+        lambda: None)
 
     @classmethod
     def set_model_max_atoms_per_dimension_per_core(
-            cls, n_atoms: _NAtoms = None):
+            cls, n_atoms: Optional[Tuple[int, ...]] = None):
         """
         Set the default maximum number of atoms per dimension per core for
         this model.  This can be overridden by the individual Population.
@@ -65,7 +63,7 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         AbstractPyNNModel._max_atoms_per_core[cls] = n_atoms
 
     @classmethod
-    def get_model_max_atoms_per_dimension_per_core(cls):
+    def get_model_max_atoms_per_dimension_per_core(cls) -> Tuple[int, ...]:
         """
         Get the maximum number of atoms per dimension per core for this model.
 

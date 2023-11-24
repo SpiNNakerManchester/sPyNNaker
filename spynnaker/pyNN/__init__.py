@@ -23,7 +23,7 @@ This package contains the profile of that code for PyNN 0.9.
 import logging
 from typing import (
     Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type,
-    TypedDict, Union, cast)
+    TypedDict, Union)
 from typing_extensions import Literal
 import numpy as __numpy
 from numpy.typing import NDArray
@@ -454,18 +454,19 @@ def set_number_of_neurons_per_core(
     set the maximum on each Population.
 
     :param type(AbstractPopulationVertex) neuron_type: neuron type
-    :param int max_permitted: the number to set to
+    :param max_permitted: the number to set to
+    :type max_permitted: int or tuple or None
     """
     if isinstance(neuron_type, str):
         raise ConfigurationException(
             "set_number_of_neurons_per_core call now expects "
             "neuron_type as a class instead of as a str")
-    max_neurons = None
+    max_neurons: Union[Tuple[int, ...], None] = None
     if max_permitted is not None:
         if is_singleton(max_permitted):
-            max_neurons = cast('Tuple[int, ...]', (max_permitted, ))
+            max_neurons = (int(max_permitted), )
         else:
-            max_neurons = cast('Tuple[int, ...]', max_permitted)
+            max_neurons = (int(m) for m in max_permitted)
 
     SpynnakerDataView.set_number_of_neurons_per_dimension_per_core(
         neuron_type, max_neurons)
