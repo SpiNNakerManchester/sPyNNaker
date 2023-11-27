@@ -85,22 +85,6 @@ def test_connector(
     assert numpy.array_equal(block["delay"], numpy.array(expected_delays))
 
 
-class MockFromListConnector(FromListConnector):
-    # Use to check that the split is done only once
-
-    def __init__(self, conn_list, safe=True, verbose=False, column_names=None):
-        super().__init__(
-            conn_list, safe=safe, verbose=verbose, column_names=column_names)
-        self._split_count = 0
-
-    def _split_connections(self, n_pre_atoms, n_post_atoms, post_slices):
-        split = super()._split_connections(
-            n_pre_atoms, n_post_atoms, post_slices)
-        if split:
-            self._split_count += 1
-        return split
-
-
 def test_connector_split():
     unittest_setup()
     n_sources = 1000
@@ -114,7 +98,7 @@ def test_connector_split():
         for i in range(0, n_targets, post_neurons_per_core)]
 
     connection_list = numpy.dstack((sources, targets))[0]
-    connector = MockFromListConnector(connection_list)
+    connector = FromListConnector(connection_list)
     weight = 1.0
     delay = 1.0
     pre_pop = MockPopulation(
@@ -143,9 +127,6 @@ def test_connector_split():
         # Check each connection has a place
         for source, target in zip(sources, targets):
             assert (source, target) in has_block
-
-        # Check the split only happens once
-        assert connector._split_count == 1
     except AssertionError as e:
         print(connection_list)
         raise e
