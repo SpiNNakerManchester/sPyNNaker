@@ -113,10 +113,10 @@ def test_write_data_spec():
         additional_parameters={
             "splitter": SplitterAbstractPopulationVertexFixed()})
     proj_one_to_one_1 = p.Projection(
-        pre_pop, post_pop, p.FromListConnector([(i, i) for i in range(10)]),
+        pre_pop, post_pop, p.OneToOneConnector(),
         p.StaticSynapse(weight=1.5, delay=1.0))
     proj_one_to_one_2 = p.Projection(
-        pre_pop, post_pop, p.FromListConnector([(i, i) for i in range(10)]),
+        pre_pop, post_pop, p.OneToOneConnector(),
         p.StaticSynapse(weight=2.5, delay=2.0))
     proj_all_to_all = p.Projection(
         pre_pop, post_pop, p.FromListConnector(
