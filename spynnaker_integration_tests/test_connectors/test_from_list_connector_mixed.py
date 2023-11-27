@@ -62,8 +62,8 @@ class TestFromListConnectorMixed(BaseTestCase):
     def do_list_nd_run(
             self, neurons_per_core_pre, pre_size, pre_shape,
             neurons_per_core_post, post_size, post_shape):
-        random_conns = numpy.unique(numpy.random.randint(
-            0, (pre_size, post_size), (100, 2)), axis=0)
+        random_conns = numpy.random.randint(
+            0, (pre_size, post_size), (100, 2))
         sim.setup(1.0)
         pre = sim.Population(
             pre_size, sim.IF_curr_exp(), structure=pre_shape)
@@ -79,10 +79,13 @@ class TestFromListConnectorMixed(BaseTestCase):
             [(int(i), int(j)) for i, j in proj.get([], "list")])
         sim.end()
 
-        c1 = numpy.sort(conns)
-        c2 = numpy.sort(random_conns)
+        _nrows, ncols = conns.shape
+        dtype = {'names': ['f{}'.format(i) for i in range(ncols)],
+                 'formats': ncols * [conns.dtype]}
 
-        assert numpy.array_equal(c1, c2)
+        diff = numpy.setdiff1d(conns.view(dtype), random_conns.view(dtype))
+
+        assert len(diff) == 0
 
     def test_list_3d_to_1d(self):
         self.do_list_nd_run(
