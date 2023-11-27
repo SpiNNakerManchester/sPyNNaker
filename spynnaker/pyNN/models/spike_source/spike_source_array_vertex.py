@@ -106,7 +106,8 @@ class SpikeSourceArrayVertex(
 
     def __init__(
             self, n_neurons: int, spike_times: Spikes, label: str,
-            max_atoms_per_core: int, model: SpikeSourceArray,
+            max_atoms_per_core: Union[int, Tuple[int, ...]],
+            model: SpikeSourceArray,
             splitter: Optional[AbstractSplitterCommon],
             n_colour_bits: Optional[int]):
         # pylint: disable=too-many-arguments

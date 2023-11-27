@@ -21,7 +21,7 @@ from numpy import integer, floating, float64, uint16, uint32
 from numpy.typing import ArrayLike, NDArray
 from pyNN.random import RandomDistribution
 from typing import (
-    Optional, Tuple, Union, cast, TYPE_CHECKING)
+    Optional, Tuple, Union, cast, TYPE_CHECKING, Sized)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import (
@@ -160,9 +160,9 @@ class PoolDenseConnector(AbstractConnector):
                       n_dims: int, param_name: str) -> NDArray[integer]:
         if numpy.isscalar(shape):
             return numpy.array([shape] * n_dims, dtype=int)
-        assert isinstance(shape, tuple)
-        if len(shape) == n_dims:
-            return numpy.array(shape, dtype=int)
+        shape_tuple = cast(Sized, shape)
+        if len(shape_tuple) == n_dims:
+            return numpy.array(shape_tuple, dtype=int)
         raise SynapticConfigurationException(
             f"{param_name} must be an int or a tuple(int) with {n_dims}"
             " dimensions")

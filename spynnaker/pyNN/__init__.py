@@ -23,7 +23,7 @@ This package contains the profile of that code for PyNN 0.9.
 import logging
 from typing import (
     Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type,
-    TypedDict, Union)
+    TypedDict, Union, cast)
 from typing_extensions import Literal
 import numpy as __numpy
 from numpy.typing import NDArray
@@ -439,7 +439,8 @@ def list_standard_models() -> List[str]:
 
 
 def set_number_of_neurons_per_core(
-        neuron_type: Type, max_permitted: Union[int, Tuple[int, ...], None]):
+        neuron_type: Type,
+        max_permitted: Optional[Union[int, Tuple[int, ...]]]):
     """
     Sets a ceiling on the number of neurons of a given model that can be
     placed on a single core.
@@ -461,12 +462,13 @@ def set_number_of_neurons_per_core(
         raise ConfigurationException(
             "set_number_of_neurons_per_core call now expects "
             "neuron_type as a class instead of as a str")
-    max_neurons: Union[Tuple[int, ...], None] = None
+    max_neurons: Optional[Tuple[int, ...]] = None
     if max_permitted is not None:
         if is_singleton(max_permitted):
             max_neurons = (int(max_permitted), )
         else:
-            max_neurons = (int(m) for m in max_permitted)
+            max_perm: Tuple[int, ...] = cast(Tuple[int, ...], max_permitted)
+            max_neurons = tuple(int(m) for m in max_perm)
 
     SpynnakerDataView.set_number_of_neurons_per_dimension_per_core(
         neuron_type, max_neurons)
