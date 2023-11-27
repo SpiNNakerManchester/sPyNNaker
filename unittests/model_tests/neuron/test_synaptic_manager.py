@@ -119,8 +119,7 @@ def test_write_data_spec():
         pre_pop, post_pop, p.OneToOneConnector(),
         p.StaticSynapse(weight=2.5, delay=2.0))
     proj_all_to_all = p.Projection(
-        pre_pop, post_pop, p.FromListConnector(
-            [(i, j) for i in range(10) for j in range(10) if i != j]),
+        pre_pop, post_pop, p.AllToAllConnector(),
         p.StaticSynapse(weight=4.5, delay=4.0))
 
     from_list_list = [(i, i, i, (i * 5) + 1) for i in range(10)]
@@ -195,7 +194,7 @@ def test_write_data_spec():
                 proj_all_to_all._synapse_information))
 
         # Check that all the connections have the right weight and delay
-        assert len(connections_3) == 90
+        assert len(connections_3) == 100
         assert all([conn["weight"] == 4.5 for conn in connections_3])
         assert all([conn["delay"] == 4.0 for conn in connections_3])
 
