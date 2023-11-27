@@ -324,12 +324,12 @@ class PopulationMachineNeurons(
         current_source_id_list = self._pop_vertex.current_source_id_list
 
         # Work out which current sources are on this core
-        current_sources = OrderedSet()
+        current_sources = list()
         for app_current_source in app_current_sources:
             for n in self._vertex_slice.get_raster_ids():
                 if (self.__in_selector(
                         n, current_source_id_list[app_current_source])):
-                    current_sources.add(app_current_source)
+                    current_sources.append(app_current_source)
 
         # Write the number of sources
         spec.write_value(len(current_sources))
