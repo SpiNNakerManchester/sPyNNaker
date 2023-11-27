@@ -402,14 +402,12 @@ class PopulationMachineNeurons(
                             spec.write_value(data=value_convert)
 
     def __get_current_sources_sorted(self) -> List[AbstractCurrentSource]:
-        lo_atom = self._vertex_slice.lo_atom
-        hi_atom = self._vertex_slice.hi_atom
         app_current_sources = self._pop_vertex.current_sources
         current_source_id_list = self._pop_vertex.current_source_id_list
 
         current_sources: Set[AbstractCurrentSource] = set()
         for app_current_source in app_current_sources:
-            for n in range(lo_atom, hi_atom + 1):
+            for n in self._vertex_slice.get_raster_ids():
                 if self.__in_selector(
                         n, current_source_id_list[app_current_source]):
                     current_sources.add(app_current_source)
