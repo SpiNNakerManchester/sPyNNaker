@@ -12,15 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from collections.abc import Container
 import ctypes
 import numpy
-from typing import (
-    List, NamedTuple, Sequence, Union, cast, TYPE_CHECKING, Container)
+from typing import List, NamedTuple, Sequence, Set, Union, cast, TYPE_CHECKING
 
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.abstract_sized import Selector
-from spinn_utilities.ordered_set import OrderedSet
 
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
@@ -41,6 +40,7 @@ from spynnaker.pyNN.utilities.utility_calls import convert_to
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
     from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+    from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
 
 
 class NeuronProvenance(ctypes.LittleEndianStructure):
@@ -308,28 +308,24 @@ class PopulationMachineNeurons(
 
     def _write_current_source_parameters(
             self, spec: DataSpecificationBase):
-        # pylint: disable=too-many-arguments
+        n_atoms = self._vertex_slice.n_atoms
+
+        spec.comment(
+            f"\nWriting Current Source Parameters for {n_atoms} Neurons:\n")
 
         # Reserve and switch to the current source region
         params_size = self._pop_vertex.\
-            get_sdram_usage_for_current_source_params(
-                self._vertex_slice.n_atoms)
+            get_sdram_usage_for_current_source_params(n_atoms)
         spec.reserve_memory_region(
             region=self._neuron_regions.current_source_params,
             size=params_size, label='CurrentSourceParams')
         spec.switch_write_focus(self._neuron_regions.current_source_params)
 
         # Get the current sources from the app vertex
-        app_current_sources = self._pop_vertex.current_sources
         current_source_id_list = self._pop_vertex.current_source_id_list
 
         # Work out which current sources are on this core
-        current_sources = list()
-        for app_current_source in app_current_sources:
-            for n in self._vertex_slice.get_raster_ids():
-                if (self.__in_selector(
-                        n, current_source_id_list[app_current_source])):
-                    current_sources.append(app_current_source)
+        current_sources = self.__get_current_sources_sorted()
 
         # Write the number of sources
         spec.write_value(len(current_sources))
@@ -345,8 +341,7 @@ class PopulationMachineNeurons(
             # sources for each neuron, then if this is non-zero, follow it with
             # the IDs indicating the current source ID value, and then the
             # index within that type of current source
-            neuron_current_sources = [
-                [0] for _ in range(self._vertex_slice.n_atoms)]
+            neuron_current_sources = [[0] for n in range(n_atoms)]
             for current_source in current_sources:
                 # Get the ID of the current source
                 cs_id = current_source.current_source_id
@@ -367,7 +362,7 @@ class PopulationMachineNeurons(
 
             # Now loop over the neurons on this core and write the current
             # source ID and index for sources attached to each neuron
-            for n in range(self._vertex_slice.n_atoms):
+            for n in range(n_atoms):
                 n_current_sources = neuron_current_sources[n][0]
                 spec.write_value(n_current_sources)
                 if n_current_sources != 0:
@@ -405,6 +400,23 @@ class PopulationMachineNeurons(
                             value_convert = convert_to(
                                 value, cs_data_types[key]).item()
                             spec.write_value(data=value_convert)
+
+    def __get_current_sources_sorted(self) -> List[AbstractCurrentSource]:
+        lo_atom = self._vertex_slice.lo_atom
+        hi_atom = self._vertex_slice.hi_atom
+        app_current_sources = self._pop_vertex.current_sources
+        current_source_id_list = self._pop_vertex.current_source_id_list
+
+        current_sources: Set[AbstractCurrentSource] = set()
+        for app_current_source in app_current_sources:
+            for n in range(lo_atom, hi_atom + 1):
+                if self.__in_selector(
+                        n, current_source_id_list[app_current_source]):
+                    current_sources.add(app_current_source)
+
+        # Sort the current sources into current_source_id order
+        return sorted(
+            current_sources, key=lambda x: x.current_source_id)
 
     def read_parameters_from_machine(self, placement: Placement):
         """
