@@ -30,7 +30,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
 from spynnaker.pyNN.types import Weight_Delay_In_Types
 from spynnaker.pyNN.models.common.local_only_2d_common import (
-    get_sources_for_target, get_rinfo_for_source, BITS_PER_SHORT,
+    get_sources_for_target, get_rinfo_for_spike_source, BITS_PER_SHORT,
     get_div_const, N_COLOUR_BITS_BITS, KEY_INFO_SIZE, get_first_and_last_slice,
     Source)
 from .abstract_local_only import AbstractLocalOnly
@@ -156,7 +156,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
                 n_connectors += 1
 
             # Get the source routing information
-            r_info, core_mask, mask_shift = get_rinfo_for_source(
+            r_info, core_mask, mask_shift = get_rinfo_for_spike_source(
                 pre_vertex)
 
             # Get the width / height per core / last_core

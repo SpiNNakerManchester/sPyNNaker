@@ -32,7 +32,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.types import Weight_Delay_In_Types
 from spynnaker.pyNN.models.common.local_only_2d_common import (
-    get_div_const, get_rinfo_for_source, get_sources_for_target,
+    get_div_const, get_rinfo_for_spike_source, get_sources_for_target,
     BITS_PER_SHORT, N_COLOUR_BITS_BITS, KEY_INFO_SIZE,
     get_first_and_last_slice, Source)
 from .abstract_local_only import AbstractLocalOnly
@@ -170,7 +170,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     weight_index))
 
             # Get the source routing information
-            r_info, core_mask, mask_shift = get_rinfo_for_source(
+            r_info, core_mask, mask_shift = get_rinfo_for_spike_source(
                 pre_vertex)
 
             # Get the width / height per core / last_core

@@ -76,9 +76,10 @@ def get_delay_for_source(incoming):
     return pre_vertex, local_delay, delay_stage
 
 
-def get_rinfo_for_source(pre_vertex):
+def get_rinfo_for_spike_source(pre_vertex):
     """
-    Get the routing information for the source of a projection.
+    Get the routing information for the source of a projection in the
+    SPIKE_PARTITION_ID partition.
 
     :param ApplicationVertex pre_vertex: The source of incoming data
     :return: Routing information, core mask, core mask shift
