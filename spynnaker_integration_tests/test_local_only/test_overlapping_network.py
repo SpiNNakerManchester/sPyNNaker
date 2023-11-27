@@ -38,8 +38,8 @@ class TestDevice(AbstractMulticastControllableDevice):
 
     @property
     def device_control_key(self):
-        # This should be unique to the device
-        return 0
+        # This should be unique to the device so higher than 262144
+        return 262145
 
     @property
     def device_control_uses_payload(self):
