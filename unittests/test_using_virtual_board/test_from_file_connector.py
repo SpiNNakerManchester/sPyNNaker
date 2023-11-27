@@ -90,6 +90,16 @@ class TestFromFileConnector(BaseTestCase):
         ]
         self.check_other_connect(as_list)
 
+    def test_list_too_big(self):
+        as_list = [
+            (0, 0, 0.1, 10),
+            (13, 0, 0.2, 11),
+            (2, 13, 0.3, 12),
+            (5, 1, 0.4, 13),
+            (0, 1, 0.5, 14),
+        ]
+        self.check_other_connect(as_list)
+
     def test_no_delays(self):
         as_list = [
             (0, 0, 0.1),

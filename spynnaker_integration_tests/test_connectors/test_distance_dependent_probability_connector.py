@@ -31,14 +31,16 @@ class DistanceDependentProbabilityConnectorTest(BaseTestCase):
 
         d_expr = f"d<{max_dist}"
         conn = p.DistanceDependentProbabilityConnector(d_expr)
+        space = p.Space()
         proj = p.Projection(
-            pre, post, conn, p.StaticSynapse(weight=1.0, delay=1.0))
+            pre, post, conn, p.StaticSynapse(weight=1.0, delay=1.0),
+            space=space)
         p.run(0)
         conns = numpy.array(
             [(int(i), int(j)) for i, j in proj.get([], "list")])
         p.end()
 
-        distances = proj.space.distances(
+        distances = space.distances(
             pre.positions, post.positions, expand=False)
         expected = numpy.where(distances < max_dist)[0]
         pres = expected // post_size

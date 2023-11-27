@@ -20,6 +20,7 @@ from typing import (
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.abstract_sized import Selector
+from spinn_utilities.ordered_set import OrderedSet
 
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
@@ -323,7 +324,7 @@ class PopulationMachineNeurons(
         current_source_id_list = self._pop_vertex.current_source_id_list
 
         # Work out which current sources are on this core
-        current_sources = set()
+        current_sources = OrderedSet()
         for app_current_source in app_current_sources:
             for n in self._vertex_slice.get_raster_ids():
                 if (self.__in_selector(

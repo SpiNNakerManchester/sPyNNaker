@@ -70,8 +70,7 @@ class Projection(object):
         "__projection_edge",
         "__synapse_information",
         "__virtual_connection_list",
-        "__label",
-        "__space"
+        "__label"
     )
 
     def __init__(
@@ -125,7 +124,6 @@ class Projection(object):
         if space is None:
             space = PyNNSpace()
         connector.set_space(space)
-        self.__space = space
 
         pre_vertex = pre_synaptic_population._vertex
         post_vertex = cast(AbstractPopulationVertex,
@@ -528,7 +526,3 @@ class Projection(object):
         """
         # TODO
         _we_dont_do_this_now()
-
-    @property
-    def space(self):
-        return self.__space

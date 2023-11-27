@@ -170,17 +170,23 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         """
         :param list(~pacman.model.graphs.common.Slice) post_slices:
         """
+        input_filter = numpy.logical_and(
+            self.__targets < n_post_atoms, self.__sources < n_pre_atoms)
+        targets = self.__targets[input_filter]
+        sources = self.__sources[input_filter]
+        weights = (None if self.__weights is None else
+                   self.__weights[input_filter])
+        delays = (None if self.__delays is None else
+                  self.__delays[input_filter])
+
         # If nothing has changed, use the cache
         if self.__split_post_slices == post_slices:
-            return False
+            return sources, targets, weights, delays
 
         # If there are no connections, return
         if not len(self.__conn_list):
             self.__split_conn_list = {}
-            return True
-
-        input_filter = numpy.logical_and(
-            self.__targets < n_post_atoms, self.__sources < n_pre_atoms)
+            return sources, targets, weights, delays
 
         self.__split_post_slices = list(post_slices)
         m_vertex_mapping = self.__id_to_m_vertex_index(
@@ -206,7 +212,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             for i, indices in enumerate(split_indices)
             if len(indices) > 0
         }
-        return True
+        return sources, targets, weights, delays
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -309,7 +315,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def create_synaptic_block(
             self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
             synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
-        self._split_connections(
+        sources, targets, weights, delays = self._split_connections(
             synapse_info.n_pre_neurons, synapse_info.n_post_neurons,
             post_slices)
         post_lo = post_vertex_slice.lo_atom
@@ -320,11 +326,11 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
         block = numpy.zeros(len(indices), dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = synapse_info.pre_vertex.get_key_ordered_indices(
-            self.__sources[indices])
+            sources[indices])
         block["target"] = post_vertex_slice.get_relative_indices(
-            self.__targets[indices])
+            targets[indices])
         # check that conn_list has weights, if not then use the value passed in
-        if self.__weights is None:
+        if weights is None:
             if _is_sequential(synapse_info.weights):
                 block["weight"] = numpy.array(synapse_info.weights)[indices]
             else:
@@ -332,9 +338,9 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                     block["source"], block["target"], len(indices),
                     post_vertex_slice, synapse_info)
         else:
-            block["weight"] = self.__weights[indices]
+            block["weight"] = weights[indices]
         # check that conn_list has delays, if not then use the value passed in
-        if self.__delays is None:
+        if delays is None:
             if _is_sequential(synapse_info.delays):
                 block["delay"] = numpy.array(synapse_info.delays)[indices]
             else:
@@ -342,7 +348,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                     block["source"], block["target"], len(indices),
                     post_vertex_slice, synapse_info)
         else:
-            block["delay"] = self._clip_delays(self.__delays[indices])
+            block["delay"] = self._clip_delays(delays[indices])
         block["synapse_type"] = synapse_type
         return block
 
