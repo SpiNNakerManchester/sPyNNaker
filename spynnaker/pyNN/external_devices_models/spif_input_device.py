@@ -128,12 +128,11 @@ class SPIFInputDevice(
 
         # Mask to apply to route packets at input
         n_key_bits = BITS_IN_KEY - self.__neuron_bits
-        self.__key_mask = (1 << n_key_bits) - 1
-        self.__spif_mask = ((self.__key_mask << self.__neuron_bits) +
-                            self.INPUT_MASK)
+        self.__key_mask = ((1 << n_key_bits) - 1) << self.__neuron_bits
+        self.__spif_mask = self.__key_mask + self.INPUT_MASK
         sub_mask = (1 << self.__index_bits) - 1
-        self.__m_vertex_mask = ((self.__key_mask << self.__neuron_bits) +
-                                (sub_mask << self.__index_shift))
+        self.__m_vertex_mask = (
+            self.__key_mask + (sub_mask << self.__index_shift))
 
         # A dictionary to get vertex index from FPGA and slice
         self.__index_by_slice = dict()
@@ -142,6 +141,7 @@ class SPIFInputDevice(
         self.__base_key = base_key
         if self.__base_key is None:
             self.__base_key = SPIFInputDevice.__n_devices
+        self.__base_key = self.__base_key << self.__neuron_bits
         SPIFInputDevice.__n_devices += 1
 
         # Generate the shifts and masks to convert the SPIF Ethernet inputs to
@@ -190,8 +190,7 @@ class SPIFInputDevice(
         fpga_link_id = machine_vertex.fpga_link_id
         vertex_slice = machine_vertex.vertex_slice
         index = self.__index_by_slice[fpga_link_id, vertex_slice]
-        key = ((self.__base_key << self.__neuron_bits) |
-               index << self.__index_shift)
+        key = self.__base_key | (index << self.__index_shift)
 
         fpga = self.__fpga_index(fpga_link_id)
 
@@ -202,8 +201,7 @@ class SPIFInputDevice(
 
     @overrides(ApplicationFPGAVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(self, partition_id):
-        return BaseKeyAndMask(self.__base_key << self.__neuron_bits,
-                              self.__key_mask)
+        return BaseKeyAndMask(self.__base_key, self.__key_mask)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
@@ -240,8 +238,7 @@ class SPIFInputDevice(
         ])
 
         # Configure the output routing key
-        commands.append(set_mapper_key(
-            self.__pipe, self.__base_key << self.__neuron_bits))
+        commands.append(set_mapper_key(self.__pipe, self.__base_key))
 
         # Configure the links to send packets to the 8 FPGAs using the
         # lower bits
@@ -262,7 +259,7 @@ class SPIFInputDevice(
 
     def __spif_key(self, fpga_link_id):
         fpga = self.__fpga_index(fpga_link_id)
-        return (self.__base_key << self.__neuron_bits) + fpga
+        return self.__base_key + fpga
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
