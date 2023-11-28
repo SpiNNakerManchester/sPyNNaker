@@ -10,7 +10,7 @@ var searchData=
   ['delay_5fparameters_7',['delay_parameters',['../delay__extension_8h.html#structdelay__parameters',1,'']]],
   ['delay_5fvalue_8',['delay_value',['../matrix__generator__common_8h.html#structdelay__value',1,'']]],
   ['diagnostics_5ft_9',['diagnostics_t',['https://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html',1,'']]],
-  ['dimension_10',['dimension',['../structdimension.html',1,'']]],
+  ['div_5fconst_10',['div_const',['../structdiv__const.html',1,'']]],
   ['divmod_5ft_11',['divmod_t',['https://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html',1,'']]],
   ['dma_5fbuffer_12',['dma_buffer',['../structdma__buffer.html',1,'']]],
   ['dma_5fcontrol_5ft_13',['dma_control_t',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html',1,'']]],

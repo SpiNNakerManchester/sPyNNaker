@@ -10693,6 +10693,83 @@
   <compound kind="struct">
     <name>connector</name>
     <filename>structconnector.html</filename>
+    <member kind="variable">
+      <type>lc_shape_t</type>
+      <name>kernel</name>
+      <anchorfile>structconnector.html</anchorfile>
+      <anchor>ac8409f536dea382a509f2f06322c8b19</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>lc_shape_t</type>
+      <name>padding</name>
+      <anchorfile>structconnector.html</anchorfile>
+      <anchor>a3a36ec47bd4df6053e40aab9fc9b0bbc</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint16_t</type>
+      <name>positive_synapse_type</name>
+      <anchorfile>structconnector.html</anchorfile>
+      <anchor>a72d74286cbe3c754229ea5d8fbd1c9a2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint16_t</type>
+      <name>negative_synapse_type</name>
+      <anchorfile>structconnector.html</anchorfile>
+      <anchor>ac8b1802bf784ffd946e6bfadfc1bd948</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint16_t</type>
+      <name>delay_stage</name>
+      <anchorfile>structconnector.html</anchorfile>
+      <anchor>accfda9315085fd47ca9b0cbe6b11ab2f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint16_t</type>
+      <name>delay</name>
+      <anchorfile>structconnector.html</anchorfile>
+      <anchor>a47cdb4667672dbf1cdd4e839dcbf966a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint16_t</type>
+      <name>kernel_index</name>
+      <anchorfile>structconnector.html</anchorfile>
+      <anchor>a30afb0fc4a449a570621d9bd97625ccb</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>div_const</type>
+      <name>stride_height_div</name>
+      <anchorfile>structconnector.html</anchorfile>
+      <anchor>a43a57ea51e53f42c3055c23b4f3a1dcd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>div_const</type>
+      <name>stride_width_div</name>
+      <anchorfile>structconnector.html</anchorfile>
+      <anchor>a1ad9114482d14cf23b130daa314104f3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>div_const</type>
+      <name>pool_stride_height_div</name>
+      <anchorfile>structconnector.html</anchorfile>
+      <anchor>af40a7ac88a607a17da50fbc92b18b1c2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>div_const</type>
+      <name>pool_stride_width_div</name>
+      <anchorfile>structconnector.html</anchorfile>
+      <anchor>a0e9fc7db73985b954e8c8adf42e282c3</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="struct">
     <name>conv_config</name>
@@ -10925,8 +11002,8 @@
     <anchor>structdelay__value</anchor>
   </compound>
   <compound kind="struct">
-    <name>dimension</name>
-    <filename>structdimension.html</filename>
+    <name>div_const</name>
+    <filename>structdiv__const.html</filename>
   </compound>
   <compound kind="struct">
     <name>dma_buffer</name>
@@ -11489,6 +11566,59 @@
       <name>self_connected</name>
       <anchorfile>spike__processing__fast_8h.html</anchorfile>
       <anchor>a62e84dad881a32b0dc9621b7404d8405</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>key_info</name>
+    <filename>structkey__info.html</filename>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>key</name>
+      <anchorfile>structkey__info.html</anchorfile>
+      <anchor>a6cf89fd230b00411df3913bdd5827da5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>mask</name>
+      <anchorfile>structkey__info.html</anchorfile>
+      <anchor>abea6254272a206f71eec3193ecff7ac8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>start</name>
+      <anchorfile>structkey__info.html</anchorfile>
+      <anchor>a5d509292c890a4f5605f9dbda15515ee</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_colour_bits</name>
+      <anchorfile>structkey__info.html</anchorfile>
+      <anchor>a1598452d31a27f1612568b844ac4db23</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>count</name>
+      <anchorfile>structkey__info.html</anchorfile>
+      <anchor>a66e01e8b78c896f2184b0f2186645f0b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>core_mask</name>
+      <anchorfile>structkey__info.html</anchorfile>
+      <anchor>ac559a6f7ae59540a0e7a6649ca964bae</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>mask_shift</name>
+      <anchorfile>structkey__info.html</anchorfile>
+      <anchor>a70334334559700beb1181c21ee6812d8</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -13106,6 +13236,73 @@
     <anchor>structsdram__variable__recording__data__t</anchor>
   </compound>
   <compound kind="struct">
+    <name>source_dim</name>
+    <filename>structsource__dim.html</filename>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>size_per_core</name>
+      <anchorfile>structsource__dim.html</anchorfile>
+      <anchor>a7989071664e4045d8617a8ae74ac9ead</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>cum_size_per_core</name>
+      <anchorfile>structsource__dim.html</anchorfile>
+      <anchor>a62063c8235bd51c3e0d80fdd25a55946</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>div_const</type>
+      <name>cum_size_per_core_div</name>
+      <anchorfile>structsource__dim.html</anchorfile>
+      <anchor>a1201234f65c45f17831f9f6000a219b7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>cores</name>
+      <anchorfile>structsource__dim.html</anchorfile>
+      <anchor>aa1f76993810850656d7e2f92089592c7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>cum_cores</name>
+      <anchorfile>structsource__dim.html</anchorfile>
+      <anchor>a56b4221e996bf0923d2dfe741ccf4653</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>div_const</type>
+      <name>cum_cores_div</name>
+      <anchorfile>structsource__dim.html</anchorfile>
+      <anchor>ade7c92c4112d50b8a34d519f6562b905</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>size_last_core</name>
+      <anchorfile>structsource__dim.html</anchorfile>
+      <anchor>aa000f63b07ba27607c9692a52d7481a5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>cum_size_last_core</name>
+      <anchorfile>structsource__dim.html</anchorfile>
+      <anchor>acd6107e951141a65421ff4e305fbf12a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>div_const</type>
+      <name>cum_size_last_core_div</name>
+      <anchorfile>structsource__dim.html</anchorfile>
+      <anchor>a23e1924d244d596ee21f153f8f77e5b4</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>source_expand_details</name>
     <filename>spike__source__poisson_8c.html</filename>
     <anchor>structsource__expand__details</anchor>
@@ -13141,6 +13338,76 @@
     <filename>spike__source__poisson_8c.html</filename>
     <anchor>structsource__info</anchor>
     <member kind="variable">
+      <type>key_info</type>
+      <name>key_info</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a10205e471662aeaacbd4ac5f73702d01</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>source_height_per_core</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a6a0cfce18d8a4b0c738382e3d606b883</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>source_width_per_core</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a788c3de5e34b6b722bf280ea0da9b02c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>source_height_last_core</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a1dc7836a1e8ffc851d0f6fb5be61ca3a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>source_width_last_core</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>ab99fcf6dc30c384eb76c78c0920df682</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>cores_per_source_height</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a70489cbc6f51bfd52a9ee6f3df515c15</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>cores_per_source_width</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a23dbf35c89be544f1185d56fe13d1003</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>div_const</type>
+      <name>source_width_div</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>aa07db897fd60e4c32da903dcae904d44</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>div_const</type>
+      <name>source_width_last_div</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a0bdcea89bdf47b39d1d80db3b2680c47</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>div_const</type>
+      <name>cores_per_width_div</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a73e54ba950e24393e9ae6c99fe51700a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
       <type>uint32_t</type>
       <name>n_rates</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
@@ -13161,10 +13428,6 @@
       <anchor>a56c2077f5085d9d86a1a5a39d62a9029</anchor>
       <arglist>[]</arglist>
     </member>
-  </compound>
-  <compound kind="struct">
-    <name>source_key_info</name>
-    <filename>structsource__key__info.html</filename>
   </compound>
   <compound kind="struct">
     <name>spike_processing_fast_provenance</name>

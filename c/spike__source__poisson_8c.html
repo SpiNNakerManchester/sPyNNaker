@@ -624,9 +624,81 @@ number of times the tdma fell behind its slot </td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p >Collection of rates to apply over time to a particular spike source. </p>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00162">162</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="local__only__conv__impl_8c_source.html#l00056">56</a> of file <a class="el" href="local__only__conv__impl_8c_source.html">local_only_conv_impl.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="a10205e471662aeaacbd4ac5f73702d01" name="a10205e471662aeaacbd4ac5f73702d01"></a><a class="el" href="structkey__info.html">key_info</a></td>
+<td class="fieldname">
+key_info</td>
+<td class="fielddoc">
+Information about the key. </td></tr>
+<tr><td class="fieldtype">
+<a id="a6a0cfce18d8a4b0c738382e3d606b883" name="a6a0cfce18d8a4b0c738382e3d606b883"></a>uint32_t</td>
+<td class="fieldname">
+source_height_per_core: 16</td>
+<td class="fielddoc">
+The source population height per core. </td></tr>
+<tr><td class="fieldtype">
+<a id="a788c3de5e34b6b722bf280ea0da9b02c" name="a788c3de5e34b6b722bf280ea0da9b02c"></a>uint32_t</td>
+<td class="fieldname">
+source_width_per_core: 16</td>
+<td class="fielddoc">
+The source population width per core. </td></tr>
+<tr><td class="fieldtype">
+<a id="a1dc7836a1e8ffc851d0f6fb5be61ca3a" name="a1dc7836a1e8ffc851d0f6fb5be61ca3a"></a>uint32_t</td>
+<td class="fieldname">
+source_height_last_core: 16</td>
+<td class="fielddoc">
+The source population height on the last core in a column. </td></tr>
+<tr><td class="fieldtype">
+<a id="ab99fcf6dc30c384eb76c78c0920df682" name="ab99fcf6dc30c384eb76c78c0920df682"></a>uint32_t</td>
+<td class="fieldname">
+source_width_last_core: 16</td>
+<td class="fielddoc">
+The source population width on the last core on a row. </td></tr>
+<tr><td class="fieldtype">
+<a id="a70489cbc6f51bfd52a9ee6f3df515c15" name="a70489cbc6f51bfd52a9ee6f3df515c15"></a>uint32_t</td>
+<td class="fieldname">
+cores_per_source_height: 16</td>
+<td class="fielddoc">
+The number cores in a height of the source. </td></tr>
+<tr><td class="fieldtype">
+<a id="a23dbf35c89be544f1185d56fe13d1003" name="a23dbf35c89be544f1185d56fe13d1003"></a>uint32_t</td>
+<td class="fieldname">
+cores_per_source_width: 16</td>
+<td class="fielddoc">
+Number of cores in a width of the source. </td></tr>
+<tr><td class="fieldtype">
+<a id="aa07db897fd60e4c32da903dcae904d44" name="aa07db897fd60e4c32da903dcae904d44"></a><a class="el" href="structdiv__const.html">div_const</a></td>
+<td class="fieldname">
+source_width_div</td>
+<td class="fielddoc">
+Used to calculate division by the source width per core efficiently. </td></tr>
+<tr><td class="fieldtype">
+<a id="a0bdcea89bdf47b39d1d80db3b2680c47" name="a0bdcea89bdf47b39d1d80db3b2680c47"></a><a class="el" href="structdiv__const.html">div_const</a></td>
+<td class="fieldname">
+source_width_last_div</td>
+<td class="fielddoc">
+Division by last core width. </td></tr>
+<tr><td class="fieldtype">
+<a id="a73e54ba950e24393e9ae6c99fe51700a" name="a73e54ba950e24393e9ae6c99fe51700a"></a><a class="el" href="structdiv__const.html">div_const</a></td>
+<td class="fieldname">
+cores_per_width_div</td>
+<td class="fielddoc">
+Division by cores per source width. </td></tr>
+<tr><td class="fieldtype">
+<a id="a26c8cbb77530f6ba0113a3a434124da9" name="a26c8cbb77530f6ba0113a3a434124da9"></a>uint32_t</td>
+<td class="fieldname">
+n_dims</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="ae705497f1e4de7ee38b68ecc3874c8ad" name="ae705497f1e4de7ee38b68ecc3874c8ad"></a><a class="el" href="structsource__dim.html">source_dim</a></td>
+<td class="fieldname">
+source_dim[]</td>
+<td class="fielddoc">
+</td></tr>
 <tr><td class="fieldtype">
 <a id="a62435794d07ae2d9589f23e7e318cf65" name="a62435794d07ae2d9589f23e7e318cf65"></a>uint32_t</td>
 <td class="fieldname">
@@ -2509,7 +2581,7 @@ The weight to send for each active Poisson source. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Nov 27 2023 15:14:09 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.5
+Generated on Tue Nov 28 2023 08:10:12 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.5
 </small></address>
 </body>
 </html>
