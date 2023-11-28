@@ -15,7 +15,5 @@ var searchData=
   ['robot_5fmotor_5fcontrol_2ec_12',['robot_motor_control.c',['../robot__motor__control_8c.html',1,'']]],
   ['round_2eh_13',['round.h',['https://spinnakermanchester.github.io/spinn_common/round_8h.html',1,'']]],
   ['routing_5ftable_2eh_14',['routing_table.h',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/routing__table_8h.html',1,'']]],
-  ['routing_5ftables_2eh_15',['routing_tables.h',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/routing__tables_8h.html',1,'']]],
-  ['routing_5ftables_5futils_2eh_16',['routing_tables_utils.h',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/routing__tables__utils_8h.html',1,'']]],
-  ['rt_5fsingle_2eh_17',['rt_single.h',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/rt__single_8h.html',1,'']]]
+  ['rt_5fsingle_2eh_15',['rt_single.h',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/rt__single_8h.html',1,'']]]
 ];

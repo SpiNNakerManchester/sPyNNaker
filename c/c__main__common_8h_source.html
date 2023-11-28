@@ -126,7 +126,7 @@ $(function() {
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        uint32_t *<a class="code hl_variable" href="delay__extension_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t *simulation_ticks,</div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        uint32_t *infinite_run, uint32_t *time, uint32_t *recording_flags,</div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        prov_callback_t store_provenance_function, callback_t timer_callback,</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        <span class="keyword">struct</span> <a class="code hl_struct" href="structcommon__regions.html">common_regions</a> regions, <span class="keyword">struct</span> <a class="code hl_struct" href="structcommon__priorities.html">common_priorities</a> <a class="code hl_enumerationRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/bit__field__sorter__and__searcher_8c.html#a7fcef664d5dc54944296abea6f026276">priorities</a>,</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        <span class="keyword">struct</span> <a class="code hl_struct" href="structcommon__regions.html">common_regions</a> regions, <span class="keyword">struct</span> <a class="code hl_struct" href="structcommon__priorities.html">common_priorities</a> priorities,</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        <a class="code hl_structRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification_metadata_t</a> **ds_regions) {</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    <span class="comment">// Get the address this core&#39;s DTCM data starts at from SRAM</span></div>
@@ -141,7 +141,7 @@ $(function() {
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    <span class="keywordflow">if</span> (!<a class="code hl_functionRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/simulation_8h.html#afbd0bd35cd583a3cc02f05f50506dc3c">simulation_initialise</a>(</div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>            data_specification_get_region(regions.system, *ds_regions),</div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>            APPLICATION_NAME_HASH, <a class="code hl_variable" href="delay__extension_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, simulation_ticks,</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>            infinite_run, time, <a class="code hl_enumerationRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/bit__field__sorter__and__searcher_8c.html#a7fcef664d5dc54944296abea6f026276">priorities</a>.sdp, <a class="code hl_enumerationRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/bit__field__sorter__and__searcher_8c.html#a7fcef664d5dc54944296abea6f026276">priorities</a>.dma)) {</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>            infinite_run, time, priorities.<a class="code hl_variable" href="structcommon__priorities.html#a52f4118b696b363a7df6cfc7c4d18083">sdp</a>, priorities.<a class="code hl_variable" href="structcommon__priorities.html#a81ff06f46e55f58109477a18f0f54b82">dma</a>)) {</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    }</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <a class="code hl_functionRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/simulation_8h.html#a08b47066c4001e5d899c5e265006e034">simulation_set_provenance_function</a>(</div>
@@ -160,7 +160,7 @@ $(function() {
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <span class="keywordflow">if</span> (timer_callback) {</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        <span class="comment">// Set up the timer tick callback (others are handled elsewhere)</span></div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        <a class="code hl_functionRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#afc98f97be297e7077334cad216d32b57">spin1_callback_on</a>(TIMER_TICK, timer_callback, <a class="code hl_enumerationRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/bit__field__sorter__and__searcher_8c.html#a7fcef664d5dc54944296abea6f026276">priorities</a>.timer);</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        <a class="code hl_functionRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#afc98f97be297e7077334cad216d32b57">spin1_callback_on</a>(TIMER_TICK, timer_callback, priorities.<a class="code hl_variable" href="structcommon__priorities.html#aa95583081515d60e30a8e99c00bb1965">timer</a>);</div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    }</div>
 <div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
@@ -175,7 +175,6 @@ $(function() {
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <a class="code hl_functionRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/profiler_8h.html#a0b7e4fa366688c5ad4e3a0861023b015">profiler_finalise</a>();</div>
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>}</div>
-<div class="ttc" id="abit__field__sorter__and__searcher_8c_html_a7fcef664d5dc54944296abea6f026276"><div class="ttname"><a href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/bit__field__sorter__and__searcher_8c.html#a7fcef664d5dc54944296abea6f026276">priorities</a></div><div class="ttdeci">priorities</div></div>
 <div class="ttc" id="adata__specification_8h_html"><div class="ttname"><a href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification.h</a></div></div>
 <div class="ttc" id="adata__specification_8h_html_a0b38bdde71cd69fa12ae7261036ea58d"><div class="ttname"><a href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html#a0b38bdde71cd69fa12ae7261036ea58d">data_specification_get_data_address</a></div><div class="ttdeci">data_specification_metadata_t * data_specification_get_data_address(void)</div></div>
 <div class="ttc" id="adata__specification_8h_html_acfeb7a17f6fd55f4fde96be91a8a4b0a"><div class="ttname"><a href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html#acfeb7a17f6fd55f4fde96be91a8a4b0a">data_specification_read_header</a></div><div class="ttdeci">bool data_specification_read_header(data_specification_metadata_t *ds_regions)</div></div>
@@ -203,7 +202,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 28 2023 08:10:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.5
+Generated on Tue Nov 28 2023 15:59:13 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.5
 </small></address>
 </body>
 </html>

@@ -15,6 +15,5 @@ var searchData=
   ['alpha_5fstate_5ft_12',['alpha_state_t',['../synapse__types__alpha__impl_8h.html#structalpha__state__t',1,'']]],
   ['app_5fdata_5ft_13',['app_data_t',['https://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html',1,'']]],
   ['arp_5fentry_14',['arp_entry',['https://spinnakermanchester.github.io/spinnaker_tools/spinn__net_8c.html',1,'']]],
-  ['arp_5fpkt_5ft_15',['arp_pkt_t',['https://spinnakermanchester.github.io/spinnaker_tools/spinn__net_8h.html',1,'']]],
-  ['available_5fsdram_5fblocks_16',['available_sdram_blocks',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/malloc__extras_8h.html',1,'']]]
+  ['arp_5fpkt_5ft_15',['arp_pkt_t',['https://spinnakermanchester.github.io/spinnaker_tools/spinn__net_8h.html',1,'']]]
 ];
