@@ -24,7 +24,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SPIF_INPUT_FPGA_LINKS,
-    N_PIPES, N_FILTERS, SpiNNFPGARegister, SPIFRegister,
+    N_PIPES, N_FIELDS, N_FILTERS, SpiNNFPGARegister, SPIFRegister,
     set_field_mask, set_field_shift, set_field_limit,
     set_filter_mask, set_filter_value, set_mapper_key,
     set_input_key, set_input_mask, set_input_route)
@@ -93,8 +93,8 @@ class SPIFInputDevice(
         # Do some checks
         if n_neurons_per_partition < self.INPUT_MASK:
             raise ConfigurationException(
-                "The number of neurons per partition must be >= 8"
-                f" ({n_neurons_per_partition} specified)")
+                "The number of neurons per partition must not be <"
+                f" {self.INPUT_MASK} ({n_neurons_per_partition} specified)")
         if not self.__is_power_of_2(n_neurons_per_partition):
             raise ConfigurationException(
                 f"n_neurons_per_partition ({n_neurons_per_partition}) "
@@ -202,9 +202,8 @@ class SPIFInputDevice(
 
     @overrides(ApplicationFPGAVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(self, partition_id):
-        n_key_bits = BITS_IN_KEY - self.__neuron_bits
-        key_mask = ((1 << n_key_bits) - 1) << self.__neuron_bits
-        return BaseKeyAndMask(self.__base_key << self.__neuron_bits, key_mask)
+        return BaseKeyAndMask(self.__base_key << self.__neuron_bits,
+                              self.__key_mask)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
@@ -223,18 +222,14 @@ class SPIFInputDevice(
         commands.extend([
             set_field_mask(self.__pipe, 0, self.__input_mask),
             set_field_shift(self.__pipe, 0, self.__input_shift),
-            set_field_limit(self.__pipe, 0, self.n_atoms),
-            # These are unused but set them to be sure
-            set_field_mask(self.__pipe, 1, 0),
-            set_field_shift(self.__pipe, 1, 0),
-            set_field_limit(self.__pipe, 1, 0),
-            set_field_mask(self.__pipe, 2, 0),
-            set_field_shift(self.__pipe, 2, 0),
-            set_field_limit(self.__pipe, 2, 0),
-            set_field_mask(self.__pipe, 3, 0),
-            set_field_shift(self.__pipe, 3, 0),
-            set_field_limit(self.__pipe, 3, 0)
-        ])
+            set_field_limit(self.__pipe, 0, self.n_atoms)])
+
+        # These are unused but set them to be sure
+        for i in range(1, N_FIELDS):
+            commands.extend([
+                set_field_mask(self.__pipe, i, 0),
+                set_field_shift(self.__pipe, i, 0),
+                set_field_limit(self.__pipe, i, 0)])
 
         # Don't filter
         commands.extend([
@@ -251,14 +246,14 @@ class SPIFInputDevice(
         # Configure the links to send packets to the 8 FPGAs using the
         # lower bits
         commands.extend(
-            set_input_key(self.__pipe, i, self.__spif_key(15 - (i * 2)))
-            for i in range(8))
+            set_input_key(self.__pipe, i, self.__spif_key(f))
+            for i, f in enumerate(reversed(SPIF_INPUT_FPGA_LINKS)))
         commands.extend(
             set_input_mask(self.__pipe, i, self.__spif_mask)
-            for i in range(8))
+            for i in range(len(SPIF_INPUT_FPGA_LINKS)))
         commands.extend(
             set_input_route(self.__pipe, i, i)
-            for i in range(8))
+            for i in range(len(SPIF_INPUT_FPGA_LINKS)))
 
         # Send the start signal
         commands.append(SpiNNFPGARegister.START.cmd())
