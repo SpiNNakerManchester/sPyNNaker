@@ -11,22 +11,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 from collections import defaultdict
 import csv
 from datetime import datetime
 import logging
-import neo
+from neo import AnalogSignal, Block, Event, Segment, SpikeTrain
 import numpy
-import quantities
+from numpy import integer, float64
+from numpy.typing import NDArray
+from quantities import Quantity, ms
+from typing import (
+    Any, Dict, Iterable, List, Optional, Tuple, Union, TYPE_CHECKING)
 from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.data import SpynnakerDataView
+if TYPE_CHECKING:
+    from _csv import _writer as CSVWriter, _reader as CSVReader
+    from spynnaker.pyNN.utilities.neo_buffer_database import Annotations
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class NeoCsv(object):
-    # pylint: disable=c-extension-no-member
+    # pylint: disable=c-extension-no-member, no-member
 
     _POPULATION = "population"
     _DESCRIPTION = "description"
@@ -54,12 +61,14 @@ class NeoCsv(object):
 
     _SPIKES = "spikes"
 
-    def _csv_variable_metdata(self, csv_writer, variable_type, variable,
-                              t_start, t_stop, sampling_interval_ms, units):
+    def _csv_variable_metdata(
+            self, csv_writer: CSVWriter, variable_type: str, variable: str,
+            t_start: float, t_stop: float, sampling_interval_ms: float,
+            units: Optional[str]):
         """
-        Writes the metadata for a variable to csv
+        Writes the metadata for a variable to CSV
 
-        :param ~csv.writer csv_writer: Open csv writer to write to
+        :param ~csv.writer csv_writer: Open CSV writer to write to
         :param str variable_type:
         :param str variable:
         :param float t_start:
@@ -68,16 +77,16 @@ class NeoCsv(object):
         :param str units:
         """
         csv_writer.writerow([variable_type, variable])
-        csv_writer.writerow([self._T_START, t_start * quantities.ms])
-        csv_writer.writerow([self._T_STOP, t_stop * quantities.ms])
-        sampling_period = sampling_interval_ms * quantities.ms
+        csv_writer.writerow([self._T_START, t_start * ms])
+        csv_writer.writerow([self._T_STOP, t_stop * ms])
+        sampling_period = sampling_interval_ms * ms
         csv_writer.writerow([self._SAMPLING_PERIOD, sampling_period])
         if units is None:
             units = "dimensionless"
         csv_writer.writerow([self._UNITS, units])
         csv_writer.writerow([])
 
-    def __quantify(self, as_str):
+    def __quantify(self, as_str: str) -> Quantity:
         """
         Converts a String into a quantities.Quantity
 
@@ -85,21 +94,22 @@ class NeoCsv(object):
 
         :param str as_str: String representation of a quantity.
         :return: A Quantities object
-        :rtype ~quantities.Quantity
+        :rtype: ~quantities.Quantity
         """
         parts = as_str.split(" ")
-        return quantities.Quantity(float(parts[0]), units=parts[1])
+        return Quantity(float(parts[0]), units=parts[1])
 
-    def __read_variable_metadata(self, csv_reader):
+    def __read_variable_metadata(self, csv_reader: CSVReader) -> Tuple[
+            Quantity, Quantity, Quantity, str]:
         """
         Reads a block of metadata, formats it and returns it as a dict
 
         A block is a number of rows each of exactly 2 values followed by an
         empty row
 
-        :param ~csv.reader csv_reader: Open csv writer to read from
+        :param ~csv.reader csv_reader: Open CSV writer to read from
         :return: t_start, t_stop, sampling_period, units
-        :rtype (~quantities.Quantity, ~quantities.Quantity,
+        :rtype: tuple(~quantities.Quantity, ~quantities.Quantity,
             ~quantities.Quantity, str)
         """
         metadata = self.__read_metadata(csv_reader)
@@ -109,15 +119,15 @@ class NeoCsv(object):
             self.__quantify(metadata[self._SAMPLING_PERIOD]),
             metadata[self._UNITS])
 
-    def __read_signal_array(self, csv_reader):
+    def __read_signal_array(self, csv_reader: CSVReader) -> NDArray[float64]:
         """
-        Reads a block of data nad converts it in a numpy array
+        Reads a block of data and converts it in a numpy array.
 
-        A block is a number of rows followed by an empty row
-        All rows must have the same length
-        The assumption is that all values in the block represent floats
+        A block is a number of rows followed by an empty row.
+        All rows must have the same length.
+        The assumption is that all values in the block represent floats.
 
-        :param ~csv.writer csv_writer: Open csv writer to read from
+        :param ~csv.writer csv_writer: Open CSV writer to read from
         :return: Numpy signal array of floats
         :rtype: ~numpy.array
         """
@@ -126,14 +136,14 @@ class NeoCsv(object):
         while len(row) > 0:
             rows.append(row)
             row = next(csv_reader)
-        return numpy.asarray(rows, dtype=numpy.float64)
+        return numpy.asarray(rows, dtype=float64)
 
-    def _csv_indexes(self, indexes, csv_writer):
+    def __csv_indexes(self, indexes: NDArray[integer], csv_writer: CSVWriter):
         """
-        Writes the indexes for which there could be data to the csv
+        Writes the indexes for which there could be data to the CSV.
 
         The indexes will be the intersection of the view used to record
-        and the view used to write the csv.
+        and the view used to write the CSV.
 
         If there is no indexes this will write the NO_INTERESTION string
 
@@ -141,7 +151,7 @@ class NeoCsv(object):
         no data below. This happens when the data is an empty array
         such as no spikes or rewires happened or the run was for time 0
 
-        :param ~csv.writer csv_writer: Open csv writer to write to
+        :param ~csv.writer csv_writer: Open CSV writer to write to
         :param list(int) indexes:
         """
         if len(indexes) > 0:
@@ -149,11 +159,11 @@ class NeoCsv(object):
         else:
             csv_writer.writerow([self._NO_INTERSECTION])
 
-    def __read_indexes(self, csv_reader):
+    def __read_indexes(self, csv_reader: CSVReader) -> NDArray[integer]:
         """
-        Reads the index or NO_INTERESTION string from the csv
+        Reads the index or NO_INTERSECTION string from the CSV
 
-        :param ~csv.writer csv_writer: Open csv writer to read from
+        :param ~csv.writer csv_writer: Open CSV writer to read from
         :return: list of indexes
         :rtype: list(int)
         """
@@ -161,20 +171,21 @@ class NeoCsv(object):
         assert len(row) > 0
         if len(row) == 1:
             if row[0] == self._NO_INTERSECTION:
-                return []
+                return numpy.array([], dtype=int)
         return numpy.asarray(row, dtype=int)
 
     def _insert_spike_data(
-            self, view_indexes, segment, spikes, t_start, t_stop,
-            sampling_rate):
+            self, view_indexes: Iterable[int], segment: Segment,
+            spikes: NDArray, t_start: float, t_stop: float,
+            sampling_rate: Quantity):
         """
         Creates the SpikeTrains and inserts then into the segment
 
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :param list(int) view_indexes:
@@ -182,7 +193,7 @@ class NeoCsv(object):
         :param ~numpy.ndarray spikes:
         :param float t_start:
         :param float t_stop:
-        :param ~quantities.Quantity sampling_rate: Arte a neuron is recorded
+        :param ~quantities.Quantity sampling_rate: Rate a neuron is recorded
         """
         block = segment.block
         first_id = block.annotations[self._FIRST_ID]
@@ -191,35 +202,37 @@ class NeoCsv(object):
             times[int(neuron_id)].append(time)
 
         for index in view_indexes:
-            spiketrain = neo.SpikeTrain(
+            spiketrain = SpikeTrain(
                 times=times[index],
                 t_start=t_start,
                 t_stop=t_stop,
-                units=quantities.ms,
-                dtype=numpy.float64,
+                units=ms,
+                dtype=float64,
                 sampling_rate=sampling_rate,
                 source_population=block.name,
                 source_id=index + first_id,
                 source_index=index)
             segment.spiketrains.append(spiketrain)
 
-    def _csv_spike_data(self, csv_writer, spikes, indexes):
+    def _csv_spike_data(self, csv_writer: CSVWriter, spikes: NDArray,
+                        indexes: NDArray[integer]):
         """
-        Writes the spikes to the csv file
+        Writes the spikes to the CSV file.
 
-        :param ~csv.writer csv_writer: Open csv writer to write to
+        :param ~csv.writer csv_writer: Open CSV writer to write to
         :param ~numpy.ndarray spikes:
         :param list(int) indexes: The indexes for which there could be data
         """
-        self._csv_indexes(indexes, csv_writer)
+        self.__csv_indexes(indexes, csv_writer)
         csv_writer.writerows(spikes)
         csv_writer.writerow([])
 
-    def __read_spike_data(self, csv_reader, segment, variable):
+    def __read_spike_data(
+            self, csv_reader: CSVReader, segment: Segment, variable: str):
         """
-        Reads spikes from the csv file and add SpikeTrains to the segment
+        Reads spikes from the CSV file and add SpikeTrains to the segment.
 
-        :param ~csv.reader csv_reader: Open csv writer to read from
+        :param ~csv.reader csv_reader: Open CSV writer to read from
         :param Segment segment:
         :param str variable: Name of the variable being read
         """
@@ -232,81 +245,66 @@ class NeoCsv(object):
             self._insert_spike_data(
                 indexes, segment, spikes, t_start, t_stop, sampling_rate)
         except KeyError as ex:
-            logger.exception(f"Metadata for {variable} is missing {ex}. "
-                             f"So this data will be skipped")
+            logger.exception("Metadata for {} is missing {}. "
+                             "So this data will be skipped", variable, ex)
             return
 
-    def __get_channel_index(self, ids, block):
-        """
-        Creates a Channel Index object
-
-        :param list(int) ids:
-        :param ~neo.core.Block block: neo block
-        :rtype: ~neo.core.ChannelIndex
-        """
-        for channel_index in block.channel_indexes:
-            if numpy.array_equal(channel_index.index, ids):
-                return channel_index
-        count = len(block.channel_indexes)
-        channel_index = neo.ChannelIndex(
-            name="Index {}".format(count), index=ids)
-        block.channel_indexes.append(channel_index)
-        return channel_index
-
     def _insert_matrix_data(
-            self, variable, segment, signal_array,
-            indexes, t_start, sampling_rate, units):
-        """ Adds a data item that is an analog signal to a neo segment
+            self, variable: str, segment: Segment, signal_array: NDArray,
+            indexes: NDArray[integer], t_start: float, sampling_rate: Quantity,
+            units: Union[Quantity, str, None]):
+        """
+        Adds a data item that is an analog signal to a neo segment.
 
         :param str variable: the variable name
         :param ~neo.core.Segment segment: Segment to add data to
         :param ~numpy.ndarray signal_array: the raw signal data
         :param list(int) indexes: The indexes for the data
         :type t_start: float or int
-        :param ~quantities.Quantity sampling_rate: Arte a neuron is recorded
+        :param ~quantities.Quantity sampling_rate: Rate a neuron is recorded
         :param units: the units of the recorded value
         :type units: quantities.quantity.Quantity or str
-
         """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
+        # pylint: disable=too-many-arguments
         block = segment.block
 
-        first_id = block.annotations[self._FIRST_ID]
+        first_id: int = block.annotations[self._FIRST_ID]
 
-        ids = list(map(lambda x: x+first_id, indexes))
+        ids = list(indexes + first_id)
         if units is None:
             units = "dimensionless"
-        data_array = neo.AnalogSignal(
+        data_array = AnalogSignal(
             signal_array,
             units=units,
             t_start=t_start,
             sampling_rate=sampling_rate,
             name=variable,
             source_population=block.name,
-            source_ids=ids)
-        channel_index = self.__get_channel_index(indexes, segment.block)
-        data_array.channel_index = channel_index
+            source_ids=ids,
+            channel_names=indexes)
         data_array.shape = (data_array.shape[0], data_array.shape[1])
         segment.analogsignals.append(data_array)
-        channel_index.analogsignals.append(data_array)
 
-    def _csv_matrix_data(self, csv_writer, signal_array, indexes):
-        """ Writes data to a csv file
+    def _csv_matrix_data(
+            self, csv_writer: CSVWriter, signal_array: NDArray,
+            indexes: NDArray[integer]):
+        """
+        Writes data to a CSV file.
 
-        :param ~csv.writer csv_writer: Open csv writer to write to
+        :param ~csv.writer csv_writer: Open CSV writer to write to
         :param ~numpy.ndarray signal_array: the raw signal data
         :param list(int) indexes: The indexes for the data
         """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
-        self._csv_indexes(indexes, csv_writer)
+        self.__csv_indexes(indexes, csv_writer)
         csv_writer.writerows(signal_array)
         csv_writer.writerow([])
 
-    def __read_matrix_data(self, csv_reader, segment, variable):
+    def __read_matrix_data(self, csv_reader: CSVReader, segment: Segment,
+                           variable: str):
         """
-        Reads matrix data and adds it to the segment
+        Reads matrix data and adds it to the segment.
 
-        :param ~csv.reader csv_reader: Open csv writer to read from
+        :param ~csv.reader csv_reader: Open CSV writer to read from
         :param Segment segment:
         :param str variable:
         """
@@ -320,16 +318,17 @@ class NeoCsv(object):
             t_start, sampling_rate, units)
 
     def _insert_formation_events(
-            self, segment, variable, formation_times, formation_labels):
-        """ Adds formation data to a neo segment.
+            self, segment: Segment, variable: str,
+            formation_times: List[Quantity], formation_labels: List[str]):
+        """
+        Adds formation data to a neo segment.
 
         :param ~neo.core.Segment segment: Segment to add data to
         :param str variable: the variable name
         :param list[~quantities.Quantity] formation_times:
-        :param lis[str] formation_labels:
+        :param list[str] formation_labels:
         """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
-        formation_event_array = neo.Event(
+        formation_event_array = Event(
             times=formation_times,
             labels=formation_labels,
             units="ms",
@@ -339,16 +338,17 @@ class NeoCsv(object):
         segment.events.append(formation_event_array)
 
     def _insert_elimination_events(
-            self, segment, variable, elimination_times, elimination_labels):
-        """ Adds elimination data to a neo segment.
+            self, segment: Segment, variable: str,
+            elimination_times: List[Quantity], elimination_labels: List[str]):
+        """
+        Adds elimination data to a neo segment.
 
         :param ~neo.core.Segment segment: Segment to add data to
         :param str variable: the variable name
         :param list[~quantities.Quantity] elimination_times:
         :param list[str] elimination_labels:
         """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
-        elimination_event_array = neo.Event(
+        elimination_event_array = Event(
             times=elimination_times,
             labels=elimination_labels,
             units="ms",
@@ -358,60 +358,55 @@ class NeoCsv(object):
         segment.events.append(elimination_event_array)
 
     def _insert_neo_rewirings(
-            self, segment, event_array, variable):
-        """ Adds data that represent rewirings events to a neo segment.
+            self, segment: Segment, event_array: NDArray, variable: str):
+        """
+        Adds data that represent rewirings events to a neo segment.
 
         :param ~neo.core.Segment segment: Segment to add data to
         :param ~numpy.ndarray event_array: the raw "event" data
         :param str variable: the variable name
         """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
-        formation_times = []
-        formation_labels = []
-        elimination_times = []
-        elimination_labels = []
+        formation_times: List[Quantity] = []
+        formation_labels: List[str] = []
+        elimination_times: List[Quantity] = []
+        elimination_labels: List[str] = []
 
         for i in range(len(event_array)):
-            event_time = event_array[i][0] * quantities.ms
+            event_time = event_array[i][0] * ms
             pre_id = int(event_array[i][1])
             post_id = int(event_array[i][2])
             if event_array[i][3] == 1:
                 formation_times.append(event_time)
-                formation_labels.append(
-                    str(pre_id) + "_" + str(post_id) + "_formation")
+                formation_labels.append(f"{pre_id}_{post_id}_formation")
             else:
                 elimination_times.append(event_time)
-                elimination_labels.append(
-                    str(pre_id) + "_" + str(post_id) + "_elimination")
+                elimination_labels.append(f"{pre_id}_{post_id}_elimination")
 
         self._insert_formation_events(
             segment, variable, formation_times, formation_labels)
         self._insert_elimination_events(
             segment, variable, elimination_times, elimination_labels)
 
-    def _csv_rewirings(self, csv_writer, event_array):
-        """ Adds data that represent rewirings events to a csv file.
+    def _csv_rewirings(self, csv_writer: CSVWriter, event_array: NDArray):
+        """
+        Adds data that represent rewirings events to a CSV file.
 
-        :param ~csv.writer csv_writer: Open csv writer to write to
+        :param ~csv.writer csv_writer: Open CSV writer to write to
         :param ~numpy.ndarray event_array: the raw "event" data
         """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
-
-        formation = []
-        elimination = []
+        formation: List[Tuple[Quantity, str]] = []
+        elimination: List[Tuple[Quantity, str]] = []
 
         for i in range(len(event_array)):
-            event_time = event_array[i][0] * quantities.ms
+            event_time = event_array[i][0] * ms
             pre_id = int(event_array[i][1])
             post_id = int(event_array[i][2])
             if event_array[i][3] == 1:
                 formation.append(
-                    [event_time,
-                     str(pre_id) + "_" + str(post_id) + "_formation"])
+                    (event_time, f"{pre_id}_{post_id}_formation"))
             else:
                 elimination.append(
-                    [event_time,
-                     str(pre_id) + "_" + str(post_id) + "_elimination"])
+                    (event_time, f"{pre_id}_{post_id}_elimination"))
 
         csv_writer.writerow([self._FORMATION])
         csv_writer.writerows(formation)
@@ -420,16 +415,17 @@ class NeoCsv(object):
         csv_writer.writerows(elimination)
         csv_writer.writerow([])
 
-    def __read_times_and_labels(self, csv_reader):
+    def __read_times_and_labels(self, csv_reader: CSVReader) -> Tuple[
+            List[Quantity], List[str]]:
         """
-        Reads formation or elimination data from the csv file
+        Reads formation or elimination data from the CSV file.
 
-        :param ~csv.reader csv_reader: Open csv writer to read from
+        :param ~csv.reader csv_reader: Open CSV writer to read from
         :return: A list of times and a list of labels
-        :rtype: (list[~quantities.Quantity], list[str])
+        :rtype: tuple(list[~quantities.Quantity], list[str])
         """
-        times = []
-        labels = []
+        times: List[Quantity] = []
+        labels: List[str] = []
         row = next(csv_reader)
         while len(row) > 0:
             assert len(row) == 2
@@ -438,11 +434,12 @@ class NeoCsv(object):
             row = next(csv_reader)
         return times, labels
 
-    def __read_rewirings(self, csv_reader, segment, variable):
+    def __read_rewirings(self, csv_reader: CSVReader, segment: Segment,
+                         variable: str):
         """
-        Reads rewiring data from a csv file and adds it to the segment
+        Reads rewiring data from a CSV file and adds it to the segment.
 
-        :param ~csv.reader csv_reader: Open csv writer to read from
+        :param ~csv.reader csv_reader: Open CSV writer to read from
         :param ~neo.core.Segment segment: Segment to add data to
         :param str variable:
         """
@@ -458,23 +455,24 @@ class NeoCsv(object):
         self._insert_elimination_events(
             segment, variable, times, labels)
 
-    def _insert_empty_segment(self, block, segment_number, rec_datetime):
+    def _insert_empty_segment(self, block: Block, segment_number: int,
+                              rec_datetime: datetime) -> Segment:
         """
-        Creates an emtpy segment and adds it to the block.
+        Creates an empty segment and adds it to the block.
 
         Unless other insert methods are called the segment will hold no data.
 
-        :param _neo.Block block:
+        :param ~neo.core.Block block:
         :param int segment_number:
         :param datetime rec_datetime:
         """
-        segment = neo.Segment(
-            name="segment{}".format(segment_number),
+        segment = Segment(
+            name=f"segment{segment_number}",
             description=block.description,
             rec_datetime=rec_datetime)
         for i in range(len(block.segments), segment_number):
-            block.segments.append(neo.Segment(
-                name="segment{}".format(i),
+            block.segments.append(Segment(
+                name=f"segment{i}",
                 description="empty"))
         if segment_number in block.segments:
             block.segments[segment_number] = segment
@@ -486,28 +484,30 @@ class NeoCsv(object):
 
         return segment
 
-    def _csv_segment_metadata(self, csv_writer, segment_number, rec_datetime):
+    def _csv_segment_metadata(self, csv_writer: CSVWriter, segment_number: int,
+                              rec_datetime: datetime):
         """
-        Writes only the segment's metadata to csv
+        Writes only the segment's metadata to CSV.
 
-        Unless other csv methods are called the csv will hold no data.
+        Unless other CSV methods are called the CSV will hold no data.
 
-        :param ~csv.writer csv_writer: Open csv writer to write to
+        :param ~csv.writer csv_writer: Open CSV writer to write to
         :param int segment_number:
-        :param datatime rec_datetime:
+        :param ~datetime.datetime rec_datetime:
         """
         csv_writer.writerow([self._SEGMENT_NUMBER, segment_number])
         csv_writer.writerow([self._REC_DATETIME, rec_datetime])
         csv_writer.writerow([])
 
-    def __read_segment(self, csv_reader, block, segment_number_st):
+    def __read_segment(self, csv_reader: CSVReader, block: Block,
+                       segment_number_st: str) -> Segment:
         """
-        Reads only segments metadata and inserts an empty segment
+        Reads only segments metadata and inserts an empty segment.
 
         Unless other read methods are called the segment will hold no data
 
-        :param ~csv.reader csv_reader: Open csv writer to read from
-        :param _neo.Block block:
+        :param ~csv.reader csv_reader: Open CSV writer to read from
+        :param ~neo.core.Block block:
         :param str segment_number_st:
         """
         row = next(csv_reader)
@@ -518,15 +518,17 @@ class NeoCsv(object):
         return self._insert_empty_segment(
             block, int(segment_number_st), rec_datetime)
 
-    def _insert_empty_block(self, pop_label, description, size, first_id, dt,
-                            simulator, annotations=None):
+    def _insert_empty_block(
+            self, pop_label: str, description: str, size: int, first_id: int,
+            dt: float, simulator: str,
+            annotations: Annotations = None) -> Block:
         """
-        Creates and empty Noe block object with just metedata
+        Creates and empty Neo block object with just metadata.
 
         Unless other insert methods are called this block will hold no data
 
         Does not actually "insert" the block anywhere.
-        The insert name is allign it with other methods to create a full block
+        The insert name is aligned with other methods to create a full block
 
         :param str pop_label:
         :param str description:
@@ -536,13 +538,13 @@ class NeoCsv(object):
         :param str simulator:
         :param dict annotations:
         :return: a block with just metadata
-        ;rtype: ~neo.Block
+        :rtype: ~neo.core.Block
         """
-        block = neo.Block()
+        block = Block()
         block.name = pop_label
         block.description = description
         # pylint: disable=no-member
-        metadata = {}
+        metadata: Dict[str, Any] = {}
         metadata[self._SIZE] = size
         metadata["first_index"] = 0
         metadata['last_index'] = size,
@@ -556,11 +558,12 @@ class NeoCsv(object):
             block.annotate(**annotations)
         return block
 
-    def _csv_block_metadat(self, csv_writer, pop_label, t_stop,
-                           pop_size, first_id, description, annotations):
+    def _csv_block_metadata(
+            self, csv_writer: CSVWriter, pop_label: str, t_stop: float,
+            pop_size: int, first_id: int, description: str,
+            annotations: Annotations):
         """
-
-        :param ~csv.writer csv_writer: Open csv writer to write to
+        :param ~csv.writer csv_writer: Open CSV writer to write to
         :param str pop_label:
         :param float t_stop:
         :param int pop_size:
@@ -570,7 +573,7 @@ class NeoCsv(object):
         :type annotations: None or dict(str, ...)
         """
         csv_writer.writerow([self._POPULATION, pop_label])
-        csv_writer.writerow([self._DESCRIPTION, f"\"{description}\""])
+        csv_writer.writerow([self._DESCRIPTION, f'"{description}"'])
 
         csv_writer.writerow([self._SIZE, pop_size])
         csv_writer.writerow([self._FIRST_ID, first_id])
@@ -583,13 +586,13 @@ class NeoCsv(object):
                 csv_writer.writerow([str(key), str(value)])
         csv_writer.writerow([])
 
-    def __read_empty_block(self, csv_reader):
+    def __read_empty_block(self, csv_reader: CSVReader) -> Block:
         """
-        Reads block metadata and uses it to create an empty block
+        Reads block metadata and uses it to create an empty block.
 
-        :param ~csv.reader csv_reader: Open csv writer to read from
-        :return: empty Block
-        ;rtype: ~neo.Block
+        :param ~csv.reader csv_reader: Open CSV writer to read from
+        :return: empty block
+        :rtype: ~neo.core.Block
         """
         metadata = self.__read_metadata(csv_reader)
         return self._insert_empty_block(
@@ -601,18 +604,18 @@ class NeoCsv(object):
             simulator=metadata.pop(self._SIMULATOR),
             annotations=metadata)
 
-    def __read_metadata(self, csv_reader):
+    def __read_metadata(self, csv_reader: CSVReader) -> Dict[str, str]:
         """
-        Reads a block of metadata and converts it to a dict
+        Reads a block of metadata and converts it to a dict.
 
         A metadata block is zero or more lines of two columns followed by an
         empty line. the first column will be the keys the second the data
 
-        :param ~csv.reader csv_reader: Open csv writer to read from
+        :param ~csv.reader csv_reader: Open CSV writer to read from
         :return: a dict of the keys to unformatted values
         :rtype: dict(str, str)
         """
-        metadata = {}
+        metadata: Dict[str, str] = {}
         row = next(csv_reader)
         while len(row) > 0:
             assert len(row) == 2
@@ -620,12 +623,13 @@ class NeoCsv(object):
             row = next(csv_reader)
         return metadata
 
-    def read_csv(self, csv_file):
+    def read_csv(self, csv_file: str) -> Block:
         """
-        Reads a whole csv_file and creates a block with data.
+        Reads a whole CSV file and creates a block with data.
 
-        :param str csv_file: Path of file to reads
-        :return: a Block with all the data in the csv file.
+        :param str csv_file: Path of file to read
+        :return: a block with all the data in the CSV file.
+        :rtype: ~neo.core.Block
         """
         with open(csv_file, newline='',  encoding="utf-8") as csvfile:
             csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
@@ -637,8 +641,8 @@ class NeoCsv(object):
                         row = next(csv_reader)
                         category = row[0]
                     except IndexError:
-                        logger.warning(
-                            f"Ignoring extra blank line after {category}")
+                        logger.warning("Ignoring extra blank line after {}",
+                                       category)
                         row = next(csv_reader)
                         while len(row) == 0:
                             row = next(csv_reader)
@@ -657,8 +661,8 @@ class NeoCsv(object):
                         self.__read_rewirings(
                             csv_reader, segment, row[1])
                     else:
-                        logger.error(
-                            f"ignoring csv block starting with {row[0]}")
+                        logger.error("ignoring csv block starting with {}",
+                                     row[0])
                         # ignore a block
                         row = next(csv_reader)
                         while len(row) > 0:

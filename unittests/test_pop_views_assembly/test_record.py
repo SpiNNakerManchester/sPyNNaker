@@ -26,9 +26,8 @@ class TestPopulation(BaseTestCase):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp())
         assert [] == pop._vertex.get_recording_variables()
-        pop.record_v()
-        pop.record_gsyn()
         target = {"v", 'gsyn_exc', 'gsyn_inh'}
+        pop.record(target)
         assert target == set(pop._vertex.get_recording_variables())
         sim.end()
 

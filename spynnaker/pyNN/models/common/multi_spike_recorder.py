@@ -13,38 +13,37 @@
 # limitations under the License.
 
 import math
-import logging
 import struct
-from pacman.model.resources.constant_sdram import ConstantSDRAM
-from spinn_utilities.log import FormatAdapter
-from pacman.model.resources.variable_sdram import VariableSDRAM
+from pacman.model.resources import (
+    AbstractSDRAM, ConstantSDRAM, VariableSDRAM)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 
-logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
 
 
 class MultiSpikeRecorder(object):
-    __slots__ = [
-        "__record"]
+    __slots__ = ("__record", )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.__record = False
 
     @property
-    def record(self):
+    def record(self) -> bool:
         """
         :rtype: bool
         """
         return self.__record
 
     @record.setter
-    def record(self, record):
-        self.__record = record
+    def record(self, record: bool):
+        self.__record = bool(record)
 
-    def get_sdram_usage_in_bytes(self, n_neurons, spikes_per_timestep):
+    def get_sdram_usage_in_bytes(
+            self, n_neurons: int, spikes_per_timestep: float) -> AbstractSDRAM:
         """
+        :param int n_neurons:
+        :param float spikes_per_timestep:
         :rtype: ~pacman.model.resources.AbstractSDRAM
         """
         if not self.__record:

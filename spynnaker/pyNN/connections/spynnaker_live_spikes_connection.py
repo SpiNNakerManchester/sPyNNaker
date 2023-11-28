@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable, List, Optional
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
 
@@ -22,14 +23,17 @@ _MAX_HALF_KEYS_PER_PACKET = 127
 
 
 class SpynnakerLiveSpikesConnection(LiveEventConnection):
-    """ A connection for receiving and sending live spikes from and to\
-        SpiNNaker
     """
-    __slots__ = []
+    A connection for receiving and sending live spikes from and to
+    SpiNNaker.
+    """
+    __slots__ = ()
 
-    def __init__(self, receive_labels=None, send_labels=None, local_host=None,
-                 local_port=NOTIFY_PORT,
-                 live_packet_gather_label="LiveSpikeReceiver"):
+    def __init__(self, receive_labels: Optional[Iterable[str]] = None,
+                 send_labels: Optional[Iterable[str]] = None,
+                 local_host: Optional[str] = None,
+                 local_port: Optional[int] = NOTIFY_PORT,
+                 live_packet_gather_label: str = "LiveSpikeReceiver"):
         """
         :param iterable(str) receive_labels:
             Labels of population from which live spikes will be received.
@@ -48,8 +52,10 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
             live_packet_gather_label, receive_labels, send_labels,
             local_host, local_port)
 
-    def send_spike(self, label, neuron_id, send_full_keys=False):
-        """ Send a spike from a single neuron
+    def send_spike(
+            self, label: str, neuron_id: int, send_full_keys: bool = False):
+        """
+        Send a spike from a single neuron.
 
         :param str label:
             The label of the population from which the spike will originate
@@ -60,8 +66,11 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
         """
         self.send_spikes(label, [neuron_id], send_full_keys)
 
-    def send_spikes(self, label, neuron_ids, send_full_keys=False):
-        """ Send a number of spikes
+    def send_spikes(
+            self, label: str, neuron_ids: List[int],
+            send_full_keys: bool = False):
+        """
+        Send a number of spikes.
 
         :param str label:
             The label of the population from which the spikes will originate

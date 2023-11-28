@@ -13,89 +13,120 @@
 # limitations under the License.
 
 from enum import Enum
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 class SendType(Enum):
-    """ The data type to be sent in the payload of the multicast packet
     """
+    The data type to be sent in the payload of the multicast packet.
+    """
+    #: Signed integer
     SEND_TYPE_INT = 0
+    #: Unsigned integer
     SEND_TYPE_UINT = 1
+    #: Signed accum (s15.16)
     SEND_TYPE_ACCUM = 2
+    #: Unsigned accum (u16.16)
     SEND_TYPE_UACCUM = 3
+    #: Signed fract (s0.31)
     SEND_TYPE_FRACT = 4
+    #: Unsigned fract (u0.32)
     SEND_TYPE_UFRACT = 5
 
 
 class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
-    """ A device that can be controlled by sending multicast packets to it,\
-        either directly, or via Ethernet using an AbstractEthernetTranslator
     """
-    __slots__ = []
+    A device that can be controlled by sending multicast packets to it,
+    either directly, or via Ethernet using an AbstractEthernetTranslator.
+    """
+    __slots__ = ()
 
-    @abstractproperty
-    def device_control_partition_id(self):
-        """ A partition ID to give to an outgoing edge partition that will\
-            control this device
+    @property
+    @abstractmethod
+    def device_control_partition_id(self) -> str:
+        """
+        A partition ID to give to an outgoing edge partition that will
+        control this device.
 
         :rtype: str
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def device_control_key(self):
-        """ The key that must be sent to the device to control it
+    @property
+    @abstractmethod
+    def device_control_key(self) -> int:
+        """
+        The key that must be sent to the device to control it.
 
         :rtype: int
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def device_control_uses_payload(self):
-        """ True if the control of the device accepts an arbitrary valued\
-            payload, the value of which will change the devices behaviour
+    @property
+    @abstractmethod
+    def device_control_uses_payload(self) -> bool:
+        """
+        Whether the control of the device accepts an arbitrary valued
+        payload, the value of which will change the devices behaviour.
 
         :rtype: bool
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def device_control_min_value(self):
-        """ The minimum value to send to the device
+    @property
+    @abstractmethod
+    def device_control_min_value(self) -> float:
+        """
+        The minimum value to send to the device.
 
         :rtype: float
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def device_control_max_value(self):
-        """ The maximum value to send to the device
+    @property
+    @abstractmethod
+    def device_control_max_value(self) -> float:
+        """
+        The maximum value to send to the device.
 
         :rtype: float
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def device_control_timesteps_between_sending(self):
-        """ The number of timesteps between sending commands to the device.\
-            This defines the "sampling interval" for the device.
+    @property
+    @abstractmethod
+    def device_control_timesteps_between_sending(self) -> int:
+        """
+        The number of timesteps between sending commands to the device.
+        This defines the "sampling interval" for the device.
 
         :rtype: int
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def device_control_send_type(self):
-        """ The type of data to be sent.
+    @property
+    @abstractmethod
+    def device_control_send_type(self) -> SendType:
+        """
+        The type of data to be sent.
 
         :rtype: SendType
         """
+        raise NotImplementedError
 
     @property
-    def device_control_scaling_factor(self):  # pragma: no cover
-        """ The scaling factor used to send the payload to this device.
+    def device_control_scaling_factor(self) -> int:  # pragma: no cover
+        """
+        The scaling factor used to send the payload to this device.
 
         :rtype: int
         """
         return 1
 
     @property
-    def device_control_first_send_timestep(self):
-        """ The first timestep that the device should send in (0 by default).
+    def device_control_first_send_timestep(self) -> int:
+        """
+        The first timestep that the device should send in (0 by default).
 
         :rtype: int
         """

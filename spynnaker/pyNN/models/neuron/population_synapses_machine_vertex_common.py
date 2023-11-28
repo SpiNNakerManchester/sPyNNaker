@@ -11,12 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from enum import Enum
+from __future__ import annotations
+from enum import IntEnum
 import ctypes
+from typing import Optional, Sequence, TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.config_holder import get_config_int
+from pacman.model.resources import AbstractSDRAM
+from pacman.model.graphs.machine import (
+    SDRAMMachineEdge, SourceSegmentedSDRAMMachinePartition)
+from pacman.model.graphs.common import Slice
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -24,8 +31,12 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
 from .population_machine_common import CommonRegions, PopulationMachineCommon
-from .population_machine_synapses import SynapseRegions
+from .synaptic_matrices import SynapseRegions
 from .population_machine_synapses_provenance import SynapseProvenance
+if TYPE_CHECKING:
+    from .abstract_population_vertex import AbstractPopulationVertex
+    from .population_neurons_machine_vertex import (
+        PopulationNeuronsMachineVertex)
 
 # Size of SDRAM params = 1 word for address + 1 word for size
 #  + 1 word for time to send
@@ -76,7 +87,8 @@ class SpikeProcessingFastProvenance(ctypes.LittleEndianStructure):
 class PopulationSynapsesMachineVertexCommon(
         PopulationMachineCommon,
         SendsSynapticInputsOverSDRAM):
-    """ Common parts of a machine vertex for the synapses of a Population
+    """
+    Common parts of a machine vertex for the synapses of a Population.
     """
 
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
@@ -94,13 +106,15 @@ class PopulationSynapsesMachineVertexCommon(
     LATEST_RECEIVE = "Latest_receive_time"
     MAX_SPIKE_OVERFLOW = "Max_spike_overflow_in_time_step"
 
-    __slots__ = [
+    __slots__ = (
         "__sdram_partition",
         "__neuron_vertex",
-        "__partition_id"]
+        "__partition_id")
 
-    class REGIONS(Enum):
-        """Regions for populations."""
+    class REGIONS(IntEnum):
+        """
+        Regions for populations.
+        """
         SYSTEM = 0
         PROVENANCE_DATA = 1
         PROFILING = 2
@@ -117,21 +131,20 @@ class PopulationSynapsesMachineVertexCommon(
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
-        system=REGIONS.SYSTEM.value,
-        provenance=REGIONS.PROVENANCE_DATA.value,
-        profile=REGIONS.PROFILING.value,
-        recording=REGIONS.RECORDING.value)
+        REGIONS.SYSTEM,
+        REGIONS.PROVENANCE_DATA,
+        REGIONS.PROFILING,
+        REGIONS.RECORDING)
 
     # Regions for this vertex used by synapse parts
     SYNAPSE_REGIONS = SynapseRegions(
-        synapse_params=REGIONS.SYNAPSE_PARAMS.value,
-        pop_table=REGIONS.POPULATION_TABLE.value,
-        synaptic_matrix=REGIONS.SYNAPTIC_MATRIX.value,
-        synapse_dynamics=REGIONS.SYNAPSE_DYNAMICS.value,
-        structural_dynamics=REGIONS.STRUCTURAL_DYNAMICS.value,
-        bitfield_filter=REGIONS.BIT_FIELD_FILTER.value,
-        connection_builder=REGIONS.CONNECTOR_BUILDER.value
-    )
+        REGIONS.SYNAPSE_PARAMS,
+        REGIONS.POPULATION_TABLE,
+        REGIONS.SYNAPTIC_MATRIX,
+        REGIONS.SYNAPSE_DYNAMICS,
+        REGIONS.STRUCTURAL_DYNAMICS,
+        REGIONS.BIT_FIELD_FILTER,
+        REGIONS.CONNECTOR_BUILDER)
 
     _PROFILE_TAG_LABELS = {
         0: "TIMER_SYNAPSES",
@@ -141,39 +154,47 @@ class PopulationSynapsesMachineVertexCommon(
         4: "PROCESS_PLASTIC_SYNAPSES"}
 
     def __init__(
-            self, sdram, label, app_vertex,  vertex_slice):
+            self, sdram: AbstractSDRAM, label: str,
+            app_vertex: AbstractPopulationVertex, vertex_slice: Slice):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The sdram used by the vertex
+            The SDRAM used by the vertex
         :param str label: The label of the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
         """
-        super(PopulationSynapsesMachineVertexCommon, self).__init__(
+        super().__init__(
             label, app_vertex, vertex_slice, sdram, self.COMMON_REGIONS,
             SynapseProvenance.N_ITEMS + SpikeProcessingFastProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
-        self.__sdram_partition = None
-        self.__neuron_vertex = None
-        self.__partition_id = None
+        self.__sdram_partition: Optional[
+            SourceSegmentedSDRAMMachinePartition] = None
+        self.__neuron_vertex: Optional[PopulationNeuronsMachineVertex] = None
+        self.__partition_id: Optional[str] = None
 
-    def set_sdram_partition(self, sdram_partition):
-        """ Set the SDRAM partition.  Must only be called once per instance
+    def set_sdram_partition(
+            self, sdram_partition: SourceSegmentedSDRAMMachinePartition):
+        """
+        Set the SDRAM partition.  Must only be called once per instance.
 
-        :param ~pacman.model.graphs.machine\
-                .SourceSegmentedSDRAMMachinePartition sdram_partition:
+        :param sdram_partition:
             The SDRAM partition to receive synapses from
+        :type sdram_partition:
+            ~pacman.model.graphs.machine.SourceSegmentedSDRAMMachinePartition
         """
         if self.__sdram_partition is not None:
             raise SynapticConfigurationException(
                 "Trying to set SDRAM partition more than once")
         self.__sdram_partition = sdram_partition
 
-    def set_neuron_vertex_and_partition_id(self, neuron_vertex, partition_id):
-        """ Set the neuron vertex and partition ID for the case with a self-
-            connection.
+    def set_neuron_vertex_and_partition_id(
+            self, neuron_vertex: PopulationNeuronsMachineVertex,
+            partition_id: str):
+        """
+        Set the neuron vertex and partition ID for the case with a
+        self-connection.
 
         :param ~pacman.model.graphs.machine.MachineEdge neuron_to_synapse_edge:
             The edge that we will receive spikes from
@@ -182,77 +203,89 @@ class PopulationSynapsesMachineVertexCommon(
         self.__partition_id = partition_id
 
     @staticmethod
-    def __get_binary_file_name(app_vertex):
-        """ Get the local binary filename for this vertex.  Static because at
-            the time this is needed, the local app_vertex is not set.
+    def __get_binary_file_name(app_vertex: AbstractPopulationVertex) -> str:
+        """
+        Get the local binary filename for this vertex.  Static because at
+        the time this is needed, the local `app_vertex` is not set.
 
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
         :rtype: str
         """
-
         # Reunite title and extension and return
         return "synapses" + app_vertex.synapse_executable_suffix + ".aplx"
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
-    def get_recorded_region_ids(self):
-        ids = self._app_vertex.synapse_recorder.recorded_ids_by_slice(
+    def get_recorded_region_ids(self) -> Sequence[int]:
+        ids = self._pop_vertex.synapse_recorder.recorded_ids_by_slice(
             self.vertex_slice)
+        assert ids is not None
         return ids
 
-    def _write_sdram_edge_spec(self, spec):
-        """ Write information about SDRAM Edge
+    def _write_sdram_edge_spec(self, spec: DataSpecificationGenerator):
+        """
+        Write information about SDRAM Edge.
 
         :param DataSpecificationGenerator spec:
             The generator of the specification to write
         """
+        assert self.__sdram_partition is not None
         send_size = self.__sdram_partition.get_sdram_size_of_region_for(self)
+        base_addr = self.__sdram_partition.get_sdram_base_address_for(self)
+
         spec.reserve_memory_region(
-            region=self.REGIONS.SDRAM_EDGE_PARAMS.value,
+            region=self.REGIONS.SDRAM_EDGE_PARAMS,
             size=SDRAM_PARAMS_SIZE, label="SDRAM Params")
-        spec.switch_write_focus(self.REGIONS.SDRAM_EDGE_PARAMS.value)
-        spec.write_value(
-            self.__sdram_partition.get_sdram_base_address_for(self))
+        spec.switch_write_focus(self.REGIONS.SDRAM_EDGE_PARAMS)
+
+        spec.write_value(base_addr)
         spec.write_value(send_size)
         spec.write_value(get_config_int(
             "Simulation", "transfer_overhead_clocks"))
 
-    def _write_key_spec(self, spec):
-        """ Write key config region
+    def _write_key_spec(self, spec: DataSpecificationGenerator):
+        """
+        Write key configuration region.
 
         :param DataSpecificationGenerator spec:
             The generator of the specification to write
         """
         spec.reserve_memory_region(
-            region=self.REGIONS.KEY_REGION.value, size=KEY_CONFIG_SIZE,
+            region=self.REGIONS.KEY_REGION, size=KEY_CONFIG_SIZE,
             label="Key Config")
-        spec.switch_write_focus(self.REGIONS.KEY_REGION.value)
+        spec.switch_write_focus(self.REGIONS.KEY_REGION)
+
         if self.__neuron_vertex is None:
             # No Key = make sure it doesn't match; i.e. spike & 0x0 != 0x1
-            spec.write_value(1)
-            spec.write_value(0)
-            spec.write_value(0)
-            spec.write_value(0)
+            spec.write_value(1)  # key
+            spec.write_value(0)  # mask
+            spec.write_value(0)  # inv_mask
+            spec.write_value(0)  # n_colour_bits
+            spec.write_value(0)  # is_self_projection
         else:
+            assert self.__partition_id is not None
             routing_info = SpynnakerDataView.get_routing_infos()
             r_info = routing_info.get_routing_info_from_pre_vertex(
                 self.__neuron_vertex, self.__partition_id)
+            assert r_info is not None
             spec.write_value(r_info.key)
             spec.write_value(r_info.mask)
             spec.write_value(~r_info.mask & 0xFFFFFFFF)
-            spec.write_value(self._app_vertex.n_colour_bits)
-            spec.write_value(int(self._app_vertex.self_projection is not None))
+            spec.write_value(self._pop_vertex.n_colour_bits)
+            spec.write_value(int(self._pop_vertex.self_projection is not None))
 
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
-    def sdram_requirement(self, sdram_machine_edge):
+    def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge) -> int:
         if isinstance(sdram_machine_edge.post_vertex,
                       ReceivesSynapticInputsOverSDRAM):
             return sdram_machine_edge.post_vertex.n_bytes_for_transfer
         raise SynapticConfigurationException(
-            "Unknown post vertex type in edge {}".format(sdram_machine_edge))
+            f"Unknown post vertex type in edge {sdram_machine_edge}")
 
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
-    def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
+    def parse_extra_provenance_items(
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
         proc_offset = SynapseProvenance.N_ITEMS
         self._parse_synapse_provenance(
             label, x, y, p, provenance_data[:proc_offset])
@@ -260,29 +293,31 @@ class PopulationSynapsesMachineVertexCommon(
             label, x, y, p, provenance_data[proc_offset:])
 
     @abstractmethod
-    def _parse_synapse_provenance(self, label, x, y, p, provenance_data):
-        """ Extract and yield synapse provenance
+    def _parse_synapse_provenance(
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
+        """
+        Extract and yield synapse provenance.
 
         :param str label: The label of the node
         :param int x: x coordinate of the chip where this core
         :param int y: y coordinate of the core where this core
         :param int p: virtual id of the core
         :param list(int) provenance_data: A list of data items to interpret
-        :return: a list of provenance data items
-        :rtype: iterator of ProvenanceDataItem
         """
+        raise NotImplementedError
 
     def _parse_spike_processing_fast_provenance(
-            self, label, x, y, p, provenance_data):
-        """ Extract and yield spike processing provenance
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
+        """
+        Extract and yield spike processing provenance.
 
         :param str label: The label of the node
         :param int x: x coordinate of the chip where this core
         :param int y: y coordinate of the core where this core
         :param int p: virtual id of the core
         :param list(int) provenance_data: A list of data items to interpret
-        :return: a list of provenance data items
-        :rtype: iterator of ProvenanceDataItem
         """
         prov = SpikeProcessingFastProvenance(*provenance_data)
 
@@ -311,7 +346,7 @@ class PopulationSynapsesMachineVertexCommon(
                 x, y, p, self.N_LATE_SPIKES_NAME, prov.n_late_packets)
             if prov.n_late_packets == 0:
                 pass
-            elif self._app_vertex.drop_late_spikes:
+            elif self._pop_vertex.drop_late_spikes:
                 db.insert_report(
                     f"On {label}, {prov.n_late_packets} packets (maximum of "
                     f" {prov.max_spikes_overflow} per time step) were dropped "

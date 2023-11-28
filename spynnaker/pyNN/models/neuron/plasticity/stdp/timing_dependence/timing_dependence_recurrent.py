@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import numpy
+from typing import Iterable, cast
 from spinn_utilities.overrides import overrides
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import (
+    DataType, DataSpecificationBase)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 
@@ -27,17 +29,18 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
 
 
 class TimingDependenceRecurrent(AbstractTimingDependence):
-    """ A timing dependence STDP rule based on recurrences.
     """
-    __slots__ = [
+    A timing dependence STDP rule based on recurrences.
+    """
+    __slots__ = (
         "__accumulator_depression_plus_one",
         "__accumulator_potentiation_minus_one",
         "__dual_fsm",
         "__mean_post_window",
         "__mean_pre_window",
-        "__synapse_structure",
         "__a_plus",
-        "__a_minus"]
+        "__a_minus")
+
     __PARAM_NAMES = (
         'accumulator_depression', 'accumulator_potentiation',
         'mean_pre_window', 'mean_post_window', 'dual_fsm')
@@ -47,14 +50,14 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         'mean_pre_window': 35.0, 'mean_post_window': 35.0, 'dual_fsm': True}
 
     def __init__(
-            self, accumulator_depression=default_parameters[
-                'accumulator_depression'],
-            accumulator_potentiation=default_parameters[
-                'accumulator_potentiation'],
-            mean_pre_window=default_parameters['mean_pre_window'],
-            mean_post_window=default_parameters['mean_post_window'],
-            dual_fsm=default_parameters['dual_fsm'],
-            A_plus=0.01, A_minus=0.01):
+            self, accumulator_depression: int = cast(int, default_parameters[
+                'accumulator_depression']),
+            accumulator_potentiation: int = cast(int, default_parameters[
+                'accumulator_potentiation']),
+            mean_pre_window: float = default_parameters['mean_pre_window'],
+            mean_post_window: float = default_parameters['mean_post_window'],
+            dual_fsm: bool = cast(bool, default_parameters['dual_fsm']),
+            A_plus: float = 0.01, A_minus: float = 0.01):
         """
         :param int accumulator_depression:
         :param int accumulator_potentiation:
@@ -65,6 +68,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         :param float A_minus: :math:`A^-`
         """
         # pylint: disable=too-many-arguments
+        super().__init__(SynapseStructureWeightAccumulator())
         self.__accumulator_depression_plus_one = accumulator_depression + 1
         self.__accumulator_potentiation_minus_one = \
             accumulator_potentiation - 1
@@ -74,49 +78,52 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         self.__a_plus = A_plus
         self.__a_minus = A_minus
 
-        self.__synapse_structure = SynapseStructureWeightAccumulator()
-
     @property
-    def A_plus(self):
-        r""" :math:`A^+`
+    def A_plus(self) -> float:
+        r"""
+        :math:`A^+`
 
         :rtype: float
         """
         return self.__a_plus
 
     @A_plus.setter
-    def A_plus(self, new_value):
+    def A_plus(self, new_value: float):
         self.__a_plus = new_value
 
     @property
-    def A_minus(self):
-        r""" :math:`A^-`
+    def A_minus(self) -> float:
+        r"""
+        :math:`A^-`
 
         :rtype: float
         """
         return self.__a_minus
 
     @A_minus.setter
-    def A_minus(self, new_value):
+    def A_minus(self, new_value: float):
         self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
-    def is_same_as(self, timing_dependence):
-        if timing_dependence is None or not isinstance(
-                timing_dependence, TimingDependenceRecurrent):
+    def is_same_as(self, timing_dependence) -> bool:
+        if not isinstance(timing_dependence, TimingDependenceRecurrent):
             return False
-        return ((self.__accumulator_depression_plus_one ==
-                 timing_dependence.accumulator_depression_plus_one) and
-                (self.__accumulator_potentiation_minus_one ==
-                 timing_dependence.accumulator_potentiation_minus_one) and
-                (self.__mean_pre_window ==
-                 timing_dependence.mean_pre_window) and
-                (self.__mean_post_window ==
-                 timing_dependence.mean_post_window))
+        # pylint: disable=protected-access
+        return self._character() == timing_dependence._character()
+
+    def _character(self) -> object:
+        """
+        Two instances of this class are the same if their characterisation is
+        the same.
+        """
+        return (self.__accumulator_depression_plus_one,
+                self.__accumulator_potentiation_minus_one,
+                self.__mean_pre_window, self.__mean_post_window)
 
     @property
-    def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+    def vertex_executable_suffix(self) -> str:
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
@@ -125,8 +132,9 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         return "recurrent_pre_stochastic"
 
     @property
-    def pre_trace_n_bytes(self):
-        """ The number of bytes used by the pre-trace of the rule per neuron
+    def pre_trace_n_bytes(self) -> int:
+        """
+        The number of bytes used by the pre-trace of the rule per neuron.
 
         :rtype: int
         """
@@ -135,15 +143,16 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         return BYTES_PER_SHORT if self.__dual_fsm else 0
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
-    def get_parameters_sdram_usage_in_bytes(self):
+    def get_parameters_sdram_usage_in_bytes(self) -> int:
         # 2 * 32-bit parameters
         # 2 * LUTS with STDP_FIXED_POINT_ONE * 16-bit entries
         return (2 * BYTES_PER_WORD) + (
             2 * STDP_FIXED_POINT_ONE * BYTES_PER_SHORT)
 
     @property
-    def n_weight_terms(self):
-        """ The number of weight terms expected by this timing rule
+    def n_weight_terms(self) -> int:
+        """
+        The number of weight terms expected by this timing rule.
 
         :rtype: int
         """
@@ -151,8 +160,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
-            self, spec, global_weight_scale, synapse_weight_scales):
-
+            self, spec: DataSpecificationBase,
+            global_weight_scale, synapse_weight_scales):
         # Write parameters
         spec.write_value(data=self.__accumulator_depression_plus_one,
                          data_type=DataType.INT32)
@@ -170,7 +179,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         self._write_exp_dist_lut(spec, mean_post_timesteps)
 
     @staticmethod
-    def _write_exp_dist_lut(spec, mean):
+    def _write_exp_dist_lut(spec: DataSpecificationBase, mean: float):
         """
         :param .DataSpecificationGenerator spec:
         :param float mean:
@@ -180,14 +189,6 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         spec.write_array(
             inv_cdf.astype(numpy.uint16), data_type=DataType.UINT16)
 
-    @property
-    def synaptic_structure(self):
-        """ Get the synaptic structure of the plastic part of the rows
-
-        :rtype: AbstractSynapseStructure
-        """
-        return self.__synapse_structure
-
     @overrides(AbstractTimingDependence.get_parameter_names)
-    def get_parameter_names(self):
+    def get_parameter_names(self) -> Iterable[str]:
         return self.__PARAM_NAMES

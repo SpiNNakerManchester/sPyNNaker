@@ -25,7 +25,7 @@ from .machine_munich_motor_device import MachineMunichMotorDevice
 
 
 class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
-    __slots__ = []
+    __slots__ = ()
 
     def __init__(self, spinnaker_link_id, board_address=None):
         super().__init__(
@@ -38,11 +38,12 @@ class MunichMotorDevice(
         AbstractOneAppOneMachineVertex,
         AbstractVertexWithEdgeToDependentVertices,
         PopulationApplicationVertex):
-    """ An Omnibot motor control device. This has a real vertex and an \
-        external device vertex.
+    """
+    An Omnibot motor control device. This has a real vertex and an
+    external device vertex.
     """
 
-    __slots__ = ["__dependent_vertices"]
+    __slots__ = ("__dependent_vertices", )
 
     def __init__(
             self, spinnaker_link_id, board_address=None, speed=30,
@@ -63,7 +64,6 @@ class MunichMotorDevice(
         :type label: str or None
         """
         # pylint: disable=too-many-arguments
-
         m_vertex = MachineMunichMotorDevice(
             speed, sample_time, update_time, delay_time, delta_threshold,
             continue_if_not_different, label, app_vertex=self)

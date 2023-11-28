@@ -23,7 +23,8 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
 
 class PushBotEthernetLEDDevice(
         PushBotEthernetDevice, AbstractSendMeMulticastCommandsVertex):
-    """ The LED of a PushBot
+    """
+    The LED of a PushBot.
     """
 
     def __init__(
@@ -32,20 +33,18 @@ class PushBotEthernetLEDDevice(
             start_total_period=None, start_frequency=None,
             timesteps_between_send=None):
         """
-        :param led: The PushBotLED parameter to control
-        :type led:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED
-        :param protocol: The protocol instance to get commands from
-        :type protocol: MunichIoEthernetProtocol
-        :param start_active_time_front:
+        :param PushBotLED led: The LED to control
+        :param MunichIoEthernetProtocol protocol:
+            The protocol instance to get commands from
+        :param int start_active_time_front:
             The "active time" to set for the front LED at the start
-        :param start_active_time_back:
+        :param int start_active_time_back:
             The "active time" to set for the back LED at the start
-        :param start_total_period: The "total period" to set at the start
-        :param start_frequency: The "frequency" to set at the start
-        :param timesteps_between_send:
-            The number of timesteps between sending commands to the device,\
-            or None to use the default
+        :param int start_total_period: The "total period" to set at the start
+        :param int start_frequency: The "frequency" to set at the start
+        :param int timesteps_between_send:
+            The number of timesteps between sending commands to the device,
+            or `None` to use the default
         """
         # pylint: disable=too-many-arguments
         if not isinstance(led, PushBotLED):
@@ -68,37 +67,31 @@ class PushBotEthernetLEDDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
-        commands = list()
-
         # add mode command if not done already
         if not self.protocol.sent_mode_command():
-            commands.append(self.protocol.set_mode())
+            yield self.protocol.set_mode()
 
         # device specific commands
         if self.__start_total_period is not None:
-            commands.append(self.__command_protocol.push_bot_led_total_period(
-                self.__start_total_period))
+            yield self.__command_protocol.push_bot_led_total_period(
+                self.__start_total_period)
         if self.__start_active_time_front is not None:
-            commands.append(
-                self.__command_protocol.push_bot_led_front_active_time(
-                    self.__start_active_time_front))
+            yield self.__command_protocol.push_bot_led_front_active_time(
+                self.__start_active_time_front)
         if self.__start_active_time_back is not None:
-            commands.append(
-                self.__command_protocol.push_bot_led_back_active_time(
-                    self.__start_active_time_back))
+            yield self.__command_protocol.push_bot_led_back_active_time(
+                self.__start_active_time_back)
         if self.__start_frequency is not None:
-            commands.append(self.__command_protocol.push_bot_led_set_frequency(
-                self.__start_frequency))
-        return commands
+            yield self.__command_protocol.push_bot_led_set_frequency(
+                self.__start_frequency)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
-        return [
-            self.__command_protocol.push_bot_led_front_active_time(0),
-            self.__command_protocol.push_bot_led_back_active_time(0),
-            self.__command_protocol.push_bot_led_total_period(0),
-            self.__command_protocol.push_bot_led_set_frequency(0)]
+        yield self.__command_protocol.push_bot_led_front_active_time(0)
+        yield self.__command_protocol.push_bot_led_back_active_time(0)
+        yield self.__command_protocol.push_bot_led_total_period(0)
+        yield self.__command_protocol.push_bot_led_set_frequency(0)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

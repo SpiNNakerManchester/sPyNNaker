@@ -14,10 +14,24 @@
 
 import numpy
 from numpy.lib.recfunctions import merge_arrays
+from numpy.typing import NDArray
+from typing import (
+    Any, Callable, Iterator, List, Optional, Sequence, Tuple, Union)
+from typing_extensions import TypeAlias, TypeGuard
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    ConnectionsArray)
+
+_ItemType: TypeAlias = numpy.floating
+_Items: TypeAlias = Union[Tuple[NDArray[_ItemType], ...], NDArray[_ItemType]]
+
+
+def _is_listable(value: Any) -> TypeGuard[Sequence[Any]]:
+    return hasattr(value, "__len__")
 
 
 class ConnectionHolder(object):
-    """ Holds a set of connections to be returned in a PyNN-specific format
+    """
+    Holds a set of connections to be returned in a PyNN-specific format.
     """
 
     __slots__ = (
@@ -50,11 +64,14 @@ class ConnectionHolder(object):
     )
 
     def __init__(
-            self, data_items_to_return, as_list, n_pre_atoms, n_post_atoms,
-            connections=None, fixed_values=None, notify=None):
+            self, data_items_to_return: Optional[Sequence[str]], as_list: bool,
+            n_pre_atoms: int, n_post_atoms: int,
+            connections: Optional[List[ConnectionsArray]] = None,
+            fixed_values: Optional[List[Tuple[str, int]]] = None,
+            notify: Optional[Callable[['ConnectionHolder'], None]] = None):
         """
         :param data_items_to_return: A list of data fields to be returned
-        :type data_items_to_return: list(int) or tuple(int) or None
+        :type data_items_to_return: list(str) or tuple(str) or None
         :param bool as_list:
             True if the data will be returned as a list, False if it is to be
             returned as a matrix (or series of matrices)
@@ -68,9 +85,11 @@ class ConnectionHolder(object):
             A list of tuples of field names and fixed values to be appended
             to the other fields per connection, formatted as
             `[(field_name, value), ...]`.
-            Note that if the field is to be returned, the name must also
-            appear in data_items_to_return, which determines the order of
-            items in the result
+
+            .. note::
+                If the field is to be returned, the name must also
+                appear in data_items_to_return, which determines the order of
+                items in the result.
         :type fixed_values: list(tuple(str,int)) or None
         :param notify:
             A callback to call when the connections have all been added.
@@ -83,13 +102,14 @@ class ConnectionHolder(object):
         self.__as_list = as_list
         self.__n_pre_atoms = n_pre_atoms
         self.__n_post_atoms = n_post_atoms
-        self.__connections = connections
-        self.__data_items = None
+        self.__connections: Optional[List[NDArray]] = connections
+        self.__data_items: Optional[_Items] = None
         self.__notify = notify
         self.__fixed_values = fixed_values
 
-    def add_connections(self, connections):
-        """ Add connections to the holder to be returned
+    def add_connections(self, connections: ConnectionsArray):
+        """
+        Add connections to the holder to be returned.
 
         :param ~numpy.ndarray connections:
             The connection to add, as a numpy structured array of
@@ -100,21 +120,24 @@ class ConnectionHolder(object):
         self.__connections.append(connections)
 
     @property
-    def connections(self):
-        """ The connections stored
+    def connections(self) -> List[ConnectionsArray]:
+        """
+        The connections stored.
 
         :rtype: list(~numpy.ndarray)
         """
-        return self.__connections
+        return self.__connections or []
 
-    def finish(self):
-        """ Finish adding connections
+    def finish(self) -> None:
+        """
+        Finish adding connections.
         """
         if self.__notify is not None:
             self.__notify(self)
 
-    def _get_data_items(self):
-        """ Merges the connections into the result data format
+    def _get_data_items(self) -> _Items:
+        """
+        Merges the connections into the result data format.
         """
         # If there are already merged connections cached, return those
         if self.__data_items is not None:
@@ -138,13 +161,13 @@ class ConnectionHolder(object):
 
         # Join all the connections that have been added (probably over multiple
         # sub-vertices of a population)
-        connections = numpy.concatenate(self.__connections)
+        connections: ConnectionsArray = numpy.concatenate(self.__connections)
 
         # If there are additional fixed values, merge them in
-        if self.__fixed_values is not None and self.__fixed_values:
+        if self.__fixed_values:
             # Generate a numpy type for the fixed values
             fixed_dtypes = [
-                ('{}'.format(field[0]), None)
+                (f'{field[0]}', None)
                 for field in self.__fixed_values]
 
             # Get the actual data as a record array
@@ -180,19 +203,21 @@ class ConnectionHolder(object):
                     connections[order][self.__data_items_to_return[0]]
 
             # Return in a format which can be understood by a FromListConnector
-            self.__data_items = []
+            items: List[Any] = []
+            # NB: The types in here are all wrong, but that's
             for data_item in data_items:
-                data_item_list = data_item
-                if hasattr(data_item_list, "__len__"):
-                    data_item_list = list(data_item)
-                self.__data_items.append(data_item_list)
+                if _is_listable(data_item):
+                    items.append(list(data_item))
+                else:
+                    items.append(data_item)
+            self.__data_items = tuple(items)
 
         else:
             if self.__data_items_to_return is None:
-                return []
+                return ()
 
             # Keep track of the matrices
-            merged_connections = list()
+            merged: List[NDArray[_ItemType]] = []
             for item in self.__data_items_to_return:
                 # Build an empty matrix and fill it with NAN
                 matrix = numpy.empty((self.__n_pre_atoms, self.__n_post_atoms))
@@ -205,14 +230,12 @@ class ConnectionHolder(object):
                     connections[item]
 
                 # Store the matrix generated
-                merged_connections.append(matrix)
+                merged.append(matrix)
 
             # If there is only one matrix, use it directly
-            if len(merged_connections) == 1:
-                self.__data_items = merged_connections[0]
             # Otherwise use a tuple of the matrices
-            else:
-                self.__data_items = tuple(merged_connections)
+            self.__data_items = (
+                merged[0] if len(merged) == 1 else tuple(merged))
 
         return self.__data_items
 
@@ -220,19 +243,19 @@ class ConnectionHolder(object):
         data = self._get_data_items()
         return data[s]
 
-    def __len__(self):
+    def __len__(self) -> int:
         data = self._get_data_items()
         return len(data)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator:
         data = self._get_data_items()
         return iter(data)
 
-    def __str__(self):
+    def __str__(self) -> str:
         data = self._get_data_items()
         return data.__str__()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         data = self._get_data_items()
         return data.__repr__()
 

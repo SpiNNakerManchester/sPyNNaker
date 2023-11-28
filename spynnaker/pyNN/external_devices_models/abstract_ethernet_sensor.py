@@ -12,44 +12,63 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+from typing import Any, Dict, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+if TYPE_CHECKING:
+    from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
+    from .abstract_ethernet_translator import AbstractEthernetTranslator
 
 
 class AbstractEthernetSensor(object, metaclass=AbstractBase):
-    __slots__ = []
+    """
+    An Ethernet-connected device that can send events (spikes) to SpiNNaker
+    via a Spike Injector.
+    """
+    __slots__ = ()
 
     @abstractmethod
-    def get_n_neurons(self):
-        """ Get the number of neurons that will be sent out by the device
+    def get_n_neurons(self) -> int:
+        """
+        Get the number of neurons that will be sent out by the device.
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_injector_parameters(self):
-        """ Get the parameters of the Spike Injector to use with this device
+    def get_injector_parameters(self) -> Dict[str, Any]:
+        """
+        Get the parameters of the Spike Injector to use with this device.
 
         :rtype: dict(str,Any)
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_injector_label(self):
-        """ Get the label to give to the Spike Injector
+    def get_injector_label(self) -> str:
+        """
+        Get the label to give to the Spike Injector.
 
         :rtype: str
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_translator(self):
-        """ Get a translator of multicast commands to Ethernet commands
+    def get_translator(self) -> AbstractEthernetTranslator:
+        """
+        Get a translator of multicast commands to Ethernet commands.
 
         :rtype: AbstractEthernetTranslator
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_database_connection(self):
-        """ Get a Database Connection instance that this device uses\
-            to inject packets
-
-        :rtype: ~spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection
+    def get_database_connection(self) -> SpynnakerLiveSpikesConnection:
         """
+        Get a Database Connection instance that this device uses to inject
+        packets.
+
+        :rtype: SpynnakerLiveSpikesConnection
+        """
+        raise NotImplementedError

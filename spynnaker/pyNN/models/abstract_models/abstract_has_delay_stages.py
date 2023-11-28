@@ -12,24 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.require_subclass import require_subclass
 from pacman.model.graphs.application import ApplicationVertex
 
 
 @require_subclass(ApplicationVertex)
 class AbstractHasDelayStages(object, metaclass=AbstractBase):
-    """ Indicates that this object (an application vertex) has delay stages\
-        that are used to increase the space required for bitfields in \
-        :py:func:`spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region`
+    """
+    Indicates that this object (an application vertex) has delay stages that
+    are used to increase the space required for bitfields in
+    :py:func:`spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region`
     """
 
     __slots__ = ()
 
-    @abstractproperty
-    def n_delay_stages(self):
-        """ The maximum number of delay stages required by any connection\
-            out of this delay extension vertex
+    @property
+    @abstractmethod
+    def n_delay_stages(self) -> int:
+        """
+        The maximum number of delay stages required by any connection
+        out of this delay extension vertex.
 
         :rtype: int
         """
+        raise NotImplementedError

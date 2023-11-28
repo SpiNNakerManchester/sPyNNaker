@@ -45,7 +45,7 @@ class DelayedPayloadMultiCastCommand(MultiCastCommand):
 class PushBotSpiNNakerLinkRetinaDevice(
         AbstractPushBotRetinaDevice, ApplicationSpiNNakerLinkVertex,
         PopulationApplicationVertex):
-    __slots__ = ["__new_key_command"]
+    __slots__ = ("__new_key_command", )
 
     default_parameters = {'label': None, 'board_address': None,
                           'n_machine_vertices': 1}
@@ -56,14 +56,12 @@ class PushBotSpiNNakerLinkRetinaDevice(
             label=default_parameters['label'],
             n_machine_vertices=default_parameters['n_machine_vertices']):
         """
-        :param spinnaker_link_id:
-        :param protocol:
-        :type protocol: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
-        :param resolution:
-        :type resolution:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution
-        :param board_address:
-        :param label:
+        :param int spinnaker_link_id:
+        :param MunichIoSpiNNakerLinkProtocol protocol:
+        :param PushBotRetinaResolution resolution:
+        :param str board_address:
+        :param str label:
+        :param int n_machine_vertices:
         """
         super().__init__(protocol, resolution)
         ApplicationSpiNNakerLinkVertex.__init__(

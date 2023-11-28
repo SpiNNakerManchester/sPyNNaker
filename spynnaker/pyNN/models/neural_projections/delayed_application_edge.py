@@ -11,18 +11,30 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
+from collections.abc import Iterable
+from typing import List, Optional, Union, cast, TYPE_CHECKING
 from pacman.model.graphs.application import ApplicationEdge
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.utility_models.delays import (
+        DelayExtensionVertex)
+    from spynnaker.pyNN.models.neural_projections import (
+        SynapseInformation, ProjectionApplicationEdge)
 
 
 class DelayedApplicationEdge(ApplicationEdge):
-
-    __slots__ = [
+    __slots__ = (
         "__synapse_information",
-        "__undelayed_edge"]
+        "__undelayed_edge")
 
     def __init__(
-            self, pre_vertex, post_vertex, synapse_information, undelayed_edge,
-            label=None):
+            self, pre_vertex: DelayExtensionVertex,
+            post_vertex: AbstractPopulationVertex,
+            synapse_information: Union[
+                SynapseInformation, Iterable[SynapseInformation]],
+            undelayed_edge: ProjectionApplicationEdge,
+            label: Optional[str] = None):
         """
         :param DelayExtensionVertex pre_vertex:
             The delay extension at the start of the edge
@@ -38,28 +50,37 @@ class DelayedApplicationEdge(ApplicationEdge):
             The edge label
         """
         super().__init__(pre_vertex, post_vertex, label=label)
-        if hasattr(synapse_information, '__iter__'):
-            self.__synapse_information = synapse_information
+        if isinstance(synapse_information, Iterable):
+            self.__synapse_information = list(synapse_information)
         else:
             self.__synapse_information = [synapse_information]
         self.__undelayed_edge = undelayed_edge
 
     @property
-    def synapse_information(self):
+    def pre_vertex(self) -> DelayExtensionVertex:
+        return cast('DelayExtensionVertex', super().pre_vertex)
+
+    @property
+    def post_vertex(self) -> AbstractPopulationVertex:
+        return cast('AbstractPopulationVertex', super().post_vertex)
+
+    @property
+    def synapse_information(self) -> List[SynapseInformation]:
         """
         :rtype: list(SynapseInformation)
         """
         return self.__synapse_information
 
-    def add_synapse_information(self, synapse_information):
+    def add_synapse_information(self, synapse_information: SynapseInformation):
         """
         :param SynapseInformation synapse_information:
         """
         self.__synapse_information.append(synapse_information)
 
     @property
-    def undelayed_edge(self):
-        """ Get the edge that for projections without extended delays
+    def undelayed_edge(self) -> ProjectionApplicationEdge:
+        """
+        The edge for projections without extended delays.
 
         :rtype: ProjectionApplicationEdge
         """

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from typing import Optional, Sequence
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
@@ -19,31 +19,38 @@ from spynnaker.pyNN.models.neuron.implementations import (
 
 class AbstractSynapseType(
         AbstractStandardNeuronComponent, metaclass=AbstractBase):
-    """ Represents the synapse types supported.
+    """
+    Represents the synapse types supported.
     """
 
     __slots__ = ()
 
     @abstractmethod
-    def get_n_synapse_types(self):
-        """ Get the number of synapse types supported.
+    def get_n_synapse_types(self) -> int:
+        """
+        Get the number of synapse types supported.
 
         :return: The number of synapse types supported
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_synapse_id_by_target(self, target):
-        """ Get the ID of a synapse given the name.
+    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+        """
+        Get the ID of a synapse given the name.
 
         :return: The ID of the synapse
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_synapse_targets(self):
-        """ Get the target names of the synapse type.
-
-        :return: an array of strings
-        :rtype: array(str)
+    def get_synapse_targets(self) -> Sequence[str]:
         """
+        Get the target names of the synapse type.
+
+        :return: an array of strings (usually a list or tuple)
+        :rtype: iterable(str)
+        """
+        raise NotImplementedError

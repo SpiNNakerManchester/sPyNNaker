@@ -18,9 +18,12 @@ from spynnaker.pyNN.models.populations import Population
 
 class MockPopulation(object):
 
-    def __init__(self, size, label):
+    def __init__(self, size, label, vertex=None):
         self._size = size
         self._label = label
+        self._mock_vertex = vertex
+        if vertex is None:
+            self._mock_vertex = MockVertex()
 
     @property
     @overrides(Population.size)
@@ -34,3 +37,13 @@ class MockPopulation(object):
 
     def __repr__(self):
         return "Population {}".format(self._label)
+
+    @property
+    def _vertex(self):
+        return self._mock_vertex
+
+
+class MockVertex(object):
+
+    def get_key_ordered_indices(self, indices):
+        return indices

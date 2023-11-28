@@ -21,32 +21,34 @@ _TWO_WORDS = struct.Struct("<II")
 
 
 class EIEIOSpikeRecorder(object):
-    """ Records spikes using EIEIO format
     """
-    __slots__ = [
-        "__record"]
+    Records spikes using EIEIO format.
+    """
+    __slots__ = ("__record", )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.__record = False
 
     @property
-    def record(self):
+    def record(self) -> bool:
         """
         :rtype: bool
         """
         return self.__record
 
     @record.setter
-    def record(self, new_state):
-        """ Old method assumed to be spikes """
-        self.__record = new_state
-
-    def set_recording(self, new_state, sampling_interval=None):
+    def record(self, new_state: bool):
         """
-        :param new_state: bool
-        :param sampling_interval: not supported functionality
+        Old method assumed to be spikes.
+        """
+        self.__record = bool(new_state)
+
+    def set_recording(self, new_state: bool, sampling_interval=None):
+        """
+        :param bool new_state:
+        :param None sampling_interval: not supported functionality
         """
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported for "
                            "SpikeSourceArray so being ignored")
-        self.__record = new_state
+        self.__record = bool(new_state)

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
+from spinnman.model.enums import ExecutableType
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.resources import ConstantSDRAM
@@ -25,7 +26,6 @@ from spinn_front_end_common.interface.provenance import (
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 
@@ -34,16 +34,17 @@ class MachineMunichMotorDevice(
         MachineVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary,
         ProvidesProvenanceDataFromMachineImpl):
-    """ An Omnibot motor control device. This has a real vertex and an \
-        external device vertex.
     """
-    __slots__ = [
+    An Omnibot motor control device. This has a real vertex and an
+    external device vertex.
+    """
+    __slots__ = (
         "__continue_if_not_different",
         "__delay_time",
         "__delta_threshold",
         "__sample_time",
         "__speed",
-        "__update_time"]
+        "__update_time")
 
     MOTOR_PARTITION_ID = "MOTOR"
 
@@ -76,7 +77,7 @@ class MachineMunichMotorDevice(
         :param int delta_threshold:
         :param bool continue_if_not_different:
         :param str label:
-        :param app_vertex:
+        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
         """
         super().__init__(
             label=label, app_vertex=app_vertex,
@@ -131,11 +132,8 @@ class MachineMunichMotorDevice(
                     "Please increase the timer_tic or time_scale_factor "
                     "or decrease the number of neurons per core.")
 
-    @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification)
+    @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
-        # pylint: disable=too-many-arguments, arguments-differ
-
         # reserve regions
         self.reserve_memory_regions(spec)
 
@@ -169,7 +167,8 @@ class MachineMunichMotorDevice(
         spec.end_specification()
 
     def reserve_memory_regions(self, spec):
-        """ Reserve SDRAM space for memory areas:
+        """
+        Reserve SDRAM space for memory areas:
 
         #. Area for information on what data to record
         #. area for start commands
@@ -190,8 +189,7 @@ class MachineMunichMotorDevice(
         self.reserve_provenance_data_region(spec)
 
     @overrides(MachineVertex.get_n_keys_for_partition)
-    def get_n_keys_for_partition(self, partition_id):
+    def get_n_keys_for_partition(self, partition_id: str) -> int:
         if partition_id == self.MOTOR_PARTITION_ID:
             return self._MOTOR_N_KEYS
-        return super(MachineMunichMotorDevice, self).get_n_keys_for_partition(
-            partition_id)
+        return super().get_n_keys_for_partition(partition_id)

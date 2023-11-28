@@ -24,7 +24,8 @@ _DEFAULT_FIRST_SEND_TIMESTEP = 100
 
 class PushBotEthernetDevice(
         AbstractMulticastControllableDevice, metaclass=AbstractBase):
-    """ An arbitrary PushBot device
+    """
+    An arbitrary PushBot device.
     """
 
     def __init__(
@@ -33,7 +34,7 @@ class PushBotEthernetDevice(
         """
         :param MunichIoEthernetProtocol protocol:
             The protocol instance to get commands from
-        :param AbstractPushBotOutputDevicedevice:
+        :param AbstractPushBotOutputDevice device:
             The Enum instance of the device to control
         :param bool uses_payload:
             True if the device uses a payload for control
@@ -56,7 +57,7 @@ class PushBotEthernetDevice(
     @property
     @overrides(AbstractMulticastControllableDevice.device_control_partition_id)
     def device_control_partition_id(self):
-        return "{}_PARTITION_ID".format(self.__device.name)
+        return f"{self.__device.name}_PARTITION_ID"
 
     @property
     @overrides(AbstractMulticastControllableDevice.device_control_uses_payload)
@@ -93,7 +94,8 @@ class PushBotEthernetDevice(
 
     @property
     def protocol(self):
-        """ The protocol instance, for use in the subclass
+        """
+        The protocol instance, for use in the subclass.
 
         :rtype: MunichIoEthernetProtocol
         """
@@ -101,10 +103,11 @@ class PushBotEthernetDevice(
 
     @abstractmethod
     def set_command_protocol(self, command_protocol):
-        """ Set the protocol use to send setup and shutdown commands,\
-            separately from the protocol used to control the device.
-
-        :param command_protocol: The protocol to use for this device
-        :type command_protocol:
-            ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
         """
+        Set the protocol use to send setup and shutdown commands,
+        separately from the protocol used to control the device.
+
+        :param MunichIoSpiNNakerLinkProtocol command_protocol:
+            The protocol to use for this device
+        """
+        raise NotImplementedError

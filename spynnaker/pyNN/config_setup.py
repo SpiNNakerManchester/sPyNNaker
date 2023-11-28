@@ -22,40 +22,40 @@ from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 CONFIG_FILE_NAME = "spynnaker.cfg"
 
 
-def setup_configs():
+def setup_configs() -> None:
     """
-    Sets up the configs including the users cfg file
+    Sets up the configurations including the users configuration file.
 
-    Clears out any previous read configs but does not load the new configs
-    so a warning is generated if a config is used before setup is called.
-
+    Clears out any previous read configurations but does not load the new
+    configurations so a warning is generated if a configuration is used before
+    setup is called.
     """
     clear_cfg_files(False)
     add_spinnaker_cfg()  # This add its dependencies too
     set_cfg_files(
-        configfile=CONFIG_FILE_NAME,
+        config_file=CONFIG_FILE_NAME,
         default=os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))
 
 
-def unittest_setup():
+def unittest_setup() -> None:
     """
-    Does all the steps that may be required before a unittest
+    Does all the steps that may be required before a unit-test.
 
-    Resets the configs so only the local default configs are included.
-    The user cfg is NOT included!
+    Resets the configurations so only the local default configurations are
+    included.
+    The user configuration is *not* included!
 
-    Unsets any previous simulators and tempdirs
+    Unsets any previous simulators and temporary directories
 
     .. note::
-         This file should only be called from Spynnaker tests
-         that do not call sim.setup
-
+         This file should only be called from sPyNNaker tests
+         that do not call `sim.setup`
     """
     clear_cfg_files(True)
     add_spynnaker_cfg()
     SpynnakerDataWriter.mock()
 
 
-def add_spynnaker_cfg():
+def add_spynnaker_cfg() -> None:
     add_spinnaker_cfg()  # This add its dependencies too
     add_default_cfg(os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))

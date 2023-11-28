@@ -11,12 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import logging
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from pyNN.space import BaseStructure
+import neo
+from typing import (
+    Any, Dict, Optional, Sequence, Tuple, Union, final,
+    TYPE_CHECKING)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
+from pacman.model.graphs.application import ApplicationVertex
+from spynnaker.pyNN.models.recorder import Recorder
+from .assembly import Assembly
+if TYPE_CHECKING:
+    from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
+    from spynnaker.pyNN.models.common.types import Names
+    from .population_view import IDMixin
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -26,23 +37,20 @@ def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
     raise NotImplementedError("sPyNNaker does not currently do this")
 
 
-def _this_is_wholly_deprecated(msg, *args):  # pylint: disable=unused-argument
-    # pragma: no cover
-    raise NotImplementedError(msg)
-
-
 class PopulationBase(object, metaclass=AbstractBase):
-    r""" Shared methods between :py:class:`Population`\ s and
+    r"""
+    Shared methods between :py:class:`Population`\ s and
     :py:class:`PopulationView`\ s.
 
     Mainly pass through and not implemented.
     """
-    __slots__ = []
+    __slots__ = ()
 
     @property
-    def local_cells(self):
-        """ An array containing the cell IDs of those neurons in the\
-            Population that exist on the local MPI node.
+    def local_cells(self) -> Sequence[IDMixin]:
+        """
+        An array containing the cell IDs of those neurons in the
+        Population that exist on the local MPI node.
 
         :rtype: list(int)
         """
@@ -50,17 +58,21 @@ class PopulationBase(object, metaclass=AbstractBase):
                        "local_cells just returns all_cells")
         return self.all_cells
 
-    @abstractproperty
-    def all_cells(self):
-        """ An array containing the cell IDs of all neurons in the\
-            Population (all MPI nodes).
+    @property
+    @abstractmethod
+    def all_cells(self) -> Sequence[IDMixin]:
+        """
+        An array containing the cell IDs of all neurons in the
+        Population (all MPI nodes).
 
         :rtype: list(int)
         """
+        raise NotImplementedError
 
-    def __add__(self, other):
-        """ A Population / PopulationView can be added to another\
-            Population, PopulationView or Assembly, returning an Assembly.
+    def __add__(self, other: PopulationBase) -> Assembly:
+        """
+        A Population / PopulationView can be added to another
+        Population, PopulationView or Assembly, returning an Assembly.
 
         .. warning::
             Currently unimplemented.
@@ -70,22 +82,16 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         # TODO: support assemblies
         _we_dont_do_this_now(other)  # pragma: no cover
-
-    def getSpikes(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """
-        .. deprecated:: 5.0
-            Use ``get_data('spikes')`` instead.
-        """
-        logger.warning(
-            'getSpikes is deprecated. Call transfered to get_data("spikes") '
-            'without additional arguments')
-        return self.get_data("spikes")
+        raise NotImplementedError
 
     @abstractmethod
-    def get_data(self, variables='all', gather=True, clear=False,
-                 annotations=None):
-        """ Return a Neo Block containing the data(spikes, state variables)\
-            recorded from the Population.
+    def get_data(
+            self, variables: Names = 'all',
+            gather: bool = True, clear: bool = False, *,
+            annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
+        """
+        Return a Neo Block containing the data(spikes, state variables)
+        recorded from the Population.
 
         :param variables:
             Either a single variable name or a list of variable names.
@@ -106,21 +112,12 @@ class PopulationBase(object, metaclass=AbstractBase):
         :type annotations: None or dict(str, ...)
         :rtype: ~neo.core.Block
         """
-
-    def get_gsyn(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """
-        .. deprecated:: 5.0
-            Use ``get_data(['gsyn_exc', 'gsyn_inh'])`` instead.
-        """
-        logger.warning(
-            'get_gsyn is deprecated. '
-            'Call transfered to get_data(["gsyn_exc", "gsyn_inh"]) '
-            'without additional arguments')
-        return self.get_data(['gsyn_exc', 'gsyn_inh'])
+        raise NotImplementedError
 
     @abstractmethod
-    def get_spike_counts(self, gather=True):
-        """ Returns a dict containing the number of spikes for each neuron.
+    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
+        """
+        Returns a dict containing the number of spikes for each neuron.
 
         The dict keys are neuron IDs, not indices.
 
@@ -135,40 +132,36 @@ class PopulationBase(object, metaclass=AbstractBase):
 
         :rtype: dict(int, int)
         """
+        raise NotImplementedError
 
-    def get_v(self, *args, **kwargs):  # pylint: disable=unused-argument
+    def inject(self, current_source: NeuronCurrentSource):
         """
-        .. deprecated:: 5.0
-            Use ``get_data('v')`` instead.
-        """
-        logger.warning(
-            'getSpikes is deprecated. '
-            'Call transfered to get_data("v") without additional arguments')
-        return self.get_data("v")
-
-    @abstractmethod
-    def inject(self, current_source):
-        """ Connect a current source to all cells in the Population.
+        Connect a current source to all cells in the Population.
 
         :param current_source:
         :type current_source:
-            pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource
+            ~pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource
         """
+        raise NotImplementedError
 
-    def is_local(self,
-                 id):  # pylint: disable=unused-argument, redefined-builtin
-        """ Indicates whether the cell with the given ID exists on the\
-            local MPI node.
+    @final
+    def is_local(self, id: int) -> bool:  # @ReservedAssignment
+        """
+        Indicates whether the cell with the given ID exists on the
+        local MPI node.
 
         :rtype: bool
         """
+        # pylint: disable=unused-argument, redefined-builtin
         logger.warning("local calls do not really make sense on sPyNNaker so "
                        "is_local always returns True")
         return True
 
     @property
-    def local_size(self):
-        """ Return the number of cells in the population on the local MPI node.
+    @final
+    def local_size(self) -> int:
+        """
+        The number of cells in the population on the local MPI node.
 
         :rtype: int
         """
@@ -176,18 +169,13 @@ class PopulationBase(object, metaclass=AbstractBase):
                        "is_local always returns size")
         return len(self)
 
-    def meanSpikeCount(self, *args, **kwargs):
-        """
-        .. deprecated:: 5.0
-            Use ``mean_spike_count()`` instead.
-        """
-        logger.warning(
-            'meanSpikeCount is deprecated. '
-            'Call transfered to mean_spike_count with additional arguements')
-        return self.mean_spike_count(*args, **kwargs)
+    @abstractmethod
+    def __len__(self) -> int:
+        raise NotImplementedError
 
     def mean_spike_count(self, gather=True):
-        """ Returns the mean number of spikes per neuron.
+        """
+        Returns the mean number of spikes per neuron.
 
         :param bool gather:
             For parallel simulators, if this is True, all data will be gathered
@@ -208,7 +196,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         return sum(counts.values()) / len(counts)
 
     def nearest(self, position):
-        """ Return the neuron closest to the specified position.
+        """
+        Return the neuron closest to the specified position.
 
         .. warning::
             Currently unimplemented.
@@ -243,10 +232,13 @@ class PopulationBase(object, metaclass=AbstractBase):
         _we_dont_do_this_now()  # pragma: no cover
 
     @abstractmethod
-    def write_data(self, io, variables='all', gather=True, clear=False,
-                   annotations=None):
-        """ Write recorded data to file, using one of the file formats\
-            supported by Neo.
+    def write_data(self, io: Union[str, neo.baseio.BaseIO],
+                   variables: Names = 'all',
+                   gather: bool = True, clear: bool = False,
+                   annotations: Optional[Dict[str, Any]] = None):
+        """
+        Write recorded data to file, using one of the file formats
+        supported by Neo.
 
         :param io:
             a Neo IO instance, or a string for where to put a Neo instance
@@ -271,57 +263,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         :type annotations: None or dict(str, ...)
         """
         # pylint: disable=too-many-arguments
-
-    def printSpikes(self, filename, gather=True):
-        """
-        .. deprecated:: 5.0
-            Use ``write_data(file, 'spikes')`` instead.
-
-        .. note::
-            Method signature is the PyNN0.7 one
-        """
-        if not gather:
-            warn_once(
-                logger, "sPyNNaker only supports gather=True. We will run "
-                "as if gather was set to True.")
-        logger.warning(
-            'printSpikes is deprecated. '
-            'Call transfered to write_data(file, "spikes", gatherer) instead.')
-        self.write_data(filename, 'spikes', gather=True)
-
-    def print_gsyn(self, filename, gather=True):
-        """
-        .. deprecated:: 5.0
-            Use ``write_data(file, ['gsyn_exc', 'gsyn_inh'])`` instead.
-
-        .. note::
-            Method signature is the PyNN0.7 one
-        """
-        if not gather:
-            warn_once(
-                logger, "sPyNNaker only supports gather=True. We will run "
-                "as if gather was set to True.")
-        logger.warning(
-            'print_gsyn is deprecated. Call transfered to '
-            'write_data(file, ["gsyn_exc", "gsyn_inh"], gatherer) instead.')
-        self.write_data(filename, ['gsyn_exc', 'gsyn_inh'], gather=True)
-
-    def print_v(self, filename, gather=True):
-        """
-        .. deprecated:: 5.0
-            Use ``write_data(file, 'v')`` instead.
-
-        .. note::
-            Method signature is the PyNN0.7 one
-        """
-        if not gather:
-            warn_once(
-                logger, "sPyNNaker only supports gather=True. We will run "
-                "as if gather was set to True.")
-        logger.warning(
-            'print_v is deprecated. '
-            'Call transfered to write_data(file, "v", gatherer) instead.')
-        self.write_data(filename, 'v', gather=True)
+        raise NotImplementedError
 
     def receptor_types(self):
         """
@@ -334,13 +276,15 @@ class PopulationBase(object, metaclass=AbstractBase):
         _we_dont_do_this_now()  # pragma: no cover
 
     @abstractmethod
-    def record(self, variables, to_file=None, sampling_interval=None):
-        """ Record the specified variable or variables for all cells in the\
-            Population or view.
+    def record(self, variables: Names, to_file=None,
+               sampling_interval=None):
+        """
+        Record the specified variable or variables for all cells in the
+        Population or view.
 
         :param variables: either a single variable name or a list of variable
-            names. For a given celltype class, `celltype.recordable` contains
-            a list of variables that can be recorded for that celltype.
+            names. For a given `celltype` class, `celltype.recordable` contains
+            a list of variables that can be recorded for that `celltype`.
         :type variables: str or list(str)
         :param to_file: a file to automatically record to (optional).
             `write_data()` will be automatically called when `end()` is called.
@@ -348,58 +292,23 @@ class PopulationBase(object, metaclass=AbstractBase):
         :param int sampling_interval: a value in milliseconds, and an integer
             multiple of the simulation timestep.
         """
-
-    def record_gsyn(self, sampling_interval=1, to_file=None):
-        """
-        .. deprecated:: 5.0
-            Use ``record(['gsyn_exc', 'gsyn_inh'])`` instead.
-
-        .. note::
-            Method signature is the PyNN 0.7 one
-            with the extra non-PyNN `sampling_interval` and `indexes`
-        """
-        logger.warning(
-            'record_gsyn is deprecated. Call transfered to '
-            'record(["gsyn_exc", "gsyn_inh"], tofile) instead.')
-        return self.record(
-            ['gsyn_exc', 'gsyn_inh'], to_file=to_file,
-            sampling_interval=sampling_interval)
-
-    def record_v(self, sampling_interval=1, to_file=None):
-        """
-        .. deprecated:: 5.0
-            Use ``record('v')`` instead.
-
-        .. note::
-            Method signature is the PyNN 0.7 one
-            with the extra non-PyNN `sampling_interval` and `indexes`
-        """
-        logger.warning('record_v is deprecated. '
-                       'Call transfered to record(["v"], .....) instead.')
-        return self.record(
-            'v', to_file=to_file,
-            sampling_interval=sampling_interval)
-
-    def rset(self, *args, **kwargs):
-        """
-        .. deprecated:: 5.0
-            Use ``set(parametername=rand_distr)`` instead.
-        """
-        _this_is_wholly_deprecated(
-            " Use set(parametername=rand_distr) instead.", args, kwargs)
+        raise NotImplementedError
 
     def save_positions(self, file):  # pylint: disable=redefined-builtin
-        """ Save positions to file. The output format is index x y z
+        """
+        Save positions to file. The output format is index x y z
 
         .. warning::
             Currently unimplemented.
         """
         # TODO:
         _we_dont_do_this_now(file)  # pragma: no cover
+        raise NotImplementedError
 
     @property
-    def structure(self):
-        """ The spatial structure of the parent Population.
+    def structure(self) -> BaseStructure:
+        """
+        The spatial structure of the parent Population.
 
         .. warning::
             Currently unimplemented.
@@ -408,28 +317,35 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         # TODO: support neuron positions and spaces
         _we_dont_do_this_now()  # pragma: no cover
+        raise NotImplementedError
 
-    def tset(self, **kwargs):
+    @property
+    @abstractmethod
+    def _vertex(self) -> ApplicationVertex:
         """
-        .. deprecated:: 5.0
-            Use ``set(parametername=value_array)`` instead.
-        """
-        _this_is_wholly_deprecated(
-            "Use set(parametername=value_array) instead.", kwargs)
-
-    @abstractproperty
-    def _vertex(self):
-        """ The underlying application vertex.
+        The underlying application vertex.
 
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def _recorder(self):
-        """ The recorder of the population
+    @property
+    @abstractmethod
+    def _view_range(self) -> Tuple[int, int]:
+        """
+        The range of neuron IDs supported.
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def _recorder(self) -> Recorder:
+        """
+        The recorder of the population.
 
         :rtype: ~Recorder
         """
+        raise NotImplementedError
 
     @staticmethod
     def _check_params(gather, annotations=None):

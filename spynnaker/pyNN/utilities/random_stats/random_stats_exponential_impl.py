@@ -17,7 +17,8 @@ from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
 class RandomStatsExponentialImpl(AbstractRandomStats):
-    """ An implementation of AbstractRandomStats for exponential distributions
+    """
+    An implementation of AbstractRandomStats for exponential distributions.
     """
 
     def _get_params(self, dist):
@@ -38,8 +39,8 @@ class RandomStatsExponentialImpl(AbstractRandomStats):
     def var(self, dist):
         return expon.var(*self._get_params(dist))
 
-    def high(self, dist):
+    def high(self, distribution):
         return None
 
-    def low(self, dist):
+    def low(self, distribution):
         return None

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -26,39 +26,39 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
 
 
 class TimingDependenceVogels2011(AbstractTimingDependence):
-    """ A timing dependence STDP rule due to Vogels (2011).
     """
-    __slots__ = [
+    A timing dependence STDP rule due to Vogels (2011).
+    """
+    __slots__ = (
         "__alpha",
-        "__synapse_structure",
         "__tau",
         "__tau_data",
         "__a_plus",
-        "__a_minus"]
+        "__a_minus")
     __PARAM_NAMES = ('alpha', 'tau')
     default_parameters = {'tau': 20.0}
 
-    def __init__(self, alpha, tau=default_parameters['tau'],
-                 A_plus=0.01, A_minus=0.01):
+    def __init__(self, alpha: float, tau: float = default_parameters['tau'],
+                 A_plus: float = 0.01, A_minus: float = 0.01):
         r"""
         :param float alpha: :math:`\alpha`
         :param float tau: :math:`\tau`
         :param float A_plus: :math:`A^+`
         :param float A_minus: :math:`A^-`
         """
+        super().__init__(SynapseStructureWeightOnly())
         self.__alpha = alpha
         self.__tau = tau
         self.__a_plus = A_plus
         self.__a_minus = A_minus
-
-        self.__synapse_structure = SynapseStructureWeightOnly()
 
         self.__tau_data = get_exp_lut_array(
             SpynnakerDataView.get_simulation_time_step_ms(), self.__tau)
 
     @property
     def alpha(self):
-        r""" :math:`\alpha`
+        r"""
+        :math:`\alpha`
 
         :rtype: float
         """
@@ -66,7 +66,8 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
     @property
     def tau(self):
-        r""" :math:`\tau`
+        r"""
+        :math:`\tau`
 
         :rtype: float
         """
@@ -74,7 +75,8 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
     @property
     def A_plus(self):
-        r""" :math:`A^+`
+        r"""
+        :math:`A^+`
 
         :rtype: float
         """
@@ -86,7 +88,8 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
     @property
     def A_minus(self):
-        r""" :math:`A^-`
+        r"""
+        :math:`A^-`
 
         :rtype: float
         """
@@ -105,7 +108,8 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
     @property
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
@@ -113,7 +117,8 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
     @property
     def pre_trace_n_bytes(self):
-        """ The number of bytes used by the pre-trace of the rule per neuron
+        """
+        The number of bytes used by the pre-trace of the rule per neuron.
 
         :rtype: int
         """
@@ -126,7 +131,8 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
     @property
     def n_weight_terms(self):
-        """ The number of weight terms expected by this timing rule
+        """
+        The number of weight terms expected by this timing rule.
 
         :rtype: int
         """
@@ -135,21 +141,12 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
             self, spec, global_weight_scale, synapse_weight_scales):
-
         # Write alpha to spec
         fixed_point_alpha = float_to_fixed(self.__alpha)
         spec.write_value(data=fixed_point_alpha, data_type=DataType.INT32)
 
         # Write lookup table
         spec.write_array(self.__tau_data)
-
-    @property
-    def synaptic_structure(self):
-        """ Get the synaptic structure of the plastic part of the rows
-
-        :rtype: AbstractSynapseStructure
-        """
-        return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):

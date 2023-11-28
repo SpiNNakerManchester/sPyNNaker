@@ -18,21 +18,21 @@ from spinn_utilities.ranged.ranged_list import RangedList
 
 
 class SpynnakerRangedList(RangedList):
+    """
+    Adds support for :py:class:`~spynnaker.pyNN.RandomDistribution` to
+    :py:class:`~spinn_utilities.ranged.RangedList`.
+    """
 
-    @staticmethod
-    @overrides(RangedList.is_list)
-    def is_list(value, size):
-
+    @overrides(RangedList.listness_check)
+    def listness_check(self, value):
         if isinstance(value, RandomDistribution):
             return True
 
-        return RangedList.is_list(value, size)
+        return super().listness_check(value)
 
-    @staticmethod
     @overrides(RangedList.as_list)
-    def as_list(value, size, ids=None):
-
+    def as_list(self, value, size, ids=None):
         if isinstance(value, RandomDistribution):
             return value.next(n=size)
 
-        return RangedList.as_list(value, size, ids)
+        return super().as_list(value, size, ids)

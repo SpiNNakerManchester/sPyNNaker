@@ -21,9 +21,10 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 class PushBotSpiNNakerLinkSpeakerDevice(
         PushBotEthernetSpeakerDevice, ApplicationSpiNNakerLinkVertex,
         PopulationApplicationVertex):
-    """ The speaker of a PushBot
     """
-    __slots__ = []
+    The speaker of a PushBot.
+    """
+    __slots__ = ()
 
     default_parameters = {
         'n_neurons': 1, 'label': None,
@@ -43,21 +44,19 @@ class PushBotSpiNNakerLinkSpeakerDevice(
             start_frequency=default_parameters['start_frequency'],
             start_melody=default_parameters['start_melody']):
         """
-        :param speaker: Which speaker device to control
-        :type speaker:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker
-        :param protocol: The protocol instance to get commands from
-        :type protocol: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
+        :param PushBotSpeaker speaker: Which speaker device to control
+        :param MunichIoSpiNNakerLinkProtocol protocol:
+            The protocol instance to get commands from
         :param int spinnaker_link_id: The SpiNNakerLink connected to
         :param int n_neurons: The number of neurons in the device
         :param str label: The label of the device
         :param board_address:
             The IP address of the board that the device is connected to
         :type board_address: str or None
-        :param start_active_time: The "active time" to set at the start
-        :param start_total_period: The "total period" to set at the start
-        :param start_frequency: The "frequency" to set at the start
-        :param start_melody: The "melody" to set at the start
+        :param int start_active_time: The "active time" to set at the start
+        :param int start_total_period: The "total period" to set at the start
+        :param int start_frequency: The "frequency" to set at the start
+        :param int start_melody: The "melody" to set at the start
         """
         # pylint: disable=too-many-arguments
         super().__init__(

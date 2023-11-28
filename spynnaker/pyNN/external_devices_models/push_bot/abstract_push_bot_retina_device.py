@@ -19,18 +19,16 @@ from spinn_front_end_common.abstract_models import (
 
 class AbstractPushBotRetinaDevice(
         AbstractSendMeMulticastCommandsVertex):
-    """ An abstraction of a silicon retina attached to a SpiNNaker system.
+    """
+    An abstraction of a silicon retina attached to a SpiNNaker system.
     """
 
     def __init__(self, protocol, resolution):
         """
         :param protocol:
         :type protocol:
-            MunichIoEthernetProtocol or
-            ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
-        :param resolution:
-        :type resolution:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution
+            MunichIoEthernetProtocol or MunichIoSpiNNakerLinkProtocol
+        :param PushBotRetinaResolution resolution:
         """
         self._protocol = protocol
         self._resolution = resolution
@@ -38,26 +36,22 @@ class AbstractPushBotRetinaDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
-        commands = list()
-
         # add mode command if not done already
         if not self._protocol.sent_mode_command():
-            commands.append(self._protocol.set_mode())
+            yield self._protocol.set_mode()
 
         # device specific commands
-        commands.append(self._protocol.disable_retina())
+        yield self._protocol.disable_retina()
+
         retina_key = None
         if self._resolution is not None:
             retina_key = self._resolution.value
-        commands.append(self._protocol.set_retina_transmission(
-            retina_key=retina_key))
-
-        return commands
+        yield self._protocol.set_retina_transmission(retina_key=retina_key)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
-        return [self._protocol.disable_retina()]
+        yield self._protocol.disable_retina()
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

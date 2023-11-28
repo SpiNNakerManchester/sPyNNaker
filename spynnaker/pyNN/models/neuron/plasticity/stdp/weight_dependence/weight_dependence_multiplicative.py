@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from typing import Iterable
 from spinn_utilities.overrides import overrides
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType, DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
@@ -23,14 +23,15 @@ _SPACE_PER_SYNAPSE_TYPE = 4 * BYTES_PER_WORD
 
 class WeightDependenceMultiplicative(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
-    """ A multiplicative weight dependence STDP rule.
     """
-    __slots__ = [
+    A multiplicative weight dependence STDP rule.
+    """
+    __slots__ = (
         "__w_max",
-        "__w_min"]
+        "__w_min")
     __PARAM_NAMES = ('w_min', 'w_max', 'A_plus', 'A_minus')
 
-    def __init__(self, w_min=0.0, w_max=1.0):
+    def __init__(self, w_min: float = 0.0, w_max: float = 1.0):
         """
         :param float w_min: :math:`w^{min}`
         :param float w_max: :math:`w^{max}`
@@ -40,23 +41,25 @@ class WeightDependenceMultiplicative(
         self.__w_max = w_max
 
     @property
-    def w_min(self):
-        """ :math:`w^{min}`
+    def w_min(self) -> float:
+        """
+        :math:`w^{min}`
 
         :rtype: float
         """
         return self.__w_min
 
     @property
-    def w_max(self):
-        """ :math:`w^{max}`
+    def w_max(self) -> float:
+        """
+        :math:`w^{max}`
 
         :rtype: float
         """
         return self.__w_max
 
     @overrides(AbstractWeightDependence.is_same_as)
-    def is_same_as(self, weight_dependence):
+    def is_same_as(self, weight_dependence) -> bool:
         if not isinstance(weight_dependence, WeightDependenceMultiplicative):
             return False
         return (
@@ -66,8 +69,9 @@ class WeightDependenceMultiplicative(
             (self.A_minus == weight_dependence.A_minus))
 
     @property
-    def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+    def vertex_executable_suffix(self) -> str:
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
@@ -75,7 +79,7 @@ class WeightDependenceMultiplicative(
 
     @overrides(AbstractWeightDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(
-            self, n_synapse_types, n_weight_terms):
+            self, n_synapse_types, n_weight_terms) -> int:
         if n_weight_terms != 1:
             raise NotImplementedError(
                 "Multiplicative weight dependence only supports single terms")
@@ -84,8 +88,8 @@ class WeightDependenceMultiplicative(
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
-            self, spec, global_weight_scale, synapse_weight_scales,
-            n_weight_terms):
+            self, spec: DataSpecificationBase,
+            global_weight_scale, synapse_weight_scales, n_weight_terms):
         if n_weight_terms != 1:
             raise NotImplementedError(
                 "Multiplicative weight dependence only supports single terms")
@@ -101,14 +105,15 @@ class WeightDependenceMultiplicative(
             spec.write_value(data=self.A_minus, data_type=DataType.S1615)
 
     @property
-    def weight_maximum(self):
-        """ The maximum weight that will ever be set in a synapse as a result\
-            of this rule
+    def weight_maximum(self) -> float:
+        """
+        The maximum weight that will ever be set in a synapse as a result
+        of this rule.
 
         :rtype: float
         """
         return self.__w_max
 
     @overrides(AbstractWeightDependence.get_parameter_names)
-    def get_parameter_names(self):
+    def get_parameter_names(self) -> Iterable[str]:
         return self.__PARAM_NAMES

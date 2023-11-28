@@ -14,13 +14,15 @@
 
 # Imports
 import sys
+from types import ModuleType
+from typing import Optional
 import numpy as np
+plt: Optional[ModuleType]
 try:
-    import matplotlib.pyplot as plt
-    matplotlib_missing = False
+    import matplotlib.pyplot  # type: ignore[import]
+    plt = matplotlib.pyplot
 except ImportError:
     plt = None
-    matplotlib_missing = True
 
 
 def _precheck(data, title):
@@ -30,7 +32,7 @@ def _precheck(data, title):
         else:
             print("NO data for " + title)
         return False
-    if matplotlib_missing:
+    if plt is None:
         if title is None:
             print("matplotlib not installed skipping plotting")
         else:
@@ -40,7 +42,8 @@ def _precheck(data, title):
 
 
 def line_plot(data_sets, title=None):
-    """ Build a line plot or plots.
+    """
+    Build a line plot or plots.
 
     :param data_sets: Numpy array of data, or list of numpy arrays of data
     :type data_sets: ~numpy.ndarray or list(~numpy.ndarray)
@@ -53,7 +56,7 @@ def line_plot(data_sets, title=None):
     if isinstance(data_sets, np.ndarray):
         data_sets = [data_sets]
 
-    print("Setting up {} sets of line plots".format(len(data_sets)))
+    print(f"Setting up {len(data_sets)} sets of line plots")
     (numrows, numcols) = _grid(len(data_sets))
     for data, index in enumerate(data_sets):
         plt.subplot(numrows, numcols, index+1)
@@ -73,7 +76,8 @@ def line_plot(data_sets, title=None):
 
 
 def heat_plot(data_sets, ylabel=None, title=None):
-    """ Build a heatmap plot or plots.
+    """
+    Build a heatmap plot or plots.
 
     :param data_sets: Numpy array of data, or list of numpy arrays of data
     :type data_sets: ~numpy.ndarray or list(~numpy.ndarray)
@@ -87,7 +91,7 @@ def heat_plot(data_sets, ylabel=None, title=None):
     if isinstance(data_sets, np.ndarray):
         data_sets = [data_sets]
 
-    print("Setting up {} sets of heat graph".format(len(data_sets)))
+    print(f"Setting up {len(data_sets)} sets of heat graph")
     (numrows, numcols) = _grid(len(data_sets))
     for data, index in enumerate(data_sets):
         plt.subplot(numrows, numcols, index+1)
@@ -130,7 +134,8 @@ def _grid(length):
 
 
 def plot_spikes(spikes, title="spikes"):
-    """ Build a spike plot or plots.
+    """
+    Build a spike plot or plots.
 
     :param spikes: Numpy array of spikes, or list of numpy arrays of spikes
     :type spikes: ~numpy.ndarray or list(~numpy.ndarray)
@@ -149,7 +154,7 @@ def plot_spikes(spikes, title="spikes"):
     min_spike = sys.maxsize
     max_spike = 0
 
-    print("Plotting {} set of spikes".format(len(spikes)))
+    print(f"Plotting {len(spikes)} set of spikes")
     (numrows, numcols) = _grid(len(spikes))
     for single_spikes, index in enumerate(spikes):
         # pylint: disable=nested-min-max
@@ -179,6 +184,6 @@ if __name__ == "__main__":
     spike_data = np.loadtxt("spikes.csv", delimiter=',')
     plot_spikes(spike_data)
     doubled_spike_data = np.loadtxt("spikes.csv", delimiter=',')
-    for doubled_spike_data_i, _i in enumerate(doubled_spike_data):
+    for _i, doubled_spike_data_i in enumerate(doubled_spike_data):
         doubled_spike_data_i[0] = doubled_spike_data[_i][0] + 5
     plot_spikes([spike_data, doubled_spike_data])

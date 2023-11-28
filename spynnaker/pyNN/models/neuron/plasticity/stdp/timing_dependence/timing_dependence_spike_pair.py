@@ -24,32 +24,32 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
 
 
 class TimingDependenceSpikePair(AbstractTimingDependence):
-    """ A basic timing dependence STDP rule.
     """
-    __slots__ = [
-        "__synapse_structure",
+    A basic timing dependence STDP rule.
+    """
+    __slots__ = (
         "__tau_minus",
         "__tau_minus_data",
         "__tau_plus",
         "__tau_plus_data",
         "__a_plus",
-        "__a_minus"]
+        "__a_minus")
     __PARAM_NAMES = ('tau_plus', 'tau_minus')
 
     def __init__(
-            self, tau_plus=20.0, tau_minus=20.0, A_plus=0.01, A_minus=0.01):
+            self, tau_plus: float = 20.0, tau_minus: float = 20.0,
+            A_plus: float = 0.01, A_minus: float = 0.01):
         r"""
         :param float tau_plus: :math:`\tau_+`
         :param float tau_minus: :math:`\tau_-`
         :param float A_plus: :math:`A^+`
         :param float A_minus: :math:`A^-`
         """
+        super().__init__(SynapseStructureWeightOnly())
         self.__tau_plus = tau_plus
         self.__tau_minus = tau_minus
         self.__a_plus = A_plus
         self.__a_minus = A_minus
-
-        self.__synapse_structure = SynapseStructureWeightOnly()
 
         # provenance data
         ts = SpynnakerDataView.get_simulation_time_step_ms()
@@ -58,7 +58,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def tau_plus(self):
-        r""" :math:`\tau_+`
+        r"""
+        :math:`\tau_+`
 
         :rtype: float
         """
@@ -66,7 +67,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def tau_minus(self):
-        r""" :math:`\tau_-`
+        r"""
+        :math:`\tau_-`
 
         :rtype: float
         """
@@ -74,7 +76,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def A_plus(self):
-        r""" :math:`A^+`
+        r"""
+        :math:`A^+`
 
         :rtype: float
         """
@@ -86,7 +89,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def A_minus(self):
-        r""" :math:`A^-`
+        r"""
+        :math:`A^-`
 
         :rtype: float
         """
@@ -105,7 +109,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
@@ -113,7 +118,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def pre_trace_n_bytes(self):
-        """ The number of bytes used by the pre-trace of the rule per neuron
+        """
+        The number of bytes used by the pre-trace of the rule per neuron.
 
         :rtype: int
         """
@@ -128,7 +134,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def n_weight_terms(self):
-        """ The number of weight terms expected by this timing rule
+        """
+        The number of weight terms expected by this timing rule.
 
         :rtype: int
         """
@@ -137,18 +144,9 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
             self, spec, global_weight_scale, synapse_weight_scales):
-
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
         spec.write_array(self.__tau_minus_data)
-
-    @property
-    def synaptic_structure(self):
-        """ Get the synaptic structure of the plastic part of the rows
-
-        :rtype: AbstractSynapseStructure
-        """
-        return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):

@@ -13,23 +13,31 @@
 # limitations under the License.
 
 """
-utility class containing simple helper methods
+Utility package containing simple helper functions.
 """
 import logging
 import os
 import math
+import neo
 import numpy
+from numpy import uint32, floating
+from numpy.typing import NDArray
 from math import isnan
 from pyNN.random import RandomDistribution
+from typing import List, Tuple
 from scipy.stats import binom
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.safe_eval import SafeEval
+from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.logger_utils import warn_once
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
     RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
     RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
-    RandomStatsVonmisesImpl, RandomStatsBinomialImpl)
+    RandomStatsVonmisesImpl, RandomStatsBinomialImpl,
+    RandomStatsExponentialClippedImpl)
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_SECOND_CONVERSION)
 from spynnaker.pyNN.utilities.constants import WRITE_BANDWIDTH_BYTES_PER_SECOND
@@ -49,6 +57,7 @@ STATS_BY_NAME = {
     'binomial': RandomStatsBinomialImpl(),
     'gamma': RandomStatsGammaImpl(),
     'exponential': RandomStatsExponentialImpl(),
+    'exponential_clipped': RandomStatsExponentialClippedImpl(),
     'lognormal': RandomStatsLogNormalImpl(),
     'normal': RandomStatsNormalImpl(),
     'normal_clipped': RandomStatsNormalClippedImpl(),
@@ -59,8 +68,9 @@ STATS_BY_NAME = {
     'vonmises': RandomStatsVonmisesImpl()}
 
 
-def check_directory_exists_and_create_if_not(filename):
-    """ Create a parent directory for a file if it doesn't exist
+def check_directory_exists_and_create_if_not(filename: str):
+    """
+    Create a parent directory for a file if it doesn't exist.
 
     :param str filename: The file whose parent directory is to be created
     """
@@ -69,30 +79,29 @@ def check_directory_exists_and_create_if_not(filename):
         os.makedirs(directory)
 
 
-def convert_param_to_numpy(param, no_atoms):
-    """ Convert parameters into numpy arrays.
+def convert_param_to_numpy(param, no_atoms: int) -> NDArray[floating]:
+    """
+    Convert parameters into numpy arrays.
 
     :param param: the param to convert
-    :type param: ~pyNN.random.NumpyRNG or int or float or list(int) or
-        list(float) or ~numpy.ndarray
+    :type param: ~pyNN.random.RandomDistribution or int or float or list(int)
+        or list(float) or ~numpy.ndarray
     :param int no_atoms: the number of atoms available for conversion of param
     :return: the converted param as an array of floats
     :rtype: ~numpy.ndarray(float)
     """
-
     # Deal with random distributions by generating values
     if isinstance(param, RandomDistribution):
-
         # numpy reduces a single valued array to a single value, so enforce
         # that it is an array
         param_value = param.next(n=no_atoms)
         if hasattr(param_value, '__iter__'):
-            return numpy.array(param_value, dtype="float")
-        return numpy.array([param_value], dtype="float")
+            return numpy.array(param_value, dtype=floating)
+        return numpy.array([param_value], dtype=floating)
 
     # Deal with a single value by exploding to multiple values
     if not hasattr(param, '__iter__'):
-        return numpy.array([param] * no_atoms, dtype="float")
+        return numpy.array([param] * no_atoms, dtype=floating)
 
     # Deal with multiple values, but not the correct number of them
     if len(param) != no_atoms:
@@ -101,25 +110,29 @@ def convert_param_to_numpy(param, no_atoms):
             " the vertex")
 
     # Deal with the correct number of multiple values
-    return numpy.array(param, dtype="float")
+    return numpy.array(param, dtype=floating)
 
 
-def convert_to(value, data_type):
-    """ Convert a value to a given data type
+def convert_to(value, data_type: DataType) -> uint32:
+    """
+    Convert a value to a given data type.
 
     :param value: The value to convert
     :param ~data_specification.enums.DataType data_type:
         The data type to convert to
     :return: The converted data as a numpy data type
-    :rtype: ~numpy.ndarray(int32)
+    :rtype: numpy.uint32
     """
     return numpy.round(data_type.encode_as_int(value)).astype(
         data_type.struct_encoding)
 
 
 def read_in_data_from_file(
-        file_path, min_atom, max_atom, min_time, max_time, extra=False):
-    """ Read in a file of data values where the values are in a format of:
+        file_path: str, min_atom: int, max_atom: int,
+        min_time: float, max_time: float, extra: bool = False) -> NDArray:
+    """
+    Read in a file of data values where the values are in a format of::
+
         <time>\t<atom ID>\t<data value>
 
     :param str file_path: absolute path to a file containing the data
@@ -133,36 +146,41 @@ def read_in_data_from_file(
     :return: a numpy array of (time stamp, atom ID, data value)
     :rtype: ~numpy.ndarray(tuple(float, int, float))
     """
-    times = list()
-    atom_ids = list()
-    data_items = list()
+    times: List[float] = []
+    atom_ids: List[int] = []
+    data_items: List[float] = []
     evaluator = SafeEval()
     with open(file_path, 'r', encoding="utf-8") as f:
         for line in f.readlines():
             if line.startswith('#'):
                 continue
             if extra:
-                time, neuron_id, data_value, extra = line.split("\t")
+                time_s, neuron_id_s, data_value_s, _extra = line.split("\t")
             else:
-                time, neuron_id, data_value = line.split("\t")
-            time = float(evaluator.eval(time))
-            neuron_id = int(evaluator.eval(neuron_id))
-            data_value = float(evaluator.eval(data_value))
+                time_s, neuron_id_s, data_value_s = line.split("\t")
+            time = float(evaluator.eval(time_s))
+            neuron_id = int(evaluator.eval(neuron_id_s))
+            data_value = float(evaluator.eval(data_value_s))
             if (min_atom <= neuron_id < max_atom and
                     min_time <= time < max_time):
                 times.append(time)
                 atom_ids.append(neuron_id)
                 data_items.append(data_value)
             else:
-                print("failed to enter {}:{}".format(neuron_id, time))
+                print(f"failed to enter {neuron_id}:{time}")
 
     result = numpy.dstack((atom_ids, times, data_items))[0]
-    return result[numpy.lexsort((times, atom_ids))]
+    return result[numpy.lexsort(result.T[1::-1])]
 
 
-def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
-                          min_time=0, max_time=float('inf'), split_value="\t"):
-    """ Read spikes from a file formatted as:
+def read_spikes_from_file(
+        file_path: str,
+        min_atom: float = 0, max_atom: float = float('inf'),
+        min_time: float = 0, max_time: float = float('inf'),
+        split_value: str = "\t") -> NDArray[numpy.integer]:
+    """
+    Read spikes from a file formatted as::
+
         <time>\t<neuron ID>
 
     :param str file_path: absolute path to a file containing spike values
@@ -176,7 +194,7 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     :type max_time: float or int
     :param str split_value: the pattern to split by
     :return:
-        a numpy array with max_atom elements each of which is a list of\
+        a numpy array with up to max_atom elements each of which is a list of
         spike times.
     :rtype: numpy.ndarray(int, int)
     """
@@ -213,9 +231,10 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
 
 def get_probable_maximum_selected(
         n_total_trials, n_trials, selection_prob, chance=(1.0 / 100.0)):
-    """ Get the likely maximum number of items that will be selected from a\
-        set of n_trials from a total set of n_total_trials\
-        with a probability of selection of selection_prob
+    """
+    Get the likely maximum number of items that will be selected from a
+    set of `n_trials` from a total set of `n_total_trials`
+    with a probability of selection of `selection_prob`.
     """
     prob = 1.0 - (chance / float(n_total_trials))
     val = binom.ppf(prob, n_trials, selection_prob)
@@ -229,81 +248,111 @@ def get_probable_maximum_selected(
 
 def get_probable_minimum_selected(
         n_total_trials, n_trials, selection_prob, chance=(1.0 / 100.0)):
-    """ Get the likely minimum number of items that will be selected from a\
-        set of n_trials from a total set of n_total_trials\
-        with a probability of selection of selection_prob
+    """
+    Get the likely minimum number of items that will be selected from a
+    set of `n_trials` from a total set of `n_total_trials`
+    with a probability of selection of `selection_prob`.
     """
     prob = (chance / float(n_total_trials))
     return binom.ppf(prob, n_trials, selection_prob)
 
 
-def get_probability_within_range(dist, lower, upper):
-    """ Get the probability that a value will fall within the given range for\
-        a given RandomDistribution
+def get_probability_within_range(distribution, lower, upper):
     """
-    stats = STATS_BY_NAME[dist.name]
-    return stats.cdf(dist, upper) - stats.cdf(dist, lower)
+    Get the probability that a value will fall within the given range for
+    a given RandomDistribution.
+
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
+    :param float lower:
+    :param float upper:
+    """
+    stats = STATS_BY_NAME[distribution.name]
+    return stats.cdf(distribution, upper) - stats.cdf(distribution, lower)
 
 
-def get_maximum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
-    """ Get the likely maximum value of a RandomDistribution given a\
-        number of draws
+def get_maximum_probable_value(distribution, n_items, chance=(1.0 / 100.0)):
     """
-    stats = STATS_BY_NAME[dist.name]
+    Get the likely maximum value of a RandomDistribution given a
+    number of draws.
+
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
+    :param int n_items:
+    :param float chance:
+    """
+    stats = STATS_BY_NAME[distribution.name]
     prob = 1.0 - (chance / float(n_items))
-    return stats.ppf(dist, prob)
+    return stats.ppf(distribution, prob)
 
 
-def get_minimum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
-    """ Get the likely minimum value of a RandomDistribution given a\
-        number of draws
+def get_minimum_probable_value(distribution, n_items, chance=(1.0 / 100.0)):
     """
-    stats = STATS_BY_NAME[dist.name]
+    Get the likely minimum value of a RandomDistribution given a
+    number of draws.
+
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
+    """
+    stats = STATS_BY_NAME[distribution.name]
     prob = chance / float(n_items)
-    return stats.ppf(dist, prob)
+    return stats.ppf(distribution, prob)
 
 
-def get_mean(dist):
-    """ Get the mean of a RandomDistribution
+def get_mean(distribution):
     """
-    stats = STATS_BY_NAME[dist.name]
-    return stats.mean(dist)
+    Get the mean of a RandomDistribution.
 
-
-def get_standard_deviation(dist):
-    """ Get the standard deviation of a RandomDistribution
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
     """
-    stats = STATS_BY_NAME[dist.name]
-    return stats.std(dist)
+    stats = STATS_BY_NAME[distribution.name]
+    return stats.mean(distribution)
 
 
-def get_variance(dist):
-    """ Get the variance of a RandomDistribution
+def get_standard_deviation(distribution):
     """
-    stats = STATS_BY_NAME[dist.name]
-    return stats.var(dist)
+    Get the standard deviation of a RandomDistribution.
 
-
-def high(dist):
-    """ Gets the high or max boundary value for this distribution
-
-    Could return None
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
     """
-    stats = STATS_BY_NAME[dist.name]
-    return stats.high(dist)
+    stats = STATS_BY_NAME[distribution.name]
+    return stats.std(distribution)
 
 
-def low(dist):
-    """ Gets the high or min boundary value for this distribution
-
-    Could return None
+def get_variance(distribution):
     """
-    stats = STATS_BY_NAME[dist.name]
-    return stats.low(dist)
+    Get the variance of a RandomDistribution.
+
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
+    """
+    stats = STATS_BY_NAME[distribution.name]
+    return stats.var(distribution)
 
 
-def _validate_mars_kiss_64_seed(seed):
-    """ Update the seed to make it compatible with the RNG algorithm
+def high(distribution):
+    """
+    Gets the high or maximum boundary value for this distribution.
+
+    Could return `None`.
+
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
+    """
+    stats = STATS_BY_NAME[distribution.name]
+    return stats.high(distribution)
+
+
+def low(distribution):
+    """
+    Gets the high or minimum boundary value for this distribution.
+
+    Could return `None`.
+
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
+    """
+    stats = STATS_BY_NAME[distribution.name]
+    return stats.low(distribution)
+
+
+def _validate_mars_kiss_64_seed(seed: List[int]) -> List[int]:
+    """
+    Update the seed to make it compatible with the RNG algorithm.
     """
     if seed[1] == 0:
         # y (<- seed[1]) can't be zero so set to arbitrary non-zero if so
@@ -314,28 +363,30 @@ def _validate_mars_kiss_64_seed(seed):
     return seed
 
 
-def create_mars_kiss_seeds(rng):
-    """ generates and checks that the seed values generated by the given\
-        random number generator or seed to a random number generator are\
-        suitable for use as a mars 64 kiss seed.
+def create_mars_kiss_seeds(rng) -> Tuple[int, ...]:
+    """
+    Generates and checks that the seed values generated by the given
+    random number generator or seed to a random number generator are
+    suitable for use as a mars 64 kiss seed.
 
     :param rng: the random number generator.
     :type rng: ~numpy.random.RandomState
     :param seed:
         the seed to create a random number generator if not handed.
     :type seed: int or None
-    :return: a list of 4 ints which are used by the mars64 kiss random number
-        generator for seeds.
+    :return: a list of 4 integers which are used by the mars64 kiss random
+        number generator for seeds.
     :rtype: list(int)
     """
     kiss_seed = _validate_mars_kiss_64_seed([
         rng.randint(-BASE_RANDOM_FOR_MARS_64, CAP_RANDOM_FOR_MARS_64) +
         BASE_RANDOM_FOR_MARS_64 for _ in range(N_RANDOM_NUMBERS)])
-    return kiss_seed
+    return tuple(kiss_seed)
 
 
 def get_n_bits(n_values):
-    """ Determine how many bits are required for the given number of values
+    """
+    Determine how many bits are required for the given number of values.
 
     :param int n_values: the number of values (starting at 0)
     :return: the number of bits required to express that many values
@@ -348,48 +399,9 @@ def get_n_bits(n_values):
     return int(math.ceil(math.log2(n_values)))
 
 
-def moved_in_v6(old_location, _):
-    """
-    Tells the users that old code is no lonfger implemented
-
-    :param str old_location: old import
-    :raise: NotImplementedError
-    """
-    raise NotImplementedError("Old import: {}".format(old_location))
-
-
-def moved_in_v7(old_location, new_location):
-    """
-    Warns the users that they are using an old import.
-
-    In version 8 this will be upgraded to a exception and then later removed
-
-    :param str old_location: old import
-    :param str new_location: new import
-    :raise: an exception if in CONTINUOUS_INTEGRATION
-    """
-    if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-        raise NotImplementedError("Old import: {}".format(old_location))
-    logger.warning("File {} moved to {}. Please fix your imports. "
-                   "In version 8 this will fail completely."
-                   "".format(old_location, new_location))
-
-
-def moved_in_v7_warning(message):
-    """
-    Warns the user that they are using old code
-
-    In version 8 this will be upgraded to a exception and then later removed
-
-    :param str message:
-    """
-    if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-        raise NotImplementedError(message)
-    logger.warning(f"{message} In version 8 old call will fail completely.")
-
-
 def get_time_to_write_us(n_bytes, n_cores):
-    """ Determine how long a write of a given number of bytes will take in us
+    """
+    Determine how long a write of a given number of bytes will take in us.
 
     :param int n_bytes: The number of bytes to transfer
     :param int n_cores: How many cores will be writing at the same time
@@ -397,3 +409,54 @@ def get_time_to_write_us(n_bytes, n_cores):
     bandwidth_per_core = WRITE_BANDWIDTH_BYTES_PER_SECOND / n_cores
     seconds = n_bytes / bandwidth_per_core
     return int(math.ceil(seconds * MICRO_TO_SECOND_CONVERSION))
+
+
+def get_neo_io(file_or_folder):
+    """
+    Hack for https://github.com/NeuralEnsemble/python-neo/issues/1287
+
+    In Neo 0.12 neo.get_io only works with existing files
+
+    :param str file_or_folder:
+    """
+    try:
+        return neo.get_io(file_or_folder)
+    except ValueError as ex:
+        try:
+            _, suffix = os.path.splitext(file_or_folder)
+            suffix = suffix[1:].lower()
+            # pylint: disable=no-member
+            if suffix in neo.io_by_extension:
+                writer_list = neo.io_by_extension[suffix]
+                return writer_list[0](file_or_folder)
+        except AttributeError:
+            # for older neo which has no io_by_extension
+            pass
+        raise ex
+
+
+def report_non_spynnaker_pyNN(msg):
+    """
+    Report a case of non-spynnaker-compatible PyNN being used.  This will warn
+    or error depending on the configuration setting.
+
+    :param str msg: The message to report
+    """
+    if get_config_bool("Simulation", "error_on_non_spynnaker_pynn"):
+        raise ConfigurationException(msg)
+    else:
+        warn_once(logger, msg)
+
+
+def check_rng(rng, where):
+    """
+    Check for non-None rng parameter since this is no longer compatible with
+    sPyNNaker.  If not None, warn or error depending on a config value.
+
+    :param rng: The rng parameter value.
+    """
+    if rng is not None and rng.seed is not None:
+        report_non_spynnaker_pyNN(
+            f"Use of rng in {where} is not supported in sPyNNaker in this"
+            " case. Please instead use seed=<seed> in the target Population to"
+            " ensure random numbers are seeded.")

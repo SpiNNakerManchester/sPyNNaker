@@ -21,8 +21,9 @@ from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
 
 
 class PushBotLifEthernet(ExternalDeviceLifControl):
-    """ Leaky integrate and fire neuron with an exponentially decaying \
-        current input
+    """
+    Leaky integrate and fire neuron with an exponentially decaying
+    current input.
 
     :param MunichIoEthernetProtocol protocol:
         How to talk to the bot.
@@ -42,7 +43,7 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
     :param float isyn_exc: LIF neuron parameter (defaulted)
     :param float isyn_inh: LIF neuron parameter (defaulted)
     """
-    __slots__ = []
+    __slots__ = ()
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(

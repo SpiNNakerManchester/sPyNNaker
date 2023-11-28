@@ -14,14 +14,16 @@
 
 from spinn_utilities.overrides import overrides
 from .abstract_partner_selection import AbstractPartnerSelection
+from spinn_front_end_common.interface.ds import DataSpecificationBase
 
 
 class LastNeuronSelection(AbstractPartnerSelection):
-    """ Partner selection that picks a random source neuron from the neurons\
-        that spiked in the last timestep
+    """
+    Partner selection that picks a random source neuron from the neurons
+    that spiked in the last timestep.
     """
 
-    __slots__ = ["__spike_buffer_size"]
+    __slots__ = ("__spike_buffer_size", )
 
     def __init__(self, spike_buffer_size=64):
         """
@@ -39,9 +41,9 @@ class LastNeuronSelection(AbstractPartnerSelection):
         return 4
 
     @overrides(AbstractPartnerSelection.write_parameters)
-    def write_parameters(self, spec):
+    def write_parameters(self, spec: DataSpecificationBase):
         spec.write_value(self.__spike_buffer_size)
 
     @overrides(AbstractPartnerSelection.get_parameter_names)
     def get_parameter_names(self):
-        return ["spike_buffer_size"]
+        yield "spike_buffer_size"

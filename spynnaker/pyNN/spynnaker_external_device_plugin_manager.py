@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable, Optional, Union
 from spinn_utilities.socket_address import SocketAddress
-from pacman.model.graphs.application import ApplicationEdge
+from pacman.model.graphs.application import (
+    ApplicationEdge, ApplicationVertex)
 from spinn_utilities.config_holder import (get_config_int, get_config_str)
-from spinnman.messages.eieio import EIEIOType
+from spinnman.messages.eieio import EIEIOPrefix, EIEIOType
 from spinn_front_end_common.utility_models import (
     ReverseIpTagMultiCastSource)
 from spinn_front_end_common.utilities.utility_objs import (
@@ -24,17 +26,21 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.populations import Population
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
+    SpikeSourcePoissonVertex)
 
 
 class SpynnakerExternalDevicePluginManager(object):
-    """ User-level interface for the external device plugin manager.
     """
-    __slots__ = []
+    User-level interface for the external device plug-in manager.
+    """
+    __slots__ = ()
 
     @staticmethod
     def add_database_socket_address(
-            database_notify_host, database_notify_port_num,
-            database_ack_port_num):
+            database_notify_host: Optional[str],
+            database_notify_port_num: Optional[int],
+            database_ack_port_num: Optional[int]):
         """
         :param database_notify_host:
             Host to talk to tell that the database (and application) is ready.
@@ -58,17 +64,23 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def activate_live_output_for(
-            population, database_notify_host=None,
-            database_notify_port_num=None,
-            database_ack_port_num=None, port=None, host=None, tag=None,
-            strip_sdp=True, use_prefix=False, key_prefix=None,
-            prefix_type=None, message_type=EIEIOType.KEY_32_BIT,
-            right_shift=0, payload_as_time_stamps=True, notify=True,
-            use_payload_prefix=True, payload_prefix=None,
-            payload_right_shift=0, number_of_packets_sent_per_time_step=0,
-            translate_keys=False):
-        """ Output the spikes from a given population from SpiNNaker as they\
-            occur in the simulation.
+            population: Population, *,
+            database_notify_host: Optional[str] = None,
+            database_notify_port_num: Optional[int] = None,
+            database_ack_port_num: Optional[int] = None,
+            port: Optional[int] = None, host: Optional[str] = None,
+            tag: Optional[int] = None, strip_sdp: bool = True,
+            use_prefix: bool = False, key_prefix: Optional[int] = None,
+            prefix_type: Optional[EIEIOPrefix] = None,
+            message_type: EIEIOType = EIEIOType.KEY_32_BIT,
+            right_shift: int = 0, payload_as_time_stamps: bool = True,
+            notify: bool = True, use_payload_prefix: bool = True,
+            payload_prefix: Optional[int] = None, payload_right_shift: int = 0,
+            number_of_packets_sent_per_time_step: int = 0,
+            translate_keys: bool = False):
+        """
+        Output the spikes from a given population from SpiNNaker as they
+        occur in the simulation.
 
         :param ~spynnaker.pyNN.models.populations.Population population:
             The population to activate the live output for
@@ -137,7 +149,6 @@ class SpynnakerExternalDevicePluginManager(object):
         # Use the mask to remove the colour from non-translated keys
         received_key_mask = 0xFFFFFFFF & ~((2 ** n_colour_bits) - 1)
 
-        # pylint: disable=too-many-arguments, too-many-locals
         params = LivePacketGatherParameters(
             port=port, hostname=host, tag=tag, strip_sdp=strip_sdp,
             use_prefix=use_prefix, key_prefix=key_prefix,
@@ -161,9 +172,14 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def activate_live_output_to(
-            population, device, partition_id=SPIKE_PARTITION_ID):
-        """ Activate the output of spikes from a population to an external\
-            device. Note that all spikes will be sent to the device.
+            population: Population,
+            device: Union[Population, ApplicationVertex],
+            partition_id: str = SPIKE_PARTITION_ID):
+        """
+        Activate the output of spikes from a population to an external device.
+
+        .. note::
+            All spikes will be sent to the device.
 
         :param ~spynnaker.pyNN.models.populations.Population population:
             The pyNN population object from which spikes will be sent.
@@ -176,41 +192,49 @@ class SpynnakerExternalDevicePluginManager(object):
         :param str partition_id:
             The partition ID to activate live output to.
         """
-        device_vertex = device
         # pylint: disable=protected-access
         if isinstance(device, Population):
-            device_vertex = device._vertex
+            device_vertex: ApplicationVertex = device._vertex
+        else:
+            device_vertex = device
         SpynnakerExternalDevicePluginManager.add_edge(
             population._vertex, device_vertex, partition_id)
 
     @staticmethod
     def update_live_packet_gather_tracker(
-            vertex_to_record_from, params, partition_ids):
-        """ Add an edge from a vertex to the live packet gatherer, builds as\
-            needed and has all the parameters for the creation of the live\
-            packet gatherer if needed.
+            vertex_to_record_from: ApplicationVertex,
+            params: LivePacketGatherParameters,
+            partition_ids: Iterable[str]):
+        """
+        Add an edge from a vertex to the live packet gatherer, builds as
+        needed and has all the parameters for the creation of the live
+        packet gatherer if needed.
 
         :param vertex_to_record_from:
         :type vertex_to_record_from:
             ~pacman.model.graphs.application.ApplicationVertex or
             ~pacman.model.graphs.machine.MachineVertex
-        :param LivePacketGatherParameters params:
+        :param params:
+        :type params:
+             ~spinn_front_end_common.utilities.utility_objs.LivePacketGatherParameters
         :param list(str) partition_ids:
         :param bool translate_keys:
         """
-
         # add to the tracker
         SpynnakerDataView.add_live_packet_gatherer_parameters(
             params, vertex_to_record_from, partition_ids)
 
     @staticmethod
     def add_poisson_live_rate_control(
-            poisson_population, control_label_extension="_control",
-            receive_port=None, database_notify_host=None,
-            database_notify_port_num=None,
-            database_ack_port_num=None, notify=True,
-            reserve_reverse_ip_tag=False):
-        """ Add a live rate controller to a Poisson population.
+            poisson_population: Population, *,
+            control_label_extension: str = "_control",
+            receive_port: Optional[int] = None,
+            database_notify_host: Optional[str] = None,
+            database_notify_port_num: Optional[int] = None,
+            database_ack_port_num: Optional[int] = None, notify: bool = True,
+            reserve_reverse_ip_tag: bool = False):
+        """
+        Add a live rate controller to a Poisson population.
 
         :param poisson_population: The population to control
         :type poisson_population:
@@ -233,7 +257,9 @@ class SpynnakerExternalDevicePluginManager(object):
         """
         # pylint: disable=too-many-arguments, protected-access
         vertex = poisson_population._vertex
-        control_label = "{}{}".format(vertex.label, control_label_extension)
+        if not isinstance(vertex, SpikeSourcePoissonVertex):
+            raise TypeError("population must contain a SpikeSourcePoisson")
+        control_label = f"{vertex.label}{control_label_extension}"
         controller = ReverseIpTagMultiCastSource(
             n_keys=vertex.n_atoms, label=control_label,
             receive_port=receive_port,
@@ -249,13 +275,16 @@ class SpynnakerExternalDevicePluginManager(object):
                 database_ack_port_num)
 
     @staticmethod
-    def add_edge(vertex, device_vertex, partition_id):
-        """ Add an edge between two vertices (often a vertex and a external\
-            device) on a given partition.
+    def add_edge(vertex: ApplicationVertex, device_vertex: ApplicationVertex,
+                 partition_id: str) -> ApplicationEdge:
+        """
+        Add an edge between two vertices (often a vertex and a external
+        device) on a given partition.
 
         :param ~pacman.model.graphs.application.ApplicationVertex vertex:
-            the pre-vertex to connect the edge from
-        :param device_vertex: the post vertex to connect the edge to
+            the pre-population vertex to connect the edge from
+        :param device_vertex:
+            the post-population vertex to connect the edge to
         :type device_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :param str partition_id: the partition identifier for making nets
@@ -265,5 +294,5 @@ class SpynnakerExternalDevicePluginManager(object):
         return edge
 
     @staticmethod
-    def add_application_vertex(vertex):
+    def add_application_vertex(vertex: ApplicationVertex):
         SpynnakerDataView.add_vertex(vertex)

@@ -12,62 +12,53 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy
-from spynnaker.pyNN.models.common.param_generator_data import (
-    is_param_generatable)
+from numpy import uint32
+from numpy.typing import NDArray
+from typing import Iterator, MutableMapping, Optional, Tuple, cast
+from spinn_utilities.helpful_functions import is_singleton
+from spinn_utilities.ranged import RangeDictionary, RangedList
+from pacman.model.graphs.common import Slice
+from pacman.model.placements import Placement
+from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
-from spynnaker.pyNN.utilities.struct import StructRepeat
-from spinn_utilities.helpful_functions import is_singleton
+from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
+    AbstractPopulationVertex)
+from spynnaker.pyNN.models.neuron.population_machine_neurons import (
+    NeuronRegions)
 
 
-def _all_one_val_gen(rd):
-    """ Determine if all the values of a dictionary are the same,
-        and can be generated.  Note that a random distribution is considered
-        the same if the same distribution is used for all neurons.
+def _all_one_val_gen(rd: RangeDictionary[float]) -> bool:
+    """
+    Determine if all the values of a dictionary are the same, assuming we
+    already know that they are generatable
+
+    .. note::
+        A random distribution is considered the same if the same distribution
+        is used for all neurons.
 
     :rtype: bool
     """
     for key in rd.keys():
         if is_singleton(rd[key]):
-            if not is_param_generatable(rd[key]):
+            return True
+        if not rd[key].range_based():
+            return False
+        for i, (_start, _stop, _val) in enumerate(rd[key].iter_ranges()):
+            if i > 0:
                 return False
-        else:
-            if not rd[key].range_based():
-                return False
-            for i, (_start, _stop, val) in enumerate(rd[key].iter_ranges()):
-                if i > 0:
-                    return False
-                if not is_param_generatable(val):
-                    return False
-    return True
-
-
-def _all_gen(rd):
-    """ Determine if all the values of a ranged dictionary can be generated.
-
-    :rtype: bool
-    """
-    for key in rd.keys():
-        if is_singleton(rd[key]):
-            if not is_param_generatable(rd[key]):
-                return False
-        else:
-            if not rd[key].range_based():
-                return False
-            for _start, _stop, val in rd[key].iter_ranges():
-                if not is_param_generatable(val):
-                    return False
     return True
 
 
 class NeuronData(object):
-    """ Holds and creates the data for a group of neurons
+    """
+    Holds and creates the data for a group of neurons.
     """
 
-    __slots__ = [
-
+    __slots__ = (
         # The application vertex
         "__app_vertex",
 
@@ -84,61 +75,49 @@ class NeuronData(object):
         "__generation_done",
 
         # Whether to generate things on the machine
-        "__gen_on_machine"
-    ]
+        "__gen_on_machine")
 
-    def __init__(self, app_vertex):
+    def __init__(self, app_vertex: AbstractPopulationVertex):
         self.__app_vertex = app_vertex
-        self.__neuron_data = None
-        self.__neuron_recording_data = None
+        self.__neuron_data: Optional[NDArray[uint32]] = None
+        self.__neuron_recording_data: Optional[NDArray[uint32]] = None
         self.__generation_done = False
-        self.__gen_on_machine = None
+        self.__gen_on_machine = False
         self.__neuron_data_n_structs = 0
 
     @property
-    def gen_on_machine(self):
-        """ Whether the neuron data can be generated on the machine or not
+    def gen_on_machine(self) -> bool:
+        """
+        Whether the neuron data can be generated on the machine or not.
 
         :rtype: bool
         """
-        if self.__gen_on_machine is None:
-            # First try to generate data.  This might have already been done.
-            self.generate_data()
-            if self.__gen_on_machine is not None:
-                return self.__gen_on_machine
-
-            # If we get here, we know the structs are fine so check params
-            params = self.__app_vertex.parameters
-            state_vars = self.__app_vertex.state_variables
-            self.__gen_on_machine = _all_gen(params) and _all_gen(state_vars)
         return self.__gen_on_machine
 
-    def generate_data(self):
-        """ Do the data generation internally
+    def generate_data(self) -> None:
+        """
+        Do the data generation internally.
         """
         if self.__generation_done:
             return
         self.__generation_done = True
 
-        # Check that all the structs can actually be generated
-        structs = self.__app_vertex.neuron_impl.structs
-        for struct in structs:
-            if not struct.is_generatable:
-                # If this is false, we can't generate anything on machine
-                self.__gen_on_machine = False
-                return
-
-        params = self.__app_vertex.parameters
-        state_vars = self.__app_vertex.state_variables
+        if not self.__app_vertex.can_generate_on_machine():
+            self.__gen_on_machine = False
+            return
 
         # Check that all parameters and state variables have a single range
-        if (not _all_one_val_gen(params) or not _all_one_val_gen(state_vars)):
+        params = self.__app_vertex.parameters
+        state_vars = self.__app_vertex.state_variables
+        if not _all_one_val_gen(params) or not _all_one_val_gen(state_vars):
             # Note at this point, we can still generate ranges on machine,
             # just that it has to be different per core
-            self.__gen_on_machine = None
+            self.__gen_on_machine = True
+            self.__neuron_data = None
             return
 
         # Go through all the structs and make all the data
+        structs = self.__app_vertex.neuron_impl.structs
         values = _MergedDict(params, state_vars)
         all_data = [struct.get_generator_data(values) for struct in structs]
         self.__neuron_data = numpy.concatenate(all_data)
@@ -153,11 +132,15 @@ class NeuronData(object):
         self.__gen_on_machine = True
 
     def write_data(
-            self, spec, vertex_slice, neuron_regions, gen_on_machine=True):
-        """ Write the generated data
+            self, spec: DataSpecificationBase, vertex_slice: Slice,
+            neuron_regions: NeuronRegions, gen_on_machine: bool = True):
+        """
+        Write the generated data.
 
-        :param DataSpecificationGenerator spec: The spec to write to
-        :param Slice vertex_slice: The vertex_slice to generate for
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The vertex slice to generate for
         :param NeuronRegions neuron_regions: The regions to write to
         :param bool gen_on_machine: Whether to allow generation on machine
         """
@@ -185,8 +168,7 @@ class NeuronData(object):
             if self.__neuron_recording_data is not None:
                 rec_data = self.__neuron_recording_data
             else:
-                rec_data = neuron_recorder.get_generator_data(
-                    vertex_slice, self.__app_vertex.atoms_shape)
+                rec_data = neuron_recorder.get_generator_data(vertex_slice)
             n_words = len(data) + len(header) + len(rec_data)
             spec.reserve_memory_region(
                 region=neuron_regions.neuron_builder,
@@ -208,67 +190,72 @@ class NeuronData(object):
                     vertex_slice.n_atoms),
             label="initial_values")
 
-    def __get_neuron_param_data(self, vertex_slice):
-        """ Get neuron parameter data for a slice
+    def __get_neuron_param_data(self, vertex_slice: Slice) -> NDArray:
+        """
+        Get neuron parameter data for a slice.
 
-        :param Slice vertex_slice: The slice to get the data for
-        :rtype: numpy.ndarray
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice to get the data for
+        :rtype: ~numpy.ndarray
         """
         structs = self.__app_vertex.neuron_impl.structs
-        params = self.__app_vertex.parameters
-        state_vars = self.__app_vertex.state_variables
-        values = _MergedDict(params, state_vars)
-        all_data = [
+        values = _MergedDict(self.__app_vertex.parameters,
+                             self.__app_vertex.state_variables)
+        return numpy.concatenate([
             self.__get_struct_data(struct, values, vertex_slice)
-            for struct in structs]
-        return numpy.concatenate(all_data)
+            for struct in structs])
 
-    def __get_struct_data(self, struct, values, vertex_slice):
-        """ Get the data for a struct
+    def __get_struct_data(self, struct: Struct, values: '_MergedDict',
+                          vertex_slice: Slice) -> NDArray[uint32]:
+        """
+        Get the data for a structure.
 
-        :param Struct struct: The struct to get the data for
-        :param RangeDictionary values: The values to fill in the struct with
+        :param Struct struct: The structure to get the data for
+        :param RangeDictionary values: The values to fill in the structure with
         :param Slice vertex_slice: The slice to get the values for
         """
         if struct.repeat_type == StructRepeat.GLOBAL:
             return struct.get_data(values)
-        return struct.get_data(
-            values, vertex_slice, self.__app_vertex.atoms_shape)
+        return struct.get_data(values, vertex_slice)
 
-    def __get_neuron_builder_data(self, vertex_slice):
-        """ Get the data to build neuron parameters with
+    def __get_neuron_builder_data(
+            self, vertex_slice: Slice) -> Tuple[int, NDArray[uint32]]:
+        """
+        Get the data to build neuron parameters with.
 
         :param Slice vertex_slice: The slice to get the parameters for
-        :return: The number of structs and the data
+        :return: The number of structures and the data
         :rtype: tuple(int, numpy.ndarray)
         """
         structs = self.__app_vertex.neuron_impl.structs
-        params = self.__app_vertex.parameters
-        state_vars = self.__app_vertex.state_variables
-        values = _MergedDict(params, state_vars)
-        all_data = [
+        values = _MergedDict(self.__app_vertex.parameters,
+                             self.__app_vertex.state_variables)
+        return len(structs), numpy.concatenate([
             self.__get_builder_data(struct, values, vertex_slice)
-            for struct in structs]
-        return len(structs), numpy.concatenate(all_data)
+            for struct in structs])
 
-    def __get_builder_data(self, struct, values, vertex_slice):
-        """ Get the builder data for a struct
+    def __get_builder_data(
+            self, struct: Struct, values: '_MergedDict',
+            vertex_slice: Slice) -> NDArray[uint32]:
+        """
+        Get the builder data for a structure.
 
-        :param Struct struct: The struct to get the data for
-        :param RangeDictionary values: The values to fill in the struct with
+        :param Struct struct: The structure to get the data for
+        :param RangeDictionary values: The values to fill in the structure with
         :param Slice vertex_slice: The slice to get the values for
         """
         if struct.repeat_type == StructRepeat.GLOBAL:
             return struct.get_generator_data(values)
-        return struct.get_generator_data(
-            values, vertex_slice, self.__app_vertex.atoms_shape)
+        return struct.get_generator_data(values, vertex_slice)
 
     def __get_neuron_builder_header(
-            self, vertex_slice, n_structs, neuron_regions):
-        """ Get the header of the neuron builder region
+            self, vertex_slice: Slice, n_structs: int,
+            neuron_regions: NeuronRegions) -> NDArray[uint32]:
+        """
+        Get the header of the neuron builder region.
 
         :param Slice vertex_slice: The slice to put in the header
-        :param int n_structs: The number of structs to generate
+        :param int n_structs: The number of structures to generate
         :param NeuronRegions neuron_regions: The regions to point to
         :rtype: numpy.ndarray
         """
@@ -277,39 +264,45 @@ class NeuronData(object):
             neuron_regions.neuron_recording,
             *self.__app_vertex.pop_seed,
             *self.__app_vertex.core_seed(vertex_slice),
-            n_structs, vertex_slice.n_atoms
-        ], dtype="uint32")
+            n_structs, vertex_slice.n_atoms], dtype=uint32)
 
-    def read_data(self, placement, neuron_regions):
-        """ Read the current state of the data from the machine into the
-            application vertex
+    def read_data(
+            self, placement: Placement, neuron_regions: NeuronRegions):
+        """
+        Read the current state of the data from the machine into the
+        application vertex.
 
-        :param Placement placement: The placement of the vertex to read
+        :param ~pacman.model.placements.Placement placement:
+            The placement of the vertex to read
         :param NeuronRegions neuron_regions: The regions to read from
         """
-        params = self.__app_vertex.parameters
-        state_vars = self.__app_vertex.state_variables
-        merged_dict = _MergedDict(params, state_vars)
+        merged_dict = _MergedDict(self.__app_vertex.parameters,
+                                  self.__app_vertex.state_variables)
         self.__do_read_data(
             placement, neuron_regions.neuron_params, merged_dict)
 
-    def read_initial_data(self, placement, neuron_regions):
-        """ Read the initial state of the data from the machine into the
-            application vertex
+    def read_initial_data(
+            self, placement: Placement, neuron_regions: NeuronRegions):
+        """
+        Read the initial state of the data from the machine into the
+        application vertex.
 
-        :param Placement placement: The placement of the vertex to read
+        :param ~pacman.model.placements.Placement placement:
+            The placement of the vertex to read
         :param NeuronRegions neuron_regions: The regions to read from
         """
-        params = self.__app_vertex.parameters
-        state_vars = self.__app_vertex.initial_state_variables
-        merged_dict = _MergedDict(params, state_vars)
+        merged_dict = _MergedDict(self.__app_vertex.parameters,
+                                  self.__app_vertex.initial_state_variables)
         self.__do_read_data(
             placement, neuron_regions.initial_values, merged_dict)
 
-    def __do_read_data(self, placement, region, results):
-        """ Perform the reading of data
+    def __do_read_data(
+            self, placement: Placement, region: int, results: '_MergedDict'):
+        """
+        Perform the reading of data.
 
-        :param Placement placement: Where the vertex is on the machine
+        :param ~pacman.model.placements.Placement placement:
+            Where the vertex is on the machine
         :param int region: The region to read from
         :param MergedDict results: Where to write the results to
         """
@@ -322,48 +315,60 @@ class NeuronData(object):
         offset = 0
         for struct in self.__app_vertex.neuron_impl.structs:
             if struct.repeat_type == StructRepeat.GLOBAL:
-                struct.read_data(block, results, offset)
+                struct.read_data(block, cast(RangeDictionary, results), offset)
                 offset += struct.get_size_in_whole_words() * BYTES_PER_WORD
             else:
-                struct.read_data(
-                    block, results, offset, vertex_slice,
-                    self.__app_vertex.atoms_shape)
+                struct.read_data(block, cast(RangeDictionary, results), offset,
+                                 vertex_slice)
                 offset += (
                     struct.get_size_in_whole_words(vertex_slice.n_atoms) *
                     BYTES_PER_WORD)
 
-    def reset_generation(self):
-        """ Reset generation so it is done again
+    def reset_generation(self) -> None:
+        """
+        Reset generation so it is done again.
         """
         self.__neuron_data = None
         self.__neuron_recording_data = None
         self.__generation_done = False
-        self.__gen_on_machine = None
+        self.__gen_on_machine = False
         self.__neuron_data_n_structs = 0
 
 
-class _MergedDict(object):
-    __slots__ = [
+class _MergedDict(MutableMapping[str, RangedList[float]]):
+    __slots__ = (
         "__params",
-        "__state_vars"
-    ]
+        "__state_vars")
 
-    def __init__(self, params, state_vars):
+    def __init__(self, params: RangeDictionary[float],
+                 state_vars: RangeDictionary[float]):
         self.__params = params
         self.__state_vars = state_vars
 
-    def __contains__(self, key):
+    def __contains__(self, key: object) -> bool:
+        if not isinstance(key, str):
+            return False
         return key in self.__params or key in self.__state_vars
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> RangedList[float]:
         if key in self.__params:
             return self.__params[key]
         return self.__state_vars[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: RangedList[float]):
         if key in self.__params:
             self.__params[key] = value
         elif key in self.__state_vars:
             self.__state_vars[key] = value
         else:
             raise KeyError(f"No such key {key}")
+
+    def __delitem__(self, __v: str):
+        raise NotImplementedError("items may not be deleted")
+
+    def __iter__(self) -> Iterator[str]:
+        yield from self.__params.keys()
+        yield from self.__state_vars.keys()
+
+    def __len__(self) -> int:
+        return len(self.__params) + len(self.__state_vars)

@@ -11,22 +11,30 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from six import add_metaclass
+from __future__ import annotations
+from numpy.typing import NDArray
+from typing import Sequence, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pacman.model.placements import Placement
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
 
 
-@add_metaclass(AbstractBase)
-class HasSynapses(object):
-
+class HasSynapses(object, metaclass=AbstractBase):
     @abstractmethod
     def get_connections_from_machine(
-            self, placement, app_edge, synapse_info):
-        """ Get the connections from the machine for this vertex.
+            self, placement: Placement, app_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation) -> Sequence[NDArray]:
+        """
+        Get the connections from the machine for this vertex.
 
-        :param ~pacman.model.placement.Placement placement:
+        :param ~pacman.model.placements.Placement placement:
             Where the connection data is on the machine
         :param ProjectionApplicationEdge app_edge:
             The edge for which the data is being read
         :param SynapseInformation synapse_info:
             The specific projection within the edge
+        :rtype: list(~numpy.ndarray)
         """
+        raise NotImplementedError

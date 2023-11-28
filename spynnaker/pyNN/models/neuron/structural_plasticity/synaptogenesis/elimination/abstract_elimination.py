@@ -12,41 +12,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractHasParameterNames)
 
 
-class AbstractElimination(object, metaclass=AbstractBase):
-    """ An elimination rule
+class AbstractElimination(AbstractHasParameterNames, metaclass=AbstractBase):
+    """
+    A synaptic connection elimination rule.
     """
 
     __slots__ = ()
 
-    @abstractproperty
-    def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+    @property
+    @abstractmethod
+    def vertex_executable_suffix(self) -> str:
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_parameters_sdram_usage_in_bytes(self):
-        """ Get the amount of SDRAM used by the parameters of this rule
+    def get_parameters_sdram_usage_in_bytes(self) -> int:
+        """
+        Get the amount of SDRAM used by the parameters of this rule.
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def write_parameters(self, spec, weight_scale):
-        """ Write the parameters of the rule to the spec
+    def write_parameters(
+            self, spec: DataSpecificationGenerator, weight_scale: float):
+        """
+        Write the parameters of the rule to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
         :param float weight_scale:
         """
-
-    @abstractmethod
-    def get_parameter_names(self):
-        """ Return the names of the parameters supported by this rule
-
-        :rtype: iterable(str)
-        """
+        raise NotImplementedError

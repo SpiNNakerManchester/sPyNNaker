@@ -23,21 +23,19 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
 
 class PushBotEthernetMotorDevice(
         PushBotEthernetDevice, AbstractSendMeMulticastCommandsVertex):
-    """ The motor of a PushBot
+    """
+    The motor of a PushBot.
     """
 
     def __init__(self, motor, protocol, timesteps_between_send=None):
         """
-        :param motor: a PushBotMotor value to indicate the motor to control
-        :type motor:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor
-        :param protocol: The protocol used to control the device
-        :type protocol: MunichIoEthernetProtocol
-        :param timesteps_between_send:
+        :param PushBotMotor motor: indicates which motor to control
+        :param MunichIoEthernetProtocol protocol:
+            The protocol used to control the device
+        :param int timesteps_between_send:
             The number of timesteps between sending commands to the device,
-            or None to use the default
+            or `None` to use the default
         """
-
         if not isinstance(motor, PushBotMotor):
             raise ConfigurationException(
                 "motor parameter must be a PushBotMotor value")
@@ -52,20 +50,17 @@ class PushBotEthernetMotorDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
-        commands = list()
-
         # add mode command if not done already
         if not self.protocol.sent_mode_command():
-            commands.append(self.protocol.set_mode())
+            yield self.protocol.set_mode()
 
         # device specific commands
-        commands.append(self.__command_protocol.generic_motor_enable())
-        return commands
+        yield self.__command_protocol.generic_motor_enable()
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
-        return [self.__command_protocol.generic_motor_disable()]
+        yield self.__command_protocol.generic_motor_disable()
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

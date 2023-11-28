@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.defaults import (
     defaults, default_parameters, default_initial_values)
@@ -88,13 +88,15 @@ def test_abstract():
 
     class BaseClass(object, metaclass=AbstractBase):
 
-        @abstractproperty
+        @property
         @staticmethod
+        @abstractmethod
         def default_parameters():
             pass
 
-        @abstractproperty
+        @property
         @staticmethod
+        @abstractmethod
         def default_initial_values():
             pass
 
@@ -156,7 +158,7 @@ def _check_warnings(lc, expected, not_expected):
         " not cell_params")
     warning_variables = set()
     for record in lc.records:
-        match = line_matcher.match(record.getMessage())
+        match = line_matcher.match(str(record.msg))
         if record.levelname == "WARNING" and match:
             warning_variables.add(match.group(1))
 

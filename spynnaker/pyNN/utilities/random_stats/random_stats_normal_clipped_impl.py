@@ -17,8 +17,9 @@ from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
 class RandomStatsNormalClippedImpl(AbstractRandomStats):
-    """ An implementation of AbstractRandomStats for normal distributions that\
-        are clipped to a boundary (redrawn)
+    """
+    An implementation of AbstractRandomStats for normal distributions that
+    are clipped to a boundary (redrawn).
     """
 
     def _get_params(self, dist):
@@ -44,8 +45,8 @@ class RandomStatsNormalClippedImpl(AbstractRandomStats):
     def var(self, dist):
         return truncnorm.var(*self._get_params(dist))
 
-    def high(self, dist):
-        return dist.parameters['high']
+    def high(self, distribution):
+        return distribution.parameters['high']
 
-    def low(self, dist):
-        return dist.parameters['low']
+    def low(self, distribution):
+        return distribution.parameters['low']

@@ -12,15 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pyNN.space import BaseStructure
 
 
 class SupportsStructure(object, metaclass=AbstractBase):
-    """ Indicates an object that supports the setting of a PyNN structure
+    """
+    Indicates an object that supports the setting of a PyNN structure.
     """
 
     @abstractmethod
-    def set_structure(self, structure):
-        """ Set the structure of the object
-
-        :param pynn.space.BaseStructure structure: The structure to set
+    def set_structure(self, structure: BaseStructure):
         """
+        Set the structure of the object.
+
+        :param ~pynn.space.BaseStructure structure: The structure to set
+        """
+        raise NotImplementedError

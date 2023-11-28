@@ -17,8 +17,8 @@ import pytest
 import numpy
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import ConnectionHolder
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSDRAMSynapseDynamics)
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    NUMPY_CONNECTORS_DTYPE)
 
 
 @pytest.fixture(
@@ -69,7 +69,7 @@ def test_connection_holder(data_items, fixed_values, as_list):
         n_post_atoms=2, fixed_values=fixed_values)
     connections = numpy.array(
         [(0, 0, 1, 10), (0, 0, 2, 20), (0, 1, 3, 30)],
-        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+        NUMPY_CONNECTORS_DTYPE)
     connection_holder.add_connections(connections)
 
     if as_list:
@@ -155,11 +155,11 @@ def test_connection_holder(data_items, fixed_values, as_list):
 
 def test_connection_holder_matrix_multiple_items():
     unittest_setup()
-    data_items = ["source", "target", "delay", "weight"]
+    data_items_to_return = ["source", "target", "delay", "weight"]
     connection_holder = ConnectionHolder(
-        data_items_to_return=data_items,
+        data_items_to_return=data_items_to_return,
         as_list=False, n_pre_atoms=2, n_post_atoms=2)
     connections = numpy.array(
         [(0, 0, 1, 10), (0, 0, 2, 20), (0, 1, 3, 30)],
-        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+        NUMPY_CONNECTORS_DTYPE)
     connection_holder.add_connections(connections)

@@ -15,7 +15,6 @@
 """
 Synfirechain-like example
 """
-from pyNN.random import NumpyRNG
 import pyNN.spiNNaker as p
 from spynnaker.pyNN.utilities import neo_convertor
 
@@ -378,7 +377,7 @@ class SynfireRunner(object):
             spike_array = {'spike_times': spike_times_list[run_count]}
 
         populations.append(p.Population(
-            n_neurons, cell_class(**cell_params), label='pop_1'))
+            n_neurons, cell_class(**cell_params), label='pop_1', seed=seed))
 
         if placement_constraint is not None:
             if len(placement_constraint) == 2:
@@ -389,11 +388,7 @@ class SynfireRunner(object):
                 populations[0].add_placement_constraint(x=x, y=y, p=proc)
 
         if randomise_v_init:
-            if seed is None:
-                v_init = p.RandomDistribution('uniform', [-60, -40])
-            else:
-                v_init = p.RandomDistribution('uniform', [-60, -40],
-                                              NumpyRNG(seed=seed))
+            v_init = p.RandomDistribution('uniform', [-60, -40])
             populations[0].initialize(v=v_init)
 
         if constraint is not None:
@@ -410,7 +405,7 @@ class SynfireRunner(object):
             populations.append(p.Population(
                 1, input_class(
                     rate=rate, start=start_time, duration=duration),
-                label='inputSSP_1', additional_parameters={"seed": seed}))
+                label='inputSSP_1', seed=seed))
 
         # handle projections
         if use_spike_connections:
@@ -570,10 +565,11 @@ class SynfireRunner(object):
 
     def get_weights(self):
         """
-        :return: if not recorded returns None.\
-            If recorded once returns a numpy array.\
-            If recorded more than once returns a list of numpy arrays.
-        :rtype: None, nparray, or list of nparray
+        :return:
+            If not recorded, returns None.
+            If recorded once, returns a numpy array.
+            If recorded more than once, returns a list of numpy arrays.
+        :rtype: None or ~numpy.ndarray or list(~numpy.ndarray)
         """
         if len(self._weights) == 0:
             return None
@@ -583,10 +579,11 @@ class SynfireRunner(object):
 
     def get_delay(self):
         """
-        :return: if not recorded returns None.\
-            f recorded once returns a numpy array.\
-            If recorded more than once returns a list of numpy arrays.
-        :rtype: None, nparray, or list of nparray
+        :return:
+            If not recorded, returns None.
+            If recorded once, returns a numpy array.
+            If recorded more than once, returns a list of numpy arrays.
+        :rtype: None or ~numpy.ndarray or list(~numpy.ndarray)
         """
         if len(self._delays) == 0:
             return None

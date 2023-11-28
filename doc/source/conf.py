@@ -54,6 +54,9 @@ extensions = [
     'sphinx.ext.mathjax'
 ]
 
+# Which version of other SpiNNaker docs do we refer to?
+spinnaker_doc_version = "latest"
+
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.8', None),
     'numpy': ("https://numpy.org/doc/1.20/", None),
@@ -61,14 +64,19 @@ intersphinx_mapping = {
     'pynn': ("https://neuralensemble.github.io/docs/PyNN/", None),
     'neo': ('https://neo.readthedocs.io/en/stable/', None),
     # We don't link to quantities; their docs are too awful
-    'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
-    'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None),
-    'spinnman': ('https://spinnman.readthedocs.io/en/latest/', None),
-    'pacman': ('https://pacman.readthedocs.io/en/latest/', None),
-    'data_specification': (
-        'https://dataspecification.readthedocs.io/en/latest/', None),
+    'spinn_utilities': (
+        f'https://spinnutils.readthedocs.io/en/{spinnaker_doc_version}/',
+        None),
+    'spinn_machine': (
+        f'https://spinnmachine.readthedocs.io/en/{spinnaker_doc_version}/',
+        None),
+    'spinnman': (
+        f'https://spinnman.readthedocs.io/en/{spinnaker_doc_version}/', None),
+    'pacman': (
+        f'https://pacman.readthedocs.io/en/{spinnaker_doc_version}/', None),
     'spinn_front_end_common': (
-        'https://spinnfrontendcommon.readthedocs.io/en/latest/', None)
+        'https://spinnfrontendcommon.readthedocs.io/en/'
+        f'{spinnaker_doc_version}/', None)
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -84,8 +92,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'sPyNNaker'
-copyright = u'2014-2021'
+project = 'sPyNNaker'
+copyright = '2014'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -219,7 +227,9 @@ html_static_path = ['_static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'sPyNNakerdoc'
 
-mathjax_path = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML'
+mathjax_path = (
+    'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js'
+    '?config=TeX-MML-AM_CHTML')
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -239,7 +249,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   ('index', 'sPyNNaker.tex',
-   u'sPyNNaker Documentation', u'', 'manual'),
+   'sPyNNaker Documentation', '', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -268,9 +278,9 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'sPyNNaker',
-     u'sPyNNaker Documentation',
-     [u''], 1)
+    ('index', project,
+     'sPyNNaker Documentation',
+     [''], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -283,8 +293,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'sPyNNaker',
-   u'sPyNNaker Documentation', u'', 'sPyNNaker', '',
+  ('index', project,
+   'sPyNNaker Documentation', '', project, '',
    'Miscellaneous'),
 ]
 
@@ -304,10 +314,10 @@ texinfo_documents = [
 # -- Options for Epub output ----------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'sPyNNaker'
-epub_author = u''
-epub_publisher = u''
-epub_copyright = u'2014-2017'
+epub_title = project
+epub_author = ''
+epub_publisher = ''
+epub_copyright = copyright
 
 # The basename for the epub file. It defaults to the project name.
 # epub_basename = u'data_allocation'
@@ -379,11 +389,13 @@ autodoc_default_options = {
     "special-members": "__call__"
 }
 
+_encoding = "utf-8"
+
 if _on_rtd:
     # Some packages need mocking
     autodoc_mock_imports = [
         '_tkinter', 'scipy', 'scipy.stats', 'matplotlib',
-        'pyNN', 'pyNN.random', 'pyNN.common', 'neo', 'quantities', 'lazyarray']
+        'neo', 'quantities', 'lazyarray']
 
 
 # Automatically called by sphinx at startup
@@ -413,7 +425,7 @@ def excluded_because_in_init(base):
     for root, _dirs, files in os.walk(base):
         if "__init__.py" in files:
             init = os.path.join(root,  "__init__.py")
-            with open(init) as f:
+            with open(init, encoding=_encoding) as f:
                 for line in f:
                     if line.startswith("from ."):
                         parts = line.split()
@@ -441,9 +453,9 @@ semantic_sugar_files = [
     os.path.join("doc", "source", "spynnaker.pyNN.extra_models.rst"),
 ]
 for semantic_sugar_file in semantic_sugar_files:
-    with open(semantic_sugar_file, 'r') as f:
-        for line in f:
+    with open(semantic_sugar_file, 'r', encoding=_encoding) as _f:
+        for _line in _f:
             pass
-        noindex_line = line.replace("show-inheritance","noindex")
-    with open(semantic_sugar_file, "a",  encoding="utf-8") as f:
+        noindex_line = _line.replace("show-inheritance", "noindex")
+    with open(semantic_sugar_file, "a",  encoding=_encoding) as f:
         f.write(noindex_line)

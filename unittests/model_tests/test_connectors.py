@@ -16,6 +16,7 @@ import functools
 import numpy
 import pytest
 import random
+import sys
 from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neural_projections.connectors import (
@@ -95,7 +96,7 @@ def test_connectors(
         synapse_info = SynapseInformation(
             connector=None, pre_population=MockPopulation(n_pre, "Pre"),
             post_population=MockPopulation(n_post, "Post"),
-            prepop_is_view=False, postpop_is_view=False, rng=None,
+            prepop_is_view=False, postpop_is_view=False,
             synapse_dynamics=None, synapse_type=None, receptor_type=None,
             synapse_type_from_dynamics=False,
             weights=weight, delays=delay)
@@ -115,11 +116,11 @@ def test_connectors(
         if max_row_length is None:
             max_row_length = connector.\
                 get_n_connections_from_pre_vertex_maximum(
-                    n_in_slice, synapse_info)
+                    n_in_slice, synapse_info, 0, sys.maxsize)
         else:
             assert (max_row_length == connector.
                     get_n_connections_from_pre_vertex_maximum(
-                        n_in_slice, synapse_info))
+                        n_in_slice, synapse_info, 0, sys.maxsize))
         if max_col_length is None:
             max_col_length = connector.\
                 get_n_connections_to_post_vertex_maximum(synapse_info)

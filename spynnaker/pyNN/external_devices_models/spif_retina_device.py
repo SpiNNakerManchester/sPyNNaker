@@ -16,10 +16,10 @@ from pacman.model.graphs.application import (
     Application2DFPGAVertex, FPGAConnection)
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.constants import BITS_IN_KEY
+from pacman.utilities.utility_calls import is_power_of_2
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SPIF_INPUT_FPGA_LINKS,
@@ -31,8 +31,9 @@ from .spif_devices import (
 
 class SPIFRetinaDevice(
         Application2DFPGAVertex, PopulationApplicationVertex,
-        AbstractSendMeMulticastCommandsVertex, HasShapeKeyFields):
-    """ A retina device connected to SpiNNaker using a SPIF board.
+        AbstractSendMeMulticastCommandsVertex):
+    """
+    A retina device connected to SpiNNaker using a SPIF board.
     """
 
     #: SPIF outputs to 8 FPGA output links, so we split into (2 x 4), meaning
@@ -48,7 +49,7 @@ class SPIFRetinaDevice(
     #: The number of devices in existence, to work out the key
     __n_devices = 0
 
-    __slots__ = [
+    __slots__ = (
         "__spif_mask",
         "__index_by_slice",
         "__base_key",
@@ -56,13 +57,19 @@ class SPIFRetinaDevice(
         "__input_y_mask",
         "__input_y_shift",
         "__input_x_mask",
-        "__input_x_shift"]
+        "__input_x_shift")
+
+    @classmethod
+    def __issue_device_id(cls, base_key):
+        if base_key is None:
+            base_key = cls.__n_devices
+        cls.__n_devices += 1
+        return base_key
 
     def __init__(self, pipe, width, height, sub_width, sub_height,
                  base_key=None, input_x_shift=16, input_y_shift=0,
                  board_address=None, chip_coords=None):
         """
-
         :param int pipe: Which pipe on SPIF the retina is connected to
         :param int width: The width of the retina in pixels
         :param int height: The height of the retina in pixels
@@ -74,34 +81,51 @@ class SPIFRetinaDevice(
             sending
         :param base_key:
             The key that is common over the whole vertex,
-            or None to use the pipe number as the key
+            or `None` to use the pipe number as the key
         :type base_key: int or None
         :param int input_x_shift:
             The shift to get the x coordinate from the input keys sent to SPIF
         :param int input_y_shift:
             The shift to get the y coordinate from the input keys sent to SPIF
         :param board_address:
-            The IP address of the board to which the FPGA is connected, or None
-            to use the default board or chip_coords.  Note chip_coords will be
-            used first if both are specified, with board_address then being
-            used if the coordinates don't connect to an FPGA.
+            The IP address of the board to which the FPGA is connected,
+            or `None` to use the default board or chip_coords.
+
+            .. note::
+                chip_coords will be used first if both are specified, with
+                board_address then being used if the coordinates don't connect
+                to an FPGA.
         :type board_address: str or None
         :param chip_coords:
             The coordinates of the chip to which the FPGA is connected, or
-            None to use the default board or board_address.   Note chip_coords
-            will be used first if board_address is also specified, with
-            board_address then being used if the coordinates don't connect to
-            an FPGA.
+            `None` to use the default board or board_address.
+
+            .. note::
+                chip_coords will be used first if board_address is also
+                specified, with board_address then being used if the
+                coordinates don't connect to an FPGA.
         :type chip_coords: tuple(int, int) or None
         """
         # Do some checks
-        if sub_width < self.X_MASK or sub_height < self.Y_MASK:
+        if sub_width < self.X_MASK + 1 or sub_height < self.Y_MASK + 1:
             raise ConfigurationException(
                 "The sub-squares must be >=4 x >= 2"
                 f" ({sub_width} x {sub_height} specified)")
         if pipe >= N_PIPES:
             raise ConfigurationException(
                 f"Pipe {pipe} is bigger than maximum allowed {N_PIPES}")
+
+        # The width has to be a power of 2 as otherwise the keys will not line
+        # up correctly (x is at the LSB of the key, so key then has an x
+        # field).  This is an error here as it affects the downstream
+        # population calculations also!
+        if not is_power_of_2(width):
+            raise ConfigurationException(
+                "The width of the SPIF retina must be a power of 2.  If the"
+                " real retina size is less than this, please round it up."
+                " This will ensure that following Populations can decode the"
+                " spikes correctly.  Note that you will also have to make the"
+                " sizes of the following Populations bigger to match!")
 
         # Call the super
         super().__init__(
@@ -135,25 +159,22 @@ class SPIFRetinaDevice(
         self.__index_by_slice = dict()
 
         self.__pipe = pipe
-        self.__base_key = base_key
-        if self.__base_key is None:
-            self.__base_key = SPIFRetinaDevice.__n_devices
-        SPIFRetinaDevice.__n_devices += 1
+        self.__base_key = self.__issue_device_id(base_key)
 
         # Generate the shifts and masks to convert the SPIF Ethernet inputs to
         # PYX format
         self.__input_x_mask = ((1 << x_bits) - 1) << input_x_shift
-        self.__input_x_shift = self.__unsigned(
-            input_x_shift)
+        self.__input_x_shift = self.__unsigned(input_x_shift)
         self.__input_y_mask = ((1 << y_bits) - 1) << input_y_shift
-        self.__input_y_shift = self.__unsigned(
-            input_y_shift - x_bits)
+        self.__input_y_shift = self.__unsigned(input_y_shift - x_bits)
 
-    def __unsigned(self, n):
+    @staticmethod
+    def __unsigned(n):
         return n & 0xFFFFFFFF
 
     def __incoming_fpgas(self, board_address, chip_coords):
-        """ Get the incoming FPGA connections
+        """
+        Get the incoming FPGA connections.
 
         :rtype: list(FPGAConnection)
         """
@@ -162,7 +183,8 @@ class SPIFRetinaDevice(
                 for i in SPIF_INPUT_FPGA_LINKS]
 
     def __outgoing_fpga(self, board_address, chip_coords):
-        """ Get the outgoing FPGA connection (for commands)
+        """
+        Get the outgoing FPGA connection (for commands).
 
         :rtype: FGPA_Connection
         """
@@ -180,8 +202,7 @@ class SPIFRetinaDevice(
 
     @overrides(Application2DFPGAVertex.get_incoming_slice_for_link)
     def get_incoming_slice_for_link(self, link, index):
-        vertex_slice = super(
-            SPIFRetinaDevice, self).get_incoming_slice_for_link(link, index)
+        vertex_slice = super().get_incoming_slice_for_link(link, index)
         self.__index_by_slice[link.fpga_link_id, vertex_slice] = index
         return vertex_slice
 
@@ -225,11 +246,11 @@ class SPIFRetinaDevice(
             set_field_mask(self.__pipe, 0, self.__input_x_mask),
             set_field_shift(self.__pipe, 0, self.__input_x_shift),
             set_field_limit(self.__pipe, 0,
-                            (self._width - 1) << self._source_x_shift),
+                            (self.width - 1) << self._source_x_shift),
             set_field_mask(self.__pipe, 1, self.__input_y_mask),
             set_field_shift(self.__pipe, 1, self.__input_y_shift),
             set_field_limit(self.__pipe, 1,
-                            (self._height - 1) << self._source_y_shift),
+                            (self.height - 1) << self._source_y_shift),
             # These are unused but set them to be sure
             set_field_mask(self.__pipe, 2, 0),
             set_field_shift(self.__pipe, 2, 0),
@@ -278,31 +299,28 @@ class SPIFRetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         # Send the stop signal
-        return [SpiNNFPGARegister.STOP.cmd()]
+        yield SpiNNFPGARegister.STOP.cmd()
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self):
         return []
 
-    @overrides(HasShapeKeyFields.get_shape_key_fields)
-    def get_shape_key_fields(self, vertex_slice):
-        return self._key_fields
-
     @overrides(PopulationApplicationVertex.get_atom_key_map)
     def get_atom_key_map(self, pre_vertex, partition_id, routing_info):
+        # Work out which machine vertex
+        x_start, y_start = pre_vertex.vertex_slice.start
         key_and_mask = self.get_machine_fixed_key_and_mask(
             pre_vertex, partition_id)
+        x_end = x_start + self.sub_width
+        y_end = y_start + self.sub_height
         key_x = (key_and_mask.key >> self._source_x_shift) & self.X_MASK
         key_y = (key_and_mask.key >> self._source_y_shift) & self.Y_MASK
-        x_start, y_start = pre_vertex.vertex_slice.start
-        x_end = x_start + self._sub_width
-        y_end = y_start + self._sub_height
-        x_start += key_x
-        y_start += key_y
-        for y in range(y_start, y_end, self.Y_MASK + 1):
-            for x in range(x_start, x_end, self.X_MASK + 1):
+        neuron_id = (pre_vertex.vertex_slice.lo_atom +
+                     (key_y * self.X_PER_ROW) + key_x)
+        for x in range(x_start, x_end, self.X_MASK + 1):
+            for y in range(y_start, y_end, self.Y_MASK + 1):
                 key = (key_and_mask.key | (x << self._source_x_shift) |
                        (y << self._source_y_shift))
-                neuron_id = (y * self._width) + x
                 yield (neuron_id, key)
+                neuron_id += self.X_PER_ROW

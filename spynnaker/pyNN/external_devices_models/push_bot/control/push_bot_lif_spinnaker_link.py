@@ -18,9 +18,10 @@ from spynnaker.pyNN.models.defaults import default_initial_values
 
 
 class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
-    """ Control module for a PushBot connected to a SpiNNaker Link
+    """
+    Control module for a PushBot connected to a SpiNNaker Link.
 
-    :param ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol protocol:
+    :param MunichIoSpiNNakerLinkProtocol protocol:
         How to talk to the bot.
     :param iterable(AbstractMulticastControllableDevice) devices:
         The devices on the bot that we are interested in.
@@ -36,7 +37,7 @@ class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
     :param float isyn_exc: LIF neuron parameter (defaulted)
     :param float isyn_inh: LIF neuron parameter (defaulted)
     """
-    __slots__ = []
+    __slots__ = ()
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(

@@ -15,12 +15,18 @@
 import logging
 import struct
 from threading import Thread
+from typing import Callable, Dict, Iterable, List, Optional, Set, Tuple
+from typing_extensions import TypeAlias
 from spinn_utilities.log import FormatAdapter
 from spinnman.connections import ConnectionListener
 from spinnman.connections.udp_packet_connections import UDPConnection
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.database import DatabaseConnection
+from spinn_front_end_common.utilities.database import DatabaseReader
 
+_EventCB: TypeAlias = Callable[[str, List[int]], None]
+_InitCB: TypeAlias = Callable[[str, int, float, float], None]
+_StartStopCB: TypeAlias = Callable[[str, 'SPIFLiveSpikesConnection'], None]
 logger = FormatAdapter(logging.getLogger(__name__))
 
 _TWO_SKIP = struct.Struct("<2x")
@@ -52,10 +58,11 @@ _SPIF_OUTPUT_SET_LEN = 0x5ec40000
 
 
 class SPIFLiveSpikesConnection(DatabaseConnection):
-    """ A connection for receiving live spikes from spif
     """
-    __slots__ = [
-        "_atom_id_to_key",
+    A connection for receiving live spikes from SPIF.
+    """
+    # TODO: define SPIF
+    __slots__ = (
         "__error_keys",
         "__init_callbacks",
         "__key_to_atom_id_and_label",
@@ -68,12 +75,14 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         "__spif_host",
         "__spif_port",
         "__spif_packet_size",
-        "__spif_packet_time_us"]
+        "__spif_packet_time_us")
 
-    def __init__(self, receive_labels, spif_host, spif_port=_DEFAULT_SPIF_PORT,
-                 events_per_packet=_EVENTS_PER_PACKET,
-                 time_per_packet=_US_PER_PACKET,
-                 local_host=None, local_port=None):
+    def __init__(self, receive_labels: Optional[Iterable[str]],
+                 spif_host: str, spif_port: int = _DEFAULT_SPIF_PORT,
+                 events_per_packet: int = _EVENTS_PER_PACKET,
+                 time_per_packet: int = _US_PER_PACKET,
+                 local_host: Optional[str] = None,
+                 local_port: Optional[int] = None):
         """
         :param iterable(str) receive_labels:
             Labels of vertices from which live events will be received.
@@ -103,31 +112,31 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         self.add_database_callback(self.__read_database_callback)
 
         self.__receive_labels = (
-            list(receive_labels) if receive_labels is not None else None)
+            list(receive_labels) if receive_labels is not None else [])
 
         self.__spif_host = spif_host
         self.__spif_port = spif_port
         self.__spif_packet_size = events_per_packet * BYTES_PER_WORD
         self.__spif_packet_time_us = time_per_packet
-        self._atom_id_to_key = dict()
-        self.__key_to_atom_id_and_label = dict()
-        self.__live_event_callbacks = list()
-        self.__start_resume_callbacks = dict()
-        self.__pause_stop_callbacks = dict()
-        self.__init_callbacks = dict()
+        self.__key_to_atom_id_and_label: Dict[int, Tuple[int, int]] = dict()
+        self.__live_event_callbacks: List[List[Tuple[_EventCB, bool]]] = list()
+        self.__start_resume_callbacks: Dict[str, List[_StartStopCB]] = dict()
+        self.__pause_stop_callbacks: Dict[str, List[_StartStopCB]] = dict()
+        self.__init_callbacks: Dict[str, List[_InitCB]] = dict()
         if receive_labels is not None:
             for label in receive_labels:
                 self.__live_event_callbacks.append(list())
                 self.__start_resume_callbacks[label] = list()
                 self.__pause_stop_callbacks[label] = list()
                 self.__init_callbacks[label] = list()
-        self.__receiver_listener = None
-        self.__receiver_connection = None
-        self.__error_keys = set()
+        self.__receiver_listener: Optional[ConnectionListener[bytes]] = None
+        self.__receiver_connection: Optional[UDPConnection] = None
+        self.__error_keys: Set[int] = set()
 
-    def add_receive_label(self, label):
-        if self.__receive_labels is None:
-            self.__receive_labels = list()
+    def add_receive_label(self, label: str):
+        """
+        :param str label:
+        """
         if label not in self.__receive_labels:
             self.__receive_labels.append(label)
             self.__live_event_callbacks.append(list())
@@ -136,8 +145,9 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             self.__pause_stop_callbacks[label] = list()
             self.__init_callbacks[label] = list()
 
-    def add_init_callback(self, label, init_callback):
-        """ Add a callback to be called to initialise a vertex
+    def add_init_callback(self, label: str, init_callback: _InitCB):
+        """
+        Add a callback to be called to initialise a vertex.
 
         :param str label:
             The label of the vertex to be notified about. Must be one of the
@@ -151,9 +161,11 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         """
         self.__init_callbacks[label].append(init_callback)
 
-    def add_receive_callback(self, label, live_event_callback,
-                             translate_key=True):
-        """ Add a callback for the reception of live events from a vertex
+    def add_receive_callback(
+            self, label: str, live_event_callback: _EventCB,
+            translate_key: bool = True):
+        """
+        Add a callback for the reception of live events from a vertex.
 
         :param str label: The label of the vertex to be notified about.
             Must be one of the vertices listed in the constructor
@@ -166,50 +178,58 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             key should stay a key
         """
         label_id = self.__receive_labels.index(label)
-        logger.info("Receive callback {} registered to label {}".format(
-            live_event_callback, label))
+        logger.info(
+            "Receive callback {} registered to label {}",
+            live_event_callback, label)
         self.__live_event_callbacks[label_id].append(
             (live_event_callback, translate_key))
 
-    def add_start_resume_callback(self, label, start_resume_callback):
-        """ Add a callback for the start and resume state of the simulation
+    def add_start_resume_callback(
+            self, label: str, start_resume_callback: _StartStopCB):
+        """
+        Add a callback for the start and resume state of the simulation.
 
         :param str label: the label of the function to be sent
         :param start_resume_callback: A function to be called when the start
             or resume message has been received. This function should take
             the label of the referenced vertex, and an instance of this
             class, which can be used to send events.
-        :type start_resume_callback: callable(str, LiveEventConnection) -> None
-        :rtype: None
+        :type start_resume_callback: callable(str,
+            ~spinn_front_end_common.utilities.connections.LiveEventConnection)
+            -> None
         """
         self.__start_resume_callbacks[label].append(start_resume_callback)
 
-    def add_pause_stop_callback(self, label, pause_stop_callback):
-        """ Add a callback for the pause and stop state of the simulation
+    def add_pause_stop_callback(
+            self, label: str, pause_stop_callback: _StartStopCB):
+        """
+        Add a callback for the pause and stop state of the simulation.
 
         :param str label: the label of the function to be sent
         :param pause_stop_callback: A function to be called when the pause
             or stop message has been received. This function should take the
             label of the referenced  vertex, and an instance of this class,
             which can be used to send events.
-        :type pause_stop_callback: callable(str, LiveEventConnection) -> None
-        :rtype: None
+        :type pause_stop_callback: callable(str,
+            ~spinn_front_end_common.utilities.connections.LiveEventConnection)
+            -> None
         """
         self.__pause_stop_callbacks[label].append(pause_stop_callback)
 
-    def __read_database_callback(self, db_reader):
+    def __read_database_callback(self, db_reader: DatabaseReader):
         """
         :param DatabaseReader db_reader:
         """
         self.__handle_possible_rerun_state()
 
-        vertex_sizes = dict()
+        vertex_sizes: Dict[str, int] = dict()
         run_time_ms = db_reader.get_configuration_parameter_value(
-            "runtime")
-        machine_timestep_ms = db_reader.get_configuration_parameter_value(
-            "machine_time_step") / 1000.0
+            "runtime") or 0.0
+        machine_timestep_ms = (
+            db_reader.get_configuration_parameter_value("machine_time_step")
+            or 0.0) / 1000.0
 
-        if self.__receive_labels is not None:
+        if self.__receive_labels:
             self.__init_receivers(db_reader, vertex_sizes)
 
         for label, vertex_size in vertex_sizes.items():
@@ -217,17 +237,13 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
                 init_callback(
                     label, vertex_size, run_time_ms, machine_timestep_ms)
 
-    def __init_receivers(self, db, vertex_sizes):
-        """
-        :param DatabaseReader db:
-        :param dict(str,int) vertex_sizes:
-        """
+    def __init_receivers(
+            self, db: DatabaseReader, vertex_sizes: Dict[str, int]):
         # Set up a single connection for receive
         if self.__receiver_connection is None:
             self.__receiver_connection = UDPConnection(
                 remote_host=self.__spif_host, remote_port=self.__spif_port)
         for label_id, label in enumerate(self.__receive_labels):
-
             key_to_atom_id = db.get_key_to_atom_id_mapping(label)
             for key, atom_id in key_to_atom_id.items():
                 self.__key_to_atom_id_and_label[key] = (atom_id, label_id)
@@ -242,7 +258,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             self.__receiver_listener.add_callback(self.__do_receive_packet)
             self.__receiver_listener.start()
 
-    def __handle_possible_rerun_state(self):
+    def __handle_possible_rerun_state(self) -> None:
         # reset from possible previous calls
         if self.__receiver_listener is not None:
             self.__receiver_listener.close()
@@ -251,14 +267,15 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             self.__receiver_connection.close()
             self.__receiver_connection = None
 
-    def __launch_thread(self, kind, label, callback):
-        thread = Thread(
-            target=callback, args=(label, self),
-            name="{} callback thread for live_event_connection {}:{}".format(
-                kind, self._local_port, self._local_ip_address))
+    def __launch_thread(self, kind: str, label: str, callback: _StartStopCB):
+        thread = Thread(target=callback, args=(label, self), name=(
+            f"{kind} callback thread for live_event_connection "
+            f"{self._local_port}:{self._local_ip_address}"))
         thread.start()
 
-    def __do_start_resume(self):
+    def __do_start_resume(self) -> None:
+        if not self.__receiver_connection:
+            return
         # Send SPIF configuration
         self.__receiver_connection.send(_THREE_INTS.pack(
             _SPIF_OUTPUT_SET_LEN + self.__spif_packet_size,
@@ -268,14 +285,16 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             for callback in callbacks:
                 self.__launch_thread("start_resume", label, callback)
 
-    def __do_stop_pause(self):
+    def __do_stop_pause(self) -> None:
+        if not self.__receiver_connection:
+            return
         # Stop SPIF output
         self.__receiver_connection.send(_ONE_INT.pack(_SPIF_OUTPUT_STOP))
         for label, callbacks in self.__pause_stop_callbacks.items():
             for callback in callbacks:
                 self.__launch_thread("pause_stop", label, callback)
 
-    def __do_receive_packet(self, packet):
+    def __do_receive_packet(self, packet: bytes):
         # pylint: disable=broad-except
         logger.debug("Received packet")
         try:
@@ -283,9 +302,9 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         except Exception:
             logger.warning("problem handling received packet", exc_info=True)
 
-    def __handle_packet(self, packet):
-        key_labels = dict()
-        atoms_labels = dict()
+    def __handle_packet(self, packet: bytes):
+        key_labels: Dict[int, List[int]] = dict()
+        atoms_labels: Dict[int, List[int]] = dict()
         n_events = len(packet) // BYTES_PER_WORD
         events = struct.unpack(f"<{n_events}I", packet)
         for key in events:
@@ -307,7 +326,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
                 else:
                     c_back(label, key_labels[label_id])
 
-    def __handle_unknown_key(self, key):
+    def __handle_unknown_key(self, key: int):
         if key not in self.__error_keys:
             self.__error_keys.add(key)
-            logger.warning("Received unexpected key {}".format(key))
+            logger.warning("Received unexpected key {}", key)

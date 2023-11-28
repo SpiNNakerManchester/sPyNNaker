@@ -39,12 +39,13 @@ def get_spike_value_from_robot_retina(key):
 class MunichRetinaDevice(
         ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex,
         AbstractSendMeMulticastCommandsVertex):
-    """ An Omnibot silicon retina device.
     """
-    __slots__ = [
+    An Omnibot silicon retina device.
+    """
+    __slots__ = (
         "__fixed_key",
         "__fixed_mask",
-        "__is_right"]
+        "__is_right")
 
     # key codes for the robot retina
     _MANAGEMENT_BIT = 0x400
@@ -119,7 +120,6 @@ class MunichRetinaDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
-        commands = list()
         # change the retina key it transmits with
         # (based off if its right or left)
         key_set_command = self._MANAGEMENT_BIT | (
@@ -130,19 +130,17 @@ class MunichRetinaDevice(
         # different based on which retina
         key_set_payload = self.__fixed_key if self.__is_right else 0
 
-        commands.append(MultiCastCommand(
-            key=key_set_command, payload=key_set_payload, repeat=5,
-            delay_between_repeats=1000))
+        yield MultiCastCommand(
+            key_set_command, key_set_payload,
+            repeat=5, delay_between_repeats=1000)
 
         # make retina enabled (dependent on if its a left or right retina
         enable_command = self._MANAGEMENT_BIT | (
             self._RIGHT_RETINA_ENABLE if self.__is_right
             else self._LEFT_RETINA_ENABLE)
-        commands.append(MultiCastCommand(
-            key=enable_command, payload=1, repeat=5,
-            delay_between_repeats=1000))
 
-        return commands
+        yield MultiCastCommand(
+            enable_command, payload=1, repeat=5, delay_between_repeats=1000)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
@@ -152,8 +150,8 @@ class MunichRetinaDevice(
             self._RIGHT_RETINA_DISABLE if self.__is_right
             else self._LEFT_RETINA_DISABLE)
 
-        return [MultiCastCommand(
-            disable_command, payload=0, repeat=5, delay_between_repeats=1000)]
+        yield MultiCastCommand(
+            disable_command, payload=0, repeat=5, delay_between_repeats=1000)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

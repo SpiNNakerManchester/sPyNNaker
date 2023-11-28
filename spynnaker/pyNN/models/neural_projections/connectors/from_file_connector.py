@@ -14,17 +14,20 @@
 
 import os
 import numpy
-from pyNN.recording.files import StandardTextFile
+from numpy.typing import NDArray
+from pyNN.recording.files import BaseFile, StandardTextFile
+from typing import Union
 from .from_list_connector import FromListConnector
 
 
 class FromFileConnector(FromListConnector):
-    """ Make connections according to a list read from a file.
     """
-    __slots__ = ["_file"]
+    Make connections according to a list read from a file.
+    """
+    __slots__ = ("_file", )
 
     def __init__(
-            self, file,  # @ReservedAssignment
+            self, file: Union[str, BaseFile],  # @ReservedAssignment
             distributed=False, safe=True, callback=None, verbose=False):
         """
         :param str file:
@@ -36,7 +39,8 @@ class FromFileConnector(FromListConnector):
 
                 # columns = ["i", "j", "weight", "delay", "U", "tau_rec"]
 
-            Note that the header requires `#` at the beginning of the line.
+            .. note::
+                The header requires `#` at the beginning of the line.
         :type file: str or ~io.FileIO
         :param bool distributed:
             Basic pyNN says:
@@ -81,10 +85,11 @@ class FromFileConnector(FromListConnector):
             conn_list, safe=safe, verbose=verbose,
             column_names=column_names, callback=callback)
 
-    def _read_conn_list(self, the_file, distributed):
+    def _read_conn_list(
+            self, the_file: BaseFile, distributed: bool) -> NDArray:
         if not distributed:
             return the_file.read()
-        filename = "{}.".format(os.path.basename(the_file.file))
+        filename = f"{os.path.basename(the_file.file)}."
 
         # This assumes it finds the files in the right order!
         conns = list()
@@ -98,12 +103,13 @@ class FromFileConnector(FromListConnector):
         return numpy.concatenate(conns)
 
     def __repr__(self):
-        return "FromFileConnector({})".format(self._file)
+        return f"FromFileConnector({self._file})"
 
-    def get_reader(self, file):  # @ReservedAssignment
-        """ Get a file reader object using the PyNN methods.
+    def get_reader(self, file: str) -> BaseFile:  # @ReservedAssignment
+        """
+        Get a file reader object using the PyNN methods.
 
         :return: A pynn StandardTextFile or similar
-        :rtype: ~pynn.recording.files.StandardTextFile
+        :rtype: ~pyNN.recording.files.StandardTextFile
         """
         return StandardTextFile(file, mode="r")

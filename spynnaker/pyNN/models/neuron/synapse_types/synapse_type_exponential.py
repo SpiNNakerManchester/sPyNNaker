@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional, Tuple
 from spinn_utilities.overrides import overrides
-from data_specification.enums import DataType
+from spinn_utilities.ranged import RangeDictionary
+from spinn_front_end_common.interface.ds import DataType
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from .abstract_synapse_type import AbstractSynapseType
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -26,30 +29,27 @@ TIMESTEP_MS = "timestep_ms"
 
 
 class SynapseTypeExponential(AbstractSynapseType):
-    __slots__ = [
+    __slots__ = (
         "__tau_syn_E",
         "__tau_syn_I",
         "__isyn_exc",
-        "__isyn_inh"]
+        "__isyn_inh")
 
-    def __init__(self, tau_syn_E, tau_syn_I, isyn_exc, isyn_inh):
+    def __init__(self, tau_syn_E: ModelParameter, tau_syn_I: ModelParameter,
+                 isyn_exc: ModelParameter, isyn_inh: ModelParameter):
         r"""
         :param tau_syn_E: :math:`\tau^{syn}_e`
-        :type tau_syn_E:
-            float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type tau_syn_E: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_syn_I: :math:`\tau^{syn}_i`
-        :type tau_syn_I:
-            float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type tau_syn_I: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param isyn_exc: :math:`I^{syn}_e`
-        :type isyn_exc:
-            float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type isyn_exc: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param isyn_inh: :math:`I^{syn}_i`
-        :type isyn_inh:
-            float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type isyn_inh: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([
@@ -65,23 +65,23 @@ class SynapseTypeExponential(AbstractSynapseType):
         self.__isyn_inh = isyn_inh
 
     @overrides(AbstractSynapseType.add_parameters)
-    def add_parameters(self, parameters):
-        parameters[TAU_SYN_E] = self.__tau_syn_E
-        parameters[TAU_SYN_I] = self.__tau_syn_I
+    def add_parameters(self, parameters: RangeDictionary[float]):
+        parameters[TAU_SYN_E] = self._convert(self.__tau_syn_E)
+        parameters[TAU_SYN_I] = self._convert(self.__tau_syn_I)
         parameters[TIMESTEP_MS] = (
             SpynnakerDataView.get_simulation_time_step_ms())
 
     @overrides(AbstractSynapseType.add_state_variables)
-    def add_state_variables(self, state_variables):
-        state_variables[ISYN_EXC] = self.__isyn_exc
-        state_variables[ISYN_INH] = self.__isyn_inh
+    def add_state_variables(self, state_variables: RangeDictionary[float]):
+        state_variables[ISYN_EXC] = self._convert(self.__isyn_exc)
+        state_variables[ISYN_INH] = self._convert(self.__isyn_inh)
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
-    def get_n_synapse_types(self):
+    def get_n_synapse_types(self) -> int:
         return 2
 
     @overrides(AbstractSynapseType.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target):
+    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         if target == "excitatory":
             return 0
         elif target == "inhibitory":
@@ -89,21 +89,21 @@ class SynapseTypeExponential(AbstractSynapseType):
         return None
 
     @overrides(AbstractSynapseType.get_synapse_targets)
-    def get_synapse_targets(self):
+    def get_synapse_targets(self) -> Tuple[str, ...]:
         return "excitatory", "inhibitory"
 
     @property
-    def tau_syn_E(self):
+    def tau_syn_E(self) -> ModelParameter:
         return self.__tau_syn_E
 
     @property
-    def tau_syn_I(self):
+    def tau_syn_I(self) -> ModelParameter:
         return self.__tau_syn_I
 
     @property
-    def isyn_exc(self):
+    def isyn_exc(self) -> ModelParameter:
         return self.__isyn_exc
 
     @property
-    def isyn_inh(self):
+    def isyn_inh(self) -> ModelParameter:
         return self.__isyn_inh

@@ -19,28 +19,27 @@ from pacman.model.graphs.machine import MachineVertex
 
 @require_subclass(MachineVertex)
 class AbstractMaxSpikes(object, metaclass=AbstractBase):
-    """ Indicates a class (a \
-        :py:class:`~pacman.model.graphs.machine.MachineVertex`) \
-        that can describe the maximum rate that it sends spikes.
+    """
+    Indicates a class (a
+    :py:class:`~pacman.model.graphs.machine.MachineVertex`)
+    that can describe the maximum rate that it sends spikes.
 
-        The :py:class:`~.SynapticManager` assumes that all machine vertexes
-        share the same synapse_information will have the same rates.
+    The :py:class:`~.SynapticManager` assumes that all machine vertexes
+    share the same synapse_information will have the same rates.
     """
 
     __slots__ = ()
 
     @abstractmethod
-    def max_spikes_per_ts(self):
-        """ Get maximum expected number of spikes per timestep
-
-        :rtype: int
+    def max_spikes_per_ts(self) -> float:
         """
+        Get maximum expected number of spikes per timestep.
+        """
+        raise NotImplementedError
 
     @abstractmethod
-    def max_spikes_per_second(self):
-        """ Get maximum expected number of spikes per second
-
-        :param str variable: the variable to find units from
-        :return: the units as a string.
-        :rtype: str
+    def max_spikes_per_second(self) -> float:
         """
+        Get maximum expected number of spikes per second.
+        """
+        raise NotImplementedError

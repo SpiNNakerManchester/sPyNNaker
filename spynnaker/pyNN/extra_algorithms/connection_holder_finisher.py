@@ -16,9 +16,10 @@ from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spinn_utilities.progress_bar import ProgressBar
 
 
-def finish_connection_holders():
-    """ Finishes the connection holders after data has been generated within\
-        them, allowing any waiting callbacks to be called.
+def finish_connection_holders() -> None:
+    """
+    Finishes the connection holders after data has been generated within
+    them, allowing any waiting callbacks to be called.
 
     :param ~pacman.model.graphs.application.ApplicationGraph application_graph:
     """

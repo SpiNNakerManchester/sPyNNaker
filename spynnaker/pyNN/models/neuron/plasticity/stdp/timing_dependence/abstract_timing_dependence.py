@@ -11,55 +11,85 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import List
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractHasParameterNames)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
+    AbstractSynapseStructure)
 
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
 
+class AbstractTimingDependence(
+        AbstractHasParameterNames, metaclass=AbstractBase):
+    """
+    An STDP timing dependence rule.
+    """
+    __slots__ = ("__synapse_structure", )
 
-class AbstractTimingDependence(object, metaclass=AbstractBase):
-
-    __slots__ = ()
+    def __init__(self, synapse_structure: AbstractSynapseStructure):
+        """
+        :param synapse_structure:
+            The synaptic structure of the plastic part of the rows.
+        """
+        self.__synapse_structure = synapse_structure
 
     @abstractmethod
-    def is_same_as(self, timing_dependence):
-        """ Determine if this timing dependence is the same as another
+    def is_same_as(
+            self, timing_dependence: 'AbstractTimingDependence') -> bool:
+        """
+        Determine if this timing dependence is the same as another.
 
         :param AbstractTimingDependence timing_dependence:
         :rtype: bool
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+    @property
+    @abstractmethod
+    def vertex_executable_suffix(self) -> str:
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def pre_trace_n_bytes(self):
-        """ The number of bytes used by the pre-trace of the rule per neuron
+    @property
+    @abstractmethod
+    def pre_trace_n_bytes(self) -> int:
+        """
+        The number of bytes used by the pre-trace of the rule per neuron.
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_parameters_sdram_usage_in_bytes(self):
-        """ Get the amount of SDRAM used by the parameters of this rule
+    def get_parameters_sdram_usage_in_bytes(self) -> int:
+        """
+        Get the amount of SDRAM used by the parameters of this rule.
 
         :rtype: int
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def n_weight_terms(self):
-        """ The number of weight terms expected by this timing rule
+    @property
+    @abstractmethod
+    def n_weight_terms(self) -> int:
+        """
+        The number of weight terms expected by this timing rule.
 
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
     def write_parameters(
-            self, spec, global_weight_scale, synapse_weight_scales):
-        """ Write the parameters of the rule to the spec
+            self, spec: DataSpecificationGenerator, global_weight_scale: float,
+            synapse_weight_scales: List[float]):
+        """
+        Write the parameters of the rule to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The specification to write to
@@ -68,18 +98,33 @@ class AbstractTimingDependence(object, metaclass=AbstractBase):
             The total weight scale applied to each synapse including the global
             weight scale
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def synaptic_structure(self):
-        """ Get the synaptic structure of the plastic part of the rows
+    @property
+    def synaptic_structure(self) -> AbstractSynapseStructure:
+        """
+        The synaptic structure of the plastic part of the rows.
 
         :rtype: AbstractSynapseStructure
         """
+        return self.__synapse_structure
 
+    @property
     @abstractmethod
-    def get_parameter_names(self):
-        """ Return the names of the parameters supported by this timing\
-            dependency model.
+    def A_plus(self):
+        r"""
+        :math:`A^+`
 
-        :rtype: iterable(str)
+        :rtype: float
         """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def A_minus(self):
+        r"""
+        :math:`A^-`
+
+        :rtype: float
+        """
+        raise NotImplementedError

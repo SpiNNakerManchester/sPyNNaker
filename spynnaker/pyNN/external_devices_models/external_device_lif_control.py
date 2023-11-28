@@ -27,14 +27,14 @@ from .threshold_type_multicast_device_control import (
 
 
 class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
-    """ Abstract control module for the PushBot, based on the LIF neuron,\
-        but without spikes, and using the voltage as the output to the various\
-        devices
     """
-    __slots__ = [
+    Abstract control module for the PushBot, based on the LIF neuron, but
+    without spikes, and using the voltage as the output to the various devices.
+    """
+    __slots__ = (
         "_create_edges",
         "_devices",
-        "_translator"]
+        "_translator")
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     @default_parameters({
@@ -66,9 +66,11 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         :param float tau_syn_I: (defaulted LIF neuron parameter)
         :param float tau_refrac: (defaulted LIF neuron parameter)
         :param float i_offset: (defaulted LIF neuron parameter)
-        :param float v: (defaulted LIF neuron state variable init)
-        :param float isyn_exc: (defaulted LIF neuron state variable init)
-        :param float isyn_inh: (defaulted LIF neuron state variable init)
+        :param float v: (defaulted LIF neuron state variable initial value)
+        :param float isyn_exc:
+            (defaulted LIF neuron state variable initial value)
+        :param float isyn_inh:
+            (defaulted LIF neuron state variable initial value)
         """
         # pylint: disable=too-many-arguments
 
@@ -94,14 +96,14 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
 
     @overrides(AbstractPyNNNeuronModelStandard.create_vertex)
     def create_vertex(
-            self, n_neurons, label, spikes_per_second,
+            self, n_neurons, label, *, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size,
             n_steps_per_timestep, drop_late_spikes, splitter, seed,
             n_colour_bits):
         if n_neurons != len(self._devices):
             raise ConfigurationException(
-                "Number of neurons does not match number of devices in {}"
-                .format(label))
+                "Number of neurons does not match number of "
+                f"devices in {label}")
         self._model.n_steps_per_timestep = n_steps_per_timestep
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return ExternalDeviceLifControlVertex(

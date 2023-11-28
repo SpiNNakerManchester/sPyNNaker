@@ -17,7 +17,8 @@ from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
 class RandomStatsUniformImpl(AbstractRandomStats):
-    """ An implementation of AbstractRandomStats for uniform distributions
+    """
+    An implementation of AbstractRandomStats for uniform distributions.
     """
 
     def _get_params(self, dist):
@@ -39,8 +40,8 @@ class RandomStatsUniformImpl(AbstractRandomStats):
     def var(self, dist):
         return uniform.var(*self._get_params(dist))
 
-    def high(self, dist):
-        return dist.parameters['high']
+    def high(self, distribution):
+        return distribution.parameters['high']
 
-    def low(self, dist):
-        return dist.parameters['low']
+    def low(self, distribution):
+        return distribution.parameters['low']

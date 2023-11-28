@@ -11,51 +11,55 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import List
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractHasParameterNames)
 
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
 
-
-class AbstractWeightDependence(object, metaclass=AbstractBase):
+class AbstractWeightDependence(
+        AbstractHasParameterNames, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def get_parameter_names(self):
-        """ Returns the parameter names
-
-        :rtype: iterable(str)
+    def is_same_as(self, weight_dependence) -> bool:
         """
-
-    @abstractmethod
-    def is_same_as(self, weight_dependence):
-        """ Determine if this weight dependence is the same as another
+        Determine if this weight dependence is the same as another.
 
         :param AbstractWeightDependence weight_dependence:
         :rtype: bool
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+    @property
+    @abstractmethod
+    def vertex_executable_suffix(self) -> str:
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_parameters_sdram_usage_in_bytes(
-            self, n_synapse_types, n_weight_terms):
-        """ Get the amount of SDRAM used by the parameters of this rule
+            self, n_synapse_types: int, n_weight_terms: int) -> int:
+        """
+        Get the amount of SDRAM used by the parameters of this rule.
 
         :param int n_synapse_types:
         :param int n_weight_terms:
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
     def write_parameters(
-            self, spec, global_weight_scale, synapse_weight_scales,
-            n_weight_terms):
-        """ Write the parameters of the rule to the spec
+            self, spec: DataSpecificationGenerator, global_weight_scale: float,
+            synapse_weight_scales: List[float], n_weight_terms: int):
+        """
+        Write the parameters of the rule to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The specification to write to
@@ -64,12 +68,16 @@ class AbstractWeightDependence(object, metaclass=AbstractBase):
             The total weight scale applied to each synapse including the global
             weight scale
         :param int n_weight_terms: The number of terms used by the synapse rule
-       """
+        """
+        raise NotImplementedError
 
-    @abstractproperty
-    def weight_maximum(self):
-        """ The maximum weight that will ever be set in a synapse as a result\
-            of this rule
+    @property
+    @abstractmethod
+    def weight_maximum(self) -> float:
+        """
+        The maximum weight that will ever be set in a synapse as a result
+        of this rule.
 
         :rtype: float
         """
+        raise NotImplementedError

@@ -13,33 +13,34 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
-from data_specification.enums import DataType
+from spinn_front_end_common.interface.ds import DataType
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from .abstract_input_type import AbstractInputType
 from spynnaker.pyNN.utilities.struct import Struct
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
 
 E_REV_E = "e_rev_E"
 E_REV_I = "e_rev_I"
 
 
 class InputTypeConductance(AbstractInputType):
-    """ The conductance input type
     """
-    __slots__ = [
+    The conductance input type.
+    """
+    __slots__ = (
         "__e_rev_E",
-        "__e_rev_I"]
+        "__e_rev_I")
 
-    def __init__(self, e_rev_E, e_rev_I):
+    def __init__(self, e_rev_E: ModelParameter, e_rev_I: ModelParameter):
         """
         :param e_rev_E: Reversal potential for excitatory input;
             :math:`E^{rev}_e`
-        :type e_rev_E:
-            float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type e_rev_E: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param e_rev_I: Reversal potential for inhibitory input;
             :math:`E^{rev}_i`
-        :type e_rev_I:
-            float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type e_rev_I: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([(DataType.S1615, E_REV_E),
@@ -49,27 +50,27 @@ class InputTypeConductance(AbstractInputType):
         self.__e_rev_I = e_rev_I
 
     @overrides(AbstractInputType.add_parameters)
-    def add_parameters(self, parameters):
-        parameters[E_REV_E] = self.__e_rev_E
-        parameters[E_REV_I] = self.__e_rev_I
+    def add_parameters(self, parameters: RangeDictionary[float]):
+        parameters[E_REV_E] = self._convert(self.__e_rev_E)
+        parameters[E_REV_I] = self._convert(self.__e_rev_I)
 
     @overrides(AbstractInputType.add_state_variables)
-    def add_state_variables(self, state_variables):
+    def add_state_variables(self, state_variables: RangeDictionary[float]):
         pass
 
     @overrides(AbstractInputType.get_global_weight_scale)
-    def get_global_weight_scale(self):
+    def get_global_weight_scale(self) -> float:
         return 1024.0
 
     @property
-    def e_rev_E(self):
+    def e_rev_E(self) -> ModelParameter:
         """
         :math:`E_{{rev}_e}`
         """
         return self.__e_rev_E
 
     @property
-    def e_rev_I(self):
+    def e_rev_I(self) -> ModelParameter:
         """
         :math:`E_{{rev}_i}`
         """

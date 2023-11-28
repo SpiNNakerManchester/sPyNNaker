@@ -12,47 +12,64 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 class AbstractRandomStats(object, metaclass=AbstractBase):
-    """ Statistics about PyNN RandomDistribution objects
+    """
+    Statistics about PyNN `~spynnaker.pyNN.RandomDistribution` objects.
     """
     __slots__ = ()
 
     @abstractmethod
-    def cdf(self, dist, v):
-        """ Return the cumulative distribution function value for the value v
+    def cdf(self, dist: RandomDistribution, v: float) -> float:
         """
+        Return the cumulative distribution function value for the value `v`.
+        """
+        raise NotImplementedError
 
     @abstractmethod
-    def ppf(self, dist, p):
-        """ Return the percent point function value for the probability p
+    def ppf(self, dist: RandomDistribution, p: float) -> float:
         """
+        Return the percent point function value for the probability `p`.
+        """
+        raise NotImplementedError
 
     @abstractmethod
-    def mean(self, dist):
-        """ Return the mean of the distribution
+    def mean(self, dist: RandomDistribution) -> float:
         """
+        Return the mean of the distribution.
+        """
+        raise NotImplementedError
 
     @abstractmethod
-    def std(self, dist):
-        """ Return the standard deviation of the distribution
+    def std(self, dist: RandomDistribution) -> float:
         """
+        Return the standard deviation of the distribution.
+        """
+        raise NotImplementedError
 
     @abstractmethod
-    def var(self, dist):
-        """ Return the variance of the distribution
+    def var(self, dist: RandomDistribution) -> float:
         """
+        Return the variance of the distribution.
+        """
+        raise NotImplementedError
 
     @abstractmethod
-    def high(self, dist):
-        """ Return the high cutoff value of the distribution, or None if the\
-            distribution is unbounded
+    def high(self, distribution: RandomDistribution) -> Optional[float]:
         """
+        Return the high cut-off value of the distribution, or `None` if the
+        distribution is unbounded.
+        """
+        raise NotImplementedError
 
     @abstractmethod
-    def low(self, dist):
-        """ Return the low cutoff value of the distribution, or None if the\
-            distribution is unbounded
+    def low(self, distribution: RandomDistribution) -> Optional[float]:
         """
+        Return the low cut-off value of the distribution, or `None` if the
+        distribution is unbounded.
+        """
+        raise NotImplementedError

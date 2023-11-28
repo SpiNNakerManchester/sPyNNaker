@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
-from data_specification.enums import DataType
+from spinn_utilities.ranged import RangeDictionary
+from spinn_front_end_common.interface.ds import DataType
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from .abstract_threshold_type import AbstractThresholdType
 from spynnaker.pyNN.utilities.struct import Struct
 
@@ -21,16 +23,16 @@ V_THRESH = "v_thresh"
 
 
 class ThresholdTypeStatic(AbstractThresholdType):
-    """ A threshold that is a static value.
     """
-    __slots__ = ["__v_thresh"]
+    A threshold that is a static value.
+    """
+    __slots__ = ("__v_thresh", )
 
-    def __init__(self, v_thresh):
+    def __init__(self, v_thresh: ModelParameter):
         """
         :param v_thresh: :math:`V_{thresh}`
-        :type v_thresh:
-            float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type v_thresh: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([(DataType.S1615, V_THRESH)])],
@@ -38,15 +40,15 @@ class ThresholdTypeStatic(AbstractThresholdType):
         self.__v_thresh = v_thresh
 
     @overrides(AbstractThresholdType.add_parameters)
-    def add_parameters(self, parameters):
-        parameters[V_THRESH] = self.__v_thresh
+    def add_parameters(self, parameters: RangeDictionary[float]):
+        parameters[V_THRESH] = self._convert(self.__v_thresh)
 
     @overrides(AbstractThresholdType.add_state_variables)
-    def add_state_variables(self, state_variables):
+    def add_state_variables(self, state_variables: RangeDictionary[float]):
         pass
 
     @property
-    def v_thresh(self):
+    def v_thresh(self) -> ModelParameter:
         """
         :math:`V_{thresh}`
         """

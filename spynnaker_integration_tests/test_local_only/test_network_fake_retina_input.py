@@ -93,10 +93,9 @@ def do_run():
 
     # Set the number of neurons per core to a rectangle
     # (creates 512 neurons per core)
-    p.set_number_of_neurons_per_core(p.IF_curr_exp, (SUB_WIDTH, SUB_HEIGHT))
+    p.set_number_of_neurons_per_core(p.IF_curr_exp, (WIDTH, HEIGHT))
     # (creates 2048 sources per core)
-    p.set_number_of_neurons_per_core(p.SpikeSourceArray,
-                                     ((SUB_WIDTH * 2), (SUB_HEIGHT * 2)))
+    p.set_number_of_neurons_per_core(p.SpikeSourceArray, (WIDTH, HEIGHT))
 
     # This is our convolution connector.  This one doesn't do much!
     conn = p.ConvolutionConnector([[WEIGHT, WEIGHT, WEIGHT],
