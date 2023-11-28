@@ -11,12 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from typing import Dict, Iterable, Tuple
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
 from pacman.model.graphs.application import (
     ApplicationFPGAVertex, FPGAConnection)
+from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex)
+    AbstractSendMeMulticastCommandsVertex, LiveOutputDevice,
+    HasCustomAtomKeyMap)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
@@ -26,6 +30,7 @@ from .spif_devices import (
     set_distiller_key, set_distiller_mask,
     set_distiller_mask_delayed, set_distiller_shift,
     set_xp_key_delayed, set_xp_mask_delayed)
+from pacman.utilities.utility_calls import get_keys
 
 # The maximum number of partitions that can be supported.
 N_OUTGOING = 6
@@ -33,7 +38,7 @@ N_OUTGOING = 6
 
 class SPIFOutputDevice(
         ApplicationFPGAVertex, PopulationApplicationVertex,
-        AbstractSendMeMulticastCommandsVertex):
+        AbstractSendMeMulticastCommandsVertex, LiveOutputDevice):
     """
     Output (only) to a SPIF device.  Each SPIF device can accept up to 6
     incoming projections.
@@ -136,9 +141,8 @@ class SPIFOutputDevice(
                     " contiguous.  Please choose a power-of-two size for the"
                     " maximum atoms per core")
         self.__incoming_partitions.append(partition)
-        if self.__create_database:
-            SpynnakerDataView.add_live_output_vertex(
-                partition.pre_vertex, partition.identifier)
+        if self.__create_database and len(self.__incoming_partitions) == 1:
+            SpynnakerDataView.add_live_output_device(self)
 
     def _get_set_key_payload(self, index):
         """
@@ -203,3 +207,36 @@ class SPIFOutputDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self):
         return []
+
+    @overrides(LiveOutputDevice.get_device_output_keys)
+    def get_device_output_keys(self) -> Dict[MachineVertex, Tuple[int, int]]:
+        all_keys: dict[MachineVertex, Tuple[int, int]] = dict()
+        routing_infos = SpynnakerDataView.get_routing_infos()
+        for i, part in enumerate(self.__incoming_partitions):
+            if part.pre_vertex in self.__output_key_and_mask:
+                key, mask = self.__output_key_and_mask[part.pre_vertex]
+            else:
+                key = i << self.__output_key_shift
+                mask = self._get_set_dist_mask_payload(i)
+            shift = part.pre_vertex.n_colour_bits
+            for m_vertex in part.pre_vertex.get_out_going_vertices(
+                    part.identifier):
+                atom_keys: Iterable[Tuple[int, int]] = list()
+                if isinstance(m_vertex.app_vertex, HasCustomAtomKeyMap):
+                    atom_keys = m_vertex.app_vertex.get_atom_key_map(
+                        m_vertex, part.identifier, routing_infos)
+                else:
+                    r_info = routing_infos.get_routing_info_from_pre_vertex(
+                        m_vertex, part.identifier)
+                    # r_info could be None if there are no outgoing edges,
+                    # at which point there is nothing to do here anyway
+                    if r_info is not None:
+                        vertex_slice = m_vertex.vertex_slice
+                        keys = get_keys(r_info.key, vertex_slice)
+                        start = vertex_slice.lo_atom
+                        atom_keys = [(i, k) for i, k in enumerate(keys, start)]
+
+                atom_keys_mapped = [(i, key | ((k & mask) >> shift))
+                                    for i, k in atom_keys]
+                all_keys[m_vertex] = atom_keys_mapped
+        return all_keys
