@@ -219,7 +219,7 @@ class SPIFOutputDevice(
                 key = i << self.__output_key_shift
                 mask = self._get_set_dist_mask_payload(i)
             shift = part.pre_vertex.n_colour_bits
-            for m_vertex in part.pre_vertex.get_out_going_vertices(
+            for m_vertex in part.pre_vertex.splitter.get_out_going_vertices(
                     part.identifier):
                 atom_keys: Iterable[Tuple[int, int]] = list()
                 if isinstance(m_vertex.app_vertex, HasCustomAtomKeyMap):
