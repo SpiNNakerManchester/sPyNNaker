@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Iterable, Tuple
+from typing import Dict, Iterable, Tuple, List
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
 from pacman.model.graphs.application import (
@@ -219,8 +219,9 @@ class SPIFOutputDevice(
         return []
 
     @overrides(LiveOutputDevice.get_device_output_keys)
-    def get_device_output_keys(self) -> Dict[MachineVertex, Tuple[int, int]]:
-        all_keys: Dict[MachineVertex, Tuple[int, int]] = dict()
+    def get_device_output_keys(self) -> Dict[MachineVertex,
+                                             List[Tuple[int, int]]]:
+        all_keys: Dict[MachineVertex, List[Tuple[int, int]]] = dict()
         routing_infos = SpynnakerDataView.get_routing_infos()
         for i, part in enumerate(self.__incoming_partitions):
             if part.pre_vertex in self.__output_key_and_mask:
@@ -246,7 +247,7 @@ class SPIFOutputDevice(
                         start = vertex_slice.lo_atom
                         atom_keys = [(i, k) for i, k in enumerate(keys, start)]
 
-                atom_keys_mapped = [(i, key | ((k & mask) >> shift))
-                                    for i, k in atom_keys]
+                atom_keys_mapped = list((i, key | ((k & mask) >> shift))
+                                        for i, k in atom_keys)
                 all_keys[m_vertex] = atom_keys_mapped
         return all_keys
