@@ -21,6 +21,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
 from unittests.mocks import MockPopulation
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
 import pyNN.spiNNaker as sim
+from unittests.connector_tests.test_from_list_connector import MockAppVertex
 
 # NO unittest_setup() as sim.setup is called
 
@@ -86,9 +87,11 @@ def test_connector(
             assert extra_params[:, i].shape == (len(clist), )
 
     # Check weights and delays are used or ignored as expected
-    post_slice = Slice(0, 10)
+    pre_slice = Slice(0, 9)
+    pre_pop = MockPopulation(10, "Pre", MockAppVertex(10, [pre_slice]))
+    post_slice = Slice(0, 9)
     synapse_info = SynapseInformation(
-        connector=None, pre_population=MockPopulation(10, "Pre"),
+        connector=None, pre_population=pre_pop,
         post_population=MockPopulation(10, "Post"), prepop_is_view=False,
         postpop_is_view=False, synapse_dynamics=None,
         synapse_type=None, receptor_type=None,

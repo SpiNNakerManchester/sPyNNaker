@@ -315,8 +315,7 @@ class SynapticMatrixApp(object):
         (row_data, delayed_row_data) = get_synapses(
             connections, self.__synapse_info, self.__app_edge.n_delay_stages,
             self.__n_synapse_types, self.__weight_scales, self.__app_edge,
-            post_vertex_slice, self.__max_row_info,
-            self.__app_key_info is not None,
+            self.__max_row_info, self.__app_key_info is not None,
             self.__delay_app_key_info is not None, self.__max_atoms_per_core)
 
         # Set connections for structural plasticity

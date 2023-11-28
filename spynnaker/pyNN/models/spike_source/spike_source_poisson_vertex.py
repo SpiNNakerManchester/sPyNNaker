@@ -149,7 +149,7 @@ class SpikeSourcePoissonVertex(
 
     def __init__(
             self, n_neurons: int, label: str, seed: Optional[int],
-            max_atoms_per_core: Optional[int],
+            max_atoms_per_core: Optional[Union[int, Tuple[int, ...]]],
             model: Union[SpikeSourcePoisson, SpikeSourcePoissonVariable],
             rate: Union[float, Sequence[float], None] = None,
             start: Union[int, Sequence[int], None] = None,

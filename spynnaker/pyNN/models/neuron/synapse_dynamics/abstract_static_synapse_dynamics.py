@@ -15,7 +15,6 @@ from numpy import integer, uint32
 from numpy.typing import NDArray
 from typing import List, Tuple
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from pacman.model.graphs.common import Slice
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     ConnectionsArray)
@@ -44,7 +43,7 @@ class AbstractStaticSynapseDynamics(
     def get_static_synaptic_data(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
-            post_vertex_slice: Slice, n_synapse_types: int,
+            n_synapse_types: int,
             max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
                 List[NDArray[uint32]], NDArray[integer]]:
         """
@@ -63,8 +62,6 @@ class AbstractStaticSynapseDynamics(
         :param ~numpy.ndarray connection_row_indices:
             The row into which each connection should go
         :param int n_rows: The number of rows to write
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-            The slice of the post vertex to generate for
         :param int n_synapse_types: The number of synapse types
         :param int max_n_synapses: The maximum number of synapses to generate
         :param int max_atoms_per_core: The maximum number of atoms on a core
@@ -98,13 +95,12 @@ class AbstractStaticSynapseDynamics(
 
     @abstractmethod
     def read_static_synaptic_data(
-            self, post_vertex_slice: Slice, n_synapse_types: int,
+            self, n_synapse_types: int,
             ff_size: NDArray[integer], ff_data: List[NDArray[uint32]],
             max_atoms_per_core: int) -> ConnectionsArray:
         """
         Read the connections from the words of data in `ff_data`.
 
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param int n_synapse_types:
         :param ~numpy.ndarray ff_size:
         :param list(~numpy.ndarray) ff_data:

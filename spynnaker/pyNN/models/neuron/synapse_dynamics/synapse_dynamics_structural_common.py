@@ -356,7 +356,6 @@ class SynapseDynamicsStructuralCommon(
             lo_atom_index[a_edge.pre_vertex, s_info, c["source"]]
             for (conns, a_edge, s_info) in slice_conns for c in conns])
         connections["source"] = connections["source"] - lo_atoms
-        connections["target"] = connections["target"] - vertex_slice.lo_atom
 
         # Make an array of all data required
         conn_data = numpy.dstack(

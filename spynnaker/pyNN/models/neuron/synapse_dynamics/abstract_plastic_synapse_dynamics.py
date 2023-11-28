@@ -15,7 +15,6 @@ from numpy import integer, uint32
 from numpy.typing import NDArray
 from typing import List, Tuple
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from pacman.model.graphs.common import Slice
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     ConnectionsArray)
@@ -44,7 +43,7 @@ class AbstractPlasticSynapseDynamics(
     def get_plastic_synaptic_data(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
-            post_vertex_slice: Slice, n_synapse_types: int,
+            n_synapse_types: int,
             max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
                 NDArray[uint32], NDArray[uint32], NDArray[uint32],
                 NDArray[uint32]]:
@@ -65,8 +64,6 @@ class AbstractPlasticSynapseDynamics(
         :param ~numpy.ndarray connection_row_indices:
             The row into which each connection should go
         :param int n_rows: The total number of rows
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-            The slice of the post vertex to get the connections for
         :param int n_synapse_types: The number of synapse types
         :param int max_n_synapses: The maximum number of synapses to generate
         :param int max_atoms_per_core: The maximum number of atoms on a core
@@ -112,7 +109,7 @@ class AbstractPlasticSynapseDynamics(
 
     @abstractmethod
     def read_plastic_synaptic_data(
-            self, post_vertex_slice: Slice, n_synapse_types: int,
+            self, n_synapse_types: int,
             pp_size: NDArray[uint32], pp_data: List[NDArray[uint32]],
             fp_size: NDArray[uint32], fp_data: List[NDArray[uint32]],
             max_atoms_per_core: int) -> ConnectionsArray:
@@ -120,7 +117,6 @@ class AbstractPlasticSynapseDynamics(
         Read the connections indicated in the connection indices from the
         data in `pp_data` and `fp_data`.
 
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param int n_synapse_types:
         :param ~numpy.ndarray pp_size: 1D
         :param ~numpy.ndarray pp_data: 2D

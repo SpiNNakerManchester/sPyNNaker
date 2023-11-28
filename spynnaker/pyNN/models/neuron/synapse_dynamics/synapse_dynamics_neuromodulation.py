@@ -18,7 +18,6 @@ from numpy.typing import NDArray
 from pyNN.standardmodels.synapses import StaticSynapse
 from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.common import Slice
 from spinn_front_end_common.interface.ds import DataType, DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -179,15 +178,16 @@ class SynapseDynamicsNeuromodulation(
     def get_plastic_synaptic_data(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
-            post_vertex_slice: Slice, n_synapse_types, max_n_synapses: int,
+            n_synapse_types, max_n_synapses: int,
             max_atoms_per_core) -> Tuple[
                 NDArray[uint32], NDArray[uint32],
                 NDArray[uint32], NDArray[uint32]]:
+        # pylint: disable=too-many-arguments
         weights = numpy.rint(
             numpy.abs(connections["weight"]) * STDP_FIXED_POINT_ONE)
         fixed_plastic = (
             ((weights.astype(uint32) & 0xFFFF) << 16) |
-            ((connections["target"] - post_vertex_slice.lo_atom)) & 0xFFFF)
+            (connections["target"] & 0xFFFF))
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
             fixed_plastic.view(dtype=uint8).reshape((-1, BYTES_PER_WORD)),
@@ -233,7 +233,7 @@ class SynapseDynamicsNeuromodulation(
 
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
-            self, post_vertex_slice: Slice, n_synapse_types,
+            self, n_synapse_types,
             pp_size: NDArray[integer], pp_data: List[NDArray[uint32]],
             fp_size: NDArray[integer], fp_data: List[NDArray[uint32]],
             max_atoms_per_core) -> ConnectionsArray:
@@ -241,7 +241,7 @@ class SynapseDynamicsNeuromodulation(
         connections = numpy.zeros(data.size, dtype=NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, fp_size[i]) for i in range(len(fp_size))])
-        connections["target"] = (data & 0xFFFF) + post_vertex_slice.lo_atom
+        connections["target"] = data & 0xFFFF
         connections["weight"] = (data >> 16) & 0xFFFF
         connections["delay"] = 1
         return connections

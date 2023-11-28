@@ -17,37 +17,32 @@
 from __future__ import annotations
 from collections.abc import Sequence
 import numpy
-from numpy import floating, float64, integer, int16, uint16, uint32, bool_
+from numpy import floating, float64, integer, int16, uint16, uint32
 from numpy.typing import NDArray
 from typing import (
     List, Optional, Sequence as TSequence, Tuple, Union,
     cast, overload, TYPE_CHECKING)
+from collections.abc import Iterable
+from pyNN.random import RandomDistribution
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
-from pyNN.random import RandomDistribution
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from .abstract_connector import AbstractConnector
-from collections.abc import Iterable
+    BYTES_PER_SHORT, BYTES_PER_WORD)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from spynnaker.pyNN.models.common.local_only_2d_common import get_div_const
+from .abstract_connector import AbstractConnector
+from pacman.model.graphs.abstract_vertex import AbstractVertex
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
 
-#: The number of 32-bit words in the source_key_info struct
-SOURCE_KEY_INFO_WORDS = 7
+#: The size of the connector struct in bytes
+CONNECTOR_CONFIG_SIZE = (10 * BYTES_PER_SHORT) + (4 * BYTES_PER_WORD)
 
-#: The number of 16-bit shorts in the connector struct,
-#: ignoring the source_key_info struct but including the delay and the
-#: 32-bit weight index
-CONNECTOR_CONFIG_SHORTS = 16
 
 _Weights = Union[
     int, float, List[Union[int, float]], Tuple[Union[int, float], ...],
@@ -71,7 +66,9 @@ class ConvolutionConnector(AbstractConnector):
         "__pool_shape",
         "__pool_stride",
         "__positive_receptor_type",
-        "__negative_receptor_type")
+        "__negative_receptor_type",
+        "__filter_edges"
+    )
 
     def __init__(self, kernel_weights: _Weights,
                  kernel_shape: _Shape = None,
@@ -79,7 +76,7 @@ class ConvolutionConnector(AbstractConnector):
                  pool_shape: _Shape = None, pool_stride: _Shape = None,
                  positive_receptor_type: str = "excitatory",
                  negative_receptor_type: str = "inhibitory",
-                 safe=True, verbose=False, callback=None):
+                 safe=True, verbose=False, callback=None, filter_edges=True):
         """
         :param kernel_weights:
             The synaptic strengths, shared by neurons in the post population.
@@ -138,12 +135,20 @@ class ConvolutionConnector(AbstractConnector):
         :param bool safe: (ignored)
         :param bool verbose: (ignored)
         :param callable callback: (ignored)
+        :param bool filter_edges:
+            Whether to filter the edges based on connectivity or not; filtered
+            means that the receiving cores will receive fewer packets, whereas
+            non-filtered means that receiving cores will receive all packets
+            whether relevant or not.  However non-filtered may be more
+            efficient in the routing tables, so may be needed if routing
+            compression doesn't work.
         """
         super().__init__(safe=safe, callback=callback, verbose=verbose)
 
         self.__kernel_weights = self.__decode_kernel(
             kernel_weights, kernel_shape)
         self.__padding_shape = self.__decode_padding(padding)
+        self.__filter_edges = filter_edges
 
         if strides is None:
             self.__strides = numpy.array((1, 1), dtype=integer)
@@ -252,15 +257,14 @@ class ConvolutionConnector(AbstractConnector):
         """
         _shape = numpy.array(shape)
         if self.__pool_shape is not None:
-            post_pool_shape = _shape - (self.__pool_shape - 1)
-            _shape = (post_pool_shape // self.__pool_stride) + 1
+            _shape = _shape // self.__pool_stride
 
         kernel_shape = numpy.array(self.__kernel_weights.shape)
         post_shape = (_shape - (kernel_shape - 1) +
                       (2 * self.__padding_shape))
 
-        return numpy.clip(
-            post_shape // self.__strides, 1, numpy.inf).astype(integer)
+        return tuple(int(i) for i in numpy.clip(
+            post_shape // self.__strides, 1, numpy.inf).astype(integer))
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
@@ -332,8 +336,11 @@ class ConvolutionConnector(AbstractConnector):
     def get_connected_vertices(
             self, s_info: SynapseInformation,
             source_vertex: ApplicationVertex,
-            target_vertex: ApplicationVertex) -> List[
-                Tuple[MachineVertex, List[MachineVertex]]]:
+            target_vertex: ApplicationVertex) -> Sequence[
+                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
+        if not self.__filter_edges:
+            return super(ConvolutionConnector, self).get_connected_vertices(
+                s_info, source_vertex, target_vertex)
         pre_vertices = numpy.array(
             source_vertex.splitter.get_out_going_vertices(SPIKE_PARTITION_ID))
         post_slice_ranges = self.__pre_as_post_slice_ranges(
@@ -353,49 +360,17 @@ class ConvolutionConnector(AbstractConnector):
             min_y = post_slice_y.start - hlf_k_h
             max_y = (post_slice_y.stop + hlf_k_h) - 1
 
-            # Filter to just the coordinates that are in range
-            pre_in_range = pre_vertices[self.__in_range(
-                post_slice_ranges, min_x, min_y, max_x, max_y)]
-            # At this point, Mypy is very confused about types!
+            # Test that the start coords are in range i.e. less than max
+            start_in_range = numpy.logical_not(
+                numpy.any(post_slice_ranges[:, 0] > [max_x, max_y], axis=1))
+            # Test that the end coords are in range i.e. more than min
+            end_in_range = numpy.logical_not(
+                numpy.any(post_slice_ranges[:, 1] < [min_x, min_y], axis=1))
+            # When both things are true, we have a vertex in range
+            pre_in_range = pre_vertices[
+                numpy.logical_and(start_in_range, end_in_range)]
             connected.append((post, list(pre_in_range)))
         return connected
-
-    def get_max_n_incoming_slices(
-            self, source_vertex: ApplicationVertex,
-            target_vertex: ApplicationVertex) -> int:
-        post_slice_ranges = self.__pre_as_post_slice_ranges(
-            source_vertex.splitter.get_out_going_slices())
-        hlf_k_w, hlf_k_h = numpy.array(self.__kernel_weights.shape) // 2
-
-        max_connected = 0
-        for post_slice in target_vertex.splitter.get_in_coming_slices():
-            post_slice_x = post_slice.get_slice(0)
-            post_slice_y = post_slice.get_slice(1)
-
-            # Get ranges allowed in post
-            min_x = post_slice_x.start - hlf_k_w
-            max_x = (post_slice_x.stop + hlf_k_w) - 1
-            min_y = post_slice_y.start - hlf_k_h
-            max_y = (post_slice_y.stop + hlf_k_h) - 1
-
-            # Get number of vertices that are in range
-            n_connected = self.__in_range(
-                post_slice_ranges, min_x, min_y, max_x, max_y).sum()
-            max_connected = max(max_connected, n_connected)
-        return max_connected
-
-    @staticmethod
-    def __in_range(post_slice_ranges: NDArray[integer],  # 2D
-                   min_x: int, min_y: int, max_x: int,
-                   max_y: int) -> NDArray[bool_]:
-        # Test that the start coords are in range i.e. less than max
-        start_in_range = numpy.logical_not(
-            numpy.any(post_slice_ranges[:, 0] > [max_x, max_y], axis=1))
-        # Test that the end coords are in range i.e. more than min
-        end_in_range = numpy.logical_not(
-            numpy.any(post_slice_ranges[:, 1] < [min_x, min_y], axis=1))
-        # When both things are true, we have a vertex in range
-        return numpy.logical_and(start_in_range, end_in_range)
 
     def __pre_as_post_slice_ranges(
             self, slices: Iterable[Slice]) -> NDArray[integer]:
@@ -426,62 +401,33 @@ class ConvolutionConnector(AbstractConnector):
 
     @property
     def parameters_n_bytes(self) -> int:
-        return (
-            (SOURCE_KEY_INFO_WORDS * BYTES_PER_WORD) +
-            (CONNECTOR_CONFIG_SHORTS * BYTES_PER_SHORT))
+        return CONNECTOR_CONFIG_SIZE
 
     def get_local_only_data(
-            self, app_edge: ProjectionApplicationEdge, vertex_slice: Slice,
-            key: int, mask: int, n_colour_bits: int,
-            delay: float, weight_index: int) -> List[NDArray[uint32]]:
+            self, app_edge: ProjectionApplicationEdge, local_delay: int,
+            delay_stage: int, weight_index: int) -> NDArray[uint32]:
         # Get info about things
         kernel_shape = self.__kernel_weights.shape
         ps_x, ps_y = 1, 1
         if self.__pool_stride is not None:
             ps_x, ps_y = self.__pool_stride
 
-        # Start with source key info
-        values = [key, mask, n_colour_bits]
-
-        # Add the column and row mask and shifts to extract the column and
-        # row from the incoming spike
-        if isinstance(app_edge.pre_vertex, HasShapeKeyFields):
-            (c_start, _c_end, c_mask, c_shift), \
-                (r_start, _r_end, r_mask, r_shift) = \
-                app_edge.pre_vertex.get_shape_key_fields(vertex_slice)
-            start: Tuple[int, ...] = (c_start, r_start)
-            values.extend([c_mask, c_shift, r_mask, r_shift])
-        else:
-            start = vertex_slice.start
-            n_bits_col = get_n_bits(vertex_slice.shape[0])
-            col_mask = (1 << n_bits_col) - 1
-            n_bits_row = get_n_bits(vertex_slice.shape[1])
-            row_mask = ((1 << n_bits_row) - 1) << n_bits_col
-            values.extend([col_mask, 0, row_mask, n_bits_col])
-        assert len(start) > 1
-
         # Do a new list for remaining connector details as uint16s
         pos_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
             self.__positive_receptor_type)
         neg_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
             self.__negative_receptor_type)
+
+        # Produce the values needed
         short_values = numpy.array([
-            start[1], start[0],
             kernel_shape[1], kernel_shape[0],
             self.__padding_shape[1], self.__padding_shape[0],
-            self.__recip(self.__strides[1]), self.__recip(self.__strides[0]),
-            self.__recip(ps_y), self.__recip(ps_x),
-            pos_synapse_type, neg_synapse_type], dtype=uint16)
-
-        # Work out delay
-        delay_step = (delay *
-                      SpynnakerDataView.get_simulation_time_step_per_ms())
-        local_delay = (delay_step %
-                       app_edge.post_vertex.splitter.max_support_delay())
-
-        return [numpy.array(values, dtype=uint32),
-                short_values.view(uint32),
-                numpy.array([local_delay, weight_index], dtype=uint32)]
+            pos_synapse_type, neg_synapse_type, delay_stage, local_delay,
+            weight_index, 0], dtype=uint16)
+        long_values = numpy.array([
+            get_div_const(self.__strides[1]), get_div_const(self.__strides[0]),
+            get_div_const(ps_y), get_div_const(ps_x)], dtype=uint32)
+        return numpy.concatenate((short_values.view(uint32), long_values))
 
     def get_encoded_kernel_weights(
             self, app_edge: ProjectionApplicationEdge,
@@ -497,11 +443,3 @@ class ConvolutionConnector(AbstractConnector):
         encoded_kernel_weights[neg_weights] *= weight_scales[neg_synapse_type]
         encoded_kernel_weights[pos_weights] *= weight_scales[pos_synapse_type]
         return numpy.round(encoded_kernel_weights).astype(int16)
-
-    @staticmethod
-    def __recip(v: float) -> int:
-        """
-        Compute the reciprocal of a number as an signed 1-bit integer,
-        14-bit fractional fixed point number, encoded in an integer.
-        """
-        return int(round((1 / v) * (1 << 14)))

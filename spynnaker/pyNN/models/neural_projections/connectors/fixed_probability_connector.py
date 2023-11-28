@@ -155,7 +155,10 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
         # If self connections are not allowed, remove possibility the self
         # connections by setting them to a value of infinity
-        if not self.__allow_self_connections:
+        no_self = (
+            not self.__allow_self_connections and
+            synapse_info.pre_population == synapse_info.post_population)
+        if no_self:
             items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
 
         present = items < self._p_connect
@@ -184,9 +187,13 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         return ConnectorIDs.FIXED_PROBABILITY_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(self) -> NDArray:
+    def gen_connector_params(
+            self, synapse_info: SynapseInformation) -> NDArray:
+        allow_self = (
+            self.__allow_self_connections or
+            synapse_info.pre_population != synapse_info.post_population)
         return numpy.array([
-            int(self.__allow_self_connections),
+            int(allow_self),
             DataType.U032.encode_as_int(self._p_connect)], dtype="uint32")
 
     @property
@@ -209,5 +216,5 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge, synapse_info: SynapseInformation):
-        if self.generate_on_machine(synapse_info.weights, synapse_info.delays):
+        if self.generate_on_machine(synapse_info):
             check_rng(self.__rng, "FixedProbabilityConnector")

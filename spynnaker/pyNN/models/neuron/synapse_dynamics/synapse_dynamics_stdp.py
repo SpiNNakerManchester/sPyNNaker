@@ -355,8 +355,7 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.get_plastic_synaptic_data)
     def get_plastic_synaptic_data(
             self, connections: ConnectionsArray, connection_row_indices,
-            n_rows, post_vertex_slice, n_synapse_types, max_n_synapses,
-            max_atoms_per_core):
+            n_rows, n_synapse_types, max_n_synapses, max_atoms_per_core):
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
@@ -367,8 +366,7 @@ class SynapseDynamicsSTDP(
              (n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype(uint16)
              << n_neuron_id_bits) |
-            ((connections["target"].astype(uint16) -
-              post_vertex_slice.lo_atom) & neuron_id_mask))
+            (connections["target"].astype(uint16) & neuron_id_mask))
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
             fixed_plastic.view(dtype=uint8).reshape((-1, 2)),
@@ -455,8 +453,9 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
-            self, post_vertex_slice, n_synapse_types, pp_size, pp_data,
-            fp_size, fp_data, max_atoms_per_core) -> ConnectionsArray:
+            self, n_synapse_types, pp_size, pp_data, fp_size, fp_data,
+            max_atoms_per_core) -> ConnectionsArray:
+        # pylint: disable=too-many-arguments
         n_rows = len(fp_size)
 
         n_synapse_type_bits = get_n_bits(n_synapse_types)
@@ -483,8 +482,7 @@ class SynapseDynamicsSTDP(
             data_fixed.size, dtype=NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, fp_size[i]) for i in range(len(fp_size))])
-        connections["target"] = (
-            (data_fixed & neuron_id_mask) + post_vertex_slice.lo_atom)
+        connections["target"] = data_fixed & neuron_id_mask
         connections["weight"] = pp_half_words
         connections["delay"] = data_fixed >> (
             n_neuron_id_bits + n_synapse_type_bits)

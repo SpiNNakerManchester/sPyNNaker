@@ -12,36 +12,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from collections import defaultdict
 import numpy
-from numpy import floating
+from math import ceil
+from numpy import floating, uint32
 from numpy.typing import NDArray
 from typing import (
-    Dict, Iterable, List, Optional, Set, Tuple, cast, TYPE_CHECKING)
+    Dict, List, Iterable, cast, TYPE_CHECKING)
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.machine import MachineVertex
-from pacman.model.graphs.common import Slice
+from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationGenerator)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     PoolDenseConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
 from spynnaker.pyNN.types import Weight_Delay_In_Types
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.models.common.local_only_2d_common import (
+    get_sources_for_target, get_rinfo_for_spike_source, BITS_PER_SHORT,
+    get_div_const, N_COLOUR_BITS_BITS, KEY_INFO_SIZE, get_first_and_last_slice,
+    Source)
 from .abstract_local_only import AbstractLocalOnly
-from pacman.model.routing_info.vertex_routing_info import VertexRoutingInfo
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron import (
         PopulationMachineLocalOnlyCombinedVertex)
-    from spynnaker.pyNN.models.utility_models.delays import (
-        DelayExtensionVertex)
-    from spynnaker.pyNN.models.common.population_application_vertex import (
-        PopulationApplicationVertex)
+    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+
+#: Size of the source information
+SOURCE_INFO_SIZE = KEY_INFO_SIZE + BYTES_PER_WORD
+
+#: Size of the source info per-dimension info
+SOURCE_INFO_DIM_SIZE = 9 * BYTES_PER_WORD
+
+#: Size of information
+CONFIG_SIZE = 3 * BYTES_PER_WORD
 
 
 class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
@@ -49,13 +55,18 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     A convolution synapse dynamics that can process spikes with only DTCM.
     """
 
-    __slots__ = ()
+    __slots__ = [
+        "__cached_sources"]
 
     def __init__(self, delay: Weight_Delay_In_Types = None):
         """
         :param float delay:
             The delay used in the connection; by default 1 time step
         """
+        # Store the sources to avoid recalculation
+        self.__cached_sources: Dict[ApplicationVertex, Dict[
+                ApplicationVertex, List[Source]]] = dict()
+
         super().__init__(delay)
         if not isinstance(self.delay, (float, int)):
             raise SynapticConfigurationException(
@@ -94,6 +105,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, n_atoms: int,
             incoming_projections: Iterable[Projection]) -> int:
         n_bytes = 0
+        seen_edges = set()
         for incoming in incoming_projections:
             # pylint: disable=protected-access
             s_info = incoming._synapse_information
@@ -103,53 +115,25 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     " of PoolDense")
             # pylint: disable=protected-access
             app_edge = incoming._projection_edge
-            in_slices = app_edge.pre_vertex.splitter.get_out_going_slices()
+            if app_edge not in seen_edges:
+                seen_edges.add(app_edge)
+                n_dims = len(app_edge.pre_vertex.atoms_shape)
+                n_bytes += SOURCE_INFO_SIZE
+                n_bytes += n_dims * SOURCE_INFO_DIM_SIZE
             n_bytes += s_info.connector.local_only_n_bytes(
-                in_slices, n_atoms)
+                app_edge.pre_vertex.atoms_shape, n_atoms)
 
-        return (2 * BYTES_PER_WORD) + n_bytes
+        return CONFIG_SIZE + n_bytes
 
     @overrides(AbstractLocalOnly.write_parameters)
     def write_parameters(
             self, spec: DataSpecificationGenerator, region: int,
             machine_vertex: PopulationMachineLocalOnlyCombinedVertex,
             weight_scales: NDArray[floating]):
-        # pylint: disable=protected-access
-        app_vertex = machine_vertex._pop_vertex
-
-        # Get all the incoming vertices and keys so we can sort
-        incoming_info: List[
-            Tuple[Projection, Slice, Tuple[int, int], int]] = []
-        seen_pre_vertices: Set[PopulationApplicationVertex] = set()
-        for incoming in app_vertex.incoming_projections:
-            app_edge = incoming._projection_edge
-            pre_vertex = app_edge.pre_vertex
-            if pre_vertex in seen_pre_vertices:
-                continue
-            seen_pre_vertices.add(pre_vertex)
-
-            delay_vertex: Optional[DelayExtensionVertex] = None
-            if self._delay > app_vertex.splitter.max_support_delay():
-                delay_edge = app_edge.delay_edge
-                assert delay_edge is not None
-                delay_vertex = delay_edge.pre_vertex
-
-            # Keep track of all the same source squares, so they can be
-            # merged; this will make sure the keys line up!
-            edges_for_source: Dict[
-                Tuple[PopulationApplicationVertex, Slice],
-                List[VertexRoutingInfo]] = defaultdict(list)
-            for pre_m_vertex in pre_vertex.splitter.get_out_going_vertices(
-                    SPIKE_PARTITION_ID):
-                edges_for_source[pre_vertex, pre_m_vertex.vertex_slice].append(
-                    self.__get_rinfo(pre_m_vertex, delay_vertex))
-
-            # Merge edges with the same source
-            for (_, vertex_slice), edge_list in edges_for_source.items():
-                incoming_info.append((
-                    incoming, vertex_slice,
-                    self.__group_key_and_mask(edge_list),
-                    pre_vertex.n_colour_bits))
+        # Get incoming sources for this vertex
+        app_vertex = cast('AbstractPopulationVertex',
+                          machine_vertex.app_vertex)
+        sources = self.__get_sources_for_target(app_vertex)
 
         size = self.get_parameters_usage_in_bytes(
             machine_vertex.vertex_slice.n_atoms,
@@ -157,55 +141,94 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.reserve_memory_region(region, size, label="LocalOnlyPoolDense")
         spec.switch_write_focus(region)
 
-        # Write the common spec
-        post_slice = machine_vertex.vertex_slice
-        n_post = int(numpy.prod(post_slice.shape))
+        connector_data: List[NDArray[uint32]] = list()
+        source_data = list()
+        n_connectors = 0
+        for pre_vertex, source_infos in sources.items():
+            first_conn_index = len(connector_data)
+            for source in source_infos:
+                # pylint: disable=protected-access
+                conn = source.projection._synapse_information.connector
+                app_edge = source.projection._projection_edge
+                connector_data.append(conn.get_local_only_data(
+                    app_edge, source.local_delay, source.delay_stage,
+                    machine_vertex.vertex_slice, weight_scales))
+                n_connectors += 1
+
+            # Get the source routing information
+            r_info, core_mask, mask_shift = get_rinfo_for_spike_source(
+                pre_vertex)
+
+            # Get the width / height per core / last_core
+            first_slice, last_slice = get_first_and_last_slice(pre_vertex)
+            n_dims = len(pre_vertex.atoms_shape)
+            pre_shape = list(pre_vertex.atoms_shape)
+
+            # Add the key and mask...
+            source_data.extend([r_info.key, r_info.mask])
+            # ... start connector index, n_colour_bits, count of connectors ...
+            source_data.append(
+                (len(source_infos) << BITS_PER_SHORT) +
+                (pre_vertex.n_colour_bits <<
+                 (BITS_PER_SHORT - N_COLOUR_BITS_BITS)) +
+                first_conn_index)
+            # ... core mask, mask shift ...
+            source_data.append((mask_shift << BITS_PER_SHORT) + core_mask)
+            # ... n_dims ...
+            source_data.append(n_dims)
+
+            # Add the dimensions; calculations are in reverse order!
+            cum_size = 1
+            cum_cores_per_dim = 1
+            cum_last_size = 1
+            all_dim_data = list()
+            for i in range(n_dims):
+                dim_data = list()
+                # Size per core
+                dim_data.append(first_slice.shape[i])
+                dim_data.append(cum_size)
+                dim_data.append(get_div_const(cum_size))
+                cum_size *= first_slice.shape[i]
+
+                # Cores
+                cores_per_dim = int(ceil(pre_shape[i] / first_slice.shape[i]))
+                dim_data.append(cores_per_dim)
+                dim_data.append(cum_cores_per_dim)
+                dim_data.append(get_div_const(cum_cores_per_dim))
+                cum_cores_per_dim *= cores_per_dim
+
+                # Last core
+                dim_data.append(last_slice.shape[i])
+                dim_data.append(cum_last_size)
+                dim_data.append(get_div_const(cum_last_size))
+                cum_last_size *= last_slice.shape[i]
+                all_dim_data.append(dim_data)
+            for dim_data in reversed(all_dim_data):
+                source_data.extend(dim_data)
+
+        # Write the spec
+        n_post = int(numpy.prod(machine_vertex.vertex_slice.shape))
         spec.write_value(n_post, data_type=DataType.UINT32)
-        spec.write_value(len(incoming_info), data_type=DataType.UINT32)
+        spec.write_value(len(sources), data_type=DataType.UINT32)
+        spec.write_value(n_connectors, data_type=DataType.UINT32)
+        spec.write_array(numpy.array(source_data, dtype=numpy.uint32))
+        spec.write_array(numpy.concatenate(connector_data))
 
-        # Write spec for each connector, sorted by key
-        incoming_info.sort(key=lambda e: e[2][1])
-        for incoming, vertex_slice, (key, mask), colour_bits in incoming_info:
-            self.__connector(incoming).write_local_only_data(
-                spec, incoming._projection_edge, vertex_slice, post_slice,
-                key, mask, colour_bits, weight_scales)
-
-    @staticmethod
-    def __group_key_and_mask(
-            r_info_list: List[VertexRoutingInfo]) -> Tuple[int, int]:
+    def __get_sources_for_target(self, app_vertex: AbstractPopulationVertex):
         """
-        Compute the group key and mask for a list of routing infos.
-        """
-        # Start with the first item in the list
-        # NB: the first iteration does nothing
-        key, mask = r_info_list[0].key, r_info_list[0].mask
-        for r_info in r_info_list:
-            # Compute the new don't-care bits when we combine this route
-            new_xs = ~(key ^ r_info.key)
-            # New mask
-            mask = mask & r_info.mask & new_xs
-            # New key
-            key = (key | r_info.key) & mask
-        return key, mask
+        Get all the application vertex sources that will hit the given
+        application vertex.
 
-    @staticmethod
-    def __get_rinfo(
-            source: MachineVertex,
-            delay_vertex: Optional[DelayExtensionVertex]) -> VertexRoutingInfo:
-        # pylint: disable=protected-access
-        routing_info = SpynnakerDataView.get_routing_infos()
-        if delay_vertex is None:
-            r_info = routing_info.get_routing_info_from_pre_vertex(
-                source, SPIKE_PARTITION_ID)
-        else:
-            delay_source = delay_vertex._delay_splitter.get_machine_vertex(
-                source.vertex_slice)
-            r_info = routing_info.get_routing_info_from_pre_vertex(
-                delay_source, SPIKE_PARTITION_ID)
-        if r_info is None:
-            raise SynapticConfigurationException(
-                f"Missing r_info for {source}")
-        return r_info
+        :param AbstractPopulationVertex app_vertex: The vertex being targeted
+        :return:
+            A dict of source ApplicationVertex to list of source information
+        :rtype: dict(ApplicationVertex, list(Source))
+        """
+        sources = self.__cached_sources.get(app_vertex)
+        if sources is None:
+            sources = get_sources_for_target(app_vertex)
+            self.__cached_sources[app_vertex] = sources
+        return sources
 
     @staticmethod
     def __get_synapse_type(proj: Projection, target: str) -> int:

@@ -439,7 +439,8 @@ def list_standard_models() -> List[str]:
 
 
 def set_number_of_neurons_per_core(
-        neuron_type: Type, max_permitted: Union[int, Tuple[int, ...], None]):
+        neuron_type: Type,
+        max_permitted: Optional[Union[int, Tuple[int, ...]]]):
     """
     Sets a ceiling on the number of neurons of a given model that can be
     placed on a single core.
@@ -454,27 +455,23 @@ def set_number_of_neurons_per_core(
     set the maximum on each Population.
 
     :param type(AbstractPopulationVertex) neuron_type: neuron type
-    :param int max_permitted: the number to set to
+    :param max_permitted: the number to set to
+    :type max_permitted: int or tuple or None
     """
     if isinstance(neuron_type, str):
         raise ConfigurationException(
             "set_number_of_neurons_per_core call now expects "
             "neuron_type as a class instead of as a str")
+    max_neurons: Optional[Tuple[int, ...]] = None
     if max_permitted is not None:
         if is_singleton(max_permitted):
-            max_neurons = cast('Tuple[int, ...]', (max_permitted, ))
+            max_neurons = (int(max_permitted), )
         else:
-            max_neurons = cast('Tuple[int, ...]', max_permitted)
-        for m in max_neurons:
-            # Make sure integer values are passed in here; warn if not
-            m_int = int(m)
-            if (m_int - m) != 0:
-                logger.warning(
-                    "The number of neurons per core requested {} is not an "
-                    "integer; the value has been set to {}", m, m_int)
+            max_perm: Tuple[int, ...] = cast(Tuple[int, ...], max_permitted)
+            max_neurons = tuple(int(m) for m in max_perm)
 
     SpynnakerDataView.set_number_of_neurons_per_dimension_per_core(
-        neuron_type, max_permitted)
+        neuron_type, max_neurons)
 
 
 # These methods will defer to PyNN methods if a simulator exists

@@ -36,6 +36,7 @@ from spynnaker.pyNN.types import (
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
@@ -646,13 +647,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def verbose(self, new_value: bool):
         self.__verbose = new_value
 
-    def use_direct_matrix(self, synapse_info: SynapseInformation) -> bool:
-        """
-        :param SynapseInformation synapse_info:
-        :rtype: bool
-        """
-        return False
-
     def get_connected_vertices(
             self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
@@ -719,14 +713,22 @@ class AbstractConnector(object, metaclass=AbstractBase):
             self, application_edge: ProjectionApplicationEdge,
             synapse_info: SynapseInformation):
         """
-        Checks that the edge supports the connector.  By default this does
-        nothing i.e. assumes the edge is OK, but can be overridden if the
-        connector has rules that need to be checked.  Returns nothing; it
+        Checks that the edge supports the connector.  Returns nothing; it
         is assumed that an Exception will be raised if anything is wrong.
+
+        By default this checks only that the views are not used
+        on multi-dimensional vertices.
 
         :param application_edge: The edge of the connection
         :type application_edge:
             ~pacman.model.graphs.application.ApplicationEdge
         :param SynapseInformation synapse_info: The synaptic information
         """
-        return
+        if ((synapse_info.prepop_is_view and
+                len(synapse_info.pre_vertex.atoms_shape) > 1) or
+                (synapse_info.postpop_is_view and
+                 len(synapse_info.post_vertex.atoms_shape) > 1)):
+            raise ConfigurationException(
+                "Using a projection where the source or target is a "
+                "PopulationView on a multi-dimensional Population is not "
+                "supported")

@@ -24,7 +24,7 @@ from spinn_utilities.ranged.abstract_sized import Selector
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.placements import Placement
-from pacman.utilities.utility_calls import get_field_based_keys
+from pacman.utilities.utility_calls import get_keys
 
 from spinn_front_end_common.interface.ds import (
     DataSpecificationBase, DataSpecificationGenerator,
@@ -36,7 +36,6 @@ from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import AbstractNeuronExpandable
 from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
-from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.utilities.utility_calls import convert_to
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
@@ -279,18 +278,9 @@ class PopulationMachineNeurons(
             spec.write_value(data=0)
             keys = [0] * n_atoms
         else:
-            n_colour_bits = self._pop_vertex.n_colour_bits
             spec.write_value(data=1)
-            # Quick and dirty way to avoid using field based keys in cases
-            # which use grids but not local-only neuron models
-            if isinstance(self._pop_vertex.synapse_dynamics,
-                          AbstractLocalOnly):
-                keys = get_field_based_keys(
-                    self._key, self._vertex_slice, n_colour_bits)
-            else:
-                # keys are consecutive from the base value
-                keys = [self._key + (nn << n_colour_bits)
-                        for nn in range(n_atoms)]
+            keys = get_keys(
+                self._key, self._vertex_slice, self._pop_vertex.n_colour_bits)
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
@@ -319,16 +309,13 @@ class PopulationMachineNeurons(
     def _write_current_source_parameters(
             self, spec: DataSpecificationBase):
         n_atoms = self._vertex_slice.n_atoms
-        lo_atom = self._vertex_slice.lo_atom
-        hi_atom = self._vertex_slice.hi_atom
 
         spec.comment(
             f"\nWriting Current Source Parameters for {n_atoms} Neurons:\n")
 
         # Reserve and switch to the current source region
         params_size = self._pop_vertex.\
-            get_sdram_usage_for_current_source_params(
-                self._vertex_slice.n_atoms)
+            get_sdram_usage_for_current_source_params(n_atoms)
         spec.reserve_memory_region(
             region=self._neuron_regions.current_source_params,
             size=params_size, label='CurrentSourceParams')
@@ -354,19 +341,19 @@ class PopulationMachineNeurons(
             # sources for each neuron, then if this is non-zero, follow it with
             # the IDs indicating the current source ID value, and then the
             # index within that type of current source
-            neuron_current_sources = [[0] for n in range(lo_atom, hi_atom + 1)]
+            neuron_current_sources = [[0] for n in range(n_atoms)]
             for current_source in current_sources:
                 # Get the ID of the current source
                 cs_id = current_source.current_source_id
 
                 # Only use IDs that are on this core
-                for n in range(lo_atom, hi_atom + 1):
+                for i, n in enumerate(self._vertex_slice.get_raster_ids()):
                     if self.__in_selector(
                             n, current_source_id_list[current_source]):
                         # I think this is now right, but test it more...
-                        neuron_current_sources[n-lo_atom][0] += 1
-                        neuron_current_sources[n-lo_atom].append(cs_id)
-                        neuron_current_sources[n-lo_atom].append(
+                        neuron_current_sources[i][0] += 1
+                        neuron_current_sources[i].append(cs_id)
+                        neuron_current_sources[i].append(
                             cs_index_array[cs_id])
 
                 # Increase the ID value in case a (different) current source
@@ -375,7 +362,7 @@ class PopulationMachineNeurons(
 
             # Now loop over the neurons on this core and write the current
             # source ID and index for sources attached to each neuron
-            for n in range(0, hi_atom + 1 - lo_atom):
+            for n in range(n_atoms):
                 n_current_sources = neuron_current_sources[n][0]
                 spec.write_value(n_current_sources)
                 if n_current_sources != 0:
@@ -415,14 +402,12 @@ class PopulationMachineNeurons(
                             spec.write_value(data=value_convert)
 
     def __get_current_sources_sorted(self) -> List[AbstractCurrentSource]:
-        lo_atom = self._vertex_slice.lo_atom
-        hi_atom = self._vertex_slice.hi_atom
         app_current_sources = self._pop_vertex.current_sources
         current_source_id_list = self._pop_vertex.current_source_id_list
 
         current_sources: Set[AbstractCurrentSource] = set()
         for app_current_source in app_current_sources:
-            for n in range(lo_atom, hi_atom + 1):
+            for n in self._vertex_slice.get_raster_ids():
                 if self.__in_selector(
                         n, current_source_id_list[app_current_source]):
                     current_sources.add(app_current_source)

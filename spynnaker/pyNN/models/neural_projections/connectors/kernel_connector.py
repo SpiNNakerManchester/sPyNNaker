@@ -24,6 +24,7 @@ from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.types import (
@@ -60,10 +61,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     array. Connect every post(row, column) neuron to many
     pre(row, column, kernel)
     through a (kernel) set of weights and/or delays.
-
-    .. admonition:: TODO
-
-        Should these include `allow_self_connections` and `with_replacement`?
     """
     __slots__ = (
         "_kernel_w", "_kernel_h",
@@ -473,7 +470,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return ConnectorIDs.KERNEL_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(self) -> NDArray[uint32]:
+    def gen_connector_params(
+            self, synapse_info: SynapseInformation) -> NDArray[uint32]:
         data = numpy.array([
             shape2word(self._common_w, self._common_h),
             shape2word(self._pre_w, self._pre_h),
@@ -543,3 +541,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
         # Otherwise, they do
         return True
+
+    @overrides(AbstractConnector.validate_connection)
+    def validate_connection(self, application_edge, synapse_info):
+        pre = application_edge.pre_vertex
+        post = application_edge.post_vertex
+        if len(pre.atoms_shape) != 1 or len(post.atoms_shape) != 1:
+            raise ConfigurationException(
+                "The Kernel Connector is designed to work with 1D vertices")

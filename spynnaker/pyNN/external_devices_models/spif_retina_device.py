@@ -16,10 +16,10 @@ from pacman.model.graphs.application import (
     Application2DFPGAVertex, FPGAConnection)
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.constants import BITS_IN_KEY
+from pacman.utilities.utility_calls import is_power_of_2
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SPIF_INPUT_FPGA_LINKS,
@@ -31,7 +31,7 @@ from .spif_devices import (
 
 class SPIFRetinaDevice(
         Application2DFPGAVertex, PopulationApplicationVertex,
-        AbstractSendMeMulticastCommandsVertex, HasShapeKeyFields):
+        AbstractSendMeMulticastCommandsVertex):
     """
     A retina device connected to SpiNNaker using a SPIF board.
     """
@@ -107,13 +107,25 @@ class SPIFRetinaDevice(
         :type chip_coords: tuple(int, int) or None
         """
         # Do some checks
-        if sub_width < self.X_MASK or sub_height < self.Y_MASK:
+        if sub_width < self.X_MASK + 1 or sub_height < self.Y_MASK + 1:
             raise ConfigurationException(
                 "The sub-squares must be >=4 x >= 2"
                 f" ({sub_width} x {sub_height} specified)")
         if pipe >= N_PIPES:
             raise ConfigurationException(
                 f"Pipe {pipe} is bigger than maximum allowed {N_PIPES}")
+
+        # The width has to be a power of 2 as otherwise the keys will not line
+        # up correctly (x is at the LSB of the key, so key then has an x
+        # field).  This is an error here as it affects the downstream
+        # population calculations also!
+        if not is_power_of_2(width):
+            raise ConfigurationException(
+                "The width of the SPIF retina must be a power of 2.  If the"
+                " real retina size is less than this, please round it up."
+                " This will ensure that following Populations can decode the"
+                " spikes correctly.  Note that you will also have to make the"
+                " sizes of the following Populations bigger to match!")
 
         # Call the super
         super().__init__(
@@ -220,57 +232,62 @@ class SPIFRetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
         # Make sure everything has stopped
-        yield SpiNNFPGARegister.STOP.cmd()
+        commands = [SpiNNFPGARegister.STOP.cmd()]
 
         # Clear the counters
-        yield SPIFRegister.OUT_PERIPH_PKT_CNT.cmd(0)
-        yield SPIFRegister.CONFIG_PKT_CNT.cmd(0)
-        yield SPIFRegister.DROPPED_PKT_CNT.cmd(0)
-        yield SPIFRegister.IN_PERIPH_PKT_CNT.cmd(0)
+        commands.append(SPIFRegister.OUT_PERIPH_PKT_CNT.cmd(0))
+        commands.append(SPIFRegister.CONFIG_PKT_CNT.cmd(0))
+        commands.append(SPIFRegister.DROPPED_PKT_CNT.cmd(0))
+        commands.append(SPIFRegister.IN_PERIPH_PKT_CNT.cmd(0))
 
         # Configure the creation of packets from fields to keys using the
         # "standard" input to SPIF (X | P | Y) and convert to (Y | X)
-        yield set_field_mask(self.__pipe, 0, self.__input_x_mask)
-        yield set_field_shift(self.__pipe, 0, self.__input_x_shift)
-        yield set_field_limit(self.__pipe, 0,
-                              (self._width - 1) << self._source_x_shift)
-        yield set_field_mask(self.__pipe, 1, self.__input_y_mask)
-        yield set_field_shift(self.__pipe, 1, self.__input_y_shift)
-        yield set_field_limit(self.__pipe, 1,
-                              (self._height - 1) << self._source_y_shift)
-        # These are unused but set them to be sure
-        yield set_field_mask(self.__pipe, 2, 0)
-        yield set_field_shift(self.__pipe, 2, 0)
-        yield set_field_limit(self.__pipe, 2, 0)
-        yield set_field_mask(self.__pipe, 3, 0)
-        yield set_field_shift(self.__pipe, 3, 0)
-        yield set_field_limit(self.__pipe, 3, 0)
+        commands.extend([
+            set_field_mask(self.__pipe, 0, self.__input_x_mask),
+            set_field_shift(self.__pipe, 0, self.__input_x_shift),
+            set_field_limit(self.__pipe, 0,
+                            (self.width - 1) << self._source_x_shift),
+            set_field_mask(self.__pipe, 1, self.__input_y_mask),
+            set_field_shift(self.__pipe, 1, self.__input_y_shift),
+            set_field_limit(self.__pipe, 1,
+                            (self.height - 1) << self._source_y_shift),
+            # These are unused but set them to be sure
+            set_field_mask(self.__pipe, 2, 0),
+            set_field_shift(self.__pipe, 2, 0),
+            set_field_limit(self.__pipe, 2, 0),
+            set_field_mask(self.__pipe, 3, 0),
+            set_field_shift(self.__pipe, 3, 0),
+            set_field_limit(self.__pipe, 3, 0)
+        ])
 
         # Don't filter
-        yield from (
-            set_filter_mask(self.__pipe, i, 0)
-            for i in range(N_FILTERS))
-        yield from (
-            set_filter_value(self.__pipe, i, 1)
-            for i in range(N_FILTERS))
+        commands.extend([
+            set_filter_mask(self.__pipe, i, 0) for i in range(N_FILTERS)
+        ])
+        commands.extend([
+            set_filter_value(self.__pipe, i, 1) for i in range(N_FILTERS)
+        ])
 
         # Configure the output routing key
-        yield set_mapper_key(self.__pipe, self.__base_key << self._key_shift)
+        commands.append(set_mapper_key(
+            self.__pipe, self.__base_key << self._key_shift))
 
         # Configure the links to send packets to the 8 FPGAs using the
         # lower bits
-        yield from (
+        commands.extend(
             set_input_key(self.__pipe, i, self.__spif_key(15 - (i * 2)))
             for i in range(8))
-        yield from (
+        commands.extend(
             set_input_mask(self.__pipe, i, self.__spif_mask)
             for i in range(8))
-        yield from (
+        commands.extend(
             set_input_route(self.__pipe, i, i)
             for i in range(8))
 
         # Send the start signal
-        yield SpiNNFPGARegister.START.cmd()
+        commands.append(SpiNNFPGARegister.START.cmd())
+
+        return commands
 
     def __spif_key(self, fpga_link_id):
         x, y = self.__fpga_indices(fpga_link_id)
@@ -289,18 +306,14 @@ class SPIFRetinaDevice(
     def timed_commands(self):
         return []
 
-    @overrides(HasShapeKeyFields.get_shape_key_fields)
-    def get_shape_key_fields(self, vertex_slice):
-        return self._key_fields
-
     @overrides(PopulationApplicationVertex.get_atom_key_map)
     def get_atom_key_map(self, pre_vertex, partition_id, routing_info):
         # Work out which machine vertex
         x_start, y_start = pre_vertex.vertex_slice.start
         key_and_mask = self.get_machine_fixed_key_and_mask(
             pre_vertex, partition_id)
-        x_end = x_start + self._sub_width
-        y_end = y_start + self._sub_height
+        x_end = x_start + self.sub_width
+        y_end = y_start + self.sub_height
         key_x = (key_and_mask.key >> self._source_x_shift) & self.X_MASK
         key_y = (key_and_mask.key >> self._source_y_shift) & self.Y_MASK
         neuron_id = (pre_vertex.vertex_slice.lo_atom +

@@ -18,7 +18,6 @@ from numpy.typing import NDArray
 from pyNN.standardmodels.synapses import StaticSynapse
 from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE)
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
@@ -109,9 +108,10 @@ class SynapseDynamicsStatic(
     def get_static_synaptic_data(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
-            post_vertex_slice: Slice, n_synapse_types: int,
+            n_synapse_types: int,
             max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
                 List[NDArray], NDArray]:
+        # pylint: disable=too-many-arguments
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
         n_synapse_type_bits = get_n_bits(n_synapse_types)
@@ -122,8 +122,7 @@ class SynapseDynamicsStatic(
             (connections["delay"].astype(uint32) <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype(uint32) << n_neuron_id_bits) |
-            ((connections["target"] - post_vertex_slice.lo_atom) &
-             neuron_id_mask))
+            (connections["target"] & neuron_id_mask))
         fixed_fixed_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
             fixed_fixed.view(uint8).reshape((-1, BYTES_PER_WORD)),
@@ -161,8 +160,7 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractStaticSynapseDynamics.read_static_synaptic_data)
     def read_static_synaptic_data(
-            self, post_vertex_slice, n_synapse_types, ff_size, ff_data,
-            max_atoms_per_core):
+            self, n_synapse_types, ff_size, ff_data, max_atoms_per_core):
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
@@ -171,8 +169,7 @@ class SynapseDynamicsStatic(
         connections = numpy.zeros(data.size, dtype=NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, ff_size[i]) for i in range(len(ff_size))])
-        connections["target"] = (
-            (data & neuron_id_mask) + post_vertex_slice.lo_atom)
+        connections["target"] = data & neuron_id_mask
         connections["weight"] = (data >> 16) & 0xFFFF
         connections["delay"] = (data & 0xFFFF) >> (
             n_neuron_id_bits + n_synapse_type_bits)

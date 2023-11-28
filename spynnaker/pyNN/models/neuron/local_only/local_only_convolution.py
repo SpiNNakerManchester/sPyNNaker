@@ -12,56 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from collections import defaultdict
 import numpy
-from numpy import floating, int16, uint32
+from math import ceil
+from numpy import floating, uint32
 from numpy.typing import NDArray
 from typing import (
-    Dict, Iterable, List, NamedTuple, Optional, Sequence, Tuple, cast,
-    TYPE_CHECKING)
+    Dict, Iterable, List, cast, TYPE_CHECKING)
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.machine import MachineVertex
-from pacman.model.graphs.common import Slice
-from pacman.model.routing_info.vertex_routing_info import VertexRoutingInfo
+from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationGenerator)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_SHORT, BYTES_PER_WORD)
-from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    ConvolutionConnector)
+    ConvolutionConnector, AbstractConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.types import Weight_Delay_In_Types
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.models.common.local_only_2d_common import (
+    get_div_const, get_rinfo_for_spike_source, get_sources_for_target,
+    BITS_PER_SHORT, N_COLOUR_BITS_BITS, KEY_INFO_SIZE,
+    get_first_and_last_slice, Source)
 from .abstract_local_only import AbstractLocalOnly
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
         AbstractPopulationVertex)
-    from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge)
     from spynnaker.pyNN.models.projection import Projection
-    from spynnaker.pyNN.models.utility_models.delays import (
-        DelayExtensionVertex)
     from spynnaker.pyNN.models.neuron import (
         PopulationMachineLocalOnlyCombinedVertex)
-    from spynnaker.pyNN.models.common.population_application_vertex import (
-        PopulationApplicationVertex)
 
 
-class Source(NamedTuple):
-    projection: Projection
-    vertex_slice: Slice
-    key: int
-    mask: int
+#: Size of convolution config main bytes
+CONV_CONFIG_SIZE = (6 * BYTES_PER_SHORT) + (4 * BYTES_PER_WORD)
 
-
-#: Number of shorts in the conv_config struct
-CONV_CONFIG_N_SHORTS = 6
-
-#: Number of words in the conv_config struct
-CONV_CONFIG_N_WORDS = 2
+#: Size of source information
+SOURCE_INFO_SIZE = KEY_INFO_SIZE + (6 * BYTES_PER_WORD)
 
 
 class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
@@ -70,8 +57,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     """
 
     __slots__ = (
-        "__cached_2d_overlaps",
-        "__cached_n_incoming"
+        "__cached_sources",
     )
 
     def __init__(self, delay: Weight_Delay_In_Types = None):
@@ -82,13 +68,9 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         """
         super().__init__(delay)
 
-        # Store the overlaps between 2d vertices to avoid recalculation
-        self.__cached_2d_overlaps: Dict[
-            AbstractPopulationVertex,
-            Dict[MachineVertex, List[Source]]] = {}
-
-        # Store the n_incoming to avoid recalcaultion
-        self.__cached_n_incoming: Dict[ProjectionApplicationEdge, int] = {}
+        # Store the sources to avoid recalculation
+        self.__cached_sources: Dict[ApplicationVertex, Dict[
+                PopulationApplicationVertex, List[Source]]] = dict()
 
     @property
     def _delay(self) -> float:
@@ -118,6 +100,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         # pylint: disable=protected-access
         n_bytes = 0
         kernel_bytes = 0
+        connectors_seen = set()
+        edges_seen = set()
         for incoming in incoming_projections:
             s_info = incoming._synapse_information
             if not isinstance(s_info.connector, ConvolutionConnector):
@@ -125,22 +109,18 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     "Only ConvolutionConnector can be used with a synapse type"
                     " of Convolution")
             app_edge = incoming._projection_edge
-
-            if app_edge in self.__cached_n_incoming:
-                n_incoming = self.__cached_n_incoming[app_edge]
-            else:
-                n_incoming = s_info.connector.get_max_n_incoming_slices(
-                    app_edge.pre_vertex, app_edge.post_vertex)
-                self.__cached_n_incoming[app_edge] = n_incoming
-            n_bytes += s_info.connector.parameters_n_bytes * n_incoming
-            kernel_bytes += s_info.connector.kernel_n_bytes
+            if app_edge not in edges_seen:
+                edges_seen.add(app_edge)
+                n_bytes += SOURCE_INFO_SIZE
+            if s_info.connector not in connectors_seen:
+                connectors_seen.add(s_info.connector)
+                kernel_bytes += s_info.connector.kernel_n_bytes
+            n_bytes += s_info.connector.parameters_n_bytes
 
         if kernel_bytes % BYTES_PER_WORD != 0:
             kernel_bytes += BYTES_PER_SHORT
 
-        return ((CONV_CONFIG_N_SHORTS * BYTES_PER_SHORT) +
-                (CONV_CONFIG_N_WORDS * BYTES_PER_WORD) + n_bytes +
-                kernel_bytes)
+        return CONV_CONFIG_SIZE + n_bytes + kernel_bytes
 
     @overrides(AbstractLocalOnly.write_parameters)
     def write_parameters(
@@ -149,11 +129,9 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             weight_scales: NDArray[floating]):
         # pylint: disable=unexpected-keyword-arg, protected-access
 
-        # Get incoming sources for this machine vertex, and sort by key
+        # Get incoming sources for this vertex
         app_vertex = machine_vertex._pop_vertex
-        sources_for_targets = self.__get_sources_for_target(app_vertex)
-        sources_for_m_vertex = sources_for_targets[machine_vertex]
-        sources_for_m_vertex.sort(key=lambda s: s.key)
+        sources = self.__get_sources_for_target(app_vertex)
 
         size = self.get_parameters_usage_in_bytes(
             machine_vertex.vertex_slice, app_vertex.incoming_projections)
@@ -161,29 +139,80 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.switch_write_focus(region)
 
         # Get spec for each incoming source
-        connector_weight_index: Dict[ConvolutionConnector, int] = {}
-        unique_connectors: List[
-            Tuple[ConvolutionConnector, ProjectionApplicationEdge]] = []
-        next_weight_index = 0
-        data: List[NDArray[uint32]] = []
-        for source in sources_for_m_vertex:
-            incoming = source.projection
-            app_edge = incoming._projection_edge
-            conn = self.__connector(incoming)
-            if conn in connector_weight_index:
-                weight_index = connector_weight_index[conn]
-            else:
-                unique_connectors.append((conn, app_edge))
-                weight_index = next_weight_index
-                connector_weight_index[conn] = weight_index
-                next_weight_index += conn.kernel_n_weights
+        connector_weight_index: Dict[AbstractConnector, int] = dict()
+        next_weight_index: int = 0
+        source_data = list()
+        connector_data: List[NDArray[uint32]] = list()
+        weight_data = list()
+        for pre_vertex, source_infos in sources.items():
 
-            data.extend(conn.get_local_only_data(
-                app_edge, source.vertex_slice, source.key, source.mask,
-                app_edge.pre_vertex.n_colour_bits, self._delay, weight_index))
-        n_weights = next_weight_index
+            # Add connectors as needed
+            first_conn_index = len(connector_data)
+            for source in source_infos:
+                # pylint: disable=protected-access
+                conn = cast(
+                    ConvolutionConnector,
+                    source.projection._synapse_information.connector)
+                app_edge = source.projection._projection_edge
+
+                # Work out whether the connector needs a new weight index
+                if conn in connector_weight_index:
+                    weight_index = connector_weight_index[conn]
+                else:
+                    weight_index = next_weight_index
+                    connector_weight_index[conn] = weight_index
+                    next_weight_index += conn.kernel_n_weights
+                    weight_data.append(conn.get_encoded_kernel_weights(
+                        app_edge, weight_scales))
+
+                connector_data.append(conn.get_local_only_data(
+                    app_edge, source.local_delay, source.delay_stage,
+                    weight_index))
+
+            # Get the source routing information
+            r_info, core_mask, mask_shift = get_rinfo_for_spike_source(
+                pre_vertex)
+
+            # Get the width / height per core / last_core
+            first_slice, last_slice = get_first_and_last_slice(pre_vertex)
+            width_per_core = first_slice.shape[0]
+            height_per_core = first_slice.shape[1]
+            width_on_last_core = last_slice.shape[0]
+            height_on_last_core = last_slice.shape[1]
+
+            # Get cores per width / height
+            pre_shape = list(pre_vertex.atoms_shape)
+            cores_per_width = int(ceil(pre_shape[0] / width_per_core))
+            cores_per_height = int(ceil(pre_shape[1] / height_per_core))
+
+            # Add the key and mask...
+            source_data.extend([r_info.key, r_info.mask])
+            # ... start connector index, n_colour_bits, count of connectors ...
+            source_data.append(
+                (len(source_infos) << BITS_PER_SHORT) +
+                (pre_vertex.n_colour_bits <<
+                 (BITS_PER_SHORT - N_COLOUR_BITS_BITS)) +
+                first_conn_index)
+            # ... core mask, mask shift ...
+            source_data.append((mask_shift << BITS_PER_SHORT) + core_mask)
+            # ... height / width per core ...
+            source_data.append(
+                (width_per_core << BITS_PER_SHORT) + height_per_core)
+            # ... height / width last core ...
+            source_data.append(
+                (width_on_last_core << BITS_PER_SHORT) + height_on_last_core)
+            # ... cores per height / width ...
+            source_data.append(
+                (cores_per_width << BITS_PER_SHORT) + cores_per_height)
+            # ... 1 / width per core ...
+            source_data.append(get_div_const(width_per_core))
+            # ... 1 / width last core ...
+            source_data.append(get_div_const(width_on_last_core))
+            # ... 1 / cores_per_width
+            source_data.append(get_div_const(cores_per_width))
+
         if next_weight_index % 2 != 0:
-            n_weights += 1
+            weight_data.append(numpy.array([0], dtype="int16"))
 
         # Write the common spec
         post_slice = machine_vertex.vertex_slice
@@ -196,126 +225,35 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.write_value(post_end[0], data_type=DataType.INT16)
         spec.write_value(post_shape[1], data_type=DataType.INT16)
         spec.write_value(post_shape[0], data_type=DataType.INT16)
+        spec.write_value(len(sources))
+        spec.write_value(len(connector_data))
         spec.write_value(next_weight_index)
-        spec.write_value(len(sources_for_m_vertex), data_type=DataType.UINT32)
 
         # Write the data
-        spec.write_array(numpy.concatenate(data, dtype=uint32))
-
-        # Write weights where they are unique
-        kernel_data = [
-            conn.get_encoded_kernel_weights(app_edge, weight_scales)
-            for conn, app_edge in unique_connectors]
-        if next_weight_index % 2 != 0:
-            kernel_data.append(numpy.array([0], dtype=int16))
+        # pylint: disable=unexpected-keyword-arg
+        spec.write_array(numpy.array(source_data, dtype="uint32"))
+        spec.write_array(numpy.concatenate(connector_data, dtype="uint32"))
         spec.write_array(
-            numpy.concatenate(kernel_data, dtype=int16).view(uint32))
-
-    @staticmethod
-    def __merge_key_and_mask(key_a, mask_a, key_b, mask_b):
-        new_xs = (~(key_a ^ key_b)) & 0xFFFFFFFF
-        mask = mask_a & mask_b & new_xs
-        key = (key_a | key_b) & mask
-        return key, mask
+            numpy.concatenate(weight_data, dtype="int16").view("uint32"))
 
     def __get_sources_for_target(
             self, app_vertex: AbstractPopulationVertex) -> Dict[
-                MachineVertex, List[Source]]:
+                PopulationApplicationVertex, List[Source]]:
         """
-        Get all the machine vertex sources that will hit the given
+        Get all the application vertex sources that will hit the given
         application vertex.
 
-        :param AbstractPopulationVertex app_vertex:
-            The vertex being targeted
-        :rtype: dict(~.MachineVertex, list(Sources))
+        :param AbstractPopulationVertex app_vertex: The vertex being targeted
+        :return:
+            A dict of source PopulationApplicationVertex to list of source
+            information
+        :rtype: dict(PopulationApplicationVertex, list(Source))
         """
-        sources_for_target = self.__cached_2d_overlaps.get(app_vertex)
-        if sources_for_target is None:
-            key_cache: Dict[
-                Tuple[PopulationApplicationVertex, Slice], Source] = {}
-            seen_pre_vertices = set()
-            sources_for_target = defaultdict(list)
-            for incoming in app_vertex.incoming_projections:
-                # pylint: disable=protected-access
-                app_edge = incoming._projection_edge
-                s_info = incoming._synapse_information
-                source_vertex = app_edge.pre_vertex
-                if source_vertex not in seen_pre_vertices:
-                    seen_pre_vertices.add(source_vertex)
-                    for tgt, srcs in s_info.connector.get_connected_vertices(
-                            s_info, source_vertex, app_vertex):
-                        r_info = self.__get_rinfo_for_sources(
-                            key_cache, cast(Sequence[MachineVertex], srcs),
-                            incoming, app_edge, app_vertex)
-                        sources_for_target[tgt].extend(r_info)
-            self.__cached_2d_overlaps[app_vertex] = sources_for_target
-        return sources_for_target
-
-    def __get_rinfo_for_sources(
-            self,
-            key_cache: Dict[Tuple[PopulationApplicationVertex, Slice], Source],
-            srcs: Sequence[MachineVertex], incoming: Projection,
-            app_edge: ProjectionApplicationEdge,
-            app_vertex: AbstractPopulationVertex) -> Iterable[Source]:
-        """
-        Get the routing information for sources, merging sources that have
-        the same vertex slice.
-
-        .. note::
-            This happens in retinas from FPGAs.
-
-        :param dict key_cache:
-        :rtype: list(Source)
-        """
-        delay_vertex: Optional[DelayExtensionVertex] = None
-        if self._delay > app_vertex.splitter.max_support_delay():
-            # pylint: disable=protected-access
-            delay_edge = incoming._projection_edge.delay_edge
-            assert delay_edge is not None
-            delay_vertex = delay_edge.pre_vertex
-
-        # Group sources by vertex slice
-        sources: Dict[Slice, List[MachineVertex]] = defaultdict(list)
-        for source in srcs:
-            sources[source.vertex_slice].append(source)
-
-        # For each slice, merge the keys
-        for vertex_slice, slice_sources in sources.items():
-            cache_key = (app_edge.pre_vertex, vertex_slice)
-            key_source = key_cache.get(cache_key)
-            if not key_source:
-                key_source = self.__build_source(
-                    slice_sources, delay_vertex, incoming, vertex_slice)
-                key_cache[cache_key] = key_source
-            yield key_source
-
-    def __build_source(
-            self, slice_sources: List[MachineVertex],
-            delay_vertex: Optional[DelayExtensionVertex],
-            incoming: Projection, vertex_slice: Slice) -> Source:
-        r_info = self.__get_rinfo(slice_sources[0], delay_vertex)
-        group_key = r_info.key
-        group_mask = r_info.mask
-        for source in slice_sources:
-            r_info = self.__get_rinfo(source, delay_vertex)
-            group_key, group_mask = self.__merge_key_and_mask(
-                group_key, group_mask, r_info.key, r_info.mask)
-        return Source(incoming, vertex_slice, group_key, group_mask)
-
-    @staticmethod
-    def __get_rinfo(
-            source: MachineVertex,
-            delay_vertex: Optional[DelayExtensionVertex]) -> VertexRoutingInfo:
-        if delay_vertex:
-            # pylint: disable=protected-access
-            source = delay_vertex._delay_splitter.get_machine_vertex(
-                source.vertex_slice)
-        routing_info = SpynnakerDataView.get_routing_infos()
-        r_info = routing_info.get_routing_info_from_pre_vertex(
-            source, SPIKE_PARTITION_ID)
-        if r_info is None:
-            raise KeyError(f"unrouted source: {source}")
-        return r_info
+        sources = self.__cached_sources.get(app_vertex)
+        if sources is None:
+            sources = get_sources_for_target(app_vertex)
+            self.__cached_sources[app_vertex] = sources
+        return sources
 
     @staticmethod
     def __connector(projection: Projection) -> ConvolutionConnector:

@@ -89,7 +89,7 @@ class _MockTransceiverinOut(MockableTransceiver):
         return datum
 
 
-def say_false(self, weights, delays):
+def say_false(self, *args, **kwargs):
     return False
 
 
@@ -119,7 +119,7 @@ def test_write_data_spec():
         pre_pop, post_pop, p.OneToOneConnector(),
         p.StaticSynapse(weight=2.5, delay=2.0))
     proj_all_to_all = p.Projection(
-        pre_pop, post_pop, p.AllToAllConnector(allow_self_connections=False),
+        pre_pop, post_pop, p.AllToAllConnector(),
         p.StaticSynapse(weight=4.5, delay=4.0))
 
     from_list_list = [(i, i, i, (i * 5) + 1) for i in range(10)]
@@ -194,7 +194,7 @@ def test_write_data_spec():
                 proj_all_to_all._synapse_information))
 
         # Check that all the connections have the right weight and delay
-        assert len(connections_3) == 90
+        assert len(connections_3) == 100
         assert all([conn["weight"] == 4.5 for conn in connections_3])
         assert all([conn["delay"] == 4.0 for conn in connections_3])
 
@@ -419,7 +419,7 @@ def test_set_synapse_dynamics():
         # (app keys work because all undelayed exist)
         (range(10), [4, 5, 6, 7], 1000, 100, 200),
         # Should work but number of cores doesn't work out
-        (range(2000), [], 10000, 5, None)
+        (range(100), [], 10000, 5, None)
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,

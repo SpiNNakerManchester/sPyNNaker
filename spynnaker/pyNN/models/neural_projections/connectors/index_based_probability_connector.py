@@ -169,14 +169,17 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         # setup probs here
         probs = self._update_probs_from_index_expression(synapse_info)
 
-        probs = probs[:, post_vertex_slice.as_slice].reshape(-1)
+        probs = probs[:, post_vertex_slice.get_raster_ids()].reshape(-1)
 
         n_items = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
         items = self.__rng.next(n_items)
 
         # If self connections are not allowed, remove the possibility of self
         # connections by setting the probability to a value of infinity
-        if not self.__allow_self_connections:
+        no_self = (
+            not self.__allow_self_connections and
+            synapse_info.pre_population == synapse_info.post_population)
+        if no_self:
             items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
 
         present = items < probs
@@ -185,9 +188,9 @@ class IndexBasedProbabilityConnector(AbstractConnector,
 
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = ids / post_vertex_slice.n_atoms
-        block["target"] = (
-            (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
+        block["source"] = synapse_info.pre_vertex.get_key_ordered_indices(
+            ids // post_vertex_slice.n_atoms)
+        block["target"] = ids % post_vertex_slice.n_atoms
         block["weight"] = self._generate_weights(
             block["source"], block["target"], n_connections, post_vertex_slice,
             synapse_info)

@@ -23,6 +23,7 @@ from spinn_utilities.safe_eval import SafeEval
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
@@ -122,16 +123,36 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     def create_synaptic_block(
             self, post_slices, post_vertex_slice: Slice, synapse_type: int,
             synapse_info: SynapseInformation) -> NDArray:
-        max_lo_atom = post_vertex_slice.lo_atom
-        min_hi_atom = min(
-            synapse_info.n_pre_neurons, post_vertex_slice.hi_atom)
+        # Get each pre_vertex id for each post_vertex id
+        post_atoms = post_vertex_slice.get_raster_ids()
+        pre_atoms = numpy.array(post_atoms)
 
-        n_connections = max(0, (min_hi_atom - max_lo_atom) + 1)
-        if n_connections <= 0:
-            return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
+        # Filter out things where there isn't a cross over
+        atom_filter = numpy.ones(len(post_atoms), dtype=numpy.bool_)
+        if synapse_info.prepop_is_view or synapse_info.postpop_is_view:
+            # If a view, we only keep things that are in the view
+            if synapse_info.prepop_is_view:
+                # pylint: disable=protected-access
+                pre_lo, pre_hi = synapse_info.pre_population._view_range
+                atom_filter &= (pre_atoms <= pre_hi & pre_atoms >= pre_lo)
+            if synapse_info.postpop_is_view:
+                # pylint: disable=protected-access
+                post_lo, post_hi = synapse_info.post_population._view_range
+                atom_filter &= (post_atoms <= post_hi & post_atoms >= post_lo)
+        else:
+            # If not a view we only keep things that are in the pre-population
+            atom_filter &= (pre_atoms <= synapse_info.pre_population.size)
+        post_atoms = post_atoms[atom_filter]
+        pre_atoms = pre_atoms[atom_filter]
+
+        # Convert to the correct coordinates
+        post_atoms = post_vertex_slice.get_relative_indices(post_atoms)
+        pre_atoms = synapse_info.pre_vertex.get_key_ordered_indices(pre_atoms)
+
+        n_connections = len(post_atoms)
         block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
-        block["target"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
+        block["source"] = pre_atoms
+        block["target"] = post_atoms
         block["weight"] = self._generate_weights(
             block["source"], block["target"], n_connections, post_vertex_slice,
             synapse_info)
@@ -144,19 +165,15 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     def __repr__(self):
         return "OneToOneConnector()"
 
-    @overrides(AbstractConnector.use_direct_matrix)
-    def use_direct_matrix(self, synapse_info: SynapseInformation) -> bool:
-        return not (
-            synapse_info.prepop_is_view or synapse_info.postpop_is_view)
-
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self) -> int:
         return ConnectorIDs.ONE_TO_ONE_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(self) -> NDArray[uint32]:
-        return numpy.array([], dtype=uint32)
+    def gen_connector_params(
+            self, synapse_info: SynapseInformation) -> NDArray[uint32]:
+        return numpy.array([], dtype="uint32")
 
     @property
     @overrides(
@@ -169,23 +186,44 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
             self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
                 Tuple[MachineVertex, Sequence[MachineVertex]]]:
-        pre_lo, pre_hi = 0, source_vertex.n_atoms - 1
-        post_lo, post_hi = 0, target_vertex.n_atoms - 1
-        if s_info.prepop_is_view:
-            # pylint: disable=protected-access
-            pre_lo, pre_hi = s_info.pre_population._view_range
-        if s_info.postpop_is_view:
-            # pylint: disable=protected-access
-            post_lo, post_hi = s_info.post_population._view_range
+        src_vtxs = source_vertex.splitter.get_out_going_vertices(
+            SPIKE_PARTITION_ID)
+        tgt_vtxs = target_vertex.splitter.get_in_coming_vertices(
+            SPIKE_PARTITION_ID)
 
-        src_splitter = source_vertex.splitter
+        # If doing a view, we must be single dimensional, so use old method
+        if s_info.prepop_is_view or s_info.postpop_is_view:
+
+            # Check again here in case the rules change elsewhere
+            if (len(s_info.pre_vertex.atoms_shape) > 1 or
+                    len(s_info.post_vertex.atoms_shape) > 1):
+                raise ConfigurationException(
+                    "The OneToOneConnector does not support PopulationView "
+                    "connections between vertices with more than 1 dimension")
+
+            pre_lo = 0
+            pre_hi = source_vertex.n_atoms - 1
+            post_lo = 0
+            post_hi = target_vertex.n_atoms - 1
+            if s_info.prepop_is_view:
+                # pylint: disable=protected-access
+                pre_lo, pre_hi = s_info.pre_population._view_range
+            if s_info.postpop_is_view:
+                # pylint: disable=protected-access
+                post_lo, post_hi = s_info.post_population._view_range
+
+            return [(t_vert,
+                     [s_vert for s_vert in src_vtxs if self.__connects(
+                          s_vert, pre_lo, pre_hi, t_vert, post_lo, post_hi)])
+                    for t_vert in tgt_vtxs]
+
+        # Check for cross over of pre- and post- rasters, as that is how the
+        # connector works
         return [(t_vert,
-                 [s_vert for s_vert in src_splitter.get_out_going_vertices(
-                              SPIKE_PARTITION_ID)
-                  if self.__connects(
-                      s_vert, pre_lo, pre_hi, t_vert, post_lo, post_hi)])
-                for t_vert in target_vertex.splitter.get_in_coming_vertices(
-                    SPIKE_PARTITION_ID)]
+                 [s_vert for s_vert in src_vtxs if any(numpy.isin(
+                     s_vert.vertex_slice.get_raster_ids(),
+                     t_vert.vertex_slice.get_raster_ids()))])
+                for t_vert in tgt_vtxs]
 
     def __connects(
             self, s_vert: MachineVertex, pre_lo: int, pre_hi: int,
@@ -215,3 +253,19 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
             return False
 
         return True
+
+    @overrides(AbstractGenerateConnectorOnMachine.generate_on_machine)
+    def generate_on_machine(self, synapse_info):
+        # If we are doing a 1:1 connector and the pre or post vertex is
+        # multi-dimensional and have different dimensions
+        pre = synapse_info.pre_vertex
+        post = synapse_info.post_vertex
+        if len(pre.atoms_shape) > 1 or len(post.atoms_shape) > 1:
+            if (pre.atoms_shape != post.atoms_shape):
+                print("Not generating on core!")
+                return False
+            if (pre.get_max_atoms_per_dimension_per_core() !=
+                    post.get_max_atoms_per_dimension_per_core()):
+                print("Not generating on core!")
+                return False
+        return super(OneToOneConnector, self).generate_on_machine(synapse_info)

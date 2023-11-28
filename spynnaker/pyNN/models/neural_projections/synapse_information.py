@@ -15,10 +15,11 @@
 from __future__ import annotations
 from typing import List, Sequence, TYPE_CHECKING, Union
 from spinn_utilities.config_holder import get_config_bool
+from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector, AbstractGenerateConnectorOnMachine, OneToOneConnector)
+    AbstractConnector, AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine, SynapseDynamicsStatic)
+    AbstractGenerateOnMachine)
 from spynnaker.pyNN.types import (Delay_Types, Weight_Types)
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.populations import Population, PopulationView
@@ -124,6 +125,26 @@ class SynapseInformation(object):
         return self.__post_population
 
     @property
+    def pre_vertex(self) -> ApplicationVertex:
+        """
+        The vertex sending spikes to the synapse.
+
+        :rtype: ApplicationVertex
+        """
+        # pylint: disable=protected-access
+        return self.__pre_population._vertex
+
+    @property
+    def post_vertex(self) -> ApplicationVertex:
+        """
+        The vertex hosting the synapse.
+
+        :rtype: ApplicationVertex
+        """
+        # pylint: disable=protected-access
+        return self.__post_population._vertex
+
+    @property
     def n_pre_neurons(self) -> int:
         """
         The number of neurons in the pre-population.
@@ -222,24 +243,11 @@ class SynapseInformation(object):
             return False
         connector_gen = (
             isinstance(self.connector, AbstractGenerateConnectorOnMachine) and
-            self.connector.generate_on_machine(self.weights, self.delays))
+            self.connector.generate_on_machine(self))
         synapse_gen = (
             isinstance(self.synapse_dynamics, AbstractGenerateOnMachine) and
             self.synapse_dynamics.generate_on_machine())
         return connector_gen and synapse_gen
-
-    def may_use_direct_matrix(self) -> bool:
-        """
-        Do the properties of the synaptic information allow it to use the
-        direct matrix?
-
-        :rtype: bool
-        """
-        return (
-            isinstance(self.__connector, OneToOneConnector) and
-            isinstance(self.__synapse_dynamics,
-                       SynapseDynamicsStatic) and
-            not self.prepop_is_view and not self.postpop_is_view)
 
     @property
     def pre_run_connection_holders(self) -> Sequence[ConnectionHolder]:

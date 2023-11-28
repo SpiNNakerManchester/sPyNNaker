@@ -64,22 +64,24 @@ class GeneratorData(object):
         synapse_dynamics = synapse_information.synapse_dynamics
 
         # Create the data needed
-        self.__data = [
-            numpy.array([
-                pre_lo, pre_hi, post_lo, post_hi,
-                synapse_information.synapse_type,
-                synapse_dynamics.gen_matrix_id,
-                connector.gen_connector_id,
-                connector.gen_weights_id(synapse_information.weights),
-                connector.gen_delays_id(synapse_information.delays)
-                ], dtype=uint32),
-            synapse_dynamics.gen_matrix_params(
-                synaptic_matrix_offset, delayed_synaptic_matrix_offset,
-                app_edge, synapse_information, max_row_info,
-                max_pre_atoms_per_core, max_post_atoms_per_core),
-            connector.gen_connector_params(),
-            connector.gen_weights_params(synapse_information.weights),
-            connector.gen_delay_params(synapse_information.delays)]
+        self.__data = list()
+        self.__data.append(numpy.array([
+            pre_lo, pre_hi, post_lo, post_hi,
+            synapse_information.synapse_type,
+            synapse_dynamics.gen_matrix_id,
+            connector.gen_connector_id,
+            connector.gen_weights_id(synapse_information.weights),
+            connector.gen_delays_id(synapse_information.delays)
+            ], dtype=numpy.uint32))
+        self.__data.append(synapse_dynamics.gen_matrix_params(
+            synaptic_matrix_offset, delayed_synaptic_matrix_offset, app_edge,
+            synapse_information, max_row_info, max_pre_atoms_per_core,
+            max_post_atoms_per_core))
+        self.__data.append(connector.gen_connector_params(synapse_information))
+        self.__data.append(connector.gen_weights_params(
+            synapse_information.weights))
+        self.__data.append(connector.gen_delay_params(
+            synapse_information.delays))
 
     @property
     def size(self) -> int:

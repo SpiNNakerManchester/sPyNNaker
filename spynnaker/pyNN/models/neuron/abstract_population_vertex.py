@@ -37,7 +37,7 @@ from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import AbstractSDRAM, MultiRegionSDRAM
-from pacman.utilities.utility_calls import get_n_bits_for_fields, get_n_bits
+from pacman.utilities.utility_calls import get_n_bits
 from pacman.model.graphs.common import Slice
 from pacman.exceptions import PacmanConfigurationException
 from spinn_front_end_common.abstract_models import (
@@ -240,7 +240,8 @@ class AbstractPopulationVertex(
     CORE_PARAMS_BASE_SIZE = 5 * BYTES_PER_WORD
 
     def __init__(
-            self, n_neurons: int, label: str, max_atoms_per_core: int,
+            self, n_neurons: int, label: str,
+            max_atoms_per_core: Union[int, Tuple[int, ...]],
             spikes_per_second: Optional[float],
             ring_buffer_sigma: Optional[float],
             incoming_spike_buffer_size: Optional[int],
@@ -1572,9 +1573,9 @@ class AbstractPopulationVertex(
             The slice to copy now
         """
         for key in self.__state_variables.keys():
-            value = self.__state_variables[key][vertex_slice.as_slice]
-            self.__initial_state_variables[key].set_value_by_slice(
-                vertex_slice.lo_atom, vertex_slice.hi_atom + 1, value)
+            value = self.__state_variables[key][vertex_slice.get_raster_ids()]
+            self.__initial_state_variables[key].set_value_by_ids(
+                vertex_slice.get_raster_ids(), value)
         # This is called during reading of initial values, so we don't
         # need to do it again
         self.__read_initial_values = False
@@ -1638,10 +1639,7 @@ class AbstractPopulationVertex(
         """
         :rtype: int
         """
-        field_sizes = [
-            min(max_atoms, n) for max_atoms, n in zip(
-                self.get_max_atoms_per_dimension_per_core(), self.atoms_shape)]
-        return get_n_bits_for_fields(field_sizes)
+        return get_n_bits(min(self.n_atoms, self.get_max_atoms_per_core()))
 
     def can_generate_on_machine(self) -> bool:
         """

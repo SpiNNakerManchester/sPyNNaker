@@ -102,25 +102,32 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
             self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
             synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         n_connections = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
-        if not self.__allow_self_connections:
+        no_self = (
+            not self.__allow_self_connections and
+            synapse_info.pre_population == synapse_info.post_population)
+        if no_self:
             n_connections -= post_vertex_slice.n_atoms
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
 
-        if not self.__allow_self_connections:
+        if no_self:
             n_atoms = synapse_info.n_pre_neurons
-            block["source"] = numpy.where(numpy.diag(
+            sources = numpy.where(numpy.diag(
                 numpy.repeat(1, n_atoms)) == 0)[0]
-            block["target"] = [block["source"][
+            targets = numpy.array([sources[
                 ((n_atoms * i) + (n_atoms - 1)) - j]
-                for j in range(n_atoms) for i in range(n_atoms - 1)]
-            block["target"] += post_vertex_slice.lo_atom
+                for j in range(n_atoms) for i in range(n_atoms - 1)])
         else:
-            block["source"] = numpy.repeat(numpy.arange(
+            sources = numpy.repeat(numpy.arange(
                 0, synapse_info.n_pre_neurons), post_vertex_slice.n_atoms)
-            block["target"] = numpy.tile(numpy.arange(
-                post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),
+            targets = numpy.tile(
+                numpy.arange(0, post_vertex_slice.n_atoms),
                 synapse_info.n_pre_neurons)
+
+        # pylint: disable=protected-access
+        block["source"] = sources
+        block["target"] = targets
+
         block["weight"] = self._generate_weights(
             block["source"], block["target"], n_connections, post_vertex_slice,
             synapse_info)
@@ -150,9 +157,12 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
         return ConnectorIDs.ALL_TO_ALL_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(self) -> NDArray[uint32]:
-        return numpy.array([
-            int(self.__allow_self_connections)], dtype=uint32)
+    def gen_connector_params(
+            self, synapse_info: SynapseInformation) -> NDArray[uint32]:
+        allow_self = (
+            self.__allow_self_connections or
+            synapse_info.pre_population != synapse_info.post_population)
+        return numpy.array([int(allow_self)], dtype=uint32)
 
     @property
     @overrides(

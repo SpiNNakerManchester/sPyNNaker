@@ -31,7 +31,7 @@ from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from spinn_front_end_common.interface.ds import DataType
 from pacman.model.graphs.common import Slice, MDSlice
-from pacman.utilities.utility_calls import get_field_based_index
+from pacman.utilities.utility_calls import get_keys
 from spinn_front_end_common.utility_models import (
     ReverseIPTagMulticastSourceMachineVertex)
 from spinn_front_end_common.interface.buffer_management.storage_objects \
@@ -614,7 +614,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         number_of_bytes_written = len(spike_data)
         offset = 0
-        indices = get_field_based_index(base_key, vertex_slice, n_colour_bits)
+        indices = {
+            key: index for index, key in enumerate(
+                get_keys(base_key, vertex_slice, n_colour_bits))}
         slice_ids = vertex_slice.get_raster_ids()
         colour_mask = (2 ** n_colour_bits) - 1
         inv_colour_mask = ~colour_mask & 0xFFFFFFFF

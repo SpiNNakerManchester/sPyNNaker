@@ -70,7 +70,8 @@ class Projection(object):
         "__projection_edge",
         "__synapse_information",
         "__virtual_connection_list",
-        "__label")
+        "__label"
+    )
 
     def __init__(
             self, pre_synaptic_population: _Pop,

@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-import numpy
 from typing import cast, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
-from pacman.utilities.utility_calls import get_field_based_keys
+from pacman.utilities.utility_calls import get_keys
 from spinn_front_end_common.utility_models import (
     ReverseIPTagMulticastSourceMachineVertex)
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
@@ -47,15 +46,13 @@ class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
             return
         if self._send_buffer_times is None or self._send_buffer is None:
             return
-        keys = get_field_based_keys(
+        keys = get_keys(
             key_base, self.vertex_slice, self._pop_vertex.n_colour_bits)
-        key_list = numpy.array(
-            [keys[atom] for atom in range(self.vertex_slice.n_atoms)])
         colour_mask = (2 ** self._pop_vertex.n_colour_bits) - 1
         for tick in sorted(self._send_buffer_times):
             if self._is_in_range(tick, first_time_step, end_time_step):
                 self._send_buffer.add_keys(
-                    tick, key_list + (tick & colour_mask))
+                    tick, keys + (tick & colour_mask))
 
     @overrides(ReverseIPTagMulticastSourceMachineVertex._fill_send_buffer_2d)
     def _fill_send_buffer_2d(self, key_base: int):
@@ -65,7 +62,7 @@ class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
             return
         if self._send_buffer_times is None or self._send_buffer is None:
             return
-        keys = get_field_based_keys(
+        keys = get_keys(
             key_base, self.vertex_slice, self._pop_vertex.n_colour_bits)
         colour_mask = (2 ** self._pop_vertex.n_colour_bits) - 1
         for atom in range(self.vertex_slice.n_atoms):

@@ -35,19 +35,16 @@ def do_run(plot):
                        'v_thresh': -40.0
                        }
 
-    def create_grid(n, label, dx=1.0, dy=1.0):
-        grid_structure = p.Grid2D(dx=dx, dy=dy, x0=0.0, y0=0.0)
-        return p.Population(n*n, p.IF_curr_exp(**cell_params_lif),
-                            structure=grid_structure, label=label)
-
     n = 4
     weight_to_spike = 5.0
     delay = 5
     runtime = 200
 
     # Network
-    grid = create_grid(n, 'grid')
-    grid.set_max_atoms_per_core((16, 16))
+    grid_structure = p.Grid2D(dx=1.0, dy=1.0, x0=0.0, y0=0.0)
+    grid = p.Population(n*n, p.IF_curr_exp(**cell_params_lif),
+                        structure=grid_structure, label='grid')
+    grid.set_max_atoms_per_core((n, n))
 
     # SpikeInjector
     injectionConnection = [(0, 0)]

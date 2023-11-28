@@ -20,7 +20,9 @@ from numpy.typing import NDArray
 from typing import (
     Dict, List, Optional, Sequence, Tuple, Union, cast, TYPE_CHECKING)
 from typing_extensions import TypeGuard
+import logging
 from spinn_utilities.overrides import overrides
+from spinn_utilities.log import FormatAdapter
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
@@ -28,14 +30,16 @@ from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.types import Weight_Types
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
         AbstractSynapseDynamics)
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 # Indices of the source and target in the connection list array
 _SOURCE = 0
@@ -152,36 +156,51 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         else:
             return numpy.var(self.__delays)
 
-    def _split_connections(self, post_slices: Sequence[Slice]):
+    def __id_to_m_vertex_index(self, n_atoms: int, slices: Sequence[Slice]):
+        """ Produce an array that maps from a vertex atom id to the
+            machine vertex index of the target
+        """
+        mapping = numpy.zeros(n_atoms, dtype="uint32")
+        for i, s in enumerate(slices):
+            mapping[s.get_raster_ids()] = i
+        return mapping
+
+    def _split_connections(self, n_pre_atoms: int, n_post_atoms: int,
+                           post_slices: Sequence[Slice]):
         """
         :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :rtype: bool
         """
+        input_filter = numpy.logical_and(
+            self.__targets < n_post_atoms, self.__sources < n_pre_atoms)
+        targets = self.__targets[input_filter]
+        sources = self.__sources[input_filter]
+        weights = (None if self.__weights is None else
+                   self.__weights[input_filter])
+        delays = (None if self.__delays is None else
+                  self.__delays[input_filter])
+
         # If nothing has changed, use the cache
         if self.__split_post_slices == post_slices:
-            return False
+            return sources, targets, weights, delays
 
         # If there are no connections, return
         if not len(self.__conn_list):
             self.__split_conn_list = {}
-            return False
+            return sources, targets, weights, delays
 
         self.__split_post_slices = list(post_slices)
+        m_vertex_mapping = self.__id_to_m_vertex_index(
+            n_post_atoms, post_slices)
 
-        # Create bins into which connections are to be grouped
-        post_bins = numpy.sort([s.hi_atom + 1 for s in post_slices])
+        # Get which index of the fromlist is on which vertex
+        target_vertices = m_vertex_mapping[self.__targets[input_filter]]
 
-        # Find the index of the top of each bin in the sorted data
-        post_indices = numpy.searchsorted(
-            post_bins, self.__targets, side="right")
+        # Get how many on each vertex there are
+        index_count = numpy.bincount(
+            target_vertices, minlength=len(post_slices))[:len(post_slices)]
 
-        # Get a count of the indices in each bin, ignoring those outside
-        # the allowed number of bins
-        n_bins = len(post_bins)
-        index_count = numpy.bincount(post_indices, minlength=n_bins)[:n_bins]
-
-        # Get a sort order on the connections
-        sort_indices = numpy.argsort(post_indices)
+        # Get the sort order to put connections on each vertex
+        sort_indices = numpy.argsort(target_vertices)
 
         # Split the sort order in to groups of connection indices
         split_indices = numpy.array(numpy.split(
@@ -189,12 +208,11 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
         # Get the results indexed by hi_atom in the slices
         self.__split_conn_list = {
-            int(post): indices
-            for post, indices in zip(post_bins - 1, split_indices)
+            post_slices[i].lo_atom: indices
+            for i, indices in enumerate(split_indices)
             if len(indices) > 0
         }
-
-        return True
+        return sources, targets, weights, delays
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -297,17 +315,22 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def create_synaptic_block(
             self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
             synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
-        self._split_connections(post_slices)
-        post_hi = post_vertex_slice.hi_atom
-        if post_hi not in self.__split_conn_list:
+        sources, targets, weights, delays = self._split_connections(
+            synapse_info.n_pre_neurons, synapse_info.n_post_neurons,
+            post_slices)
+        post_lo = post_vertex_slice.lo_atom
+        if post_lo not in self.__split_conn_list:
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         else:
-            indices = self.__split_conn_list[post_hi]
+            indices = self.__split_conn_list[post_lo]
+
         block = numpy.zeros(len(indices), dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = self.__sources[indices]
-        block["target"] = self.__targets[indices]
+        block["source"] = synapse_info.pre_vertex.get_key_ordered_indices(
+            sources[indices])
+        block["target"] = post_vertex_slice.get_relative_indices(
+            targets[indices])
         # check that conn_list has weights, if not then use the value passed in
-        if self.__weights is None:
+        if weights is None:
             if _is_sequential(synapse_info.weights):
                 block["weight"] = numpy.array(synapse_info.weights)[indices]
             else:
@@ -315,9 +338,9 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                     block["source"], block["target"], len(indices),
                     post_vertex_slice, synapse_info)
         else:
-            block["weight"] = self.__weights[indices]
+            block["weight"] = weights[indices]
         # check that conn_list has delays, if not then use the value passed in
-        if self.__delays is None:
+        if delays is None:
             if _is_sequential(synapse_info.delays):
                 block["delay"] = numpy.array(synapse_info.delays)[indices]
             else:
@@ -325,7 +348,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                     block["source"], block["target"], len(indices),
                     post_vertex_slice, synapse_info)
         else:
-            block["delay"] = self._clip_delays(self.__delays[indices])
+            block["delay"] = self._clip_delays(delays[indices])
         block["synapse_type"] = synapse_type
         return block
 
@@ -383,8 +406,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                     f"Need to set 'column_names' for n_columns={n_columns}")
 
         # Set the source and targets
-        self.__sources = self.__conn_list[:, _SOURCE]
-        self.__targets = self.__conn_list[:, _TARGET]
+        self.__sources = self.__conn_list[:, _SOURCE].astype(numpy.uint32)
+        self.__targets = self.__conn_list[:, _TARGET].astype(numpy.uint32)
 
         # Find any weights
         try:
@@ -469,42 +492,48 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             target_vertex: ApplicationVertex) -> Sequence[
                 Tuple[MachineVertex, Sequence[AbstractVertex]]]:
         # Divide the targets into bins based on post slices
-        post_slices = target_vertex.splitter.get_in_coming_slices()
-        post_bins = numpy.sort([s.hi_atom + 1 for s in post_slices])
-        post_indices = numpy.searchsorted(
-            post_bins, self.__targets, side="right")
-
-        # Divide the sources into bins based on pre slices
+        post_slices = [m.vertex_slice
+                       for m in target_vertex.splitter.get_in_coming_vertices(
+                           SPIKE_PARTITION_ID)]
         pre_vertices = source_vertex.splitter.get_out_going_vertices(
             SPIKE_PARTITION_ID)
-        pre_bins = numpy.sort([m.vertex_slice.hi_atom + 1
-                              for m in pre_vertices])
-        pre_indices = numpy.searchsorted(
-            pre_bins, self.__sources, side="right")
+        pre_slices = [m.vertex_slice for m in pre_vertices]
+
+        post_mapping = self.__id_to_m_vertex_index(
+            s_info.n_post_neurons, post_slices)
+        pre_mapping = self.__id_to_m_vertex_index(
+            s_info.n_pre_neurons, pre_slices)
+
+        input_filter = numpy.logical_and(
+            self.__targets < target_vertex.n_atoms,
+            self.__sources < source_vertex.n_atoms)
+
+        target_vertices = post_mapping[self.__targets[input_filter]]
+        source_vertices = pre_mapping[self.__sources[input_filter]]
 
         # Join the groups from both axes
-        n_bins = (len(pre_bins), len(post_bins))
+        n_bins = (len(pre_slices), len(post_slices))
         joined_indices = numpy.ravel_multi_index(
-            (pre_indices, post_indices), n_bins, mode="clip")
+            (source_vertices, target_vertices), n_bins, mode="clip")
 
         # Get a count of the indices in each bin
         index_count = numpy.bincount(
             joined_indices, minlength=numpy.prod(n_bins))
 
-        pre_post_hi = [(pre - 1, post - 1) for pre in pre_bins
-                       for post in post_bins]
+        pre_post_lo = [(pre.lo_atom, post.lo_atom) for pre in pre_slices
+                       for post in post_slices]
 
         # Put the counts into a dict by hi-atom
         split_counts = {
             pre_post: count
-            for pre_post, count in zip(pre_post_hi, index_count)
+            for pre_post, count in zip(pre_post_lo, index_count)
             if count > 0
         }
 
         return [
             (m_vert, [s_vert for s_vert in pre_vertices
-                      if (s_vert.vertex_slice.hi_atom,
-                          m_vert.vertex_slice.hi_atom) in split_counts])
+                      if (s_vert.vertex_slice.lo_atom,
+                          m_vert.vertex_slice.lo_atom) in split_counts])
             for m_vert in target_vertex.splitter.get_in_coming_vertices(
                 SPIKE_PARTITION_ID)
         ]
@@ -517,3 +546,17 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         if self.__extra_params:
             for i, name in enumerate(self.__extra_params.names):
                 synapse_type.set_value(name, self.__extra_params.data[:, i])
+
+    @overrides(AbstractConnector.validate_connection)
+    def validate_connection(self, application_edge,
+                            synapse_info: SynapseInformation):
+        out_of_range_targets = self.__targets >= synapse_info.n_post_neurons
+        if any(out_of_range_targets):
+            logger.warning(
+                "Some targets are out of range: {}",
+                self.__conn_list[out_of_range_targets])
+        out_of_range_sources = self.__sources >= synapse_info.n_pre_neurons
+        if any(out_of_range_sources):
+            logger.warning(
+                "Some sources are out of range: {}",
+                self.__conn_list[out_of_range_sources])

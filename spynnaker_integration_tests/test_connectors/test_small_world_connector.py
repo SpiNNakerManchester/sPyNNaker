@@ -48,7 +48,7 @@ def do_run(plot):
 
     # Network population
     small_world = create_grid(n, 'small_world')
-    small_world.set_max_atoms_per_core((10, 10))
+    small_world.set_max_atoms_per_core((n, n))
 
     # SpikeInjector
     injectionConnection = [(0, 0)]

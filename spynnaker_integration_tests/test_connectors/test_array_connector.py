@@ -198,6 +198,42 @@ class ArrayConnectorTest(BaseTestCase):
     def test_larger_array(self):
         self.runsafe(self.larger_array)
 
+    def do_array_nd_test(
+            self, neurons_per_core_pre, pre_size, pre_shape,
+            neurons_per_core_post, post_size, post_shape):
+        p.setup(1.0)
+        pre = p.Population(
+            pre_size, p.IF_curr_exp(), structure=pre_shape)
+        pre.set_max_atoms_per_core(neurons_per_core_pre)
+        post = p.Population(
+            post_size, p.IF_curr_exp(), structure=post_shape)
+        post.set_max_atoms_per_core(neurons_per_core_post)
+
+        # Make up to 100 unique connections (might be less if less atoms)
+        random_conns = numpy.unique(numpy.random.randint(
+            0, (pre_size, post_size), (100, 2)), axis=0)
+        conn_matrix = numpy.zeros((pre_size, post_size), dtype=numpy.uint)
+        conn_matrix[random_conns[:, 0], random_conns[:, 1]] = 1
+
+        proj = p.Projection(
+            pre, post, p.ArrayConnector(conn_matrix),
+            p.StaticSynapse(weight=1.0, delay=1.0))
+        p.run(0)
+        conns = numpy.array(
+            [(int(i), int(j)) for i, j in proj.get([], "list")])
+        p.end()
+
+        assert numpy.array_equal(numpy.sort(random_conns, axis=0),
+                                 numpy.sort(conns, axis=0))
+
+    def test_3d_to_1d_array(self):
+        self.do_array_nd_test((5, 2, 1), 10 * 6 * 4, p.Grid3D(10 / 6, 10 / 4),
+                              12, 40, None)
+
+    def test_2d_to_2d_array(self):
+        self.do_array_nd_test((3, 4), 9 * 8, p.Grid2D(9 / 8),
+                              (1, 2), 5 * 6, p.Grid2D(5 / 6))
+
 
 if __name__ == '__main__':
     v, spikes, v2, spikes2 = do_run(plot=True)

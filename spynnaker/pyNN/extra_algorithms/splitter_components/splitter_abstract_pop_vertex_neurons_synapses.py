@@ -340,7 +340,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         """
         neuron_vertex = PopulationNeuronsMachineVertex(
             sdram,
-            f"{label}_Neurons:{vertex_slice.lo_atom}-{vertex_slice.hi_atom}",
+            f"{label}_Neurons:{vertex_slice.lo_atom}",
             self.governed_app_vertex, vertex_slice, index, rb_shifts,
             weight_scales, neuron_data, atoms_per_core)
         self.governed_app_vertex.remember_machine_vertex(neuron_vertex)
@@ -384,7 +384,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         synapse_references = SynapseRegionReferences(
             *SpynnakerDataView.get_next_ds_references(7))
         syn_label = (
-            f"{label}_Synapses:{vertex_slice.lo_atom}-{vertex_slice.hi_atom}")
+            f"{label}_Synapses:{vertex_slice.lo_atom}")
 
         # Do the lead synapse core
         lead_synapse_vertex = PopulationSynapsesMachineVertexLead(
@@ -508,7 +508,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                     poisson_m_vertex = pre_vertex.create_machine_vertex(
                         vertex_slice, sdram, label=(
                             f"{label}_Poisson:"
-                            f"{vertex_slice.lo_atom}-{vertex_slice.hi_atom}"))
+                            f"{vertex_slice.lo_atom}"))
                     pre_vertex.remember_machine_vertex(poisson_m_vertex)
                     incoming_direct_poisson[vertex_slice].append(
                         (poisson_m_vertex, edge))

@@ -86,6 +86,11 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
         return self.__partition.pre_vertex.n_atoms
 
     @property
+    @overrides(ApplicationVertex.atoms_shape)
+    def atoms_shape(self):
+        return self.__partition.pre_vertex.atoms_shape
+
+    @property
     def _delay_splitter(self) -> SplitterDelayVertexSlice:
         if TYPE_CHECKING:
             return cast(SplitterDelayVertexSlice, self._splitter)

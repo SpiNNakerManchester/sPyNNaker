@@ -27,7 +27,6 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import (
     get_config_bool, get_config_str_or_none)
 from spinn_utilities.overrides import overrides
-from pacman.model.routing_tables import MulticastRoutingTables
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.interface.provenance import (
@@ -46,10 +45,6 @@ from spynnaker.pyNN.extra_algorithms import (
     delay_support_adder, neuron_expander, synapse_expander,
     redundant_packet_count_report,
     spynnaker_neuron_graph_network_specification_report)
-from spynnaker.pyNN.extra_algorithms.\
-    spynnaker_machine_bit_field_router_compressor import (
-        spynnaker_machine_bitfield_ordered_covering_compressor,
-        spynnaker_machine_bitField_pair_router_compressor)
 from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
@@ -398,40 +393,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         # pylint: disable=protected-access
         SpynnakerDataView.register_binary_search_path(search_path)
-
-    def _execute_spynnaker_ordered_covering_compressor(self) -> None:
-        with FecTimer("Spynnaker machine bitfield ordered covering compressor",
-                      TimerWork.COMPRESSING) as timer:
-            if timer.skip_if_virtual_board():
-                return
-            spynnaker_machine_bitfield_ordered_covering_compressor()
-            # pylint: disable=attribute-defined-outside-init
-            self._multicast_routes_loaded = True
-            return
-
-    def _execute_spynnaker_pair_compressor(self) -> None:
-        with FecTimer("Spynnaker machine bitfield pair router compressor",
-                      TimerWork.COMPRESSING) as timer:
-            if timer.skip_if_virtual_board():
-                return
-            spynnaker_machine_bitField_pair_router_compressor()
-            # pylint: disable=attribute-defined-outside-init
-            self._multicast_routes_loaded = True
-            return
-
-    @overrides(AbstractSpinnakerBase._do_delayed_compression)
-    def _do_delayed_compression(
-            self, name: str, compressed: Optional[MulticastRoutingTables]
-            ) -> Optional[MulticastRoutingTables]:
-        if name == "SpynnakerMachineBitFieldOrderedCoveringCompressor":
-            self._execute_spynnaker_ordered_covering_compressor()
-            return None
-        elif name == "SpynnakerMachineBitFieldPairRouterCompressor":
-            self._execute_spynnaker_pair_compressor()
-            return None
-
-        return AbstractSpinnakerBase._do_delayed_compression(
-            self, name, compressed)
 
     def _execute_write_neo_metadata(self) -> None:
         with FecTimer("Write Neo Metadata", TimerWork.OTHER):

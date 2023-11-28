@@ -18,7 +18,7 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.routing_info import RoutingInfo
-from pacman.utilities.utility_calls import get_field_based_keys
+from pacman.utilities.utility_calls import get_keys
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import HasCustomAtomKeyMap
 from spinn_front_end_common.interface.ds import DataType
@@ -430,5 +430,5 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         if base_key is None:
             base_key = 0
         vertex_slice = pre_vertex.vertex_slice
-        keys = get_field_based_keys(base_key, vertex_slice, self.n_colour_bits)
-        return enumerate(keys, vertex_slice.lo_atom)
+        keys = get_keys(base_key, vertex_slice, self.n_colour_bits)
+        return zip(vertex_slice.get_raster_ids(), keys)

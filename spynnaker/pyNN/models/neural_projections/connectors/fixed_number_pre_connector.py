@@ -102,7 +102,8 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
 
         if (not self.__with_replacement and
                 not self.__allow_self_connections and
-                self.__n_pre == synapse_info.n_pre_neurons):
+                self.__n_pre == synapse_info.n_pre_neurons and
+                synapse_info.pre_population is synapse_info.post_population):
             raise SpynnakerException(
                 "FixedNumberPreConnector will not work when "
                 "with_replacement=False, allow_self_connections=False "
@@ -268,9 +269,13 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         return ConnectorIDs.FIXED_NUMBER_PRE_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(self) -> NDArray[uint32]:
+    def gen_connector_params(
+            self, synapse_info: SynapseInformation) -> NDArray[uint32]:
+        allow_self = (
+            self.__allow_self_connections or
+            synapse_info.pre_population != synapse_info.post_population)
         return numpy.array([
-            int(self.__allow_self_connections),
+            int(allow_self),
             int(self.__with_replacement),
             self.__n_pre], dtype=uint32)
 
@@ -283,5 +288,5 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge, synapse_info: SynapseInformation):
-        if self.generate_on_machine(synapse_info.weights, synapse_info.delays):
+        if self.generate_on_machine(synapse_info):
             utility_calls.check_rng(self.__rng, "FixedNumberPreConnector")
