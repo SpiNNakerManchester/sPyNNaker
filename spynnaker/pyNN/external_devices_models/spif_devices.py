@@ -40,13 +40,6 @@ N_FIELDS = 4
 #: The number of filters supported for each pipe
 N_FILTERS = 8
 
-#: The number of FPGA inputs per pipe
-#:
-#: .. note::
-#:     The 16 inputs are not actually separated in the hardware,
-#:     but a logical separation per pipe is useful.
-N_INPUTS = 8
-
 #: SPIF is always connected to FPGA 0
 SPIF_FPGA_ID = 0
 
@@ -55,6 +48,13 @@ SPIF_OUTPUT_FPGA_LINK = 15
 
 #: SPIF always gets input from odd links on FPGA 0 (1, 3, 5, 7, 9, 11, 13, 15)
 SPIF_INPUT_FPGA_LINKS = range(1, 16, 2)
+
+#: The number of FPGA inputs per pipe
+#:
+#: .. note::
+#:     The inputs are not actually separated in the hardware,
+#:     but a logical separation per pipe is useful.
+N_INPUTS = len(SPIF_INPUT_FPGA_LINKS)
 
 
 class SPIFRegister(IntEnum):
