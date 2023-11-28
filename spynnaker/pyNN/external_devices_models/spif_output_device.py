@@ -220,7 +220,7 @@ class SPIFOutputDevice(
 
     @overrides(LiveOutputDevice.get_device_output_keys)
     def get_device_output_keys(self) -> Dict[MachineVertex, Tuple[int, int]]:
-        all_keys: dict[MachineVertex, Tuple[int, int]] = dict()
+        all_keys: Dict[MachineVertex, Tuple[int, int]] = dict()
         routing_infos = SpynnakerDataView.get_routing_infos()
         for i, part in enumerate(self.__incoming_partitions):
             if part.pre_vertex in self.__output_key_and_mask:
