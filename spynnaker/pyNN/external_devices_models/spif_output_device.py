@@ -31,6 +31,7 @@ from .spif_devices import (
     set_distiller_mask_delayed, set_distiller_shift,
     set_xp_key_delayed, set_xp_mask_delayed)
 from pacman.utilities.utility_calls import get_keys
+from spinn_front_end_common.utility_models.command_sender import CommandSender
 
 # The maximum number of partitions that can be supported.
 N_OUTGOING = 6
@@ -125,6 +126,15 @@ class SPIFOutputDevice(
 
     @overrides(ApplicationFPGAVertex.add_incoming_edge)
     def add_incoming_edge(self, edge, partition):
+        # Only add edges from PopulationApplicationVertices
+        if not isinstance(edge.pre_vertex, PopulationApplicationVertex):
+            if not isinstance(edge.pre_vertex, CommandSender):
+                raise ValueError(
+                    "This vertex only accepts input from "
+                    "PopulationApplicationVertex instances")
+            # Ignore the command sender sending to us!
+            return
+
         if len(self.__incoming_partitions) >= N_OUTGOING:
             raise ValueError(
                 f"Only {N_OUTGOING} outgoing connections are supported per"
