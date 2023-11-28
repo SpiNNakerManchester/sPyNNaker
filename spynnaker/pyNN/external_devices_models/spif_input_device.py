@@ -241,7 +241,10 @@ class SPIFInputDevice(
         commands.append(set_mapper_key(self.__pipe, self.__base_key))
 
         # Configure the links to send packets to the 8 FPGAs using the
-        # lower bits
+        # lower bits; the input key is against the reversed links list because
+        # the input numbering on SPIF is upside-down to the FPGA numbering, and
+        # we put out the fixed key and mask in the FPGA link order, so we need
+        # to match that with what SPIF will output.
         commands.extend(
             set_input_key(self.__pipe, i, self.__spif_key(f))
             for i, f in enumerate(reversed(SPIF_INPUT_FPGA_LINKS)))
