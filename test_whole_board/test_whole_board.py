@@ -207,8 +207,7 @@ def test_run(x, y, b):
         triad=(x, y, b), machine_name=SPALLOC_MACHINE)
     with job:
         job.launch_keepalive_task()
-        # Wait for not queued for up to 30 seconds
-        sleep(2.0)
+        job.wait_until_ready(10.0, 3)
         state = job.get_state(wait_for_change=True)
         # If queued or destroyed skip test
         if state == SpallocState.QUEUED:
