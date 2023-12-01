@@ -207,7 +207,7 @@ def test_run(x, y, b):
         triad=(x, y, b), machine_name=SPALLOC_MACHINE)
     with job:
         job.launch_keepalive_task()
-        job.wait_until_ready(n_retries=1)
+        job.wait_until_ready(n_retries=2)
         state = job.get_state()
         # If queued or destroyed skip test
         if state == SpallocState.QUEUED:
