@@ -17,6 +17,7 @@ import numpy
 from numpy.typing import NDArray
 import os
 import inspect
+from pyNN.descriptions import TemplateEngine
 from typing import (
     Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple,
     Type, Union, final, overload, TYPE_CHECKING)
@@ -239,7 +240,7 @@ class Population(PopulationBase):
 
     @overrides(PopulationBase.write_data, extend_doc=False)
     def write_data(self, io: Union[str, BaseIO], variables: Names = 'all',
-                   gather=True, clear=False,
+                   gather: bool = True, clear: bool = False,
                    annotations: Optional[Dict[str, Any]] = None):
         """
         Write recorded data to file, using one of the file formats
@@ -282,7 +283,9 @@ class Population(PopulationBase):
         # write the neo block to the file
         io.write(data)
 
-    def describe(self, template='population_default.txt', engine='default'):
+    def describe(self, template: str = 'population_default.txt',
+                 engine:  Optional[Union[str, TemplateEngine]] = 'default'
+                 ) -> Union[str, Dict[str]]:
         """
         Returns a human-readable description of the population.
 
@@ -336,8 +339,9 @@ class Population(PopulationBase):
     @overrides(PopulationBase.get_data, extend_doc=False)
     def get_data(
             self, variables: Names = 'all',
-            gather=True, clear=False, *,
+            gather: bool = True, clear=False, *,
             annotations: Optional[Dict[str, Any]] = None):
+
         """
         Return a Neo Block containing the data (spikes, state variables)
         recorded from the Assembly.
@@ -390,7 +394,7 @@ class Population(PopulationBase):
                                          variable, as_matrix, view_indexes)
 
     @overrides(PopulationBase.get_spike_counts, extend_doc=False)
-    def get_spike_counts(self, gather=True):
+    def get_spike_counts(self, gather: bool = True):
         """
         Return the number of spikes for each neuron.
 
@@ -599,7 +603,7 @@ class Population(PopulationBase):
         return self.__vertex.conductance_based
 
     def get(self, parameter_names: Names,
-            gather=True, simplify=True) -> ParameterHolder:
+            gather: bool = True, simplify=True) -> ParameterHolder:
         """
         Get the values of a parameter for every local cell in the population.
 

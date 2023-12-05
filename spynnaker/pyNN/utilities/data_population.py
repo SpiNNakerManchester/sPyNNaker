@@ -16,6 +16,7 @@ import logging
 import numpy
 from numpy import floating
 from numpy.typing import NDArray
+from pyNN.descriptions import TemplateEngine
 from typing import Any, Dict, Optional, Sequence, Union, TYPE_CHECKING
 import neo  # type: ignore[import]
 from spinn_utilities.ranged.abstract_sized import AbstractSized, Selector
@@ -65,8 +66,10 @@ class DataPopulation(object):
         # write the neo block to the file
         io.write(bl=data)
 
-    @overrides(Population.describe)
-    def describe(self, template=None, engine=None) -> Any:
+    @overrides(Population.describe, adds_typing=True)
+    def describe(self, template: str = None,
+                 engine: Optional[Union[str, TemplateEngine]] = None
+                 ) -> Union[str, Dict[str]]:
         if template is not None:
             logger.warning("Ignoring template as supported in this mode")
         if engine is not None:

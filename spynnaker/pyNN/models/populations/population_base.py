@@ -348,7 +348,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @staticmethod
-    def _check_params(gather, annotations=None):
+    def _check_params(
+            gather: bool, annotations: Optional[Dict[str, Any]] = None):
         if not gather:
             logger.warning(
                 "sPyNNaker only supports gather=True. We will run "
