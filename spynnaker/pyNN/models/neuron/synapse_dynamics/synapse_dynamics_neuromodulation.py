@@ -37,6 +37,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray)
+    from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 # The targets of neuromodulation
 NEUROMODULATION_TARGETS = {
@@ -100,7 +101,8 @@ class SynapseDynamicsNeuromodulation(
         return self.__w_max
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
-    def merge(self, synapse_dynamics):
+    def merge(self, synapse_dynamics: AbstractSynapseDynamics
+              ) -> AbstractSynapseDynamics:
         # This must replace something that supports neuromodulation,
         # so it can't be the first thing to be merged!
         raise SynapticConfigurationException(
@@ -109,7 +111,7 @@ class SynapseDynamicsNeuromodulation(
             " neuromodulation")
 
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
-    def is_same_as(self, synapse_dynamics) -> bool:
+    def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:
         # Shouln't ever come up, but if it does, it is False!
         return False
 

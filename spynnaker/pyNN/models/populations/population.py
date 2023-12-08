@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
+import neo
 import numpy
 from numpy.typing import NDArray
 import os
@@ -339,8 +340,8 @@ class Population(PopulationBase):
     @overrides(PopulationBase.get_data, extend_doc=False)
     def get_data(
             self, variables: Names = 'all',
-            gather: bool = True, clear=False, *,
-            annotations: Optional[Dict[str, Any]] = None):
+            gather: bool = True, clear: bool = False, *,
+            annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
 
         """
         Return a Neo Block containing the data (spikes, state variables)

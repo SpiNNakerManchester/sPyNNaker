@@ -11,14 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from __future__ import annotations
 from enum import IntEnum
-from typing import cast
+from typing import cast, Sequence, TYPE_CHECKING
 
 from spinnman.model.enums import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
+from pacman.model.resources import AbstractSDRAM
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spinn_front_end_common.abstract_models import (
@@ -26,6 +29,9 @@ from spinn_front_end_common.abstract_models import (
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .delay_extension_vertex import DelayExtensionVertex
+if TYPE_CHECKING:
+    from pacman.model.placements import Placement
+    from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 
 
 class DelayExtensionMachineVertex(
@@ -94,7 +100,8 @@ class DelayExtensionMachineVertex(
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
-    def __init__(self, sdram, label, vertex_slice, app_vertex=None):
+    def __init__(self, sdram: AbstractSDRAM, label, vertex_slice,
+                 app_vertex=None):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM required by the vertex
@@ -111,23 +118,25 @@ class DelayExtensionMachineVertex(
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
-    def _provenance_region_id(self):
+    def _provenance_region_id(self) -> int:
         return self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION
 
     @property
     @overrides(
         ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
-    def _n_additional_data_items(self):
+    def _n_additional_data_items(self) -> int:
         return self.N_EXTRA_PROVENANCE_DATA_ENTRIES
 
     @property
     @overrides(MachineVertex.sdram_required)
-    def sdram_required(self):
+    def sdram_required(self) -> AbstractSDRAM:
         return self.__sdram
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                parse_extra_provenance_items)
-    def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
+    def parse_extra_provenance_items(
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
         (n_received, n_processed, n_added, n_sent, n_overflows, n_delays,
          n_sat, n_bad_neuron, n_bad_keys, n_late_spikes, max_bg,
          n_bg_overloads) = provenance_data
@@ -239,15 +248,16 @@ class DelayExtensionMachineVertex(
         return n_keys * v.n_delay_stages * n_colours
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
-    def get_binary_file_name(self):
+    def get_binary_file_name(self) -> str:
         return "delay_extension.aplx"
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
-    def get_binary_start_type(self):
+    def get_binary_start_type(self) -> ExecutableType:
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(self, spec, placement):
+    def generate_data_specification(
+            self, spec: DataSpecificationGenerator, placement: Placement):
         vertex = placement.vertex
 
         # Reserve memory:

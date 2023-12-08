@@ -21,7 +21,7 @@ from numpy import (
     minimum, e, pi)
 from numpy.typing import NDArray
 from pyNN.random import NumpyRNG
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, Sequence, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 from pacman.model.graphs.common import Slice
@@ -164,8 +164,8 @@ class IndexBasedProbabilityConnector(AbstractConnector,
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice: Slice, synapse_type: int,
-            synapse_info: SynapseInformation) -> NDArray:
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
+            synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         # setup probs here
         probs = self._update_probs_from_index_expression(synapse_info)
 
