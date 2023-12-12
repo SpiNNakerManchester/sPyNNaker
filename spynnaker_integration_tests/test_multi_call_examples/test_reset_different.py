@@ -54,8 +54,8 @@ class TestResetDifferent(BaseTestCase):
         neo = pop_1.get_data("all")
         self.check_data(neo, pop_1, expected_spikes, simtime)
 
-        pop_1.write_data("test.csv")
-        neo = NeoCsv().read_csv("test.csv")
+        pop_1.write_data("test_reset.csv")
+        neo = NeoCsv().read_csv("test_reset.csv")
         self.check_data(neo, pop_1, expected_spikes, simtime)
 
         sim.end()
