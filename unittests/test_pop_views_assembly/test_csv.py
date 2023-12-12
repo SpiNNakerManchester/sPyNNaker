@@ -50,7 +50,7 @@ class TestCSV(BaseTestCase):
     def test_write(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "all_data.sqlite3")
-        my_csv = os.path.join(my_dir, "test.csv")
+        my_csv = os.path.join(my_dir, "test_write.csv")
         my_packets = os.path.join(my_dir, "packets-per-timestep.csv")
         packets_expected = []
         with open(my_packets) as csvfile:
@@ -82,7 +82,7 @@ class TestCSV(BaseTestCase):
     def test_view(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "all_data.sqlite3")
-        my_csv = os.path.join(my_dir, "test.csv")
+        my_csv = os.path.join(my_dir, "test_view.csv")
         with NeoBufferDatabase(my_buffer) as db:
             #  packets-per-timestep data can not be extracted using a view
             db.csv_block_metadata(my_csv, "pop_1", annotations=None)
@@ -106,7 +106,7 @@ class TestCSV(BaseTestCase):
     def test_over_view(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "view_data.sqlite3")
-        my_csv = os.path.join(my_dir, "test.csv")
+        my_csv = os.path.join(my_dir, "test_over_view.csv")
         with NeoBufferDatabase(my_buffer) as db:
             db.csv_block_metadata(my_csv, "pop_1", annotations=None)
             db.csv_segment(my_csv, "pop_1", variables="all")
@@ -126,7 +126,7 @@ class TestCSV(BaseTestCase):
     def test_over_sub_view(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "view_data.sqlite3")
-        my_csv = os.path.join(my_dir, "test.csv")
+        my_csv = os.path.join(my_dir, "test_over_sub_view.csv")
         with NeoBufferDatabase(my_buffer) as db:
             db.csv_block_metadata(my_csv, "pop_1", annotations=None)
             db.csv_segment(
@@ -147,7 +147,7 @@ class TestCSV(BaseTestCase):
     def test_no_intersection(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "view_data.sqlite3")
-        my_csv = os.path.join(my_dir, "test.csv")
+        my_csv = os.path.join(my_dir, "test_no_intersection.csv")
         with NeoBufferDatabase(my_buffer) as db:
             db.csv_block_metadata(my_csv, "pop_1", annotations=None)
             db.csv_segment(
@@ -167,7 +167,7 @@ class TestCSV(BaseTestCase):
         my_buffer = os.path.join(my_dir, "rewiring_data.sqlite3")
         my_labels = os.path.join(my_dir, "rewiring_labels.txt")
 
-        my_csv = os.path.join(my_dir, "test.csv")
+        my_csv = os.path.join(my_dir, "test_rewiring.csv")
         with NeoBufferDatabase(my_buffer) as db:
             db.csv_block_metadata(my_csv, "pop_1", annotations=None)
             db.csv_segment(my_csv, "pop_1", variables="all")
