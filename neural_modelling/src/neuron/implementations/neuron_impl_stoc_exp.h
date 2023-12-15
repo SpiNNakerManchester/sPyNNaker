@@ -1,8 +1,24 @@
-#ifndef _MY_FULL_NEURON_IMPL_
-#define _MY_FULL_NEURON_IMPL_
+/*
+ * Copyright (c) 2023 The University of Manchester
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-// Demonstrating that a "neuron model" can be defined in a different
-// way without the use of components for additional input / input / threshold
+//! \file
+//! \brief Stochastic neuron implementation with exponential probability
+
+#ifndef _NEURON_IMPL_STOC_EXP_
+#define _NEURON_IMPL_STOC_EXP_
 
 #include <neuron/implementations/neuron_impl.h>
 #include <spin1_api.h>
@@ -257,4 +273,4 @@ static const char *neuron_impl_get_synapse_type_char(uint32_t synapse_type) {
 #endif // LOG_LEVEL >= LOG_DEBUG
 
 
-#endif // _MY_FULL_NEURON_IMPL_
+#endif // _NEURON_IMPL_STOC_EXP_
