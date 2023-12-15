@@ -1,4 +1,4 @@
-# Copyright (c) 2017 The University of Manchester
+# Copyright (c) 2015 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .abstract_standard_neuron_component import (
-    AbstractStandardNeuronComponent, ModelParameter)
-from .abstract_neuron_impl import AbstractNeuronImpl
-from .neuron_impl_standard import NeuronImplStandard
-from .neuron_impl_stoc_exp import NeuronImplStocExp
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
+from spynnaker.pyNN.models.defaults import default_parameters
+from spynnaker.pyNN.models.neuron.implementations import NeuronImplStocExp
 
-__all__ = [
-    "AbstractNeuronImpl", "AbstractStandardNeuronComponent",
-    "ModelParameter", "NeuronImplStandard", "NeuronImplStocExp"]
+
+class StocExp(AbstractPyNNNeuronModel):
+
+    @default_parameters({"tau", "bias"})
+    def __init__(self, tau=10, bias=0, refract_init=0, seed=None):
+        super().__init__(NeuronImplStocExp(tau, bias, refract_init, seed))

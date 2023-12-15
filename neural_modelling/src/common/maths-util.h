@@ -223,6 +223,14 @@ static inline REAL kdivk(REAL a, REAL b) {
 	return kbits((uint32_t) udiv64(((uint64_t) bitsk(a) << 15), (uint64_t) bitsk(b)));
 }
 
+//! \brief Divides an unsigned accum by another unsigned accum
+//! \param[in] a The dividend
+//! \param[in] b The divisor
+//! \return a divided by b
+static inline UREAL ukdivuk(UREAL a, UREAL b) {
+	return ukbits((uint32_t) udiv64(((uint64_t) bitsuk(a) << 16), (uint64_t) bitsuk(b)));
+}
+
 //! \brief Divides an integer by an accum
 //! \param[in] a The dividend
 //! \param[in] b The divisor
