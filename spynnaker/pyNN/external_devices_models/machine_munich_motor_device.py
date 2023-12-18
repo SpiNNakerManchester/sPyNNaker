@@ -12,15 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Sequence
 from spinn_utilities.overrides import overrides
 from spinnman.model.enums import ExecutableType
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
+from pacman.model.placements import Placement
 from pacman.model.resources import ConstantSDRAM
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary)
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification)
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spinn_front_end_common.interface.simulation import simulation_utilities
@@ -91,33 +94,34 @@ class MachineMunichMotorDevice(
 
     @property
     @overrides(MachineVertex.sdram_required)
-    def sdram_required(self):
+    def sdram_required(self) -> ConstantSDRAM:
         return ConstantSDRAM(
                 SYSTEM_BYTES_REQUIREMENT + self._PARAMS_SIZE +
                 self.get_provenance_data_size(self._PROVENANCE_ELEMENTS))
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
-    def get_binary_file_name(self):
+    def get_binary_file_name(self) -> str:
         return "robot_motor_control.aplx"
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
-    def get_binary_start_type(self):
+    def get_binary_start_type(self) -> ExecutableType:
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
-    def _provenance_region_id(self):
+    def _provenance_region_id(self) -> int:
         return self._PROVENANCE_REGION
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
-    def _n_additional_data_items(self):
+    def _n_additional_data_items(self) -> int:
         return self._PROVENANCE_ELEMENTS
 
     @overrides(
         ProvidesProvenanceDataFromMachineImpl.parse_extra_provenance_items)
     def parse_extra_provenance_items(
-            self, label, x, y, p, provenance_data):
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
         n_buffer_overflows, = provenance_data
 
         with ProvenanceWriter() as db:
@@ -133,7 +137,8 @@ class MachineMunichMotorDevice(
                     "or decrease the number of neurons per core.")
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(self, spec, placement):
+    def generate_data_specification(
+            self, spec: DataSpecificationGenerator, placement: Placement):
         # reserve regions
         self.reserve_memory_regions(spec)
 

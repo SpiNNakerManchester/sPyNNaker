@@ -15,6 +15,7 @@ from __future__ import annotations
 import logging
 import neo
 import numpy
+from numpy import floating
 from numpy.typing import NDArray
 import os
 import inspect
@@ -199,10 +200,8 @@ class Population(PopulationBase):
         return variable in self.__vertex.get_recordable_variables()
 
     @overrides(PopulationBase.record, extend_doc=False)
-    def record(
-            self, variables: Names,
-            to_file: Optional[Union[str]] = None,
-            sampling_interval: Optional[int] = None):
+    def record(self, variables: Names, to_file: Optional[str] = None,
+               sampling_interval: Optional[int] = None):
         """
         Record the specified variable or variables for all cells in the
         Population or view.
@@ -374,7 +373,7 @@ class Population(PopulationBase):
 
     def spinnaker_get_data(
             self, variable: str, as_matrix: bool = False,
-            view_indexes: Optional[Sequence[int]] = None):
+            view_indexes: Optional[Sequence[int]] = None) -> NDArray[floating]:
         """
         Public accessor for getting data as a numpy array, instead of
         the Neo-based object
@@ -395,7 +394,7 @@ class Population(PopulationBase):
                                          variable, as_matrix, view_indexes)
 
     @overrides(PopulationBase.get_spike_counts, extend_doc=False)
-    def get_spike_counts(self, gather: bool = True):
+    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
         """
         Return the number of spikes for each neuron.
 

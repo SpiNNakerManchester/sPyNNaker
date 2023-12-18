@@ -104,16 +104,19 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
         return self._get_fixed_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, partition_id) -> List[MachineVertex]:
+    def get_out_going_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, partition_id) -> List[MachineVertex]:
+    def get_in_coming_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
-            self, source_vertex: ApplicationVertex, partition_id) -> List[
+            self, source_vertex: ApplicationVertex,
+            partition_id: str) -> List[
                 Tuple[MachineVertex, Sequence[MachineVertex]]]:
         # Determine the real pre-vertex
         pre_vertex = source_vertex
@@ -138,7 +141,7 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(
-            self, variable_to_record) -> Iterable[MachineVertex]:
+            self, variable_to_record: str) -> Iterable[MachineVertex]:
         return self.governed_app_vertex.machine_vertices
 
     def create_machine_vertex(

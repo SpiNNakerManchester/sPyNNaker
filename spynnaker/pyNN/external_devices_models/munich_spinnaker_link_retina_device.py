@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable
 from spinn_utilities.overrides import overrides
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
@@ -114,12 +115,12 @@ class MunichRetinaDevice(
             label=label, board_address=board_address)
 
     @overrides(ApplicationSpiNNakerLinkVertex.get_fixed_key_and_mask)
-    def get_fixed_key_and_mask(self, partition_id):
+    def get_fixed_key_and_mask(self, partition_id: str) -> BaseKeyAndMask:
         return BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
-    def start_resume_commands(self):
+    def start_resume_commands(self) -> Iterable[MultiCastCommand]:
         # change the retina key it transmits with
         # (based off if its right or left)
         key_set_command = self._MANAGEMENT_BIT | (

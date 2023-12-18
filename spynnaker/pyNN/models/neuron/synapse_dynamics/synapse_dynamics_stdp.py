@@ -14,11 +14,12 @@
 from __future__ import annotations
 import math
 import numpy
-from numpy import uint8, uint16, uint32
+from numpy import floating, integer, uint8, uint16, uint32
 from numpy.typing import NDArray
 from pyNN.standardmodels.synapses import StaticSynapse
-from typing import Iterable, List, Optional, TYPE_CHECKING
+from typing import Any, Iterable, List, Optional, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -35,15 +36,21 @@ from .abstract_synapse_dynamics_structural import (
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractConnector)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
     abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray)
     from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.\
         abstract_timing_dependence import AbstractTimingDependence
     from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
         abstract_weight_dependence import AbstractWeightDependence
+    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+    from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = BYTES_PER_WORD
@@ -130,7 +137,8 @@ class SynapseDynamicsSTDP(
                 " edges to the same Population")
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
-    def merge(self, synapse_dynamics):
+    def merge(self, synapse_dynamics: AbstractSynapseDynamics
+              ) -> AbstractSynapseDynamics:
         # If dynamics is Neuromodulation, merge with other neuromodulation,
         # and then return ourselves, as neuromodulation can't be used by
         # itself
@@ -173,7 +181,7 @@ class SynapseDynamicsSTDP(
         return self
 
     @overrides(AbstractPlasticSynapseDynamics.get_value)
-    def get_value(self, key):
+    def get_value(self, key: str) -> Any:
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
                 return getattr(obj, key)
@@ -181,7 +189,7 @@ class SynapseDynamicsSTDP(
             f"Type {type(self)} does not have parameter {key}")
 
     @overrides(AbstractPlasticSynapseDynamics.set_value)
-    def set_value(self, key, value):
+    def set_value(self, key: str, value: Any):
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
                 setattr(obj, key, value)
@@ -238,7 +246,7 @@ class SynapseDynamicsSTDP(
         return self.__neuromodulation
 
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
-    def is_same_as(self, synapse_dynamics):
+    def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:
         if not isinstance(synapse_dynamics, SynapseDynamicsSTDP):
             return False
         return (
@@ -249,7 +257,7 @@ class SynapseDynamicsSTDP(
             (self.__dendritic_delay_fraction ==
              synapse_dynamics.dendritic_delay_fraction))
 
-    def get_vertex_executable_suffix(self):
+    def get_vertex_executable_suffix(self) -> str:
         """
         :rtype: str
         """
@@ -284,7 +292,9 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractPlasticSynapseDynamics.write_parameters)
     def write_parameters(
-            self, spec, region, global_weight_scale, synapse_weight_scales):
+            self, spec: DataSpecificationBase, region: int,
+            global_weight_scale: float,
+            synapse_weight_scales: NDArray[floating]):
         spec.comment("Writing Plastic Parameters")
 
         # Switch focus to the region:
@@ -354,8 +364,12 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractPlasticSynapseDynamics.get_plastic_synaptic_data)
     def get_plastic_synaptic_data(
-            self, connections: ConnectionsArray, connection_row_indices,
-            n_rows, n_synapse_types, max_n_synapses, max_atoms_per_core):
+            self, connections: ConnectionsArray,
+            connection_row_indices: NDArray[integer], n_rows: int,
+            n_synapse_types: int,
+            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
+                NDArray[uint32], NDArray[uint32], NDArray[uint32],
+                NDArray[uint32]]:
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
@@ -435,26 +449,31 @@ class SynapseDynamicsSTDP(
 
     @overrides(
         AbstractPlasticSynapseDynamics.get_n_plastic_plastic_words_per_row)
-    def get_n_plastic_plastic_words_per_row(self, pp_size):
+    def get_n_plastic_plastic_words_per_row(
+            self, pp_size: NDArray[uint32]) -> NDArray[integer]:
         # pp_size is in words, so return
         return pp_size
 
     @overrides(
         AbstractPlasticSynapseDynamics.get_n_fixed_plastic_words_per_row)
-    def get_n_fixed_plastic_words_per_row(self, fp_size):
+    def get_n_fixed_plastic_words_per_row(
+            self, fp_size: NDArray[uint32]) -> NDArray[integer]:
         # fp_size is in half-words
         return numpy.ceil(fp_size / 2.0).astype(dtype=uint32)
 
     @overrides(AbstractPlasticSynapseDynamics.get_n_synapses_in_rows)
-    def get_n_synapses_in_rows(self, pp_size, fp_size):
+    def get_n_synapses_in_rows(self, pp_size: NDArray[uint32],
+                               fp_size: NDArray[uint32]) -> NDArray[integer]:
         # Each fixed-plastic synapse is a half-word and fp_size is in half
         # words so just return it
         return fp_size
 
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
-            self, n_synapse_types, pp_size, pp_data, fp_size, fp_data,
-            max_atoms_per_core) -> ConnectionsArray:
+            self, n_synapse_types: int, pp_size: NDArray[uint32],
+            pp_data: List[NDArray[uint32]], fp_size: NDArray[uint32],
+            fp_data: List[NDArray[uint32]],
+            max_atoms_per_core: int) -> ConnectionsArray:
         # pylint: disable=too-many-arguments
         n_rows = len(fp_size)
 
@@ -489,20 +508,23 @@ class SynapseDynamicsSTDP(
         return connections
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)
-    def get_weight_mean(self, connector, synapse_info):
+    def get_weight_mean(self, connector: AbstractConnector,
+                        synapse_info: SynapseInformation) -> float:
         # Because the weights could all be changed to the maximum, the mean
         # has to be given as the maximum for scaling
         return self.get_weight_maximum(connector, synapse_info)
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_variance)
     def get_weight_variance(
-            self, connector, weights: Weight_Types, synapse_info):
+           self, connector: AbstractConnector, weights: Weight_Types,
+            synapse_info: SynapseInformation) -> float:
         # Because the weights could all be changed to the maximum, the variance
         # has to be given as no variance
         return 0.0
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_maximum)
-    def get_weight_maximum(self, connector, synapse_info):
+    def get_weight_maximum(self, connector: AbstractConnector,
+                           synapse_info: SynapseInformation) -> float:
         w_max = super().get_weight_maximum(connector, synapse_info)
         # The maximum weight is the largest that it could be set to from
         # the weight dependence
@@ -516,7 +538,7 @@ class SynapseDynamicsSTDP(
         yield from self.__weight_dependence.get_parameter_names()
 
     @overrides(AbstractPlasticSynapseDynamics.get_max_synapses)
-    def get_max_synapses(self, n_words):
+    def get_max_synapses(self, n_words: int) -> int:
         # Subtract the header size that will always exist
         n_header_words = self._n_header_bytes // BYTES_PER_WORD
         n_words_space = n_words - n_header_words
@@ -547,14 +569,16 @@ class SynapseDynamicsSTDP(
 
     @property
     @overrides(AbstractGenerateOnMachine.gen_matrix_id)
-    def gen_matrix_id(self):
+    def gen_matrix_id(self) -> int:
         return MatrixGeneratorID.STDP_MATRIX.value
 
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
     def gen_matrix_params(
-            self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
-            synapse_info, max_row_info, max_pre_atoms_per_core,
-            max_post_atoms_per_core):
+            self, synaptic_matrix_offset: int, delayed_matrix_offset: int,
+            app_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation, max_row_info: MaxRowInfo,
+            max_pre_atoms_per_core: int, max_post_atoms_per_core: int
+            ) -> NDArray[uint32]:
         vertex = app_edge.post_vertex
         n_synapse_type_bits = get_n_bits(
             vertex.neuron_impl.get_n_synapse_types())
@@ -580,22 +604,21 @@ class SynapseDynamicsSTDP(
             dtype=uint32)
 
     @property
-    @overrides(AbstractGenerateOnMachine.
-               gen_matrix_params_size_in_bytes)
-    def gen_matrix_params_size_in_bytes(self):
+    @overrides(AbstractGenerateOnMachine.gen_matrix_params_size_in_bytes)
+    def gen_matrix_params_size_in_bytes(self) -> int:
         return 17 * BYTES_PER_WORD
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.changes_during_run)
-    def changes_during_run(self):
+    def changes_during_run(self) -> bool:
         return True
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.is_combined_core_capable)
-    def is_combined_core_capable(self):
+    def is_combined_core_capable(self) -> bool:
         return self.__neuromodulation is None
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
-    def pad_to_length(self):
+    def pad_to_length(self) -> Optional[int]:
         return self.__pad_to_length

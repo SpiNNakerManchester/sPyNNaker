@@ -11,10 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Iterable
+from typing import Iterable, List
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationBase)
+    DataType, DataSpecificationGenerator)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
@@ -92,7 +92,7 @@ class WeightDependenceAdditiveTriplet(
         return self.__a3_minus
 
     @overrides(AbstractWeightDependence.is_same_as)
-    def is_same_as(self, weight_dependence) -> bool:
+    def is_same_as(self, weight_dependence: AbstractWeightDependence) -> bool:
         if not isinstance(weight_dependence, WeightDependenceAdditiveTriplet):
             return False
         return (
@@ -114,7 +114,7 @@ class WeightDependenceAdditiveTriplet(
 
     @overrides(AbstractWeightDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(
-            self, n_synapse_types, n_weight_terms) -> int:
+            self, n_synapse_types: int, n_weight_terms: int) -> int:
         if n_weight_terms != 2:
             raise NotImplementedError(
                 "Additive weight dependence only supports one or two terms")
@@ -122,8 +122,8 @@ class WeightDependenceAdditiveTriplet(
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
-            self, spec: DataSpecificationBase, global_weight_scale: float,
-            synapse_weight_scales, n_weight_terms):
+            self, spec: DataSpecificationGenerator, global_weight_scale: float,
+            synapse_weight_scales: List[float], n_weight_terms: int):
         # Loop through each synapse type
         for _ in synapse_weight_scales:
             # Scale the weights

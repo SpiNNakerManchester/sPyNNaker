@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Dict, Sequence, Tuple
+
+from typing import Dict, Iterable, Sequence, Tuple
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
@@ -136,7 +137,8 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
                 DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES))
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
-    def machine_vertices_for_recording(self, variable_to_record):
+    def machine_vertices_for_recording(
+            self, variable_to_record: str) -> Iterable[MachineVertex]:
         raise PacmanInvalidParameterException(
             variable_to_record, variable_to_record, self.DELAY_RECORDING_ERROR)
 

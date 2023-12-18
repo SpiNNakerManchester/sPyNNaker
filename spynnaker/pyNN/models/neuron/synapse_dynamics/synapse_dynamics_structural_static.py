@@ -14,7 +14,8 @@
 from __future__ import annotations
 import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
-from typing import Any, Dict, Iterable, Optional, Tuple, TYPE_CHECKING
+from typing import (
+    Any, Dict, Iterable, Optional, Tuple, TYPE_CHECKING, Sequence, Union)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
@@ -34,8 +35,12 @@ from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
 if TYPE_CHECKING:
+    from pacman.model.graphs import AbstractVertex
+    from pacman.model.graphs.machine import MachineVertex
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
+    from spynnaker.pyNN.models.neural_projections.connectors import (
+        AbstractConnector)
     from spynnaker.pyNN.models.neuron.synapse_dynamics.\
         abstract_synapse_dynamics_structural import (
             InitialDelay)
@@ -184,7 +189,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
             raise ValueError(f"Unknown parameter {param}")
 
     @overrides(AbstractStaticSynapseDynamics.is_same_as)
-    def is_same_as(self, synapse_dynamics) -> bool:
+    def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:
         return _Common.is_same_as(self, synapse_dynamics)
 
     @overrides(AbstractStaticSynapseDynamics.get_vertex_executable_suffix)
@@ -226,37 +231,37 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.s_max)
-    def s_max(self):
+    def s_max(self) -> int:
         return self.__s_max
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.with_replacement)
-    def with_replacement(self):
+    def with_replacement(self) -> bool:
         return self.__with_replacement
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.initial_weight)
-    def initial_weight(self):
+    def initial_weight(self) -> float:
         return self.__initial_weight
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.initial_delay)
-    def initial_delay(self):
+    def initial_delay(self) -> InitialDelay:
         return self.__initial_delay
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.partner_selection)
-    def partner_selection(self):
+    def partner_selection(self) -> AbstractPartnerSelection:
         return self.__partner_selection
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.formation)
-    def formation(self):
+    def formation(self) -> AbstractFormation:
         return self.__formation
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.elimination)
-    def elimination(self):
+    def elimination(self) -> AbstractElimination:
         return self.__elimination
 
     @property
@@ -265,35 +270,45 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         return self.__connections
 
     @overrides(SynapseDynamicsStatic.get_weight_mean)
-    def get_weight_mean(self, connector, synapse_info):
+    def get_weight_mean(self, connector: AbstractConnector,
+                        synapse_info: SynapseInformation) -> float:
         return self.get_weight_maximum(connector, synapse_info)
 
     @overrides(SynapseDynamicsStatic.get_weight_variance)
     def get_weight_variance(
-            self, connector, weights: Weight_Types, synapse_info):
+           self, connector: AbstractConnector, weights: Weight_Types,
+           synapse_info: SynapseInformation) -> float:
         return 0.0
 
     @overrides(SynapseDynamicsStatic.get_weight_maximum)
-    def get_weight_maximum(self, connector, synapse_info):
+    def get_weight_maximum(self, connector: AbstractConnector,
+                           synapse_info: SynapseInformation) -> float:
         w_m = super().get_weight_maximum(connector, synapse_info)
         return max(w_m, self.__initial_weight)
 
     @overrides(SynapseDynamicsStatic.get_delay_maximum)
-    def get_delay_maximum(self, connector, synapse_info):
+    def get_delay_maximum(self, connector: AbstractConnector,
+                          synapse_info: SynapseInformation) -> Optional[float]:
         d_m = super().get_delay_maximum(connector, synapse_info)
         return max(d_m, self.__initial_delay)
 
     @overrides(SynapseDynamicsStatic.get_delay_minimum)
-    def get_delay_minimum(self, connector, synapse_info):
+    def get_delay_minimum(
+            self, connector: AbstractConnector,
+            synapse_info: SynapseInformation) -> Optional[float]:
         d_m = super().get_delay_minimum(connector, synapse_info)
         return min(d_m, self.__initial_delay)
 
     @overrides(SynapseDynamicsStatic.get_delay_variance)
-    def get_delay_variance(self, connector, delays, synapse_info):
+    def get_delay_variance(
+            self, connector: AbstractConnector, delays: numpy.ndarray,
+            synapse_info: SynapseInformation) -> float:
         return 0.0
 
     @overrides(_Common._get_seeds)
-    def _get_seeds(self, app_vertex=None) -> Tuple[int, ...]:
+    def _get_seeds(
+            self, app_vertex: Union[None, ApplicationVertex, Slice] = None
+            ) -> Sequence[int]:
         if app_vertex:
             if app_vertex not in self.__seeds.keys():
                 self.__seeds[app_vertex] = (
@@ -303,14 +318,16 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
             return create_mars_kiss_seeds(self.__rng)
 
     @overrides(SynapseDynamicsStatic.generate_on_machine)
-    def generate_on_machine(self):
+    def generate_on_machine(self) -> bool:
         # Never generate structural connections on the machine
         return False
 
     @overrides(AbstractSynapseDynamics.get_connected_vertices)
     def get_connected_vertices(
             self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
-            target_vertex: ApplicationVertex):
+            target_vertex: ApplicationVertex) -> Sequence[
+            Tuple[MachineVertex, Sequence[AbstractVertex]]]:
+
         # Things change, so assume all connected
         return [(m_vertex, [source_vertex])
                 for m_vertex in target_vertex.splitter.get_in_coming_vertices(
@@ -318,5 +335,5 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
 
     @property
     @overrides(AbstractSynapseDynamics.is_combined_core_capable)
-    def is_combined_core_capable(self):
+    def is_combined_core_capable(self) -> bool:
         return False

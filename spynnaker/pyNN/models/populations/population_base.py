@@ -276,8 +276,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         _we_dont_do_this_now()  # pragma: no cover
 
     @abstractmethod
-    def record(self, variables: Names, to_file=None,
-               sampling_interval=None):
+    def record(self, variables: Names, to_file: Optional[str] = None,
+               sampling_interval: Optional[int] = None):
         """
         Record the specified variable or variables for all cells in the
         Population or view.

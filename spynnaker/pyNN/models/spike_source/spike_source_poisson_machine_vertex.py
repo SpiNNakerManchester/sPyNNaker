@@ -570,7 +570,7 @@ class SpikeSourcePoissonMachineVertex(
                 self._pop_vertex.rates.set_value_by_id(i, numpy.array(rates))
 
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
-    def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge):
+    def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge) -> int:
         if isinstance(sdram_machine_edge.post_vertex,
                       ReceivesSynapticInputsOverSDRAM):
             return sdram_machine_edge.post_vertex.n_bytes_for_transfer

@@ -23,7 +23,8 @@ class AbstractWeightDependence(
     __slots__ = ()
 
     @abstractmethod
-    def is_same_as(self, weight_dependence) -> bool:
+    def is_same_as(
+            self, weight_dependence: "AbstractWeightDependence") -> bool:
         """
         Determine if this weight dependence is the same as another.
 

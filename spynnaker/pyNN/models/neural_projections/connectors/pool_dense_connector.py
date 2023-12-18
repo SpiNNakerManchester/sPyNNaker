@@ -198,7 +198,8 @@ class PoolDenseConnector(AbstractConnector):
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
-            self, application_edge: ProjectionApplicationEdge, synapse_info):
+            self, application_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation):
         pre = application_edge.pre_vertex
         post = application_edge.post_vertex
         if len(pre.atoms_shape) != 2:

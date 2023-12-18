@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    SplitterAbstractPopulationVertex)
+from spynnaker.pyNN.models.neuron import (
+    AbstractPopulationVertex, AbstractPyNNNeuronModelStandard)
 from spynnaker.pyNN.models.defaults import (
     default_initial_values, default_parameters)
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
@@ -96,10 +100,14 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
 
     @overrides(AbstractPyNNNeuronModelStandard.create_vertex)
     def create_vertex(
-            self, n_neurons, label, *, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size,
-            n_steps_per_timestep, drop_late_spikes, splitter, seed,
-            n_colour_bits):
+            self, n_neurons: int, label: str, *,
+            spikes_per_second: Optional[float] = None,
+            ring_buffer_sigma: Optional[float] = None,
+            incoming_spike_buffer_size: Optional[int] = None,
+            drop_late_spikes: Optional[bool] = None,
+            splitter: Optional[SplitterAbstractPopulationVertex] = None,
+            seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
+            n_steps_per_timestep: int = 1) -> AbstractPopulationVertex:
         if n_neurons != len(self._devices):
             raise ConfigurationException(
                 "Number of neurons does not match number of "

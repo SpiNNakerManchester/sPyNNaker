@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable
+from typing import Iterable, List
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.utilities.constants import (
@@ -136,7 +136,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
-    def is_same_as(self, timing_dependence) -> bool:
+    def is_same_as(self, timing_dependence: AbstractTimingDependence) -> bool:
         if not isinstance(
                 timing_dependence, TimingDependencePfisterSpikeTriplet):
             return False
@@ -184,8 +184,8 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
-            self, spec: DataSpecificationGenerator,
-            global_weight_scale, synapse_weight_scales):
+            self, spec: DataSpecificationGenerator, global_weight_scale: float,
+            synapse_weight_scales: List[float]):
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
         spec.write_array(self.__tau_minus_data)

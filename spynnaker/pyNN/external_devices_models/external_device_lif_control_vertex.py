@@ -26,6 +26,8 @@ from .abstract_ethernet_controller import AbstractEthernetController
 from .abstract_multicast_controllable_device import (
     AbstractMulticastControllableDevice)
 if TYPE_CHECKING:
+    from pacman.model.graphs.machine.machine_vertex import MachineVertex
+    from pacman.model.routing_info.routing_info import RoutingInfo
     from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
     from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
     from .abstract_ethernet_translator import AbstractEthernetTranslator
@@ -146,14 +148,15 @@ class ExternalDeviceLifControlVertex(
 
     @overrides(HasCustomAtomKeyMap.get_atom_key_map)
     def get_atom_key_map(
-            self, pre_vertex, partition_id: str, routing_info) -> List[
-                Tuple[int, int]]:
+            self, pre_vertex: MachineVertex, partition_id: str,
+            routing_info: RoutingInfo) -> Iterable[Tuple[int, int]]:
         index = self.__indices[partition_id]
         device = self.__devices[partition_id]
         return [(index, device.device_control_key)]
 
     @overrides(AbstractPopulationVertex.get_fixed_key_and_mask)
-    def get_fixed_key_and_mask(self, partition_id: str):
+    def get_fixed_key_and_mask(
+            self, partition_id: str) -> Optional[BaseKeyAndMask]:
         return BaseKeyAndMask(
             self.__devices[partition_id].device_control_key,
             self._DEFAULT_COMMAND_MASK)

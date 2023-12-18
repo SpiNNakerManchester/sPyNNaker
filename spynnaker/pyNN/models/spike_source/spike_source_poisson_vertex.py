@@ -49,9 +49,11 @@ from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
     get_sdram_edge_params_bytes, get_expander_rates_bytes, get_params_bytes)
 if TYPE_CHECKING:
+    from spinn_utilities.ranged.abstract_sized import Selector
     from .spike_source_poisson import SpikeSourcePoisson
     from .spike_source_poisson_variable import SpikeSourcePoissonVariable
     from spynnaker.pyNN.models.projection import Projection
+    from spynnaker.pyNN.models.common.types import Values
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -363,12 +365,14 @@ class SpikeSourcePoissonVertex(
         return f"{name}s"
 
     @overrides(PopulationApplicationVertex.get_parameter_values)
-    def get_parameter_values(self, names: Names, selector=None):
+    def get_parameter_values(
+            self, names: Names, selector: Selector = None) -> ParameterHolder:
         self._check_parameters(names, self.__allowed_parameters)
         return ParameterHolder(names, self.__read_parameter, selector)
 
     @overrides(PopulationApplicationVertex.set_parameter_values)
-    def set_parameter_values(self, name: str, value, selector=None):
+    def set_parameter_values(
+            self, name: str, value: Values, selector: Selector = None):
         self._check_parameters(name, self.__allowed_parameters)
         if self.__is_variable_rate:
             raise KeyError(f"Cannot set the {name} of a variable rate Poisson")
@@ -420,7 +424,9 @@ class SpikeSourcePoissonVertex(
         return 0
 
     @overrides(PopulationApplicationVertex.set_recording)
-    def set_recording(self, name: str, sampling_interval=None, indices=None):
+    def set_recording(
+            self, name: str, sampling_interval: Optional[float] = None,
+            indices: Optional[Collection[int]] = None):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if sampling_interval is not None:
