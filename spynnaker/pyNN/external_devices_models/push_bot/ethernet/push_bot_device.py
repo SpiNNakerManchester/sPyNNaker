@@ -100,6 +100,7 @@ class PushBotEthernetDevice(
         """
         The protocol instance, for use in the subclass.
 
+        :rtype: MunichIoSpiNNakerLinkProtocol
         """
         return self.__protocol
 
