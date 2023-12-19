@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 import numpy
-from numpy import uint8, uint32, integer
+from numpy import floating, integer, uint8, uint32
 from numpy.typing import NDArray
 from pyNN.standardmodels.synapses import StaticSynapse
 from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING

@@ -20,6 +20,7 @@ from pyNN.space import Space
 from typing import Dict, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
 from typing_extensions import TypeAlias
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice

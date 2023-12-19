@@ -54,6 +54,7 @@ if TYPE_CHECKING:
         ConnectionsArray)
     from .synapse_dynamics_structural_common import ConnectionsInfo
 
+
 class SynapseDynamicsStructuralSTDP(
         SynapseDynamicsSTDP, SynapseDynamicsStructuralCommon):
     """
