@@ -168,9 +168,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     def _split_connections(
             self, n_pre_atoms: int, n_post_atoms: int,
-            post_slices: Sequence[Slice]
-            ) -> Tuple[NDArray[numpy.integer], NDArray[numpy.integer],
-                       NDArray[numpy.float], NDArray[numpy.float]]:
+            post_slices: Sequence[Slice]):
         """
         :param list(~pacman.model.graphs.common.Slice) post_slices:
         """
