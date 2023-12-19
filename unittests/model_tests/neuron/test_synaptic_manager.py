@@ -13,6 +13,7 @@
 # limitations under the License.
 import shutil
 import struct
+from typing import BinaryIO, Optional, Tuple, Union
 import unittest
 from tempfile import mkdtemp
 import numpy
@@ -62,13 +63,17 @@ import pyNN.spiNNaker as p
 class _MockTransceiverinOut(MockableTransceiver):
 
     @overrides(MockableTransceiver.malloc_sdram)
-    def malloc_sdram(self, x, y, size, app_id, tag=None):
+    def malloc_sdram(
+            self, x: int, y: int, size: int, app_id: int, tag: int = 0) -> int:
         self._data_to_read = bytearray(size)
         return 0
 
     @overrides(MockableTransceiver.write_memory)
-    def write_memory(self, x, y, base_address, data, *, n_bytes=None,
-                     offset=0, cpu=0, get_sum=False):
+    def write_memory(
+            self, x: int, y: int, base_address: int,
+            data: Union[BinaryIO, bytes, int, str], *,
+            n_bytes: Optional[int] = None, offset: int = 0, cpu: int = 0,
+            get_sum: bool = False) -> Tuple[int, int]:
         if data is None:
             return
         if isinstance(data, int):
@@ -76,15 +81,18 @@ class _MockTransceiverinOut(MockableTransceiver):
         self._data_to_read[base_address:base_address + len(data)] = data
 
     @overrides(Transceiver.get_region_base_address)
-    def get_region_base_address(self, x, y, p):
+    def get_region_base_address(self, x: int, y: int, p: int):
         return 0
 
     @overrides(MockableTransceiver.read_memory)
-    def read_memory(self, x, y, base_address, length, cpu=0):
+    def read_memory(
+            self, x: int, y: int, base_address: int, length: int,
+            cpu: int = 0) -> bytearray:
         return self._data_to_read[base_address:base_address + length]
 
     @overrides(MockableTransceiver.read_word)
-    def read_word(self, x, y, base_address, cpu=0):
+    def read_word(
+            self, x: int, y: int, base_address: int, cpu: int = 0) -> int:
         datum, = struct.unpack("<I", self.read_memory(x, y, base_address, 4))
         return datum
 
