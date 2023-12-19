@@ -11,15 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Iterable, List, Tuple
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     Application2DFPGAVertex, FPGAConnection)
-from pacman.model.routing_info import BaseKeyAndMask
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.routing_info import BaseKeyAndMask, RoutingInfo
 from pacman.utilities.constants import BITS_IN_KEY
 from pacman.utilities.utility_calls import is_power_of_2
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SPIF_INPUT_FPGA_LINKS,
@@ -201,13 +205,16 @@ class SPIFRetinaDevice(
         return fpga_x_index, fpga_y_index
 
     @overrides(Application2DFPGAVertex.get_incoming_slice_for_link)
-    def get_incoming_slice_for_link(self, link, index):
+    def get_incoming_slice_for_link(
+            self, link: FPGAConnection, index: int) -> Slice:
         vertex_slice = super().get_incoming_slice_for_link(link, index)
         self.__index_by_slice[link.fpga_link_id, vertex_slice] = index
         return vertex_slice
 
     @overrides(Application2DFPGAVertex.get_machine_fixed_key_and_mask)
-    def get_machine_fixed_key_and_mask(self, machine_vertex, partition_id):
+    def get_machine_fixed_key_and_mask(
+            self, machine_vertex: MachineVertex,
+            partition_id: str) -> BaseKeyAndMask:
         fpga_link_id = machine_vertex.fpga_link_id
         vertex_slice = machine_vertex.vertex_slice
         index = self.__index_by_slice[fpga_link_id, vertex_slice]
@@ -223,14 +230,14 @@ class SPIFRetinaDevice(
         return BaseKeyAndMask(fpga_key, fpga_mask)
 
     @overrides(Application2DFPGAVertex.get_fixed_key_and_mask)
-    def get_fixed_key_and_mask(self, partition_id):
+    def get_fixed_key_and_mask(self, partition_id: str) -> BaseKeyAndMask:
         n_key_bits = BITS_IN_KEY - self._key_shift
         key_mask = ((1 << n_key_bits) - 1) << self._key_shift
         return BaseKeyAndMask(self.__base_key << self._key_shift, key_mask)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
-    def start_resume_commands(self):
+    def start_resume_commands(self) -> Iterable[MultiCastCommand]:
         # Make sure everything has stopped
         commands = [SpiNNFPGARegister.STOP.cmd()]
 
@@ -297,17 +304,19 @@ class SPIFRetinaDevice(
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
-    def pause_stop_commands(self):
+    def pause_stop_commands(self) -> Iterable[MultiCastCommand]:
         # Send the stop signal
         yield SpiNNFPGARegister.STOP.cmd()
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
-    def timed_commands(self):
+    def timed_commands(self) -> List[MultiCastCommand]:
         return []
 
     @overrides(PopulationApplicationVertex.get_atom_key_map)
-    def get_atom_key_map(self, pre_vertex, partition_id, routing_info):
+    def get_atom_key_map(
+            self, pre_vertex: MachineVertex, partition_id: str,
+            routing_info: RoutingInfo) -> Iterable[Tuple[int, int]]:
         # Work out which machine vertex
         x_start, y_start = pre_vertex.vertex_slice.start
         key_and_mask = self.get_machine_fixed_key_and_mask(

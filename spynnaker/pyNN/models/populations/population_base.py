@@ -173,7 +173,7 @@ class PopulationBase(object, metaclass=AbstractBase):
     def __len__(self) -> int:
         raise NotImplementedError
 
-    def mean_spike_count(self, gather=True):
+    def mean_spike_count(self, gather: bool = True) -> float:
         """
         Returns the mean number of spikes per neuron.
 

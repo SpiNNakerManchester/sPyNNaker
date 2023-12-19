@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spinn_front_end_common.utility_models import MultiCastCommand
@@ -88,7 +89,8 @@ class PushBotSpiNNakerLinkRetinaDevice(
 
     @property
     @overrides(AbstractPushBotRetinaDevice.start_resume_commands)
-    def start_resume_commands(self):
+    def start_resume_commands(
+            self) -> Iterable[DelayedPayloadMultiCastCommand]:
         # Update the commands with the additional one to set the key
         new_commands = list()
         for command in super().start_resume_commands:

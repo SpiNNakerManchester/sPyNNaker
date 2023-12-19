@@ -354,12 +354,12 @@ class _DelayedMultiCastCommand(MultiCastCommand):
 
     @property
     @overrides(MultiCastCommand.payload)
-    def payload(self):
+    def payload(self) -> int:
         return self.__get_payload(self.__index)
 
     @property
     @overrides(MultiCastCommand.is_payload)
-    def is_payload(self):
+    def is_payload(self) -> bool:
         return True
 
 

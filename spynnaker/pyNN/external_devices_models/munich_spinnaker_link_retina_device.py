@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable
+from typing import Iterable, List
 from spinn_utilities.overrides import overrides
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
@@ -145,7 +145,7 @@ class MunichRetinaDevice(
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
-    def pause_stop_commands(self):
+    def pause_stop_commands(self) -> Iterable[MultiCastCommand]:
         # disable retina
         disable_command = self._MANAGEMENT_BIT | (
             self._RIGHT_RETINA_DISABLE if self.__is_right
@@ -156,5 +156,5 @@ class MunichRetinaDevice(
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
-    def timed_commands(self):
+    def timed_commands(self) -> List[MultiCastCommand]:
         return []

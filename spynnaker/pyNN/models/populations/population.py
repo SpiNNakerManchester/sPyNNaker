@@ -633,7 +633,8 @@ class Population(PopulationBase):
             self, id: Iterable[int]) -> Sequence[int]:  # @ReservedAssignment
         ...
 
-    def id_to_index(self, id):  # @ReservedAssignment
+    def id_to_index(self, id: Union[int, Iterable[int]]
+                    ) -> Union[int, Sequence[int]]:  # @ReservedAssignment
         """
         Given the ID(s) of cell(s) in the Population, return its (their)
         index (order in the Population).
@@ -662,7 +663,8 @@ class Population(PopulationBase):
     def index_to_id(self, index: Iterable[int]) -> Sequence[int]:
         ...
 
-    def index_to_id(self, index):
+    def index_to_id(self, index: Union[int, Iterable[int]]
+                    ) -> Union[int, Sequence[int]]:
         """
         Given the index (order in the Population) of cell(s) in the
         Population, return their ID(s)
