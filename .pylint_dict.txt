@@ -71,6 +71,7 @@ RandomDistribution
 ConnectionHolder
 FPGAConnection
 ProgressBar
+PopulationApplicationVertex
 AbstractSynapseType
 SynapseInformation
 SynapseRegions
@@ -82,6 +83,7 @@ MultiRegionSDRAM
 AbstractMulticastControllableDevice
 CommonRegions
 NeuronRegions
+MDSlice
 DataSpecificationGenerator
 CoreSubset
 CoreSubsets
