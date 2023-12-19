@@ -1,4 +1,4 @@
-# Copyright (c) 2017 The University of Manchester
+# Copyright (c) 2023 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .abstract_standard_neuron_component import (
-    AbstractStandardNeuronComponent, ModelParameter)
-from .abstract_neuron_impl import AbstractNeuronImpl
-from .neuron_impl_standard import NeuronImplStandard
-from .neuron_impl_stoc_exp import NeuronImplStocExp
-from .neuron_impl_stoc_sigma import NeuronImplStocSigma
 
-__all__ = [
-    "AbstractNeuronImpl", "AbstractStandardNeuronComponent",
-    "ModelParameter", "NeuronImplStandard", "NeuronImplStocExp",
-    "NeuronImplStocSigma"]
+APP = $(notdir $(CURDIR))
+
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_stoc_sigma.h
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
+
+include ../neural_build.mk

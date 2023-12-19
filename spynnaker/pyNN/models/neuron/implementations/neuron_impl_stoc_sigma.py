@@ -20,7 +20,8 @@ from spynnaker.pyNN.models.neuron.implementations import (
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from pyNN.random import NumpyRNG
 
-TAU = "tau"
+TAU_REFRAC = "tau_refrac"
+ALPHA = "alpha"
 TIMESTEP = "timestep"
 BIAS = "bias"
 REFRACT_INIT = "refract_init"
@@ -30,7 +31,7 @@ SEED2 = "seed2"
 SEED3 = "seed3"
 
 UNITS = {
-    TAU: "ms",
+    TAU_REFRAC: "ms",
     BIAS: "mV",
     REFRACT_INIT: "ms",
 }
@@ -38,17 +39,19 @@ UNITS = {
 MAX_INT = float(0xFFFFFFFF)
 
 
-class NeuronImplStocExp(AbstractNeuronImpl):
+class NeuronImplStocSigma(AbstractNeuronImpl):
 
-    def __init__(self, tau, bias, refract_init, seed):
+    def __init__(self, tau_refrac, alpha, bias, refract_init, seed):
 
-        self._tau = tau
+        self._tau_refrac = tau_refrac
+        self._alpha = alpha
         self._bias = bias
         self._refract_init = refract_init
         self._seed = seed
 
         self._struct = Struct([
-            (DataType.U1616, TAU),
+            (DataType.U1616, TAU_REFRAC),
+            (DataType.S1615, ALPHA),
             (DataType.U1616, TIMESTEP),
             (DataType.S1615, BIAS),
             (DataType.UINT32, REFRACT_INIT),
@@ -65,12 +68,12 @@ class NeuronImplStocExp(AbstractNeuronImpl):
     @property
     @overrides(AbstractNeuronImpl.model_name)
     def model_name(self):
-        return "StocExp"
+        return "StocSigma"
 
     @property
     @overrides(AbstractNeuronImpl.binary_name)
     def binary_name(self):
-        return "stoc_exp.aplx"
+        return "stoc_sigma.aplx"
 
     @overrides(AbstractNeuronImpl.get_global_weight_scale)
     def get_global_weight_scale(self):
@@ -104,10 +107,9 @@ class NeuronImplStocExp(AbstractNeuronImpl):
 
     @overrides(AbstractNeuronImpl.get_recordable_units)
     def get_recordable_units(self, variable):
-        # TODO: Update with the appropriate units for variables
         if variable in ("v", "ex_input", "in_input"):
             return "mV"
-        elif variable == "prob":
+        if variable == "prob":
             return ""
         raise ValueError("Unknown variable {}".format(variable))
 
@@ -125,12 +127,12 @@ class NeuronImplStocExp(AbstractNeuronImpl):
 
     @overrides(AbstractNeuronImpl.is_recordable)
     def is_recordable(self, variable):
-        # TODO: Update to identify variables that can be recorded
         return variable in ("v", "ex_input", "in_input", "prob")
 
     @overrides(AbstractNeuronImpl.add_parameters)
     def add_parameters(self, parameters):
-        parameters[TAU] = self._tau
+        parameters[TAU_REFRAC] = self._tau_refrac
+        parameters[ALPHA] = self._alpha
         parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
         parameters[BIAS] = self._bias
 

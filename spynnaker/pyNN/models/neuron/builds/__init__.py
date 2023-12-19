@@ -37,10 +37,11 @@ from .if_curr_exp_ca2_adaptive import IFCurrExpCa2Adaptive
 from .if_curr_exp_semd_base import IFCurrExpSEMDBase
 from .if_curr_delta_ca2_adaptive import IFCurrDeltaCa2Adaptive
 from .stoc_exp import StocExp
+from .stoc_sigma import StocSigma
 
 __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",
            "IFCurrExpBase", "IFFacetsConductancePopulation", "IzkCondExpBase",
            "IzkCurrExpBase", "IFCondExpStoc", "IzkCondDualExpBase",
            "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase",
-           "IFCurrDeltaCa2Adaptive", "StocExp"]
+           "IFCurrDeltaCa2Adaptive", "StocExp", "StocSigma"]

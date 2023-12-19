@@ -15,10 +15,10 @@
  */
 
 //! \file
-//! \brief Stochastic neuron implementation with exponential probability
+//! \brief Stochastic neuron implementation with sigma shaped probability
 
-#ifndef _NEURON_IMPL_STOC_EXP_
-#define _NEURON_IMPL_STOC_EXP_
+#ifndef _NEURON_IMPL_STOC_SIGMA_
+#define _NEURON_IMPL_STOC_SIGMA_
 
 #include <neuron/implementations/neuron_impl.h>
 #include <spin1_api.h>
@@ -41,11 +41,22 @@
 #include <neuron/current_sources/current_source_impl.h>
 #include <neuron/current_sources/current_source.h>
 
+//! A probability of a half
+#define PROB_HALF 0x7FFFFFFF
+
+//! The power of 2 that == 32
+#define MAX_POWER REAL_CONST(5)
+
+#define MIN_POWER REAL_CONST(-5)
+
 //! definition of neuron parameters
 typedef struct neuron_params_t {
 
-    //! The tau value of the neuron
-    UREAL tau_ms;
+	//! The refractory period of the neuron, in ms
+	UREAL tau_refract;
+
+    //! The alpha value of the neuron prob = (2^(-2^(alpha x voltage)))
+    REAL alpha;
 
     //! The timestep of the neuron being used
     UREAL time_step;
@@ -64,8 +75,8 @@ typedef struct neuron_params_t {
 //! definition of neuron state
 typedef struct neuron_impl_t {
 
-    //! The reciprocal of the tau value
-    uint32_t tau_recip;
+    //! The alpha value of the neuron prob = (2^(-2^(alpha x voltage)))
+    REAL alpha;
 
     //! The bias value
     REAL bias;
@@ -100,7 +111,7 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
     return true;
 }
 
-static inline uint32_t stoc_exp_ceil_accum(UREAL value) {
+static inline uint32_t stoc_sigma_ceil_accum(UREAL value) {
 	uint32_t bits = bitsuk(value);
 	uint32_t integer = bits >> 16;
 	uint32_t fraction = bits & 0xFFFF;
@@ -113,9 +124,9 @@ static inline uint32_t stoc_exp_ceil_accum(UREAL value) {
 static inline void neuron_model_initialise(
 		neuron_impl_t *state, neuron_params_t *params) {
 	UREAL ts = params->time_step;
-	state->tau_recip = bitsuk(ukdivuk(UREAL_CONST(1.0), params->tau_ms));
+	state->alpha = params->alpha;
 	state->bias = params->bias;
-	state->t_refract = stoc_exp_ceil_accum(ukdivuk(params->tau_ms, ts));
+	state->t_refract = stoc_sigma_ceil_accum(ukdivuk(params->tau_refract, ts));
     state->refract_timer = params->refract_init;
     spin1_memcpy(state->random_seed, params->random_seed, sizeof(mars_kiss64_seed_t));
     validate_mars_kiss64_seed(state->random_seed);
@@ -199,9 +210,11 @@ static void neuron_impl_do_timestep_update(
         neuron->inputs[0] = ZERO;
         neuron->inputs[1] = ZERO;
 
-        // Work out the probability
-        uint32_t val = __stdfix_smul_uk(neuron->tau_recip, bitsuk(pow_of_2(v_membrane)));
-        uint32_t prob = muliuk(0xFFFFFFFF, ukbits(val));
+		// Work out the probability of spiking
+		REAL power = v_membrane * neuron->alpha;
+		REAL next_power = (REAL) pow_of_2(power * REAL_CONST(-1));
+		UREAL val = pow_of_2(next_power * REAL_CONST(-1));
+		uint32_t prob = muliuk(0xFFFFFFFF, val);
 
 		// Record the probability
 		neuron_recording_record_int32(PROB_INDEX, neuron_index, (int32_t) prob);
