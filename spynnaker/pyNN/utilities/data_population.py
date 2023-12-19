@@ -132,13 +132,16 @@ class DataPopulation(object):
 
     @overload
     def id_to_index(self, id: int) -> int:  # @ReservedAssignment
+        # pylint: disable=redefined-builtin
         ...
 
     @overload
     def id_to_index(
             self, id: Iterable[int]) -> Sequence[int]:  # @ReservedAssignment
+        # pylint: disable=redefined-builtin
         ...
 
+    @overrides(Population.id_to_index)
     def id_to_index(self, id: Union[int, Iterable[int]]
                     ) -> Union[int, Sequence[int]]:  # @ReservedAssignment
         # pylint: disable=redefined-builtin
@@ -162,6 +165,7 @@ class DataPopulation(object):
     def index_to_id(self, index: Iterable[int]) -> Sequence[int]:
         ...
 
+    @overrides(Population.index_to_id)
     def index_to_id(self, index: Union[int, Iterable[int]]
                     ) -> Union[int, Sequence[int]]:
         # assuming not called often so not caching first id
