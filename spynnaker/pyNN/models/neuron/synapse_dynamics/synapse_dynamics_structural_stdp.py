@@ -208,7 +208,7 @@ class SynapseDynamicsStructuralSTDP(
             AbstractSynapseDynamicsStructural]) -> bool:
         if not (isinstance(synapse_dynamics, SynapseDynamicsStructuralSTDP)):
             return False
-        if not SynapseDynamicsSTDP.is_same_as(synapse_dynamics):
+        if not SynapseDynamicsSTDP.is_same_as(self, synapse_dynamics):
             return False
         return SynapseDynamicsStructuralCommon.is_same_as(
             self, synapse_dynamics)

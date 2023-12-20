@@ -195,7 +195,8 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
             AbstractSynapseDynamicsStructural]) -> bool:
         if not (isinstance(synapse_dynamics, SynapseDynamicsStructuralStatic)):
             return False
-        if not AbstractStaticSynapseDynamics.is_same_as(synapse_dynamics):
+        if not AbstractStaticSynapseDynamics.is_same_as(
+                self, synapse_dynamics):
             return False
         return _Common.is_same_as(self, synapse_dynamics)
 
