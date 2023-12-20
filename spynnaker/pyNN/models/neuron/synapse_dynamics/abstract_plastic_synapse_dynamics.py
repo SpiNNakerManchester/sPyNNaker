@@ -13,7 +13,7 @@
 # limitations under the License.
 from numpy import integer, uint32
 from numpy.typing import NDArray
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
@@ -44,9 +44,11 @@ class AbstractPlasticSynapseDynamics(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
-            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
-                NDArray[uint32], NDArray[uint32], NDArray[uint32],
-                NDArray[uint32]]:
+            max_n_synapses: int, max_atoms_per_core: int) -> Union[
+                Tuple[NDArray[uint32], NDArray[uint32],
+                      NDArray[uint32], NDArray[uint32]],
+                Tuple[List[NDArray[uint32]], List[NDArray[uint32]],
+                      NDArray[uint32], NDArray[uint32]]]:
         """
         Get the fixed-plastic data, and plastic-plastic data for each row, and
         lengths for the fixed_plastic and plastic-plastic parts of each row.

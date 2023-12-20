@@ -368,8 +368,8 @@ class SynapseDynamicsSTDP(
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
             max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
-                NDArray[uint32], NDArray[uint32], NDArray[uint32],
-                NDArray[uint32]]:
+                List[NDArray[uint32]], List[NDArray[uint32]],
+                NDArray[uint32], NDArray[uint32]]:
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
