@@ -224,7 +224,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         mask = None
         delays_handled = False
         if (min_delay is not None and max_delay is not None):
-            if self.__delays:
+            if self.__delays is not None:
                 mask = ((self.__delays >= min_delay) &
                         (self.__delays <= max_delay))
                 delays_handled = True
