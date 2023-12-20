@@ -120,6 +120,11 @@ def _normalize_times(
         return numpy.array(times)
 
 
+def is_iterable(value: Values) -> TypeGuard[
+        Union[Sequence[float], NDArray[numpy.floating]]]:
+    return hasattr(value, "__iter__")
+
+
 class SpikeSourcePoissonVertex(
         PopulationApplicationVertex,
         LegacyPartitionerAPI, SupportsStructure):
@@ -385,7 +390,7 @@ class SpikeSourcePoissonVertex(
 
         # Must be parameter without the s
         fixed_name = f"{name}s"
-        if hasattr(value, "__len__"):
+        if is_iterable(value):
             # Single start per neuron for whole simulation
             self.__data[fixed_name].set_value_by_selector(
                 selector, [numpy.array([s]) for s in value])

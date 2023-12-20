@@ -29,7 +29,7 @@ from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.types import Delay_Types, Weight_Types
+from spynnaker.pyNN.types import Delay_Types, Weight_Delay_Types, Weight_Types
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
@@ -48,8 +48,9 @@ _TARGET = 1
 _FIRST_PARAM = 2
 
 
-def _is_sequential(value) -> TypeGuard[Union[List, NDArray]]:
-    return isinstance(value, (list, numpy.ndarray))
+def _is_sequential(value: Weight_Delay_Types
+                   ) -> TypeGuard[NDArray[numpy.float64]]:
+    return isinstance(value, numpy.ndarray)
 
 
 @dataclass(frozen=True)
