@@ -202,12 +202,16 @@ class SynapseDynamicsStructuralSTDP(
             raise ValueError(f"Unknown parameter {param}")
 
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
-    def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:
-        if (isinstance(synapse_dynamics, SynapseDynamicsSTDP) and
-                not super().is_same_as(synapse_dynamics)):
-            return False
-        return SynapseDynamicsStructuralCommon.is_same_as(
-            self, synapse_dynamics)
+    @overrides(SynapseDynamicsStructuralCommon.is_same_as)
+    def is_same_as(self, synapse_dynamics: Union[
+            AbstractSynapseDynamics,
+            AbstractSynapseDynamicsStructural]) -> bool:
+        if (isinstance(synapse_dynamics, SynapseDynamicsSTDP)):
+            return SynapseDynamicsSTDP.is_same_as(synapse_dynamics)
+        if (isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural)):
+            return SynapseDynamicsStructuralCommon.is_same_as(
+                self, synapse_dynamics)
+        return False
 
     @overrides(SynapseDynamicsSTDP.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self) -> str:
