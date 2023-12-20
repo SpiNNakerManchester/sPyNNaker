@@ -13,10 +13,12 @@
 # limitations under the License.
 
 import numpy
-from typing import cast, Iterable, List
+from numpy import floating
+from numpy.typing import NDArray
+from typing import cast, Iterable
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationBase, DataSpecificationGenerator)
+    DataType, DataSpecificationBase)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 
@@ -160,8 +162,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
-            self, spec: DataSpecificationGenerator, global_weight_scale: float,
-            synapse_weight_scales: List[float]):
+            self, spec: DataSpecificationBase, global_weight_scale: float,
+            synapse_weight_scales: NDArray[floating]):
         # Write parameters
         spec.write_value(data=self.__accumulator_depression_plus_one,
                          data_type=DataType.INT32)

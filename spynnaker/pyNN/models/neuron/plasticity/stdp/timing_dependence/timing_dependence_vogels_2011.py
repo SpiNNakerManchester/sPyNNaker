@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Iterable
+from numpy import floating
+from numpy.typing import NDArray
+from typing import Iterable
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import (
-    DataSpecificationGenerator, DataType)
+    DataSpecificationBase, DataType)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -142,8 +144,8 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
-            self, spec: DataSpecificationGenerator, global_weight_scale: float,
-            synapse_weight_scales: List[float]):
+            self, spec: DataSpecificationBase, global_weight_scale: float,
+            synapse_weight_scales: NDArray[floating]):
         # Write alpha to spec
         fixed_point_alpha = float_to_fixed(self.__alpha)
         spec.write_value(data=fixed_point_alpha, data_type=DataType.INT32)
