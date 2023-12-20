@@ -174,7 +174,7 @@ class SynapseDynamicsSTDP(
                 None, self.dendritic_delay_fraction,
                 synapse_dynamics.f_rew, synapse_dynamics.initial_weight,
                 synapse_dynamics.initial_delay, synapse_dynamics.s_max,
-                synapse_dynamics.seed,
+                seed=synapse_dynamics.seed,
                 backprop_delay=self.backprop_delay)
 
         # Otherwise, it is static or neuromodulation, so return ourselves
