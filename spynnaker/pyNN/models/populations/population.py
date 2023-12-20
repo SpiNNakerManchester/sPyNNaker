@@ -285,7 +285,7 @@ class Population(PopulationBase):
 
     def describe(self, template: str = 'population_default.txt',
                  engine:  Optional[Union[str, TemplateEngine]] = 'default'
-                 ) -> Union[str, Dict[str]]:
+                 ) -> Union[str, Dict[str, Any]]:
         """
         Returns a human-readable description of the population.
 
@@ -313,6 +313,7 @@ class Population(PopulationBase):
         context.update(self.annotations)
         if self.size > 0:
             parameters = self.__vertex.get_parameters()
+            cell_parameters: Union[str, ParameterHolder]
             if parameters:
                 cell_parameters = self.__vertex.get_parameter_values(
                     parameters, 0)
