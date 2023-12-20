@@ -223,13 +223,15 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             max_delay: Optional[float] = None) -> int:
         mask = None
         delays_handled = False
-        if (min_delay is not None and max_delay is not None and
-                (self.__delays is not None or
-                 _is_sequential(synapse_info.delays))):
-            delays = synapse_info.delays if self.__delays is None \
-                else self.__delays
-            mask = ((delays >= min_delay) & (delays <= max_delay))
-            delays_handled = True
+        if (min_delay is not None and max_delay is not None):
+            if self.__delays:
+                mask = ((self.__delays >= min_delay) &
+                        (self.__delays <= max_delay))
+                delays_handled = True
+            elif _is_sequential(synapse_info.delays):
+                delays = synapse_info.delays
+                mask = ((delays >= min_delay) & (delays <= max_delay))
+                delays_handled = True
         if mask is None:
             conns = self.__conn_list.copy()
         else:
