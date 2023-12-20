@@ -68,13 +68,13 @@ class DataPopulation(object):
         io.write(bl=data)
 
     @overrides(Population.describe, adds_typing=True)
-    def describe(self, template: str = None,
+    def describe(self, template: Optional[str] = None,
                  engine: Optional[Union[str, TemplateEngine]] = None
-                 ) -> Union[str, Dict[str]]:
+                 ) -> Union[str, Dict[str, Any]]:
         if template is not None:
-            logger.warning("Ignoring template as supported in this mode")
+            logger.warning("Ignoring template as not supported in this mode")
         if engine is not None:
-            logger.warning("Ignoring engine as supported in this mode")
+            logger.warning("Ignoring engine as not supported in this mode")
         with NeoBufferDatabase(self.__database_file) as db:
             _, _, description = db.get_population_metadata(self.label)
             return description
