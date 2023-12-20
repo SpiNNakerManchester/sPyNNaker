@@ -206,12 +206,12 @@ class SynapseDynamicsStructuralSTDP(
     def is_same_as(self, synapse_dynamics: Union[
             AbstractSynapseDynamics,
             AbstractSynapseDynamicsStructural]) -> bool:
-        if (isinstance(synapse_dynamics, SynapseDynamicsSTDP)):
-            return SynapseDynamicsSTDP.is_same_as(synapse_dynamics)
-        if (isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural)):
-            return SynapseDynamicsStructuralCommon.is_same_as(
-                self, synapse_dynamics)
-        return False
+        if not (isinstance(synapse_dynamics, SynapseDynamicsStructuralSTDP)):
+            return False
+        if not SynapseDynamicsSTDP.is_same_as(synapse_dynamics):
+            return False
+        return SynapseDynamicsStructuralCommon.is_same_as(
+            self, synapse_dynamics)
 
     @overrides(SynapseDynamicsSTDP.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self) -> str:

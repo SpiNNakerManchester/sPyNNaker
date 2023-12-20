@@ -189,7 +189,14 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
             raise ValueError(f"Unknown parameter {param}")
 
     @overrides(AbstractStaticSynapseDynamics.is_same_as)
-    def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:
+    @overrides(_Common.is_same_as())
+    def is_same_as(self, synapse_dynamics: Union[
+            AbstractSynapseDynamics,
+            AbstractSynapseDynamicsStructural]) -> bool:
+        if not (isinstance(synapse_dynamics, SynapseDynamicsStructuralStatic)):
+            return False
+        if not AbstractStaticSynapseDynamics.is_same_as(synapse_dynamics):
+            return False
         return _Common.is_same_as(self, synapse_dynamics)
 
     @overrides(AbstractStaticSynapseDynamics.get_vertex_executable_suffix)
