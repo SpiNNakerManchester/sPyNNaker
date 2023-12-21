@@ -34,8 +34,9 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
 
+# see https://github.com/SpiNNakerManchester/sPyNNaker/issues/1427
 #: :meta private:
-InitialDelay: TypeAlias = Union[float, Tuple[float, float]]
+InitialDelay: TypeAlias = float
 
 
 class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
