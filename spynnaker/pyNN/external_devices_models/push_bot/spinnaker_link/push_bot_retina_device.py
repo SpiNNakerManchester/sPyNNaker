@@ -90,7 +90,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
     @property
     @overrides(AbstractPushBotRetinaDevice.start_resume_commands)
     def start_resume_commands(
-            self) -> Iterable[DelayedPayloadMultiCastCommand]:
+            self) -> Iterable[MultiCastCommand]:
         # Update the commands with the additional one to set the key
         new_commands = list()
         for command in super().start_resume_commands:
