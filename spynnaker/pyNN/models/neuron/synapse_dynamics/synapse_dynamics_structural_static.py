@@ -307,6 +307,8 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
             self, connector: AbstractConnector,
             synapse_info: SynapseInformation) -> Optional[float]:
         d_m = super().get_delay_minimum(connector, synapse_info)
+        if d_m is None:
+            return self.__initial_delay
         return min(d_m, self.__initial_delay)
 
     @overrides(SynapseDynamicsStatic.get_delay_variance)
