@@ -298,6 +298,8 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
     def get_delay_maximum(self, connector: AbstractConnector,
                           synapse_info: SynapseInformation) -> Optional[float]:
         d_m = super().get_delay_maximum(connector, synapse_info)
+        if d_m is None:
+            return self.__initial_delay
         return max(d_m, self.__initial_delay)
 
     @overrides(SynapseDynamicsStatic.get_delay_minimum)
