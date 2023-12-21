@@ -22,6 +22,7 @@ from spynnaker.pyNN.models.neuron import (
 from spynnaker.pyNN.models.defaults import (
     default_initial_values, default_parameters)
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
+from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 from spynnaker.pyNN.models.neuron.neuron_models import (
     NeuronModelLeakyIntegrateAndFire)
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
@@ -112,10 +113,12 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             raise ConfigurationException(
                 "Number of neurons does not match number of "
                 f"devices in {label}")
-        self._model.n_steps_per_timestep = n_steps_per_timestep
+        model = self._model
+        assert isinstance(model, NeuronImplStandard)
+        model.n_steps_per_timestep = n_steps_per_timestep
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return ExternalDeviceLifControlVertex(
-            self._devices, self._create_edges, max_atoms, self._model, self,
+            self._devices, self._create_edges, max_atoms, model, self,
             self._translator, spikes_per_second, label, ring_buffer_sigma,
             incoming_spike_buffer_size, drop_late_spikes, splitter, seed,
             n_colour_bits)
