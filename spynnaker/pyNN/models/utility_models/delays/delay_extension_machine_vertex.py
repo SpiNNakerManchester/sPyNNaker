@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 from enum import IntEnum
-from typing import cast, Sequence, TYPE_CHECKING
+from typing import Sequence, TYPE_CHECKING
 
 from spinnman.model.enums import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
