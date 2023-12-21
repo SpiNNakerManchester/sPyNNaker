@@ -117,6 +117,12 @@ class DelayExtensionMachineVertex(
         self.__sdram = sdram
 
     @property
+    @overrides(MachineVertex.app_vertex)
+    def app_vertex(self) -> DelayExtensionVertex:
+        assert isinstance(self._app_vertex, DelayExtensionVertex)
+        return self._app_vertex
+
+    @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
     def _provenance_region_id(self) -> int:
         return self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION
@@ -208,7 +214,7 @@ class DelayExtensionMachineVertex(
             db.insert_core(x, y, p, self.N_LATE_SPIKES_NAME, n_late_spikes)
             if n_late_spikes == 0:
                 pass
-            elif self._app_vertex.drop_late_spikes:
+            elif self.app_vertex.drop_late_spikes:
                 db.insert_report(
                     f"On {label}, {n_late_spikes} packets were dropped from "
                     f"the input buffer, because they arrived too late to be "
@@ -243,7 +249,7 @@ class DelayExtensionMachineVertex(
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id: str) -> int:
         n_keys = super().get_n_keys_for_partition(partition_id)
-        v = cast(DelayExtensionVertex, self.app_vertex)
+        v = self.app_vertex
         n_colours = 2 ** v.n_colour_bits
         return n_keys * v.n_delay_stages * n_colours
 
@@ -265,7 +271,7 @@ class DelayExtensionMachineVertex(
 
         # ###################################################################
         # Reserve SDRAM space for memory areas:
-        delay_params_sz = self._app_vertex.delay_params_size()
+        delay_params_sz = self.app_vertex.delay_params_size()
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.SYSTEM,
@@ -292,6 +298,7 @@ class DelayExtensionMachineVertex(
             if source_vertex.vertex_slice == self.vertex_slice:
                 r_info = routing_infos.get_routing_info_from_pre_vertex(
                     source_vertex, SPIKE_PARTITION_ID)
+                assert (r_info is not None)
                 incoming_key = r_info.key
                 incoming_mask = r_info.mask
                 break
@@ -346,14 +353,15 @@ class DelayExtensionMachineVertex(
         # Write the number of neurons in the block:
         spec.write_value(data=vertex_slice.n_atoms)
 
+        app_vertex = self.app_vertex
         # Write the number of blocks of delays:
-        spec.write_value(data=self._app_vertex.n_delay_stages)
+        spec.write_value(data=app_vertex.n_delay_stages)
 
         # write the delay per delay stage
-        spec.write_value(data=self._app_vertex.delay_per_stage)
+        spec.write_value(data=app_vertex.delay_per_stage)
 
         # write whether to throw away spikes
-        spec.write_value(data=int(self._app_vertex.drop_late_spikes))
+        spec.write_value(data=int(app_vertex.drop_late_spikes))
 
         # Write the number of colour bits
-        spec.write_value(data=self.app_vertex.n_colour_bits)
+        spec.write_value(data=app_vertex.n_colour_bits)
