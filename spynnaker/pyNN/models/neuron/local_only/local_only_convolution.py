@@ -138,7 +138,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         sources = self.__get_sources_for_target(app_vertex)
 
         size = self.get_parameters_usage_in_bytes(
-            machine_vertex.vertex_slice, app_vertex.incoming_projections)
+            machine_vertex.vertex_slice.n_atoms,
+            app_vertex.incoming_projections)
         spec.reserve_memory_region(region, size, label="LocalOnlyConvolution")
         spec.switch_write_focus(region)
 
