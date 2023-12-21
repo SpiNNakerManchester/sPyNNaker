@@ -17,7 +17,7 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     ApplicationFPGAVertex, FPGAConnection)
 from pacman.model.graphs.common.slice import Slice
-from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.machine import MachineFPGAVertex, MachineVertex
 from pacman.model.routing_info import BaseKeyAndMask, RoutingInfo
 from pacman.utilities.constants import BITS_IN_KEY
 from pacman.utilities.utility_calls import get_n_bits
@@ -193,6 +193,7 @@ class SPIFInputDevice(
     @overrides(ApplicationFPGAVertex.get_machine_fixed_key_and_mask)
     def get_machine_fixed_key_and_mask(self, machine_vertex: MachineVertex,
                                        partition_id: str) -> BaseKeyAndMask:
+        assert isinstance(machine_vertex, MachineFPGAVertex)
         fpga_link_id = machine_vertex.fpga_link_id
         vertex_slice = machine_vertex.vertex_slice
         index = self.__index_by_slice[fpga_link_id, vertex_slice]

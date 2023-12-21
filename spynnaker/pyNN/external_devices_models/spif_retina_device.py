@@ -13,6 +13,7 @@
 # limitations under the License.
 from typing import Iterable, List, Tuple
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.machine import MachineFPGAVertex
 from pacman.model.graphs.application import (
     Application2DFPGAVertex, FPGAConnection)
 from pacman.model.graphs.common import Slice
@@ -215,6 +216,7 @@ class SPIFRetinaDevice(
     def get_machine_fixed_key_and_mask(
             self, machine_vertex: MachineVertex,
             partition_id: str) -> BaseKeyAndMask:
+        assert isinstance(machine_vertex, MachineFPGAVertex)
         fpga_link_id = machine_vertex.fpga_link_id
         vertex_slice = machine_vertex.vertex_slice
         index = self.__index_by_slice[fpga_link_id, vertex_slice]

@@ -284,6 +284,7 @@ class DelayExtensionMachineVertex(
         # reserve region for provenance
         self.reserve_provenance_data_region(spec)
 
+        assert isinstance(vertex, AbstractHasAssociatedBinary)
         self._write_setup_info(spec, vertex.get_binary_file_name())
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")

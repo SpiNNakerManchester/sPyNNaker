@@ -147,8 +147,10 @@ class MachineMunichMotorDevice(
 
         # handle simulation data
         spec.switch_write_focus(self._SYSTEM_REGION)
+        vertex = placement.vertex
+        assert isinstance(vertex, AbstractHasAssociatedBinary)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            placement.vertex.get_binary_file_name()))
+            vertex.get_binary_file_name()))
 
         # Get the key
         routing_info = SpynnakerDataView.get_routing_infos()
