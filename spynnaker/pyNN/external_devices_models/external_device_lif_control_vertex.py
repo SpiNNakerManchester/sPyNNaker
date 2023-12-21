@@ -55,7 +55,7 @@ class ExternalDeviceLifControlVertex(
 
     def __init__(
             self, devices: Sequence[AbstractMulticastControllableDevice],
-            create_edges: bool, max_atoms_per_core: int,
+            create_edges: bool, max_atoms_per_core: Tuple[int, ...],
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel,
             translator: Optional[AbstractEthernetTranslator] = None,
@@ -63,7 +63,7 @@ class ExternalDeviceLifControlVertex(
             label: Optional[str] = None,
             ring_buffer_sigma: Optional[float] = None,
             incoming_spike_buffer_size: Optional[int] = None,
-            drop_late_spikes: bool = False,
+            drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterAbstractPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None):
         """
@@ -73,7 +73,7 @@ class ExternalDeviceLifControlVertex(
         :param bool create_edges:
             True if edges to the devices should be added by this dev (set
             to False if using the dev over Ethernet using a translator)
-        :param int max_atoms_per_core:
+        :param tuple(int, ...) max_atoms_per_core:
         :param AbstractNeuronImpl neuron_impl:
         :param AbstractPyNNNeuronModel pynn_model:
         :param translator:
@@ -89,6 +89,8 @@ class ExternalDeviceLifControlVertex(
         :param int n_colour_bits: The number of colour bits to use
         """
         # pylint: disable=too-many-arguments
+        if drop_late_spikes is None:
+            drop_late_spikes = False
         super().__init__(
             len(devices), f"ext_dev{devices}" if label is None else label,
             max_atoms_per_core,
