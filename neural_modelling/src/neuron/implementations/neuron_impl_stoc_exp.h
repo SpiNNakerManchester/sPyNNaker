@@ -119,6 +119,10 @@ static inline void neuron_model_initialise(
     state->refract_timer = params->refract_init;
     spin1_memcpy(state->random_seed, params->random_seed, sizeof(mars_kiss64_seed_t));
     validate_mars_kiss64_seed(state->random_seed);
+
+    // Reset the inputs
+    state->inputs[0] = ZERO;
+    state->inputs[1] = ZERO;
 }
 
 static inline void neuron_model_save_state(neuron_impl_t *state, neuron_params_t *params) {
@@ -181,10 +185,14 @@ static void neuron_impl_do_timestep_update(
 			neuron_recording_record_accum(EX_INPUT_INDEX, neuron_index, neuron->inputs[0]);
 			neuron_recording_record_accum(IN_INPUT_INDEX, neuron_index, neuron->inputs[1]);
 
+			// Reset the inputs
+			neuron->inputs[0] = ZERO;
+			neuron->inputs[1] = ZERO;
+
 			// Send a spike
 			neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
 		    send_spike(timer_count, time, neuron_index);
-		    return;
+		    continue;
 		}
 
         // Work out the membrane voltage

@@ -85,7 +85,7 @@ def _normalize_rates(
         rates: Union[Sequence[float], NDArray[numpy.floating], None]
         ) -> Union[NDArray[numpy.floating], List[NDArray[numpy.floating]]]:
     if rates is None:
-        if isinstance(rate, Sequence):
+        if isinstance(rate, (Sequence, numpy.ndarray)):
             # Single rate per neuron for whole simulation
             return [numpy.array([r]) for r in rate]
         else:

@@ -19,6 +19,7 @@ from spynnaker.pyNN.models.neuron.implementations import (
     AbstractNeuronImpl)
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from pyNN.random import NumpyRNG
+from spynnaker.pyNN.random_distribution import RandomDistribution
 
 TAU = "tau"
 TIMESTEP = "timestep"
@@ -45,7 +46,8 @@ class NeuronImplStocExp(AbstractNeuronImpl):
         self._tau = tau
         self._bias = bias
         self._refract_init = refract_init
-        self._seed = seed
+        self._random = RandomDistribution(
+            "uniform", low=0, high=0xFFFFFFFF, rng=NumpyRNG(seed))
 
         self._struct = Struct([
             (DataType.U1616, TAU),
@@ -137,11 +139,10 @@ class NeuronImplStocExp(AbstractNeuronImpl):
     @overrides(AbstractNeuronImpl.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[REFRACT_INIT] = self._refract_init
-        rng = NumpyRNG(self._seed)
-        state_variables[SEED0] = int(rng.next() * MAX_INT)
-        state_variables[SEED1] = int(rng.next() * MAX_INT)
-        state_variables[SEED2] = int(rng.next() * MAX_INT)
-        state_variables[SEED3] = int(rng.next() * MAX_INT)
+        state_variables[SEED0] = self._random
+        state_variables[SEED1] = self._random
+        state_variables[SEED2] = self._random
+        state_variables[SEED3] = self._random
 
     @overrides(AbstractNeuronImpl.get_units)
     def get_units(self, variable):
