@@ -132,6 +132,8 @@ static inline void neuron_model_initialise(
     validate_mars_kiss64_seed(state->random_seed);
     log_info("%u %u %u %u", state->random_seed[0], state->random_seed[1],
     		state->random_seed[2], state->random_seed[3]);
+    state->inputs[0] = ZERO;
+    state->inputs[1] = ZERO;
 }
 
 static inline void neuron_model_save_state(neuron_impl_t *state, neuron_params_t *params) {
@@ -205,7 +207,7 @@ static void neuron_impl_do_timestep_update(
 		}
 
         // Work out the membrane voltage
-        REAL v_membrane = neuron->bias + neuron->inputs[0] - neuron->inputs[1];
+        REAL v_membrane = (neuron->inputs[0] - neuron->inputs[1]) - neuron->bias;
 
         // Record things
         neuron_recording_record_accum(V_RECORDING_INDEX, neuron_index, v_membrane);
@@ -227,6 +229,8 @@ static void neuron_impl_do_timestep_update(
 
 		// Get a random number
 		uint32_t random = mars_kiss64_seed(neuron->random_seed);
+
+		log_info("Neuron %u, prob %u, random %u", neuron_index, prob, random);
 
 		// If the random number is less than the probability value, spike
 		if (random < prob) {
