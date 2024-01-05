@@ -13,10 +13,11 @@
 # limitations under the License.
 from __future__ import annotations
 from collections.abc import Sequence as Seq
+from collections.abc import Sized
 import logging
 import math
 from typing import (
-    Any, Collection, Dict, List, Optional, Sequence, Sized, Tuple, Union,
+    Any, Collection, Dict, List, Optional, Sequence, Tuple, Union,
     cast, TYPE_CHECKING)
 from typing_extensions import TypeGuard
 import numpy
