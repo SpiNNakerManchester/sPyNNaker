@@ -56,7 +56,7 @@ def get_div_const(value):
 
 def get_delay_for_source(incoming):
     """ Get the vertex which will send data from a given source projection,
-        along with the delay stage and locally-handled delay valule
+        along with the delay stage and locally-handled delay value
 
     :param Projection incoming: The incoming projection to get the delay from
     :return: The vertex, the local delay, the delay stage
