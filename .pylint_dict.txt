@@ -94,7 +94,7 @@ SynapseRegionReferences
 SynapseRegions
 VariableSDRAM
 
-# Others' Python types
+# Others' Python types (including PYNN terms)
 AnalogSignal
 BaseIO
 BaseStructure
@@ -107,6 +107,7 @@ GSLRNG
 NumpyRNG
 NativeRNG
 NeuronCurrentSource
+RandomDistribtuion
 RandomState
 SpikeTrain
 TemplateEngine
