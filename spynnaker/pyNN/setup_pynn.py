@@ -22,7 +22,7 @@ module.
 
 import os
 # TODO: switch to packaging.version
-from distutils.version import StrictVersion as Version  # pylint: disable=all
+from packaging.version import Version
 import pyNN
 
 # The version of PyNN that we really want

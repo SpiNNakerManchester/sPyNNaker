@@ -30,7 +30,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        python-version: [3.8, 3.9, "3.10", "3.11"]
+        python-version: [3.8, 3.9, "3.10", "3.11", "3.12"]
 
     steps:
     - name: Checkout
@@ -78,7 +78,7 @@ jobs:
       uses: ./support/actions/pytest
       with:
         tests: unittests
-        coverage: ${{ matrix.python-version == 3.8 }}
+        coverage: ${{ matrix.python-version == 3.12 }}
         cover-packages: ${{ env.BASE_PKG }}
         coveralls-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -98,7 +98,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8"]
+        python-version: [3.12]
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -143,7 +143,7 @@ jobs:
       with:
         base-path: ${{ env.BASE_PKG }}
 
-    - name: Build documentation with sphinx (3.8 only)
+    - name: Build documentation with sphinx (3.12 only)
       uses: ./support/actions/sphinx
       with:
         directory: doc/source

@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from collections.abc import Sized
 from enum import IntEnum
 import numpy
 from numpy import uint16, uint32
 import struct
 from typing import (
-    Iterable, List, Optional, Sequence, Sized, TypeVar, Union,
+    Iterable, List, Optional, Sequence, TypeVar, Union,
     cast, TYPE_CHECKING)
 
 from spinn_utilities.overrides import overrides

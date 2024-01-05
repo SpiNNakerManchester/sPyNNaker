@@ -15,13 +15,13 @@
 # limitations under the License.
 
 from __future__ import annotations
-from collections.abc import Iterable
+from collections.abc import Iterable, Sized
 import numpy
 from numpy import integer, floating, float64, uint16, uint32
 from numpy.typing import ArrayLike, NDArray
 from pyNN.random import RandomDistribution
 from typing import (
-    Optional, Tuple, Union, cast, TYPE_CHECKING, Sized)
+    Optional, Tuple, Union, cast, TYPE_CHECKING)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import (
