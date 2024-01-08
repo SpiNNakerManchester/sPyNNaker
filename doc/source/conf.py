@@ -58,7 +58,7 @@ extensions = [
 spinnaker_doc_version = "latest"
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.8', None),
+    'python': ('https://docs.python.org/3.12', None),
     'numpy': ("https://numpy.org/doc/1.20/", None),
     'matplotlib': ('https://matplotlib.org', None),
     'pynn': ("https://neuralensemble.github.io/docs/PyNN/", None),
