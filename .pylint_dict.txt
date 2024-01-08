@@ -79,6 +79,7 @@ IDMixin
 MachineEdge
 MachineVertex
 MDSlice
+ModuleType
 MultiRegionSDRAM
 NeuronRegions
 ProjectionApplicationEdge
