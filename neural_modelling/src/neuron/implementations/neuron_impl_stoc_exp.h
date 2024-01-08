@@ -196,7 +196,7 @@ static void neuron_impl_do_timestep_update(
 		}
 
         // Work out the membrane voltage
-        REAL v_membrane = neuron->bias + neuron->inputs[0] - neuron->inputs[1];
+        REAL v_membrane = (neuron->bias + neuron->inputs[0]) - neuron->inputs[1];
 
         // Record things
         neuron_recording_record_accum(V_RECORDING_INDEX, neuron_index, v_membrane);
