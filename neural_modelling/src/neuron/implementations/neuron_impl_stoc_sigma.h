@@ -230,8 +230,6 @@ static void neuron_impl_do_timestep_update(
 		// Get a random number
 		uint32_t random = mars_kiss64_seed(neuron->random_seed);
 
-		log_info("Neuron %u, prob %u, random %u", neuron_index, prob, random);
-
 		// If the random number is less than the probability value, spike
 		if (random < prob) {
 			neuron->refract_timer = neuron->t_refract - 1;
