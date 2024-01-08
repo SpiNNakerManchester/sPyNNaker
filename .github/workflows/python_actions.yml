@@ -89,6 +89,7 @@ jobs:
       uses: ./support/actions/pylint
       with:
         package: ${{ env.BASE_PKG }}
+        exitcheck: 31 # Action fails on any message
         language: en_GB
     - name: Lint with mypy
       run: mypy ${{ env.BASE_PKG }}
