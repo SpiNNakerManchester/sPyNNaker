@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Any, Dict
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.external_devices_models import AbstractEthernetSensor
 from .push_bot_translator import PushBotTranslator
@@ -52,23 +53,23 @@ class PushBotEthernetRetinaDevice(
         self.__n_neurons = resolution.value.n_neurons
 
     @overrides(AbstractEthernetSensor.get_n_neurons)
-    def get_n_neurons(self):
+    def get_n_neurons(self) -> int:
         return self.__n_neurons
 
     @overrides(AbstractEthernetSensor.get_injector_parameters)
-    def get_injector_parameters(self):
+    def get_injector_parameters(self) -> Dict[str, Any]:
         return {"port": self.__injector_port}
 
     @overrides(AbstractEthernetSensor.get_injector_label)
-    def get_injector_label(self):
+    def get_injector_label(self) -> str:
         return self.__retina_injector_label
 
     @overrides(AbstractEthernetSensor.get_translator)
-    def get_translator(self):
+    def get_translator(self) -> PushBotTranslator:
         return self.__translator
 
     @overrides(AbstractEthernetSensor.get_database_connection)
-    def get_database_connection(self):
+    def get_database_connection(self) -> PushBotRetinaConnection:
         """
         :rtype: PushBotRetinaConnection
         """

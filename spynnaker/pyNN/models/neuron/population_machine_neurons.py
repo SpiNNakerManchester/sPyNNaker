@@ -137,7 +137,7 @@ class PopulationMachineNeurons(
         raise NotImplementedError
 
     @abstractmethod
-    def _set_key(self, key: int) -> None:
+    def _set_key(self, key: int):
         """
         Set the key for spikes.
 

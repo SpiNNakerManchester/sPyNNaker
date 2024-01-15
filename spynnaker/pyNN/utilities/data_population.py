@@ -16,7 +16,9 @@ import logging
 import numpy
 from numpy import floating
 from numpy.typing import NDArray
-from typing import Any, Dict, Optional, Sequence, Union, TYPE_CHECKING
+from pyNN.descriptions import TemplateEngine
+from typing import (
+    Any, Dict, Iterable, Optional, overload, Sequence, Union, TYPE_CHECKING)
 import neo  # type: ignore[import]
 from spinn_utilities.ranged.abstract_sized import AbstractSized, Selector
 from spinn_utilities.log import FormatAdapter
@@ -65,12 +67,14 @@ class DataPopulation(object):
         # write the neo block to the file
         io.write(bl=data)
 
-    @overrides(Population.describe)
-    def describe(self, template=None, engine=None) -> Any:
+    @overrides(Population.describe, adds_typing=True)
+    def describe(self, template: Optional[str] = None,
+                 engine: Optional[Union[str, TemplateEngine]] = None
+                 ) -> Union[str, Dict[str, Any]]:
         if template is not None:
-            logger.warning("Ignoring template as supported in this mode")
+            logger.warning("Ignoring template as not supported in this mode")
         if engine is not None:
-            logger.warning("Ignoring engine as supported in this mode")
+            logger.warning("Ignoring engine as not supported in this mode")
         with NeoBufferDatabase(self.__database_file) as db:
             _, _, description = db.get_population_metadata(self.label)
             return description
@@ -78,8 +82,8 @@ class DataPopulation(object):
     @overrides(Population.get_data)
     def get_data(
             self, variables: Names = 'all',
-            gather=True, clear: bool = False, *,
-            annotations: Annotations = None) -> neo.Block:
+            gather: bool = True, clear: bool = False, *,
+            annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
         # pylint: disable=protected-access
         Population._check_params(gather, annotations)
         if clear:
@@ -99,7 +103,7 @@ class DataPopulation(object):
                 self.__label, variable, as_matrix, self._indexes)
 
     @overrides(Population.get_spike_counts)
-    def get_spike_counts(self, gather=True) -> Dict[int, int]:
+    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
         # pylint: disable=protected-access
         Population._check_params(gather)
         with NeoBufferDatabase(self.__database_file) as db:
@@ -126,8 +130,20 @@ class DataPopulation(object):
     def size(self) -> int:
         return self._size
 
+    @overload
+    def id_to_index(self, id: int) -> int:  # @ReservedAssignment
+        # pylint: disable=redefined-builtin
+        ...
+
+    @overload
+    def id_to_index(
+            self, id: Iterable[int]) -> Sequence[int]:  # @ReservedAssignment
+        # pylint: disable=redefined-builtin
+        ...
+
     @overrides(Population.id_to_index)
-    def id_to_index(self, id):  # @ReservedAssignment
+    def id_to_index(self, id: Union[int, Iterable[int]]
+                    ) -> Union[int, Sequence[int]]:  # @ReservedAssignment
         # pylint: disable=redefined-builtin
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
@@ -141,8 +157,17 @@ class DataPopulation(object):
             return int(id - first_id)  # assume IDs are consecutive
         return id - first_id
 
+    @overload
+    def index_to_id(self, index: int) -> int:
+        ...
+
+    @overload
+    def index_to_id(self, index: Iterable[int]) -> Sequence[int]:
+        ...
+
     @overrides(Population.index_to_id)
-    def index_to_id(self, index):
+    def index_to_id(self, index: Union[int, Iterable[int]]
+                    ) -> Union[int, Sequence[int]]:
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
             _, first_id, _ = db.get_population_metadata(self.__label)
@@ -184,7 +209,7 @@ class DataPopulation(object):
         return DataPopulation(self.__database_file, self.__label, indexes)
 
     @overrides(Population.mean_spike_count)
-    def mean_spike_count(self, gather=True) -> float:
+    def mean_spike_count(self, gather: bool = True) -> float:
         Population._check_params(gather)  # pylint: disable=protected-access
         counts = self.get_spike_counts()
         return sum(counts.values()) / len(counts)

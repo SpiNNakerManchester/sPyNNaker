@@ -316,7 +316,7 @@ class PopulationNeuronsMachineVertex(
             self._pop_vertex.neuron_impl.get_n_synapse_types())
 
     @overrides(ReceivesSynapticInputsOverSDRAM.sdram_requirement)
-    def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge):
+    def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge) -> int:
         if isinstance(sdram_machine_edge.pre_vertex,
                       SendsSynapticInputsOverSDRAM):
             return self.n_bytes_for_transfer

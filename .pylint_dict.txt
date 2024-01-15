@@ -38,6 +38,7 @@ analog
 componentised
 config
 heatmap
+multiplicator
 generatable
 multapse
 multiplicator
@@ -90,10 +91,26 @@ ProgressBar
 RandomDistribution
 SourceSegmentedSDRAMMachinePartition
 SpinnmanIOException
+PopulationApplicationVertex
+AbstractSynapseType
 SynapseInformation
 SynapseRegionReferences
 SynapseRegions
 VariableSDRAM
+MultiRegionSDRAM
+AbstractMulticastControllableDevice
+CommonRegions
+NeuronRegions
+MDSlice
+DataSpecificationGenerator
+CoreSubset
+CoreSubsets
+SpinnmanIOException
+AbstractCurrentSource
+GeneratorData
+EIEIOType
+EIEIOPrefix
+RandomDistribtuion
 
 # Others' Python types (including PYNN terms)
 AnalogSignal

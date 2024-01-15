@@ -30,7 +30,8 @@ from .abstract_generate_connector_on_machine import (
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neural_projections import SynapseInformation
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
 
 
 class MultapseConnector(AbstractGenerateConnectorOnMachine,
@@ -184,7 +185,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay=None, max_delay=None) -> int:
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
         # If the chance of there being a connection in the slice is almost 0,
         # there will probably be at least 1 connection somewhere
         prob_in_slice = min(
@@ -296,6 +298,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
-            self, application_edge, synapse_info: SynapseInformation):
+            self, application_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation):
         if self.generate_on_machine(synapse_info):
             utility_calls.check_rng(self.__rng, "MultapseConnector")

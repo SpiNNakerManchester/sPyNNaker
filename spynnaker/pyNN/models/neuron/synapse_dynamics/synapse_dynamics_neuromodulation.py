@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 import numpy
-from numpy import integer, uint8, uint32
+from numpy import floating, integer, uint8, uint32
 from numpy.typing import NDArray
 from pyNN.standardmodels.synapses import StaticSynapse
 from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
@@ -37,6 +37,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray)
+    from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 # The targets of neuromodulation
 NEUROMODULATION_TARGETS = {
@@ -100,7 +101,8 @@ class SynapseDynamicsNeuromodulation(
         return self.__w_max
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
-    def merge(self, synapse_dynamics):
+    def merge(self, synapse_dynamics: AbstractSynapseDynamics
+              ) -> AbstractSynapseDynamics:
         # This must replace something that supports neuromodulation,
         # so it can't be the first thing to be merged!
         raise SynapticConfigurationException(
@@ -109,7 +111,7 @@ class SynapseDynamicsNeuromodulation(
             " neuromodulation")
 
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
-    def is_same_as(self, synapse_dynamics) -> bool:
+    def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:
         # Shouln't ever come up, but if it does, it is False!
         return False
 
@@ -124,7 +126,7 @@ class SynapseDynamicsNeuromodulation(
     @overrides(AbstractPlasticSynapseDynamics
                .get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(
-            self, n_neurons, n_synapse_types) -> int:
+            self, n_neurons: int, n_synapse_types: int) -> int:
         size = BYTES_PER_WORD * 3
         size += BYTES_PER_WORD * len(self.__tau_c_data)
         size += BYTES_PER_WORD * len(self.__tau_d_data)
@@ -132,8 +134,9 @@ class SynapseDynamicsNeuromodulation(
 
     @overrides(AbstractPlasticSynapseDynamics.write_parameters)
     def write_parameters(
-            self, spec: DataSpecificationBase, region, global_weight_scale,
-            synapse_weight_scales):
+            self, spec: DataSpecificationBase, region: int,
+            global_weight_scale: float,
+            synapse_weight_scales: NDArray[floating]):
         # Calculate constant component in Izhikevich's model weight update
         # function and write to SDRAM.
         weight_update_component = \
@@ -178,10 +181,10 @@ class SynapseDynamicsNeuromodulation(
     def get_plastic_synaptic_data(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
-            n_synapse_types, max_n_synapses: int,
-            max_atoms_per_core) -> Tuple[
-                NDArray[uint32], NDArray[uint32],
-                NDArray[uint32], NDArray[uint32]]:
+            n_synapse_types: int,
+            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
+                NDArray[uint32], NDArray[uint32], NDArray[uint32],
+                NDArray[uint32]]:
         # pylint: disable=too-many-arguments
         weights = numpy.rint(
             numpy.abs(connections["weight"]) * STDP_FIXED_POINT_ONE)
@@ -233,10 +236,10 @@ class SynapseDynamicsNeuromodulation(
 
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
-            self, n_synapse_types,
-            pp_size: NDArray[integer], pp_data: List[NDArray[uint32]],
-            fp_size: NDArray[integer], fp_data: List[NDArray[uint32]],
-            max_atoms_per_core) -> ConnectionsArray:
+            self, n_synapse_types: int,
+            pp_size: NDArray[uint32], pp_data: List[NDArray[uint32]],
+            fp_size: NDArray[uint32], fp_data: List[NDArray[uint32]],
+            max_atoms_per_core: int) -> ConnectionsArray:
         data = numpy.concatenate(fp_data)
         connections = numpy.zeros(data.size, dtype=NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
@@ -292,7 +295,7 @@ class SynapseDynamicsNeuromodulation(
         return None
 
     @overrides(AbstractPlasticSynapseDynamics.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         return NEUROMODULATION_TARGETS.get(target, None)
 
     @property

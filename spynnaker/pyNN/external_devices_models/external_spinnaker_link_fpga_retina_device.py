@@ -101,7 +101,7 @@ class ExternalFPGARetinaDevice(
         self.__fixed_mask = self._get_mask(mode)
 
     @overrides(ApplicationSpiNNakerLinkVertex.get_fixed_key_and_mask)
-    def get_fixed_key_and_mask(self, partition_id) -> BaseKeyAndMask:
+    def get_fixed_key_and_mask(self, partition_id: str) -> BaseKeyAndMask:
         return BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)
 
     def _get_mask(self, mode: str) -> int:

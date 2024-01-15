@@ -39,6 +39,8 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron import (
         PopulationMachineLocalOnlyCombinedVertex)
     from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+        AbstractSynapseDynamics)
 
 #: Size of the source information
 SOURCE_INFO_SIZE = KEY_INFO_SIZE + BYTES_PER_WORD
@@ -78,7 +80,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         return cast(float, self.delay)
 
     @overrides(AbstractLocalOnly.merge)
-    def merge(self, synapse_dynamics) -> LocalOnlyPoolDense:
+    def merge(self, synapse_dynamics: AbstractSynapseDynamics
+              ) -> LocalOnlyPoolDense:
         if not isinstance(synapse_dynamics, LocalOnlyPoolDense):
             raise SynapticConfigurationException(
                 "All Projections of this Population must have a synapse_type"

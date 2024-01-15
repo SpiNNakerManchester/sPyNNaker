@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from numpy import floating
+from numpy.typing import NDArray
+from typing import Iterable
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_SHORT, BYTES_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -101,7 +105,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
-    def is_same_as(self, timing_dependence):
+    def is_same_as(
+            self, timing_dependence: AbstractTimingDependence) -> bool:
         if not isinstance(timing_dependence, TimingDependenceSpikePair):
             return False
         return (self.__tau_plus == timing_dependence.tau_plus and
@@ -128,7 +133,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         return BYTES_PER_SHORT
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
-    def get_parameters_sdram_usage_in_bytes(self):
+    def get_parameters_sdram_usage_in_bytes(self) -> int:
         return BYTES_PER_WORD * (len(self.__tau_plus_data) +
                                  len(self.__tau_minus_data))
 
@@ -143,11 +148,12 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
-            self, spec, global_weight_scale, synapse_weight_scales):
+            self, spec: DataSpecificationBase, global_weight_scale: float,
+            synapse_weight_scales: NDArray[floating]):
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
         spec.write_array(self.__tau_minus_data)
 
     @overrides(AbstractTimingDependence.get_parameter_names)
-    def get_parameter_names(self):
+    def get_parameter_names(self) -> Iterable[str]:
         return self.__PARAM_NAMES

@@ -564,12 +564,12 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         return self._get_fixed_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, partition_id) -> Sequence[
+    def get_out_going_vertices(self, partition_id: str) -> Sequence[
             PopulationNeuronsMachineVertex]:
         return self.__neuron_vertices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, partition_id) -> Sequence[
+    def get_in_coming_vertices(self, partition_id: str) -> Sequence[
             PopulationSynapsesMachineVertexCommon]:
         return self.__synapse_vertices
 

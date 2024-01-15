@@ -336,6 +336,8 @@ def _get_row_data(
     :rtype: ~numpy.ndarray
     """
     # pylint: disable=too-many-arguments
+    fp_data: Union[NDArray[uint32], List[NDArray[uint32]]]
+    pp_data: Union[NDArray[uint32], List[NDArray[uint32]]]
     if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics):
         # Get the static data
         ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(

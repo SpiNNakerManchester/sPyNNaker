@@ -173,7 +173,7 @@ class PopulationBase(object, metaclass=AbstractBase):
     def __len__(self) -> int:
         raise NotImplementedError
 
-    def mean_spike_count(self, gather=True):
+    def mean_spike_count(self, gather: bool = True) -> float:
         """
         Returns the mean number of spikes per neuron.
 
@@ -276,8 +276,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         _we_dont_do_this_now()  # pragma: no cover
 
     @abstractmethod
-    def record(self, variables: Names, to_file=None,
-               sampling_interval=None):
+    def record(self, variables: Names, to_file: Optional[str] = None,
+               sampling_interval: Optional[int] = None):
         """
         Record the specified variable or variables for all cells in the
         Population or view.
@@ -348,7 +348,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @staticmethod
-    def _check_params(gather, annotations=None):
+    def _check_params(
+            gather: bool, annotations: Optional[Dict[str, Any]] = None):
         if not gather:
             logger.warning(
                 "sPyNNaker only supports gather=True. We will run "

@@ -14,7 +14,7 @@
 from __future__ import annotations
 import numpy
 from numpy.typing import NDArray
-from typing import List, Optional, Tuple, TYPE_CHECKING
+from typing import List, Optional, Tuple, TYPE_CHECKING, Sequence
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 from .abstract_connector import AbstractConnector
@@ -149,8 +149,8 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice: Slice, synapse_type: int,
-            synapse_info: SynapseInformation) -> NDArray:
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
+            synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         n_connections, pair_list = self._get_n_connections(
             post_vertex_slice, synapse_info)
 

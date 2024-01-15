@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Sequence, TYPE_CHECKING, cast
+from typing import List, Sequence, Tuple, TYPE_CHECKING, cast
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import get_config_bool
 from pacman.model.graphs.application import (
@@ -87,7 +87,7 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
 
     @property
     @overrides(ApplicationVertex.atoms_shape)
-    def atoms_shape(self):
+    def atoms_shape(self) -> Tuple[int, ...]:
         return self.__partition.pre_vertex.atoms_shape
 
     @property
