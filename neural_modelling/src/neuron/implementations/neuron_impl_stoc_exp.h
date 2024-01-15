@@ -65,7 +65,7 @@ typedef struct neuron_params_t {
 typedef struct neuron_impl_t {
 
     //! The reciprocal of the tau value
-    uint32_t tau_recip;
+    UFRACT tau_recip;
 
     //! The bias value
     REAL bias;
@@ -110,10 +110,72 @@ static inline uint32_t stoc_exp_ceil_accum(UREAL value) {
 	return integer;
 }
 
+static inline uint64_t multiply(uint64_t a, uint32_t b) {
+	return ((a >> 32) * (uint64_t) b) + (((a & 0xFFFFFFFFL) * (uint64_t) b) >> 32);
+}
+
+//! \brief Calculates the probability as a uint32_t from 0 to 0xFFFFFFFF (which is 1)
+static inline uint32_t get_probability(UFRACT frac, REAL p) {
+
+	// The variable that will hold the return value
+	uint64_t accumulator;
+
+	// The fractional bits from the input
+	uint32_t fract_bits;
+
+	// The powers to use in the calculation
+	const uint64_t *powers;
+
+	if (p >= 0) {
+		if (p >= 32) {
+			return 0xFFFFFFFF;
+		}
+		accumulator = bitsulk(1.0ulk) << (bitsk(p) >> 15);
+		fract_bits = bitsk(p) & 0x7FFF;
+		powers = long_fract_powers_2;
+	} else {
+		if (p <= -32) {
+			return 0;
+		}
+		REAL val = p * REAL_CONST(-1);
+		accumulator = bitsulk(1.0ulk) >> (bitsk(val) >> 15);
+		fract_bits = bitsk(val) & 0x7FFF;
+		powers = long_fract_powers_half;
+	}
+
+	// Pre-multiply the accumulator by the fraction
+	accumulator = multiply(accumulator, bitsulr(frac));
+
+	// If we are only going to get bigger and already big enough, return max
+	// (negative powers will make this smaller, so still unknown there).
+	if ((p > 0) && (accumulator >= 0x100000000L)) {
+		return 0xFFFFFFFF;
+	}
+
+	// Multiply in fractional powers for each non-zero fractional bits
+	for (uint32_t i = 0; i < 15; i++) {
+		uint32_t bit = (fract_bits >> (14 - i)) & 0x1;
+		if (bit) {
+			uint64_t f = bit * powers[i];
+			// Either the accumulator < "1" or f < "1", so this will not
+			// overflow (trust me ;)
+			accumulator = (accumulator * f) >> 32;
+		}
+	}
+
+	// If we are now > 1 in whatever case, return maximum
+	if (accumulator >= 0x100000000L) {
+		return 0xFFFFFFFF;
+	}
+
+	return (uint32_t) (accumulator & 0xFFFFFFFFL);
+}
+
 static inline void neuron_model_initialise(
 		neuron_impl_t *state, neuron_params_t *params) {
 	UREAL ts = params->time_step;
-	state->tau_recip = bitsuk(ukdivuk(UREAL_CONST(1.0), params->tau_ms));
+	state->tau_recip = ulrbits((
+			bitsuk(ukdivuk(UREAL_CONST(1.0), params->tau_ms)) & 0xFFFF) << 16);
 	state->bias = params->bias;
 	state->t_refract = stoc_exp_ceil_accum(ukdivuk(params->tau_ms, ts));
     state->refract_timer = params->refract_init;
@@ -208,8 +270,7 @@ static void neuron_impl_do_timestep_update(
         neuron->inputs[1] = ZERO;
 
         // Work out the probability
-        uint32_t val = __stdfix_smul_uk(neuron->tau_recip, bitsuk(pow_of_2(v_membrane)));
-        uint32_t prob = muliuk(0xFFFFFFFF, ukbits(val));
+        uint32_t prob = get_probability(neuron->tau_recip, v_membrane);
 
 		// Record the probability
 		neuron_recording_record_int32(PROB_INDEX, neuron_index, (int32_t) prob);
