@@ -335,6 +335,4 @@ static const uint64_t MAX_REAL = 0xFFFFFFFF0000L;
 
 static const uint64_t MIN_REAL = 0x000000010000L;
 
-
-
 #endif  // _MATHS_UTIL_
