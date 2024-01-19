@@ -27,18 +27,12 @@ Vogels
 gsyn
 MPI
 Omnibot
-pacman
 pushbot
-spalloc
-spinnman
-Omnibot
 
 # Our "special" words
 analog
 componentised
-config
 heatmap
-multiplicator
 generatable
 multapse
 multiplicator
@@ -55,61 +49,28 @@ stdev
 AbstractCurrentSource
 AbstractMulticastControllableDevice
 AbstractPopulationVertex
-AbstractSDRAM
 AbstractSynapseType
-AbstractVertex
-ApplicationEdge
-ApplicationEdgePartition
-ApplicationGraph
-ApplicationVertex
 CommonRegions
 ConnectionHolder
 ConstantSDRAM
-CoreSubset
-CoreSubsets
-DataSpecificationGenerator
 DataType
 DelayedApplicationEdge
 DelayExtensionVertex
-EIEIOPrefix
-EIEIOType
-ExecutableTargets
-FPGAConnection
 GeneratorData
 IDMixin
-MachineEdge
-MachineVertex
 MDSlice
-ModuleType
 MultiRegionSDRAM
 NeuronRegions
 ProjectionApplicationEdge
 PopulationApplicationVertex
 PopulationBase
 PopulationView
-ProgressBar
 RandomDistribution
 SourceSegmentedSDRAMMachinePartition
 SpinnmanIOException
-PopulationApplicationVertex
-AbstractSynapseType
 SynapseInformation
 SynapseRegionReferences
 SynapseRegions
-VariableSDRAM
-MultiRegionSDRAM
-AbstractMulticastControllableDevice
-CommonRegions
-NeuronRegions
-MDSlice
-DataSpecificationGenerator
-CoreSubset
-CoreSubsets
-SpinnmanIOException
-AbstractCurrentSource
-GeneratorData
-EIEIOType
-EIEIOPrefix
 RandomDistribtuion
 
 # Others' Python types (including PYNN terms)
@@ -120,12 +81,10 @@ ChannelIndex
 CSet
 ctype
 dtype
-FileIO
 GSLRNG
 NumpyRNG
 NativeRNG
 NeuronCurrentSource
-RandomDistribtuion
 RandomState
 SpikeTrain
 TemplateEngine
@@ -138,14 +97,12 @@ connset
 ctypes
 csa
 cset
-datetime
 graphviz
 neo
 pynn
 pyNN
 rawio
 standardmodels
-struct
 unitquantity
 
 # Misc (arguments, etc.)
@@ -156,8 +113,6 @@ csv
 csvfile
 db
 dt
-eieio
-params
 rd
 sdram
 simtime
