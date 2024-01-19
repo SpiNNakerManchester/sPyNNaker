@@ -12,16 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# People names
-Bogdan
-Djurfeldt
-Gerstner
-Habenschuss
-Izhikevich
-Jonke
-Maass
-Petrut
-Vogels
 
 # Our abbreviations/names
 gsyn
