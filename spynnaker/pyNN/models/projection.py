@@ -503,15 +503,14 @@ class Projection(object):
 
     # -----------------------------------------------------------------
 
-    def set(self, **attributes):  # @UnusedVariable
-        # pylint: disable=unused-argument
+    def set(self, **attributes):
         """
         .. warning::
             Not implemented.
         """
         _we_dont_do_this_now()
 
-    def size(self, gather=True):  # @UnusedVariable
+    def size(self, gather=True):
         # pylint: disable=unused-argument
         """
         Return the total number of connections.
