@@ -81,7 +81,9 @@ class SpikeInjectorVertex(
         return ["spikes"]
 
     @overrides(PopulationApplicationVertex.set_recording)
-    def set_recording(self, name: str, sampling_interval=None, indices=None):
+    def set_recording(
+            self, name: str, sampling_interval: Optional[float] = None,
+            indices: Optional[Collection[int]] = None):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if sampling_interval is not None:

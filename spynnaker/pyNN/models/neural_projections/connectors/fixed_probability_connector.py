@@ -32,7 +32,8 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neural_projections import SynapseInformation
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -114,7 +115,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay=None, max_delay=None) -> int:
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
         n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_post_atoms, self._p_connect, chance=1.0/10000.0)
@@ -215,6 +217,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
-            self, application_edge, synapse_info: SynapseInformation):
+            self, application_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation):
         if self.generate_on_machine(synapse_info):
             check_rng(self.__rng, "FixedProbabilityConnector")

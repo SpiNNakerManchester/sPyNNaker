@@ -17,7 +17,7 @@ import numpy
 from numpy import integer, uint32
 from numpy.typing import NDArray
 from pyNN.random import NumpyRNG
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional, Sequence, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -29,7 +29,8 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neural_projections import SynapseInformation
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
 
 N_GEN_PARAMS = 8
 
@@ -256,8 +257,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice: Slice, synapse_type: int,
-            synapse_info: SynapseInformation) -> NDArray:
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
+            synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         # Get lo and hi for the pre vertex
         lo = 0
         hi = synapse_info.n_pre_neurons - 1
@@ -327,6 +328,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
-            self, application_edge, synapse_info: SynapseInformation):
+            self, application_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation):
         if self.generate_on_machine(synapse_info):
             utility_calls.check_rng(self.__rng, "FixedNumberPostConnector")

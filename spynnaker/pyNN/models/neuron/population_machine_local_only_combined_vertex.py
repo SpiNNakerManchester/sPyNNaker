@@ -316,7 +316,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(
-            self, spec: DataSpecificationReloader, placement):
+            self, spec: DataSpecificationReloader, placement: Placement):
         self._rewrite_neuron_data_spec(spec)
 
         # close spec

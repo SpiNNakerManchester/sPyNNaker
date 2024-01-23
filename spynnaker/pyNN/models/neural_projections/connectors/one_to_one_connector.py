@@ -17,7 +17,7 @@ import numpy
 from numpy import integer, floating, uint32
 from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
-from typing import Sequence, Tuple, TYPE_CHECKING
+from typing import Optional, Sequence, Tuple, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 from pacman.model.graphs.application import ApplicationVertex
@@ -83,8 +83,9 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_post_atoms, synapse_info: SynapseInformation,
-            min_delay=None, max_delay=None) -> int:
+            self, n_post_atoms: int, synapse_info: SynapseInformation,
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
         delays = synapse_info.delays
 
         if min_delay is None or max_delay is None or delays is None:
@@ -109,7 +110,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
                    (min_delay <= slice_min_delay <= max_delay))
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self, synapse_info) -> int:
+    def get_n_connections_to_post_vertex_maximum(
+            self, synapse_info: SynapseInformation) -> int:
         return 1
 
     @overrides(AbstractConnector.get_weight_maximum)
@@ -121,8 +123,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice: Slice, synapse_type: int,
-            synapse_info: SynapseInformation) -> NDArray:
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
+            synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         # Get each pre_vertex id for each post_vertex id
         post_atoms = post_vertex_slice.get_raster_ids()
         pre_atoms = numpy.array(post_atoms)
@@ -255,7 +257,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         return True
 
     @overrides(AbstractGenerateConnectorOnMachine.generate_on_machine)
-    def generate_on_machine(self, synapse_info):
+    def generate_on_machine(self, synapse_info: SynapseInformation) -> bool:
         # If we are doing a 1:1 connector and the pre or post vertex is
         # multi-dimensional and have different dimensions
         pre = synapse_info.pre_vertex

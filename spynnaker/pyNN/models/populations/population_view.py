@@ -413,23 +413,8 @@ class PopulationView(PopulationBase):
         return self.__population.spinnaker_get_data(
             variable, as_matrix, self.__indexes)
 
-    def get_spike_counts(self, gather=True) -> Dict[int, int]:
-        """
-        Returns a dict containing the number of spikes for each neuron.
-
-        The dict keys are neuron IDs, not indices.
-
-        .. note::
-            Implementation of this method is different to Population as the
-            Populations uses PyNN 7 version of the ``get_spikes`` method which
-            does not support indexes.
-
-        :param bool gather:
-            .. note::
-                SpiNNaker always gathers.
-
-        :rtype: dict(int,int)
-        """
+    @overrides(PopulationBase.get_spike_counts)
+    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
         self._check_params(gather)
         with NeoBufferDatabase() as db:
             return db.get_spike_counts(

@@ -20,7 +20,6 @@ from numpy.typing import NDArray
 from typing import TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.application import ApplicationEdge
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -33,7 +32,8 @@ from .abstract_generate_connector_on_host import (
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.utilities.utility_calls import check_rng
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neural_projections import SynapseInformation
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
 
 
 # Hashes of the connection generators supported by the synapse expander
@@ -57,7 +57,7 @@ class AbstractGenerateConnectorOnMachine(
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
-            self, application_edge: ApplicationEdge,
+            self, application_edge: ProjectionApplicationEdge,
             synapse_info: SynapseInformation):
         # If we can't generate on machine, we must be able to generate on host
         if not self.generate_on_machine(synapse_info):

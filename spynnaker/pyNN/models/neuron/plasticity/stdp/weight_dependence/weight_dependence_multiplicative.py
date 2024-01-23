@@ -11,9 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from numpy import floating
+from numpy.typing import NDArray
 from typing import Iterable
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.interface.ds import DataType, DataSpecificationBase
+from spinn_front_end_common.interface.ds import (
+    DataType, DataSpecificationBase)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
@@ -59,7 +62,7 @@ class WeightDependenceMultiplicative(
         return self.__w_max
 
     @overrides(AbstractWeightDependence.is_same_as)
-    def is_same_as(self, weight_dependence) -> bool:
+    def is_same_as(self, weight_dependence: AbstractWeightDependence) -> bool:
         if not isinstance(weight_dependence, WeightDependenceMultiplicative):
             return False
         return (
@@ -79,7 +82,7 @@ class WeightDependenceMultiplicative(
 
     @overrides(AbstractWeightDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(
-            self, n_synapse_types, n_weight_terms) -> int:
+            self, n_synapse_types: int, n_weight_terms: int) -> int:
         if n_weight_terms != 1:
             raise NotImplementedError(
                 "Multiplicative weight dependence only supports single terms")
@@ -88,8 +91,8 @@ class WeightDependenceMultiplicative(
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
-            self, spec: DataSpecificationBase,
-            global_weight_scale, synapse_weight_scales, n_weight_terms):
+            self, spec: DataSpecificationBase, global_weight_scale: float,
+            synapse_weight_scales: NDArray[floating], n_weight_terms: int):
         if n_weight_terms != 1:
             raise NotImplementedError(
                 "Multiplicative weight dependence only supports single terms")

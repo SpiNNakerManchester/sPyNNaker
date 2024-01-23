@@ -42,6 +42,8 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron import (
         PopulationMachineLocalOnlyCombinedVertex)
+    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+        AbstractSynapseDynamics)
 
 
 #: Size of convolution config main bytes
@@ -78,7 +80,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         return cast(float, self.delay)
 
     @overrides(AbstractLocalOnly.merge)
-    def merge(self, synapse_dynamics) -> LocalOnlyConvolution:
+    def merge(self, synapse_dynamics: AbstractSynapseDynamics
+              ) -> LocalOnlyConvolution:
         if not isinstance(synapse_dynamics, LocalOnlyConvolution):
             raise SynapticConfigurationException(
                 "All targets of this Population must have a synapse_type of"
@@ -96,7 +99,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractLocalOnly.get_parameters_usage_in_bytes)
     def get_parameters_usage_in_bytes(
-            self, n_atoms, incoming_projections: Iterable[Projection]) -> int:
+            self, n_atoms: int,
+            incoming_projections: Iterable[Projection]) -> int:
         # pylint: disable=protected-access
         n_bytes = 0
         kernel_bytes = 0
@@ -134,7 +138,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         sources = self.__get_sources_for_target(app_vertex)
 
         size = self.get_parameters_usage_in_bytes(
-            machine_vertex.vertex_slice, app_vertex.incoming_projections)
+            machine_vertex.vertex_slice.n_atoms,
+            app_vertex.incoming_projections)
         spec.reserve_memory_region(region, size, label="LocalOnlyConvolution")
         spec.switch_write_focus(region)
 

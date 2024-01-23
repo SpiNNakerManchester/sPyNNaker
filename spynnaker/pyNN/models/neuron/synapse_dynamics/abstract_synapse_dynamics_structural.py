@@ -14,7 +14,7 @@
 from __future__ import annotations
 from numpy import floating
 from numpy.typing import NDArray
-from typing import Iterable, Optional, Tuple, Union, TYPE_CHECKING
+from typing import Iterable, Optional, TYPE_CHECKING
 from typing_extensions import TypeAlias
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.common import Slice
@@ -34,8 +34,9 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
 
+# see https://github.com/SpiNNakerManchester/sPyNNaker/issues/1427
 #: :meta private:
-InitialDelay: TypeAlias = Union[float, Tuple[float, float]]
+InitialDelay: TypeAlias = float
 
 
 class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):

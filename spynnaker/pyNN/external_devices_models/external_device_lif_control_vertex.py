@@ -26,6 +26,8 @@ from .abstract_ethernet_controller import AbstractEthernetController
 from .abstract_multicast_controllable_device import (
     AbstractMulticastControllableDevice)
 if TYPE_CHECKING:
+    from pacman.model.graphs.machine.machine_vertex import MachineVertex
+    from pacman.model.routing_info.routing_info import RoutingInfo
     from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
     from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
     from .abstract_ethernet_translator import AbstractEthernetTranslator
@@ -53,7 +55,7 @@ class ExternalDeviceLifControlVertex(
 
     def __init__(
             self, devices: Sequence[AbstractMulticastControllableDevice],
-            create_edges: bool, max_atoms_per_core: int,
+            create_edges: bool, max_atoms_per_core: Tuple[int, ...],
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel,
             translator: Optional[AbstractEthernetTranslator] = None,
@@ -61,7 +63,7 @@ class ExternalDeviceLifControlVertex(
             label: Optional[str] = None,
             ring_buffer_sigma: Optional[float] = None,
             incoming_spike_buffer_size: Optional[int] = None,
-            drop_late_spikes: bool = False,
+            drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterAbstractPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None):
         """
@@ -71,7 +73,7 @@ class ExternalDeviceLifControlVertex(
         :param bool create_edges:
             True if edges to the devices should be added by this dev (set
             to False if using the dev over Ethernet using a translator)
-        :param int max_atoms_per_core:
+        :param tuple(int, ...) max_atoms_per_core:
         :param AbstractNeuronImpl neuron_impl:
         :param AbstractPyNNNeuronModel pynn_model:
         :param translator:
@@ -87,6 +89,8 @@ class ExternalDeviceLifControlVertex(
         :param int n_colour_bits: The number of colour bits to use
         """
         # pylint: disable=too-many-arguments
+        if drop_late_spikes is None:
+            drop_late_spikes = False
         super().__init__(
             len(devices), f"ext_dev{devices}" if label is None else label,
             max_atoms_per_core,
@@ -146,14 +150,15 @@ class ExternalDeviceLifControlVertex(
 
     @overrides(HasCustomAtomKeyMap.get_atom_key_map)
     def get_atom_key_map(
-            self, pre_vertex, partition_id: str, routing_info) -> List[
-                Tuple[int, int]]:
+            self, pre_vertex: MachineVertex, partition_id: str,
+            routing_info: RoutingInfo) -> Iterable[Tuple[int, int]]:
         index = self.__indices[partition_id]
         device = self.__devices[partition_id]
         return [(index, device.device_control_key)]
 
     @overrides(AbstractPopulationVertex.get_fixed_key_and_mask)
-    def get_fixed_key_and_mask(self, partition_id: str):
+    def get_fixed_key_and_mask(
+            self, partition_id: str) -> Optional[BaseKeyAndMask]:
         return BaseKeyAndMask(
             self.__devices[partition_id].device_control_key,
             self._DEFAULT_COMMAND_MASK)

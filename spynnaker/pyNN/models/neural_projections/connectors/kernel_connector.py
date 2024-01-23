@@ -17,9 +17,11 @@ from numpy import floating, integer, ndarray, uint32
 from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
 from pyNN.space import Space
-from typing import Dict, List, Optional, Tuple, Union, TYPE_CHECKING
+from typing import Dict, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
 from typing_extensions import TypeAlias
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs import AbstractVertex
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.interface.ds import DataType
@@ -35,8 +37,8 @@ from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neural_projections.synapse_information import (
-        SynapseInformation)
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
     _TwoD: TypeAlias = Union[List[int], Tuple[int, int]]
 
 _Kernel: TypeAlias = Union[
@@ -401,12 +403,14 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_post_atoms: int, synapse_info,
-            min_delay=None, max_delay=None) -> int:
+            self, n_post_atoms: int, synapse_info: SynapseInformation,
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
         return numpy.clip(self._kernel_h * self._kernel_w, 0, n_post_atoms)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self, synapse_info) -> int:
+    def get_n_connections_to_post_vertex_maximum(
+            self, synapse_info: SynapseInformation) -> int:
         return numpy.clip(self._kernel_h * self._kernel_w, 0, 255)
 
     @overrides(AbstractConnector.get_weight_maximum)
@@ -442,8 +446,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice: Slice, synapse_type,
-            synapse_info: SynapseInformation) -> NDArray:
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
+            synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         (n_connections, all_post, all_pre_in_range, all_pre_in_range_delays,
          all_pre_in_range_weights) = self.__compute_statistics(
             synapse_info.weights, synapse_info.delays, post_vertex_slice,
@@ -503,7 +507,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnMachine.get_connected_vertices)
     def get_connected_vertices(
-            self, s_info: SynapseInformation, source_vertex, target_vertex):
+            self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
+            target_vertex: ApplicationVertex) -> Sequence[
+                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
         src_splitter = source_vertex.splitter
         return [
             (t_vert,
@@ -543,7 +549,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return True
 
     @overrides(AbstractConnector.validate_connection)
-    def validate_connection(self, application_edge, synapse_info):
+    def validate_connection(
+            self, application_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation):
         pre = application_edge.pre_vertex
         post = application_edge.post_vertex
         if len(pre.atoms_shape) != 1 or len(post.atoms_shape) != 1:

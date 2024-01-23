@@ -29,13 +29,14 @@ from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.types import Weight_Types
+from spynnaker.pyNN.types import Delay_Types, Weight_Delay_Types, Weight_Types
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neural_projections import SynapseInformation
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
         AbstractSynapseDynamics)
 
@@ -47,8 +48,9 @@ _TARGET = 1
 _FIRST_PARAM = 2
 
 
-def _is_sequential(value) -> TypeGuard[Union[List, NDArray]]:
-    return isinstance(value, (list, numpy.ndarray))
+def _is_sequential(value: Weight_Delay_Types
+                   ) -> TypeGuard[NDArray[numpy.float64]]:
+    return isinstance(value, numpy.ndarray)
 
 
 @dataclass(frozen=True)
@@ -146,8 +148,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             return numpy.min(self.__delays)
 
     @overrides(AbstractConnector.get_delay_variance)
-    def get_delay_variance(
-            self, delays, synapse_info: SynapseInformation) -> float:
+    def get_delay_variance(self, delays: Delay_Types,
+                           synapse_info: SynapseInformation) -> float:
         if self.__delays is None:
             if _is_sequential(synapse_info.delays):
                 return float(numpy.var(synapse_info.delays))
@@ -165,8 +167,9 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             mapping[s.get_raster_ids()] = i
         return mapping
 
-    def _split_connections(self, n_pre_atoms: int, n_post_atoms: int,
-                           post_slices: Sequence[Slice]):
+    def _split_connections(
+            self, n_pre_atoms: int, n_post_atoms: int,
+            post_slices: Sequence[Slice]):
         """
         :param list(~pacman.model.graphs.common.Slice) post_slices:
         """
@@ -217,16 +220,19 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay=None, max_delay=None) -> int:
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
         mask = None
         delays_handled = False
-        if (min_delay is not None and max_delay is not None and
-                (self.__delays is not None or
-                 _is_sequential(synapse_info.delays))):
-            delays = synapse_info.delays if self.__delays is None \
-                else self.__delays
-            mask = ((delays >= min_delay) & (delays <= max_delay))
-            delays_handled = True
+        if (min_delay is not None and max_delay is not None):
+            if self.__delays is not None:
+                mask = ((self.__delays >= min_delay) &
+                        (self.__delays <= max_delay))
+                delays_handled = True
+            elif _is_sequential(synapse_info.delays):
+                delays = synapse_info.delays
+                mask = ((delays >= min_delay) & (delays <= max_delay))
+                delays_handled = True
         if mask is None:
             conns = self.__conn_list.copy()
         else:
@@ -273,15 +279,16 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         return numpy.array_split(conns, split_points)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self, synapse_info) -> int:
+    def get_n_connections_to_post_vertex_maximum(
+            self, synapse_info: SynapseInformation) -> int:
         if not len(self.__targets):
             return 0
         return int(numpy.max(numpy.bincount(
             self.__targets.astype(int64, copy=False))))
 
     @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(
-            self, weights, synapse_info: SynapseInformation) -> float:
+    def get_weight_mean(self, weights: Weight_Types,
+                        synapse_info: SynapseInformation) -> float:
         if self.__weights is None:
             if _is_sequential(synapse_info.weights):
                 return float(numpy.mean(synapse_info.weights))
@@ -548,8 +555,9 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                 synapse_type.set_value(name, self.__extra_params.data[:, i])
 
     @overrides(AbstractConnector.validate_connection)
-    def validate_connection(self, application_edge,
-                            synapse_info: SynapseInformation):
+    def validate_connection(
+            self, application_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation):
         out_of_range_targets = self.__targets >= synapse_info.n_post_neurons
         if any(out_of_range_targets):
             logger.warning(

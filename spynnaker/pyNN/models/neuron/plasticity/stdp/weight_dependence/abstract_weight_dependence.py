@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List
+from numpy import floating
+from numpy.typing import NDArray
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spinn_front_end_common.interface.ds import DataSpecificationGenerator
+from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractHasParameterNames)
 
@@ -23,7 +24,8 @@ class AbstractWeightDependence(
     __slots__ = ()
 
     @abstractmethod
-    def is_same_as(self, weight_dependence) -> bool:
+    def is_same_as(
+            self, weight_dependence: "AbstractWeightDependence") -> bool:
         """
         Determine if this weight dependence is the same as another.
 
@@ -56,8 +58,8 @@ class AbstractWeightDependence(
 
     @abstractmethod
     def write_parameters(
-            self, spec: DataSpecificationGenerator, global_weight_scale: float,
-            synapse_weight_scales: List[float], n_weight_terms: int):
+            self, spec: DataSpecificationBase, global_weight_scale: float,
+            synapse_weight_scales: NDArray[floating], n_weight_terms: int):
         """
         Write the parameters of the rule to the spec.
 

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable
 from spinn_utilities.overrides import overrides
 from .abstract_partner_selection import AbstractPartnerSelection
 from spinn_front_end_common.interface.ds import DataSpecificationBase
@@ -33,11 +34,11 @@ class LastNeuronSelection(AbstractPartnerSelection):
 
     @property
     @overrides(AbstractPartnerSelection.vertex_executable_suffix)
-    def vertex_executable_suffix(self):
+    def vertex_executable_suffix(self) -> str:
         return "_last_neuron"
 
     @overrides(AbstractPartnerSelection.get_parameters_sdram_usage_in_bytes)
-    def get_parameters_sdram_usage_in_bytes(self):
+    def get_parameters_sdram_usage_in_bytes(self) -> int:
         return 4
 
     @overrides(AbstractPartnerSelection.write_parameters)
@@ -45,5 +46,5 @@ class LastNeuronSelection(AbstractPartnerSelection):
         spec.write_value(self.__spike_buffer_size)
 
     @overrides(AbstractPartnerSelection.get_parameter_names)
-    def get_parameter_names(self):
+    def get_parameter_names(self) -> Iterable[str]:
         yield "spike_buffer_size"
