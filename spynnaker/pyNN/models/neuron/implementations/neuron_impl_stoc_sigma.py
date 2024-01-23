@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Mapping, Optional, Sequence
 from spinn_front_end_common.interface.ds import DataType
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractNeuronImpl)
+    AbstractNeuronImpl, ModelParameter)
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from pyNN.random import NumpyRNG
 from spynnaker.pyNN.random_distribution import RandomDistribution
@@ -42,7 +43,9 @@ MAX_INT = float(0xFFFFFFFF)
 
 class NeuronImplStocSigma(AbstractNeuronImpl):
 
-    def __init__(self, tau_refrac, alpha, bias, refract_init, seed):
+    def __init__(self, tau_refrac: ModelParameter, alpha: ModelParameter,
+                 bias: ModelParameter, refract_init: ModelParameter,
+                 seed: int):
 
         self._tau_refrac = tau_refrac
         self._alpha = alpha
@@ -64,29 +67,29 @@ class NeuronImplStocSigma(AbstractNeuronImpl):
 
     @property
     @overrides(AbstractNeuronImpl.structs)
-    def structs(self):
+    def structs(self) -> Sequence[Struct]:
         return [self._struct]
 
     @property
     @overrides(AbstractNeuronImpl.model_name)
-    def model_name(self):
+    def model_name(self) -> str:
         return "StocSigma"
 
     @property
     @overrides(AbstractNeuronImpl.binary_name)
-    def binary_name(self):
+    def binary_name(self) -> str:
         return "stoc_sigma.aplx"
 
     @overrides(AbstractNeuronImpl.get_global_weight_scale)
-    def get_global_weight_scale(self):
+    def get_global_weight_scale(self) -> float:
         return 1.0
 
     @overrides(AbstractNeuronImpl.get_n_synapse_types)
-    def get_n_synapse_types(self):
+    def get_n_synapse_types(self) -> int:
         return 2
 
     @overrides(AbstractNeuronImpl.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target):
+    def get_synapse_id_by_target(self, target) -> Optional[int]:
         if target == "excitatory":
             return 0
         elif target == "inhibitory":
@@ -94,21 +97,21 @@ class NeuronImplStocSigma(AbstractNeuronImpl):
         raise ValueError("Unknown target {}".format(target))
 
     @overrides(AbstractNeuronImpl.get_synapse_targets)
-    def get_synapse_targets(self):
+    def get_synapse_targets(self) -> Sequence[str]:
         return ["excitatory", "inhibitory"]
 
     @overrides(AbstractNeuronImpl.get_recordable_variables)
-    def get_recordable_variables(self):
+    def get_recordable_variables(self) -> Sequence[str]:
         return ["v", "ex_input", "in_input", "prob"]
 
     @overrides(AbstractNeuronImpl.get_recordable_data_types)
-    def get_recordable_data_types(self):
+    def get_recordable_data_types(self) -> Mapping[str, DataType]:
         return {"v": DataType.S1615,
                 "ex_input": DataType.S1615, "in_input": DataType.S1615,
                 "prob": DataType.U032}
 
     @overrides(AbstractNeuronImpl.get_recordable_units)
-    def get_recordable_units(self, variable):
+    def get_recordable_units(self, variable) -> Optional[str]:
         if variable in ("v", "ex_input", "in_input"):
             return "mV"
         if variable == "prob":
@@ -116,7 +119,7 @@ class NeuronImplStocSigma(AbstractNeuronImpl):
         raise ValueError("Unknown variable {}".format(variable))
 
     @overrides(AbstractNeuronImpl.get_recordable_variable_index)
-    def get_recordable_variable_index(self, variable):
+    def get_recordable_variable_index(self, variable) -> Optional[int]:
         if variable == "v":
             return 0
         if variable == "ex_input":
@@ -128,7 +131,7 @@ class NeuronImplStocSigma(AbstractNeuronImpl):
         raise ValueError("Unknown variable {}".format(variable))
 
     @overrides(AbstractNeuronImpl.is_recordable)
-    def is_recordable(self, variable):
+    def is_recordable(self, variable) -> bool:
         return variable in ("v", "ex_input", "in_input", "prob")
 
     @overrides(AbstractNeuronImpl.add_parameters)
@@ -147,10 +150,10 @@ class NeuronImplStocSigma(AbstractNeuronImpl):
         state_variables[SEED3] = self._random
 
     @overrides(AbstractNeuronImpl.get_units)
-    def get_units(self, variable):
+    def get_units(self, variable) -> str:
         return UNITS[variable]
 
     @property
     @overrides(AbstractNeuronImpl.is_conductance_based)
-    def is_conductance_based(self):
+    def is_conductance_based(self) -> bool:
         return False
