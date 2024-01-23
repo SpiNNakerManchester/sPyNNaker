@@ -16,8 +16,10 @@ from .neuron_model import NeuronModel
 from .neuron_model_izh import NeuronModelIzh
 from .neuron_model_leaky_integrate_and_fire import (
     NeuronModelLeakyIntegrateAndFire)
+from .neuron_model_if_trunc import NeuronModelIFTrunc
 
 __all__ = [
     "NeuronModel",
     "NeuronModelIzh",
-    "NeuronModelLeakyIntegrateAndFire"]
+    "NeuronModelLeakyIntegrateAndFire",
+    "NeuronModelIFTrunc"]
