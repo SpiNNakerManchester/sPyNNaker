@@ -108,7 +108,7 @@ class NeuronImplStocExp(AbstractNeuronImpl):
                 "prob": DataType.U032}
 
     @overrides(AbstractNeuronImpl.get_recordable_units)
-    def get_recordable_units(self, variable: str) -> Optional[str]:
+    def get_recordable_units(self, variable: str) -> str:
         # TODO: Update with the appropriate units for variables
         if variable in ("v", "ex_input", "in_input"):
             return "mV"
@@ -117,7 +117,7 @@ class NeuronImplStocExp(AbstractNeuronImpl):
         raise ValueError("Unknown variable {}".format(variable))
 
     @overrides(AbstractNeuronImpl.get_recordable_variable_index)
-    def get_recordable_variable_index(self, variable: str) -> Optional[int]:
+    def get_recordable_variable_index(self, variable: str) -> int:
         if variable == "v":
             return 0
         if variable == "ex_input":
