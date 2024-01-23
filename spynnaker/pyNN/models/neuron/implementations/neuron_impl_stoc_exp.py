@@ -15,6 +15,7 @@
 from typing import Optional, Sequence, Mapping
 from spinn_front_end_common.interface.ds import DataType
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged import RangeDictionary
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractNeuronImpl, ModelParameter)
@@ -85,7 +86,7 @@ class NeuronImplStocExp(AbstractNeuronImpl):
         return 2
 
     @overrides(AbstractNeuronImpl.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         if target == "excitatory":
             return 0
         elif target == "inhibitory":
@@ -107,7 +108,7 @@ class NeuronImplStocExp(AbstractNeuronImpl):
                 "prob": DataType.U032}
 
     @overrides(AbstractNeuronImpl.get_recordable_units)
-    def get_recordable_units(self, variable) -> Optional[str]:
+    def get_recordable_units(self, variable: str) -> Optional[str]:
         # TODO: Update with the appropriate units for variables
         if variable in ("v", "ex_input", "in_input"):
             return "mV"
@@ -116,7 +117,7 @@ class NeuronImplStocExp(AbstractNeuronImpl):
         raise ValueError("Unknown variable {}".format(variable))
 
     @overrides(AbstractNeuronImpl.get_recordable_variable_index)
-    def get_recordable_variable_index(self, variable) -> Optional[int]:
+    def get_recordable_variable_index(self, variable: str) -> Optional[int]:
         if variable == "v":
             return 0
         if variable == "ex_input":
@@ -128,18 +129,18 @@ class NeuronImplStocExp(AbstractNeuronImpl):
         raise ValueError("Unknown variable {}".format(variable))
 
     @overrides(AbstractNeuronImpl.is_recordable)
-    def is_recordable(self, variable) -> bool:
+    def is_recordable(self, variable: str) -> bool:
         # TODO: Update to identify variables that can be recorded
         return variable in ("v", "ex_input", "in_input", "prob")
 
     @overrides(AbstractNeuronImpl.add_parameters)
-    def add_parameters(self, parameters):
+    def add_parameters(self, parameters: RangeDictionary):
         parameters[TAU] = self._tau
         parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
         parameters[BIAS] = self._bias
 
     @overrides(AbstractNeuronImpl.add_state_variables)
-    def add_state_variables(self, state_variables):
+    def add_state_variables(self, state_variables: RangeDictionary):
         state_variables[REFRACT_INIT] = self._refract_init
         state_variables[SEED0] = self._random
         state_variables[SEED1] = self._random
@@ -147,7 +148,7 @@ class NeuronImplStocExp(AbstractNeuronImpl):
         state_variables[SEED3] = self._random
 
     @overrides(AbstractNeuronImpl.get_units)
-    def get_units(self, variable) -> str:
+    def get_units(self, variable: str) -> str:
         return UNITS[variable]
 
     @property
