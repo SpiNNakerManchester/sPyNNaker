@@ -194,7 +194,7 @@ static inline uint32_t get_probability(UREAL tau, REAL p) {
 		// and so the value will be 0.  The most number of leading zeros is 32,
 		// so this is always >= 0.  If we have a bit in position 31 (a very big
 		// tau), this clz = 0 so this is 32, which means we can shift by 32
-		uint32_t over_right_shift = 32 - __builtin_clz(tau);
+		uint32_t over_right_shift = 32 - __builtin_clz(bitsuk(tau));
 
 		// If p <= 0, tau can only get smaller through multiplication with
 		// fractional powers, so there is no point in doing the calculation if
