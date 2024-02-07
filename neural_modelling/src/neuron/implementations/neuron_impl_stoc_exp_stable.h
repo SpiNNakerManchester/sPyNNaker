@@ -343,6 +343,10 @@ static void neuron_impl_do_timestep_update(
 			neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
 		    send_spike(timer_count, time, neuron_index);
 		}
+
+		if (neuron->v_membrane < neuron->v_reset) {
+			neuron->v_membrane = neuron->v_reset;
+		}
     }
 }
 
