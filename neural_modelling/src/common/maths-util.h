@@ -255,6 +255,7 @@ static const uint32_t fract_powers_2[] = {
 	0x10058, 0x1002c, 0x10016, 0x1000b, 0x10005, 0x10002, 0x10001
 };
 
+
 //! 2^-(1/2^n)) for values of n between 1 and 15, in U1616 format, then converted
 //! to uint32_t for computation.
 //! These can be used to work out negative fractional power of 2 by multiplication.
@@ -306,30 +307,6 @@ static inline UREAL pow_of_2(REAL p) {
 
 	return ukbits(accumulator);
 }
-
-//! 2^(1/(2^n)) for values of n between 1 and 31, in U3232 format, then converted
-//! to uint64_t for computation.
-//! These can be used to work out fractional powers of 2 by multiplication.
-static const uint64_t long_fract_powers_2[] = {
-	0x16a09e667L, 0x1306fe0a3L, 0x1172b83c7L, 0x10b5586cfL, 0x1059b0d31L, 0x102c9a3e7L,
-	0x10163da9fL, 0x100b1afa5L, 0x10058c86dL, 0x1002c605eL, 0x100162f39L, 0x1000b175eL,
-	0x100058ba0L, 0x10002c5ccL, 0x1000162e5L, 0x10000b172L, 0x1000058b9L, 0x100002c5cL,
-	0x10000162eL, 0x100000b17L, 0x10000058bL, 0x1000002c5L, 0x100000162L, 0x1000000b1L,
-	0x100000058L, 0x10000002cL, 0x100000016L, 0x10000000bL, 0x100000005L, 0x100000002L,
-	0x100000001L
-};
-
-//! 2^-(1/2^n)) for values of n between 0 and 31, in U3232 format, then converted
-//! to uint64_t for computation.
-//! These can be used to work out negative fractional power of 2 by multiplication.
-static const uint64_t long_fract_powers_half[] = {
-	0xb504f333L, 0xd744fccaL, 0xeac0c6e7L, 0xf5257d15L, 0xfa83b2dbL, 0xfd3e0c0cL,
-	0xfe9e115cL, 0xff4ecb59L, 0xffa75652L, 0xffd3a751L, 0xffe9d2b2L, 0xfff4e91bL,
-	0xfffa747eL, 0xfffd3a3bL, 0xfffe9d1cL, 0xffff4e8eL, 0xffffa747L, 0xffffd3a3L,
-	0xffffe9d1L, 0xfffff4e8L, 0xfffffa74L, 0xfffffd3aL, 0xfffffe9dL, 0xffffff4eL,
-	0xffffffa7L, 0xffffffd3L, 0xffffffe9L, 0xfffffff4L, 0xfffffffaL, 0xfffffffdL,
-	0xfffffffeL
-};
 
 static const uint64_t MAX_REAL = 0xFFFFFFFF0000L;
 

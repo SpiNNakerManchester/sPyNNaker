@@ -22,6 +22,7 @@ MODELS = IF_curr_exp \
          IF_curr_exp_ca2_adaptive \
          IF_curr_delta_ca2_adaptive \
          stoc_exp \
+         stoc_exp_stable \
          stoc_sigma
 
 ifneq ($(SPYNNAKER_DEBUG), DEBUG)
