@@ -151,7 +151,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         self._post_w = shape_post[WIDTH]
         self._post_h = shape_post[HEIGHT]
 
-        # Get the starting coords and step sizes (or defaults if not given)
+        # Get the starting coordinates and step sizes (or defaults if not given)
         if pre_start_coords_in_post is None:
             self._pre_start_w = 0
             self._pre_start_h = 0
@@ -230,7 +230,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
         """
-        # TODO: When slices become hashable, update this code to use them
         # directly as the cache index
         if post_vertex_slice not in self._post_as_pre:
             post_r, post_c = self.__to_post_coords(post_vertex_slice)
@@ -332,11 +331,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             # Loop over post-vertices
             for post_idx in range(
                     post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1):
-                # convert to common coord system
+                # convert to common coordinate system
                 pac_r = post_as_pre_r[post_idx - post_lo]
                 pac_c = post_as_pre_c[post_idx - post_lo]
 
-                # now convert common to pre coords
+                # now convert common to pre coordinates
                 pap_r, pap_c = self.__pre_as_post(pac_r, pac_c)
 
                 # Obtain coordinates to test against kernel sizes
@@ -458,7 +457,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         if n_connections <= 0:
             return numpy.zeros(0, dtype=syn_dtypes)
 
-        # 0 for exc, 1 for inh
+        # 0 for excitatory, 1 for inhibitory
         syn_type = numpy.array(all_pre_in_range_weights < 0)
         block = numpy.zeros(n_connections, dtype=syn_dtypes)
         block["source"] = all_pre_in_range

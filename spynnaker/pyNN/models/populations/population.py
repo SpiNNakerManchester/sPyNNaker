@@ -120,7 +120,6 @@ class Population(PopulationBase):
         self.__create_vertex(model, realsize, label, additional)
         self.__recorder = Recorder(population=self, vertex=self.__vertex)
 
-        # Internal structure now supported 23 November 2014 ADR
         # structure should be a valid Space.py structure type.
         # generation of positions is deferred until needed.
         self.__structure = structure
@@ -289,7 +288,7 @@ class Population(PopulationBase):
         """
         Returns a human-readable description of the population.
 
-        The output may be customized by specifying a different template
+        The output may be customised by specifying a different template
         together with an associated template engine (see
         :mod:`pyNN.descriptions`).
 
@@ -376,8 +375,8 @@ class Population(PopulationBase):
             self, variable: str, as_matrix: bool = False,
             view_indexes: Optional[Sequence[int]] = None) -> NDArray[floating]:
         """
-        Public accessor for getting data as a numpy array, instead of
-        the Neo-based object
+        SsPyNNaker specific method for getting data as a numpy array,
+        instead of the Neo-based object
 
         :param str variable: a single variable name.
         :type variable: str or list(str)

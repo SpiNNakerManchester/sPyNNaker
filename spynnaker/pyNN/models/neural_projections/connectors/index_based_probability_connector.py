@@ -166,7 +166,7 @@ class IndexBasedProbabilityConnector(AbstractConnector,
     def create_synaptic_block(
             self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
             synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
-        # setup probs here
+        # setup probabilities here
         probs = self._update_probs_from_index_expression(synapse_info)
 
         probs = probs[:, post_vertex_slice.get_raster_ids()].reshape(-1)

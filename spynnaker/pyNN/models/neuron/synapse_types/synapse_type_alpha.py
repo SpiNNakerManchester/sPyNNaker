@@ -110,7 +110,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self) -> int:
-        return 2  # EX and IH
+        return 2  # excitatory and inhibitory
 
     @overrides(AbstractSynapseType.get_synapse_id_by_target)
     def get_synapse_id_by_target(self, target: str) -> Optional[int]:

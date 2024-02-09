@@ -31,7 +31,7 @@ Weight_Types: TypeAlias = Optional[Union[
 Delay_Types: TypeAlias = \
     Union[float, str, RandomDistribution, NDArray[numpy.float64]]
 # These are the Types we know are coming in.
-# Most things that can be considered ints and floats will work
+# Most things that can be considered floats (including int)  will work
 Weight_Delay_In_Types: TypeAlias = Optional[Union[
     int, float, str, RandomDistribution, Iterable[int], Iterable[float]]]
 

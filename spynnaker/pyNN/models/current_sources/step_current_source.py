@@ -113,7 +113,7 @@ class StepCurrentSource(AbstractCurrentSource):
     @overrides(AbstractCurrentSource.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self) -> int:
         # The parameters themselves take up this amount of space
-        # ((len(times) + length_val)) * 2) + ID
+        # length(times) + length_val) * 2) + ID
         sdram_for_parameters = ((len(self.__times) + 1) * 2) * BYTES_PER_WORD
 
         # For each_source there is the last amplitude holder and index

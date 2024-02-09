@@ -41,7 +41,7 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                  safe=True, callback=None, verbose=False):
         """
         :param array:
-            An explicit boolean matrix that specifies the connections
+            An explicit Boolean matrix that specifies the connections
             between the pre- and post-populations
             (see PyNN documentation). Must be 2D in practice.
         :type array: ~numpy.ndarray(2, ~numpy.uint8)
@@ -60,7 +60,7 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         super().__init__(safe, callback, verbose)
         self.__array = array
         # we can get the total number of connections straight away
-        # from the boolean matrix
+        # from the Boolean matrix
         n_total_connections = 0
         # array shape
         dims = array.shape

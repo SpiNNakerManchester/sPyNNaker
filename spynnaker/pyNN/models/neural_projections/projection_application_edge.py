@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 
 class _Dynamics:
     """
-    Holds late-initialized class references.
+    Holds late-initialised class references.
     """
     _Structural: Optional[Type[AbstractSynapseDynamicsStructural]] = None
     _STDP: Optional[Type[SynapseDynamicsSTDP]] = None

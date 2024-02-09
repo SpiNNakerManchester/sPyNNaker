@@ -360,10 +360,10 @@ class ConvolutionConnector(AbstractConnector):
             min_y = post_slice_y.start - hlf_k_h
             max_y = (post_slice_y.stop + hlf_k_h) - 1
 
-            # Test that the start coords are in range i.e. less than max
+            # Test that the start coordinates are in range i.e. less than max
             start_in_range = numpy.logical_not(
                 numpy.any(post_slice_ranges[:, 0] > [max_x, max_y], axis=1))
-            # Test that the end coords are in range i.e. more than min
+            # Test that the end coordinates are in range i.e. more than min
             end_in_range = numpy.logical_not(
                 numpy.any(post_slice_ranges[:, 1] < [min_x, min_y], axis=1))
             # When both things are true, we have a vertex in range

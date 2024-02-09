@@ -389,7 +389,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         # delayed import due to circular dependencies
         from .data_population import DataPopulation as DataPop
-        # DataPopulation validates the pop_label so no need to do hre too
+        # DataPopulation validates the pop_label so no need to do here too
         return DataPop(self._database_file, pop_label)
 
     def get_recording_variables(self, pop_label: str) -> Tuple[str, ...]:

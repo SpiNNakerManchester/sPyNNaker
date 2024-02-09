@@ -112,7 +112,7 @@ class SynapseDynamicsNeuromodulation(
 
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:
-        # Shouln't ever come up, but if it does, it is False!
+        # Shouldn't ever come up, but if it does, it is False!
         return False
 
     def is_neuromodulation_same_as(self, other) -> bool:

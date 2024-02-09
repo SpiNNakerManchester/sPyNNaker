@@ -75,8 +75,6 @@ class RandomDistribution(pyNN.random.RandomDistribution):
           - ``mu``, ``kappa``
           -
     """
-    # TODO: should uniform_int be randint to match utility_calls.STATS_BY_NAME?
-
     # Pylint is wrong about the super-delegation being useless
     def __init__(  # pylint: disable=useless-super-delegation
             self, distribution: str, parameters_pos: Optional[tuple] = None,

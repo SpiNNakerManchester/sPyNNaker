@@ -67,7 +67,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
                         f"Expected types in collection are int and float")
             return
         except TypeError:
-            # Ok not a collection
+            # OK not a collection
             pass
         raise TypeError(
             f"Unexpected type for {name}: {type(value)}. "

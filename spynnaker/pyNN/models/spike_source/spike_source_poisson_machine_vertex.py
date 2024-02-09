@@ -165,7 +165,7 @@ SDRAM_EDGE_PARAMS_BYTES_PER_WEIGHT = BYTES_PER_SHORT
 
 # SDRAM edge param base size:
 # 1. address, 2. size of transfer,
-# 3. offset to start writing, 4. VLA of weights (not counted here)
+# 3. offset to start writing, 4. Array of weights (not counted here)
 SDRAM_EDGE_PARAMS_BASE_BYTES = 3 * BYTES_PER_WORD
 
 _ONE_WORD = struct.Struct("<I")
@@ -219,7 +219,7 @@ class SpikeSourcePoissonMachineVertex(
     # The maximum timestep - this is the maximum value of a uint32
     _MAX_TIMESTEP = 0xFFFFFFFF
 
-    # as suggested by MH (between Exp and Knuth)
+    # between Exp and Knuth
     SLOW_RATE_PER_TICK_CUTOFF = 0.01
 
     # between Knuth algorithm and Gaussian approx.
@@ -350,7 +350,7 @@ class SpikeSourcePoissonMachineVertex(
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes))
 
-        # Write provenence space
+        # Write provenance space
         self.reserve_provenance_data_region(spec)
 
         # write parameters

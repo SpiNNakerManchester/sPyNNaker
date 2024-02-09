@@ -152,7 +152,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__user_max_delay = max_delay
         self.__user_allow_delay_extension = allow_delay_extension
         if max_delay is None:
-            # to be calcutaed by __update_max_delay
+            # to be calculated by __update_max_delay
             self.__expect_delay_extension: Optional[bool] = None
         else:
             # The user may ask for the delay even if then told no

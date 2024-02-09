@@ -195,7 +195,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         m_vertex_mapping = self.__id_to_m_vertex_index(
             n_post_atoms, post_slices)
 
-        # Get which index of the fromlist is on which vertex
+        # Get which index of the from list is on which vertex
         target_vertices = m_vertex_mapping[self.__targets[input_filter]]
 
         # Get how many on each vertex there are
@@ -442,6 +442,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         # Check any additional parameters have single values over the whole
         # set of connections (as other things aren't currently supported)
         for i in extra_columns:
+            # pylint: disable=wrong-spelling-in-comment
             # numpy.ptp gives the difference between the maximum and
             # minimum values of an array, so if 0, all values are equal
             if numpy.ptp(self.__conn_list[:, i]):

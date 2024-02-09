@@ -183,7 +183,7 @@ class DataPopulation(object):
     def __getitem__(self, index_or_slice: Selector) -> DataPopulation:
         """
         :param selector: a slice or numpy mask array.
-            The mask array should either be a boolean array (ideally) of the
+            The mask array should either be a Boolean array (ideally) of the
             same size as the parent,
             or an integer array containing cell indices,
             i.e. if `p.size == 5` then:

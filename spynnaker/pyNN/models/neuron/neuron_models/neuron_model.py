@@ -19,7 +19,7 @@ from spynnaker.pyNN.models.neuron.implementations import (
 class NeuronModel(AbstractStandardNeuronComponent):
     # pylint: disable=abstract-method
     """
-    A component of a neuron that is the model of the soma.
+    A component of a neuron that is the model of the model.
     """
     __slots__ = ()
 

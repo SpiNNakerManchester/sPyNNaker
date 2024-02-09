@@ -80,7 +80,8 @@ def spynnaker_neuron_graph_network_specification_report() -> None:
     # write edges into dot diagram
     _generate_edges(dot_diagram, vertex_ids, progress)
 
-    # write dot file and generate pdf
+
+    # write dot file and generate PDF
     file_to_output = os.path.join(
         SpynnakerDataView.get_run_dir_path(), _GRAPH_NAME)
     try:

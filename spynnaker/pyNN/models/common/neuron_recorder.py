@@ -287,7 +287,7 @@ class NeuronRecorder(object):
                     "Population {} has multiple recorded data for time {}"
                     " in region {} ", label, time, region)
             else:
-                # Set row to NaN
+                # Set row to Nan
                 fragment[i] = numpy.full(n_neurons, numpy.nan)
         return fragment
 

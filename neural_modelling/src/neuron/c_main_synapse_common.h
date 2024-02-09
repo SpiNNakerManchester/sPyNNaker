@@ -96,7 +96,7 @@ static inline void store_synapse_provenance(struct synapse_provenance *prov) {
 //! \param[in/out] n_recording_regions_used: Pointer to variable which starts
 //!                                          as the next recording region to use
 //!                                          and is updated with regions used here
-//! \return a boolean indicating success (True) or failure (False)
+//! \return a Boolean indicating success (True) or failure (False)
 static inline bool initialise_synapse_regions(
         data_specification_metadata_t *ds_regions,
         struct synapse_regions regions, weight_t **ring_buffers,

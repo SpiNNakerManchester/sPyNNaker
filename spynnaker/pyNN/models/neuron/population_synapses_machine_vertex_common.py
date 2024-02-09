@@ -44,7 +44,7 @@ SDRAM_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
 # Size of the Key config params = 1 work for key + 1 word for mask
 #  + 1 word for spike mask + 1 word for colour shift
-#  + 1 word for self connection boolean
+#  + 1 word for self connection Boolean
 KEY_CONFIG_SIZE = 5 * BYTES_PER_WORD
 
 

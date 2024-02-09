@@ -139,11 +139,12 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             this duration.  The continue_simulation() method must then be
             called for the simulation to continue.
         """
-        # extra post prerun algorithms
+        # sPyNNaker specific algorithms to do before starting a run
         self.__flush_post_vertex_caches()
 
         super(SpiNNaker, self).run(run_time, sync_time)
-        # extra post run algorithms
+
+        # PyNNaker specific algorithms to do after finishing a run
         self.__flush_post_vertex_caches()
 
     def __flush_post_vertex_caches(self) -> None:

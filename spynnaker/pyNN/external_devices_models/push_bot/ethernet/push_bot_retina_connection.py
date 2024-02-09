@@ -122,7 +122,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
                 self.__next_data = None
 
             # Go through the data and find pairs where the first of the pair
-            # has a 1 in the MSB
+            # has a 1 in the most significant bit
             data_all = b''
             for i in range(len(data)):
                 if data[i] > 128:
