@@ -43,6 +43,7 @@ def get_pushbot_wifi_connection(remote_host, remote_port=56000):
 
 
 class PushBotWIFIConnection(Connection, Listenable):
+    # pylint: disable=wrong-spelling-in-docstring
     """
     A connection to a PushBot via Wi-Fi.
     """

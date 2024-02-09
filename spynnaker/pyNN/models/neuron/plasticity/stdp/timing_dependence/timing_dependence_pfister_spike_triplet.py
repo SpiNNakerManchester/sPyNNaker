@@ -29,6 +29,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
 
 
 class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
+    # pylint: disable=wrong-spelling-in-docstring
     """
     A timing dependence STDP rule based on spike triplets.
 

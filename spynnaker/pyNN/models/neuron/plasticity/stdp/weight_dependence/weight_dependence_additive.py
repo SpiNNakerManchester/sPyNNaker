@@ -104,6 +104,7 @@ class WeightDependenceAdditive(
                 data=self.__w_max * global_weight_scale,
                 data_type=DataType.S1615)
 
+            # pylint: disable=wrong-spelling-in-comment
             # Based on http://data.andrewdavison.info/docs/PyNN/_modules/pyNN
             #                /standardmodels/synapses.html
             # Pre-multiply A+ and A- by Wmax

@@ -25,7 +25,7 @@ RECORD_STATE_BIT = 1 << 1
 RECORD_GSYN_BIT = 1 << 2
 RECORDING_ENTRY_BYTE_SIZE = BYTES_PER_WORD
 
-
+# pylint: disable=wrong-spelling-in-comment
 # From neuron common-typedefs.h
 SYNAPSE_INDEX_BITS = 8
 MAX_NEURON_SIZE = 1 << SYNAPSE_INDEX_BITS

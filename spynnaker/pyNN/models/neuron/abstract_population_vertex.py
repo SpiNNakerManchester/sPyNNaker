@@ -1109,6 +1109,7 @@ class AbstractPopulationVertex(
                                 POSSION_SIGMA_SUMMATION_LIMIT *
                                 math.sqrt(average_spikes_per_timestep)))
 
+        # pylint:disable=wrong-spelling-in-comment
         # Closed-form exact solution for summation that gives the variance
         # contributed by weight distribution variation when modulated by
         # Poisson PDF.  Requires scipy.special for gamma and incomplete gamma

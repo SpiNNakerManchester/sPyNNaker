@@ -37,6 +37,7 @@ def _signed_int(uint_value: Optional[int]) -> int:
 
 
 class PushBotTranslator(AbstractEthernetTranslator):
+    # pylint: disable=wrong-spelling-in-docstring
     """
     Translates packets between PushBot Multicast packets and PushBot
     Wi-Fi Commands.
@@ -47,6 +48,7 @@ class PushBotTranslator(AbstractEthernetTranslator):
 
     def __init__(self, protocol: MunichIoSpiNNakerLinkProtocol,
                  pushbot_wifi_connection: PushBotWIFIConnection):
+        # pylint: disable=wrong-spelling-in-docstring
         """
         :param MunichIoEthernetProtocol protocol:
             The instance of the PushBot protocol to get keys from
@@ -60,7 +62,6 @@ class PushBotTranslator(AbstractEthernetTranslator):
     def translate_control_packet(self, multicast_packet: MultiCastCommand):
         # pylint: disable=too-many-statements, too-many-branches
         key = multicast_packet.key
-
         # disable retina
         if key == self.__protocol.disable_retina_key:
             logger.debug("Sending retina disable")
