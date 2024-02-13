@@ -6065,60 +6065,6 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>profile_tags.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
-    <filename>neuron_2profile__tags_8h.html</filename>
-    <member kind="enumeration">
-      <type></type>
-      <name>profiler_tags_e</name>
-      <anchorfile>neuron_2profile__tags_8h.html</anchorfile>
-      <anchor>a0d952ae768d975f73145cdb93a775973</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>PROFILER_TIMER</name>
-      <anchorfile>neuron_2profile__tags_8h.html</anchorfile>
-      <anchor>a0d952ae768d975f73145cdb93a775973a54cf15346177f758a5cf2bddf4584f47</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>PROFILER_DMA_READ</name>
-      <anchorfile>neuron_2profile__tags_8h.html</anchorfile>
-      <anchor>a0d952ae768d975f73145cdb93a775973a23b8508f6c83d4ea5af04cef9377aebb</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>PROFILER_INCOMING_SPIKE</name>
-      <anchorfile>neuron_2profile__tags_8h.html</anchorfile>
-      <anchor>a0d952ae768d975f73145cdb93a775973a06f29c1c8c010cad288570a2e846bef9</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>PROFILER_PROCESS_FIXED_SYNAPSES</name>
-      <anchorfile>neuron_2profile__tags_8h.html</anchorfile>
-      <anchor>a0d952ae768d975f73145cdb93a775973a6325244b78e2b4c5f39ec14a58b9679d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>PROFILER_PROCESS_PLASTIC_SYNAPSES</name>
-      <anchorfile>neuron_2profile__tags_8h.html</anchorfile>
-      <anchor>a0d952ae768d975f73145cdb93a775973a070e57e10719c6c91dfe162487a31018</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="file">
-    <name>profile_tags.h</name>
-    <path>/github/workspace/neural_modelling/src/spike_source/poisson/</path>
-    <filename>spike__source_2poisson_2profile__tags_8h.html</filename>
-    <member kind="enumeration">
-      <type></type>
-      <name>ssp_profiler_tags</name>
-      <anchorfile>spike__source_2poisson_2profile__tags_8h.html</anchorfile>
-      <anchor>abdc12e2df9e44bac3198456b4bdb6876</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="file">
     <name>regions.h</name>
     <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>regions_8h.html</filename>
@@ -8620,6 +8566,60 @@
       <name>infinite_run</name>
       <anchorfile>robot__motor__control_8c.html</anchorfile>
       <anchor>a9ee6c18f2c55e2b60ea4194d4722f735</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>profile_tags.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <filename>neuron_2profile__tags_8h.html</filename>
+    <member kind="enumeration">
+      <type></type>
+      <name>profiler_tags_e</name>
+      <anchorfile>neuron_2profile__tags_8h.html</anchorfile>
+      <anchor>a0d952ae768d975f73145cdb93a775973</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>PROFILER_TIMER</name>
+      <anchorfile>neuron_2profile__tags_8h.html</anchorfile>
+      <anchor>a0d952ae768d975f73145cdb93a775973a54cf15346177f758a5cf2bddf4584f47</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>PROFILER_DMA_READ</name>
+      <anchorfile>neuron_2profile__tags_8h.html</anchorfile>
+      <anchor>a0d952ae768d975f73145cdb93a775973a23b8508f6c83d4ea5af04cef9377aebb</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>PROFILER_INCOMING_SPIKE</name>
+      <anchorfile>neuron_2profile__tags_8h.html</anchorfile>
+      <anchor>a0d952ae768d975f73145cdb93a775973a06f29c1c8c010cad288570a2e846bef9</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>PROFILER_PROCESS_FIXED_SYNAPSES</name>
+      <anchorfile>neuron_2profile__tags_8h.html</anchorfile>
+      <anchor>a0d952ae768d975f73145cdb93a775973a6325244b78e2b4c5f39ec14a58b9679d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>PROFILER_PROCESS_PLASTIC_SYNAPSES</name>
+      <anchorfile>neuron_2profile__tags_8h.html</anchorfile>
+      <anchor>a0d952ae768d975f73145cdb93a775973a070e57e10719c6c91dfe162487a31018</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>profile_tags.h</name>
+    <path>/github/workspace/neural_modelling/src/spike_source/poisson/</path>
+    <filename>spike__source_2poisson_2profile__tags_8h.html</filename>
+    <member kind="enumeration">
+      <type></type>
+      <name>ssp_profiler_tags</name>
+      <anchorfile>spike__source_2poisson_2profile__tags_8h.html</anchorfile>
+      <anchor>abdc12e2df9e44bac3198456b4bdb6876</anchor>
       <arglist></arglist>
     </member>
   </compound>
