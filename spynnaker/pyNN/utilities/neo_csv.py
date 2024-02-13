@@ -360,7 +360,7 @@ class NeoCsv(object):
     def _insert_neo_rewirings(
             self, segment: Segment, event_array: NDArray, variable: str):
         """
-        Adds data that represent rewirings events to a neo segment.
+        Adds data that represent rewire events to a neo segment.
 
         :param ~neo.core.Segment segment: Segment to add data to
         :param ~numpy.ndarray event_array: the raw "event" data
@@ -389,7 +389,7 @@ class NeoCsv(object):
 
     def _csv_rewirings(self, csv_writer: CSVWriter, event_array: NDArray):
         """
-        Adds data that represent rewirings events to a CSV file.
+        Adds data that represent rewires events to a CSV file.
 
         :param ~csv.writer csv_writer: Open CSV writer to write to
         :param ~numpy.ndarray event_array: the raw "event" data

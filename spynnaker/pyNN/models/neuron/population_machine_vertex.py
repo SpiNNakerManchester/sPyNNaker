@@ -48,7 +48,7 @@ class SpikeProcessingProvenance(ctypes.LittleEndianStructure):
         ("n_dmas_complete", ctypes.c_uint32),
         # The number of spikes successfully processed
         ("n_spikes_processed", ctypes.c_uint32),
-        # The number of rewirings performed.
+        # The number of rewires performed.
         ("n_rewires", ctypes.c_uint32),
         # The number of packets that were dropped due to being late
         ("n_late_packets", ctypes.c_uint32),

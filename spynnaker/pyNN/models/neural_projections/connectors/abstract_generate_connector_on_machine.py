@@ -91,7 +91,7 @@ class AbstractGenerateConnectorOnMachine(
         Get the id of the weight generator on the machine.
 
         :param weights:
-        :type weights: ~pyNN.random.RandomDistribtuion or int or float
+        :type weights: ~pyNN.random.RandomDistribution or int or float
         :rtype: int
         """
         return param_generator_id(weights)

@@ -1280,7 +1280,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         Writes the data including metadata to a CSV file.
         Overwrites any previous data in the file.
 
-        :param str csvfile: Path to file to write block metadata to
+        :param str csv_file: Path to file to write block metadata to
         :param str pop_label: The label for the population of interest
 
             .. note::
