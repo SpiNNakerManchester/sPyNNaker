@@ -1287,13 +1287,13 @@ class AbstractPopulationVertex(
             addr = self.__add_matrix_size(addr, proj, n_post_atoms)
         return addr
 
-    def __add_matrix_size(
-            self, addr: int, projection: Projection, n_post_atoms: int) -> int:
+    def __add_matrix_size(self, address: int, projection: Projection,
+                          n_post_atoms: int) -> int:
         """
         Add to the address the size of the matrices for the projection to
         the vertex slice.
 
-        :param int addr: The address to start from
+        :param int address: The address to start from
         :param ~spynnaker.pyNN.models.projection.Projection:
             The projection to add
         :param int n_post_atoms: The number of atoms projected to
@@ -1314,17 +1314,17 @@ class AbstractPopulationVertex(
         if max_row_info.undelayed_max_n_synapses > 0:
             size = n_sub_atoms * max_row_info.undelayed_max_bytes
             for _ in range(n_sub_edges):
-                addr = MasterPopTableAsBinarySearch.get_next_allowed_address(
-                    addr)
-                addr += size
+                address = MasterPopTableAsBinarySearch.get_next_allowed_address(
+                    address)
+                address += size
         if max_row_info.delayed_max_n_synapses > 0:
             size = (n_sub_atoms * max_row_info.delayed_max_bytes *
                     app_edge.n_delay_stages)
             for _ in range(n_sub_edges):
-                addr = MasterPopTableAsBinarySearch.get_next_allowed_address(
-                    addr)
-                addr += size
-        return addr
+                address = MasterPopTableAsBinarySearch.get_next_allowed_address(
+                    address)
+                address += size
+        return address
 
     def get_max_row_info(
             self, synapse_info: SynapseInformation, n_post_atoms: int,

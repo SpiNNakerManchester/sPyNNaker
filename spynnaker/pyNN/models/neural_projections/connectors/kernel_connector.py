@@ -249,32 +249,32 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         c = ((pre_c - self._pre_start_w - 1) // self._pre_step_w) + 1
         return (r, c)
 
-    def __get_kernel_vals(self, vals: Optional[Union[
+    def __get_kernel_vals(self, values: Optional[Union[
             _Kernel, Weight_Delay_Types]]) -> Optional[ConvolutionKernel]:
         """
         Convert kernel values given into the correct format.
 
-        :param vals:
-        :type vals: int or float or ~pyNN.random.RandomDistribution
+        :param values:
+        :type values: int or float or ~pyNN.random.RandomDistribution
             or ~numpy.ndarray or ConvolutionKernel
         :rtype: ~numpy.ndarray
         """
-        if vals is None:
+        if values is None:
             return None
-        if isinstance(vals, list):
-            vals = numpy.asarray(vals)
+        if isinstance(values, list):
+            values = numpy.asarray(values)
         krn_size = self._kernel_h * self._kernel_w
         krn_shape = (self._kernel_h, self._kernel_w)
-        if isinstance(vals, RandomDistribution):
-            return numpy.array(vals.next(krn_size)).reshape(krn_shape).view(
+        if isinstance(values, RandomDistribution):
+            return numpy.array(values.next(krn_size)).reshape(krn_shape).view(
                 ConvolutionKernel)
-        elif numpy.isscalar(vals):
-            return numpy.full(krn_shape, vals).view(ConvolutionKernel)
-        elif ((isinstance(vals, numpy.ndarray) or
-                isinstance(vals, ConvolutionKernel)) and
-                vals.shape[HEIGHT] == self._kernel_h and
-                vals.shape[WIDTH] == self._kernel_w):
-            return vals.view(ConvolutionKernel)
+        elif numpy.isscalar(values):
+            return numpy.full(krn_shape, values).view(ConvolutionKernel)
+        elif ((isinstance(values, numpy.ndarray) or
+               isinstance(values, ConvolutionKernel)) and
+              values.shape[HEIGHT] == self._kernel_h and
+              values.shape[WIDTH] == self._kernel_w):
+            return values.view(ConvolutionKernel)
         raise SpynnakerException(
             "Error generating KernelConnector values; if you have supplied "
             "weight and/or delay kernel then ensure they are the same size "
