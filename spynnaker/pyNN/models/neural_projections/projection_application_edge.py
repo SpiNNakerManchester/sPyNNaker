@@ -176,15 +176,18 @@ class ProjectionApplicationEdge(
 
     @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self) -> None:
+        # pylint: disable=missing-function-docstring
         for synapse_info in self.synapse_information:
             synapse_info.connector.get_provenance_data(synapse_info)
 
     @property
     @overrides(ApplicationEdge.pre_vertex)
     def pre_vertex(self) -> PopulationApplicationVertex:
+        # pylint: disable=missing-function-docstring
         return cast(PopulationApplicationVertex, super().pre_vertex)
 
     @property
     @overrides(ApplicationEdge.post_vertex)
     def post_vertex(self) -> AbstractPopulationVertex:
+        # pylint: disable=missing-function-docstring
         return cast('AbstractPopulationVertex', super().post_vertex)

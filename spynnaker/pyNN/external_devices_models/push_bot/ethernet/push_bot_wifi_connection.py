@@ -16,6 +16,7 @@ import logging
 import select
 import socket
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
 from spinn_utilities.ping import Ping
 from spinnman.connections.abstract_classes import Listenable, Connection
 from spinnman.utilities.socket_utils import (
@@ -172,8 +173,12 @@ class PushBotWIFIConnection(Connection, Listenable):
             pass
         self.__socket.close()
 
+    @overrides(Listenable.is_ready_to_receive)
     def is_ready_to_receive(self, timeout=0):
+        # pylint: disable=missing-function-docstring
         return bool(select.select([self.__socket], [], [], timeout)[0])
 
+    @overrides(Listenable.get_receive_method)
     def get_receive_method(self):
+        # pylint: disable=missing-function-docstring
         return self.receive

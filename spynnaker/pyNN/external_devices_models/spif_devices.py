@@ -355,11 +355,13 @@ class _DelayedMultiCastCommand(MultiCastCommand):
     @property
     @overrides(MultiCastCommand.payload)
     def payload(self) -> int:
+        # pylint: disable=missing-function-docstring
         return self.__get_payload(self.__index)
 
     @property
     @overrides(MultiCastCommand.is_payload)
     def is_payload(self) -> bool:
+        # pylint: disable=missing-function-docstring
         return True
 
 

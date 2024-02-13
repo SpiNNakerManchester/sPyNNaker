@@ -121,12 +121,14 @@ class ExternalDeviceLifControlVertex(
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.dependent_vertices)
     def dependent_vertices(self) -> Iterable[ApplicationVertex]:
+        # pylint: disable=missing-function-docstring
         return self.__dependent_vertices
 
     @overrides(AbstractVertexWithEdgeToDependentVertices
                .edge_partition_identifiers_for_dependent_vertex)
     def edge_partition_identifiers_for_dependent_vertex(
             self, vertex: ApplicationVertex) -> Iterable[str]:
+        # pylint: disable=missing-function-docstring
         assert isinstance(vertex, AbstractMulticastControllableDevice)
         return [vertex.device_control_partition_id]
 
@@ -159,6 +161,7 @@ class ExternalDeviceLifControlVertex(
     @overrides(AbstractPopulationVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(
             self, partition_id: str) -> Optional[BaseKeyAndMask]:
+        # pylint: disable=missing-function-docstring
         return BaseKeyAndMask(
             self.__devices[partition_id].device_control_key,
             self._DEFAULT_COMMAND_MASK)

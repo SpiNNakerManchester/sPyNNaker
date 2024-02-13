@@ -88,6 +88,7 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
     @property
     @overrides(ApplicationVertex.atoms_shape)
     def atoms_shape(self) -> Tuple[int, ...]:
+        # pylint: disable=missing-function-docstring
         return self.__partition.pre_vertex.atoms_shape
 
     @property

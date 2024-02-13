@@ -209,6 +209,7 @@ class SPIFRetinaDevice(
     @overrides(Application2DFPGAVertex.get_incoming_slice_for_link)
     def get_incoming_slice_for_link(
             self, link: FPGAConnection, index: int) -> Slice:
+        # pylint: disable=missing-function-docstring
         vertex_slice = super().get_incoming_slice_for_link(link, index)
         self.__index_by_slice[link.fpga_link_id, vertex_slice] = index
         return vertex_slice
@@ -217,6 +218,7 @@ class SPIFRetinaDevice(
     def get_machine_fixed_key_and_mask(
             self, machine_vertex: MachineVertex,
             partition_id: str) -> BaseKeyAndMask:
+        # pylint: disable=missing-function-docstring
         assert isinstance(machine_vertex, MachineFPGAVertex)
         fpga_link_id = machine_vertex.fpga_link_id
         vertex_slice = machine_vertex.vertex_slice
@@ -234,6 +236,7 @@ class SPIFRetinaDevice(
 
     @overrides(Application2DFPGAVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(self, partition_id: str) -> BaseKeyAndMask:
+        # pylint: disable=missing-function-docstring
         n_key_bits = BITS_IN_KEY - self._key_shift
         key_mask = ((1 << n_key_bits) - 1) << self._key_shift
         return BaseKeyAndMask(self.__base_key << self._key_shift, key_mask)
@@ -241,6 +244,7 @@ class SPIFRetinaDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self) -> Iterable[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         # Make sure everything has stopped
         commands = [SpiNNFPGARegister.STOP.cmd()]
 
@@ -308,12 +312,14 @@ class SPIFRetinaDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self) -> Iterable[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         # Send the stop signal
         yield SpiNNFPGARegister.STOP.cmd()
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self) -> List[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         return []
 
     @overrides(PopulationApplicationVertex.get_atom_key_map)

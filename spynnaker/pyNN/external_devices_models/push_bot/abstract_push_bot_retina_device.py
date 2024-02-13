@@ -38,6 +38,7 @@ class AbstractPushBotRetinaDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self) -> Iterable[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         # add mode command if not done already
         if not self._protocol.sent_mode_command():
             yield self._protocol.set_mode()
@@ -53,9 +54,11 @@ class AbstractPushBotRetinaDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self) -> Iterable[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         yield self._protocol.disable_retina()
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self) -> List[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         return []

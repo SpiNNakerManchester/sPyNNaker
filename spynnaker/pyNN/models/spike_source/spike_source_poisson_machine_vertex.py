@@ -251,6 +251,7 @@ class SpikeSourcePoissonMachineVertex(
     @property
     @overrides(MachineVertex.sdram_required)
     def sdram_required(self) -> AbstractSDRAM:
+        # pylint: disable=missing-function-docstring
         return self.__sdram
 
     @property
@@ -265,50 +266,60 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self) -> List[int]:
+        # pylint: disable=missing-function-docstring
         if self.__is_recording:
             return [0]
         return []
 
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
     def get_recording_region_base_address(self, placement: Placement) -> int:
+        # pylint: disable=missing-function-docstring
         return locate_memory_region_for_placement(
             placement, self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION)
 
     @overrides(AbstractHasProfileData.get_profile_data)
     def get_profile_data(self, placement: Placement) -> ProfileData:
+        # pylint: disable=missing-function-docstring
         return profile_utils.get_profiling_data(
             self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION,
             self.PROFILE_TAG_LABELS, placement)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self) -> str:
+        # pylint: disable=missing-function-docstring
         return "spike_source_poisson.aplx"
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self) -> ExecutableType:
+        # pylint: disable=missing-function-docstring
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractMaxSpikes.max_spikes_per_second)
     def max_spikes_per_second(self) -> float:
+        # pylint: disable=missing-function-docstring
         return self._pop_vertex.max_rate
 
     @overrides(AbstractMaxSpikes.max_spikes_per_ts)
     def max_spikes_per_ts(self) -> float:
+        # pylint: disable=missing-function-docstring
         return self._pop_vertex.max_spikes_per_ts()
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self) -> bool:
+        # pylint: disable=missing-function-docstring
         if self.__rate_changed:
             return True
         return SpynnakerDataView.get_first_machine_time_step() == 0
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value: bool):
+        # pylint: disable=missing-function-docstring
         self.__rate_changed = new_value
 
     @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(
             self, spec: DataSpecificationReloader, placement: Placement):
+        # pylint: disable=missing-function-docstring
         # write rates
         self._write_poisson_rates(spec)
 
@@ -324,6 +335,7 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(
             self, spec: DataSpecificationGenerator, placement: Placement):
+        # pylint: disable=missing-function-docstring
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
         # if we are here, the rates have changed!
         self.__rate_changed = True
@@ -572,6 +584,7 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge) -> int:
+        # pylint: disable=missing-function-docstring
         if isinstance(sdram_machine_edge.post_vertex,
                       ReceivesSynapticInputsOverSDRAM):
             return sdram_machine_edge.post_vertex.n_bytes_for_transfer
@@ -580,4 +593,5 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id: str) -> int:
+        # pylint: disable=missing-function-docstring
         return self.vertex_slice.n_atoms << self._pop_vertex.n_colour_bits

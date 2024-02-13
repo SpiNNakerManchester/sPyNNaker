@@ -14,7 +14,10 @@
 from __future__ import annotations
 from collections.abc import Iterable
 from typing import List, Optional, Union, cast, TYPE_CHECKING
+
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
     from spynnaker.pyNN.models.utility_models.delays import (
@@ -57,11 +60,15 @@ class DelayedApplicationEdge(ApplicationEdge):
         self.__undelayed_edge = undelayed_edge
 
     @property
+    @overrides(ApplicationEdge.pre_vertex)
     def pre_vertex(self) -> DelayExtensionVertex:
+        # pylint: disable=missing-function-docstring
         return cast('DelayExtensionVertex', super().pre_vertex)
 
     @property
+    @overrides(ApplicationEdge.post_vertex)
     def post_vertex(self) -> AbstractPopulationVertex:
+        # pylint: disable=missing-function-docstring
         return cast('AbstractPopulationVertex', super().post_vertex)
 
     @property

@@ -371,8 +371,10 @@ class AbstractPopulationVertex(
         self.__have_read_initial_values = False
         self.__last_parameter_read_time: Optional[float] = None
 
-    @property  # type: ignore[override]
+    @property
+    @overrides(PopulationApplicationVertex.splitter)
     def splitter(self) -> SplitterAbstractPopulationVertex:
+        # pylint: disable=missing-function-docstring
         s = self._splitter
         if s is None:
             raise PacmanConfigurationException(
@@ -399,6 +401,7 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.get_max_atoms_per_core)
     def get_max_atoms_per_core(self) -> int:
+        # pylint: disable=missing-function-docstring
         max_atoms = super().get_max_atoms_per_core()
 
         # Dynamically adjust depending on the needs of the synapse dynamics
@@ -408,6 +411,7 @@ class AbstractPopulationVertex(
     @overrides(
         PopulationApplicationVertex.get_max_atoms_per_dimension_per_core)
     def get_max_atoms_per_dimension_per_core(self) -> Tuple[int, ...]:
+        # pylint: disable=missing-function-docstring
         max_atoms = self.get_max_atoms_per_core()
 
         # If single dimensional, we can use the max atoms calculation
@@ -436,6 +440,7 @@ class AbstractPopulationVertex(
                set_max_atoms_per_dimension_per_core)
     def set_max_atoms_per_dimension_per_core(
             self, new_value: Union[None, int, Tuple[int, ...]]):
+        # pylint: disable=missing-function-docstring
         if new_value is not None:
             max_atoms = self.__synapse_dynamics.absolute_max_atoms_per_core
             if numpy.prod(new_value) > max_atoms:
@@ -539,11 +544,13 @@ class AbstractPopulationVertex(
     @property
     @overrides(PopulationApplicationVertex.n_atoms)
     def n_atoms(self) -> int:
+        # pylint: disable=missing-function-docstring
         return self.__n_atoms
 
     @property
     @overrides(PopulationApplicationVertex.atoms_shape)
     def atoms_shape(self) -> Tuple[int, ...]:
+        # pylint: disable=missing-function-docstring
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.__n_atoms)
         return super().atoms_shape
@@ -1055,6 +1062,7 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self) -> None:
+        # pylint: disable=missing-function-docstring
         # Reset state variables
         self.__state_variables.copy_into(self.__initial_state_variables)
 

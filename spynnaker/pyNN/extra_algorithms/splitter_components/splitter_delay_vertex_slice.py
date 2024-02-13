@@ -55,11 +55,13 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(
             self, partition_id: str) -> Sequence[MachineVertex]:
+        # pylint: disable=missing-function-docstring
         return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(
             self, partition_id: str) -> Sequence[MachineVertex]:
+        # pylint: disable=missing-function-docstring
         return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
@@ -67,6 +69,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
             self, source_vertex: ApplicationVertex,
             partition_id: str) -> Sequence[Tuple[
                 DelayExtensionMachineVertex, Sequence[MachineVertex]]]:
+        # pylint: disable=missing-function-docstring
         # Only connect to the source that matches the slice
         return [
             (self._machine_vertex_by_slice[m_vertex.vertex_slice], [m_vertex])
@@ -75,6 +78,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter: ChipCounter):
+        # pylint: disable=missing-function-docstring
         source_app_vertex = self.governed_app_vertex.source_vertex
         slices = source_app_vertex.splitter.get_out_going_slices()
 
@@ -87,16 +91,19 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self) -> Sequence[Slice]:
+        # pylint: disable=missing-function-docstring
         other_splitter = self.governed_app_vertex.source_vertex.splitter
         return other_splitter.get_in_coming_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self) -> Sequence[Slice]:
+        # pylint: disable=missing-function-docstring
         other_splitter = self.governed_app_vertex.source_vertex.splitter
         return other_splitter.get_out_going_slices()
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex: DelayExtensionVertex):
+        # pylint: disable=missing-function-docstring
         super().set_governed_app_vertex(app_vertex)
         if not isinstance(app_vertex, DelayExtensionVertex):
             raise PacmanConfigurationException(
@@ -139,11 +146,13 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(
             self, variable_to_record: str) -> Iterable[MachineVertex]:
+        # pylint: disable=missing-function-docstring
         raise PacmanInvalidParameterException(
             variable_to_record, variable_to_record, self.DELAY_RECORDING_ERROR)
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self) -> None:
+        # pylint: disable=missing-function-docstring
         self._machine_vertex_by_slice = dict()
 
     def get_machine_vertex(

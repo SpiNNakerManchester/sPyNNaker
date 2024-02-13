@@ -228,6 +228,7 @@ class PopulationNeuronsMachineVertex(
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
             provenance_data: Sequence[int]):
+        # pylint: disable=missing-function-docstring
         self._parse_neuron_provenance(
             x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
 
@@ -247,6 +248,7 @@ class PopulationNeuronsMachineVertex(
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self) -> List[int]:
+        # pylint: disable=missing-function-docstring
         ids = self._pop_vertex.neuron_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         return ids
@@ -254,6 +256,7 @@ class PopulationNeuronsMachineVertex(
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(
             self, spec: DataSpecificationGenerator, placement: Placement):
+        # pylint: disable=missing-function-docstring
         assert self.__sdram_partition is not None
         rec_regions = self._pop_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
@@ -278,6 +281,7 @@ class PopulationNeuronsMachineVertex(
         AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(
             self, spec: DataSpecificationReloader, placement: Placement):
+        # pylint: disable=missing-function-docstring
         # Write the other parameters
         self._rewrite_neuron_data_spec(spec)
 
@@ -286,10 +290,12 @@ class PopulationNeuronsMachineVertex(
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self) -> bool:
+        # pylint: disable=missing-function-docstring
         return self.__regenerate_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value: bool):
+        # pylint: disable=missing-function-docstring
         self.__regenerate_data = new_value
 
     @property
@@ -317,6 +323,7 @@ class PopulationNeuronsMachineVertex(
 
     @overrides(ReceivesSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge) -> int:
+        # pylint: disable=missing-function-docstring
         if isinstance(sdram_machine_edge.pre_vertex,
                       SendsSynapticInputsOverSDRAM):
             return self.n_bytes_for_transfer

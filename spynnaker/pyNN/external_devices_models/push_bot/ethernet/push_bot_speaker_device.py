@@ -68,6 +68,7 @@ class PushBotEthernetSpeakerDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self) -> Iterable[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         # add mode command if not done already
         if not self.protocol.sent_mode_command():
             yield self.protocol.set_mode()
@@ -87,6 +88,7 @@ class PushBotEthernetSpeakerDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self) -> Iterable[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         yield self.__command_protocol.push_bot_speaker_config_total_period(0)
         yield self.__command_protocol.push_bot_speaker_config_active_time(0)
         yield self.__command_protocol.push_bot_speaker_set_tone(0)
@@ -94,4 +96,5 @@ class PushBotEthernetSpeakerDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self) -> List[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         return []

@@ -217,6 +217,7 @@ class PopulationSynapsesMachineVertexCommon(
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self) -> Sequence[int]:
+        # pylint: disable=missing-function-docstring
         ids = self._pop_vertex.synapse_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         assert ids is not None
@@ -276,6 +277,7 @@ class PopulationSynapsesMachineVertexCommon(
 
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge) -> int:
+        # pylint: disable=missing-function-docstring
         if isinstance(sdram_machine_edge.post_vertex,
                       ReceivesSynapticInputsOverSDRAM):
             return sdram_machine_edge.post_vertex.n_bytes_for_transfer
@@ -286,6 +288,7 @@ class PopulationSynapsesMachineVertexCommon(
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
             provenance_data: Sequence[int]):
+        # pylint: disable=missing-function-docstring
         proc_offset = SynapseProvenance.N_ITEMS
         self._parse_synapse_provenance(
             label, x, y, p, provenance_data[:proc_offset])

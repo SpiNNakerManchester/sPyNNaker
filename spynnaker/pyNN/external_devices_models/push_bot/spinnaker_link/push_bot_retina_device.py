@@ -33,19 +33,26 @@ class DelayedPayloadMultiCastCommand(MultiCastCommand):
         self._vertex = vertex
 
     @property
+    @overrides(MultiCastCommand.payload)
     def payload(self):
+        # pylint: disable=missing-function-docstring
         if self._payload is None:
             self._payload = self._vertex.new_key_command_payload()
         return self._payload
 
     @property
+    @overrides(MultiCastCommand.is_payload)
     def is_payload(self):
+        # pylint: disable=missing-function-docstring
         return self.payload is not None
 
 
 class PushBotSpiNNakerLinkRetinaDevice(
         AbstractPushBotRetinaDevice, ApplicationSpiNNakerLinkVertex,
         PopulationApplicationVertex):
+    """
+    Implementation of a PushBot Retina vertex over a Spinnaker link
+    """
     __slots__ = ("__new_key_command", )
 
     default_parameters = {'label': None, 'board_address': None,

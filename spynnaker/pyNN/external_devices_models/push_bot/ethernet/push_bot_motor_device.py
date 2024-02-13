@@ -55,6 +55,7 @@ class PushBotEthernetMotorDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self) -> Iterable[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         # add mode command if not done already
         if not self.protocol.sent_mode_command():
             yield self.protocol.set_mode()
@@ -65,9 +66,11 @@ class PushBotEthernetMotorDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self) -> Iterable[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         yield self.__command_protocol.generic_motor_disable()
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self) -> List[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         return []

@@ -129,6 +129,7 @@ class SPIFOutputDevice(
     @overrides(ApplicationFPGAVertex.add_incoming_edge)
     def add_incoming_edge(
             self, edge: ApplicationEdge, partition: ApplicationEdgePartition):
+        # pylint: disable=missing-function-docstring
         # Only add edges from PopulationApplicationVertices
         if not isinstance(edge.pre_vertex, PopulationApplicationVertex):
             if not isinstance(edge.pre_vertex, CommandSender):
@@ -192,6 +193,7 @@ class SPIFOutputDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self) -> Iterable[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         # The commands here are delayed, as at the time of providing them,
         # we don't know the key or mask of the incoming link...
         commands = list()
@@ -214,16 +216,19 @@ class SPIFOutputDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self) -> Iterable[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         return []
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self) -> List[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         return []
 
     @overrides(LiveOutputDevice.get_device_output_keys)
     def get_device_output_keys(self) -> Dict[MachineVertex,
                                              List[Tuple[int, int]]]:
+        # pylint: disable=missing-function-docstring
         all_keys: Dict[MachineVertex, List[Tuple[int, int]]] = dict()
         routing_infos = SpynnakerDataView.get_routing_infos()
         for i, part in enumerate(self.__incoming_partitions):

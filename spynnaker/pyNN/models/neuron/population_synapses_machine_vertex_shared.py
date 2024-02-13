@@ -59,10 +59,10 @@ class PopulationSynapsesMachineVertexShared(
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(
             self, spec: DataSpecificationGenerator, placement: Placement):
+        # pylint: disable=missing-function-docstring
         rec_regions = self._pop_vertex.synapse_recorder.get_region_sizes(
             self.vertex_slice)
         self._write_common_data_spec(spec, rec_regions)
-
         # Write references to shared regions
         for reg, ref in zip(self.SYNAPSE_REGIONS, self.__synapse_references):
             if ref is not None:

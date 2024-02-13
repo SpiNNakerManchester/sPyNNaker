@@ -142,6 +142,7 @@ class SpikeSourceArrayVertex(
     def create_machine_vertex(
             self, vertex_slice: Slice, sdram: AbstractSDRAM,
             label: Optional[str] = None) -> SpikeSourceArrayMachineVertex:
+        # pylint: disable=missing-function-docstring
         send_buffer_times = self._filtered_send_buffer_times(vertex_slice)
         machine_vertex = SpikeSourceArrayMachineVertex(
             label=label, app_vertex=self, vertex_slice=vertex_slice,
@@ -201,6 +202,7 @@ class SpikeSourceArrayVertex(
     @property
     @overrides(ReverseIpTagMultiCastSource.atoms_shape)
     def atoms_shape(self) -> Tuple[int, ...]:
+        # pylint: disable=missing-function-docstring
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.n_atoms)
         return super().atoms_shape

@@ -533,12 +533,15 @@ class SpikeSourcePoissonVertex(
         return recording + other
 
     @property
+    @overrides(PopulationApplicationVertex.n_atoms)
     def n_atoms(self) -> int:
+        # pylint: disable=missing-function-docstring
         return self.__n_atoms
 
     @property
     @overrides(PopulationApplicationVertex.atoms_shape)
     def atoms_shape(self) -> Tuple[int, ...]:
+        # pylint: disable=missing-function-docstring
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.__n_atoms)
         return super().atoms_shape
@@ -547,6 +550,7 @@ class SpikeSourcePoissonVertex(
     def create_machine_vertex(
             self, vertex_slice: Slice, sdram: AbstractSDRAM,
             label: Optional[str] = None) -> SpikeSourcePoissonMachineVertex:
+        # pylint: disable=missing-function-docstring
         return SpikeSourcePoissonMachineVertex(
             sdram, self.__spike_recorder.record,
             label, self, vertex_slice)
