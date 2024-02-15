@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from typing import Final
+import numpy
+from numpy.typing import NDArray
 from .spike_source_array import SpikeSourceArray, Spikes
 from spynnaker.pyNN.utilities import utility_calls
 
@@ -37,5 +39,10 @@ class SpikeSourceFromFile(SpikeSourceArray):
         super().__init__(spike_times)
 
     @property
-    def spike_times(self) -> Spikes:
+    def spike_times(self) -> NDArray[numpy.integer]:
+        """
+        The spike times read from the file.
+
+        :rtype: ndarray
+        """
         return self._spike_times

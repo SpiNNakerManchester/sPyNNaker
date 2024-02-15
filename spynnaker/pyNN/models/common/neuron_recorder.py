@@ -61,6 +61,9 @@ def get_sampling_interval(sampling_rate):
 
 
 class NeuronRecorder(object):
+    """
+    Methods related to recording of neuron data.
+    """
     __slots__ = (
         "__indexes",
         "__n_neurons",

@@ -36,8 +36,10 @@ if TYPE_CHECKING:
         ProjectionApplicationEdge, SynapseInformation)
 
 
-# Hashes of the connection generators supported by the synapse expander
 class ConnectorIDs(Enum):
+    """
+    Hashes of the connection generators supported by the synapse expander
+    """
     ONE_TO_ONE_CONNECTOR = 0
     ALL_TO_ALL_CONNECTOR = 1
     FIXED_PROBABILITY_CONNECTOR = 2

@@ -295,4 +295,11 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def add_application_vertex(vertex: ApplicationVertex):
+        """
+        Adds an Application vertex to the user graph.
+
+        Semantic sugar for SpynnakerDataView.add_vertex(vertex)
+
+        :param ApplicationVertex vertex:
+        """
         SpynnakerDataView.add_vertex(vertex)

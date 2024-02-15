@@ -49,6 +49,9 @@ KEY_CONFIG_SIZE = 5 * BYTES_PER_WORD
 
 
 class SpikeProcessingFastProvenance(ctypes.LittleEndianStructure):
+    """
+    Types of provenance and the datatype used to represent each.
+    """
     _fields_ = [
         # A count of the times that the synaptic input circular buffers
         # overflowed

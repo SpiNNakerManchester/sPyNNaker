@@ -27,6 +27,9 @@ if TYPE_CHECKING:
 
 
 class DelayedApplicationEdge(ApplicationEdge):
+    """
+    The Edge from a delay vertex to a Population vertex.
+    """
     __slots__ = (
         "__synapse_information",
         "__undelayed_edge")

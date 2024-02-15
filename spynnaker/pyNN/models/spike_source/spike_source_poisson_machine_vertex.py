@@ -246,6 +246,11 @@ class SpikeSourcePoissonMachineVertex(
         return cast('SpikeSourcePoissonVertex', self.app_vertex)
 
     def set_sdram_partition(self, sdram_partition: AbstractSDRAMPartition):
+        """
+        Sets the SDRAM partition
+
+        :param AbstractSDRAMPartition sdram_partition:
+        """
         self.__sdram_partition = sdram_partition
 
     @property
@@ -544,6 +549,9 @@ class SpikeSourcePoissonMachineVertex(
         spec.write_array(keys)
 
     def set_rate_changed(self) -> None:
+        """
+        Records that the rates have changed.
+        """
         self.__rate_changed = True
 
     def __poisson_rate_region_address(self, placement: Placement) -> int:
@@ -551,6 +559,11 @@ class SpikeSourcePoissonMachineVertex(
             placement, self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION)
 
     def read_parameters_from_machine(self, placement: Placement):
+        """
+        Reads the poisson rates of the machine if they could have changed.
+
+        :param Placement placement:
+        """
         # It is only worth updating the rates when there is a control edge
         # that can change them
         if self._pop_vertex.incoming_control_edge is not None:

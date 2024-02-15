@@ -99,6 +99,11 @@ class NeuronImplStandard(AbstractNeuronImpl):
 
     @property
     def n_steps_per_timestep(self) -> int:
+        """
+        Get the last set n steps per timestep
+
+        :rtype: int
+        """
         return self.__n_steps_per_timestep
 
     @n_steps_per_timestep.setter

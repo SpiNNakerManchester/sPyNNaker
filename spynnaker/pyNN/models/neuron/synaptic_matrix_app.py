@@ -133,6 +133,11 @@ class SynapticMatrixApp(object):
 
     @property
     def gen_size(self) -> int:
+        """
+        Size of a block.
+
+        :rtype: int
+        """
         max_row_length = max(
             self.__max_row_info.undelayed_max_bytes,
             self.__max_row_info.delayed_max_bytes)

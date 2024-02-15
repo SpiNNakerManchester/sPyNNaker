@@ -305,6 +305,13 @@ class PopulationNeuronsMachineVertex(
 
     @staticmethod
     def get_n_bytes_for_transfer(n_neurons: int, n_synapse_types: int) -> int:
+        """
+        Calculate the number of bytes needed for a transfer.
+
+        :param int n_neurons: number of neurons
+        :param int n_synapse_types: number of synapse types
+        :rtype: int
+        """
         n_bytes = (2 ** get_n_bits(n_neurons) *
                    n_synapse_types *
                    ReceivesSynapticInputsOverSDRAM.N_BYTES_PER_INPUT)

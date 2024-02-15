@@ -21,6 +21,9 @@ from .spike_source_array_vertex import SpikeSourceArrayVertex
 
 
 class SpikeSourceArray(AbstractPyNNModel):
+    """
+    Model that creates a Spike Source Array Vertex
+    """
     default_population_parameters = {
         "splitter": None, "n_colour_bits": None}
 

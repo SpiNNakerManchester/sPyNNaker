@@ -298,6 +298,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
 
     @property
     def allow_self_connections(self) -> bool:
+        """
+        Do we include connections from a neuron/id to itself?
+
+        :rtype: bool
+        """
         return self.__allow_self_connections
 
     @allow_self_connections.setter

@@ -1709,13 +1709,18 @@ class _Stats(object):
         self.default_spikes_per_second = default_spikes_per_second
         self.ring_buffer_sigma = ring_buffer_sigma
 
-    def add_projection(self, proj: Projection):
+    def add_projection(self, projection: Projection):
+        """
+        Adds the projection.
+
+        :param Projection projection:
+        """
         # pylint: disable=protected-access
-        s_dynamics = proj._synapse_information.synapse_dynamics
+        s_dynamics = projection._synapse_information.synapse_dynamics
         if isinstance(s_dynamics, AbstractSupportsSignedWeights):
-            self.__add_signed_projection(proj)
+            self.__add_signed_projection(projection)
         else:
-            self.__add_unsigned_projection(proj)
+            self.__add_unsigned_projection(projection)
 
     def __add_signed_projection(self, proj: Projection):
         # pylint: disable=protected-access
@@ -1782,6 +1787,12 @@ class _Stats(object):
         return spikes_per_tick, spikes_per_second
 
     def get_max_weight(self, s_type: int) -> float:
+        """
+        Get the max weight.
+
+        :param int s_type: synapse_type
+        :rtype: float
+        """
         if self.delay_running_totals[s_type].variance == 0.0:
             return max(self.total_weights[s_type], self.biggest_weight[s_type])
 

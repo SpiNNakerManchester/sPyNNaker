@@ -18,6 +18,9 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
 
 
 class SynapseStructureWeightAccumulator(AbstractSynapseStructure):
+    """
+    Structured synapse with accumulated weight
+    """
     __slots__ = ()
 
     @overrides(AbstractSynapseStructure.get_n_half_words_per_connection)

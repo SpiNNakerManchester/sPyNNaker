@@ -60,6 +60,9 @@ def install_sPyNNaker_into(module):
 
 
 def setup_pynn():
+    """
+    Checks pyNN version and creates the spynnaker model in pynn.
+    """
     # Check the version and blow up if it isn't there
     if not version_satisfies(pyNN, _TARGET_PYNN_VERSION):
         raise NotImplementedError(

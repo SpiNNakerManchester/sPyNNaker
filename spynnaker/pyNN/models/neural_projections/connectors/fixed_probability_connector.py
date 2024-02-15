@@ -206,6 +206,13 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     @property
     def p_connect(self) -> float:
+        """
+        Probability for each potential connection.
+
+        A value between zero and one. (inclusive)
+
+        :rtype: float
+        """
         return self._p_connect
 
     @p_connect.setter

@@ -42,6 +42,11 @@ class _Dynamics:
 
     @classmethod
     def Structural(cls) -> Type[AbstractSynapseDynamicsStructural]:
+        """
+        Delayed import of AbstractSynapseDynamicsStructura
+
+        :rtype: type
+        """
         if cls._Structural is None:
             # Avoid import loop by postponing this import
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -51,6 +56,11 @@ class _Dynamics:
 
     @classmethod
     def STDP(cls) -> Type[SynapseDynamicsSTDP]:
+        """
+        Delayed import of SynapseDynamicsSTDP
+
+        :rtype: type
+        """
         if cls._STDP is None:
             # Avoid import loop by postponing this import
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -60,6 +70,11 @@ class _Dynamics:
 
     @classmethod
     def Neuromodulation(cls) -> Type[SynapseDynamicsNeuromodulation]:
+        """
+        Delayed import of SynapseDynamicsNeuromodulation
+
+        :rtype: type
+        """
         if cls._Neuromodulation is None:
             # Avoid import loop by postponing this import
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -72,18 +87,36 @@ def are_dynamics_structural(
         synapse_dynamics: AbstractSynapseDynamics) -> TypeGuard[
             AbstractSynapseDynamicsStructural]:
     # pylint: disable=isinstance-second-argument-not-valid-type
+    """
+    Checks if synapse_dynamics is a AbstractSynapseDynamicsStructural
+
+    :param AbstractSynapseDynamics synapse_dynamics:
+    :rtype: bool
+    """
     return isinstance(synapse_dynamics, _Dynamics.Structural())
 
 
 def are_dynamics_stdp(synapse_dynamics: AbstractSynapseDynamics) -> TypeGuard[
         SynapseDynamicsSTDP]:
     # pylint: disable=isinstance-second-argument-not-valid-type
+    """
+    Checks if synapse_dynamics is a SynapseDynamicsSTD
+
+    :param AbstractSynapseDynamics synapse_dynamics:
+    :rtype: bool
+    """
     return isinstance(synapse_dynamics, _Dynamics.STDP())
 
 
 def are_dynamics_neuromodulation(
         synapse_dynamics: AbstractSynapseDynamics) -> TypeGuard[
             SynapseDynamicsNeuromodulation]:
+    """
+    Checks if synapse_dynamics is a SynapseDynamicsNeuromodulation
+
+    :param AbstractSynapseDynamics synapse_dynamics:
+    :rtype: bool
+    """
     # pylint: disable=isinstance-second-argument-not-valid-type
     return isinstance(synapse_dynamics, _Dynamics.Neuromodulation())
 

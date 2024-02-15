@@ -27,8 +27,10 @@ if TYPE_CHECKING:
 CurrentParameter: TypeAlias = Union[int, float, Sequence[int], Sequence[float]]
 
 
-# Hashes of the current sources currently supported
 class CurrentSourceIDs(Enum):
+    """
+    Hashes of the current sources currently supported
+    """
     NO_SOURCE = 0
     DC_SOURCE = 1
     AC_SOURCE = 2

@@ -166,14 +166,29 @@ class ConvolutionConnector(AbstractConnector):
 
     @property
     def positive_receptor_type(self) -> str:
+        """
+        The receptor type to add the positive weights to.
+
+        :rtype: str
+        """
         return self.__positive_receptor_type
 
     @property
     def negative_receptor_type(self) -> str:
+        """
+         The receptor type to add the negative weights to.
+
+        :rtype: str
+        """
         return self.__negative_receptor_type
 
     @property
-    def kernel_weights(self):
+    def kernel_weights(self) -> NDArray[float64]:
+        """
+        The weights for this connection.
+
+        :rtype: ndarray
+        """
         return self.__kernel_weights
 
     def __get_kernel_shape(self, shape: _Shape) -> Tuple[int, int]:
@@ -392,20 +407,42 @@ class ConvolutionConnector(AbstractConnector):
 
     @property
     def kernel_n_bytes(self) -> int:
+        """
+        Size of the weights in bytes
+
+        :rtype: int
+        """
         n_weights = self.__kernel_weights.size
         return n_weights * BYTES_PER_SHORT
 
     @property
     def kernel_n_weights(self) -> int:
+        """
+        Size of the weights.
+
+        :rtype: int
+        """
         return self.__kernel_weights.size
 
     @property
     def parameters_n_bytes(self) -> int:
+        """
+        :rtype: int
+        """
         return CONNECTOR_CONFIG_SIZE
 
     def get_local_only_data(
             self, app_edge: ProjectionApplicationEdge, local_delay: int,
             delay_stage: int, weight_index: int) -> NDArray[uint32]:
+        """
+        Gets the local only data
+
+        :param ProjectionApplicationEdge app_edge:
+        :param int local_delay:
+        :param int delay_stage:
+        :param int weight_index:
+        :rtype: ndarray
+        """
         # Get info about things
         kernel_shape = self.__kernel_weights.shape
         ps_x, ps_y = 1, 1
@@ -432,7 +469,13 @@ class ConvolutionConnector(AbstractConnector):
     def get_encoded_kernel_weights(
             self, app_edge: ProjectionApplicationEdge,
             weight_scales: NDArray[floating]) -> NDArray[int16]:
-        # Encode weights with weight scaling
+        """
+        Encode weights with weight scaling.
+
+        :param ProjectionApplicationEdge app_edge:
+        :param ndarray weight_scales:
+        :rtype: ndarray
+        """
         encoded_kernel_weights = self.__kernel_weights.flatten()
         neg_weights = encoded_kernel_weights < 0
         pos_weights = encoded_kernel_weights > 0

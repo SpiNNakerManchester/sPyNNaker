@@ -195,6 +195,11 @@ class Recorder(object):
 
     @property
     def recording_label(self) -> str:
+        """
+        The label from the vertex is applicable or a default.
+
+        :rtype: str
+        """
         SpynnakerDataView.check_user_can_act()
         return self.__vertex.label or "!!UNLABELLED VERTEX!!"
 

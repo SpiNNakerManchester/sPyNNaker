@@ -29,6 +29,9 @@ TIMESTEP_MS = "timestep_ms"
 
 
 class SynapseTypeExponential(AbstractSynapseType):
+    """
+    A simple exponential synapse.
+    """
     __slots__ = (
         "__tau_syn_E",
         "__tau_syn_I",
@@ -94,16 +97,36 @@ class SynapseTypeExponential(AbstractSynapseType):
 
     @property
     def tau_syn_E(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__tau_syn_E
 
     @property
     def tau_syn_I(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__tau_syn_I
 
     @property
     def isyn_exc(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__isyn_exc
 
     @property
     def isyn_inh(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__isyn_inh

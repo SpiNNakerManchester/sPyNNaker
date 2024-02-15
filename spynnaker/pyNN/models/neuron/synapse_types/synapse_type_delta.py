@@ -76,8 +76,18 @@ class SynapseTypeDelta(AbstractSynapseType):
 
     @property
     def isyn_exc(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__isyn_exc
 
     @property
     def isyn_inh(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__isyn_inh

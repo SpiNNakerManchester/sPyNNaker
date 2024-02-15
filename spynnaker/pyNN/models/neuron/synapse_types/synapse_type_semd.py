@@ -34,6 +34,11 @@ TIMESTEP_MS = "timestep_ms"
 
 
 class SynapseTypeSEMD(AbstractSynapseType):
+    """
+    Synapse for a Leaky integrate and fire neuron with an exponentially
+    decaying current input, where the excitatory input depends upon the
+    inhibitory input (see https://www.cit-ec.de/en/nbs/spiking-insect-vision)
+    """
     __slots__ = (
         "__tau_syn_E",
         "__tau_syn_E2",
@@ -142,36 +147,81 @@ class SynapseTypeSEMD(AbstractSynapseType):
 
     @property
     def tau_syn_E(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__tau_syn_E
 
     @property
     def tau_syn_E2(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__tau_syn_E2
 
     @property
     def tau_syn_I(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__tau_syn_I
 
     @property
     def isyn_exc(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__isyn_exc
 
     @property
     def isyn_inh(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__isyn_inh
 
     @property
     def isyn_exc2(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__isyn_exc2
 
     @property
     def multiplicator(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__multiplicator
 
     @property
     def exc2_old(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__exc2_old
 
     @property
     def scaling_factor(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__scaling_factor

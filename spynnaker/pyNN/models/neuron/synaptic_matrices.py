@@ -250,6 +250,9 @@ class SynapticMatrices(object):
                 self.__host_generated_block_addr)
 
     def generate_data(self) -> None:
+        """
+        Generates the data if it has not already been done.
+        """
         # If the data has already been generated, stop
         if self.__data_generated:
             return

@@ -24,6 +24,9 @@ from spynnaker.pyNN.external_devices_models.push_bot import (
 
 class PushBotEthernetRetinaDevice(
         AbstractPushBotRetinaDevice, AbstractEthernetSensor):
+    """
+    A PushBot retina over Ethernet
+    """
     def __init__(
             self, protocol, resolution, pushbot_ip_address, pushbot_port=56000,
             injector_port=None, local_host=None, local_port=None,

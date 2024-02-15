@@ -49,11 +49,22 @@ N_KERNEL_PARAMS = 8
 
 
 class ConvolutionKernel(ndarray):
+    """
+    Thin wrapper around a numpy array.
+    """
     pass
 
 
-def shape2word(sw: Union[int, integer], sh: Union[int, integer]) -> uint32:
-    return uint32(((uint32(sh) & 0xFFFF) << 16) | (uint32(sw) & 0xFFFF))
+def shape2word(
+        short1: Union[int, integer], short2: Union[int, integer]) -> uint32:
+    """
+    Combines two short values into 1 int by shifting the first 16 places
+
+    :param int short1: first 2 byte value
+    :param int short2: second 2 bytes value
+    :rtype: int
+    """
+    return uint32(((uint32(short2) & 0xFFFF) << 16) | (uint32(short1) & 0xFFFF))
 
 
 class KernelConnector(AbstractGenerateConnectorOnMachine,

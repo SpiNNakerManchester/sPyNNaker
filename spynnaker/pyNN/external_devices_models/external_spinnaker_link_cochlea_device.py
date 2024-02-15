@@ -18,6 +18,9 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 class ExternalCochleaDevice(
         ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex):
+    """
+    An ear vertex.
+    """
     __slots__ = ()
 
     def __init__(

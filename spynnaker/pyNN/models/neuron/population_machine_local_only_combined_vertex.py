@@ -39,6 +39,9 @@ from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 
 
 class LocalOnlyProvenance(ctypes.LittleEndianStructure):
+    """
+    Types of provenance and the datatype used to represent each.
+    """
     _fields_ = [
         # The maximum number of spikes received in a time step
         ("max_spikes_per_timestep", ctypes.c_uint32),

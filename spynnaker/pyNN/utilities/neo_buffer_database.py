@@ -1014,6 +1014,22 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def spinnaker_get_data(
             self, pop_label: str, variable: str, as_matrix: bool = False,
             view_indexes: ViewIndices = None) -> NDArray[floating]:
+        """
+        SsPyNNaker specific method for getting data as a numpy array,
+        instead of the Neo-based object
+
+        :param str pop_label: label for the Population
+        :param variable: Single variable name.
+        :type variable: str or list(str)
+        :param as_matrix: If set True the data is returned as a 2d matrix
+        :param view_indexes: The indexes for which data should be returned.
+            If ``None``, all data (view_index = data_indexes)
+        :type view_indexes: None or iter(int)
+        :return: array of the data
+        :rtype: ~numpy.ndarray
+        :raises ConfigurationException:
+            If variable is a list of a length other than 1
+        """
         if not isinstance(variable, str):
             if len(variable) != 1:
                 raise ConfigurationException(
@@ -1041,6 +1057,15 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def get_spike_counts(
             self, pop_label: str,
             view_indexes: ViewIndices = None) -> Dict[int, int]:
+        """
+        Gets the spike counts for the population with this label.
+
+        :param str pop_label: label for the Population
+        :param view_indexes: If supplied indexes to retrieve.
+        :type view_indexes: None or iter(int)
+        :return: dict of index to count
+        :rtype: dict(int, int)
+        """
         # called to trigger the virtual data warning if applicable
         self.__get_segment_info()
         (rec_id, _, buffered_type, _, _, pop_size, _, n_colour_bits) = \

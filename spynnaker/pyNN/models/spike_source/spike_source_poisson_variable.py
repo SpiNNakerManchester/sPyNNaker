@@ -26,6 +26,9 @@ DEFAULT_MAX_ATOMS_PER_CORE = 500
 
 
 class SpikeSourcePoissonVariable(AbstractPyNNModel):
+    """
+    Model to create a Spike Source Poisson Vertex.
+    """
     default_population_parameters = _population_parameters
 
     def __init__(

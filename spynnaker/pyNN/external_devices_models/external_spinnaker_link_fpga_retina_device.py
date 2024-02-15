@@ -22,7 +22,12 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
-def get_y_from_fpga_retina(key, mode):
+def get_y_from_fpga_retina(key: int, mode: int) -> int:
+    """
+    :param int key:
+    :param int mode:
+    :rtype: int
+    """
     if mode == 128:
         return key & 0x7f
     elif mode == 64:
@@ -34,7 +39,12 @@ def get_y_from_fpga_retina(key, mode):
     return None
 
 
-def get_x_from_fpga_retina(key, mode):
+def get_x_from_fpga_retina(key: int, mode: int) -> int:
+    """
+    :param int key:
+    :param int mode:
+    :rtype: int
+    """
     if mode == 128:
         return (key >> 7) & 0x7f
     elif mode == 64:
@@ -46,7 +56,12 @@ def get_x_from_fpga_retina(key, mode):
     return None
 
 
-def get_spike_value_from_fpga_retina(key, mode):
+def get_spike_value_from_fpga_retina(key: int, mode: int) -> int:
+    """
+    :param int key:
+    :param int mode:
+    :rtype: int
+    """
     if mode == 128:
         return (key >> 14) & 0x1
     elif mode == 64:
@@ -61,6 +76,9 @@ def get_spike_value_from_fpga_retina(key, mode):
 class ExternalFPGARetinaDevice(
         ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex,
         AbstractSendMeMulticastCommandsVertex):
+    """
+    A retina connected by FPGA
+    """
     __slots__ = (
         "__fixed_key",
         "__fixed_mask")
@@ -102,6 +120,7 @@ class ExternalFPGARetinaDevice(
 
     @overrides(ApplicationSpiNNakerLinkVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(self, partition_id: str) -> BaseKeyAndMask:
+        # pylint: disable=missing-function-docstring
         return BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)
 
     def _get_mask(self, mode: str) -> int:
@@ -149,16 +168,19 @@ class ExternalFPGARetinaDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self) -> Iterable[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         yield MultiCastCommand(
             key=0x0000FFFF, payload=1, repeat=5, delay_between_repeats=100)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self) -> Iterable[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         yield MultiCastCommand(
             key=0x0000FFFE, payload=0, repeat=5, delay_between_repeats=100)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self) -> List[MultiCastCommand]:
+        # pylint: disable=missing-function-docstring
         return []

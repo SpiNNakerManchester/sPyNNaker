@@ -86,18 +86,38 @@ class SynapseDynamicsNeuromodulation(
 
     @property
     def tau_c(self) -> float:
+        """
+        The tau c value passed into the init.
+
+        :rtype: float
+        """
         return self.__tau_c
 
     @property
     def tau_d(self) -> float:
+        """
+        The tau d value passed into the init.
+
+        :rtype: float
+        """
         return self.__tau_d
 
     @property
     def w_min(self) -> float:
+        """
+        The w min value passed into the init.
+
+        :rtype: float
+        """
         return self.__w_min
 
     @property
     def w_max(self) -> float:
+        """
+        The w max value passed into the init.
+
+        :rtype: float
+        """
         return self.__w_max
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
@@ -115,7 +135,14 @@ class SynapseDynamicsNeuromodulation(
         # Shouldn't ever come up, but if it does, it is False!
         return False
 
-    def is_neuromodulation_same_as(self, other) -> bool:
+    def is_neuromodulation_same_as(
+            self, other: SynapseDynamicsNeuromodulation) -> bool:
+        """
+        Checks that tau c, tau d, w max and w min are all the same.
+
+        :param SynapseDynamicsNeuromodulation other:
+        :rtype: bool
+        """
         return (self.__tau_c == other.tau_c and self.__tau_d == other.tau_d and
                 self.__w_min == other.w_min and self.__w_max == other.w_max)
 

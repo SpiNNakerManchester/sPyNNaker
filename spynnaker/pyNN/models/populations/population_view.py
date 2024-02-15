@@ -681,6 +681,9 @@ class PopulationView(PopulationBase):
 
 
 class IDMixin(PopulationView):
+    """
+    Implementation of PyNN IDMixin.
+    """
     __slots__ = ()
 
     def get_parameters(self) -> ParameterHolder:

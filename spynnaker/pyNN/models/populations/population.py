@@ -961,6 +961,10 @@ class _VertexHolder(AbstractPyNNModel):
 
     @property
     def vertex(self):
+        """
+        The vertex passed into the init.
+        :return:
+        """
         return self.__vertex
 
     @overrides(AbstractPyNNModel.create_vertex)

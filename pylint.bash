@@ -23,7 +23,7 @@
 # sudo apt-get -o Dpkg::Use-Pty=0 install --fix-missing enchant-2 hunspell hunspell-en-gb
 
 # check all
-pylint --output-format=colorized --disable=R --persistent=no --jobs=1 --rcfile=../SupportScripts/actions/pylint/strict_rcfile --spelling-dict=en_GB --spelling-private-dict-file="../SupportScripts/actions/pylint/default_dict.txt" --disable=import-error  spynnaker
+# pylint --output-format=colorized --disable=R --persistent=no --jobs=1 --rcfile=../SupportScripts/actions/pylint/strict_rcfile --spelling-dict=en_GB --spelling-private-dict-file="../SupportScripts/actions/pylint/default_dict.txt" --disable=import-error  spynnaker
 
 #
 # check one test
@@ -34,5 +34,5 @@ pylint --output-format=colorized --disable=R --persistent=no --jobs=1 --rcfile=.
 
 #
 # check docs including spelling
-# pylint --enable=missing-function-docstring,missing-class-docstring,invalid-characters-in-docstring,wrong-spelling-in-comment,wrong-spelling-in-docstring  --output-format=colorized --disable=R --persistent=no --jobs=1 --rcfile=../SupportScripts/actions/pylint/strict_rcfile --spelling-dict=en_GB --spelling-private-dict-file="../SupportScripts/actions/pylint/default_dict.txt" --disable=all  spynnaker
+pylint --enable=missing-function-docstring,missing-class-docstring,invalid-characters-in-docstring,wrong-spelling-in-comment,wrong-spelling-in-docstring  --output-format=colorized --disable=R --persistent=no --jobs=1 --rcfile=../SupportScripts/actions/pylint/strict_rcfile --spelling-dict=en_GB --spelling-private-dict-file="../SupportScripts/actions/pylint/default_dict.txt" --disable=all  spynnaker
 

@@ -40,6 +40,9 @@ from .population_machine_synapses_provenance import SynapseProvenance
 
 
 class SpikeProcessingProvenance(ctypes.LittleEndianStructure):
+    """
+    The provenance from spike processing.
+    """
     _fields_ = [
         # A count of the times that the synaptic input circular buffers
         # overflowed

@@ -27,6 +27,9 @@ TIME_STEP = "time_step"
 
 
 class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
+    """
+    The additional model parameters for a leaky integrate and fire model.
+    """
     __slots__ = (
         "__tau_ca2",
         "__i_ca2",

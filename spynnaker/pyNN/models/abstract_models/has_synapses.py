@@ -22,6 +22,9 @@ if TYPE_CHECKING:
 
 
 class HasSynapses(object, metaclass=AbstractBase):
+    """
+    API for getting connections from the machine.
+    """
     @abstractmethod
     def get_connections_from_machine(
             self, placement: Placement, app_edge: ProjectionApplicationEdge,

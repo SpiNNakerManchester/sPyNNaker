@@ -24,6 +24,9 @@ if TYPE_CHECKING:
 
 
 class MatrixGeneratorID(Enum):
+    """
+    Type of Matrix in use.
+    """
     STATIC_MATRIX = 0
     STDP_MATRIX = 1
     NEUROMODULATION_MATRIX = 2

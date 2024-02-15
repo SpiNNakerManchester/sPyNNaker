@@ -33,6 +33,9 @@ TIMESTEP_MS = "timestep_ms"
 
 
 class SynapseTypeAlpha(AbstractSynapseType):
+    """
+    Alpha Type Synapse
+    """
     __slots__ = (
         "__exc_exp_response",
         "__exc_response",
@@ -126,20 +129,45 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     @property
     def exc_response(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__exc_response
 
     @exc_response.setter
     def exc_response(self, exc_response: ModelParameter):
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         self.__exc_response = exc_response
 
     @property
     def tau_syn_E(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__tau_syn_E
 
     @property
     def inh_response(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__inh_response
 
     @property
     def tau_syn_I(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__tau_syn_I
