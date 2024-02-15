@@ -15,11 +15,11 @@
 import numpy
 
 
-def synfire_spike_checker(spikes, nNeurons):
+def synfire_spike_checker(spikes, n_neurons):
     """
     :param spikes: The spike data to check.
     :type spikes: ~numpy.ndarray or list(~numpy.ndarray)
-    :param int nNeurons: The number of neurons.
+    :param int n_neurons: The number of neurons.
     :raises Exception: If there is a problem with the data
     """
     if isinstance(spikes, numpy.ndarray):
@@ -32,21 +32,21 @@ def synfire_spike_checker(spikes, nNeurons):
                               delimiter=',')
                 raise ValueError(f"Unexpected spike at time {row[1]}")
             num += 1
-            if num >= nNeurons:
+            if num >= n_neurons:
                 num = 0
     else:
         for single in spikes:
-            synfire_spike_checker(single, nNeurons)
+            synfire_spike_checker(single, n_neurons)
 
 
 def synfire_multiple_lines_spike_checker(
-        spikes, nNeurons, lines, wrap_around=True):
+        spikes, n_neurons, lines, wrap_around=True):
     """
     Checks that there are the expected number of spike lines
 
     :param spikes: The spikes
     :type spikes: ~numpy.ndarray or list(~numpy.ndarray)
-    :param int nNeurons: The number of neurons.
+    :param int n_neurons: The number of neurons.
     :param int lines: Expected number of lines
     :param bool wrap_around:
         If True the lines will wrap around when reaching the last neuron.
@@ -62,7 +62,7 @@ def synfire_multiple_lines_spike_checker(
             if nums[i] == node:
                 found = True
                 nums[i] += 1
-                if nums[i] >= nNeurons and wrap_around:
+                if nums[i] >= n_neurons and wrap_around:
                     nums[i] = 0
                 used[i] = True
                 break

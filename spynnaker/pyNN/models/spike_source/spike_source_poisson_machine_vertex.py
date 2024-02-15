@@ -191,7 +191,7 @@ class SpikeSourcePoissonMachineVertex(
         "__sdram_partition",
         "__rate_changed")
 
-    class POISSON_SPIKE_SOURCE_REGIONS(IntEnum):
+    class _PoissonSpikeSourceRegions(IntEnum):
         """
         Memory region IDs for the the Poisson source code.
         """
@@ -262,7 +262,7 @@ class SpikeSourcePoissonMachineVertex(
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
     def _provenance_region_id(self) -> int:
-        return self.POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION
+        return self._PoissonSpikeSourceRegions.PROVENANCE_REGION
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
@@ -280,13 +280,13 @@ class SpikeSourcePoissonMachineVertex(
     def get_recording_region_base_address(self, placement: Placement) -> int:
         # pylint: disable=missing-function-docstring
         return locate_memory_region_for_placement(
-            placement, self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION)
+            placement, self._PoissonSpikeSourceRegions.SPIKE_HISTORY_REGION)
 
     @overrides(AbstractHasProfileData.get_profile_data)
     def get_profile_data(self, placement: Placement) -> ProfileData:
         # pylint: disable=missing-function-docstring
         return profile_utils.get_profiling_data(
-            self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION,
+            self._PoissonSpikeSourceRegions.PROFILER_REGION,
             self.PROFILE_TAG_LABELS, placement)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
@@ -347,20 +347,20 @@ class SpikeSourcePoissonMachineVertex(
 
         # write setup data
         spec.reserve_memory_region(
-            region=self.POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION,
+            region=self._PoissonSpikeSourceRegions.SYSTEM_REGION,
             size=SIMULATION_N_BYTES, label='setup')
         spec.switch_write_focus(
-            self.POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION)
+            self._PoissonSpikeSourceRegions.SYSTEM_REGION)
         spec.write_array(simulation_utilities.get_simulation_header_array(
             self.get_binary_file_name()))
 
         # write recording data
         spec.reserve_memory_region(
-            region=self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION,
+            region=self._PoissonSpikeSourceRegions.SPIKE_HISTORY_REGION,
             size=recording_utilities.get_recording_header_size(1),
             label="Recording")
         spec.switch_write_focus(
-            self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION)
+            self._PoissonSpikeSourceRegions.SPIKE_HISTORY_REGION)
         sdram = self._pop_vertex.get_recording_sdram_usage(self.vertex_slice)
         recorded_region_sizes = [sdram.get_total_sdram(
             SpynnakerDataView.get_max_run_time_steps())]
@@ -378,19 +378,19 @@ class SpikeSourcePoissonMachineVertex(
 
         # write profile data
         profile_utils.reserve_profile_region(
-            spec, self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION,
+            spec, self._PoissonSpikeSourceRegions.PROFILER_REGION,
             self._pop_vertex.n_profile_samples)
         profile_utils.write_profile_region_data(
-            spec, self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION,
+            spec, self._PoissonSpikeSourceRegions.PROFILER_REGION,
             self._pop_vertex.n_profile_samples)
 
         # write SDRAM edge parameters
         spec.reserve_memory_region(
-            region=self.POISSON_SPIKE_SOURCE_REGIONS.SDRAM_EDGE_PARAMS,
+            region=self._PoissonSpikeSourceRegions.SDRAM_EDGE_PARAMS,
             label="sdram edge params",
             size=get_sdram_edge_params_bytes(self.vertex_slice))
         spec.switch_write_focus(
-            self.POISSON_SPIKE_SOURCE_REGIONS.SDRAM_EDGE_PARAMS)
+            self._PoissonSpikeSourceRegions.SDRAM_EDGE_PARAMS)
         if self.__sdram_partition is None:
             spec.write_array([0, 0, 0])
         else:
@@ -440,7 +440,7 @@ class SpikeSourcePoissonMachineVertex(
         n_atoms = self.vertex_slice.n_atoms
         n_rates = n_atoms * self._pop_vertex.max_n_rates
         spec.reserve_memory_region(
-            region=self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION,
+            region=self._PoissonSpikeSourceRegions.RATES_REGION,
             size=get_rates_bytes(n_atoms, n_rates), label='PoissonRates')
 
         # List starts with n_items, so start with 0.  Use arrays to allow
@@ -464,10 +464,10 @@ class SpikeSourcePoissonMachineVertex(
         data_items[1] = [n_items]
         data_to_write = numpy.concatenate(data_items)
         spec.reserve_memory_region(
-            region=self.POISSON_SPIKE_SOURCE_REGIONS.EXPANDER_REGION,
+            region=self._PoissonSpikeSourceRegions.EXPANDER_REGION,
             size=get_expander_rates_bytes(n_atoms, n_rates), label='Expander')
         spec.switch_write_focus(
-            self.POISSON_SPIKE_SOURCE_REGIONS.EXPANDER_REGION)
+            self._PoissonSpikeSourceRegions.EXPANDER_REGION)
         spec.write_array(data_to_write)
 
         self.__rate_changed = False
@@ -484,11 +484,11 @@ class SpikeSourcePoissonMachineVertex(
             "Poisson sources:\n")
 
         spec.reserve_memory_region(
-            region=self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION,
+            region=self._PoissonSpikeSourceRegions.POISSON_PARAMS_REGION,
             size=get_params_bytes(self.vertex_slice.n_atoms),
             label="PoissonParams")
         spec.switch_write_focus(
-            self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION)
+            self._PoissonSpikeSourceRegions.POISSON_PARAMS_REGION)
 
         # Write Key info for this core:
         routing_info = SpynnakerDataView.get_routing_infos()
@@ -556,7 +556,7 @@ class SpikeSourcePoissonMachineVertex(
 
     def __poisson_rate_region_address(self, placement: Placement) -> int:
         return helpful_functions.locate_memory_region_for_placement(
-            placement, self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION)
+            placement, self._PoissonSpikeSourceRegions.RATES_REGION)
 
     def read_parameters_from_machine(self, placement: Placement):
         """

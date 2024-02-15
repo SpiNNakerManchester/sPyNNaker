@@ -435,7 +435,7 @@ def get_neo_io(file_or_folder):
         raise ex
 
 
-def report_non_spynnaker_pyNN(msg):
+def report_non_spynnaker_pynn(msg):
     """
     Report a case of non-spynnaker-compatible PyNN being used.  This will warn
     or error depending on the configuration setting.
@@ -456,7 +456,7 @@ def check_rng(rng, where):
     :param rng: The rng parameter value.
     """
     if rng is not None and rng.seed is not None:
-        report_non_spynnaker_pyNN(
+        report_non_spynnaker_pynn(
             f"Use of rng in {where} is not supported in sPyNNaker in this"
             " case. Please instead use seed=<seed> in the target Population to"
             " ensure random numbers are seeded.")

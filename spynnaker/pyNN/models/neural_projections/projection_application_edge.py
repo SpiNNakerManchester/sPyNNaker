@@ -41,9 +41,9 @@ class _Dynamics:
     _Neuromodulation: Optional[Type[SynapseDynamicsNeuromodulation]] = None
 
     @classmethod
-    def Structural(cls) -> Type[AbstractSynapseDynamicsStructural]:
+    def structural(cls) -> Type[AbstractSynapseDynamicsStructural]:
         """
-        Delayed import of AbstractSynapseDynamicsStructura
+        Delayed import of AbstractSynapseDynamicsStructural
 
         :rtype: type
         """
@@ -55,7 +55,7 @@ class _Dynamics:
         return cls._Structural
 
     @classmethod
-    def STDP(cls) -> Type[SynapseDynamicsSTDP]:
+    def stdp(cls) -> Type[SynapseDynamicsSTDP]:
         """
         Delayed import of SynapseDynamicsSTDP
 
@@ -69,7 +69,7 @@ class _Dynamics:
         return cls._STDP
 
     @classmethod
-    def Neuromodulation(cls) -> Type[SynapseDynamicsNeuromodulation]:
+    def neuromodulation(cls) -> Type[SynapseDynamicsNeuromodulation]:
         """
         Delayed import of SynapseDynamicsNeuromodulation
 
@@ -93,7 +93,7 @@ def are_dynamics_structural(
     :param AbstractSynapseDynamics synapse_dynamics:
     :rtype: bool
     """
-    return isinstance(synapse_dynamics, _Dynamics.Structural())
+    return isinstance(synapse_dynamics, _Dynamics.structural())
 
 
 def are_dynamics_stdp(synapse_dynamics: AbstractSynapseDynamics) -> TypeGuard[
@@ -105,7 +105,7 @@ def are_dynamics_stdp(synapse_dynamics: AbstractSynapseDynamics) -> TypeGuard[
     :param AbstractSynapseDynamics synapse_dynamics:
     :rtype: bool
     """
-    return isinstance(synapse_dynamics, _Dynamics.STDP())
+    return isinstance(synapse_dynamics, _Dynamics.stdp())
 
 
 def are_dynamics_neuromodulation(
@@ -118,7 +118,7 @@ def are_dynamics_neuromodulation(
     :rtype: bool
     """
     # pylint: disable=isinstance-second-argument-not-valid-type
-    return isinstance(synapse_dynamics, _Dynamics.Neuromodulation())
+    return isinstance(synapse_dynamics, _Dynamics.neuromodulation())
 
 
 class ProjectionApplicationEdge(
