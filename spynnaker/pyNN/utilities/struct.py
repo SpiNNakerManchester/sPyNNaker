@@ -12,23 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from enum import Enum
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+
 import numpy
 from numpy import uint8, uint32, integer
 from numpy.typing import NDArray
-from enum import Enum
 from pyNN.random import RandomDistribution
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 from typing_extensions import TypeAlias
+
 from spinn_utilities.helpful_functions import is_singleton
+from spinn_utilities.ranged.abstract_list import AbstractList
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
+
 from pacman.model.graphs.common import Slice
+
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.utilities.utility_calls import convert_to
 from spynnaker.pyNN.models.common.param_generator_data import (
     get_generator_type, param_generator_id, param_generator_params,
     type_has_generator)
-from spinn_utilities.ranged.abstract_list import AbstractList
-from spinn_utilities.ranged.range_dictionary import RangeDictionary
 
 #: The type of values used populate structure instances
 ValueMap: TypeAlias = Mapping[str, Union[int, float, AbstractList[float]]]

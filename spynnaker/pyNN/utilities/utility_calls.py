@@ -18,28 +18,32 @@ Utility package containing simple helper functions.
 import logging
 import os
 import math
+from math import isnan
+from typing import List, Tuple
+
 import neo
 import numpy
 from numpy import uint32, floating
 from numpy.typing import NDArray
-from math import isnan
 from pyNN.random import RandomDistribution
-from typing import List, Tuple
 from scipy.stats import binom
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.safe_eval import SafeEval
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.logger_utils import warn_once
+
 from spinn_front_end_common.interface.ds import DataType
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_SECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
     RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
     RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
     RandomStatsVonmisesImpl, RandomStatsBinomialImpl,
     RandomStatsExponentialClippedImpl)
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_SECOND_CONVERSION)
 from spynnaker.pyNN.utilities.constants import WRITE_BANDWIDTH_BYTES_PER_SECOND
 
 logger = FormatAdapter(logging.getLogger(__name__))

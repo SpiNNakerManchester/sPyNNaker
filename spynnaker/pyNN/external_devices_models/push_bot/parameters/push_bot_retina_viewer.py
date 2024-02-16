@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
 from threading import Thread, RLock
 from time import sleep
+
 from matplotlib import pyplot  # type: ignore[import]
 import numpy
-import logging
+
 from spinn_utilities.log import FormatAdapter
 
 _logger = FormatAdapter(logging.getLogger(__name__))

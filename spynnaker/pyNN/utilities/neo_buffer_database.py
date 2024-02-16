@@ -16,22 +16,28 @@ import csv
 from datetime import datetime
 import logging
 import math
-import numpy
-from numpy import floating, integer, uint8
-from numpy.typing import NDArray
 import os
-import quantities
-import struct
 import re
-import neo  # type: ignore[import]
+import struct
 from typing import (
     Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
     TYPE_CHECKING)
+
+import numpy
+from numpy import floating, integer, uint8
+from numpy.typing import NDArray
+import quantities
+import neo  # type: ignore[import]
+
 from spinn_utilities.log import FormatAdapter
+
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
-from spinn_front_end_common.interface.ds import DataType
+
+
 from pacman.model.graphs.common import Slice, MDSlice
 from pacman.utilities.utility_calls import get_keys
+
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utility_models import (
     ReverseIPTagMulticastSourceMachineVertex)
 from spinn_front_end_common.interface.buffer_management.storage_objects \
@@ -40,11 +46,13 @@ from spinn_front_end_common.utilities.base_database import _SqliteTypes
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import SPIKES
 from spynnaker.pyNN.utilities.neo_csv import NeoCsv
+
 if TYPE_CHECKING:
     from _csv import _writer as CSVWriter
     from spynnaker.pyNN.models.common.types import Names as ConcreteNames

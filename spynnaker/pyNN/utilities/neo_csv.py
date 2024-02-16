@@ -16,15 +16,19 @@ from collections import defaultdict
 import csv
 from datetime import datetime
 import logging
+from typing import (
+    Any, Dict, Iterable, List, Optional, Tuple, Union, TYPE_CHECKING)
+
 from neo import AnalogSignal, Block, Event, Segment, SpikeTrain
 import numpy
 from numpy import integer, float64
 from numpy.typing import NDArray
 from quantities import Quantity, ms
-from typing import (
-    Any, Dict, Iterable, List, Optional, Tuple, Union, TYPE_CHECKING)
+
 from spinn_utilities.log import FormatAdapter
+
 from spynnaker.pyNN.data import SpynnakerDataView
+
 if TYPE_CHECKING:
     from _csv import _writer as CSVWriter, _reader as CSVReader
     from spynnaker.pyNN.utilities.neo_buffer_database import Annotations

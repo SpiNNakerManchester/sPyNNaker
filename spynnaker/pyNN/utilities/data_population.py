@@ -13,20 +13,24 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
+from typing import (
+    Any, Dict, Iterable, Optional, overload, Sequence, Union, TYPE_CHECKING)
+
 import numpy
 from numpy import floating
 from numpy.typing import NDArray
 from pyNN.descriptions import TemplateEngine
-from typing import (
-    Any, Dict, Iterable, Optional, overload, Sequence, Union, TYPE_CHECKING)
 import neo  # type: ignore[import]
+
 from spinn_utilities.ranged.abstract_sized import AbstractSized, Selector
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
+
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 from spynnaker.pyNN.models.common.types import Names
+
 if TYPE_CHECKING:
     from .neo_buffer_database import Annotations
 

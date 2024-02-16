@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from neo import AnalogSignal, Block, Segment, SpikeTrain
 from typing import List
+from neo import AnalogSignal, Block, Segment, SpikeTrain
 
 
 def compare_spiketrain(
