@@ -18,6 +18,7 @@ and implementation for the PyNN High-level API
 
 This package contains the profile of that code for PyNN 0.9.
 """
+# pylint: disable=invalid-name
 
 # common imports
 import logging

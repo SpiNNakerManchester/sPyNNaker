@@ -62,6 +62,7 @@ class SynapseTypeExponential(AbstractSynapseType):
                 (DataType.S1615, ISYN_INH),
                 (DataType.S1615, TIMESTEP_MS)])],
             {TAU_SYN_E: "mV", TAU_SYN_I: 'mV', ISYN_EXC: "", ISYN_INH: ""})
+        # pylint: disable=invalid-name
         self.__tau_syn_E = tau_syn_E
         self.__tau_syn_I = tau_syn_I
         self.__isyn_exc = isyn_exc
@@ -97,6 +98,7 @@ class SynapseTypeExponential(AbstractSynapseType):
 
     @property
     def tau_syn_E(self) -> ModelParameter:
+        # pylint: disable=invalid-name
         """
         Value as passed into the init.
 
@@ -106,6 +108,7 @@ class SynapseTypeExponential(AbstractSynapseType):
 
     @property
     def tau_syn_I(self) -> ModelParameter:
+        # pylint: disable=invalid-name
         """
         Value as passed into the init.
 

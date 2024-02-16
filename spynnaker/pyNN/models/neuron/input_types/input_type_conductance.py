@@ -46,6 +46,7 @@ class InputTypeConductance(AbstractInputType):
             [Struct([(DataType.S1615, E_REV_E),
                      (DataType.S1615, E_REV_I)])],
             {E_REV_E: "mV", E_REV_I: "mV"})
+        # pylint: disable=invalid-name
         self.__e_rev_E = e_rev_E
         self.__e_rev_I = e_rev_I
 
@@ -64,6 +65,7 @@ class InputTypeConductance(AbstractInputType):
 
     @property
     def e_rev_E(self) -> ModelParameter:
+        # pylint: disable=invalid-name
         """
         :math:`E_{{rev}_e}`
         """
@@ -71,6 +73,7 @@ class InputTypeConductance(AbstractInputType):
 
     @property
     def e_rev_I(self) -> ModelParameter:
+        # pylint: disable=invalid-name
         """
         :math:`E_{{rev}_i}`
         """

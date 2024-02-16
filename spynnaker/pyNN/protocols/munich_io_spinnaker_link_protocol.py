@@ -114,6 +114,7 @@ _PAYLOAD_OFFSET_FOR_SENSOR_TIME = 0
 
 
 def GET_RETINA_KEY_VALUE(payload: int) -> int:
+    # pylint: disable=invalid-name
     """
     Gets the payload with the retina key mask and offset.
 
@@ -124,6 +125,7 @@ def GET_RETINA_KEY_VALUE(payload: int) -> int:
 
 
 def GET_RETINA_PAYLOAD_VALUE(payload: int) -> int:
+    # pylint: disable=invalid-name
     """
     Gets the payload with the retina payload mask and offset.
 
@@ -353,6 +355,7 @@ class RetinaPayload(Enum):
 
 
 class MUNICH_MODES(Enum):
+    # pylint: disable=invalid-name
     """
     Types of modes supported by this protocol.
     """

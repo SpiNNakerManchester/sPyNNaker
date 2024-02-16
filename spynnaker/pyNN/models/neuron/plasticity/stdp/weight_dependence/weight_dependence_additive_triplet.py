@@ -82,6 +82,7 @@ class WeightDependenceAdditiveTriplet(
 
         :rtype: float
         """
+        # pylint: disable=invalid-name
         return self.__a3_plus
 
     @property
@@ -91,6 +92,7 @@ class WeightDependenceAdditiveTriplet(
 
         :rtype: float
         """
+        # pylint: disable=invalid-name
         return self.__a3_minus
 
     @overrides(AbstractWeightDependence.is_same_as)

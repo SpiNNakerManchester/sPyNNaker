@@ -17,6 +17,7 @@ import sys
 from types import ModuleType
 from typing import Optional
 import numpy as np
+# pylint: disable=invalid-name
 plt: Optional[ModuleType]
 try:
     import matplotlib.pyplot  # type: ignore[import]

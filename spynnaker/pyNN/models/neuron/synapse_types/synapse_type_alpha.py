@@ -88,6 +88,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
         # pylint: disable=too-many-arguments
         self.__exc_response = exc_response
         self.__exc_exp_response = exc_exp_response
+        # pylint: disable=invalid-name
         self.__tau_syn_E = tau_syn_E
         self.__inh_response = inh_response
         self.__inh_exp_response = inh_exp_response
@@ -152,6 +153,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
         :rtype: ModelParameter
         """
+        # pylint: disable=invalid-name
         return self.__tau_syn_E
 
     @property
@@ -170,4 +172,5 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
         :rtype: ModelParameter
         """
+        # pylint: disable=invalid-name
         return self.__tau_syn_I
