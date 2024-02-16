@@ -375,11 +375,11 @@ class NeoCsv(object):
         elimination_times: List[Quantity] = []
         elimination_labels: List[str] = []
 
-        for i in range(len(event_array)):
-            event_time = event_array[i][0] * ms
-            pre_id = int(event_array[i][1])
-            post_id = int(event_array[i][2])
-            if event_array[i][3] == 1:
+        for event in event_array:
+            event_time = event[0] * ms
+            pre_id = int(event[1])
+            post_id = int(event[2])
+            if event[3] == 1:
                 formation_times.append(event_time)
                 formation_labels.append(f"{pre_id}_{post_id}_formation")
             else:
@@ -401,11 +401,11 @@ class NeoCsv(object):
         formation: List[Tuple[Quantity, str]] = []
         elimination: List[Tuple[Quantity, str]] = []
 
-        for i in range(len(event_array)):
-            event_time = event_array[i][0] * ms
-            pre_id = int(event_array[i][1])
-            post_id = int(event_array[i][2])
-            if event_array[i][3] == 1:
+        for event in event_array:
+            event_time = event[0] * ms
+            pre_id = int(event[1])
+            post_id = int(event[2])
+            if event[3] == 1:
                 formation.append(
                     (event_time, f"{pre_id}_{post_id}_formation"))
             else:

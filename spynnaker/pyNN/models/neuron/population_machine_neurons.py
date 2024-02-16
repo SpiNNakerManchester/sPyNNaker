@@ -391,9 +391,9 @@ class PopulationMachineNeurons(
                     # All other sources have single-valued params
                     else:
                         if isinstance(value, Sequence):
-                            for m in range(len(value)):
+                            for a_value in value:
                                 value_convert = convert_to(
-                                    value[m],
+                                    a_value,
                                     cs_data_types[key]).item()
                                 spec.write_value(data=value_convert)
                         else:

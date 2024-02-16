@@ -214,13 +214,13 @@ class SpikeSourceArrayVertex(
         :param list(int) spike_times:
         """
         current_time = SpynnakerDataView.get_current_run_time_ms()
-        for i in range(len(spike_times)):
-            if spike_times[i] < current_time:
+        for spike_time in spike_times:
+            if spike_time < current_time:
                 logger.warning(
                     "SpikeSourceArray {} has spike_times that are lower than "
                     "the current time {} For example {} - "
                     "these will be ignored.",
-                    self, current_time, float(spike_times[i]))
+                    self, current_time, float(spike_time))
                 return
 
     def _check_spikes_double_list(self, spike_times: _DoubleList):
@@ -234,13 +234,13 @@ class SpikeSourceArrayVertex(
         current_time = SpynnakerDataView.get_current_run_time_ms()
         for neuron_id in range(0, self.n_atoms):
             id_times = spike_times[neuron_id]
-            for i in range(len(id_times)):
-                if id_times[i] < current_time:
+            for id_time in id_times:
+                if id_time < current_time:
                     logger.warning(
                         "SpikeSourceArray {} has spike_times that are lower "
                         "than the current time {} For example {} - "
                         "these will be ignored.",
-                        self, current_time, float(id_times[i]))
+                        self, current_time, float(id_time))
                     return
 
     def __set_spike_buffer_times(self, spike_times: Spikes):
