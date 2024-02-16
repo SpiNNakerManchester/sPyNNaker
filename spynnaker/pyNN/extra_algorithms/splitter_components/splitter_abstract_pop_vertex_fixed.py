@@ -150,6 +150,21 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
             weight_scales: NDArray[floating], index: int,
             max_atoms_per_core: int, synaptic_matrices: SynapticMatrices,
             neuron_data: NeuronData) -> PopulationMachineCommon:
+        """
+        Create the machine vertex for a slice.
+
+        :param Slice vertex_slice:
+        :param AbstractSDRAM sdram:
+        :param str label:
+        :param int structural_sz:
+        :param list(list) ring_buffer_shifts:
+        :param ndarray weight_scales:
+        :param int index:
+        :param int max_atoms_per_core:
+        :param SynapticMatrices synaptic_matrices:
+        :param NeuronData neuron_data:
+        :rtype: PopulationMachineCommon
+        """
         # If using local-only create a local-only vertex
         s_dynamics = self.governed_app_vertex.synapse_dynamics
         if isinstance(s_dynamics, AbstractLocalOnly):
