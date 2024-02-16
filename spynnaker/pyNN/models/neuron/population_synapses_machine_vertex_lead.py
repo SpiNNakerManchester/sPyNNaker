@@ -109,7 +109,6 @@ class PopulationSynapsesMachineVertexLead(
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(
             self, spec: DataSpecificationGenerator, placement: Placement):
-        # pylint: disable=missing-function-docstring
         rec_regions = self._pop_vertex.synapse_recorder.get_region_sizes(
             self.vertex_slice)
         self._write_common_data_spec(spec, rec_regions)
@@ -137,19 +136,16 @@ class PopulationSynapsesMachineVertexLead(
     @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(
             self, spec: DataSpecificationReloader, placement: Placement):
-        # pylint: disable=missing-function-docstring
         # We don't need to do anything here because the originally written
         # data can be used again
         pass
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self) -> bool:
-        # pylint: disable=missing-function-docstring
         return self.__regenerate_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value: bool):
-        # pylint: disable=missing-function-docstring
         self.__regenerate_data = new_value
 
     @overrides(PopulationMachineSynapses.set_do_synapse_regeneration)

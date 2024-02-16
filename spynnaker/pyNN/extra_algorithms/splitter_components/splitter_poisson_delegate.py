@@ -53,7 +53,6 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
 
     @overrides(SplitterFixedLegacy.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex: SpikeSourcePoissonVertex):
-        # pylint: disable=missing-function-docstring
         if not isinstance(app_vertex, SpikeSourcePoissonVertex):
             raise PacmanConfigurationException(
                 f"The vertex {app_vertex} cannot be supported by the "
@@ -64,7 +63,6 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
 
     @overrides(SplitterFixedLegacy.create_machine_vertices)
     def create_machine_vertices(self, chip_counter: ChipCounter):
-        # pylint: disable=missing-function-docstring
         # If sending over SDRAM, let the target handle this
         if self.send_over_sdram:
             return
@@ -74,7 +72,6 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self) -> List[Slice]:
-        # pylint: disable=missing-function-docstring
         if self.send_over_sdram:
             proj = self.governed_app_vertex.outgoing_projections[0]
             # pylint: disable=protected-access
@@ -84,7 +81,6 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self) -> List[Slice]:
-        # pylint: disable=missing-function-docstring
         if self.send_over_sdram:
             proj = self.governed_app_vertex.outgoing_projections[0]
             # pylint: disable=protected-access
@@ -94,7 +90,6 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id: str) -> List[MachineVertex]:
-        # pylint: disable=missing-function-docstring
         if self.send_over_sdram:
             return []
         return super().get_out_going_vertices(partition_id)
@@ -102,7 +97,6 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
     @overrides(AbstractSplitterCommon.get_same_chip_groups)
     def get_same_chip_groups(self) -> Sequence[
             Tuple[Sequence[MachineVertex], AbstractSDRAM]]:
-        # pylint: disable=missing-function-docstring
         if self.send_over_sdram:
             return []
         return super().get_same_chip_groups()

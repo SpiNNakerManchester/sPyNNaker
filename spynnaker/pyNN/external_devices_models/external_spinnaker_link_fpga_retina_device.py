@@ -120,7 +120,6 @@ class ExternalFPGARetinaDevice(
 
     @overrides(ApplicationSpiNNakerLinkVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(self, partition_id: str) -> BaseKeyAndMask:
-        # pylint: disable=missing-function-docstring
         return BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)
 
     def _get_mask(self, mode: str) -> int:
@@ -168,19 +167,16 @@ class ExternalFPGARetinaDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self) -> Iterable[MultiCastCommand]:
-        # pylint: disable=missing-function-docstring
         yield MultiCastCommand(
             key=0x0000FFFF, payload=1, repeat=5, delay_between_repeats=100)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self) -> Iterable[MultiCastCommand]:
-        # pylint: disable=missing-function-docstring
         yield MultiCastCommand(
             key=0x0000FFFE, payload=0, repeat=5, delay_between_repeats=100)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self) -> List[MultiCastCommand]:
-        # pylint: disable=missing-function-docstring
         return []

@@ -106,7 +106,6 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
 
     @overrides(LiveEventConnection.add_start_callback)
     def add_start_callback(self, label: str, start_callback: _Callback):
-        # pylint: disable=missing-function-docstring
         super().add_start_callback(
             self.__control_label(label), functools.partial(
                 self.__callback_wrapper, start_callback))
@@ -114,14 +113,12 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
     @overrides(LiveEventConnection.add_start_resume_callback)
     def add_start_resume_callback(
             self, label: str, start_resume_callback: _Callback):
-        # pylint: disable=missing-function-docstring
         super().add_start_resume_callback(
             self.__control_label(label), functools.partial(
                 self.__callback_wrapper, start_resume_callback))
 
     @overrides(LiveEventConnection.add_init_callback)
     def add_init_callback(self, label: str, init_callback: _InitCallback):
-        # pylint: disable=missing-function-docstring
         super().add_init_callback(
             self.__control_label(label), functools.partial(
                 self.__init_callback_wrapper, init_callback))
@@ -130,7 +127,6 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
     def add_receive_callback(
             self, label: str, live_event_callback: _RcvTimeCallback,
             translate_key: bool = True):
-        # pylint: disable=missing-function-docstring
         raise ConfigurationException(
             "SpynnakerPoissonControlPopulation can't receive data")
 
@@ -138,14 +134,12 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
     def add_receive_no_time_callback(
             self, label: str, live_event_callback: _RcvCallback,
             translate_key: bool = True):
-        # pylint: disable=missing-function-docstring
         raise ConfigurationException(
             "SpynnakerPoissonControlPopulation can't receive data")
 
     @overrides(LiveEventConnection.add_pause_stop_callback)
     def add_pause_stop_callback(
             self, label: str, pause_stop_callback: _Callback):
-        # pylint: disable=missing-function-docstring
         super().add_pause_stop_callback(
             self.__control_label(label), functools.partial(
                 self.__callback_wrapper, pause_stop_callback))

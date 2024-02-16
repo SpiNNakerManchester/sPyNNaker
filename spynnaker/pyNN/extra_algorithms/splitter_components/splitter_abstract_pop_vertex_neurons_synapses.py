@@ -178,7 +178,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter: ChipCounter):
-        # pylint: disable=missing-function-docstring
         label = self.governed_app_vertex.label or ""
 
         # Structural plasticity can only be run on a single synapse core
@@ -558,24 +557,20 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self) -> Sequence[Slice]:
-        # pylint: disable=missing-function-docstring
         return self._get_fixed_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self) -> Sequence[Slice]:
-        # pylint: disable=missing-function-docstring
         return self._get_fixed_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id: str) -> Sequence[
             PopulationNeuronsMachineVertex]:
-        # pylint: disable=missing-function-docstring
         return self.__neuron_vertices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(self, partition_id: str) -> Sequence[
             PopulationSynapsesMachineVertexCommon]:
-        # pylint: disable=missing-function-docstring
         return self.__synapse_vertices
 
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
@@ -584,7 +579,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             partition_id: str) -> Sequence[
                 Tuple[MachineVertex, Sequence[Union[
                     MachineVertex, ApplicationVertex]]]]:
-        # pylint: disable=missing-function-docstring
         # If delayed get the real pre-vertex
         if isinstance(source_vertex, DelayExtensionVertex):
             pre_vertex = cast(
@@ -648,7 +642,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(
             self, variable_to_record: str) -> Sequence[MachineVertex]:
-        # pylint: disable=missing-function-docstring
         if self.governed_app_vertex.neuron_recorder.is_recordable(
                 variable_to_record):
             return self.__neuron_vertices
@@ -836,17 +829,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     @overrides(AbstractSplitterCommon.get_same_chip_groups)
     def get_same_chip_groups(self) -> List[
             Tuple[List[MachineVertex], AbstractSDRAM]]:
-        # pylint: disable=missing-function-docstring
         return self.__same_chip_groups
 
     @overrides(AbstractSplitterCommon.get_internal_multicast_partitions)
     def get_internal_multicast_partitions(
             self) -> List[MulticastEdgePartition]:
-        # pylint: disable=missing-function-docstring
         return self.__multicast_partitions
 
     @overrides(AbstractSplitterCommon.get_internal_sdram_partitions)
     def get_internal_sdram_partitions(
             self) -> List[SourceSegmentedSDRAMMachinePartition]:
-        # pylint: disable=missing-function-docstring
         return self.__sdram_partitions

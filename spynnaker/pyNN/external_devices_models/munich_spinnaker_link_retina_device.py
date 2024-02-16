@@ -128,13 +128,11 @@ class MunichRetinaDevice(
 
     @overrides(ApplicationSpiNNakerLinkVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(self, partition_id: str) -> BaseKeyAndMask:
-        # pylint: disable=missing-function-docstring
         return BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self) -> Iterable[MultiCastCommand]:
-        # pylint: disable=missing-function-docstring
         # change the retina key it transmits with
         # (based off if its right or left)
         key_set_command = self._MANAGEMENT_BIT | (
@@ -160,7 +158,6 @@ class MunichRetinaDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self) -> Iterable[MultiCastCommand]:
-        # pylint: disable=missing-function-docstring
         # disable retina
         disable_command = self._MANAGEMENT_BIT | (
             self._RIGHT_RETINA_DISABLE if self.__is_right
@@ -172,5 +169,4 @@ class MunichRetinaDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self) -> List[MultiCastCommand]:
-        # pylint: disable=missing-function-docstring
         return []

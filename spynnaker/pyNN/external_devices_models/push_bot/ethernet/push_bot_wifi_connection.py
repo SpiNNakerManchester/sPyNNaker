@@ -175,10 +175,8 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     @overrides(Listenable.is_ready_to_receive)
     def is_ready_to_receive(self, timeout=0):
-        # pylint: disable=missing-function-docstring
         return bool(select.select([self.__socket], [], [], timeout)[0])
 
     @overrides(Listenable.get_receive_method)
     def get_receive_method(self):
-        # pylint: disable=missing-function-docstring
         return self.receive

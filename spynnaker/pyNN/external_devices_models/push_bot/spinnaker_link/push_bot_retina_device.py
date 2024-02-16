@@ -35,7 +35,6 @@ class DelayedPayloadMultiCastCommand(MultiCastCommand):
     @property
     @overrides(MultiCastCommand.payload)
     def payload(self):
-        # pylint: disable=missing-function-docstring
         if self._payload is None:
             self._payload = self._vertex.new_key_command_payload()
         return self._payload
@@ -43,7 +42,6 @@ class DelayedPayloadMultiCastCommand(MultiCastCommand):
     @property
     @overrides(MultiCastCommand.is_payload)
     def is_payload(self):
-        # pylint: disable=missing-function-docstring
         return self.payload is not None
 
 

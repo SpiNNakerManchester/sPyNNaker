@@ -109,7 +109,6 @@ class PopulationMachineCommon(
     @property
     @overrides(MachineVertex.sdram_required)
     def sdram_required(self) -> AbstractSDRAM:
-        # pylint: disable=missing-function-docstring
         return self.__sdram
 
     @property
@@ -128,19 +127,16 @@ class PopulationMachineCommon(
 
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
     def get_recording_region_base_address(self, placement: Placement) -> int:
-        # pylint: disable=missing-function-docstring
         return locate_memory_region_for_placement(
             placement, self.__regions.recording)
 
     @overrides(AbstractHasProfileData.get_profile_data)
     def get_profile_data(self, placement: Placement) -> ProfileData:
-        # pylint: disable=missing-function-docstring
         return get_profiling_data(
             self.__regions.profile, self.__profile_tags, placement)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self) -> ExecutableType:
-        # pylint: disable=missing-function-docstring
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     def _write_common_data_spec(
@@ -180,11 +176,9 @@ class PopulationMachineCommon(
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self) -> str:
-        # pylint: disable=missing-function-docstring
         return self.__binary_file_name
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id: str) -> int:
-        # pylint: disable=missing-function-docstring
         # Colour each time slot with up to 16 colours to allow for delays
         return self.vertex_slice.n_atoms * 16

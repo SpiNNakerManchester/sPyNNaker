@@ -244,7 +244,6 @@ class PopulationMachineLocalOnlyCombinedVertex(
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
             provenance_data: Sequence[int]):
-        # pylint: disable=missing-function-docstring
         proc_offset = NeuronProvenance.N_ITEMS
         end_proc_offset = proc_offset + LocalOnlyProvenance.N_ITEMS
         self._parse_neuron_provenance(
@@ -276,7 +275,6 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self) -> List[int]:
-        # pylint: disable=missing-function-docstring
         ids = self._pop_vertex.neuron_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         ids.extend(self._pop_vertex.synapse_recorder.recorded_ids_by_slice(
@@ -286,7 +284,6 @@ class PopulationMachineLocalOnlyCombinedVertex(
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(
             self, spec: DataSpecificationGenerator, placement: Placement):
-        # pylint: disable=missing-function-docstring
         rec_regions = self._pop_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
         rec_regions.extend(self._pop_vertex.synapse_recorder.get_region_sizes(
@@ -323,7 +320,6 @@ class PopulationMachineLocalOnlyCombinedVertex(
     @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(
             self, spec: DataSpecificationReloader, placement: Placement):
-        # pylint: disable=missing-function-docstring
         self._rewrite_neuron_data_spec(spec)
 
         # close spec
@@ -331,12 +327,10 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self) -> bool:
-        # pylint: disable=missing-function-docstring
         return self.__regenerate_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value: bool):
-        # pylint: disable=missing-function-docstring
         self.__regenerate_data = new_value
 
     def _parse_local_only_provenance(

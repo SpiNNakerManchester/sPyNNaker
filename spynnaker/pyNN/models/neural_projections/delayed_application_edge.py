@@ -65,13 +65,11 @@ class DelayedApplicationEdge(ApplicationEdge):
     @property
     @overrides(ApplicationEdge.pre_vertex)
     def pre_vertex(self) -> DelayExtensionVertex:
-        # pylint: disable=missing-function-docstring
         return cast('DelayExtensionVertex', super().pre_vertex)
 
     @property
     @overrides(ApplicationEdge.post_vertex)
     def post_vertex(self) -> AbstractPopulationVertex:
-        # pylint: disable=missing-function-docstring
         return cast('AbstractPopulationVertex', super().post_vertex)
 
     @property

@@ -73,7 +73,6 @@ class PopulationMachineSynapses(
     @abstractmethod
     @overrides(MachineVertex.vertex_slice)
     def vertex_slice(self) -> Slice:
-        # pylint: disable=missing-function-docstring
         raise NotImplementedError
 
     @property
@@ -125,7 +124,6 @@ class PopulationMachineSynapses(
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                bit_field_base_address)
     def bit_field_base_address(self, placement: Placement) -> int:
-        # pylint: disable=missing-function-docstring
         return locate_memory_region_for_placement(
             placement=placement, region=self._synapse_regions.bitfield_filter)
 
@@ -133,7 +131,6 @@ class PopulationMachineSynapses(
                regeneratable_sdram_blocks_and_sizes)
     def regeneratable_sdram_blocks_and_sizes(
             self, placement: Placement) -> List[Tuple[int, int]]:
-        # pylint: disable=missing-function-docstring
         synaptic_matrix_base_address = locate_memory_region_for_placement(
             placement=placement, region=self._synapse_regions.synaptic_matrix)
         return [(

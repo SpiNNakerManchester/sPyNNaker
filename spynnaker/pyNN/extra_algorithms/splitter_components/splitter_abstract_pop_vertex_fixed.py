@@ -65,7 +65,6 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter: ChipCounter):
-        # pylint: disable=missing-function-docstring
         app_vertex = self.governed_app_vertex
         app_vertex.synapse_recorder.add_region_offset(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
@@ -98,24 +97,20 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self) -> List[Slice]:
-        # pylint: disable=missing-function-docstring
         return self._get_fixed_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self) -> List[Slice]:
-        # pylint: disable=missing-function-docstring
         return self._get_fixed_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(
             self, partition_id: str) -> Sequence[MachineVertex]:
-        # pylint: disable=missing-function-docstring
         return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(
             self, partition_id: str) -> Sequence[MachineVertex]:
-        # pylint: disable=missing-function-docstring
         return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
@@ -123,7 +118,6 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
             self, source_vertex: ApplicationVertex,
             partition_id: str) -> List[
                 Tuple[MachineVertex, Sequence[MachineVertex]]]:
-        # pylint: disable=missing-function-docstring
         # Determine the real pre-vertex
         pre_vertex = source_vertex
         if isinstance(source_vertex, DelayExtensionVertex):
@@ -148,7 +142,6 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(
             self, variable_to_record: str) -> Iterable[MachineVertex]:
-        # pylint: disable=missing-function-docstring
         return self.governed_app_vertex.machine_vertices
 
     def create_machine_vertex(
@@ -157,7 +150,6 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
             weight_scales: NDArray[floating], index: int,
             max_atoms_per_core: int, synaptic_matrices: SynapticMatrices,
             neuron_data: NeuronData) -> PopulationMachineCommon:
-        # pylint: disable=missing-function-docstring
         # If using local-only create a local-only vertex
         s_dynamics = self.governed_app_vertex.synapse_dynamics
         if isinstance(s_dynamics, AbstractLocalOnly):

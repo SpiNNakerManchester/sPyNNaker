@@ -119,7 +119,6 @@ class DelayExtensionMachineVertex(
     @property
     @overrides(MachineVertex.app_vertex)
     def app_vertex(self) -> DelayExtensionVertex:
-        # pylint: disable=missing-function-docstring
         assert isinstance(self._app_vertex, DelayExtensionVertex)
         return self._app_vertex
 
@@ -137,7 +136,6 @@ class DelayExtensionMachineVertex(
     @property
     @overrides(MachineVertex.sdram_required)
     def sdram_required(self) -> AbstractSDRAM:
-        # pylint: disable=missing-function-docstring
         return self.__sdram
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
@@ -145,7 +143,6 @@ class DelayExtensionMachineVertex(
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
             provenance_data: Sequence[int]):
-        # pylint: disable=missing-function-docstring
         (n_received, n_processed, n_added, n_sent, n_overflows, n_delays,
          n_sat, n_bad_neuron, n_bad_keys, n_late_spikes, max_bg,
          n_bg_overloads) = provenance_data
@@ -251,7 +248,6 @@ class DelayExtensionMachineVertex(
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id: str) -> int:
-        # pylint: disable=missing-function-docstring
         n_keys = super().get_n_keys_for_partition(partition_id)
         v = self.app_vertex
         n_colours = 2 ** v.n_colour_bits
@@ -259,18 +255,15 @@ class DelayExtensionMachineVertex(
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self) -> str:
-        # pylint: disable=missing-function-docstring
         return "delay_extension.aplx"
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self) -> ExecutableType:
-        # pylint: disable=missing-function-docstring
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(
             self, spec: DataSpecificationGenerator, placement: Placement):
-        # pylint: disable=missing-function-docstring
         vertex = placement.vertex
 
         # Reserve memory:

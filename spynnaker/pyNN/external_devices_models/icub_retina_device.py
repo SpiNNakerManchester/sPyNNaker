@@ -98,7 +98,6 @@ class ICUBRetinaDevice(Application2DSpiNNakerLinkVertex):
 
     @overrides(Application2DSpiNNakerLinkVertex.get_incoming_slice)
     def get_incoming_slice(self, index: int) -> Slice:
-        # pylint: disable=missing-function-docstring
         vertex_slice = super().get_incoming_slice(index)
         self.__index_by_slice[vertex_slice] = index
         return vertex_slice
@@ -107,14 +106,12 @@ class ICUBRetinaDevice(Application2DSpiNNakerLinkVertex):
     def get_machine_fixed_key_and_mask(
             self, machine_vertex: MachineVertex,
             partition_id: str) -> BaseKeyAndMask:
-        # pylint: disable=missing-function-docstring
         vertex_slice = machine_vertex.vertex_slice
         index = self.__index_by_slice[vertex_slice]
         return self._get_key_and_mask(self.__base_key, index)
 
     @overrides(Application2DSpiNNakerLinkVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(self, partition_id: str) -> BaseKeyAndMask:
-        # pylint: disable=missing-function-docstring
         n_key_bits = BITS_IN_KEY - self._key_shift
         key_mask = ((1 << n_key_bits) - 1) << self._key_shift
         return BaseKeyAndMask(self.__base_key << self._key_shift, key_mask)

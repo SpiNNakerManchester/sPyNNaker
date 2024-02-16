@@ -45,7 +45,6 @@ class SplitterAbstractPopulationVertex(
     @final
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex: AbstractPopulationVertex):
-        # pylint: disable=missing-function-docstring
         if not isinstance(app_vertex, AbstractPopulationVertex):
             raise PacmanConfigurationException(
                 f"The vertex {app_vertex} cannot be supported by the "
@@ -57,7 +56,6 @@ class SplitterAbstractPopulationVertex(
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self) -> None:
-        # pylint: disable=missing-function-docstring
         self._max_delay = None
         self.__slices = None
 

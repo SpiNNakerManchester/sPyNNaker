@@ -76,12 +76,10 @@ class MunichMotorDevice(
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.dependent_vertices)
     def dependent_vertices(self) -> Iterable[ApplicationVertex]:
-        # pylint: disable=missing-function-docstring
         return self.__dependent_vertices
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.
                edge_partition_identifiers_for_dependent_vertex)
     def edge_partition_identifiers_for_dependent_vertex(
             self, vertex: ApplicationVertex) -> Iterable[str]:
-        # pylint: disable=missing-function-docstring
         yield self.machine_vertex.MOTOR_PARTITION_ID

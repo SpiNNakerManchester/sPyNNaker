@@ -424,7 +424,6 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     def get_atom_key_map(
             self, pre_vertex: MachineVertex, partition_id: str,
             routing_info: RoutingInfo) -> Iterable[Tuple[int, int]]:
-        # pylint: disable=missing-function-docstring
         base_key = routing_info.get_first_key_from_pre_vertex(
             pre_vertex, partition_id)
         # This might happen if there are no edges

@@ -71,7 +71,6 @@ class SpikeInjectorVertex(
 
     @property
     @overrides(PopulationApplicationVertex.atoms_shape)
-    # pylint: disable=missing-function-docstring
     def atoms_shape(self) -> Tuple[int, ...]:
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.n_atoms)

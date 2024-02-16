@@ -95,19 +95,16 @@ class MachineMunichMotorDevice(
     @property
     @overrides(MachineVertex.sdram_required)
     def sdram_required(self) -> ConstantSDRAM:
-        # pylint: disable=missing-function-docstring
         return ConstantSDRAM(
                 SYSTEM_BYTES_REQUIREMENT + self._PARAMS_SIZE +
                 self.get_provenance_data_size(self._PROVENANCE_ELEMENTS))
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self) -> str:
-        # pylint: disable=missing-function-docstring
         return "robot_motor_control.aplx"
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self) -> ExecutableType:
-        # pylint: disable=missing-function-docstring
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @property
@@ -125,7 +122,6 @@ class MachineMunichMotorDevice(
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
             provenance_data: Sequence[int]):
-        # pylint: disable=missing-function-docstring
         n_buffer_overflows, = provenance_data
 
         with ProvenanceWriter() as db:
@@ -143,7 +139,6 @@ class MachineMunichMotorDevice(
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(
             self, spec: DataSpecificationGenerator, placement: Placement):
-        # pylint: disable=missing-function-docstring
         # reserve regions
         self.reserve_memory_regions(spec)
 
@@ -202,7 +197,6 @@ class MachineMunichMotorDevice(
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id: str) -> int:
-        # pylint: disable=missing-function-docstring
         if partition_id == self.MOTOR_PARTITION_ID:
             return self._MOTOR_N_KEYS
         return super().get_n_keys_for_partition(partition_id)

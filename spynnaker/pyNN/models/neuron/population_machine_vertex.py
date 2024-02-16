@@ -274,7 +274,6 @@ class PopulationMachineVertex(
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
             provenance_data: Sequence[int]):
-        # pylint: disable=missing-function-docstring
         syn_offset = NeuronProvenance.N_ITEMS
         proc_offset = syn_offset + SynapseProvenance.N_ITEMS
         end_proc_offset = proc_offset + SpikeProcessingProvenance.N_ITEMS
@@ -310,7 +309,6 @@ class PopulationMachineVertex(
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self) -> List[int]:
-        # pylint: disable=missing-function-docstring
         ids = self._pop_vertex.neuron_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         ids.extend(self._pop_vertex.synapse_recorder.recorded_ids_by_slice(
@@ -320,7 +318,6 @@ class PopulationMachineVertex(
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(
             self, spec: DataSpecificationGenerator, placement: Placement):
-        # pylint: disable=missing-function-docstring
         rec_regions = self._pop_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
         rec_regions.extend(self._pop_vertex.synapse_recorder.get_region_sizes(
@@ -340,7 +337,6 @@ class PopulationMachineVertex(
         AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(
             self, spec: DataSpecificationReloader, placement: Placement):
-        # pylint: disable=missing-function-docstring
         if self.__regenerate_neuron_data:
             self._rewrite_neuron_data_spec(spec)
             self.__regenerate_neuron_data = False
@@ -356,12 +352,10 @@ class PopulationMachineVertex(
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self) -> bool:
-        # pylint: disable=missing-function-docstring
         return self.__regenerate_neuron_data or self.__regenerate_synapse_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value: bool):
-        # pylint: disable=missing-function-docstring
         # These are set elsewhere once data is generated
         pass
 

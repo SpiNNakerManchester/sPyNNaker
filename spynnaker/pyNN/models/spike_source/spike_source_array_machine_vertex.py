@@ -34,7 +34,6 @@ class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
     @overrides(
         ReverseIPTagMulticastSourceMachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id: str) -> int:
-        # pylint: disable=missing-function-docstring
         n_keys = super().get_n_keys_for_partition(partition_id)
         n_colours = 2 ** self._pop_vertex.n_colour_bits
         return n_keys * n_colours

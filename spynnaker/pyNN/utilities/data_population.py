@@ -60,7 +60,6 @@ class DataPopulation(object):
     def write_data(self, io: Union[str, neo.baseio.BaseIO],
                    variables: Names = 'all', gather: bool = True,
                    clear: bool = False, annotations: Annotations = None):
-        # pylint: disable=missing-function-docstring,protected-access
         Population._check_params(gather, annotations)
         if clear:
             logger.warning("Ignoring clear as supported in this mode")
@@ -74,7 +73,6 @@ class DataPopulation(object):
     def describe(self, template: Optional[str] = None,
                  engine: Optional[Union[str, TemplateEngine]] = None
                  ) -> Union[str, Dict[str, Any]]:
-        # pylint: disable=missing-function-docstring
         if template is not None:
             logger.warning("Ignoring template as not supported in this mode")
         if engine is not None:
@@ -88,7 +86,6 @@ class DataPopulation(object):
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
             annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
-        # pylint: disable=missing-function-docstring,protected-access
         Population._check_params(gather, annotations)
         if clear:
             logger.warning("Ignoring clear as supported in this mode")
@@ -100,7 +97,6 @@ class DataPopulation(object):
     def spinnaker_get_data(
             self, variable: str, as_matrix: bool = False,
             view_indexes: Optional[Sequence[int]] = None) -> NDArray[floating]:
-        # pylint: disable=missing-function-docstring
         if view_indexes:
             return self[view_indexes].spinnaker_get_data(variable, as_matrix)
         with NeoBufferDatabase(self.__database_file) as db:
@@ -109,14 +105,12 @@ class DataPopulation(object):
 
     @overrides(Population.get_spike_counts)
     def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
-        # pylint: disable=missing-function-docstring,protected-access
         Population._check_params(gather)
         with NeoBufferDatabase(self.__database_file) as db:
             return db.get_spike_counts(self.__label, self._indexes)
 
     @overrides(Population.find_units)
     def find_units(self, variable: str) -> Optional[str]:
-        # pylint: disable=missing-function-docstring
         with NeoBufferDatabase(self.__database_file) as db:
             (_, _, units) = db.get_recording_metadata(self.__label, variable)
         return units
@@ -127,19 +121,16 @@ class DataPopulation(object):
     @property
     @overrides(Population.label)
     def label(self) -> str:
-        # pylint: disable=missing-function-docstring
         return self.__label
 
     @property
     @overrides(Population.local_size)
     def local_size(self) -> int:
-        # pylint: disable=missing-function-docstring
         return self._size
 
     @property
     @overrides(Population.size)
     def size(self) -> int:
-        # pylint: disable=missing-function-docstring
         return self._size
 
     @overload
@@ -156,7 +147,7 @@ class DataPopulation(object):
     @overrides(Population.id_to_index)
     def id_to_index(self, id: Union[int, Iterable[int]]
                     ) -> Union[int, Sequence[int]]:  # @ReservedAssignment
-        # pylint: disable=missing-function-docstring,redefined-builtin
+        # pylint: disable=redefined-builtin
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
             _, first_id, _ = db.get_population_metadata(self.__label)
@@ -180,7 +171,6 @@ class DataPopulation(object):
     @overrides(Population.index_to_id)
     def index_to_id(self, index: Union[int, Iterable[int]]
                     ) -> Union[int, Sequence[int]]:
-        # pylint: disable=missing-function-docstring
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
             _, first_id, _ = db.get_population_metadata(self.__label)
@@ -223,7 +213,6 @@ class DataPopulation(object):
 
     @overrides(Population.mean_spike_count)
     def mean_spike_count(self, gather: bool = True) -> float:
-        # pylint: disable=missing-function-docstring
-        Population._check_params(gather)  # pylint: disable=protected-access
+        Population._check_params(gather)
         counts = self.get_spike_counts()
         return sum(counts.values()) / len(counts)
