@@ -60,6 +60,7 @@ class DataPopulation(object):
     def write_data(self, io: Union[str, neo.baseio.BaseIO],
                    variables: Names = 'all', gather: bool = True,
                    clear: bool = False, annotations: Annotations = None):
+        # pylint: disable=protected-access
         Population._check_params(gather, annotations)
         if clear:
             logger.warning("Ignoring clear as supported in this mode")
@@ -86,6 +87,7 @@ class DataPopulation(object):
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
             annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
+        # pylint: disable=protected-access
         Population._check_params(gather, annotations)
         if clear:
             logger.warning("Ignoring clear as supported in this mode")
@@ -105,7 +107,7 @@ class DataPopulation(object):
 
     @overrides(Population.get_spike_counts)
     def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
-        Population._check_params(gather)
+        Population._check_params(gather)  # pylint: disable=protected-access
         with NeoBufferDatabase(self.__database_file) as db:
             return db.get_spike_counts(self.__label, self._indexes)
 
@@ -213,6 +215,6 @@ class DataPopulation(object):
 
     @overrides(Population.mean_spike_count)
     def mean_spike_count(self, gather: bool = True) -> float:
-        Population._check_params(gather)
+        Population._check_params(gather)  # pylint: disable=protected-access
         counts = self.get_spike_counts()
         return sum(counts.values()) / len(counts)
