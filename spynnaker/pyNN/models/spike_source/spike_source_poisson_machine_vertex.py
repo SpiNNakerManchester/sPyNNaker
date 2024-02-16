@@ -295,10 +295,14 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(AbstractMaxSpikes.max_spikes_per_second)
     def max_spikes_per_second(self) -> float:
+        # pylint: disable=missing-function-docstring
+        # TODO https://github.com/SpiNNakerManchester/sPyNNaker/issues/1435
         return self._pop_vertex.max_rate
 
     @overrides(AbstractMaxSpikes.max_spikes_per_ts)
     def max_spikes_per_ts(self) -> float:
+        # pylint: disable=missing-function-docstring
+        # TODO https://github.com/SpiNNakerManchester/sPyNNaker/issues/1435
         return self._pop_vertex.max_spikes_per_ts()
 
     @overrides(AbstractRewritesDataSpecification.reload_required)

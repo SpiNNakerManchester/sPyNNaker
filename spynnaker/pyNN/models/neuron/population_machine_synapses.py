@@ -73,6 +73,8 @@ class PopulationMachineSynapses(
     @abstractmethod
     @overrides(MachineVertex.vertex_slice)
     def vertex_slice(self) -> Slice:
+        # classes that implement this API also implement MachineVertex
+        # pylint: disable=missing-function-docstring
         raise NotImplementedError
 
     @property
