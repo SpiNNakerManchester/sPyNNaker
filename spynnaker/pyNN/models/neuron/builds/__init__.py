@@ -40,6 +40,7 @@ from .stoc_exp import StocExp
 from .stoc_exp_stable import StocExpStable
 from .stoc_sigma import StocSigma
 from .if_trunc_delta import IFTruncDelta
+from .if_curr_delta_fixed_prob import IFCurrDeltaFixedProb
 
 __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",
@@ -47,4 +48,4 @@ __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IzkCurrExpBase", "IFCondExpStoc", "IzkCondDualExpBase",
            "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase",
            "IFCurrDeltaCa2Adaptive", "StocExp", "StocExpStable", "StocSigma",
-           "IFTruncDelta"]
+           "IFTruncDelta", "IFCurrDeltaFixedProb"]
