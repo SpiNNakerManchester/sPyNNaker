@@ -41,6 +41,8 @@
 #include <neuron/current_sources/current_source_impl.h>
 #include <neuron/current_sources/current_source.h>
 
+#include "stoc_exp_common.h"
+
 //! definition of neuron parameters
 typedef struct neuron_params_t {
 
