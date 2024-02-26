@@ -45,7 +45,7 @@ from .abstract_population_vertex import AbstractPopulationVertex
 
 class LocalOnlyProvenance(ctypes.LittleEndianStructure):
     """
-    Types of provenance and the datatype used to represent each.
+    Types of provenance and the DataType used to represent each.
     """
     _fields_ = [
         # The maximum number of spikes received in a time step
