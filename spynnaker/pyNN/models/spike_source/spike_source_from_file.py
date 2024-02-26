@@ -19,7 +19,7 @@ from numpy.typing import NDArray
 
 from spynnaker.pyNN.utilities import utility_calls
 
-from .spike_source_array import SpikeSourceArray, Spikes
+from .spike_source_array import SpikeSourceArray
 
 _inf: Final = float('inf')
 
