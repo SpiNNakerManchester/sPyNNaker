@@ -60,7 +60,6 @@ class ConvolutionKernel(ndarray):
     """
     Thin wrapper around a numpy array.
     """
-    pass
 
 
 def shape2word(
