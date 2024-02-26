@@ -27,7 +27,7 @@ except ImportError:
 
 
 def _precheck(data, title):
-    if not len(data):
+    if len(data) == 0:
         if title is None:
             print("NO Data")
         else:

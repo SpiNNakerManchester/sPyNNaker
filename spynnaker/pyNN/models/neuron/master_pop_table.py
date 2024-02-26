@@ -163,7 +163,7 @@ def _to_numpy(array) -> NDArray[uint32]:
     :rtype: numpy.ndarray
     """
     # Nothing to do if the array is 0 sized
-    if not len(array):
+    if len(array) == 0:
         return numpy.zeros(0, dtype=uint32)
 
     uint32_array = ctypes.cast(array, _UINT32_PTR)

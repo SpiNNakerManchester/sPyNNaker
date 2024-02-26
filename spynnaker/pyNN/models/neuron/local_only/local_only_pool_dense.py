@@ -286,7 +286,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         if isinstance(weights, (int, float)):
             return weights
         pos_weights = weights[weights > 0]
-        if not len(pos_weights):
+        if len(pos_weights) == 0:
             return 0
         return numpy.mean(pos_weights)
 
@@ -298,7 +298,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         if isinstance(weights, (int, float)):
             return weights
         neg_weights = weights[weights < 0]
-        if not len(neg_weights):
+        if len(neg_weights) == 0:
             return 0
         return numpy.mean(neg_weights)
 
@@ -310,7 +310,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         if isinstance(weights, (int, float)):
             return 0
         pos_weights = weights[weights > 0]
-        if not len(pos_weights):
+        if len(pos_weights) == 0:
             return 0
         return numpy.var(pos_weights)
 
@@ -322,6 +322,6 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         if isinstance(weights, (int, float)):
             return 0
         neg_weights = weights[weights < 0]
-        if not len(neg_weights):
+        if len(neg_weights) == 0:
             return 0
         return numpy.var(neg_weights)

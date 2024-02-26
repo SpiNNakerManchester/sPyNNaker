@@ -315,7 +315,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, incoming_projection: Projection) -> float:
         conn = self.__connector(incoming_projection)
         pos_weights = conn.kernel_weights[conn.kernel_weights > 0]
-        if not len(pos_weights):
+        if len(pos_weights) == 0:
             return 0
         return numpy.mean(pos_weights)
 
@@ -324,7 +324,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, incoming_projection: Projection) -> float:
         conn = self.__connector(incoming_projection)
         neg_weights = conn.kernel_weights[conn.kernel_weights < 0]
-        if not len(neg_weights):
+        if len(neg_weights) == 0:
             return 0
         return numpy.mean(neg_weights)
 
@@ -333,7 +333,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, incoming_projection: Projection) -> float:
         conn = self.__connector(incoming_projection)
         pos_weights = conn.kernel_weights[conn.kernel_weights > 0]
-        if not len(pos_weights):
+        if len(pos_weights) == 0:
             return 0
         return numpy.var(pos_weights)
 
@@ -342,6 +342,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, incoming_projection: Projection) -> float:
         conn = self.__connector(incoming_projection)
         neg_weights = conn.kernel_weights[conn.kernel_weights < 0]
-        if not len(neg_weights):
+        if len(neg_weights) == 0:
             return 0
         return numpy.var(neg_weights)

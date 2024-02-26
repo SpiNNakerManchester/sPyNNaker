@@ -193,7 +193,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             return sources, targets, weights, delays
 
         # If there are no connections, return
-        if not len(self.__conn_list):
+        if len(self.__conn_list) == 0:
             self.__split_conn_list = {}
             return sources, targets, weights, delays
 
@@ -287,7 +287,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(
             self, synapse_info: SynapseInformation) -> int:
-        if not len(self.__targets):
+        if len(self.__targets) == 0:
             return 0
         return int(numpy.max(numpy.bincount(
             self.__targets.astype(int64, copy=False))))
@@ -380,7 +380,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @conn_list.setter
     def conn_list(self, conn_list: Union[
             None, NDArray, List[Tuple[int, ...]]]):
-        if conn_list is None or not len(conn_list):
+        if conn_list is None or len(conn_list) == 0:
             self.__conn_list = numpy.zeros((0, 2), dtype=uint32)
         else:
             self.__conn_list = numpy.array(conn_list)

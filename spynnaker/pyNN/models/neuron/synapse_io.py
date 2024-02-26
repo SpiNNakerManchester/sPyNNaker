@@ -417,7 +417,7 @@ def convert_to_connections(
     :rtype: ~numpy.ndarray
     """
     # If there is no data, return nothing
-    if data is None or not len(data):
+    if data is None or len(data) == 0:
         return numpy.zeros(0, dtype=NUMPY_CONNECTORS_DTYPE)
 
     # Translate the data into rows
