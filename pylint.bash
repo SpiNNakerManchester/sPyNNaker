@@ -30,7 +30,7 @@ params="--output-format=colorized --disable=R --persistent=no --jobs=1 --spellin
 check=--disable=import-error
 
 # one test
-check="--enable=consider-iterating-dictionary --disable=all"
+# check="--enable=import-outside-toplevel --disable=all"
 
 # check imports
 #check="--enable=wrong-import-order,ungrouped-imports --disable=all"
