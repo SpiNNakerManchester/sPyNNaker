@@ -13,10 +13,13 @@
 # limitations under the License.
 
 from typing import Final
+
 import numpy
 from numpy.typing import NDArray
-from .spike_source_array import SpikeSourceArray, Spikes
+
 from spynnaker.pyNN.utilities import utility_calls
+
+from .spike_source_array import SpikeSourceArray, Spikes
 
 _inf: Final = float('inf')
 

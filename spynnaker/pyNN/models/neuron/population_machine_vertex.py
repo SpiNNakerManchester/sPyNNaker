@@ -11,32 +11,37 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import ctypes
 from enum import IntEnum
 import os
-import ctypes
-from numpy import floating
-from numpy.typing import NDArray
 from typing import List, Optional, Sequence
 
+from numpy import floating
+from numpy.typing import NDArray
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.resources import AbstractSDRAM
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.placements import Placement
+
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from spinn_front_end_common.interface.ds import (
     DataSpecificationGenerator, DataSpecificationReloader)
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+
 from .abstract_population_vertex import AbstractPopulationVertex
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
-from .synaptic_matrices import SynapseRegions
 from .population_machine_synapses import PopulationMachineSynapses
 from .population_machine_synapses_provenance import SynapseProvenance
+from .synaptic_matrices import SynapseRegions
 
 
 class SpikeProcessingProvenance(ctypes.LittleEndianStructure):

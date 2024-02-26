@@ -13,13 +13,16 @@
 # limitations under the License.
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import List, Optional, Tuple, Union, TYPE_CHECKING
+
 import numpy
 from numpy import floating, integer, uint32
 from numpy.typing import NDArray
-from typing import List, Optional, Tuple, Union, TYPE_CHECKING
 
 from pacman.model.graphs.common import Slice
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
@@ -29,7 +32,9 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractPlasticSynapseDynamics)
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE, ConnectionsArray)
+
 from .master_pop_table import MasterPopTableAsBinarySearch
+
 if TYPE_CHECKING:
     from typing_extensions import TypeAlias
     from spynnaker.pyNN.models.neural_projections import (

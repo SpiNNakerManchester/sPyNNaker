@@ -13,13 +13,17 @@
 # limitations under the License.
 
 from typing import Optional, Tuple
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
+
 from spinn_front_end_common.interface.ds import DataType
+
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
-from .abstract_synapse_type import AbstractSynapseType
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
+
+from .abstract_synapse_type import AbstractSynapseType
 
 EXC_RESPONSE = "exc_response"
 EXC_EXP_RESPONSE = "exc_exp_response"

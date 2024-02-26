@@ -12,52 +12,57 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from collections.abc import Sized
 from enum import IntEnum
-import numpy
-from numpy import uint16, uint32
+from collections.abc import Sized
 import struct
 from typing import (
     Iterable, List, Optional, Sequence, TypeVar, Union,
     cast, TYPE_CHECKING)
 
+import numpy
+from numpy import uint16, uint32
+
 from spinn_utilities.overrides import overrides
+
 from spinnman.model.enums import ExecutableType
+
 from pacman.model.graphs import AbstractEdgePartition
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import (
     MachineVertex, AbstractSDRAMPartition, SDRAMMachineEdge)
-from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM
 from pacman.model.placements import Placement
+from pacman.model.resources import AbstractSDRAM
+from pacman.utilities.utility_calls import get_keys
+
+from spinn_front_end_common.abstract_models import (
+    AbstractHasAssociatedBinary,
+    AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
+from spinn_front_end_common.interface.buffer_management import (
+    recording_utilities)
+from spinn_front_end_common.interface.buffer_management.buffer_models import (
+    AbstractReceiveBuffersToHost)
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationBase, DataSpecificationGenerator,
     DataSpecificationReloader)
-from spinn_front_end_common.interface.buffer_management import (
-    recording_utilities)
+from spinn_front_end_common.interface.profiling import (
+    AbstractHasProfileData, ProfileData, profile_utils)
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities.constants import (
     SIMULATION_N_BYTES, BYTES_PER_WORD, BYTES_PER_SHORT)
-from pacman.utilities.utility_calls import get_keys
-from spinn_front_end_common.abstract_models import (
-    AbstractHasAssociatedBinary,
-    AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
-from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
-from spinn_front_end_common.interface.buffer_management.buffer_models import (
-    AbstractReceiveBuffersToHost)
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
-from spinn_front_end_common.interface.profiling import (
-    AbstractHasProfileData, ProfileData, profile_utils)
+
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models import (
-    SendsSynapticInputsOverSDRAM, ReceivesSynapticInputsOverSDRAM)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.models.abstract_models import (AbstractMaxSpikes,
+    SendsSynapticInputsOverSDRAM, ReceivesSynapticInputsOverSDRAM)
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID)
+
 if TYPE_CHECKING:
     from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
     from spynnaker.pyNN.models.neural_projections import SynapseInformation

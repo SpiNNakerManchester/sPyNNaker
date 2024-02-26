@@ -12,19 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Mapping, Optional, Sequence
+
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
-from .abstract_neuron_impl import AbstractNeuronImpl
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
+
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
-from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
-from spynnaker.pyNN.models.neuron.input_types import AbstractInputType
-from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
-from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
+
 from spynnaker.pyNN.models.neuron.additional_inputs import (
     AbstractAdditionalInput)
-from spinn_utilities.ranged.range_dictionary import RangeDictionary
+from spynnaker.pyNN.models.neuron.input_types import (
+    AbstractInputType, InputTypeConductance)
+from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
+from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
+from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
+from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
+
+from .abstract_neuron_impl import AbstractNeuronImpl
 
 # The size of the n_steps_per_timestep parameter
 _N_STEPS_PER_TIMESTEP_SIZE = 1 * BYTES_PER_WORD

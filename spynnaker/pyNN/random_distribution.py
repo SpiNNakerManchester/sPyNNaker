@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.random
-from pyNN.random import NumpyRNG
 from typing import Optional
-from pyNN.random import available_distributions
+
+import pyNN.random
+from pyNN.random import available_distributions, NumpyRNG
 # This file is to work around a Sphinx bug
 
 if "exponential_clipped" not in available_distributions:

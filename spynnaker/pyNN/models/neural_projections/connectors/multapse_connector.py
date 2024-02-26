@@ -14,21 +14,29 @@
 
 from __future__ import annotations
 import math
+from typing import Optional, Sequence, TYPE_CHECKING
+
 from numpy import uint32, integer
 from numpy.typing import NDArray
 import numpy.random
+
 from pyNN.random import NumpyRNG
-from typing import Optional, Sequence, TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.common import Slice
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
+
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)

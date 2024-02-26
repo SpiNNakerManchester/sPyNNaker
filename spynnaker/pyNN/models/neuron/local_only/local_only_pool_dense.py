@@ -12,17 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-import numpy
 from math import ceil
-from numpy import floating, uint32
-from numpy.typing import NDArray
 from typing import (
     Dict, List, Iterable, cast, TYPE_CHECKING)
+
+import numpy
+from numpy import floating, uint32
+from numpy.typing import NDArray
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import ApplicationVertex
+
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationGenerator)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     PoolDenseConnector)
@@ -33,7 +38,9 @@ from spynnaker.pyNN.models.common.local_only_2d_common import (
     get_sources_for_target, get_rinfo_for_spike_source, BITS_PER_SHORT,
     get_div_const, N_COLOUR_BITS_BITS, KEY_INFO_SIZE, get_first_and_last_slice,
     Source)
+
 from .abstract_local_only import AbstractLocalOnly
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron import (

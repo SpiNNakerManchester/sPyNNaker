@@ -16,19 +16,25 @@ from __future__ import annotations
 from enum import IntEnum
 from typing import Sequence, TYPE_CHECKING
 
-from spinnman.model.enums import ExecutableType
-from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 from spinn_utilities.overrides import overrides
+
+from spinnman.model.enums import ExecutableType
+
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.resources import AbstractSDRAM
-from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
+
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
+from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
 from .delay_extension_vertex import DelayExtensionVertex
+
 if TYPE_CHECKING:
     from pacman.model.placements import Placement
     from spinn_front_end_common.interface.ds import DataSpecificationGenerator

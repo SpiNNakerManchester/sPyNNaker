@@ -12,13 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy
 from typing import Dict, Mapping
+
+import numpy
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
+
 from .abstract_current_source import (
     AbstractCurrentSource, CurrentSourceIDs, CurrentParameter)
 

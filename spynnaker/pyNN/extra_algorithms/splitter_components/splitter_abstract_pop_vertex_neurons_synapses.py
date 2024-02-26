@@ -14,12 +14,15 @@
 from collections import defaultdict
 import logging
 import math
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, cast
+
 from numpy import floating
 from numpy.typing import NDArray
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, cast
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.ordered_set import OrderedSet
+
 from pacman.model.resources import AbstractSDRAM, MultiRegionSDRAM
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.model.graphs import AbstractEdgePartition, AbstractVertex
@@ -29,7 +32,9 @@ from pacman.model.graphs.machine import (
     MulticastEdgePartition, MachineVertex)
 from pacman.model.graphs.common import Slice
 from pacman.utilities.utility_objs import ChipCounter
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.models.projection import Projection
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
@@ -69,6 +74,7 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
     import (
         SpikeSourcePoissonMachineVertex)
+
 from .splitter_poisson_delegate import SplitterPoissonDelegate
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from .splitter_abstract_pop_vertex import SplitterAbstractPopulationVertex

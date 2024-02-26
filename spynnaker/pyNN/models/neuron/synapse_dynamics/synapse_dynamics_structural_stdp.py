@@ -12,15 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-import numpy
-from pyNN.standardmodels.synapses import StaticSynapse
 from typing import (
     Dict, Iterable, Optional, Sequence, Tuple, TYPE_CHECKING, Union)
+
+import numpy
+
+from pyNN.standardmodels.synapses import StaticSynapse
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import ApplicationVertex
+
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.types import Weight_Delay_In_Types as _In_Types
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
+
+from .abstract_synapse_dynamics import AbstractSynapseDynamics
+from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural, InitialDelay)
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
@@ -28,9 +37,7 @@ from .synapse_dynamics_structural_common import (
     DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
     DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from .abstract_synapse_dynamics import AbstractSynapseDynamics
-from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+
 if TYPE_CHECKING:
     from pacman.model.graphs import AbstractVertex
     from pacman.model.graphs.machine import MachineVertex

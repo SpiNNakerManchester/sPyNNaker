@@ -13,15 +13,20 @@
 # limitations under the License.
 
 from __future__ import annotations
+from typing import Sequence, Optional, TYPE_CHECKING
+
 import numpy
 from numpy import uint8
 from numpy.typing import NDArray
-from typing import Sequence, Optional, TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.common import Slice
+
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
 

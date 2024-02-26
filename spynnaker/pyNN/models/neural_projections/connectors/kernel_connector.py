@@ -12,30 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from typing import Dict, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
+
 import numpy
 from numpy import floating, integer, ndarray, uint32
 from numpy.typing import NDArray
+from typing_extensions import TypeAlias
+
 from pyNN.random import RandomDistribution
 from pyNN.space import Space
-from typing import Dict, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
-from typing_extensions import TypeAlias
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
+
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from .abstract_connector import AbstractConnector
+
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.types import (
     Delay_Types, Weight_Delay_Types, Weight_Types)
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
+from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)

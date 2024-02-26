@@ -13,10 +13,12 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import Any, Dict, Optional, cast, TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 from .abstract_pynn_neuron_model import (
     AbstractPyNNNeuronModel, _population_parameters as APNM_default_params)
-from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.additional_inputs import (
         AbstractAdditionalInput)

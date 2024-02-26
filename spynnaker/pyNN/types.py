@@ -16,11 +16,13 @@
 Types (and related) that are useful for implementing connectors.
 """
 
+from typing import Iterable, Optional, Union
+
 import numpy
 from numpy.typing import NDArray
-from pyNN.random import RandomDistribution
-from typing import Iterable, Optional, Union
 from typing_extensions import TypeAlias, TypeGuard
+
+from pyNN.random import RandomDistribution
 
 #: The type of weights and delays provided by Synapse / SynapseInformation
 # Combined types (where value could be either)

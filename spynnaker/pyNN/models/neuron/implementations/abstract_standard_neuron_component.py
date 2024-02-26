@@ -12,16 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Dict, Iterable, List, Union
+
+import numpy
 from numpy import floating
 from numpy.typing import NDArray
-from pyNN.random import RandomDistribution
-from typing import Dict, Iterable, List, Union
 from typing_extensions import TypeAlias
+
+from pyNN.random import RandomDistribution
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ranged import RangeDictionary, RangedList
+
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from spynnaker.pyNN.utilities.struct import Struct
-import numpy
 
 #: The type of parameters to a neuron model.
 ModelParameter: TypeAlias = Union[

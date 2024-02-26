@@ -16,20 +16,28 @@
 
 from __future__ import annotations
 from collections.abc import Iterable, Sized
+from typing import (
+    Optional, Tuple, Union, cast, TYPE_CHECKING)
+
 import numpy
 from numpy import integer, floating, float64, uint16, uint32
 from numpy.typing import ArrayLike, NDArray
+
 from pyNN.random import RandomDistribution
-from typing import (
-    Optional, Tuple, Union, cast, TYPE_CHECKING)
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.common import Slice
+
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from .abstract_connector import AbstractConnector
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.common.local_only_2d_common import get_div_const
+
+from .abstract_connector import AbstractConnector
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)

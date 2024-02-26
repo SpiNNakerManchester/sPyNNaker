@@ -12,99 +12,103 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from collections import defaultdict
+from functools import reduce
 import logging
 import math
-import numpy
-from numpy.typing import NDArray
-from scipy import special  # @UnresolvedImport
 import operator
-from functools import reduce
-from collections import defaultdict
 from typing import (
     Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
     cast, TYPE_CHECKING)
+
+import numpy
+from numpy.typing import NDArray
+from scipy import special  # @UnresolvedImport
 from typing_extensions import TypeGuard
 
 from pyNN.space import Grid2D, Grid3D, BaseStructure
 from pyNN.random import RandomDistribution
 
+from spinn_utilities.config_holder import (
+    get_config_int, get_config_float, get_config_bool)
+from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ranged import RangeDictionary
 from spinn_utilities.ranged.abstract_list import Selector
-from spinn_utilities.helpful_functions import is_singleton
-from spinn_utilities.config_holder import (
-    get_config_int, get_config_float, get_config_bool)
+
+from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs.common import Slice
 from pacman.model.resources import AbstractSDRAM, MultiRegionSDRAM
 from pacman.utilities.utility_calls import get_n_bits
-from pacman.model.graphs.common import Slice
-from pacman.exceptions import PacmanConfigurationException
+
 from spinn_front_end_common.abstract_models import (
     AbstractCanReset)
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
-from spinn_front_end_common.interface.profiling.profile_utils import (
-    get_profile_region_size)
-from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.interface.buffer_management\
     .recording_utilities import (
        get_recording_header_size, get_recording_data_constant_size)
+from spinn_front_end_common.interface.ds import DataType
+from spinn_front_end_common.interface.profiling.profile_utils import (
+    get_profile_region_size)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
+
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.common import NeuronRecorder
+from spynnaker.pyNN.exceptions import SpynnakerException
+
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses, AbstractMaxSpikes, HasSynapses,
     SupportsStructure)
-from spynnaker.pyNN.utilities.constants import (
-    POSSION_SIGMA_SUMMATION_LIMIT)
-from spynnaker.pyNN.utilities.running_stats import RunningStats
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamics, AbstractSynapseDynamicsStructural,
-    AbstractSupportsSignedWeights)
+from spynnaker.pyNN.models.common import (
+    ParameterHolder, PopulationApplicationVertex, NeuronRecorder)
+from spynnaker.pyNN.models.common.types import Names, Values
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
+from spynnaker.pyNN.models.common.param_generator_data import (
+    MAX_PARAMS_BYTES, is_param_generatable)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.population_machine_common import (
     CommonRegions)
 from spynnaker.pyNN.models.neuron.population_machine_neurons import (
     NeuronRegions)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamics, AbstractSynapseDynamicsStructural,
+    AbstractSDRAMSynapseDynamics, AbstractSupportsSignedWeights,
+    SynapseDynamicsStatic)
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
+from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
+
+from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
+from spynnaker.pyNN.utilities.constants import (
+    POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.utility_calls import (
     create_mars_kiss_seeds, check_rng)
-from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
+from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.utilities.struct import StructRepeat
-from spynnaker.pyNN.models.common import (
-    ParameterHolder, PopulationApplicationVertex)
-from spynnaker.pyNN.models.common.types import Names, Values
-from spynnaker.pyNN.models.common.param_generator_data import (
-    MAX_PARAMS_BYTES, is_param_generatable)
-from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from .population_machine_neurons import PopulationMachineNeurons
-from .synapse_io import get_max_row_info
-from .master_pop_table import MasterPopTableAsBinarySearch
+
 from .generator_data import GeneratorData
+from .master_pop_table import MasterPopTableAsBinarySearch
+from .population_machine_neurons import PopulationMachineNeurons
 from .synaptic_matrices import SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
-from spynnaker.pyNN.models.neuron.synapse_dynamics.\
-    abstract_sdram_synapse_dynamics import (
-        AbstractSDRAMSynapseDynamics)
+from .synapse_io import get_max_row_info
+
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
-    from spynnaker.pyNN.models.projection import Projection
-    from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
-    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
-    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
+    from spynnaker.pyNN.extra_algorithms.splitter_components import (
+        SplitterAbstractPopulationVertex)
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
     from spynnaker.pyNN.models.neural_projections import (
         SynapseInformation, ProjectionApplicationEdge)
-    from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterAbstractPopulationVertex)
+    from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
+    from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
+    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray)
+    from spynnaker.pyNN.models.projection import Projection
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

@@ -12,14 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
+
 import numpy
 from numpy import floating, integer, uint8, uint32
 from numpy.typing import NDArray
+
 from pyNN.standardmodels.synapses import StaticSynapse
-from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import DataType, DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
     SynapticConfigurationException, InvalidParameterType)
@@ -28,9 +33,11 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     STDP_FIXED_POINT_ONE, get_exp_lut_array)
 from spynnaker.pyNN.types import Weight_Delay_In_Types as _Weight
+
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)

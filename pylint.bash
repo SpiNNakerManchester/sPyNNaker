@@ -22,17 +22,19 @@
 # requires the spelling dicts
 # sudo apt-get -o Dpkg::Use-Pty=0 install --fix-missing enchant-2 hunspell hunspell-en-gb
 
-# check all
-# pylint --output-format=colorized --disable=R --persistent=no --jobs=1 --rcfile=../SupportScripts/actions/pylint/strict_rcfile --spelling-dict=en_GB --spelling-private-dict-file="../SupportScripts/actions/pylint/default_dict.txt" --disable=import-error  spynnaker
+rcfile="--rcfile=../SupportScripts/actions/pylint/strict_rcfile"
+dict="--spelling-private-dict-file=../SupportScripts/actions/pylint/default_dict.txt"
+params="--output-format=colorized --disable=R --persistent=no --jobs=1 --spelling-dict=en_GB"
+# check all except import-error to avoid needing all non spinnaker code
+check=--disable=import-error
+# one test
+#check="--enable=consider-using-enumerate --disable=all"
+#import-outside-toplevel
+#use-implicit-booleaness-not-len
+#consider-iterating-dictionary
+# check imports
+check="--enable=wrong-import-order,ungrouped-imports --disable=all"
+# check docs
+# check="--enable=missing-function-docstring,missing-class-docstring,invalid-characters-in-docstring,wrong-spelling-in-comment,wrong-spelling-in-docstring --disable=all"
 
-#
-# check one test
-pylint --enable=invalid-name --output-format=colorized --disable=R --persistent=no --jobs=1 --rcfile=../SupportScripts/actions/pylint/strict_rcfile --spelling-dict=en_GB --spelling-private-dict-file="../SupportScripts/actions/pylint/default_dict.txt" --disable=all  spynnaker
-
-# check spelling
-# pylint --enable=invalid-characters-in-docstring,wrong-spelling-in-comment,wrong-spelling-in-docstring  --output-format=colorized --disable=R --persistent=no --jobs=1 --rcfile=../SupportScripts/actions/pylint/strict_rcfile --spelling-dict=en_GB --spelling-private-dict-file="../SupportScripts/actions/pylint/default_dict.txt" --disable=all spynnaker
-
-#
-# check docs including spelling
-# pylint --enable=missing-function-docstring,missing-class-docstring,invalid-characters-in-docstring,wrong-spelling-in-comment,wrong-spelling-in-docstring  --output-format=colorized --disable=R --persistent=no --jobs=1 --rcfile=../SupportScripts/actions/pylint/strict_rcfile --spelling-dict=en_GB --spelling-private-dict-file="../SupportScripts/actions/pylint/default_dict.txt" --disable=all  spynnaker
-
+pylint $check $rcfile $dict $params spynnaker

@@ -15,27 +15,34 @@
 # limitations under the License.
 
 from __future__ import annotations
-from collections.abc import Sequence
-import numpy
-from numpy import floating, float64, integer, int16, uint16, uint32
-from numpy.typing import NDArray
+from collections.abc import (Iterable, Sequence)
 from typing import (
     List, Optional, Sequence as TSequence, Tuple, Union,
     cast, overload, TYPE_CHECKING)
-from collections.abc import Iterable
+
+import numpy
+from numpy import floating, float64, integer, int16, uint16, uint32
+from numpy.typing import NDArray
+
 from pyNN.random import RandomDistribution
+
 from spinn_utilities.overrides import overrides
+
+from pacman.model.graphs.abstract_vertex import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
+
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_SHORT, BYTES_PER_WORD)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.models.common.local_only_2d_common import get_div_const
+
 from .abstract_connector import AbstractConnector
-from pacman.model.graphs.abstract_vertex import AbstractVertex
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)

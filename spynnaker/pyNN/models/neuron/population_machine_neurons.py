@@ -14,8 +14,9 @@
 from __future__ import annotations
 from collections.abc import Container
 import ctypes
-import numpy
 from typing import List, NamedTuple, Sequence, Set, Union, cast, TYPE_CHECKING
+
+import numpy
 
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides

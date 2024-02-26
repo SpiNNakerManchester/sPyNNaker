@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from typing import List, Sequence, Tuple, TYPE_CHECKING
+
 from numpy import floating
 from numpy.typing import NDArray
-from typing import List, Sequence, Tuple, TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
 
@@ -38,6 +40,7 @@ from .abstract_population_vertex import AbstractPopulationVertex
 from .population_machine_synapses_provenance import (
     PopulationMachineSynapsesProvenance)
 from .synaptic_matrices import SynapseRegions, SynapseRegionReferences
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
     from spynnaker.pyNN.models.neural_projections import (

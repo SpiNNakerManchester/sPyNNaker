@@ -12,19 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+import ctypes
 import math
+from typing import (
+    Dict, Iterable, List, Sequence, Tuple, Type, TypeVar, TYPE_CHECKING)
+
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
-import ctypes
-from typing import (
-    Dict, Iterable, List, Sequence, Tuple, Type, TypeVar, TYPE_CHECKING)
+
 from pacman.model.routing_info import BaseKeyAndMask
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.exceptions import (
     SynapseRowTooBigException, SynapticConfigurationException)
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.utilities.bit_field_utilities import BIT_IN_A_WORD
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     # pylint: disable=no-member, protected-access

@@ -13,33 +13,40 @@
 # limitations under the License.
 from __future__ import annotations
 import math
+from typing import Any, Iterable, List, Optional, Tuple, TYPE_CHECKING
+
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
 from numpy.typing import NDArray
+
 from pyNN.standardmodels.synapses import StaticSynapse
-from typing import Any, Iterable, List, Optional, Tuple, TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
     SynapticConfigurationException, InvalidParameterType)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractConnector)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
+    abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from spynnaker.pyNN.types import Weight_Types
 from spynnaker.pyNN.types import Weight_Delay_In_Types as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE)
+
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
-    abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)

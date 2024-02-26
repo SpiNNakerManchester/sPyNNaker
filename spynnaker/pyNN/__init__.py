@@ -25,9 +25,11 @@ import logging
 from typing import (
     Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type,
     TypedDict, Union, cast)
-from typing_extensions import Literal
+
 import numpy as __numpy
+from typing_extensions import Literal
 from numpy.typing import NDArray
+
 from pyNN import common as pynn_common
 from pyNN.common import control as _pynn_control
 from pyNN.recording import get_io
@@ -40,11 +42,12 @@ from neo import Block
 from spinn_utilities.exceptions import SimulatorNotSetupException
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.helpful_functions import is_singleton
-from spinn_front_end_common.utilities.exceptions import (
-    ConfigurationException)
 from spinn_utilities.socket_address import SocketAddress
 
 from spinn_machine.machine import Machine
+
+from spinn_front_end_common.utilities.exceptions import (
+    ConfigurationException)
 
 from spynnaker.pyNN.random_distribution import RandomDistribution
 from spynnaker.pyNN.data import SpynnakerDataView

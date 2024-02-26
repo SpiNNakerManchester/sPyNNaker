@@ -13,11 +13,14 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.interface.ds import DataType
-from spynnaker.pyNN.models.neuron.implementations import ModelParameter
-from .abstract_input_type import AbstractInputType
-from spynnaker.pyNN.utilities.struct import Struct
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
+
+from spinn_front_end_common.interface.ds import DataType
+
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
+from spynnaker.pyNN.utilities.struct import Struct
+
+from .abstract_input_type import AbstractInputType
 
 E_REV_E = "e_rev_E"
 E_REV_I = "e_rev_I"

@@ -14,30 +14,37 @@
 from __future__ import annotations
 from collections import Counter
 import logging
-import numpy
-from numpy.typing import ArrayLike, NDArray
-from pyNN.space import Grid2D, Grid3D, BaseStructure
 from typing import (
     Collection, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING)
+
+import numpy
+from numpy.typing import ArrayLike, NDArray
 from typing_extensions import TypeAlias, TypeGuard
+
+from pyNN.space import Grid2D, Grid3D, BaseStructure
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.ranged.abstract_sized import Selector
+
 from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
+from pacman.model.resources import AbstractSDRAM
+
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
+
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
-from spynnaker.pyNN.models.common.types import Names
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.models.common import (
+    ParameterHolder, PopulationApplicationVertex)
+from spynnaker.pyNN.models.common.types import (Names, Spikes)
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
-from spynnaker.pyNN.models.common import ParameterHolder
-from spynnaker.pyNN.models.common.types import Spikes
+
 from .spike_source_array_machine_vertex import SpikeSourceArrayMachineVertex
+
 if TYPE_CHECKING:
     from .spike_source_array import SpikeSourceArray
 

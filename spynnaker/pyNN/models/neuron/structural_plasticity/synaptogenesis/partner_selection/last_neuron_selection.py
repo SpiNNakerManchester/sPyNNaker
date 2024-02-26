@@ -14,8 +14,8 @@
 
 from typing import Iterable
 from spinn_utilities.overrides import overrides
-from .abstract_partner_selection import AbstractPartnerSelection
 from spinn_front_end_common.interface.ds import DataSpecificationBase
+from .abstract_partner_selection import AbstractPartnerSelection
 
 
 class LastNeuronSelection(AbstractPartnerSelection):

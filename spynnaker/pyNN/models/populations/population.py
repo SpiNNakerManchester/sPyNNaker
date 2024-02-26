@@ -12,36 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-import logging
-import neo
-import numpy
-from numpy import floating
-from numpy.typing import NDArray
-import os
 import inspect
-from pyNN.descriptions import TemplateEngine
+import logging
+import os
 from typing import (
     Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple,
     Type, Union, final, overload, TYPE_CHECKING)
+
+import numpy
+from numpy import floating
+from numpy.typing import NDArray
 from typing_extensions import TypeAlias
+
+import neo
+from neo.io.baseio import BaseIO  # type: ignore[import]
+from pyNN.descriptions import TemplateEngine
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
 from pyNN.space import BaseStructure
-from neo.io.baseio import BaseIO  # type: ignore[import]
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-from spynnaker.pyNN.models.recorder import Recorder
-from .population_base import PopulationBase
-from .population_view import PopulationView, IDMixin
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
+
+from .population_base import PopulationBase
+from .population_view import PopulationView, IDMixin
+
 if TYPE_CHECKING:
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
     from spynnaker.pyNN.models.common.types import Names, Values

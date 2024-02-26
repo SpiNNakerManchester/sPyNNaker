@@ -11,18 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Iterator, MutableMapping, Optional, Tuple, cast
+
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
-from typing import Iterator, MutableMapping, Optional, Tuple, cast
+
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged import RangeDictionary, RangedList
+
 from pacman.model.graphs.common import Slice
 from pacman.model.placements import Placement
+
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
+
 from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.abstract_population_vertex import (

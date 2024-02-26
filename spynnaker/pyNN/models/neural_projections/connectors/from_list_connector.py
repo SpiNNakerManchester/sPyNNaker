@@ -14,26 +14,32 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
+import logging
+from typing import (
+    Dict, List, Optional, Sequence, Tuple, Union, cast, TYPE_CHECKING)
+
 import numpy
 from numpy import floating, integer, int64, uint32
 from numpy.typing import NDArray
-from typing import (
-    Dict, List, Optional, Sequence, Tuple, Union, cast, TYPE_CHECKING)
 from typing_extensions import TypeGuard
-import logging
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.types import Delay_Types, Weight_Delay_Types, Weight_Types
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)

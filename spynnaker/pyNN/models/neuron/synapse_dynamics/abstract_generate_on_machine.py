@@ -13,10 +13,13 @@
 # limitations under the License.
 from __future__ import annotations
 from enum import Enum
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from typing import TYPE_CHECKING
+
 from numpy import uint32
 from numpy.typing import NDArray
-from typing import TYPE_CHECKING
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)

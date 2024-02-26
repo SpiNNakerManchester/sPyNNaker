@@ -12,14 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable
+
 from numpy import floating
 from numpy.typing import NDArray
-from typing import Iterable
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import (
     DataSpecificationBase, DataType)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     AbstractTimingDependence)
