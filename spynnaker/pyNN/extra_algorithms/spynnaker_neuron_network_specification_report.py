@@ -38,7 +38,7 @@ def _get_diagram(label: str) -> Tuple[gv.Digraph, Type[gv.ExecutableNotFound]]:
     :param str label:
     :rtype: tuple(~graphviz.Digraph, type)
     """
-    # pylint: disable=import-error
+    # pylint: disable=import-error,import-outside-toplevel
     try:
         import graphviz
     except ImportError as e:

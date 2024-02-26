@@ -49,6 +49,7 @@ class _Dynamics:
         """
         if cls._Structural is None:
             # Avoid import loop by postponing this import
+            # pylint: disable=import-outside-toplevel
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (
                 AbstractSynapseDynamicsStructural as StructuralDynamics)
             cls._Structural = StructuralDynamics
@@ -63,6 +64,7 @@ class _Dynamics:
         """
         if cls._STDP is None:
             # Avoid import loop by postponing this import
+            # pylint: disable=import-outside-toplevel
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (
                 SynapseDynamicsSTDP as STDPDynamics)
             cls._STDP = STDPDynamics
@@ -77,6 +79,7 @@ class _Dynamics:
         """
         if cls._Neuromodulation is None:
             # Avoid import loop by postponing this import
+            # pylint: disable=import-outside-toplevel
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (
                 SynapseDynamicsNeuromodulation as Neuromodulation)
             cls._Neuromodulation = Neuromodulation

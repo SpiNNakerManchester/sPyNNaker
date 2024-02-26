@@ -396,6 +396,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :rtype: DataPopulation
         """
         # delayed import due to circular dependencies
+        # pylint: disable=import-outside-toplevel
         from .data_population import DataPopulation as DataPop
         # DataPopulation validates the pop_label so no need to do here too
         return DataPop(self._database_file, pop_label)

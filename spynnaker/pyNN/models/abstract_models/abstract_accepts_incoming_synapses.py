@@ -94,6 +94,7 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
             instance of AbstractSpynnakerSplitterDelay
         """
         # Delayed import to avoid circular dependency
+        # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.extra_algorithms.splitter_components import (
             AbstractSpynnakerSplitterDelay as DelaySplitter)
         if not isinstance(splitter, DelaySplitter):

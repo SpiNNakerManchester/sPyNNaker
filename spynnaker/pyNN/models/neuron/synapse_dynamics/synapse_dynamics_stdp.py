@@ -170,6 +170,7 @@ class SynapseDynamicsSTDP(
 
         # If dynamics is structural but not STDP (as here), merge
         # NOTE: Import here as otherwise we get a circular dependency
+        # pylint: disable=import-outside-toplevel
         from .synapse_dynamics_structural_stdp import (
             SynapseDynamicsStructuralSTDP)
         if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):

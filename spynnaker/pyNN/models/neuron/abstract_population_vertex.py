@@ -393,6 +393,7 @@ class AbstractPopulationVertex(
                 f"The splitter object on {self._label} has already been set, "
                 "it cannot be reset. Please fix and try again.")
         # Circularity
+        # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.extra_algorithms.splitter_components import (
             SplitterAbstractPopulationVertex as ValidSplitter)
         if not isinstance(splitter, ValidSplitter):
