@@ -150,6 +150,8 @@ class PoolDenseConnector(AbstractConnector):
         elif isinstance(self.__weights, RandomDistribution):
             n_weights = self.__get_n_weights(
                 pre_shape, post_vertex_slice.n_atoms)
+            # pylint: disable=no-member
+            # see https://github.com/SpiNNakerManchester/sPyNNaker/issues/1436
             return numpy.array(self.__weights.next(n_weights), dtype=float64)
         else:
             raise SynapticConfigurationException(
