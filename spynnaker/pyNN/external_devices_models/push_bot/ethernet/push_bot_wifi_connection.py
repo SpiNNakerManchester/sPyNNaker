@@ -15,6 +15,7 @@
 import logging
 import select
 import socket
+from typing import Callable, TypeVar
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ping import Ping
@@ -23,6 +24,8 @@ from spinnman.utilities.socket_utils import (
     get_tcp_socket, connect_socket, get_socket_address, resolve_host,
     receive_message, send_message)
 from spinn_front_end_common.utilities.constants import BYTES_PER_KB
+#: :meta private:
+T = TypeVar("T")
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # A set of connections that have already been made
@@ -174,9 +177,9 @@ class PushBotWIFIConnection(Connection, Listenable):
         self.__socket.close()
 
     @overrides(Listenable.is_ready_to_receive)
-    def is_ready_to_receive(self, timeout=0):
+    def is_ready_to_receive(self, timeout: float = 0) -> bool:
         return bool(select.select([self.__socket], [], [], timeout)[0])
 
     @overrides(Listenable.get_receive_method)
-    def get_receive_method(self):
+    def get_receive_method(self) -> Callable[[], T]:
         return self.receive

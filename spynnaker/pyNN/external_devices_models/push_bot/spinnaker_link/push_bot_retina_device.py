@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
+from typing import List, Optional
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spinn_front_end_common.utility_models import MultiCastCommand
@@ -34,14 +34,14 @@ class DelayedPayloadMultiCastCommand(MultiCastCommand):
 
     @property
     @overrides(MultiCastCommand.payload)
-    def payload(self):
+    def payload(self) -> Optional[int]:
         if self._payload is None:
             self._payload = self._vertex.new_key_command_payload()
         return self._payload
 
     @property
     @overrides(MultiCastCommand.is_payload)
-    def is_payload(self):
+    def is_payload(self) -> bool:
         return self.payload is not None
 
 
