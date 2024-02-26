@@ -116,8 +116,8 @@ class Projection(object):
                 f"to post {post_synaptic_population.label} "
                 f"with connector {connector}")
             # give an auto generated label for the underlying edge
-            label = "projection edge {}".format(
-                SpynnakerDataView.get_next_none_labelled_edge_number())
+            label = f"projection edge " \
+                    f"{SpynnakerDataView.get_next_none_labelled_edge_number()}"
         else:
             self.__label = label
 

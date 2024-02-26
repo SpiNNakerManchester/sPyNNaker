@@ -169,9 +169,9 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
 
             # if verbose open a file to output the connectivity
             if self.verbose:
-                filename = "{}_to_{}_fixednumberpost-conn.csv".format(
-                    synapse_info.pre_population.label,
-                    synapse_info.post_population.label)
+                filename = f"{synapse_info.pre_population.label}_to_" \
+                           f"{synapse_info.post_population.label}" \
+                           f"_fixednumberpost-conn.csv"
                 print('Output post-connectivity to ', filename)
                 with open(filename, 'w', encoding="utf-8") as file_handle:
                     numpy.savetxt(file_handle,
