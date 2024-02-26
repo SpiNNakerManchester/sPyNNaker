@@ -53,9 +53,9 @@ class SynapseDynamicsStatic(
     The dynamics of a synapse that does not change over time.
     """
 
-    __slots__ = (
+    __slots__ = [
         # padding to add to a synaptic row for synaptic rewiring
-        "__pad_to_length")
+        "__pad_to_length"]
 
     def __init__(
             self, weight: _Weight = StaticSynapse.default_parameters['weight'],
