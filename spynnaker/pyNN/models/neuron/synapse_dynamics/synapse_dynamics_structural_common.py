@@ -447,7 +447,9 @@ class SynapseDynamicsStructuralCommon(
             self.f_rew == synapse_dynamics.f_rew and
             self.initial_weight == synapse_dynamics.initial_weight and
             self.initial_delay == synapse_dynamics.initial_delay and
-            (type(self.partner_selection) ==  # noqa: E721
+            # noqa: E721
+            # pylint: disable=unidiomatic-typecheck
+            (type(self.partner_selection) ==
              type(synapse_dynamics.partner_selection)) and
             (type(self.formation) ==
              type(synapse_dynamics.formation)) and
