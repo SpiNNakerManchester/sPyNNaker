@@ -92,7 +92,7 @@ def default_parameters(parameters: Iterable[str]) -> Callable:
             # Check for state variables that have been specified in cell_params
             args_provided = method_args.args[:len(args)]
             args_provided.extend([
-                arg for arg in kwargs.keys() if arg in method_args.args])
+                arg for arg in kwargs if arg in method_args.args])
             for arg in args_provided:
                 if arg not in method._parameters and arg != "self":
                     logger.warning(
@@ -130,7 +130,7 @@ def default_initial_values(state_variables: Iterable[str]) -> Callable:
             # Check for state variables that have been specified in cell_params
             args_provided = method_args.args[:len(args)]
             args_provided.extend([
-                arg for arg in kwargs.keys() if arg in method_args.args])
+                arg for arg in kwargs if arg in method_args.args])
             for arg in args_provided:
                 if arg in method._state_variables:
                     logger.warning(

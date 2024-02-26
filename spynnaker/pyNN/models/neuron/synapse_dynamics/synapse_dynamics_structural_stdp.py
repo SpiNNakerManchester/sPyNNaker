@@ -334,7 +334,7 @@ class SynapseDynamicsStructuralSTDP(
             self, app_vertex: Union[None, ApplicationVertex, Slice] = None
             ) -> Sequence[int]:
         if app_vertex:
-            if app_vertex not in self.__seeds.keys():
+            if app_vertex not in self.__seeds:
                 self.__seeds[app_vertex] = (
                     create_mars_kiss_seeds(self.__rng))
             return self.__seeds[app_vertex]

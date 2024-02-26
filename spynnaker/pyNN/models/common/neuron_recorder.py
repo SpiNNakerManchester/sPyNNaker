@@ -753,7 +753,7 @@ class NeuronRecorder(object):
         :param iterable(int) indexes:
         """
         if variable == "all":
-            for key in self.__sampling_rates.keys():
+            for key in self.__sampling_rates:
                 self.set_recording(key, new_state, sampling_interval, indexes)
             for var in self.__events_per_core_variables:
                 # Skip the unsupported items for an events-per-core variable

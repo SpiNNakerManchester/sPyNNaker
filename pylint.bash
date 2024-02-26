@@ -25,15 +25,16 @@
 rcfile="--rcfile=../SupportScripts/actions/pylint/strict_rcfile"
 dict="--spelling-private-dict-file=../SupportScripts/actions/pylint/default_dict.txt"
 params="--output-format=colorized --disable=R --persistent=no --jobs=1 --spelling-dict=en_GB"
+
 # check all except import-error to avoid needing all non spinnaker code
 check=--disable=import-error
+
 # one test
-#check="--enable=consider-using-enumerate --disable=all"
-#import-outside-toplevel
-#use-implicit-booleaness-not-len
-#consider-iterating-dictionary
+check="--enable=consider-iterating-dictionary --disable=all"
+
 # check imports
-check="--enable=wrong-import-order,ungrouped-imports --disable=all"
+#check="--enable=wrong-import-order,ungrouped-imports --disable=all"
+
 # check docs
 # check="--enable=missing-function-docstring,missing-class-docstring,invalid-characters-in-docstring,wrong-spelling-in-comment,wrong-spelling-in-docstring --disable=all"
 

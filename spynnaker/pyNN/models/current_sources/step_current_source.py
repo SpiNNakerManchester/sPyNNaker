@@ -63,7 +63,7 @@ class StepCurrentSource(AbstractCurrentSource):
     @overrides(AbstractCurrentSource.set_parameters)
     def set_parameters(self, **parameters: CurrentParameter):
         for key, value in parameters.items():
-            if key not in self.__parameters.keys():
+            if key not in self.__parameters:
                 # throw an exception
                 raise SpynnakerException(f"{key} is not a parameter of {self}")
             if not isinstance(value, Sequence):
