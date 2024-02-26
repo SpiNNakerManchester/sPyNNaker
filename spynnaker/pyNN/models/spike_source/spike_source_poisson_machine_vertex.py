@@ -57,8 +57,9 @@ from spinn_front_end_common.utilities.helpful_functions import (
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.abstract_models import (AbstractMaxSpikes,
-    SendsSynapticInputsOverSDRAM, ReceivesSynapticInputsOverSDRAM)
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractMaxSpikes, SendsSynapticInputsOverSDRAM,
+    ReceivesSynapticInputsOverSDRAM)
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID)

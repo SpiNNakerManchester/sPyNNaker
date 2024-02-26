@@ -71,7 +71,8 @@ def shape2word(
     :param int short2: second 2 bytes value
     :rtype: int
     """
-    return uint32(((uint32(short2) & 0xFFFF) << 16) | (uint32(short1) & 0xFFFF))
+    return uint32(((uint32(short2) & 0xFFFF) << 16)
+                  | (uint32(short1) & 0xFFFF))
 
 
 class KernelConnector(AbstractGenerateConnectorOnMachine,
@@ -169,7 +170,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         self._post_w = shape_post[WIDTH]
         self._post_h = shape_post[HEIGHT]
 
-        # Get the starting coordinates and step sizes (or defaults if not given)
+        # Get the starting coordinates and step sizes
+        # (or defaults if not given)
         if pre_start_coords_in_post is None:
             self._pre_start_w = 0
             self._pre_start_h = 0

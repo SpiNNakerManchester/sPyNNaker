@@ -22,7 +22,7 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
-from pacman.model.resources import  AbstractSDRAM, ConstantSDRAM
+from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 from spinn_front_end_common.utilities.constants import (

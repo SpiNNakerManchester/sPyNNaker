@@ -1320,15 +1320,17 @@ class AbstractPopulationVertex(
         if max_row_info.undelayed_max_n_synapses > 0:
             size = n_sub_atoms * max_row_info.undelayed_max_bytes
             for _ in range(n_sub_edges):
-                address = MasterPopTableAsBinarySearch.get_next_allowed_address(
-                    address)
+                address = \
+                    MasterPopTableAsBinarySearch.get_next_allowed_address(
+                        address)
                 address += size
         if max_row_info.delayed_max_n_synapses > 0:
             size = (n_sub_atoms * max_row_info.delayed_max_bytes *
                     app_edge.n_delay_stages)
             for _ in range(n_sub_edges):
-                address = MasterPopTableAsBinarySearch.get_next_allowed_address(
-                    address)
+                address = \
+                    MasterPopTableAsBinarySearch.get_next_allowed_address(
+                        address)
                 address += size
         return address
 
