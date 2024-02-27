@@ -375,7 +375,7 @@ class AbstractPopulationVertex(
         self.__have_read_initial_values = False
         self.__last_parameter_read_time: Optional[float] = None
 
-    @property
+    @property  # type: ignore[override]
     @overrides(PopulationApplicationVertex.splitter)
     def splitter(self) -> SplitterAbstractPopulationVertex:
         s = self._splitter
