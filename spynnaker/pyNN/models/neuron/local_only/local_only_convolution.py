@@ -299,7 +299,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, incoming_projection: Projection) -> float:
         conn = self.__connector(incoming_projection)
         # We know the connector doesn't care about the argument
-        max_weight = numpy.amax(conn.kernel_weights)
+        # conn.kernel_weights known to be an array of floats
+        max_weight = cast(float, numpy.amax(conn.kernel_weights))
         return max_weight if max_weight > 0 else 0
 
     @overrides(AbstractSupportsSignedWeights.get_minimum_negative_weight)
@@ -307,7 +308,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, incoming_projection: Projection) -> float:
         conn = self.__connector(incoming_projection)
         # This is different because the connector happens to support this
-        min_weight = numpy.amin(conn.kernel_weights)
+        # conn.kernel_weights known to be an array of floats
+        min_weight = cast(float, numpy.amin(conn.kernel_weights))
         return min_weight if min_weight < 0 else 0
 
     @overrides(AbstractSupportsSignedWeights.get_mean_positive_weight)
