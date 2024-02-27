@@ -22,11 +22,11 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
-def get_y_from_fpga_retina(key: int, mode: int) -> int:
+def get_y_from_fpga_retina(key: int, mode: int) -> Optional[int]:
     """
     :param int key:
     :param int mode:
-    :rtype: int
+    :rtype: int or None
     """
     if mode == 128:
         return key & 0x7f
@@ -39,11 +39,11 @@ def get_y_from_fpga_retina(key: int, mode: int) -> int:
     return None
 
 
-def get_x_from_fpga_retina(key: int, mode: int) -> int:
+def get_x_from_fpga_retina(key: int, mode: int) -> Optional[int]:
     """
     :param int key:
     :param int mode:
-    :rtype: int
+    :rtype: int or None
     """
     if mode == 128:
         return (key >> 7) & 0x7f
@@ -56,11 +56,11 @@ def get_x_from_fpga_retina(key: int, mode: int) -> int:
     return None
 
 
-def get_spike_value_from_fpga_retina(key: int, mode: int) -> int:
+def get_spike_value_from_fpga_retina(key: int, mode: int) -> Optional[int]:
     """
     :param int key:
     :param int mode:
-    :rtype: int
+    :rtype: int or None
     """
     if mode == 128:
         return (key >> 14) & 0x1
