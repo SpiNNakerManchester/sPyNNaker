@@ -521,11 +521,11 @@ class SpikeSourcePoissonMachineVertex(
             data=SpynnakerDataView.get_simulation_time_step_per_ms(),
             data_type=DataType.U1616)
 
-        # Write the slow-rate-per-tick-cutoff (accum)
+        # Write the slow rate per tick cut-off (accum)
         spec.write_value(
             data=self.SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
 
-        # Write the fast-rate-per-tick-cutoff (accum)
+        # Write the fast rate per tick cut-off (accum)
         spec.write_value(
             data=self.FAST_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
 
