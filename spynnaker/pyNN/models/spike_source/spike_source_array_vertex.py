@@ -50,7 +50,7 @@ if TYPE_CHECKING:
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
-# Cutoff to warn too many spikes sent at one time
+# Cut off to warn too many spikes sent at one time
 TOO_MANY_SPIKES = 100
 
 _Number: TypeAlias = Union[int, float]
