@@ -146,7 +146,7 @@ def _u3232_to_uint64(array: numpy.ndarray) -> numpy.ndarray:
 # 1. uint32_t has_key;
 # 2. uint32_t set_rate_neuron_id_mask;
 # 3. UFRACT seconds_per_tick; 4. REAL ticks_per_second;
-# 5. REAL slow_rate_per_tick_cutoff; 6. REAL fast_rate_per_tick_cutoff;
+# 5. REAL slow_rate_per_tick_cut-off; 6. REAL fast_rate_per_tick_cut-off;
 # 7. unt32_t first_source_id; 8. uint32_t n_spike_sources;
 # 9. uint32_t max_spikes_per_timestep;
 # 10. uint32_t n_colour_bits;

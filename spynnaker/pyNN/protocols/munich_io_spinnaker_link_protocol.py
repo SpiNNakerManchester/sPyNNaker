@@ -218,10 +218,10 @@ QUERY_STATES_LINES_KEY = _munich_key(5, 0)
 #: set output pattern to payload
 SET_OUTPUT_PATTERN_KEY = _munich_key(5, 1)
 
-#: add payload (logic or (PL)) to current output
+#: add payload (logic or (payload)) to current output
 ADD_PAYLOAD_TO_CURRENT_OUTPUT_KEY = _munich_key(5, 2)
 
-#: remove payload (logic or (PL)) to current output from current output
+#: remove payload (logic or (payload)) to current output from current output
 REMOVE_PAYLOAD_TO_CURRENT_OUTPUT_KEY = _munich_key(5, 3)
 
 #: set payload pins to high impedance
