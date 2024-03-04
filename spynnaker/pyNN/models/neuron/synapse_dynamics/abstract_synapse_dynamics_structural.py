@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from typing import Iterable, Optional, TYPE_CHECKING
+
 from numpy import floating
 from numpy.typing import NDArray
-from typing import Iterable, Optional, TYPE_CHECKING
 from typing_extensions import TypeAlias
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.interface.ds import DataSpecificationBase
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray)

@@ -22,7 +22,12 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
-def get_y_from_fpga_retina(key, mode):
+def get_y_from_fpga_retina(key: int, mode: int) -> Optional[int]:
+    """
+    :param int key:
+    :param int mode:
+    :rtype: int or None
+    """
     if mode == 128:
         return key & 0x7f
     elif mode == 64:
@@ -34,7 +39,12 @@ def get_y_from_fpga_retina(key, mode):
     return None
 
 
-def get_x_from_fpga_retina(key, mode):
+def get_x_from_fpga_retina(key: int, mode: int) -> Optional[int]:
+    """
+    :param int key:
+    :param int mode:
+    :rtype: int or None
+    """
     if mode == 128:
         return (key >> 7) & 0x7f
     elif mode == 64:
@@ -46,7 +56,12 @@ def get_x_from_fpga_retina(key, mode):
     return None
 
 
-def get_spike_value_from_fpga_retina(key, mode):
+def get_spike_value_from_fpga_retina(key: int, mode: int) -> Optional[int]:
+    """
+    :param int key:
+    :param int mode:
+    :rtype: int or None
+    """
     if mode == 128:
         return (key >> 14) & 0x1
     elif mode == 64:
@@ -61,6 +76,9 @@ def get_spike_value_from_fpga_retina(key, mode):
 class ExternalFPGARetinaDevice(
         ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex,
         AbstractSendMeMulticastCommandsVertex):
+    """
+    A retina connected by FPGA
+    """
     __slots__ = (
         "__fixed_key",
         "__fixed_mask")

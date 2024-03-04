@@ -13,13 +13,17 @@
 # limitations under the License.
 
 from typing import Optional, Tuple
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
+
 from spinn_front_end_common.interface.ds import DataType
+
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
-from .abstract_synapse_type import AbstractSynapseType
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
+
+from .abstract_synapse_type import AbstractSynapseType
 
 TAU_SYN_E = 'tau_syn_E'
 TAU_SYN_I = 'tau_syn_I'
@@ -29,6 +33,9 @@ TIMESTEP_MS = "timestep_ms"
 
 
 class SynapseTypeExponential(AbstractSynapseType):
+    """
+    A simple exponential synapse.
+    """
     __slots__ = (
         "__tau_syn_E",
         "__tau_syn_I",
@@ -59,6 +66,7 @@ class SynapseTypeExponential(AbstractSynapseType):
                 (DataType.S1615, ISYN_INH),
                 (DataType.S1615, TIMESTEP_MS)])],
             {TAU_SYN_E: "mV", TAU_SYN_I: 'mV', ISYN_EXC: "", ISYN_INH: ""})
+        # pylint: disable=invalid-name
         self.__tau_syn_E = tau_syn_E
         self.__tau_syn_I = tau_syn_I
         self.__isyn_exc = isyn_exc
@@ -94,16 +102,38 @@ class SynapseTypeExponential(AbstractSynapseType):
 
     @property
     def tau_syn_E(self) -> ModelParameter:
+        # pylint: disable=invalid-name
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__tau_syn_E
 
     @property
     def tau_syn_I(self) -> ModelParameter:
+        # pylint: disable=invalid-name
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__tau_syn_I
 
     @property
     def isyn_exc(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__isyn_exc
 
     @property
     def isyn_inh(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__isyn_inh

@@ -11,15 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Iterable
+
 from numpy import floating
 from numpy.typing import NDArray
-from typing import Iterable
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationBase)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
+
 # Four words per synapse type
 _SPACE_PER_SYNAPSE_TYPE = 4 * BYTES_PER_WORD
 
@@ -104,6 +109,7 @@ class WeightDependenceAdditive(
                 data=self.__w_max * global_weight_scale,
                 data_type=DataType.S1615)
 
+            # pylint: disable=wrong-spelling-in-comment
             # Based on http://data.andrewdavison.info/docs/PyNN/_modules/pyNN
             #                /standardmodels/synapses.html
             # Pre-multiply A+ and A- by Wmax

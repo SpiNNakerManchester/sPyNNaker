@@ -164,13 +164,28 @@ class ParameterHolder(object):
         return hash(data)
 
     def keys(self) -> Iterable[str]:
+        """
+        The names of the data
+
+        :rtype: iter(str)
+        """
         data = self._get_data_items()
         return data.keys()
 
     def values(self) -> Iterable[_BaseValueType]:
+        """
+        The names and values of the data
+
+        :rtype: iter(list(float))
+        """
         data = self._get_data_items()
         return data.values()
 
     def items(self) -> Iterable[Tuple[str, _BaseValueType]]:
+        """
+        The names and values of the data
+
+        :rtype: iter(tuple(str, list(float)))
+        """
         data = self._get_data_items()
         return data.items()

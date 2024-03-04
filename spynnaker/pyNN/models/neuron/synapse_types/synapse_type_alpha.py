@@ -13,13 +13,17 @@
 # limitations under the License.
 
 from typing import Optional, Tuple
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
+
 from spinn_front_end_common.interface.ds import DataType
+
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
-from .abstract_synapse_type import AbstractSynapseType
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
+
+from .abstract_synapse_type import AbstractSynapseType
 
 EXC_RESPONSE = "exc_response"
 EXC_EXP_RESPONSE = "exc_exp_response"
@@ -33,6 +37,9 @@ TIMESTEP_MS = "timestep_ms"
 
 
 class SynapseTypeAlpha(AbstractSynapseType):
+    """
+    Alpha Type Synapse
+    """
     __slots__ = (
         "__exc_exp_response",
         "__exc_response",
@@ -85,6 +92,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
         # pylint: disable=too-many-arguments
         self.__exc_response = exc_response
         self.__exc_exp_response = exc_exp_response
+        # pylint: disable=invalid-name
         self.__tau_syn_E = tau_syn_E
         self.__inh_response = inh_response
         self.__inh_exp_response = inh_exp_response
@@ -110,7 +118,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self) -> int:
-        return 2  # EX and IH
+        return 2  # excitatory and inhibitory
 
     @overrides(AbstractSynapseType.get_synapse_id_by_target)
     def get_synapse_id_by_target(self, target: str) -> Optional[int]:
@@ -126,20 +134,47 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     @property
     def exc_response(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__exc_response
 
     @exc_response.setter
     def exc_response(self, exc_response: ModelParameter):
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         self.__exc_response = exc_response
 
     @property
     def tau_syn_E(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
+        # pylint: disable=invalid-name
         return self.__tau_syn_E
 
     @property
     def inh_response(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__inh_response
 
     @property
     def tau_syn_I(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
+        # pylint: disable=invalid-name
         return self.__tau_syn_I

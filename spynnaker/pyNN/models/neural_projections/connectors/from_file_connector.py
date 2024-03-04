@@ -13,10 +13,13 @@
 # limitations under the License.
 
 import os
+from typing import Union
+
 import numpy
 from numpy.typing import NDArray
+
 from pyNN.recording.files import BaseFile, StandardTextFile
-from typing import Union
+
 from .from_list_connector import FromListConnector
 
 

@@ -16,22 +16,28 @@ import csv
 from datetime import datetime
 import logging
 import math
-import numpy
-from numpy import floating, integer, uint8
-from numpy.typing import NDArray
 import os
-import quantities
-import struct
 import re
-import neo  # type: ignore[import]
+import struct
 from typing import (
     Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
     TYPE_CHECKING)
+
+import numpy
+from numpy import floating, integer, uint8
+from numpy.typing import NDArray
+import quantities
+import neo  # type: ignore[import]
+
 from spinn_utilities.log import FormatAdapter
+
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
-from spinn_front_end_common.interface.ds import DataType
+
+
 from pacman.model.graphs.common import Slice, MDSlice
 from pacman.utilities.utility_calls import get_keys
+
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utility_models import (
     ReverseIPTagMulticastSourceMachineVertex)
 from spinn_front_end_common.interface.buffer_management.storage_objects \
@@ -40,11 +46,13 @@ from spinn_front_end_common.utilities.base_database import _SqliteTypes
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import SPIKES
 from spynnaker.pyNN.utilities.neo_csv import NeoCsv
+
 if TYPE_CHECKING:
     from _csv import _writer as CSVWriter
     from spynnaker.pyNN.models.common.types import Names as ConcreteNames
@@ -388,8 +396,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :rtype: DataPopulation
         """
         # delayed import due to circular dependencies
+        # pylint: disable=import-outside-toplevel
         from .data_population import DataPopulation as DataPop
-        # DataPopulation validates the pop_label so no need to do hre too
+        # DataPopulation validates the pop_label so no need to do here too
         return DataPop(self._database_file, pop_label)
 
     def get_recording_variables(self, pop_label: str) -> Tuple[str, ...]:
@@ -1014,6 +1023,22 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def spinnaker_get_data(
             self, pop_label: str, variable: str, as_matrix: bool = False,
             view_indexes: ViewIndices = None) -> NDArray[floating]:
+        """
+        SsPyNNaker specific method for getting data as a numpy array,
+        instead of the Neo-based object
+
+        :param str pop_label: label for the Population
+        :param variable: Single variable name.
+        :type variable: str or list(str)
+        :param as_matrix: If set True the data is returned as a 2d matrix
+        :param view_indexes: The indexes for which data should be returned.
+            If ``None``, all data (view_index = data_indexes)
+        :type view_indexes: None or iter(int)
+        :return: array of the data
+        :rtype: ~numpy.ndarray
+        :raises ConfigurationException:
+            If variable is a list of a length other than 1
+        """
         if not isinstance(variable, str):
             if len(variable) != 1:
                 raise ConfigurationException(
@@ -1041,6 +1066,15 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def get_spike_counts(
             self, pop_label: str,
             view_indexes: ViewIndices = None) -> Dict[int, int]:
+        """
+        Gets the spike counts for the population with this label.
+
+        :param str pop_label: label for the Population
+        :param view_indexes: If supplied indexes to retrieve.
+        :type view_indexes: None or iter(int)
+        :return: dict of index to count
+        :rtype: dict(int, int)
+        """
         # called to trigger the virtual data warning if applicable
         self.__get_segment_info()
         (rec_id, _, buffered_type, _, _, pop_size, _, n_colour_bits) = \
@@ -1280,7 +1314,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         Writes the data including metadata to a CSV file.
         Overwrites any previous data in the file.
 
-        :param str csvfile: Path to file to write block metadata to
+        :param str csv_file: Path to file to write block metadata to
         :param str pop_label: The label for the population of interest
 
             .. note::

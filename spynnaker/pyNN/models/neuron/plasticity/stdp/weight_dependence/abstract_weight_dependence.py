@@ -21,6 +21,9 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 
 class AbstractWeightDependence(
         AbstractHasParameterNames, metaclass=AbstractBase):
+    """
+    API with the weight dependency methods.
+    """
     __slots__ = ()
 
     @abstractmethod

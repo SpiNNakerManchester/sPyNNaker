@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Tuple
 import numpy
 from numpy import integer, uint32
 from numpy.typing import NDArray
-from typing import Tuple
 
 
 def _calculate_stdp_times(

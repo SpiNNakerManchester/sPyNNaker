@@ -28,4 +28,7 @@ class PyNNSynapseDynamics(object):
 
     @property
     def slow(self):
+        """
+        unused!
+        """
         return self.__slow

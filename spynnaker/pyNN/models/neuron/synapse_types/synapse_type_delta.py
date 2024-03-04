@@ -13,12 +13,15 @@
 # limitations under the License.
 
 from typing import Optional, Tuple
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
 from spinn_front_end_common.interface.ds import DataType
+
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
-from .abstract_synapse_type import AbstractSynapseType
 from spynnaker.pyNN.utilities.struct import Struct
+
+from .abstract_synapse_type import AbstractSynapseType
 
 ISYN_EXC = "isyn_exc"
 ISYN_INH = "isyn_inh"
@@ -76,8 +79,18 @@ class SynapseTypeDelta(AbstractSynapseType):
 
     @property
     def isyn_exc(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__isyn_exc
 
     @property
     def isyn_inh(self) -> ModelParameter:
+        """
+        Value as passed into the init.
+
+        :rtype: ModelParameter
+        """
         return self.__isyn_inh

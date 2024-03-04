@@ -98,7 +98,7 @@ static inline void store_neuron_provenance(struct neuron_provenance *prov) {
 //! \param[in] ds_regions: Pointer to region position data
 //! \param[in] regions: The indices of the regions to be read
 //! \param[out] n_rec_regions_used: The number of recording regions used
-//! \return a boolean indicating success (True) or failure (False)
+//! \return a Boolean indicating success (True) or failure (False)
 static inline bool initialise_neuron_regions(
         data_specification_metadata_t *ds_regions,
         struct neuron_regions regions, uint32_t *n_rec_regions_used) {

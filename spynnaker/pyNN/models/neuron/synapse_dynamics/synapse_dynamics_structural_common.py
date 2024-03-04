@@ -13,26 +13,33 @@
 # limitations under the License.
 
 from __future__ import annotations
-import numpy
-from numpy.typing import NDArray
 from typing import (
     Dict, Iterable, List, Sequence, Tuple, Union, TYPE_CHECKING)
+
+import numpy
+from numpy.typing import NDArray
 from typing_extensions import TypeAlias
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
+
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationBase)
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
+
 from spynnaker.pyNN.data import SpynnakerDataView
-from .abstract_synapse_dynamics_structural import (
-    AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
+from .abstract_synapse_dynamics_structural import (
+    AbstractSynapseDynamicsStructural)
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neural_projections import (
@@ -440,6 +447,7 @@ class SynapseDynamicsStructuralCommon(
             self.f_rew == synapse_dynamics.f_rew and
             self.initial_weight == synapse_dynamics.initial_weight and
             self.initial_delay == synapse_dynamics.initial_delay and
+            # pylint: disable=unidiomatic-typecheck
             (type(self.partner_selection) ==  # noqa: E721
              type(synapse_dynamics.partner_selection)) and
             (type(self.formation) ==

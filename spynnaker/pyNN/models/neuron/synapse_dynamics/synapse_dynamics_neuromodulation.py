@@ -12,14 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
+
 import numpy
 from numpy import floating, integer, uint8, uint32
 from numpy.typing import NDArray
+
 from pyNN.standardmodels.synapses import StaticSynapse
-from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import DataType, DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
     SynapticConfigurationException, InvalidParameterType)
@@ -28,9 +33,11 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     STDP_FIXED_POINT_ONE, get_exp_lut_array)
 from spynnaker.pyNN.types import Weight_Delay_In_Types as _Weight
+
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
@@ -86,18 +93,38 @@ class SynapseDynamicsNeuromodulation(
 
     @property
     def tau_c(self) -> float:
+        """
+        The tau c value passed into the init.
+
+        :rtype: float
+        """
         return self.__tau_c
 
     @property
     def tau_d(self) -> float:
+        """
+        The tau d value passed into the init.
+
+        :rtype: float
+        """
         return self.__tau_d
 
     @property
     def w_min(self) -> float:
+        """
+        The w min value passed into the init.
+
+        :rtype: float
+        """
         return self.__w_min
 
     @property
     def w_max(self) -> float:
+        """
+        The w max value passed into the init.
+
+        :rtype: float
+        """
         return self.__w_max
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
@@ -112,10 +139,17 @@ class SynapseDynamicsNeuromodulation(
 
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:
-        # Shouln't ever come up, but if it does, it is False!
+        # Shouldn't ever come up, but if it does, it is False!
         return False
 
-    def is_neuromodulation_same_as(self, other) -> bool:
+    def is_neuromodulation_same_as(
+            self, other: SynapseDynamicsNeuromodulation) -> bool:
+        """
+        Checks that tau c, tau d, w max and w min are all the same.
+
+        :param SynapseDynamicsNeuromodulation other:
+        :rtype: bool
+        """
         return (self.__tau_c == other.tau_c and self.__tau_d == other.tau_d and
                 self.__w_min == other.w_min and self.__w_max == other.w_max)
 

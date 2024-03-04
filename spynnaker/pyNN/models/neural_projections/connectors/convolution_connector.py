@@ -15,27 +15,34 @@
 # limitations under the License.
 
 from __future__ import annotations
-from collections.abc import Sequence
-import numpy
-from numpy import floating, float64, integer, int16, uint16, uint32
-from numpy.typing import NDArray
+from collections.abc import (Iterable, Sequence)
 from typing import (
     List, Optional, Sequence as TSequence, Tuple, Union,
     cast, overload, TYPE_CHECKING)
-from collections.abc import Iterable
+
+import numpy
+from numpy import floating, float64, integer, int16, uint16, uint32
+from numpy.typing import NDArray
+
 from pyNN.random import RandomDistribution
+
 from spinn_utilities.overrides import overrides
+
+from pacman.model.graphs.abstract_vertex import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
+
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_SHORT, BYTES_PER_WORD)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.models.common.local_only_2d_common import get_div_const
+
 from .abstract_connector import AbstractConnector
-from pacman.model.graphs.abstract_vertex import AbstractVertex
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
@@ -166,14 +173,29 @@ class ConvolutionConnector(AbstractConnector):
 
     @property
     def positive_receptor_type(self) -> str:
+        """
+        The receptor type to add the positive weights to.
+
+        :rtype: str
+        """
         return self.__positive_receptor_type
 
     @property
     def negative_receptor_type(self) -> str:
+        """
+         The receptor type to add the negative weights to.
+
+        :rtype: str
+        """
         return self.__negative_receptor_type
 
     @property
-    def kernel_weights(self):
+    def kernel_weights(self) -> NDArray[float64]:
+        """
+        The weights for this connection.
+
+        :rtype: ndarray
+        """
         return self.__kernel_weights
 
     def __get_kernel_shape(self, shape: _Shape) -> Tuple[int, int]:
@@ -360,10 +382,10 @@ class ConvolutionConnector(AbstractConnector):
             min_y = post_slice_y.start - hlf_k_h
             max_y = (post_slice_y.stop + hlf_k_h) - 1
 
-            # Test that the start coords are in range i.e. less than max
+            # Test that the start coordinates are in range i.e. less than max
             start_in_range = numpy.logical_not(
                 numpy.any(post_slice_ranges[:, 0] > [max_x, max_y], axis=1))
-            # Test that the end coords are in range i.e. more than min
+            # Test that the end coordinates are in range i.e. more than min
             end_in_range = numpy.logical_not(
                 numpy.any(post_slice_ranges[:, 1] < [min_x, min_y], axis=1))
             # When both things are true, we have a vertex in range
@@ -392,20 +414,42 @@ class ConvolutionConnector(AbstractConnector):
 
     @property
     def kernel_n_bytes(self) -> int:
+        """
+        Size of the weights in bytes
+
+        :rtype: int
+        """
         n_weights = self.__kernel_weights.size
         return n_weights * BYTES_PER_SHORT
 
     @property
     def kernel_n_weights(self) -> int:
+        """
+        Size of the weights.
+
+        :rtype: int
+        """
         return self.__kernel_weights.size
 
     @property
     def parameters_n_bytes(self) -> int:
+        """
+        :rtype: int
+        """
         return CONNECTOR_CONFIG_SIZE
 
     def get_local_only_data(
             self, app_edge: ProjectionApplicationEdge, local_delay: int,
             delay_stage: int, weight_index: int) -> NDArray[uint32]:
+        """
+        Gets the local only data
+
+        :param ProjectionApplicationEdge app_edge:
+        :param int local_delay:
+        :param int delay_stage:
+        :param int weight_index:
+        :rtype: ndarray
+        """
         # Get info about things
         kernel_shape = self.__kernel_weights.shape
         ps_x, ps_y = 1, 1
@@ -432,7 +476,13 @@ class ConvolutionConnector(AbstractConnector):
     def get_encoded_kernel_weights(
             self, app_edge: ProjectionApplicationEdge,
             weight_scales: NDArray[floating]) -> NDArray[int16]:
-        # Encode weights with weight scaling
+        """
+        Encode weights with weight scaling.
+
+        :param ProjectionApplicationEdge app_edge:
+        :param ndarray weight_scales:
+        :rtype: ndarray
+        """
         encoded_kernel_weights = self.__kernel_weights.flatten()
         neg_weights = encoded_kernel_weights < 0
         pos_weights = encoded_kernel_weights > 0

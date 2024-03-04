@@ -27,6 +27,9 @@ _population_parameters = {
 
 
 class SpikeInjector(AbstractPyNNModel):
+    """
+    Model that creates a Spike Injector Vertex
+    """
     __slots__ = ()
 
     default_population_parameters = _population_parameters

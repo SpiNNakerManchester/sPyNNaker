@@ -13,15 +13,19 @@
 # limitations under the License.
 
 from typing import Iterable, List
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import MultiCastCommand
-from .push_bot_device import PushBotEthernetDevice
+
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotLED)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+
+from .push_bot_device import PushBotEthernetDevice
 
 
 class PushBotEthernetLEDDevice(

@@ -17,6 +17,7 @@ import sys
 from types import ModuleType
 from typing import Optional
 import numpy as np
+# pylint: disable=invalid-name
 plt: Optional[ModuleType]
 try:
     import matplotlib.pyplot  # type: ignore[import]
@@ -26,7 +27,7 @@ except ImportError:
 
 
 def _precheck(data, title):
-    if not len(data):
+    if len(data) == 0:
         if title is None:
             print("NO Data")
         else:
@@ -77,7 +78,7 @@ def line_plot(data_sets, title=None):
 
 def heat_plot(data_sets, ylabel=None, title=None):
     """
-    Build a heatmap plot or plots.
+    Build a heat map plot or plots.
 
     :param data_sets: Numpy array of data, or list of numpy arrays of data
     :type data_sets: ~numpy.ndarray or list(~numpy.ndarray)

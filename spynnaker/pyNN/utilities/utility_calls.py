@@ -18,28 +18,32 @@ Utility package containing simple helper functions.
 import logging
 import os
 import math
+from math import isnan
+from typing import List, Tuple
+
 import neo
 import numpy
 from numpy import uint32, floating
 from numpy.typing import NDArray
-from math import isnan
 from pyNN.random import RandomDistribution
-from typing import List, Tuple
 from scipy.stats import binom
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.safe_eval import SafeEval
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.logger_utils import warn_once
+
 from spinn_front_end_common.interface.ds import DataType
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_SECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
     RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
     RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
     RandomStatsVonmisesImpl, RandomStatsBinomialImpl,
     RandomStatsExponentialClippedImpl)
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_SECOND_CONVERSION)
 from spynnaker.pyNN.utilities.constants import WRITE_BANDWIDTH_BYTES_PER_SECOND
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -435,7 +439,7 @@ def get_neo_io(file_or_folder):
         raise ex
 
 
-def report_non_spynnaker_pyNN(msg):
+def report_non_spynnaker_pynn(msg):
     """
     Report a case of non-spynnaker-compatible PyNN being used.  This will warn
     or error depending on the configuration setting.
@@ -456,7 +460,7 @@ def check_rng(rng, where):
     :param rng: The rng parameter value.
     """
     if rng is not None and rng.seed is not None:
-        report_non_spynnaker_pyNN(
+        report_non_spynnaker_pynn(
             f"Use of rng in {where} is not supported in sPyNNaker in this"
             " case. Please instead use seed=<seed> in the target Population to"
             " ensure random numbers are seeded.")

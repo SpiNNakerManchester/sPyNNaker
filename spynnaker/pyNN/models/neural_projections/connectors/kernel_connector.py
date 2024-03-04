@@ -12,30 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from typing import Dict, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
+
 import numpy
 from numpy import floating, integer, ndarray, uint32
 from numpy.typing import NDArray
+from typing_extensions import TypeAlias
+
 from pyNN.random import RandomDistribution
 from pyNN.space import Space
-from typing import Dict, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
-from typing_extensions import TypeAlias
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
+
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from .abstract_connector import AbstractConnector
+
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.types import (
     Delay_Types, Weight_Delay_Types, Weight_Types)
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
+from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
@@ -49,11 +57,22 @@ N_KERNEL_PARAMS = 8
 
 
 class ConvolutionKernel(ndarray):
-    pass
+    """
+    Thin wrapper around a numpy array.
+    """
 
 
-def shape2word(sw: Union[int, integer], sh: Union[int, integer]) -> uint32:
-    return uint32(((uint32(sh) & 0xFFFF) << 16) | (uint32(sw) & 0xFFFF))
+def shape2word(
+        short1: Union[int, integer], short2: Union[int, integer]) -> uint32:
+    """
+    Combines two short values into 1 int by shifting the first 16 places
+
+    :param int short1: first 2 byte value
+    :param int short2: second 2 bytes value
+    :rtype: int
+    """
+    return uint32(((uint32(short2) & 0xFFFF) << 16)
+                  | (uint32(short1) & 0xFFFF))
 
 
 class KernelConnector(AbstractGenerateConnectorOnMachine,
@@ -151,7 +170,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         self._post_w = shape_post[WIDTH]
         self._post_h = shape_post[HEIGHT]
 
-        # Get the starting coords and step sizes (or defaults if not given)
+        # Get the starting coordinates and step sizes
+        # (or defaults if not given)
         if pre_start_coords_in_post is None:
             self._pre_start_w = 0
             self._pre_start_h = 0
@@ -230,7 +250,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
         """
-        # TODO: When slices become hashable, update this code to use them
         # directly as the cache index
         if post_vertex_slice not in self._post_as_pre:
             post_r, post_c = self.__to_post_coords(post_vertex_slice)
@@ -250,32 +269,32 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         c = ((pre_c - self._pre_start_w - 1) // self._pre_step_w) + 1
         return (r, c)
 
-    def __get_kernel_vals(self, vals: Optional[Union[
+    def __get_kernel_vals(self, values: Optional[Union[
             _Kernel, Weight_Delay_Types]]) -> Optional[ConvolutionKernel]:
         """
         Convert kernel values given into the correct format.
 
-        :param vals:
-        :type vals: int or float or ~pyNN.random.RandomDistribution
+        :param values:
+        :type values: int or float or ~pyNN.random.RandomDistribution
             or ~numpy.ndarray or ConvolutionKernel
         :rtype: ~numpy.ndarray
         """
-        if vals is None:
+        if values is None:
             return None
-        if isinstance(vals, list):
-            vals = numpy.asarray(vals)
+        if isinstance(values, list):
+            values = numpy.asarray(values)
         krn_size = self._kernel_h * self._kernel_w
         krn_shape = (self._kernel_h, self._kernel_w)
-        if isinstance(vals, RandomDistribution):
-            return numpy.array(vals.next(krn_size)).reshape(krn_shape).view(
+        if isinstance(values, RandomDistribution):
+            return numpy.array(values.next(krn_size)).reshape(krn_shape).view(
                 ConvolutionKernel)
-        elif numpy.isscalar(vals):
-            return numpy.full(krn_shape, vals).view(ConvolutionKernel)
-        elif ((isinstance(vals, numpy.ndarray) or
-                isinstance(vals, ConvolutionKernel)) and
-                vals.shape[HEIGHT] == self._kernel_h and
-                vals.shape[WIDTH] == self._kernel_w):
-            return vals.view(ConvolutionKernel)
+        elif numpy.isscalar(values):
+            return numpy.full(krn_shape, values).view(ConvolutionKernel)
+        elif ((isinstance(values, numpy.ndarray) or
+               isinstance(values, ConvolutionKernel)) and
+              values.shape[HEIGHT] == self._kernel_h and
+              values.shape[WIDTH] == self._kernel_w):
+            return values.view(ConvolutionKernel)
         raise SpynnakerException(
             "Error generating KernelConnector values; if you have supplied "
             "weight and/or delay kernel then ensure they are the same size "
@@ -332,11 +351,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             # Loop over post-vertices
             for post_idx in range(
                     post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1):
-                # convert to common coord system
+                # convert to common coordinate system
                 pac_r = post_as_pre_r[post_idx - post_lo]
                 pac_c = post_as_pre_c[post_idx - post_lo]
 
-                # now convert common to pre coords
+                # now convert common to pre coordinates
                 pap_r, pap_c = self.__pre_as_post(pac_r, pac_c)
 
                 # Obtain coordinates to test against kernel sizes
@@ -458,7 +477,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         if n_connections <= 0:
             return numpy.zeros(0, dtype=syn_dtypes)
 
-        # 0 for exc, 1 for inh
+        # 0 for excitatory, 1 for inhibitory
         syn_type = numpy.array(all_pre_in_range_weights < 0)
         block = numpy.zeros(n_connections, dtype=syn_dtypes)
         block["source"] = all_pre_in_range

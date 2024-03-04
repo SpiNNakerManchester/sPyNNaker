@@ -93,7 +93,8 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         :raises PacmanConfigurationException: if the splitter is not an
             instance of AbstractSpynnakerSplitterDelay
         """
-        # Delayed import to avoid cicular dependency
+        # Delayed import to avoid circular dependency
+        # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.extra_algorithms.splitter_components import (
             AbstractSpynnakerSplitterDelay as DelaySplitter)
         if not isinstance(splitter, DelaySplitter):

@@ -118,6 +118,7 @@ class AbstractTimingDependence(
 
         :rtype: float
         """
+        # pylint: disable=invalid-name
         raise NotImplementedError
 
     @property
@@ -128,4 +129,5 @@ class AbstractTimingDependence(
 
         :rtype: float
         """
+        # pylint: disable=invalid-name
         raise NotImplementedError

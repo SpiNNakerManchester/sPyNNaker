@@ -185,7 +185,7 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         """
         Returns a human-readable description of the population.
 
-        The output may be customized by specifying a different template
+        The output may be customised by specifying a different template
         together with an associated template engine (see
         :mod:`pyNN.descriptions`).
 

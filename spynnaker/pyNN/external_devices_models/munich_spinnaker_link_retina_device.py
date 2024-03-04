@@ -25,15 +25,27 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 # robot with 7 7 1
 
 
-def get_x_from_robot_retina(key):
+def get_x_from_robot_retina(key: int) -> int:
+    """
+    :param int key:
+    :rtype: int
+    """
     return (key >> 7) & 0x7f
 
 
-def get_y_from_robot_retina(key):
+def get_y_from_robot_retina(key: int) -> int:
+    """
+    :param int key:
+    :rtype: int
+    """
     return key & 0x7f
 
 
-def get_spike_value_from_robot_retina(key):
+def get_spike_value_from_robot_retina(key: int) -> int:
+    """
+    :param int key:
+    :rtype: int
+    """
     return (key >> 14) & 0x1
 
 

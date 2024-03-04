@@ -215,7 +215,7 @@ class _DelaySupportAdder(object):
         if max_delay_ms >= max_delay_needed_ms:
             return 0, max_delay_steps, False
 
-        # Check post vertex is ok with getting a delay
+        # Check post vertex is OK with getting a delay
         if not post_splitter.accepts_edges_from_delay_vertex():
             raise DelayExtensionException(
                 f"The app vertex {app_edge.post_vertex} "
@@ -225,7 +225,7 @@ class _DelaySupportAdder(object):
                 "accepts_edges_from_delay_vertex turned off.")
 
         # needs a delay extension, check can be supported with 1 delay
-        # extension. coz we dont do more than 1 at the moment
+        # extension. We don't do more than 1 at the moment
         ext_provided_ms = DelayExtensionVertex.get_max_delay_ticks_supported(
                 max_delay_steps) * time_step_ms
         total_delay_ms = ext_provided_ms + max_delay_ms

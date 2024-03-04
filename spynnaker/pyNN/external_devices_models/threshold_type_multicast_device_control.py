@@ -13,11 +13,14 @@
 # limitations under the License.
 
 from typing import Sequence
+
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
+
 from spinn_front_end_common.interface.ds import DataType
+
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
 from spynnaker.pyNN.utilities.struct import Struct
-from spinn_utilities.ranged.range_dictionary import RangeDictionary
 from spynnaker.pyNN.external_devices_models import (
     AbstractMulticastControllableDevice)
 
