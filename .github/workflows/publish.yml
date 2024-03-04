@@ -51,7 +51,7 @@ jobs:
         working-directory: neural_modelling
 
       - name: Build C documentation
-        uses: mattnotmitt/doxygen-action@v1.9.5
+        uses: mattnotmitt/doxygen-action@v1.9.8
         with:
           working-directory: neural_modelling
 
