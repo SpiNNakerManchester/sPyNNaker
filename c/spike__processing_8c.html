@@ -177,7 +177,7 @@ Variables</h2></td></tr>
 <tr class="memdesc:a4f91d051c76c3a6e81e61a7707c277b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The index of the buffer currently being filled by a DMA read.  <a href="spike__processing_8c.html#a4f91d051c76c3a6e81e61a7707c277b4">More...</a><br /></td></tr>
 <tr class="separator:a4f91d051c76c3a6e81e61a7707c277b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58209497c5fe5ba1a7034e03e6622d6d"><td class="memItemLeft" align="right" valign="top">static volatile uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a58209497c5fe5ba1a7034e03e6622d6d">rewires_to_do</a> = 0</td></tr>
-<tr class="memdesc:a58209497c5fe5ba1a7034e03e6622d6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of outstanding synaptogenic rewirings.  <a href="spike__processing_8c.html#a58209497c5fe5ba1a7034e03e6622d6d">More...</a><br /></td></tr>
+<tr class="memdesc:a58209497c5fe5ba1a7034e03e6622d6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of outstanding synaptogenic rewires.  <a href="spike__processing_8c.html#a58209497c5fe5ba1a7034e03e6622d6d">More...</a><br /></td></tr>
 <tr class="separator:a58209497c5fe5ba1a7034e03e6622d6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af760c32944840948570708761ca97038"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#af760c32944840948570708761ca97038">dma_n_rewires</a></td></tr>
 <tr class="memdesc:af760c32944840948570708761ca97038"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of rewires to do when the DMA completes.  <a href="spike__processing_8c.html#af760c32944840948570708761ca97038">More...</a><br /></td></tr>
@@ -363,7 +363,7 @@ struct {</td></tr>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">spike</td><td>The spike being processed </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">result</td><td>The result of the pop table lookup </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">n_rewire</td><td>Accumulator of number of rewirings </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">n_rewire</td><td>Accumulator of number of rewires </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">n_process_spike</td><td>Accumulator of number of processed spikes </td></tr>
   </table>
   </dd>
@@ -419,7 +419,7 @@ struct {</td></tr>
 <p >Calls <a class="el" href="spike__processing_8c.html#aabdb3130b5c92cc4badbc4ea8109b079" title="Check if there is anything to do. If not, DMA is not busy.">is_something_to_do()</a>, do_direct_row() and <a class="el" href="spike__processing_8c.html#a7864846d55171d96eba62635e0d61a49" title="Perform a DMA read of a synaptic row.">do_dma_read()</a> </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">current_buffer</td><td>The current buffer, if any. </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">n_rewires</td><td>Accumulator of number of rewirings </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">n_rewires</td><td>Accumulator of number of rewires </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">n_synapse_processes</td><td>Accumulator of number of synapses processed </td></tr>
   </table>
   </dd>
@@ -830,7 +830,7 @@ struct {</td></tr>
 <p>Set the number of times spike_processing has to attempt rewiring. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">number_of_rewires</td><td>The number of rewirings to perform </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">number_of_rewires</td><td>The number of rewires to perform </td></tr>
   </table>
   </dd>
 </dl>
@@ -992,7 +992,7 @@ struct {</td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Number of outstanding synaptogenic rewirings. </p>
+<p>Number of outstanding synaptogenic rewires. </p>
 
 <p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00079">79</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
@@ -1237,7 +1237,7 @@ struct {</td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 13 2024 08:27:04 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.5
+Generated on Mon Mar 4 2024 16:15:47 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.5
 </small></address>
 </body>
 </html>
