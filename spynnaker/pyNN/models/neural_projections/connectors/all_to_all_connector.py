@@ -78,17 +78,24 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
             self, n_post_atoms: int, synapse_info: SynapseInformation,
             min_delay: Optional[float] = None,
             max_delay: Optional[float] = None) -> int:
+
+        max_post = min(n_post_atoms, synapse_info.get_n_post_neurons_in_view())
         if min_delay is None or max_delay is None:
-            return n_post_atoms
+            return max_post
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
-            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            n_post_atoms, min_delay, max_delay, synapse_info)
+            (synapse_info.get_n_post_neurons_in_view() *
+             synapse_info.get_n_pre_neurons_in_view()),
+            max_post, min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(
             self, synapse_info: SynapseInformation) -> int:
+        if synapse_info.prepop_is_view:
+            # pylint: disable=protected-access
+            view_range = synapse_info.pre_population._view_range
+            return (view_range[1] - view_range[0]) + 1
         return synapse_info.n_pre_neurons
 
     @overrides(AbstractConnector.get_weight_maximum)

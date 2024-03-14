@@ -16,6 +16,7 @@ from __future__ import annotations
 from typing import List, Sequence, TYPE_CHECKING, Union
 from spinn_utilities.config_holder import get_config_bool
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector, AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -161,6 +162,45 @@ class SynapseInformation(object):
         :rtype: int
         """
         return self.__post_population.size
+
+    def get_n_post_neurons_in_view_slice(self, post_slice: Slice) -> int:
+        """
+        The number of neurons in the slice of the post-population view.
+
+        :param Slice post_slice: The slice of the post-population
+        :rtype: int
+        """
+        if not self.__postpop_is_view:
+            return post_slice.n_atoms
+        # pylint: disable=protected-access
+        lo, hi = self.__post_population._view_range
+        return len(i for i in post_slice.get_raster_ids()
+                   if i >= lo and i <= hi)
+
+    def get_n_pre_neurons_in_view(self):
+        """
+        The number of neurons in the pre-population view.
+
+        :rtype: int
+        """
+        if not self.__prepop_is_view:
+            return self.__pre_population.size
+        # pylint: disable=protected-access
+        lo, hi = self.__pre_population._view_range
+        return (hi - lo) + 1
+
+    def get_n_post_neurons_in_view(self):
+        """
+        The number of neurons in the post-population view.
+
+        :rtype: int
+        """
+        if not self.__postpop_is_view:
+            return self.__post_population.size
+        # pylint: disable=protected-access
+        lo, hi = self.__post_population._view_range
+        return (hi - lo) + 1
+
 
     @property
     def prepop_is_view(self) -> bool:
