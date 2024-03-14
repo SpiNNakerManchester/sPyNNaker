@@ -353,9 +353,13 @@ static uint32_t initialize(void) {
 	log_debug("Copying Configuration");
 	config *sdram_config = data_specification_get_region(CONFIG, ds_regions);
 	cfg = *sdram_config;
-	log_info("Config: send=%d, key=%08x, min_run_length=%d, max_spike_diff=%d,"
+	log_info("Config: send_results=%d, results_key=%08x,"
+			" send_poisson_control=%d, poisson_control_key=%08x,"
+			" min_run_length=%d, max_spike_diff=%d,"
 			" n_sources=%d, n_values=%d, n_key_entries=%d",
-			cfg.send_results, cfg.results_key, cfg.min_run_length, cfg.max_spike_diff,
+			cfg.send_results, cfg.results_key,
+			cfg.send_poisson_control, cfg.poisson_control_key,
+			cfg.min_run_length, cfg.max_spike_diff,
 			cfg.n_sources, cfg.n_values, cfg.n_key_entries);
 
 	// Set up the key entries

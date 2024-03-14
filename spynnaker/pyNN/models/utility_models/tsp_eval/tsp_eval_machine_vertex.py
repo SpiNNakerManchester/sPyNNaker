@@ -45,8 +45,9 @@ if TYPE_CHECKING:
     from pacman.model.placements import Placement
     from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 
-# send, key, min_run_length, max_spike_diff, n_sources, n_values, n_key_entries
-PARAMS_SZ = 7 * BYTES_PER_WORD
+# send_report, report_key, send_poisson_control, poisson_control_key,
+# min_run_length, max_spike_diff, n_sources, n_values, n_key_entries
+PARAMS_SZ = 9 * BYTES_PER_WORD
 
 # key, mask, n_colour_bits, min_neuron_id, node_index, neurons_per_value
 KEY_STRUCT_SZ = 6 * BYTES_PER_WORD
