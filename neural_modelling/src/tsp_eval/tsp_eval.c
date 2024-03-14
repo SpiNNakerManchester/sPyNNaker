@@ -68,7 +68,7 @@ typedef struct config {
 	uint32_t send;
 
 	// The key to send spikes with
-	uint32_t key;
+	uint32_t results_key;
 
 	// The minimum run length to consider this a useful value
 	uint32_t min_run_length;
@@ -177,12 +177,12 @@ static inline uint32_t check_runs(void) {
 	return 1;
 }
 
-static inline void send_spikes(void) {
+static inline void send_results(void) {
 	if (!cfg.send) {
 		return;
 	}
 	for (uint32_t i = 0; i < cfg.n_sources; i++) {
-		send_spike_mc_payload(cfg.key + i, rec->values[i]);
+		send_spike_mc_payload(cfg.results_key + i, rec->values[i]);
 	}
 }
 
@@ -303,7 +303,7 @@ static void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
 	if (source_check_required) {
 		log_debug("Checking runs");
 		if (check_runs()) {
-			send_spikes();
+			send_results();
 			record();
 		}
 	}
@@ -349,7 +349,7 @@ static uint32_t initialize(void) {
 	cfg = *sdram_config;
 	log_info("Config: send=%d, key=%08x, min_run_length=%d, max_spike_diff=%d,"
 			" n_sources=%d, n_values=%d, n_key_entries=%d",
-			cfg.send, cfg.key, cfg.min_run_length, cfg.max_spike_diff,
+			cfg.send, cfg.results_key, cfg.min_run_length, cfg.max_spike_diff,
 			cfg.n_sources, cfg.n_values, cfg.n_key_entries);
 
 	// Set up the key entries
