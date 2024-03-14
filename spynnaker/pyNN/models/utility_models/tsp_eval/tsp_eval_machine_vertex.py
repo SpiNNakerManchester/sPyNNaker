@@ -37,8 +37,8 @@ from spinn_front_end_common.interface.buffer_management\
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID,\
-    LIVE_POISSON_CONTROL_PARTITION_ID
+from spynnaker.pyNN.utilities.constants import (
+    SPIKE_PARTITION_ID, LIVE_POISSON_CONTROL_PARTITION_ID)
 from spynnaker.pyNN.models.populations import Population
 if TYPE_CHECKING:
     from .tsp_eval_vertex import TSPEvalVertex
