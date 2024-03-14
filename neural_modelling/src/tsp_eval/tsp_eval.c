@@ -65,10 +65,16 @@ typedef struct source_value {
 typedef struct config {
 
 	// Whether to send data
-	uint32_t send;
+	uint32_t send_results;
 
-	// The key to send spikes with
+	// The key to send results with
 	uint32_t results_key;
+
+	// Whether to send Poisson control
+	uint32_t send_poisson_control;
+
+	// The key to send Poisson control with
+	uint32_t poisson_control_key;
 
 	// The minimum run length to consider this a useful value
 	uint32_t min_run_length;
@@ -178,7 +184,7 @@ static inline uint32_t check_runs(void) {
 }
 
 static inline void send_results(void) {
-	if (!cfg.send) {
+	if (!cfg.send_results) {
 		return;
 	}
 	for (uint32_t i = 0; i < cfg.n_sources; i++) {
@@ -349,7 +355,7 @@ static uint32_t initialize(void) {
 	cfg = *sdram_config;
 	log_info("Config: send=%d, key=%08x, min_run_length=%d, max_spike_diff=%d,"
 			" n_sources=%d, n_values=%d, n_key_entries=%d",
-			cfg.send, cfg.results_key, cfg.min_run_length, cfg.max_spike_diff,
+			cfg.send_results, cfg.results_key, cfg.min_run_length, cfg.max_spike_diff,
 			cfg.n_sources, cfg.n_values, cfg.n_key_entries);
 
 	// Set up the key entries

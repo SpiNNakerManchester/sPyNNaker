@@ -37,7 +37,8 @@ from spinn_front_end_common.interface.buffer_management\
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID,\
+    LIVE_POISSON_CONTROL_PARTITION_ID
 from spynnaker.pyNN.models.populations import Population
 if TYPE_CHECKING:
     from .tsp_eval_vertex import TSPEvalVertex
@@ -202,16 +203,25 @@ class TSPEvalMachineVertex(
         spec.switch_write_focus(self._REGIONS.PARAMS)
 
         routing_infos = SpynnakerDataView.get_routing_infos()
-        key = routing_infos.get_first_key_from_pre_vertex(
+        report_key = routing_infos.get_first_key_from_pre_vertex(
             self, SPIKE_PARTITION_ID)
 
         # Write Key info for this core
-        if key is None:
+        if report_key is None:
             spec.write_value(0)
             spec.write_value(0)
         else:
             spec.write_value(1)
-            spec.write_value(data=key)
+            spec.write_value(data=report_key)
+
+        poisson_control_key = routing_infos.get_first_key_from_pre_vertex(
+            self, LIVE_POISSON_CONTROL_PARTITION_ID)
+        if poisson_control_key is None:
+            spec.write_value(0)
+            spec.write_value(0)
+        else:
+            spec.write_value(1)
+            spec.write_value(data=poisson_control_key)
 
         spec.write_value(data=self.__min_run_length)
         spec.write_value(data=self.__max_spike_diff)
