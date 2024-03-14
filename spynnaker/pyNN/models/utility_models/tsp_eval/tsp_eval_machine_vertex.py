@@ -46,8 +46,10 @@ if TYPE_CHECKING:
     from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 
 # send_report, report_key, send_poisson_control, poisson_control_key,
-# min_run_length, max_spike_diff, n_sources, n_values, n_key_entries
-PARAMS_SZ = 9 * BYTES_PER_WORD
+# min_run_length, max_spike_diff, n_sources, n_values, n_key_entries,
+# poisson_low_rate, poisson_high_rate, time_between_solution_and_high_rate,
+# time_without_solution_before_low_rate
+PARAMS_SZ = 13 * BYTES_PER_WORD
 
 # key, mask, n_colour_bits, min_neuron_id, node_index, neurons_per_value
 KEY_STRUCT_SZ = 6 * BYTES_PER_WORD
@@ -80,7 +82,11 @@ class TSPEvalMachineVertex(
         "__max_spike_diff",
         "__recording_size",
         "__keys_size",
-        "__is_recording"
+        "__is_recording",
+        "__poisson_low_rate",
+        "__poisson_high_rate",
+        "__time_between_solution_and_high_rate",
+        "__time_without_solution_before_low_rate"
     )
 
     class _REGIONS(IntEnum):
@@ -95,6 +101,9 @@ class TSPEvalMachineVertex(
 
     def __init__(self, neurons_per_value: int, populations: List[Population],
                  min_run_length: int, max_spike_diff: int, n_recordings: int,
+                 poisson_low_rate: float, poisson_high_rate: float,
+                 time_between_solution_and_high_rate: int,
+                 time_without_solution_before_low_rate: int,
                  label: str, app_vertex: TSPEvalVertex):
         """
         :param int neurons_per_value:
@@ -108,6 +117,16 @@ class TSPEvalMachineVertex(
         :param int n_recordings:
             The number of recordings of state to allow at most
         :param str label: The label of the vertex
+        :param float poisson_low_rate:
+            The rate of the Poisson source when looking for solutions
+        :param float poisson_high_rate:
+            The rate of the Poisson source when stuck in a local minimum
+        :param int time_between_solution_and_high_rate:
+            The time between finding a solution and a change in the Poisson
+            source rate to high
+        :param int time_without_solution_before_low_rate:
+            The time without a solution before the Poisson source rate changes
+            to low
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
             The application vertex that caused this machine vertex to be
             created. If `None`, there is no such application vertex.
@@ -121,6 +140,12 @@ class TSPEvalMachineVertex(
         self.__is_recording = False
         self.__min_run_length = min_run_length
         self.__max_spike_diff = max_spike_diff
+        self.__poisson_low_rate = poisson_low_rate
+        self.__poisson_high_rate = poisson_high_rate
+        self.__time_between_solution_and_high_rate = (
+            time_between_solution_and_high_rate)
+        self.__time_without_solution_before_low_rate = (
+            time_without_solution_before_low_rate)
 
         # Recording is time, followed by int for each population
         self.__recording_size = (
@@ -233,6 +258,11 @@ class TSPEvalMachineVertex(
         n_m_verts = sum(len(pop._vertex.splitter.get_out_going_slices())
                         for pop in self.__populations)
         spec.write_value(data=n_m_verts)
+
+        spec.write_value(data=self.__poisson_low_rate)
+        spec.write_value(data=self.__poisson_high_rate)
+        spec.write_value(data=self.__time_between_solution_and_high_rate)
+        spec.write_value(data=self.__time_without_solution_before_low_rate)
 
     def write_keys(self, spec):
         spec.switch_write_focus(self._REGIONS.KEYS)

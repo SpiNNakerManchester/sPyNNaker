@@ -91,6 +91,18 @@ typedef struct config {
 	// The number of key entries
 	uint32_t n_key_entries;
 
+	// The rate of the Poisson source when looking for solutions
+	REAL poisson_low_rate;
+
+	// The rate of the Poisson source when stuck in a local minimum
+	REAL poisson_high_rate;
+
+	// Amount of time between finding a solution and switching to high rate
+	uint32_t time_between_solution_and_high_rate;
+
+    // Amount of time without a solution before switching to low rate
+	uint32_t time_without_solution_before_low_rate;
+
 } config;
 
 typedef struct recording {

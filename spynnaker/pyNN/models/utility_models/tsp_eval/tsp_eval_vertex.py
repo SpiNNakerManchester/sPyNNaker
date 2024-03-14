@@ -36,6 +36,9 @@ class TSPEvalVertex(AbstractOneAppOneMachineVertex):
     def __init__(
             self, neurons_per_value: int, populations: List[Population],
             min_run_length: int, max_spike_diff: int, n_recordings: int,
+            poisson_low_rate: float, poisson_high_rate: float,
+            time_between_solution_and_high_rate: int,
+            time_without_solution_before_low_rate: int,
             label: str):
         """
         :param int neurons_per_value:
@@ -48,6 +51,16 @@ class TSPEvalVertex(AbstractOneAppOneMachineVertex):
             The maximum time between spikes in a run
         :param int n_recordings:
             The number of recordings to allow overall
+            :param float poisson_low_rate:
+            The rate of the Poisson source when looking for solutions
+        :param float poisson_high_rate:
+            The rate of the Poisson source when stuck in a local minimum
+        :param int time_between_solution_and_high_rate:
+            The time between finding a solution and a change in the Poisson
+            source rate to high
+        :param int time_without_solution_before_low_rate:
+            The time without a solution before the Poisson source rate changes
+            to low
         :param str label: The label of the vertex
         """
 
@@ -55,7 +68,9 @@ class TSPEvalVertex(AbstractOneAppOneMachineVertex):
         super(TSPEvalVertex, self).__init__(
             TSPEvalMachineVertex(
                 neurons_per_value, populations, min_run_length, max_spike_diff,
-                n_recordings, label, self),
+                n_recordings, poisson_low_rate, poisson_high_rate,
+                time_between_solution_and_high_rate,
+                time_without_solution_before_low_rate, label, self),
             label, len(populations))
 
         self.__recording_dtype = numpy.dtype(f"<u4, {len(populations)}<u4")
