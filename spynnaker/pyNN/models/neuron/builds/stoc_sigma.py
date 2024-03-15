@@ -18,6 +18,8 @@ from spynnaker.pyNN.models.neuron.implementations import NeuronImplStocSigma
 
 
 class StocSigma(AbstractPyNNNeuronModel):
+    """ Stochastic model with sigma threshold and instantaneous synapses.
+    """
 
     @default_parameters({"tau_refrac", "alpha", "bias"})
     def __init__(self, tau_refrac=1, alpha=1.0, bias=0, refract_init=0,

@@ -18,6 +18,9 @@ from spynnaker.pyNN.models.neuron.implementations import NeuronImplStocExp
 
 
 class StocExp(AbstractPyNNNeuronModel):
+    """ Stochastic neuron model exponential threshold and instantaneous
+        synapses, and voltage which is reset each time step.
+    """
 
     @default_parameters({"tau", "bias"})
     def __init__(self, tau=10, bias=0, refract_init=0, seed=None):

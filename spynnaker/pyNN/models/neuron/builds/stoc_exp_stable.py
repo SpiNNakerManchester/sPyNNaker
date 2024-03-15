@@ -19,6 +19,9 @@ from spynnaker.pyNN.models.neuron.implementations import (
 
 
 class StocExpStable(AbstractPyNNNeuronModel):
+    """ Stochastic neuron model with exponential threshold and instantaneous
+        synapses, and voltage stays unless changed by input.
+    """
 
     @default_parameters({"v_reset", "tau", "tau_refrac", "bias"})
     def __init__(

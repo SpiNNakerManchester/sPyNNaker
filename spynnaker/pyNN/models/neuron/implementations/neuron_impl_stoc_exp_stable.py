@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from typing import Optional, Sequence, Mapping
+from pyNN.random import NumpyRNG
 from spinn_front_end_common.interface.ds import DataType
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
@@ -20,7 +21,6 @@ from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractNeuronImpl, ModelParameter)
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
-from pyNN.random import NumpyRNG
 from spynnaker.pyNN.random_distribution import RandomDistribution
 
 V_INIT = "v_init"
@@ -45,6 +45,9 @@ MAX_INT = float(0xFFFFFFFF)
 
 
 class NeuronImplStocExpStable(AbstractNeuronImpl):
+    """ Stochastic neuron model with exponential threshold and instantaneous
+        synapses, and voltage stays unless changed by input.
+    """
 
     def __init__(self, v_init: ModelParameter, v_reset: ModelParameter,
                  tau: ModelParameter, tau_refrac: ModelParameter,
@@ -102,7 +105,7 @@ class NeuronImplStocExpStable(AbstractNeuronImpl):
             return 0
         elif target == "inhibitory":
             return 1
-        raise ValueError("Unknown target {}".format(target))
+        raise ValueError(f"Unknown target {target}")
 
     @overrides(AbstractNeuronImpl.get_synapse_targets)
     def get_synapse_targets(self) -> Sequence[str]:
@@ -125,7 +128,7 @@ class NeuronImplStocExpStable(AbstractNeuronImpl):
             return "mV"
         elif variable == "prob":
             return ""
-        raise ValueError("Unknown variable {}".format(variable))
+        raise ValueError(f"Unknown variable {variable}")
 
     @overrides(AbstractNeuronImpl.get_recordable_variable_index)
     def get_recordable_variable_index(self, variable: str) -> int:
@@ -137,7 +140,7 @@ class NeuronImplStocExpStable(AbstractNeuronImpl):
             return 2
         if variable == "prob":
             return 3
-        raise ValueError("Unknown variable {}".format(variable))
+        raise ValueError(f"Unknown variable {variable}")
 
     @overrides(AbstractNeuronImpl.is_recordable)
     def is_recordable(self, variable: str) -> bool:
