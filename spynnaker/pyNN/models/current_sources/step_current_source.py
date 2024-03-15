@@ -63,7 +63,7 @@ class StepCurrentSource(AbstractCurrentSource):
     @overrides(AbstractCurrentSource.set_parameters)
     def set_parameters(self, **parameters: CurrentParameter):
         for key, value in parameters.items():
-            if key not in self.__parameters.keys():
+            if key not in self.__parameters:
                 # throw an exception
                 raise SpynnakerException(f"{key} is not a parameter of {self}")
             if not isinstance(value, Sequence):
@@ -113,7 +113,7 @@ class StepCurrentSource(AbstractCurrentSource):
     @overrides(AbstractCurrentSource.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self) -> int:
         # The parameters themselves take up this amount of space
-        # ((len(times) + length_val)) * 2) + ID
+        # length(times) + length_val) * 2) + ID
         sdram_for_parameters = ((len(self.__times) + 1) * 2) * BYTES_PER_WORD
 
         # For each_source there is the last amplitude holder and index

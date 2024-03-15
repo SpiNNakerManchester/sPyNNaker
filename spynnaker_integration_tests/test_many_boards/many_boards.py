@@ -89,7 +89,7 @@ class ManyBoards(BaseTestCase):
             check_data(pop, self._expected_spikes, self.simtime)
         t_after_check = time.time()
         with GlobalProvenance() as db:
-            results = db.get_run_time_of_BufferExtractor()
+            results = db.get_run_time_of_buffer_extractor()
         self.report(results, report_file)
         self.report(
             "machine run time was: {} seconds\n".format(

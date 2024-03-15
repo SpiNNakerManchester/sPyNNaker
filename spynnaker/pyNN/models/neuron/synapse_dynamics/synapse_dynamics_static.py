@@ -12,23 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
+
 import numpy
 from numpy import floating, integer, uint8, uint32
 from numpy.typing import NDArray
+
 from pyNN.standardmodels.synapses import StaticSynapse
-from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import DataSpecificationBase
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE)
+from spynnaker.pyNN.types import Weight_Delay_In_Types as _Weight
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
+
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.types import Weight_Delay_In_Types as _Weight
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 if TYPE_CHECKING:
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
     from spynnaker.pyNN.models.neural_projections import (
@@ -45,9 +53,9 @@ class SynapseDynamicsStatic(
     The dynamics of a synapse that does not change over time.
     """
 
-    __slots__ = (
+    __slots__ = [
         # padding to add to a synaptic row for synaptic rewiring
-        "__pad_to_length")
+        "__pad_to_length"]
 
     def __init__(
             self, weight: _Weight = StaticSynapse.default_parameters['weight'],

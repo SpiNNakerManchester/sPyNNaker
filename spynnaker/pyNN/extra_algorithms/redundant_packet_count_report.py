@@ -76,6 +76,9 @@ _MAX = 100
 
 
 def redundant_packet_count_report() -> None:
+    """
+    Writes a report detailing the redundant packet counts.
+    """
     file_name = os.path.join(SpynnakerDataView.get_run_dir_path(), _FILE_NAME)
 
     try:

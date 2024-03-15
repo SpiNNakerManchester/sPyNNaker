@@ -433,7 +433,7 @@ static inline bool prepare_timestep(uint32_t time) {
 
 //! \brief Perform synaptic rewiring for this time step
 //! \param[in] time The current time step
-//! \param[in] n_rewires The number of rewirings to try
+//! \param[in] n_rewires The number of rewires to try
 static inline void do_rewiring(uint32_t time, uint32_t n_rewires) {
     uint32_t spike;
     pop_table_lookup_result_t result;

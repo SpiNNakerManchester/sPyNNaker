@@ -14,31 +14,36 @@
 from enum import IntEnum
 import os
 import ctypes
-from numpy import floating
-from numpy.typing import NDArray
 from typing import List, Optional, Sequence
 
+from numpy import floating
+from numpy.typing import NDArray
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.machine import (
     MachineVertex, SDRAMMachineEdge, SourceSegmentedSDRAMMachinePartition)
 from pacman.model.graphs.common import Slice
 from pacman.model.resources import AbstractSDRAM
 from pacman.model.placements import Placement
+
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.interface.ds import (
     DataSpecificationGenerator, DataSpecificationReloader)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
+from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
 from .abstract_population_vertex import AbstractPopulationVertex
-from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 
 # Size of SDRAM params = 1 word for address + 1 word for size
 # + 1 word for n_neurons + 1 word for n_synapse_types
@@ -299,6 +304,13 @@ class PopulationNeuronsMachineVertex(
 
     @staticmethod
     def get_n_bytes_for_transfer(n_neurons: int, n_synapse_types: int) -> int:
+        """
+        Calculate the number of bytes needed for a transfer.
+
+        :param int n_neurons: number of neurons
+        :param int n_synapse_types: number of synapse types
+        :rtype: int
+        """
         n_bytes = (2 ** get_n_bits(n_neurons) *
                    n_synapse_types *
                    ReceivesSynapticInputsOverSDRAM.N_BYTES_PER_INPUT)

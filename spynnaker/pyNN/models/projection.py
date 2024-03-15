@@ -14,35 +14,42 @@
 from __future__ import annotations
 import functools
 import logging
-import numpy
-from numpy import void
-from numpy.typing import NDArray
 from typing import (
     Any, Callable, Dict, List, Optional, Sequence, Tuple, Union,
     cast, TYPE_CHECKING)
+
+import numpy
+from numpy import void
+from numpy.typing import NDArray
 from typing_extensions import Literal, TypeAlias
-from spinn_utilities.config_holder import get_config_bool
-from spinn_utilities.log import FormatAdapter
+
 from pyNN.recording.files import StandardTextFile, BaseFile
 from pyNN.space import Space as PyNNSpace
+
+from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
+
 from pacman.model.graphs.application import ApplicationVertex
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
 from spynnaker.pyNN.models.neural_projections import (
     SynapseInformation, ProjectionApplicationEdge)
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FromListConnector)
-from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spynnaker.pyNN.models.neuron import (
+    AbstractPopulationVertex, ConnectionHolder)
+from spynnaker.pyNN.models.populations import Population, PopulationView
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractHasParameterNames)
-from spynnaker._version import __version__
-from spynnaker.pyNN.models.populations import Population, PopulationView
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker._version import __version__
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections.connectors import (
         AbstractConnector)
@@ -109,8 +116,8 @@ class Projection(object):
                 f"to post {post_synaptic_population.label} "
                 f"with connector {connector}")
             # give an auto generated label for the underlying edge
-            label = "projection edge {}".format(
-                SpynnakerDataView.get_next_none_labelled_edge_number())
+            label = f"projection edge " \
+                    f"{SpynnakerDataView.get_next_none_labelled_edge_number()}"
         else:
             self.__label = label
 

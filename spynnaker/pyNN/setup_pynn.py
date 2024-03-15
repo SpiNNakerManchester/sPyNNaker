@@ -41,7 +41,7 @@ def version_satisfies(module, requirement):
     return Version(module.__version__) >= Version(requirement)
 
 
-def install_sPyNNaker_into(module):
+def install_spynnaker_into(module):
     """
     Do the actual installation by creating a package within the given
     module's implementation. This is very nasty!
@@ -60,6 +60,9 @@ def install_sPyNNaker_into(module):
 
 
 def setup_pynn():
+    """
+    Checks pyNN version and creates the spynnaker model in pynn.
+    """
     # Check the version and blow up if it isn't there
     if not version_satisfies(pyNN, _TARGET_PYNN_VERSION):
         raise NotImplementedError(
@@ -68,7 +71,7 @@ def setup_pynn():
 
     # Perform the installation unless we're on READTHEDOCS
     if os.environ.get('READTHEDOCS', 'False') != 'True':
-        install_sPyNNaker_into(pyNN)
+        install_spynnaker_into(pyNN)
 
 
 if __name__ == "__main__":

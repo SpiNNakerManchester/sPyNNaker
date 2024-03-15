@@ -12,22 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import cast, Iterable
+
 import numpy
 from numpy import floating
 from numpy.typing import NDArray
-from typing import cast, Iterable
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationBase)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightAccumulator)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     STDP_FIXED_POINT_ONE)
+
+from .abstract_timing_dependence import AbstractTimingDependence
 
 
 class TimingDependenceRecurrent(AbstractTimingDependence):

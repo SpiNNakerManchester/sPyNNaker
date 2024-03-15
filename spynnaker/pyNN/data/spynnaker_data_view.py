@@ -166,6 +166,7 @@ class SpynnakerDataView(FecDataView):
             If projections should not be added in the current state
         """
         # UGLY but needed to avoid circular import
+        # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.models.projection import Projection as Proj
         cls.check_user_can_act()
         if projection in cls.__spy_data._projections:
@@ -217,6 +218,7 @@ class SpynnakerDataView(FecDataView):
             If called after `sim.end`
         """
         # UGLY but needed to avoid circular import
+        # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.models.populations.population import (
             Population as Pop)
         cls.check_user_can_act()

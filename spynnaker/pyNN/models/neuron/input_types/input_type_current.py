@@ -14,8 +14,8 @@
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
-from .abstract_input_type import AbstractInputType
 from spynnaker.pyNN.utilities.struct import Struct
+from .abstract_input_type import AbstractInputType
 
 
 class InputTypeCurrent(AbstractInputType):

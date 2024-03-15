@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+from typing import List, Optional, Tuple, TYPE_CHECKING, Sequence
+
 import numpy
 from numpy.typing import NDArray
-from typing import List, Optional, Tuple, TYPE_CHECKING, Sequence
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.common import Slice
+
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)

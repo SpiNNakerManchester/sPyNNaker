@@ -12,52 +12,58 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from collections.abc import Sized
 from enum import IntEnum
-import numpy
-from numpy import uint16, uint32
+from collections.abc import Sized
 import struct
 from typing import (
     Iterable, List, Optional, Sequence, TypeVar, Union,
     cast, TYPE_CHECKING)
 
+import numpy
+from numpy import uint16, uint32
+
 from spinn_utilities.overrides import overrides
+
 from spinnman.model.enums import ExecutableType
+
 from pacman.model.graphs import AbstractEdgePartition
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import (
     MachineVertex, AbstractSDRAMPartition, SDRAMMachineEdge)
-from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM
 from pacman.model.placements import Placement
+from pacman.model.resources import AbstractSDRAM
+from pacman.utilities.utility_calls import get_keys
+
+from spinn_front_end_common.abstract_models import (
+    AbstractHasAssociatedBinary,
+    AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
+from spinn_front_end_common.interface.buffer_management import (
+    recording_utilities)
+from spinn_front_end_common.interface.buffer_management.buffer_models import (
+    AbstractReceiveBuffersToHost)
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationBase, DataSpecificationGenerator,
     DataSpecificationReloader)
-from spinn_front_end_common.interface.buffer_management import (
-    recording_utilities)
+from spinn_front_end_common.interface.profiling import (
+    AbstractHasProfileData, ProfileData, profile_utils)
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities.constants import (
     SIMULATION_N_BYTES, BYTES_PER_WORD, BYTES_PER_SHORT)
-from pacman.utilities.utility_calls import get_keys
-from spinn_front_end_common.abstract_models import (
-    AbstractHasAssociatedBinary,
-    AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
-from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
-from spinn_front_end_common.interface.buffer_management.buffer_models import (
-    AbstractReceiveBuffersToHost)
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
-from spinn_front_end_common.interface.profiling import (
-    AbstractHasProfileData, ProfileData, profile_utils)
+
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models import (
-    SendsSynapticInputsOverSDRAM, ReceivesSynapticInputsOverSDRAM)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractMaxSpikes, SendsSynapticInputsOverSDRAM,
+    ReceivesSynapticInputsOverSDRAM)
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID)
+
 if TYPE_CHECKING:
     from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
@@ -140,7 +146,7 @@ def _u3232_to_uint64(array: numpy.ndarray) -> numpy.ndarray:
 # 1. uint32_t has_key;
 # 2. uint32_t set_rate_neuron_id_mask;
 # 3. UFRACT seconds_per_tick; 4. REAL ticks_per_second;
-# 5. REAL slow_rate_per_tick_cutoff; 6. REAL fast_rate_per_tick_cutoff;
+# 5. REAL slow_rate_per_tick_cut-off; 6. REAL fast_rate_per_tick_cut-off;
 # 7. unt32_t first_source_id; 8. uint32_t n_spike_sources;
 # 9. uint32_t max_spikes_per_timestep;
 # 10. uint32_t n_colour_bits;
@@ -165,7 +171,7 @@ SDRAM_EDGE_PARAMS_BYTES_PER_WEIGHT = BYTES_PER_SHORT
 
 # SDRAM edge param base size:
 # 1. address, 2. size of transfer,
-# 3. offset to start writing, 4. VLA of weights (not counted here)
+# 3. offset to start writing, 4. Array of weights (not counted here)
 SDRAM_EDGE_PARAMS_BASE_BYTES = 3 * BYTES_PER_WORD
 
 _ONE_WORD = struct.Struct("<I")
@@ -191,7 +197,7 @@ class SpikeSourcePoissonMachineVertex(
         "__sdram_partition",
         "__rate_changed")
 
-    class POISSON_SPIKE_SOURCE_REGIONS(IntEnum):
+    class _PoissonSpikeSourceRegions(IntEnum):
         """
         Memory region IDs for the the Poisson source code.
         """
@@ -219,7 +225,7 @@ class SpikeSourcePoissonMachineVertex(
     # The maximum timestep - this is the maximum value of a uint32
     _MAX_TIMESTEP = 0xFFFFFFFF
 
-    # as suggested by MH (between Exp and Knuth)
+    # between Exp and Knuth
     SLOW_RATE_PER_TICK_CUTOFF = 0.01
 
     # between Knuth algorithm and Gaussian approx.
@@ -246,6 +252,11 @@ class SpikeSourcePoissonMachineVertex(
         return cast('SpikeSourcePoissonVertex', self.app_vertex)
 
     def set_sdram_partition(self, sdram_partition: AbstractSDRAMPartition):
+        """
+        Sets the SDRAM partition
+
+        :param AbstractSDRAMPartition sdram_partition:
+        """
         self.__sdram_partition = sdram_partition
 
     @property
@@ -256,7 +267,7 @@ class SpikeSourcePoissonMachineVertex(
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
     def _provenance_region_id(self) -> int:
-        return self.POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION
+        return self._PoissonSpikeSourceRegions.PROVENANCE_REGION
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
@@ -272,12 +283,12 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
     def get_recording_region_base_address(self, placement: Placement) -> int:
         return locate_memory_region_for_placement(
-            placement, self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION)
+            placement, self._PoissonSpikeSourceRegions.SPIKE_HISTORY_REGION)
 
     @overrides(AbstractHasProfileData.get_profile_data)
     def get_profile_data(self, placement: Placement) -> ProfileData:
         return profile_utils.get_profiling_data(
-            self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION,
+            self._PoissonSpikeSourceRegions.PROFILER_REGION,
             self.PROFILE_TAG_LABELS, placement)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
@@ -290,10 +301,14 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(AbstractMaxSpikes.max_spikes_per_second)
     def max_spikes_per_second(self) -> float:
+        # pylint: disable=missing-function-docstring
+        # TODO https://github.com/SpiNNakerManchester/sPyNNaker/issues/1435
         return self._pop_vertex.max_rate
 
     @overrides(AbstractMaxSpikes.max_spikes_per_ts)
     def max_spikes_per_ts(self) -> float:
+        # pylint: disable=missing-function-docstring
+        # TODO https://github.com/SpiNNakerManchester/sPyNNaker/issues/1435
         return self._pop_vertex.max_spikes_per_ts()
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
@@ -330,27 +345,27 @@ class SpikeSourcePoissonMachineVertex(
 
         # write setup data
         spec.reserve_memory_region(
-            region=self.POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION,
+            region=self._PoissonSpikeSourceRegions.SYSTEM_REGION,
             size=SIMULATION_N_BYTES, label='setup')
         spec.switch_write_focus(
-            self.POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION)
+            self._PoissonSpikeSourceRegions.SYSTEM_REGION)
         spec.write_array(simulation_utilities.get_simulation_header_array(
             self.get_binary_file_name()))
 
         # write recording data
         spec.reserve_memory_region(
-            region=self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION,
+            region=self._PoissonSpikeSourceRegions.SPIKE_HISTORY_REGION,
             size=recording_utilities.get_recording_header_size(1),
             label="Recording")
         spec.switch_write_focus(
-            self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION)
+            self._PoissonSpikeSourceRegions.SPIKE_HISTORY_REGION)
         sdram = self._pop_vertex.get_recording_sdram_usage(self.vertex_slice)
         recorded_region_sizes = [sdram.get_total_sdram(
             SpynnakerDataView.get_max_run_time_steps())]
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes))
 
-        # Write provenence space
+        # Write provenance space
         self.reserve_provenance_data_region(spec)
 
         # write parameters
@@ -361,19 +376,19 @@ class SpikeSourcePoissonMachineVertex(
 
         # write profile data
         profile_utils.reserve_profile_region(
-            spec, self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION,
+            spec, self._PoissonSpikeSourceRegions.PROFILER_REGION,
             self._pop_vertex.n_profile_samples)
         profile_utils.write_profile_region_data(
-            spec, self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION,
+            spec, self._PoissonSpikeSourceRegions.PROFILER_REGION,
             self._pop_vertex.n_profile_samples)
 
         # write SDRAM edge parameters
         spec.reserve_memory_region(
-            region=self.POISSON_SPIKE_SOURCE_REGIONS.SDRAM_EDGE_PARAMS,
+            region=self._PoissonSpikeSourceRegions.SDRAM_EDGE_PARAMS,
             label="sdram edge params",
             size=get_sdram_edge_params_bytes(self.vertex_slice))
         spec.switch_write_focus(
-            self.POISSON_SPIKE_SOURCE_REGIONS.SDRAM_EDGE_PARAMS)
+            self._PoissonSpikeSourceRegions.SDRAM_EDGE_PARAMS)
         if self.__sdram_partition is None:
             spec.write_array([0, 0, 0])
         else:
@@ -423,7 +438,7 @@ class SpikeSourcePoissonMachineVertex(
         n_atoms = self.vertex_slice.n_atoms
         n_rates = n_atoms * self._pop_vertex.max_n_rates
         spec.reserve_memory_region(
-            region=self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION,
+            region=self._PoissonSpikeSourceRegions.RATES_REGION,
             size=get_rates_bytes(n_atoms, n_rates), label='PoissonRates')
 
         # List starts with n_items, so start with 0.  Use arrays to allow
@@ -447,10 +462,10 @@ class SpikeSourcePoissonMachineVertex(
         data_items[1] = [n_items]
         data_to_write = numpy.concatenate(data_items)
         spec.reserve_memory_region(
-            region=self.POISSON_SPIKE_SOURCE_REGIONS.EXPANDER_REGION,
+            region=self._PoissonSpikeSourceRegions.EXPANDER_REGION,
             size=get_expander_rates_bytes(n_atoms, n_rates), label='Expander')
         spec.switch_write_focus(
-            self.POISSON_SPIKE_SOURCE_REGIONS.EXPANDER_REGION)
+            self._PoissonSpikeSourceRegions.EXPANDER_REGION)
         spec.write_array(data_to_write)
 
         self.__rate_changed = False
@@ -467,11 +482,11 @@ class SpikeSourcePoissonMachineVertex(
             "Poisson sources:\n")
 
         spec.reserve_memory_region(
-            region=self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION,
+            region=self._PoissonSpikeSourceRegions.POISSON_PARAMS_REGION,
             size=get_params_bytes(self.vertex_slice.n_atoms),
             label="PoissonParams")
         spec.switch_write_focus(
-            self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION)
+            self._PoissonSpikeSourceRegions.POISSON_PARAMS_REGION)
 
         # Write Key info for this core:
         routing_info = SpynnakerDataView.get_routing_infos()
@@ -506,11 +521,11 @@ class SpikeSourcePoissonMachineVertex(
             data=SpynnakerDataView.get_simulation_time_step_per_ms(),
             data_type=DataType.U1616)
 
-        # Write the slow-rate-per-tick-cutoff (accum)
+        # Write the slow rate per tick cut-off (accum)
         spec.write_value(
             data=self.SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
 
-        # Write the fast-rate-per-tick-cutoff (accum)
+        # Write the fast rate per tick cut-off (accum)
         spec.write_value(
             data=self.FAST_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
 
@@ -532,13 +547,21 @@ class SpikeSourcePoissonMachineVertex(
         spec.write_array(keys)
 
     def set_rate_changed(self) -> None:
+        """
+        Records that the rates have changed.
+        """
         self.__rate_changed = True
 
     def __poisson_rate_region_address(self, placement: Placement) -> int:
         return helpful_functions.locate_memory_region_for_placement(
-            placement, self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION)
+            placement, self._PoissonSpikeSourceRegions.RATES_REGION)
 
     def read_parameters_from_machine(self, placement: Placement):
+        """
+        Reads the poisson rates of the machine if they could have changed.
+
+        :param Placement placement:
+        """
         # It is only worth updating the rates when there is a control edge
         # that can change them
         if self._pop_vertex.incoming_control_edge is not None:

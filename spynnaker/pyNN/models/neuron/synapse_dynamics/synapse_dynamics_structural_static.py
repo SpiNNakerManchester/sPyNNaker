@@ -12,16 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-import numpy
-from pyNN.standardmodels.synapses import StaticSynapse
 from typing import (
     Any, Dict, Iterable, Optional, Tuple, TYPE_CHECKING, Sequence, Union)
+
+import numpy
+
+from pyNN.standardmodels.synapses import StaticSynapse
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
+
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.types import Weight_Types
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
+
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .synapse_dynamics_structural_common import (
@@ -32,8 +39,8 @@ from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
+
 if TYPE_CHECKING:
     from pacman.model.graphs import AbstractVertex
     from pacman.model.graphs.machine import MachineVertex
@@ -322,7 +329,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
             self, app_vertex: Union[None, ApplicationVertex, Slice] = None
             ) -> Sequence[int]:
         if app_vertex:
-            if app_vertex not in self.__seeds.keys():
+            if app_vertex not in self.__seeds:
                 self.__seeds[app_vertex] = (
                     create_mars_kiss_seeds(self.__rng))
             return self.__seeds[app_vertex]

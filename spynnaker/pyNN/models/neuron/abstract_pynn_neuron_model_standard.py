@@ -13,10 +13,12 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import Any, Dict, Optional, cast, TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 from .abstract_pynn_neuron_model import (
     AbstractPyNNNeuronModel, _population_parameters as APNM_default_params)
-from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.additional_inputs import (
         AbstractAdditionalInput)
@@ -52,7 +54,7 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
         :param str model_name: Name of the model.
         :param str binary: Name of the implementation executable.
         :param NeuronModel neuron_model:
-            The model of the neuron soma
+            The model of the neuron body
         :param AbstractInputType input_type: The model of synaptic input types
         :param AbstractSynapseType synapse_type:
             The model of the synapses' dynamics

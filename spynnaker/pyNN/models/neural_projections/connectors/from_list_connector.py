@@ -14,26 +14,32 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
+import logging
+from typing import (
+    Dict, List, Optional, Sequence, Tuple, Union, cast, TYPE_CHECKING)
+
 import numpy
 from numpy import floating, integer, int64, uint32
 from numpy.typing import NDArray
-from typing import (
-    Dict, List, Optional, Sequence, Tuple, Union, cast, TYPE_CHECKING)
 from typing_extensions import TypeGuard
-import logging
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.types import Delay_Types, Weight_Delay_Types, Weight_Types
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
@@ -187,7 +193,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             return sources, targets, weights, delays
 
         # If there are no connections, return
-        if not len(self.__conn_list):
+        if len(self.__conn_list) == 0:
             self.__split_conn_list = {}
             return sources, targets, weights, delays
 
@@ -195,7 +201,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         m_vertex_mapping = self.__id_to_m_vertex_index(
             n_post_atoms, post_slices)
 
-        # Get which index of the fromlist is on which vertex
+        # Get which index of the from list is on which vertex
         target_vertices = m_vertex_mapping[self.__targets[input_filter]]
 
         # Get how many on each vertex there are
@@ -281,7 +287,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(
             self, synapse_info: SynapseInformation) -> int:
-        if not len(self.__targets):
+        if len(self.__targets) == 0:
             return 0
         return int(numpy.max(numpy.bincount(
             self.__targets.astype(int64, copy=False))))
@@ -374,7 +380,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @conn_list.setter
     def conn_list(self, conn_list: Union[
             None, NDArray, List[Tuple[int, ...]]]):
-        if conn_list is None or not len(conn_list):
+        if conn_list is None or len(conn_list) == 0:
             self.__conn_list = numpy.zeros((0, 2), dtype=uint32)
         else:
             self.__conn_list = numpy.array(conn_list)
@@ -442,6 +448,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         # Check any additional parameters have single values over the whole
         # set of connections (as other things aren't currently supported)
         for i in extra_columns:
+            # pylint: disable=wrong-spelling-in-comment
             # numpy.ptp gives the difference between the maximum and
             # minimum values of an array, so if 0, all values are equal
             if numpy.ptp(self.__conn_list[:, i]):

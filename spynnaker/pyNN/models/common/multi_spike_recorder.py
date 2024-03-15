@@ -23,6 +23,9 @@ _TWO_WORDS = struct.Struct("<II")
 
 
 class MultiSpikeRecorder(object):
+    """
+    Support for recording more than one spike per timestep.
+    """
     __slots__ = ("__record", )
 
     def __init__(self) -> None:

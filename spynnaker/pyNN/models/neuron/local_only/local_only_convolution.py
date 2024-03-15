@@ -12,18 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-import numpy
 from math import ceil
-from numpy import floating, uint32
-from numpy.typing import NDArray
 from typing import (
     Dict, Iterable, List, cast, TYPE_CHECKING)
+
+import numpy
+from numpy import floating, uint32
+from numpy.typing import NDArray
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import ApplicationVertex
+
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationGenerator)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_SHORT, BYTES_PER_WORD)
+
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     ConvolutionConnector, AbstractConnector)
@@ -36,6 +41,7 @@ from spynnaker.pyNN.models.common.local_only_2d_common import (
     BITS_PER_SHORT, N_COLOUR_BITS_BITS, KEY_INFO_SIZE,
     get_first_and_last_slice, Source)
 from .abstract_local_only import AbstractLocalOnly
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
         AbstractPopulationVertex)
@@ -293,7 +299,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, incoming_projection: Projection) -> float:
         conn = self.__connector(incoming_projection)
         # We know the connector doesn't care about the argument
-        max_weight = numpy.amax(conn.kernel_weights)
+        # conn.kernel_weights known to be an array of floats
+        max_weight = cast(float, numpy.amax(conn.kernel_weights))
         return max_weight if max_weight > 0 else 0
 
     @overrides(AbstractSupportsSignedWeights.get_minimum_negative_weight)
@@ -301,7 +308,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, incoming_projection: Projection) -> float:
         conn = self.__connector(incoming_projection)
         # This is different because the connector happens to support this
-        min_weight = numpy.amin(conn.kernel_weights)
+        # conn.kernel_weights known to be an array of floats
+        min_weight = cast(float, numpy.amin(conn.kernel_weights))
         return min_weight if min_weight < 0 else 0
 
     @overrides(AbstractSupportsSignedWeights.get_mean_positive_weight)
@@ -309,7 +317,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, incoming_projection: Projection) -> float:
         conn = self.__connector(incoming_projection)
         pos_weights = conn.kernel_weights[conn.kernel_weights > 0]
-        if not len(pos_weights):
+        if len(pos_weights) == 0:
             return 0
         return numpy.mean(pos_weights)
 
@@ -318,7 +326,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, incoming_projection: Projection) -> float:
         conn = self.__connector(incoming_projection)
         neg_weights = conn.kernel_weights[conn.kernel_weights < 0]
-        if not len(neg_weights):
+        if len(neg_weights) == 0:
             return 0
         return numpy.mean(neg_weights)
 
@@ -327,7 +335,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, incoming_projection: Projection) -> float:
         conn = self.__connector(incoming_projection)
         pos_weights = conn.kernel_weights[conn.kernel_weights > 0]
-        if not len(pos_weights):
+        if len(pos_weights) == 0:
             return 0
         return numpy.var(pos_weights)
 
@@ -336,6 +344,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, incoming_projection: Projection) -> float:
         conn = self.__connector(incoming_projection)
         neg_weights = conn.kernel_weights[conn.kernel_weights < 0]
-        if not len(neg_weights):
+        if len(neg_weights) == 0:
             return 0
         return numpy.var(neg_weights)

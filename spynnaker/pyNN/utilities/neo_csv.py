@@ -16,15 +16,19 @@ from collections import defaultdict
 import csv
 from datetime import datetime
 import logging
+from typing import (
+    Any, Dict, Iterable, List, Optional, Tuple, Union, TYPE_CHECKING)
+
 from neo import AnalogSignal, Block, Event, Segment, SpikeTrain
 import numpy
 from numpy import integer, float64
 from numpy.typing import NDArray
 from quantities import Quantity, ms
-from typing import (
-    Any, Dict, Iterable, List, Optional, Tuple, Union, TYPE_CHECKING)
+
 from spinn_utilities.log import FormatAdapter
+
 from spynnaker.pyNN.data import SpynnakerDataView
+
 if TYPE_CHECKING:
     from _csv import _writer as CSVWriter, _reader as CSVReader
     from spynnaker.pyNN.utilities.neo_buffer_database import Annotations
@@ -33,6 +37,10 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class NeoCsv(object):
+    """
+    Code to read a csv file and create a neo object.
+
+    """
     # pylint: disable=c-extension-no-member, no-member
 
     _POPULATION = "population"
@@ -360,7 +368,7 @@ class NeoCsv(object):
     def _insert_neo_rewirings(
             self, segment: Segment, event_array: NDArray, variable: str):
         """
-        Adds data that represent rewirings events to a neo segment.
+        Adds data that represent rewire events to a neo segment.
 
         :param ~neo.core.Segment segment: Segment to add data to
         :param ~numpy.ndarray event_array: the raw "event" data
@@ -371,11 +379,11 @@ class NeoCsv(object):
         elimination_times: List[Quantity] = []
         elimination_labels: List[str] = []
 
-        for i in range(len(event_array)):
-            event_time = event_array[i][0] * ms
-            pre_id = int(event_array[i][1])
-            post_id = int(event_array[i][2])
-            if event_array[i][3] == 1:
+        for event in event_array:
+            event_time = event[0] * ms
+            pre_id = int(event[1])
+            post_id = int(event[2])
+            if event[3] == 1:
                 formation_times.append(event_time)
                 formation_labels.append(f"{pre_id}_{post_id}_formation")
             else:
@@ -389,7 +397,7 @@ class NeoCsv(object):
 
     def _csv_rewirings(self, csv_writer: CSVWriter, event_array: NDArray):
         """
-        Adds data that represent rewirings events to a CSV file.
+        Adds data that represent rewires events to a CSV file.
 
         :param ~csv.writer csv_writer: Open CSV writer to write to
         :param ~numpy.ndarray event_array: the raw "event" data
@@ -397,11 +405,11 @@ class NeoCsv(object):
         formation: List[Tuple[Quantity, str]] = []
         elimination: List[Tuple[Quantity, str]] = []
 
-        for i in range(len(event_array)):
-            event_time = event_array[i][0] * ms
-            pre_id = int(event_array[i][1])
-            post_id = int(event_array[i][2])
-            if event_array[i][3] == 1:
+        for event in event_array:
+            event_time = event[0] * ms
+            pre_id = int(event[1])
+            post_id = int(event[2])
+            if event[3] == 1:
                 formation.append(
                     (event_time, f"{pre_id}_{post_id}_formation"))
             else:

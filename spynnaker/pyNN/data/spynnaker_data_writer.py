@@ -115,6 +115,9 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
         self.__spy_data._min_delay = min_delay
 
     def shut_down(self) -> None:
+        """
+        Records that shutdown has been called and clears neuron type limits.
+        """
         FecDataWriter.shut_down(self)
         # Clears all previously added ceiling on the number of neurons per core
         for neuron_type in self.__spy_data._neurons_per_core_set:

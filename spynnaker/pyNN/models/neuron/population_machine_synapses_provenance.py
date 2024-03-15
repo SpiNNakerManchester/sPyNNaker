@@ -37,7 +37,7 @@ class SynapseProvenance(ctypes.LittleEndianStructure):
         ("n_filtered_by_bitfield", ctypes.c_uint32),
         # The number of synapses skipped due to late spikes
         ("n_skipped_synapses", ctypes.c_uint32),
-        # The number of spikes detecte as late
+        # The number of spikes detected as late
         ("n_late_spikes", ctypes.c_uint32),
         # The maximum lateness of a spike
         ("max_late_spike", ctypes.c_uint32)

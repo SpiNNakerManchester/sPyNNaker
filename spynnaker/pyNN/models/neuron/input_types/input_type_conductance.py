@@ -13,11 +13,14 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.interface.ds import DataType
-from spynnaker.pyNN.models.neuron.implementations import ModelParameter
-from .abstract_input_type import AbstractInputType
-from spynnaker.pyNN.utilities.struct import Struct
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
+
+from spinn_front_end_common.interface.ds import DataType
+
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
+from spynnaker.pyNN.utilities.struct import Struct
+
+from .abstract_input_type import AbstractInputType
 
 E_REV_E = "e_rev_E"
 E_REV_I = "e_rev_I"
@@ -46,6 +49,7 @@ class InputTypeConductance(AbstractInputType):
             [Struct([(DataType.S1615, E_REV_E),
                      (DataType.S1615, E_REV_I)])],
             {E_REV_E: "mV", E_REV_I: "mV"})
+        # pylint: disable=invalid-name
         self.__e_rev_E = e_rev_E
         self.__e_rev_I = e_rev_I
 
@@ -64,6 +68,7 @@ class InputTypeConductance(AbstractInputType):
 
     @property
     def e_rev_E(self) -> ModelParameter:
+        # pylint: disable=invalid-name
         """
         :math:`E_{{rev}_e}`
         """
@@ -71,6 +76,7 @@ class InputTypeConductance(AbstractInputType):
 
     @property
     def e_rev_I(self) -> ModelParameter:
+        # pylint: disable=invalid-name
         """
         :math:`E_{{rev}_i}`
         """

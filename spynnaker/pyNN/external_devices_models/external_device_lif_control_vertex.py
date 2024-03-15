@@ -71,14 +71,14 @@ class ExternalDeviceLifControlVertex(
             The AbstractMulticastControllableDevice instances to be controlled
             by the population
         :param bool create_edges:
-            True if edges to the devices should be added by this dev (set
-            to False if using the dev over Ethernet using a translator)
+            True if edges to the devices should be added by this device (set
+            to False if using the device over Ethernet using a translator)
         :param tuple(int, ...) max_atoms_per_core:
         :param AbstractNeuronImpl neuron_impl:
         :param AbstractPyNNNeuronModel pynn_model:
         :param translator:
             Translator to be used when used for Ethernet communication.  Must
-            be provided if the dev is to be controlled over Ethernet.
+            be provided if the device is to be controlled over Ethernet.
         :type translator: AbstractEthernetTranslator or None
         :param float spikes_per_second:
         :param str label:

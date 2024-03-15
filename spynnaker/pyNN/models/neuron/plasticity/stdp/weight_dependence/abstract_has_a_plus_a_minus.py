@@ -44,10 +44,12 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
 
         :rtype: float
         """
+        # pylint: disable=invalid-name
         return self.__a_plus
 
     @A_plus.setter
     def A_plus(self, new_value: float):
+        # pylint: disable=invalid-name
         self.__a_plus = new_value
 
     @property
@@ -57,8 +59,10 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
 
         :rtype: float
         """
+        # pylint: disable=invalid-name
         return self.__a_minus
 
     @A_minus.setter
     def A_minus(self, new_value: float):
+        # pylint: disable=invalid-name
         self.__a_minus = new_value

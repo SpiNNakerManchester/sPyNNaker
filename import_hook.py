@@ -12,21 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
-    AbstractSynapseStructure)
+"""
+This file is imported by init-hook in the rcfile
+https://github.com/SpiNNakerManchester/SupportScripts/blob/master/actions/pylint/strict_rcfile
 
+It allows you to temporarily add the other spinnaker repositories without making them part of the permemnant python path
 
-class SynapseStructureWeightAccumulator(AbstractSynapseStructure):
-    """
-    Structured synapse with accumulated weight
-    """
-    __slots__ = ()
-
-    @overrides(AbstractSynapseStructure.get_n_half_words_per_connection)
-    def get_n_half_words_per_connection(self) -> int:
-        return 2
-
-    @overrides(AbstractSynapseStructure.get_weight_half_word)
-    def get_weight_half_word(self) -> int:
-        return 0
+Intended for use when running pylint.bash
+"""
+import sys
+sys.path.append("../SpiNNUtils")
+sys.path.append("../SpiNNMachine")
+sys.path.append("../SpiNNMan")
+sys.path.append("../PACMAN")
+sys.path.append("../spalloc")
+sys.path.append("../SpiNNFrontEndCommon")

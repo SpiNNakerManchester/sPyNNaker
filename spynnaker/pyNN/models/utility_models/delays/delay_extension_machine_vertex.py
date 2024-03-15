@@ -16,19 +16,25 @@ from __future__ import annotations
 from enum import IntEnum
 from typing import Sequence, TYPE_CHECKING
 
-from spinnman.model.enums import ExecutableType
-from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 from spinn_utilities.overrides import overrides
+
+from spinnman.model.enums import ExecutableType
+
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.resources import AbstractSDRAM
-from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
+
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
+from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
 from .delay_extension_vertex import DelayExtensionVertex
+
 if TYPE_CHECKING:
     from pacman.model.placements import Placement
     from spinn_front_end_common.interface.ds import DataSpecificationGenerator
@@ -46,7 +52,7 @@ class DelayExtensionMachineVertex(
         "__sdram",
         "__drop_late_spikes")
 
-    class _DELAY_EXTENSION_REGIONS(IntEnum):
+    class _DelayExtensionRegions(IntEnum):
         """
         Region indices.
         """
@@ -55,7 +61,7 @@ class DelayExtensionMachineVertex(
         PROVENANCE_REGION = 2
         TDMA_REGION = 3
 
-    class EXTRA_PROVENANCE_DATA_ENTRIES(IntEnum):
+    class _ExtraProvenanceDataEntries(IntEnum):
         """
         Indices into raw provenance data about delay extension vertices.
         """
@@ -84,7 +90,7 @@ class DelayExtensionMachineVertex(
         #: The number of times the background queue overflowed
         N_BACKGROUND_OVERLOADS = 11
 
-    N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
+    N_EXTRA_PROVENANCE_DATA_ENTRIES = len(_ExtraProvenanceDataEntries)
 
     COUNT_SATURATION_NAME = "saturation_count"
     INVALID_NEURON_ID_COUNT_NAME = "invalid_neuron_count"
@@ -125,7 +131,7 @@ class DelayExtensionMachineVertex(
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
     def _provenance_region_id(self) -> int:
-        return self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION
+        return self._DelayExtensionRegions.PROVENANCE_REGION
 
     @property
     @overrides(
@@ -274,11 +280,11 @@ class DelayExtensionMachineVertex(
         delay_params_sz = self.app_vertex.delay_params_size()
 
         spec.reserve_memory_region(
-            region=self._DELAY_EXTENSION_REGIONS.SYSTEM,
+            region=self._DelayExtensionRegions.SYSTEM,
             size=SIMULATION_N_BYTES, label='setup')
 
         spec.reserve_memory_region(
-            region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS,
+            region=self._DelayExtensionRegions.DELAY_PARAMS,
             size=delay_params_sz, label='delay_params')
 
         # reserve region for provenance
@@ -316,7 +322,7 @@ class DelayExtensionMachineVertex(
         :param str binary_name: the binary name
         """
         # Write this to the system region (to be picked up by the simulation):
-        spec.switch_write_focus(self._DELAY_EXTENSION_REGIONS.SYSTEM)
+        spec.switch_write_focus(self._DelayExtensionRegions.SYSTEM)
         spec.write_array(simulation_utilities.get_simulation_header_array(
             binary_name))
 
@@ -338,7 +344,7 @@ class DelayExtensionMachineVertex(
             f"Writing Delay Parameters for {vertex_slice.n_atoms} Neurons:\n")
 
         # Set the focus to the memory region 2 (delay parameters):
-        spec.switch_write_focus(self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS)
+        spec.switch_write_focus(self._DelayExtensionRegions.DELAY_PARAMS)
 
         # Write header info to the memory region:
         # Write Key info for this core and the incoming key and mask:
