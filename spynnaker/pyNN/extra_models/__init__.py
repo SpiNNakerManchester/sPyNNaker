@@ -31,7 +31,6 @@ from spynnaker.pyNN.models.neuron.builds import (
     IFCurrExpSEMDBase as IF_curr_exp_sEMD,
     IFCurrDeltaCa2Adaptive, StocExp, StocExpStable,  StocSigma, IFTruncDelta,
     IFCurrDeltaFixedProb)
-from spynnaker.pyNN.models.utility_models.tsp_eval import TSPEvalVertex
 
 # Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
@@ -58,5 +57,5 @@ __all__ = [
     'StocExp', 'StocExpStable', 'StocSigma', 'IFCurrDeltaFixedProb',
 
     # Special
-    'IFTruncDelta', 'TSPEvalVertex'
+    'IFTruncDelta'
     ]
