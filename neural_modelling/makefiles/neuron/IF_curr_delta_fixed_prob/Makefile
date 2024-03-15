@@ -12,15 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .abstract_standard_neuron_component import (
-    AbstractStandardNeuronComponent, ModelParameter)
-from .abstract_neuron_impl import AbstractNeuronImpl
-from .neuron_impl_standard import NeuronImplStandard
-from .neuron_impl_stoc_exp import NeuronImplStocExp
-from .neuron_impl_stoc_exp_stable import NeuronImplStocExpStable
-from .neuron_impl_stoc_sigma import NeuronImplStocSigma
+APP = $(notdir $(CURDIR))
 
-__all__ = [
-    "AbstractNeuronImpl", "AbstractStandardNeuronComponent",
-    "ModelParameter", "NeuronImplStandard", "NeuronImplStocExp",
-    "NeuronImplStocExpStable", "NeuronImplStocSigma"]
+NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.h
+INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_delta.h
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard.h
+THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_fixed_prob.h
+SYNAPSE_TYPE_H = $(NEURON_DIR)/neuron/synapse_types/synapse_types_delta_impl.h
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
+
+include ../neural_build.mk

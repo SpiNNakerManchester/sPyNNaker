@@ -29,7 +29,8 @@ from spynnaker.pyNN.models.neuron.builds import (
     IzkCondExpBase as Izhikevich_cond,
     IzkCondDualExpBase as Izhikevich_cond_dual,
     IFCurrExpSEMDBase as IF_curr_exp_sEMD,
-    IFCurrDeltaCa2Adaptive)
+    IFCurrDeltaCa2Adaptive, StocExp, StocExpStable,  StocSigma, IFTruncDelta,
+    IFCurrDeltaFixedProb)
 
 # Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
@@ -50,4 +51,11 @@ __all__ = [
     'RecurrentRule', 'Vogels2011Rule',
 
     # Variable rate Poisson
-    'SpikeSourcePoissonVariable']
+    'SpikeSourcePoissonVariable',
+
+    # Stochastic
+    'StocExp', 'StocExpStable', 'StocSigma', 'IFCurrDeltaFixedProb',
+
+    # Special
+    'IFTruncDelta'
+    ]

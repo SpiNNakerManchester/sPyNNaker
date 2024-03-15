@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .neuron_model import NeuronModel
-from .neuron_model_izh import NeuronModelIzh
-from .neuron_model_leaky_integrate_and_fire import (
-    NeuronModelLeakyIntegrateAndFire)
-from .neuron_model_if_trunc import NeuronModelIFTrunc
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
+from spynnaker.pyNN.models.defaults import default_parameters
+from spynnaker.pyNN.models.neuron.implementations import NeuronImplStocExp
 
-__all__ = [
-    "NeuronModel",
-    "NeuronModelIzh",
-    "NeuronModelLeakyIntegrateAndFire",
-    "NeuronModelIFTrunc"]
+
+class StocExp(AbstractPyNNNeuronModel):
+    """ Stochastic neuron model exponential threshold and instantaneous
+        synapses, and voltage which is reset each time step.
+    """
+
+    @default_parameters({"tau", "bias"})
+    def __init__(self, tau=10, bias=0, refract_init=0, seed=None):
+        super().__init__(NeuronImplStocExp(tau, bias, refract_init, seed))
