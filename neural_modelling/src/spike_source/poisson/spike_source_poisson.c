@@ -60,7 +60,7 @@ typedef struct spike_source_t {
     //! exp(-&lambda;)
     UFRACT exp_minus_lambda;
     //! sqrt(&lambda;)
-    REAL sqrt_lambda;
+    UREAL sqrt_lambda;
     //! Mean interspike interval, in ticks
     uint32_t mean_isi_ticks;
     //! Planned time to spike, in ticks
@@ -127,9 +127,9 @@ typedef struct global_parameters {
     //! The number of ticks per millisecond for setting the start and duration
     UREAL ticks_per_ms;
     //! The border rate between slow and fast sources
-    REAL slow_rate_per_tick_cutoff;
+    UREAL slow_rate_per_tick_cutoff;
     //! The border rate between fast and faster sources
-    REAL fast_rate_per_tick_cutoff;
+    UREAL fast_rate_per_tick_cutoff;
     //! The ID of the first source relative to the population as a whole
     uint32_t first_source_id;
     //! The number of sources in this sub-population
@@ -360,11 +360,11 @@ static inline uint32_t faster_spike_source_get_num_spikes(
 //! \param[in] id: the ID of the source to be updated
 //! \param[in] rate:
 //!     the rate in Hz, to be multiplied to get per-tick values
-void set_spike_source_rate(uint32_t sub_id, unsigned long accum rate) {
+void set_spike_source_rate(uint32_t sub_id, UREAL rate) {
 
-    REAL rate_per_tick = kbits(
-            (__U64(bitsk(rate)) * __U64(bitsulr(ssp_params.seconds_per_tick))) >> 32);
-    log_debug("Setting rate of %u to %kHz (%k per tick)",
+    UREAL rate_per_tick = ukbits(
+            (__U64(bitsuk(rate)) * __U64(bitsulr(ssp_params.seconds_per_tick))) >> 32);
+    log_info("Setting rate of %u to %KHz (%K per tick)",
             sub_id, rate, rate_per_tick);
     spike_source_t *spike_source = &source[sub_id];
 
@@ -373,22 +373,26 @@ void set_spike_source_rate(uint32_t sub_id, unsigned long accum rate) {
         spike_source->mean_isi_ticks = 0;
         spike_source->time_to_spike_ticks = 0;
         if (rate_per_tick >= ssp_params.fast_rate_per_tick_cutoff) {
-            spike_source->sqrt_lambda = SQRT(rate_per_tick);
+            spike_source->sqrt_lambda = (UREAL) SQRT(rate_per_tick);
             spike_source->exp_minus_lambda = UFRACT_CONST(0);
+            log_info("    fast, sqrt_lambda=%K", spike_source->sqrt_lambda);
         } else {
             spike_source->exp_minus_lambda = (UFRACT) EXP(-rate_per_tick);
-            spike_source->sqrt_lambda = ZERO;
+            spike_source->sqrt_lambda = 0.0K;
+            log_info("    fast, exp_minus_lambda=%K", (UREAL) spike_source->exp_minus_lambda);
         }
     } else {
-        if (rate > 0) {
+        if (rate > 0.0K) {
             spike_source->mean_isi_ticks =
-                (uint32_t) ((bitsulk((unsigned long accum) ts_per_second)) / bitsulk(rate));
+                (uint32_t) ((bitsulk(ts_per_second)) / bitsuk(rate));
+            log_info("    slow, isi ticks = %u", spike_source->mean_isi_ticks);
         } else {
             spike_source->mean_isi_ticks = 0;
+            log_info("    slow, isi ticks = 0");
         }
 
         spike_source->exp_minus_lambda = UFRACT_CONST(0);
-        spike_source->sqrt_lambda = ZERO;
+        spike_source->sqrt_lambda = 0.0K;
         spike_source->is_fast_source = 0;
         spike_source->time_to_spike_ticks =
                 slow_spike_source_get_time_to_spike(spike_source->mean_isi_ticks);
@@ -467,8 +471,8 @@ static void print_spike_source(index_t s) {
     log_info("scaled end = %u", p->end_ticks);
     log_info("scaled next = %u", p->next_ticks);
     log_info("is_fast_source = %d", p->is_fast_source);
-    log_info("exp_minus_lambda = %k", (REAL) p->exp_minus_lambda);
-    log_info("sqrt_lambda = %k", p->sqrt_lambda);
+    log_info("exp_minus_lambda = %K", (UREAL) p->exp_minus_lambda);
+    log_info("sqrt_lambda = %K", p->sqrt_lambda);
     log_info("isi_val = %u", p->mean_isi_ticks);
     log_info("time_to_spike = %u", p->time_to_spike_ticks);
 }

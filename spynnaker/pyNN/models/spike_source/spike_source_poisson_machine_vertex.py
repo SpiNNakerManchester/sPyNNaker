@@ -523,11 +523,11 @@ class SpikeSourcePoissonMachineVertex(
 
         # Write the slow rate per tick cut-off (accum)
         spec.write_value(
-            data=self.SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
+            data=self.SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.U1616)
 
         # Write the fast rate per tick cut-off (accum)
         spec.write_value(
-            data=self.FAST_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
+            data=self.FAST_RATE_PER_TICK_CUTOFF, data_type=DataType.U1616)
 
         # Write the lo_atom ID
         spec.write_value(data=self.vertex_slice.lo_atom)
