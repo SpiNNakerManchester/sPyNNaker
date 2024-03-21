@@ -364,7 +364,7 @@ void set_spike_source_rate(uint32_t sub_id, UREAL rate) {
 
     UREAL rate_per_tick = ukbits(
             (__U64(bitsuk(rate)) * __U64(bitsulr(ssp_params.seconds_per_tick))) >> 32);
-    log_info("Setting rate of %u to %KHz (%K per tick)",
+    log_debug("Setting rate of %u to %KHz (%K per tick)",
             sub_id, rate, rate_per_tick);
     spike_source_t *spike_source = &source[sub_id];
 
@@ -373,22 +373,22 @@ void set_spike_source_rate(uint32_t sub_id, UREAL rate) {
         spike_source->mean_isi_ticks = 0;
         spike_source->time_to_spike_ticks = 0;
         if (rate_per_tick >= ssp_params.fast_rate_per_tick_cutoff) {
-            spike_source->sqrt_lambda = (UREAL) SQRT(rate_per_tick);
+            spike_source->sqrt_lambda = SQRTU(rate_per_tick);
             spike_source->exp_minus_lambda = UFRACT_CONST(0);
-            log_info("    fast, sqrt_lambda=%K", spike_source->sqrt_lambda);
+            log_debug("    fast, sqrt_lambda=%K", spike_source->sqrt_lambda);
         } else {
-            spike_source->exp_minus_lambda = (UFRACT) EXP(-rate_per_tick);
+            spike_source->exp_minus_lambda = EXPU(rate_per_tick * -1.0k);
             spike_source->sqrt_lambda = 0.0K;
-            log_info("    fast, exp_minus_lambda=%K", (UREAL) spike_source->exp_minus_lambda);
+            log_debug("    fast, exp_minus_lambda=%K", (UREAL) spike_source->exp_minus_lambda);
         }
     } else {
         if (rate > 0.0K) {
             spike_source->mean_isi_ticks =
-                (uint32_t) ((bitsulk(ts_per_second)) / bitsuk(rate));
-            log_info("    slow, isi ticks = %u", spike_source->mean_isi_ticks);
+                (uint32_t) ((bitsuk(ts_per_second)) / bitsuk(rate));
+            log_debug("    slow, isi ticks = %u", spike_source->mean_isi_ticks);
         } else {
             spike_source->mean_isi_ticks = 0;
-            log_info("    slow, isi ticks = 0");
+            log_debug("    slow, isi ticks = 0");
         }
 
         spike_source->exp_minus_lambda = UFRACT_CONST(0);
