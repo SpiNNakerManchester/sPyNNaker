@@ -21,7 +21,7 @@ import pytest
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version import ANY_VERSION, FOUR_PLUS_CHIPS
+from spinn_machine.version.version_strings import VersionStrings
 from spinnman.transceiver.mockable_transceiver import MockableTransceiver
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
@@ -104,7 +104,7 @@ def say_false(self, *args, **kwargs):
 
 def test_write_data_spec():
     unittest_setup()
-    set_config("Machine", "version", ANY_VERSION)
+    set_config("Machine", "versions", VersionStrings.ANY.value)
     writer = SpynnakerDataWriter.mock()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
@@ -434,7 +434,7 @@ def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
         n_pre_neurons, neurons_per_core, max_delay):
     unittest_setup()
-    set_config("Machine", "version", FOUR_PLUS_CHIPS)
+    set_config("Machine", "versions", VersionStrings.FOUR_PLUS.value)
     writer = SpynnakerDataWriter.mock()
 
     # Build a from list connector with the delays we want
