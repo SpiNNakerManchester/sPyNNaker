@@ -22,7 +22,7 @@ from spinnaker_testbase import BaseTestCase
 
 def do_run():
     # Setup
-    p.setup(timestep=1.0)
+    p.setup(timestep=1.0, n_boards_required=3)
 
     src_1 = p.Population(
         None,
