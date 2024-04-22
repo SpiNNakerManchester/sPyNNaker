@@ -14,22 +14,29 @@
 
 from __future__ import annotations
 import math
+from typing import Optional, Sequence, TYPE_CHECKING
+
 import numpy
 from numpy import (
     arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
     hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
     minimum, e, pi, floating)
 from numpy.typing import NDArray
+
 from pyNN.random import NumpyRNG
-from typing import Optional, TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
+
 from pacman.model.graphs.common import Slice
+
 from spynnaker.pyNN.utilities.utility_calls import (
     get_probable_maximum_selected, get_probable_minimum_selected)
+
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
@@ -159,7 +166,7 @@ class DistanceDependentProbabilityConnector(
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
             min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None):
+            max_delay: Optional[float] = None) -> int:
         max_prob = numpy.amax(self._probs)
         n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
@@ -193,8 +200,8 @@ class DistanceDependentProbabilityConnector(
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice: Slice, synapse_type: int,
-            synapse_info: SynapseInformation) -> NDArray:
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
+            synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         probs = self._probs[:, post_vertex_slice.get_raster_ids()].reshape(-1)
         n_items = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
         items = self.__rng.next(n_items)

@@ -11,21 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Dict, Sequence, Tuple
+
+from typing import Dict, Iterable, Sequence, Tuple
+
 from spinn_utilities.overrides import overrides
+
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
-from pacman.model.resources import ConstantSDRAM
+from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
+from pacman.utilities.utility_objs.chip_counter import ChipCounter
+
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, BYTES_PER_WORD)
+
 from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionVertex, DelayExtensionMachineVertex)
-from pacman.utilities.utility_objs.chip_counter import ChipCounter
-from pacman.model.resources.abstract_sdram import AbstractSDRAM
 
 
 class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
@@ -136,7 +140,8 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
                 DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES))
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
-    def machine_vertices_for_recording(self, variable_to_record):
+    def machine_vertices_for_recording(
+            self, variable_to_record: str) -> Iterable[MachineVertex]:
         raise PacmanInvalidParameterException(
             variable_to_record, variable_to_record, self.DELAY_RECORDING_ERROR)
 

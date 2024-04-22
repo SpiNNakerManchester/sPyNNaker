@@ -44,11 +44,14 @@ SDRAM_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
 # Size of the Key config params = 1 work for key + 1 word for mask
 #  + 1 word for spike mask + 1 word for colour shift
-#  + 1 word for self connection boolean
+#  + 1 word for self connection Boolean
 KEY_CONFIG_SIZE = 5 * BYTES_PER_WORD
 
 
 class SpikeProcessingFastProvenance(ctypes.LittleEndianStructure):
+    """
+    Types of provenance and the DataType used to represent each.
+    """
     _fields_ = [
         # A count of the times that the synaptic input circular buffers
         # overflowed
@@ -57,7 +60,7 @@ class SpikeProcessingFastProvenance(ctypes.LittleEndianStructure):
         ("n_dmas_complete", ctypes.c_uint32),
         # The number of spikes successfully processed
         ("n_spikes_processed", ctypes.c_uint32),
-        # The number of rewirings performed.
+        # The number of rewires performed.
         ("n_rewires", ctypes.c_uint32),
         # The number of packets that were dropped due to being late
         ("n_late_packets", ctypes.c_uint32),

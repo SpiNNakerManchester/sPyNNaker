@@ -13,17 +13,23 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-from pyNN.space import BaseStructure
-import neo
 from typing import (
     Any, Dict, Optional, Sequence, Tuple, Union, final,
     TYPE_CHECKING)
+
+from pyNN.space import BaseStructure
+import neo
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
+
 from pacman.model.graphs.application import ApplicationVertex
+
 from spynnaker.pyNN.models.recorder import Recorder
+
 from .assembly import Assembly
+
 if TYPE_CHECKING:
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
     from spynnaker.pyNN.models.common.types import Names
@@ -173,7 +179,7 @@ class PopulationBase(object, metaclass=AbstractBase):
     def __len__(self) -> int:
         raise NotImplementedError
 
-    def mean_spike_count(self, gather=True):
+    def mean_spike_count(self, gather: bool = True) -> float:
         """
         Returns the mean number of spikes per neuron.
 
@@ -276,8 +282,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         _we_dont_do_this_now()  # pragma: no cover
 
     @abstractmethod
-    def record(self, variables: Names, to_file=None,
-               sampling_interval=None):
+    def record(self, variables: Names, to_file: Optional[str] = None,
+               sampling_interval: Optional[int] = None):
         """
         Record the specified variable or variables for all cells in the
         Population or view.
@@ -348,7 +354,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @staticmethod
-    def _check_params(gather, annotations=None):
+    def _check_params(
+            gather: bool, annotations: Optional[Dict[str, Any]] = None):
         if not gather:
             logger.warning(
                 "sPyNNaker only supports gather=True. We will run "

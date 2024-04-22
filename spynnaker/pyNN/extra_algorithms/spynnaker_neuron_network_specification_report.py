@@ -38,7 +38,7 @@ def _get_diagram(label: str) -> Tuple[gv.Digraph, Type[gv.ExecutableNotFound]]:
     :param str label:
     :rtype: tuple(~graphviz.Digraph, type)
     """
-    # pylint: disable=import-error
+    # pylint: disable=import-error,import-outside-toplevel
     try:
         import graphviz
     except ImportError as e:
@@ -58,7 +58,7 @@ def spynnaker_neuron_graph_network_specification_report() -> None:
     :param str report_folder: the report folder to put figure into
     """
     # create holders for data
-    dot_diagram, exeNotFoundExn = _get_diagram(_GRAPH_TITLE)
+    dot_diagram, exe_not_found_exn = _get_diagram(_GRAPH_TITLE)
 
     graph_format = get_config_str_or_none("Reports", "network_graph_format")
     if graph_format is None:
@@ -80,12 +80,12 @@ def spynnaker_neuron_graph_network_specification_report() -> None:
     # write edges into dot diagram
     _generate_edges(dot_diagram, vertex_ids, progress)
 
-    # write dot file and generate pdf
+    # write dot file and generate PDF
     file_to_output = os.path.join(
         SpynnakerDataView.get_run_dir_path(), _GRAPH_NAME)
     try:
         dot_diagram.render(file_to_output, view=False, format=graph_format)
-    except exeNotFoundExn:
+    except exe_not_found_exn:
         logger.exception("could not render diagram in {}", file_to_output)
     progress.update()
     progress.end()

@@ -24,6 +24,7 @@ from spynnaker.pyNN.models.neuron.additional_inputs import (
 
 
 class IFCurrExpCa2Adaptive(AbstractPyNNNeuronModelStandard):
+    # pylint: disable=wrong-spelling-in-docstring
     """
     Model from Liu, Y. H., & Wang, X. J. (2001). Spike-frequency
     adaptation of a generalized leaky integrate-and-fire model neuron.

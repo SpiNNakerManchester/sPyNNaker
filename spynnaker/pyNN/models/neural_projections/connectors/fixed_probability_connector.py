@@ -12,27 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+import logging
 import math
+from typing import Optional, Sequence, TYPE_CHECKING
+
 import numpy
 from numpy.typing import NDArray
-import logging
-from typing import Optional, Sequence, TYPE_CHECKING
+
 from pyNN.random import NumpyRNG
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+
 from pacman.model.graphs.common import Slice
+
 from spinn_front_end_common.interface.ds import DataType
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.utilities.utility_calls import (
     get_probable_maximum_selected, get_probable_minimum_selected, check_rng)
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neural_projections import SynapseInformation
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -114,7 +122,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay=None, max_delay=None) -> int:
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
         n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_post_atoms, self._p_connect, chance=1.0/10000.0)
@@ -204,6 +213,13 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     @property
     def p_connect(self) -> float:
+        """
+        Probability for each potential connection.
+
+        A value between zero and one. (inclusive)
+
+        :rtype: float
+        """
         return self._p_connect
 
     @p_connect.setter
@@ -215,6 +231,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
-            self, application_edge, synapse_info: SynapseInformation):
+            self, application_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation):
         if self.generate_on_machine(synapse_info):
             check_rng(self.__rng, "FixedProbabilityConnector")

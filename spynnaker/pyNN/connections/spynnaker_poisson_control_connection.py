@@ -18,7 +18,8 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.connections.live_event_connection \
     import (
-        LiveEventConnection, _Callback, _InitCallback)
+        LiveEventConnection, _Callback, _InitCallback, _RcvCallback,
+        _RcvTimeCallback)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
 
@@ -124,13 +125,15 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
 
     @overrides(LiveEventConnection.add_receive_callback)
     def add_receive_callback(
-            self, label, live_event_callback, translate_key=False):
+            self, label: str, live_event_callback: _RcvTimeCallback,
+            translate_key: bool = True):
         raise ConfigurationException(
             "SpynnakerPoissonControlPopulation can't receive data")
 
     @overrides(LiveEventConnection.add_receive_no_time_callback)
     def add_receive_no_time_callback(
-            self, label, live_event_callback, translate_key=True):
+            self, label: str, live_event_callback: _RcvCallback,
+            translate_key: bool = True):
         raise ConfigurationException(
             "SpynnakerPoissonControlPopulation can't receive data")
 

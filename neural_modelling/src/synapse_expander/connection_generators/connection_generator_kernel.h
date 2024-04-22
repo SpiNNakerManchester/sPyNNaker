@@ -163,7 +163,7 @@ static bool connection_generator_kernel_generate(
             int16_t pap_r, pap_c; // post as pre
             post_r = uidiv(post, obj->postWidth, &post_c);
 
-            //move post coords into common coordinate system
+            //move post coordinates into common coordinate system
             post_in_pre_world(
                     post_r, post_c, obj->startPostHeight, obj->startPostWidth,
                     obj->stepPostHeight, obj->stepPostWidth, &pac_r, &pac_c);

@@ -12,12 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Iterable
+
+from numpy import floating
+from numpy.typing import NDArray
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationBase)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
+
 # Six words per synapse type
 _SPACE_PER_SYNAPSE_TYPE = 6 * BYTES_PER_WORD
 
@@ -80,6 +87,7 @@ class WeightDependenceAdditiveTriplet(
 
         :rtype: float
         """
+        # pylint: disable=invalid-name
         return self.__a3_plus
 
     @property
@@ -89,10 +97,11 @@ class WeightDependenceAdditiveTriplet(
 
         :rtype: float
         """
+        # pylint: disable=invalid-name
         return self.__a3_minus
 
     @overrides(AbstractWeightDependence.is_same_as)
-    def is_same_as(self, weight_dependence) -> bool:
+    def is_same_as(self, weight_dependence: AbstractWeightDependence) -> bool:
         if not isinstance(weight_dependence, WeightDependenceAdditiveTriplet):
             return False
         return (
@@ -114,7 +123,7 @@ class WeightDependenceAdditiveTriplet(
 
     @overrides(AbstractWeightDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(
-            self, n_synapse_types, n_weight_terms) -> int:
+            self, n_synapse_types: int, n_weight_terms: int) -> int:
         if n_weight_terms != 2:
             raise NotImplementedError(
                 "Additive weight dependence only supports one or two terms")
@@ -123,7 +132,7 @@ class WeightDependenceAdditiveTriplet(
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
             self, spec: DataSpecificationBase, global_weight_scale: float,
-            synapse_weight_scales, n_weight_terms):
+            synapse_weight_scales: NDArray[floating], n_weight_terms: int):
         # Loop through each synapse type
         for _ in synapse_weight_scales:
             # Scale the weights
@@ -132,6 +141,7 @@ class WeightDependenceAdditiveTriplet(
             spec.write_value(data=self.__w_max * global_weight_scale,
                              data_type=DataType.S1615)
 
+            # pylint: disable=wrong-spelling-in-comment
             # Based on http://data.andrewdavison.info/docs/PyNN/_modules/pyNN
             #                /standardmodels/synapses.html
             # Pre-multiply A+ and A- by Wmax

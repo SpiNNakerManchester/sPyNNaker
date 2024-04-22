@@ -13,16 +13,23 @@
 # limitations under the License.
 from __future__ import annotations
 import math
+from typing import Optional, Sequence, TYPE_CHECKING
+
 import numpy
 from numpy.typing import NDArray
+
 from pyNN.random import NumpyRNG
-from typing import Optional, TYPE_CHECKING
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.common import Slice
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
@@ -136,7 +143,8 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay=None, max_delay=None) -> int:
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
         assert self.__mask is not None
         # Break the array into n_post_atoms units
         split_positions = numpy.arange(
@@ -171,8 +179,8 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice: Slice, synapse_type: int,
-            synapse_info: SynapseInformation) -> NDArray:
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
+            synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         if self.__mask is None:
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         raster_ids = post_vertex_slice.get_raster_ids()

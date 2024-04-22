@@ -14,36 +14,43 @@
 from __future__ import annotations
 from collections import Counter
 import logging
-import numpy
-from numpy.typing import ArrayLike, NDArray
-from pyNN.space import Grid2D, Grid3D, BaseStructure
 from typing import (
     Collection, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING)
+
+import numpy
+from numpy.typing import ArrayLike, NDArray
 from typing_extensions import TypeAlias, TypeGuard
+
+from pyNN.space import Grid2D, Grid3D, BaseStructure
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.ranged.abstract_sized import Selector
+
 from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
+from pacman.model.resources import AbstractSDRAM
+
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
+
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
-from spynnaker.pyNN.models.common.types import Names
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.models.common import (
+    ParameterHolder, PopulationApplicationVertex)
+from spynnaker.pyNN.models.common.types import (Names, Spikes)
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
-from spynnaker.pyNN.models.common import ParameterHolder
-from spynnaker.pyNN.models.common.types import Spikes
+
 from .spike_source_array_machine_vertex import SpikeSourceArrayMachineVertex
+
 if TYPE_CHECKING:
     from .spike_source_array import SpikeSourceArray
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
-# Cutoff to warn too many spikes sent at one time
+# Cut off to warn too many spikes sent at one time
 TOO_MANY_SPIKES = 100
 
 _Number: TypeAlias = Union[int, float]
@@ -214,13 +221,13 @@ class SpikeSourceArrayVertex(
         :param list(int) spike_times:
         """
         current_time = SpynnakerDataView.get_current_run_time_ms()
-        for i in range(len(spike_times)):
-            if spike_times[i] < current_time:
+        for spike_time in spike_times:
+            if spike_time < current_time:
                 logger.warning(
                     "SpikeSourceArray {} has spike_times that are lower than "
                     "the current time {} For example {} - "
                     "these will be ignored.",
-                    self, current_time, float(spike_times[i]))
+                    self, current_time, float(spike_time))
                 return
 
     def _check_spikes_double_list(self, spike_times: _DoubleList):
@@ -234,13 +241,13 @@ class SpikeSourceArrayVertex(
         current_time = SpynnakerDataView.get_current_run_time_ms()
         for neuron_id in range(0, self.n_atoms):
             id_times = spike_times[neuron_id]
-            for i in range(len(id_times)):
-                if id_times[i] < current_time:
+            for id_time in id_times:
+                if id_time < current_time:
                     logger.warning(
                         "SpikeSourceArray {} has spike_times that are lower "
                         "than the current time {} For example {} - "
                         "these will be ignored.",
-                        self, current_time, float(id_times[i]))
+                        self, current_time, float(id_time))
                     return
 
     def __set_spike_buffer_times(self, spike_times: Spikes):
@@ -310,7 +317,9 @@ class SpikeSourceArrayVertex(
         return vertex_slice.get_raster_ids()
 
     @overrides(PopulationApplicationVertex.set_recording)
-    def set_recording(self, name: str, sampling_interval=None, indices=None):
+    def set_recording(
+            self, name: str, sampling_interval: Optional[float] = None,
+            indices: Optional[Collection[int]] = None):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if sampling_interval is not None:

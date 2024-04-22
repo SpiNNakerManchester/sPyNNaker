@@ -13,14 +13,21 @@
 # limitations under the License.
 
 from typing import Iterable
+
+from numpy import floating
+from numpy.typing import NDArray
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.interface.ds import DataSpecificationBase
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     get_exp_lut_array)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightOnly)
+
 from .abstract_timing_dependence import AbstractTimingDependence
 
 
@@ -102,7 +109,8 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
         self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
-    def is_same_as(self, timing_dependence) -> bool:
+    def is_same_as(
+            self, timing_dependence: AbstractTimingDependence) -> bool:
         if not isinstance(timing_dependence, TimingDependenceSpikeNearestPair):
             return False
         return (self.__tau_plus == timing_dependence.tau_plus and
@@ -144,8 +152,8 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
-            self, spec: DataSpecificationBase,
-            global_weight_scale, synapse_weight_scales):
+            self, spec: DataSpecificationBase, global_weight_scale: float,
+            synapse_weight_scales: NDArray[floating]):
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
         spec.write_array(self.__tau_minus_data)

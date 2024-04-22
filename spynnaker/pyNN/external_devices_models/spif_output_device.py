@@ -13,25 +13,32 @@
 # limitations under the License.
 
 from typing import Dict, Iterable, Tuple, List
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
+
 from pacman.model.graphs.application import (
-    ApplicationFPGAVertex, FPGAConnection)
+    ApplicationEdge, ApplicationEdgePartition, ApplicationFPGAVertex,
+    FPGAConnection)
 from pacman.model.graphs.machine import MachineVertex
+from pacman.utilities.utility_calls import get_keys
+
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex, LiveOutputDevice,
     HasCustomAtomKeyMap)
+from spinn_front_end_common.utility_models.command_sender import CommandSender
+from spinn_front_end_common.utility_models import MultiCastCommand
+
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager)
+
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK,
     set_distiller_key, set_distiller_mask,
     set_distiller_mask_delayed, set_distiller_shift,
     set_xp_key_delayed, set_xp_mask_delayed)
-from pacman.utilities.utility_calls import get_keys
-from spinn_front_end_common.utility_models.command_sender import CommandSender
 
 # The maximum number of partitions that can be supported.
 N_OUTGOING = 6
@@ -125,7 +132,8 @@ class SPIFOutputDevice(
         return (v & (v - 1) == 0) and (v != 0)
 
     @overrides(ApplicationFPGAVertex.add_incoming_edge)
-    def add_incoming_edge(self, edge, partition):
+    def add_incoming_edge(
+            self, edge: ApplicationEdge, partition: ApplicationEdgePartition):
         # Only add edges from PopulationApplicationVertices
         if not isinstance(edge.pre_vertex, PopulationApplicationVertex):
             if not isinstance(edge.pre_vertex, CommandSender):
@@ -188,7 +196,7 @@ class SPIFOutputDevice(
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
-    def start_resume_commands(self):
+    def start_resume_commands(self) -> Iterable[MultiCastCommand]:
         # The commands here are delayed, as at the time of providing them,
         # we don't know the key or mask of the incoming link...
         commands = list()
@@ -210,12 +218,12 @@ class SPIFOutputDevice(
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
-    def pause_stop_commands(self):
+    def pause_stop_commands(self) -> Iterable[MultiCastCommand]:
         return []
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
-    def timed_commands(self):
+    def timed_commands(self) -> List[MultiCastCommand]:
         return []
 
     @overrides(LiveOutputDevice.get_device_output_keys)

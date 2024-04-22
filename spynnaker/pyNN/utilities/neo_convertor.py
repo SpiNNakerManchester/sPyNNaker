@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import quantities
-from quantities import UnitTime
+from typing import List, Optional, Sequence
+
 import numpy as np
 from numpy.typing import NDArray
 from neo import AnalogSignal, Block, SpikeTrain
-from typing import List, Optional, Sequence
+import quantities
+from quantities import UnitTime
 
 # needed as dealing with quantities
 # pylint: disable=c-extension-no-member

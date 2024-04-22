@@ -12,33 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-import logging
-import numpy
-from numpy.typing import NDArray
-import os
 import inspect
+import logging
+import os
 from typing import (
     Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple,
     Type, Union, final, overload, TYPE_CHECKING)
+
+import numpy
+from numpy import floating
+from numpy.typing import NDArray
 from typing_extensions import TypeAlias
+
+import neo
+from neo.io.baseio import BaseIO  # type: ignore[import]
+from pyNN.descriptions import TemplateEngine
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
 from pyNN.space import BaseStructure
-from neo.io.baseio import BaseIO  # type: ignore[import]
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-from spynnaker.pyNN.models.recorder import Recorder
-from .population_base import PopulationBase
-from .population_view import PopulationView, IDMixin
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
+
+from .population_base import PopulationBase
+from .population_view import PopulationView, IDMixin
+
 if TYPE_CHECKING:
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
     from spynnaker.pyNN.models.common.types import Names, Values
@@ -117,7 +127,6 @@ class Population(PopulationBase):
         self.__create_vertex(model, realsize, label, additional)
         self.__recorder = Recorder(population=self, vertex=self.__vertex)
 
-        # Internal structure now supported 23 November 2014 ADR
         # structure should be a valid Space.py structure type.
         # generation of positions is deferred until needed.
         self.__structure = structure
@@ -197,10 +206,8 @@ class Population(PopulationBase):
         return variable in self.__vertex.get_recordable_variables()
 
     @overrides(PopulationBase.record, extend_doc=False)
-    def record(
-            self, variables: Names,
-            to_file: Optional[Union[str]] = None,
-            sampling_interval: Optional[int] = None):
+    def record(self, variables: Names, to_file: Optional[str] = None,
+               sampling_interval: Optional[int] = None):
         """
         Record the specified variable or variables for all cells in the
         Population or view.
@@ -239,7 +246,7 @@ class Population(PopulationBase):
 
     @overrides(PopulationBase.write_data, extend_doc=False)
     def write_data(self, io: Union[str, BaseIO], variables: Names = 'all',
-                   gather=True, clear=False,
+                   gather: bool = True, clear: bool = False,
                    annotations: Optional[Dict[str, Any]] = None):
         """
         Write recorded data to file, using one of the file formats
@@ -282,11 +289,13 @@ class Population(PopulationBase):
         # write the neo block to the file
         io.write(data)
 
-    def describe(self, template='population_default.txt', engine='default'):
+    def describe(self, template: str = 'population_default.txt',
+                 engine:  Optional[Union[str, TemplateEngine]] = 'default'
+                 ) -> Union[str, Dict[str, Any]]:
         """
         Returns a human-readable description of the population.
 
-        The output may be customized by specifying a different template
+        The output may be customised by specifying a different template
         together with an associated template engine (see
         :mod:`pyNN.descriptions`).
 
@@ -310,6 +319,7 @@ class Population(PopulationBase):
         context.update(self.annotations)
         if self.size > 0:
             parameters = self.__vertex.get_parameters()
+            cell_parameters: Union[str, ParameterHolder]
             if parameters:
                 cell_parameters = self.__vertex.get_parameter_values(
                     parameters, 0)
@@ -336,8 +346,9 @@ class Population(PopulationBase):
     @overrides(PopulationBase.get_data, extend_doc=False)
     def get_data(
             self, variables: Names = 'all',
-            gather=True, clear=False, *,
-            annotations: Optional[Dict[str, Any]] = None):
+            gather: bool = True, clear: bool = False, *,
+            annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
+
         """
         Return a Neo Block containing the data (spikes, state variables)
         recorded from the Assembly.
@@ -369,10 +380,10 @@ class Population(PopulationBase):
 
     def spinnaker_get_data(
             self, variable: str, as_matrix: bool = False,
-            view_indexes: Optional[Sequence[int]] = None):
+            view_indexes: Optional[Sequence[int]] = None) -> NDArray[floating]:
         """
-        Public accessor for getting data as a numpy array, instead of
-        the Neo-based object
+        SsPyNNaker specific method for getting data as a numpy array,
+        instead of the Neo-based object
 
         :param str variable: a single variable name.
         :type variable: str or list(str)
@@ -390,7 +401,7 @@ class Population(PopulationBase):
                                          variable, as_matrix, view_indexes)
 
     @overrides(PopulationBase.get_spike_counts, extend_doc=False)
-    def get_spike_counts(self, gather=True):
+    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
         """
         Return the number of spikes for each neuron.
 
@@ -599,7 +610,7 @@ class Population(PopulationBase):
         return self.__vertex.conductance_based
 
     def get(self, parameter_names: Names,
-            gather=True, simplify=True) -> ParameterHolder:
+            gather: bool = True, simplify=True) -> ParameterHolder:
         """
         Get the values of a parameter for every local cell in the population.
 
@@ -629,7 +640,8 @@ class Population(PopulationBase):
             self, id: Iterable[int]) -> Sequence[int]:  # @ReservedAssignment
         ...
 
-    def id_to_index(self, id):  # @ReservedAssignment
+    def id_to_index(self, id: Union[int, Iterable[int]]
+                    ) -> Union[int, Sequence[int]]:  # @ReservedAssignment
         """
         Given the ID(s) of cell(s) in the Population, return its (their)
         index (order in the Population).
@@ -658,7 +670,8 @@ class Population(PopulationBase):
     def index_to_id(self, index: Iterable[int]) -> Sequence[int]:
         ...
 
-    def index_to_id(self, index):
+    def index_to_id(self, index: Union[int, Iterable[int]]
+                    ) -> Union[int, Sequence[int]]:
         """
         Given the index (order in the Population) of cell(s) in the
         Population, return their ID(s)
@@ -955,6 +968,10 @@ class _VertexHolder(AbstractPyNNModel):
 
     @property
     def vertex(self):
+        """
+        The vertex passed into the init.
+        :return:
+        """
         return self.__vertex
 
     @overrides(AbstractPyNNModel.create_vertex)

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Sequence, TYPE_CHECKING, cast
+from typing import List, Sequence, Tuple, TYPE_CHECKING, cast
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import get_config_bool
 from pacman.model.graphs.application import (
@@ -87,7 +87,7 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
 
     @property
     @overrides(ApplicationVertex.atoms_shape)
-    def atoms_shape(self):
+    def atoms_shape(self) -> Tuple[int, ...]:
         return self.__partition.pre_vertex.atoms_shape
 
     @property
@@ -106,6 +106,12 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
 
     @staticmethod
     def get_max_delay_ticks_supported(delay_ticks_at_post_vertex: int) -> int:
+        """
+        Get the max ticks the combination of delay and post vertex can handle.
+
+        :param int delay_ticks_at_post_vertex:
+        :rtype: int
+        """
         return DelayExtensionVertex.MAX_SLOTS * delay_ticks_at_post_vertex
 
     @property
@@ -115,6 +121,12 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
 
     def set_new_n_delay_stages_and_delay_per_stage(
             self, n_delay_stages: int, delay_per_stage: int):
+        """
+        Sets the delays per stages. Verifies delay per stage is unchanged.
+
+        :param int n_delay_stages:
+        :param int delay_per_stage:
+        """
         if delay_per_stage != self.__delay_per_stage:
             raise DelayExtensionException(
                 "The delay per stage is already set to "
@@ -134,6 +146,11 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
 
     @property
     def source_vertex(self) -> ApplicationVertex:
+        """
+        The pre vertex of the delayed partition.
+
+        :rtype:  ApplicationVertex
+        """
         return self.__partition.pre_vertex
 
     def delay_params_size(self):

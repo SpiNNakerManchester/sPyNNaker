@@ -13,24 +13,30 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-import numpy
-from numpy import bool_, integer
-from numpy.typing import NDArray
 import os
 from typing import (
     Any, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple, Union,
     overload, TYPE_CHECKING)
+
+import numpy
+from numpy import bool_, integer
+from numpy.typing import NDArray
 from typing_extensions import TypeAlias
-from spinn_utilities.log import FormatAdapter
+
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
 import neo  # type: ignore[import]
+
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
-from spinn_utilities.ranged.abstract_sized import AbstractSized
-from .population_base import PopulationBase
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged.abstract_sized import AbstractSized
+
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
+
+from .population_base import PopulationBase
+
 if TYPE_CHECKING:
     from .population import Population
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
@@ -85,7 +91,7 @@ class PopulationView(PopulationBase):
         :param PopulationApplicationVertex vertex: The actual underlying vertex
         :param Recorder recorder: The recorder of the Population
         :param selector: a slice or numpy mask array.
-            The mask array should either be a boolean array (ideally) of the
+            The mask array should either be a Boolean array (ideally) of the
             same size as the parent,
             or an integer array containing cell indices,
             i.e. if `p.size == 5` then:
@@ -299,7 +305,7 @@ class PopulationView(PopulationBase):
         """
         Returns a human-readable description of the population view.
 
-        The output may be customized by specifying a different template
+        The output may be customised by specifying a different template
         together with an associated template engine (see pyNN.descriptions).
 
         If template is ``None``, then a dictionary containing the template
@@ -402,8 +408,8 @@ class PopulationView(PopulationBase):
     def spinnaker_get_data(
             self, variable: str, as_matrix: bool = False) -> NDArray:
         """
-        Public accessor for getting data as a numpy array, instead of
-        the Neo-based object
+        SsPyNNaker specific method for getting data as a numpy array,
+        instead of the Neo-based object
 
         :param str variable: a single variable name
         :param bool as_matrix: If set True the data is returned as a 2d matrix
@@ -413,23 +419,8 @@ class PopulationView(PopulationBase):
         return self.__population.spinnaker_get_data(
             variable, as_matrix, self.__indexes)
 
-    def get_spike_counts(self, gather=True) -> Dict[int, int]:
-        """
-        Returns a dict containing the number of spikes for each neuron.
-
-        The dict keys are neuron IDs, not indices.
-
-        .. note::
-            Implementation of this method is different to Population as the
-            Populations uses PyNN 7 version of the ``get_spikes`` method which
-            does not support indexes.
-
-        :param bool gather:
-            .. note::
-                SpiNNaker always gathers.
-
-        :rtype: dict(int,int)
-        """
+    @overrides(PopulationBase.get_spike_counts)
+    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
         self._check_params(gather)
         with NeoBufferDatabase() as db:
             return db.get_spike_counts(
@@ -696,6 +687,9 @@ class PopulationView(PopulationBase):
 
 
 class IDMixin(PopulationView):
+    """
+    Implementation of PyNN IDMixin.
+    """
     __slots__ = ()
 
     def get_parameters(self) -> ParameterHolder:

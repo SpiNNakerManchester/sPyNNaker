@@ -11,13 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Any, Union, cast
+
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
-from typing import Any, Union, cast
 from typing_extensions import TypeAlias
-from spinn_front_end_common.interface.ds import DataType
+
 from pyNN.random import RandomDistribution, available_distributions
+
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 

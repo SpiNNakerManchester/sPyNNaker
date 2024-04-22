@@ -14,15 +14,20 @@
 from __future__ import annotations
 from datetime import datetime
 import logging
-import neo  # type: ignore[import]
 from typing import (
     Any, Collection, Dict, Mapping, Optional, Sequence, Union, TYPE_CHECKING)
+
+import neo  # type: ignore[import]
 from typing_extensions import TypeAlias
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.types import Names
     from spynnaker.pyNN.models.populations import Population
@@ -195,6 +200,11 @@ class Recorder(object):
 
     @property
     def recording_label(self) -> str:
+        """
+        The label from the vertex is applicable or a default.
+
+        :rtype: str
+        """
         SpynnakerDataView.check_user_can_act()
         return self.__vertex.label or "!!UNLABELLED VERTEX!!"
 

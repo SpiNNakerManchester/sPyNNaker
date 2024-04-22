@@ -55,7 +55,7 @@ class SpikeSourcePoisson(AbstractPyNNModel):
             self, n_neurons: int, label: str, *,
             seed: Optional[int] = None, max_rate: Optional[float] = None,
             splitter: Optional[AbstractSplitterCommon] = None,
-            n_colour_bits: Optional[int] = None):
+            n_colour_bits: Optional[int] = None) -> SpikeSourcePoissonVertex:
         """
         :param float seed:
         :param float max_rate:

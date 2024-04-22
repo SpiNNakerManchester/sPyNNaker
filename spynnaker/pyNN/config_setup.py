@@ -57,5 +57,8 @@ def unittest_setup() -> None:
 
 
 def add_spynnaker_cfg() -> None:
+    """
+    Add the local configuration and all dependent configuration files.
+    """
     add_spinnaker_cfg()  # This add its dependencies too
     add_default_cfg(os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))

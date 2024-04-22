@@ -12,33 +12,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+import ctypes
 from enum import IntEnum
 import os
-import ctypes
-from numpy import floating
-from numpy.typing import NDArray
 from typing import List, Optional, Sequence, cast
 
+from numpy import floating
+from numpy.typing import NDArray
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.placements import Placement
 from pacman.model.graphs.common import Slice
 from pacman.model.resources import AbstractSDRAM
+
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.interface.ds import (
     DataSpecificationGenerator, DataSpecificationReloader)
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
+from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
 from .abstract_population_vertex import AbstractPopulationVertex
-from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 
 
 class LocalOnlyProvenance(ctypes.LittleEndianStructure):
+    """
+    Types of provenance and the DataType used to represent each.
+    """
     _fields_ = [
         # The maximum number of spikes received in a time step
         ("max_spikes_per_timestep", ctypes.c_uint32),
@@ -316,7 +324,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(
-            self, spec: DataSpecificationReloader, placement):
+            self, spec: DataSpecificationReloader, placement: Placement):
         self._rewrite_neuron_data_spec(spec)
 
         # close spec

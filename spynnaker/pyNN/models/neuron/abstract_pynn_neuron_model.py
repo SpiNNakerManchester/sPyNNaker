@@ -34,6 +34,9 @@ _population_parameters: Dict[str, Any] = {
 
 
 class AbstractPyNNNeuronModel(AbstractPyNNModel):
+    """
+    API for a PyNN Neuron Model
+    """
     __slots__ = ("__model", )
 
     #: Population parameters for neuron models.

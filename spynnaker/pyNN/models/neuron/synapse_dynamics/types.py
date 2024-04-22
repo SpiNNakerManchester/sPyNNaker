@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Final
 from numpy import dtype, float64, uint32, void
 from numpy.typing import NDArray
-from typing import Final
 from typing_extensions import TypeAlias
 
 #: Type model of the basic configuration data of a connector

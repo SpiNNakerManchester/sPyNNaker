@@ -14,23 +14,28 @@
 import itertools
 import logging
 import math
-import numpy
-from numpy import float64, uint8, uint16, uint32
-from numpy.typing import NDArray
 from types import MappingProxyType
 from typing import (
     Collection, Dict, Iterable, List, Mapping, Optional, Sequence, Set, Tuple)
+
+import numpy
+from numpy import float64, uint8, uint16, uint32
+from numpy.typing import NDArray
+
 from spinn_utilities.log import FormatAdapter
+
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.resources import AbstractSDRAM, VariableSDRAM
 from pacman.model.placements import Placement
+
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationBase)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 
@@ -61,6 +66,9 @@ def get_sampling_interval(sampling_rate):
 
 
 class NeuronRecorder(object):
+    """
+    Methods related to recording of neuron data.
+    """
     __slots__ = (
         "__indexes",
         "__n_neurons",
@@ -287,7 +295,7 @@ class NeuronRecorder(object):
                     "Population {} has multiple recorded data for time {}"
                     " in region {} ", label, time, region)
             else:
-                # Set row to NaN
+                # Set row to Nan
                 fragment[i] = numpy.full(n_neurons, numpy.nan)
         return fragment
 
@@ -745,7 +753,7 @@ class NeuronRecorder(object):
         :param iterable(int) indexes:
         """
         if variable == "all":
-            for key in self.__sampling_rates.keys():
+            for key in self.__sampling_rates:
                 self.set_recording(key, new_state, sampling_interval, indexes)
             for var in self.__events_per_core_variables:
                 # Skip the unsupported items for an events-per-core variable

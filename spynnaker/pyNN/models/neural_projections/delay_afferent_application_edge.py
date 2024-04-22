@@ -23,6 +23,9 @@ if TYPE_CHECKING:
 
 
 class DelayAfferentApplicationEdge(ApplicationEdge):
+    """
+    Edge between a Population vertex and a delay vertex.
+    """
     __slots__ = ()
 
     def __init__(self, pre_vertex: PopulationApplicationVertex,
