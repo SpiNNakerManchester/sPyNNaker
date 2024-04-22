@@ -160,7 +160,7 @@ class WholeBoardTest(object):
         # find number of cores on machine less one for monitors
         self.to_allocate = dict()
         for key, chip in machine:
-            self.to_allocate[key] = chip.n_user_processors - 1
+            self.to_allocate[key] = chip.n_placable_processors - 1
         # less 1 for the gather
         self.to_allocate[(0, 0)] -= 1
 
