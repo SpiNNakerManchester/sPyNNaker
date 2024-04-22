@@ -12,14 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-import numpy
-from numpy import integer, uint8, uint32
-from numpy.typing import NDArray
-from pyNN.standardmodels.synapses import StaticSynapse
 from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
+
+import numpy
+from numpy import floating, integer, uint8, uint32
+from numpy.typing import NDArray
+
+from pyNN.standardmodels.synapses import StaticSynapse
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import DataType, DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
     SynapticConfigurationException, InvalidParameterType)
@@ -28,15 +33,18 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     STDP_FIXED_POINT_ONE, get_exp_lut_array)
 from spynnaker.pyNN.types import Weight_Delay_In_Types as _Weight
+
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray)
+    from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 # The targets of neuromodulation
 NEUROMODULATION_TARGETS = {
@@ -85,22 +93,43 @@ class SynapseDynamicsNeuromodulation(
 
     @property
     def tau_c(self) -> float:
+        """
+        The tau c value passed into the init.
+
+        :rtype: float
+        """
         return self.__tau_c
 
     @property
     def tau_d(self) -> float:
+        """
+        The tau d value passed into the init.
+
+        :rtype: float
+        """
         return self.__tau_d
 
     @property
     def w_min(self) -> float:
+        """
+        The w min value passed into the init.
+
+        :rtype: float
+        """
         return self.__w_min
 
     @property
     def w_max(self) -> float:
+        """
+        The w max value passed into the init.
+
+        :rtype: float
+        """
         return self.__w_max
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
-    def merge(self, synapse_dynamics):
+    def merge(self, synapse_dynamics: AbstractSynapseDynamics
+              ) -> AbstractSynapseDynamics:
         # This must replace something that supports neuromodulation,
         # so it can't be the first thing to be merged!
         raise SynapticConfigurationException(
@@ -109,11 +138,18 @@ class SynapseDynamicsNeuromodulation(
             " neuromodulation")
 
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
-    def is_same_as(self, synapse_dynamics) -> bool:
-        # Shouln't ever come up, but if it does, it is False!
+    def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:
+        # Shouldn't ever come up, but if it does, it is False!
         return False
 
-    def is_neuromodulation_same_as(self, other) -> bool:
+    def is_neuromodulation_same_as(
+            self, other: SynapseDynamicsNeuromodulation) -> bool:
+        """
+        Checks that tau c, tau d, w max and w min are all the same.
+
+        :param SynapseDynamicsNeuromodulation other:
+        :rtype: bool
+        """
         return (self.__tau_c == other.tau_c and self.__tau_d == other.tau_d and
                 self.__w_min == other.w_min and self.__w_max == other.w_max)
 
@@ -124,7 +160,7 @@ class SynapseDynamicsNeuromodulation(
     @overrides(AbstractPlasticSynapseDynamics
                .get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(
-            self, n_neurons, n_synapse_types) -> int:
+            self, n_neurons: int, n_synapse_types: int) -> int:
         size = BYTES_PER_WORD * 3
         size += BYTES_PER_WORD * len(self.__tau_c_data)
         size += BYTES_PER_WORD * len(self.__tau_d_data)
@@ -132,8 +168,9 @@ class SynapseDynamicsNeuromodulation(
 
     @overrides(AbstractPlasticSynapseDynamics.write_parameters)
     def write_parameters(
-            self, spec: DataSpecificationBase, region, global_weight_scale,
-            synapse_weight_scales):
+            self, spec: DataSpecificationBase, region: int,
+            global_weight_scale: float,
+            synapse_weight_scales: NDArray[floating]):
         # Calculate constant component in Izhikevich's model weight update
         # function and write to SDRAM.
         weight_update_component = \
@@ -178,10 +215,10 @@ class SynapseDynamicsNeuromodulation(
     def get_plastic_synaptic_data(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
-            n_synapse_types, max_n_synapses: int,
-            max_atoms_per_core) -> Tuple[
-                NDArray[uint32], NDArray[uint32],
-                NDArray[uint32], NDArray[uint32]]:
+            n_synapse_types: int,
+            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
+                NDArray[uint32], NDArray[uint32], NDArray[uint32],
+                NDArray[uint32]]:
         # pylint: disable=too-many-arguments
         weights = numpy.rint(
             numpy.abs(connections["weight"]) * STDP_FIXED_POINT_ONE)
@@ -233,10 +270,10 @@ class SynapseDynamicsNeuromodulation(
 
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
-            self, n_synapse_types,
-            pp_size: NDArray[integer], pp_data: List[NDArray[uint32]],
-            fp_size: NDArray[integer], fp_data: List[NDArray[uint32]],
-            max_atoms_per_core) -> ConnectionsArray:
+            self, n_synapse_types: int,
+            pp_size: NDArray[uint32], pp_data: List[NDArray[uint32]],
+            fp_size: NDArray[uint32], fp_data: List[NDArray[uint32]],
+            max_atoms_per_core: int) -> ConnectionsArray:
         data = numpy.concatenate(fp_data)
         connections = numpy.zeros(data.size, dtype=NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
@@ -292,7 +329,7 @@ class SynapseDynamicsNeuromodulation(
         return None
 
     @overrides(AbstractPlasticSynapseDynamics.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         return NEUROMODULATION_TARGETS.get(target, None)
 
     @property

@@ -14,14 +14,19 @@
 
 from __future__ import annotations
 import logging
-import numpy
 from typing import Any, cast, List, Optional, Sequence, Tuple, TYPE_CHECKING
+
+import numpy
+
 from pyNN.random import RandomDistribution
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
+
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.types import (
     Delay_Types, Weight_Delay_In_Types, Weight_Types)
@@ -30,6 +35,7 @@ from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE as CONNECTOR_DTYPE)
 from spynnaker.pyNN.types import is_scalar
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections.connectors import (
         AbstractConnector)
@@ -67,7 +73,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
                         f"Expected types in collection are int and float")
             return
         except TypeError:
-            # Ok not a collection
+            # OK not a collection
             pass
         raise TypeError(
             f"Unexpected type for {name}: {type(value)}. "

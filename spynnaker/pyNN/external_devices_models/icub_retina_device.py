@@ -18,6 +18,7 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
 from pacman.model.graphs.application import Application2DSpiNNakerLinkVertex
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.utilities.constants import BITS_IN_KEY
 from pacman.utilities.utility_calls import is_power_of_2
@@ -102,13 +103,15 @@ class ICUBRetinaDevice(Application2DSpiNNakerLinkVertex):
         return vertex_slice
 
     @overrides(Application2DSpiNNakerLinkVertex.get_machine_fixed_key_and_mask)
-    def get_machine_fixed_key_and_mask(self, machine_vertex, partition_id):
+    def get_machine_fixed_key_and_mask(
+            self, machine_vertex: MachineVertex,
+            partition_id: str) -> BaseKeyAndMask:
         vertex_slice = machine_vertex.vertex_slice
         index = self.__index_by_slice[vertex_slice]
         return self._get_key_and_mask(self.__base_key, index)
 
     @overrides(Application2DSpiNNakerLinkVertex.get_fixed_key_and_mask)
-    def get_fixed_key_and_mask(self, partition_id) -> BaseKeyAndMask:
+    def get_fixed_key_and_mask(self, partition_id: str) -> BaseKeyAndMask:
         n_key_bits = BITS_IN_KEY - self._key_shift
         key_mask = ((1 << n_key_bits) - 1) << self._key_shift
         return BaseKeyAndMask(self.__base_key << self._key_shift, key_mask)

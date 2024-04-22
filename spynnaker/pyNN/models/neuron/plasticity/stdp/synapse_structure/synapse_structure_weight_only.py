@@ -17,6 +17,9 @@ from .abstract_synapse_structure import AbstractSynapseStructure
 
 
 class SynapseStructureWeightOnly(AbstractSynapseStructure):
+    """
+    Structured synapse with only weights
+    """
     __slots__ = ()
 
     @overrides(AbstractSynapseStructure.get_n_half_words_per_connection)

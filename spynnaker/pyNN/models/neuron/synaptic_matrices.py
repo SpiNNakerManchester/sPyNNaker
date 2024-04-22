@@ -13,11 +13,12 @@
 # limitations under the License.
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import (
+    Dict, List, NamedTuple, Optional, Sequence, Tuple, TYPE_CHECKING)
+
 import numpy
 from numpy import floating, uint32
 from numpy.typing import NDArray
-from typing import (
-    Dict, List, NamedTuple, Optional, Sequence, Tuple, TYPE_CHECKING)
 
 from pacman.model.graphs.common import Slice
 from pacman.model.placements import Placement
@@ -27,18 +28,22 @@ from pacman.utilities.utility_calls import allocator_bits_needed
 from pacman.model.graphs.application import ApplicationVirtualVertex
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationBase)
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from .synaptic_matrix_app import SynapticMatrixApp
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region, get_bitfield_key_map_data,
     write_bitfield_init_data)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+
+from .synaptic_matrix_app import SynapticMatrixApp
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
         AbstractPopulationVertex)
@@ -250,6 +255,9 @@ class SynapticMatrices(object):
                 self.__host_generated_block_addr)
 
     def generate_data(self) -> None:
+        """
+        Generates the data if it has not already been done.
+        """
         # If the data has already been generated, stop
         if self.__data_generated:
             return

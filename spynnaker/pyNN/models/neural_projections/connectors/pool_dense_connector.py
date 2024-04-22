@@ -16,20 +16,28 @@
 
 from __future__ import annotations
 from collections.abc import Iterable, Sized
+from typing import (
+    Optional, Tuple, Union, cast, TYPE_CHECKING)
+
 import numpy
 from numpy import integer, floating, float64, uint16, uint32
 from numpy.typing import ArrayLike, NDArray
+
 from pyNN.random import RandomDistribution
-from typing import (
-    Optional, Tuple, Union, cast, TYPE_CHECKING)
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.common import Slice
+
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from .abstract_connector import AbstractConnector
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.common.local_only_2d_common import get_div_const
+
+from .abstract_connector import AbstractConnector
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
@@ -142,6 +150,8 @@ class PoolDenseConnector(AbstractConnector):
         elif isinstance(self.__weights, RandomDistribution):
             n_weights = self.__get_n_weights(
                 pre_shape, post_vertex_slice.n_atoms)
+            # pylint: disable=no-member
+            # see https://github.com/SpiNNakerManchester/sPyNNaker/issues/1436
             return numpy.array(self.__weights.next(n_weights), dtype=float64)
         else:
             raise SynapticConfigurationException(
@@ -172,6 +182,14 @@ class PoolDenseConnector(AbstractConnector):
             cls, pre_shape: Tuple[int, ...],
             pool_shape: Union[int, Tuple[int, ...], None] = None,
             pool_stride: Union[int, Tuple[int, ...], None] = None) -> NDArray:
+        """
+        The shape considering the stride
+
+        :param pre_shape: tuple(int)
+        :type pool_shape: int, tuple(int) or None
+        :type pool_stride: int, tuple(int) or None
+        :rtype: ndarray
+        """
         real_pool_shape = cls.__to_nd_shape_or_none(
             pool_shape, len(pre_shape), "pool_shape")
         real_pool_stride = cls.__to_nd_shape_or_none(
@@ -198,7 +216,8 @@ class PoolDenseConnector(AbstractConnector):
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
-            self, application_edge: ProjectionApplicationEdge, synapse_info):
+            self, application_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation):
         pre = application_edge.pre_vertex
         post = application_edge.post_vertex
         if len(pre.atoms_shape) != 2:

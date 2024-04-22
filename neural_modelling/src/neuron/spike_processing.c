@@ -75,7 +75,7 @@ static uint32_t next_buffer_to_fill;
 //! The index of the buffer currently being filled by a DMA read
 static uint32_t buffer_being_read;
 
-//! Number of outstanding synaptogenic rewirings
+//! Number of outstanding synaptogenic rewires
 static volatile uint32_t rewires_to_do = 0;
 
 //! \brief The number of rewires to do when the DMA completes.
@@ -147,7 +147,7 @@ static inline void do_dma_read(
 //! \brief Check if there is anything to do. If not, DMA is not busy
 //! \param[out] spike: The spike being processed
 //! \param[out] result: The result of the pop table lookup
-//! \param[in,out] n_rewire: Accumulator of number of rewirings
+//! \param[in,out] n_rewire: Accumulator of number of rewires
 //! \param[in,out] n_process_spike: Accumulator of number of processed spikes
 //! \return True if there's something to do
 static inline bool is_something_to_do(
@@ -213,7 +213,7 @@ static inline bool is_something_to_do(
 //!
 //! Calls is_something_to_do(), do_direct_row() and do_dma_read()
 //! \param[in] current_buffer: The current buffer, if any.
-//! \param[in,out] n_rewires: Accumulator of number of rewirings
+//! \param[in,out] n_rewires: Accumulator of number of rewires
 //! \param[in,out] n_synapse_processes:
 //!     Accumulator of number of synapses processed
 //! \return Whether an actual DMA was set up or not

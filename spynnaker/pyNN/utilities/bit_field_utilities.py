@@ -13,14 +13,18 @@
 # limitations under the License.
 from __future__ import annotations
 import math
+from typing import Iterable, Optional, TYPE_CHECKING
+
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
-from typing import Iterable, Optional, TYPE_CHECKING
+
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.data import SpynnakerDataView
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neural_projections import (

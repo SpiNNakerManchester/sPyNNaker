@@ -11,13 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import List, Tuple
+
 from numpy import integer, uint32
 from numpy.typing import NDArray
-from typing import List, Tuple
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     ConnectionsArray)
+from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 
 
 class AbstractStaticSynapseDynamics(

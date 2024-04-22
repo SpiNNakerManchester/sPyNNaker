@@ -12,17 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-import numpy
 from math import ceil
-from numpy import floating, uint32
-from numpy.typing import NDArray
 from typing import (
     Dict, List, Iterable, cast, TYPE_CHECKING)
+
+import numpy
+from numpy import floating, uint32
+from numpy.typing import NDArray
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import ApplicationVertex
+
 from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationGenerator)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     PoolDenseConnector)
@@ -33,12 +38,16 @@ from spynnaker.pyNN.models.common.local_only_2d_common import (
     get_sources_for_target, get_rinfo_for_spike_source, BITS_PER_SHORT,
     get_div_const, N_COLOUR_BITS_BITS, KEY_INFO_SIZE, get_first_and_last_slice,
     Source)
+
 from .abstract_local_only import AbstractLocalOnly
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron import (
         PopulationMachineLocalOnlyCombinedVertex)
     from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+        AbstractSynapseDynamics)
 
 #: Size of the source information
 SOURCE_INFO_SIZE = KEY_INFO_SIZE + BYTES_PER_WORD
@@ -78,7 +87,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         return cast(float, self.delay)
 
     @overrides(AbstractLocalOnly.merge)
-    def merge(self, synapse_dynamics) -> LocalOnlyPoolDense:
+    def merge(self, synapse_dynamics: AbstractSynapseDynamics
+              ) -> LocalOnlyPoolDense:
         if not isinstance(synapse_dynamics, LocalOnlyPoolDense):
             raise SynapticConfigurationException(
                 "All Projections of this Population must have a synapse_type"
@@ -276,7 +286,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         if isinstance(weights, (int, float)):
             return weights
         pos_weights = weights[weights > 0]
-        if not len(pos_weights):
+        if len(pos_weights) == 0:
             return 0
         return numpy.mean(pos_weights)
 
@@ -288,7 +298,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         if isinstance(weights, (int, float)):
             return weights
         neg_weights = weights[weights < 0]
-        if not len(neg_weights):
+        if len(neg_weights) == 0:
             return 0
         return numpy.mean(neg_weights)
 
@@ -300,7 +310,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         if isinstance(weights, (int, float)):
             return 0
         pos_weights = weights[weights > 0]
-        if not len(pos_weights):
+        if len(pos_weights) == 0:
             return 0
         return numpy.var(pos_weights)
 
@@ -312,6 +322,6 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         if isinstance(weights, (int, float)):
             return 0
         neg_weights = weights[weights < 0]
-        if not len(neg_weights):
+        if len(neg_weights) == 0:
             return 0
         return numpy.var(neg_weights)

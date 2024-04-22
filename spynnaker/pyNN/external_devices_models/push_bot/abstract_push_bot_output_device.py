@@ -43,10 +43,16 @@ class AbstractPushBotOutputDevice(Enum):
 
     @property
     def min_value(self) -> int:
+        """
+        :rtype: int
+        """
         return self._min_value
 
     @property
     def max_value(self) -> int:
+        """
+        :rtype: int
+        """
         return self._max_value
 
     @property

@@ -34,34 +34,52 @@ if TYPE_CHECKING:
 
 class _Dynamics:
     """
-    Holds late-initialized class references.
+    Holds late-initialised class references.
     """
     _Structural: Optional[Type[AbstractSynapseDynamicsStructural]] = None
     _STDP: Optional[Type[SynapseDynamicsSTDP]] = None
     _Neuromodulation: Optional[Type[SynapseDynamicsNeuromodulation]] = None
 
     @classmethod
-    def Structural(cls) -> Type[AbstractSynapseDynamicsStructural]:
+    def structural(cls) -> Type[AbstractSynapseDynamicsStructural]:
+        """
+        Delayed import of AbstractSynapseDynamicsStructural
+
+        :rtype: type
+        """
         if cls._Structural is None:
             # Avoid import loop by postponing this import
+            # pylint: disable=import-outside-toplevel
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (
                 AbstractSynapseDynamicsStructural as StructuralDynamics)
             cls._Structural = StructuralDynamics
         return cls._Structural
 
     @classmethod
-    def STDP(cls) -> Type[SynapseDynamicsSTDP]:
+    def stdp(cls) -> Type[SynapseDynamicsSTDP]:
+        """
+        Delayed import of SynapseDynamicsSTDP
+
+        :rtype: type
+        """
         if cls._STDP is None:
             # Avoid import loop by postponing this import
+            # pylint: disable=import-outside-toplevel
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (
                 SynapseDynamicsSTDP as STDPDynamics)
             cls._STDP = STDPDynamics
         return cls._STDP
 
     @classmethod
-    def Neuromodulation(cls) -> Type[SynapseDynamicsNeuromodulation]:
+    def neuromodulation(cls) -> Type[SynapseDynamicsNeuromodulation]:
+        """
+        Delayed import of SynapseDynamicsNeuromodulation
+
+        :rtype: type
+        """
         if cls._Neuromodulation is None:
             # Avoid import loop by postponing this import
+            # pylint: disable=import-outside-toplevel
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (
                 SynapseDynamicsNeuromodulation as Neuromodulation)
             cls._Neuromodulation = Neuromodulation
@@ -72,20 +90,38 @@ def are_dynamics_structural(
         synapse_dynamics: AbstractSynapseDynamics) -> TypeGuard[
             AbstractSynapseDynamicsStructural]:
     # pylint: disable=isinstance-second-argument-not-valid-type
-    return isinstance(synapse_dynamics, _Dynamics.Structural())
+    """
+    Checks if synapse_dynamics is a AbstractSynapseDynamicsStructural
+
+    :param AbstractSynapseDynamics synapse_dynamics:
+    :rtype: bool
+    """
+    return isinstance(synapse_dynamics, _Dynamics.structural())
 
 
 def are_dynamics_stdp(synapse_dynamics: AbstractSynapseDynamics) -> TypeGuard[
         SynapseDynamicsSTDP]:
     # pylint: disable=isinstance-second-argument-not-valid-type
-    return isinstance(synapse_dynamics, _Dynamics.STDP())
+    """
+    Checks if synapse_dynamics is a SynapseDynamicsSTD
+
+    :param AbstractSynapseDynamics synapse_dynamics:
+    :rtype: bool
+    """
+    return isinstance(synapse_dynamics, _Dynamics.stdp())
 
 
 def are_dynamics_neuromodulation(
         synapse_dynamics: AbstractSynapseDynamics) -> TypeGuard[
             SynapseDynamicsNeuromodulation]:
+    """
+    Checks if synapse_dynamics is a SynapseDynamicsNeuromodulation
+
+    :param AbstractSynapseDynamics synapse_dynamics:
+    :rtype: bool
+    """
     # pylint: disable=isinstance-second-argument-not-valid-type
-    return isinstance(synapse_dynamics, _Dynamics.Neuromodulation())
+    return isinstance(synapse_dynamics, _Dynamics.neuromodulation())
 
 
 class ProjectionApplicationEdge(

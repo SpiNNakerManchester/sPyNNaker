@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from spinn_utilities.progress_bar import ProgressBar
 
 
 def finish_connection_holders() -> None:

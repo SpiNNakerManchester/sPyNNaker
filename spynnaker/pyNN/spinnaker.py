@@ -13,20 +13,23 @@
 # limitations under the License.
 
 import logging
-from lazyarray import __version__ as lazyarray_version
-from quantities import __version__ as quantities_version
 import math
-from neo import __version__ as neo_version
 import os
+from typing import Collection, Optional, Union, cast
+
+from lazyarray import __version__ as lazyarray_version
+from typing_extensions import Literal
+
+from neo import __version__ as neo_version
+from quantities import __version__ as quantities_version
 from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
-from typing import Collection, Optional, Union, cast
-from typing_extensions import Literal
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import (
     get_config_bool, get_config_str_or_none)
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.interface.provenance import (
@@ -139,11 +142,12 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             this duration.  The continue_simulation() method must then be
             called for the simulation to continue.
         """
-        # extra post prerun algorithms
+        # sPyNNaker specific algorithms to do before starting a run
         self.__flush_post_vertex_caches()
 
         super(SpiNNaker, self).run(run_time, sync_time)
-        # extra post run algorithms
+
+        # PyNNaker specific algorithms to do after finishing a run
         self.__flush_post_vertex_caches()
 
     def __flush_post_vertex_caches(self) -> None:
@@ -374,6 +378,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 "****************************************************")
 
     def stop(self) -> None:
+        """
+        End running of the simulation. Notifying each Population of the end.
+        """
         # pylint: disable=protected-access
         FecTimer.start_category(TimerCategory.SHUTTING_DOWN)
         for population in self.__writer.iterate_populations():

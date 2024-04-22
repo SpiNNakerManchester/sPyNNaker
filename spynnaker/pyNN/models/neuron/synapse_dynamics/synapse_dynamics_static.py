@@ -12,22 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-import numpy
-from numpy import uint8, uint32, integer
-from numpy.typing import NDArray
-from pyNN.standardmodels.synapses import StaticSynapse
 from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
+
+import numpy
+from numpy import floating, integer, uint8, uint32
+from numpy.typing import NDArray
+
+from pyNN.standardmodels.synapses import StaticSynapse
+
 from spinn_utilities.overrides import overrides
+
+from spinn_front_end_common.interface.ds import DataSpecificationBase
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE)
+from spynnaker.pyNN.types import Weight_Delay_In_Types as _Weight
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
+
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.types import Weight_Delay_In_Types as _Weight
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 if TYPE_CHECKING:
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
     from spynnaker.pyNN.models.neural_projections import (
@@ -44,9 +53,9 @@ class SynapseDynamicsStatic(
     The dynamics of a synapse that does not change over time.
     """
 
-    __slots__ = (
+    __slots__ = [
         # padding to add to a synaptic row for synaptic rewiring
-        "__pad_to_length")
+        "__pad_to_length"]
 
     def __init__(
             self, weight: _Weight = StaticSynapse.default_parameters['weight'],
@@ -87,12 +96,14 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.
                get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(
-            self, n_neurons, n_synapse_types) -> int:
+            self, n_neurons: int, n_synapse_types: int) -> int:
         return 0
 
     @overrides(AbstractStaticSynapseDynamics.write_parameters)
     def write_parameters(
-            self, spec, region, global_weight_scale, synapse_weight_scales):
+            self, spec: DataSpecificationBase, region: int,
+            global_weight_scale: float,
+            synapse_weight_scales: NDArray[floating]):
         # Nothing to do here
         pass
 
@@ -160,7 +171,9 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractStaticSynapseDynamics.read_static_synaptic_data)
     def read_static_synaptic_data(
-            self, n_synapse_types, ff_size, ff_data, max_atoms_per_core):
+            self, n_synapse_types: int, ff_size: NDArray[integer],
+            ff_data: List[NDArray[uint32]],
+            max_atoms_per_core: int) -> ConnectionsArray:
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
@@ -181,12 +194,12 @@ class SynapseDynamicsStatic(
         return ('weight', 'delay')
 
     @overrides(AbstractStaticSynapseDynamics.get_max_synapses)
-    def get_max_synapses(self, n_words):
+    def get_max_synapses(self, n_words: int) -> int:
         return n_words
 
     @property
     @overrides(AbstractGenerateOnMachine.gen_matrix_id)
-    def gen_matrix_id(self):
+    def gen_matrix_id(self) -> int:
         return MatrixGeneratorID.STATIC_MATRIX.value
 
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
@@ -214,20 +227,20 @@ class SynapseDynamicsStatic(
     @property
     @overrides(AbstractGenerateOnMachine.
                gen_matrix_params_size_in_bytes)
-    def gen_matrix_params_size_in_bytes(self):
+    def gen_matrix_params_size_in_bytes(self) -> int:
         return 12 * BYTES_PER_WORD
 
     @property
     @overrides(AbstractStaticSynapseDynamics.changes_during_run)
-    def changes_during_run(self):
+    def changes_during_run(self) -> bool:
         return False
 
     @property
     @overrides(AbstractStaticSynapseDynamics.pad_to_length)
-    def pad_to_length(self):
+    def pad_to_length(self) -> Optional[int]:
         return self.__pad_to_length
 
     @property
     @overrides(AbstractStaticSynapseDynamics.is_combined_core_capable)
-    def is_combined_core_capable(self):
+    def is_combined_core_capable(self) -> bool:
         return True

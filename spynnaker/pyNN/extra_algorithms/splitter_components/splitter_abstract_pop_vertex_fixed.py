@@ -12,17 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from collections import defaultdict
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple, cast
+
 from numpy import floating
 from numpy.typing import NDArray
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple, cast
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
+
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.resources import AbstractSDRAM, MultiRegionSDRAM
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.utilities.utility_objs import ChipCounter
+
+from spynnaker.pyNN.models.common.population_application_vertex import (
+    PopulationApplicationVertex)
 from spynnaker.pyNN.models.neuron import (
     PopulationMachineVertex,
     PopulationMachineLocalOnlyCombinedVertex, LocalOnlyProvenance)
@@ -41,10 +47,9 @@ from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.population_machine_common import (
     PopulationMachineCommon)
+
 from .splitter_abstract_pop_vertex import SplitterAbstractPopulationVertex
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
-from spynnaker.pyNN.models.common.population_application_vertex import (
-    PopulationApplicationVertex)
 
 # The maximum number of bits for the ring buffer index that are likely to
 # fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
@@ -104,16 +109,19 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
         return self._get_fixed_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, partition_id) -> List[MachineVertex]:
+    def get_out_going_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, partition_id) -> List[MachineVertex]:
+    def get_in_coming_vertices(
+            self, partition_id: str) -> Sequence[MachineVertex]:
         return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
-            self, source_vertex: ApplicationVertex, partition_id) -> List[
+            self, source_vertex: ApplicationVertex,
+            partition_id: str) -> List[
                 Tuple[MachineVertex, Sequence[MachineVertex]]]:
         # Determine the real pre-vertex
         pre_vertex = source_vertex
@@ -138,7 +146,7 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(
-            self, variable_to_record) -> Iterable[MachineVertex]:
+            self, variable_to_record: str) -> Iterable[MachineVertex]:
         return self.governed_app_vertex.machine_vertices
 
     def create_machine_vertex(
@@ -147,6 +155,21 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
             weight_scales: NDArray[floating], index: int,
             max_atoms_per_core: int, synaptic_matrices: SynapticMatrices,
             neuron_data: NeuronData) -> PopulationMachineCommon:
+        """
+        Create the machine vertex for a slice.
+
+        :param Slice vertex_slice:
+        :param AbstractSDRAM sdram:
+        :param str label:
+        :param int structural_sz:
+        :param list(list) ring_buffer_shifts:
+        :param ndarray weight_scales:
+        :param int index:
+        :param int max_atoms_per_core:
+        :param SynapticMatrices synaptic_matrices:
+        :param NeuronData neuron_data:
+        :rtype: PopulationMachineCommon
+        """
         # If using local-only create a local-only vertex
         s_dynamics = self.governed_app_vertex.synapse_dynamics
         if isinstance(s_dynamics, AbstractLocalOnly):

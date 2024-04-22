@@ -27,12 +27,12 @@ class MockPopulation(object):
 
     @property
     @overrides(Population.size)
-    def size(self):
+    def size(self) -> int:
         return self._size
 
     @property
     @overrides(Population.label)
-    def label(self):
+    def label(self) -> str:
         return self.label
 
     def __repr__(self):

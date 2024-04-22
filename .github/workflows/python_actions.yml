@@ -46,7 +46,7 @@ jobs:
       with:
         packages: graphviz
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install pip, etc
@@ -89,7 +89,9 @@ jobs:
       uses: ./support/actions/pylint
       with:
         package: ${{ env.BASE_PKG }}
+        exitcheck: 31 # Action fails on any message
         language: en_GB
+        rcfile: global_strict
     - name: Lint with mypy
       run: mypy ${{ env.BASE_PKG }}
 
@@ -113,7 +115,7 @@ jobs:
       with:
         packages: graphviz
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install pip, etc

@@ -17,6 +17,7 @@ from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
 class RandomStatsVonmisesImpl(AbstractRandomStats):
+    # pylint: disable=wrong-spelling-in-docstring
     """
     An implementation of AbstractRandomStats for von Mises distributions.
     """
