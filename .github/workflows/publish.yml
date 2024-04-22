@@ -61,7 +61,7 @@ jobs:
           cp -vaT $C_DOC_DIR $DEPLOY_DIR/c
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.5.0
+        uses: JamesIves/github-pages-deploy-action@v4.6.0
         with:
           branch: gh-pages
           folder: ${{ env.DEPLOY_DIR }}
