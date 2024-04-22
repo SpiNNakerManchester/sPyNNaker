@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['generate_0',['generate',['../connection__generator_8c.html#ac02a18c2c72affcf44c2166cab070a84',1,'connection_generator_info::generate()'],['../param__generator_8c.html#ad9c1ec831eb4ff50829162738b662847',1,'param_generator_info::generate()']]],
+  ['generate_0',['generate',['../connection__generator_8c.html#ac02a18c2c72affcf44c2166cab070a84',1,'connection_generator_info::generate'],['../param__generator_8c.html#ad9c1ec831eb4ff50829162738b662847',1,'param_generator_info::generate']]],
   ['generate_5fbit_5ffield_1',['generate_bit_field',['../bit__field__expander_8h.html#ac4477b4a6faf287e216d3a2ba19f91ca',1,'bit_field_expander.h']]],
   ['generate_5fconnection_5ffunc_2',['generate_connection_func',['../generator__types_8h.html#ae7498b5ac57ed8c5279e034819ae4c3f',1,'generator_types.h']]],
   ['generate_5fparam_5ffunc_3',['generate_param_func',['../generator__types_8h.html#aeb13a16410f550a8620d9db733b00114',1,'generator_types.h']]],
@@ -21,7 +21,7 @@ var searchData=
   ['get_5frow_5flength_18',['get_row_length',['../population__table_8h.html#a44d4641d18cf8073f34f171a7e9a0f54',1,'population_table.h']]],
   ['get_5fstdp_5ffixed_5frow_19',['get_stdp_fixed_row',['../matrix__generator__stdp_8h.html#a97c90fc0e4a1cf3399c32a8421380e9a',1,'matrix_generator_stdp.h']]],
   ['get_5ftype_5fchar_20',['get_type_char',['../synapses_8c.html#a1a333d14cf1e2ac31a3d3d8bee59dedd',1,'synapses.c']]],
-  ['ghost_5fpop_5ftable_5fsearches_21',['ghost_pop_table_searches',['../population__table_8h.html#ac69edc9d8d10785e6775d3805c8e7037',1,'ghost_pop_table_searches():&#160;population_table_binary_search_impl.c'],['../population__table__binary__search__impl_8c.html#ac69edc9d8d10785e6775d3805c8e7037',1,'ghost_pop_table_searches():&#160;population_table_binary_search_impl.c']]],
+  ['ghost_5fpop_5ftable_5fsearches_21',['ghost_pop_table_searches',['../population__table_8h.html#ac69edc9d8d10785e6775d3805c8e7037',1,'ghost_pop_table_searches:&#160;population_table_binary_search_impl.c'],['../population__table__binary__search__impl_8c.html#ac69edc9d8d10785e6775d3805c8e7037',1,'ghost_pop_table_searches:&#160;population_table_binary_search_impl.c']]],
   ['gidr_5fid_22',['gidr_id',['https://spinnakermanchester.github.io/spinnaker_tools/scamp-nn_8c.html#ab0220b89bc365b6e1ef669bb54e06833',1,'nn_desc_t']]],
   ['global_5fcontrol_23',['global_control',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a51a63768e00c5f8fbf88c62dc3ebf7d7',1,'dma_t']]],
   ['global_5fparameters_24',['global_parameters',['../spike__source__poisson_8c.html#structglobal__parameters',1,'']]],
@@ -33,7 +33,7 @@ var searchData=
   ['grid_5fx_5frecip_30',['grid_x_recip',['../formation__distance__dependent__impl_8h.html#a36308a64f1768104aa73dd155c05a87b',1,'formation_params']]],
   ['grid_5fy_31',['grid_y',['../formation__distance__dependent__impl_8h.html#a1bb0a8d3a12b2bc16b2f00d7e6b54b4f',1,'formation_params']]],
   ['grid_5fy_5frecip_32',['grid_y_recip',['../formation__distance__dependent__impl_8h.html#a5e8b9fd4addaadfef9a0604acf4ea8c7',1,'formation_params']]],
-  ['gsyn_5fexc_5frecording_5findex_33',['GSYN_EXC_RECORDING_INDEX',['../neuron__impl__external__devices_8h.html#a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e',1,'GSYN_EXC_RECORDING_INDEX():&#160;neuron_impl_external_devices.h'],['../neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e',1,'GSYN_EXC_RECORDING_INDEX():&#160;neuron_impl_standard.h']]],
-  ['gsyn_5finh_5frecording_5findex_34',['GSYN_INH_RECORDING_INDEX',['../neuron__impl__external__devices_8h.html#a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e',1,'GSYN_INH_RECORDING_INDEX():&#160;neuron_impl_external_devices.h'],['../neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e',1,'GSYN_INH_RECORDING_INDEX():&#160;neuron_impl_standard.h']]],
+  ['gsyn_5fexc_5frecording_5findex_33',['gsyn_exc_recording_index',['../neuron__impl__external__devices_8h.html#a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e',1,'GSYN_EXC_RECORDING_INDEX:&#160;neuron_impl_external_devices.h'],['../neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e',1,'GSYN_EXC_RECORDING_INDEX:&#160;neuron_impl_standard.h']]],
+  ['gsyn_5finh_5frecording_5findex_34',['gsyn_inh_recording_index',['../neuron__impl__external__devices_8h.html#a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e',1,'GSYN_INH_RECORDING_INDEX:&#160;neuron_impl_external_devices.h'],['../neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e',1,'GSYN_INH_RECORDING_INDEX:&#160;neuron_impl_standard.h']]],
   ['gw_5faddr_35',['gw_addr',['https://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a54eb515cd59f33b53eb523d3197cf46c',1,'srom_data_t']]]
 ];

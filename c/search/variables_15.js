@@ -6,7 +6,7 @@ var searchData=
   ['undef_5fvec_3',['undef_vec',['https://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a052b32accc8bf379edaf289dc1373450',1,'sark_vec_t']]],
   ['unix_5ftime_4',['unix_time',['https://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a2f53dfc85f86092b7fa0ca216537f645',1,'sv_t']]],
   ['unread_5fcounter_5',['unread_counter',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a3a847828442fd3dccf79cff3ccd2ab97',1,'ethernet_general_status_t']]],
-  ['update_5ftime_6',['update_time',['../robot__motor__control_8c.html#af91db5a416282fefdb525fadbc6f5f8f',1,'motor_control_config_t::update_time()'],['../robot__motor__control_8c.html#a86e18fc3ab6be6646e80307e68187e63',1,'update_time():&#160;robot_motor_control.c']]],
+  ['update_5ftime_6',['update_time',['../robot__motor__control_8c.html#af91db5a416282fefdb525fadbc6f5f8f',1,'motor_control_config_t::update_time'],['../robot__motor__control_8c.html#a86e18fc3ab6be6646e80307e68187e63',1,'update_time:&#160;robot_motor_control.c']]],
   ['use_5fkey_7',['use_key',['../neuron_8c.html#ab9132b5a04a7bdb8ac2e4293c1ec96bf',1,'neuron.c']]],
   ['user_8',['user',['https://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a469168c154fd3642bf156ae8955a7aea',1,'event_data_t']]],
   ['user0_9',['user0',['https://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a6d10a703182a1f793dc7f2e16167d4e6',1,'vcpu_t']]],

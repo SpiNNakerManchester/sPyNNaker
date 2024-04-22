@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['generate_0',['generate',['../connection__generator_8c.html#ac02a18c2c72affcf44c2166cab070a84',1,'connection_generator_info::generate()'],['../param__generator_8c.html#ad9c1ec831eb4ff50829162738b662847',1,'param_generator_info::generate()']]],
-  ['ghost_5fpop_5ftable_5fsearches_1',['ghost_pop_table_searches',['../population__table_8h.html#ac69edc9d8d10785e6775d3805c8e7037',1,'ghost_pop_table_searches():&#160;population_table_binary_search_impl.c'],['../population__table__binary__search__impl_8c.html#ac69edc9d8d10785e6775d3805c8e7037',1,'ghost_pop_table_searches():&#160;population_table_binary_search_impl.c']]],
+  ['generate_0',['generate',['../connection__generator_8c.html#ac02a18c2c72affcf44c2166cab070a84',1,'connection_generator_info::generate'],['../param__generator_8c.html#ad9c1ec831eb4ff50829162738b662847',1,'param_generator_info::generate']]],
+  ['ghost_5fpop_5ftable_5fsearches_1',['ghost_pop_table_searches',['../population__table_8h.html#ac69edc9d8d10785e6775d3805c8e7037',1,'ghost_pop_table_searches:&#160;population_table_binary_search_impl.c'],['../population__table__binary__search__impl_8c.html#ac69edc9d8d10785e6775d3805c8e7037',1,'ghost_pop_table_searches:&#160;population_table_binary_search_impl.c']]],
   ['gidr_5fid_2',['gidr_id',['https://spinnakermanchester.github.io/spinnaker_tools/scamp-nn_8c.html#ab0220b89bc365b6e1ef669bb54e06833',1,'nn_desc_t']]],
   ['global_5fcontrol_3',['global_control',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a51a63768e00c5f8fbf88c62dc3ebf7d7',1,'dma_t']]],
   ['gpio_4',['gpio',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#af830b22b6430044906c6c4dad7a98d4e',1,'sc_io_t']]],

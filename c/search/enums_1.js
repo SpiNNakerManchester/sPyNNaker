@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['callback_5fpriorities_0',['callback_priorities',['../c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964',1,'callback_priorities():&#160;c_main.c'],['../c__main__neurons_8c.html#a65b19dabf5283c1ea37df964ca25e964',1,'callback_priorities():&#160;c_main_neurons.c'],['../c__main__synapses_8c.html#a65b19dabf5283c1ea37df964ca25e964',1,'callback_priorities():&#160;c_main_synapses.c'],['../spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964',1,'callback_priorities():&#160;spike_source_poisson.c']]]
+  ['callback_5fpriorities_0',['callback_priorities',['../c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964',1,'callback_priorities:&#160;c_main.c'],['../c__main__neurons_8c.html#a65b19dabf5283c1ea37df964ca25e964',1,'callback_priorities:&#160;c_main_neurons.c'],['../c__main__synapses_8c.html#a65b19dabf5283c1ea37df964ca25e964',1,'callback_priorities:&#160;c_main_synapses.c'],['../spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964',1,'callback_priorities:&#160;spike_source_poisson.c']]]
 ];

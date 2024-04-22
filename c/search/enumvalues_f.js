@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['sdp_0',['SDP',['../robot__motor__control_8c.html#ad8ff0294897e11d77bb67c6f1e9a3386ad645defae8408de2415f3dc417f69773',1,'SDP():&#160;robot_motor_control.c'],['../spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773',1,'SDP():&#160;spike_source_poisson.c'],['../delay__extension_8c.html#a9754029f237bd209c67ffa701d8250c6ad645defae8408de2415f3dc417f69773',1,'SDP():&#160;delay_extension.c']]],
+  ['sdp_0',['sdp',['../robot__motor__control_8c.html#ad8ff0294897e11d77bb67c6f1e9a3386ad645defae8408de2415f3dc417f69773',1,'SDP:&#160;robot_motor_control.c'],['../spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773',1,'SDP:&#160;spike_source_poisson.c'],['../delay__extension_8c.html#a9754029f237bd209c67ffa701d8250c6ad645defae8408de2415f3dc417f69773',1,'SDP:&#160;delay_extension.c']]],
   ['sdram_5fparams_5fregion_1',['SDRAM_PARAMS_REGION',['../spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a83adee9297ce4e0afe12a39cc55f4562',1,'spike_source_poisson.c']]],
   ['send_5ftype_5faccum_2',['SEND_TYPE_ACCUM',['../neuron__impl__external__devices_8h.html#a73f8837bd24ba4a9abf204756c0b9b9ea020920e4dc6523fa9322a718de973b59',1,'neuron_impl_external_devices.h']]],
   ['send_5ftype_5ffract_3',['SEND_TYPE_FRACT',['../neuron__impl__external__devices_8h.html#a73f8837bd24ba4a9abf204756c0b9b9eab4b21fb2f7c58f05dee2ce53c31a1675',1,'neuron_impl_external_devices.h']]],
@@ -22,6 +22,6 @@ var searchData=
   ['synapse_5fdynamics_5fregion_19',['SYNAPSE_DYNAMICS_REGION',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ab672882ccd8470f490be492ed18d717b',1,'regions.h']]],
   ['synapse_5fparams_5fregion_20',['SYNAPSE_PARAMS_REGION',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a3e4b437e3952b8683d2dde3f61a15d80',1,'regions.h']]],
   ['synaptic_5fmatrix_5fregion_21',['SYNAPTIC_MATRIX_REGION',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ad5778663b1d738822f9b1b5ce9dd9061',1,'regions.h']]],
-  ['system_22',['SYSTEM',['../delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32a57cc238145ec1361c72c327674c0d754',1,'SYSTEM():&#160;delay_extension.h'],['../spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a57cc238145ec1361c72c327674c0d754',1,'SYSTEM():&#160;spike_source_poisson.c']]],
-  ['system_5fregion_23',['SYSTEM_REGION',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ad102acc20b0123ad06640d8c591c304f',1,'SYSTEM_REGION():&#160;regions.h'],['../robot__motor__control_8c.html#a7f61ffa202f9ba34d1917f6f83d8bf9dad102acc20b0123ad06640d8c591c304f',1,'SYSTEM_REGION():&#160;robot_motor_control.c']]]
+  ['system_22',['system',['../delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32a57cc238145ec1361c72c327674c0d754',1,'SYSTEM:&#160;delay_extension.h'],['../spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a57cc238145ec1361c72c327674c0d754',1,'SYSTEM:&#160;spike_source_poisson.c']]],
+  ['system_5fregion_23',['system_region',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ad102acc20b0123ad06640d8c591c304f',1,'SYSTEM_REGION:&#160;regions.h'],['../robot__motor__control_8c.html#a7f61ffa202f9ba34d1917f6f83d8bf9dad102acc20b0123ad06640d8c591c304f',1,'SYSTEM_REGION:&#160;robot_motor_control.c']]]
 ];

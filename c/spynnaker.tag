@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-<tagfile doxygen_version="1.9.5">
+<tagfile doxygen_version="1.9.8">
   <compound kind="file">
     <name>in_spikes.h</name>
-    <path>/github/workspace/neural_modelling/src/common/</path>
+    <path>src/common/</path>
     <filename>in__spikes_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="yes" imported="no">neuron-typedefs.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="yes" import="no" module="no" objc="no">neuron-typedefs.h</includes>
     <member kind="function" static="yes">
       <type>static bool</type>
       <name>in_spikes_initialize_spike_buffer</name>
@@ -106,7 +106,7 @@
   </compound>
   <compound kind="file">
     <name>maths-util.h</name>
-    <path>/github/workspace/neural_modelling/src/common/</path>
+    <path>src/common/</path>
     <filename>maths-util_8h.html</filename>
     <member kind="define">
       <type>#define</type>
@@ -307,7 +307,7 @@
   </compound>
   <compound kind="file">
     <name>munich_protocol.h</name>
-    <path>/github/workspace/neural_modelling/src/common/</path>
+    <path>src/common/</path>
     <filename>munich__protocol_8h.html</filename>
     <class kind="struct">munich_key_bitfields_t</class>
     <class kind="union">munich_key_t</class>
@@ -1133,9 +1133,9 @@
   </compound>
   <compound kind="file">
     <name>neuron-typedefs.h</name>
-    <path>/github/workspace/neural_modelling/src/common/</path>
+    <path>src/common/</path>
     <filename>neuron-typedefs_8h.html</filename>
-    <includes id="maths-util_8h" name="maths-util.h" local="yes" imported="no">maths-util.h</includes>
+    <includes id="maths-util_8h" name="maths-util.h" local="yes" import="no" module="no" objc="no">maths-util.h</includes>
     <member kind="typedef">
       <type>uint32_t</type>
       <name>key_t</name>
@@ -1195,11 +1195,11 @@
   </compound>
   <compound kind="file">
     <name>delay_extension.c</name>
-    <path>/github/workspace/neural_modelling/src/delay_extension/</path>
+    <path>src/delay_extension/</path>
     <filename>delay__extension_8c.html</filename>
-    <includes id="delay__extension_8h" name="delay_extension.h" local="yes" imported="no">delay_extension.h</includes>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <includes id="in__spikes_8h" name="in_spikes.h" local="no" imported="no">common/in_spikes.h</includes>
+    <includes id="delay__extension_8h" name="delay_extension.h" local="yes" import="no" module="no" objc="no">delay_extension.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
+    <includes id="in__spikes_8h" name="in_spikes.h" local="no" import="no" module="no" objc="no">common/in_spikes.h</includes>
     <class kind="struct">delay_extension_provenance</class>
     <member kind="define">
       <type>#define</type>
@@ -1583,7 +1583,7 @@
   </compound>
   <compound kind="file">
     <name>delay_extension.h</name>
-    <path>/github/workspace/neural_modelling/src/delay_extension/</path>
+    <path>src/delay_extension/</path>
     <filename>delay__extension_8h.html</filename>
     <class kind="struct">delay_parameters</class>
     <member kind="define">
@@ -1641,9 +1641,9 @@
   </compound>
   <compound kind="file">
     <name>additional_input.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/additional_inputs/</path>
+    <path>src/neuron/additional_inputs/</path>
     <filename>additional__input_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>additional_input_initialise</name>
@@ -1675,9 +1675,9 @@
   </compound>
   <compound kind="file">
     <name>additional_input_ca2_adaptive_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/additional_inputs/</path>
+    <path>src/neuron/additional_inputs/</path>
     <filename>additional__input__ca2__adaptive__impl_8h.html</filename>
-    <includes id="additional__input_8h" name="additional_input.h" local="yes" imported="no">additional_input.h</includes>
+    <includes id="additional__input_8h" name="additional_input.h" local="yes" import="no" module="no" objc="no">additional_input.h</includes>
     <class kind="struct">additional_input_params_t</class>
     <class kind="struct">additional_input_t</class>
     <member kind="function" static="yes">
@@ -1697,9 +1697,9 @@
   </compound>
   <compound kind="file">
     <name>additional_input_none_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/additional_inputs/</path>
+    <path>src/neuron/additional_inputs/</path>
     <filename>additional__input__none__impl_8h.html</filename>
-    <includes id="additional__input_8h" name="additional_input.h" local="yes" imported="no">additional_input.h</includes>
+    <includes id="additional__input_8h" name="additional_input.h" local="yes" import="no" module="no" objc="no">additional_input.h</includes>
     <class kind="struct">additional_input_params_t</class>
     <class kind="struct">additional_input_t</class>
     <member kind="function" static="yes">
@@ -1719,41 +1719,17 @@
   </compound>
   <compound kind="file">
     <name>c_main.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>c__main_8c.html</filename>
-    <includes id="regions_8h" name="regions.h" local="yes" imported="no">regions.h</includes>
-    <includes id="neuron_2profile__tags_8h" name="profile_tags.h" local="yes" imported="no">profile_tags.h</includes>
-    <includes id="spike__processing_8h" name="spike_processing.h" local="yes" imported="no">spike_processing.h</includes>
+    <includes id="regions_8h" name="regions.h" local="yes" import="no" module="no" objc="no">regions.h</includes>
+    <includes id="neuron_2profile__tags_8h" name="profile_tags.h" local="yes" import="no" module="no" objc="no">profile_tags.h</includes>
+    <includes id="spike__processing_8h" name="spike_processing.h" local="yes" import="no" module="no" objc="no">spike_processing.h</includes>
     <class kind="struct">combined_provenance</class>
     <member kind="enumeration">
       <type></type>
       <name>callback_priorities</name>
       <anchorfile>c__main_8c.html</anchorfile>
       <anchor>a65b19dabf5283c1ea37df964ca25e964</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>MULTICAST</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>SDP</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>DMA</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>TIMER</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769</anchor>
       <arglist></arglist>
     </member>
     <member kind="function" static="yes">
@@ -1899,9 +1875,9 @@
   </compound>
   <compound kind="file">
     <name>c_main_neurons.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>c__main__neurons_8c.html</filename>
-    <includes id="neuron_2profile__tags_8h" name="profile_tags.h" local="yes" imported="no">profile_tags.h</includes>
+    <includes id="neuron_2profile__tags_8h" name="profile_tags.h" local="yes" import="no" module="no" objc="no">profile_tags.h</includes>
     <class kind="struct">sdram_config</class>
     <class kind="struct">neurons_provenance</class>
     <member kind="define">
@@ -1916,30 +1892,6 @@
       <name>callback_priorities</name>
       <anchorfile>c__main__neurons_8c.html</anchorfile>
       <anchor>a65b19dabf5283c1ea37df964ca25e964</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>MULTICAST</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>SDP</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>DMA</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>TIMER</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumeration">
@@ -2078,40 +2030,16 @@
   </compound>
   <compound kind="file">
     <name>c_main_synapses.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>c__main__synapses_8c.html</filename>
-    <includes id="spike__processing__fast_8h" name="spike_processing_fast.h" local="yes" imported="no">spike_processing_fast.h</includes>
-    <includes id="synaptogenesis__dynamics_8h" name="synaptogenesis_dynamics.h" local="yes" imported="no">structural_plasticity/synaptogenesis_dynamics.h</includes>
+    <includes id="spike__processing__fast_8h" name="spike_processing_fast.h" local="yes" import="no" module="no" objc="no">spike_processing_fast.h</includes>
+    <includes id="synaptogenesis__dynamics_8h" name="synaptogenesis_dynamics.h" local="yes" import="no" module="no" objc="no">structural_plasticity/synaptogenesis_dynamics.h</includes>
     <class kind="struct">provenance_data</class>
     <member kind="enumeration">
       <type></type>
       <name>callback_priorities</name>
       <anchorfile>c__main__synapses_8c.html</anchorfile>
       <anchor>a65b19dabf5283c1ea37df964ca25e964</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>MULTICAST</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>SDP</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>DMA</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>TIMER</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumeration">
@@ -2215,9 +2143,9 @@
   </compound>
   <compound kind="file">
     <name>current_source.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <path>src/neuron/current_sources/</path>
     <filename>current__source_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
     <class kind="struct">cs_id_index_t</class>
     <class kind="struct">neuron_current_source_t</class>
     <member kind="function" static="yes">
@@ -2244,75 +2172,75 @@
   </compound>
   <compound kind="file">
     <name>current_source_ac.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <path>src/neuron/current_sources/</path>
     <filename>current__source__ac_8h.html</filename>
     <class kind="struct">ac_source_t</class>
   </compound>
   <compound kind="file">
     <name>current_source_ac_only_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <path>src/neuron/current_sources/</path>
     <filename>current__source__ac__only__impl_8h.html</filename>
-    <includes id="current__source__ac_8h" name="current_source_ac.h" local="yes" imported="no">current_source_ac.h</includes>
+    <includes id="current__source__ac_8h" name="current_source_ac.h" local="yes" import="no" module="no" objc="no">current_source_ac.h</includes>
   </compound>
   <compound kind="file">
     <name>current_source_dc.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <path>src/neuron/current_sources/</path>
     <filename>current__source__dc_8h.html</filename>
     <class kind="struct">dc_source_t</class>
   </compound>
   <compound kind="file">
     <name>current_source_dc_only_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <path>src/neuron/current_sources/</path>
     <filename>current__source__dc__only__impl_8h.html</filename>
-    <includes id="current__source__dc_8h" name="current_source_dc.h" local="yes" imported="no">current_source_dc.h</includes>
+    <includes id="current__source__dc_8h" name="current_source_dc.h" local="yes" import="no" module="no" objc="no">current_source_dc.h</includes>
   </compound>
   <compound kind="file">
     <name>current_source_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <path>src/neuron/current_sources/</path>
     <filename>current__source__impl_8h.html</filename>
-    <includes id="current__source__dc_8h" name="current_source_dc.h" local="yes" imported="no">current_source_dc.h</includes>
-    <includes id="current__source__ac_8h" name="current_source_ac.h" local="yes" imported="no">current_source_ac.h</includes>
-    <includes id="current__source__step_8h" name="current_source_step.h" local="yes" imported="no">current_source_step.h</includes>
-    <includes id="current__source__noisy_8h" name="current_source_noisy.h" local="yes" imported="no">current_source_noisy.h</includes>
+    <includes id="current__source__dc_8h" name="current_source_dc.h" local="yes" import="no" module="no" objc="no">current_source_dc.h</includes>
+    <includes id="current__source__ac_8h" name="current_source_ac.h" local="yes" import="no" module="no" objc="no">current_source_ac.h</includes>
+    <includes id="current__source__step_8h" name="current_source_step.h" local="yes" import="no" module="no" objc="no">current_source_step.h</includes>
+    <includes id="current__source__noisy_8h" name="current_source_noisy.h" local="yes" import="no" module="no" objc="no">current_source_noisy.h</includes>
   </compound>
   <compound kind="file">
     <name>current_source_noisy.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <path>src/neuron/current_sources/</path>
     <filename>current__source__noisy_8h.html</filename>
     <class kind="struct">noisy_current_source_t</class>
   </compound>
   <compound kind="file">
     <name>current_source_noisy_only_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <path>src/neuron/current_sources/</path>
     <filename>current__source__noisy__only__impl_8h.html</filename>
-    <includes id="current__source__noisy_8h" name="current_source_noisy.h" local="yes" imported="no">current_source_noisy.h</includes>
+    <includes id="current__source__noisy_8h" name="current_source_noisy.h" local="yes" import="no" module="no" objc="no">current_source_noisy.h</includes>
   </compound>
   <compound kind="file">
     <name>current_source_step.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <path>src/neuron/current_sources/</path>
     <filename>current__source__step_8h.html</filename>
     <class kind="struct">step_current_source_times_t</class>
     <class kind="struct">step_current_source_amps_t</class>
   </compound>
   <compound kind="file">
     <name>current_source_step_only_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <path>src/neuron/current_sources/</path>
     <filename>current__source__step__only__impl_8h.html</filename>
-    <includes id="current__source__step_8h" name="current_source_step.h" local="yes" imported="no">current_source_step.h</includes>
+    <includes id="current__source__step_8h" name="current_source_step.h" local="yes" import="no" module="no" objc="no">current_source_step.h</includes>
   </compound>
   <compound kind="file">
     <name>current_source_stepnoisy_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <path>src/neuron/current_sources/</path>
     <filename>current__source__stepnoisy__impl_8h.html</filename>
-    <includes id="current__source__step_8h" name="current_source_step.h" local="yes" imported="no">current_source_step.h</includes>
-    <includes id="current__source__noisy_8h" name="current_source_noisy.h" local="yes" imported="no">current_source_noisy.h</includes>
+    <includes id="current__source__step_8h" name="current_source_step.h" local="yes" import="no" module="no" objc="no">current_source_step.h</includes>
+    <includes id="current__source__noisy_8h" name="current_source_noisy.h" local="yes" import="no" module="no" objc="no">current_source_noisy.h</includes>
   </compound>
   <compound kind="file">
     <name>decay.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>decay_8h.html</filename>
-    <includes id="maths-util_8h" name="maths-util.h" local="no" imported="no">common/maths-util.h</includes>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <includes id="maths-util_8h" name="maths-util.h" local="no" import="no" module="no" objc="no">common/maths-util.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
     <member kind="define">
       <type>#define</type>
       <name>decay</name>
@@ -2358,9 +2286,9 @@
   </compound>
   <compound kind="file">
     <name>neuron_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/implementations/</path>
+    <path>src/neuron/implementations/</path>
     <filename>neuron__impl_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
     <member kind="function" static="yes">
       <type>static bool</type>
       <name>neuron_impl_initialise</name>
@@ -2420,15 +2348,15 @@
   </compound>
   <compound kind="file">
     <name>neuron_impl_external_devices.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/implementations/</path>
+    <path>src/neuron/implementations/</path>
     <filename>neuron__impl__external__devices_8h.html</filename>
-    <includes id="neuron__impl_8h" name="neuron_impl.h" local="yes" imported="no">neuron_impl.h</includes>
-    <includes id="neuron__model__lif__impl_8h" name="neuron_model_lif_impl.h" local="no" imported="no">neuron/models/neuron_model_lif_impl.h</includes>
-    <includes id="synapse__types__exponential__impl_8h" name="synapse_types_exponential_impl.h" local="no" imported="no">neuron/synapse_types/synapse_types_exponential_impl.h</includes>
-    <includes id="input__type__current_8h" name="input_type_current.h" local="no" imported="no">neuron/input_types/input_type_current.h</includes>
-    <includes id="current__source__impl_8h" name="current_source_impl.h" local="no" imported="no">neuron/current_sources/current_source_impl.h</includes>
-    <includes id="current__source_8h" name="current_source.h" local="no" imported="no">neuron/current_sources/current_source.h</includes>
-    <includes id="neuron__recording_8h" name="neuron_recording.h" local="no" imported="no">neuron/neuron_recording.h</includes>
+    <includes id="neuron__impl_8h" name="neuron_impl.h" local="yes" import="no" module="no" objc="no">neuron_impl.h</includes>
+    <includes id="neuron__model__lif__impl_8h" name="neuron_model_lif_impl.h" local="no" import="no" module="no" objc="no">neuron/models/neuron_model_lif_impl.h</includes>
+    <includes id="synapse__types__exponential__impl_8h" name="synapse_types_exponential_impl.h" local="no" import="no" module="no" objc="no">neuron/synapse_types/synapse_types_exponential_impl.h</includes>
+    <includes id="input__type__current_8h" name="input_type_current.h" local="no" import="no" module="no" objc="no">neuron/input_types/input_type_current.h</includes>
+    <includes id="current__source__impl_8h" name="current_source_impl.h" local="no" import="no" module="no" objc="no">neuron/current_sources/current_source_impl.h</includes>
+    <includes id="current__source_8h" name="current_source.h" local="no" import="no" module="no" objc="no">neuron/current_sources/current_source.h</includes>
+    <includes id="neuron__recording_8h" name="neuron_recording.h" local="no" import="no" module="no" objc="no">neuron/neuron_recording.h</includes>
     <class kind="struct">packet_firing_data_t</class>
     <member kind="enumeration">
       <type></type>
@@ -2504,30 +2432,6 @@
       <anchor>a68f96be069d7309d70ec3343afad2e03a868c932bcf4cab46d2b226b04bc2438f</anchor>
       <arglist></arglist>
     </member>
-    <member kind="enumvalue">
-      <name>V_RECORDING_INDEX</name>
-      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
-      <anchor>a68f96be069d7309d70ec3343afad2e03ab3af76b3ea8cdd3c68aaa7432e4acf96</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>GSYN_EXC_RECORDING_INDEX</name>
-      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
-      <anchor>a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>GSYN_INH_RECORDING_INDEX</name>
-      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
-      <anchor>a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>N_RECORDED_VARS</name>
-      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
-      <anchor>a68f96be069d7309d70ec3343afad2e03a868c932bcf4cab46d2b226b04bc2438f</anchor>
-      <arglist></arglist>
-    </member>
     <member kind="enumeration">
       <type></type>
       <name>bitfield_recording_indices</name>
@@ -2544,18 +2448,6 @@
     <member kind="enumvalue">
       <name>N_BITFIELD_VARS</name>
       <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>a1a1145a27f2273fe3bf900dc1602b4e3aa2d088b9c45269b7bf9461907960c21c</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>SPIKE_RECORDING_BITFIELD</name>
-      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
-      <anchor>a1a1145a27f2273fe3bf900dc1602b4e3a12b36ddd66438ef711657d3a5ff70ebb</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>N_BITFIELD_VARS</name>
-      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
       <anchor>a1a1145a27f2273fe3bf900dc1602b4e3aa2d088b9c45269b7bf9461907960c21c</anchor>
       <arglist></arglist>
     </member>
@@ -2646,45 +2538,21 @@
   </compound>
   <compound kind="file">
     <name>neuron_impl_standard.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/implementations/</path>
+    <path>src/neuron/implementations/</path>
     <filename>neuron__impl__standard_8h.html</filename>
-    <includes id="neuron__impl_8h" name="neuron_impl.h" local="yes" imported="no">neuron_impl.h</includes>
-    <includes id="neuron__model_8h" name="neuron_model.h" local="no" imported="no">neuron/models/neuron_model.h</includes>
-    <includes id="input__type_8h" name="input_type.h" local="no" imported="no">neuron/input_types/input_type.h</includes>
-    <includes id="additional__input_8h" name="additional_input.h" local="no" imported="no">neuron/additional_inputs/additional_input.h</includes>
-    <includes id="threshold__type_8h" name="threshold_type.h" local="no" imported="no">neuron/threshold_types/threshold_type.h</includes>
-    <includes id="synapse__types_8h" name="synapse_types.h" local="no" imported="no">neuron/synapse_types/synapse_types.h</includes>
-    <includes id="current__source_8h" name="current_source.h" local="no" imported="no">neuron/current_sources/current_source.h</includes>
-    <includes id="neuron__recording_8h" name="neuron_recording.h" local="no" imported="no">neuron/neuron_recording.h</includes>
+    <includes id="neuron__impl_8h" name="neuron_impl.h" local="yes" import="no" module="no" objc="no">neuron_impl.h</includes>
+    <includes id="neuron__model_8h" name="neuron_model.h" local="no" import="no" module="no" objc="no">neuron/models/neuron_model.h</includes>
+    <includes id="input__type_8h" name="input_type.h" local="no" import="no" module="no" objc="no">neuron/input_types/input_type.h</includes>
+    <includes id="additional__input_8h" name="additional_input.h" local="no" import="no" module="no" objc="no">neuron/additional_inputs/additional_input.h</includes>
+    <includes id="threshold__type_8h" name="threshold_type.h" local="no" import="no" module="no" objc="no">neuron/threshold_types/threshold_type.h</includes>
+    <includes id="synapse__types_8h" name="synapse_types.h" local="no" import="no" module="no" objc="no">neuron/synapse_types/synapse_types.h</includes>
+    <includes id="current__source_8h" name="current_source.h" local="no" import="no" module="no" objc="no">neuron/current_sources/current_source.h</includes>
+    <includes id="neuron__recording_8h" name="neuron_recording.h" local="no" import="no" module="no" objc="no">neuron/neuron_recording.h</includes>
     <member kind="enumeration">
       <type></type>
       <name>word_recording_indices</name>
       <anchorfile>neuron__impl__standard_8h.html</anchorfile>
       <anchor>a68f96be069d7309d70ec3343afad2e03</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>V_RECORDING_INDEX</name>
-      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>a68f96be069d7309d70ec3343afad2e03ab3af76b3ea8cdd3c68aaa7432e4acf96</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>GSYN_EXC_RECORDING_INDEX</name>
-      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>GSYN_INH_RECORDING_INDEX</name>
-      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>N_RECORDED_VARS</name>
-      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>a68f96be069d7309d70ec3343afad2e03a868c932bcf4cab46d2b226b04bc2438f</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
@@ -2716,18 +2584,6 @@
       <name>bitfield_recording_indices</name>
       <anchorfile>neuron__impl__standard_8h.html</anchorfile>
       <anchor>a1a1145a27f2273fe3bf900dc1602b4e3</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>PACKET_RECORDING_BITFIELD</name>
-      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>a1a1145a27f2273fe3bf900dc1602b4e3a122d35b1c72444010af712fe58cd21be</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>N_BITFIELD_VARS</name>
-      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>a1a1145a27f2273fe3bf900dc1602b4e3aa2d088b9c45269b7bf9461907960c21c</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
@@ -2850,9 +2706,9 @@
   </compound>
   <compound kind="file">
     <name>input_type.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/input_types/</path>
+    <path>src/neuron/input_types/</path>
     <filename>input__type_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
     <member kind="define">
       <type>#define</type>
       <name>NUM_EXCITATORY_RECEPTORS</name>
@@ -2905,9 +2761,9 @@
   </compound>
   <compound kind="file">
     <name>input_type_conductance.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/input_types/</path>
+    <path>src/neuron/input_types/</path>
     <filename>input__type__conductance_8h.html</filename>
-    <includes id="input__type_8h" name="input_type.h" local="yes" imported="no">input_type.h</includes>
+    <includes id="input__type_8h" name="input_type.h" local="yes" import="no" module="no" objc="no">input_type.h</includes>
     <class kind="struct">input_type_params_t</class>
     <class kind="struct">input_type_t</class>
     <member kind="function" static="yes">
@@ -2934,9 +2790,9 @@
   </compound>
   <compound kind="file">
     <name>input_type_current.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/input_types/</path>
+    <path>src/neuron/input_types/</path>
     <filename>input__type__current_8h.html</filename>
-    <includes id="input__type_8h" name="input_type.h" local="yes" imported="no">input_type.h</includes>
+    <includes id="input__type_8h" name="input_type.h" local="yes" import="no" module="no" objc="no">input_type.h</includes>
     <class kind="struct">input_type_params_t</class>
     <class kind="struct">input_type_t</class>
     <member kind="function" static="yes">
@@ -2963,9 +2819,9 @@
   </compound>
   <compound kind="file">
     <name>input_type_delta.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/input_types/</path>
+    <path>src/neuron/input_types/</path>
     <filename>input__type__delta_8h.html</filename>
-    <includes id="input__type_8h" name="input_type.h" local="yes" imported="no">input_type.h</includes>
+    <includes id="input__type_8h" name="input_type.h" local="yes" import="no" module="no" objc="no">input_type.h</includes>
     <class kind="struct">input_type_params_t</class>
     <class kind="struct">input_type_t</class>
     <member kind="function" static="yes">
@@ -2992,9 +2848,9 @@
   </compound>
   <compound kind="file">
     <name>input_type_none.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/input_types/</path>
+    <path>src/neuron/input_types/</path>
     <filename>input__type__none_8h.html</filename>
-    <includes id="input__type_8h" name="input_type.h" local="yes" imported="no">input_type.h</includes>
+    <includes id="input__type_8h" name="input_type.h" local="yes" import="no" module="no" objc="no">input_type.h</includes>
     <class kind="struct">input_type_params_t</class>
     <class kind="struct">input_type_t</class>
     <member kind="define">
@@ -3035,9 +2891,9 @@
   </compound>
   <compound kind="file">
     <name>local_only.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>local__only_8c.html</filename>
-    <includes id="local__only_8h" name="local_only.h" local="yes" imported="no">local_only.h</includes>
+    <includes id="local__only_8h" name="local_only.h" local="yes" import="no" module="no" objc="no">local_only.h</includes>
     <class kind="struct">local_only_config</class>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -3196,9 +3052,9 @@
   </compound>
   <compound kind="file">
     <name>local_only.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>local__only_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
     <class kind="struct">local_only_provenance</class>
     <member kind="function">
       <type>bool</type>
@@ -3224,9 +3080,9 @@
   </compound>
   <compound kind="file">
     <name>neuron_model.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/models/</path>
+    <path>src/neuron/models/</path>
     <filename>neuron__model_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>neuron_model_initialise</name>
@@ -3279,9 +3135,9 @@
   </compound>
   <compound kind="file">
     <name>neuron_model_izh_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/models/</path>
+    <path>src/neuron/models/</path>
     <filename>neuron__model__izh__impl_8h.html</filename>
-    <includes id="neuron__model_8h" name="neuron_model.h" local="yes" imported="no">neuron_model.h</includes>
+    <includes id="neuron__model_8h" name="neuron_model.h" local="yes" import="no" module="no" objc="no">neuron_model.h</includes>
     <class kind="struct">neuron_params_t</class>
     <class kind="struct">neuron_t</class>
     <member kind="function" static="yes">
@@ -3329,9 +3185,9 @@
   </compound>
   <compound kind="file">
     <name>neuron_model_lif_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/models/</path>
+    <path>src/neuron/models/</path>
     <filename>neuron__model__lif__impl_8h.html</filename>
-    <includes id="neuron__model_8h" name="neuron_model.h" local="yes" imported="no">neuron_model.h</includes>
+    <includes id="neuron__model_8h" name="neuron_model.h" local="yes" import="no" module="no" objc="no">neuron_model.h</includes>
     <class kind="struct">neuron_params_t</class>
     <class kind="struct">neuron_t</class>
     <member kind="function" static="yes">
@@ -3372,13 +3228,13 @@
   </compound>
   <compound kind="file">
     <name>neuron.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>neuron_8c.html</filename>
-    <includes id="neuron_8h" name="neuron.h" local="yes" imported="no">neuron.h</includes>
-    <includes id="neuron__recording_8h" name="neuron_recording.h" local="yes" imported="no">neuron_recording.h</includes>
-    <includes id="neuron__impl_8h" name="neuron_impl.h" local="yes" imported="no">implementations/neuron_impl.h</includes>
-    <includes id="current__source_8h" name="current_source.h" local="yes" imported="no">current_sources/current_source.h</includes>
-    <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="yes" imported="no">plasticity/synapse_dynamics.h</includes>
+    <includes id="neuron_8h" name="neuron.h" local="yes" import="no" module="no" objc="no">neuron.h</includes>
+    <includes id="neuron__recording_8h" name="neuron_recording.h" local="yes" import="no" module="no" objc="no">neuron_recording.h</includes>
+    <includes id="neuron__impl_8h" name="neuron_impl.h" local="yes" import="no" module="no" objc="no">implementations/neuron_impl.h</includes>
+    <includes id="current__source_8h" name="current_source.h" local="yes" import="no" module="no" objc="no">current_sources/current_source.h</includes>
+    <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="yes" import="no" module="no" objc="no">plasticity/synapse_dynamics.h</includes>
     <class kind="struct">neuron_core_parameters</class>
     <member kind="function" static="yes">
       <type>static bool</type>
@@ -3537,10 +3393,10 @@
   </compound>
   <compound kind="file">
     <name>neuron.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>neuron_8h.html</filename>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="yes" imported="no">synapse_row.h</includes>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="yes" import="no" module="no" objc="no">synapse_row.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
     <member kind="function">
       <type>bool</type>
       <name>neuron_initialise</name>
@@ -3600,9 +3456,9 @@
   </compound>
   <compound kind="file">
     <name>neuron_recording.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>neuron__recording_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
     <class kind="struct">recording_values_t</class>
     <class kind="struct">bitfield_values_t</class>
     <class kind="struct">recording_info_t</class>
@@ -3786,9 +3642,9 @@
   </compound>
   <compound kind="file">
     <name>maths.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/</path>
+    <path>src/neuron/plasticity/stdp/</path>
     <filename>maths_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
     <class kind="struct">int16_lut</class>
     <member kind="define">
       <type>#define</type>
@@ -3849,7 +3705,7 @@
   </compound>
   <compound kind="file">
     <name>post_events.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/</path>
+    <path>src/neuron/plasticity/stdp/</path>
     <filename>post__events_8h.html</filename>
     <class kind="struct">post_event_history_t</class>
     <class kind="struct">post_event_window_t</class>
@@ -3905,7 +3761,7 @@
   </compound>
   <compound kind="file">
     <name>post_events_with_da.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/</path>
+    <path>src/neuron/plasticity/stdp/</path>
     <filename>post__events__with__da_8h.html</filename>
     <class kind="struct">nm_post_trace_t</class>
     <class kind="struct">post_event_history_t</class>
@@ -3962,7 +3818,7 @@
   </compound>
   <compound kind="file">
     <name>stdp_typedefs.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/</path>
+    <path>src/neuron/plasticity/stdp/</path>
     <filename>stdp__typedefs_8h.html</filename>
     <member kind="define">
       <type>#define</type>
@@ -4002,14 +3858,14 @@
   </compound>
   <compound kind="file">
     <name>synapse_dynamics_stdp_common.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/</path>
+    <path>src/neuron/plasticity/stdp/</path>
     <filename>synapse__dynamics__stdp__common_8h.html</filename>
-    <includes id="synapses_8h" name="synapses.h" local="no" imported="no">neuron/synapses.h</includes>
-    <includes id="maths_8h" name="maths.h" local="yes" imported="no">maths.h</includes>
-    <includes id="post__events_8h" name="post_events.h" local="yes" imported="no">post_events.h</includes>
-    <includes id="weight_8h" name="weight.h" local="yes" imported="no">weight_dependence/weight.h</includes>
-    <includes id="timing_8h" name="timing.h" local="yes" imported="no">timing_dependence/timing.h</includes>
-    <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="no" imported="no">neuron/plasticity/synapse_dynamics.h</includes>
+    <includes id="synapses_8h" name="synapses.h" local="no" import="no" module="no" objc="no">neuron/synapses.h</includes>
+    <includes id="maths_8h" name="maths.h" local="yes" import="no" module="no" objc="no">maths.h</includes>
+    <includes id="post__events_8h" name="post_events.h" local="yes" import="no" module="no" objc="no">post_events.h</includes>
+    <includes id="weight_8h" name="weight.h" local="yes" import="no" module="no" objc="no">weight_dependence/weight.h</includes>
+    <includes id="timing_8h" name="timing.h" local="yes" import="no" module="no" objc="no">timing_dependence/timing.h</includes>
+    <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="no" import="no" module="no" objc="no">neuron/plasticity/synapse_dynamics.h</includes>
     <class kind="struct">pre_event_history_t</class>
     <class kind="struct">stdp_params</class>
     <class kind="struct">fixed_stdp_synapse</class>
@@ -4072,11 +3928,11 @@
   </compound>
   <compound kind="file">
     <name>synapse_dynamics_stdp_izhikevich_neuromodulation.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/</path>
+    <path>src/neuron/plasticity/stdp/</path>
     <filename>synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html</filename>
-    <includes id="post__events__with__da_8h" name="post_events_with_da.h" local="yes" imported="no">post_events_with_da.h</includes>
-    <includes id="synapse__dynamics__stdp__common_8h" name="synapse_dynamics_stdp_common.h" local="yes" imported="no">synapse_dynamics_stdp_common.h</includes>
-    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="yes" imported="no">stdp_typedefs.h</includes>
+    <includes id="post__events__with__da_8h" name="post_events_with_da.h" local="yes" import="no" module="no" objc="no">post_events_with_da.h</includes>
+    <includes id="synapse__dynamics__stdp__common_8h" name="synapse_dynamics_stdp_common.h" local="yes" import="no" module="no" objc="no">synapse_dynamics_stdp_common.h</includes>
+    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="yes" import="no" module="no" objc="no">stdp_typedefs.h</includes>
     <class kind="struct">neuromodulation_data_t</class>
     <class kind="struct">neuromodulated_synapse_t</class>
     <class kind="struct">nm_update_state_t</class>
@@ -4158,10 +4014,10 @@
   </compound>
   <compound kind="file">
     <name>synapse_dynamics_stdp_mad_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/</path>
+    <path>src/neuron/plasticity/stdp/</path>
     <filename>synapse__dynamics__stdp__mad__impl_8c.html</filename>
-    <includes id="post__events_8h" name="post_events.h" local="yes" imported="no">post_events.h</includes>
-    <includes id="synapse__dynamics__stdp__common_8h" name="synapse_dynamics_stdp_common.h" local="yes" imported="no">synapse_dynamics_stdp_common.h</includes>
+    <includes id="post__events_8h" name="post_events.h" local="yes" import="no" module="no" objc="no">post_events.h</includes>
+    <includes id="synapse__dynamics__stdp__common_8h" name="synapse_dynamics_stdp_common.h" local="yes" import="no" module="no" objc="no">synapse_dynamics_stdp_common.h</includes>
     <class kind="struct">synapse_row_plastic_data_t</class>
     <member kind="function" static="yes">
       <type>static final_state_t</type>
@@ -4236,9 +4092,9 @@
   </compound>
   <compound kind="file">
     <name>synapse_structure.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
+    <path>src/neuron/plasticity/stdp/synapse_structure/</path>
     <filename>synapse__structure_8h.html</filename>
-    <includes id="weight_8h" name="weight.h" local="no" imported="no">neuron/plasticity/stdp/weight_dependence/weight.h</includes>
+    <includes id="weight_8h" name="weight.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/weight_dependence/weight.h</includes>
     <member kind="function" static="yes">
       <type>static update_state_t</type>
       <name>synapse_structure_get_update_state</name>
@@ -4298,9 +4154,9 @@
   </compound>
   <compound kind="file">
     <name>synapse_structure_weight_accumulator_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
+    <path>src/neuron/plasticity/stdp/synapse_structure/</path>
     <filename>synapse__structure__weight__accumulator__impl_8h.html</filename>
-    <includes id="synapse__structure_8h" name="synapse_structure.h" local="yes" imported="no">synapse_structure.h</includes>
+    <includes id="synapse__structure_8h" name="synapse_structure.h" local="yes" import="no" module="no" objc="no">synapse_structure.h</includes>
     <class kind="struct">plastic_synapse_t</class>
     <class kind="struct">update_state_t</class>
     <member kind="typedef">
@@ -4355,9 +4211,9 @@
   </compound>
   <compound kind="file">
     <name>synapse_structure_weight_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
+    <path>src/neuron/plasticity/stdp/synapse_structure/</path>
     <filename>synapse__structure__weight__impl_8h.html</filename>
-    <includes id="synapse__structure_8h" name="synapse_structure.h" local="yes" imported="no">synapse_structure.h</includes>
+    <includes id="synapse__structure_8h" name="synapse_structure.h" local="yes" import="no" module="no" objc="no">synapse_structure.h</includes>
     <member kind="typedef">
       <type>weight_t</type>
       <name>plastic_synapse_t</name>
@@ -4424,9 +4280,9 @@
   </compound>
   <compound kind="file">
     <name>synapse_structure_weight_state_accumulator_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
+    <path>src/neuron/plasticity/stdp/synapse_structure/</path>
     <filename>synapse__structure__weight__state__accumulator__impl_8h.html</filename>
-    <includes id="synapse__structure_8h" name="synapse_structure.h" local="yes" imported="no">synapse_structure.h</includes>
+    <includes id="synapse__structure_8h" name="synapse_structure.h" local="yes" import="no" module="no" objc="no">synapse_structure.h</includes>
     <class kind="struct">plastic_synapse_t</class>
     <class kind="struct">update_state_t</class>
     <member kind="typedef">
@@ -4481,9 +4337,9 @@
   </compound>
   <compound kind="file">
     <name>synapse_structure_weight_state_accumulator_window_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/synapse_structure/</path>
+    <path>src/neuron/plasticity/stdp/synapse_structure/</path>
     <filename>synapse__structure__weight__state__accumulator__window__impl_8h.html</filename>
-    <includes id="synapse__structure_8h" name="synapse_structure.h" local="yes" imported="no">synapse_structure.h</includes>
+    <includes id="synapse__structure_8h" name="synapse_structure.h" local="yes" import="no" module="no" objc="no">synapse_structure.h</includes>
     <class kind="struct">plastic_synapse_t</class>
     <class kind="struct">update_state_t</class>
     <member kind="typedef">
@@ -4538,7 +4394,7 @@
   </compound>
   <compound kind="file">
     <name>random_util.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>random__util_8h.html</filename>
     <member kind="variable" static="yes">
       <type>static mars_kiss64_seed_t</type>
@@ -4550,7 +4406,7 @@
   </compound>
   <compound kind="file">
     <name>timing.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing_8h.html</filename>
     <member kind="function">
       <type>address_t</type>
@@ -4604,9 +4460,9 @@
   </compound>
   <compound kind="file">
     <name>timing_nearest_pair_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__nearest__pair__impl_8c.html</filename>
-    <includes id="timing__nearest__pair__impl_8h" name="timing_nearest_pair_impl.h" local="yes" imported="no">timing_nearest_pair_impl.h</includes>
+    <includes id="timing__nearest__pair__impl_8h" name="timing_nearest_pair_impl.h" local="yes" import="no" module="no" objc="no">timing_nearest_pair_impl.h</includes>
     <member kind="function">
       <type>address_t</type>
       <name>timing_initialise</name>
@@ -4631,12 +4487,12 @@
   </compound>
   <compound kind="file">
     <name>timing_nearest_pair_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__nearest__pair__impl_8h.html</filename>
-    <includes id="synapse__structure__weight__impl_8h" name="synapse_structure_weight_impl.h" local="no" imported="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h</includes>
-    <includes id="timing_8h" name="timing.h" local="yes" imported="no">timing.h</includes>
-    <includes id="weight__one__term_8h" name="weight_one_term.h" local="no" imported="no">neuron/plasticity/stdp/weight_dependence/weight_one_term.h</includes>
-    <includes id="maths_8h" name="maths.h" local="no" imported="no">neuron/plasticity/stdp/maths.h</includes>
+    <includes id="synapse__structure__weight__impl_8h" name="synapse_structure_weight_impl.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h</includes>
+    <includes id="timing_8h" name="timing.h" local="yes" import="no" module="no" objc="no">timing.h</includes>
+    <includes id="weight__one__term_8h" name="weight_one_term.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/weight_dependence/weight_one_term.h</includes>
+    <includes id="maths_8h" name="maths.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/maths.h</includes>
     <class kind="struct">post_trace_t</class>
     <class kind="struct">pre_trace_t</class>
     <member kind="function" static="yes">
@@ -4677,9 +4533,9 @@
   </compound>
   <compound kind="file">
     <name>timing_pair_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__pair__impl_8c.html</filename>
-    <includes id="timing__pair__impl_8h" name="timing_pair_impl.h" local="yes" imported="no">timing_pair_impl.h</includes>
+    <includes id="timing__pair__impl_8h" name="timing_pair_impl.h" local="yes" import="no" module="no" objc="no">timing_pair_impl.h</includes>
     <member kind="function">
       <type>address_t</type>
       <name>timing_initialise</name>
@@ -4704,13 +4560,13 @@
   </compound>
   <compound kind="file">
     <name>timing_pair_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__pair__impl_8h.html</filename>
-    <includes id="synapse__structure__weight__impl_8h" name="synapse_structure_weight_impl.h" local="no" imported="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h</includes>
-    <includes id="timing_8h" name="timing.h" local="yes" imported="no">timing.h</includes>
-    <includes id="weight__one__term_8h" name="weight_one_term.h" local="no" imported="no">neuron/plasticity/stdp/weight_dependence/weight_one_term.h</includes>
-    <includes id="maths_8h" name="maths.h" local="no" imported="no">neuron/plasticity/stdp/maths.h</includes>
-    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" imported="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
+    <includes id="synapse__structure__weight__impl_8h" name="synapse_structure_weight_impl.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h</includes>
+    <includes id="timing_8h" name="timing.h" local="yes" import="no" module="no" objc="no">timing.h</includes>
+    <includes id="weight__one__term_8h" name="weight_one_term.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/weight_dependence/weight_one_term.h</includes>
+    <includes id="maths_8h" name="maths.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/maths.h</includes>
+    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
     <member kind="typedef">
       <type>int16_t</type>
       <name>post_trace_t</name>
@@ -4763,9 +4619,9 @@
   </compound>
   <compound kind="file">
     <name>timing_pfister_triplet_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__pfister__triplet__impl_8c.html</filename>
-    <includes id="timing__pfister__triplet__impl_8h" name="timing_pfister_triplet_impl.h" local="yes" imported="no">timing_pfister_triplet_impl.h</includes>
+    <includes id="timing__pfister__triplet__impl_8h" name="timing_pfister_triplet_impl.h" local="yes" import="no" module="no" objc="no">timing_pfister_triplet_impl.h</includes>
     <member kind="function">
       <type>address_t</type>
       <name>timing_initialise</name>
@@ -4804,13 +4660,13 @@
   </compound>
   <compound kind="file">
     <name>timing_pfister_triplet_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__pfister__triplet__impl_8h.html</filename>
-    <includes id="synapse__structure__weight__impl_8h" name="synapse_structure_weight_impl.h" local="no" imported="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h</includes>
-    <includes id="timing_8h" name="timing.h" local="yes" imported="no">timing.h</includes>
-    <includes id="weight__two__term_8h" name="weight_two_term.h" local="no" imported="no">neuron/plasticity/stdp/weight_dependence/weight_two_term.h</includes>
-    <includes id="maths_8h" name="maths.h" local="no" imported="no">neuron/plasticity/stdp/maths.h</includes>
-    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" imported="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
+    <includes id="synapse__structure__weight__impl_8h" name="synapse_structure_weight_impl.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h</includes>
+    <includes id="timing_8h" name="timing.h" local="yes" import="no" module="no" objc="no">timing.h</includes>
+    <includes id="weight__two__term_8h" name="weight_two_term.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/weight_dependence/weight_two_term.h</includes>
+    <includes id="maths_8h" name="maths.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/maths.h</includes>
+    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
     <class kind="struct">post_trace_t</class>
     <class kind="struct">pre_trace_t</class>
     <member kind="function" static="yes">
@@ -4879,13 +4735,13 @@
   </compound>
   <compound kind="file">
     <name>timing_recurrent_common.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__recurrent__common_8h.html</filename>
-    <includes id="timing_8h" name="timing.h" local="yes" imported="no">timing.h</includes>
-    <includes id="weight__one__term_8h" name="weight_one_term.h" local="no" imported="no">neuron/plasticity/stdp/weight_dependence/weight_one_term.h</includes>
-    <includes id="maths_8h" name="maths.h" local="no" imported="no">neuron/plasticity/stdp/maths.h</includes>
-    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" imported="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
-    <includes id="random__util_8h" name="random_util.h" local="yes" imported="no">random_util.h</includes>
+    <includes id="timing_8h" name="timing.h" local="yes" import="no" module="no" objc="no">timing.h</includes>
+    <includes id="weight__one__term_8h" name="weight_one_term.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/weight_dependence/weight_one_term.h</includes>
+    <includes id="maths_8h" name="maths.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/maths.h</includes>
+    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
+    <includes id="random__util_8h" name="random_util.h" local="yes" import="no" module="no" objc="no">random_util.h</includes>
     <member kind="enumeration">
       <type></type>
       <name>recurrent_state_machine_state_t</name>
@@ -4977,9 +4833,9 @@
   </compound>
   <compound kind="file">
     <name>timing_recurrent_dual_fsm_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__recurrent__dual__fsm__impl_8c.html</filename>
-    <includes id="timing__recurrent__dual__fsm__impl_8h" name="timing_recurrent_dual_fsm_impl.h" local="yes" imported="no">timing_recurrent_dual_fsm_impl.h</includes>
+    <includes id="timing__recurrent__dual__fsm__impl_8h" name="timing_recurrent_dual_fsm_impl.h" local="yes" import="no" module="no" objc="no">timing_recurrent_dual_fsm_impl.h</includes>
     <class kind="struct">dual_fsm_config_t</class>
     <member kind="function">
       <type>uint32_t *</type>
@@ -5012,14 +4868,14 @@
   </compound>
   <compound kind="file">
     <name>timing_recurrent_dual_fsm_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__recurrent__dual__fsm__impl_8h.html</filename>
-    <includes id="synapse__structure__weight__accumulator__impl_8h" name="synapse_structure_weight_accumulator_impl.h" local="no" imported="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_accumulator_impl.h</includes>
-    <includes id="timing_8h" name="timing.h" local="yes" imported="no">timing.h</includes>
-    <includes id="weight__one__term_8h" name="weight_one_term.h" local="no" imported="no">neuron/plasticity/stdp/weight_dependence/weight_one_term.h</includes>
-    <includes id="maths_8h" name="maths.h" local="no" imported="no">neuron/plasticity/stdp/maths.h</includes>
-    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" imported="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
-    <includes id="random__util_8h" name="random_util.h" local="yes" imported="no">random_util.h</includes>
+    <includes id="synapse__structure__weight__accumulator__impl_8h" name="synapse_structure_weight_accumulator_impl.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_accumulator_impl.h</includes>
+    <includes id="timing_8h" name="timing.h" local="yes" import="no" module="no" objc="no">timing.h</includes>
+    <includes id="weight__one__term_8h" name="weight_one_term.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/weight_dependence/weight_one_term.h</includes>
+    <includes id="maths_8h" name="maths.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/maths.h</includes>
+    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
+    <includes id="random__util_8h" name="random_util.h" local="yes" import="no" module="no" objc="no">random_util.h</includes>
     <class kind="struct">plasticity_trace_region_data_t</class>
     <member kind="typedef">
       <type>uint16_t</type>
@@ -5080,9 +4936,9 @@
   </compound>
   <compound kind="file">
     <name>timing_recurrent_pre_stochastic_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__recurrent__pre__stochastic__impl_8c.html</filename>
-    <includes id="timing__recurrent__pre__stochastic__impl_8h" name="timing_recurrent_pre_stochastic_impl.h" local="yes" imported="no">timing_recurrent_pre_stochastic_impl.h</includes>
+    <includes id="timing__recurrent__pre__stochastic__impl_8h" name="timing_recurrent_pre_stochastic_impl.h" local="yes" import="no" module="no" objc="no">timing_recurrent_pre_stochastic_impl.h</includes>
     <class kind="struct">pre_stochastic_config_t</class>
     <member kind="function">
       <type>address_t</type>
@@ -5115,9 +4971,9 @@
   </compound>
   <compound kind="file">
     <name>timing_recurrent_pre_stochastic_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__recurrent__pre__stochastic__impl_8h.html</filename>
-    <includes id="timing__recurrent__common_8h" name="timing_recurrent_common.h" local="yes" imported="no">timing_recurrent_common.h</includes>
+    <includes id="timing__recurrent__common_8h" name="timing_recurrent_common.h" local="yes" import="no" module="no" objc="no">timing_recurrent_common.h</includes>
     <class kind="struct">post_trace_t</class>
     <class kind="struct">pre_trace_t</class>
     <class kind="struct">plasticity_trace_region_data_t</class>
@@ -5152,9 +5008,9 @@
   </compound>
   <compound kind="file">
     <name>timing_vogels_2011_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__vogels__2011__impl_8c.html</filename>
-    <includes id="timing__vogels__2011__impl_8h" name="timing_vogels_2011_impl.h" local="yes" imported="no">timing_vogels_2011_impl.h</includes>
+    <includes id="timing__vogels__2011__impl_8h" name="timing_vogels_2011_impl.h" local="yes" import="no" module="no" objc="no">timing_vogels_2011_impl.h</includes>
     <class kind="struct">vogels_2011_config_t</class>
     <member kind="function">
       <type>address_t</type>
@@ -5180,13 +5036,13 @@
   </compound>
   <compound kind="file">
     <name>timing_vogels_2011_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
+    <path>src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>timing__vogels__2011__impl_8h.html</filename>
-    <includes id="synapse__structure__weight__impl_8h" name="synapse_structure_weight_impl.h" local="no" imported="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h</includes>
-    <includes id="timing_8h" name="timing.h" local="yes" imported="no">timing.h</includes>
-    <includes id="weight__one__term_8h" name="weight_one_term.h" local="no" imported="no">neuron/plasticity/stdp/weight_dependence/weight_one_term.h</includes>
-    <includes id="maths_8h" name="maths.h" local="no" imported="no">neuron/plasticity/stdp/maths.h</includes>
-    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" imported="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
+    <includes id="synapse__structure__weight__impl_8h" name="synapse_structure_weight_impl.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h</includes>
+    <includes id="timing_8h" name="timing.h" local="yes" import="no" module="no" objc="no">timing.h</includes>
+    <includes id="weight__one__term_8h" name="weight_one_term.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/weight_dependence/weight_one_term.h</includes>
+    <includes id="maths_8h" name="maths.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/maths.h</includes>
+    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
     <class kind="struct">plasticity_trace_region_data_t</class>
     <member kind="typedef">
       <type>int16_t</type>
@@ -5254,10 +5110,10 @@
   </compound>
   <compound kind="file">
     <name>weight.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="no" import="no" module="no" objc="no">neuron/synapse_row.h</includes>
     <member kind="function">
       <type>address_t</type>
       <name>weight_initialise</name>
@@ -5296,9 +5152,9 @@
   </compound>
   <compound kind="file">
     <name>weight_additive_one_term_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__additive__one__term__impl_8c.html</filename>
-    <includes id="weight__additive__one__term__impl_8h" name="weight_additive_one_term_impl.h" local="yes" imported="no">weight_additive_one_term_impl.h</includes>
+    <includes id="weight__additive__one__term__impl_8h" name="weight_additive_one_term_impl.h" local="yes" import="no" module="no" objc="no">weight_additive_one_term_impl.h</includes>
     <class kind="struct">additive_one_term_config_t</class>
     <member kind="function">
       <type>address_t</type>
@@ -5324,12 +5180,12 @@
   </compound>
   <compound kind="file">
     <name>weight_additive_one_term_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__additive__one__term__impl_8h.html</filename>
-    <includes id="maths_8h" name="maths.h" local="no" imported="no">neuron/plasticity/stdp/maths.h</includes>
-    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" imported="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
-    <includes id="weight__one__term_8h" name="weight_one_term.h" local="yes" imported="no">weight_one_term.h</includes>
+    <includes id="maths_8h" name="maths.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/maths.h</includes>
+    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="no" import="no" module="no" objc="no">neuron/synapse_row.h</includes>
+    <includes id="weight__one__term_8h" name="weight_one_term.h" local="yes" import="no" module="no" objc="no">weight_one_term.h</includes>
     <class kind="struct">plasticity_weight_region_data_t</class>
     <class kind="struct">weight_state_t</class>
     <member kind="function" static="yes">
@@ -5363,9 +5219,9 @@
   </compound>
   <compound kind="file">
     <name>weight_additive_two_term_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__additive__two__term__impl_8c.html</filename>
-    <includes id="weight__additive__two__term__impl_8h" name="weight_additive_two_term_impl.h" local="yes" imported="no">weight_additive_two_term_impl.h</includes>
+    <includes id="weight__additive__two__term__impl_8h" name="weight_additive_two_term_impl.h" local="yes" import="no" module="no" objc="no">weight_additive_two_term_impl.h</includes>
     <class kind="struct">additive_two_term_config_t</class>
     <member kind="function">
       <type>address_t</type>
@@ -5391,12 +5247,12 @@
   </compound>
   <compound kind="file">
     <name>weight_additive_two_term_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__additive__two__term__impl_8h.html</filename>
-    <includes id="maths_8h" name="maths.h" local="no" imported="no">neuron/plasticity/stdp/maths.h</includes>
-    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" imported="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
-    <includes id="weight__two__term_8h" name="weight_two_term.h" local="yes" imported="no">weight_two_term.h</includes>
+    <includes id="maths_8h" name="maths.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/maths.h</includes>
+    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="no" import="no" module="no" objc="no">neuron/synapse_row.h</includes>
+    <includes id="weight__two__term_8h" name="weight_two_term.h" local="yes" import="no" module="no" objc="no">weight_two_term.h</includes>
     <class kind="struct">plasticity_weight_region_data_t</class>
     <class kind="struct">weight_state_t</class>
     <member kind="function" static="yes">
@@ -5430,9 +5286,9 @@
   </compound>
   <compound kind="file">
     <name>weight_multiplicative_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__multiplicative__impl_8c.html</filename>
-    <includes id="weight__multiplicative__impl_8h" name="weight_multiplicative_impl.h" local="yes" imported="no">weight_multiplicative_impl.h</includes>
+    <includes id="weight__multiplicative__impl_8h" name="weight_multiplicative_impl.h" local="yes" import="no" module="no" objc="no">weight_multiplicative_impl.h</includes>
     <class kind="struct">multiplicative_config_t</class>
     <member kind="function">
       <type>address_t</type>
@@ -5458,12 +5314,12 @@
   </compound>
   <compound kind="file">
     <name>weight_multiplicative_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__multiplicative__impl_8h.html</filename>
-    <includes id="maths_8h" name="maths.h" local="no" imported="no">neuron/plasticity/stdp/maths.h</includes>
-    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" imported="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
-    <includes id="weight__one__term_8h" name="weight_one_term.h" local="yes" imported="no">weight_one_term.h</includes>
+    <includes id="maths_8h" name="maths.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/maths.h</includes>
+    <includes id="stdp__typedefs_8h" name="stdp_typedefs.h" local="no" import="no" module="no" objc="no">neuron/plasticity/stdp/stdp_typedefs.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="no" import="no" module="no" objc="no">neuron/synapse_row.h</includes>
+    <includes id="weight__one__term_8h" name="weight_one_term.h" local="yes" import="no" module="no" objc="no">weight_one_term.h</includes>
     <class kind="struct">plasticity_weight_region_data_t</class>
     <class kind="struct">weight_state_t</class>
     <member kind="function" static="yes">
@@ -5497,9 +5353,9 @@
   </compound>
   <compound kind="file">
     <name>weight_one_term.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__one__term_8h.html</filename>
-    <includes id="weight_8h" name="weight.h" local="yes" imported="no">weight.h</includes>
+    <includes id="weight_8h" name="weight.h" local="yes" import="no" module="no" objc="no">weight.h</includes>
     <member kind="function" static="yes">
       <type>static weight_state_t</type>
       <name>weight_one_term_apply_depression</name>
@@ -5517,9 +5373,9 @@
   </compound>
   <compound kind="file">
     <name>weight_two_term.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/weight_dependence/</path>
+    <path>src/neuron/plasticity/stdp/weight_dependence/</path>
     <filename>weight__two__term_8h.html</filename>
-    <includes id="weight_8h" name="weight.h" local="yes" imported="no">weight.h</includes>
+    <includes id="weight_8h" name="weight.h" local="yes" import="no" module="no" objc="no">weight.h</includes>
     <member kind="function" static="yes">
       <type>static weight_state_t</type>
       <name>weight_two_term_apply_depression</name>
@@ -5537,10 +5393,10 @@
   </compound>
   <compound kind="file">
     <name>synapse_dynamics.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/</path>
+    <path>src/neuron/plasticity/</path>
     <filename>synapse__dynamics_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="no" import="no" module="no" objc="no">neuron/synapse_row.h</includes>
     <member kind="function">
       <type>bool</type>
       <name>synapse_dynamics_initialise</name>
@@ -5614,10 +5470,10 @@
   </compound>
   <compound kind="file">
     <name>synapse_dynamics_static_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/plasticity/</path>
+    <path>src/neuron/plasticity/</path>
     <filename>synapse__dynamics__static__impl_8c.html</filename>
-    <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="yes" imported="no">synapse_dynamics.h</includes>
-    <includes id="synapses_8h" name="synapses.h" local="no" imported="no">neuron/synapses.h</includes>
+    <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="yes" import="no" module="no" objc="no">synapse_dynamics.h</includes>
+    <includes id="synapses_8h" name="synapses.h" local="no" import="no" module="no" objc="no">neuron/synapses.h</includes>
     <member kind="function">
       <type>bool</type>
       <name>synapse_dynamics_initialise</name>
@@ -5691,10 +5547,10 @@
   </compound>
   <compound kind="file">
     <name>population_table.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/population_table/</path>
+    <path>src/neuron/population_table/</path>
     <filename>population__table_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="no" import="no" module="no" objc="no">neuron/synapse_row.h</includes>
     <class kind="struct">master_population_table_entry</class>
     <class kind="struct">address_list_entry</class>
     <class kind="struct">pop_table_config_t</class>
@@ -5877,10 +5733,10 @@
   </compound>
   <compound kind="file">
     <name>population_table_binary_search_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/population_table/</path>
+    <path>src/neuron/population_table/</path>
     <filename>population__table__binary__search__impl_8c.html</filename>
-    <includes id="population__table_8h" name="population_table.h" local="yes" imported="no">population_table.h</includes>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
+    <includes id="population__table_8h" name="population_table.h" local="yes" import="no" module="no" objc="no">population_table.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="no" import="no" module="no" objc="no">neuron/synapse_row.h</includes>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>print_master_population_table</name>
@@ -6066,7 +5922,7 @@
   </compound>
   <compound kind="file">
     <name>regions.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>regions_8h.html</filename>
     <member kind="enumeration">
       <type></type>
@@ -6180,14 +6036,14 @@
   </compound>
   <compound kind="file">
     <name>spike_processing.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>spike__processing_8c.html</filename>
-    <includes id="spike__processing_8h" name="spike_processing.h" local="yes" imported="no">spike_processing.h</includes>
-    <includes id="population__table_8h" name="population_table.h" local="yes" imported="no">population_table/population_table.h</includes>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="yes" imported="no">synapse_row.h</includes>
-    <includes id="synapses_8h" name="synapses.h" local="yes" imported="no">synapses.h</includes>
-    <includes id="synaptogenesis__dynamics_8h" name="synaptogenesis_dynamics.h" local="yes" imported="no">structural_plasticity/synaptogenesis_dynamics.h</includes>
-    <includes id="in__spikes_8h" name="in_spikes.h" local="no" imported="no">common/in_spikes.h</includes>
+    <includes id="spike__processing_8h" name="spike_processing.h" local="yes" import="no" module="no" objc="no">spike_processing.h</includes>
+    <includes id="population__table_8h" name="population_table.h" local="yes" import="no" module="no" objc="no">population_table/population_table.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="yes" import="no" module="no" objc="no">synapse_row.h</includes>
+    <includes id="synapses_8h" name="synapses.h" local="yes" import="no" module="no" objc="no">synapses.h</includes>
+    <includes id="synaptogenesis__dynamics_8h" name="synaptogenesis_dynamics.h" local="yes" import="no" module="no" objc="no">structural_plasticity/synaptogenesis_dynamics.h</includes>
+    <includes id="in__spikes_8h" name="in_spikes.h" local="no" import="no" module="no" objc="no">common/in_spikes.h</includes>
     <class kind="struct">dma_buffer</class>
     <member kind="define">
       <type>#define</type>
@@ -6421,10 +6277,10 @@
   </compound>
   <compound kind="file">
     <name>spike_processing.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>spike__processing_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <includes id="in__spikes_8h" name="in_spikes.h" local="no" imported="no">common/in_spikes.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
+    <includes id="in__spikes_8h" name="in_spikes.h" local="no" import="no" module="no" objc="no">common/in_spikes.h</includes>
     <class kind="struct">spike_processing_provenance</class>
     <member kind="function">
       <type>bool</type>
@@ -6457,11 +6313,11 @@
   </compound>
   <compound kind="file">
     <name>spike_processing_fast.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>spike__processing__fast_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <includes id="in__spikes_8h" name="in_spikes.h" local="no" imported="no">common/in_spikes.h</includes>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="yes" imported="no">synapse_row.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
+    <includes id="in__spikes_8h" name="in_spikes.h" local="no" import="no" module="no" objc="no">common/in_spikes.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="yes" import="no" module="no" objc="no">synapse_row.h</includes>
     <class kind="struct">sdram_config</class>
     <class kind="struct">key_config</class>
     <class kind="struct">spike_processing_fast_provenance</class>
@@ -6489,9 +6345,9 @@
   </compound>
   <compound kind="file">
     <name>elimination.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/elimination/</path>
+    <path>src/neuron/structural_plasticity/synaptogenesis/elimination/</path>
     <filename>elimination_8h.html</filename>
-    <includes id="sp__structs_8h" name="sp_structs.h" local="no" imported="no">neuron/structural_plasticity/synaptogenesis/sp_structs.h</includes>
+    <includes id="sp__structs_8h" name="sp_structs.h" local="no" import="no" module="no" objc="no">neuron/structural_plasticity/synaptogenesis/sp_structs.h</includes>
     <member kind="function">
       <type>elimination_params_t *</type>
       <name>synaptogenesis_elimination_init</name>
@@ -6509,9 +6365,9 @@
   </compound>
   <compound kind="file">
     <name>elimination_random_by_weight_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/elimination/</path>
+    <path>src/neuron/structural_plasticity/synaptogenesis/elimination/</path>
     <filename>elimination__random__by__weight__impl_8c.html</filename>
-    <includes id="elimination__random__by__weight__impl_8h" name="elimination_random_by_weight_impl.h" local="yes" imported="no">elimination_random_by_weight_impl.h</includes>
+    <includes id="elimination__random__by__weight__impl_8h" name="elimination_random_by_weight_impl.h" local="yes" import="no" module="no" objc="no">elimination_random_by_weight_impl.h</includes>
     <member kind="function">
       <type>elimination_params_t *</type>
       <name>synaptogenesis_elimination_init</name>
@@ -6522,9 +6378,9 @@
   </compound>
   <compound kind="file">
     <name>elimination_random_by_weight_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/elimination/</path>
+    <path>src/neuron/structural_plasticity/synaptogenesis/elimination/</path>
     <filename>elimination__random__by__weight__impl_8h.html</filename>
-    <includes id="elimination_8h" name="elimination.h" local="yes" imported="no">elimination.h</includes>
+    <includes id="elimination_8h" name="elimination.h" local="yes" import="no" module="no" objc="no">elimination.h</includes>
     <class kind="struct">elimination_params</class>
     <member kind="function" static="yes">
       <type>static bool</type>
@@ -6536,9 +6392,9 @@
   </compound>
   <compound kind="file">
     <name>formation.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/formation/</path>
+    <path>src/neuron/structural_plasticity/synaptogenesis/formation/</path>
     <filename>formation_8h.html</filename>
-    <includes id="sp__structs_8h" name="sp_structs.h" local="no" imported="no">neuron/structural_plasticity/synaptogenesis/sp_structs.h</includes>
+    <includes id="sp__structs_8h" name="sp_structs.h" local="no" import="no" module="no" objc="no">neuron/structural_plasticity/synaptogenesis/sp_structs.h</includes>
     <member kind="function">
       <type>formation_params_t *</type>
       <name>synaptogenesis_formation_init</name>
@@ -6556,9 +6412,9 @@
   </compound>
   <compound kind="file">
     <name>formation_distance_dependent_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/formation/</path>
+    <path>src/neuron/structural_plasticity/synaptogenesis/formation/</path>
     <filename>formation__distance__dependent__impl_8c.html</filename>
-    <includes id="formation__distance__dependent__impl_8h" name="formation_distance_dependent_impl.h" local="yes" imported="no">formation_distance_dependent_impl.h</includes>
+    <includes id="formation__distance__dependent__impl_8h" name="formation_distance_dependent_impl.h" local="yes" import="no" module="no" objc="no">formation_distance_dependent_impl.h</includes>
     <member kind="function">
       <type>formation_params_t *</type>
       <name>synaptogenesis_formation_init</name>
@@ -6569,9 +6425,9 @@
   </compound>
   <compound kind="file">
     <name>formation_distance_dependent_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/formation/</path>
+    <path>src/neuron/structural_plasticity/synaptogenesis/formation/</path>
     <filename>formation__distance__dependent__impl_8h.html</filename>
-    <includes id="formation_8h" name="formation.h" local="yes" imported="no">formation.h</includes>
+    <includes id="formation_8h" name="formation.h" local="yes" import="no" module="no" objc="no">formation.h</includes>
     <class kind="struct">formation_params</class>
     <member kind="define">
       <type>#define</type>
@@ -6597,9 +6453,9 @@
   </compound>
   <compound kind="file">
     <name>last_neuron_selection_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
+    <path>src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
     <filename>last__neuron__selection__impl_8c.html</filename>
-    <includes id="last__neuron__selection__impl_8h" name="last_neuron_selection_impl.h" local="yes" imported="no">last_neuron_selection_impl.h</includes>
+    <includes id="last__neuron__selection__impl_8h" name="last_neuron_selection_impl.h" local="yes" import="no" module="no" objc="no">last_neuron_selection_impl.h</includes>
     <member kind="function">
       <type>void</type>
       <name>partner_init</name>
@@ -6638,10 +6494,10 @@
   </compound>
   <compound kind="file">
     <name>last_neuron_selection_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
+    <path>src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
     <filename>last__neuron__selection__impl_8h.html</filename>
-    <includes id="partner_8h" name="partner.h" local="yes" imported="no">partner.h</includes>
-    <includes id="spike__processing_8h" name="spike_processing.h" local="no" imported="no">neuron/spike_processing.h</includes>
+    <includes id="partner_8h" name="partner.h" local="yes" import="no" module="no" objc="no">partner.h</includes>
+    <includes id="spike__processing_8h" name="spike_processing.h" local="no" import="no" module="no" objc="no">neuron/spike_processing.h</includes>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>partner_spike_received</name>
@@ -6673,10 +6529,10 @@
   </compound>
   <compound kind="file">
     <name>partner.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
+    <path>src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
     <filename>partner_8h.html</filename>
-    <includes id="synapses_8h" name="synapses.h" local="no" imported="no">neuron/synapses.h</includes>
-    <includes id="sp__structs_8h" name="sp_structs.h" local="no" imported="no">neuron/structural_plasticity/synaptogenesis/sp_structs.h</includes>
+    <includes id="synapses_8h" name="synapses.h" local="no" import="no" module="no" objc="no">neuron/synapses.h</includes>
+    <includes id="sp__structs_8h" name="sp_structs.h" local="no" import="no" module="no" objc="no">neuron/structural_plasticity/synaptogenesis/sp_structs.h</includes>
     <member kind="define">
       <type>#define</type>
       <name>INVALID_SELECTION</name>
@@ -6708,9 +6564,9 @@
   </compound>
   <compound kind="file">
     <name>random_selection_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
+    <path>src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
     <filename>random__selection__impl_8c.html</filename>
-    <includes id="random__selection__impl_8h" name="random_selection_impl.h" local="yes" imported="no">random_selection_impl.h</includes>
+    <includes id="random__selection__impl_8h" name="random_selection_impl.h" local="yes" import="no" module="no" objc="no">random_selection_impl.h</includes>
     <member kind="function">
       <type>void</type>
       <name>partner_init</name>
@@ -6721,10 +6577,10 @@
   </compound>
   <compound kind="file">
     <name>random_selection_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
+    <path>src/neuron/structural_plasticity/synaptogenesis/partner_selection/</path>
     <filename>random__selection__impl_8h.html</filename>
-    <includes id="partner_8h" name="partner.h" local="yes" imported="no">partner.h</includes>
-    <includes id="spike__processing_8h" name="spike_processing.h" local="no" imported="no">neuron/spike_processing.h</includes>
+    <includes id="partner_8h" name="partner.h" local="yes" import="no" module="no" objc="no">partner.h</includes>
+    <includes id="spike__processing_8h" name="spike_processing.h" local="no" import="no" module="no" objc="no">neuron/spike_processing.h</includes>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>partner_spike_received</name>
@@ -6742,10 +6598,10 @@
   </compound>
   <compound kind="file">
     <name>sp_structs.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/</path>
+    <path>src/neuron/structural_plasticity/synaptogenesis/</path>
     <filename>sp__structs_8h.html</filename>
-    <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="no" imported="no">neuron/plasticity/synapse_dynamics.h</includes>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
+    <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="no" import="no" module="no" objc="no">neuron/plasticity/synapse_dynamics.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="no" import="no" module="no" objc="no">neuron/synapse_row.h</includes>
     <class kind="struct">post_to_pre_entry</class>
     <class kind="struct">key_atom_info_t</class>
     <class kind="struct">pre_info_t</class>
@@ -6804,16 +6660,16 @@
   </compound>
   <compound kind="file">
     <name>topographic_map_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/synaptogenesis/</path>
+    <path>src/neuron/structural_plasticity/synaptogenesis/</path>
     <filename>topographic__map__impl_8c.html</filename>
-    <includes id="synaptogenesis__dynamics_8h" name="synaptogenesis_dynamics.h" local="no" imported="no">neuron/structural_plasticity/synaptogenesis_dynamics.h</includes>
-    <includes id="population__table_8h" name="population_table.h" local="no" imported="no">neuron/population_table/population_table.h</includes>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
-    <includes id="synapses_8h" name="synapses.h" local="no" imported="no">neuron/synapses.h</includes>
-    <includes id="maths-util_8h" name="maths-util.h" local="no" imported="no">common/maths-util.h</includes>
-    <includes id="partner_8h" name="partner.h" local="yes" imported="no">partner_selection/partner.h</includes>
-    <includes id="elimination_8h" name="elimination.h" local="yes" imported="no">elimination/elimination.h</includes>
-    <includes id="formation_8h" name="formation.h" local="yes" imported="no">formation/formation.h</includes>
+    <includes id="synaptogenesis__dynamics_8h" name="synaptogenesis_dynamics.h" local="no" import="no" module="no" objc="no">neuron/structural_plasticity/synaptogenesis_dynamics.h</includes>
+    <includes id="population__table_8h" name="population_table.h" local="no" import="no" module="no" objc="no">neuron/population_table/population_table.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="no" import="no" module="no" objc="no">neuron/synapse_row.h</includes>
+    <includes id="synapses_8h" name="synapses.h" local="no" import="no" module="no" objc="no">neuron/synapses.h</includes>
+    <includes id="maths-util_8h" name="maths-util.h" local="no" import="no" module="no" objc="no">common/maths-util.h</includes>
+    <includes id="partner_8h" name="partner.h" local="yes" import="no" module="no" objc="no">partner_selection/partner.h</includes>
+    <includes id="elimination_8h" name="elimination.h" local="yes" import="no" module="no" objc="no">elimination/elimination.h</includes>
+    <includes id="formation_8h" name="formation.h" local="yes" import="no" module="no" objc="no">formation/formation.h</includes>
     <class kind="struct">structural_recording_values_t</class>
     <member kind="define">
       <type>#define</type>
@@ -6963,10 +6819,10 @@
   </compound>
   <compound kind="file">
     <name>synaptogenesis_dynamics.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/</path>
+    <path>src/neuron/structural_plasticity/</path>
     <filename>synaptogenesis__dynamics_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <includes id="population__table_8h" name="population_table.h" local="no" imported="no">neuron/population_table/population_table.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
+    <includes id="population__table_8h" name="population_table.h" local="no" import="no" module="no" objc="no">neuron/population_table/population_table.h</includes>
     <member kind="function">
       <type>bool</type>
       <name>synaptogenesis_dynamics_initialise</name>
@@ -7012,9 +6868,9 @@
   </compound>
   <compound kind="file">
     <name>synaptogenesis_dynamics_static_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/</path>
+    <path>src/neuron/structural_plasticity/</path>
     <filename>synaptogenesis__dynamics__static__impl_8c.html</filename>
-    <includes id="synaptogenesis__dynamics_8h" name="synaptogenesis_dynamics.h" local="yes" imported="no">synaptogenesis_dynamics.h</includes>
+    <includes id="synaptogenesis__dynamics_8h" name="synaptogenesis_dynamics.h" local="yes" import="no" module="no" objc="no">synaptogenesis_dynamics.h</includes>
     <member kind="function">
       <type>bool</type>
       <name>synaptogenesis_dynamics_initialise</name>
@@ -7060,9 +6916,9 @@
   </compound>
   <compound kind="file">
     <name>synapse_row.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>synapse__row_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
     <class kind="struct">synapse_row_plastic_part_t</class>
     <class kind="struct">synapse_row_fixed_part_t</class>
     <member kind="define">
@@ -7211,9 +7067,9 @@
   </compound>
   <compound kind="file">
     <name>exp_synapse_utils.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
+    <path>src/neuron/synapse_types/</path>
     <filename>exp__synapse__utils_8h.html</filename>
-    <includes id="decay_8h" name="decay.h" local="no" imported="no">neuron/decay.h</includes>
+    <includes id="decay_8h" name="decay.h" local="no" import="no" module="no" objc="no">neuron/decay.h</includes>
     <class kind="struct">exp_params_t</class>
     <class kind="struct">exp_state_t</class>
     <member kind="function" static="yes">
@@ -7240,10 +7096,10 @@
   </compound>
   <compound kind="file">
     <name>synapse_types.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
+    <path>src/neuron/synapse_types/</path>
     <filename>synapse__types_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="no" import="no" module="no" objc="no">neuron/synapse_row.h</includes>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_initialise</name>
@@ -7310,10 +7166,10 @@
   </compound>
   <compound kind="file">
     <name>synapse_types_alpha_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
+    <path>src/neuron/synapse_types/</path>
     <filename>synapse__types__alpha__impl_8h.html</filename>
-    <includes id="decay_8h" name="decay.h" local="no" imported="no">neuron/decay.h</includes>
-    <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
+    <includes id="decay_8h" name="decay.h" local="no" import="no" module="no" objc="no">neuron/decay.h</includes>
+    <includes id="synapse__types_8h" name="synapse_types.h" local="yes" import="no" module="no" objc="no">synapse_types.h</includes>
     <class kind="struct">alpha_params_t</class>
     <class kind="struct">synapse_types_params_t</class>
     <class kind="struct">alpha_state_t</class>
@@ -7431,10 +7287,10 @@
   </compound>
   <compound kind="file">
     <name>synapse_types_delta_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
+    <path>src/neuron/synapse_types/</path>
     <filename>synapse__types__delta__impl_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
+    <includes id="synapse__types_8h" name="synapse_types.h" local="yes" import="no" module="no" objc="no">synapse_types.h</includes>
     <class kind="struct">synapse_types_params_t</class>
     <class kind="struct">synapse_types_t</class>
     <member kind="define">
@@ -7536,10 +7392,10 @@
   </compound>
   <compound kind="file">
     <name>synapse_types_dual_excitatory_exponential_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
+    <path>src/neuron/synapse_types/</path>
     <filename>synapse__types__dual__excitatory__exponential__impl_8h.html</filename>
-    <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
-    <includes id="exp__synapse__utils_8h" name="exp_synapse_utils.h" local="yes" imported="no">exp_synapse_utils.h</includes>
+    <includes id="synapse__types_8h" name="synapse_types.h" local="yes" import="no" module="no" objc="no">synapse_types.h</includes>
+    <includes id="exp__synapse__utils_8h" name="exp_synapse_utils.h" local="yes" import="no" module="no" objc="no">exp_synapse_utils.h</includes>
     <class kind="struct">synapse_types_params_t</class>
     <class kind="struct">synapse_types_t</class>
     <member kind="define">
@@ -7647,10 +7503,10 @@
   </compound>
   <compound kind="file">
     <name>synapse_types_exponential_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
+    <path>src/neuron/synapse_types/</path>
     <filename>synapse__types__exponential__impl_8h.html</filename>
-    <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
-    <includes id="exp__synapse__utils_8h" name="exp_synapse_utils.h" local="yes" imported="no">exp_synapse_utils.h</includes>
+    <includes id="synapse__types_8h" name="synapse_types.h" local="yes" import="no" module="no" objc="no">synapse_types.h</includes>
+    <includes id="exp__synapse__utils_8h" name="exp_synapse_utils.h" local="yes" import="no" module="no" objc="no">exp_synapse_utils.h</includes>
     <class kind="struct">synapse_types_params_t</class>
     <class kind="struct">synapse_types_t</class>
     <member kind="define">
@@ -7752,10 +7608,10 @@
   </compound>
   <compound kind="file">
     <name>synapse_types_semd_impl.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
+    <path>src/neuron/synapse_types/</path>
     <filename>synapse__types__semd__impl_8h.html</filename>
-    <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
-    <includes id="exp__synapse__utils_8h" name="exp_synapse_utils.h" local="yes" imported="no">exp_synapse_utils.h</includes>
+    <includes id="synapse__types_8h" name="synapse_types.h" local="yes" import="no" module="no" objc="no">synapse_types.h</includes>
+    <includes id="exp__synapse__utils_8h" name="exp_synapse_utils.h" local="yes" import="no" module="no" objc="no">exp_synapse_utils.h</includes>
     <class kind="struct">synapse_types_params_t</class>
     <class kind="struct">synapse_types_t</class>
     <member kind="define">
@@ -7863,12 +7719,12 @@
   </compound>
   <compound kind="file">
     <name>synapses.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>synapses_8c.html</filename>
-    <includes id="synapses_8h" name="synapses.h" local="yes" imported="no">synapses.h</includes>
-    <includes id="spike__processing_8h" name="spike_processing.h" local="yes" imported="no">spike_processing.h</includes>
-    <includes id="neuron_8h" name="neuron.h" local="yes" imported="no">neuron.h</includes>
-    <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="yes" imported="no">plasticity/synapse_dynamics.h</includes>
+    <includes id="synapses_8h" name="synapses.h" local="yes" import="no" module="no" objc="no">synapses.h</includes>
+    <includes id="spike__processing_8h" name="spike_processing.h" local="yes" import="no" module="no" objc="no">spike_processing.h</includes>
+    <includes id="neuron_8h" name="neuron.h" local="yes" import="no" module="no" objc="no">neuron.h</includes>
+    <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="yes" import="no" module="no" objc="no">plasticity/synapse_dynamics.h</includes>
     <class kind="struct">synapse_params</class>
     <member kind="function" static="yes">
       <type>static const char *</type>
@@ -8083,10 +7939,10 @@
   </compound>
   <compound kind="file">
     <name>synapses.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>synapses_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="yes" imported="no">synapse_row.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="yes" import="no" module="no" objc="no">synapse_row.h</includes>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapses_print_weight</name>
@@ -8216,9 +8072,9 @@
   </compound>
   <compound kind="file">
     <name>threshold_type.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/threshold_types/</path>
+    <path>src/neuron/threshold_types/</path>
     <filename>threshold__type_8h.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>threshold_type_initialise</name>
@@ -8243,9 +8099,9 @@
   </compound>
   <compound kind="file">
     <name>threshold_type_maass_stochastic.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/threshold_types/</path>
+    <path>src/neuron/threshold_types/</path>
     <filename>threshold__type__maass__stochastic_8h.html</filename>
-    <includes id="threshold__type_8h" name="threshold_type.h" local="yes" imported="no">threshold_type.h</includes>
+    <includes id="threshold__type_8h" name="threshold_type.h" local="yes" import="no" module="no" objc="no">threshold_type.h</includes>
     <class kind="struct">threshold_type_params_t</class>
     <class kind="struct">threshold_type_t</class>
     <member kind="define">
@@ -8265,9 +8121,9 @@
   </compound>
   <compound kind="file">
     <name>threshold_type_none.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/threshold_types/</path>
+    <path>src/neuron/threshold_types/</path>
     <filename>threshold__type__none_8h.html</filename>
-    <includes id="threshold__type_8h" name="threshold_type.h" local="yes" imported="no">threshold_type.h</includes>
+    <includes id="threshold__type_8h" name="threshold_type.h" local="yes" import="no" module="no" objc="no">threshold_type.h</includes>
     <class kind="struct">threshold_type_params_t</class>
     <class kind="struct">threshold_type_t</class>
     <member kind="function" static="yes">
@@ -8280,9 +8136,9 @@
   </compound>
   <compound kind="file">
     <name>threshold_type_static.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/threshold_types/</path>
+    <path>src/neuron/threshold_types/</path>
     <filename>threshold__type__static_8h.html</filename>
-    <includes id="threshold__type_8h" name="threshold_type.h" local="yes" imported="no">threshold_type.h</includes>
+    <includes id="threshold__type_8h" name="threshold_type.h" local="yes" import="no" module="no" objc="no">threshold_type.h</includes>
     <class kind="struct">threshold_type_params_t</class>
     <class kind="struct">threshold_type_t</class>
     <member kind="function" static="yes">
@@ -8295,10 +8151,10 @@
   </compound>
   <compound kind="file">
     <name>robot_motor_control.c</name>
-    <path>/github/workspace/neural_modelling/src/robot_motor_control/</path>
+    <path>src/robot_motor_control/</path>
     <filename>robot__motor__control_8c.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <includes id="in__spikes_8h" name="in_spikes.h" local="no" imported="no">common/in_spikes.h</includes>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" import="no" module="no" objc="no">common/neuron-typedefs.h</includes>
+    <includes id="in__spikes_8h" name="in_spikes.h" local="no" import="no" module="no" objc="no">common/in_spikes.h</includes>
     <class kind="struct">motor_control_config_t</class>
     <class kind="struct">robot_motor_control_provenance</class>
     <member kind="define">
@@ -8571,7 +8427,7 @@
   </compound>
   <compound kind="file">
     <name>profile_tags.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <path>src/neuron/</path>
     <filename>neuron_2profile__tags_8h.html</filename>
     <member kind="enumeration">
       <type></type>
@@ -8613,7 +8469,7 @@
   </compound>
   <compound kind="file">
     <name>profile_tags.h</name>
-    <path>/github/workspace/neural_modelling/src/spike_source/poisson/</path>
+    <path>src/spike_source/poisson/</path>
     <filename>spike__source_2poisson_2profile__tags_8h.html</filename>
     <member kind="enumeration">
       <type></type>
@@ -8625,10 +8481,10 @@
   </compound>
   <compound kind="file">
     <name>spike_source_poisson.c</name>
-    <path>/github/workspace/neural_modelling/src/spike_source/poisson/</path>
+    <path>src/spike_source/poisson/</path>
     <filename>spike__source__poisson_8c.html</filename>
-    <includes id="maths-util_8h" name="maths-util.h" local="no" imported="no">common/maths-util.h</includes>
-    <includes id="spike__source_2poisson_2profile__tags_8h" name="profile_tags.h" local="yes" imported="no">profile_tags.h</includes>
+    <includes id="maths-util_8h" name="maths-util.h" local="no" import="no" module="no" objc="no">common/maths-util.h</includes>
+    <includes id="spike__source_2poisson_2profile__tags_8h" name="profile_tags.h" local="yes" import="no" module="no" objc="no">profile_tags.h</includes>
     <class kind="struct">spike_source_t</class>
     <class kind="struct">timed_out_spikes</class>
     <class kind="struct">rng_seed_t</class>
@@ -9063,11 +8919,11 @@
   </compound>
   <compound kind="file">
     <name>bit_field_expander.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>bit__field__expander_8h.html</filename>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
-    <includes id="population__table_8h" name="population_table.h" local="no" imported="no">neuron/population_table/population_table.h</includes>
-    <includes id="sp__structs_8h" name="sp_structs.h" local="no" imported="no">neuron/structural_plasticity/synaptogenesis/sp_structs.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="no" import="no" module="no" objc="no">neuron/synapse_row.h</includes>
+    <includes id="population__table_8h" name="population_table.h" local="no" import="no" module="no" objc="no">neuron/population_table/population_table.h</includes>
+    <includes id="sp__structs_8h" name="sp_structs.h" local="no" import="no" module="no" objc="no">neuron/structural_plasticity/synaptogenesis/sp_structs.h</includes>
     <member kind="function" static="yes">
       <type>static bool</type>
       <name>do_sdram_read_and_test</name>
@@ -9099,9 +8955,9 @@
   </compound>
   <compound kind="file">
     <name>common_kernel.c</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>common__kernel_8c.html</filename>
-    <includes id="common__kernel_8h" name="common_kernel.h" local="yes" imported="no">common_kernel.h</includes>
+    <includes id="common__kernel_8h" name="common_kernel.h" local="yes" import="no" module="no" objc="no">common_kernel.h</includes>
     <member kind="function">
       <type>uint16_t</type>
       <name>uidiv</name>
@@ -9126,7 +8982,7 @@
   </compound>
   <compound kind="file">
     <name>common_kernel.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>common__kernel_8h.html</filename>
     <member kind="function">
       <type>uint16_t</type>
@@ -9152,7 +9008,7 @@
   </compound>
   <compound kind="file">
     <name>common_mem.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>common__mem_8h.html</filename>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -9164,17 +9020,17 @@
   </compound>
   <compound kind="file">
     <name>connection_generator.c</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>connection__generator_8c.html</filename>
-    <includes id="connection__generator_8h" name="connection_generator.h" local="yes" imported="no">connection_generator.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="yes" imported="no">generator_types.h</includes>
-    <includes id="connection__generator__one__to__one_8h" name="connection_generator_one_to_one.h" local="yes" imported="no">connection_generators/connection_generator_one_to_one.h</includes>
-    <includes id="connection__generator__all__to__all_8h" name="connection_generator_all_to_all.h" local="yes" imported="no">connection_generators/connection_generator_all_to_all.h</includes>
-    <includes id="connection__generator__fixed__prob_8h" name="connection_generator_fixed_prob.h" local="yes" imported="no">connection_generators/connection_generator_fixed_prob.h</includes>
-    <includes id="connection__generator__fixed__total_8h" name="connection_generator_fixed_total.h" local="yes" imported="no">connection_generators/connection_generator_fixed_total.h</includes>
-    <includes id="connection__generator__fixed__pre_8h" name="connection_generator_fixed_pre.h" local="yes" imported="no">connection_generators/connection_generator_fixed_pre.h</includes>
-    <includes id="connection__generator__fixed__post_8h" name="connection_generator_fixed_post.h" local="yes" imported="no">connection_generators/connection_generator_fixed_post.h</includes>
-    <includes id="connection__generator__kernel_8h" name="connection_generator_kernel.h" local="yes" imported="no">connection_generators/connection_generator_kernel.h</includes>
+    <includes id="connection__generator_8h" name="connection_generator.h" local="yes" import="no" module="no" objc="no">connection_generator.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="yes" import="no" module="no" objc="no">generator_types.h</includes>
+    <includes id="connection__generator__one__to__one_8h" name="connection_generator_one_to_one.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_one_to_one.h</includes>
+    <includes id="connection__generator__all__to__all_8h" name="connection_generator_all_to_all.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_all_to_all.h</includes>
+    <includes id="connection__generator__fixed__prob_8h" name="connection_generator_fixed_prob.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_fixed_prob.h</includes>
+    <includes id="connection__generator__fixed__total_8h" name="connection_generator_fixed_total.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_fixed_total.h</includes>
+    <includes id="connection__generator__fixed__pre_8h" name="connection_generator_fixed_pre.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_fixed_pre.h</includes>
+    <includes id="connection__generator__fixed__post_8h" name="connection_generator_fixed_post.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_fixed_post.h</includes>
+    <includes id="connection__generator__kernel_8h" name="connection_generator_kernel.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_kernel.h</includes>
     <class kind="struct">connection_generator_info</class>
     <class kind="struct">connection_generator</class>
     <member kind="enumvalue">
@@ -9256,10 +9112,10 @@
   </compound>
   <compound kind="file">
     <name>connection_generator.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>connection__generator_8h.html</filename>
-    <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
-    <includes id="matrix__generator_8h" name="matrix_generator.h" local="yes" imported="no">matrix_generator.h</includes>
+    <includes id="param__generator_8h" name="param_generator.h" local="yes" import="no" module="no" objc="no">param_generator.h</includes>
+    <includes id="matrix__generator_8h" name="matrix_generator.h" local="yes" import="no" module="no" objc="no">matrix_generator.h</includes>
     <member kind="function">
       <type>connection_generator_t</type>
       <name>connection_generator_init</name>
@@ -9284,9 +9140,9 @@
   </compound>
   <compound kind="file">
     <name>connection_generator_all_to_all.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
+    <path>src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__all__to__all_8h.html</filename>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">all_to_all</class>
     <member kind="function" static="yes">
       <type>static void *</type>
@@ -9312,9 +9168,9 @@
   </compound>
   <compound kind="file">
     <name>connection_generator_fixed_post.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
+    <path>src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__fixed__post_8h.html</filename>
-    <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
+    <includes id="rng_8h" name="rng.h" local="no" import="no" module="no" objc="no">synapse_expander/rng.h</includes>
     <class kind="struct">fixed_post_params</class>
     <class kind="struct">fixed_post</class>
     <member kind="function" static="yes">
@@ -9348,9 +9204,9 @@
   </compound>
   <compound kind="file">
     <name>connection_generator_fixed_pre.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
+    <path>src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__fixed__pre_8h.html</filename>
-    <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
+    <includes id="rng_8h" name="rng.h" local="no" import="no" module="no" objc="no">synapse_expander/rng.h</includes>
     <class kind="struct">fixed_pre_params</class>
     <class kind="struct">fixed_pre</class>
     <member kind="function" static="yes">
@@ -9384,10 +9240,10 @@
   </compound>
   <compound kind="file">
     <name>connection_generator_fixed_prob.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
+    <path>src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__fixed__prob_8h.html</filename>
-    <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="rng_8h" name="rng.h" local="no" import="no" module="no" objc="no">synapse_expander/rng.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">fixed_prob_params</class>
     <class kind="struct">fixed_prob</class>
     <member kind="function" static="yes">
@@ -9414,10 +9270,10 @@
   </compound>
   <compound kind="file">
     <name>connection_generator_fixed_total.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
+    <path>src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__fixed__total_8h.html</filename>
-    <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="rng_8h" name="rng.h" local="no" import="no" module="no" objc="no">synapse_expander/rng.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">fixed_total_params</class>
     <class kind="struct">fixed_total</class>
     <member kind="function" static="yes">
@@ -9444,11 +9300,11 @@
   </compound>
   <compound kind="file">
     <name>connection_generator_kernel.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
+    <path>src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__kernel_8h.html</filename>
-    <includes id="common__kernel_8h" name="common_kernel.h" local="no" imported="no">synapse_expander/common_kernel.h</includes>
-    <includes id="common__mem_8h" name="common_mem.h" local="no" imported="no">synapse_expander/common_mem.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="common__kernel_8h" name="common_kernel.h" local="no" import="no" module="no" objc="no">synapse_expander/common_kernel.h</includes>
+    <includes id="common__mem_8h" name="common_mem.h" local="no" import="no" module="no" objc="no">synapse_expander/common_mem.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">kernel</class>
     <member kind="function" static="yes">
       <type>static void *</type>
@@ -9474,9 +9330,9 @@
   </compound>
   <compound kind="file">
     <name>connection_generator_one_to_one.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
+    <path>src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__one__to__one_8h.html</filename>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <member kind="function" static="yes">
       <type>static void *</type>
       <name>connection_generator_one_to_one_initialise</name>
@@ -9501,10 +9357,10 @@
   </compound>
   <compound kind="file">
     <name>generator_types.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>generator__types_8h.html</filename>
-    <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
-    <includes id="matrix__generator_8h" name="matrix_generator.h" local="yes" imported="no">matrix_generator.h</includes>
+    <includes id="param__generator_8h" name="param_generator.h" local="yes" import="no" module="no" objc="no">param_generator.h</includes>
+    <includes id="matrix__generator_8h" name="matrix_generator.h" local="yes" import="no" module="no" objc="no">matrix_generator.h</includes>
     <member kind="typedef">
       <type>uint32_t</type>
       <name>generator_hash_t</name>
@@ -9578,14 +9434,14 @@
   </compound>
   <compound kind="file">
     <name>matrix_generator.c</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>matrix__generator_8c.html</filename>
-    <includes id="matrix__generator_8h" name="matrix_generator.h" local="yes" imported="no">matrix_generator.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="yes" imported="no">generator_types.h</includes>
-    <includes id="matrix__generator__static_8h" name="matrix_generator_static.h" local="yes" imported="no">matrix_generators/matrix_generator_static.h</includes>
-    <includes id="matrix__generator__stdp_8h" name="matrix_generator_stdp.h" local="yes" imported="no">matrix_generators/matrix_generator_stdp.h</includes>
-    <includes id="matrix__generator__neuromodulation_8h" name="matrix_generator_neuromodulation.h" local="yes" imported="no">matrix_generators/matrix_generator_neuromodulation.h</includes>
-    <includes id="delay__extension_8h" name="delay_extension.h" local="no" imported="no">delay_extension/delay_extension.h</includes>
+    <includes id="matrix__generator_8h" name="matrix_generator.h" local="yes" import="no" module="no" objc="no">matrix_generator.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="yes" import="no" module="no" objc="no">generator_types.h</includes>
+    <includes id="matrix__generator__static_8h" name="matrix_generator_static.h" local="yes" import="no" module="no" objc="no">matrix_generators/matrix_generator_static.h</includes>
+    <includes id="matrix__generator__stdp_8h" name="matrix_generator_stdp.h" local="yes" import="no" module="no" objc="no">matrix_generators/matrix_generator_stdp.h</includes>
+    <includes id="matrix__generator__neuromodulation_8h" name="matrix_generator_neuromodulation.h" local="yes" import="no" module="no" objc="no">matrix_generators/matrix_generator_neuromodulation.h</includes>
+    <includes id="delay__extension_8h" name="delay_extension.h" local="no" import="no" module="no" objc="no">delay_extension/delay_extension.h</includes>
     <class kind="struct">matrix_generator_info</class>
     <class kind="struct">matrix_generator</class>
     <member kind="enumvalue">
@@ -9643,7 +9499,7 @@
   </compound>
   <compound kind="file">
     <name>matrix_generator.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>matrix__generator_8h.html</filename>
     <member kind="function">
       <type>matrix_generator_t</type>
@@ -9669,7 +9525,7 @@
   </compound>
   <compound kind="file">
     <name>matrix_generator_common.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/matrix_generators/</path>
+    <path>src/synapse_expander/matrix_generators/</path>
     <filename>matrix__generator__common_8h.html</filename>
     <class kind="struct">delay_value</class>
     <member kind="define">
@@ -9703,11 +9559,11 @@
   </compound>
   <compound kind="file">
     <name>matrix_generator_neuromodulation.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/matrix_generators/</path>
+    <path>src/synapse_expander/matrix_generators/</path>
     <filename>matrix__generator__neuromodulation_8h.html</filename>
-    <includes id="delay__extension_8h" name="delay_extension.h" local="no" imported="no">delay_extension/delay_extension.h</includes>
-    <includes id="matrix__generator__common_8h" name="matrix_generator_common.h" local="yes" imported="no">matrix_generator_common.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="delay__extension_8h" name="delay_extension.h" local="no" import="no" module="no" objc="no">delay_extension/delay_extension.h</includes>
+    <includes id="matrix__generator__common_8h" name="matrix_generator_common.h" local="yes" import="no" module="no" objc="no">matrix_generator_common.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">matrix_generator_neuromodulation</class>
     <class kind="struct">row_nm_plastic_t</class>
     <class kind="struct">row_nm_fixed_t</class>
@@ -9750,11 +9606,11 @@
   </compound>
   <compound kind="file">
     <name>matrix_generator_static.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/matrix_generators/</path>
+    <path>src/synapse_expander/matrix_generators/</path>
     <filename>matrix__generator__static_8h.html</filename>
-    <includes id="delay__extension_8h" name="delay_extension.h" local="no" imported="no">delay_extension/delay_extension.h</includes>
-    <includes id="matrix__generator__common_8h" name="matrix_generator_common.h" local="yes" imported="no">matrix_generator_common.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="delay__extension_8h" name="delay_extension.h" local="no" import="no" module="no" objc="no">delay_extension/delay_extension.h</includes>
+    <includes id="matrix__generator__common_8h" name="matrix_generator_common.h" local="yes" import="no" module="no" objc="no">matrix_generator_common.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">static_row_t</class>
     <class kind="struct">matrix_genetator_static_data_t</class>
     <class kind="union">matrix_genetator_static_data_t.__unnamed21__</class>
@@ -9811,11 +9667,11 @@
   </compound>
   <compound kind="file">
     <name>matrix_generator_stdp.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/matrix_generators/</path>
+    <path>src/synapse_expander/matrix_generators/</path>
     <filename>matrix__generator__stdp_8h.html</filename>
-    <includes id="delay__extension_8h" name="delay_extension.h" local="no" imported="no">delay_extension/delay_extension.h</includes>
-    <includes id="matrix__generator__common_8h" name="matrix_generator_common.h" local="yes" imported="no">matrix_generator_common.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="delay__extension_8h" name="delay_extension.h" local="no" import="no" module="no" objc="no">delay_extension/delay_extension.h</includes>
+    <includes id="matrix__generator__common_8h" name="matrix_generator_common.h" local="yes" import="no" module="no" objc="no">matrix_generator_common.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">row_plastic_t</class>
     <class kind="struct">row_fixed_t</class>
     <class kind="struct">matrix_generator_stdp_data_t</class>
@@ -9873,12 +9729,12 @@
   </compound>
   <compound kind="file">
     <name>neuron_expander.c</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>neuron__expander_8c.html</filename>
-    <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
-    <includes id="rng_8h" name="rng.h" local="yes" imported="no">rng.h</includes>
-    <includes id="type__writers_8h" name="type_writers.h" local="yes" imported="no">type_writers.h</includes>
-    <includes id="common__mem_8h" name="common_mem.h" local="yes" imported="no">common_mem.h</includes>
+    <includes id="param__generator_8h" name="param_generator.h" local="yes" import="no" module="no" objc="no">param_generator.h</includes>
+    <includes id="rng_8h" name="rng.h" local="yes" import="no" module="no" objc="no">rng.h</includes>
+    <includes id="type__writers_8h" name="type_writers.h" local="yes" import="no" module="no" objc="no">type_writers.h</includes>
+    <includes id="common__mem_8h" name="common_mem.h" local="yes" import="no" module="no" objc="no">common_mem.h</includes>
     <class kind="struct">neuron_param_item_t</class>
     <class kind="struct">neuron_param_t</class>
     <class kind="struct">neuron_params_struct_t</class>
@@ -9940,17 +9796,17 @@
   </compound>
   <compound kind="file">
     <name>param_generator.c</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>param__generator_8c.html</filename>
-    <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="yes" imported="no">generator_types.h</includes>
-    <includes id="param__generator__constant_8h" name="param_generator_constant.h" local="yes" imported="no">param_generators/param_generator_constant.h</includes>
-    <includes id="param__generator__uniform_8h" name="param_generator_uniform.h" local="yes" imported="no">param_generators/param_generator_uniform.h</includes>
-    <includes id="param__generator__normal_8h" name="param_generator_normal.h" local="yes" imported="no">param_generators/param_generator_normal.h</includes>
-    <includes id="param__generator__normal__clipped_8h" name="param_generator_normal_clipped.h" local="yes" imported="no">param_generators/param_generator_normal_clipped.h</includes>
-    <includes id="param__generator__normal__clipped__to__boundary_8h" name="param_generator_normal_clipped_to_boundary.h" local="yes" imported="no">param_generators/param_generator_normal_clipped_to_boundary.h</includes>
-    <includes id="param__generator__exponential_8h" name="param_generator_exponential.h" local="yes" imported="no">param_generators/param_generator_exponential.h</includes>
-    <includes id="param__generator__exponential__clipped_8h" name="param_generator_exponential_clipped.h" local="yes" imported="no">param_generators/param_generator_exponential_clipped.h</includes>
+    <includes id="param__generator_8h" name="param_generator.h" local="yes" import="no" module="no" objc="no">param_generator.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="yes" import="no" module="no" objc="no">generator_types.h</includes>
+    <includes id="param__generator__constant_8h" name="param_generator_constant.h" local="yes" import="no" module="no" objc="no">param_generators/param_generator_constant.h</includes>
+    <includes id="param__generator__uniform_8h" name="param_generator_uniform.h" local="yes" import="no" module="no" objc="no">param_generators/param_generator_uniform.h</includes>
+    <includes id="param__generator__normal_8h" name="param_generator_normal.h" local="yes" import="no" module="no" objc="no">param_generators/param_generator_normal.h</includes>
+    <includes id="param__generator__normal__clipped_8h" name="param_generator_normal_clipped.h" local="yes" import="no" module="no" objc="no">param_generators/param_generator_normal_clipped.h</includes>
+    <includes id="param__generator__normal__clipped__to__boundary_8h" name="param_generator_normal_clipped_to_boundary.h" local="yes" import="no" module="no" objc="no">param_generators/param_generator_normal_clipped_to_boundary.h</includes>
+    <includes id="param__generator__exponential_8h" name="param_generator_exponential.h" local="yes" import="no" module="no" objc="no">param_generators/param_generator_exponential.h</includes>
+    <includes id="param__generator__exponential__clipped_8h" name="param_generator_exponential_clipped.h" local="yes" import="no" module="no" objc="no">param_generators/param_generator_exponential_clipped.h</includes>
     <class kind="struct">param_generator_info</class>
     <class kind="struct">param_generator</class>
     <member kind="enumvalue">
@@ -10032,7 +9888,7 @@
   </compound>
   <compound kind="file">
     <name>param_generator.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>param__generator_8h.html</filename>
     <member kind="function">
       <type>param_generator_t</type>
@@ -10058,9 +9914,9 @@
   </compound>
   <compound kind="file">
     <name>param_generator_constant.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
+    <path>src/synapse_expander/param_generators/</path>
     <filename>param__generator__constant_8h.html</filename>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">param_generator_constant</class>
     <member kind="function" static="yes">
       <type>static void *</type>
@@ -10086,10 +9942,10 @@
   </compound>
   <compound kind="file">
     <name>param_generator_exponential.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
+    <path>src/synapse_expander/param_generators/</path>
     <filename>param__generator__exponential_8h.html</filename>
-    <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="rng_8h" name="rng.h" local="no" import="no" module="no" objc="no">synapse_expander/rng.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">param_generator_exponential_params</class>
     <class kind="struct">param_generator_exponential</class>
     <member kind="function" static="yes">
@@ -10116,10 +9972,10 @@
   </compound>
   <compound kind="file">
     <name>param_generator_exponential_clipped.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
+    <path>src/synapse_expander/param_generators/</path>
     <filename>param__generator__exponential__clipped_8h.html</filename>
-    <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="rng_8h" name="rng.h" local="no" import="no" module="no" objc="no">synapse_expander/rng.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">param_generator_exponential_clipped_params</class>
     <class kind="struct">param_generator_exponential_clipped</class>
     <member kind="define">
@@ -10153,10 +10009,10 @@
   </compound>
   <compound kind="file">
     <name>param_generator_normal.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
+    <path>src/synapse_expander/param_generators/</path>
     <filename>param__generator__normal_8h.html</filename>
-    <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="rng_8h" name="rng.h" local="no" import="no" module="no" objc="no">synapse_expander/rng.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">normal_params</class>
     <class kind="struct">param_generator_normal</class>
     <member kind="function" static="yes">
@@ -10183,10 +10039,10 @@
   </compound>
   <compound kind="file">
     <name>param_generator_normal_clipped.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
+    <path>src/synapse_expander/param_generators/</path>
     <filename>param__generator__normal__clipped_8h.html</filename>
-    <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="rng_8h" name="rng.h" local="no" import="no" module="no" objc="no">synapse_expander/rng.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">normal_clipped_params</class>
     <class kind="struct">param_generator_normal_clipped</class>
     <member kind="define">
@@ -10220,10 +10076,10 @@
   </compound>
   <compound kind="file">
     <name>param_generator_normal_clipped_to_boundary.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
+    <path>src/synapse_expander/param_generators/</path>
     <filename>param__generator__normal__clipped__to__boundary_8h.html</filename>
-    <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="rng_8h" name="rng.h" local="no" import="no" module="no" objc="no">synapse_expander/rng.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">normal_clipped_boundary_params</class>
     <class kind="struct">param_generator_normal_clipped_boundary</class>
     <member kind="function" static="yes">
@@ -10250,10 +10106,10 @@
   </compound>
   <compound kind="file">
     <name>param_generator_uniform.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
+    <path>src/synapse_expander/param_generators/</path>
     <filename>param__generator__uniform_8h.html</filename>
-    <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
+    <includes id="rng_8h" name="rng.h" local="no" import="no" module="no" objc="no">synapse_expander/rng.h</includes>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">uniform_params</class>
     <class kind="struct">param_generator_uniform</class>
     <member kind="function" static="yes">
@@ -10280,10 +10136,10 @@
   </compound>
   <compound kind="file">
     <name>rng.c</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>rng_8c.html</filename>
-    <includes id="rng_8h" name="rng.h" local="yes" imported="no">rng.h</includes>
-    <includes id="common__mem_8h" name="common_mem.h" local="yes" imported="no">common_mem.h</includes>
+    <includes id="rng_8h" name="rng.h" local="yes" import="no" module="no" objc="no">rng.h</includes>
+    <includes id="common__mem_8h" name="common_mem.h" local="yes" import="no" module="no" objc="no">common_mem.h</includes>
     <member kind="function">
       <type>uint32_t</type>
       <name>rng_generator</name>
@@ -10308,7 +10164,7 @@
   </compound>
   <compound kind="file">
     <name>rng.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>rng_8h.html</filename>
     <class kind="struct">rng_t</class>
     <member kind="function">
@@ -10363,14 +10219,14 @@
   </compound>
   <compound kind="file">
     <name>synapse_expander.c</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>synapse__expander_8c.html</filename>
-    <includes id="matrix__generator_8h" name="matrix_generator.h" local="yes" imported="no">matrix_generator.h</includes>
-    <includes id="connection__generator_8h" name="connection_generator.h" local="yes" imported="no">connection_generator.h</includes>
-    <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
-    <includes id="rng_8h" name="rng.h" local="yes" imported="no">rng.h</includes>
-    <includes id="common__mem_8h" name="common_mem.h" local="yes" imported="no">common_mem.h</includes>
-    <includes id="bit__field__expander_8h" name="bit_field_expander.h" local="yes" imported="no">bit_field_expander.h</includes>
+    <includes id="matrix__generator_8h" name="matrix_generator.h" local="yes" import="no" module="no" objc="no">matrix_generator.h</includes>
+    <includes id="connection__generator_8h" name="connection_generator.h" local="yes" import="no" module="no" objc="no">connection_generator.h</includes>
+    <includes id="param__generator_8h" name="param_generator.h" local="yes" import="no" module="no" objc="no">param_generator.h</includes>
+    <includes id="rng_8h" name="rng.h" local="yes" import="no" module="no" objc="no">rng.h</includes>
+    <includes id="common__mem_8h" name="common_mem.h" local="yes" import="no" module="no" objc="no">common_mem.h</includes>
+    <includes id="bit__field__expander_8h" name="bit_field_expander.h" local="yes" import="no" module="no" objc="no">bit_field_expander.h</includes>
     <class kind="struct">connection_builder_config_t</class>
     <member kind="function" static="yes">
       <type>static bool</type>
@@ -10410,7 +10266,7 @@
   </compound>
   <compound kind="file">
     <name>type_writers.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <path>src/synapse_expander/</path>
     <filename>type__writers_8h.html</filename>
     <class kind="struct">type_info</class>
   </compound>
