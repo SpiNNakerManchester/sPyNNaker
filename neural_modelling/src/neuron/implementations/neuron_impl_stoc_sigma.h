@@ -97,16 +97,13 @@ typedef struct neuron_impl_t {
 //! Array of neuron states
 static neuron_impl_t *neuron_array;
 
-SOMETIMES_UNUSED // Marked unused as only used sometimes
 static bool neuron_impl_initialise(uint32_t n_neurons) {
     // Allocate DTCM for neuron array
-    if (sizeof(neuron_impl_t) != 0) {
-        neuron_array = spin1_malloc(n_neurons * sizeof(neuron_impl_t));
-        if (neuron_array == NULL) {
-            log_error("Unable to allocate neuron array - Out of DTCM");
-            return false;
-        }
-    }
+	neuron_array = spin1_malloc(n_neurons * sizeof(neuron_impl_t));
+	if (neuron_array == NULL) {
+		log_error("Unable to allocate neuron array - Out of DTCM");
+		return false;
+	}
 
     return true;
 }
@@ -141,7 +138,6 @@ static inline void neuron_model_save_state(neuron_impl_t *state, neuron_params_t
 	spin1_memcpy(params->random_seed, state->random_seed, sizeof(mars_kiss64_seed_t));
 }
 
-SOMETIMES_UNUSED // Marked unused as only used sometimes
 static void neuron_impl_load_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons,
         address_t save_initial_state) {
@@ -159,7 +155,6 @@ static void neuron_impl_load_neuron_parameters(
     }
 }
 
-SOMETIMES_UNUSED // Marked unused as only used sometimes
 static void neuron_impl_store_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons) {
     neuron_params_t *params = (neuron_params_t *) &address[next];
@@ -168,7 +163,6 @@ static void neuron_impl_store_neuron_parameters(
 	}
 }
 
-SOMETIMES_UNUSED // Marked unused as only used sometimes
 static void neuron_impl_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep) {
@@ -179,7 +173,59 @@ static void neuron_impl_add_inputs(
     neuron->inputs[synapse_type_index] += weights_this_timestep;
 }
 
-SOMETIMES_UNUSED // Marked unused as only used sometimes
+static inline void do_refrac_update(uint32_t timer_count, uint32_t time,
+		uint32_t neuron_index, neuron_impl_t *neuron) {
+	neuron->refract_timer -= 1;
+
+	// Record things
+	neuron_recording_record_int32(PROB_INDEX, neuron_index, 0);
+	neuron_recording_record_accum(V_RECORDING_INDEX, neuron_index, ZERO);
+	neuron_recording_record_accum(EX_INPUT_INDEX, neuron_index, neuron->inputs[0]);
+	neuron_recording_record_accum(IN_INPUT_INDEX, neuron_index, neuron->inputs[1]);
+
+	// Reset the inputs
+	neuron->inputs[0] = ZERO;
+	neuron->inputs[1] = ZERO;
+
+	// Send a spike
+	neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
+	send_spike(timer_count, time, neuron_index);
+}
+
+static inline void do_non_refrac_update(uint32_t timer_count, uint32_t time,
+		uint32_t neuron_index, neuron_impl_t *neuron) {
+	// Work out the membrane voltage
+	REAL v_membrane = (neuron->inputs[0] - neuron->inputs[1]) - neuron->bias;
+
+	// Record things
+	neuron_recording_record_accum(V_RECORDING_INDEX, neuron_index, v_membrane);
+	neuron_recording_record_accum(EX_INPUT_INDEX, neuron_index, neuron->inputs[0]);
+	neuron_recording_record_accum(IN_INPUT_INDEX, neuron_index, neuron->inputs[1]);
+
+	// Reset the inputs
+	neuron->inputs[0] = ZERO;
+	neuron->inputs[1] = ZERO;
+
+	// Work out the probability of spiking
+	REAL power = v_membrane * neuron->alpha;
+	REAL next_power = (REAL) pow_of_2(power * REAL_CONST(-1));
+	UREAL val = pow_of_2(next_power * REAL_CONST(-1));
+	uint32_t prob = muliuk(0xFFFFFFFF, val);
+
+	// Record the probability
+	neuron_recording_record_int32(PROB_INDEX, neuron_index, (int32_t) prob);
+
+	// Get a random number
+	uint32_t random = mars_kiss64_seed(neuron->random_seed);
+
+	// If the random number is less than the probability value, spike
+	if (random < prob) {
+		neuron->refract_timer = neuron->t_refract - 1;
+		neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
+		send_spike(timer_count, time, neuron_index);
+	}
+}
+
 static void neuron_impl_do_timestep_update(
         uint32_t timer_count, uint32_t time, uint32_t n_neurons) {
     for (uint32_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
@@ -188,59 +234,16 @@ static void neuron_impl_do_timestep_update(
 
         // If in refractory, count down and spike!
 		if (neuron->refract_timer > 0) {
-			neuron->refract_timer -= 1;
-
-			// Record things
-			neuron_recording_record_int32(PROB_INDEX, neuron_index, 0);
-			neuron_recording_record_accum(V_RECORDING_INDEX, neuron_index, ZERO);
-			neuron_recording_record_accum(EX_INPUT_INDEX, neuron_index, neuron->inputs[0]);
-			neuron_recording_record_accum(IN_INPUT_INDEX, neuron_index, neuron->inputs[1]);
-
-			// Reset the inputs
-			neuron->inputs[0] = ZERO;
-			neuron->inputs[1] = ZERO;
-
-			// Send a spike
-			neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
-		    send_spike(timer_count, time, neuron_index);
-		    continue;
+			do_refrac_update(timer_count, time, neuron_index, neuron);
+		} else {
+			do_non_refrac_update(timer_count, time, neuron_index, neuron);
 		}
 
-        // Work out the membrane voltage
-        REAL v_membrane = (neuron->inputs[0] - neuron->inputs[1]) - neuron->bias;
 
-        // Record things
-        neuron_recording_record_accum(V_RECORDING_INDEX, neuron_index, v_membrane);
-        neuron_recording_record_accum(EX_INPUT_INDEX, neuron_index, neuron->inputs[0]);
-        neuron_recording_record_accum(IN_INPUT_INDEX, neuron_index, neuron->inputs[1]);
-
-        // Reset the inputs
-        neuron->inputs[0] = ZERO;
-        neuron->inputs[1] = ZERO;
-
-		// Work out the probability of spiking
-		REAL power = v_membrane * neuron->alpha;
-		REAL next_power = (REAL) pow_of_2(power * REAL_CONST(-1));
-		UREAL val = pow_of_2(next_power * REAL_CONST(-1));
-		uint32_t prob = muliuk(0xFFFFFFFF, val);
-
-		// Record the probability
-		neuron_recording_record_int32(PROB_INDEX, neuron_index, (int32_t) prob);
-
-		// Get a random number
-		uint32_t random = mars_kiss64_seed(neuron->random_seed);
-
-		// If the random number is less than the probability value, spike
-		if (random < prob) {
-			neuron->refract_timer = neuron->t_refract - 1;
-			neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
-		    send_spike(timer_count, time, neuron_index);
-		}
     }
 }
 
 #if LOG_LEVEL >= LOG_DEBUG
-SOMETIMES_UNUSED // Marked unused as only used sometimes
 static void neuron_impl_print_inputs(uint32_t n_neurons) {
     log_debug("-------------------------------------\n");
     for (index_t i = 0; i < n_neurons; i++) {
@@ -250,13 +253,11 @@ static void neuron_impl_print_inputs(uint32_t n_neurons) {
     log_debug("-------------------------------------\n");
 }
 
-SOMETIMES_UNUSED // Marked unused as only used sometimes
 static void neuron_impl_print_synapse_parameters(uint32_t n_neurons) {
     // there aren't any accessible
     use(n_neurons);
 }
 
-SOMETIMES_UNUSED // Marked unused as only used sometimes
 static const char *neuron_impl_get_synapse_type_char(uint32_t synapse_type) {
     if (synapse_type == 0) {
     	return 'E';

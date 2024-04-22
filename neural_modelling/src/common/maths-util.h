@@ -308,8 +308,4 @@ static inline UREAL pow_of_2(REAL p) {
 	return ukbits(accumulator);
 }
 
-static const uint64_t MAX_REAL = 0xFFFFFFFF0000L;
-
-static const uint64_t MIN_REAL = 0x000000010000L;
-
 #endif  // _MATHS_UTIL_
