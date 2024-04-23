@@ -1,4 +1,4 @@
-# Copyright (c) 2015 The University of Manchester
+# Copyright (c) 2023 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .neuron_model import NeuronModel
-from .neuron_model_izh import NeuronModelIzh
-from .neuron_model_leaky_integrate_and_fire import (
-    NeuronModelLeakyIntegrateAndFire)
-from .neuron_model_if_trunc import NeuronModelIFTrunc
 
-__all__ = [
-    "NeuronModel",
-    "NeuronModelIzh",
-    "NeuronModelLeakyIntegrateAndFire",
-    "NeuronModelIFTrunc"]
+APP = $(notdir $(CURDIR))
+
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_stoc_sigma.h
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
+
+include ../neural_build.mk
