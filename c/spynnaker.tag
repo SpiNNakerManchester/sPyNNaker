@@ -291,6 +291,13 @@
       <arglist>(REAL a, REAL b)</arglist>
     </member>
     <member kind="function" static="yes">
+      <type>static UREAL</type>
+      <name>ukdivuk</name>
+      <anchorfile>maths-util_8h.html</anchorfile>
+      <anchor>aad39b7916d4863f936206b699997aff1</anchor>
+      <arglist>(UREAL a, UREAL b)</arglist>
+    </member>
+    <member kind="function" static="yes">
       <type>static int32_t</type>
       <name>udivk</name>
       <anchorfile>maths-util_8h.html</anchorfile>
@@ -303,6 +310,27 @@
       <anchorfile>maths-util_8h.html</anchorfile>
       <anchor>ab6e6f665bddb5253982e560b4b2969c5</anchor>
       <arglist>(REAL a, uint32_t b)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static UREAL</type>
+      <name>pow_of_2</name>
+      <anchorfile>maths-util_8h.html</anchorfile>
+      <anchor>a03cafd4286b9fe615a385e4dab2d5661</anchor>
+      <arglist>(REAL p)</arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static const uint32_t</type>
+      <name>fract_powers_2</name>
+      <anchorfile>maths-util_8h.html</anchorfile>
+      <anchor>abb38685f45ce9c8eb5d4e97abd17ec84</anchor>
+      <arglist>[]</arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static const uint32_t</type>
+      <name>fract_powers_half</name>
+      <anchorfile>maths-util_8h.html</anchorfile>
+      <anchor>ae38cf018c6a9bd98947ca008c9e519ff</anchor>
+      <arglist>[]</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -2705,6 +2733,98 @@
     </member>
   </compound>
   <compound kind="file">
+    <name>neuron_impl_stoc_exp.h</name>
+    <path>src/neuron/implementations/</path>
+    <filename>neuron__impl__stoc__exp_8h.html</filename>
+    <includes id="neuron__impl_8h" name="neuron_impl.h" local="no" import="no" module="no" objc="no">neuron/implementations/neuron_impl.h</includes>
+    <includes id="maths-util_8h" name="maths-util.h" local="no" import="no" module="no" objc="no">common/maths-util.h</includes>
+    <includes id="neuron__recording_8h" name="neuron_recording.h" local="no" import="no" module="no" objc="no">neuron/neuron_recording.h</includes>
+    <includes id="current__source__impl_8h" name="current_source_impl.h" local="no" import="no" module="no" objc="no">neuron/current_sources/current_source_impl.h</includes>
+    <includes id="current__source_8h" name="current_source.h" local="no" import="no" module="no" objc="no">neuron/current_sources/current_source.h</includes>
+    <includes id="stoc__exp__common_8h" name="stoc_exp_common.h" local="yes" import="no" module="no" objc="no">stoc_exp_common.h</includes>
+    <class kind="struct">neuron_params_t</class>
+    <class kind="struct">neuron_impl_t</class>
+    <member kind="variable" static="yes">
+      <type>static neuron_impl_t *</type>
+      <name>neuron_array</name>
+      <anchorfile>neuron__impl__stoc__exp_8h.html</anchorfile>
+      <anchor>a209605cbeeebb5cd81cbd1e26a2fe1f3</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>neuron_impl_stoc_exp_stable.h</name>
+    <path>src/neuron/implementations/</path>
+    <filename>neuron__impl__stoc__exp__stable_8h.html</filename>
+    <includes id="neuron__impl_8h" name="neuron_impl.h" local="no" import="no" module="no" objc="no">neuron/implementations/neuron_impl.h</includes>
+    <includes id="maths-util_8h" name="maths-util.h" local="no" import="no" module="no" objc="no">common/maths-util.h</includes>
+    <includes id="neuron__recording_8h" name="neuron_recording.h" local="no" import="no" module="no" objc="no">neuron/neuron_recording.h</includes>
+    <includes id="current__source__impl_8h" name="current_source_impl.h" local="no" import="no" module="no" objc="no">neuron/current_sources/current_source_impl.h</includes>
+    <includes id="current__source_8h" name="current_source.h" local="no" import="no" module="no" objc="no">neuron/current_sources/current_source.h</includes>
+    <includes id="stoc__exp__common_8h" name="stoc_exp_common.h" local="yes" import="no" module="no" objc="no">stoc_exp_common.h</includes>
+    <class kind="struct">neuron_params_t</class>
+    <class kind="struct">neuron_impl_t</class>
+    <member kind="variable" static="yes">
+      <type>static neuron_impl_t *</type>
+      <name>neuron_array</name>
+      <anchorfile>neuron__impl__stoc__exp__stable_8h.html</anchorfile>
+      <anchor>a209605cbeeebb5cd81cbd1e26a2fe1f3</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>neuron_impl_stoc_sigma.h</name>
+    <path>src/neuron/implementations/</path>
+    <filename>neuron__impl__stoc__sigma_8h.html</filename>
+    <includes id="neuron__impl_8h" name="neuron_impl.h" local="no" import="no" module="no" objc="no">neuron/implementations/neuron_impl.h</includes>
+    <includes id="maths-util_8h" name="maths-util.h" local="no" import="no" module="no" objc="no">common/maths-util.h</includes>
+    <includes id="neuron__recording_8h" name="neuron_recording.h" local="no" import="no" module="no" objc="no">neuron/neuron_recording.h</includes>
+    <includes id="current__source__impl_8h" name="current_source_impl.h" local="no" import="no" module="no" objc="no">neuron/current_sources/current_source_impl.h</includes>
+    <includes id="current__source_8h" name="current_source.h" local="no" import="no" module="no" objc="no">neuron/current_sources/current_source.h</includes>
+    <class kind="struct">neuron_params_t</class>
+    <class kind="struct">neuron_impl_t</class>
+    <member kind="define">
+      <type>#define</type>
+      <name>PROB_HALF</name>
+      <anchorfile>neuron__impl__stoc__sigma_8h.html</anchorfile>
+      <anchor>ab49cae6f7784ccc3fa600a6aeb2631c4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>MAX_POWER</name>
+      <anchorfile>neuron__impl__stoc__sigma_8h.html</anchorfile>
+      <anchor>a6e5f254e637637d3a3256dfd7a1399c7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static neuron_impl_t *</type>
+      <name>neuron_array</name>
+      <anchorfile>neuron__impl__stoc__sigma_8h.html</anchorfile>
+      <anchor>a209605cbeeebb5cd81cbd1e26a2fe1f3</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>stoc_exp_common.h</name>
+    <path>src/neuron/implementations/</path>
+    <filename>stoc__exp__common_8h.html</filename>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_probability</name>
+      <anchorfile>stoc__exp__common_8h.html</anchorfile>
+      <anchor>a9f0abc6e7d8d0554710c01336d6e2b35</anchor>
+      <arglist>(UREAL tau, REAL p)</arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static const uint32_t</type>
+      <name>MIN_TAU</name>
+      <anchorfile>stoc__exp__common_8h.html</anchorfile>
+      <anchor>a9100a4cc657cf64c13e2533439ce4ae5</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
     <name>input_type.h</name>
     <path>src/neuron/input_types/</path>
     <filename>input__type_8h.html</filename>
@@ -3130,6 +3250,42 @@
       <name>neuron_model_print_parameters</name>
       <anchorfile>neuron__model_8h.html</anchorfile>
       <anchor>ae984b1ab35b6ea027f5d622074c21212</anchor>
+      <arglist>(const neuron_t *neuron)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>neuron_model_if_trunc.h</name>
+    <path>src/neuron/models/</path>
+    <filename>neuron__model__if__trunc_8h.html</filename>
+    <includes id="neuron__model_8h" name="neuron_model.h" local="yes" import="no" module="no" objc="no">neuron_model.h</includes>
+    <class kind="struct">neuron_params_t</class>
+    <class kind="struct">neuron_t</class>
+    <member kind="function" static="yes">
+      <type>static int32_t</type>
+      <name>lif_ceil_accum</name>
+      <anchorfile>neuron__model__if__trunc_8h.html</anchorfile>
+      <anchor>a9657bc9566431a1077df6f73dae27baf</anchor>
+      <arglist>(REAL value)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static state_t</type>
+      <name>neuron_model_state_update</name>
+      <anchorfile>neuron__model__if__trunc_8h.html</anchorfile>
+      <anchor>a6809c07eadc54841c5970164ca52dc3b</anchor>
+      <arglist>(uint16_t num_excitatory_inputs, const input_t *exc_input, uint16_t num_inhibitory_inputs, const input_t *inh_input, input_t external_bias, REAL current_offset, neuron_t *restrict neuron)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>neuron_model_has_spiked</name>
+      <anchorfile>neuron__model__if__trunc_8h.html</anchorfile>
+      <anchor>a6d9e95529a2c510cc1010163f9ea89ee</anchor>
+      <arglist>(neuron_t *restrict neuron)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static state_t</type>
+      <name>neuron_model_get_membrane_voltage</name>
+      <anchorfile>neuron__model__if__trunc_8h.html</anchorfile>
+      <anchor>a36ed2fe89ac12da019a6bcee8b6672c9</anchor>
       <arglist>(const neuron_t *neuron)</arglist>
     </member>
   </compound>
@@ -8098,6 +8254,14 @@
     </member>
   </compound>
   <compound kind="file">
+    <name>threshold_type_fixed_prob.h</name>
+    <path>src/neuron/threshold_types/</path>
+    <filename>threshold__type__fixed__prob_8h.html</filename>
+    <includes id="threshold__type_8h" name="threshold_type.h" local="yes" import="no" module="no" objc="no">threshold_type.h</includes>
+    <class kind="struct">threshold_type_params_t</class>
+    <class kind="struct">threshold_type_t</class>
+  </compound>
+  <compound kind="file">
     <name>threshold_type_maass_stochastic.h</name>
     <path>src/neuron/threshold_types/</path>
     <filename>threshold__type__maass__stochastic_8h.html</filename>
@@ -12108,6 +12272,81 @@
     <anchor>structneuron__current__source__t</anchor>
   </compound>
   <compound kind="struct">
+    <name>neuron_impl_t</name>
+    <filename>neuron__impl__stoc__sigma_8h.html</filename>
+    <anchor>structneuron__impl__t</anchor>
+    <member kind="variable">
+      <type>UFRACT</type>
+      <name>tau_recip</name>
+      <anchorfile>neuron__impl__stoc__sigma_8h.html</anchorfile>
+      <anchor>a160c0c5aedbfdf315dd9f49301f215bc</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>bias</name>
+      <anchorfile>neuron__impl__stoc__sigma_8h.html</anchorfile>
+      <anchor>a9ee1ffbb56f496e2051b7fd997a416fb</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>t_refract</name>
+      <anchorfile>neuron__impl__stoc__sigma_8h.html</anchorfile>
+      <anchor>a23e1b3358de7aa4fc8ee02cd09fc1e62</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>refract_timer</name>
+      <anchorfile>neuron__impl__stoc__sigma_8h.html</anchorfile>
+      <anchor>aab41b75883f25efc679c83c42cd77cc4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>mars_kiss64_seed_t</type>
+      <name>random_seed</name>
+      <anchorfile>neuron__impl__stoc__sigma_8h.html</anchorfile>
+      <anchor>a2c2d6827f3442df74b84e01e8ecd7f06</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>input_t</type>
+      <name>inputs</name>
+      <anchorfile>neuron__impl__stoc__sigma_8h.html</anchorfile>
+      <anchor>a25914975ca586ee9b1fe641d18a7b9ad</anchor>
+      <arglist>[2]</arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>v_membrane</name>
+      <anchorfile>neuron__impl__stoc__sigma_8h.html</anchorfile>
+      <anchor>a9de0a8c85cb8426915b83891e66d0a01</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>v_reset</name>
+      <anchorfile>neuron__impl__stoc__sigma_8h.html</anchorfile>
+      <anchor>a4e3f9b433ea7a6130bd04c0423817b6d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>UREAL</type>
+      <name>tau</name>
+      <anchorfile>neuron__impl__stoc__sigma_8h.html</anchorfile>
+      <anchor>a7c8a2489d4bac187f5a32fc081d64d34</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>alpha</name>
+      <anchorfile>neuron__impl__stoc__sigma_8h.html</anchorfile>
+      <anchor>ac8d2b942c5540605e94dae85d560a790</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>neuron_param_item_t</name>
     <filename>neuron__expander_8c.html</filename>
     <anchor>structneuron__param__item__t</anchor>
@@ -12127,14 +12366,14 @@
     <filename>neuron__model__lif__impl_8h.html</filename>
     <anchor>structneuron__params__t</anchor>
     <member kind="variable">
-      <type>REAL</type>
-      <name>I_offset</name>
+      <type>UREAL</type>
+      <name>tau_ms</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>a4b4a2ba9fba6d6f10d8ef1e1c851a39e</anchor>
+      <anchor>a50a7b399c9d5b99abef66aa751692c7a</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>REAL</type>
+      <type>UREAL</type>
       <name>time_step</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
       <anchor>a6d28ebcdd47a7628df5f538f5e5b60a6</anchor>
@@ -12142,9 +12381,58 @@
     </member>
     <member kind="variable">
       <type>REAL</type>
-      <name>next_h</name>
+      <name>bias</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>a44341613a6482efe24379ae9a3c758d3</anchor>
+      <anchor>a1e7bce63899fea4ca8689094b1751c68</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>refract_init</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a9411633446c19d345ffadaa40f409435</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>mars_kiss64_seed_t</type>
+      <name>random_seed</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a504704f3502ce97768d4a563b92dc5c3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>v_init</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a74e15e71db3d2e1a31cd86ec8339a2c0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>v_reset</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>abf6a65a8f972971302f597cf4d7fad72</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>UREAL</type>
+      <name>tau</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a3877ff4af421b226018173d6e65010a1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>UREAL</type>
+      <name>tau_refract</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a69b47bf8aad4ffc4420bbc1f5020ac0d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>alpha</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a1a2b165694ee203c08c3bde620a3ed2a</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -12152,13 +12440,6 @@
       <name>V_init</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
       <anchor>a01195d3e2b315b7049b25bed7a00f322</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>REAL</type>
-      <name>V_rest</name>
-      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>a390f6f7e76ae18b982c519ad517e74ad</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -12173,6 +12454,13 @@
       <name>tau_m</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
       <anchor>acd02a68c932cc69f2815114f26f1609c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>I_offset</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a4b4a2ba9fba6d6f10d8ef1e1c851a39e</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -12194,6 +12482,27 @@
       <name>refract_timer_init</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
       <anchor>ac2ffdee96e7211c98c8a5465cb277fd6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>time_step</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a6d28ebcdd47a7628df5f538f5e5b60a6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>next_h</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a44341613a6482efe24379ae9a3c758d3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>V_rest</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a390f6f7e76ae18b982c519ad517e74ad</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -12293,37 +12602,9 @@
     <anchor>structneuron__t</anchor>
     <member kind="variable">
       <type>REAL</type>
-      <name>I_offset</name>
-      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>afa7f374c044dc5b6f4c0158ea694010e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>REAL</type>
-      <name>this_h</name>
-      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>ac81d28edfc234c0304748c166baeb0ac</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>REAL</type>
-      <name>reset_h</name>
-      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>a1d7622da6c04a63fde21386757b3b332</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>REAL</type>
       <name>V_membrane</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
       <anchor>ad66d54c7a07b1786b0d03888ba1c487d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>REAL</type>
-      <name>V_rest</name>
-      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>a33437019fe16a8c9bde9773714eee263</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -12335,9 +12616,9 @@
     </member>
     <member kind="variable">
       <type>REAL</type>
-      <name>exp_TC</name>
+      <name>I_offset</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>ad8b828cd0ae1cfcd20f1493d629fbb81</anchor>
+      <anchor>afa7f374c044dc5b6f4c0158ea694010e</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -12359,6 +12640,34 @@
       <name>T_refract</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
       <anchor>a552b3d69763d3e600964e6a1ee7a5c89</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>this_h</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>ac81d28edfc234c0304748c166baeb0ac</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>reset_h</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a1d7622da6c04a63fde21386757b3b332</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>V_rest</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a33437019fe16a8c9bde9773714eee263</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>exp_TC</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>ad8b828cd0ae1cfcd20f1493d629fbb81</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -13925,6 +14234,27 @@
     <anchor>structthreshold__type__params__t</anchor>
     <member kind="variable">
       <type>REAL</type>
+      <name>threshold_value</name>
+      <anchorfile>threshold__type__static_8h.html</anchorfile>
+      <anchor>a6e1abe871ed27b99be9a050662871898</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>UREAL</type>
+      <name>prob</name>
+      <anchorfile>threshold__type__static_8h.html</anchorfile>
+      <anchor>acb6480b8c89a0d8f37f0a6b1ac43d829</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>mars_kiss64_seed_t</type>
+      <name>random_seed</name>
+      <anchorfile>threshold__type__static_8h.html</anchorfile>
+      <anchor>adc735fc21bcd1ae87be78e94606176e1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
       <name>du_th</name>
       <anchorfile>threshold__type__static_8h.html</anchorfile>
       <anchor>a39a4a0cad4335ec0a6228e491c51b715</anchor>
@@ -13951,18 +14281,32 @@
       <anchor>a6618b1cdebadeb52e86c0ea33d94ea8b</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable">
-      <type>REAL</type>
-      <name>threshold_value</name>
-      <anchorfile>threshold__type__static_8h.html</anchorfile>
-      <anchor>a6e1abe871ed27b99be9a050662871898</anchor>
-      <arglist></arglist>
-    </member>
   </compound>
   <compound kind="struct">
     <name>threshold_type_t</name>
     <filename>threshold__type__static_8h.html</filename>
     <anchor>structthreshold__type__t</anchor>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>threshold_value</name>
+      <anchorfile>threshold__type__static_8h.html</anchorfile>
+      <anchor>a8d25a3b92dbeffe773c096f0289aeb44</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>prob</name>
+      <anchorfile>threshold__type__static_8h.html</anchorfile>
+      <anchor>ae90fdec13c7d2862578f4256ceab80e3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>mars_kiss64_seed_t</type>
+      <name>random_seed</name>
+      <anchorfile>threshold__type__static_8h.html</anchorfile>
+      <anchor>a84a9a1b91768c0849b17569e73381e99</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="variable">
       <type>REAL</type>
       <name>du_th_inv</name>
@@ -13989,13 +14333,6 @@
       <name>neg_machine_time_step_ms_div_10</name>
       <anchorfile>threshold__type__static_8h.html</anchorfile>
       <anchor>ad4d04f4117f32c07cd86ee51cdc9eb74</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>REAL</type>
-      <name>threshold_value</name>
-      <anchorfile>threshold__type__static_8h.html</anchorfile>
-      <anchor>a8d25a3b92dbeffe773c096f0289aeb44</anchor>
       <arglist></arglist>
     </member>
   </compound>

@@ -91,10 +91,10 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:structneuron__params__t" id="r_structneuron__params__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__params__t">neuron_params_t</a></td></tr>
-<tr class="memdesc:structneuron__params__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state parameters of an Izhekevich model neuron.  <a href="neuron__model__lif__impl_8h.html#structneuron__params__t">More...</a><br /></td></tr>
+<tr class="memdesc:structneuron__params__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">definition of neuron parameters  <a href="neuron__model__lif__impl_8h.html#structneuron__params__t">More...</a><br /></td></tr>
 <tr class="separator:structneuron__params__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:structneuron__t" id="r_structneuron__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a></td></tr>
-<tr class="memdesc:structneuron__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state variables of an Izhekevich model neuron.  <a href="neuron__model__lif__impl_8h.html#structneuron__t">More...</a><br /></td></tr>
+<tr class="memdesc:structneuron__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">definition for LIF neuron state  <a href="neuron__model__lif__impl_8h.html#structneuron__t">More...</a><br /></td></tr>
 <tr class="separator:structneuron__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
@@ -145,12 +145,125 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock"><p>The state parameters of an Izhekevich model neuron. </p>
+<div class="textblock"><p>definition of neuron parameters </p>
+<p>The state parameters of an Izhekevich model neuron.</p>
 <p>definition for LIF neuron parameters </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8h_source.html#l00025">25</a> of file <a class="el" href="neuron__model__izh__impl_8h_source.html">neuron_model_izh_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__impl__stoc__exp_8h_source.html#l00047">47</a> of file <a class="el" href="neuron__impl__stoc__exp_8h_source.html">neuron_impl_stoc_exp.h</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="a50a7b399c9d5b99abef66aa751692c7a" name="a50a7b399c9d5b99abef66aa751692c7a"></a><a class="el" href="maths-util_8h.html#a2e4c6b7f842497114d81356c763536c4">UREAL</a></td>
+<td class="fieldname">
+tau_ms</td>
+<td class="fielddoc">
+The tau value of the neuron. </td></tr>
+<tr><td class="fieldtype">
+<a id="a6d28ebcdd47a7628df5f538f5e5b60a6" name="a6d28ebcdd47a7628df5f538f5e5b60a6"></a><a class="el" href="maths-util_8h.html#a2e4c6b7f842497114d81356c763536c4">UREAL</a></td>
+<td class="fieldname">
+time_step</td>
+<td class="fielddoc">
+The timestep of the neuron being used. <p>The time step in milliseconds.</p>
+<p>current timestep in ms </p>
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a1e7bce63899fea4ca8689094b1751c68" name="a1e7bce63899fea4ca8689094b1751c68"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+bias</td>
+<td class="fielddoc">
+The bias value. </td></tr>
+<tr><td class="fieldtype">
+<a id="a9411633446c19d345ffadaa40f409435" name="a9411633446c19d345ffadaa40f409435"></a>uint32_t</td>
+<td class="fieldname">
+refract_init</td>
+<td class="fielddoc">
+The initial refractory timer. </td></tr>
+<tr><td class="fieldtype">
+<a id="a504704f3502ce97768d4a563b92dc5c3" name="a504704f3502ce97768d4a563b92dc5c3"></a><a class="elRef" href="https://spinnakermanchester.github.io/spinn_common/random_8h.html#ad0b387766bfa2af618fb636ed7bcba6e">mars_kiss64_seed_t</a></td>
+<td class="fieldname">
+random_seed</td>
+<td class="fielddoc">
+Random seed to use. </td></tr>
+<tr><td class="fieldtype">
+<a id="a74e15e71db3d2e1a31cd86ec8339a2c0" name="a74e15e71db3d2e1a31cd86ec8339a2c0"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+v_init</td>
+<td class="fielddoc">
+The initial membrane voltage. </td></tr>
+<tr><td class="fieldtype">
+<a id="abf6a65a8f972971302f597cf4d7fad72" name="abf6a65a8f972971302f597cf4d7fad72"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+v_reset</td>
+<td class="fielddoc">
+The reset membrane voltage after a spike. </td></tr>
+<tr><td class="fieldtype">
+<a id="a3877ff4af421b226018173d6e65010a1" name="a3877ff4af421b226018173d6e65010a1"></a><a class="el" href="maths-util_8h.html#a2e4c6b7f842497114d81356c763536c4">UREAL</a></td>
+<td class="fieldname">
+tau</td>
+<td class="fielddoc">
+The tau value of the neuron, multiplied by 2^v to get probability. </td></tr>
+<tr><td class="fieldtype">
+<a id="a69b47bf8aad4ffc4420bbc1f5020ac0d" name="a69b47bf8aad4ffc4420bbc1f5020ac0d"></a><a class="el" href="maths-util_8h.html#a2e4c6b7f842497114d81356c763536c4">UREAL</a></td>
+<td class="fieldname">
+tau_refract</td>
+<td class="fielddoc">
+The refractory period of the neuron in milliseconds. <p>The refractory period of the neuron, in ms. </p>
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a1a2b165694ee203c08c3bde620a3ed2a" name="a1a2b165694ee203c08c3bde620a3ed2a"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+alpha</td>
+<td class="fielddoc">
+The alpha value of the neuron prob = (2^(-2^(alpha x voltage))) </td></tr>
+<tr><td class="fieldtype">
+<a id="a01195d3e2b315b7049b25bed7a00f322" name="a01195d3e2b315b7049b25bed7a00f322"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+V_init</td>
+<td class="fielddoc">
+membrane voltage [mV] </td></tr>
+<tr><td class="fieldtype">
+<a id="a0d2e44ce37bdc89bdeaba22c3fc65903" name="a0d2e44ce37bdc89bdeaba22c3fc65903"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+c_m</td>
+<td class="fielddoc">
+membrane capacitance [nF] </td></tr>
+<tr><td class="fieldtype">
+<a id="acd02a68c932cc69f2815114f26f1609c" name="acd02a68c932cc69f2815114f26f1609c"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+tau_m</td>
+<td class="fielddoc">
+membrane decay time constant </td></tr>
+<tr><td class="fieldtype">
+<a id="a4b4a2ba9fba6d6f10d8ef1e1c851a39e" name="a4b4a2ba9fba6d6f10d8ef1e1c851a39e"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+I_offset</td>
+<td class="fielddoc">
+offset current [nA] </td></tr>
+<tr><td class="fieldtype">
+<a id="a1b77e28a1ebe5e091767984d96a1e41f" name="a1b77e28a1ebe5e091767984d96a1e41f"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+V_reset</td>
+<td class="fielddoc">
+post-spike reset membrane voltage [mV] </td></tr>
+<tr><td class="fieldtype">
+<a id="a2a4cc8608f712cd69e40daa4bcecb9b9" name="a2a4cc8608f712cd69e40daa4bcecb9b9"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+T_refract_ms</td>
+<td class="fielddoc">
+refractory time of neuron [ms] </td></tr>
+<tr><td class="fieldtype">
+<a id="ac2ffdee96e7211c98c8a5465cb277fd6" name="ac2ffdee96e7211c98c8a5465cb277fd6"></a>int32_t</td>
+<td class="fieldname">
+refract_timer_init</td>
+<td class="fielddoc">
+initial refractory timer value (saved) </td></tr>
+<tr><td class="fieldtype">
+<a id="a6d28ebcdd47a7628df5f538f5e5b60a6" name="a6d28ebcdd47a7628df5f538f5e5b60a6"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+time_step</td>
+<td class="fielddoc">
+The time step in milliseconds. <p>current timestep in ms </p>
+</td></tr>
 <tr><td class="fieldtype">
 <a id="a09dfcb6dca0125b67b65ca41c402c663" name="a09dfcb6dca0125b67b65ca41c402c663"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
@@ -188,66 +301,17 @@ U</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a4b4a2ba9fba6d6f10d8ef1e1c851a39e" name="a4b4a2ba9fba6d6f10d8ef1e1c851a39e"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-I_offset</td>
-<td class="fielddoc">
-offset current [nA] </td></tr>
-<tr><td class="fieldtype">
-<a id="a6d28ebcdd47a7628df5f538f5e5b60a6" name="a6d28ebcdd47a7628df5f538f5e5b60a6"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-time_step</td>
-<td class="fielddoc">
-current timestep in ms <p>The time step in milliseconds. </p>
-</td></tr>
-<tr><td class="fieldtype">
 <a id="a44341613a6482efe24379ae9a3c758d3" name="a44341613a6482efe24379ae9a3c758d3"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 next_h</td>
 <td class="fielddoc">
 next value of this_h (saved) </td></tr>
 <tr><td class="fieldtype">
-<a id="a01195d3e2b315b7049b25bed7a00f322" name="a01195d3e2b315b7049b25bed7a00f322"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-V_init</td>
-<td class="fielddoc">
-membrane voltage [mV] </td></tr>
-<tr><td class="fieldtype">
 <a id="a390f6f7e76ae18b982c519ad517e74ad" name="a390f6f7e76ae18b982c519ad517e74ad"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 V_rest</td>
 <td class="fielddoc">
 membrane resting voltage [mV] </td></tr>
-<tr><td class="fieldtype">
-<a id="a0d2e44ce37bdc89bdeaba22c3fc65903" name="a0d2e44ce37bdc89bdeaba22c3fc65903"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-c_m</td>
-<td class="fielddoc">
-membrane capacitance [nF] </td></tr>
-<tr><td class="fieldtype">
-<a id="acd02a68c932cc69f2815114f26f1609c" name="acd02a68c932cc69f2815114f26f1609c"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-tau_m</td>
-<td class="fielddoc">
-membrane decay time constant </td></tr>
-<tr><td class="fieldtype">
-<a id="a1b77e28a1ebe5e091767984d96a1e41f" name="a1b77e28a1ebe5e091767984d96a1e41f"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-V_reset</td>
-<td class="fielddoc">
-post-spike reset membrane voltage [mV] </td></tr>
-<tr><td class="fieldtype">
-<a id="a2a4cc8608f712cd69e40daa4bcecb9b9" name="a2a4cc8608f712cd69e40daa4bcecb9b9"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-T_refract_ms</td>
-<td class="fielddoc">
-refractory time of neuron [ms] </td></tr>
-<tr><td class="fieldtype">
-<a id="ac2ffdee96e7211c98c8a5465cb277fd6" name="ac2ffdee96e7211c98c8a5465cb277fd6"></a>int32_t</td>
-<td class="fieldname">
-refract_timer_init</td>
-<td class="fielddoc">
-initial refractory timer value (saved) </td></tr>
 </table>
 
 </div>
@@ -263,12 +327,48 @@ initial refractory timer value (saved) </td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock"><p>The state variables of an Izhekevich model neuron. </p>
-<p>definition for LIF neuron state </p>
+<div class="textblock"><p>definition for LIF neuron state </p>
+<p>The state variables of an Izhekevich model neuron. </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8h_source.html#l00047">47</a> of file <a class="el" href="neuron__model__izh__impl_8h_source.html">neuron_model_izh_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__model__if__trunc_8h_source.html#l00053">53</a> of file <a class="el" href="neuron__model__if__trunc_8h_source.html">neuron_model_if_trunc.h</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="ad66d54c7a07b1786b0d03888ba1c487d" name="ad66d54c7a07b1786b0d03888ba1c487d"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+V_membrane</td>
+<td class="fielddoc">
+membrane voltage [mV] </td></tr>
+<tr><td class="fieldtype">
+<a id="a8d199c1f0e0423ae3707530f872afc75" name="a8d199c1f0e0423ae3707530f872afc75"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+R_membrane</td>
+<td class="fielddoc">
+membrane resistance [MOhm] </td></tr>
+<tr><td class="fieldtype">
+<a id="afa7f374c044dc5b6f4c0158ea694010e" name="afa7f374c044dc5b6f4c0158ea694010e"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+I_offset</td>
+<td class="fielddoc">
+offset current [nA] </td></tr>
+<tr><td class="fieldtype">
+<a id="affef55f4b097428004fad494ffaa7a26" name="affef55f4b097428004fad494ffaa7a26"></a>int32_t</td>
+<td class="fieldname">
+refract_timer</td>
+<td class="fielddoc">
+countdown to end of next refractory period [timesteps] </td></tr>
+<tr><td class="fieldtype">
+<a id="a0c21f2095b2338097db6a4de641a9b0e" name="a0c21f2095b2338097db6a4de641a9b0e"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+V_reset</td>
+<td class="fielddoc">
+post-spike reset membrane voltage [mV] </td></tr>
+<tr><td class="fieldtype">
+<a id="a552b3d69763d3e600964e6a1ee7a5c89" name="a552b3d69763d3e600964e6a1ee7a5c89"></a>int32_t</td>
+<td class="fieldname">
+T_refract</td>
+<td class="fielddoc">
+refractory time of neuron [timesteps] </td></tr>
 <tr><td class="fieldtype">
 <a id="ac27f43527e901f816f9fd6f370a93c43" name="ac27f43527e901f816f9fd6f370a93c43"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
@@ -306,12 +406,6 @@ U</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="afa7f374c044dc5b6f4c0158ea694010e" name="afa7f374c044dc5b6f4c0158ea694010e"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-I_offset</td>
-<td class="fielddoc">
-offset current [nA] </td></tr>
-<tr><td class="fieldtype">
 <a id="ac81d28edfc234c0304748c166baeb0ac" name="ac81d28edfc234c0304748c166baeb0ac"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 this_h</td>
@@ -324,23 +418,11 @@ reset_h</td>
 <td class="fielddoc">
 timestep to reset to when not just spiked </td></tr>
 <tr><td class="fieldtype">
-<a id="ad66d54c7a07b1786b0d03888ba1c487d" name="ad66d54c7a07b1786b0d03888ba1c487d"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-V_membrane</td>
-<td class="fielddoc">
-membrane voltage [mV] </td></tr>
-<tr><td class="fieldtype">
 <a id="a33437019fe16a8c9bde9773714eee263" name="a33437019fe16a8c9bde9773714eee263"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 V_rest</td>
 <td class="fielddoc">
 membrane resting voltage [mV] </td></tr>
-<tr><td class="fieldtype">
-<a id="a8d199c1f0e0423ae3707530f872afc75" name="a8d199c1f0e0423ae3707530f872afc75"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-R_membrane</td>
-<td class="fielddoc">
-membrane resistance [MOhm] </td></tr>
 <tr><td class="fieldtype">
 <a id="ad8b828cd0ae1cfcd20f1493d629fbb81" name="ad8b828cd0ae1cfcd20f1493d629fbb81"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
@@ -348,24 +430,6 @@ exp_TC</td>
 <td class="fielddoc">
 <p>'fixed' computation parameter - time constant multiplier for closed-form solution exp(-(machine time step in ms)/(R * C)) [.] </p>
 </td></tr>
-<tr><td class="fieldtype">
-<a id="affef55f4b097428004fad494ffaa7a26" name="affef55f4b097428004fad494ffaa7a26"></a>int32_t</td>
-<td class="fieldname">
-refract_timer</td>
-<td class="fielddoc">
-countdown to end of next refractory period [timesteps] </td></tr>
-<tr><td class="fieldtype">
-<a id="a0c21f2095b2338097db6a4de641a9b0e" name="a0c21f2095b2338097db6a4de641a9b0e"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-V_reset</td>
-<td class="fielddoc">
-post-spike reset membrane voltage [mV] </td></tr>
-<tr><td class="fieldtype">
-<a id="a552b3d69763d3e600964e6a1ee7a5c89" name="a552b3d69763d3e600964e6a1ee7a5c89"></a>int32_t</td>
-<td class="fieldname">
-T_refract</td>
-<td class="fielddoc">
-refractory time of neuron [timesteps] </td></tr>
 </table>
 
 </div>
@@ -775,7 +839,7 @@ refractory time of neuron [timesteps] </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Apr 22 2024 13:53:01 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
+Generated on Tue Apr 23 2024 06:40:34 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
 </small></address>
 </body>
 </html>

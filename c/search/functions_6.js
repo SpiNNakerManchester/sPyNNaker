@@ -11,9 +11,10 @@ var searchData=
   ['get_5fnm_5ffixed_5frow_8',['get_nm_fixed_row',['../matrix__generator__neuromodulation_8h.html#a3c46723fedbc28bed3058596ce6417f0',1,'matrix_generator_neuromodulation.h']]],
   ['get_5fnm_5frow_9',['get_nm_row',['../matrix__generator__neuromodulation_8h.html#a1a29f0db40c53c9eb7514bc9b543f2a9',1,'matrix_generator_neuromodulation.h']]],
   ['get_5foffset_10',['get_offset',['../population__table_8h.html#a071de88b0691d4747c55dbea8cc58f86',1,'population_table.h']]],
-  ['get_5frow_11',['get_row',['../matrix__generator__common_8h.html#ae4c39a14584912fa86c805ebcdfec177',1,'matrix_generator_common.h']]],
-  ['get_5frow_5faddr_5fand_5fsize_12',['get_row_addr_and_size',['../population__table_8h.html#a45f32a7841183cdb7aab2be2a91fd6ba',1,'population_table.h']]],
-  ['get_5frow_5flength_13',['get_row_length',['../population__table_8h.html#a44d4641d18cf8073f34f171a7e9a0f54',1,'population_table.h']]],
-  ['get_5fstdp_5ffixed_5frow_14',['get_stdp_fixed_row',['../matrix__generator__stdp_8h.html#a97c90fc0e4a1cf3399c32a8421380e9a',1,'matrix_generator_stdp.h']]],
-  ['get_5ftype_5fchar_15',['get_type_char',['../synapses_8c.html#a1a333d14cf1e2ac31a3d3d8bee59dedd',1,'synapses.c']]]
+  ['get_5fprobability_11',['get_probability',['../stoc__exp__common_8h.html#a9f0abc6e7d8d0554710c01336d6e2b35',1,'stoc_exp_common.h']]],
+  ['get_5frow_12',['get_row',['../matrix__generator__common_8h.html#ae4c39a14584912fa86c805ebcdfec177',1,'matrix_generator_common.h']]],
+  ['get_5frow_5faddr_5fand_5fsize_13',['get_row_addr_and_size',['../population__table_8h.html#a45f32a7841183cdb7aab2be2a91fd6ba',1,'population_table.h']]],
+  ['get_5frow_5flength_14',['get_row_length',['../population__table_8h.html#a44d4641d18cf8073f34f171a7e9a0f54',1,'population_table.h']]],
+  ['get_5fstdp_5ffixed_5frow_15',['get_stdp_fixed_row',['../matrix__generator__stdp_8h.html#a97c90fc0e4a1cf3399c32a8421380e9a',1,'matrix_generator_stdp.h']]],
+  ['get_5ftype_5fchar_16',['get_type_char',['../synapses_8c.html#a1a333d14cf1e2ac31a3d3d8bee59dedd',1,'synapses.c']]]
 ];
