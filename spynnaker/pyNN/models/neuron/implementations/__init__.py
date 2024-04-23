@@ -16,7 +16,11 @@ from .abstract_standard_neuron_component import (
     AbstractStandardNeuronComponent, ModelParameter)
 from .abstract_neuron_impl import AbstractNeuronImpl
 from .neuron_impl_standard import NeuronImplStandard
+from .neuron_impl_stoc_exp import NeuronImplStocExp
+from .neuron_impl_stoc_exp_stable import NeuronImplStocExpStable
+from .neuron_impl_stoc_sigma import NeuronImplStocSigma
 
 __all__ = [
     "AbstractNeuronImpl", "AbstractStandardNeuronComponent",
-    "ModelParameter", "NeuronImplStandard"]
+    "ModelParameter", "NeuronImplStandard", "NeuronImplStocExp",
+    "NeuronImplStocExpStable", "NeuronImplStocSigma"]
