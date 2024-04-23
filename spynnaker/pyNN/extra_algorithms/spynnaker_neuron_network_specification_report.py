@@ -14,7 +14,7 @@
 from __future__ import annotations
 import logging
 import os
-from typing import Dict, Tuple, Type, TypeVar, TYPE_CHECKING
+from typing import Dict, Set, Tuple, Type, TypeVar, TYPE_CHECKING
 from spinn_utilities.config_holder import get_config_str_or_none
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
@@ -24,6 +24,7 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 if TYPE_CHECKING:
     import graphviz as gv  # type: ignore[import]
+
 logger = FormatAdapter(logging.getLogger(__name__))
 _RE = TypeVar("_RE", bound=RuntimeError)
 
@@ -72,7 +73,7 @@ def spynnaker_neuron_graph_network_specification_report() -> None:
     # build progress bar for the vertices, edges, and rendering
     progress = ProgressBar(
         SpynnakerDataView.get_n_vertices() +
-        SpynnakerDataView.get_n_partitions() + 1,
+        SpynnakerDataView.get_n_partitions(),
         "generating the graphical representation of the neural network")
 
     # write vertices into dot diagram
@@ -83,12 +84,13 @@ def spynnaker_neuron_graph_network_specification_report() -> None:
     # write dot file and generate PDF
     file_to_output = os.path.join(
         SpynnakerDataView.get_run_dir_path(), _GRAPH_NAME)
+    progress.end()
+
+    logger.info(f"rendering dot diagram {file_to_output}")
     try:
         dot_diagram.render(file_to_output, view=False, format=graph_format)
     except exe_not_found_exn:
         logger.exception("could not render diagram in {}", file_to_output)
-    progress.update()
-    progress.end()
 
 
 def _generate_vertices(
@@ -125,10 +127,12 @@ def _generate_edges(
             source_vertex_id = vertex_ids[edge.pre_vertex]
             dest_vertex_id = vertex_ids[edge.post_vertex]
             if isinstance(edge, ProjectionApplicationEdge):
+                links: Set[str] = set()
                 for synapse_info in edge.synapse_information:
+                    links.add(str(synapse_info.connector))
+                for synapse_str in links:
                     dot_diagram.edge(
-                        source_vertex_id, dest_vertex_id,
-                        str(synapse_info.connector))
+                        source_vertex_id, dest_vertex_id, synapse_str)
             else:
                 # Unlabelled edge
                 dot_diagram.edge(source_vertex_id, dest_vertex_id)
