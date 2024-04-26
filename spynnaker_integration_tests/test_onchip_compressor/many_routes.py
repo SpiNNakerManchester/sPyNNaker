@@ -25,8 +25,8 @@ def find_good_chip(machine, n_target):
         for y in range(1, 8):
             chip = machine.get_chip_at(x, y)
             if chip:
-                # Must be greater than to allow the extra monitor
-                if chip.n_placable_processors > n_target:
+                if (chip.n_placable_processors -
+                        SpynnakerDataView.get_n_monitors() <= n_target):
                     print(chip.n_placable_processors, "processors on", x, y)
                     return (x, y)
     SpynnakerDataView.raise_skiptest(
