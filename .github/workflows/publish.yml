@@ -15,7 +15,7 @@
 name: Publish
 on:
   push:
-    branches: [ master, write_permission ]
+    branches: [ master ]
 
 env:
   ROOT_DOC_DIR: doc/global
