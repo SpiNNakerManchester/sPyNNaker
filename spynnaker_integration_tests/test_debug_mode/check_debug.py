@@ -21,9 +21,6 @@ from spinn_front_end_common.utilities.report_functions.network_specification \
 from spinn_front_end_common.utilities.report_functions.drift_report import (
     CLOCK_DRIFT_REPORT)
 from spinn_front_end_common.utilities.report_functions.\
-    routing_table_from_machine_report import _FOLDER_NAME as \
-    routing_tables_from_machine_report
-from spinn_front_end_common.utilities.report_functions.\
     memory_map_on_host_report import _FOLDER_NAME as \
     memory_map_on_host_report
 # from spinn_front_end_common.utilities.report_functions.energy_report \
@@ -67,8 +64,6 @@ class CheckDebug(BaseTestCase):
             reports_names._ROUTING_TABLE_DIR,
             reports_names._C_ROUTING_TABLE_DIR,
             reports_names._COMPARED_FILENAME,
-            # write_routing_tables_from_machine_report
-            routing_tables_from_machine_report,
             # write_memory_map_report
             memory_map_on_host_report,
             # write_network_specification_report
