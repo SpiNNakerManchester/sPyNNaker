@@ -22,7 +22,7 @@ def triplet_additive():
     # -------------------------------------------------------------------
     # This test uses a single data point from the Pfister/Gerstner example
     # which is described and evaluated in more detail in
-    # PyNN8Examples/extra_models_examples/stdp_triplet.py
+    # PyNNExamples/examples/extra_models_examples/stdp_triplet.py
     # -------------------------------------------------------------------
 
     # -------------------------------------------------------------------
