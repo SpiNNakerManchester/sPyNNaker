@@ -11,12 +11,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import logging
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from typing import (
+    Any, Dict, Optional, Sequence, Tuple, Union, final,
+    TYPE_CHECKING)
+
+from pyNN.space import BaseStructure
+import neo
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
+
+from pacman.model.graphs.application import ApplicationVertex
+
+from spynnaker.pyNN.models.recorder import Recorder
+
+from .assembly import Assembly
+
+if TYPE_CHECKING:
+    from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
+    from spynnaker.pyNN.models.common.types import Names
+    from .population_view import IDMixin
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -33,10 +50,10 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     Mainly pass through and not implemented.
     """
-    __slots__ = []
+    __slots__ = ()
 
     @property
-    def local_cells(self):
+    def local_cells(self) -> Sequence[IDMixin]:
         """
         An array containing the cell IDs of those neurons in the
         Population that exist on the local MPI node.
@@ -47,16 +64,18 @@ class PopulationBase(object, metaclass=AbstractBase):
                        "local_cells just returns all_cells")
         return self.all_cells
 
-    @abstractproperty
-    def all_cells(self):
+    @property
+    @abstractmethod
+    def all_cells(self) -> Sequence[IDMixin]:
         """
         An array containing the cell IDs of all neurons in the
         Population (all MPI nodes).
 
         :rtype: list(int)
         """
+        raise NotImplementedError
 
-    def __add__(self, other):
+    def __add__(self, other: PopulationBase) -> Assembly:
         """
         A Population / PopulationView can be added to another
         Population, PopulationView or Assembly, returning an Assembly.
@@ -69,10 +88,13 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         # TODO: support assemblies
         _we_dont_do_this_now(other)  # pragma: no cover
+        raise NotImplementedError
 
     @abstractmethod
-    def get_data(self, variables='all', gather=True, clear=False,
-                 annotations=None):
+    def get_data(
+            self, variables: Names = 'all',
+            gather: bool = True, clear: bool = False, *,
+            annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
         """
         Return a Neo Block containing the data(spikes, state variables)
         recorded from the Population.
@@ -96,9 +118,10 @@ class PopulationBase(object, metaclass=AbstractBase):
         :type annotations: None or dict(str, ...)
         :rtype: ~neo.core.Block
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_spike_counts(self, gather=True):
+    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
         """
         Returns a dict containing the number of spikes for each neuron.
 
@@ -115,9 +138,9 @@ class PopulationBase(object, metaclass=AbstractBase):
 
         :rtype: dict(int, int)
         """
+        raise NotImplementedError
 
-    @abstractmethod
-    def inject(self, current_source):
+    def inject(self, current_source: NeuronCurrentSource):
         """
         Connect a current source to all cells in the Population.
 
@@ -125,21 +148,24 @@ class PopulationBase(object, metaclass=AbstractBase):
         :type current_source:
             ~pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource
         """
+        raise NotImplementedError
 
-    def is_local(self,
-                 id):  # pylint: disable=unused-argument, redefined-builtin
+    @final
+    def is_local(self, id: int) -> bool:  # @ReservedAssignment
         """
         Indicates whether the cell with the given ID exists on the
         local MPI node.
 
         :rtype: bool
         """
+        # pylint: disable=unused-argument, redefined-builtin
         logger.warning("local calls do not really make sense on sPyNNaker so "
                        "is_local always returns True")
         return True
 
     @property
-    def local_size(self):
+    @final
+    def local_size(self) -> int:
         """
         The number of cells in the population on the local MPI node.
 
@@ -149,7 +175,11 @@ class PopulationBase(object, metaclass=AbstractBase):
                        "is_local always returns size")
         return len(self)
 
-    def mean_spike_count(self, gather=True):
+    @abstractmethod
+    def __len__(self) -> int:
+        raise NotImplementedError
+
+    def mean_spike_count(self, gather: bool = True) -> float:
         """
         Returns the mean number of spikes per neuron.
 
@@ -208,8 +238,10 @@ class PopulationBase(object, metaclass=AbstractBase):
         _we_dont_do_this_now()  # pragma: no cover
 
     @abstractmethod
-    def write_data(self, io, variables='all', gather=True, clear=False,
-                   annotations=None):
+    def write_data(self, io: Union[str, neo.baseio.BaseIO],
+                   variables: Names = 'all',
+                   gather: bool = True, clear: bool = False,
+                   annotations: Optional[Dict[str, Any]] = None):
         """
         Write recorded data to file, using one of the file formats
         supported by Neo.
@@ -237,6 +269,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         :type annotations: None or dict(str, ...)
         """
         # pylint: disable=too-many-arguments
+        raise NotImplementedError
 
     def receptor_types(self):
         """
@@ -249,7 +282,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         _we_dont_do_this_now()  # pragma: no cover
 
     @abstractmethod
-    def record(self, variables, to_file=None, sampling_interval=None):
+    def record(self, variables: Names, to_file: Optional[str] = None,
+               sampling_interval: Optional[int] = None):
         """
         Record the specified variable or variables for all cells in the
         Population or view.
@@ -264,6 +298,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         :param int sampling_interval: a value in milliseconds, and an integer
             multiple of the simulation timestep.
         """
+        raise NotImplementedError
 
     def save_positions(self, file):  # pylint: disable=redefined-builtin
         """
@@ -274,9 +309,10 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         # TODO:
         _we_dont_do_this_now(file)  # pragma: no cover
+        raise NotImplementedError
 
     @property
-    def structure(self):
+    def structure(self) -> BaseStructure:
         """
         The spatial structure of the parent Population.
 
@@ -287,25 +323,39 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         # TODO: support neuron positions and spaces
         _we_dont_do_this_now()  # pragma: no cover
+        raise NotImplementedError
 
-    @abstractproperty
-    def _vertex(self):
+    @property
+    @abstractmethod
+    def _vertex(self) -> ApplicationVertex:
         """
         The underlying application vertex.
 
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def _recorder(self):
+    @property
+    @abstractmethod
+    def _view_range(self) -> Tuple[int, int]:
+        """
+        The range of neuron IDs supported.
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def _recorder(self) -> Recorder:
         """
         The recorder of the population.
 
         :rtype: ~Recorder
         """
+        raise NotImplementedError
 
     @staticmethod
-    def _check_params(gather, annotations=None):
+    def _check_params(
+            gather: bool, annotations: Optional[Dict[str, Any]] = None):
         if not gather:
             logger.warning(
                 "sPyNNaker only supports gather=True. We will run "

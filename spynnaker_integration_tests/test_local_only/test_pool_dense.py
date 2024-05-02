@@ -35,7 +35,7 @@ def do_run():
     run_time = 60.
 
     sim.setup(timestep=1.)
-    sim.set_number_of_neurons_per_core(sim.SpikeSourceArray, (3, 3))
+    sim.set_number_of_neurons_per_core(sim.SpikeSourceArray, (5, 1))
     sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 16)
 
     src = sim.Population(n_input, sim.SpikeSourceArray,

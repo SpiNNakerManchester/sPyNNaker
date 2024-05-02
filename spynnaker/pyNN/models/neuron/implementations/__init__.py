@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .abstract_standard_neuron_component import AbstractStandardNeuronComponent
+from .abstract_standard_neuron_component import (
+    AbstractStandardNeuronComponent, ModelParameter)
 from .abstract_neuron_impl import AbstractNeuronImpl
 from .neuron_impl_standard import NeuronImplStandard
-from .ranged_dict_vertex_slice import RangedDictVertexSlice
+from .neuron_impl_stoc_exp import NeuronImplStocExp
+from .neuron_impl_stoc_exp_stable import NeuronImplStocExpStable
+from .neuron_impl_stoc_sigma import NeuronImplStocSigma
 
 __all__ = [
     "AbstractNeuronImpl", "AbstractStandardNeuronComponent",
-    "NeuronImplStandard", "RangedDictVertexSlice"]
+    "ModelParameter", "NeuronImplStandard", "NeuronImplStocExp",
+    "NeuronImplStocExpStable", "NeuronImplStocSigma"]

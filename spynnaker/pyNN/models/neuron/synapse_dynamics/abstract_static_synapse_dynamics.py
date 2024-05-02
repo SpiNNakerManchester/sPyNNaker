@@ -11,8 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import List, Tuple
+
+from numpy import integer, uint32
+from numpy.typing import NDArray
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    ConnectionsArray)
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 
 
@@ -26,19 +32,22 @@ class AbstractStaticSynapseDynamics(
     __slots__ = ()
 
     @abstractmethod
-    def get_n_words_for_static_connections(self, n_connections):
+    def get_n_words_for_static_connections(self, n_connections: int) -> int:
         """
         Get the number of 32-bit words for `n_connections` in a single row.
 
         :param int n_connections:
         :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_static_synaptic_data(
-            self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, max_n_synapses,
-            max_atoms_per_core):
+            self, connections: ConnectionsArray,
+            connection_row_indices: NDArray[integer], n_rows: int,
+            n_synapse_types: int,
+            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
+                List[NDArray[uint32]], NDArray[integer]]:
         """
         Get the fixed-fixed data for each row, and lengths for the
         fixed-fixed parts of each row.
@@ -55,17 +64,17 @@ class AbstractStaticSynapseDynamics(
         :param ~numpy.ndarray connection_row_indices:
             The row into which each connection should go
         :param int n_rows: The number of rows to write
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-            The slice of the post vertex to generate for
         :param int n_synapse_types: The number of synapse types
         :param int max_n_synapses: The maximum number of synapses to generate
         :param int max_atoms_per_core: The maximum number of atoms on a core
         :return: (ff_data, ff_size)
         :rtype: tuple(list(~numpy.ndarray), ~numpy.ndarray)
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_n_static_words_per_row(self, ff_size):
+    def get_n_static_words_per_row(
+            self, ff_size: NDArray[integer]) -> NDArray[integer]:
         """
         Get the number of bytes to be read per row for the static data
         given the size that was written to each row.
@@ -73,27 +82,31 @@ class AbstractStaticSynapseDynamics(
         :param ~numpy.ndarray ff_size:
         :rtype: ~numpy.ndarray
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_n_synapses_in_rows(self, ff_size):
+    def get_n_synapses_in_rows(
+            self, ff_size: NDArray[integer]) -> NDArray[integer]:
         """
         Get the number of synapses in the rows with sizes `ff_size`.
 
         :param ~numpy.ndarray ff_size:
         :rtype: ~numpy.ndarray
         """
+        raise NotImplementedError
 
     @abstractmethod
     def read_static_synaptic_data(
-            self, post_vertex_slice, n_synapse_types, ff_size, ff_data,
-            max_atoms_per_core):
+            self, n_synapse_types: int,
+            ff_size: NDArray[integer], ff_data: List[NDArray[uint32]],
+            max_atoms_per_core: int) -> ConnectionsArray:
         """
         Read the connections from the words of data in `ff_data`.
 
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param int n_synapse_types:
         :param ~numpy.ndarray ff_size:
         :param list(~numpy.ndarray) ff_data:
         :param int max_atoms_per_core:
         :rtype: ~numpy.ndarray
         """
+        raise NotImplementedError

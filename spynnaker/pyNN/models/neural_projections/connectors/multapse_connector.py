@@ -12,18 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
 import math
+from typing import Optional, Sequence, TYPE_CHECKING
+
+from numpy import uint32, integer
+from numpy.typing import NDArray
 import numpy.random
+
 from pyNN.random import NumpyRNG
+
 from spinn_utilities.overrides import overrides
+
+from pacman.model.graphs.common import Slice
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
+
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
 
 
 class MultapseConnector(AbstractGenerateConnectorOnMachine,
@@ -35,17 +51,17 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
     synapses is created by selecting at random from the source and target
     populations with replacement. Uniform selection probability is assumed.
     """
-    __slots__ = [
+    __slots__ = (
         "__allow_self_connections",
         "__num_synapses",
         "__post_slices",
         "__synapses_per_edge",
         "__with_replacement",
-        "__rng"]
+        "__rng")
 
-    def __init__(self, n, allow_self_connections=True,
-                 with_replacement=True, safe=True,
-                 verbose=False, rng=None, callback=None):
+    def __init__(self, n: int, allow_self_connections: bool = True,
+                 with_replacement: bool = True, rng: Optional[NumpyRNG] = None,
+                 safe=True, verbose=False, callback=None):
         """
         :param int n:
             This is the total number of synapses in the connection.
@@ -74,11 +90,11 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         self.__num_synapses = self._roundsize(n, "MultapseConnector")
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
-        self.__post_slices = None
-        self.__synapses_per_edge = None
+        self.__post_slices: Sequence[Slice] = ()
+        self.__synapses_per_edge: Optional[NDArray[integer]] = None
         self.__rng = rng
 
-    def set_projection_information(self, synapse_info):
+    def set_projection_information(self, synapse_info: SynapseInformation):
         super().set_projection_information(synapse_info)
         n_pairs = synapse_info.n_post_neurons * synapse_info.n_pre_neurons
         if not self.__with_replacement and self.__num_synapses > n_pairs:
@@ -87,13 +103,15 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
                 "with_replacement=False and n > n_pre * n_post")
         if (not self.__with_replacement and
                 not self.__allow_self_connections and
-                self.__num_synapses == n_pairs):
+                self.__num_synapses == n_pairs and
+                synapse_info.pre_population == synapse_info.post_population):
             raise SpynnakerException(
                 "FixedNumberPostConnector will not work when "
                 "with_replacement=False, allow_self_connections=False "
                 "and n = n_pre * n_post")
 
-    def get_rng_next(self, num_synapses, prob_connect, rng):
+    def get_rng_next(self, num_synapses: int, prob_connect: Sequence[float],
+                     rng: NumpyRNG) -> NDArray[integer]:
         """
         Get the required RNGs.
 
@@ -121,22 +139,25 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         return multinomial
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, synapse_info):
+    def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
         return self._get_delay_maximum(
             synapse_info.delays, self.__num_synapses, synapse_info)
 
     @overrides(AbstractConnector.get_delay_minimum)
-    def get_delay_minimum(self, synapse_info):
+    def get_delay_minimum(self, synapse_info: SynapseInformation) -> float:
         return self._get_delay_minimum(
             synapse_info.delays, self.__num_synapses, synapse_info)
 
-    def _update_synapses_per_post_vertex(self, post_slices, n_pre_atoms, rng):
+    def _update_synapses_per_post_vertex(
+            self, post_slices: Sequence[Slice], n_pre_atoms: int,
+            rng: NumpyRNG):
         """
         :param list(~pacman.model.graphs.common.Slice) post_slices:
         """
         if (self.__synapses_per_edge is None or
                 len(self.__post_slices) != len(post_slices)):
-            n_post_atoms = sum(post.n_atoms for post in post_slices if post)
+            n_post_atoms = sum(
+                post.n_atoms for post in post_slices if post is not None)
             n_connections = n_pre_atoms * n_post_atoms
             if (not self.__with_replacement and
                     n_connections < self.__num_synapses):
@@ -147,31 +168,33 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
                 n_pre_atoms * post.n_atoms / float(n_connections)
                 if n_pre_atoms and post.n_atoms else 0 for post in post_slices]
             # Use the multinomial directly if possible
-            if (hasattr(rng, "rng") and
-                    hasattr(rng.rng, "multinomial")):
+            if hasattr(rng, "rng") and hasattr(rng.rng, "multinomial"):
                 self.__synapses_per_edge = rng.rng.multinomial(
                     self.__num_synapses, prob_connect)
             else:
                 self.__synapses_per_edge = self.get_rng_next(
                     self.__num_synapses, prob_connect, rng)
+            assert self.__synapses_per_edge is not None
             if sum(self.__synapses_per_edge) != self.__num_synapses:
                 raise SpynnakerException(
                     f"{sum(self.__synapses_per_edge)} of "
                     f"{self.__num_synapses} synapses generated")
             self.__post_slices = post_slices
 
-    def _get_n_connections(self, post_slice_index):
+    def _get_n_connections(self, post_slice_index: int) -> int:
         """
         :param int post_slice_index:
         :rtype: int
         """
+        if not self.__synapses_per_edge:
+            return 0
         return self.__synapses_per_edge[post_slice_index]
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_post_atoms, synapse_info, min_delay=None,
-            max_delay=None):
-
+            self, n_post_atoms: int, synapse_info: SynapseInformation,
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
         # If the chance of there being a connection in the slice is almost 0,
         # there will probably be at least 1 connection somewhere
         prob_in_slice = min(
@@ -195,21 +218,22 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             n_connections, min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
+    def get_n_connections_to_post_vertex_maximum(
+            self, synapse_info: SynapseInformation) -> int:
         prob_of_choosing_post_atom = 1.0 / synapse_info.n_post_neurons
         return utility_calls.get_probable_maximum_selected(
             self.__num_synapses, self.__num_synapses,
             prob_of_choosing_post_atom)
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, synapse_info):
+    def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
         return self._get_weight_maximum(
             synapse_info.weights, self.__num_synapses, synapse_info)
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
-        # pylint: disable=too-many-arguments
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
+            synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         # update the synapses as required, and get the number of connections
         rng = self.__rng or NumpyRNG()
         post_slice_index = post_slices.index(post_vertex_slice)
@@ -260,23 +284,29 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
-    def gen_connector_id(self):
+    def gen_connector_id(self) -> int:
         return ConnectorIDs.FIXED_TOTAL_NUMBER_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(self):
+    def gen_connector_params(
+            self, synapse_info: SynapseInformation) -> NDArray[uint32]:
+        allow_self = (
+            self.__allow_self_connections or
+            synapse_info.pre_population != synapse_info.post_population)
         return numpy.array([
-            int(self.__allow_self_connections),
+            int(allow_self),
             int(self.__with_replacement),
-            self.__num_synapses], dtype=numpy.uint32)
+            self.__num_synapses], dtype=uint32)
 
     @property
     @overrides(
         AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
-    def gen_connector_params_size_in_bytes(self):
+    def gen_connector_params_size_in_bytes(self) -> int:
         return (3 * BYTES_PER_WORD)
 
     @overrides(AbstractConnector.validate_connection)
-    def validate_connection(self, application_edge, synapse_info):
-        if self.generate_on_machine(synapse_info.weights, synapse_info.delays):
-            utility_calls.check_rng(self.__rng, "FixedTotalNumberConnector")
+    def validate_connection(
+            self, application_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation):
+        if self.generate_on_machine(synapse_info):
+            utility_calls.check_rng(self.__rng, "MultapseConnector")

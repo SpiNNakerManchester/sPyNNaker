@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# from __future__ import print_function
+from typing import List
+from neo import AnalogSignal, Block, Segment, SpikeTrain
 
 
-def compare_spiketrain(spiketrain1, spiketrain2, same_length=True):
+def compare_spiketrain(
+        spiketrain1: SpikeTrain, spiketrain2: SpikeTrain, *, same_length=True):
     """
     Checks two spike trains have the exact same data.
 
@@ -44,7 +46,8 @@ def compare_spiketrain(spiketrain1, spiketrain2, same_length=True):
 
 
 def compare_spiketrains(
-        spiketrains1, spiketrains2, same_data=True, same_length=True):
+        spiketrains1: List[SpikeTrain], spiketrains2: List[SpikeTrain], *,
+        same_data=True, same_length=True):
     """
     Check two Lists of spike trains have the exact same data.
 
@@ -69,10 +72,11 @@ def compare_spiketrains(
             f"spiketrains1 has {len(spiketrains1)} spiketrains while "
             f"spiketrains2 fas {len(spiketrains2)} analogsignalarrays")
     for spiketrain1, spiketrain2 in zip(spiketrains1, spiketrains2):
-        compare_spiketrain(spiketrain1, spiketrain2, same_length)
+        compare_spiketrain(spiketrain1, spiketrain2, same_length=same_length)
 
 
-def compare_analogsignal(as1, as2, same_length=True):
+def compare_analogsignal(
+        as1: AnalogSignal, as2: AnalogSignal, *, same_length=True):
     """
     Compares two analog signal objects to see if they are the same.
 
@@ -132,7 +136,8 @@ def compare_analogsignal(as1, as2, same_length=True):
                     f"value 2 is {value1} for {as1.name}")
 
 
-def compare_segments(seg1, seg2, same_data=True, same_length=True):
+def compare_segments(
+        seg1: Segment, seg2: Segment, *, same_data=True, same_length=True):
     """
     :param ~neo.core.Segment seg1: First Segment to check
     :param ~neo.core.Segment seg2: Second Segment to check
@@ -146,7 +151,8 @@ def compare_segments(seg1, seg2, same_data=True, same_length=True):
     :raises AssertionError: If the segments are not equal
     """
     compare_spiketrains(
-        seg1.spiketrains, seg2.spiketrains, same_data, same_length)
+        seg1.spiketrains, seg2.spiketrains,
+        same_data=same_data, same_length=same_length)
     seg1_analogsignals = seg1.analogsignals
     seg2_analogsignals = seg2.analogsignals
 
@@ -162,11 +168,13 @@ def compare_segments(seg1, seg2, same_data=True, same_length=True):
             raise AssertionError(
                 f"Segment1 has {name} data while Segment2 does not")
         analogsignal2 = seg2.filter(name=name)[0]
-        compare_analogsignal(analogsignal1, analogsignal2, same_length)
+        compare_analogsignal(analogsignal1, analogsignal2,
+                             same_length=same_length)
 
 
 def compare_blocks(
-        neo1, neo2, same_runs=True, same_data=True, same_length=True):
+        neo1: Block, neo2: Block, *,
+        same_runs=True, same_data=True, same_length=True):
     """
     Compares two neo Blocks to see if they hold the same data.
 
@@ -188,4 +196,5 @@ def compare_blocks(
             f"Block1 has {len(neo1.segments)} segments while "
             f"block2 has {len(neo2.segments)} segments")
     for seg1, seg2 in zip(neo1.segments, neo2.segments):
-        compare_segments(seg1, seg2, same_data, same_length)
+        compare_segments(seg1, seg2,
+                         same_data=same_data, same_length=same_length)

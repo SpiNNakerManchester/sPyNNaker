@@ -12,11 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+from typing import List, Sequence, TYPE_CHECKING, Union
 from spinn_utilities.config_holder import get_config_bool
+from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine, OneToOneConnector)
+    AbstractConnector, AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine, SynapseDynamicsStatic)
+    AbstractGenerateOnMachine)
+from spynnaker.pyNN.types import (Delay_Types, Weight_Types)
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.populations import Population, PopulationView
+    from spynnaker.pyNN.models.neuron import ConnectionHolder
+    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+        AbstractSynapseDynamics)
 
 
 class SynapseInformation(object):
@@ -24,7 +33,8 @@ class SynapseInformation(object):
     Contains the synapse information including the connector, synapse type
     and synapse dynamics.
     """
-    __slots__ = [
+    # Made by a Projection
+    __slots__ = (
         "__connector",
         "__pre_population",
         "__post_population",
@@ -36,12 +46,17 @@ class SynapseInformation(object):
         "__weights",
         "__delays",
         "__pre_run_connection_holders",
-        "__synapse_type_from_dynamics"]
+        "__synapse_type_from_dynamics")
 
-    def __init__(self, connector, pre_population, post_population,
-                 prepop_is_view, postpop_is_view, synapse_dynamics,
-                 synapse_type, receptor_type, synapse_type_from_dynamics,
-                 weights=None, delays=None):
+    def __init__(self, connector: AbstractConnector,
+                 pre_population: Union[Population, PopulationView],
+                 post_population: Union[Population, PopulationView],
+                 prepop_is_view: bool, postpop_is_view: bool,
+                 synapse_dynamics: AbstractSynapseDynamics,
+                 synapse_type: int, receptor_type: str,
+                 synapse_type_from_dynamics: bool,
+                 weights: Weight_Types = None,
+                 delays: Delay_Types = None):
         """
         :param AbstractConnector connector:
             The connector connected to the synapse
@@ -72,15 +87,16 @@ class SynapseInformation(object):
         self.__synapse_dynamics = synapse_dynamics
         self.__synapse_type = synapse_type
         self.__receptor_type = receptor_type
+        assert (delays is not None)
         self.__weights = weights
         self.__delays = delays
         self.__synapse_type_from_dynamics = synapse_type_from_dynamics
 
         # Make a list of holders to be updated
-        self.__pre_run_connection_holders = list()
+        self.__pre_run_connection_holders: List[ConnectionHolder] = list()
 
     @property
-    def connector(self):
+    def connector(self) -> AbstractConnector:
         """
         The connector connected to the synapse.
 
@@ -89,7 +105,7 @@ class SynapseInformation(object):
         return self.__connector
 
     @property
-    def pre_population(self):
+    def pre_population(self) -> Union[Population, PopulationView]:
         """
         The population sending spikes to the synapse.
 
@@ -99,7 +115,7 @@ class SynapseInformation(object):
         return self.__pre_population
 
     @property
-    def post_population(self):
+    def post_population(self) -> Union[Population, PopulationView]:
         """
         The population hosting the synapse.
 
@@ -109,7 +125,27 @@ class SynapseInformation(object):
         return self.__post_population
 
     @property
-    def n_pre_neurons(self):
+    def pre_vertex(self) -> ApplicationVertex:
+        """
+        The vertex sending spikes to the synapse.
+
+        :rtype: ApplicationVertex
+        """
+        # pylint: disable=protected-access
+        return self.__pre_population._vertex
+
+    @property
+    def post_vertex(self) -> ApplicationVertex:
+        """
+        The vertex hosting the synapse.
+
+        :rtype: ApplicationVertex
+        """
+        # pylint: disable=protected-access
+        return self.__post_population._vertex
+
+    @property
+    def n_pre_neurons(self) -> int:
         """
         The number of neurons in the pre-population.
 
@@ -118,7 +154,7 @@ class SynapseInformation(object):
         return self.__pre_population.size
 
     @property
-    def n_post_neurons(self):
+    def n_post_neurons(self) -> int:
         """
         The number of neurons in the post-population.
 
@@ -127,7 +163,7 @@ class SynapseInformation(object):
         return self.__post_population.size
 
     @property
-    def prepop_is_view(self):
+    def prepop_is_view(self) -> bool:
         """
         Whether the :py:meth:`pre_population` is a view.
 
@@ -136,7 +172,7 @@ class SynapseInformation(object):
         return self.__prepop_is_view
 
     @property
-    def postpop_is_view(self):
+    def postpop_is_view(self) -> bool:
         """
         Whether the :py:meth:`post_population` is a view.
 
@@ -154,16 +190,17 @@ class SynapseInformation(object):
         return self.__synapse_dynamics
 
     @property
-    def synapse_type(self):
+    def synapse_type(self) -> int:
         """
-        The type of the synapse.
+        The type of the synapse. An index into the set of synapse types
+        supported by a neuron.
 
         :rtype: int
         """
         return self.__synapse_type
 
     @property
-    def receptor_type(self):
+    def receptor_type(self) -> str:
         """
         A string representing the receptor type.
 
@@ -172,24 +209,24 @@ class SynapseInformation(object):
         return self.__receptor_type
 
     @property
-    def weights(self):
+    def weights(self) -> Weight_Types:
         """
         The synaptic weights (if any).
 
-        :rtype: float or list(float) or ~numpy.ndarray(float) or None
+        :rtype: float or ~numpy.ndarray(float64) or str or RandomDistribution
         """
         return self.__weights
 
     @property
-    def delays(self):
+    def delays(self) -> Delay_Types:
         """
         The total synaptic delays (if any).
 
-        :rtype: float or list(float) or ~numpy.ndarray(float) or None
+        :rtype: float or ~numpy.ndarray(float64) or str or RandomDistribution
         """
         return self.__delays
 
-    def may_generate_on_machine(self):
+    def may_generate_on_machine(self) -> bool:
         """
         Do we describe a collection of synapses whose synaptic matrix may
         be generated on SpiNNaker instead of needing to be calculated in
@@ -206,27 +243,14 @@ class SynapseInformation(object):
             return False
         connector_gen = (
             isinstance(self.connector, AbstractGenerateConnectorOnMachine) and
-            self.connector.generate_on_machine(self.weights, self.delays))
+            self.connector.generate_on_machine(self))
         synapse_gen = (
             isinstance(self.synapse_dynamics, AbstractGenerateOnMachine) and
             self.synapse_dynamics.generate_on_machine())
         return connector_gen and synapse_gen
 
-    def may_use_direct_matrix(self):
-        """
-        Do the properties of the synaptic information allow it to use the
-        direct matrix?
-
-        :rtype: bool
-        """
-        return (
-            isinstance(self.__connector, OneToOneConnector) and
-            isinstance(self.__synapse_dynamics,
-                       SynapseDynamicsStatic) and
-            not self.prepop_is_view and not self.postpop_is_view)
-
     @property
-    def pre_run_connection_holders(self):
+    def pre_run_connection_holders(self) -> Sequence[ConnectionHolder]:
         """
         The list of connection holders to be filled in before run.
 
@@ -234,7 +258,8 @@ class SynapseInformation(object):
         """
         return self.__pre_run_connection_holders
 
-    def add_pre_run_connection_holder(self, pre_run_connection_holder):
+    def add_pre_run_connection_holder(
+            self, pre_run_connection_holder: ConnectionHolder):
         """
         Add a connection holder that will be filled in before run.
 
@@ -243,7 +268,7 @@ class SynapseInformation(object):
         """
         self.__pre_run_connection_holders.append(pre_run_connection_holder)
 
-    def finish_connection_holders(self):
+    def finish_connection_holders(self) -> None:
         """
         Finish all the connection holders, and clear the list so that they
         are not generated again later.
@@ -253,7 +278,7 @@ class SynapseInformation(object):
         del self.__pre_run_connection_holders[:]
 
     @property
-    def synapse_type_from_dynamics(self):
+    def synapse_type_from_dynamics(self) -> bool:
         """
         Whether the synapse type comes from the synapse dynamics.
 

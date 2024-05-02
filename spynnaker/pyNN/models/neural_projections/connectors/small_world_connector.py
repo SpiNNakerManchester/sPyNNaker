@@ -11,13 +11,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 import math
+from typing import Optional, Sequence, TYPE_CHECKING
+
 import numpy
+from numpy.typing import NDArray
+
 from pyNN.random import NumpyRNG
+
 from spinn_utilities.overrides import overrides
+
+from pacman.model.graphs.common import Slice
+
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 
 class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
@@ -28,18 +42,20 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     .. note::
         This is typically used from a population to itself.
     """
-    __slots__ = [
+    __slots__ = (
         "__allow_self_connections",  # TODO: currently ignored
         "__degree",
         "__mask",
         "__n_connections",
         "__rewiring",
-        "__rng"]
+        "__rng")
 
     def __init__(
-            self, degree, rewiring, allow_self_connections=True,
-            n_connections=None, rng=None, safe=True, callback=None,
-            verbose=False):
+            self, degree: float, rewiring: float,
+            allow_self_connections: bool = True,
+            n_connections: Optional[int] = None,
+            rng: Optional[NumpyRNG] = None,
+            safe=True, callback=None, verbose=False):
         """
         :param float degree:
             the region length where nodes will be connected locally
@@ -68,14 +84,13 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             Whether to output extra information about the connectivity to a
             CSV file
         """
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, unused-private-member
         super().__init__(safe, callback, verbose)
         self.__rewiring = rewiring
         self.__degree = degree
-        # pylint:disable=unused-private-member
         self.__allow_self_connections = allow_self_connections
-        self.__mask = None
-        self.__n_connections = None
+        self.__mask: Optional[NDArray] = None
+        self.__n_connections = 0
         self.__rng = rng or NumpyRNG()
 
         if n_connections is not None:
@@ -84,14 +99,16 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                 " SmallWorldConnector on this platform")
 
     @overrides(AbstractConnector.set_projection_information)
-    def set_projection_information(self, synapse_info):
+    def set_projection_information(self, synapse_info: SynapseInformation):
         super().set_projection_information(synapse_info)
         self._set_n_connections(synapse_info)
 
-    def _set_n_connections(self, synapse_info):
+    def _set_n_connections(self, synapse_info: SynapseInformation):
         """
         :param SynapseInformation synapse_info:
         """
+        if self.space is None:
+            raise ConfigurationException("a metric space is required")
         # Get the probabilities up-front for now
         # TODO: Work out how this can be done statistically
         # space.distances(...) expects N,3 array in PyNN0.7, but 3,N in PyNN0.8
@@ -111,24 +128,24 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             d = distances
 
         self.__mask = (d < self.__degree).astype(float)
-
         self.__n_connections = int(math.ceil(numpy.sum(self.__mask)))
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, synapse_info):
+    def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
         return self._get_delay_maximum(
             synapse_info.delays, self.__n_connections, synapse_info)
 
     @overrides(AbstractConnector.get_delay_minimum)
-    def get_delay_minimum(self, synapse_info):
+    def get_delay_minimum(self, synapse_info: SynapseInformation) -> float:
         return self._get_delay_minimum(
             synapse_info.delays, self.__n_connections, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_post_atoms, synapse_info, min_delay=None,
-            max_delay=None):
-
+            self, n_post_atoms: int, synapse_info: SynapseInformation,
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
+        assert self.__mask is not None
         # Break the array into n_post_atoms units
         split_positions = numpy.arange(
             0, synapse_info.n_post_neurons, n_post_atoms)
@@ -148,29 +165,33 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        # pylint: disable=too-many-arguments
+    def get_n_connections_to_post_vertex_maximum(
+            self, synapse_info: SynapseInformation) -> int:
+        assert self.__mask is not None
         return numpy.amax([
             numpy.sum(self.__mask[:, i]) for i in range(
                 synapse_info.n_post_neurons)])
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, synapse_info):
-        # pylint: disable=too-many-arguments
+    def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
         return self._get_weight_maximum(
             synapse_info.weights, self.__n_connections, synapse_info)
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
-        # pylint: disable=too-many-arguments
-        ids = numpy.where(self.__mask[:, post_vertex_slice.as_slice])
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
+            synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
+        if self.__mask is None:
+            return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
+        raster_ids = post_vertex_slice.get_raster_ids()
+        ids = numpy.where(self.__mask[:, raster_ids])
         n_connections = len(ids[0])
 
         block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = ids[0] % synapse_info.n_pre_neurons
-        block["target"] = (
-            (ids[1] % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
+        block["source"] = synapse_info.pre_vertex.get_key_ordered_indices(
+            ids[0] % synapse_info.n_pre_neurons)
+        block["target"] = post_vertex_slice.get_relative_indices(
+            raster_ids[ids[1]])
         block["weight"] = self._generate_weights(
             block["source"], block["target"], n_connections, post_vertex_slice,
             synapse_info)

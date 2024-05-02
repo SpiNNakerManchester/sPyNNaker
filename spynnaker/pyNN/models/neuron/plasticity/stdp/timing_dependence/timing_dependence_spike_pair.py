@@ -12,45 +12,53 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable
+
+from numpy import floating
+from numpy.typing import NDArray
+
 from spinn_utilities.overrides import overrides
+
+from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_SHORT, BYTES_PER_WORD)
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     get_exp_lut_array)
-from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightOnly)
+
+from .abstract_timing_dependence import AbstractTimingDependence
 
 
 class TimingDependenceSpikePair(AbstractTimingDependence):
     """
     A basic timing dependence STDP rule.
     """
-    __slots__ = [
-        "__synapse_structure",
+    __slots__ = (
         "__tau_minus",
         "__tau_minus_data",
         "__tau_plus",
         "__tau_plus_data",
         "__a_plus",
-        "__a_minus"]
+        "__a_minus")
     __PARAM_NAMES = ('tau_plus', 'tau_minus')
 
     def __init__(
-            self, tau_plus=20.0, tau_minus=20.0, A_plus=0.01, A_minus=0.01):
+            self, tau_plus: float = 20.0, tau_minus: float = 20.0,
+            A_plus: float = 0.01, A_minus: float = 0.01):
         r"""
         :param float tau_plus: :math:`\tau_+`
         :param float tau_minus: :math:`\tau_-`
         :param float A_plus: :math:`A^+`
         :param float A_minus: :math:`A^-`
         """
+        super().__init__(SynapseStructureWeightOnly())
         self.__tau_plus = tau_plus
         self.__tau_minus = tau_minus
         self.__a_plus = A_plus
         self.__a_minus = A_minus
-
-        self.__synapse_structure = SynapseStructureWeightOnly()
 
         # provenance data
         ts = SpynnakerDataView.get_simulation_time_step_ms()
@@ -102,7 +110,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
-    def is_same_as(self, timing_dependence):
+    def is_same_as(
+            self, timing_dependence: AbstractTimingDependence) -> bool:
         if not isinstance(timing_dependence, TimingDependenceSpikePair):
             return False
         return (self.__tau_plus == timing_dependence.tau_plus and
@@ -129,7 +138,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         return BYTES_PER_SHORT
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
-    def get_parameters_sdram_usage_in_bytes(self):
+    def get_parameters_sdram_usage_in_bytes(self) -> int:
         return BYTES_PER_WORD * (len(self.__tau_plus_data) +
                                  len(self.__tau_minus_data))
 
@@ -144,21 +153,12 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
-            self, spec, global_weight_scale, synapse_weight_scales):
-
+            self, spec: DataSpecificationBase, global_weight_scale: float,
+            synapse_weight_scales: NDArray[floating]):
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
         spec.write_array(self.__tau_minus_data)
 
-    @property
-    def synaptic_structure(self):
-        """
-        The synaptic structure of the plastic part of the rows.
-
-        :rtype: AbstractSynapseStructure
-        """
-        return self.__synapse_structure
-
     @overrides(AbstractTimingDependence.get_parameter_names)
-    def get_parameter_names(self):
+    def get_parameter_names(self) -> Iterable[str]:
         return self.__PARAM_NAMES

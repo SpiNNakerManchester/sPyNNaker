@@ -12,9 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .neuron_model import NeuronModel
 from .neuron_model_izh import NeuronModelIzh
 from .neuron_model_leaky_integrate_and_fire import (
     NeuronModelLeakyIntegrateAndFire)
+from .neuron_model_if_trunc import NeuronModelIFTrunc
 
-__all__ = ["NeuronModelIzh",
-           "NeuronModelLeakyIntegrateAndFire"]
+__all__ = [
+    "NeuronModel",
+    "NeuronModelIzh",
+    "NeuronModelLeakyIntegrateAndFire",
+    "NeuronModelIFTrunc"]

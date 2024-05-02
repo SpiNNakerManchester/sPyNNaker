@@ -25,10 +25,11 @@ class AbstractInputType(
     __slots__ = ()
 
     @abstractmethod
-    def get_global_weight_scale(self):
+    def get_global_weight_scale(self) -> float:
         """
         Get the global weight scaling value.
 
         :return: The global weight scaling value
         :rtype: float
         """
+        raise NotImplementedError

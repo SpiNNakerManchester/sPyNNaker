@@ -12,6 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+These are particular configurations of neuron model components. Each of them
+is either supported or explicitly not supported.
+
+*Others are possible* but might require an unknown amount of work to get
+running on SpiNNaker.
+"""
+
 from .eif_cond_alpha_isfa_ista import EIFConductanceAlphaPopulation
 from .hh_cond_exp import HHCondExp
 from .if_cond_alpha import IFCondAlpha
@@ -28,10 +36,16 @@ from .if_curr_delta import IFCurrDelta
 from .if_curr_exp_ca2_adaptive import IFCurrExpCa2Adaptive
 from .if_curr_exp_semd_base import IFCurrExpSEMDBase
 from .if_curr_delta_ca2_adaptive import IFCurrDeltaCa2Adaptive
+from .stoc_exp import StocExp
+from .stoc_exp_stable import StocExpStable
+from .stoc_sigma import StocSigma
+from .if_trunc_delta import IFTruncDelta
+from .if_curr_delta_fixed_prob import IFCurrDeltaFixedProb
 
 __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",
            "IFCurrExpBase", "IFFacetsConductancePopulation", "IzkCondExpBase",
            "IzkCurrExpBase", "IFCondExpStoc", "IzkCondDualExpBase",
            "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase",
-           "IFCurrDeltaCa2Adaptive"]
+           "IFCurrDeltaCa2Adaptive", "StocExp", "StocExpStable", "StocSigma",
+           "IFTruncDelta", "IFCurrDeltaFixedProb"]

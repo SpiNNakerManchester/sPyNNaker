@@ -26,8 +26,8 @@ def find_good_chip(machine, n_target):
             chip = machine.get_chip_at(x, y)
             if chip:
                 # Must be greater than to allow the extra monitor
-                if chip.n_user_processors > n_target:
-                    print(chip.n_user_processors)
+                if chip.n_placable_processors > n_target:
+                    print(chip.n_placable_processors)
                     return (x, y)
     raise SkipTest("No Chip found with You Need at least {} user processors"
                    .format(n_target))

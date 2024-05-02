@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.interface.ds import DataSpecificationBase
 from .abstract_partner_selection import AbstractPartnerSelection
 
 
@@ -21,21 +23,21 @@ class RandomSelection(AbstractPartnerSelection):
     Partner selection that picks a random source neuron from all sources.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     @property
     @overrides(AbstractPartnerSelection.vertex_executable_suffix)
-    def vertex_executable_suffix(self):
+    def vertex_executable_suffix(self) -> str:
         return "_random"
 
     @overrides(AbstractPartnerSelection.get_parameters_sdram_usage_in_bytes)
-    def get_parameters_sdram_usage_in_bytes(self):
+    def get_parameters_sdram_usage_in_bytes(self) -> int:
         return 0
 
     @overrides(AbstractPartnerSelection.write_parameters)
-    def write_parameters(self, spec):
+    def write_parameters(self, spec: DataSpecificationBase):
         pass
 
     @overrides(AbstractPartnerSelection.get_parameter_names)
-    def get_parameter_names(self):
-        return []
+    def get_parameter_names(self) -> Iterable[str]:
+        return ()

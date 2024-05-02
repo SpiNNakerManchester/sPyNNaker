@@ -107,7 +107,19 @@ class TestSampling(BaseTestCase):
         pop_1[0:3].record(["spikes", "v"])
         simtime = 10
         sim.run(simtime)
+        rec_data = pop_1.get_data(["spikes", "v"]).segments[0]
         sim.end()
+
+        spikes = rec_data.spiketrains
+        v = rec_data.filter(name="v")[0]
+
+        # Spikes are one train per neuron, so all exist but some are empty
+        assert all(len(spikes[i]) > 0 for i in range(0, 3))
+        assert all(len(spikes[i]) == 0 for i in range(3, 10))
+
+        # V is 2D with time on axis 0, neuron id on axis 1
+        assert len(v) == 10
+        assert all(len(v[i]) == 3 for i in range(0, 10))
 
     def test_one_core_no_recording(self):
         self.runsafe(self.one_core_no_recording)

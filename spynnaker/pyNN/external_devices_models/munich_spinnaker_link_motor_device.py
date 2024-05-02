@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     ApplicationSpiNNakerLinkVertex)
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.application.abstract import (
     AbstractOneAppOneMachineVertex)
 from spinn_front_end_common.abstract_models import (
@@ -25,7 +27,7 @@ from .machine_munich_motor_device import MachineMunichMotorDevice
 
 
 class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
-    __slots__ = []
+    __slots__ = ()
 
     def __init__(self, spinnaker_link_id, board_address=None):
         super().__init__(
@@ -43,7 +45,7 @@ class MunichMotorDevice(
     external device vertex.
     """
 
-    __slots__ = ["__dependent_vertices"]
+    __slots__ = ("__dependent_vertices", )
 
     def __init__(
             self, spinnaker_link_id, board_address=None, speed=30,
@@ -73,10 +75,11 @@ class MunichMotorDevice(
             _MunichMotorDevice(spinnaker_link_id, board_address)]
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.dependent_vertices)
-    def dependent_vertices(self):
+    def dependent_vertices(self) -> Iterable[ApplicationVertex]:
         return self.__dependent_vertices
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.
                edge_partition_identifiers_for_dependent_vertex)
-    def edge_partition_identifiers_for_dependent_vertex(self, vertex):
+    def edge_partition_identifiers_for_dependent_vertex(
+            self, vertex: ApplicationVertex) -> Iterable[str]:
         yield self.machine_vertex.MOTOR_PARTITION_ID

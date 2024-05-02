@@ -48,18 +48,15 @@ def run_script():
     connectors = [
         (p.OneToOneConnector, functools.partial(check_one_to_one, 10)),
         (p.AllToAllConnector,
-         functools.partial(check_all_to_all, 10, True)),
-        (functools.partial(p.AllToAllConnector,
-                           allow_self_connections=False),
-         functools.partial(check_all_to_all, 10, False)),
+         functools.partial(check_all_to_all, 10)),
         (functools.partial(p.FixedProbabilityConnector, 0.5),
-         functools.partial(check_fixed_prob, 10, 0.5, 3)),
+         functools.partial(check_fixed_prob, 10, 0.5)),
         (functools.partial(p.FixedTotalNumberConnector, 50,
                            with_replacement=True),
-         functools.partial(check_fixed_total, 10, 50)),
+         functools.partial(check_fixed_total, 50)),
         (functools.partial(p.FixedTotalNumberConnector, 20,
                            with_replacement=False),
-         functools.partial(check_fixed_total, 10, 20))
+         functools.partial(check_fixed_total, 20))
     ]
 
     projs = list()
@@ -134,19 +131,14 @@ def conns_by_post(conns):
     return cbp
 
 
-def check_all_to_all(n, allow_self, conns):
+def check_all_to_all(n, conns):
     cbp = conns_by_pre(conns)
     assert len(cbp) == n
     for pre in cbp:
-        if allow_self:
-            assert numpy.array_equal(sorted(cbp[pre]), range(n))
-        else:
-            assert (numpy.array_equal(
-                sorted(cbp[pre]),
-                [i for i in range(n) if i != pre]))
+        assert numpy.array_equal(sorted(cbp[pre]), range(n))
 
 
-def check_fixed_prob(n, prob, n_per_core, conns):
+def check_fixed_prob(n, prob, conns):
     cbpre = conns_by_pre(conns)
     cbpost = conns_by_post(conns)
     expected = n * prob
@@ -159,7 +151,7 @@ def check_fixed_prob(n, prob, n_per_core, conns):
     assert avgpost <= (expected + error)
 
 
-def check_fixed_total(n, total, conns):
+def check_fixed_total(total, conns):
     assert len(conns) == total
 
 
@@ -167,12 +159,12 @@ def run_bad_normal_clipping():
     p.setup(timestep=1.0)
 
     pop_1 = p.Population(4, p.IF_curr_exp(), label="pop_1")
-    input = p.Population(4, p.SpikeSourceArray(spike_times=[0]), label="input")
+    source = p.Population(4, p.SpikeSourceArray(spike_times=[0]), label="src")
 
     delays = p.RandomDistribution(
         "normal_clipped", mu=20, sigma=1, low=1, high=6)
 
-    p.Projection(input, pop_1, p.AllToAllConnector(),
+    p.Projection(source, pop_1, p.AllToAllConnector(),
                  synapse_type=p.StaticSynapse(weight=5, delay=delays))
 
     p.run(10)

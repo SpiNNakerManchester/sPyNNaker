@@ -37,7 +37,7 @@ class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
     :param float isyn_exc: LIF neuron parameter (defaulted)
     :param float isyn_inh: LIF neuron parameter (defaulted)
     """
-    __slots__ = []
+    __slots__ = ()
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(

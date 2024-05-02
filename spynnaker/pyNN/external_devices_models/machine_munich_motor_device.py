@@ -12,15 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Sequence
 from spinn_utilities.overrides import overrides
 from spinnman.model.enums import ExecutableType
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
+from pacman.model.placements import Placement
 from pacman.model.resources import ConstantSDRAM
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary)
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification)
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spinn_front_end_common.interface.simulation import simulation_utilities
@@ -38,13 +41,13 @@ class MachineMunichMotorDevice(
     An Omnibot motor control device. This has a real vertex and an
     external device vertex.
     """
-    __slots__ = [
+    __slots__ = (
         "__continue_if_not_different",
         "__delay_time",
         "__delta_threshold",
         "__sample_time",
         "__speed",
-        "__update_time"]
+        "__update_time")
 
     MOTOR_PARTITION_ID = "MOTOR"
 
@@ -91,33 +94,34 @@ class MachineMunichMotorDevice(
 
     @property
     @overrides(MachineVertex.sdram_required)
-    def sdram_required(self):
+    def sdram_required(self) -> ConstantSDRAM:
         return ConstantSDRAM(
                 SYSTEM_BYTES_REQUIREMENT + self._PARAMS_SIZE +
                 self.get_provenance_data_size(self._PROVENANCE_ELEMENTS))
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
-    def get_binary_file_name(self):
+    def get_binary_file_name(self) -> str:
         return "robot_motor_control.aplx"
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
-    def get_binary_start_type(self):
+    def get_binary_start_type(self) -> ExecutableType:
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
-    def _provenance_region_id(self):
+    def _provenance_region_id(self) -> int:
         return self._PROVENANCE_REGION
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
-    def _n_additional_data_items(self):
+    def _n_additional_data_items(self) -> int:
         return self._PROVENANCE_ELEMENTS
 
     @overrides(
         ProvidesProvenanceDataFromMachineImpl.parse_extra_provenance_items)
     def parse_extra_provenance_items(
-            self, label, x, y, p, provenance_data):
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
         n_buffer_overflows, = provenance_data
 
         with ProvenanceWriter() as db:
@@ -133,7 +137,8 @@ class MachineMunichMotorDevice(
                     "or decrease the number of neurons per core.")
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(self, spec, placement):
+    def generate_data_specification(
+            self, spec: DataSpecificationGenerator, placement: Placement):
         # reserve regions
         self.reserve_memory_regions(spec)
 
@@ -142,8 +147,10 @@ class MachineMunichMotorDevice(
 
         # handle simulation data
         spec.switch_write_focus(self._SYSTEM_REGION)
+        vertex = placement.vertex
+        assert isinstance(vertex, AbstractHasAssociatedBinary)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            placement.vertex.get_binary_file_name()))
+            vertex.get_binary_file_name()))
 
         # Get the key
         routing_info = SpynnakerDataView.get_routing_infos()
@@ -189,8 +196,7 @@ class MachineMunichMotorDevice(
         self.reserve_provenance_data_region(spec)
 
     @overrides(MachineVertex.get_n_keys_for_partition)
-    def get_n_keys_for_partition(self, partition_id):
+    def get_n_keys_for_partition(self, partition_id: str) -> int:
         if partition_id == self.MOTOR_PARTITION_ID:
             return self._MOTOR_N_KEYS
-        return super(MachineMunichMotorDevice, self).get_n_keys_for_partition(
-            partition_id)
+        return super().get_n_keys_for_partition(partition_id)

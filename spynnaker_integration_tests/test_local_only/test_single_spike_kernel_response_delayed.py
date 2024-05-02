@@ -33,8 +33,8 @@ def do_run(plot):
     run_time = 600.
 
     sim.setup(timestep=1.)
-    sim.set_number_of_neurons_per_core(sim.SpikeSourceArray, (5, 5))
-    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, (3, 3))
+    sim.set_number_of_neurons_per_core(sim.SpikeSourceArray, (11, 1))
+    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, (7, 1))
 
     spike_idx = ((in_shape[1] // 2) * in_shape[0]) + (in_shape[1] // 2)
     spike_times = [[1.0] if i == spike_idx else []

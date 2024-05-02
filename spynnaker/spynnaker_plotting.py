@@ -17,12 +17,15 @@ Plotting tools to be used together with
 https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/utility/plotting.py
 """
 
+from types import ModuleType
 from neo import SpikeTrain, Block, Segment, AnalogSignal
 import numpy as np
 import quantities
+plt: ModuleType
 try:
     from pyNN.utility.plotting import repeat
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot  # type: ignore[import]
+    plt = matplotlib.pyplot
     _matplotlib_missing = False
 except ImportError:
     _matplotlib_missing = True
@@ -114,7 +117,7 @@ def plot_spikes_numpy(axes, spikes, label='', **options):
 
 def _heat_plot(axes, neurons, times, values, label='', **options):
     """
-    Plots three lists of neurons, times and values into a heatmap.
+    Plots three lists of neurons, times and values into a heat map.
 
     :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
     :param neurons: List of neuron IDs
@@ -138,7 +141,7 @@ def _heat_plot(axes, neurons, times, values, label='', **options):
 
 def heat_plot_numpy(axes, data, label='', **options):
     """
-    Plots neurons, times and values into a heatmap.
+    Plots neurons, times and values into a heat map.
 
     :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
     :param ~numpy.ndarray data: numpy array of values in spynnaker7 format
@@ -153,7 +156,7 @@ def heat_plot_numpy(axes, data, label='', **options):
 
 def heat_plot_neo(axes, signal_array, label='', **options):
     """
-    Plots neurons, times and values into a heatmap.
+    Plots neurons, times and values into a heat map.
 
     :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
     :param ~neo.core.AnalogSignal signal_array: Neo Signal array object
@@ -175,7 +178,7 @@ def heat_plot_neo(axes, signal_array, label='', **options):
 
 def plot_segment(axes, segment, label='', **options):
     """
-    Plots a segment into a plot of spikes or a heatmap.
+    Plots a segment into a plot of spikes or a heat map.
 
     If there is more than ode type of Data in the segment options must
     include the name of the data to plot
@@ -218,7 +221,7 @@ class SpynnakerPanel(object):
 
     Unlike :py:class:`pyNN.utility.plotting.Panel`,
     Spikes are plotted faster,
-    other data is plotted as a heatmap.
+    other data is plotted as a heat map.
 
     A panel is a Matplotlib Axes or Subplot instance. A data item may be an
     :py:class:`~neo.core.AnalogSignal`, or a list of

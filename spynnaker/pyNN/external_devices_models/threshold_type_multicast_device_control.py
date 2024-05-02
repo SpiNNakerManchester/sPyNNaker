@@ -12,19 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Sequence
+
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
+
 from spinn_front_end_common.interface.ds import DataType
+
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
 from spynnaker.pyNN.utilities.struct import Struct
+from spynnaker.pyNN.external_devices_models import (
+    AbstractMulticastControllableDevice)
 
-DEVICE = "device"
-KEY = "key"
-SCALE = "scale"
-MIN = "min"
-MAX = "max"
-TS_INTER_SEND = "ts_inter_send"
-TS_NEXT_SEND = "ts_next_send"
-TYPE = "type"
+_DEVICE = "device"
+_KEY = "key"
+_SCALE = "scale"
+_MIN = "min"
+_MAX = "max"
+_TS_INTER_SEND = "ts_inter_send"
+_TS_NEXT_SEND = "ts_next_send"
+_TYPE = "type"
 
 
 class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
@@ -32,42 +39,43 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
     A threshold type that can send multicast keys with the value of
     membrane voltage as the payload.
     """
-    __slots__ = ["__devices"]
+    __slots__ = ("__devices", )
 
-    def __init__(self, devices):
+    def __init__(self, devices: Sequence[AbstractMulticastControllableDevice]):
         """
         :param list(AbstractMulticastControllableDevice) device:
         """
         super().__init__(
             [Struct([
-                (DataType.UINT32, KEY),
-                (DataType.UINT32, SCALE),
-                (DataType.S1615, MIN),
-                (DataType.S1615, MAX),
-                (DataType.UINT32, TS_INTER_SEND),
-                (DataType.UINT32, TS_NEXT_SEND),
-                (DataType.UINT32, TYPE)])],
-            {KEY: "", SCALE: "", MIN: "mV", MAX: "mV",
-             TS_INTER_SEND: "time steps", TS_NEXT_SEND: "time steps",
-             TYPE: ""})
+                (DataType.UINT32, _KEY),
+                (DataType.UINT32, _SCALE),
+                (DataType.S1615, _MIN),
+                (DataType.S1615, _MAX),
+                (DataType.UINT32, _TS_INTER_SEND),
+                (DataType.UINT32, _TS_NEXT_SEND),
+                (DataType.UINT32, _TYPE)])],
+            {_KEY: "", _SCALE: "", _MIN: "mV", _MAX: "mV",
+             _TS_INTER_SEND: "time steps", _TS_NEXT_SEND: "time steps",
+             _TYPE: ""})
         self.__devices = devices
 
     @overrides(AbstractThresholdType.add_parameters)
-    def add_parameters(self, parameters):
-        parameters[KEY] = [
-            d.device_control_key for d in self.__devices]
-        parameters[SCALE] = [
-            d.device_control_scaling_factor for d in self.__devices]
-        parameters[MIN] = [
-            d.device_control_min_value for d in self.__devices]
-        parameters[MAX] = [
-            d.device_control_max_value for d in self.__devices]
-        parameters[TS_INTER_SEND] = [
-            d.device_control_timesteps_between_sending for d in self.__devices]
-        parameters[TYPE] = [
-            d.device_control_send_type.value for d in self.__devices]
+    def add_parameters(self, parameters: RangeDictionary[float]):
+        parameters[_KEY] = self._convert([
+            d.device_control_key for d in self.__devices])
+        parameters[_SCALE] = self._convert([
+            d.device_control_scaling_factor for d in self.__devices])
+        parameters[_MIN] = self._convert([
+            d.device_control_min_value for d in self.__devices])
+        parameters[_MAX] = self._convert([
+            d.device_control_max_value for d in self.__devices])
+        parameters[_TS_INTER_SEND] = self._convert([
+            d.device_control_timesteps_between_sending
+            for d in self.__devices])
+        parameters[_TYPE] = self._convert([
+            d.device_control_send_type.value for d in self.__devices])
 
     @overrides(AbstractThresholdType.add_state_variables)
-    def add_state_variables(self, state_variables):
-        state_variables[TS_NEXT_SEND] = [
-            d.device_control_first_send_timestep for d in self.__devices]
+    def add_state_variables(self, state_variables: RangeDictionary[float]):
+        state_variables[_TS_NEXT_SEND] = self._convert([
+            d.device_control_first_send_timestep for d in self.__devices])

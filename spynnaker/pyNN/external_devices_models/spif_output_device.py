@@ -11,16 +11,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from typing import Dict, Iterable, Tuple, List
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
+
 from pacman.model.graphs.application import (
-    ApplicationFPGAVertex, FPGAConnection)
+    ApplicationEdge, ApplicationEdgePartition, ApplicationFPGAVertex,
+    FPGAConnection)
+from pacman.model.graphs.machine import MachineVertex
+from pacman.utilities.utility_calls import get_keys
+
 from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex)
+    AbstractSendMeMulticastCommandsVertex, LiveOutputDevice,
+    HasCustomAtomKeyMap)
+from spinn_front_end_common.utility_models.command_sender import CommandSender
+from spinn_front_end_common.utility_models import MultiCastCommand
+
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager)
+
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK,
     set_distiller_key, set_distiller_mask,
@@ -33,7 +46,7 @@ N_OUTGOING = 6
 
 class SPIFOutputDevice(
         ApplicationFPGAVertex, PopulationApplicationVertex,
-        AbstractSendMeMulticastCommandsVertex):
+        AbstractSendMeMulticastCommandsVertex, LiveOutputDevice):
     """
     Output (only) to a SPIF device.  Each SPIF device can accept up to 6
     incoming projections.
@@ -49,8 +62,8 @@ class SPIFOutputDevice(
     packet, but this can be controlled with the output_key_shift parameter.
     """
 
-    __slots__ = ["__incoming_partitions", "__create_database",
-                 "__output_key_shift", "__output_key_and_mask"]
+    __slots__ = ("__incoming_partitions", "__create_database",
+                 "__output_key_shift", "__output_key_and_mask")
 
     def __init__(self, board_address=None, chip_coords=None, label=None,
                  create_database=True, database_notify_host=None,
@@ -119,7 +132,17 @@ class SPIFOutputDevice(
         return (v & (v - 1) == 0) and (v != 0)
 
     @overrides(ApplicationFPGAVertex.add_incoming_edge)
-    def add_incoming_edge(self, edge, partition):
+    def add_incoming_edge(
+            self, edge: ApplicationEdge, partition: ApplicationEdgePartition):
+        # Only add edges from PopulationApplicationVertices
+        if not isinstance(edge.pre_vertex, PopulationApplicationVertex):
+            if not isinstance(edge.pre_vertex, CommandSender):
+                raise ValueError(
+                    "This vertex only accepts input from "
+                    "PopulationApplicationVertex instances")
+            # Ignore the command sender sending to us!
+            return
+
         if len(self.__incoming_partitions) >= N_OUTGOING:
             raise ValueError(
                 f"Only {N_OUTGOING} outgoing connections are supported per"
@@ -136,15 +159,15 @@ class SPIFOutputDevice(
                     " contiguous.  Please choose a power-of-two size for the"
                     " maximum atoms per core")
         self.__incoming_partitions.append(partition)
-        if self.__create_database:
-            SpynnakerDataView.add_live_output_vertex(
-                partition.pre_vertex, partition.identifier)
+        if self.__create_database and len(self.__incoming_partitions) == 1:
+            SpynnakerDataView.add_live_output_device(self)
 
     def _get_set_key_payload(self, index):
         """
         Get the payload for the command to set the router key.
 
         :param int index: The index of key to get
+        :rtype: int
         """
         r_infos = SpynnakerDataView.get_routing_infos()
         return r_infos.get_first_key_from_pre_vertex(
@@ -156,6 +179,7 @@ class SPIFOutputDevice(
         Get the payload for the command to set the router mask.
 
         :param int index: The index of the mask to get
+        :rtype: int
         """
         r_infos = SpynnakerDataView.get_routing_infos()
         return r_infos.get_routing_info_from_pre_vertex(
@@ -171,7 +195,8 @@ class SPIFOutputDevice(
             self.__incoming_partitions[index].identifier).mask & 0xFFFFFFFF
 
     @property
-    def start_resume_commands(self):
+    @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
+    def start_resume_commands(self) -> Iterable[MultiCastCommand]:
         # The commands here are delayed, as at the time of providing them,
         # we don't know the key or mask of the incoming link...
         commands = list()
@@ -192,9 +217,45 @@ class SPIFOutputDevice(
         return commands
 
     @property
-    def pause_stop_commands(self):
+    @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
+    def pause_stop_commands(self) -> Iterable[MultiCastCommand]:
         return []
 
     @property
-    def timed_commands(self):
+    @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
+    def timed_commands(self) -> List[MultiCastCommand]:
         return []
+
+    @overrides(LiveOutputDevice.get_device_output_keys)
+    def get_device_output_keys(self) -> Dict[MachineVertex,
+                                             List[Tuple[int, int]]]:
+        all_keys: Dict[MachineVertex, List[Tuple[int, int]]] = dict()
+        routing_infos = SpynnakerDataView.get_routing_infos()
+        for i, part in enumerate(self.__incoming_partitions):
+            if part.pre_vertex in self.__output_key_and_mask:
+                key, mask = self.__output_key_and_mask[part.pre_vertex]
+            else:
+                key = i << self.__output_key_shift
+                mask = self._get_set_dist_mask_payload(i)
+            shift = part.pre_vertex.n_colour_bits
+            for m_vertex in part.pre_vertex.splitter.get_out_going_vertices(
+                    part.identifier):
+                atom_keys: Iterable[Tuple[int, int]] = list()
+                if isinstance(m_vertex.app_vertex, HasCustomAtomKeyMap):
+                    atom_keys = m_vertex.app_vertex.get_atom_key_map(
+                        m_vertex, part.identifier, routing_infos)
+                else:
+                    r_info = routing_infos.get_routing_info_from_pre_vertex(
+                        m_vertex, part.identifier)
+                    # r_info could be None if there are no outgoing edges,
+                    # at which point there is nothing to do here anyway
+                    if r_info is not None:
+                        vertex_slice = m_vertex.vertex_slice
+                        keys = get_keys(r_info.key, vertex_slice)
+                        start = vertex_slice.lo_atom
+                        atom_keys = [(i, k) for i, k in enumerate(keys, start)]
+
+                atom_keys_mapped = list((i, key | ((k & mask) >> shift))
+                                        for i, k in atom_keys)
+                all_keys[m_vertex] = atom_keys_mapped
+        return all_keys

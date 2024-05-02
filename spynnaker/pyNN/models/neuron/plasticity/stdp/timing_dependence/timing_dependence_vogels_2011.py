@@ -12,10 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable
+
+from numpy import floating
+from numpy.typing import NDArray
+
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.interface.ds import DataType
+
+from spinn_front_end_common.interface.ds import (
+    DataSpecificationBase, DataType)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     AbstractTimingDependence)
@@ -29,30 +37,28 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     """
     A timing dependence STDP rule due to Vogels (2011).
     """
-    __slots__ = [
+    __slots__ = (
         "__alpha",
-        "__synapse_structure",
         "__tau",
         "__tau_data",
         "__a_plus",
-        "__a_minus"]
+        "__a_minus")
     __PARAM_NAMES = ('alpha', 'tau')
     default_parameters = {'tau': 20.0}
 
-    def __init__(self, alpha, tau=default_parameters['tau'],
-                 A_plus=0.01, A_minus=0.01):
+    def __init__(self, alpha: float, tau: float = default_parameters['tau'],
+                 A_plus: float = 0.01, A_minus: float = 0.01):
         r"""
         :param float alpha: :math:`\alpha`
         :param float tau: :math:`\tau`
         :param float A_plus: :math:`A^+`
         :param float A_minus: :math:`A^-`
         """
+        super().__init__(SynapseStructureWeightOnly())
         self.__alpha = alpha
         self.__tau = tau
         self.__a_plus = A_plus
         self.__a_minus = A_minus
-
-        self.__synapse_structure = SynapseStructureWeightOnly()
 
         self.__tau_data = get_exp_lut_array(
             SpynnakerDataView.get_simulation_time_step_ms(), self.__tau)
@@ -102,7 +108,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
-    def is_same_as(self, timing_dependence):
+    def is_same_as(self, timing_dependence: AbstractTimingDependence) -> bool:
         if not isinstance(timing_dependence, TimingDependenceVogels2011):
             return False
         return (self.__tau == timing_dependence.tau and
@@ -128,7 +134,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return BYTES_PER_SHORT
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
-    def get_parameters_sdram_usage_in_bytes(self):
+    def get_parameters_sdram_usage_in_bytes(self) -> int:
         return BYTES_PER_WORD + BYTES_PER_WORD * len(self.__tau_data)
 
     @property
@@ -142,8 +148,8 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
-            self, spec, global_weight_scale, synapse_weight_scales):
-
+            self, spec: DataSpecificationBase, global_weight_scale: float,
+            synapse_weight_scales: NDArray[floating]):
         # Write alpha to spec
         fixed_point_alpha = float_to_fixed(self.__alpha)
         spec.write_value(data=fixed_point_alpha, data_type=DataType.INT32)
@@ -151,15 +157,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         # Write lookup table
         spec.write_array(self.__tau_data)
 
-    @property
-    def synaptic_structure(self):
-        """
-        The synaptic structure of the plastic part of the rows.
-
-        :rtype: AbstractSynapseStructure
-        """
-        return self.__synapse_structure
-
     @overrides(AbstractTimingDependence.get_parameter_names)
-    def get_parameter_names(self):
+    def get_parameter_names(self) -> Iterable[str]:
         return self.__PARAM_NAMES

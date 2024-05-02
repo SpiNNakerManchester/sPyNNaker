@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from typing import Dict, Mapping, Tuple
 from spinn_utilities.progress_bar import ProgressBar
+from pacman.model.graphs.application import ApplicationGraph
 from spynnaker.pyNN.models.neuron import ConnectionHolder
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections import (
+    ProjectionApplicationEdge, SynapseInformation)
 
 
 class SpYNNakerConnectionHolderGenerator(object):
@@ -22,7 +24,9 @@ class SpYNNakerConnectionHolderGenerator(object):
     Sets up connection holders for reports to use.
     """
 
-    def __call__(self, application_graph):
+    def __call__(self, application_graph: ApplicationGraph) -> Mapping[
+            Tuple[ProjectionApplicationEdge, SynapseInformation],
+            ConnectionHolder]:
         """
         :param application_graph: application graph
         :type application_graph:
@@ -37,7 +41,9 @@ class SpYNNakerConnectionHolderGenerator(object):
             application_graph.n_outgoing_edge_partitions,
             "Generating connection holders for reporting connection data.")
 
-        data_holders = dict()
+        data_holders: Dict[
+            Tuple[ProjectionApplicationEdge, SynapseInformation],
+            ConnectionHolder] = dict()
         for partition in progress.over(
                 application_graph.outgoing_edge_partitions):
             for edge in partition.edges:
@@ -51,7 +57,10 @@ class SpYNNakerConnectionHolderGenerator(object):
         return data_holders
 
     @staticmethod
-    def _generate_holder_for_edge(edge, data_holders):
+    def _generate_holder_for_edge(
+            edge: ProjectionApplicationEdge, data_holders: Dict[
+                Tuple[ProjectionApplicationEdge, SynapseInformation],
+                ConnectionHolder]):
         """
         :param ProjectionApplicationEdge edge:
         :param dict data_holders:

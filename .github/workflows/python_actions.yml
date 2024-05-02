@@ -30,7 +30,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        python-version: [3.8, 3.9, "3.10", "3.11"]
+        python-version: [3.8, 3.9, "3.10", "3.11", "3.12"]
 
     steps:
     - name: Checkout
@@ -46,11 +46,13 @@ jobs:
       with:
         packages: graphviz
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install pip, etc
       uses: ./support/actions/python-tools
+    - name: Install mypy
+      run: pip install mypy
 
     - name: Install Spinnaker Dependencies
       uses: ./support/actions/install-spinn-deps
@@ -76,7 +78,7 @@ jobs:
       uses: ./support/actions/pytest
       with:
         tests: unittests
-        coverage: ${{ matrix.python-version == 3.8 }}
+        coverage: ${{ matrix.python-version == 3.12 }}
         cover-packages: ${{ env.BASE_PKG }}
         coveralls-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -87,14 +89,18 @@ jobs:
       uses: ./support/actions/pylint
       with:
         package: ${{ env.BASE_PKG }}
+        exitcheck: 31 # Action fails on any message
         language: en_GB
+        rcfile: global_strict
+    - name: Lint with mypy
+      run: mypy ${{ env.BASE_PKG }}
 
   validate:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8"]
+        python-version: [3.12]
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -109,7 +115,7 @@ jobs:
       with:
         packages: graphviz
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install pip, etc
@@ -139,7 +145,7 @@ jobs:
       with:
         base-path: ${{ env.BASE_PKG }}
 
-    - name: Build documentation with sphinx (3.8 only)
+    - name: Build documentation with sphinx (3.12 only)
       uses: ./support/actions/sphinx
       with:
         directory: doc/source

@@ -15,13 +15,17 @@
 import logging
 import select
 import socket
+from typing import Callable, TypeVar
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
 from spinn_utilities.ping import Ping
 from spinnman.connections.abstract_classes import Listenable, Connection
 from spinnman.utilities.socket_utils import (
     get_tcp_socket, connect_socket, get_socket_address, resolve_host,
     receive_message, send_message)
 from spinn_front_end_common.utilities.constants import BYTES_PER_KB
+#: :meta private:
+T = TypeVar("T")
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # A set of connections that have already been made
@@ -43,15 +47,16 @@ def get_pushbot_wifi_connection(remote_host, remote_port=56000):
 
 
 class PushBotWIFIConnection(Connection, Listenable):
+    # pylint: disable=wrong-spelling-in-docstring
     """
     A connection to a PushBot via Wi-Fi.
     """
-    __slots__ = [
+    __slots__ = (
         "__local_ip_address",
         "__local_port",
         "__remote_ip_address",
         "__remote_port",
-        "__socket"]
+        "__socket")
 
     RECV_SIZE = 1 * BYTES_PER_KB
 
@@ -171,8 +176,10 @@ class PushBotWIFIConnection(Connection, Listenable):
             pass
         self.__socket.close()
 
-    def is_ready_to_receive(self, timeout=0):
+    @overrides(Listenable.is_ready_to_receive)
+    def is_ready_to_receive(self, timeout: float = 0) -> bool:
         return bool(select.select([self.__socket], [], [], timeout)[0])
 
-    def get_receive_method(self):
+    @overrides(Listenable.get_receive_method)
+    def get_receive_method(self) -> Callable[[], T]:
         return self.receive

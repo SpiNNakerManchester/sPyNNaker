@@ -12,20 +12,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections.abc import Iterable
+from __future__ import annotations
+from typing import (
+    Dict, Iterable, List, Sequence, Tuple, Union, TYPE_CHECKING)
+
 import numpy
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from numpy.typing import NDArray
+from typing_extensions import TypeAlias
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.interface.ds import DataType
+
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.common import Slice
+
+from spinn_front_end_common.interface.ds import (
+    DataType, DataSpecificationBase)
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
+
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.projection import Projection
+    from spynnaker.pyNN.models.neural_projections import (
+        SynapseInformation)
+    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray)
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge)
+
+    _PopIndexType: TypeAlias = Dict[
+        Tuple[PopulationApplicationVertex, SynapseInformation], int]
+    _SubpopIndexType: TypeAlias = Dict[
+        Tuple[PopulationApplicationVertex, SynapseInformation, int], int]
+
+    #: :meta private:
+    ConnectionsInfo: TypeAlias = Dict[
+        Tuple[AbstractPopulationVertex, int],
+        List[Tuple[ConnectionsArray, ProjectionApplicationEdge,
+                   SynapseInformation]]]
 
 #: Default value for frequency of rewiring
 DEFAULT_F_REW = 10 ** 4.0
@@ -39,6 +74,9 @@ DEFAULT_S_MAX = 32
 
 class SynapseDynamicsStructuralCommon(
         AbstractSynapseDynamicsStructural, metaclass=AbstractBase):
+    """
+    Common code for structural synapse dynamics.
+    """
 
     # 8 32-bit numbers (fast; p_rew; s_max; app_no_atoms; machine_no_atoms;
     # low_atom; high_atom; with_replacement) + 2 4-word RNG seeds (shared_seed;
@@ -63,20 +101,22 @@ class SynapseDynamicsStructuralCommon(
         "Only one Projection between each pair of Populations can use "
         "structural plasticity")
 
-    def get_parameter_names(self):
+    __slots__ = ()
+
+    def get_parameter_names(self) -> Iterable[str]:
         """
         :rtype: list(str)
         """
-        names = ['initial_weight', 'initial_delay', 'f_rew', 'p_rew', 's_max',
-                 'with_replacement']
+        yield from [
+            'initial_weight', 'initial_delay', 'f_rew', 'p_rew', 's_max',
+            'with_replacement']
         # pylint: disable=no-member
-        names.extend(self.partner_selection.get_parameter_names())
-        names.extend(self.formation.get_parameter_names())
-        names.extend(self.elimination.get_parameter_names())
-        return names
+        yield from self.partner_selection.get_parameter_names()
+        yield from self.formation.get_parameter_names()
+        yield from self.elimination.get_parameter_names()
 
     @property
-    def p_rew(self):
+    def p_rew(self) -> float:
         """
         The period of rewiring.
 
@@ -86,19 +126,20 @@ class SynapseDynamicsStructuralCommon(
 
     @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters)
     def write_structural_parameters(
-            self, spec, region, weight_scales, app_vertex,
-            vertex_slice, synaptic_matrices):
+            self, spec: DataSpecificationBase, region: int,
+            weight_scales: NDArray[numpy.floating],
+            app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
+            synaptic_matrices: SynapticMatrices):
         spec.comment("Writing structural plasticity parameters")
         spec.switch_write_focus(region)
 
         # Get relevant edges
         structural_projections = self.__get_structural_projections(
-                app_vertex.incoming_projections)
+            app_vertex.incoming_projections)
 
         # Write the common part of the rewiring data
         self.__write_common_rewiring_data(
-            spec, app_vertex, vertex_slice,
-            len(structural_projections))
+            spec, app_vertex, vertex_slice, len(structural_projections))
 
         # Write the pre-population info
         pop_index, subpop_index, lo_atom_index = \
@@ -125,7 +166,9 @@ class SynapseDynamicsStructuralCommon(
             dynamics.elimination.write_parameters(
                 spec, weight_scales[proj._synapse_information.synapse_type])
 
-    def __get_structural_projections(self, incoming_projections):
+    def __get_structural_projections(
+            self, incoming_projections: Iterable[Projection]
+            ) -> List[Projection]:
         """
         :param list(Projection) incoming_projections:
             Projections to filter to structural only
@@ -140,15 +183,15 @@ class SynapseDynamicsStructuralCommon(
                 if isinstance(synapse_info.synapse_dynamics,
                               AbstractSynapseDynamicsStructural):
                     if app_edge in seen_app_edges:
-                        raise SynapticConfigurationException(
-                            self.PAIR_ERROR)
-                    else:
-                        seen_app_edges.add(app_edge)
-                        structural_projections.append(proj)
+                        raise SynapticConfigurationException(self.PAIR_ERROR)
+                    seen_app_edges.add(app_edge)
+                    structural_projections.append(proj)
         return structural_projections
 
     def __write_common_rewiring_data(
-            self, spec, app_vertex, vertex_slice, n_pre_pops):
+            self, spec: DataSpecificationBase,
+            app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
+            n_pre_pops: int):
         """
         Write the non-sub-population synapse parameters to the spec.
 
@@ -187,40 +230,42 @@ class SynapseDynamicsStructuralCommon(
         spec.write_value(data=self.with_replacement)
 
         # write app level seeds
-        spec.write_array(self.get_seeds(app_vertex))
+        spec.write_array(self._get_seeds(app_vertex))
 
         # write local seed (4 words), generated randomly!
         # Note that in case of a reset, these need a key to ensure subsequent
         # runs match the first run
-        spec.write_array(self.get_seeds(vertex_slice))
+        spec.write_array(self._get_seeds(vertex_slice))
 
         # write the number of pre-populations
         spec.write_value(data=n_pre_pops)
 
     def __write_prepopulation_info(
-            self, spec, app_vertex, structural_projections,
-            weight_scales, synaptic_matrices):
+            self, spec: DataSpecificationBase,
+            app_vertex: ApplicationVertex,
+            structural_projections: Iterable[Projection],
+            weight_scales: NDArray[numpy.floating],
+            synaptic_matrices: SynapticMatrices) -> Tuple[
+                _PopIndexType, _SubpopIndexType, _SubpopIndexType]:
         """
         :param ~data_specification.DataSpecificationGenerator spec:
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
             the vertex for which data specs are being prepared
         :param structural_projections: Projections that are structural
-        :type structural_projections:
-            list(tuple(ProjectionApplicationEdge,SynapseInformation))
         :param machine_edges_by_app:
             map of application edge to associated machine edges
         :type machine_edges_by_app:
             dict(~pacman.model.graphs.application.ApplicationEdge,
             list(~pacman.model.graphs.machine.MachineEdge))
-        :param dict(AbstractSynapseType,float) weight_scales:
+        :param dict(int,float) weight_scales:
         :param SynapticMatrices synaptic_matrices:
         :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
         """
         spec.comment("Writing pre-population info")
-        pop_index = dict()
+        pop_index: _PopIndexType = dict()
         routing_info = SpynnakerDataView.get_routing_infos()
-        subpop_index = dict()
-        lo_atom_index = dict()
+        subpop_index: _SubpopIndexType = dict()
+        lo_atom_index: _SubpopIndexType = dict()
         index = 0
         for proj in structural_projections:
             spec.comment(f"Writing pre-population info for {proj.label}")
@@ -241,7 +286,7 @@ class SynapseDynamicsStructuralCommon(
             spec.write_value(int(self_connected), data_type=DataType.UINT16)
             # Delay
             delay_scale = SpynnakerDataView.get_simulation_time_step_per_ms()
-            if isinstance(dynamics.initial_delay, Iterable):
+            if isinstance(dynamics.initial_delay, tuple):
                 spec.write_value(int(dynamics.initial_delay[0] * delay_scale),
                                  data_type=DataType.UINT16)
                 spec.write_value(int(dynamics.initial_delay[1] * delay_scale),
@@ -262,23 +307,27 @@ class SynapseDynamicsStructuralCommon(
             for sub, m_vertex in enumerate(out_verts):
                 r_info = routing_info.get_routing_info_from_pre_vertex(
                     m_vertex, SPIKE_PARTITION_ID)
+                assert r_info is not None
                 vertex_slice = m_vertex.vertex_slice
                 spec.write_value(r_info.key)
                 spec.write_value(r_info.mask)
-                spec.write_value(m_vertex.app_vertex.n_colour_bits)
+                out_app = m_vertex.app_vertex
+                assert isinstance(out_app, PopulationApplicationVertex)
+                spec.write_value(out_app.n_colour_bits)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
                 spec.write_value(synaptic_matrices.get_index(
                     app_edge, synapse_info))
-                lo = m_vertex.vertex_slice.lo_atom
-                for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
+                lo = vertex_slice.lo_atom
+                for i in range(lo, vertex_slice.hi_atom + 1):
                     subpop_index[app_edge.pre_vertex, synapse_info, i] = sub
                     lo_atom_index[app_edge.pre_vertex, synapse_info, i] = lo
         return pop_index, subpop_index, lo_atom_index
 
     def __write_post_to_pre_table(
-            self, spec, pop_index, subpop_index, lo_atom_index, app_vertex,
-            vertex_slice):
+            self, spec: DataSpecificationBase, pop_index: _PopIndexType,
+            subpop_index: _SubpopIndexType, lo_atom_index: _SubpopIndexType,
+            app_vertex: AbstractPopulationVertex, vertex_slice: Slice):
         """
         Post to pre table is basically the transpose of the synaptic matrix.
 
@@ -314,7 +363,6 @@ class SynapseDynamicsStructuralCommon(
             lo_atom_index[a_edge.pre_vertex, s_info, c["source"]]
             for (conns, a_edge, s_info) in slice_conns for c in conns])
         connections["source"] = connections["source"] - lo_atoms
-        connections["target"] = connections["target"] - vertex_slice.lo_atom
 
         # Make an array of all data required
         conn_data = numpy.dstack(
@@ -348,7 +396,8 @@ class SynapseDynamicsStructuralCommon(
     @overrides(AbstractSynapseDynamicsStructural.
                get_structural_parameters_sdram_usage_in_bytes)
     def get_structural_parameters_sdram_usage_in_bytes(
-            self, incoming_projections, n_neurons):
+            self, incoming_projections: Iterable[Projection],
+            n_neurons: int) -> int:
         # Work out how many sub-edges we will end up with, as this is used
         # for key_atom_info
         # pylint: disable=no-member
@@ -375,7 +424,7 @@ class SynapseDynamicsStructuralCommon(
             (self._POST_TO_PRE_ENTRY_SIZE * n_neurons * self.s_max) +
             param_sizes)
 
-    def get_vertex_executable_suffix(self):
+    def get_vertex_executable_suffix(self) -> str:
         """
         :rtype: str
         """
@@ -386,7 +435,8 @@ class SynapseDynamicsStructuralCommon(
         name += self.elimination.vertex_executable_suffix
         return name
 
-    def is_same_as(self, synapse_dynamics):
+    def is_same_as(
+            self, synapse_dynamics: AbstractSynapseDynamicsStructural) -> bool:
         """
         :param SynapseDynamicsStructuralCommon synapse_dynamics:
         :rtype: bool
@@ -397,6 +447,7 @@ class SynapseDynamicsStructuralCommon(
             self.f_rew == synapse_dynamics.f_rew and
             self.initial_weight == synapse_dynamics.initial_weight and
             self.initial_delay == synapse_dynamics.initial_delay and
+            # pylint: disable=unidiomatic-typecheck
             (type(self.partner_selection) ==  # noqa: E721
              type(synapse_dynamics.partner_selection)) and
             (type(self.formation) ==
@@ -404,16 +455,20 @@ class SynapseDynamicsStructuralCommon(
             (type(self.elimination) ==
              type(synapse_dynamics.elimination)))
 
-    @abstractproperty
-    def connections(self):
+    @property
+    @abstractmethod
+    def connections(self) -> ConnectionsInfo:
         """
         Initial connectivity as defined via connector.
 
         :rtype: dict
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_seeds(self, app_vertex=None):
+    def _get_seeds(
+            self, app_vertex: Union[None, ApplicationVertex, Slice] = None
+            ) -> Sequence[int]:
         """
         Generate a seed for the RNG on chip that is the same for all
         of the cores that have perform structural updates.
@@ -428,15 +483,16 @@ class SynapseDynamicsStructuralCommon(
         :return: list of random seed (4 words), generated randomly
         :rtype: list(int)
         """
+        raise NotImplementedError
 
-    def check_initial_delay(self, max_delay_ms):
+    def check_initial_delay(self, max_delay_ms: float):
         """
         Check that delays can be done without delay extensions.
 
         :param float max_delay_ms: The maximum delay supported, in milliseconds
         :raises ValueError: if the delay is out of range
         """
-        if isinstance(self.initial_delay, Iterable):
+        if isinstance(self.initial_delay, tuple):
             # pylint: disable=unsubscriptable-object
             init_del = self.initial_delay
             if init_del[0] > max_delay_ms or init_del[1] > max_delay_ms:
@@ -448,7 +504,7 @@ class SynapseDynamicsStructuralCommon(
                 f"The initial delay {self.initial_delay} "
                 f"is bigger than {max_delay_ms}.")
 
-    def get_max_rewires_per_ts(self):
+    def get_max_rewires_per_ts(self) -> int:
         max_rewires_per_ts = 1
         if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
                 SpynnakerDataView.get_simulation_time_step_ms()):

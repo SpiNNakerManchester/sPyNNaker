@@ -13,29 +13,28 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
-from .abstract_input_type import AbstractInputType
+from spinn_utilities.ranged import RangeDictionary
 from spynnaker.pyNN.utilities.struct import Struct
+from .abstract_input_type import AbstractInputType
 
 
 class InputTypeCurrent(AbstractInputType):
     """
     The current input type.
     """
-    __slots__ = []
+    __slots__ = ()
 
-    def __init__(self):
-        """
-        """
+    def __init__(self) -> None:
         super().__init__([Struct([])], dict())
 
     @overrides(AbstractInputType.add_parameters)
-    def add_parameters(self, parameters):
+    def add_parameters(self, parameters: RangeDictionary[float]):
         pass
 
     @overrides(AbstractInputType.add_state_variables)
-    def add_state_variables(self, state_variables):
+    def add_state_variables(self, state_variables: RangeDictionary[float]):
         pass
 
     @overrides(AbstractInputType.get_global_weight_scale)
-    def get_global_weight_scale(self):
+    def get_global_weight_scale(self) -> float:
         return 1.0

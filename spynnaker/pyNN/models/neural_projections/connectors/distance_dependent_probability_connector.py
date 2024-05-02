@@ -12,20 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
 import math
+from typing import Optional, Sequence, TYPE_CHECKING
+
 import numpy
 from numpy import (
     arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
     hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
-    minimum, e, pi)
+    minimum, e, pi, floating)
+from numpy.typing import NDArray
+
 from pyNN.random import NumpyRNG
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
+
+from pacman.model.graphs.common import Slice
+
 from spynnaker.pyNN.utilities.utility_calls import (
     get_probable_maximum_selected, get_probable_minimum_selected)
+
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 # support for arbitrary expression for the distance dependence
 _d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,
@@ -40,15 +53,17 @@ class DistanceDependentProbabilityConnector(
     Make connections using a distribution which varies with distance.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__allow_self_connections",
         "__d_expression",
         "__probs",
-        "__rng"]
+        "__rng")
 
     def __init__(
-            self, d_expression, allow_self_connections=True, safe=True,
-            verbose=False, n_connections=None, rng=None, callback=None):
+            self, d_expression: str, allow_self_connections: bool = True,
+            n_connections: Optional[int] = None,
+            rng: Optional[NumpyRNG] = None,
+            safe=True, verbose=False, callback=None):
         """
         :param str d_expression:
             the right-hand side of a valid python expression for
@@ -84,18 +99,18 @@ class DistanceDependentProbabilityConnector(
         self.__d_expression = d_expression
         self.__allow_self_connections = allow_self_connections
         self.__rng = rng or NumpyRNG()
-        self.__probs = None
+        self.__probs: Optional[NDArray[floating]] = None
         if n_connections is not None:
             raise NotImplementedError(
                 "n_connections is not implemented for"
                 " DistanceDependentProbabilityConnector on this platform")
 
     @overrides(AbstractConnector.set_projection_information)
-    def set_projection_information(self, synapse_info):
+    def set_projection_information(self, synapse_info: SynapseInformation):
         super().set_projection_information(synapse_info)
         self._set_probabilities(synapse_info)
 
-    def _set_probabilities(self, synapse_info):
+    def _set_probabilities(self, synapse_info: SynapseInformation):
         """
         :param SynapseInformation synapse_info:
         """
@@ -105,7 +120,9 @@ class DistanceDependentProbabilityConnector(
         pre_positions = synapse_info.pre_population.positions
         post_positions = synapse_info.post_population.positions
 
-        d1 = self.space.distances(
+        if self.space is None:
+            raise ValueError("need a space to be set")
+        d1: NDArray[floating] = self.space.distances(
             pre_positions, post_positions, expand_distances)
 
         # PyNN 0.8 returns a flattened (C-style) array from space.distances,
@@ -119,32 +136,38 @@ class DistanceDependentProbabilityConnector(
 
         self.__probs = _d_expr_context.eval(self.__d_expression, d=d)
 
+    @property
+    def _probs(self) -> NDArray[floating]:
+        if self.__probs is None:
+            raise ValueError("no projection information set")
+        return self.__probs
+
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, synapse_info):
+    def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
         return self._get_delay_maximum(
             synapse_info.delays,
             get_probable_maximum_selected(
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-                numpy.amax(self.__probs)),
+                numpy.amax(self._probs)),
             synapse_info)
 
     @overrides(AbstractConnector.get_delay_minimum)
-    def get_delay_minimum(self, synapse_info):
+    def get_delay_minimum(self, synapse_info: SynapseInformation) -> float:
         return self._get_delay_minimum(
             synapse_info.delays,
             get_probable_minimum_selected(
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-                numpy.amax(self.__probs)),
+                numpy.amax(self._probs)),
             synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_post_atoms, synapse_info, min_delay=None,
-            max_delay=None):
-        # pylint: disable=too-many-arguments
-        max_prob = numpy.amax(self.__probs)
+            self, n_post_atoms: int, synapse_info: SynapseInformation,
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
+        max_prob = numpy.amax(self._probs)
         n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_post_atoms, max_prob)
@@ -158,45 +181,48 @@ class DistanceDependentProbabilityConnector(
             n_connections, min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        # pylint: disable=too-many-arguments
+    def get_n_connections_to_post_vertex_maximum(
+            self, synapse_info: SynapseInformation) -> int:
         return get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_post_neurons,
-            numpy.amax(self.__probs))
+            numpy.amax(self._probs))
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, synapse_info):
-        # pylint: disable=too-many-arguments
+    def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
         return self._get_weight_maximum(
             synapse_info.weights,
             get_probable_maximum_selected(
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-                numpy.amax(self.__probs)),
+                numpy.amax(self._probs)),
             synapse_info)
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
-        probs = self.__probs[:, post_vertex_slice.as_slice].reshape(-1)
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
+            synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
+        probs = self._probs[:, post_vertex_slice.get_raster_ids()].reshape(-1)
         n_items = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
         items = self.__rng.next(n_items)
 
         # If self connections are not allowed, remove the possibility of
         # self connections by setting them to a value of infinity
-        if not self.__allow_self_connections:
+        no_self = (
+            not self.__allow_self_connections and
+            synapse_info.pre_population == synapse_info.post_population)
+        if no_self:
             items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
 
         present = items < probs
         ids = numpy.where(present)[0]
-        n_connections = numpy.sum(present)
+        n_connections = len(ids)
 
         block = numpy.zeros(
             n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = (ids // post_vertex_slice.n_atoms)
-        block["target"] = (
-            (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
+        block["source"] = synapse_info.pre_vertex.get_key_ordered_indices(
+            ids // post_vertex_slice.n_atoms)
+        block["target"] = ids % post_vertex_slice.n_atoms
         block["weight"] = self._generate_weights(
             block["source"], block["target"], n_connections, post_vertex_slice,
             synapse_info)
@@ -210,18 +236,18 @@ class DistanceDependentProbabilityConnector(
         return f"DistanceDependentProbabilityConnector({self.__d_expression})"
 
     @property
-    def allow_self_connections(self):
+    def allow_self_connections(self) -> bool:
         """
         :rtype: bool
         """
         return self.__allow_self_connections
 
     @allow_self_connections.setter
-    def allow_self_connections(self, new_value):
+    def allow_self_connections(self, new_value: bool):
         self.__allow_self_connections = new_value
 
     @property
-    def d_expression(self):
+    def d_expression(self) -> str:
         """
         The distance expression.
 
@@ -230,5 +256,5 @@ class DistanceDependentProbabilityConnector(
         return self.__d_expression
 
     @d_expression.setter
-    def d_expression(self, new_value):
+    def d_expression(self, new_value: str):
         self.__d_expression = new_value

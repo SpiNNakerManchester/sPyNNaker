@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+
 import pyNN.random
-from pyNN.random import available_distributions
+from pyNN.random import available_distributions, NumpyRNG
 # This file is to work around a Sphinx bug
 
 if "exponential_clipped" not in available_distributions:
@@ -27,10 +29,10 @@ class RandomDistribution(pyNN.random.RandomDistribution):
 
     Examples::
 
-        >>> rd = RandomDistribution('uniform', (-70, -50))
-        >>> rd = RandomDistribution('normal', mu=0.5, sigma=0.1)
+        >>> rng = RandomDistribution('uniform', (-70, -50))
+        >>> rng = RandomDistribution('normal', mu=0.5, sigma=0.1)
         >>> rng = NumpyRNG(seed=8658764)
-        >>> rd = RandomDistribution('gamma', k=2.0, theta=5.0, rng=rng)
+        >>> rng = RandomDistribution('gamma', k=2.0, theta=5.0, rng=rng)
 
     .. list-table:: Available distributions
         :widths: auto
@@ -73,12 +75,10 @@ class RandomDistribution(pyNN.random.RandomDistribution):
           - ``mu``, ``kappa``
           -
     """
-    # TODO: should uniform_int be randint to match utility_calls.STATS_BY_NAME?
-
     # Pylint is wrong about the super-delegation being useless
     def __init__(  # pylint: disable=useless-super-delegation
-            self, distribution, parameters_pos=None, rng=None,
-            **parameters_named):
+            self, distribution: str, parameters_pos: Optional[tuple] = None,
+            rng: Optional[NumpyRNG] = None, **parameters_named):
         """
         :param str distribution: the name of a random number distribution.
         :param parameters_pos:

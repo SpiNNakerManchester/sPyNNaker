@@ -40,13 +40,6 @@ N_FIELDS = 4
 #: The number of filters supported for each pipe
 N_FILTERS = 8
 
-#: The number of FPGA inputs per pipe
-#:
-#: .. note::
-#:     The 16 inputs are not actually separated in the hardware,
-#:     but a logical separation per pipe is useful.
-N_INPUTS = 8
-
 #: SPIF is always connected to FPGA 0
 SPIF_FPGA_ID = 0
 
@@ -55,6 +48,13 @@ SPIF_OUTPUT_FPGA_LINK = 15
 
 #: SPIF always gets input from odd links on FPGA 0 (1, 3, 5, 7, 9, 11, 13, 15)
 SPIF_INPUT_FPGA_LINKS = range(1, 16, 2)
+
+#: The number of FPGA inputs per pipe
+#:
+#: .. note::
+#:     The inputs are not actually separated in the hardware,
+#:     but a logical separation per pipe is useful.
+N_INPUTS = len(SPIF_INPUT_FPGA_LINKS)
 
 
 class SPIFRegister(IntEnum):
@@ -334,13 +334,15 @@ class _DelayedMultiCastCommand(MultiCastCommand):
     """
     A command where the getting of the payload is delayed.
     """
-    __slots__ = ["__get_payload", "__index"]
+    __slots__ = ("__get_payload", "__index")
 
     def __init__(self, key, get_payload, repeat, delay_between_repeats, index):
         """
         :param int key: The key to send
-        :param callable(int)->int get_payload:
-            A function to call that returns a payload
+        :param callable()->int get_payload:
+            A function to call that returns a payload.
+            May be called multiple times; should produce the same value each
+            time.
         :param int repeat: The number of times to repeat the command
         :param int delay_between_repeats: The delay between the repeats
         :param int index: The index to pass to get_payload when called
@@ -352,12 +354,12 @@ class _DelayedMultiCastCommand(MultiCastCommand):
 
     @property
     @overrides(MultiCastCommand.payload)
-    def payload(self):
+    def payload(self) -> int:
         return self.__get_payload(self.__index)
 
     @property
     @overrides(MultiCastCommand.is_payload)
-    def is_payload(self):
+    def is_payload(self) -> bool:
         return True
 
 

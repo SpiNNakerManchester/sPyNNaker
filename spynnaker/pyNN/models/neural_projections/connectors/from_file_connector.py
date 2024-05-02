@@ -13,8 +13,13 @@
 # limitations under the License.
 
 import os
+from typing import Union
+
 import numpy
-from pyNN.recording.files import StandardTextFile
+from numpy.typing import NDArray
+
+from pyNN.recording.files import BaseFile, StandardTextFile
+
 from .from_list_connector import FromListConnector
 
 
@@ -22,10 +27,10 @@ class FromFileConnector(FromListConnector):
     """
     Make connections according to a list read from a file.
     """
-    __slots__ = ["_file"]
+    __slots__ = ("_file", )
 
     def __init__(
-            self, file,  # @ReservedAssignment
+            self, file: Union[str, BaseFile],  # @ReservedAssignment
             distributed=False, safe=True, callback=None, verbose=False):
         """
         :param str file:
@@ -83,7 +88,8 @@ class FromFileConnector(FromListConnector):
             conn_list, safe=safe, verbose=verbose,
             column_names=column_names, callback=callback)
 
-    def _read_conn_list(self, the_file, distributed):
+    def _read_conn_list(
+            self, the_file: BaseFile, distributed: bool) -> NDArray:
         if not distributed:
             return the_file.read()
         filename = f"{os.path.basename(the_file.file)}."
@@ -102,11 +108,11 @@ class FromFileConnector(FromListConnector):
     def __repr__(self):
         return f"FromFileConnector({self._file})"
 
-    def get_reader(self, file):  # @ReservedAssignment
+    def get_reader(self, file: str) -> BaseFile:  # @ReservedAssignment
         """
         Get a file reader object using the PyNN methods.
 
         :return: A pynn StandardTextFile or similar
-        :rtype: ~pynn.recording.files.StandardTextFile
+        :rtype: ~pyNN.recording.files.StandardTextFile
         """
         return StandardTextFile(file, mode="r")

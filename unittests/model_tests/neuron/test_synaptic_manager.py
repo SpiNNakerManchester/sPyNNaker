@@ -13,6 +13,7 @@
 # limitations under the License.
 import shutil
 import struct
+from typing import BinaryIO, Optional, Tuple, Union
 import unittest
 from tempfile import mkdtemp
 import numpy
@@ -20,6 +21,7 @@ import pytest
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
+from spinn_machine.version.version_strings import VersionStrings
 from spinnman.transceiver.mockable_transceiver import MockableTransceiver
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
@@ -62,13 +64,17 @@ import pyNN.spiNNaker as p
 class _MockTransceiverinOut(MockableTransceiver):
 
     @overrides(MockableTransceiver.malloc_sdram)
-    def malloc_sdram(self, x, y, size, app_id, tag=None):
+    def malloc_sdram(
+            self, x: int, y: int, size: int, app_id: int, tag: int = 0) -> int:
         self._data_to_read = bytearray(size)
         return 0
 
     @overrides(MockableTransceiver.write_memory)
-    def write_memory(self, x, y, base_address, data, *, n_bytes=None,
-                     offset=0, cpu=0, get_sum=False):
+    def write_memory(
+            self, x: int, y: int, base_address: int,
+            data: Union[BinaryIO, bytes, int, str], *,
+            n_bytes: Optional[int] = None, offset: int = 0, cpu: int = 0,
+            get_sum: bool = False) -> Tuple[int, int]:
         if data is None:
             return
         if isinstance(data, int):
@@ -76,26 +82,29 @@ class _MockTransceiverinOut(MockableTransceiver):
         self._data_to_read[base_address:base_address + len(data)] = data
 
     @overrides(Transceiver.get_region_base_address)
-    def get_region_base_address(self, x, y, p):
+    def get_region_base_address(self, x: int, y: int, p: int):
         return 0
 
     @overrides(MockableTransceiver.read_memory)
-    def read_memory(self, x, y, base_address, length, cpu=0):
+    def read_memory(
+            self, x: int, y: int, base_address: int, length: int,
+            cpu: int = 0) -> bytearray:
         return self._data_to_read[base_address:base_address + length]
 
     @overrides(MockableTransceiver.read_word)
-    def read_word(self, x, y, base_address, cpu=0):
+    def read_word(
+            self, x: int, y: int, base_address: int, cpu: int = 0) -> int:
         datum, = struct.unpack("<I", self.read_memory(x, y, base_address, 4))
         return datum
 
 
-def say_false(self, weights, delays):
+def say_false(self, *args, **kwargs):
     return False
 
 
 def test_write_data_spec():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = SpynnakerDataWriter.mock()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
@@ -119,7 +128,7 @@ def test_write_data_spec():
         pre_pop, post_pop, p.OneToOneConnector(),
         p.StaticSynapse(weight=2.5, delay=2.0))
     proj_all_to_all = p.Projection(
-        pre_pop, post_pop, p.AllToAllConnector(allow_self_connections=False),
+        pre_pop, post_pop, p.AllToAllConnector(),
         p.StaticSynapse(weight=4.5, delay=4.0))
 
     from_list_list = [(i, i, i, (i * 5) + 1) for i in range(10)]
@@ -194,7 +203,7 @@ def test_write_data_spec():
                 proj_all_to_all._synapse_information))
 
         # Check that all the connections have the right weight and delay
-        assert len(connections_3) == 90
+        assert len(connections_3) == 100
         assert all([conn["weight"] == 4.5 for conn in connections_3])
         assert all([conn["delay"] == 4.0 for conn in connections_3])
 
@@ -419,13 +428,13 @@ def test_set_synapse_dynamics():
         # (app keys work because all undelayed exist)
         (range(10), [4, 5, 6, 7], 1000, 100, 200),
         # Should work but number of cores doesn't work out
-        (range(2000), [], 10000, 5, None)
+        (range(100), [], 10000, 5, None)
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
         n_pre_neurons, neurons_per_core, max_delay):
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.FOUR_PLUS.text)
     writer = SpynnakerDataWriter.mock()
 
     # Build a from list connector with the delays we want
@@ -468,7 +477,7 @@ def test_pop_based_master_pop_table_standard(
 
     # Generate the data
     with DsSqlliteDatabase() as db:
-        spec = DataSpecificationGenerator(1, 2, 3, post_mac_vertex, db)
+        spec = DataSpecificationGenerator(1, 0, 3, post_mac_vertex, db)
 
         regions = SynapseRegions(
             synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
@@ -486,7 +495,7 @@ def test_pop_based_master_pop_table_standard(
             spec, post_vertex_slice, references)
 
         # Read the population table and check entries
-        info = list(db.get_region_pointers_and_content(1, 2, 3))
+        info = list(db.get_region_pointers_and_content(1, 0, 3))
     region, _, region_data = info[1]
     assert region == 3
     mpop_data = numpy.frombuffer(region_data, dtype="uint8").view("uint32")

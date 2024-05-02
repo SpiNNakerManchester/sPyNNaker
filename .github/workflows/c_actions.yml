@@ -29,11 +29,11 @@ jobs:
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
-    - name: Set up Python 3.8
+    - name: Set up Python 3.12
       # Note: Python is needed for spinn_utilities.make_tools when building
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.8
+        python-version: 3.12
     - name: Install Ubuntu dependencies
       uses: ./support/actions/apt-get-install
       with:

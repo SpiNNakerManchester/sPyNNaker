@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+from typing import List, Tuple
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_front_end_common.utilities.system_control_logic import (
-    run_system_application)
 from spinnman.model.enums import ExecutableType
 from spinnman.model import ExecutableTargets
-from spinnman.model.enums import CPUState
+from spinnman.model.enums import CPUState, UserRegister
+from pacman.model.placements import Placement
+from spinn_front_end_common.utilities.system_control_logic import (
+    run_system_application)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractNeuronExpandable, NEURON_EXPANDER_APLX)
@@ -27,7 +29,7 @@ from spynnaker.pyNN.models.abstract_models import (
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def neuron_expander():
+def neuron_expander() -> None:
     """
     Run the neuron expander.
 
@@ -37,30 +39,32 @@ def neuron_expander():
     # Find the places where the neuron expander should run
     expander_cores, expanded_pop_vertices = _plan_expansion()
 
-    progress = ProgressBar(expander_cores.total_processors,
-                           "Expanding Neuron Data")
-    expander_app_id = SpynnakerDataView.get_new_id()
-    run_system_application(
-        expander_cores, expander_app_id,
-        get_config_bool("Reports", "write_expander_iobuf"),
-        None, [CPUState.FINISHED], False,
-        "neuron_expander_on_{}_{}_{}.txt", progress_bar=progress,
-        logger=logger)
-    progress.end()
+    with ProgressBar(expander_cores.total_processors,
+                     "Expanding Neuron Data") as progress:
+        expander_app_id = SpynnakerDataView.get_new_id()
+        run_system_application(
+            expander_cores, expander_app_id,
+            get_config_bool("Reports", "write_expander_iobuf") or False,
+            None, frozenset({CPUState.FINISHED}), False,
+            "neuron_expander_on_{}_{}_{}.txt", progress_bar=progress,
+            logger=logger)
 
     _fill_in_initial_data(expanded_pop_vertices)
 
 
-def _plan_expansion():
+def _plan_expansion() -> Tuple[
+        ExecutableTargets, List[Tuple[AbstractNeuronExpandable, Placement]]]:
     """
     Plan the expansion of neurons and set up the regions using USER1.
 
     :rtype: tuple(ExecutableTargets, list(tuple(MachineVertex, Placement)))
     """
     neuron_bin = SpynnakerDataView.get_executable_path(NEURON_EXPANDER_APLX)
+    txrx = SpynnakerDataView.get_transceiver()
 
     expander_cores = ExecutableTargets()
-    expanded_pop_vertices = list()
+    expanded_pop_vertices: List[
+        Tuple[AbstractNeuronExpandable, Placement]] = list()
 
     progress = ProgressBar(
         SpynnakerDataView.get_n_placements(),
@@ -76,14 +80,15 @@ def _plan_expansion():
                     neuron_bin, placement.x, placement.y, placement.p,
                     executable_type=ExecutableType.SYSTEM)
                 # Write the region to USER1, as that is the best we can do
-                txrx = SpynnakerDataView.get_transceiver()
-                txrx.write_user(placement.x, placement.y, placement.p, 1,
-                                vertex.neuron_generator_region)
+                txrx.write_user(
+                    placement.x, placement.y, placement.p, UserRegister.USER_1,
+                    vertex.neuron_generator_region)
 
     return expander_cores, expanded_pop_vertices
 
 
-def _fill_in_initial_data(expanded_pop_vertices):
+def _fill_in_initial_data(expanded_pop_vertices: List[
+        Tuple[AbstractNeuronExpandable, Placement]]):
     """
     Once expander has run, fill in the connection data.
 

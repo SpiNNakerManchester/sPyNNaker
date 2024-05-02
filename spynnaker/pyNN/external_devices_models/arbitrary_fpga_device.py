@@ -12,17 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+from spinn_utilities.typing.coords import XY
 from pacman.model.graphs.application import (
     ApplicationFPGAVertex, FPGAConnection)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
 class ArbitraryFPGADevice(ApplicationFPGAVertex, PopulationApplicationVertex):
-    __slots__ = []
+    """
+    A device connected to SpiNNaker via one of the on-board FPGAs.
+    """
+
+    __slots__ = ()
 
     def __init__(
-            self, n_neurons, fpga_link_id, fpga_id, board_address=None,
-            chip_coords=None, label=None):
+            self, n_neurons: int, fpga_link_id: int, fpga_id: int,
+            board_address: Optional[str] = None,
+            chip_coords: Optional[XY] = None, label: Optional[str] = None):
         """
         :param int n_neurons: Number of neurons
         :param int fpga_link_id:
