@@ -71,9 +71,14 @@ jobs:
       run: |
         make -C $SPINN_DIRS
         make -C spinn_common install
-        make -C SpiNNFrontEndCommon/c_common install
 
-    - name: Build C code
+    - name: "Check: Build FEC C code"
+      run: make
+      working-directory: SpiNNFrontEndCommon/c_common
+      env:
+        CFLAGS: -fdiagnostics-color=always
+
+    - name: Build PYNN C code
       run: make
       working-directory: neural_modelling
       env:
