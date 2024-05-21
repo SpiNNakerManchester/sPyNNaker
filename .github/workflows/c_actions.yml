@@ -89,11 +89,16 @@ jobs:
       run: make doxysetup doxygen
       working-directory: neural_modelling
 
-    - name: Upload binaries
+    - name: Upload Fec binaries
       uses: actions/upload-artifact@v4
       with:
-        name: binaries
+        name: fec_binaries
+        path: SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
+
+    - name: Upload PyNN binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: pynn_binaries
         path: |
-          SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
           spynnaker/pyNN/model_binaries/*.aplx
           spynnaker/pyNN/model_binaries/logs.sqlite3
