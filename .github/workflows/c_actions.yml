@@ -24,27 +24,18 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
     - name: Checkout SupportScripts
       uses: actions/checkout@v4
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
+
     - name: Set up Python 3.12
       # Note: Python is needed for spinn_utilities.make_tools when building
       uses: actions/setup-python@v5
       with:
         python-version: 3.12
-    - name: Install Ubuntu dependencies
-      uses: ./support/actions/apt-get-install
-      with:
-        packages: doxygen gcc-arm-none-eabi
-
-    - name: Checkout SpiNNaker C Dependencies
-      uses: ./support/actions/install-spinn-deps
-      with:
-        # Note: SpiNNUtils needed for spinn_utilities.make_tools
-        repositories: spinnaker_tools spinn_common SpiNNFrontEndCommon
-        install: false
 
     - name: "Prepare: Install SpiNNUtils"
       uses: ./support/actions/install-spinn-deps
@@ -53,10 +44,23 @@ jobs:
         repositories: SpiNNUtils
         install: true
 
+    - name: Install Ubuntu dependencies
+      uses: ./support/actions/apt-get-install
+      with:
+        packages: doxygen gcc-arm-none-eabi
+
     - name: Set environment variables
       run: |
         echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
         echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
+        echo "C_LOGS_DICT=$PWD/spynnaker/pyNN/model_binaries/logs.sqlite3" >> $GITHUB_ENV
+
+    - name: Checkout SpiNNaker C Dependencies
+      uses: ./support/actions/install-spinn-deps
+      with:
+        # Note: SpiNNUtils needed for spinn_utilities.make_tools
+        repositories: spinnaker_tools spinn_common SpiNNFrontEndCommon
+        install: false
 
     - name: Lint C code using Vera++
       uses: ./support/actions/vera
@@ -84,3 +88,12 @@ jobs:
     - name: Build documentation using doxygen
       run: make doxysetup doxygen
       working-directory: neural_modelling
+
+    - name: Upload binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: binaries
+        path: |
+          SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
+          spynnaker/pyNN/model_binaries/*.aplx
+          spynnaker/pyNN/model_binaries/logs.sqlite3
