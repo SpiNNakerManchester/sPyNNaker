@@ -107,3 +107,62 @@ jobs:
         path: |
           spynnaker/pyNN/model_binaries/*.aplx
           spynnaker/pyNN/model_binaries/logs.sqlite3
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+    env:
+      C_LOGS_DICT: $PWD/spynnaker/pyNN/model_binaries/logs.sqlite3
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Checkout SupportScripts
+      uses: actions/checkout@v4
+      with:
+        repository: SpiNNakerManchester/SupportScripts
+        path: support
+
+    - name: Download PyNN Binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: pynn_binaries
+        path: spynnaker/pyNN/model_binaries
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install pip, etc
+      uses: ./support/actions/python-tools
+
+    - name: Install Spinnaker Dependencies
+      uses: ./support/actions/install-spinn-deps
+      with:
+        repositories: >
+          SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
+          SpiNNFrontEndCommon TestBase
+        install: true
+
+    - name: Setup
+      uses: ./support/actions/run-install
+
+    - name: Setup PyNN
+      uses: ./support/actions/pynn-setup
+
+    - name: Install Ubuntu dependencies
+      uses: ./support/actions/apt-get-install
+      with:
+        packages: graphviz
+
+    - name: Install matplotlib
+      uses: ./support/actions/install-matplotlib
+
+    - name: Test with pytest and proxy
+      run: pytest proxy_integration_tests
