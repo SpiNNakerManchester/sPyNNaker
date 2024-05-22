@@ -159,8 +159,8 @@ jobs:
     - name: Create cfg
       run: | 
         echo '[Machine]' >> ~/.spynnaker.cfg
-        echo 'spalloc_server = 22244' >> ~/.spynnaker.cfg
         echo 'spalloc_server = https://spinnaker.cs.man.ac.uk/spalloc/' >> ~/.spynnaker.cfg
+        echo 'spalloc_port = 22244' >> ~/.spynnaker.cfg
 
     - name: Install Ubuntu dependencies
       uses: ./support/actions/apt-get-install
