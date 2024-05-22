@@ -128,6 +128,12 @@ jobs:
         repository: SpiNNakerManchester/SupportScripts
         path: support
 
+    - name: Download Fec binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: fec_binaries
+        path: SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries
+
     - name: Download PyNN Binaries
       uses: actions/download-artifact@v4
       with:
