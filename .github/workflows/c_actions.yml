@@ -156,6 +156,12 @@ jobs:
     - name: Setup PyNN
       uses: ./support/actions/pynn-setup
 
+    - name: Create cfg
+      run: | 
+        echo '[Machine]' >> ~/.spynnaker.cfg
+        echo 'spalloc_server = 22244' >> ~/.spynnaker.cfg
+        echo 'spalloc_server = https://spinnaker.cs.man.ac.uk/spalloc/' >> ~/.spynnaker.cfg
+
     - name: Install Ubuntu dependencies
       uses: ./support/actions/apt-get-install
       with:
@@ -165,4 +171,7 @@ jobs:
       uses: ./support/actions/install-matplotlib
 
     - name: Test with pytest and proxy
+      env:
+        SPALLOC_USER: ${{ secrets.SPALLOC_USER }}
+        SPALLOC_PASSWORD: ${{ secrets.SPALLOC_PASSWORD }}
       run: pytest proxy_integration_tests
