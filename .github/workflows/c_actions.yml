@@ -128,6 +128,13 @@ jobs:
         repository: SpiNNakerManchester/SupportScripts
         path: support
 
+    - name: Install Spinnaker Dependencies
+      uses: ./support/actions/install-spinn-deps
+      with:
+        repositories: >
+          SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
+          SpiNNFrontEndCommon TestBase
+        install: true
     - name: Download Fec binaries
       uses: actions/download-artifact@v4
       with:
@@ -147,14 +154,6 @@ jobs:
 
     - name: Install pip, etc
       uses: ./support/actions/python-tools
-
-    - name: Install Spinnaker Dependencies
-      uses: ./support/actions/install-spinn-deps
-      with:
-        repositories: >
-          SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
-          SpiNNFrontEndCommon TestBase
-        install: true
 
     - name: Setup
       uses: ./support/actions/run-install
