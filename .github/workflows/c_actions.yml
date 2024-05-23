@@ -132,6 +132,11 @@ jobs:
       run: |
         echo "EXTERNAL_BINARIES=%cd%\external_binaries" >> $GITHUB_ENV
 
+    - name: EXTERNAL_BINARIES
+      run: |
+        echo $EXTERNAL_BINARIES
+        echo %EXTERNAL_BINARIES%
+
     - name: Checkout
       uses: actions/checkout@v4
 
