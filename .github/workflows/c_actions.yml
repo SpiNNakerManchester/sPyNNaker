@@ -167,11 +167,6 @@ jobs:
         name: logs.sqlite3
         path: external_binaries
 
-    - name:  EXTERNAL_BINARIES
-      run: |
-        echo $EXTERNAL_BINARIES
-        ls -al $EXTERNAL_BINARIES
-
     - name: Setup
       uses: ./support/actions/run-install
 
@@ -196,11 +191,6 @@ jobs:
 
     - name: Install matplotlib
       uses: ./support/actions/install-matplotlib
-
-    - name:  EXTERNAL_BINARIES
-      run: |
-        echo $EXTERNAL_BINARIES
-        ls -al $EXTERNAL_BINARIES
 
     - name: Test with pytest and proxy
       env:
