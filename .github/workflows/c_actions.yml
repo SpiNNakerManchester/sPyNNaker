@@ -153,13 +153,13 @@ jobs:
       with:
         name: fec_binaries
         # Need to go into spynnaker as FEC will have been moved by install
-        path: ~/external_binaries
+        path: $PWD/external_binaries"
 
     - name: Download PyNN Binaries
       uses: actions/download-artifact@v4
       with:
         name: pynn_binaries
-        path: ~/external_binaries
+        path: $PWD/external_binaries"
 
     - name: Download logs.sqlite3
       uses: actions/download-artifact@v4
@@ -167,14 +167,15 @@ jobs:
         name: logs.sqlite3
         path: ~/logs.sqlite3
 
-    - name: ls
+    - name:  EXTERNAL_BINARIES
       run: |
-        ls ~/external_binaries
-        ls ~/logs.sqlite3
-        echo EXTERNAL_BINARIES
-        ls $EXTERNAL_BINARIES
-        echo /home/runner/work/sPyNNaker/sPyNNaker/external_binaries
-        ls /home/runner/work/sPyNNaker/sPyNNaker/external_binaries
+        echo $EXTERNAL_BINARIES
+        ls -al $EXTERNAL_BINARIES
+
+    - name: C_LOGS_DICT
+      run: |
+        echo $C_LOGS_DICT
+        ls -al $C_LOGS_DICT
 
     - name: Setup
       uses: ./support/actions/run-install
@@ -199,10 +200,15 @@ jobs:
     - name: Install matplotlib
       uses: ./support/actions/install-matplotlib
 
-    - name: ls ~/logs.sqlite3
-      run: ls ~/logs.sqlite3
-    - name: ls ~/external_binaries
-      run: ls ~/external_binaries
+    - name:  EXTERNAL_BINARIES
+      run: |
+        echo $EXTERNAL_BINARIES
+        ls -al $EXTERNAL_BINARIES
+
+    - name: C_LOGS_DICT
+      run: |
+        echo $C_LOGS_DICT
+        ls -al $C_LOGS_DICT
 
     - name: Test with pytest and proxy
       env:
