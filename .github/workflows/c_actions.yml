@@ -145,7 +145,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: fec_binaries
-        path: SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries
+        path: spynnaker/pyNN/model_binaries
 
     - name: Download PyNN Binaries
       uses: actions/download-artifact@v4
@@ -155,7 +155,6 @@ jobs:
 
     - name: ls
       run: |
-        ls SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries
         ls spynnaker/pyNN/model_binaries
 
     - name: Setup
