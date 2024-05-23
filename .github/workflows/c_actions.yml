@@ -171,6 +171,10 @@ jobs:
       run: |
         ls ~/external_binaries
         ls ~/logs.sqlite3
+        echo EXTERNAL_BINARIES
+        ls $EXTERNAL_BINARIES
+        echo /home/runner/work/sPyNNaker/sPyNNaker/external_binaries
+        ls /home/runner/work/sPyNNaker/sPyNNaker/external_binaries
 
     - name: Setup
       uses: ./support/actions/run-install
