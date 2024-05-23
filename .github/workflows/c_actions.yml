@@ -123,7 +123,7 @@ jobs:
     steps:
     - name: Set environment variables
       run: |
-        echo "EXTERNAL_BINARIES=$PWD/external_binaries" >> $GITHUB_ENV
+        echo "EXTERNAL_BINARIES=external_binaries" >> $GITHUB_ENV
       # echo "C_LOGS_DICT=$PWD/logs.sqlite3" >> $GITHUB_ENV
 
     - name: Checkout
