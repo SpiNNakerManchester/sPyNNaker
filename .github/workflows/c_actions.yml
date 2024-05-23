@@ -121,6 +121,7 @@ jobs:
         python-version: ["3.12"]
     env:
       C_LOGS_DICT: ~/logs.sqlite3
+      EXTERNAL_BINARIES: ~/external_binaries
 
     steps:
     - name: Checkout
@@ -150,13 +151,13 @@ jobs:
       with:
         name: fec_binaries
         # Need to go into spynnaker as FEC will have been moved by install
-        path: spynnaker/pyNN/model_binaries
+        path: ~/external_binaries
 
     - name: Download PyNN Binaries
       uses: actions/download-artifact@v4
       with:
         name: pynn_binaries
-        path: spynnaker/pyNN/model_binaries
+        path: ~/external_binaries
 
     - name: Download logs.sqlite3
       uses: actions/download-artifact@v4
@@ -166,7 +167,7 @@ jobs:
 
     - name: ls
       run: |
-        ls spynnaker/pyNN/model_binaries
+        ls ~/external_binaries
         ls ~/logs.sqlite3
 
     - name: Setup
@@ -194,8 +195,8 @@ jobs:
 
     - name: ls ~/logs.sqlite3
       run: ls ~/logs.sqlite3
-    - name: ls ~/spynnaker/pyNN/model_binaries
-      run: ls ~/spynnaker/pyNN/model_binaries
+    - name: ls ~/external_binaries
+      run: ls ~/external_binaries
 
     - name: Test with pytest and proxy
       env:
