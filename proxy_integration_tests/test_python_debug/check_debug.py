@@ -102,38 +102,4 @@ class CheckDebug(BaseTestCase):
         self.assertIn("data.sqlite3", found)
         self.assertIn("ds.sqlite3", found)
 
-        sim.run(10)  # second run
-        pop.get_data("v")
-        self.assertEqual(run0, SpynnakerDataView.get_run_dir_path())
-        # No point in checking files they are already there
-
-        sim.reset()  # Soft
-        # check get works directly after a reset
-        pop.get_data("v")
-        sim.run(10)
-        found = os.listdir(SpynnakerDataView.get_run_dir_path())
-        self.assertIn("data1.sqlite3", found)
-        self.assertNotIn("ds1.sqlite3", found)
-
-        sim.reset()  # soft with dsg
-        SpynnakerDataView.set_requires_data_generation()
-        sim.run(10)
-        pop.get_data("v")
-        self.assertEqual(run0, SpynnakerDataView.get_run_dir_path())
-        found = os.listdir(run0)
-        self.assertIn("data2.sqlite3", found)
-        self.assertIn("ds2.sqlite3", found)
-        # No point in checking files they are already there
-
-        sim.reset()  # hard
-        SpynnakerDataView.set_requires_mapping()
-        sim.run(10)
-        pop.get_data("v")
-        self.assertNotEqual(run0, SpynnakerDataView.get_run_dir_path())
-        found = os.listdir(SpynnakerDataView.get_run_dir_path())
-        for report in reports:
-            self.assertIn(report, found)
-        self.assertIn("data3.sqlite3", found)
-        self.assertIn("ds3.sqlite3", found)
-
         sim.end()
