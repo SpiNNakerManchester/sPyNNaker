@@ -153,7 +153,7 @@ jobs:
       with:
         name: fec_binaries
         # Need to go into spynnaker as FEC will have been moved by install
-        path: external_binaries"
+        path: external_binaries
 
     - name: Download PyNN Binaries
       uses: actions/download-artifact@v4
