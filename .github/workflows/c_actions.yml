@@ -205,9 +205,6 @@ jobs:
         echo $EXTERNAL_BINARIES
         ls -al $EXTERNAL_BINARIES
 
-    - name: chmod C_LOGS_DICT
-      run: chmod 777 $C_LOGS_DICT
-
     - name: C_LOGS_DICT
       run: |
         echo $C_LOGS_DICT
