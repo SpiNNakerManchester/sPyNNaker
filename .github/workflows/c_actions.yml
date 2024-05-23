@@ -189,10 +189,10 @@ jobs:
       with:
           check_tools: ignore
 
-    - name: Install Ubuntu dependencies
-      uses: ./support/actions/apt-get-install
-      with:
-        packages: graphviz
+    #- name: Install Ubuntu dependencies
+    #  uses: ./support/actions/apt-get-install
+    #  with:
+    #    packages: graphviz
 
     - name: Install matplotlib
       uses: ./support/actions/install-matplotlib
