@@ -159,7 +159,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: pynn_binaries
-        path: external_binaries"
+        path: external_binaries
 
     - name: Download logs.sqlite3
       uses: actions/download-artifact@v4
