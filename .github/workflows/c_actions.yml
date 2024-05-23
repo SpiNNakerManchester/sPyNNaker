@@ -122,13 +122,13 @@ jobs:
 
     steps:
     - name: Set environment variables ubuntu
-      if: { { matrix.runner != 'windows-latest' } }
+      if: { { matrix.runner != 'windows-latest' }}
       run: |
         echo "EXTERNAL_BINARIES=$PWD/external_binaries" >> $GITHUB_ENV
       # echo "C_LOGS_DICT=$PWD/logs.sqlite3" >> $GITHUB_ENV
 
     - name: Set environment variables windos
-      if: { { matrix.runner == 'windows-latest' } }
+      if: { { matrix.runner == 'windows-latest' }}
       run: |
         echo "EXTERNAL_BINARIES=%cd%/external_binaries" >> $GITHUB_ENV
 
