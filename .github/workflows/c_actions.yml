@@ -119,11 +119,13 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.12"]
-    env:
-      C_LOGS_DICT: ~/logs.sqlite3
-      EXTERNAL_BINARIES: ~/external_binaries
 
     steps:
+    - name: Set environment variables
+      run: |
+        echo "EXTERNAL_BINARIES=$PWD/external_binaries" >> $GITHUB_ENV
+        echo "C_LOGS_DICT=$PWD/logs.sqlite3" >> $GITHUB_ENV
+
     - name: Checkout
       uses: actions/checkout@v4
 
