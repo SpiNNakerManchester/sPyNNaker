@@ -186,6 +186,8 @@ jobs:
 
     - name: Install pip, etc
       uses: ./support/actions/python-tools
+      with:
+          check_tools: false
 
     - name: Install Ubuntu dependencies
       uses: ./support/actions/apt-get-install
