@@ -124,7 +124,7 @@ jobs:
     - name: Set environment variables
       run: |
         echo "EXTERNAL_BINARIES=$PWD/external_binaries" >> $GITHUB_ENV
-        echo "C_LOGS_DICT=$PWD/logs.sqlite3" >> $GITHUB_ENV
+      # echo "C_LOGS_DICT=$PWD/logs.sqlite3" >> $GITHUB_ENV
 
     - name: Checkout
       uses: actions/checkout@v4
@@ -165,17 +165,12 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: logs.sqlite3
-        path: logs.sqlite3
+        path: external_binaries/logs.sqlite3
 
     - name:  EXTERNAL_BINARIES
       run: |
         echo $EXTERNAL_BINARIES
         ls -al $EXTERNAL_BINARIES
-
-    - name: C_LOGS_DICT
-      run: |
-        echo $C_LOGS_DICT
-        ls -al $C_LOGS_DICT
 
     - name: Setup
       uses: ./support/actions/run-install
@@ -204,11 +199,6 @@ jobs:
       run: |
         echo $EXTERNAL_BINARIES
         ls -al $EXTERNAL_BINARIES
-
-    - name: C_LOGS_DICT
-      run: |
-        echo $C_LOGS_DICT
-        ls -al $C_LOGS_DICT
 
     - name: Test with pytest and proxy
       env:
