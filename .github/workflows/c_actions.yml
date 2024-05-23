@@ -153,19 +153,19 @@ jobs:
       with:
         name: fec_binaries
         # Need to go into spynnaker as FEC will have been moved by install
-        path: $PWD/external_binaries"
+        path: external_binaries"
 
     - name: Download PyNN Binaries
       uses: actions/download-artifact@v4
       with:
         name: pynn_binaries
-        path: $PWD/external_binaries"
+        path: external_binaries"
 
     - name: Download logs.sqlite3
       uses: actions/download-artifact@v4
       with:
         name: logs.sqlite3
-        path: ~/logs.sqlite3
+        path: logs.sqlite3
 
     - name:  EXTERNAL_BINARIES
       run: |
