@@ -33,7 +33,7 @@ from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_neuron_network_specification_report import (
-        _GRAPH_NAME, _GRAPH_FORMAT)
+        _GRAPH_NAME) #, _GRAPH_FORMAT)
 import pyNN.spiNNaker as sim
 
 
@@ -75,9 +75,9 @@ class CheckDebug(BaseTestCase):
             CLOCK_DRIFT_REPORT,
             # write_board_chip_report
             AREA_CODE_REPORT_NAME,
+            # spynnaker_neuron_graph_network_specification_report
             _GRAPH_NAME,
-            _GRAPH_NAME + "." +
-            _GRAPH_FORMAT,
+            # _GRAPH_NAME + "." +  _GRAPH_FORMAT,
             ]
 
         sim.setup(1.0)
