@@ -53,7 +53,7 @@ jobs:
       run: |
         echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
         echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
-        echo "C_LOGS_DICT=$PWD/spynnaker/pyNN/model_binaries/logs.sqlite3" >> $GITHUB_ENV
+        echo "C_LOGS_DICT=$PWD/logs.sqlite3" >> $GITHUB_ENV
 
     - name: Checkout SpiNNaker C Dependencies
       uses: ./support/actions/install-spinn-deps
@@ -104,9 +104,13 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: pynn_binaries
-        path: |
-          spynnaker/pyNN/model_binaries/*.aplx
-          spynnaker/pyNN/model_binaries/logs.sqlite3
+        path: spynnaker/pyNN/model_binaries/*.aplx
+
+    - name: Upload log.sqlite3s
+      uses: actions/upload-artifact@v4
+      with:
+        name: logs.sqlite3
+        path: $C_LOGS_DICT
 
   test:
     needs: build
@@ -116,7 +120,7 @@ jobs:
       matrix:
         python-version: ["3.12"]
     env:
-      C_LOGS_DICT: ~/spynnaker/pyNN/model_binaries/logs.sqlite3
+      C_LOGS_DICT: ~/logs.sqlite3
 
     steps:
     - name: Checkout
@@ -145,6 +149,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: fec_binaries
+        # Need to go into spynnaker as FEC will have been moved by install
         path: spynnaker/pyNN/model_binaries
 
     - name: Download PyNN Binaries
@@ -153,9 +158,16 @@ jobs:
         name: pynn_binaries
         path: spynnaker/pyNN/model_binaries
 
+    - name: Download logs.sqlite3
+      uses: actions/download-artifact@v4
+      with:
+        name: logs.sqlite3
+        path: $C_LOGS_DICT
+
     - name: ls
       run: |
         ls spynnaker/pyNN/model_binaries
+        ls $C_LOGS_DICT
 
     - name: Setup
       uses: ./support/actions/run-install
@@ -182,9 +194,8 @@ jobs:
 
     - name: ls C_LOGS_DICT
       run: ls $C_LOGS_DICT
-    - name: ls ~/spynnaker/pyNN/model_binaries/logs.sqlite3
-      run: ls ~/spynnaker/pyNN/model_binaries/logs.sqlite3
-
+    - name: ls ~/spynnaker/pyNN/model_binaries
+      run: ls ~/spynnaker/pyNN/model_binaries
 
     - name: Test with pytest and proxy
       env:
