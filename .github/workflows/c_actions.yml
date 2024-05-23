@@ -114,11 +114,11 @@ jobs:
 
   test:
     needs: build
-    runs-on: ubuntu-latest
+    rruns-on: ${{ matrix.runner }}
     timeout-minutes: 20
     strategy:
       matrix:
-        python-version: ["3.12"]
+        runner: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
     - name: Set environment variables
@@ -135,10 +135,10 @@ jobs:
         repository: SpiNNakerManchester/SupportScripts
         path: support
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: "3.12"
 
     - name: Install Spinnaker Dependencies
       uses: ./support/actions/install-spinn-deps
