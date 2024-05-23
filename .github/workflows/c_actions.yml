@@ -53,7 +53,7 @@ jobs:
       run: |
         echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
         echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
-        echo "C_LOGS_DICT=~/logs.sqlite3" >> $GITHUB_ENV
+        echo "C_LOGS_DICT=$PWD/logs.sqlite3" >> $GITHUB_ENV
 
     - name: Checkout SpiNNaker C Dependencies
       uses: ./support/actions/install-spinn-deps
@@ -110,7 +110,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: logs.sqlite3
-        path: ~/logs.sqlite3
+        path: logs.sqlite3
 
   test:
     needs: build
