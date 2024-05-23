@@ -53,7 +53,7 @@ jobs:
       run: |
         echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
         echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
-        echo "C_LOGS_DICT=$PWD/logs.sqlite3" >> $GITHUB_ENV
+        echo "C_LOGS_DICT=~/logs.sqlite3" >> $GITHUB_ENV
 
     - name: Checkout SpiNNaker C Dependencies
       uses: ./support/actions/install-spinn-deps
@@ -110,7 +110,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: logs.sqlite3
-        path: $C_LOGS_DICT
+        path: ~/logs.sqlite3
 
   test:
     needs: build
@@ -162,12 +162,12 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: logs.sqlite3
-        path: $C_LOGS_DICT
+        path: ~/logs.sqlite3
 
     - name: ls
       run: |
         ls spynnaker/pyNN/model_binaries
-        ls $C_LOGS_DICT
+        ls ~/logs.sqlite3
 
     - name: Setup
       uses: ./support/actions/run-install
@@ -192,8 +192,8 @@ jobs:
     - name: Install matplotlib
       uses: ./support/actions/install-matplotlib
 
-    - name: ls C_LOGS_DICT
-      run: ls $C_LOGS_DICT
+    - name: ls ~/logs.sqlite3
+      run: ls ~/logs.sqlite3
     - name: ls ~/spynnaker/pyNN/model_binaries
       run: ls ~/spynnaker/pyNN/model_binaries
 
