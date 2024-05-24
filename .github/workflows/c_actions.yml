@@ -121,28 +121,6 @@ jobs:
         runner: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-    - name: see environment variable
-      if: runner.os != 'Windows'
-      run: echo $SPINNAKER_EXTERNAL_BINARIES
-    - name: see environment variable on Windows
-      if: runner.os == 'Windows'
-      run: echo %SPINNAKER_EXTERNAL_BINARIES%
-
-
-    - name: Set environment variable
-      if: runner.os != 'Windows'
-      run: echo "SPINNAKER_EXTERNAL_BINARIES=$PWD/external_binaries" >> "$GITHUB_ENV"
-    - name: Set environment variable on Windows
-      if: runner.os == 'Windows'
-      run: echo "SPINNAKER_EXTERNAL_BINARIES=$PWD/external_binaries" | Out-File -FilePath $env:GITHUB_ENV -Append
-
-    - name: see environment variable
-      if: runner.os != 'Windows'
-      run: echo $SPINNAKER_EXTERNAL_BINARIES
-    - name: see environment variable on Windows
-      if: runner.os == 'Windows'
-      run: echo %SPINNAKER_EXTERNAL_BINARIES%
-
     - name: Checkout
       uses: actions/checkout@v4
 
@@ -195,16 +173,19 @@ jobs:
         echo '[Machine]' >> ~/.spynnaker.cfg
         echo 'spalloc_server = https://spinnaker.cs.man.ac.uk/spalloc/' >> ~/.spynnaker.cfg
         echo 'spalloc_port = 22244' >> ~/.spynnaker.cfg
+        echo '[Mapping]' >> ~/.spynnaker.cfg
+        echo "external_binaries=$PWD/external_binaries" >> ~/.spynnaker.cfg
 
     - name: Install pip, etc
       uses: ./support/actions/python-tools
       with:
           check_tools: ignore
 
-    #- name: Install Ubuntu dependencies
-    #  uses: ./support/actions/apt-get-install
-    #  with:
-    #    packages: graphviz
+    - name: Install Graphviz
+      if: runner.os != 'Windows'
+      uses: ./support/actions/apt-get-install
+      with:
+        packages: graphviz
 
     - name: Install matplotlib
       uses: ./support/actions/install-matplotlib
