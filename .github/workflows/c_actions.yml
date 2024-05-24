@@ -99,18 +99,21 @@ jobs:
       with:
         name: fec_binaries
         path: SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
+        retention-days: 5
 
     - name: Upload PyNN binaries
       uses: actions/upload-artifact@v4
       with:
         name: pynn_binaries
         path: spynnaker/pyNN/model_binaries/*.aplx
+        retention-days: 5
 
     - name: Upload log.sqlite3s
       uses: actions/upload-artifact@v4
       with:
         name: logs.sqlite3
         path: logs.sqlite3
+        retention-days: 5
 
   test:
     needs: build
@@ -182,7 +185,7 @@ jobs:
           check_tools: ignore
 
     - name: Install Graphviz
-      if: runner.os != 'Windows'
+      if: runner.os == 'Linux'
       uses: ./support/actions/apt-get-install
       with:
         packages: graphviz
