@@ -131,6 +131,14 @@ jobs:
         name: logs.sqlite3
         path: external_binaries
 
+    - name: Create cfg
+      run: | 
+        echo '[Machine]' >> ~/.spynnaker.cfg
+        echo 'spalloc_server = https://spinnaker.cs.man.ac.uk/spalloc/' >> ~/.spynnaker.cfg
+        echo 'spalloc_port = 22244' >> ~/.spynnaker.cfg
+        echo '[Mapping]' >> ~/.spynnaker.cfg
+        echo "external_binaries=$PWD/external_binaries" >> ~/.spynnaker.cfg
+
     - name: Test with pytest and proxy
       env:
         SPALLOC_USER: ${{ secrets.SPALLOC_USER }}
