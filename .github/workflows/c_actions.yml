@@ -110,7 +110,7 @@ jobs:
         install_module: true
         install_check_tools: false
         ubuntu_packages: graphviz
-        cfg_file: spynnaker
+        #cfg_file: spynnaker
 
     - name: Download Fec binaries
       uses: actions/download-artifact@v4
@@ -133,11 +133,14 @@ jobs:
 
     - name: Create cfg
       run: | 
-        echo '[Machine]' >> ~/.spynnaker.cfg
+        echo '[Machine]' > ~/.spynnaker.cfg
         echo 'spalloc_server = https://spinnaker.cs.man.ac.uk/spalloc/' >> ~/.spynnaker.cfg
         echo 'spalloc_port = 22244' >> ~/.spynnaker.cfg
         echo '[Mapping]' >> ~/.spynnaker.cfg
         echo "external_binaries=$PWD/external_binaries" >> ~/.spynnaker.cfg
+
+    - name: cat cfg
+      run: cat ~/.spynnaker.cfg
 
     - name: Test with pytest and proxy
       env:
