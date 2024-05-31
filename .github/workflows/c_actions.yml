@@ -39,7 +39,7 @@ jobs:
         echo "C_LOGS_DICT=$PWD/logs.sqlite3" >> $GITHUB_ENV
 
     - name: Lint C code using Vera++
-      uses: ./support/actions/vera
+      uses: SpiNNakerManchester/SupportScripts/actions/vera@main
       with:
         base-dir: neural_modelling/src
 
