@@ -28,6 +28,7 @@ jobs:
     with:
       base-package: spynnaker
       dependencies: SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc SpiNNFrontEndCommon TestBase
+      ubuntu_packages: graphviz
       test_directories: unittests
       flake8-packages: spynnaker unittests
       check_prereleases: false

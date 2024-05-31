@@ -22,45 +22,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Checkout SupportScripts
-      uses: actions/checkout@v4
+    - name: Prepare
+      uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
       with:
-        repository: SpiNNakerManchester/SupportScripts
-        path: support
-
-    - name: Set up Python 3.12
-      # Note: Python is needed for spinn_utilities.make_tools when building
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.12
-
-    - name: "Prepare: Install SpiNNUtils"
-      uses: ./support/actions/install-spinn-deps
-      with:
-        # Note: SpiNNUtils needed for spinn_utilities.make_tools
-        repositories: SpiNNUtils
-        install: true
-
-    - name: Install Ubuntu dependencies
-      uses: ./support/actions/apt-get-install
-      with:
-        packages: doxygen gcc-arm-none-eabi
+        python-version: "3.12"
+        checkout_dependencies: spinnaker_tools spinn_common SpiNNFrontEndCommon
+        install_dependencies: SpiNNUtils
+        install_module: false
+        install_check_tools: false
+        ubuntu_packages: doxygen gcc-arm-none-eabi
 
     - name: Set environment variables
       run: |
         echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
         echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
         echo "C_LOGS_DICT=$PWD/logs.sqlite3" >> $GITHUB_ENV
-
-    - name: Checkout SpiNNaker C Dependencies
-      uses: ./support/actions/install-spinn-deps
-      with:
-        # Note: SpiNNUtils needed for spinn_utilities.make_tools
-        repositories: spinnaker_tools spinn_common SpiNNFrontEndCommon
-        install: false
 
     - name: Lint C code using Vera++
       uses: ./support/actions/vera
@@ -72,7 +48,7 @@ jobs:
         make -C $SPINN_DIRS
         make -C spinn_common install
 
-    - name: "Check: Build FEC C code"
+    - name: Build FEC C code
       run: make
       working-directory: SpiNNFrontEndCommon/c_common
       env:
@@ -124,27 +100,17 @@ jobs:
         runner: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Checkout SupportScripts
-      uses: actions/checkout@v4
-      with:
-        repository: SpiNNakerManchester/SupportScripts
-        path: support
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Prepare
+      uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
       with:
         python-version: "3.12"
-
-    - name: Install Spinnaker Dependencies
-      uses: ./support/actions/install-spinn-deps
-      with:
-        repositories: >
+        install_dependencies: > 
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
           SpiNNFrontEndCommon TestBase
-        install: true
+        install_module: false
+        install_check_tools: false
+        ubuntu_packages: graphviz
+        cfg_file: spynnaker
 
     - name: Download Fec binaries
       uses: actions/download-artifact@v4
@@ -164,34 +130,6 @@ jobs:
       with:
         name: logs.sqlite3
         path: external_binaries
-
-    - name: Setup
-      uses: ./support/actions/run-install
-
-    - name: Setup PyNN
-      uses: ./support/actions/pynn-setup
-
-    - name: Create cfg
-      run: | 
-        echo '[Machine]' >> ~/.spynnaker.cfg
-        echo 'spalloc_server = https://spinnaker.cs.man.ac.uk/spalloc/' >> ~/.spynnaker.cfg
-        echo 'spalloc_port = 22244' >> ~/.spynnaker.cfg
-        echo '[Mapping]' >> ~/.spynnaker.cfg
-        echo "external_binaries=$PWD/external_binaries" >> ~/.spynnaker.cfg
-
-    - name: Install pip, etc
-      uses: ./support/actions/python-tools
-      with:
-          check_tools: ignore
-
-    - name: Install Graphviz
-      if: runner.os == 'Linux'
-      uses: ./support/actions/apt-get-install
-      with:
-        packages: graphviz
-
-    - name: Install matplotlib
-      uses: ./support/actions/install-matplotlib
 
     - name: Test with pytest and proxy
       env:
