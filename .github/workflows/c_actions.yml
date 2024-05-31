@@ -107,7 +107,7 @@ jobs:
         install_dependencies: > 
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
           SpiNNFrontEndCommon TestBase
-        install_module: false
+        install_module: true
         install_check_tools: false
         ubuntu_packages: graphviz
         cfg_file: spynnaker
