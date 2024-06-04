@@ -26,9 +26,12 @@ jobs:
   call:
     uses: SpiNNakerManchester/SupportScripts/.github/workflows/python_checks.yml@main
     with:
-      base-package: spynnaker
       dependencies: SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc SpiNNFrontEndCommon TestBase
+      ubuntu_packages: graphviz
       test_directories: unittests
+      coverage-package: spynnaker
       flake8-packages: spynnaker unittests
+      pylint-packages: spynnaker
+      mypy-packages: spynnaker
       check_prereleases: false
       cfg_file: spynnaker
