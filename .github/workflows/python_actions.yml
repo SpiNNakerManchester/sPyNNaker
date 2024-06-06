@@ -33,5 +33,4 @@ jobs:
       flake8-packages: spynnaker unittests
       pylint-packages: spynnaker
       mypy-packages: spynnaker
-      check_prereleases: false
       cfg_file: spynnaker
