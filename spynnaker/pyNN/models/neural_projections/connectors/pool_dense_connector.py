@@ -49,10 +49,14 @@ _CONN_SIZE = (6 * BYTES_PER_SHORT)
 
 class PoolDenseConnector(AbstractConnector):
     """
-    Where the pre- and post-synaptic populations are considered as a 2D
-    array. Connect every post(row, column) neuron to many
-    pre(row, column, kernel)
-    through a (kernel) set of weights and/or delays.
+    A multidimensional connector based on weight and pool shape and stride.
+
+    A weight is provided for every pre-post pair of neurons,
+    where the post-population size is determined by the pre-population size
+    and a pool shape,
+    which how many pre-neurons are connected to each post-neuron
+    in each dimension, and pool stride, which decides how the shape moves over
+    the image in each dimension to choose the pre-neurons for each post-neuron.
     """
 
     __slots__ = (
