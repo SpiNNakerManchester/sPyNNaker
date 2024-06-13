@@ -22,44 +22,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Checkout SupportScripts
-      uses: actions/checkout@v4
+    - name: Prepare
+      uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
       with:
-        repository: SpiNNakerManchester/SupportScripts
-        path: support
-    - name: Set up Python 3.12
-      # Note: Python is needed for spinn_utilities.make_tools when building
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.12
-    - name: Install Ubuntu dependencies
-      uses: ./support/actions/apt-get-install
-      with:
-        packages: doxygen gcc-arm-none-eabi
-
-    - name: Checkout SpiNNaker C Dependencies
-      uses: ./support/actions/install-spinn-deps
-      with:
-        # Note: SpiNNUtils needed for spinn_utilities.make_tools
-        repositories: spinnaker_tools spinn_common SpiNNFrontEndCommon
-        install: false
-
-    - name: "Prepare: Install SpiNNUtils"
-      uses: ./support/actions/install-spinn-deps
-      with:
-        # Note: SpiNNUtils needed for spinn_utilities.make_tools
-        repositories: SpiNNUtils
-        install: true
+        python-version: "3.12"
+        checkout_dependencies: spinnaker_tools spinn_common SpiNNFrontEndCommon
+        install_dependencies: SpiNNUtils
+        install_module: false
+        install_check_tools: false
+        ubuntu_packages: doxygen gcc-arm-none-eabi
 
     - name: Set environment variables
       run: |
         echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
         echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
+        echo "C_LOGS_DICT=$PWD/logs.sqlite3" >> $GITHUB_ENV
 
     - name: Lint C code using Vera++
-      uses: ./support/actions/vera
+      uses: SpiNNakerManchester/SupportScripts/actions/vera@main
       with:
         base-dir: neural_modelling/src
 
@@ -67,9 +47,14 @@ jobs:
       run: |
         make -C $SPINN_DIRS
         make -C spinn_common install
-        make -C SpiNNFrontEndCommon/c_common install
 
-    - name: Build C code
+    - name: Build FEC C code
+      run: make
+      working-directory: SpiNNFrontEndCommon/c_common
+      env:
+        CFLAGS: -fdiagnostics-color=always
+
+    - name: Build PYNN C code
       run: make
       working-directory: neural_modelling
       env:
@@ -84,3 +69,77 @@ jobs:
     - name: Build documentation using doxygen
       run: make doxysetup doxygen
       working-directory: neural_modelling
+
+    - name: Upload Fec binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: fec_binaries
+        path: SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
+        retention-days: 5
+
+    - name: Upload PyNN binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: pynn_binaries
+        path: spynnaker/pyNN/model_binaries/*.aplx
+        retention-days: 5
+
+    - name: Upload log.sqlite3s
+      uses: actions/upload-artifact@v4
+      with:
+        name: logs.sqlite3
+        path: logs.sqlite3
+        retention-days: 5
+
+  test:
+    needs: build
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        runner: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - name: Prepare
+      uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
+      with:
+        python-version: "3.12"
+        install_dependencies: > 
+          SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
+          SpiNNFrontEndCommon TestBase
+        install_module: true
+        install_check_tools: false
+        ubuntu_packages: graphviz
+        cfg_file: spynnaker
+
+    - name: Download Fec binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: fec_binaries
+        # Need to go into spynnaker as FEC will have been moved by install
+        path: external_binaries
+
+    - name: Download PyNN Binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: pynn_binaries
+        path: external_binaries
+
+    - name: Download logs.sqlite3
+      uses: actions/download-artifact@v4
+      with:
+        name: logs.sqlite3
+        path: external_binaries
+
+    - name: Append cfg
+      # Doing this in the prepare action ended with a different path
+      run: | 
+        echo '[Mapping]' >> ~/.spynnaker.cfg
+        echo "external_binaries=$PWD/external_binaries" >> ~/.spynnaker.cfg
+        cat ~/.spynnaker.cfg
+
+    - name: Test with pytest and proxy
+      env:
+        SPALLOC_USER: ${{ secrets.SPALLOC_USER }}
+        SPALLOC_PASSWORD: ${{ secrets.SPALLOC_PASSWORD }}
+      run: pytest proxy_integration_tests
