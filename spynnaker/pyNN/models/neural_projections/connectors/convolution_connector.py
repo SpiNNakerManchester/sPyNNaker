@@ -60,7 +60,7 @@ _Padding = Union[bool, _Shape]
 
 class ConvolutionConnector(AbstractConnector):
     """
-    A 2D connector that centers on a pos neuron.
+    A 2D connector that centres on a post neuron.
 
     Special connector which dynamically maps a 2D kernel over a 2D plane,
     so that when the kernel is centred on a post-neuron,

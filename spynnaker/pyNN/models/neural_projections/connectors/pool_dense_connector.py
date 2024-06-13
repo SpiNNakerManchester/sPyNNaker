@@ -49,7 +49,7 @@ _CONN_SIZE = (6 * BYTES_PER_SHORT)
 
 class PoolDenseConnector(AbstractConnector):
     """
-    A multidimensional connector based on weight and pool shope and stride.
+    A multidimensional connector based on weight and pool shape and stride.
 
     A weight is provided for every pre-post pair of neurons,
     where the post-population size is determined by the pre-population size
