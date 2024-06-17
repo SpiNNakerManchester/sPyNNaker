@@ -60,10 +60,14 @@ _Padding = Union[bool, _Shape]
 
 class ConvolutionConnector(AbstractConnector):
     """
-    Where the pre- and post-synaptic populations are considered as a 2D
-    array. Connect every post(row, column) neuron to many
-    pre(row, column, kernel)
-    through a (kernel) set of weights and/or delays.
+    A 2D connector that centres on a post neuron.
+
+    Special connector which dynamically maps a 2D kernel over a 2D plane,
+    so that when the kernel is centred on a post-neuron,
+    that post-neuron receives input from each pre-neuron
+    that the kernel touches,
+    and the weights of those pre-post connections
+    are then the values of the kernel.
     """
 
     __slots__ = (
