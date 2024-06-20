@@ -248,7 +248,7 @@ class AbstractPopulationVertex(
             max_atoms_per_core: Union[int, Tuple[int, ...]],
             spikes_per_second: Optional[float],
             ring_buffer_sigma: Optional[float],
-            max_expected_summed_weights: Optional[List[float]],
+            max_expected_summed_weight: Optional[List[float]],
             incoming_spike_buffer_size: Optional[int],
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel, drop_late_spikes: bool,
@@ -266,7 +266,7 @@ class AbstractPopulationVertex(
             size; a good starting choice is 5.0. Given length of simulation
             we can set this for approximate number of saturation events.
         :type ring_buffer_sigma: float or None
-        :param max_expected_summed_weights:
+        :param max_expected_summed_weight:
             The maximum expected summed weights for each synapse type.
         :param incoming_spike_buffer_size:
         :type incoming_spike_buffer_size: int or None
@@ -306,9 +306,9 @@ class AbstractPopulationVertex(
         else:
             self.__spikes_per_second = spikes_per_second
 
-        self.__max_expected_summed_weights = max_expected_summed_weights
-        if (max_expected_summed_weights is not None and
-                len(max_expected_summed_weights) !=
+        self.__max_expected_summed_weight = max_expected_summed_weight
+        if (max_expected_summed_weight is not None and
+                len(max_expected_summed_weight) !=
                 neuron_impl.get_n_synapse_types()):
             raise ValueError(
                 "The number of expected summed weights does not match "
@@ -1169,8 +1169,8 @@ class AbstractPopulationVertex(
         """
         n_synapse_types = self.__neuron_impl.get_n_synapse_types()
         max_weights = numpy.zeros(n_synapse_types)
-        if self.__max_expected_summed_weights is not None:
-            max_weights[:] = self.__max_expected_summed_weights
+        if self.__max_expected_summed_weight is not None:
+            max_weights[:] = self.__max_expected_summed_weight
         else:
             stats = _Stats(self.__neuron_impl, self.__spikes_per_second,
                            self.__ring_buffer_sigma)
