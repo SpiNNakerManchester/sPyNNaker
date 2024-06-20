@@ -23,7 +23,7 @@ from numpy import void
 from numpy.typing import NDArray
 from typing_extensions import Literal, TypeAlias
 
-from pyNN.recording.files import StandardTextFile, BaseFile
+from pyNN.recording.files import BaseFile
 from pyNN.space import Space as PyNNSpace
 
 from spinn_utilities.config_holder import get_config_bool
