@@ -78,10 +78,14 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         # pylint: disable=arguments-differ
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return AbstractPopulationVertex(
-            n_neurons, label, max_atoms, spikes_per_second, ring_buffer_sigma,
-            max_expected_summed_weight, incoming_spike_buffer_size,
-            self.__model, self, drop_late_spikes or False, splitter, seed,
-            n_colour_bits)
+            n_neurons=n_neurons, label=label, max_atoms_per_core=max_atoms,
+            spikes_per_second=spikes_per_second,
+            ring_buffer_sigma=ring_buffer_sigma,
+            max_expected_summed_weight=max_expected_summed_weight,
+            incoming_spike_buffer_size=incoming_spike_buffer_size,
+            neuron_impl=self.__model, pynn_model=self,
+            drop_late_spikes=drop_late_spikes or False,
+            splitter=splitter, seed=seed, n_colour_bits=n_colour_bits)
 
     @property
     @overrides(AbstractPyNNModel.name)

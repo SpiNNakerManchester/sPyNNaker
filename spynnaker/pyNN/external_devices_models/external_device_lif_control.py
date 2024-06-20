@@ -119,7 +119,11 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         model.n_steps_per_timestep = n_steps_per_timestep
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return ExternalDeviceLifControlVertex(
-            self._devices, self._create_edges, max_atoms, model, self,
-            self._translator, spikes_per_second, label, ring_buffer_sigma,
-            max_expected_summed_weight, incoming_spike_buffer_size,
-            drop_late_spikes, splitter, seed, n_colour_bits)
+            devices=self._devices, create_edges=self._create_edges,
+            max_atoms_per_core=max_atoms, neuron_model=model, pynn_model=self,
+            translator=self._translator, spikes_per_second=spikes_per_second,
+            label=label, ring_buffer_sigma=ring_buffer_sigma,
+            max_expected_summed_weight=max_expected_summed_weight,
+            incoming_spike_buffer_size=incoming_spike_buffer_size,
+            drop_late_spikes=drop_late_spikes, splitter=splitter, seed=seed,
+            n_colour_bits=n_colour_bits)

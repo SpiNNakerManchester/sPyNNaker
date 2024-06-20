@@ -87,7 +87,8 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
         cast(NeuronImplStandard,
              self._model).n_steps_per_timestep = n_steps_per_timestep
         return super().create_vertex(
-            n_neurons, label, spikes_per_second=spikes_per_second,
+            n_neurons=n_neurons, label=label,
+            spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             max_expected_summed_weight=max_expected_summed_weight,
             incoming_spike_buffer_size=incoming_spike_buffer_size,

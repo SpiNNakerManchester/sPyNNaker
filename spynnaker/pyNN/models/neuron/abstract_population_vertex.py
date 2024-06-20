@@ -244,7 +244,7 @@ class AbstractPopulationVertex(
     CORE_PARAMS_BASE_SIZE = 5 * BYTES_PER_WORD
 
     def __init__(
-            self, n_neurons: int, label: str,
+            self, *, n_neurons: int, label: str,
             max_atoms_per_core: Union[int, Tuple[int, ...]],
             spikes_per_second: Optional[float],
             ring_buffer_sigma: Optional[float],
