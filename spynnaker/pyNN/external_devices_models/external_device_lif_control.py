@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
+from typing import Optional, List
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
@@ -104,6 +104,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             self, n_neurons: int, label: str, *,
             spikes_per_second: Optional[float] = None,
             ring_buffer_sigma: Optional[float] = None,
+            max_expected_summed_weight: Optional[List[float]] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterAbstractPopulationVertex] = None,
@@ -120,5 +121,5 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         return ExternalDeviceLifControlVertex(
             self._devices, self._create_edges, max_atoms, model, self,
             self._translator, spikes_per_second, label, ring_buffer_sigma,
-            incoming_spike_buffer_size, drop_late_spikes, splitter, seed,
-            n_colour_bits)
+            max_expected_summed_weight, incoming_spike_buffer_size,
+            drop_late_spikes, splitter, seed, n_colour_bits)

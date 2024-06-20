@@ -62,6 +62,7 @@ class ExternalDeviceLifControlVertex(
             spikes_per_second: Optional[float] = None,
             label: Optional[str] = None,
             ring_buffer_sigma: Optional[float] = None,
+            max_expected_summed_weight: Optional[List[float]] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterAbstractPopulationVertex] = None,
@@ -94,9 +95,9 @@ class ExternalDeviceLifControlVertex(
         super().__init__(
             len(devices), f"ext_dev{devices}" if label is None else label,
             max_atoms_per_core,
-            spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model, drop_late_spikes, splitter, seed,
-            n_colour_bits)
+            spikes_per_second, ring_buffer_sigma, max_expected_summed_weight,
+            incoming_spike_buffer_size, neuron_impl, pynn_model,
+            drop_late_spikes, splitter, seed, n_colour_bits)
 
         if not devices:
             raise ConfigurationException("No devices specified")
