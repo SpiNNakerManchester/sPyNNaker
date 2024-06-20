@@ -380,7 +380,8 @@ class Projection(object):
         else:
             data_file = save_file
         try:
-            header_lines = ["# %s = %s" % item for item in metadata.items()]
+            header_lines = [
+                f"# {key} = {value}" for key, value in metadata.items()]
             header = "\n".join(header_lines) + '\n'
             data_file.write(header.encode('utf-8'))
             # write data
