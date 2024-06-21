@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Any, Dict, Optional, cast, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, cast, TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
@@ -74,6 +74,7 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             self, n_neurons: int, label: str, *,
             spikes_per_second: Optional[float] = None,
             ring_buffer_sigma: Optional[float] = None,
+            max_expected_summed_weight: Optional[List[float]] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterAbstractPopulationVertex] = None,
@@ -86,8 +87,10 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
         cast(NeuronImplStandard,
              self._model).n_steps_per_timestep = n_steps_per_timestep
         return super().create_vertex(
-            n_neurons, label, spikes_per_second=spikes_per_second,
+            n_neurons=n_neurons, label=label,
+            spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
+            max_expected_summed_weight=max_expected_summed_weight,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
             drop_late_spikes=drop_late_spikes,
             splitter=splitter, seed=seed, n_colour_bits=n_colour_bits)

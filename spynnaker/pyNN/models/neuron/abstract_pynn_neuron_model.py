@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
@@ -28,6 +28,7 @@ DEFAULT_MAX_ATOMS_PER_CORE = POP_TABLE_MAX_ROW_LENGTH
 
 _population_parameters: Dict[str, Any] = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
+    "max_expected_summed_weight": None,
     "incoming_spike_buffer_size": None, "drop_late_spikes": None,
     "splitter": None, "seed": None, "n_colour_bits": None
 }
@@ -58,6 +59,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             self, n_neurons: int, label: str, *,
             spikes_per_second: Optional[float] = None,
             ring_buffer_sigma: Optional[float] = None,
+            max_expected_summed_weight: Optional[List[float]] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterAbstractPopulationVertex] = None,
@@ -76,9 +78,14 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         # pylint: disable=arguments-differ
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return AbstractPopulationVertex(
-            n_neurons, label, max_atoms, spikes_per_second, ring_buffer_sigma,
-            incoming_spike_buffer_size, self.__model, self,
-            drop_late_spikes or False, splitter, seed, n_colour_bits)
+            n_neurons=n_neurons, label=label, max_atoms_per_core=max_atoms,
+            spikes_per_second=spikes_per_second,
+            ring_buffer_sigma=ring_buffer_sigma,
+            max_expected_summed_weight=max_expected_summed_weight,
+            incoming_spike_buffer_size=incoming_spike_buffer_size,
+            neuron_impl=self.__model, pynn_model=self,
+            drop_late_spikes=drop_late_spikes or False,
+            splitter=splitter, seed=seed, n_colour_bits=n_colour_bits)
 
     @property
     @overrides(AbstractPyNNModel.name)
