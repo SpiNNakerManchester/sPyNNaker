@@ -24,7 +24,7 @@ from typing import (
     TYPE_CHECKING)
 
 import numpy
-from numpy import floating, integer, uint8
+from numpy import floating, integer, uint8, uint32
 from numpy.typing import NDArray
 import quantities
 import neo  # type: ignore[import]
@@ -644,7 +644,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             key_bytes = eieio_header.eieio_type.key_bytes
             keys = numpy.frombuffer(
                 spike_data, dtype=f"<u{key_bytes}",
-                count=eieio_header.count, offset=data_offset)
+                count=eieio_header.count, offset=data_offset).astype(uint32)
             keys = numpy.bitwise_and(keys, inv_colour_mask)
             local_ids = numpy.array([indices[key] for key in keys])
             neuron_ids = slice_ids[local_ids]

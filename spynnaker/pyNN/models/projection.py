@@ -23,7 +23,7 @@ from numpy import void
 from numpy.typing import NDArray
 from typing_extensions import Literal, TypeAlias
 
-from pyNN.recording.files import StandardTextFile, BaseFile
+from pyNN.recording.files import BaseFile
 from pyNN.space import Space as PyNNSpace
 
 from spinn_utilities.config_holder import get_config_bool
@@ -376,11 +376,17 @@ class Projection(object):
             data = data.astype(dtype)
         npdata = numpy.nan_to_num(cast(NDArray, data))
         if isinstance(save_file, str):
-            data_file = StandardTextFile(save_file, mode='wb')
+            data_file = open(save_file, mode='wb')
         else:
             data_file = save_file
         try:
-            data_file.write(npdata, metadata)
+            header_lines = [
+                f"# {key} = {value}" for key, value in metadata.items()]
+            header = "\n".join(header_lines) + '\n'
+            data_file.write(header.encode('utf-8'))
+            # write data
+            numpy.savetxt(data_file, npdata, delimiter='\t')
+            data_file.close()
         finally:
             data_file.close()
 
