@@ -382,7 +382,7 @@ class SynapseDynamicsStructuralCommon(
                        for row in rows]
 
         # Finally make the table and write it out
-        post_to_pre = numpy.core.records.fromarrays(
+        post_to_pre = numpy.rec.fromarrays(
             numpy.concatenate(padded_rows).T, formats="u1, u1, u2").view("u4")
         if len(post_to_pre) != vertex_slice.n_atoms * self.s_max:
             raise ValueError(

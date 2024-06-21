@@ -14,7 +14,7 @@
 from typing import Any, Union, cast
 
 import numpy
-from numpy import uint32
+from numpy import uint32, int32
 from numpy.typing import NDArray
 from typing_extensions import TypeAlias
 
@@ -117,7 +117,8 @@ def param_generator_params(values: _ParamType) -> NDArray[uint32]:
     """
     if numpy.isscalar(values):
         return numpy.array(
-            [DataType.S1615.encode_as_int(cast(float, values))], dtype=uint32)
+            [DataType.S1615.encode_as_int(cast(float, values))],
+            dtype=int32).view(uint32)
 
     if isinstance(values, RandomDistribution):
         parameters = (
@@ -129,7 +130,7 @@ def param_generator_params(values: _ParamType) -> NDArray[uint32]:
             for param in parameters if param is not None)
         params = [
             DataType.S1615.encode_as_int(param) for param in parameters]
-        return numpy.array(params, dtype=uint32)
+        return numpy.array(params, dtype=int32).view(uint32)
 
     raise ValueError(f"Unexpected value {values}")
 
