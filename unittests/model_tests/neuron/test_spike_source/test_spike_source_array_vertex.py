@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from testfixtures import LogCapture
+from testfixtures import LogCapture  # type: ignore[import]
 import unittest
 from spynnaker.pyNN.models.spike_source import SpikeSourceArrayVertex
 import pyNN.spiNNaker as sim
