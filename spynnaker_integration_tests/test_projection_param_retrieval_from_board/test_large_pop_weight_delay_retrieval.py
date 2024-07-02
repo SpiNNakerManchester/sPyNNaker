@@ -49,7 +49,7 @@ def do_run():
 
     # before
     pre_delays_array = projections[0].get(attribute_names=["delay"],
-                                          format="nparray")
+                                          format="ndarray")
     pre_delays_list = projections[0].get(attribute_names=["delay"],
                                          format="list")
     pre_weights_array = projections[0].get(attribute_names=["weight"],
@@ -61,7 +61,7 @@ def do_run():
 
     # after
     post_delays_array = projections[0].get(attribute_names=["delay"],
-                                           format="nparray")
+                                           format="ndarray")
     post_delays_list = projections[0].get(attribute_names=["delay"],
                                           format="list")
     post_weights_array = projections[0].get(attribute_names=["weight"],
