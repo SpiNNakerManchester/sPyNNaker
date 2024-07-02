@@ -69,7 +69,7 @@ def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
 
 class Population(PopulationBase):
     """
-    PyNN 0.9 population object.
+    PyNN population object.
     """
     # pylint: disable=redefined-builtin
     __slots__ = (

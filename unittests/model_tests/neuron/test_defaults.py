@@ -16,7 +16,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.defaults import (
     defaults, default_parameters, default_initial_values)
-from testfixtures.logcapture import LogCapture
+from testfixtures import LogCapture  # type: ignore[import]
 import re
 # pylint: disable=no-member
 
