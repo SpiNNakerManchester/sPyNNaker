@@ -33,7 +33,7 @@ from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_neuron_network_specification_report import (
-        _GRAPH_NAME) #, _GRAPH_FORMAT)
+        _GRAPH_NAME)
 import pyNN.spiNNaker as sim
 
 
