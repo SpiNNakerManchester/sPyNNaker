@@ -101,7 +101,7 @@ class TestAllow(BaseTestCase):
 
 if __name__ == '__main__':
     # Hack in to set the ignores with used IP address
-    GetMachineProcess._receive_chip_info = hacked_receive_chip_info
+    GetMachineProcess._receive_chip_info = hacked_receive_chip_info   # type: ignore[method-assign]  # noqa: E501
 
     sim.setup(timestep=1.0, n_boards_required=6)
     machine = sim.get_machine()
