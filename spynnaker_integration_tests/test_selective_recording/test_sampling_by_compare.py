@@ -497,4 +497,3 @@ if __name__ == '__main__':
         record_v=True, v_rate=3,
         record_exc=True, exc_rate=4,
         record_inh=True, inh_rate=5)
-
