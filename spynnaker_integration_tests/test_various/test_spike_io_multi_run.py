@@ -243,7 +243,7 @@ class SpikeIoMultiRun(BaseTestCase):
 
 
 if __name__ == '__main__':
-    import pylab
+    import pylab  # type: ignore[import]
 
     (spikes_forward, spikes_backward) = do_run()
     print(len(spikes_forward))
