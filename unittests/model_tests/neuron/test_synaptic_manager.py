@@ -13,7 +13,7 @@
 # limitations under the License.
 import shutil
 import struct
-from typing import BinaryIO, Optional, Tuple, Union
+from typing import BinaryIO, Optional, Sized, Tuple, Union
 import unittest
 from tempfile import mkdtemp
 import numpy
@@ -79,7 +79,9 @@ class _MockTransceiverinOut(MockableTransceiver):
             return
         if isinstance(data, int):
             data = struct.Struct("<I").pack(data)
+        assert isinstance(data, Sized)
         self._data_to_read[base_address:base_address + len(data)] = data
+        return (-1, -1)
 
     @overrides(Transceiver.get_region_base_address)
     def get_region_base_address(self, x: int, y: int, p: int):
