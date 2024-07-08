@@ -79,7 +79,7 @@ class _MockTransceiverinOut(MockableTransceiver):
             return
         if isinstance(data, int):
             data = struct.Struct("<I").pack(data)
-        assert isinstance(data, Sized)
+        assert isinstance(data, (BinaryIO, bytes, bytearray))
         self._data_to_read[base_address:base_address + len(data)] = data
         return (-1, -1)
 
