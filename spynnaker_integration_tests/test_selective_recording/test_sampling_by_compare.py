@@ -493,7 +493,8 @@ if __name__ == '__main__':
 
     run_and_compare_script(
         _simtime, _n_neurons,
-        record_spikes=True, spike_rate=2, spike_indexes=None,
-        record_v=True, v_rate=3, v_indexes=None,
-        record_exc=True, exc_rate=4, exc_indexes=None,
-        record_inh=True, inh_rate=5, inh_indexes=None)
+        record_spikes=True, spike_rate=2,
+        record_v=True, v_rate=3,
+        record_exc=True, exc_rate=4,
+        record_inh=True, inh_rate=5)
+
