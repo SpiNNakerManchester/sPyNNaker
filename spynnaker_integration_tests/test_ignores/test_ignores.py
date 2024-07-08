@@ -46,7 +46,7 @@ class TestAllow(BaseTestCase):
         self.assert_not_spin_three()
 
         # Hack in to set the ignores with used IP address
-        GetMachineProcess._receive_chip_info = hacked_receive_chip_info   # type: ignore  # noqa: E501
+        GetMachineProcess._receive_chip_info = hacked_receive_chip_info   # type: ignore[method-assign]  # noqa: E501
 
         machine = sim.get_machine()
         sim.end()
