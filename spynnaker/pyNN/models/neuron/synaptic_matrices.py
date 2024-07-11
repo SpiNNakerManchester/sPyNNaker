@@ -38,8 +38,7 @@ from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities.bit_field_utilities import (
-    get_sdram_for_bit_field_region, get_bitfield_key_map_data,
-    write_bitfield_init_data)
+    get_sdram_for_bit_field_region, get_bitfield_key_map_data)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 from .synaptic_matrix_app import SynapticMatrixApp
@@ -386,7 +385,7 @@ class SynapticMatrices(object):
         self.__write_synapse_expander_data_spec(
             spec, post_vertex_slice, references.connection_builder)
 
-        #write_bitfield_init_data(
+        # write_bitfield_init_data(
         #    spec, self.__regions.bitfield_filter, self.__bit_field_size,
         #    references.bitfield_filter)
 
