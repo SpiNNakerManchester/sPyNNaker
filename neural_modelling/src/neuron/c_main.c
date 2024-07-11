@@ -269,10 +269,10 @@ static bool initialise(void) {
     }
 
     // Do bitfield configuration last to only use any unused memory
-    if (!population_table_load_bitfields(data_specification_get_region(
-            SYNAPSE_REGIONS.bitfield_filter, ds_regions))) {
-        return false;
-    }
+    //if (!population_table_load_bitfields(data_specification_get_region(
+    //        SYNAPSE_REGIONS.bitfield_filter, ds_regions))) {
+    //    return false;
+    //}
 
     // Set timer tick (in microseconds)
     spin1_set_timer_tick(timer_period);

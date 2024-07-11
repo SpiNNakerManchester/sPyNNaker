@@ -386,9 +386,9 @@ class SynapticMatrices(object):
         self.__write_synapse_expander_data_spec(
             spec, post_vertex_slice, references.connection_builder)
 
-        write_bitfield_init_data(
-            spec, self.__regions.bitfield_filter, self.__bit_field_size,
-            references.bitfield_filter)
+        #write_bitfield_init_data(
+        #    spec, self.__regions.bitfield_filter, self.__bit_field_size,
+        #    references.bitfield_filter)
 
     def __write_synapse_expander_data_spec(
             self, spec: DataSpecificationBase, post_vertex_slice: Slice,

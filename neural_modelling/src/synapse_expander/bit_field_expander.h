@@ -207,11 +207,11 @@ static bool do_bitfield_generation(
             structural_matrix, &rewiring_data, &pre_info, &post_to_pre_table);
     }
 
-    if (!generate_bit_field(bitfield_filters, n_atom_data, synaptic_matrix,
-            structural_matrix, &pre_info, row_data)) {
-        log_error("Failed to generate bit fields");
-        return false;
-    }
-    determine_redundancy(bitfield_filters);
+    //if (!generate_bit_field(bitfield_filters, n_atom_data, synaptic_matrix,
+    //        structural_matrix, &pre_info, row_data)) {
+    //    log_error("Failed to generate bit fields");
+    //    return false;
+    //}
+    //determine_redundancy(bitfield_filters);
     return true;
 }
