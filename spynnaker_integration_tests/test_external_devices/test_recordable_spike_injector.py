@@ -15,6 +15,7 @@
 from collections import defaultdict
 from random import randint
 import time
+from typing import Dict
 import unittest
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
@@ -22,7 +23,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestRecordableSpikeInjector(BaseTestCase):
 
-    _n_spikes = defaultdict(lambda: 0)
+    _n_spikes: Dict[int, int] = defaultdict(lambda: 0)
     _n_neurons = 100
 
     def _inject(self, label, connection):

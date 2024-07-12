@@ -15,7 +15,7 @@
 """
 Synfirechain-like example
 """
-from testfixtures import LogCapture
+from testfixtures import LogCapture  # type: ignore[import]
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
 from spinnaker_testbase import BaseTestCase

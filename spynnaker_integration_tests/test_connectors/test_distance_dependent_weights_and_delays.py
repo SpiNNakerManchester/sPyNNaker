@@ -17,7 +17,7 @@ import math
 from spinnaker_testbase import BaseTestCase
 from pyNN.utility.plotting import Figure, Panel
 from pyNN.random import NumpyRNG
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # type: ignore[import]
 
 
 def do_run(plot):
