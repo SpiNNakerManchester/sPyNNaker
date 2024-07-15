@@ -169,9 +169,6 @@ class SpynnakerDataView(FecDataView):
         # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.models.projection import Projection as Proj
         cls.check_user_can_act()
-        # if projection in cls.__spy_data._projections:
-        #    raise NotImplementedError(
-        #        "This method should only be called from the Projection init")
         if not isinstance(projection, Proj):
             raise TypeError("The projection must be a Projection")
         cls.__spy_data._projections.append(projection)
