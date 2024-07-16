@@ -70,8 +70,8 @@ class _SpynnakerDataModel(object):
         self._min_delay: Optional[float] = None
         # Using a dict to verify if later could be stored here only
         self._neurons_per_core_set: Set[Type[AbstractPyNNModel]] = set()
-        self._populations: List[Population] = []
-        self._projections: List[Projection] = []
+        self._populations: Set[Population] = set()
+        self._projections: Set[Projection] = set()
         self._segment_counter = 0
 
     def _hard_reset(self) -> None:
@@ -139,6 +139,8 @@ class SpynnakerDataView(FecDataView):
 
         The iteration will be empty if no projections added.
 
+        Note: This method is backed by a set so does not guarantee order
+
         :rtype: iterable(Projection)
         """
         return iter(cls.__spy_data._projections)
@@ -174,7 +176,7 @@ class SpynnakerDataView(FecDataView):
                 "This method should only be called from the Projection init")
         if not isinstance(projection, Proj):
             raise TypeError("The projection must be a Projection")
-        cls.__spy_data._projections.append(projection)
+        cls.__spy_data._projections.add(projection)
 
     @classmethod
     def iterate_populations(cls) -> Iterator[Population]:
@@ -182,6 +184,8 @@ class SpynnakerDataView(FecDataView):
         An iteration of the populations previously added.
 
         The iteration will be empty if no populations added.
+
+        Note: This method is backed by a set so does not guarantee order
 
         :rtype: iterable(~spynnaker.pyNN.models.populations.Population)
         """
@@ -229,7 +233,7 @@ class SpynnakerDataView(FecDataView):
                 "This method should only be called from the Population init")
         first_id = cls.__spy_data._id_counter
         cls.__spy_data._id_counter += population.size
-        cls.__spy_data._populations.append(population)
+        cls.__spy_data._populations.add(population)
         return first_id, cls.__spy_data._id_counter-1
 
     @classmethod

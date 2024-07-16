@@ -101,8 +101,9 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(5, writer._SpynnakerDataWriter__spy_data._id_counter)
         pop_2 = Population(size=15, cellclass=model)
 
-        self.assertListEqual(
-            [pop_1, pop_2], list(SpynnakerDataView.iterate_populations()))
+        as_list = list(SpynnakerDataView.iterate_populations())
+        self.assertListEqual([pop_1, pop_2], sorted(
+            SpynnakerDataView.iterate_populations(), key=lambda x: x.label))
         self.assertEqual(2, SpynnakerDataView.get_n_populations())
         # Hack to check internal data
         # DO NOT COPY as unsupported
@@ -114,8 +115,8 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(1, SpynnakerDataView.get_n_projections())
         pro_2 = Projection(
             pop_2, pop_1, OneToOneConnector(), receptor_type='excitatory')
-        self.assertListEqual(
-            [pro_1, pro_2], list(SpynnakerDataView.iterate_projections()))
+        self.assertListEqual([pro_1, pro_2], sorted(
+            SpynnakerDataView.iterate_projections(), key=lambda x: x.label))
         self.assertEqual(2, SpynnakerDataView.get_n_projections())
         writer.start_run()
         # Unable to add while running
@@ -127,11 +128,11 @@ class TestSimulatorData(unittest.TestCase):
         writer.finish_run()
         writer.hard_reset()
         # population not changed by hard reset
-        self.assertListEqual(
-            [pop_1, pop_2], list(SpynnakerDataView.iterate_populations()))
+        self.assertListEqual([pop_1, pop_2], sorted(
+            SpynnakerDataView.iterate_populations(), key=lambda x: x.label))
         self.assertEqual(2, SpynnakerDataView.get_n_populations())
-        self.assertListEqual(
-            [pro_1, pro_2], list(SpynnakerDataView.iterate_projections()))
+        self.assertListEqual([pro_1, pro_2], sorted(
+            SpynnakerDataView.iterate_projections(), key=lambda x: x.label))
         self.assertEqual(2, SpynnakerDataView.get_n_projections())
         self.assertEqual(20, writer._SpynnakerDataWriter__spy_data._id_counter)
         with self.assertRaises(TypeError):

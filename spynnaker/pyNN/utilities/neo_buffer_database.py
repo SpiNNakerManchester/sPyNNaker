@@ -1459,6 +1459,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         Write the current metadata to the database.
 
+        The underlying call does not guarantee order
+        so there order the metadata is added is not consistent,
+
         .. note::
             The database must be writable for this to work!
         """
