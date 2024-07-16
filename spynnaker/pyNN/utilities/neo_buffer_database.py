@@ -515,7 +515,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 SELECT region_id, recording_neurons_st, vertex_slice, base_key
                 FROM region_metadata
                 WHERE rec_id = ?
-                ORDER BY region_id, recording_neurons_st, vertex_slice, base_key
+                ORDER BY region_id, recording_neurons_st, vertex_slice, 
+                    base_key
                 """, (rec_id,))):
             vertex_slice = MDSlice.from_string(
                 self._string(row["vertex_slice"]))
