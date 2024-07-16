@@ -83,7 +83,7 @@ class PopulationView(PopulationBase):
 
     def __init__(
             self, parent: Union[Population, 'PopulationView'],
-            selector: Selector, label: Optional[str] = None):
+            selector: Selector, label: str):
         """
         :param parent: the population or view to make the view from
         :type parent: ~spynnaker.pyNN.models.populations.Population or
@@ -146,7 +146,7 @@ class PopulationView(PopulationBase):
         return len(self.__indexes)
 
     @property
-    def label(self) -> Optional[str]:
+    def label(self) -> str:
         """
         A label for the Population View.
 

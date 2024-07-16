@@ -161,10 +161,11 @@ class Population(PopulationBase):
 
     def __getitem__(self, index_or_slice) -> PopulationView:
         if isinstance(index_or_slice, int):
-            return IDMixin(self, index_or_slice)
+            return IDMixin(
+                self, index_or_slice, label=f"{self.label}:{index_or_slice}")
         else:
             return PopulationView(
-                self, index_or_slice, label=f"view over {self.label}")
+                self, index_or_slice, label=f"{self.label}:{index_or_slice}")
 
     def all(self) -> Iterable[PopulationView]:
         """
