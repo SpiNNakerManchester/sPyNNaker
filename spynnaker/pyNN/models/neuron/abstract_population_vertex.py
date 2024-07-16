@@ -1327,7 +1327,7 @@ class AbstractPopulationVertex(
                             address)
                 except SynapticConfigurationException as ex:
                     n_projections = (sum(len(x)
-                        for x in self.__incoming_projections.values()))
+                            for x in self.__incoming_projections.values()))
                     if n_projections > 100:
                         raise SpynnakerException(
                             f"{self} has {n_projections} incoming Projections "
