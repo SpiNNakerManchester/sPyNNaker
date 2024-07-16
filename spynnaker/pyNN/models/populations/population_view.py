@@ -118,6 +118,8 @@ class PopulationView(PopulationBase):
             self.__population = parent
             self.__indexes = ids
         self.__mask = selector
+        if label is None:
+            label = f"{parent.label}:{selector}"
         self.__label = label
         self.__annotations: Dict[str, Any] = dict()
 
@@ -146,7 +148,7 @@ class PopulationView(PopulationBase):
         return len(self.__indexes)
 
     @property
-    def label(self) -> Optional[str]:
+    def label(self) -> str:
         """
         A label for the Population View.
 
