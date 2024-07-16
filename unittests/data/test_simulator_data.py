@@ -101,7 +101,6 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(5, writer._SpynnakerDataWriter__spy_data._id_counter)
         pop_2 = Population(size=15, cellclass=model)
 
-        as_list = list(SpynnakerDataView.iterate_populations())
         self.assertListEqual([pop_1, pop_2], sorted(
             SpynnakerDataView.iterate_populations(), key=lambda x: x.label))
         self.assertEqual(2, SpynnakerDataView.get_n_populations())

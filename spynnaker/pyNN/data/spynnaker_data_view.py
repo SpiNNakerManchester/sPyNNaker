@@ -14,7 +14,7 @@
 from __future__ import annotations
 import logging
 from typing import (
-    Iterator, List, Optional, Set, Tuple, Type, Union, TYPE_CHECKING)
+    Iterator, Optional, Set, Tuple, Type, Union, TYPE_CHECKING)
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.data import FecDataView
 from spynnaker import _version
