@@ -83,7 +83,7 @@ class PopulationView(PopulationBase):
 
     def __init__(
             self, parent: Union[Population, 'PopulationView'],
-            selector: Selector, label: str):
+            selector: Selector, label: Optional[str] = None):
         """
         :param parent: the population or view to make the view from
         :type parent: ~spynnaker.pyNN.models.populations.Population or
@@ -118,6 +118,8 @@ class PopulationView(PopulationBase):
             self.__population = parent
             self.__indexes = ids
         self.__mask = selector
+        if label is None:
+            label = f"{parent.label}:{selector}"
         self.__label = label
         self.__annotations: Dict[str, Any] = dict()
 
