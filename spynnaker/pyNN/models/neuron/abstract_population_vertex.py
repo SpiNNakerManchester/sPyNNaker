@@ -1326,8 +1326,8 @@ class AbstractPopulationVertex(
                         MasterPopTableAsBinarySearch.get_next_allowed_address(
                             address)
                 except SynapticConfigurationException as ex:
-                    n_projections = (sum(len(x)
-                            for x in self.__incoming_projections.values()))
+                    values = self.__incoming_projections.values()
+                    n_projections = (sum(len(x) for x in values))
                     if n_projections > 100:
                         raise SpynnakerException(
                             f"{self} has {n_projections} incoming Projections "
