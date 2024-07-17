@@ -13,7 +13,7 @@
 # limitations under the License.
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
-from testfixtures import LogCapture
+from testfixtures import LogCapture  # type: ignore[import]
 
 
 def a_run():

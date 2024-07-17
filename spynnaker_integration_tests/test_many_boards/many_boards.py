@@ -104,4 +104,3 @@ class ManyBoards(BaseTestCase):
 if __name__ == '__main__':
     me = ManyBoards()
     me.do_run()
-    me.check_all_data()

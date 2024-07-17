@@ -17,7 +17,7 @@
 """
 Synfirechain-like example
 """
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # type: ignore[import]
 import numpy
 from pyNN.utility.plotting import Figure
 import spynnaker.spike_checker as spike_checker

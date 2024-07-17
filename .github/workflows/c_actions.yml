@@ -25,7 +25,6 @@ jobs:
     - name: Prepare
       uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
       with:
-        python-version: "3.12"
         checkout_dependencies: spinnaker_tools spinn_common SpiNNFrontEndCommon
         install_dependencies: SpiNNUtils
         install_module: false
@@ -103,7 +102,6 @@ jobs:
     - name: Prepare
       uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
       with:
-        python-version: "3.12"
         install_dependencies: > 
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
           SpiNNFrontEndCommon TestBase

@@ -57,7 +57,8 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.exceptions import (
+    SynapticConfigurationException, SpynnakerException)
 
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses, AbstractMaxSpikes, HasSynapses,
@@ -1335,9 +1336,19 @@ class AbstractPopulationVertex(
         if max_row_info.undelayed_max_n_synapses > 0:
             size = n_sub_atoms * max_row_info.undelayed_max_bytes
             for _ in range(n_sub_edges):
-                address = \
-                    MasterPopTableAsBinarySearch.get_next_allowed_address(
-                        address)
+                try:
+                    address = \
+                        MasterPopTableAsBinarySearch.get_next_allowed_address(
+                            address)
+                except SynapticConfigurationException as ex:
+                    values = self.__incoming_projections.values()
+                    n_projections = (sum(len(x) for x in values))
+                    if n_projections > 100:
+                        raise SpynnakerException(
+                            f"{self} has {n_projections} incoming Projections "
+                            f"which is more than Spynnaker can handle.")\
+                            from ex
+                    raise
                 address += size
         if max_row_info.delayed_max_n_synapses > 0:
             size = (n_sub_atoms * max_row_info.delayed_max_bytes *
