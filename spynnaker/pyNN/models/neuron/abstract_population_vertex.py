@@ -1172,6 +1172,7 @@ class AbstractPopulationVertex(
         max_weights = numpy.zeros(n_synapse_types)
         if self.__max_expected_summed_weight is not None:
             max_weights[:] = self.__max_expected_summed_weight
+            max_weights *= self.__neuron_impl.get_global_weight_scale()
         else:
             stats = _Stats(self.__neuron_impl, self.__spikes_per_second,
                            self.__ring_buffer_sigma)
