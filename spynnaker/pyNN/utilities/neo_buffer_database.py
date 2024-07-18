@@ -515,7 +515,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 SELECT region_id, recording_neurons_st, vertex_slice, base_key
                 FROM region_metadata
                 WHERE rec_id = ?
-                ORDER BY region_metadata_id
+                ORDER BY region_id, recording_neurons_st, vertex_slice,
+                    base_key
                 """, (rec_id,))):
             vertex_slice = MDSlice.from_string(
                 self._string(row["vertex_slice"]))
@@ -1458,6 +1459,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def write_metadata(self) -> None:
         """
         Write the current metadata to the database.
+
+        The underlying call does not guarantee order
+        so there order the metadata is added is not consistent,
 
         .. note::
             The database must be writable for this to work!
