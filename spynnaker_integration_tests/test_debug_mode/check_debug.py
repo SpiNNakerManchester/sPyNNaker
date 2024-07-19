@@ -15,8 +15,8 @@
 import os
 from spinn_utilities.config_holder import get_config_bool
 
-from spinn_front_end_common.interface.interface_functions.\
-    load_data_specification import load_using_advanced_monitors
+from spinn_front_end_common.interface.interface_functions \
+    import load_using_advanced_monitors
 import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
 from spinn_front_end_common.utilities.report_functions.network_specification \
@@ -103,7 +103,8 @@ class CheckDebug(BaseTestCase):
             reports.append(
                 DataSpeedUpPacketGatherMachineVertex.OUT_REPORT_NAME)
             if load_using_advanced_monitors():
-                reports.append(DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
+                reports.append(
+                    DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
         for report in reports:
             self.assertIn(report, found)
         self.assertIn("data.sqlite3", found)
