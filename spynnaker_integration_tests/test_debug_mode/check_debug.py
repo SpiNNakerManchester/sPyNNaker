@@ -14,6 +14,9 @@
 
 import os
 from spinn_utilities.config_holder import get_config_bool
+
+from spinn_front_end_common.interface.interface_functions.\
+    load_data_specification import load_using_advanced_monitors
 import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
 from spinn_front_end_common.utilities.report_functions.network_specification \
@@ -27,6 +30,8 @@ from spinn_front_end_common.utilities.report_functions.\
 #    import EnergyReport
 from spinn_front_end_common.utilities.report_functions.board_chip_report \
     import AREA_CODE_REPORT_NAME
+from spinn_front_end_common.utilities.report_functions.\
+    fixed_route_from_machine_report import REPORT_NAME as fixed_route_report
 from spinn_front_end_common.utility_models import \
      DataSpeedUpPacketGatherMachineVertex
 from spinnaker_testbase import BaseTestCase
@@ -78,15 +83,10 @@ class CheckDebug(BaseTestCase):
             _GRAPH_NAME,
             _GRAPH_NAME + "." +
             _GRAPH_FORMAT,
+            fixed_route_report,
             ]
 
         sim.setup(1.0)
-        if (get_config_bool("Machine", "enable_advanced_monitor_support")
-                and not get_config_bool("Java", "use_java")):
-            # write_data_speed_up_report
-            reports.append(
-                DataSpeedUpPacketGatherMachineVertex.OUT_REPORT_NAME)
-            reports.append(DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
         pop.record("v")
         inp = sim.Population(1, sim.SpikeSourceArray(
@@ -97,6 +97,13 @@ class CheckDebug(BaseTestCase):
         pop.get_data("v")
         run0 = SpynnakerDataView.get_run_dir_path()
         found = os.listdir(run0)
+        if (get_config_bool("Machine", "enable_advanced_monitor_support")
+                and not get_config_bool("Java", "use_java")):
+            # write_data_speed_up_report
+            reports.append(
+                DataSpeedUpPacketGatherMachineVertex.OUT_REPORT_NAME)
+            if load_using_advanced_monitors():
+                reports.append(DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
         for report in reports:
             self.assertIn(report, found)
         self.assertIn("data.sqlite3", found)
