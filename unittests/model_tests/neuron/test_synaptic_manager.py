@@ -111,7 +111,7 @@ class _MockTransceiverinOut(MockableTransceiver):
         return datum
 
     @overrides(Transceiver.get_scamp_connection_selector)
-    def get_scamp_connection_selector(self)->MostDirectConnectionSelector:
+    def get_scamp_connection_selector(self) -> MostDirectConnectionSelector:
         return MostDirectConnectionSelector([_MockConnection(0, 0)])
 
 
