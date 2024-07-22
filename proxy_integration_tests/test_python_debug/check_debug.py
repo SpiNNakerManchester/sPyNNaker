@@ -81,12 +81,14 @@ class CheckDebug(BaseTestCase):
             ]
 
         sim.setup(1.0)
-        if (get_config_bool("Machine", "enable_advanced_monitor_support")
-                and not get_config_bool("Java", "use_java")):
+        if get_config_bool("Machine", "enable_advanced_monitor_support"):
             # write_data_speed_up_report
-            reports.append(
-                DataSpeedUpPacketGatherMachineVertex.OUT_REPORT_NAME)
-            reports.append(DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
+            if not get_config_bool("Java", "use_java"):
+                reports.append(
+                    DataSpeedUpPacketGatherMachineVertex.OUT_REPORT_NAME)
+            else:
+                reports.append(
+                    DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
         pop.record("v")
         inp = sim.Population(1, sim.SpikeSourceArray(

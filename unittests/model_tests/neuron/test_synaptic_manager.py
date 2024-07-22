@@ -24,6 +24,9 @@ from spinn_utilities.config_holder import set_config
 from spinn_machine.version.version_strings import VersionStrings
 from spinnman.transceiver.mockable_transceiver import MockableTransceiver
 from spinnman.transceiver import Transceiver
+from spinnman.processes import MostDirectConnectionSelector
+from spinnman.connections.udp_packet_connections import SCAMPConnection
+from spinnman.exceptions import SpinnmanTimeoutException
 from pacman.model.placements import Placement
 from pacman.operations.routing_info_allocator_algorithms import (
     ZonedRoutingInfoAllocator)
@@ -59,6 +62,14 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.utilities import constants
 import pyNN.spiNNaker as p
+
+
+class _MockConnection(SCAMPConnection):
+    def send(self, data):
+        pass
+
+    def receive_scp_response(self, timeout=1.0):
+        raise SpinnmanTimeoutException("Test", timeout)
 
 
 class _MockTransceiverinOut(MockableTransceiver):
@@ -98,6 +109,10 @@ class _MockTransceiverinOut(MockableTransceiver):
             self, x: int, y: int, base_address: int, cpu: int = 0) -> int:
         datum, = struct.unpack("<I", self.read_memory(x, y, base_address, 4))
         return datum
+
+    @overrides(Transceiver.get_scamp_connection_selector)
+    def get_scamp_connection_selector(self) -> MostDirectConnectionSelector:
+        return MostDirectConnectionSelector([_MockConnection(0, 0)])
 
 
 def say_false(self, *args, **kwargs):
