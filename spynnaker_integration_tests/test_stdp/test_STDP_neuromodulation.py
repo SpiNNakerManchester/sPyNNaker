@@ -106,7 +106,8 @@ class TestSTDPNeuromodulation(BaseTestCase):
             pre_pop, post_pop,
             sim.AllToAllConnector(),
             synapse_type=synapse_dynamics,
-            receptor_type='excitatory', label='Pre-post projection')
+            receptor_type='excitatory', label='Pre-post projection',
+            download_synapses=True)
 
         # Create dopaminergic connection
         sim.Projection(

@@ -194,11 +194,11 @@ class TestIFCurrDeltaSTDP(BaseTestCase):
         injector_proj_exc = sim.Projection(
             injector_neurons_exc, output_neuron,
             sim.AllToAllConnector(allow_self_connections=True),
-            stdp_model, receptor_type='excitatory')
+            stdp_model, receptor_type='excitatory', download_synapses=True)
         injector_proj_inh = sim.Projection(
             injector_neurons_inh, output_neuron,
             sim.AllToAllConnector(allow_self_connections=True),
-            stdp_model2, receptor_type='inhibitory')
+            stdp_model2, receptor_type='inhibitory', download_synapses=True)
 
         sim.run(runtime)
 

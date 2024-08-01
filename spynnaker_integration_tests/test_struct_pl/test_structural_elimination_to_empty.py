@@ -33,7 +33,8 @@ def structural_eliminate_to_empty():
             formation=p.DistanceDependentFormation([3, 3], 0.0),
             elimination=p.RandomByWeightElimination(4.0, 1.0, 1.0),
             f_rew=1000, initial_weight=4.0, initial_delay=3.0,
-            s_max=9, seed=0, weight=0.0, delay=1.0))
+            s_max=9, seed=0, weight=0.0, delay=1.0),
+        download_synapses=True)
 
     pop.record("rewiring")
 

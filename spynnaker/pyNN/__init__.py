@@ -350,7 +350,8 @@ def Projection(
         connector: AbstractConnector,
         synapse_type: Optional[AbstractStaticSynapseDynamics] = None,
         source: None = None, receptor_type: str = "excitatory",
-        space: Optional[Space] = None, label: Optional[str] = None):
+        space: Optional[Space] = None, label: Optional[str] = None,
+        download_synapses: bool = False) -> SpiNNakerProjection:
     """
     Used to support PEP 8 spelling correctly.
 
@@ -368,6 +369,7 @@ def Projection(
     :type space: ~pyNN.space.Space or None
     :param label: the label
     :type label: str or None
+    :param bool download_synapses: whether to download synapses
     :return: a projection object for SpiNNaker
     :rtype: ~spynnaker.pyNN.models.projection.Projection
     """
@@ -376,7 +378,7 @@ def Projection(
         pre_synaptic_population=presynaptic_population,
         post_synaptic_population=postsynaptic_population, connector=connector,
         synapse_type=synapse_type, source=source, receptor_type=receptor_type,
-        space=space, label=label)
+        space=space, label=label, download_synapses=download_synapses)
 
 
 def _create_overloaded_functions(spinnaker_simulator: SpiNNaker):
