@@ -30,7 +30,8 @@ def structural_formation_to_full():
             formation=p.DistanceDependentFormation([2, 2], 1.0),
             elimination=p.RandomByWeightElimination(4.0, 0, 0),
             f_rew=1000, initial_weight=4.0, initial_delay=3.0,
-            s_max=4, seed=0, weight=0.0, delay=1.0, with_replacement=False))
+            s_max=4, seed=0, weight=0.0, delay=1.0, with_replacement=False),
+        download_synapses=True)
 
     pop.record("rewiring")
 

@@ -86,7 +86,8 @@ class Projection(object):
             synapse_type: Optional[AbstractSynapseDynamics] = None,
             source: None = None, receptor_type: str = "excitatory",
             space: Optional[PyNNSpace] = None,
-            label: Optional[str] = None):
+            label: Optional[str] = None,
+            download_synapses: bool = False):
         """
         :param ~spynnaker.pyNN.models.populations.PopulationBase \
                 pre_synaptic_population:
@@ -98,6 +99,7 @@ class Projection(object):
         :param str receptor_type:
         :param ~pyNN.space.Space space:
         :param str label:
+        :param bool download_synapses:
         """
         # pylint: disable=too-many-arguments
         if source is not None:
@@ -167,7 +169,8 @@ class Projection(object):
             connector, pre_synaptic_population, post_synaptic_population,
             pre_is_view, post_is_view, synapse_dynamics,
             synapse_id, receptor_type, synapse_id_from_dynamics,
-            synapse_dynamics.weight, synapse_dynamics.delay)
+            synapse_dynamics.weight, synapse_dynamics.delay,
+            download_synapses)
 
         # Set projection information in connector
         connector.set_projection_information(self.__synapse_information)
@@ -539,3 +542,11 @@ class Projection(object):
         """
         # TODO
         _we_dont_do_this_now()
+
+    def set_download_synapses(self, download_synapses):
+        """
+        Set whether synapses should be downloaded when the simulation pauses.
+
+        :param bool download_synapses: Whether to download synapses or not
+        """
+        self.__synapse_information.download_synapses = download_synapses
