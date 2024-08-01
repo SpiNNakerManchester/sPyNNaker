@@ -142,8 +142,8 @@ class SynapticMatrixApp(object):
         self.__index: Optional[int] = None
         self.__delay_index: Optional[int] = None
 
-        self.__download_index = None
-        self.__download_delay_index = None
+        self.__download_index: Optional[int] = None
+        self.__download_delay_index: Optional[int] = None
 
     @property
     def gen_size(self) -> int:
@@ -412,22 +412,24 @@ class SynapticMatrixApp(object):
         """
         connections = list()
 
-        synapses_address = None
-        buffers = None
+        synapses_address: Optional[int] = None
+        buffers: Optional[BufferManager] = None
         if (self.__download_index is None and
                 self.__download_delay_index is None):
-            synapses_address: int = locate_memory_region_for_placement(
+            synapses_address = locate_memory_region_for_placement(
                 placement, self.__synaptic_matrix_region)
         else:
-            buffers: BufferManager = SpynnakerDataView().get_buffer_manager()
+            buffers = SpynnakerDataView().get_buffer_manager()
 
         splitter = self.__app_edge.post_vertex.splitter
         vertex_slice = placement.vertex.vertex_slice
         if self.__syn_mat_offset is not None:
             if self.__download_index is not None:
+                assert buffers is not None
                 block = buffers.get_data_by_placement(
                     placement, self.__download_index)[0]
             else:
+                assert synapses_address is not None
                 block = self.__get_block(placement, synapses_address)
             connections.append(convert_to_connections(
                 self.__synapse_info, vertex_slice,
@@ -438,9 +440,11 @@ class SynapticMatrixApp(object):
 
         if self.__delay_syn_mat_offset is not None:
             if self.__download_delay_index is not None:
+                assert buffers is not None
                 block = buffers.get_data_by_placement(
                     placement, self.__download_delay_index)[0]
             else:
+                assert synapses_address is not None
                 block = self.__get_delayed_block(placement, synapses_address)
             connections.append(convert_to_connections(
                 self.__synapse_info, vertex_slice,

@@ -569,7 +569,7 @@ class SynapticMatrices(object):
 
     def get_download_regions(
             self, placement: Placement,
-            start_index: int) -> Tuple[int, int, int]:
+            start_index: int) -> List[Tuple[int, int, int]]:
         """
         Get the regions that need to be downloaded.
 

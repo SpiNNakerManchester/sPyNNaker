@@ -271,7 +271,7 @@ class PopulationMachineSynapses(
 
     @overrides(AbstractReceiveRegionsToHost.get_download_regions)
     def get_download_regions(
-            self, placement: Placement) -> Sequence[Tuple[int, int]]:
+            self, placement: Placement) -> Sequence[Tuple[int, int, int]]:
 
         # Make sure not to overwrite the recording regions
         start_index = len(self._pop_vertex.get_recording_variables())
