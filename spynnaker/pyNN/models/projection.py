@@ -549,4 +549,4 @@ class Projection(object):
 
         :param bool download_synapses: Whether to download synapses or not
         """
-        self.__synapse_information.download_synapses = download_synapses
+        self.__synapse_information.download_on_pause = download_synapses
