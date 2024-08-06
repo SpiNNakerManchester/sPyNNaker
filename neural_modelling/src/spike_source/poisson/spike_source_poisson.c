@@ -975,7 +975,7 @@ static void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
     // Do any rate changes
     while (circular_buffer_size(rate_change_buffer) >= 2) {
     	uint32_t id = 0;
-    	REAL rate = 0.0k;
+    	UREAL rate = 0.0k;
     	circular_buffer_get_next(rate_change_buffer, &id);
     	circular_buffer_get_next(rate_change_buffer, (uint32_t *) &rate);
         set_spike_source_rate(id, rate);
