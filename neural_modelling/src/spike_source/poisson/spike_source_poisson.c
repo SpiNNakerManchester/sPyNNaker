@@ -366,7 +366,7 @@ void set_spike_source_rate(uint32_t sub_id, UREAL rate) {
 	// but in S1615 (required later) is shifted by 33 to account for the sign
     REAL rate_per_tick = kbits(
             (__U64(bitsuk(rate)) * __U64(bitsulr(ssp_params.seconds_per_tick))) >> 33);
-    log_info("Setting rate of %u to %KHz (%k per tick)",
+    log_debug("Setting rate of %u to %KHz (%k per tick)",
             sub_id, rate, rate_per_tick);
     spike_source_t *spike_source = &source[sub_id];
 
