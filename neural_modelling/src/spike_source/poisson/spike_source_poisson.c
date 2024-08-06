@@ -360,11 +360,13 @@ static inline uint32_t faster_spike_source_get_num_spikes(
 //! \param[in] id: the ID of the source to be updated
 //! \param[in] rate:
 //!     the rate in Hz, to be multiplied to get per-tick values
-void set_spike_source_rate(uint32_t sub_id, unsigned long accum rate) {
+void set_spike_source_rate(uint32_t sub_id, UREAL rate) {
 
+    // This is an U1616 * U032 which means the result in U1616 is shifted by 32,
+	// but in S1615 (required later) is shifted by 33 to account for the sign
     REAL rate_per_tick = kbits(
-            (__U64(bitsk(rate)) * __U64(bitsulr(ssp_params.seconds_per_tick))) >> 32);
-    log_debug("Setting rate of %u to %kHz (%k per tick)",
+            (__U64(bitsuk(rate)) * __U64(bitsulr(ssp_params.seconds_per_tick))) >> 33);
+    log_info("Setting rate of %u to %KHz (%k per tick)",
             sub_id, rate, rate_per_tick);
     spike_source_t *spike_source = &source[sub_id];
 
@@ -509,12 +511,12 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
 
     log_info("\tspike sources = %u, starting at %u",
             ssp_params.n_spike_sources, ssp_params.first_source_id);
-    log_info("seconds_per_tick = %k\n", (REAL) ssp_params.seconds_per_tick);
-    log_info("ticks_per_ms = %k\n", ssp_params.ticks_per_ms);
-    log_info("ts_per_second = %k", ts_per_second);
-    log_info("slow_rate_per_tick_cutoff = %k\n",
+    log_info("seconds_per_tick = %K", (UREAL) ssp_params.seconds_per_tick);
+    log_info("ticks_per_ms = %K", ssp_params.ticks_per_ms);
+    log_info("ts_per_second = %K", ts_per_second);
+    log_info("slow_rate_per_tick_cutoff = %K",
             ssp_params.slow_rate_per_tick_cutoff);
-    log_info("fast_rate_per_tick_cutoff = %k\n",
+    log_info("fast_rate_per_tick_cutoff = %K",
             ssp_params.fast_rate_per_tick_cutoff);
 #if LOG_LEVEL >= LOG_DEBUG
     for (uint32_t i = 0; i < ssp_params.n_spike_sources; i++) {
@@ -768,7 +770,7 @@ static bool initialize(void) {
 
     // Allocate buffer to allow rate change (2 ints) per source
     rate_change_buffer = circular_buffer_initialize(
-    		ssp_params.n_spike_sources * 2);
+    		(ssp_params.n_spike_sources * 2) + 1);
     if (rate_change_buffer == NULL) {
     	log_error("Could not allocate rate change buffer!");
     	return false;
@@ -971,7 +973,7 @@ static void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
     // Do any rate changes
     while (circular_buffer_size(rate_change_buffer) >= 2) {
     	uint32_t id = 0;
-    	REAL rate = 0.0k;
+    	UREAL rate = 0.0k;
     	circular_buffer_get_next(rate_change_buffer, &id);
     	circular_buffer_get_next(rate_change_buffer, (uint32_t *) &rate);
         set_spike_source_rate(id, rate);
@@ -1035,8 +1037,12 @@ static void multicast_packet_callback(uint key, uint payload) {
     }
     // The above condition prevents this from being negative
     uint32_t sub_id = (uint32_t) id - ssp_params.first_source_id;
-    circular_buffer_add(rate_change_buffer, sub_id);
-    circular_buffer_add(rate_change_buffer, payload);
+
+    if ((circular_buffer_real_size(rate_change_buffer) -
+    		circular_buffer_size(rate_change_buffer)) >= 2) {
+		circular_buffer_add(rate_change_buffer, sub_id);
+	    circular_buffer_add(rate_change_buffer, payload);
+    }
 }
 
 //! The entry point for this model
