@@ -69,7 +69,7 @@ def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
 
 class Population(PopulationBase):
     """
-    PyNN 0.9 population object.
+    PyNN population object.
     """
     # pylint: disable=redefined-builtin
     __slots__ = (
@@ -163,8 +163,7 @@ class Population(PopulationBase):
         if isinstance(index_or_slice, int):
             return IDMixin(self, index_or_slice)
         else:
-            return PopulationView(
-                self, index_or_slice, label=f"view over {self.label}")
+            return PopulationView(self, index_or_slice)
 
     def all(self) -> Iterable[PopulationView]:
         """

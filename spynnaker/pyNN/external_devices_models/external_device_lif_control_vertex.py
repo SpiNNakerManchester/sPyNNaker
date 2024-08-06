@@ -54,7 +54,7 @@ class ExternalDeviceLifControlVertex(
     _DEFAULT_COMMAND_MASK = 0xFFFFFFFF
 
     def __init__(
-            self, devices: Sequence[AbstractMulticastControllableDevice],
+            self, *, devices: Sequence[AbstractMulticastControllableDevice],
             create_edges: bool, max_atoms_per_core: Tuple[int, ...],
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel,
@@ -62,6 +62,7 @@ class ExternalDeviceLifControlVertex(
             spikes_per_second: Optional[float] = None,
             label: Optional[str] = None,
             ring_buffer_sigma: Optional[float] = None,
+            max_expected_summed_weight: Optional[List[float]] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterAbstractPopulationVertex] = None,
@@ -92,11 +93,16 @@ class ExternalDeviceLifControlVertex(
         if drop_late_spikes is None:
             drop_late_spikes = False
         super().__init__(
-            len(devices), f"ext_dev{devices}" if label is None else label,
-            max_atoms_per_core,
-            spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model, drop_late_spikes, splitter, seed,
-            n_colour_bits)
+            n_neurons=len(devices),
+            label=f"ext_dev{devices}" if label is None else label,
+            max_atoms_per_core=max_atoms_per_core,
+            spikes_per_second=spikes_per_second,
+            ring_buffer_sigma=ring_buffer_sigma,
+            max_expected_summed_weight=max_expected_summed_weight,
+            incoming_spike_buffer_size=incoming_spike_buffer_size,
+            neuron_impl=neuron_impl, pynn_model=pynn_model,
+            drop_late_spikes=drop_late_spikes, splitter=splitter, seed=seed,
+            n_colour_bits=n_colour_bits)
 
         if not devices:
             raise ConfigurationException("No devices specified")

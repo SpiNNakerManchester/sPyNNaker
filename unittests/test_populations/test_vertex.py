@@ -104,6 +104,7 @@ class MockNeuron(AbstractPopulationVertex):
             n_neurons=5, label="Mock",
             max_atoms_per_core=None, spikes_per_second=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+            max_expected_summed_weight=None,
             neuron_impl=foo_bar.model, pynn_model=foo_bar,
             drop_late_spikes=True, splitter=None, seed=None,
             n_colour_bits=None)

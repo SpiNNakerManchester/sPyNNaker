@@ -57,7 +57,8 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.exceptions import (
+    SynapticConfigurationException, SpynnakerException)
 
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses, AbstractMaxSpikes, HasSynapses,
@@ -244,10 +245,11 @@ class AbstractPopulationVertex(
     CORE_PARAMS_BASE_SIZE = 5 * BYTES_PER_WORD
 
     def __init__(
-            self, n_neurons: int, label: str,
+            self, *, n_neurons: int, label: str,
             max_atoms_per_core: Union[int, Tuple[int, ...]],
             spikes_per_second: Optional[float],
             ring_buffer_sigma: Optional[float],
+            max_expected_summed_weight: Optional[List[float]],
             incoming_spike_buffer_size: Optional[int],
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel, drop_late_spikes: bool,
@@ -265,6 +267,8 @@ class AbstractPopulationVertex(
             size; a good starting choice is 5.0. Given length of simulation
             we can set this for approximate number of saturation events.
         :type ring_buffer_sigma: float or None
+        :param max_expected_summed_weight:
+            The maximum expected summed weights for each synapse type.
         :param incoming_spike_buffer_size:
         :type incoming_spike_buffer_size: int or None
         :param bool drop_late_spikes: control flag for dropping late packets.
@@ -302,6 +306,15 @@ class AbstractPopulationVertex(
                 "Simulation", "spikes_per_second")
         else:
             self.__spikes_per_second = spikes_per_second
+
+        self.__max_expected_summed_weight = max_expected_summed_weight
+        if (max_expected_summed_weight is not None and
+                len(max_expected_summed_weight) !=
+                neuron_impl.get_n_synapse_types()):
+            raise ValueError(
+                "The number of expected summed weights does not match "
+                "the number of synapses in the neuron model "
+                f"({neuron_impl.get_n_synapse_types()})")
 
         self.__drop_late_spikes = drop_late_spikes
         if self.__drop_late_spikes is None:
@@ -1155,21 +1168,25 @@ class AbstractPopulationVertex(
 
         :rtype: list(int)
         """
-        stats = _Stats(self.__neuron_impl, self.__spikes_per_second,
-                       self.__ring_buffer_sigma)
-
-        for proj in self.incoming_projections:
-            # pylint: disable=protected-access
-            synapse_info = proj._synapse_information
-            # Skip if this is a synapse dynamics synapse type
-            if synapse_info.synapse_type_from_dynamics:
-                continue
-            stats.add_projection(proj)
-
         n_synapse_types = self.__neuron_impl.get_n_synapse_types()
         max_weights = numpy.zeros(n_synapse_types)
-        for synapse_type in range(n_synapse_types):
-            max_weights[synapse_type] = stats.get_max_weight(synapse_type)
+        if self.__max_expected_summed_weight is not None:
+            max_weights[:] = self.__max_expected_summed_weight
+            max_weights *= self.__neuron_impl.get_global_weight_scale()
+        else:
+            stats = _Stats(self.__neuron_impl, self.__spikes_per_second,
+                           self.__ring_buffer_sigma)
+
+            for proj in self.incoming_projections:
+                # pylint: disable=protected-access
+                synapse_info = proj._synapse_information
+                # Skip if this is a synapse dynamics synapse type
+                if synapse_info.synapse_type_from_dynamics:
+                    continue
+                stats.add_projection(proj)
+
+            for synapse_type in range(n_synapse_types):
+                max_weights[synapse_type] = stats.get_max_weight(synapse_type)
 
         # Convert these to powers; we could use int.bit_length() for this if
         # they were integers, but they aren't...
@@ -1320,9 +1337,19 @@ class AbstractPopulationVertex(
         if max_row_info.undelayed_max_n_synapses > 0:
             size = n_sub_atoms * max_row_info.undelayed_max_bytes
             for _ in range(n_sub_edges):
-                address = \
-                    MasterPopTableAsBinarySearch.get_next_allowed_address(
-                        address)
+                try:
+                    address = \
+                        MasterPopTableAsBinarySearch.get_next_allowed_address(
+                            address)
+                except SynapticConfigurationException as ex:
+                    values = self.__incoming_projections.values()
+                    n_projections = (sum(len(x) for x in values))
+                    if n_projections > 100:
+                        raise SpynnakerException(
+                            f"{self} has {n_projections} incoming Projections "
+                            f"which is more than Spynnaker can handle.")\
+                            from ex
+                    raise
                 address += size
         if max_row_info.delayed_max_n_synapses > 0:
             size = (n_sub_atoms * max_row_info.delayed_max_bytes *

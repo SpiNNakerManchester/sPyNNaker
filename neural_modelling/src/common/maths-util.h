@@ -235,6 +235,14 @@ static inline REAL kdivk(REAL a, REAL b) {
 	return kbits((uint32_t) udiv64(((uint64_t) bitsk(a) << 15), (uint64_t) bitsk(b)));
 }
 
+//! \brief Divides an unsigned accum by another unsigned accum
+//! \param[in] a The dividend
+//! \param[in] b The divisor
+//! \return a divided by b
+static inline UREAL ukdivuk(UREAL a, UREAL b) {
+	return ukbits((uint32_t) udiv64(((uint64_t) bitsuk(a) << 16), (uint64_t) bitsuk(b)));
+}
+
 //! \brief Divides an integer by an accum
 //! \param[in] a The dividend
 //! \param[in] b The divisor
@@ -249,6 +257,67 @@ static inline int32_t udivk(int32_t a, REAL b) {
 //! \return a divided by b
 static inline REAL kdivui(REAL a, uint32_t b) {
 	return kbits((uint32_t) __LI(udiv64(__U64(bitsk(a)), __U64(b))));
+}
+
+//! 2^(1/(2^n)) for values of n between 1 and 15, in U1616 format, then converted
+//! to uint32_t for computation.
+//! These can be used to work out fractional powers of 2 by multiplication.
+static const uint32_t fract_powers_2[] = {
+	0x16a09, 0x1306f, 0x1172b, 0x10b55, 0x1059b, 0x102c9, 0x10163, 0x100b1,
+	0x10058, 0x1002c, 0x10016, 0x1000b, 0x10005, 0x10002, 0x10001
+};
+
+
+//! 2^-(1/2^n)) for values of n between 1 and 15, in U1616 format, then converted
+//! to uint32_t for computation.
+//! These can be used to work out negative fractional power of 2 by multiplication.
+static const uint32_t fract_powers_half[] = {
+	0xb504, 0xd744, 0xeac0, 0xf525, 0xfa83, 0xfd3e, 0xfe9e, 0xff4e, 0xffa7,
+	0xffd3, 0xffe9, 0xfff4, 0xfffa, 0xfffd, 0xfffe
+};
+
+//! \brief Calculates 2^p where p is a real number (rather than just an integer).
+//!        This is still quicker than general power operations.
+//! \param[in] p The power to raise 2 to; if p >= 16 or <= -16 the result will
+//!              be saturated to MAX_U_REAL or 0 respectively.
+static inline UREAL pow_of_2(REAL p) {
+
+	// The variable that will hold the return value
+	uint32_t accumulator;
+
+	// The fractional bits from the input
+	uint32_t fract_bits;
+
+	// The powers to use in the calculation
+	const uint32_t *powers;
+
+	if (p >= 0) {
+		if (p >= 16) {
+			return kbits(0xFFFFFFFF);
+		}
+		accumulator = bitsuk(UREAL_CONST(1)) << (bitsk(p) >> 15);
+		fract_bits = bitsk(p) & 0x7FFF;
+		powers = fract_powers_2;
+	} else {
+		if (p <= -16) {
+			return kbits(0);
+		}
+		REAL val = p * REAL_CONST(-1);
+		accumulator = bitsuk(UREAL_CONST(1)) >> (bitsk(val) >> 15);
+		fract_bits = bitsk(val) & 0x7FFF;
+		powers = fract_powers_half;
+	}
+
+	// Multiply in fractional powers for each non-zero fractional bits
+	for (uint32_t i = 0; i < 15; i++) {
+		uint32_t bit = (fract_bits >> (14 - i)) & 0x1;
+		if (bit) {
+			uint32_t f = bit * powers[i];
+			accumulator = __stdfix_smul_uk(accumulator, f);
+		}
+	}
+
+	return ukbits(accumulator);
 }
 
 #endif  // _MATHS_UTIL_

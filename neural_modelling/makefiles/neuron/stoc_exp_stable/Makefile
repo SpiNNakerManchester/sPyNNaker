@@ -1,4 +1,4 @@
-# Copyright (c) 2017 The University of Manchester
+# Copyright (c) 2023 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinnaker_testbase import BaseTestCase
-from spynnaker_integration_tests.test_onchip_compressor.many_bitfields \
-    import do_bitfield_run
 
+APP = $(notdir $(CURDIR))
 
-class TestHostBitFieldCompressor(BaseTestCase):
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_stoc_exp_stable.h
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
 
-    def test_do_run(self):
-        self.runsafe(do_bitfield_run)
+include ../neural_build.mk

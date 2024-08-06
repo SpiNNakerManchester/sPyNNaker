@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from neo.io import PickleIO
+from neo.io import PickleIO  # type: ignore[import]
 import pyNN.spiNNaker as sim
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities import neo_compare

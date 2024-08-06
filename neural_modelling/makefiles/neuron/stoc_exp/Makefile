@@ -1,4 +1,4 @@
-# Copyright (c) 2017 The University of Manchester
+# Copyright (c) 2023 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
 
-packages = ["spynnaker_integration_tests",
-            "spynnaker_integration_tests.scripts"]
+APP = $(notdir $(CURDIR))
 
-setup(
-    packages=packages,
-)
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_stoc_exp.h
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
+
+include ../neural_build.mk

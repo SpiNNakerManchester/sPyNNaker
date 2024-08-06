@@ -24,6 +24,8 @@ env:
 
 jobs:
   build:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -51,7 +53,7 @@ jobs:
         working-directory: neural_modelling
 
       - name: Build C documentation
-        uses: mattnotmitt/doxygen-action@v1.9.5
+        uses: mattnotmitt/doxygen-action@v1.9.8
         with:
           working-directory: neural_modelling
 
@@ -61,7 +63,7 @@ jobs:
           cp -vaT $C_DOC_DIR $DEPLOY_DIR/c
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        uses: JamesIves/github-pages-deploy-action@v4.6.1
         with:
           branch: gh-pages
           folder: ${{ env.DEPLOY_DIR }}

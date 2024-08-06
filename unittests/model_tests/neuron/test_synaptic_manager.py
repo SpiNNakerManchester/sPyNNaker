@@ -21,6 +21,7 @@ import pytest
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
+from spinn_machine.version.version_strings import VersionStrings
 from spinnman.transceiver.mockable_transceiver import MockableTransceiver
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
@@ -78,7 +79,9 @@ class _MockTransceiverinOut(MockableTransceiver):
             return
         if isinstance(data, int):
             data = struct.Struct("<I").pack(data)
+        assert isinstance(data, (bytes, bytearray))
         self._data_to_read[base_address:base_address + len(data)] = data
+        return (-1, -1)
 
     @overrides(Transceiver.get_region_base_address)
     def get_region_base_address(self, x: int, y: int, p: int):
@@ -103,7 +106,7 @@ def say_false(self, *args, **kwargs):
 
 def test_write_data_spec():
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = SpynnakerDataWriter.mock()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
@@ -433,7 +436,7 @@ def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
         n_pre_neurons, neurons_per_core, max_delay):
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.FOUR_PLUS.text)
     writer = SpynnakerDataWriter.mock()
 
     # Build a from list connector with the delays we want
@@ -476,7 +479,7 @@ def test_pop_based_master_pop_table_standard(
 
     # Generate the data
     with DsSqlliteDatabase() as db:
-        spec = DataSpecificationGenerator(1, 2, 3, post_mac_vertex, db)
+        spec = DataSpecificationGenerator(1, 0, 3, post_mac_vertex, db)
 
         regions = SynapseRegions(
             synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
@@ -494,7 +497,7 @@ def test_pop_based_master_pop_table_standard(
             spec, post_vertex_slice, references)
 
         # Read the population table and check entries
-        info = list(db.get_region_pointers_and_content(1, 2, 3))
+        info = list(db.get_region_pointers_and_content(1, 0, 3))
     region, _, region_data = info[1]
     assert region == 3
     mpop_data = numpy.frombuffer(region_data, dtype="uint8").view("uint32")
