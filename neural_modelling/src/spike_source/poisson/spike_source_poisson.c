@@ -513,12 +513,12 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
 
     log_info("\tspike sources = %u, starting at %u",
             ssp_params.n_spike_sources, ssp_params.first_source_id);
-    log_info("seconds_per_tick = %k\n", (REAL) ssp_params.seconds_per_tick);
-    log_info("ticks_per_ms = %k\n", ssp_params.ticks_per_ms);
-    log_info("ts_per_second = %k", ts_per_second);
-    log_info("slow_rate_per_tick_cutoff = %k\n",
+    log_info("seconds_per_tick = %K", (UREAL) ssp_params.seconds_per_tick);
+    log_info("ticks_per_ms = %K\n", ssp_params.ticks_per_ms);
+    log_info("ts_per_second = %K", ts_per_second);
+    log_info("slow_rate_per_tick_cutoff = %K",
             ssp_params.slow_rate_per_tick_cutoff);
-    log_info("fast_rate_per_tick_cutoff = %k\n",
+    log_info("fast_rate_per_tick_cutoff = %K",
             ssp_params.fast_rate_per_tick_cutoff);
 #if LOG_LEVEL >= LOG_DEBUG
     for (uint32_t i = 0; i < ssp_params.n_spike_sources; i++) {
@@ -772,7 +772,7 @@ static bool initialize(void) {
 
     // Allocate buffer to allow rate change (2 ints) per source
     rate_change_buffer = circular_buffer_initialize(
-    		ssp_params.n_spike_sources * 2);
+    		(ssp_params.n_spike_sources * 2) + 1);
     if (rate_change_buffer == NULL) {
     	log_error("Could not allocate rate change buffer!");
     	return false;
