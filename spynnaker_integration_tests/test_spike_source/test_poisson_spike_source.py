@@ -20,15 +20,12 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 class TestPoissonSpikeSource(BaseTestCase):
 
-    def check_spikes(self, n_neurons, input, expected):
-        neo = input.get_data("spikes")
+    def check_spikes(self, n_neurons, neo, expected):
         spikes = neo.segments[0].spiketrains
         count = sum(len(s) for s in spikes)
         tolerance = math.sqrt(expected)
-        print(expected, float(count) / float(n_neurons))
         self.assertAlmostEqual(expected, float(count) / float(n_neurons),
-                               delta=tolerance,
-                               msg="Error on {}".format(input.label))
+                               delta=tolerance)
 
     def recording_poisson_spikes(self, run_zero):
         sim.setup(timestep=1.0, min_delay=1.0)
@@ -48,19 +45,20 @@ class TestPoissonSpikeSource(BaseTestCase):
 
         pop_1 = sim.Population(
             n_neurons, sim.IF_curr_exp, cell_params_lif, label='pop_1')
-        input = sim.Population(
-            n_neurons, sim.SpikeSourcePoisson, {}, label='inputSpikes_1')
+        ssp = sim.Population(
+            n_neurons, sim.SpikeSourcePoisson(rate=1), label='inputSpikes_1')
 
-        sim.Projection(input, pop_1, sim.OneToOneConnector())
+        sim.Projection(ssp, pop_1, sim.OneToOneConnector())
 
-        input.record("spikes")
+        ssp.record("spikes")
 
         if run_zero:
             sim.run(0)
         sim.run(5000)
-        self.check_spikes(n_neurons, input, 5)
-
+        neo = ssp.get_data("spikes")
         sim.end()
+
+        self.check_spikes(n_neurons, neo, 5)
 
     def recording_poisson_spikes_no_zero(self):
         self.recording_poisson_spikes(False)
@@ -91,17 +89,18 @@ class TestPoissonSpikeSource(BaseTestCase):
 
         pop_1 = sim.Population(
             n_neurons, sim.IF_curr_exp, cell_params_lif, label='pop_1')
-        input = sim.Population(
-            n_neurons, sim.SpikeSourcePoisson, {}, label='inputSpikes_1')
+        ssp = sim.Population(
+            n_neurons, sim.SpikeSourcePoisson(rate=1), label='inputSpikes_1')
 
-        sim.Projection(input, pop_1, sim.OneToOneConnector())
+        sim.Projection(ssp, pop_1, sim.OneToOneConnector())
 
-        input.record("spikes")
+        ssp.record("spikes")
 
         sim.run(5000)
-        self.check_spikes(n_neurons, input, 5)
-
+        neo = ssp.get_data("spikes")
         sim.end()
+
+        self.check_spikes(n_neurons, neo, 5)
 
     def test_recording_poisson_spikes_big(self):
         self.runsafe(self.recording_poisson_spikes_big)
@@ -124,17 +123,18 @@ class TestPoissonSpikeSource(BaseTestCase):
 
         pop_1 = sim.Population(
             n_neurons, sim.IF_curr_exp, cell_params_lif, label='pop_1')
-        input = sim.Population(
-            n_neurons, sim.SpikeSourcePoisson, {'rate': 0}, label='input')
+        ssp = sim.Population(
+            n_neurons, sim.SpikeSourcePoisson, {'rate': 0}, label='ssp')
 
-        sim.Projection(input, pop_1, sim.OneToOneConnector())
+        sim.Projection(ssp, pop_1, sim.OneToOneConnector())
 
-        input.record("spikes")
+        ssp.record("spikes")
 
         sim.run(5000)
-        self.check_spikes(n_neurons, input, 0)
-
+        neo = ssp.get_data("spikes")
         sim.end()
+
+        self.check_spikes(n_neurons, neo, 0)
 
     def test_recording_poisson_spikes_rate_0(self):
         self.runsafe(self.recording_poisson_spikes_rate_0)
@@ -142,18 +142,22 @@ class TestPoissonSpikeSource(BaseTestCase):
     def check_rates(self, rates, seconds, seed):
         n_neurons = 100
         sim.setup(timestep=1.0)
-        inputs = {}
+        ssps = {}
         for rate in rates:
-            input = sim.Population(
+            ssp = sim.Population(
                 n_neurons, sim.SpikeSourcePoisson(rate),
                 label='inputSpikes_{}'.format(rate),
                 additional_parameters={"seed": seed})
-            input.record("spikes")
-            inputs[rate] = input
+            ssp.record("spikes")
+            ssps[rate] = ssp
         sim.run(seconds * 1000)
+        spikes = {}
         for rate in rates:
-            self.check_spikes(n_neurons, inputs[rate], rate*seconds)
+            neo = ssps[rate].get_data("spikes")
+            spikes[rate] = neo
         sim.end()
+        for rate in rates:
+            self.check_spikes(n_neurons, spikes[rate], rate*seconds)
 
     def recording_poisson_spikes_rate_fast(self):
         self.check_rates(
@@ -259,3 +263,16 @@ class TestPoissonSpikeSource(BaseTestCase):
 
     def test_poisson_multi_run_change_rate(self):
         self.runsafe(self.poisson_multi_run_change_rate)
+
+    def poisson_higher_rate(self):
+        sim.setup(timestep=1.0)
+        pop_src = sim.Population(
+            100, sim.SpikeSourcePoisson(rate=1000), label="src")
+        pop_src.record("spikes")
+        sim.run(10000)
+        neo = pop_src.get_data("spikes")
+        sim.end()
+        self.check_spikes(100, neo, 10000)
+
+    def test_poisson_higher_rate(self):
+        self.runsafe(self.poisson_higher_rate)

@@ -270,6 +270,7 @@ static bool initialise(void) {
     spin1_memcpy(&sdram_inputs, sdram_config, sizeof(struct sdram_config));
 
     uint32_t n_words = sdram_inputs.size_in_bytes >> 2;
+    uint32_t n_weights = sdram_inputs.size_in_bytes >> 1;
     for (uint32_t i = 0; i < N_SYNAPTIC_BUFFERS; i++) {
         synaptic_contributions[i] = spin1_malloc(sdram_inputs.size_in_bytes);
         if (synaptic_contributions[i] == NULL) {
@@ -277,7 +278,7 @@ static bool initialise(void) {
                     sdram_inputs.size_in_bytes, i);
             return false;
         }
-        for (uint32_t j = 0; j < n_words; j++) {
+        for (uint32_t j = 0; j < n_weights; j++) {
             synaptic_contributions[i][j] = 0;
         }
     }

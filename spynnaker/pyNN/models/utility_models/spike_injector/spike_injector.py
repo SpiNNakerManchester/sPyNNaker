@@ -51,6 +51,7 @@ class SpikeInjector(AbstractPyNNModel):
             ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
         """
         # pylint: disable=arguments-differ
+        max_atoms_per_core = self.get_model_max_atoms_per_dimension_per_core()
         return SpikeInjectorVertex(
             n_neurons, label, port, virtual_key,
-            reserve_reverse_ip_tag, splitter)
+            reserve_reverse_ip_tag, splitter, max_atoms_per_core)

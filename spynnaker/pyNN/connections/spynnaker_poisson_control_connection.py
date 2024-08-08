@@ -164,7 +164,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
             A list of tuples of (neuron ID, rate) to be set
         """
         control = self.__control_label(label)
-        datatype = DataType.S1615
+        datatype = DataType.U1616
         atom_ids_and_payloads = [(nid, datatype.encode_as_int(rate))
                                  for nid, rate in neuron_id_rates]
         self.send_events_with_payloads(control, atom_ids_and_payloads)
