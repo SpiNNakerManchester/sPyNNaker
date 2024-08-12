@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__version__ = "1!7.1.1"
+__version__ = "1!7.3.0"
 __version_month__ = "TBD"
 __version_year__ = "TBD"
 __version_day__ = "TBD"
-__version_name__ = "Post_HBP"
+__version_name__ = "TBD"
 
 _NAME = f"sPyNNaker_under_version({__version__}-{__version_name__})"
