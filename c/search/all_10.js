@@ -76,7 +76,7 @@ var searchData=
   ['param_5fgenerator_5funiform_5fgenerate_73',['param_generator_uniform_generate',['../param__generator__uniform_8h.html#a2b29e827b33797b652c59eb606a042b5',1,'param_generator_uniform.h']]],
   ['param_5fgenerator_5funiform_5finitialize_74',['param_generator_uniform_initialize',['../param__generator__uniform_8h.html#a738047e64cc7e8589b3d4bb65bb23eef',1,'param_generator_uniform.h']]],
   ['param_5fgenerators_75',['param_generators',['../param__generator_8c.html#ace4d5547ba44f140e4eb0e5f6fe1a0cc',1,'param_generator.c']]],
-  ['params_76',['params',['../synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670',1,'params:&#160;synapse_dynamics_stdp_common.h'],['../connection__generator__fixed__post_8h.html#a8ed1e9dc57252dc7895cc4922ae38687',1,'fixed_post::params']]],
+  ['params_76',['params',['../connection__generator__fixed__post_8h.html#a8ed1e9dc57252dc7895cc4922ae38687',1,'fixed_post::params'],['../synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670',1,'params:&#160;synapse_dynamics_stdp_common.h']]],
   ['params_5fregion_77',['PARAMS_REGION',['../robot__motor__control_8c.html#a7f61ffa202f9ba34d1917f6f83d8bf9da91faf3838b3b1ca64895b4f7bc331410',1,'robot_motor_control.c']]],
   ['parent_78',['parent',['https://spinnakermanchester.github.io/spinnaker_tools/scamp_8h.html#a957372fa67250a0ea787d4898d009055',1,'level_t']]],
   ['parity_79',['parity',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a840df697155530f70521f636e280b438',1,'spinnaker_packet_control_byte_t::common']]],
