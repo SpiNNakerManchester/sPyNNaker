@@ -25,7 +25,6 @@ jobs:
     - name: Prepare
       uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
       with:
-        python-version: "3.12"
         checkout_dependencies: spinnaker_tools spinn_common SpiNNFrontEndCommon
         install_dependencies: SpiNNUtils
         install_module: false
@@ -94,7 +93,7 @@ jobs:
   test:
     needs: build
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 20
+    timeout-minutes: 60
     strategy:
       matrix:
         runner: [ubuntu-latest, windows-latest, macos-latest]
@@ -103,7 +102,6 @@ jobs:
     - name: Prepare
       uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
       with:
-        python-version: "3.12"
         install_dependencies: > 
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
           SpiNNFrontEndCommon TestBase

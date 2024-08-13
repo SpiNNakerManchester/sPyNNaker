@@ -14,6 +14,9 @@
 
 import os
 from spinn_utilities.config_holder import get_config_bool
+
+from spinn_front_end_common.interface.interface_functions \
+    import load_using_advanced_monitors
 import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
 from spinn_front_end_common.utilities.report_functions.network_specification \
@@ -27,13 +30,15 @@ from spinn_front_end_common.utilities.report_functions.\
 #    import EnergyReport
 from spinn_front_end_common.utilities.report_functions.board_chip_report \
     import AREA_CODE_REPORT_NAME
+from spinn_front_end_common.utilities.report_functions.\
+    fixed_route_from_machine_report import REPORT_NAME as fixed_route_report
 from spinn_front_end_common.utility_models import \
      DataSpeedUpPacketGatherMachineVertex
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_neuron_network_specification_report import (
-        _GRAPH_NAME) #, _GRAPH_FORMAT)
+        _GRAPH_NAME)
 import pyNN.spiNNaker as sim
 
 
@@ -75,18 +80,13 @@ class CheckDebug(BaseTestCase):
             CLOCK_DRIFT_REPORT,
             # write_board_chip_report
             AREA_CODE_REPORT_NAME,
-            # spynnaker_neuron_graph_network_specification_report
             _GRAPH_NAME,
-            # _GRAPH_NAME + "." +  _GRAPH_FORMAT,
+            # graphviz exe may not be installed so there will be no image file
+            # _GRAPH_NAME + "." + _GRAPH_FORMAT,
+            fixed_route_report,
             ]
 
         sim.setup(1.0)
-        if (get_config_bool("Machine", "enable_advanced_monitor_support")
-                and not get_config_bool("Java", "use_java")):
-            # write_data_speed_up_report
-            reports.append(
-                DataSpeedUpPacketGatherMachineVertex.OUT_REPORT_NAME)
-            reports.append(DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
         pop.record("v")
         inp = sim.Population(1, sim.SpikeSourceArray(
@@ -97,9 +97,51 @@ class CheckDebug(BaseTestCase):
         pop.get_data("v")
         run0 = SpynnakerDataView.get_run_dir_path()
         found = os.listdir(run0)
+        if (get_config_bool("Machine", "enable_advanced_monitor_support")
+                and not get_config_bool("Java", "use_java")):
+            # write_data_speed_up_report
+            reports.append(
+                DataSpeedUpPacketGatherMachineVertex.OUT_REPORT_NAME)
+            if load_using_advanced_monitors():
+                reports.append(
+                    DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
         for report in reports:
             self.assertIn(report, found)
         self.assertIn("data.sqlite3", found)
         self.assertIn("ds.sqlite3", found)
+
+        sim.run(10)  # second run
+        pop.get_data("v")
+        self.assertEqual(run0, SpynnakerDataView.get_run_dir_path())
+        # No point in checking files they are already there
+
+        sim.reset()  # Soft
+        # check get works directly after a reset
+        pop.get_data("v")
+        sim.run(10)
+        found = os.listdir(SpynnakerDataView.get_run_dir_path())
+        self.assertIn("data1.sqlite3", found)
+        self.assertNotIn("ds1.sqlite3", found)
+
+        sim.reset()  # soft with dsg
+        SpynnakerDataView.set_requires_data_generation()
+        sim.run(10)
+        pop.get_data("v")
+        self.assertEqual(run0, SpynnakerDataView.get_run_dir_path())
+        found = os.listdir(run0)
+        self.assertIn("data2.sqlite3", found)
+        self.assertIn("ds2.sqlite3", found)
+        # No point in checking files they are already there
+
+        sim.reset()  # hard
+        SpynnakerDataView.set_requires_mapping()
+        sim.run(10)
+        pop.get_data("v")
+        self.assertNotEqual(run0, SpynnakerDataView.get_run_dir_path())
+        found = os.listdir(SpynnakerDataView.get_run_dir_path())
+        for report in reports:
+            self.assertIn(report, found)
+        self.assertIn("data3.sqlite3", found)
+        self.assertIn("ds3.sqlite3", found)
 
         sim.end()

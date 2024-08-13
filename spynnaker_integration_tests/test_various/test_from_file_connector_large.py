@@ -15,7 +15,7 @@
 import os
 import numpy
 import random
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # type: ignore[import]
 from pyNN.utility.plotting import Figure, Panel
 import pyNN.spiNNaker as p
 from spynnaker.pyNN.utilities import neo_convertor
