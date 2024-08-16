@@ -20,7 +20,6 @@ import pyNN.spiNNaker as sim
 
 class TestDoubleDownloadSynapses(BaseTestCase):
 
-
     def do_run(self):
         sim.setup(timestep=1.0, n_boards_required=1)
         pop = sim.Population(1, sim.IF_curr_exp(), label="pop_1")
