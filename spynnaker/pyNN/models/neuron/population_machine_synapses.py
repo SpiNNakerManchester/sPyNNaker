@@ -274,6 +274,6 @@ class PopulationMachineSynapses(
             self, placement: Placement) -> Sequence[Tuple[int, int, int]]:
 
         # Make sure not to overwrite the recording regions
-        start_index = len(self._pop_vertex.get_recording_variables())
+        start_index = len(self._pop_vertex.get_recordable_variables())
         return self._synaptic_matrices.get_download_regions(
             placement, start_index)
