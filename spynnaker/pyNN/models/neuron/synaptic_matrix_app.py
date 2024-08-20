@@ -428,6 +428,13 @@ class SynapticMatrixApp(object):
                 assert buffers is not None
                 block = buffers.get_data_by_placement(
                     placement, self.__download_index)[0]
+                if len(block) > self.__matrix_size:
+                    if len(block) % self.__matrix_size == 0:
+                        block = block[-self.__matrix_size:]
+                    else:
+                        raise NotImplementedError(
+                            f"Unexpected block size {len(block)} "
+                            f"Expected a multiple of {self.__matrix_size}")
             else:
                 assert synapses_address is not None
                 block = self.__get_block(placement, synapses_address)
@@ -437,12 +444,18 @@ class SynapticMatrixApp(object):
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block, False,
                 splitter.max_support_delay(), self.__max_atoms_per_core))
-
         if self.__delay_syn_mat_offset is not None:
             if self.__download_delay_index is not None:
                 assert buffers is not None
                 block = buffers.get_data_by_placement(
                     placement, self.__download_delay_index)[0]
+                if len(block) > self.__delay_matrix_size:
+                    if len(block) % self.__delay_matrix_size == 0:
+                        block = block[-self.__delay_matrix_size:]
+                    else:
+                        raise NotImplementedError(
+                            f"Unexpected block size {len(block)} "
+                            f"Expected a multiple of {self.__delay_matrix_size}")
             else:
                 assert synapses_address is not None
                 block = self.__get_delayed_block(placement, synapses_address)
