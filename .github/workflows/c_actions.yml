@@ -100,7 +100,7 @@ jobs:
 
     steps:
     - name: Prepare
-      uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
+      uses: SpiNNakerManchester/SupportScripts/actions/prepare@dns8
       with:
         install_dependencies: > 
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
