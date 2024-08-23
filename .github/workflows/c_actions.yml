@@ -100,7 +100,7 @@ jobs:
 
     steps:
     - name: Prepare
-      uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
+      uses: SpiNNakerManchester/SupportScripts/actions/prepare@130.88.193.57
       with:
         install_dependencies: > 
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
