@@ -97,7 +97,7 @@ jobs:
     strategy:
       matrix:
         #runner: [ubuntu-latest, windows-latest, macos-latest]
-        runner: [ubuntu-latest]
+        runner: [macos-latest]
 
     steps:
     - name: Prepare
