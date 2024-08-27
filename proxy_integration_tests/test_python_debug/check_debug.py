@@ -47,6 +47,45 @@ class CheckDebug(BaseTestCase):
     that it does not crash in debug mode. All reports on.
     """
     def debug(self):
+        # pylint: disable=protected-access
+        reports = [
+            # write_energy_report
+            # EnergyReport._DETAILED_FILENAME,
+            # EnergyReport._SUMMARY_FILENAME,
+            # write_text_specs = False
+            "data_spec_text_files",
+            # write_router_reports
+            reports_names._ROUTING_FILENAME,
+            # write_partitioner_reports
+            reports_names._PARTITIONING_FILENAME,
+            # write_application_graph_placer_report
+            reports_names._PLACEMENT_VTX_GRAPH_FILENAME,
+            reports_names._PLACEMENT_CORE_GRAPH_FILENAME,
+            reports_names._SDRAM_FILENAME,
+            # repeats reports_names._SDRAM_FILENAME,
+            # write_router_info_report
+            reports_names._VIRTKEY_FILENAME,
+            # write_routing_table_reports
+            reports_names._ROUTING_TABLE_DIR,
+            reports_names._C_ROUTING_TABLE_DIR,
+            reports_names._COMPARED_FILENAME,
+            # write_memory_map_report
+            memory_map_on_host_report,
+            # write_network_specification_report
+            network_specification_file_name,
+            "provenance_data",
+            # write_tag_allocation_reports
+            reports_names._TAGS_FILENAME,
+            # write_drift_report_end or start
+            CLOCK_DRIFT_REPORT,
+            # write_board_chip_report
+            AREA_CODE_REPORT_NAME,
+            _GRAPH_NAME,
+            # graphviz exe may not be installed so there will be no image file
+            # _GRAPH_NAME + "." + _GRAPH_FORMAT,
+            fixed_route_report,
+            ]
+
         sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
         pop.record("v")
@@ -54,5 +93,25 @@ class CheckDebug(BaseTestCase):
             spike_times=[0]), label="input")
         sim.Projection(inp, pop, sim.AllToAllConnector(),
                        synapse_type=sim.StaticSynapse(weight=5))
-        sim.run(10)
+        sim.run(0)
+        pop.get_data("v")
+        run0 = SpynnakerDataView.get_run_dir_path()
+        found = os.listdir(run0)
+        if (get_config_bool("Machine", "enable_advanced_monitor_support")
+                and not get_config_bool("Java", "use_java")):
+            # write_data_speed_up_report
+            reports.append(
+                DataSpeedUpPacketGatherMachineVertex.OUT_REPORT_NAME)
+            if load_using_advanced_monitors():
+                reports.append(
+                    DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
+        for report in reports:
+            self.assertIn(report, found)
+        self.assertIn("data.sqlite3", found)
+        self.assertIn("ds.sqlite3", found)
+
+        sim.run(10)  # second run
+        pop.get_data("v")
+        self.assertEqual(run0, SpynnakerDataView.get_run_dir_path())
+
         sim.end()
