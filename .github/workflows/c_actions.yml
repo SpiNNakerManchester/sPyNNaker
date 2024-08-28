@@ -97,7 +97,59 @@ jobs:
     strategy:
       matrix:
         #runner: [ubuntu-latest, windows-latest, macos-latest]
-        runner: [ubuntu-latest]
+        runner: [ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Prepare
+      uses: SpiNNakerManchester/SupportScripts/actions/prepare@dns8
+      with:
+        install_dependencies: > 
+          SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
+          SpiNNFrontEndCommon TestBase
+        install_module: true
+        install_check_tools: false
+        ubuntu_packages: graphviz
+        cfg_file: spynnaker
+
+    - name: Download Fec binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: fec_binaries
+        # Need to go into spynnaker as FEC will have been moved by install
+        path: external_binaries
+
+    - name: Download PyNN Binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: pynn_binaries
+        path: external_binaries
+
+    - name: Download logs.sqlite3
+      uses: actions/download-artifact@v4
+      with:
+        name: logs.sqlite3
+        path: external_binaries
+
+    - name: Append cfg
+      # Doing this in the prepare action ended with a different path
+      run: | 
+        echo '[Mapping]' >> ~/.spynnaker.cfg
+        echo "external_binaries=$PWD/external_binaries" >> ~/.spynnaker.cfg
+        cat ~/.spynnaker.cfg
+
+    - name: Test with pytest and proxy
+      env:
+        SPALLOC_USER: ${{ secrets.SPALLOC_USER }}
+        SPALLOC_PASSWORD: ${{ secrets.SPALLOC_PASSWORD }}
+      run: pytest proxy_integration_tests
+
+  test_mac:
+    needs: test
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        runner: [macos-latest]
 
     steps:
     - name: Prepare
