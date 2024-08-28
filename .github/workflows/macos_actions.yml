@@ -92,13 +92,8 @@ jobs:
 
   test:
     needs: build
-    runs-on: ${{ matrix.runner }}
+    runs-on: macos-latest
     timeout-minutes: 60
-    strategy:
-      matrix:
-        #runner: [ubuntu-latest, windows-latest, macos-latest]
-        runner: [ubuntu-latest, windows-latest]
-
     steps:
     - name: Prepare
       uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
