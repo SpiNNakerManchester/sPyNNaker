@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 10
     steps:
     - name: Enforce IPv4 Connectivity
-      uses: undergroundwires/privacy.sexy/github/actions/force-ipv4
+      uses: undergroundwires/privacy.sexy/actions/force-ipv4
     - name: Prepare
       uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
       with:
@@ -102,7 +102,7 @@ jobs:
 
     steps:
     - name: Enforce IPv4 Connectivity
-      uses: undergroundwires/privacy.sexy/github/actions/force-ipv4
+      uses: undergroundwires/privacy.sexy/actions/force-ipv4
     - name: Prepare
       uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
       with:
