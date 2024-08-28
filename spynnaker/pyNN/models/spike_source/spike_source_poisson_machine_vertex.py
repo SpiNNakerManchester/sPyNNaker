@@ -54,6 +54,7 @@ from spinn_front_end_common.utilities.constants import (
     SIMULATION_N_BYTES, BYTES_PER_WORD, BYTES_PER_SHORT)
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
+from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -269,10 +270,25 @@ class SpikeSourcePoissonMachineVertex(
     def _provenance_region_id(self) -> int:
         return self._PoissonSpikeSourceRegions.PROVENANCE_REGION
 
+    @overrides(ProvidesProvenanceDataFromMachineImpl
+               .parse_extra_provenance_items)
+    def parse_extra_provenance_items(
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]):
+        (n_saturations,) = provenance_data
+        with ProvenanceWriter() as db:
+            db.insert_core(
+                x, y, p, "Times_synaptic_weights_have_saturated",
+                n_saturations)
+            if n_saturations > 0:
+                db.insert_report(
+                    f"The weights from the Poisson synapses for {label}"
+                    f" saturated {n_saturations} times. ")
+
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self) -> int:
-        return 0
+        return 1
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self) -> List[int]:

@@ -41,11 +41,12 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
 
         for i in range(n_neurons):
             for j in range(runtime - 2):
-                v_i = v[j + 2][i] / weight
+                v_i = math.ceil(v[j + 2][i] / weight)
                 s_i = spikes_by_time[i][j]
                 if v_i != s_i:
                     print(f"v[{i}][{j}]: {v_i} != spikes[{i}][{j}]: {s_i}")
-        count_v = numpy.sum(numpy.sum(v_i.magnitude) for v_i in v) / weight
+        count_v = numpy.ceil(
+            numpy.sum([numpy.sum(v_i.magnitude) for v_i in v]) / weight)
         count_spikes = sum(
             sum(1 for i in s if i < runtime - 2) for s in spikes)
         self.assertEqual(count_v, count_spikes)

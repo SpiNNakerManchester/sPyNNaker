@@ -144,8 +144,9 @@ typedef struct global_parameters {
 
 //! Structure of the provenance data
 struct poisson_extension_provenance {
-    //! number of times the tdma fell behind its slot
-    uint32_t times_tdma_fell_behind;
+
+    //! number of saturations
+    uint32_t n_saturations;
 };
 
 __attribute__((aligned(4)))
@@ -253,6 +254,10 @@ static uint32_t colour;
 
 //! The mask to apply to the time to get the colour
 static uint32_t colour_mask;
+
+//! The number of times the sending of spikes saturated the weight buffers
+//! (only when doing SDRAM transfers)
+static uint32_t n_saturations = 0;
 
 //! \brief Random number generation for the Poisson sources.
 //!        This is a local version for speed of operation.
@@ -408,7 +413,7 @@ static void store_provenance_data(address_t provenance_region) {
     struct poisson_extension_provenance *prov = (void *) provenance_region;
 
     // store the data into the provenance data region
-    prov->times_tdma_fell_behind = 0;
+    prov->n_saturations = n_saturations;
     log_debug("finished other provenance data");
 }
 
@@ -847,6 +852,17 @@ static inline void record_spikes(uint32_t time) {
     }
 }
 
+static inline void add_sdram_spikes(uint32_t s_id, uint32_t num_spikes) {
+	uint32_t accumulation = input_this_timestep[sdram_inputs->offset + s_id] +
+			(sdram_inputs->weights[s_id] * num_spikes);
+	uint32_t sat_test = accumulation & 0xFFFF0000;
+	if (sat_test) {
+		accumulation = 0xFFFF;
+		n_saturations++;
+	}
+	input_this_timestep[sdram_inputs->offset + s_id] = (uint16_t) accumulation;
+}
+
 //! \brief Handle a fast spike source
 //! \param s_id: Source ID
 //! \param source: Source descriptor
@@ -887,8 +903,7 @@ static void process_fast_source(index_t s_id, spike_source_t *source) {
                 const uint32_t spike_key = keys[s_id] | colour;
                 send_spike_mc_payload(spike_key, num_spikes);
             } else if (sdram_inputs->address != 0) {
-                input_this_timestep[sdram_inputs->offset + s_id] +=
-                     sdram_inputs->weights[s_id] * num_spikes;
+            	add_sdram_spikes(s_id, num_spikes);
             }
         }
     }
@@ -924,8 +939,7 @@ static void process_slow_source(index_t s_id, spike_source_t *source) {
                 const uint32_t spike_key = keys[s_id] | colour;
                 send_spike_mc_payload(spike_key, count);
             } else if (sdram_inputs->address != 0) {
-                input_this_timestep[sdram_inputs->offset + s_id] +=
-                    sdram_inputs->weights[s_id] * count;
+                add_sdram_spikes(s_id, count);
             }
         }
 
