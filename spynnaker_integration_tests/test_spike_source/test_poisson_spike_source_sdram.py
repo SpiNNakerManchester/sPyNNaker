@@ -14,7 +14,6 @@
 from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as sim
 import numpy
-import math
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterAbstractPopulationVertexNeuronsSynapses)
 
@@ -31,29 +30,48 @@ PARAMS = {
 
 class TestPoissonSpikeSourceSDRAM(BaseTestCase):
 
-    def check_rate(self, n_neurons, v, weight, expected, spikes, runtime):
-        # Check that the voltage and spike counts match
-        spikes_by_time = [
-            [0 for _ in range(runtime)] for _ in range(n_neurons)]
+    def check_rate(
+            self, n_neurons, v, weight, rate, spikes, seconds,
+            max_spikes_per_ts, max_weight):
+        runtime = seconds * 1000
+
+        spikes_by_time = []
         for i in range(n_neurons):
-            for s in spikes[i].magnitude:
-                spikes_by_time[i][int(s)] += 1
+            times, counts = numpy.unique(
+                spikes[i].magnitude, return_counts=True)
+            times = times.astype(int)
+            indices = numpy.where(times < runtime - 2)[0]
+            times = times[indices]
+            counts = counts[indices]
+            spikes_by_time.append((times, counts))
 
         for i in range(n_neurons):
-            for j in range(runtime - 2):
-                v_i = math.ceil(v[j + 2][i] / weight)
-                s_i = spikes_by_time[i][j]
-                if v_i != s_i:
-                    print(f"v[{i}][{j}]: {v_i} != spikes[{i}][{j}]: {s_i}")
-        count_v = numpy.ceil(
-            numpy.sum([numpy.sum(v_i.magnitude) for v_i in v]) / weight)
-        count_spikes = sum(
-            sum(1 for i in s if i < runtime - 2) for s in spikes)
-        self.assertEqual(count_v, count_spikes)
+            times, counts = spikes_by_time[i]
+            vs = v.magnitude[times + 2, i]
+            counts_above_max = counts > max_spikes_per_ts
+            vs_where_counts_above_max = vs[counts_above_max]
+            counts_below_max = counts[~counts_above_max]
+            v_count_below_max = numpy.ceil(vs[~counts_above_max] / weight)
 
-        # Check that the rate is as expected
-        tolerance = math.sqrt(expected)
-        self.assertAlmostEqual(expected, float(count_v) / float(n_neurons),
+            max_mismatch = numpy.where(
+                vs_where_counts_above_max != max_weight)[0]
+            value_mismatch = numpy.where(
+                v_count_below_max != counts_below_max)[0]
+
+            for j in max_mismatch:
+                print(f"{rate}: vs_where_counts_above_max[{i}][{j}]: "
+                      f"{vs_where_counts_above_max[j]} < {max_spikes_per_ts}")
+            for j in value_mismatch:
+                print(f"{rate}: v_count_below_max[{j}]: "
+                      f"{v_count_below_max[j]} != "
+                      f"counts_below_max[{j}]: {counts_below_max[j]}")
+            self.assertEqual(len(max_mismatch), 0)
+            self.assertEqual(len(value_mismatch), 0)
+
+        count = sum(len(s) for s in spikes)
+        expected = rate * seconds
+        tolerance = numpy.sqrt(expected)
+        self.assertAlmostEqual(expected, float(count) / float(n_neurons),
                                delta=tolerance)
 
     def make_delta_pop(self, n_neurons, ssp, weight):
@@ -80,7 +98,7 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
         v = pop_1.get_data("v").segments[0].filter(name='v')[0]
         spikes = ssp.get_data("spikes").segments[0].spiketrains
         sim.end()
-        self.check_rate(n_neurons, v, 1.0, 0.0, spikes, 2000)
+        self.check_rate(n_neurons, v, 1.0, 0.0, spikes, 2000, 0, 1.0)
 
     def test_recording_poisson_spikes_rate_0(self):
         self.runsafe(self.recording_poisson_spikes_rate_0)
@@ -101,15 +119,24 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
         sim.run(seconds * 1000)
         v = {}
         spikes = {}
+        max_spikes = {}
+        max_weight = {}
         for rate in rates:
             ssp, target = pops[rate]
             v[rate] = target.get_data("v").segments[0].filter(name='v')[0]
             spikes[rate] = ssp.get_data("spikes").segments[0].spiketrains
+
+            vtx = target._vertex
+            weight_scale = vtx.get_weight_scales(
+                vtx.get_ring_buffer_shifts())[0]
+            max_w = 65535 / weight_scale
+            max_weight[rate] = max_w
+            max_spikes[rate] = int(max_w / weight)
         sim.end()
         for rate in rates:
             self.check_rate(
-                n_neurons, v[rate], weight, rate * seconds, spikes[rate],
-                seconds * 1000)
+                n_neurons, v[rate], weight, rate, spikes[rate],
+                seconds, max_spikes[rate], max_weight[rate])
 
     def recording_poisson_spikes_rate_fast(self):
         self.check_rates(
