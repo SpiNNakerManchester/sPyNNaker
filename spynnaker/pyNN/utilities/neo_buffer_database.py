@@ -1445,7 +1445,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     FROM region_metadata NATURAL JOIN recording_view
                     WHERE label = ? AND variable = ?
                     """, (pop_label, variable)):
-                region_ids.append((row["region_id"],))
+                region_ids.append(int((row["region_id"])))
 
         for region_id in region_ids:
             self._clear_region(region_id)
