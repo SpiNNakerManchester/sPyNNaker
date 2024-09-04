@@ -24,7 +24,7 @@ on: [push]
 
 jobs:
   call:
-    uses: SpiNNakerManchester/SupportScripts/.github/workflows/python_checks.yml@main
+    uses: SpiNNakerManchester/SupportScripts/.github/workflows/python_checks.yml@pep585
     with:
       dependencies: SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc SpiNNFrontEndCommon TestBase
       ubuntu_packages: graphviz
