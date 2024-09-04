@@ -34,3 +34,4 @@ jobs:
       pylint-packages: spynnaker
       mypy-packages: spynnaker unittests spynnaker_integration_tests proxy_integration_tests
       cfg_file: spynnaker
+      check_prereleases: true
