@@ -537,7 +537,7 @@ class SpikeSourcePoissonVertex(
         sdram_sz = get_sdram_edge_params_bytes(vertex_slice)
         other = ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
-            SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
+            SpikeSourcePoissonMachineVertex.get_provenance_data_size(1) +
             poisson_params_sz + poisson_rates_sz + poisson_expander_sz +
             recording_utilities.get_recording_header_size(1) +
             recording_utilities.get_recording_data_constant_size(1) +
