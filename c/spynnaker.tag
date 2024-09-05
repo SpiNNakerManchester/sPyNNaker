@@ -180,9 +180,23 @@
     </member>
     <member kind="define">
       <type>#define</type>
+      <name>SQRTU</name>
+      <anchorfile>maths-util_8h.html</anchorfile>
+      <anchor>a7d7e418d74fe9c51ff761e95c53b36ce</anchor>
+      <arglist>(x)</arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
       <name>EXP</name>
       <anchorfile>maths-util_8h.html</anchorfile>
       <anchor>a179978530f93b1e13bc48dc40dc1960e</anchor>
+      <arglist>(x)</arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>EXPU</name>
+      <anchorfile>maths-util_8h.html</anchorfile>
+      <anchor>a434280e3efa8104178a0cc10cb56f0c4</anchor>
       <arglist>(x)</arglist>
     </member>
     <member kind="define">
@@ -8811,8 +8825,8 @@
       <type>void</type>
       <name>set_spike_source_rate</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a8bf6651c51e0a26f22f653842a1dcba8</anchor>
-      <arglist>(uint32_t sub_id, unsigned long accum rate)</arglist>
+      <anchor>a92c02fc6489d4fae08305a7d36212cf9</anchor>
+      <arglist>(uint32_t sub_id, UREAL rate)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -9078,6 +9092,13 @@
       <name>colour_mask</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>a4aa662177b306e9085f7ef20b3a6a2c1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>n_saturations</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>ab1ae1a332cf8e1862c7a299b9c9a03bf</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -11307,17 +11328,17 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>REAL</type>
+      <type>UREAL</type>
       <name>slow_rate_per_tick_cutoff</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a8fc7a576f718c19bb241c4c6301fd416</anchor>
+      <anchor>ac5efb799fc72db5752921c90667b5404</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>REAL</type>
+      <type>UREAL</type>
       <name>fast_rate_per_tick_cutoff</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>afd5bbf1b89c098c3f2bf38a4689f42ba</anchor>
+      <anchor>a2ab562cb1f5e281f23847934ec9e7ddc</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -13007,9 +13028,9 @@
     <anchor>structpoisson__extension__provenance</anchor>
     <member kind="variable">
       <type>uint32_t</type>
-      <name>times_tdma_fell_behind</name>
+      <name>n_saturations</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a1a4790914bd12e136b3b9f1de01a920a</anchor>
+      <anchor>a55c4a2fa564698252c27abd2d94bd51a</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -13784,10 +13805,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>REAL</type>
+      <type>UREAL</type>
       <name>sqrt_lambda</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a0f76e635e260b47d8e260740166324cd</anchor>
+      <anchor>a98c710c1c2152d5c19f41ed2ccb2094f</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">

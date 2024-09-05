@@ -80,6 +80,7 @@ var searchData=
   ['exponential_77',['EXPONENTIAL',['../param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181faa6055a3a8ab1aed0594419b51d9ec15e',1,'param_generator.c']]],
   ['exponential_5fclipped_78',['EXPONENTIAL_CLIPPED',['../param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181faf2695167689db2a433e28e813f6d88f3',1,'param_generator.c']]],
   ['exponential_5fsynapse_5finput_5fbuffer_5fregions_79',['exponential_synapse_input_buffer_regions',['../synapse__types__exponential__impl_8h.html#aa8f436b9633d82c53bcbeea73f3eb4ab',1,'synapse_types_exponential_impl.h']]],
-  ['extra_5fmonitor_5fprovenance_5ft_80',['extra_monitor_provenance_t',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/extra__monitor__support_8c.html',1,'']]],
-  ['extra_5fmonitor_5fsupport_2ec_81',['extra_monitor_support.c',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/extra__monitor__support_8c.html',1,'']]]
+  ['expu_80',['EXPU',['../maths-util_8h.html#a434280e3efa8104178a0cc10cb56f0c4',1,'maths-util.h']]],
+  ['extra_5fmonitor_5fprovenance_5ft_81',['extra_monitor_provenance_t',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/extra__monitor__support_8c.html',1,'']]],
+  ['extra_5fmonitor_5fsupport_2ec_82',['extra_monitor_support.c',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/extra__monitor__support_8c.html',1,'']]]
 ];

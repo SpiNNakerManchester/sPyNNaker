@@ -2,7 +2,7 @@ var searchData=
 [
   ['send_5fto_5fmotor_0',['send_to_motor',['../robot__motor__control_8c.html#a9d116f770371127474391640debce621',1,'robot_motor_control.c']]],
   ['set_5fprotocol_5fmode_1',['set_protocol_mode',['../munich__protocol_8h.html#a63f78c33f4497c8732b5532c3985e627',1,'munich_protocol.h']]],
-  ['set_5fspike_5fsource_5frate_2',['set_spike_source_rate',['../spike__source__poisson_8c.html#a8bf6651c51e0a26f22f653842a1dcba8',1,'spike_source_poisson.c']]],
+  ['set_5fspike_5fsource_5frate_2',['set_spike_source_rate',['../spike__source__poisson_8c.html#a92c02fc6489d4fae08305a7d36212cf9',1,'spike_source_poisson.c']]],
   ['setup_5fnm_5frows_3',['setup_nm_rows',['../matrix__generator__neuromodulation_8h.html#aac7b4d7aaf8b502f118972ae9bdb0bef',1,'matrix_generator_neuromodulation.h']]],
   ['setup_5frows_4',['setup_rows',['../matrix__generator__static_8h.html#ad8a76e9758256ce53a6f257964452086',1,'matrix_generator_static.h']]],
   ['setup_5fstdp_5frows_5',['setup_stdp_rows',['../matrix__generator__stdp_8h.html#a730440b766c56973dcde444c94792da1',1,'matrix_generator_stdp.h']]],
