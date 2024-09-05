@@ -179,9 +179,9 @@ static inline void synapse_dynamics_stdp_update_ring_buffers(
         weight_t *ring_buffers, fixed_stdp_synapse s, int32_t weight) {
     uint32_t accumulation = ring_buffers[s.ring_buffer_index] + weight;
 
-    uint32_t sat_test = accumulation & 0x10000;
+    uint32_t sat_test = accumulation & 0xFFFF0000;
     if (sat_test) {
-        accumulation = sat_test - 1;
+        accumulation = 0xFFFF;
         plastic_saturation_count++;
     }
 
