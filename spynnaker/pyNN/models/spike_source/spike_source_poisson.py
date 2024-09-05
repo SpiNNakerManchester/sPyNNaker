@@ -37,7 +37,7 @@ class SpikeSourcePoisson(AbstractPyNNModel):
 
     default_population_parameters = _population_parameters
 
-    def __init__(self, rate: Union[float, Sequence[float]] = 1.0,
+    def __init__(self, rate: Union[float, Sequence[float]] = 0.0,
                  start: Union[int, Sequence[int]] = 0,
                  duration: Union[int, Sequence[int], None] = None):
         self.__start = start
