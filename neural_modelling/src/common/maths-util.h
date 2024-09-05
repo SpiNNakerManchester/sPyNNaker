@@ -67,7 +67,9 @@ static REAL macro_arg_1, macro_arg_2, macro_arg_3, macro_arg_4;
 #define POW(x, p)	pow((x), (p))
 
 #define SQRT(x)		sqrt(x)
+#define SQRTU(x)	sqrt(x)
 #define EXP(x)		exp(x)
+#define EXPU(x)		exp(x)
 #define LN(x)		log(x)
 #define ABS(x)		fabs(x)
 
@@ -127,10 +129,20 @@ typedef unsigned long fract	UFRACT;
 //! \return The ::REAL-valued square root of the argument
 #define SQRT(x)	    sqrtk(x)
 
+//! \brief This calculates the square-root of the argument
+//! \param[in] x: The ::UREAL-valued argument
+//! \return The ::UREAL-valued square root of the argument
+#define SQRTU(x)	sqrtuk(x)
+
 //! \brief This calculates the exponential (to base _e_) of the argument
 //! \param[in] x: The ::REAL-valued argument
 //! \return The ::REAL-valued exponential of the argument
 #define EXP(x)		expk(x)
+
+//! \brief This calculates the exponential (to base _e_) of the argument
+//! \param[in] x: The ::UREAL-valued argument
+//! \return The ::UREAL-valued exponential of the argument
+#define EXPU(x)		expuk(x)
 
 #if 0
 //! \brief This calculates the logarithm (to base _e_) of the argument
