@@ -206,6 +206,8 @@ static inline void do_convolution_operation(
     log_debug("pre row %d, col %d AS post row %d, col %d",
             pre_coord.row, pre_coord.col, post_coord.row, post_coord.col);
     lc_weight_t *connector_weights = &weights[connector->kernel_index];
+    uint32_t sat_flag = 0xFFFF0000;
+    uint32_t sat_value = 0xFFFF;
 
     int32_t kw = connector->kernel.width;
     for (int32_t r = -half_kh, kr = 0; r <= half_kh; r++, kr++) {
@@ -246,9 +248,9 @@ static inline void do_convolution_operation(
 
             // Add weight to current ring buffer value, avoiding saturation
             uint32_t accumulation = ring_buffers[rb_index] + weight;
-            uint32_t sat_test = accumulation & 0x10000;
+            uint32_t sat_test = accumulation & sat_flag;
             if (sat_test) {
-                accumulation = sat_test - 1;
+                accumulation = sat_value;
             }
             ring_buffers[rb_index] = accumulation;
         }
