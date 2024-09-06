@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import logging
-from typing import Collection, List, Optional, Tuple
+import sys
+from typing import Collection, List, Optional, Tuple, Union
 import numpy
 from numpy.typing import NDArray
 from pyNN.space import Grid2D, Grid3D, BaseStructure
@@ -52,14 +53,16 @@ class SpikeInjectorVertex(
             self, n_neurons: int, label: str,
             port: Optional[int], virtual_key: Optional[int],
             reserve_reverse_ip_tag: bool,
-            splitter: Optional[AbstractSplitterCommon]):
+            splitter: Optional[AbstractSplitterCommon],
+            max_atoms_per_core: Optional[
+                Union[int, Tuple[int, ...]]] = sys.maxsize):
         # pylint: disable=too-many-arguments
         super().__init__(
             n_keys=n_neurons, label=label, receive_port=port,
             virtual_key=virtual_key,
             reserve_reverse_ip_tag=reserve_reverse_ip_tag,
             injection_partition_id=SPIKE_PARTITION_ID,
-            splitter=splitter)
+            splitter=splitter, max_atoms_per_core=max_atoms_per_core)
 
         # Set up for recording
         self.__spike_recorder = EIEIOSpikeRecorder()

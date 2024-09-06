@@ -214,6 +214,8 @@ static inline bool process_fixed_synapses(
     // Pre-mask the time and account for colour delay
     uint32_t colour_delay_shifted = colour_delay << synapse_type_index_bits;
     uint32_t masked_time = ((time - colour_delay) & synapse_delay_mask) << synapse_type_index_bits;
+    uint32_t sat_flag = 0xFFFF0000;
+    uint32_t sat_value = 0xFFFF;
 
     for (; fixed_synapse > 0; fixed_synapse--) {
         // Get the next 32 bit word from the synaptic_row
@@ -237,13 +239,10 @@ static inline bool process_fixed_synapses(
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
 
-        // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
-        // **NOTE** 0x10000 can be expressed as an ARM literal,
-        //          but 0xFFFF cannot.  Therefore, we use (0x10000 - 1)
-        //          to obtain this value
-        uint32_t sat_test = accumulation & 0x10000;
+        // If any of bits 31-17 are set, saturate accumulator at UINT16_MAX (0xFFFF)
+        uint32_t sat_test = accumulation & sat_flag;
         if (sat_test) {
-            accumulation = sat_test - 1;
+            accumulation = sat_value;
             synapses_saturation_count++;
         }
 
