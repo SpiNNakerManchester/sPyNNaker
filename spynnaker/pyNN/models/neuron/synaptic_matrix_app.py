@@ -426,7 +426,7 @@ class SynapticMatrixApp(object):
         if self.__syn_mat_offset is not None:
             if self.__download_index is not None:
                 assert buffers is not None
-                block, _ = buffers.get_last_data_by_placement(
+                block, _ = buffers.get_data_by_placement(
                     placement, self.__download_index)
             else:
                 assert synapses_address is not None
@@ -440,7 +440,7 @@ class SynapticMatrixApp(object):
         if self.__delay_syn_mat_offset is not None:
             if self.__download_delay_index is not None:
                 assert buffers is not None
-                block, _ = buffers.get_last_data_by_placement(
+                block, _ = buffers.get_data_by_placement(
                     placement, self.__download_delay_index)
             else:
                 assert synapses_address is not None
