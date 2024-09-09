@@ -24,6 +24,7 @@ from pacman.model.placements import Placement
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.interface.buffer_management import BufferManager
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -82,7 +83,11 @@ class SynapticMatrixApp(object):
         # table
         "__delay_index",
         # The number of bits to use for neuron IDs
-        "__max_atoms_per_core")
+        "__max_atoms_per_core",
+        # The download index for the undelayed synaptic matrix
+        "__download_index",
+        # The download index for the delayed synaptic matrix
+        "__download_delay_index")
 
     def __init__(
             self, synapse_info: SynapseInformation,
@@ -136,6 +141,9 @@ class SynapticMatrixApp(object):
         self.__delay_syn_mat_offset: Optional[int] = None
         self.__index: Optional[int] = None
         self.__delay_index: Optional[int] = None
+
+        self.__download_index: Optional[int] = None
+        self.__download_delay_index: Optional[int] = None
 
     @property
     def gen_size(self) -> int:
@@ -378,20 +386,6 @@ class SynapticMatrixApp(object):
             self.__app_edge, self.__synapse_info, self.__max_row_info,
             max_pre_atoms_per_core, self.__max_atoms_per_core)
 
-    def get_connections(self, placement: Placement) -> List[NDArray]:
-        """
-        Get the connections for this matrix from the machine.
-
-        :param ~pacman.model.placements.Placement placement:
-            Where the matrix is on the machine
-        :return: A list of arrays of connections, each with dtype
-            :py:const:`~.NUMPY_CONNECTORS_DTYPE`
-        :rtype: list(~numpy.ndarray)
-        """
-        synapses_address = locate_memory_region_for_placement(
-            placement, self.__synaptic_matrix_region)
-        return self.__read_connections(placement, synapses_address)
-
     def read_generated_connection_holders(self, placement: Placement):
         """
         Read any pre-run connection holders after data has been generated.
@@ -406,40 +400,56 @@ class SynapticMatrixApp(object):
                 for holder in self.__synapse_info.pre_run_connection_holders:
                     holder.add_connections(conns)
 
-    def __read_connections(
-            self, placement: Placement,
-            synapses_address: int) -> List[NDArray]:
+    def get_connections(self, placement: Placement) -> List[NDArray]:
         """
         Read connections from an address on the machine.
 
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
-        :param int synapses_address:
-            The base address of the synaptic matrix region
         :return: A list of arrays of connections, each with dtype
             :py:const:`~.NUMPY_CONNECTORS_DTYPE`
         :rtype: list(~numpy.ndarray)
         """
         connections = list()
 
+        synapses_address: Optional[int] = None
+        buffers: Optional[BufferManager] = None
+        if (self.__download_index is None and
+                self.__download_delay_index is None):
+            synapses_address = locate_memory_region_for_placement(
+                placement, self.__synaptic_matrix_region)
+        else:
+            buffers = SpynnakerDataView().get_buffer_manager()
+
         splitter = self.__app_edge.post_vertex.splitter
         vertex_slice = placement.vertex.vertex_slice
         if self.__syn_mat_offset is not None:
+            if self.__download_index is not None:
+                assert buffers is not None
+                block, _ = buffers.get_last_data_by_placement(
+                    placement, self.__download_index)
+            else:
+                assert synapses_address is not None
+                block = self.__get_block(placement, synapses_address)
             connections.append(convert_to_connections(
                 self.__synapse_info, vertex_slice,
                 self.__app_edge.pre_vertex.n_atoms,
                 self.__max_row_info.undelayed_max_words,
-                self.__n_synapse_types, self.__weight_scales,
-                self.__get_block(placement, synapses_address), False,
+                self.__n_synapse_types, self.__weight_scales, block, False,
                 splitter.max_support_delay(), self.__max_atoms_per_core))
-
         if self.__delay_syn_mat_offset is not None:
+            if self.__download_delay_index is not None:
+                assert buffers is not None
+                block, _ = buffers.get_last_data_by_placement(
+                    placement, self.__download_delay_index)
+            else:
+                assert synapses_address is not None
+                block = self.__get_delayed_block(placement, synapses_address)
             connections.append(convert_to_connections(
                 self.__synapse_info, vertex_slice,
                 self.__app_edge.pre_vertex.n_atoms,
-                self.__max_row_info.delayed_max_words, self.__n_synapse_types,
-                self.__weight_scales,
-                self.__get_delayed_block(placement, synapses_address), True,
+                self.__max_row_info.delayed_max_words,
+                self.__n_synapse_types, self.__weight_scales, block, True,
                 splitter.max_support_delay(), self.__max_atoms_per_core))
 
         return connections
@@ -488,3 +498,35 @@ class SynapticMatrixApp(object):
         if self.__index is None:
             raise RuntimeError("master pop table space not yet reserved")
         return self.__index
+
+    def get_download_regions(
+            self, placement: Placement,
+            start_index: int) -> List[Tuple[int, int, int]]:
+        """
+        Get the data regions that should be downloaded when the simulation
+        pauses.
+
+        :param ~pacman.model.placements.Placement placement:
+            The placement of the vertex
+        :param int start_index:
+            The index to use for the first region to download
+
+        :return: A list of tuples of (index, address, size) to download
+        """
+        if not self.__synapse_info.download_on_pause:
+            return []
+        synapses_address = locate_memory_region_for_placement(
+            placement, self.__synaptic_matrix_region)
+        regions = list()
+        if self.__syn_mat_offset is not None:
+            regions.append((start_index,
+                            synapses_address + self.__syn_mat_offset,
+                            self.__matrix_size))
+            self.__download_index = start_index
+            start_index += 1
+        if self.__delay_syn_mat_offset is not None:
+            regions.append((start_index,
+                            synapses_address + self.__delay_syn_mat_offset,
+                            self.__delay_matrix_size))
+            self.__download_delay_index = start_index
+        return regions

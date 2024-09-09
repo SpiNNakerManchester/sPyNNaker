@@ -58,7 +58,8 @@ def split_structural_with_stdp():
                 tau_plus, tau_minus, A_plus, A_minus),
             weight_dependence=p.AdditiveWeightDependence(w_min, w_max),
             f_rew=1000, initial_weight=w_init_1, initial_delay=delay_1,
-            s_max=1, seed=0, weight=0.0, delay=1.0))
+            s_max=1, seed=0, weight=0.0, delay=1.0),
+        download_synapses=True)
     proj_2 = p.Projection(
         stim, pop_2, p.FromListConnector([]), p.StructuralMechanismSTDP(
             partner_selection=p.RandomSelection(),
@@ -68,7 +69,8 @@ def split_structural_with_stdp():
                 tau_plus, tau_minus, A_plus, A_minus),
             weight_dependence=p.AdditiveWeightDependence(w_min, w_max),
             f_rew=1000, initial_weight=w_init_2, initial_delay=delay_2,
-            s_max=1, seed=0, weight=0.0, delay=1.0))
+            s_max=1, seed=0, weight=0.0, delay=1.0),
+        download_synapses=True)
     proj_3 = p.Projection(
         stim, pop_3, p.FromListConnector([(0, 0)]),
         p.StructuralMechanismSTDP(
