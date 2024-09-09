@@ -1427,6 +1427,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         t_start = SpynnakerDataView.get_current_run_time_ms()
         variables = self.__clean_variables(variables, pop_label)
+        region_ids = []
         for variable in variables:
             self.execute(
                 """
@@ -1437,24 +1438,17 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     FROM recording_view
                     WHERE label = ? AND variable = ?)
                 """, (t_start, pop_label, variable))
-            self.execute(
-                """
-                UPDATE region SET
-                    content = CAST('' AS BLOB), content_len = 0,
-                    fetches = 0, append_time = NULL
-                WHERE region_id in (
+
+            for row in self.execute(
+               """
                     SELECT region_id
                     FROM region_metadata NATURAL JOIN recording_view
-                    WHERE label = ? AND variable = ?)
-                """, (pop_label, variable))
-            self.execute(
-                """
-                DELETE FROM region_extra
-                WHERE region_id in (
-                    SELECT region_id
-                    FROM region_metadata NATURAL JOIN recording_view
-                    WHERE label = ? AND variable = ?)
-                """, (pop_label, variable))
+                    WHERE label = ? AND variable = ?
+                    """, (pop_label, variable)):
+                region_ids.append(int((row["region_id"])))
+
+        for region_id in region_ids:
+            self._clear_region(region_id)
 
     def write_metadata(self) -> None:
         """
