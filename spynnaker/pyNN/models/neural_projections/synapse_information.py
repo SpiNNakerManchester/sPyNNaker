@@ -46,7 +46,8 @@ class SynapseInformation(object):
         "__weights",
         "__delays",
         "__pre_run_connection_holders",
-        "__synapse_type_from_dynamics")
+        "__synapse_type_from_dynamics",
+        "__download_on_pause")
 
     def __init__(self, connector: AbstractConnector,
                  pre_population: Union[Population, PopulationView],
@@ -56,7 +57,8 @@ class SynapseInformation(object):
                  synapse_type: int, receptor_type: str,
                  synapse_type_from_dynamics: bool,
                  weights: Weight_Types = None,
-                 delays: Delay_Types = None):
+                 delays: Delay_Types = None,
+                 download_on_pause: bool = False):
         """
         :param AbstractConnector connector:
             The connector connected to the synapse
@@ -78,6 +80,8 @@ class SynapseInformation(object):
         :type weights: float or list(float) or ~numpy.ndarray(float) or None
         :param delays: The total synaptic delays
         :type delays: float or list(float) or ~numpy.ndarray(float) or None
+        :param bool download_on_pause:
+            Whether to download the synapse matrix when the simulation pauses
         """
         self.__connector = connector
         self.__pre_population = pre_population
@@ -91,6 +95,7 @@ class SynapseInformation(object):
         self.__weights = weights
         self.__delays = delays
         self.__synapse_type_from_dynamics = synapse_type_from_dynamics
+        self.__download_on_pause = download_on_pause
 
         # Make a list of holders to be updated
         self.__pre_run_connection_holders: List[ConnectionHolder] = list()
@@ -285,3 +290,22 @@ class SynapseInformation(object):
         :rtype: bool
         """
         return self.__synapse_type_from_dynamics
+
+    @property
+    def download_on_pause(self) -> bool:
+        """
+        Whether to download the synapse matrix when the simulation pauses.
+
+        :rtype: bool
+        """
+        return self.__download_on_pause
+
+    @download_on_pause.setter
+    def download_on_pause(self, download_on_pause: bool):
+        """
+        Set whether to download the synapse matrix when the simulation pauses.
+
+        :param bool download_on_pause:
+            Whether to download the synapse matrix when the simulation pauses
+        """
+        self.__download_on_pause = download_on_pause

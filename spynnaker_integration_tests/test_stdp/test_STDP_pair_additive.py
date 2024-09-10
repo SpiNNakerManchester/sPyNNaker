@@ -136,7 +136,8 @@ def potentiation_and_depression():
     plastic_synapse = p.Projection(pre_pop, post_pop,
                                    p.OneToOneConnector(),
                                    synapse_type=syn_plas,
-                                   receptor_type='excitatory')
+                                   receptor_type='excitatory',
+                                   download_synapses=True)
 
     # Record the spikes
     post_pop.record("spikes")

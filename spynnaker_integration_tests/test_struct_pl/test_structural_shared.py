@@ -50,9 +50,11 @@ def structural_shared():
             f_rew=1000, initial_weight=2.0, initial_delay=5.0,
             s_max=1, seed=0, weight=0.0, delay=1.0)
     proj = p.Projection(
-        stim, pop, p.FromListConnector([]), struct_pl_static)
+        stim, pop, p.FromListConnector([]), struct_pl_static,
+        download_synapses=True)
     proj_2 = p.Projection(
-        stim, pop_2, p.FromListConnector([]), struct_pl_static)
+        stim, pop_2, p.FromListConnector([]), struct_pl_static,
+        download_synapses=True)
     proj_3 = p.Projection(
         stim, pop_3, p.FromListConnector([(0, 0)]), struct_pl_stdp)
     proj_4 = p.Projection(

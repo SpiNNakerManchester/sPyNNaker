@@ -29,6 +29,8 @@ from spinn_front_end_common.utilities.helpful_functions import (
 from spinn_front_end_common.abstract_models import (
     AbstractSupportsBitFieldRoutingCompression)
 from spinn_front_end_common.interface.ds import DataSpecificationBase
+from spinn_front_end_common.interface.buffer_management.buffer_models import (
+    AbstractReceiveRegionsToHost)
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural, AbstractSDRAMSynapseDynamics)
@@ -51,7 +53,7 @@ class PopulationMachineSynapses(
         PopulationMachineSynapsesProvenance,
         AbstractSupportsBitFieldRoutingCompression,
         AbstractSynapseExpandable,
-        HasSynapses, allow_derivation=True):
+        HasSynapses, AbstractReceiveRegionsToHost, allow_derivation=True):
     """
     Mix-in for machine vertices that contain synapses.
     """
@@ -266,3 +268,12 @@ class PopulationMachineSynapses(
     @overrides(AbstractSynapseExpandable.bit_field_size)
     def bit_field_size(self) -> int:
         return self._synaptic_matrices.bit_field_size
+
+    @overrides(AbstractReceiveRegionsToHost.get_download_regions)
+    def get_download_regions(
+            self, placement: Placement) -> Sequence[Tuple[int, int, int]]:
+
+        # Make sure not to overwrite the recording regions
+        start_index = len(self._pop_vertex.get_recordable_variables())
+        return self._synaptic_matrices.get_download_regions(
+            placement, start_index)
