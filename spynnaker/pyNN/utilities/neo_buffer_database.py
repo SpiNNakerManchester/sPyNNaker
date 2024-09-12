@@ -553,7 +553,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         n_bytes = n_words * BYTES_PER_WORD
         n_words_with_timestamp = n_words + 1
 
-        record_raw = self._read_contents(region_id)
+        record_raw = self._read_recording(region_id)
 
         if len(record_raw) == 0:
             return
@@ -620,7 +620,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :return: all recording indexes spikes or not
         :rtype: list(int)
         """
-        spike_data = self._read_contents(region_id)
+        spike_data = self._read_recording(region_id)
 
         number_of_bytes_written = len(spike_data)
         offset = 0
@@ -697,7 +697,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param list(float) spike_times: List to add spike times to
         :param list(int) spike_ids: List to add spike IDs to
         """
-        raw_data = self._read_contents(region_id)
+        raw_data = self._read_recording(region_id)
 
         n_words = int(math.ceil(len(neurons) / BITS_PER_WORD))
         n_bytes_per_block = n_words * BYTES_PER_WORD
@@ -828,7 +828,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
         """
         # for buffering output info is taken form the buffer manager
-        record_raw = self._read_contents(region_id)
+        record_raw = self._read_recording(region_id)
         record_length = len(record_raw)
 
         # There is one column for time and one for each neuron recording
@@ -929,7 +929,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param list(int) rewire_preids:
         :param list(int) rewire_times:
         """
-        record_raw = self._read_contents(region_id)
+        record_raw = self._read_recording(region_id)
         if len(record_raw) < 1:
             return
 
