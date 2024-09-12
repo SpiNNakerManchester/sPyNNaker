@@ -1448,7 +1448,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 region_ids.append(int((row["region_id"])))
 
         for region_id in region_ids:
-            self._clear_region(region_id)
+            self._clear_recording_region(region_id)
 
     def write_metadata(self) -> None:
         """
