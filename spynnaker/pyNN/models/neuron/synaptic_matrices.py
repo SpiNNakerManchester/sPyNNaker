@@ -568,18 +568,16 @@ class SynapticMatrices(object):
         return matrix.get_index()
 
     def get_download_regions(
-            self, placement: Placement,
-            start_index: int) -> List[Tuple[int, int, int]]:
+            self, placement: Placement) -> List[Tuple[int, int, int]]:
         """
         Get the regions that need to be downloaded.
 
         :param ~pacman.model.placements.Placement placement:
             The placement of the vertex
-        :param int start_index:
-            The first index to use in the region identifiers
 
         :return: The index, the start address and the size of the regions
         """
+        start_index = 0
         regions = list()
         for matrix in self.__matrices.values():
             mat_regions = matrix.get_download_regions(placement, start_index)
