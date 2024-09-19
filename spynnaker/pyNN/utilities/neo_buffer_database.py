@@ -188,11 +188,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 t_stop = row[self._T_STOP]
             return (row[self._SEGMENT_NUMBER], time, t_stop, row[self._DT],
                     self._string(row[self._SIMULATOR]))
-        if (SpynnakerDataView.is_shutdown() and
-                not get_config_bool("Reports","keep_data_database")):
-            raise ConfigurationException(
-                "Unable to get data after shutdown as "
-                "cfg:Reports:keep_data_database is false")
         raise ConfigurationException(
             "No recorded data. Did the simulation run?")
 
