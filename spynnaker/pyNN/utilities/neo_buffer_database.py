@@ -29,7 +29,6 @@ from numpy.typing import NDArray
 import quantities
 import neo  # type: ignore[import]
 
-from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 
