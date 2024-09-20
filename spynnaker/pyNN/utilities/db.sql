@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS region_metadata(
     rec_id INTEGER NOT NULL
 		REFERENCES recording(rec_id) ON DELETE RESTRICT,
     region_id INTEGER NOT NULL
-		REFERENCES region(region_id) ON DELETE RESTRICT,
+		REFERENCES recording_region(recording_region_id) ON DELETE RESTRICT,
     recording_neurons_st TEXT,
     vertex_slice TEXT,
     base_key INT);

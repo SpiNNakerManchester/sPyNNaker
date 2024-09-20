@@ -326,7 +326,7 @@ class NeuronRecorder(object):
 
         # for buffering output info is taken form the buffer manager
         buffer_manager = SpynnakerDataView.get_buffer_manager()
-        record_raw, missing_data = buffer_manager.get_data_by_placement(
+        record_raw, missing_data = buffer_manager.get_recording(
             placement, region)
         record_length = len(record_raw)
 
