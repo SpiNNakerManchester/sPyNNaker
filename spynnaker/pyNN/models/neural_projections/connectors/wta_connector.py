@@ -23,6 +23,8 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.interface.ds import DataType
+from spynnaker.pyNN.types import Weight_Types
 
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
@@ -43,9 +45,9 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
     post-neuron in the same group, except the one with the same index.
     """
 
-    __slots__ = ("__n_values", )
+    __slots__ = ("__n_values", "__weights")
 
-    def __init__(self, n_values=None, safe=True,
+    def __init__(self, n_values=None, weights=None, safe=True,
                  verbose=None, callback=None):
         """
         :param int n_values:
@@ -64,6 +66,7 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
         """
         super().__init__(safe, callback, verbose)
         self.__n_values = n_values
+        self.__weights = weights
 
     def __n_connections(self, synapse_info):
         # If not specified, use the smallest of the two populations
@@ -121,9 +124,29 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
+        if self.__weights is not None:
+            return numpy.amax(self.__weights)
         return self._get_weight_maximum(
             synapse_info.weights, self.__n_connections(synapse_info),
             synapse_info)
+
+    @overrides(AbstractConnector.get_weight_mean)
+    def get_weight_mean(self, weights: Weight_Types,
+                        synapse_info: SynapseInformation) -> float:
+        if self.__weights is None:
+            return AbstractConnector.get_weight_mean(
+                self, weights, synapse_info)
+        else:
+            return float(numpy.mean(numpy.abs(self.__weights)))
+
+    @overrides(AbstractConnector.get_weight_variance)
+    def get_weight_variance(self, weights: Weight_Types,
+                            synapse_info: SynapseInformation) -> float:
+        if self.__weights is None:
+            return AbstractConnector.get_weight_variance(
+                self, weights, synapse_info)
+        else:
+            return float(numpy.var(numpy.abs(self.__weights)))
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
@@ -186,10 +209,19 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
         if n_values is None:
             n_values = min(synapse_info.n_pre_neurons,
                            synapse_info.n_post_neurons)
-        return numpy.array([int(n_values)], dtype=uint32)
+        has_weights = int(self.__weights is not None)
+        params = numpy.array([n_values, has_weights], dtype=uint32)
+        if self.__weights is None:
+            weights = numpy.zeros(0, dtype=uint32)
+        else:
+            weights = DataType.S1615.encode_as_numpy_int_array(self.__weights)
+        return numpy.concatenate((params, weights))
 
     @property
     @overrides(
         AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self) -> int:
-        return BYTES_PER_WORD
+        size = BYTES_PER_WORD * 2
+        if self.__weights is not None:
+            size += len(self.__weights) * BYTES_PER_WORD
+        return size

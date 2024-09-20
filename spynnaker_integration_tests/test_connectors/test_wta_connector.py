@@ -72,5 +72,23 @@ def test_wta_offline():
     assert numpy.array_equal(conns, offline_conns)
 
 
+def test_wta_weights():
+    sim.setup()
+    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
+    pre = sim.Population(11, sim.IF_curr_exp())
+    post = sim.Population(11, sim.IF_curr_exp())
+    weights = numpy.arange(0.25, ((11 * 10) + 1) * 0.25, 0.25)
+    conn = sim.extra_models.WTAConnector(weights=weights)
+    proj = sim.Projection(pre, post, conn)
+    sim.run(0)
+    conns = list(proj.get(["weight"], format="list"))
+    sim.end()
+    groups = list([i, j, w]
+                  for ((i, j), w) in zip(permutations(range(11), 2), weights))
+    print(conns)
+    print(groups)
+    assert numpy.array_equal(conns, groups)
+
+
 if __name__ == "__main__":
-    test_wta_offline()
+    test_wta_weights()

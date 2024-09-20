@@ -25,10 +25,28 @@
 #include <synapse_expander/generator_types.h>
 
 //! \brief The parameters to be passed around for this connector
+struct wta_conf {
+	// How many values there are in each WTA group
+    uint32_t n_values;
+
+    // Whether there are weight values specified or not
+    uint32_t has_weights;
+
+    // The weight values if specified.
+    // If so, there must be (n_values * n_values - 1) weights
+    accum weights[];
+};
+
+//! \brief The parameters to be passed around for this connector
 struct wta {
 	// How many values there are in each WTA group
     uint32_t n_values;
+
+    // The weight values if specified.
+    // If so, there must be (n_values * n_values - 1) weights
+    accum *weights;
 };
+
 
 /**
  * \brief Initialise the wta connection generator
@@ -37,15 +55,31 @@ struct wta {
  * \return A data item to be passed in to other functions later on
  */
 static void *connection_generator_wta_initialise(void **region) {
+	// Get the SDRAM params
+    struct wta_conf *params_sdram = *region;
+
     // Allocate the data structure for parameters
     struct wta *params = spin1_malloc(sizeof(struct wta));
-    struct wta *params_sdram = *region;
 
-    // Copy the parameters into the data structure
-    *params = *params_sdram;
-    *region = &params_sdram[1];
+    // Copy the parameters
+    params->n_values = params_sdram->n_values;
+	if (params_sdram->has_weights) {
+		uint32_t n_values = params->n_values;
+	    uint32_t weight_size = n_values * (n_values - 1) * sizeof(accum);
+	    params->weights = spin1_malloc(weight_size);
+	    if (params->weights == NULL) {
+			// If we can't copy, just reference the SDRAM
+			params->weights = &params_sdram->weights[0];
+		} else {
+			spin1_memcpy(&params->weights[0], &params_sdram->weights[0], weight_size);
+		}
+	    *region = &params_sdram->weights[n_values * (n_values - 1)];
+	} else {
+		params->weights = NULL;
+	    *region = &params_sdram->weights[0];
+	}
 
-    log_debug("WTA connector, n_values = %u", params->n_values);
+    log_info("WTA connector, n_values = %u, has_weights = %u", params->n_values, params_sdram->has_weights);
 
     return params;
 }
@@ -58,11 +92,10 @@ static void connection_generator_wta_free(void *generator) {
     sark_free(generator);
 }
 
-static inline bool make_wta_conn(param_generator_t weight_generator,
+static inline bool make_wta_conn(accum weight,
 		param_generator_t delay_generator, matrix_generator_t matrix_generator,
 		uint32_t pre, uint32_t post, unsigned long accum weight_scale,
 		accum timestep_per_delay) {
-	accum weight = param_generator_generate(weight_generator);
 	uint16_t delay = rescale_delay(
 			param_generator_generate(delay_generator), timestep_per_delay);
 	if (!matrix_generator_write_synapse(matrix_generator, pre, post,
@@ -86,6 +119,27 @@ static inline void div_mod(uint32_t dividend, uint32_t divisor, uint32_t *div,
 }
 
 /**
+ * Get the weight for a given pre *value* and post *value*.
+ */
+static inline accum get_weight(struct wta *obj, param_generator_t weight_generator,
+		uint32_t pre_value, uint32_t post_value) {
+	// Get the post position rather than the post value.  Because each "row" in
+	// the table has the diagonal removed, we need to adjust where we get the
+	// value from depending on the relative pre and post values (which must not
+	// be the same - this isn't checked here though).
+	uint32_t post_pos = post_value;
+	if (post_value >= pre_value) {
+		post_pos -= 1;
+	}
+	if (obj->weights != NULL) {
+		uint32_t weight_index = (pre_value * (obj->n_values - 1)) + post_pos;
+		return obj->weights[weight_index];
+	} else {
+		return param_generator_generate(weight_generator);
+	}
+}
+
+/**
  * \brief Generate connections with the wta connection generator
  * \param[in] generator: The generator to use to generate connections
  * \param[in] pre_slice_start: The start of the slice of the pre-population
@@ -99,7 +153,7 @@ static inline void div_mod(uint32_t dividend, uint32_t divisor, uint32_t *div,
  */
 static bool connection_generator_wta_generate(
         void *generator, uint32_t pre_lo, uint32_t pre_hi,
-        uint32_t post_lo, uint32_t post_hi, uint32_t post_index,
+        uint32_t post_lo, uint32_t post_hi, UNUSED uint32_t post_index,
         uint32_t post_slice_start, uint32_t post_slice_count,
         unsigned long accum weight_scale, accum timestep_per_delay,
         param_generator_t weight_generator, param_generator_t delay_generator,
@@ -133,10 +187,11 @@ static bool connection_generator_wta_generate(
 
 		// Go through each of the "values" in this group that can target this
 		// post neuron (each of which is a pre-neuron)
-		for (uint32_t value = 0; value < n_values; value++) {
-			if (value != post_value) {
-				uint32_t pre = pre_start + value;
-				if (!make_wta_conn(weight_generator, delay_generator,
+		for (uint32_t pre_value = 0; pre_value < n_values; pre_value++) {
+			if (pre_value != post_value) {
+				uint32_t pre = pre_start + pre_value;
+				accum weight = get_weight(obj, weight_generator, pre_value, post_value);
+				if (!make_wta_conn(weight, delay_generator,
 						matrix_generator, pre, local_post, weight_scale,
 						timestep_per_delay)) {
 				    return false;
