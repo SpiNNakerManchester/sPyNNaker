@@ -34,6 +34,8 @@ from .abstract_generate_connector_on_host import (
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge)
 
 
 class WTAConnector(AbstractGenerateConnectorOnMachine,
@@ -68,6 +70,17 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
         super().__init__(safe, callback, verbose)
         self.__n_neurons_per_group = n_neurons_per_group
         self.__weights = weights
+        self.__check_weights(weights, n_neurons_per_group)
+
+    def __check_weights(self, weights, n_neurons_per_group):
+        if weights is not None and n_neurons_per_group is not None:
+            n_weights = n_neurons_per_group * (n_neurons_per_group - 1)
+            if len(weights) != n_weights:
+                raise ValueError(
+                    "The number of weights must be equal to the number of "
+                    f"connections in a group "
+                    f"({n_neurons_per_group} x ({n_neurons_per_group} - 1) = "
+                    f"{n_weights})")
 
     def __n_connections(self, synapse_info):
         # If not specified, use the smallest of the two populations
@@ -229,3 +242,30 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
         if self.__weights is not None:
             size += len(self.__weights) * BYTES_PER_WORD
         return size
+
+    @overrides(AbstractConnector.validate_connection)
+    def validate_connection(
+            self, application_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation):
+        if (synapse_info.pre_population.size !=
+                synapse_info.post_population.size):
+            raise ValueError(
+                "WTAConnector can only be used with populations that are "
+                "the same size as each other")
+        if self.__n_neurons_per_group is not None:
+            if self.__n_neurons_per_group > synapse_info.pre_population.size:
+                raise ValueError(
+                    "WTAConnector cannot be used with a group size larger "
+                    "than the population size")
+            if ((synapse_info.post_population.size /
+                 self.__n_neurons_per_group) !=
+                    (synapse_info.post_population.size //
+                     self.__n_neurons_per_group)):
+                raise ValueError(
+                    "The number of neurons in each population must be "
+                    "divisible by the number of neurons per group")
+        n_neurons_per_group = self.__n_neurons_per_group
+        if n_neurons_per_group is None:
+            n_neurons_per_group = min(synapse_info.pre_population.size,
+                                      synapse_info.post_population.size)
+        self.__check_weights(self.__weights, n_neurons_per_group)

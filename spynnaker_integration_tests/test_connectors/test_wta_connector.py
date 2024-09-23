@@ -15,6 +15,7 @@ import pyNN.spiNNaker as sim
 from itertools import permutations
 import numpy
 from pacman.model.graphs.common.slice import Slice
+import pytest
 
 
 def test_wta():
@@ -33,16 +34,16 @@ def test_wta():
 
 def test_wta_groups():
     sim.setup()
-    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 4)
-    pop = sim.Population(11, sim.IF_curr_exp())
+    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
+    pop = sim.Population(12, sim.IF_curr_exp())
     proj = sim.Projection(pop, pop, sim.extra_models.WTAConnector(
         n_neurons_per_group=3))
     sim.run(0)
     conns = list(proj.get([], format="list"))
     sim.end()
     groups = list()
-    for group_start in range(0, 11, 3):
-        group_end = min(11, group_start + 3)
+    for group_start in range(0, 12, 3):
+        group_end = min(12, group_start + 3)
         neurons_in_group = range(group_start, group_end)
         groups.extend([i, j] for (i, j) in permutations(neurons_in_group, 2))
     print(conns)
@@ -91,5 +92,39 @@ def test_wta_weights():
     assert numpy.array_equal(conns, groups)
 
 
+def test_wta_wrong_number_of_neurons():
+    sim.setup()
+    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
+    pre = sim.Population(11, sim.IF_curr_exp())
+    post = sim.Population(11, sim.IF_curr_exp())
+    with pytest.raises(ValueError):
+        sim.Projection(
+            pre, post, sim.extra_models.WTAConnector(n_neurons_per_group=3))
+    sim.end()
+
+
+def test_wta_diff_number_of_neurons():
+    sim.setup()
+    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
+    pre = sim.Population(12, sim.IF_curr_exp())
+    post = sim.Population(9, sim.IF_curr_exp())
+    with pytest.raises(ValueError):
+        sim.Projection(
+            pre, post, sim.extra_models.WTAConnector(n_neurons_per_group=3))
+    sim.end()
+
+
+def test_wta_wrong_number_of_weights():
+    sim.setup()
+    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
+    pre = sim.Population(12, sim.IF_curr_exp())
+    post = sim.Population(12, sim.IF_curr_exp())
+    with pytest.raises(ValueError):
+        sim.Projection(
+            pre, post, sim.extra_models.WTAConnector(
+                n_neurons_per_group=3, weights=[10]))
+    sim.end()
+
+
 if __name__ == "__main__":
-    test_wta_weights()
+    test_wta_wrong_number_of_neurons()
