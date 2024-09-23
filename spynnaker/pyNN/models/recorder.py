@@ -236,6 +236,7 @@ class Recorder(object):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
         """
+        SpynnakerDataView.check_user_can_act()
         if self.__data_cache:
             dbfile = next(iter(self.__data_cache.values()))
         else:
@@ -314,8 +315,6 @@ class Recorder(object):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
         """
-        SpynnakerDataView.check_user_can_act()
-
         with NeoBufferDatabase() as db:
             if SpynnakerDataView.is_reset_last():
                 logger.warning(
