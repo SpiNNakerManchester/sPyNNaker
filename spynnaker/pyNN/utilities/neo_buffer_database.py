@@ -30,7 +30,6 @@ import quantities
 import neo  # type: ignore[import]
 
 from spinn_utilities.log import FormatAdapter
-
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 
 
