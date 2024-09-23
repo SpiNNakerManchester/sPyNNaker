@@ -20,7 +20,7 @@ from pacman.model.graphs.common.slice import Slice
 from spinnaker_testbase import BaseTestCase
 
 
-class  TestWTAConnector(BaseTestCase):
+class TestWTAConnector(BaseTestCase):
 
     def check_wta(self):
         sim.setup()
@@ -51,7 +51,8 @@ class  TestWTAConnector(BaseTestCase):
         for group_start in range(0, 12, 3):
             group_end = min(12, group_start + 3)
             neurons_in_group = range(group_start, group_end)
-            groups.extend([i, j] for (i, j) in permutations(neurons_in_group, 2))
+            groups.extend([i, j]
+                          for (i, j) in permutations(neurons_in_group, 2))
         print(conns)
         print(groups)
         assert numpy.array_equal(conns, groups)
@@ -95,8 +96,9 @@ class  TestWTAConnector(BaseTestCase):
         sim.run(0)
         conns = list(proj.get(["weight"], format="list"))
         sim.end()
-        groups = list([i, j, w]
-                      for ((i, j), w) in zip(permutations(range(11), 2), weights))
+        groups = list(
+            [i, j, w] for ((i, j), w) in
+            zip(permutations(range(11), 2), weights))
         print(conns)
         print(groups)
         assert numpy.array_equal(conns, groups)
@@ -111,7 +113,8 @@ class  TestWTAConnector(BaseTestCase):
         post = sim.Population(11, sim.IF_curr_exp())
         with pytest.raises(ValueError):
             sim.Projection(
-                pre, post, sim.extra_models.WTAConnector(n_neurons_per_group=3))
+                pre, post, sim.extra_models.WTAConnector(
+                    n_neurons_per_group = 3))
         sim.end()
 
     def test_wta_wrong_number_of_neurons(self):
@@ -124,7 +127,8 @@ class  TestWTAConnector(BaseTestCase):
         post = sim.Population(9, sim.IF_curr_exp())
         with pytest.raises(ValueError):
             sim.Projection(
-                pre, post, sim.extra_models.WTAConnector(n_neurons_per_group=3))
+                pre, post, sim.extra_models.WTAConnector(
+                    n_neurons_per_group = 3))
         sim.end()
 
     def test_wta_diff_number_of_neurons(self):
