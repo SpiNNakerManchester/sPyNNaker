@@ -40,9 +40,10 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
                    AbstractGenerateConnectorOnHost):
     """
     Normally used to connect a population to itself, the assumption is that
-    the population can represent multiple potential WTA groups, where each is
-    independent.  The connector will connect each pre-neuron in a group to each
-    post-neuron in the same group, except the one with the same index.
+    the population can represent multiple potential winner-takes-all groups,
+    where each is independent.  The connector will connect each pre-neuron in a
+    group to each post-neuron in the same group, except the one with the same
+    index.
     """
 
     __slots__ = ("__n_values", "__weights")
@@ -51,7 +52,7 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
                  verbose=None, callback=None):
         """
         :param int n_values:
-            The number of values in each WTA group.
+            The number of values in each winner-takes-all group.
         :param bool safe:
             If ``True``, check that weights and delays have valid values.
             If ``False``, this check is skipped.
@@ -106,7 +107,7 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
         if self.__n_values is not None:
             n_targets = min(self.__n_values - 1, n_post_atoms)
         if min_delay is None or max_delay is None:
-            n_targets
+            return n_targets
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays, self.__n_connections(synapse_info),
@@ -156,6 +157,7 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
         if group_size is None:
             group_size = min(synapse_info.n_pre_neurons,
                              synapse_info.n_post_neurons)
+        # pylint: disable=protected-access
         post_lo, post_hi = synapse_info.pre_population._view_range
         pre_lo, pre_hi = synapse_info.pre_population._view_range
         post_start = max(post_vertex_slice.lo_atom, post_lo)
