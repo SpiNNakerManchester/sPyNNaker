@@ -46,22 +46,32 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
     where each is independent.  The connector will connect each pre-neuron in a
     group to each post-neuron in the same group, except the one with the same
     index.
+
+    Can be used for two distinct populations BUT
+    they must have the same number of neurons
+    and neuron X of the source will not connect to neuron X of the target.
     """
 
     __slots__ = ("__n_neurons_per_group", "__weights")
 
-    def __init__(self, n_neurons_per_group=None, weights=None, safe=True,
-                 verbose=None, callback=None):
+    def __init__(self, n_neurons_per_group: Optional[int] = None,
+                 weights: Optional[NDArray[numpy.float64]] = None,
+                 safe: bool = True, verbose: Optional[bool] = None,
+                 callback: None = None):
         """
-        :param int n_neurons_per_group:
+        :param n_neurons_per_group:
             The number of neurons in each winner-takes-all group.
-        :param bool safe:
+            Must be a positive integer divisor of source.size
+        :param weights:
+            The weights for one group of neurons
+            Single Value, RandomDistribution and string values not supported.
+        :param safe:
             If ``True``, check that weights and delays have valid values.
             If ``False``, this check is skipped.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
@@ -72,7 +82,8 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
         self.__weights = weights
         self.__check_weights(weights, n_neurons_per_group)
 
-    def __check_weights(self, weights, n_neurons_per_group):
+    def __check_weights(self, weights: Optional[NDArray[numpy.float64]],
+                        n_neurons_per_group: Optional[int]):
         if weights is not None and n_neurons_per_group is not None:
             n_weights = n_neurons_per_group * (n_neurons_per_group - 1)
             if len(weights) != n_weights:
@@ -82,7 +93,7 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
                     f"({n_neurons_per_group} x ({n_neurons_per_group} - 1) = "
                     f"{n_weights})")
 
-    def __n_connections(self, synapse_info):
+    def __n_connections(self, synapse_info: SynapseInformation):
         # If not specified, use the smallest of the two populations
         if self.__n_neurons_per_group is None:
             n_values = min(synapse_info.n_pre_neurons,
