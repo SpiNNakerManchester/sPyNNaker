@@ -79,7 +79,8 @@ static void *connection_generator_wta_initialise(void **region) {
 	    *region = &params_sdram->weights[0];
 	}
 
-    log_info("WTA connector, n_values = %u, has_weights = %u", params->n_values, params_sdram->has_weights);
+    log_info("WTA connector, n_values = %u, has_weights = %u", params->n_values,
+    		params_sdram->has_weights);
 
     return params;
 }
