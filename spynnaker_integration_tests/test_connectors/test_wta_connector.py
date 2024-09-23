@@ -114,7 +114,7 @@ class TestWTAConnector(BaseTestCase):
         with pytest.raises(ValueError):
             sim.Projection(
                 pre, post, sim.extra_models.WTAConnector(
-                    n_neurons_per_group = 3))
+                    n_neurons_per_group=3))
         sim.end()
 
     def test_wta_wrong_number_of_neurons(self):
@@ -128,7 +128,7 @@ class TestWTAConnector(BaseTestCase):
         with pytest.raises(ValueError):
             sim.Projection(
                 pre, post, sim.extra_models.WTAConnector(
-                    n_neurons_per_group = 3))
+                    n_neurons_per_group=3))
         sim.end()
 
     def test_wta_diff_number_of_neurons(self):
