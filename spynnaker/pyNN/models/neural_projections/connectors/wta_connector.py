@@ -46,13 +46,13 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
     index.
     """
 
-    __slots__ = ("__n_values", "__weights")
+    __slots__ = ("__n_neurons_per_group", "__weights")
 
-    def __init__(self, n_values=None, weights=None, safe=True,
+    def __init__(self, n_neurons_per_group=None, weights=None, safe=True,
                  verbose=None, callback=None):
         """
-        :param int n_values:
-            The number of values in each winner-takes-all group.
+        :param int n_neurons_per_group:
+            The number of neurons in each winner-takes-all group.
         :param bool safe:
             If ``True``, check that weights and delays have valid values.
             If ``False``, this check is skipped.
@@ -66,21 +66,23 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
                 Not supported by sPyNNaker.
         """
         super().__init__(safe, callback, verbose)
-        self.__n_values = n_values
+        self.__n_neurons_per_group = n_neurons_per_group
         self.__weights = weights
 
     def __n_connections(self, synapse_info):
         # If not specified, use the smallest of the two populations
-        if self.__n_values is None:
+        if self.__n_neurons_per_group is None:
             n_values = min(synapse_info.n_pre_neurons,
                            synapse_info.n_post_neurons)
             return n_values * (n_values - 1)
 
         # Find out how many groups there are at most
-        n_groups_pre = synapse_info.n_pre_neurons // self.__n_values
-        n_groups_post = synapse_info.n_post_neurons // self.__n_values
+        n_groups_pre = synapse_info.n_pre_neurons // self.__n_neurons_per_group
+        n_groups_post = (synapse_info.n_post_neurons //
+                         self.__n_neurons_per_group)
         n_groups = min(n_groups_pre, n_groups_post)
-        return n_groups * self.__n_values * (self.__n_values - 1)
+        return (n_groups * self.__n_neurons_per_group *
+                (self.__n_neurons_per_group - 1))
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
@@ -104,8 +106,8 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
         # except the one with the same index.  For a given subset of post
         # atoms, there might be fewer to target...
         n_targets = n_post_atoms
-        if self.__n_values is not None:
-            n_targets = min(self.__n_values - 1, n_post_atoms)
+        if self.__n_neurons_per_group is not None:
+            n_targets = min(self.__n_neurons_per_group - 1, n_post_atoms)
         if min_delay is None or max_delay is None:
             return n_targets
 
@@ -118,10 +120,10 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
             self, synapse_info: SynapseInformation) -> int:
         # At most, each post-neuron will be targeted by all pre-neurons in a
         # group, except the one with the same index.
-        if self.__n_values is None:
+        if self.__n_neurons_per_group is None:
             return min(synapse_info.n_pre_neurons,
                        synapse_info.n_post_neurons) - 1
-        return self.__n_values - 1
+        return self.__n_neurons_per_group - 1
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
@@ -153,7 +155,7 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
     def create_synaptic_block(
             self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
             synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
-        group_size = self.__n_values
+        group_size = self.__n_neurons_per_group
         if group_size is None:
             group_size = min(synapse_info.n_pre_neurons,
                              synapse_info.n_post_neurons)
@@ -197,7 +199,7 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
         return block
 
     def __repr__(self):
-        return f"WTAConnector(n_values={self.__n_values})"
+        return f"WTAConnector(n_neuron_per_group={self.__n_neurons_per_group})"
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
@@ -207,7 +209,7 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
             self, synapse_info: SynapseInformation) -> NDArray[uint32]:
-        n_values = self.__n_values
+        n_values = self.__n_neurons_per_group
         if n_values is None:
             n_values = min(synapse_info.n_pre_neurons,
                            synapse_info.n_post_neurons)

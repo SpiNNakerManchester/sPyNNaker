@@ -35,7 +35,8 @@ def test_wta_groups():
     sim.setup()
     sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 4)
     pop = sim.Population(11, sim.IF_curr_exp())
-    proj = sim.Projection(pop, pop, sim.extra_models.WTAConnector(n_values=3))
+    proj = sim.Projection(pop, pop, sim.extra_models.WTAConnector(
+        n_neurons_per_group=3))
     sim.run(0)
     conns = list(proj.get([], format="list"))
     sim.end()
