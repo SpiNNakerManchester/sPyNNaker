@@ -96,6 +96,7 @@ $(function() {
 <code>#include &quot;<a class="el" href="connection__generator__fixed__pre_8h_source.html">connection_generators/connection_generator_fixed_pre.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="connection__generator__fixed__post_8h_source.html">connection_generators/connection_generator_fixed_post.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="connection__generator__kernel_8h_source.html">connection_generators/connection_generator_kernel.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="connection__generator__all__but__me_8h_source.html">connection_generators/connection_generator_all_but_me.h</a>&quot;</code><br />
 </div>
 <p><a href="connection__generator_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -119,7 +120,9 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceaa667dfec30c43a0320c7bd76b99bd4c7">FIXED_PRE</a>
 , <a class="el" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceaa130e7b038fc0ede3b0203931063b116">FIXED_POST</a>
 , <a class="el" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fcea53c6e691e7db9eceefc0fb37cb724cd2">KERNEL</a>
-, <a class="el" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceab1144285d7382feeb4687af0263e2467">N_CONNECTION_GENERATORS</a>
+, <a class="el" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fcea37abc5f972bd9d81bd02f1ede4200e1e">ALL_BUT_ME</a>
+, <br />
+&#160;&#160;<a class="el" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceab1144285d7382feeb4687af0263e2467">N_CONNECTION_GENERATORS</a>
 <br />
  }</td></tr>
 <tr class="memdesc:aaf105ae5beaca1dee30ae54530691fce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Known "hashes" of connection generators.  <a href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fce">More...</a><br /></td></tr>
@@ -161,7 +164,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p>A "class" for connection generators. </p>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00050">50</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00052">52</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -206,7 +209,7 @@ Frees any data for the generator. </td></tr>
 <div class="textblock"><p>The data for a connection generator. </p>
 <p>Connection generator "object". </p>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00065">65</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00067">67</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -255,11 +258,13 @@ data</td>
 </td></tr>
 <tr><td class="fieldname"><a id="aaf105ae5beaca1dee30ae54530691fcea53c6e691e7db9eceefc0fb37cb724cd2" name="aaf105ae5beaca1dee30ae54530691fcea53c6e691e7db9eceefc0fb37cb724cd2"></a>KERNEL&#160;</td><td class="fielddoc"><p>Convolution kernel connection generator. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="aaf105ae5beaca1dee30ae54530691fcea37abc5f972bd9d81bd02f1ede4200e1e" name="aaf105ae5beaca1dee30ae54530691fcea37abc5f972bd9d81bd02f1ede4200e1e"></a>ALL_BUT_ME&#160;</td><td class="fielddoc"><p>AllButMe connection generator. </p>
+</td></tr>
 <tr><td class="fieldname"><a id="aaf105ae5beaca1dee30ae54530691fceab1144285d7382feeb4687af0263e2467" name="aaf105ae5beaca1dee30ae54530691fceab1144285d7382feeb4687af0263e2467"></a>N_CONNECTION_GENERATORS&#160;</td><td class="fielddoc"><p>The number of known generators. </p>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00038">38</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00039">39</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 
 </div>
 </div>
@@ -300,7 +305,7 @@ data</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An initialised connection generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00102">102</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00108">108</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 
 </div>
 </div>
@@ -412,7 +417,7 @@ data</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of connections generated </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00130">130</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00136">136</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 
 </div>
 </div>
@@ -440,7 +445,7 @@ data</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00143">143</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00149">149</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 
 </div>
 </div>
@@ -464,75 +469,17 @@ data</td>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
-<div class="line">    {<a class="code hl_enumvalue" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceadaccc17f840cc67d0e9c1a9a331b2fb4">ONE_TO_ONE</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__one__to__one_8h.html#aebf476a54cd4676d243dfc25c6d0b9ba">connection_generator_one_to_one_initialise</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__one__to__one_8h.html#a0995920e464679529f2a804431341768">connection_generator_one_to_one_generate</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__one__to__one_8h.html#a519a2706ae01863c6124c8dc78a6a8a7">connection_generator_one_to_one_free</a>},</div>
-<div class="line">    {<a class="code hl_enumvalue" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fcea403e4025d2925f132293a50eae7381fe">ALL_TO_ALL</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__all__to__all_8h.html#a4b108e7a6f036749f5e95c75c42ad5ec">connection_generator_all_to_all_initialise</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__all__to__all_8h.html#af13222b82326b2caa582ee2b216252de">connection_generator_all_to_all_generate</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__all__to__all_8h.html#a71eb137d1e03e170895b6bf705bcd0bd">connection_generator_all_to_all_free</a>},</div>
-<div class="line">    {<a class="code hl_enumvalue" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fcea8f6a6db47b5476cf11f24317f14ee4a7">FIXED_PROBABILITY</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__fixed__prob_8h.html#a2fc35e6abb5092061cf619615b65e385">connection_generator_fixed_prob_initialise</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__fixed__prob_8h.html#ac8b2f5a508831466425f0f0967a30604">connection_generator_fixed_prob_generate</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__fixed__prob_8h.html#ad5ab082c89ff3e5317a09aa7f67a6442">connection_generator_fixed_prob_free</a>},</div>
-<div class="line">    {<a class="code hl_enumvalue" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fcea8338dcf5840ce1a01a4c26d9c49dc560">FIXED_TOTAL</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__fixed__total_8h.html#a511965266bcd412ca17e61aa8651b71e">connection_generator_fixed_total_initialise</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__fixed__total_8h.html#a5326514456754b8f06dfff55a3d4ee7a">connection_generator_fixed_total_generate</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__fixed__total_8h.html#a0d3e8f5ac6f3487cc51cf868f75e7619">connection_generator_fixed_total_free</a>},</div>
-<div class="line">    {<a class="code hl_enumvalue" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceaa667dfec30c43a0320c7bd76b99bd4c7">FIXED_PRE</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__fixed__pre_8h.html#a6f42d103a8e2a6767ff3acefca67076f">connection_generator_fixed_pre_initialise</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__fixed__pre_8h.html#a7451194e2c09026732c5d82654c8120c">connection_generator_fixed_pre_generate</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__fixed__pre_8h.html#ac7bbf4bf4f70b6455cb935e57165a614">connection_generator_fixed_pre_free</a>},</div>
-<div class="line">    {<a class="code hl_enumvalue" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceaa130e7b038fc0ede3b0203931063b116">FIXED_POST</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__fixed__post_8h.html#a693239adbef288dda13b0c6530e47c56">connection_generator_fixed_post_initialise</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__fixed__post_8h.html#a7d6fda536e854ee9bab7178fd773b5a9">connection_generator_fixed_post_generate</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__fixed__post_8h.html#ae913507c69e31814ff266356875d0c3f">connection_generator_fixed_post_free</a>},</div>
-<div class="line">    {<a class="code hl_enumvalue" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fcea53c6e691e7db9eceefc0fb37cb724cd2">KERNEL</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__kernel_8h.html#a0f9f9790bda6198acbb71dcd1dfb64fe">connection_generator_kernel_initialise</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__kernel_8h.html#a9d2040bb7df48fbe84c9ce51256964a3">connection_generator_kernel_generate</a>,</div>
-<div class="line">            <a class="code hl_function" href="connection__generator__kernel_8h.html#a0e3d6a7e01f6bcfe0c5f9063e879bff2">connection_generator_kernel_free</a>}</div>
-<div class="line">}</div>
-<div class="ttc" id="aconnection__generator_8c_html_aaf105ae5beaca1dee30ae54530691fcea403e4025d2925f132293a50eae7381fe"><div class="ttname"><a href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fcea403e4025d2925f132293a50eae7381fe">ALL_TO_ALL</a></div><div class="ttdeci">@ ALL_TO_ALL</div><div class="ttdoc">All-to-all connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator_8c_source.html#l00040">connection_generator.c:40</a></div></div>
-<div class="ttc" id="aconnection__generator_8c_html_aaf105ae5beaca1dee30ae54530691fcea53c6e691e7db9eceefc0fb37cb724cd2"><div class="ttname"><a href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fcea53c6e691e7db9eceefc0fb37cb724cd2">KERNEL</a></div><div class="ttdeci">@ KERNEL</div><div class="ttdoc">Convolution kernel connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator_8c_source.html#l00045">connection_generator.c:45</a></div></div>
-<div class="ttc" id="aconnection__generator_8c_html_aaf105ae5beaca1dee30ae54530691fcea8338dcf5840ce1a01a4c26d9c49dc560"><div class="ttname"><a href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fcea8338dcf5840ce1a01a4c26d9c49dc560">FIXED_TOTAL</a></div><div class="ttdeci">@ FIXED_TOTAL</div><div class="ttdoc">Fixed total connections connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator_8c_source.html#l00042">connection_generator.c:42</a></div></div>
-<div class="ttc" id="aconnection__generator_8c_html_aaf105ae5beaca1dee30ae54530691fcea8f6a6db47b5476cf11f24317f14ee4a7"><div class="ttname"><a href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fcea8f6a6db47b5476cf11f24317f14ee4a7">FIXED_PROBABILITY</a></div><div class="ttdeci">@ FIXED_PROBABILITY</div><div class="ttdoc">Fixed probability connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator_8c_source.html#l00041">connection_generator.c:41</a></div></div>
-<div class="ttc" id="aconnection__generator_8c_html_aaf105ae5beaca1dee30ae54530691fceaa130e7b038fc0ede3b0203931063b116"><div class="ttname"><a href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceaa130e7b038fc0ede3b0203931063b116">FIXED_POST</a></div><div class="ttdeci">@ FIXED_POST</div><div class="ttdoc">Fixed post-size connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator_8c_source.html#l00044">connection_generator.c:44</a></div></div>
-<div class="ttc" id="aconnection__generator_8c_html_aaf105ae5beaca1dee30ae54530691fceaa667dfec30c43a0320c7bd76b99bd4c7"><div class="ttname"><a href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceaa667dfec30c43a0320c7bd76b99bd4c7">FIXED_PRE</a></div><div class="ttdeci">@ FIXED_PRE</div><div class="ttdoc">Fixed pre-size connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator_8c_source.html#l00043">connection_generator.c:43</a></div></div>
-<div class="ttc" id="aconnection__generator_8c_html_aaf105ae5beaca1dee30ae54530691fceadaccc17f840cc67d0e9c1a9a331b2fb4"><div class="ttname"><a href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceadaccc17f840cc67d0e9c1a9a331b2fb4">ONE_TO_ONE</a></div><div class="ttdeci">@ ONE_TO_ONE</div><div class="ttdoc">One-to-one connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator_8c_source.html#l00039">connection_generator.c:39</a></div></div>
-<div class="ttc" id="aconnection__generator__all__to__all_8h_html_a4b108e7a6f036749f5e95c75c42ad5ec"><div class="ttname"><a href="connection__generator__all__to__all_8h.html#a4b108e7a6f036749f5e95c75c42ad5ec">connection_generator_all_to_all_initialise</a></div><div class="ttdeci">static void * connection_generator_all_to_all_initialise(void **region)</div><div class="ttdoc">Initialise the all-to-all connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__all__to__all_8h_source.html#l00040">connection_generator_all_to_all.h:40</a></div></div>
-<div class="ttc" id="aconnection__generator__all__to__all_8h_html_a71eb137d1e03e170895b6bf705bcd0bd"><div class="ttname"><a href="connection__generator__all__to__all_8h.html#a71eb137d1e03e170895b6bf705bcd0bd">connection_generator_all_to_all_free</a></div><div class="ttdeci">static void connection_generator_all_to_all_free(void *generator)</div><div class="ttdoc">Free the all-to-all connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__all__to__all_8h_source.html#l00059">connection_generator_all_to_all.h:59</a></div></div>
-<div class="ttc" id="aconnection__generator__all__to__all_8h_html_af13222b82326b2caa582ee2b216252de"><div class="ttname"><a href="connection__generator__all__to__all_8h.html#af13222b82326b2caa582ee2b216252de">connection_generator_all_to_all_generate</a></div><div class="ttdeci">static bool connection_generator_all_to_all_generate(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</div><div class="ttdoc">Generate connections with the all-to-all connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__all__to__all_8h_source.html#l00075">connection_generator_all_to_all.h:75</a></div></div>
-<div class="ttc" id="aconnection__generator__fixed__post_8h_html_a693239adbef288dda13b0c6530e47c56"><div class="ttname"><a href="connection__generator__fixed__post_8h.html#a693239adbef288dda13b0c6530e47c56">connection_generator_fixed_post_initialise</a></div><div class="ttdeci">static void * connection_generator_fixed_post_initialise(void **region)</div><div class="ttdoc">Initialise the fixed-post connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__fixed__post_8h_source.html#l00053">connection_generator_fixed_post.h:53</a></div></div>
-<div class="ttc" id="aconnection__generator__fixed__post_8h_html_a7d6fda536e854ee9bab7178fd773b5a9"><div class="ttname"><a href="connection__generator__fixed__post_8h.html#a7d6fda536e854ee9bab7178fd773b5a9">connection_generator_fixed_post_generate</a></div><div class="ttdeci">static bool connection_generator_fixed_post_generate(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</div><div class="ttdoc">Generate connections with the fixed-post connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__fixed__post_8h_source.html#l00118">connection_generator_fixed_post.h:118</a></div></div>
-<div class="ttc" id="aconnection__generator__fixed__post_8h_html_ae913507c69e31814ff266356875d0c3f"><div class="ttname"><a href="connection__generator__fixed__post_8h.html#ae913507c69e31814ff266356875d0c3f">connection_generator_fixed_post_free</a></div><div class="ttdeci">static void connection_generator_fixed_post_free(void *generator)</div><div class="ttdoc">Free the fixed-post connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__fixed__post_8h_source.html#l00073">connection_generator_fixed_post.h:73</a></div></div>
-<div class="ttc" id="aconnection__generator__fixed__pre_8h_html_a6f42d103a8e2a6767ff3acefca67076f"><div class="ttname"><a href="connection__generator__fixed__pre_8h.html#a6f42d103a8e2a6767ff3acefca67076f">connection_generator_fixed_pre_initialise</a></div><div class="ttdeci">static void * connection_generator_fixed_pre_initialise(void **region)</div><div class="ttdoc">Initialise the fixed-pre connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__fixed__pre_8h_source.html#l00060">connection_generator_fixed_pre.h:60</a></div></div>
-<div class="ttc" id="aconnection__generator__fixed__pre_8h_html_a7451194e2c09026732c5d82654c8120c"><div class="ttname"><a href="connection__generator__fixed__pre_8h.html#a7451194e2c09026732c5d82654c8120c">connection_generator_fixed_pre_generate</a></div><div class="ttdeci">bool connection_generator_fixed_pre_generate(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</div><div class="ttdoc">Generate connections with the fixed-pre connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__fixed__pre_8h_source.html#l00105">connection_generator_fixed_pre.h:105</a></div></div>
-<div class="ttc" id="aconnection__generator__fixed__pre_8h_html_ac7bbf4bf4f70b6455cb935e57165a614"><div class="ttname"><a href="connection__generator__fixed__pre_8h.html#ac7bbf4bf4f70b6455cb935e57165a614">connection_generator_fixed_pre_free</a></div><div class="ttdeci">void connection_generator_fixed_pre_free(void *generator)</div><div class="ttdoc">Free the fixed-pre connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__fixed__pre_8h_source.html#l00082">connection_generator_fixed_pre.h:82</a></div></div>
-<div class="ttc" id="aconnection__generator__fixed__prob_8h_html_a2fc35e6abb5092061cf619615b65e385"><div class="ttname"><a href="connection__generator__fixed__prob_8h.html#a2fc35e6abb5092061cf619615b65e385">connection_generator_fixed_prob_initialise</a></div><div class="ttdeci">static void * connection_generator_fixed_prob_initialise(void **region)</div><div class="ttdoc">Initialise the fixed-probability connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__fixed__prob_8h_source.html#l00049">connection_generator_fixed_prob.h:49</a></div></div>
-<div class="ttc" id="aconnection__generator__fixed__prob_8h_html_ac8b2f5a508831466425f0f0967a30604"><div class="ttname"><a href="connection__generator__fixed__prob_8h.html#ac8b2f5a508831466425f0f0967a30604">connection_generator_fixed_prob_generate</a></div><div class="ttdeci">static bool connection_generator_fixed_prob_generate(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</div><div class="ttdoc">Generate connections with the fixed-probability connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__fixed__prob_8h_source.html#l00091">connection_generator_fixed_prob.h:91</a></div></div>
-<div class="ttc" id="aconnection__generator__fixed__prob_8h_html_ad5ab082c89ff3e5317a09aa7f67a6442"><div class="ttname"><a href="connection__generator__fixed__prob_8h.html#ad5ab082c89ff3e5317a09aa7f67a6442">connection_generator_fixed_prob_free</a></div><div class="ttdeci">static void connection_generator_fixed_prob_free(void *generator)</div><div class="ttdoc">Free the fixed-probability connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__fixed__prob_8h_source.html#l00068">connection_generator_fixed_prob.h:68</a></div></div>
-<div class="ttc" id="aconnection__generator__fixed__total_8h_html_a0d3e8f5ac6f3487cc51cf868f75e7619"><div class="ttname"><a href="connection__generator__fixed__total_8h.html#a0d3e8f5ac6f3487cc51cf868f75e7619">connection_generator_fixed_total_free</a></div><div class="ttdeci">static void connection_generator_fixed_total_free(void *generator)</div><div class="ttdoc">Free the fixed-total connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__fixed__total_8h_source.html#l00140">connection_generator_fixed_total.h:140</a></div></div>
-<div class="ttc" id="aconnection__generator__fixed__total_8h_html_a511965266bcd412ca17e61aa8651b71e"><div class="ttname"><a href="connection__generator__fixed__total_8h.html#a511965266bcd412ca17e61aa8651b71e">connection_generator_fixed_total_initialise</a></div><div class="ttdeci">static void * connection_generator_fixed_total_initialise(void **region)</div><div class="ttdoc">Draw from a binomial distribution i.e. with replacement.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__fixed__total_8h_source.html#l00100">connection_generator_fixed_total.h:100</a></div></div>
-<div class="ttc" id="aconnection__generator__fixed__total_8h_html_a5326514456754b8f06dfff55a3d4ee7a"><div class="ttname"><a href="connection__generator__fixed__total_8h.html#a5326514456754b8f06dfff55a3d4ee7a">connection_generator_fixed_total_generate</a></div><div class="ttdeci">static bool connection_generator_fixed_total_generate(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</div><div class="ttdoc">Generate connections with the fixed-total connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__fixed__total_8h_source.html#l00177">connection_generator_fixed_total.h:177</a></div></div>
-<div class="ttc" id="aconnection__generator__kernel_8h_html_a0e3d6a7e01f6bcfe0c5f9063e879bff2"><div class="ttname"><a href="connection__generator__kernel_8h.html#a0e3d6a7e01f6bcfe0c5f9063e879bff2">connection_generator_kernel_free</a></div><div class="ttdeci">static void connection_generator_kernel_free(void *generator)</div><div class="ttdoc">Free the convolution-kernel connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__kernel_8h_source.html#l00115">connection_generator_kernel.h:115</a></div></div>
-<div class="ttc" id="aconnection__generator__kernel_8h_html_a0f9f9790bda6198acbb71dcd1dfb64fe"><div class="ttname"><a href="connection__generator__kernel_8h.html#a0f9f9790bda6198acbb71dcd1dfb64fe">connection_generator_kernel_initialise</a></div><div class="ttdeci">static void * connection_generator_kernel_initialise(void **region)</div><div class="ttdoc">Initialise the convolution-kernel connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__kernel_8h_source.html#l00084">connection_generator_kernel.h:84</a></div></div>
-<div class="ttc" id="aconnection__generator__kernel_8h_html_a9d2040bb7df48fbe84c9ce51256964a3"><div class="ttname"><a href="connection__generator__kernel_8h.html#a9d2040bb7df48fbe84c9ce51256964a3">connection_generator_kernel_generate</a></div><div class="ttdeci">static bool connection_generator_kernel_generate(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</div><div class="ttdoc">Generate connections with the convolution-kernel connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__kernel_8h_source.html#l00138">connection_generator_kernel.h:138</a></div></div>
-<div class="ttc" id="aconnection__generator__one__to__one_8h_html_a0995920e464679529f2a804431341768"><div class="ttname"><a href="connection__generator__one__to__one_8h.html#a0995920e464679529f2a804431341768">connection_generator_one_to_one_generate</a></div><div class="ttdeci">static bool connection_generator_one_to_one_generate(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</div><div class="ttdoc">Generate connections with the one-to-one connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__one__to__one_8h_source.html#l00064">connection_generator_one_to_one.h:64</a></div></div>
-<div class="ttc" id="aconnection__generator__one__to__one_8h_html_a519a2706ae01863c6124c8dc78a6a8a7"><div class="ttname"><a href="connection__generator__one__to__one_8h.html#a519a2706ae01863c6124c8dc78a6a8a7">connection_generator_one_to_one_free</a></div><div class="ttdeci">static void connection_generator_one_to_one_free(void *generator)</div><div class="ttdoc">Free the one-to-one connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__one__to__one_8h_source.html#l00041">connection_generator_one_to_one.h:41</a></div></div>
-<div class="ttc" id="aconnection__generator__one__to__one_8h_html_aebf476a54cd4676d243dfc25c6d0b9ba"><div class="ttname"><a href="connection__generator__one__to__one_8h.html#aebf476a54cd4676d243dfc25c6d0b9ba">connection_generator_one_to_one_initialise</a></div><div class="ttdeci">static void * connection_generator_one_to_one_initialise(void **region)</div><div class="ttdoc">Initialise the one-to-one connection generator.</div><div class="ttdef"><b>Definition</b> <a href="connection__generator__one__to__one_8h_source.html#l00030">connection_generator_one_to_one.h:30</a></div></div>
-</div><!-- fragment -->
+
 <p>An Array of known generators. </p>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00071">71</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00073">73</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Sep 23 2024 10:34:59 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
+Generated on Tue Sep 24 2024 11:45:56 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
 </small></address>
 </body>
 </html>

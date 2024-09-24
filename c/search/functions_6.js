@@ -16,5 +16,6 @@ var searchData=
   ['get_5frow_5faddr_5fand_5fsize_13',['get_row_addr_and_size',['../population__table_8h.html#a45f32a7841183cdb7aab2be2a91fd6ba',1,'population_table.h']]],
   ['get_5frow_5flength_14',['get_row_length',['../population__table_8h.html#a44d4641d18cf8073f34f171a7e9a0f54',1,'population_table.h']]],
   ['get_5fstdp_5ffixed_5frow_15',['get_stdp_fixed_row',['../matrix__generator__stdp_8h.html#a97c90fc0e4a1cf3399c32a8421380e9a',1,'matrix_generator_stdp.h']]],
-  ['get_5ftype_5fchar_16',['get_type_char',['../synapses_8c.html#a1a333d14cf1e2ac31a3d3d8bee59dedd',1,'synapses.c']]]
+  ['get_5ftype_5fchar_16',['get_type_char',['../synapses_8c.html#a1a333d14cf1e2ac31a3d3d8bee59dedd',1,'synapses.c']]],
+  ['get_5fweight_17',['get_weight',['../connection__generator__all__but__me_8h.html#a92f901f11db3fa84feb3cd401e4ca672',1,'connection_generator_all_but_me.h']]]
 ];

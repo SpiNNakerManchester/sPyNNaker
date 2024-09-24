@@ -9216,6 +9216,7 @@
     <includes id="connection__generator__fixed__pre_8h" name="connection_generator_fixed_pre.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_fixed_pre.h</includes>
     <includes id="connection__generator__fixed__post_8h" name="connection_generator_fixed_post.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_fixed_post.h</includes>
     <includes id="connection__generator__kernel_8h" name="connection_generator_kernel.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_kernel.h</includes>
+    <includes id="connection__generator__all__but__me_8h" name="connection_generator_all_but_me.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_all_but_me.h</includes>
     <class kind="struct">connection_generator_info</class>
     <class kind="struct">connection_generator</class>
     <member kind="enumvalue">
@@ -9258,6 +9259,12 @@
       <name>KERNEL</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
       <anchor>aaf105ae5beaca1dee30ae54530691fcea53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ALL_BUT_ME</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>aaf105ae5beaca1dee30ae54530691fcea37abc5f972bd9d81bd02f1ede4200e1e</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
@@ -9321,6 +9328,42 @@
       <anchorfile>connection__generator_8h.html</anchorfile>
       <anchor>aae17e4a6bdf077f36b078033db1c7fbe</anchor>
       <arglist>(connection_generator_t generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>connection_generator_all_but_me.h</name>
+    <path>src/synapse_expander/connection_generators/</path>
+    <filename>connection__generator__all__but__me_8h.html</filename>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
+    <class kind="struct">all_but_me_conf</class>
+    <class kind="struct">all_but_me</class>
+    <member kind="function" static="yes">
+      <type>static void *</type>
+      <name>connection_generator_all_but_me_initialise</name>
+      <anchorfile>connection__generator__all__but__me_8h.html</anchorfile>
+      <anchor>a2aa78b833aead77694d27666289a119b</anchor>
+      <arglist>(void **region)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>connection_generator_all_but_me_free</name>
+      <anchorfile>connection__generator__all__but__me_8h.html</anchorfile>
+      <anchor>a1a40c2d7750a8a0088cfd941edf93e29</anchor>
+      <arglist>(void *generator)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static accum</type>
+      <name>get_weight</name>
+      <anchorfile>connection__generator__all__but__me_8h.html</anchorfile>
+      <anchor>a92f901f11db3fa84feb3cd401e4ca672</anchor>
+      <arglist>(struct all_but_me *obj, param_generator_t weight_generator, uint32_t pre_value, uint32_t post_value)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>connection_generator_all_but_me_generate</name>
+      <anchorfile>connection__generator__all__but__me_8h.html</anchorfile>
+      <anchor>a9807e38c00ed1f42fe51fd652e0fd338</anchor>
+      <arglist>(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -10547,6 +10590,16 @@
       <anchor>a2e8ba6ab7ff064d79ef52417c492d38e</anchor>
       <arglist></arglist>
     </member>
+  </compound>
+  <compound kind="struct">
+    <name>all_but_me</name>
+    <filename>connection__generator__all__but__me_8h.html</filename>
+    <anchor>structall__but__me</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>all_but_me_conf</name>
+    <filename>connection__generator__all__but__me_8h.html</filename>
+    <anchor>structall__but__me__conf</anchor>
   </compound>
   <compound kind="struct">
     <name>all_to_all</name>

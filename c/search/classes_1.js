@@ -10,10 +10,12 @@ var searchData=
   ['alias_5felement_5ft_7',['alias_element_t',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/aliases_8h.html',1,'']]],
   ['alias_5flist_5ft_8',['alias_list_t',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/aliases_8h.html',1,'']]],
   ['aliases_5ft_9',['aliases_t',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/aliases_8h.html',1,'']]],
-  ['all_5fto_5fall_10',['all_to_all',['../connection__generator__all__to__all_8h.html#structall__to__all',1,'']]],
-  ['alpha_5fparams_5ft_11',['alpha_params_t',['../synapse__types__alpha__impl_8h.html#structalpha__params__t',1,'']]],
-  ['alpha_5fstate_5ft_12',['alpha_state_t',['../synapse__types__alpha__impl_8h.html#structalpha__state__t',1,'']]],
-  ['app_5fdata_5ft_13',['app_data_t',['https://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html',1,'']]],
-  ['arp_5fentry_14',['arp_entry',['https://spinnakermanchester.github.io/spinnaker_tools/spinn__net_8c.html',1,'']]],
-  ['arp_5fpkt_5ft_15',['arp_pkt_t',['https://spinnakermanchester.github.io/spinnaker_tools/spinn__net_8h.html',1,'']]]
+  ['all_5fbut_5fme_10',['all_but_me',['../connection__generator__all__but__me_8h.html#structall__but__me',1,'']]],
+  ['all_5fbut_5fme_5fconf_11',['all_but_me_conf',['../connection__generator__all__but__me_8h.html#structall__but__me__conf',1,'']]],
+  ['all_5fto_5fall_12',['all_to_all',['../connection__generator__all__to__all_8h.html#structall__to__all',1,'']]],
+  ['alpha_5fparams_5ft_13',['alpha_params_t',['../synapse__types__alpha__impl_8h.html#structalpha__params__t',1,'']]],
+  ['alpha_5fstate_5ft_14',['alpha_state_t',['../synapse__types__alpha__impl_8h.html#structalpha__state__t',1,'']]],
+  ['app_5fdata_5ft_15',['app_data_t',['https://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html',1,'']]],
+  ['arp_5fentry_16',['arp_entry',['https://spinnakermanchester.github.io/spinnaker_tools/spinn__net_8c.html',1,'']]],
+  ['arp_5fpkt_5ft_17',['arp_pkt_t',['https://spinnakermanchester.github.io/spinnaker_tools/spinn__net_8h.html',1,'']]]
 ];
