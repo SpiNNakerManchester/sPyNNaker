@@ -152,7 +152,7 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
         if self.__weights is not None:
-            return numpy.amax(self.__weights)
+            return float(numpy.amax(self.__weights))
         return self._get_weight_maximum(
             synapse_info.weights, self.__n_connections(synapse_info),
             synapse_info)
