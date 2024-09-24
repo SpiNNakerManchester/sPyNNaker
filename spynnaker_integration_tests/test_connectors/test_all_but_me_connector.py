@@ -118,7 +118,7 @@ class TestAllButMeConnector(BaseTestCase):
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(11, sim.IF_curr_exp())
         post = sim.Population(11, sim.IF_curr_exp())
-        with pytest.raises(ValueError):
+        with pytest.raises(NotImplementedError):
             sim.Projection(
                 pre, post, sim.extra_models.AllButMeConnector(
                     n_neurons_per_group=3))
@@ -132,7 +132,7 @@ class TestAllButMeConnector(BaseTestCase):
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(12, sim.IF_curr_exp())
         post = sim.Population(9, sim.IF_curr_exp())
-        with pytest.raises(ValueError):
+        with pytest.raises(NotImplementedError):
             sim.Projection(
                 pre, post, sim.extra_models.AllButMeConnector(
                     n_neurons_per_group=3))

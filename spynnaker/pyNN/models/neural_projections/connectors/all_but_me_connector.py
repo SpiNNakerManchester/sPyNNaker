@@ -260,19 +260,21 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
             synapse_info: SynapseInformation):
         if (synapse_info.pre_population.size !=
                 synapse_info.post_population.size):
-            raise ValueError(
-                "WTAConnector can only be used with populations that are "
-                "the same size as each other")
+            # Probably works by implementation but there is no know need
+            raise NotImplementedError(
+                "AllButMeConnector is only designed to be used with "
+                "populations that are the same size as each other")
         if self.__n_neurons_per_group is not None:
             if self.__n_neurons_per_group > synapse_info.pre_population.size:
                 raise ValueError(
-                    "WTAConnector cannot be used with a group size larger "
-                    "than the population size")
+                    "AllButMeConnector cannot be used with a group size "
+                    "larger than the population size")
             if ((synapse_info.post_population.size /
                  self.__n_neurons_per_group) !=
                     (synapse_info.post_population.size //
                      self.__n_neurons_per_group)):
-                raise ValueError(
+                # Probably works by implementation but there is no know need
+                raise NotImplementedError(
                     "The number of neurons in each population must be "
                     "divisible by the number of neurons per group")
         n_neurons_per_group = self.__n_neurons_per_group
