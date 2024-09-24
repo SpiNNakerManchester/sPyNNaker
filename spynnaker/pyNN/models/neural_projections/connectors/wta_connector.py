@@ -56,7 +56,7 @@ class WTAConnector(AbstractGenerateConnectorOnMachine,
 
     def __init__(self, n_neurons_per_group: Optional[int] = None,
                  weights: Optional[NDArray[numpy.float64]] = None,
-                 safe: bool = True, verbose: Optional[bool] = None,
+                 safe: bool = True, verbose: bool = False,
                  callback: None = None):
         """
         :param n_neurons_per_group:
