@@ -44,18 +44,19 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
     A Connector that connect all the neurons except the one with the same id.
 
     This will connect each neuron in each group (default a single group for
-    the whole Population) which all the target neurons in that group except
+    the whole Population) to the target neurons in that group except
     the one with the same id.
 
-    There is also an option to add weights for each group.
+    There is also an option to add weights.
+    These are then used for each group.
 
     The know use case is multiple potential winner-takes-all groups where the
     connector each time a neurons spikes will inhibit all other neurons
     in the group.
 
-    As the only know usecase is source and target population of the same size
+    As the only know use case is source and target population of the same size
     (including self connections) whose size is an exact positive integer
-    multiple of the n_neurons_per_group that is all currently supported.
+    multiple of the n_neurons_per_group so that is all currently supported.
     """
 
     __slots__ = ("__n_neurons_per_group", "__weights")
