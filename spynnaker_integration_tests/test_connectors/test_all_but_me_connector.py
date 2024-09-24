@@ -20,13 +20,13 @@ from pacman.model.graphs.common.slice import Slice
 from spinnaker_testbase import BaseTestCase
 
 
-class TestWTAConnector(BaseTestCase):
+class TestAllButMeConnector(BaseTestCase):
 
-    def check_wta(self):
+    def check_all_but_me(self):
         sim.setup()
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 2)
         pop = sim.Population(11, sim.IF_curr_exp())
-        proj = sim.Projection(pop, pop, sim.extra_models.WTAConnector())
+        proj = sim.Projection(pop, pop, sim.extra_models.AllButMeConnector())
         sim.run(0)
         conns = list(proj.get([], format="list"))
         sim.end()
@@ -35,14 +35,14 @@ class TestWTAConnector(BaseTestCase):
         print(groups)
         assert numpy.array_equal(conns, groups)
 
-    def test_wta(self):
-        self.runsafe(self.check_wta)
+    def test_all_but_me(self):
+        self.runsafe(self.check_all_but_me)
 
-    def check_wta_groups(self):
+    def check_all_but_me_groups(self):
         sim.setup()
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
         pop = sim.Population(12, sim.IF_curr_exp())
-        proj = sim.Projection(pop, pop, sim.extra_models.WTAConnector(
+        proj = sim.Projection(pop, pop, sim.extra_models.AllButMeConnector(
             n_neurons_per_group=3))
         sim.run(0)
         conns = list(proj.get([], format="list"))
@@ -57,13 +57,13 @@ class TestWTAConnector(BaseTestCase):
         print(groups)
         assert numpy.array_equal(conns, groups)
 
-    def test_wta_groups(self):
-        self.runsafe(self.check_wta_groups)
+    def test_all_but_me_groups(self):
+        self.runsafe(self.check_all_but_me_groups)
 
-    def check_wta_offline(self):
+    def check_all_but_me_offline(self):
         sim.setup()
         pop = sim.Population(11, sim.IF_curr_exp())
-        conn = sim.extra_models.WTAConnector()
+        conn = sim.extra_models.AllButMeConnector()
         proj = sim.Projection(pop, pop, conn)
         sim.run(0)
         conns = list(proj.get([], format="list"))
@@ -82,16 +82,16 @@ class TestWTAConnector(BaseTestCase):
         assert numpy.array_equal(conns, groups)
         assert numpy.array_equal(conns, offline_conns)
 
-    def test_wta_offline(self):
-        self.runsafe(self.check_wta_offline)
+    def test_all_but_me_offline(self):
+        self.runsafe(self.check_all_but_me_offline)
 
-    def check_wta_weights(self):
+    def check_all_but_me_weights(self):
         sim.setup()
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(11, sim.IF_curr_exp())
         post = sim.Population(11, sim.IF_curr_exp())
         weights = numpy.arange(0.25, ((11 * 10) + 1) * 0.25, 0.25)
-        conn = sim.extra_models.WTAConnector(weights=weights)
+        conn = sim.extra_models.AllButMeConnector(weights=weights)
         proj = sim.Projection(pre, post, conn)
         sim.run(0)
         conns = list(proj.get(["weight"], format="list"))
@@ -103,47 +103,47 @@ class TestWTAConnector(BaseTestCase):
         print(groups)
         assert numpy.array_equal(conns, groups)
 
-    def test_wta_weights(self):
-        self.runsafe(self.check_wta_weights)
+    def test_all_but_me_weights(self):
+        self.runsafe(self.check_all_but_me_weights)
 
-    def check_wta_wrong_number_of_neurons(self):
+    def check_all_but_me_wrong_number_of_neurons(self):
         sim.setup()
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(11, sim.IF_curr_exp())
         post = sim.Population(11, sim.IF_curr_exp())
         with pytest.raises(ValueError):
             sim.Projection(
-                pre, post, sim.extra_models.WTAConnector(
+                pre, post, sim.extra_models.AllButMeConnector(
                     n_neurons_per_group=3))
         sim.end()
 
-    def test_wta_wrong_number_of_neurons(self):
-        self.runsafe(self.check_wta_wrong_number_of_neurons)
+    def test_all_but_me_wrong_number_of_neurons(self):
+        self.runsafe(self.check_all_but_me_wrong_number_of_neurons)
 
-    def check_wta_diff_number_of_neurons(self):
+    def check_all_but_me_diff_number_of_neurons(self):
         sim.setup()
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(12, sim.IF_curr_exp())
         post = sim.Population(9, sim.IF_curr_exp())
         with pytest.raises(ValueError):
             sim.Projection(
-                pre, post, sim.extra_models.WTAConnector(
+                pre, post, sim.extra_models.AllButMeConnector(
                     n_neurons_per_group=3))
         sim.end()
 
-    def test_wta_diff_number_of_neurons(self):
-        self.runsafe(self.check_wta_diff_number_of_neurons)
+    def test_all_but_me_diff_number_of_neurons(self):
+        self.runsafe(self.check_all_but_me_diff_number_of_neurons)
 
-    def check_wta_wrong_number_of_weights(self):
+    def check_all_but_me_wrong_number_of_weights(self):
         sim.setup()
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(12, sim.IF_curr_exp())
         post = sim.Population(12, sim.IF_curr_exp())
         with pytest.raises(ValueError):
             sim.Projection(
-                pre, post, sim.extra_models.WTAConnector(
+                pre, post, sim.extra_models.AllButMeConnector(
                     n_neurons_per_group=3, weights=[10]))
         sim.end()
 
-    def test_wta_wrong_number_of_weights(self):
-        self.runsafe(self.check_wta_wrong_number_of_weights)
+    def test_all_but_me_wrong_number_of_weights(self):
+        self.runsafe(self.check_all_but_me_wrong_number_of_weights)

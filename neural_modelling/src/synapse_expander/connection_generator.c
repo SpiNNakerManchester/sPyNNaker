@@ -31,7 +31,7 @@
 #include "connection_generators/connection_generator_fixed_pre.h"
 #include "connection_generators/connection_generator_fixed_post.h"
 #include "connection_generators/connection_generator_kernel.h"
-#include "connection_generators/connection_generator_wta.h"
+#include "connection_generators/connection_generator_all_but_me.h"
 
 //! \brief Known "hashes" of connection generators
 //!
@@ -44,7 +44,7 @@ enum {
     FIXED_PRE,             //!< Fixed pre-size connection generator
     FIXED_POST,            //!< Fixed post-size connection generator
     KERNEL,                //!< Convolution kernel connection generator
-	WTA,                   //!< Winner takes all connection generator
+	ALL_BUT_ME,            //!< AllButMe connection generator
     N_CONNECTION_GENERATORS//!< The number of known generators
 };
 
@@ -99,10 +99,10 @@ static const connection_generator_info connection_generators[] = {
             connection_generator_kernel_initialise,
             connection_generator_kernel_generate,
             connection_generator_kernel_free},
-    {WTA,
-			connection_generator_wta_initialise,
-			connection_generator_wta_generate,
-			connection_generator_wta_free}
+    {ALL_BUT_ME,
+			connection_generator_all_but_me_initialise,
+			connection_generator_all_but_me_generate,
+			connection_generator_all_but_me_free}
 };
 
 connection_generator_t connection_generator_init(

@@ -38,8 +38,8 @@ if TYPE_CHECKING:
         ProjectionApplicationEdge)
 
 
-class WTAConnector(AbstractGenerateConnectorOnMachine,
-                   AbstractGenerateConnectorOnHost):
+class AllButMeConnector(AbstractGenerateConnectorOnMachine,
+                        AbstractGenerateConnectorOnHost):
     """
     Normally used to connect a population to itself, the assumption is that
     the population can represent multiple potential winner-takes-all groups,
