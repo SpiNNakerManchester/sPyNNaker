@@ -30,13 +30,13 @@ class TestAllButMeConnector(BaseTestCase):
         pop = sim.Population(11, sim.IF_curr_exp())
         proj = sim.Projection(
             pop, pop, sim.extra_models.AllButMeConnector(),
-              synapse_type=sim.StaticSynapse(weight = weight))
+            synapse_type=sim.StaticSynapse(weight=weight))
         sim.run(0)
         conns = list(proj.get(["weight", "delay"], format="list"))
         sim.end()
         print(conns)
         # weight if not set in the connector will be the one from the syanpse
-        #delay if not set in the synapse will be the timestep
+        # delay if not set in the synapse will be the timestep
         for index, (i, j) in enumerate(permutations(range(11), 2)):
             assert conns[index] == [i, j, weight, timestep]
 
@@ -99,7 +99,7 @@ class TestAllButMeConnector(BaseTestCase):
         conn = sim.extra_models.AllButMeConnector(weights=weights)
         # The weight in the synapse_type is ignored it the connector has one
         proj = sim.Projection(pre, post, conn,
-                              synapse_type=sim.StaticSynapse(weight = .3))
+                              synapse_type=sim.StaticSynapse(weight=.3))
         sim.run(0)
         conns = list(proj.get(["weight"], format="list"))
         sim.end()
