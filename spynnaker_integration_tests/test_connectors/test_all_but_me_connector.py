@@ -23,23 +23,28 @@ from spinnaker_testbase import BaseTestCase
 class TestAllButMeConnector(BaseTestCase):
 
     def check_all_but_me(self):
-        sim.setup()
+        weight = 5.0
+        timestep = 1.0
+        sim.setup(timestep=timestep)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 2)
         pop = sim.Population(11, sim.IF_curr_exp())
-        proj = sim.Projection(pop, pop, sim.extra_models.AllButMeConnector())
+        proj = sim.Projection(
+            pop, pop, sim.extra_models.AllButMeConnector(),
+              synapse_type=sim.StaticSynapse(weight = weight))
         sim.run(0)
-        conns = list(proj.get([], format="list"))
+        conns = list(proj.get(["weight", "delay"], format="list"))
         sim.end()
-        groups = list([i, j] for (i, j) in permutations(range(11), 2))
         print(conns)
-        print(groups)
-        assert numpy.array_equal(conns, groups)
+        # weight if not set in the connector will be the one from the syanpse
+        #delay if not set in the synapse will be the timestep
+        for index, (i, j) in enumerate(permutations(range(11), 2)):
+            assert conns[index] == [i, j, weight, timestep]
 
     def test_all_but_me(self):
         self.runsafe(self.check_all_but_me)
 
     def check_all_but_me_groups(self):
-        sim.setup()
+        sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
         pop = sim.Population(12, sim.IF_curr_exp())
         proj = sim.Projection(pop, pop, sim.extra_models.AllButMeConnector(
@@ -61,7 +66,7 @@ class TestAllButMeConnector(BaseTestCase):
         self.runsafe(self.check_all_but_me_groups)
 
     def check_all_but_me_offline(self):
-        sim.setup()
+        sim.setup(timestep=1)
         pop = sim.Population(11, sim.IF_curr_exp())
         conn = sim.extra_models.AllButMeConnector()
         proj = sim.Projection(pop, pop, conn)
@@ -86,13 +91,15 @@ class TestAllButMeConnector(BaseTestCase):
         self.runsafe(self.check_all_but_me_offline)
 
     def check_all_but_me_weights(self):
-        sim.setup()
+        sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(11, sim.IF_curr_exp())
         post = sim.Population(11, sim.IF_curr_exp())
         weights = numpy.arange(0.25, ((11 * 10) + 1) * 0.25, 0.25)
         conn = sim.extra_models.AllButMeConnector(weights=weights)
-        proj = sim.Projection(pre, post, conn)
+        # The weight in the synapse_type is ignored it the connector has one
+        proj = sim.Projection(pre, post, conn,
+                              synapse_type=sim.StaticSynapse(weight = .3))
         sim.run(0)
         conns = list(proj.get(["weight"], format="list"))
         sim.end()
@@ -107,7 +114,7 @@ class TestAllButMeConnector(BaseTestCase):
         self.runsafe(self.check_all_but_me_weights)
 
     def check_all_but_me_wrong_number_of_neurons(self):
-        sim.setup()
+        sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(11, sim.IF_curr_exp())
         post = sim.Population(11, sim.IF_curr_exp())
@@ -121,7 +128,7 @@ class TestAllButMeConnector(BaseTestCase):
         self.runsafe(self.check_all_but_me_wrong_number_of_neurons)
 
     def check_all_but_me_diff_number_of_neurons(self):
-        sim.setup()
+        sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(12, sim.IF_curr_exp())
         post = sim.Population(9, sim.IF_curr_exp())
@@ -135,7 +142,7 @@ class TestAllButMeConnector(BaseTestCase):
         self.runsafe(self.check_all_but_me_diff_number_of_neurons)
 
     def check_all_but_me_wrong_number_of_weights(self):
-        sim.setup()
+        sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(12, sim.IF_curr_exp())
         post = sim.Population(12, sim.IF_curr_exp())
