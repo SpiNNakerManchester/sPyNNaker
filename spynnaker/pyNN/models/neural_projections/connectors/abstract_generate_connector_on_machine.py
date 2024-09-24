@@ -53,6 +53,7 @@ class ConnectorIDs(Enum):
     FIXED_NUMBER_PRE_CONNECTOR = 4
     FIXED_NUMBER_POST_CONNECTOR = 5
     KERNEL_CONNECTOR = 6
+    WTA_CONNECTOR = 7
 
 
 class AbstractGenerateConnectorOnMachine(

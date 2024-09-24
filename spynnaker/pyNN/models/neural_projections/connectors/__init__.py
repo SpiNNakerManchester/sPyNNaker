@@ -17,6 +17,7 @@ from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine)
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+from .all_but_me_connector import AllButMeConnector
 from .all_to_all_connector import AllToAllConnector
 from .array_connector import ArrayConnector
 from .csa_connector import CSAConnector
@@ -36,8 +37,8 @@ from .convolution_connector import ConvolutionConnector
 from .pool_dense_connector import PoolDenseConnector
 
 __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
-           "AbstractGenerateConnectorOnHost", "AllToAllConnector",
-           "ArrayConnector", "CSAConnector",
+           "AbstractGenerateConnectorOnHost", "AllButMeConnector",
+           "AllToAllConnector", "ArrayConnector", "CSAConnector",
            "DistanceDependentProbabilityConnector", "FixedNumberPostConnector",
            "FixedNumberPreConnector", "FixedProbabilityConnector",
            "FromFileConnector",
