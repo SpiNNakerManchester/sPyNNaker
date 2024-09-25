@@ -298,7 +298,7 @@ def setup(timestep: Optional[Union[float, Literal["auto"]]] = None,
             f"The default PyNN timestep of {_pynn_control.DEFAULT_TIMESTEP} "
             "is less than 1(ms) that SpyNNaker is designed for. "
             "Consider including a timestep in your setup call.")
-        timestep = _pynn_control.DEFAULT_TIMESTEP
+        timestep = float(_pynn_control.DEFAULT_TIMESTEP)
     elif timestep == "auto":
         timestep = SPYNNAKER_AUTO_TIMESTEP
     if min_delay == "auto":
