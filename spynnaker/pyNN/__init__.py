@@ -246,7 +246,7 @@ def distance(src_cell: IDMixin, tgt_cell: IDMixin,
         src_cell, tgt_cell, mask, scale_factor, offset, periodic_boundaries)
 
 
-def setup(timestep: Optional[float] = None,
+def setup(timestep: Optional[Union[float, Literal["auto"]]] = None,
           min_delay: Union[float, Literal["auto"]] = (
               _pynn_control.DEFAULT_MIN_DELAY),
           max_delay: Optional[Union[float, Literal["auto"]]] = None,
