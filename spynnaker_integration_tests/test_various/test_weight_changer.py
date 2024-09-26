@@ -43,6 +43,11 @@ def test_weight_changer_limits():
     changer_2 = sim.Population(
         5, sim.SpikeSourceArray(spike_times=changes_2))
 
+    pre.set_max_atoms_per_core(4)
+    post.set_max_atoms_per_core(3)
+    changer_1.set_max_atoms_per_core(2)
+    changer_2.set_max_atoms_per_core(1)
+
     changable_proj_1 = sim.Projection(
         pre, post, sim.OneToOneConnector(),
         sim.extra_models.WeightChangeable(0.25, 4.5, weight=2.0, delay=1.0))
@@ -176,4 +181,4 @@ def test_weight_changer_diffs():
 
 
 if __name__ == "__main__":
-    test_weight_changer_diffs()
+    test_weight_changer_limits()
