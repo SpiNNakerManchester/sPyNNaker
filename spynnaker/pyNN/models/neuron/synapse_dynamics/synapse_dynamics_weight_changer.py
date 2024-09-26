@@ -52,7 +52,7 @@ class SynapseDynamicsWeightChanger(
     Synapses that target a weight change
     """
 
-    __slots__ = ["__projection"]
+    __slots__ = ["__post_vertex", "__synapse_info"]
 
     def __init__(self, weight_change: float, projection: Projection):
         """
@@ -62,12 +62,15 @@ class SynapseDynamicsWeightChanger(
             The projection that this synapse dynamics is being added to
         """
         super().__init__(delay=1, weight=weight_change)
-        self.__projection = projection
         # pylint: disable=protected-access
-        if not isinstance(projection._synapse_information.synapse_dynamics,
+        self.__synapse_info = projection._synapse_information
+        if not isinstance(self.__synapse_info.synapse_dynamics,
                           SynapseDynamicsWeightChangable):
             raise SynapticConfigurationException(
                 "A changer can only affect a changeable projection")
+        # Note: we store the post vertex here rather than the dynamics, as the
+        # dynamics can change over time
+        self.__post_vertex = self.__synapse_info.post_vertex
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
     def merge(self, synapse_dynamics: AbstractSynapseDynamics
@@ -227,17 +230,21 @@ class SynapseDynamicsWeightChanger(
         n_synapse_type_bits = get_n_bits(
             vertex.neuron_impl.get_n_synapse_types())
         n_synapse_index_bits = get_n_bits(max_post_atoms_per_core)
+        # We need to use the "global" dynamics object to get the offset
+        dynamics = app_edge.post_vertex.synapse_dynamics
+        row_offset = dynamics.get_synapse_info_index(self.__synapse_info)
         return numpy.array([
             synaptic_matrix_offset, max_row_info.undelayed_max_words,
             max_row_info.undelayed_max_n_synapses,
             app_edge.pre_vertex.n_atoms, synapse_info.synapse_type,
-            n_synapse_type_bits, n_synapse_index_bits], dtype=uint32)
+            n_synapse_type_bits, n_synapse_index_bits, row_offset],
+            dtype=uint32)
 
     @property
     @overrides(AbstractGenerateOnMachine.
                gen_matrix_params_size_in_bytes)
     def gen_matrix_params_size_in_bytes(self) -> int:
-        return 7 * BYTES_PER_WORD
+        return 8 * BYTES_PER_WORD
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.changes_during_run)
@@ -262,22 +269,19 @@ class SynapseDynamicsWeightChanger(
     def get_weight_maximum(
             self, connector: AbstractConnector,
             synapse_info: SynapseInformation) -> float:
-        # pylint: disable=protected-access
-        dynamics = self.__projection._synapse_information.synapse_dynamics
-        return dynamics.get_weight_maximum(connector, synapse_info)
+        return self.__post_vertex.synapse_dynamics.get_weight_maximum(
+            connector, synapse_info)
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)
     def get_weight_mean(
             self, connector: AbstractConnector,
             synapse_info: SynapseInformation) -> float:
-        # pylint: disable=protected-access
-        dynamics = self.__projection._synapse_information.synapse_dynamics
-        return dynamics.get_weight_mean(connector, synapse_info)
+        return self.__post_vertex.synapse_dynamics.get_weight_mean(
+            connector, synapse_info)
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_variance)
     def get_weight_variance(
             self, connector: AbstractConnector, weights: Weight_Types,
             synapse_info: SynapseInformation) -> float:
-        # pylint: disable=protected-access
-        dynamics = self.__projection._synapse_information.synapse_dynamics
-        return dynamics.get_weight_variance(connector, weights, synapse_info)
+        return self.__post_vertex.synapse_dynamics.get_weight_variance(
+            connector, weights, synapse_info)

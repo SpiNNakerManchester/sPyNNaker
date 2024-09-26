@@ -71,7 +71,13 @@ class SynapseDynamicsWeightChangable(
         "__weight_max",
 
         # The minimum weight
-        "__weight_min")
+        "__weight_min",
+
+        # The map of synapse information to index
+        "__synapse_info_to_index",
+
+        # The next index to use for the next projection
+        "__next_index")
 
     def __init__(
             self,
@@ -86,6 +92,8 @@ class SynapseDynamicsWeightChangable(
         super().__init__(delay=delay, weight=weight)
         self.__weight_max = weight_max
         self.__weight_min = weight_min
+        self.__synapse_info_to_index = dict()
+        self.__next_index = 0
 
     @property
     def weight_max(self) -> float:
@@ -94,6 +102,12 @@ class SynapseDynamicsWeightChangable(
     @property
     def weight_min(self) -> float:
         return self.__weight_min
+
+    def get_synapse_info_index(self, synapse_info: SynapseInformation) -> int:
+        if synapse_info not in self.__synapse_info_to_index:
+            self.__synapse_info_to_index[synapse_info] = self.__next_index
+            self.__next_index += synapse_info.pre_vertex.n_atoms
+        return self.__synapse_info_to_index[synapse_info]
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
     def merge(self, synapse_dynamics: AbstractSynapseDynamics
@@ -221,7 +235,8 @@ class SynapseDynamicsWeightChangable(
         plastic_plastic_row_data = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows, plastic_plastic_bytes,
             max_n_synapses)
-
+        # TODO: Get the synapse info index and add to the row offset
+        # row_offset = self.get_synapse_info_index(synapse_info)
         plastic_headers = numpy.arange(n_rows, dtype=uint32).view(
             uint8).reshape((-1, BYTES_PER_WORD))
         plastic_plastic_rows = [
@@ -347,6 +362,9 @@ class SynapseDynamicsWeightChangable(
         n_half_words = 1
         header_half_words = 2
         write_row_number_to_header = 1
+        # We need to use the "global" dynamics object to get the offset
+        dynamics = app_edge.post_vertex.synapse_dynamics
+        row_offset = dynamics.get_synapse_info_index(synapse_info)
         return numpy.array([
             synaptic_matrix_offset, delayed_matrix_offset,
             max_row_info.undelayed_max_n_synapses,
@@ -356,13 +374,13 @@ class SynapseDynamicsWeightChangable(
             n_synapse_index_bits, app_edge.n_delay_stages + 1,
             max_delay, max_delay_bits, app_edge.pre_vertex.n_atoms,
             max_pre_atoms_per_core, header_half_words,
-            n_half_words, half_word, write_row_number_to_header],
+            n_half_words, half_word, write_row_number_to_header, row_offset],
             dtype=uint32)
 
     @property
     @overrides(AbstractGenerateOnMachine.gen_matrix_params_size_in_bytes)
     def gen_matrix_params_size_in_bytes(self) -> int:
-        return 18 * BYTES_PER_WORD
+        return 19 * BYTES_PER_WORD
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.changes_during_run)

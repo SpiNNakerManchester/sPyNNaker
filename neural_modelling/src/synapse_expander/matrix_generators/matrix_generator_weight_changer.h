@@ -39,6 +39,7 @@ typedef struct {
     uint32_t synapse_type;
     uint32_t synapse_type_bits;
     uint32_t synapse_index_bits;
+    uint32_t row_offset;
 } matrix_generator_weight_changer;
 
 //! The layout of the initial plastic synapse part of the row
@@ -86,11 +87,11 @@ static row_changer_fixed_t *get_changer_fixed_row(row_changer_plastic_t *plastic
  * \param[in] max_row_n_words The maximum number of words used by a row
  */
 static void setup_changer_rows(uint32_t *matrix, uint32_t n_rows,
-		uint32_t max_row_n_words) {
+		uint32_t max_row_n_words, uint32_t row_offset) {
     for (uint32_t i = 0; i < n_rows; i++) {
         row_changer_plastic_t *row = get_changer_row(matrix, max_row_n_words, i);
         row->plastic_plastic_size = 1;
-        row->pre_spike = i;
+        row->pre_spike = i + row_offset;
         row->is_update = 1;
         row_changer_fixed_t *fixed = get_changer_fixed_row(row);
         fixed->fixed_fixed_size = 0;
@@ -121,7 +122,7 @@ void *matrix_generator_changer_initialize(void **region,
     uint32_t *syn_mat = synaptic_matrix;
     conf->synaptic_matrix = &(syn_mat[conf->synaptic_matrix_offset]);
     setup_changer_rows(conf->synaptic_matrix, conf->n_pre_neurons,
-    		conf->max_row_n_words);
+    		conf->max_row_n_words, conf->row_offset);
 
     return conf;
 }
