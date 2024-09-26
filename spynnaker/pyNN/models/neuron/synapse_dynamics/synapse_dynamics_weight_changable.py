@@ -127,6 +127,7 @@ class SynapseDynamicsWeightChangable(
         if not self.is_same_as(synapse_dynamics):
             raise SynapticConfigurationException(
                 "Multiple WeightChangables must have the same min and max")
+        return self
 
     @overrides(AbstractPlasticSynapseDynamics.get_value)
     def get_value(self, key: str) -> Any:
