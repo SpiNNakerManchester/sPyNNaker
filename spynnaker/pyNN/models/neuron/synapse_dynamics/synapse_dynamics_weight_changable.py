@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Any, Iterable, List, Optional, Tuple, TYPE_CHECKING
+from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
@@ -26,9 +26,7 @@ from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 
-from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.exceptions import (
-    SynapticConfigurationException, InvalidParameterType)
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.types import Weight_Types
