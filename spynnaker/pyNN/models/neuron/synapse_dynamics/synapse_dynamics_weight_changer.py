@@ -236,7 +236,7 @@ class SynapseDynamicsWeightChanger(
         return numpy.array([
             synaptic_matrix_offset, max_row_info.undelayed_max_words,
             max_row_info.undelayed_max_n_synapses,
-            app_edge.pre_vertex.n_atoms, synapse_info.synapse_type,
+            app_edge.pre_vertex.n_atoms, self.__synapse_info.synapse_type,
             n_synapse_type_bits, n_synapse_index_bits, row_offset],
             dtype=uint32)
 
@@ -270,18 +270,39 @@ class SynapseDynamicsWeightChanger(
             self, connector: AbstractConnector,
             synapse_info: SynapseInformation) -> float:
         return self.__post_vertex.synapse_dynamics.get_weight_maximum(
-            connector, synapse_info)
+            self.__synapse_info.connector, self.__synapse_info)
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)
     def get_weight_mean(
             self, connector: AbstractConnector,
             synapse_info: SynapseInformation) -> float:
-        return self.__post_vertex.synapse_dynamics.get_weight_mean(
-            connector, synapse_info)
+        return self.get_weight_maximum(connector, synapse_info)
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_variance)
     def get_weight_variance(
             self, connector: AbstractConnector, weights: Weight_Types,
             synapse_info: SynapseInformation) -> float:
-        return self.__post_vertex.synapse_dynamics.get_weight_variance(
-            connector, weights, synapse_info)
+        return 0.0
+
+    @overrides(AbstractPlasticSynapseDynamics.validate_connection)
+    def validate_connection(
+            self, application_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation):
+        if (application_edge.pre_vertex.n_atoms !=
+                self.__synapse_info.pre_vertex.n_atoms):
+            raise SynapticConfigurationException(
+                "The pre-Population of this projection must have the same"
+                " number of atoms as the pre-Population of the projection"
+                " whose weights are to be changed")
+        if application_edge.post_vertex != self.__synapse_info.post_vertex:
+            raise SynapticConfigurationException(
+                "The post-Population of this projection must be the same as"
+                " the post-Population of the projection whose weights are to"
+                " be changed")
+        if synapse_info.synapse_type != self.__synapse_info.synapse_type:
+            raise SynapticConfigurationException(
+                "The synapse type of the projection must be the same as the"
+                " synapse type of the projection whose weights are to be"
+                " changed")
+        AbstractPlasticSynapseDynamics.validate_connection(
+            self, application_edge, synapse_info)
