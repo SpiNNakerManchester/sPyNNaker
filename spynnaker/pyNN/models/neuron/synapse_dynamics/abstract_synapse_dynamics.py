@@ -40,6 +40,8 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections.connectors import (
         AbstractConnector)
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -377,3 +379,22 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         # By default, we can only support the maximum row length per core
         return POP_TABLE_MAX_ROW_LENGTH
+
+    def validate_connection(
+            self, application_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation):
+        """
+        Checks that the edge supports the connector.  Returns nothing; it
+        is assumed that an Exception will be raised if anything is wrong.
+
+        By default this checks only that the views are not used
+        on multi-dimensional vertices.
+
+        :param application_edge: The edge of the connection
+        :type application_edge:
+            ~pacman.model.graphs.application.ApplicationEdge
+        :param SynapseInformation synapse_info: The synaptic information
+        """
+        # By default, just ask the connector
+        synapse_info.connector.validate_connection(
+            application_edge, synapse_info)
