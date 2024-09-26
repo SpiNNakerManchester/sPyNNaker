@@ -28,7 +28,8 @@ MODELS = IF_curr_exp \
          IF_trunc_delta \
          IF_curr_alpha \
          IF_cond_exp_stoc \
-         IF_curr_exp_sEMD
+         IF_curr_exp_sEMD \
+         IF_curr_exp_weight_change
 
 ifneq ($(SPYNNAKER_DEBUG), DEBUG)
     MODELS += external_device_lif_control \
