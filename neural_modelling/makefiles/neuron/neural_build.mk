@@ -158,14 +158,16 @@ else
     SYNAPSE_DYNAMICS_STATIC := neuron/plasticity/synapse_dynamics_static_impl.c
     STDP_ENABLED = 0
     ifneq ($(SYNAPSE_DYNAMICS), $(SYNAPSE_DYNAMICS_STATIC))
-        STDP_ENABLED = 1
-
-        ifndef TIMING_DEPENDENCE_H
-            $(error TIMING_DEPENDENCE_H is not set which is required when SYNAPSE_DYNAMICS ($(SYNAPSE_DYNAMICS_C)) != $(SYNAPSE_DYNAMICS_STATIC))
-        endif
-        ifndef WEIGHT_DEPENDENCE_H
-            $(error WEIGHT_DEPENDENCE_H is not set which is required when SYNAPSE_DYNAMICS ($(SYNAPSE_DYNAMICS_C)) != $(SYNAPSE_DYNAMICS_STATIC))
-        endif
+        ifndef SYNAPSE_DYNAMICS_CUSTOM
+	        STDP_ENABLED = 1
+	
+	        ifndef TIMING_DEPENDENCE_H
+	            $(error TIMING_DEPENDENCE_H is not set which is required when SYNAPSE_DYNAMICS ($(SYNAPSE_DYNAMICS_C)) != $(SYNAPSE_DYNAMICS_STATIC))
+	        endif
+	        ifndef WEIGHT_DEPENDENCE_H
+	            $(error WEIGHT_DEPENDENCE_H is not set which is required when SYNAPSE_DYNAMICS ($(SYNAPSE_DYNAMICS_C)) != $(SYNAPSE_DYNAMICS_STATIC))
+	        endif
+	    endif
     endif
 endif
 

@@ -46,6 +46,8 @@ from .abstract_synapse_dynamics_structural import (
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
+from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
+from .synapse_dynamics_weight_changer import SynapseDynamicsWeightChanger
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
@@ -152,6 +154,11 @@ class SynapseDynamicsSTDP(
         if isinstance(synapse_dynamics, SynapseDynamicsNeuromodulation):
             self._merge_neuromodulation(synapse_dynamics)
             return self
+
+        if isinstance(synapse_dynamics, (SynapseDynamicsWeightChangable,
+                                         SynapseDynamicsWeightChanger)):
+            raise SynapticConfigurationException(
+                "Weight Changer and STDP are not currently compatible")
 
         # If dynamics is STDP, test if same as
         if isinstance(synapse_dynamics, SynapseDynamicsSTDP):
@@ -599,6 +606,7 @@ class SynapseDynamicsSTDP(
         if self.__neuromodulation:
             n_half_words += 1
             half_word = 0
+        write_row_number_to_header = 0
         return numpy.array([
             synaptic_matrix_offset, delayed_matrix_offset,
             max_row_info.undelayed_max_n_synapses,
@@ -608,13 +616,13 @@ class SynapseDynamicsSTDP(
             n_synapse_index_bits, app_edge.n_delay_stages + 1,
             max_delay, max_delay_bits, app_edge.pre_vertex.n_atoms,
             max_pre_atoms_per_core, self._n_header_bytes // BYTES_PER_SHORT,
-            n_half_words, half_word],
+            n_half_words, half_word, write_row_number_to_header],
             dtype=uint32)
 
     @property
     @overrides(AbstractGenerateOnMachine.gen_matrix_params_size_in_bytes)
     def gen_matrix_params_size_in_bytes(self) -> int:
-        return 17 * BYTES_PER_WORD
+        return 18 * BYTES_PER_WORD
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.changes_during_run)

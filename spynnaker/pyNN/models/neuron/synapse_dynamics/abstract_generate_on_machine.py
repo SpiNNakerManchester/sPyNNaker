@@ -33,6 +33,7 @@ class MatrixGeneratorID(Enum):
     STATIC_MATRIX = 0
     STDP_MATRIX = 1
     NEUROMODULATION_MATRIX = 2
+    CHANGE_WEIGHT_MATRIX = 3
 
 
 class AbstractGenerateOnMachine(object, metaclass=AbstractBase):

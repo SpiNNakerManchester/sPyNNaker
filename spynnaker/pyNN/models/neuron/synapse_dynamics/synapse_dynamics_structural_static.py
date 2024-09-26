@@ -40,6 +40,8 @@ from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
+from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
+from .synapse_dynamics_weight_changer import SynapseDynamicsWeightChanger
 
 if TYPE_CHECKING:
     from pacman.model.graphs import AbstractVertex
@@ -156,6 +158,12 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
     @overrides(AbstractStaticSynapseDynamics.merge)
     def merge(self, synapse_dynamics: AbstractSynapseDynamics
               ) -> AbstractSynapseDynamics:
+        if isinstance(synapse_dynamics, (SynapseDynamicsWeightChangable,
+                                         SynapseDynamicsWeightChanger)):
+            raise SynapticConfigurationException(
+                "Weight Changer and Structural Plasticity are not currently"
+                " compatible")
+
         # If the dynamics is structural, check if same as this
         if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
             if not self.is_same_as(synapse_dynamics):
