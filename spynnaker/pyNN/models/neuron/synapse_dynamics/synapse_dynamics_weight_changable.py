@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
+from typing import Iterable, List, Optional, Tuple, Dict, TYPE_CHECKING, cast
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
@@ -90,7 +90,7 @@ class SynapseDynamicsWeightChangable(
         super().__init__(delay=delay, weight=weight)
         self.__weight_max = weight_max
         self.__weight_min = weight_min
-        self.__synapse_info_to_index = dict()
+        self.__synapse_info_to_index: Dict[SynapseInformation, int] = dict()
         self.__next_index = 0
 
     @property
@@ -354,7 +354,8 @@ class SynapseDynamicsWeightChangable(
         header_half_words = 2
         write_row_number_to_header = 1
         # We need to use the "global" dynamics object to get the offset
-        dynamics = app_edge.post_vertex.synapse_dynamics
+        dynamics = cast(SynapseDynamicsWeightChangable,
+                        app_edge.post_vertex.synapse_dynamics)
         row_offset = dynamics.get_synapse_info_index(synapse_info)
         return numpy.array([
             synaptic_matrix_offset, delayed_matrix_offset,

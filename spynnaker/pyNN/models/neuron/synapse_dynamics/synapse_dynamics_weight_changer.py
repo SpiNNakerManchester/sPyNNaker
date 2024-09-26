@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
+from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING, cast
 
 import numpy
 from numpy import floating, integer, uint8, uint32, int16
@@ -70,7 +70,11 @@ class SynapseDynamicsWeightChanger(
                 "A changer can only affect a changeable projection")
         # Note: we store the post vertex here rather than the dynamics, as the
         # dynamics can change over time
-        self.__post_vertex = self.__synapse_info.post_vertex
+        # Import here required to avoid circular imports
+        # pylint: disable=import-outside-toplevel
+        from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+        self.__post_vertex = cast(AbstractPopulationVertex,
+                                  self.__synapse_info.post_vertex)
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
     def merge(self, synapse_dynamics: AbstractSynapseDynamics
@@ -227,7 +231,8 @@ class SynapseDynamicsWeightChanger(
             vertex.neuron_impl.get_n_synapse_types())
         n_synapse_index_bits = get_n_bits(max_post_atoms_per_core)
         # We need to use the "global" dynamics object to get the offset
-        dynamics = app_edge.post_vertex.synapse_dynamics
+        dynamics = cast(SynapseDynamicsWeightChangable,
+                        app_edge.post_vertex.synapse_dynamics)
         row_offset = dynamics.get_synapse_info_index(self.__synapse_info)
         return numpy.array([
             synaptic_matrix_offset, max_row_info.undelayed_max_words,
