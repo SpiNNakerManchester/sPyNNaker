@@ -39,10 +39,12 @@ def test_weight_changer():
 
     change_proj_1 = sim.Projection(
         changer, post_1, sim.OneToOneConnector(),
-        sim.extra_models.WeightChanger(weight_change=0.5))
+        sim.extra_models.WeightChanger(
+            weight_change=0.5, projection=changable_proj_1))
     change_proj_2 = sim.Projection(
         changer, post_2, sim.OneToOneConnector(),
-        sim.extra_models.WeightChanger(weight_change=-0.25))
+        sim.extra_models.WeightChanger(
+            weight_change=-0.25, projection=changable_proj_2))
 
     weights_1 = []
     weights_2 = []

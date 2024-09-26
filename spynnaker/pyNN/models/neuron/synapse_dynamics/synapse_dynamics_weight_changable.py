@@ -39,7 +39,6 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
-from .synapse_dynamics_weight_changer import SynapseDynamicsWeightChanger
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
@@ -88,17 +87,32 @@ class SynapseDynamicsWeightChangable(
         self.__weight_max = weight_max
         self.__weight_min = weight_min
 
+    @property
+    def weight_max(self) -> float:
+        return self.__weight_max
+
+    @property
+    def weight_min(self) -> float:
+        return self.__weight_min
+
     @overrides(AbstractPlasticSynapseDynamics.merge)
     def merge(self, synapse_dynamics: AbstractSynapseDynamics
               ) -> AbstractSynapseDynamics:
         # If dynamics is a WeightChanger, return ourselves, as
         # WeightChanger can't be used by itself
+        # Note: hack required to avoid circular import
+        from .synapse_dynamics_weight_changer import (
+            SynapseDynamicsWeightChanger)
         if isinstance(synapse_dynamics, SynapseDynamicsWeightChanger):
-            synapse_dynamics.set_changable(self)
             return self
 
-        raise SynapticConfigurationException(
-            "Only a single incoming WeightChangable can be added")
+        if not isinstance(synapse_dynamics, SynapseDynamicsWeightChangable):
+            raise SynapticConfigurationException(
+                "Only a WeightChanger and WeightChangable can be combined")
+
+        if not self.is_same_as(synapse_dynamics):
+            raise SynapticConfigurationException(
+                "Multiple WeightChangables must have the same min and max")
 
     @overrides(AbstractPlasticSynapseDynamics.get_value)
     def get_value(self, key: str) -> Any:
@@ -120,7 +134,10 @@ class SynapseDynamicsWeightChangable(
 
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:
-        return False
+        if not isinstance(synapse_dynamics, SynapseDynamicsWeightChangable):
+            return False
+        return (synapse_dynamics.weight_max == self.weight_max and
+                synapse_dynamics.weight_min == self.weight_min)
 
     def get_vertex_executable_suffix(self) -> str:
         """

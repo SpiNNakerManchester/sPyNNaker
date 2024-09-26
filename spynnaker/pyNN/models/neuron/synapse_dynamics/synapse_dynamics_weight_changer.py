@@ -31,6 +31,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import AbstractGenerateOnMachine
 from .abstract_generate_on_machine import MatrixGeneratorID
+from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
@@ -41,6 +42,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections.connectors import (
         AbstractConnector)
     from spynnaker.pyNN.types import Weight_Types
+    from spynnaker.pyNN.models.projection import Projection
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 
@@ -50,21 +52,22 @@ class SynapseDynamicsWeightChanger(
     Synapses that target a weight change
     """
 
-    __slots__ = ["__changable"]
+    __slots__ = ["__projection"]
 
-    def __init__(self, weight_change: float):
+    def __init__(self, weight_change: float, projection: Projection):
         """
         :param float weight_change:
             The positive or negative change in weight to apply on each spike
+        :param Projection projection:
+            The projection that this synapse dynamics is being added to
         """
         super().__init__(delay=1, weight=weight_change)
-        self.__changable = None
-
-    def set_changable(self, changable):
-        if self.__changable is not None:
+        self.__projection = projection
+        # pylint: disable=protected-access
+        if not isinstance(projection._synapse_information.synapse_dynamics,
+                          SynapseDynamicsWeightChangable):
             raise SynapticConfigurationException(
-                "A changer can only affect a single changeable projection")
-        self.__changable = changable
+                "A changer can only affect a changeable projection")
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
     def merge(self, synapse_dynamics: AbstractSynapseDynamics
@@ -259,17 +262,22 @@ class SynapseDynamicsWeightChanger(
     def get_weight_maximum(
             self, connector: AbstractConnector,
             synapse_info: SynapseInformation) -> float:
-        return self.__changable.get_weight_maximum(connector, synapse_info)
+        # pylint: disable=protected-access
+        dynamics = self.__projection._synapse_information.synapse_dynamics
+        return dynamics.get_weight_maximum(connector, synapse_info)
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)
     def get_weight_mean(
             self, connector: AbstractConnector,
             synapse_info: SynapseInformation) -> float:
-        return self.__changable.get_weight_mean(connector, synapse_info)
+        # pylint: disable=protected-access
+        dynamics = self.__projection._synapse_information.synapse_dynamics
+        return dynamics.get_weight_mean(connector, synapse_info)
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_variance)
     def get_weight_variance(
             self, connector: AbstractConnector, weights: Weight_Types,
             synapse_info: SynapseInformation) -> float:
-        return self.__changable.get_weight_variance(
-            connector, weights, synapse_info)
+        # pylint: disable=protected-access
+        dynamics = self.__projection._synapse_information.synapse_dynamics
+        return dynamics.get_weight_variance(connector, weights, synapse_info)
