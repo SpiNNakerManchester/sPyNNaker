@@ -97,13 +97,21 @@ class SynapseDynamicsWeightChangable(
 
     @property
     def weight_max(self) -> float:
+        """ Get the maximum weight allowed to change to
+        """
         return self.__weight_max
 
     @property
     def weight_min(self) -> float:
+        """ Get the minimum weight allowed to change to
+        """
         return self.__weight_min
 
     def get_synapse_info_index(self, synapse_info: SynapseInformation) -> int:
+        """ Get the row offset for the given synapse information.  Each synapse
+            information has a unique row offset which then allows for multiple
+            connections to be identified and kept separate.
+        """
         if synapse_info not in self.__synapse_info_to_index:
             self.__synapse_info_to_index[synapse_info] = self.__next_index
             self.__next_index += synapse_info.pre_vertex.n_atoms
@@ -115,6 +123,7 @@ class SynapseDynamicsWeightChangable(
         # If dynamics is a WeightChanger, return ourselves, as
         # WeightChanger can't be used by itself
         # Note: hack required to avoid circular import
+        # pylint: disable=import-outside-toplevel
         from .synapse_dynamics_weight_changer import (
             SynapseDynamicsWeightChanger)
         if isinstance(synapse_dynamics, SynapseDynamicsWeightChanger):
@@ -128,24 +137,6 @@ class SynapseDynamicsWeightChangable(
             raise SynapticConfigurationException(
                 "Multiple WeightChangables must have the same min and max")
         return self
-
-    @overrides(AbstractPlasticSynapseDynamics.get_value)
-    def get_value(self, key: str) -> Any:
-        for obj in [self.__timing_dependence, self.__weight_dependence, self]:
-            if hasattr(obj, key):
-                return getattr(obj, key)
-        raise InvalidParameterType(
-            f"Type {type(self)} does not have parameter {key}")
-
-    @overrides(AbstractPlasticSynapseDynamics.set_value)
-    def set_value(self, key: str, value: Any):
-        for obj in [self.__timing_dependence, self.__weight_dependence, self]:
-            if hasattr(obj, key):
-                setattr(obj, key, value)
-                SpynnakerDataView.set_requires_mapping()
-                return
-        raise InvalidParameterType(
-            f"Type {type(self)} does not have parameter {key}")
 
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics: AbstractSynapseDynamics) -> bool:

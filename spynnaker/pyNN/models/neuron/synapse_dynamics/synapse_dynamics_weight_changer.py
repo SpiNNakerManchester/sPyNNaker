@@ -202,11 +202,7 @@ class SynapseDynamicsWeightChanger(
 
     @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)
     def get_parameter_names(self) -> Iterable[str]:
-        yield 'weight_change'
-
-    @property
-    def weight_change(self) -> float:
-        return self.__weight_change
+        yield 'weight'
 
     @overrides(AbstractPlasticSynapseDynamics.get_max_synapses)
     def get_max_synapses(self, n_words: int) -> int:
