@@ -187,8 +187,9 @@ class SynapseDynamicsWeightChangable(
         n_words = n_connections // 2
         if n_connections % 2 != 0:
             n_words += 1
-        # PP has 1 header and then a half-word-weight per connection
-        # FP has a half-word per connection for the other elements
+        # plastic-plastic has 1 header and then a half-word-weight per
+        # connection
+        # fixed-plastic has a half-word per connection for the other elements
         return 1 + n_words * 2
 
     @overrides(AbstractPlasticSynapseDynamics.get_plastic_synaptic_data)
