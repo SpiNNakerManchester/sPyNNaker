@@ -32,6 +32,7 @@
 #include "connection_generators/connection_generator_fixed_post.h"
 #include "connection_generators/connection_generator_kernel.h"
 #include "connection_generators/connection_generator_all_but_me.h"
+#include "connection_generators/connection_generator_shift.h"
 
 //! \brief Known "hashes" of connection generators
 //!
@@ -45,6 +46,7 @@ enum {
     FIXED_POST,            //!< Fixed post-size connection generator
     KERNEL,                //!< Convolution kernel connection generator
 	ALL_BUT_ME,            //!< AllButMe connection generator
+	SHIFT,                 //!< Shift connection generator
     N_CONNECTION_GENERATORS//!< The number of known generators
 };
 
@@ -102,7 +104,11 @@ static const connection_generator_info connection_generators[] = {
     {ALL_BUT_ME,
 			connection_generator_all_but_me_initialise,
 			connection_generator_all_but_me_generate,
-			connection_generator_all_but_me_free}
+			connection_generator_all_but_me_free},
+	{SHIFT,
+			connection_generator_shift_initialise,
+			connection_generator_shift_generate,
+			connection_generator_shift_free}
 };
 
 connection_generator_t connection_generator_init(

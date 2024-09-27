@@ -35,6 +35,7 @@ from .small_world_connector import SmallWorldConnector
 from .kernel_connector import KernelConnector
 from .convolution_connector import ConvolutionConnector
 from .pool_dense_connector import PoolDenseConnector
+from .shift_connector import ShiftConnector
 
 __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
            "AbstractGenerateConnectorOnHost", "AllButMeConnector",
@@ -44,4 +45,5 @@ __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
            "FromFileConnector",
            "FromListConnector", "IndexBasedProbabilityConnector",
            "KernelConnector", "ConvolutionConnector", "PoolDenseConnector",
-           "MultapseConnector", "OneToOneConnector", "SmallWorldConnector"]
+           "MultapseConnector", "OneToOneConnector", "SmallWorldConnector",
+           "ShiftConnector"]
