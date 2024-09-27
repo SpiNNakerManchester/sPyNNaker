@@ -246,7 +246,7 @@ def distance(src_cell: IDMixin, tgt_cell: IDMixin,
         src_cell, tgt_cell, mask, scale_factor, offset, periodic_boundaries)
 
 
-def setup(timestep: float = _pynn_control.DEFAULT_TIMESTEP,
+def setup(timestep: Optional[Union[float, Literal["auto"]]] = None,
           min_delay: Union[float, Literal["auto"]] = (
               _pynn_control.DEFAULT_MIN_DELAY),
           max_delay: Optional[Union[float, Literal["auto"]]] = None,
@@ -291,9 +291,15 @@ def setup(timestep: float = _pynn_control.DEFAULT_TIMESTEP,
         if both ``n_chips_required`` and ``n_boards_required`` are used.
     """
     # pylint: disable=global-statement,too-many-arguments
+    # Check for "auto" values and None
     global __simulator
-    # Check for "auto" values
-    if timestep == "auto":
+    if timestep is None:
+        logger.warning(
+            f"The default PyNN timestep of {_pynn_control.DEFAULT_TIMESTEP} "
+            "is less than 1(ms) that SpyNNaker is designed for. "
+            "Consider including a timestep in your setup call.")
+        timestep = float(_pynn_control.DEFAULT_TIMESTEP)
+    elif timestep == "auto":
         timestep = SPYNNAKER_AUTO_TIMESTEP
     if min_delay == "auto":
         min_delay = timestep
