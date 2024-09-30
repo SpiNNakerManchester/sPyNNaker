@@ -246,9 +246,10 @@ class SynapseDynamicsWeightChangable(
             pp_data: List[NDArray[uint32]], fp_size: NDArray[uint32],
             fp_data: List[NDArray[uint32]],
             max_atoms_per_core: int) -> ConnectionsArray:
-        logger.warn("Weights are only changed when a pre-spike arrives after a"
-                    " change-spike has been received, and so the weights might"
-                    " not be as expected")
+        logger.warning(
+            "Weights are only changed when a pre-spike arrives after a"
+            " change-spike has been received, and so the weights might"
+            " not be as expected")
 
         # pylint: disable=too-many-arguments
         n_rows = len(fp_size)
