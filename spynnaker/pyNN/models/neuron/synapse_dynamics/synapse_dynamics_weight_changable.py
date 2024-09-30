@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 from typing import Iterable, List, Optional, Tuple, Dict, TYPE_CHECKING, cast
+import logging
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
@@ -21,6 +22,7 @@ from numpy.typing import NDArray
 from pyNN.standardmodels.synapses import StaticSynapse
 
 from spinn_utilities.overrides import overrides
+from spinn_utilities.log import FormatAdapter
 
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import (
@@ -56,6 +58,8 @@ NEUROMODULATION_TARGETS = {
     "reward": 0,
     "punishment": 1
 }
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SynapseDynamicsWeightChangable(
@@ -242,6 +246,10 @@ class SynapseDynamicsWeightChangable(
             pp_data: List[NDArray[uint32]], fp_size: NDArray[uint32],
             fp_data: List[NDArray[uint32]],
             max_atoms_per_core: int) -> ConnectionsArray:
+        logger.warn("Weights are only changed when a pre-spike arrives after a"
+                    " change-spike has been received, and so the weights might"
+                    " not be as expected")
+
         # pylint: disable=too-many-arguments
         n_rows = len(fp_size)
 
