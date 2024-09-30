@@ -158,7 +158,8 @@ class SynapseDynamicsWeightChangable(
 
     @overrides(AbstractPlasticSynapseDynamics.
                get_parameters_sdram_usage_in_bytes)
-    def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
+    def get_parameters_sdram_usage_in_bytes(
+            self, n_neurons: int, n_synapse_types: int) -> int:
         """
         :param int n_neurons:
         :param int n_synapse_types:
@@ -190,7 +191,7 @@ class SynapseDynamicsWeightChangable(
 
     @overrides(AbstractPlasticSynapseDynamics.
                get_n_words_for_plastic_connections)
-    def get_n_words_for_plastic_connections(self, n_connections):
+    def get_n_words_for_plastic_connections(self, n_connections: int) -> int:
         """
         :param int n_connections:
         :rtype: int
