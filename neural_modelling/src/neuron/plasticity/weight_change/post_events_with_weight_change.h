@@ -35,7 +35,7 @@
 
 typedef struct update_post_trace_t {
 
-    //! The new weight to set
+    //! The amount to change the weight by (positive or negative)
     int16_t weight_change;
 
     //! The synapse type
