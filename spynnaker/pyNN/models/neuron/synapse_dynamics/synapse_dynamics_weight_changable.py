@@ -50,15 +50,6 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
-# How large are the time-stamps stored with each event
-TIME_STAMP_BYTES = BYTES_PER_WORD
-
-# The targets of neuromodulation
-NEUROMODULATION_TARGETS = {
-    "reward": 0,
-    "punishment": 1
-}
-
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
