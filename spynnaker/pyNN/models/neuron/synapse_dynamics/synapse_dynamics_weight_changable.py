@@ -99,7 +99,13 @@ class SynapseDynamicsWeightChangable(
         self.__synapse_info_to_index: Dict[SynapseInformation, int] = dict()
         self.__next_index = 0
 
-        if (weight_min >= weight_max):
+        if weight_min < 0.0:
+            raise SynapticConfigurationException(
+                "The minimum weight must be greater than or equal to 0")
+        if weight_max < 0.0:
+            raise SynapticConfigurationException(
+                "The maximum weight must be greater than or equal to 0")
+        if weight_min >= weight_max:
             raise SynapticConfigurationException(
                 "The minimum weight must be less than the maximum")
 
