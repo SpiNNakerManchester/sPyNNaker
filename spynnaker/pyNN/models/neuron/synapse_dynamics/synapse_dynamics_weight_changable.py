@@ -34,6 +34,8 @@ from spynnaker.pyNN.types import Weight_Delay_In_Types as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractGenerateConnectorOnMachine)
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
@@ -147,12 +149,15 @@ class SynapseDynamicsWeightChangable(
         return (synapse_dynamics.weight_max == self.weight_max and
                 synapse_dynamics.weight_min == self.weight_min)
 
+    @overrides(AbstractPlasticSynapseDynamics.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self) -> str:
         """
         :rtype: str
         """
         return "_weight_change"
 
+    @overrides(AbstractPlasticSynapseDynamics.
+               get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
         """
         :param int n_neurons:
@@ -183,6 +188,8 @@ class SynapseDynamicsWeightChangable(
             uint16).view(uint32)
         spec.write_array(weights)
 
+    @overrides(AbstractPlasticSynapseDynamics.
+               get_n_words_for_plastic_connections)
     def get_n_words_for_plastic_connections(self, n_connections):
         """
         :param int n_connections:
@@ -204,44 +211,8 @@ class SynapseDynamicsWeightChangable(
             max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
                 List[NDArray[uint32]], List[NDArray[uint32]],
                 NDArray[uint32], NDArray[uint32]]:
-        n_synapse_type_bits = get_n_bits(n_synapse_types)
-        n_neuron_id_bits = get_n_bits(max_atoms_per_core)
-        neuron_id_mask = (1 << n_neuron_id_bits) - 1
-
-        # Get the fixed data
-        fixed_plastic = (
-            (connections["delay"].astype(uint16) <<
-             (n_neuron_id_bits + n_synapse_type_bits)) |
-            (connections["synapse_type"].astype(uint16) << n_neuron_id_bits) |
-            (connections["target"].astype(uint16) & neuron_id_mask))
-        fixed_plastic_rows = self.convert_per_connection_data_to_rows(
-            connection_row_indices, n_rows,
-            fixed_plastic.view(dtype=uint8).reshape((-1, 2)),
-            max_n_synapses)
-        fp_size = self.get_n_items(fixed_plastic_rows, BYTES_PER_SHORT)
-        fp_data = self.get_words(fixed_plastic_rows)
-
-        # Convert the plastic data into groups of bytes per connection and
-        # then into rows
-        plastic_plastic = numpy.rint(
-            numpy.abs(connections["weight"])).astype(uint16)
-        plastic_plastic_bytes = plastic_plastic.view(dtype=uint8).reshape(
-            (-1, BYTES_PER_SHORT))
-        plastic_plastic_row_data = self.convert_per_connection_data_to_rows(
-            connection_row_indices, n_rows, plastic_plastic_bytes,
-            max_n_synapses)
-        # TODO: Get the synapse info index and add to the row offset
-        # row_offset = self.get_synapse_info_index(synapse_info)
-        plastic_headers = numpy.arange(n_rows, dtype=uint32).view(
-            uint8).reshape((-1, BYTES_PER_WORD))
-        plastic_plastic_rows = [
-            numpy.concatenate((
-                plastic_headers[i], plastic_plastic_row_data[i]))
-            for i in range(n_rows)]
-        pp_size = self.get_n_items(plastic_plastic_rows, BYTES_PER_WORD)
-        pp_data = self.get_words(plastic_plastic_rows)
-
-        return fp_data, pp_data, fp_size, pp_size
+        raise NotImplementedError(
+            "WeightChangable can only be generated on machine")
 
     @overrides(
         AbstractPlasticSynapseDynamics.get_n_plastic_plastic_words_per_row)
@@ -392,3 +363,19 @@ class SynapseDynamicsWeightChangable(
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
     def pad_to_length(self) -> Optional[int]:
         return None
+
+    @overrides(AbstractPlasticSynapseDynamics.validate_connection)
+    def validate_connection(
+            self, application_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation):
+        AbstractPlasticSynapseDynamics.validate_connection(
+            self, application_edge, synapse_info)
+        if not isinstance(synapse_info.connector,
+                          AbstractGenerateConnectorOnMachine):
+            raise SynapticConfigurationException(
+                "WeightChangable only works with on-machine generated "
+                "connectors at present")
+        if not synapse_info.connector.generate_on_machine(synapse_info):
+            raise SynapticConfigurationException(
+                "WeightChangable only works with on-machine generated "
+                "connectors at present")
