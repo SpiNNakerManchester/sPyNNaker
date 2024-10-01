@@ -48,7 +48,8 @@ ifneq ($(SPYNNAKER_DEBUG), DEBUG)
               IF_curr_delta_stdp_mad_pair_additive \
               IF_curr_delta_stdp_mad_nearest_pair_additive \
               IF_curr_exp_stdp_mad_recurrent_pre_stochastic_multiplicative \
-              IF_curr_exp_stdp_mad_pfister_triplet_additive
+              IF_curr_exp_stdp_mad_pfister_triplet_additive \
+              IF_curr_exp_weight_change
 endif
 
 all:

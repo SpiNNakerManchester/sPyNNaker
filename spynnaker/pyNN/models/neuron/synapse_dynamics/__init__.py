@@ -31,6 +31,8 @@ from .synapse_dynamics_utils import (
     calculate_spike_pair_additive_stdp_weight,
     calculate_spike_pair_multiplicative_stdp_weight)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
+from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
+from .synapse_dynamics_weight_changer import SynapseDynamicsWeightChanger
 
 
 __all__ = ("AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
@@ -46,4 +48,5 @@ __all__ = ("AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
            "SynapseDynamicsStructuralSTDP",
            # Neuromodulation
            "SynapseDynamicsNeuromodulation",
-           "AbstractSupportsSignedWeights")
+           "AbstractSupportsSignedWeights",
+           "SynapseDynamicsWeightChanger", "SynapseDynamicsWeightChangable")

@@ -190,7 +190,7 @@ class Projection(object):
                 self.__projection_edge, SPIKE_PARTITION_ID)
 
         # Ensure the connector is happy
-        connector.validate_connection(
+        synapse_dynamics.validate_connection(
             self.__projection_edge, self.__synapse_information)
 
         # add projection to the SpiNNaker control system
