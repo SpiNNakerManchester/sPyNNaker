@@ -34,7 +34,7 @@ from spynnaker.pyNN.models.neuron.builds import (
     IFCurrDeltaCa2Adaptive, StocExp, StocExpStable,  StocSigma, IFTruncDelta,
     IFCurrDeltaFixedProb)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AllButMeConnector)
+    AllButMeConnector, OneToOneOffsetConnector)
 
 # Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
@@ -64,7 +64,7 @@ __all__ = [
     'IFTruncDelta',
 
     # Connectors
-    'AllButMeConnector',
+    'AllButMeConnector', 'OneToOneOffsetConnector',
 
     # Weight changeable synapse dynamics
     'WeightChangeable', 'WeightChanger'
