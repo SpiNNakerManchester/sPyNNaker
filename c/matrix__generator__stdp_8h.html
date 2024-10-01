@@ -117,9 +117,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a97c90fc0e4a1cf3399c32a8421380e9a" id="r_a97c90fc0e4a1cf3399c32a8421380e9a"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="matrix__generator__stdp_8h.html#structrow__fixed__t">row_fixed_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#a97c90fc0e4a1cf3399c32a8421380e9a">get_stdp_fixed_row</a> (<a class="el" href="matrix__generator__stdp_8h.html#structrow__plastic__t">row_plastic_t</a> *plastic_row, uint32_t n_half_words_per_pp_header, uint32_t n_half_words_per_pp_synapse, uint32_t max_row_n_synapses)</td></tr>
 <tr class="memdesc:a97c90fc0e4a1cf3399c32a8421380e9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the fixed part of a row that comes after the plastic part. Note that this assumes the max row size in number of synapses.  <br /></td></tr>
 <tr class="separator:a97c90fc0e4a1cf3399c32a8421380e9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a730440b766c56973dcde444c94792da1" id="r_a730440b766c56973dcde444c94792da1"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#a730440b766c56973dcde444c94792da1">setup_stdp_rows</a> (uint32_t *matrix, uint32_t n_rows, uint32_t n_half_words_per_pp_header, uint32_t n_half_words_per_pp_synapse, uint32_t max_row_n_synapses, uint32_t max_row_n_words)</td></tr>
-<tr class="memdesc:a730440b766c56973dcde444c94792da1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up the rows so that they are ready for writing to.  <br /></td></tr>
-<tr class="separator:a730440b766c56973dcde444c94792da1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf6239622dfc48b7cdb9415ac2476a33" id="r_abf6239622dfc48b7cdb9415ac2476a33"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#abf6239622dfc48b7cdb9415ac2476a33">setup_stdp_rows</a> (uint32_t *matrix, uint32_t n_rows, uint32_t n_half_words_per_pp_header, uint32_t n_half_words_per_pp_synapse, uint32_t max_row_n_synapses, uint32_t max_row_n_words, uint32_t first_header_word_is_row_index, uint32_t row_offset)</td></tr>
+<tr class="memdesc:abf6239622dfc48b7cdb9415ac2476a33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up the rows so that they are ready for writing to.  <br /></td></tr>
+<tr class="separator:abf6239622dfc48b7cdb9415ac2476a33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad136b625e3f52e67d888a50058e43a16" id="r_ad136b625e3f52e67d888a50058e43a16"><td class="memItemLeft" align="right" valign="top">static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#ad136b625e3f52e67d888a50058e43a16">build_fixed_plastic_half_word</a> (uint16_t delay, uint32_t type, uint32_t post_index, uint32_t <a class="el" href="synapses_8c.html#af20079aa1e3c31a3efd344176025ce0f">synapse_type_bits</a>, uint32_t <a class="el" href="local__only_8c.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a>, uint32_t delay_bits)</td></tr>
 <tr class="memdesc:ad136b625e3f52e67d888a50058e43a16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build a fixed-plastic half-word from its components.  <br /></td></tr>
 <tr class="separator:ad136b625e3f52e67d888a50058e43a16"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -326,6 +326,19 @@ The number of half-words in each plastic-plastic synapse. </td></tr>
 weight_half_word</td>
 <td class="fielddoc">
 The index of the half-word that will contain the weight. </td></tr>
+<tr><td class="fieldtype">
+<a id="a3d3577ee274c584ba90d55ea61d3fb46" name="a3d3577ee274c584ba90d55ea61d3fb46"></a>uint32_t</td>
+<td class="fieldname">
+first_word_is_row_index</td>
+<td class="fielddoc">
+<p>Whether to write the pre-neuron index in the first word of the header space (used for externally changeable synapses) </p>
+</td></tr>
+<tr><td class="fieldtype">
+<a id="af36433df7b71fb7bf05f0b2497ac16b3" name="af36433df7b71fb7bf05f0b2497ac16b3"></a>uint32_t</td>
+<td class="fieldname">
+row_offset</td>
+<td class="fielddoc">
+The offset of the row index to use. </td></tr>
 </table>
 
 </div>
@@ -444,7 +457,7 @@ The offset of the delayed synaptic matrix (as read from SDRAM) </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the number of plastic half-words in a maximum length row </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00099">99</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00104">104</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
 
 </div>
 </div>
@@ -506,12 +519,12 @@ The offset of the delayed synaptic matrix (as read from SDRAM) </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the fixed part of the row assuming all synapses used </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00120">120</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00125">125</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
 
 </div>
 </div>
-<a id="a730440b766c56973dcde444c94792da1" name="a730440b766c56973dcde444c94792da1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a730440b766c56973dcde444c94792da1">&#9670;&#160;</a></span>setup_stdp_rows()</h2>
+<a id="abf6239622dfc48b7cdb9415ac2476a33" name="abf6239622dfc48b7cdb9415ac2476a33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf6239622dfc48b7cdb9415ac2476a33">&#9670;&#160;</a></span>setup_stdp_rows()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -553,7 +566,19 @@ The offset of the delayed synaptic matrix (as read from SDRAM) </td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>max_row_n_words</em>&#160;</td>
+          <td class="paramname"><em>max_row_n_words</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>first_header_word_is_row_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>row_offset</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -581,7 +606,7 @@ The offset of the delayed synaptic matrix (as read from SDRAM) </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00139">139</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00144">144</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
 
 </div>
 </div>
@@ -657,7 +682,7 @@ The offset of the delayed synaptic matrix (as read from SDRAM) </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A half-word fixed-plastic synapse </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00172">172</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00183">183</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
 
 </div>
 </div>
@@ -697,7 +722,7 @@ The offset of the delayed synaptic matrix (as read from SDRAM) </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00196">196</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00207">207</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
 
 </div>
 </div>
@@ -725,7 +750,7 @@ The offset of the delayed synaptic matrix (as read from SDRAM) </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00236">236</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00249">249</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
 
 </div>
 </div>
@@ -800,14 +825,14 @@ The offset of the delayed synaptic matrix (as read from SDRAM) </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00250">250</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00263">263</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Sep 25 2024 11:09:14 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
+Generated on Tue Oct 1 2024 07:05:17 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
 </small></address>
 </body>
 </html>

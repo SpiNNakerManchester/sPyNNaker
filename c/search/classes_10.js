@@ -58,7 +58,7 @@ var searchData=
   ['synapse_5fprovenance_55',['synapse_provenance',['../structsynapse__provenance.html',1,'']]],
   ['synapse_5fregions_56',['synapse_regions',['../structsynapse__regions.html',1,'']]],
   ['synapse_5frow_5ffixed_5fpart_5ft_57',['synapse_row_fixed_part_t',['../synapse__row_8h.html#structsynapse__row__fixed__part__t',1,'']]],
-  ['synapse_5frow_5fplastic_5fdata_5ft_58',['synapse_row_plastic_data_t',['../synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t',1,'']]],
+  ['synapse_5frow_5fplastic_5fdata_5ft_58',['synapse_row_plastic_data_t',['../synapse__dynamics__external__weight__change_8c.html#structsynapse__row__plastic__data__t',1,'']]],
   ['synapse_5frow_5fplastic_5fdata_5ft_2e_5f_5funnamed10_5f_5f_59',['synapse_row_plastic_data_t.__unnamed10__',['../synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#unionsynapse__row__plastic__data__t_8____unnamed10____',1,'']]],
   ['synapse_5frow_5fplastic_5fdata_5ft_2e_5f_5funnamed10_5f_5f_2e_5f_5funnamed12_5f_5f_60',['synapse_row_plastic_data_t.__unnamed10__.__unnamed12__',['../synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structsynapse__row__plastic__data__t_8____unnamed10_____8____unnamed12____',1,'']]],
   ['synapse_5frow_5fplastic_5fpart_5ft_61',['synapse_row_plastic_part_t',['../synapse__row_8h.html#structsynapse__row__plastic__part__t',1,'']]],

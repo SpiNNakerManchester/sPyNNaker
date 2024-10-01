@@ -35,10 +35,12 @@ var searchData=
   ['router_5ft_32',['router_t',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html',1,'']]],
   ['router_5ftiming_5fcounter_5fctrl_5ft_33',['router_timing_counter_ctrl_t',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html',1,'']]],
   ['routes_34',['routes',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html',1,'router_multicast_route_t::routes'],['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html',1,'router_p2p_table_entry_t::routes']]],
-  ['row_5ffixed_5ft_35',['row_fixed_t',['../matrix__generator__stdp_8h.html#structrow__fixed__t',1,'']]],
-  ['row_5fnm_5ffixed_5ft_36',['row_nm_fixed_t',['../matrix__generator__neuromodulation_8h.html#structrow__nm__fixed__t',1,'']]],
-  ['row_5fnm_5fplastic_5ft_37',['row_nm_plastic_t',['../matrix__generator__neuromodulation_8h.html#structrow__nm__plastic__t',1,'']]],
-  ['row_5fplastic_5ft_38',['row_plastic_t',['../matrix__generator__stdp_8h.html#structrow__plastic__t',1,'']]],
-  ['rtr_5fentry_5ft_39',['rtr_entry_t',['https://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html',1,'']]],
-  ['rx_5fdesc_5ft_40',['rx_desc_t',['https://spinnakermanchester.github.io/spinnaker_tools/scamp-p2p_8c.html',1,'']]]
+  ['row_5fchanger_5ffixed_5ft_35',['row_changer_fixed_t',['../matrix__generator__weight__changer_8h.html#structrow__changer__fixed__t',1,'']]],
+  ['row_5fchanger_5fplastic_5ft_36',['row_changer_plastic_t',['../matrix__generator__weight__changer_8h.html#structrow__changer__plastic__t',1,'']]],
+  ['row_5ffixed_5ft_37',['row_fixed_t',['../matrix__generator__stdp_8h.html#structrow__fixed__t',1,'']]],
+  ['row_5fnm_5ffixed_5ft_38',['row_nm_fixed_t',['../matrix__generator__neuromodulation_8h.html#structrow__nm__fixed__t',1,'']]],
+  ['row_5fnm_5fplastic_5ft_39',['row_nm_plastic_t',['../matrix__generator__neuromodulation_8h.html#structrow__nm__plastic__t',1,'']]],
+  ['row_5fplastic_5ft_40',['row_plastic_t',['../matrix__generator__stdp_8h.html#structrow__plastic__t',1,'']]],
+  ['rtr_5fentry_5ft_41',['rtr_entry_t',['https://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html',1,'']]],
+  ['rx_5fdesc_5ft_42',['rx_desc_t',['https://spinnakermanchester.github.io/spinnaker_tools/scamp-p2p_8c.html',1,'']]]
 ];

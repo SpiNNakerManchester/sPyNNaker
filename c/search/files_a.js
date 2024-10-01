@@ -9,7 +9,8 @@ var searchData=
   ['matrix_5fgenerator_5fneuromodulation_2eh_6',['matrix_generator_neuromodulation.h',['../matrix__generator__neuromodulation_8h.html',1,'']]],
   ['matrix_5fgenerator_5fstatic_2eh_7',['matrix_generator_static.h',['../matrix__generator__static_8h.html',1,'']]],
   ['matrix_5fgenerator_5fstdp_2eh_8',['matrix_generator_stdp.h',['../matrix__generator__stdp_8h.html',1,'']]],
-  ['merge_2eh_9',['merge.h',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/merge_8h.html',1,'']]],
-  ['minimise_2eh_10',['minimise.h',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/minimise_8h.html',1,'']]],
-  ['munich_5fprotocol_2eh_11',['munich_protocol.h',['../munich__protocol_8h.html',1,'']]]
+  ['matrix_5fgenerator_5fweight_5fchanger_2eh_9',['matrix_generator_weight_changer.h',['../matrix__generator__weight__changer_8h.html',1,'']]],
+  ['merge_2eh_10',['merge.h',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/merge_8h.html',1,'']]],
+  ['minimise_2eh_11',['minimise.h',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/minimise_8h.html',1,'']]],
+  ['munich_5fprotocol_2eh_12',['munich_protocol.h',['../munich__protocol_8h.html',1,'']]]
 ];

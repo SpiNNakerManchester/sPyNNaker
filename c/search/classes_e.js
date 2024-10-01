@@ -25,7 +25,7 @@ var searchData=
   ['poisson_5fextension_5fprovenance_22',['poisson_extension_provenance',['../spike__source__poisson_8c.html#structpoisson__extension__provenance',1,'']]],
   ['pop_5ftable_5fconfig_5ft_23',['pop_table_config_t',['../population__table_8h.html#structpop__table__config__t',1,'']]],
   ['pop_5ftable_5flookup_5fresult_5ft_24',['pop_table_lookup_result_t',['../population__table_8h.html#structpop__table__lookup__result__t',1,'']]],
-  ['post_5fevent_5fhistory_5ft_25',['post_event_history_t',['../post__events__with__da_8h.html#structpost__event__history__t',1,'']]],
+  ['post_5fevent_5fhistory_5ft_25',['post_event_history_t',['../post__events__with__weight__change_8h.html#structpost__event__history__t',1,'']]],
   ['post_5fevent_5fwindow_5ft_26',['post_event_window_t',['../post__events__with__da_8h.html#structpost__event__window__t',1,'']]],
   ['post_5fto_5fpre_5fentry_27',['post_to_pre_entry',['../sp__structs_8h.html#structpost__to__pre__entry',1,'']]],
   ['post_5ftrace_5ft_28',['post_trace_t',['../timing__recurrent__pre__stochastic__impl_8h.html#structpost__trace__t',1,'']]],

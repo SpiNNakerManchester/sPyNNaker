@@ -97,10 +97,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a5087bc7e79f5dc3850f73239c5c463a3" id="r_a5087bc7e79f5dc3850f73239c5c463a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__static__impl_8c.html#a5087bc7e79f5dc3850f73239c5c463a3">synapse_dynamics_process_post_synaptic_event</a> (uint32_t <a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="elRef" href="https://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> neuron_index)</td></tr>
 <tr class="memdesc:a5087bc7e79f5dc3850f73239c5c463a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inform the synapses that the neuron fired.  <br /></td></tr>
 <tr class="separator:a5087bc7e79f5dc3850f73239c5c463a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaefbee0b2c6af4b88af6bfb696eda140" id="r_aaefbee0b2c6af4b88af6bfb696eda140"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__static__impl_8c.html#aaefbee0b2c6af4b88af6bfb696eda140">synapse_dynamics_process_plastic_synapses</a> (<a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *plastic_region_data, <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed_region, weight_t *ring_buffer, uint32_t <a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t colour_delay, bool *write_back)</td></tr>
+<tr class="memitem:aaefbee0b2c6af4b88af6bfb696eda140" id="r_aaefbee0b2c6af4b88af6bfb696eda140"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__static__impl_8c.html#aaefbee0b2c6af4b88af6bfb696eda140">synapse_dynamics_process_plastic_synapses</a> (<a class="el" href="synapse__dynamics__external__weight__change_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *plastic_region_data, <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed_region, weight_t *ring_buffer, uint32_t <a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t colour_delay, bool *write_back)</td></tr>
 <tr class="memdesc:aaefbee0b2c6af4b88af6bfb696eda140"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process the dynamics of the synapses.  <br /></td></tr>
 <tr class="separator:aaefbee0b2c6af4b88af6bfb696eda140"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb203e3c4f9b3e72bb69ce5033e83543" id="r_acb203e3c4f9b3e72bb69ce5033e83543"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__static__impl_8c.html#acb203e3c4f9b3e72bb69ce5033e83543">synapse_dynamics_print_plastic_synapses</a> (<a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *plastic_region_data, <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed_region, uint32_t *<a class="el" href="neuron_8c.html#ade696d20461dc712b7daafcbcad6ba4b">ring_buffer_to_input_left_shifts</a>)</td></tr>
+<tr class="memitem:acb203e3c4f9b3e72bb69ce5033e83543" id="r_acb203e3c4f9b3e72bb69ce5033e83543"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__static__impl_8c.html#acb203e3c4f9b3e72bb69ce5033e83543">synapse_dynamics_print_plastic_synapses</a> (<a class="el" href="synapse__dynamics__external__weight__change_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *plastic_region_data, <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed_region, uint32_t *<a class="el" href="neuron_8c.html#ade696d20461dc712b7daafcbcad6ba4b">ring_buffer_to_input_left_shifts</a>)</td></tr>
 <tr class="memdesc:acb203e3c4f9b3e72bb69ce5033e83543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the synapse dynamics.  <br /></td></tr>
 <tr class="separator:acb203e3c4f9b3e72bb69ce5033e83543"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24b755e1d96fcab4e950b83796376e75" id="r_a24b755e1d96fcab4e950b83796376e75"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__static__impl_8c.html#a24b755e1d96fcab4e950b83796376e75">synapse_dynamics_get_plastic_pre_synaptic_events</a> (void)</td></tr>
@@ -230,7 +230,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">bool synapse_dynamics_process_plastic_synapses </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="synapse__dynamics__external__weight__change_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *&#160;</td>
           <td class="paramname"><em>plastic_region_data</em>, </td>
         </tr>
         <tr>
@@ -297,7 +297,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void synapse_dynamics_print_plastic_synapses </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="synapse__dynamics__external__weight__change_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *&#160;</td>
           <td class="paramname"><em>plastic_region_data</em>, </td>
         </tr>
         <tr>
@@ -581,7 +581,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Sep 25 2024 11:09:14 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
+Generated on Tue Oct 1 2024 07:05:16 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
 </small></address>
 </body>
 </html>

@@ -101,8 +101,8 @@ Data Structures</h2></td></tr>
 <tr class="separator:structnm__update__state__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:structnm__final__state__t" id="r_structnm__final__state__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structnm__final__state__t">nm_final_state_t</a></td></tr>
 <tr class="separator:structnm__final__state__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:structsynapse__row__plastic__data__t" id="r_structsynapse__row__plastic__data__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a></td></tr>
-<tr class="memdesc:structsynapse__row__plastic__data__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The format of the plastic data region of a synaptic row.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">More...</a><br /></td></tr>
+<tr class="memitem:structsynapse__row__plastic__data__t" id="r_structsynapse__row__plastic__data__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__external__weight__change_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a></td></tr>
+<tr class="memdesc:structsynapse__row__plastic__data__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The format of the plastic data region of a synaptic row.  <a href="synapse__dynamics__external__weight__change_8c.html#structsynapse__row__plastic__data__t">More...</a><br /></td></tr>
 <tr class="separator:structsynapse__row__plastic__data__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:structnm__params__t" id="r_structnm__params__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structnm__params__t">nm_params_t</a></td></tr>
 <tr class="separator:structnm__params__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -126,17 +126,17 @@ Functions</h2></td></tr>
 <tr class="separator:aff9ef4c7380606e03b88d23a68b79e21"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64fb319eb2d84d0539a5af8d7ecb3309" id="r_a64fb319eb2d84d0539a5af8d7ecb3309"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structneuromodulated__synapse__t">neuromodulated_synapse_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a64fb319eb2d84d0539a5af8d7ecb3309">get_nm_final_synaptic_word</a> (<a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structnm__final__state__t">nm_final_state_t</a> final_state)</td></tr>
 <tr class="separator:a64fb319eb2d84d0539a5af8d7ecb3309"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25e0b6ac08afdef28abda1346366b83d" id="r_a25e0b6ac08afdef28abda1346366b83d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="post__events__with__da_8h.html#structpost__event__window__t">post_event_window_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a25e0b6ac08afdef28abda1346366b83d">get_post_event_window</a> (const <a class="el" href="post__events__with__da_8h.html#structpost__event__history__t">post_event_history_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a9738c22cad44349036699b2383355540">post_event_history</a>, const uint32_t delayed_pre_time, const uint32_t delayed_last_pre_time, const uint32_t delay_dendritic)</td></tr>
+<tr class="memitem:a25e0b6ac08afdef28abda1346366b83d" id="r_a25e0b6ac08afdef28abda1346366b83d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="post__events__with__da_8h.html#structpost__event__window__t">post_event_window_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a25e0b6ac08afdef28abda1346366b83d">get_post_event_window</a> (const <a class="el" href="post__events__with__weight__change_8h.html#structpost__event__history__t">post_event_history_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a9738c22cad44349036699b2383355540">post_event_history</a>, const uint32_t delayed_pre_time, const uint32_t delayed_last_pre_time, const uint32_t delay_dendritic)</td></tr>
 <tr class="separator:a25e0b6ac08afdef28abda1346366b83d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a86214c827c6919568eb88cd219b20597" id="r_a86214c827c6919568eb88cd219b20597"><td class="memItemLeft" align="right" valign="top">static accum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a86214c827c6919568eb88cd219b20597">get_weight_update</a> (int16_t decay_eligibility_trace, int16_t decay_dopamine_trace, int16_t last_dopamine_trace, accum eligibility_weight)</td></tr>
 <tr class="separator:a86214c827c6919568eb88cd219b20597"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeea32132c2a3d9f4bce71f846d2f9ec7" id="r_aeea32132c2a3d9f4bce71f846d2f9ec7"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structnm__final__state__t">nm_final_state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#aeea32132c2a3d9f4bce71f846d2f9ec7">izhikevich_neuromodulation_plasticity_update_synapse</a> (const uint32_t <a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, const uint32_t last_pre_time, const <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a> last_pre_trace, const <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a> new_pre_trace, const uint32_t delay_dendritic, const uint32_t delay_axonal, <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structnm__update__state__t">nm_update_state_t</a> current_state, const <a class="el" href="post__events__with__da_8h.html#structpost__event__history__t">post_event_history_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a9738c22cad44349036699b2383355540">post_event_history</a>)</td></tr>
+<tr class="memitem:aeea32132c2a3d9f4bce71f846d2f9ec7" id="r_aeea32132c2a3d9f4bce71f846d2f9ec7"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structnm__final__state__t">nm_final_state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#aeea32132c2a3d9f4bce71f846d2f9ec7">izhikevich_neuromodulation_plasticity_update_synapse</a> (const uint32_t <a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, const uint32_t last_pre_time, const <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a> last_pre_trace, const <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a> new_pre_trace, const uint32_t delay_dendritic, const uint32_t delay_axonal, <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structnm__update__state__t">nm_update_state_t</a> current_state, const <a class="el" href="post__events__with__weight__change_8h.html#structpost__event__history__t">post_event_history_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a9738c22cad44349036699b2383355540">post_event_history</a>)</td></tr>
 <tr class="memdesc:aeea32132c2a3d9f4bce71f846d2f9ec7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synapse update loop core.  <br /></td></tr>
 <tr class="separator:aeea32132c2a3d9f4bce71f846d2f9ec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a1c98d660ba6a17d4678ae9ef2a5526" id="r_a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a4a1c98d660ba6a17d4678ae9ef2a5526">synapse_dynamics_initialise</a> (<a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> address, uint32_t <a class="el" href="neuron_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="neuron_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
 <tr class="memdesc:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse dynamics.  <br /></td></tr>
 <tr class="separator:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0dc7f1b3f6348db279fbad8c8040b1c" id="r_ac0dc7f1b3f6348db279fbad8c8040b1c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#ac0dc7f1b3f6348db279fbad8c8040b1c">synapse_dynamics_print_plastic_synapses</a> (<a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *plastic_region_data, <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed_region, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
+<tr class="memitem:ac0dc7f1b3f6348db279fbad8c8040b1c" id="r_ac0dc7f1b3f6348db279fbad8c8040b1c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#ac0dc7f1b3f6348db279fbad8c8040b1c">synapse_dynamics_print_plastic_synapses</a> (<a class="el" href="synapse__dynamics__external__weight__change_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *plastic_region_data, <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed_region, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
 <tr class="memdesc:ac0dc7f1b3f6348db279fbad8c8040b1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the synapse dynamics.  <br /></td></tr>
 <tr class="separator:ac0dc7f1b3f6348db279fbad8c8040b1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abade6b73a469c1ff0e54366f065343e5" id="r_abade6b73a469c1ff0e54366f065343e5"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="https://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#abade6b73a469c1ff0e54366f065343e5">sparse_axonal_delay</a> (uint32_t <a class="elRef" href="https://spinnakermanchester.github.io/spinnaker_tools/scamp-3_8c.html#a7ce14bf4029a6d24e8c67abd1019dc49">x</a>)</td></tr>
@@ -147,9 +147,9 @@ Functions</h2></td></tr>
 <tr class="separator:a5087bc7e79f5dc3850f73239c5c463a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c28c800b5eb0abfd9f24e17d9db5178" id="r_a1c28c800b5eb0abfd9f24e17d9db5178"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structneuromodulated__synapse__t">neuromodulated_synapse_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a1c28c800b5eb0abfd9f24e17d9db5178">process_plastic_synapse</a> (uint32_t control_word, uint32_t last_pre_time, <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a> last_pre_trace, <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a> new_pre_trace, weight_t *<a class="el" href="c__main_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a>, uint32_t <a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t colour_delay, <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structneuromodulated__synapse__t">neuromodulated_synapse_t</a> synapse)</td></tr>
 <tr class="separator:a1c28c800b5eb0abfd9f24e17d9db5178"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a913cb37dd2d4e0124005ed08f1f4325f" id="r_a913cb37dd2d4e0124005ed08f1f4325f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a913cb37dd2d4e0124005ed08f1f4325f">process_neuromodulation</a> (<a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *plastic_region_address, <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed_region, uint32_t <a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
+<tr class="memitem:a913cb37dd2d4e0124005ed08f1f4325f" id="r_a913cb37dd2d4e0124005ed08f1f4325f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a913cb37dd2d4e0124005ed08f1f4325f">process_neuromodulation</a> (<a class="el" href="synapse__dynamics__external__weight__change_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *plastic_region_address, <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed_region, uint32_t <a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
 <tr class="separator:a913cb37dd2d4e0124005ed08f1f4325f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afaa7bb6d8e094b3447e52c9b94eebcbd" id="r_afaa7bb6d8e094b3447e52c9b94eebcbd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#afaa7bb6d8e094b3447e52c9b94eebcbd">synapse_dynamics_process_plastic_synapses</a> (<a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *plastic_region_address, <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed_region, weight_t *<a class="el" href="c__main_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a>, uint32_t <a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t colour_delay, bool *write_back)</td></tr>
+<tr class="memitem:afaa7bb6d8e094b3447e52c9b94eebcbd" id="r_afaa7bb6d8e094b3447e52c9b94eebcbd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#afaa7bb6d8e094b3447e52c9b94eebcbd">synapse_dynamics_process_plastic_synapses</a> (<a class="el" href="synapse__dynamics__external__weight__change_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *plastic_region_address, <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed_region, weight_t *<a class="el" href="c__main_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a>, uint32_t <a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t colour_delay, bool *write_back)</td></tr>
 <tr class="memdesc:afaa7bb6d8e094b3447e52c9b94eebcbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process the dynamics of the synapses.  <br /></td></tr>
 <tr class="separator:afaa7bb6d8e094b3447e52c9b94eebcbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea2de68a39645c4747d19262cda5c80d" id="r_aea2de68a39645c4747d19262cda5c80d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structneuromodulated__synapse__t">neuromodulated_synapse_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#aea2de68a39645c4747d19262cda5c80d">get_plastic_synapses</a> (<a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row)</td></tr>
@@ -352,6 +352,24 @@ The pre-event history. </td></tr>
 synapses[]</td>
 <td class="fielddoc">
 The per-synapse information. </td></tr>
+<tr><td class="fieldtype">
+<a id="a85025485b011faeabc05ec478c5eee7e" name="a85025485b011faeabc05ec478c5eee7e"></a>uint32_t</td>
+<td class="fieldname">
+pre_spike: 31</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a4bb90318ab77c589660920773523004a" name="a4bb90318ab77c589660920773523004a"></a>uint32_t</td>
+<td class="fieldname">
+is_update: 1</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="ac4db3008a6aff12e483ef6aae6bc5e38" name="ac4db3008a6aff12e483ef6aae6bc5e38"></a><a class="el" href="synapse__dynamics__external__weight__change_8c.html#structupdatable__synapse__t">updatable_synapse_t</a></td>
+<td class="fieldname">
+synapses[]</td>
+<td class="fielddoc">
+</td></tr>
 </table>
 
 </div>
@@ -603,7 +621,7 @@ The per-synapse information. </td></tr>
         <tr>
           <td class="memname">static <a class="el" href="post__events__with__da_8h.html#structpost__event__window__t">post_event_window_t</a> get_post_event_window </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="post__events__with__da_8h.html#structpost__event__history__t">post_event_history_t</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="post__events__with__weight__change_8h.html#structpost__event__history__t">post_event_history_t</a> *&#160;</td>
           <td class="paramname"><em>post_event_history</em>, </td>
         </tr>
         <tr>
@@ -745,7 +763,7 @@ The per-synapse information. </td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="post__events__with__da_8h.html#structpost__event__history__t">post_event_history_t</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="post__events__with__weight__change_8h.html#structpost__event__history__t">post_event_history_t</a> *&#160;</td>
           <td class="paramname"><em>post_event_history</em>&#160;</td>
         </tr>
         <tr>
@@ -844,7 +862,7 @@ The per-synapse information. </td></tr>
         <tr>
           <td class="memname">void synapse_dynamics_print_plastic_synapses </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="synapse__dynamics__external__weight__change_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *&#160;</td>
           <td class="paramname"><em>plastic_region_data</em>, </td>
         </tr>
         <tr>
@@ -1043,7 +1061,7 @@ The per-synapse information. </td></tr>
         <tr>
           <td class="memname">static void process_neuromodulation </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="synapse__dynamics__external__weight__change_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *&#160;</td>
           <td class="paramname"><em>plastic_region_address</em>, </td>
         </tr>
         <tr>
@@ -1084,7 +1102,7 @@ The per-synapse information. </td></tr>
         <tr>
           <td class="memname">bool synapse_dynamics_process_plastic_synapses </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="synapse__dynamics__external__weight__change_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *&#160;</td>
           <td class="paramname"><em>plastic_region_data</em>, </td>
         </tr>
         <tr>
@@ -1464,7 +1482,7 @@ The per-synapse information. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Sep 25 2024 11:09:14 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
+Generated on Tue Oct 1 2024 07:05:16 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
 </small></address>
 </body>
 </html>

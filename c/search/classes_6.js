@@ -9,7 +9,7 @@ var searchData=
   ['fixed_5fpre_5fparams_6',['fixed_pre_params',['../connection__generator__fixed__pre_8h.html#structfixed__pre__params',1,'']]],
   ['fixed_5fprob_7',['fixed_prob',['../connection__generator__fixed__prob_8h.html#structfixed__prob',1,'']]],
   ['fixed_5fprob_5fparams_8',['fixed_prob_params',['../connection__generator__fixed__prob_8h.html#structfixed__prob__params',1,'']]],
-  ['fixed_5fstdp_5fsynapse_9',['fixed_stdp_synapse',['../synapse__dynamics__stdp__common_8h.html#structfixed__stdp__synapse',1,'']]],
+  ['fixed_5fstdp_5fsynapse_9',['fixed_stdp_synapse',['../synapse__dynamics__external__weight__change_8c.html#structfixed__stdp__synapse',1,'']]],
   ['fixed_5ftotal_10',['fixed_total',['../connection__generator__fixed__total_8h.html#structfixed__total',1,'']]],
   ['fixed_5ftotal_5fparams_11',['fixed_total_params',['../connection__generator__fixed__total_8h.html#structfixed__total__params',1,'']]],
   ['flags_12',['flags',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html',1,'router_packet_header_t']]],

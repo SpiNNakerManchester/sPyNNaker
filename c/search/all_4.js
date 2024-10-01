@@ -91,7 +91,7 @@ var searchData=
   ['do_5fmotion_88',['do_motion',['../robot__motor__control_8c.html#a96363d8d245d659d10d5512cb46aa0e3',1,'robot_motor_control.c']]],
   ['do_5fsdram_5fread_5fand_5ftest_89',['do_sdram_read_and_test',['../bit__field__expander_8h.html#aedbb9078114fc3e4f94a7e6c4ca3c5ae',1,'bit_field_expander.h']]],
   ['do_5fupdate_90',['do_update',['../robot__motor__control_8c.html#a559960c23f8a6e90bde4d3e5b8dc7811',1,'robot_motor_control.c']]],
-  ['dopamine_5ftrace_5fmarkers_91',['dopamine_trace_markers',['../post__events__with__da_8h.html#a428f6a53ef30e1c3dedb4a0c106cccde',1,'post_event_history_t::dopamine_trace_markers'],['../post__events__with__da_8h.html#ad131b5cd0825ed1698608c173fc222ef',1,'post_event_window_t::dopamine_trace_markers']]],
+  ['dopamine_5ftrace_5fmarkers_91',['dopamine_trace_markers',['../post__events__with__weight__change_8h.html#a428f6a53ef30e1c3dedb4a0c106cccde',1,'post_event_history_t::dopamine_trace_markers'],['../post__events__with__da_8h.html#ad131b5cd0825ed1698608c173fc222ef',1,'post_event_window_t::dopamine_trace_markers']]],
   ['drop_5fcounter_92',['drop_counter',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#aa1a4947a252193eace6a9c2040330f82',1,'ethernet_general_status_t']]],
   ['drop_5fwait_5ftime_93',['drop_wait_time',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a73f3c531fe322334a94bf6619cbeb154',1,'router_control_t']]],
   ['ds_94',['DS',['https://spinnakermanchester.github.io/spinnaker_tools/spinn__net_8h.html#a16ed05e077e3c1f75a258903d8b05aa4',1,'ip_hdr_t']]],

@@ -106,7 +106,7 @@ Data Structures</h2></td></tr>
 <tr class="memitem:structstdp__params" id="r_structstdp__params"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__common_8h.html#structstdp__params">stdp_params</a></td></tr>
 <tr class="memdesc:structstdp__params"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of configuration parameters in SDRAM (written by host)  <a href="synapse__dynamics__stdp__common_8h.html#structstdp__params">More...</a><br /></td></tr>
 <tr class="separator:structstdp__params"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:structfixed__stdp__synapse" id="r_structfixed__stdp__synapse"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__common_8h.html#structfixed__stdp__synapse">fixed_stdp_synapse</a></td></tr>
+<tr class="memitem:structfixed__stdp__synapse" id="r_structfixed__stdp__synapse"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__external__weight__change_8c.html#structfixed__stdp__synapse">fixed_stdp_synapse</a></td></tr>
 <tr class="separator:structfixed__stdp__synapse"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
@@ -128,9 +128,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a540b2206e6909e8e88c3a98a47ddcb2a" id="r_a540b2206e6909e8e88c3a98a47ddcb2a"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__common_8h.html#a540b2206e6909e8e88c3a98a47ddcb2a">synapse_dynamics_get_plastic_saturation_count</a> (void)</td></tr>
 <tr class="memdesc:a540b2206e6909e8e88c3a98a47ddcb2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of ring buffer saturation events due to adding plastic weights.  <br /></td></tr>
 <tr class="separator:a540b2206e6909e8e88c3a98a47ddcb2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6d77c46d1c3aab4cee6804819831cb9e" id="r_a6d77c46d1c3aab4cee6804819831cb9e"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__dynamics__stdp__common_8h.html#structfixed__stdp__synapse">fixed_stdp_synapse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__common_8h.html#a6d77c46d1c3aab4cee6804819831cb9e">synapse_dynamics_stdp_get_fixed</a> (uint32_t control_word, uint32_t <a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t colour_delay)</td></tr>
+<tr class="memitem:a6d77c46d1c3aab4cee6804819831cb9e" id="r_a6d77c46d1c3aab4cee6804819831cb9e"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__dynamics__external__weight__change_8c.html#structfixed__stdp__synapse">fixed_stdp_synapse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__common_8h.html#a6d77c46d1c3aab4cee6804819831cb9e">synapse_dynamics_stdp_get_fixed</a> (uint32_t control_word, uint32_t <a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t colour_delay)</td></tr>
 <tr class="separator:a6d77c46d1c3aab4cee6804819831cb9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab19bb3c7995c0a3f5023370c2ab43032" id="r_ab19bb3c7995c0a3f5023370c2ab43032"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__common_8h.html#ab19bb3c7995c0a3f5023370c2ab43032">synapse_dynamics_stdp_update_ring_buffers</a> (weight_t *<a class="el" href="c__main_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a>, <a class="el" href="synapse__dynamics__stdp__common_8h.html#structfixed__stdp__synapse">fixed_stdp_synapse</a> s, int32_t weight)</td></tr>
+<tr class="memitem:ab19bb3c7995c0a3f5023370c2ab43032" id="r_ab19bb3c7995c0a3f5023370c2ab43032"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__common_8h.html#ab19bb3c7995c0a3f5023370c2ab43032">synapse_dynamics_stdp_update_ring_buffers</a> (weight_t *<a class="el" href="c__main_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a>, <a class="el" href="synapse__dynamics__external__weight__change_8c.html#structfixed__stdp__synapse">fixed_stdp_synapse</a> s, int32_t weight)</td></tr>
 <tr class="separator:ab19bb3c7995c0a3f5023370c2ab43032"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06f2e2d805f0d8aa8b3ca7b687f24a24" id="r_a06f2e2d805f0d8aa8b3ca7b687f24a24"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2">control_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__common_8h.html#a06f2e2d805f0d8aa8b3ca7b687f24a24">control_conversion</a> (uint32_t id, uint32_t delay, uint32_t type)</td></tr>
 <tr class="memdesc:a06f2e2d805f0d8aa8b3ca7b687f24a24"><td class="mdescLeft">&#160;</td><td class="mdescRight">packing all of the information into the required plastic control word  <br /></td></tr>
@@ -144,7 +144,7 @@ Variables</h2></td></tr>
 <tr class="memitem:a159669347528cd4f88c368d0d33e4670" id="r_a159669347528cd4f88c368d0d33e4670"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__dynamics__stdp__common_8h.html#structstdp__params">stdp_params</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a></td></tr>
 <tr class="memdesc:a159669347528cd4f88c368d0d33e4670"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configuration parameters.  <br /></td></tr>
 <tr class="separator:a159669347528cd4f88c368d0d33e4670"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9738c22cad44349036699b2383355540" id="r_a9738c22cad44349036699b2383355540"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="post__events__with__da_8h.html#structpost__event__history__t">post_event_history_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__common_8h.html#a9738c22cad44349036699b2383355540">post_event_history</a></td></tr>
+<tr class="memitem:a9738c22cad44349036699b2383355540" id="r_a9738c22cad44349036699b2383355540"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="post__events__with__weight__change_8h.html#structpost__event__history__t">post_event_history_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__common_8h.html#a9738c22cad44349036699b2383355540">post_event_history</a></td></tr>
 <tr class="memdesc:a9738c22cad44349036699b2383355540"><td class="mdescLeft">&#160;</td><td class="mdescRight">The history data of post-events.  <br /></td></tr>
 <tr class="separator:a9738c22cad44349036699b2383355540"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e7456ba7de4fa401d09c84644229f91" id="r_a9e7456ba7de4fa401d09c84644229f91"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__common_8h.html#a9e7456ba7de4fa401d09c84644229f91">num_plastic_pre_synaptic_events</a> = 0</td></tr>
@@ -267,6 +267,12 @@ type_index</td>
 <a id="aab93edd38e18ccc689712f03a2ca9218" name="aab93edd38e18ccc689712f03a2ca9218"></a>uint32_t</td>
 <td class="fieldname">
 ring_buffer_index</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a6f0044aab2771dff961b0e896e90345c" name="a6f0044aab2771dff961b0e896e90345c"></a>uint32_t</td>
+<td class="fieldname">
+delay</td>
 <td class="fielddoc">
 </td></tr>
 </table>
@@ -443,7 +449,7 @@ ring_buffer_index</td>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="synapse__dynamics__stdp__common_8h.html#structfixed__stdp__synapse">fixed_stdp_synapse</a> synapse_dynamics_stdp_get_fixed </td>
+          <td class="memname">static <a class="el" href="synapse__dynamics__external__weight__change_8c.html#structfixed__stdp__synapse">fixed_stdp_synapse</a> synapse_dynamics_stdp_get_fixed </td>
           <td>(</td>
           <td class="paramtype">uint32_t&#160;</td>
           <td class="paramname"><em>control_word</em>, </td>
@@ -495,7 +501,7 @@ ring_buffer_index</td>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="synapse__dynamics__stdp__common_8h.html#structfixed__stdp__synapse">fixed_stdp_synapse</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="synapse__dynamics__external__weight__change_8c.html#structfixed__stdp__synapse">fixed_stdp_synapse</a>&#160;</td>
           <td class="paramname"><em>s</em>, </td>
         </tr>
         <tr>
@@ -633,7 +639,7 @@ ring_buffer_index</td>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="post__events__with__da_8h.html#structpost__event__history__t">post_event_history_t</a>* post_event_history</td>
+          <td class="memname"><a class="el" href="post__events__with__weight__change_8h.html#structpost__event__history__t">post_event_history_t</a>* post_event_history</td>
         </tr>
       </table>
   </td>
@@ -704,7 +710,7 @@ ring_buffer_index</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Sep 25 2024 11:09:14 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
+Generated on Tue Oct 1 2024 07:05:16 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
 </small></address>
 </body>
 </html>
