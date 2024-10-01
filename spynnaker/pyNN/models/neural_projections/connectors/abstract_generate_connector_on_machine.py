@@ -54,7 +54,7 @@ class ConnectorIDs(Enum):
     FIXED_NUMBER_POST_CONNECTOR = 5
     KERNEL_CONNECTOR = 6
     WTA_CONNECTOR = 7
-    SHIFT_CONNECTOR = 8
+    ONE_TO_ONE_OFFSET_CONNECTOR = 8
 
 
 class AbstractGenerateConnectorOnMachine(

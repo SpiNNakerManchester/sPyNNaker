@@ -19,18 +19,18 @@ from pacman.model.graphs.common.slice import Slice
 from spinnaker_testbase import BaseTestCase
 
 
-class TestShiftConnector(BaseTestCase):
+class TestOneToOneOffsetConnector(BaseTestCase):
 
-    def check_shift(self):
+    def check_offset(self):
         timestep = 1.0
         sim.setup(timestep=timestep)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 2)
         pop = sim.Population(11, sim.IF_curr_exp())
         proj_no_wrap = sim.Projection(
-            pop, pop, sim.extra_models.ShiftConnector(-2, wrap=False),
+            pop, pop, sim.extra_models.OneToOneOffsetConnector(-2, wrap=False),
             synapse_type=sim.StaticSynapse())
         proj_wrap = sim.Projection(
-            pop, pop, sim.extra_models.ShiftConnector(3, wrap=True),
+            pop, pop, sim.extra_models.OneToOneOffsetConnector(3, wrap=True),
             synapse_type=sim.StaticSynapse())
         sim.run(0)
         conns_no_wrap = list(proj_no_wrap.get([], format="list"))
@@ -45,18 +45,19 @@ class TestShiftConnector(BaseTestCase):
         for i, j in conns_wrap:
             assert j == (i + 3) % 11
 
-    def test_shift(self):
-        self.runsafe(self.check_shift)
+    def test_offset(self):
+        self.runsafe(self.check_offset)
 
-    def check_shift_groups(self):
+    def check_offset_groups(self):
         sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
         pop = sim.Population(12, sim.IF_curr_exp())
         proj_no_wrap = sim.Projection(
-            pop, pop, sim.extra_models.ShiftConnector(
+            pop, pop, sim.extra_models.OneToOneOffsetConnector(
                 4, wrap=False, n_neurons_per_group=6))
-        proj_wrap = sim.Projection(pop, pop, sim.extra_models.ShiftConnector(
-            -1, wrap=True, n_neurons_per_group=3))
+        proj_wrap = sim.Projection(
+            pop, pop, sim.extra_models.OneToOneOffsetConnector(
+                -1, wrap=True, n_neurons_per_group=3))
         sim.run(0)
         conns_no_wrap = list(proj_no_wrap.get([], format="list"))
         conns_wrap = list(proj_wrap.get([], format="list"))
@@ -77,14 +78,16 @@ class TestShiftConnector(BaseTestCase):
             assert group_i == group_j
             assert j - (group_j * 3) == (i - (group_i * 3) - 1) % 3
 
-    def test_shift_groups(self):
-        self.runsafe(self.check_shift_groups)
+    def test_offset_groups(self):
+        self.runsafe(self.check_offset_groups)
 
-    def check_shift_offline(self):
+    def check_offset_offline(self):
         sim.setup(timestep=1)
         pop = sim.Population(11, sim.IF_curr_exp())
-        conn_no_wrap = sim.extra_models.ShiftConnector(shift=-1, wrap=False)
-        conn_wrap = sim.extra_models.ShiftConnector(shift=3, wrap=True)
+        conn_no_wrap = sim.extra_models.OneToOneOffsetConnector(
+            offset=-1, wrap=False)
+        conn_wrap = sim.extra_models.OneToOneOffsetConnector(
+            offset=3, wrap=True)
         proj_wrap = sim.Projection(pop, pop, conn_wrap)
         proj_no_wrap = sim.Projection(pop, pop, conn_no_wrap)
         sim.run(0)
@@ -107,47 +110,47 @@ class TestShiftConnector(BaseTestCase):
         assert numpy.array_equal(conns_no_wrap, offline_conns_no_wrap)
         assert numpy.array_equal(conns_wrap, offline_conns_wrap)
 
-    def test_shift_offline(self):
-        self.runsafe(self.check_shift_offline)
+    def test_offset_offline(self):
+        self.runsafe(self.check_offset_offline)
 
-    def check_shift_wrong_number_of_neurons(self):
+    def check_offset_wrong_number_of_neurons(self):
         sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(11, sim.IF_curr_exp())
         post = sim.Population(11, sim.IF_curr_exp())
         with pytest.raises(NotImplementedError):
             sim.Projection(
-                pre, post, sim.extra_models.ShiftConnector(
+                pre, post, sim.extra_models.OneToOneOffsetConnector(
                     3, False, n_neurons_per_group=3))
         sim.end()
 
-    def test_shift_wrong_number_of_neurons(self):
-        self.runsafe(self.check_shift_wrong_number_of_neurons)
+    def test_offset_wrong_number_of_neurons(self):
+        self.runsafe(self.check_offset_wrong_number_of_neurons)
 
-    def check_shift_diff_number_of_neurons(self):
+    def check_offset_diff_number_of_neurons(self):
         sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(12, sim.IF_curr_exp())
         post = sim.Population(9, sim.IF_curr_exp())
         with pytest.raises(NotImplementedError):
             sim.Projection(
-                pre, post, sim.extra_models.ShiftConnector(
+                pre, post, sim.extra_models.OneToOneOffsetConnector(
                     2, True, n_neurons_per_group=3))
         sim.end()
 
-    def test_shift_diff_number_of_neurons(self):
-        self.runsafe(self.check_shift_diff_number_of_neurons)
+    def test_offset_diff_number_of_neurons(self):
+        self.runsafe(self.check_offset_diff_number_of_neurons)
 
-    def check_shift_wrong_shift(self):
+    def check_offset_wrong_offset(self):
         sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(12, sim.IF_curr_exp())
         post = sim.Population(12, sim.IF_curr_exp())
         with pytest.raises(ValueError):
             sim.Projection(
-                pre, post, sim.extra_models.ShiftConnector(
+                pre, post, sim.extra_models.OneToOneOffsetConnector(
                     12, True, n_neurons_per_group=3))
         sim.end()
 
-    def test_shift_wrong_shift(self):
-        self.runsafe(self.check_shift_wrong_shift)
+    def test_offset_wrong_offset(self):
+        self.runsafe(self.check_offset_wrong_offset)

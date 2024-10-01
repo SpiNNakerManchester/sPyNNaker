@@ -16,54 +16,54 @@
 
 /**
  * \file
- * \brief Shift Connection generator implementation
+ * \brief one_to_one_offset Connection generator implementation
  */
 
 #include <synapse_expander/generator_types.h>
 
 //! \brief The parameters to be passed around for this connector
-struct shift {
-	// Amount to shift the pre by to get the post
-    int32_t shift;
+struct one_to_one_offset {
+	// Amount to add to the pre by to get the post
+    int32_t offset;
     // Whether to wrap around the post values or just clip
     uint32_t wrap;
-    // The group size to consider for the shift
+    // The group size to consider for the offset
     uint32_t n_neurons_per_group;
 
 };
 
 
 /**
- * \brief Initialise the shift connection generator
+ * \brief Initialise the one_to_one_offset connection generator
  * \param[in,out] region: Region to read parameters from.  Should be updated
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *connection_generator_shift_initialise(UNUSED void **region) {
+static void *connection_generator_one_to_one_offset_initialise(UNUSED void **region) {
 	// Allocate the data structure for parameters
-	struct shift *params = spin1_malloc(sizeof(struct shift));
-	struct shift *params_sdram = *region;
+	struct one_to_one_offset *params = spin1_malloc(sizeof(struct one_to_one_offset));
+	struct one_to_one_offset *params_sdram = *region;
 
 	// Copy the parameters into the data structure
 	*params = *params_sdram;
 	*region = &params_sdram[1];
 
-	log_debug("Shift connector, shift = %u, wrap = %u, n_neurons_per_group = %u",
-			params->shift, params->wrap, params->n_neurons_per_group);
+	log_debug("one_to_one_offset connector, one_to_one_offset = %u, wrap = %u, n_neurons_per_group = %u",
+			params->offset, params->wrap, params->n_neurons_per_group);
 
 	return params;
 }
 
 /**
- * \brief Free the shift connection generator
+ * \brief Free the one_to_one_offset connection generator
  * \param[in] generator: The generator to free
  */
-static void connection_generator_shift_free(UNUSED void *generator) {
+static void connection_generator_one_to_one_offset_free(UNUSED void *generator) {
     // Nothing to do
 }
 
 /**
- * \brief Generate connections with the shift connection generator
+ * \brief Generate connections with the one_to_one_offset connection generator
  * \param[in] generator: The generator to use to generate connections
  * \param[in] pre_slice_start: The start of the slice of the pre-population
  *                             being generated
@@ -81,7 +81,7 @@ static void connection_generator_shift_free(UNUSED void *generator) {
  *                         \p max_row_length in size
  * \return The number of connections generated
  */
-static bool connection_generator_shift_generate(
+static bool connection_generator_one_to_one_offset_generate(
         void *generator, uint32_t pre_lo, uint32_t pre_hi,
         uint32_t post_lo, uint32_t post_hi, UNUSED uint32_t post_index,
         uint32_t post_slice_start, uint32_t post_slice_count,
@@ -89,7 +89,7 @@ static bool connection_generator_shift_generate(
         param_generator_t weight_generator, param_generator_t delay_generator,
         matrix_generator_t matrix_generator) {
 
-	struct shift *obj = generator;
+	struct one_to_one_offset *obj = generator;
 
 	// Get the actual ranges to generate within
 	uint32_t post_start = max(post_slice_start, post_lo);
@@ -114,9 +114,9 @@ static bool connection_generator_shift_generate(
 	for (uint32_t post = post_start; post <= post_end; post++) {
 		uint32_t local_post = post - post_slice_start;
 
-		// Find the pre that occurs after shifting; as the shift is post from
-		// pre, we subtract it to get pre from post (notee it might be negative already)
-		int32_t pre = post - obj->shift;
+		// Find the pre that occurs after offset; as the offset is post from
+		// pre, we subtract it to get pre from post (note it might be negative already)
+		int32_t pre = post - obj->offset;
 		bool use = true;
 		if (pre < (int32_t) pre_start) {
 			if (obj->wrap) {

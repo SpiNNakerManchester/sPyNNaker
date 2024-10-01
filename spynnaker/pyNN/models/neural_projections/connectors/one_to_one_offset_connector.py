@@ -36,30 +36,31 @@ if TYPE_CHECKING:
         ProjectionApplicationEdge)
 
 
-class ShiftConnector(AbstractGenerateConnectorOnMachine,
-                     AbstractGenerateConnectorOnHost):
+class OneToOneOffsetConnector(
+        AbstractGenerateConnectorOnMachine,
+        AbstractGenerateConnectorOnHost):
     """
-    A Connector that connects each pre-neuron to a post-neuron shifted by a
+    A Connector that connects each pre-neuron to a post-neuron offset by a
     specific amount, positive or negative.  If this goes beyond the start or
     end of the post neurons, it can optionally wrap around.  Additional options
-    include a group size, where the shift and wrap is applied repeatedly to
+    include a group size, where the offset and wrap is applied repeatedly to
     subsets of neurons.
 
     In the current implementation it is assumed that the pre- and
     post-populations have the same number of neurons, and that the number of
-    neurons is divisible by the group size if specified.  The shift must also
-    be smaller than the group size, or the number of neurons.
+    neurons is divisible by the group size if specified.  The offset must also
+    be smaller than the group size or the number of neurons.
     """
 
-    __slots__ = ("__n_neurons_per_group", "__shift", "__wrap")
+    __slots__ = ("__n_neurons_per_group", "__offset", "__wrap")
 
-    def __init__(self, shift: int, wrap: bool,
+    def __init__(self, offset: int, wrap: bool,
                  n_neurons_per_group: Optional[int] = None,
                  safe: bool = True, verbose: bool = False,
                  callback: None = None):
         """
-        :param shift:
-            The shift to apply to the pre-neuron index to get the post neuron
+        :param offset:
+            The offset to apply to the pre-neuron index to get the post neuron
             index.  This can be positive or negative.
         :param wrap:
             Whether to wrap around the start or end of the post neurons if the
@@ -81,7 +82,7 @@ class ShiftConnector(AbstractGenerateConnectorOnMachine,
         """
         super().__init__(safe, callback, verbose)
         self.__n_neurons_per_group = n_neurons_per_group
-        self.__shift = shift
+        self.__offset = offset
         self.__wrap = wrap
 
     def __n_connections(self, synapse_info: SynapseInformation):
@@ -89,14 +90,14 @@ class ShiftConnector(AbstractGenerateConnectorOnMachine,
             if self.__wrap:
                 # If there is a wrap, there will always be a next connection
                 return synapse_info.n_pre_neurons
-            # If there isn't a wrap, there are always shift less connections
-            return synapse_info.n_pre_neurons - abs(self.__shift)
+            # If there isn't a wrap, there are always offset less connections
+            return synapse_info.n_pre_neurons - abs(self.__offset)
 
         if self.__wrap:
             # If there is a wrap, there will always be a next connection
             return self.__n_neurons_per_group
-        # If there isn't a wrap, there are always shift less
-        return self.__n_neurons_per_group - abs(self.__shift)
+        # If there isn't a wrap, there are always offset less
+        return self.__n_neurons_per_group - abs(self.__offset)
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
@@ -152,7 +153,7 @@ class ShiftConnector(AbstractGenerateConnectorOnMachine,
         pres = list()
         posts = list()
         for post in range(post_start, post_end):
-            pre = post - self.__shift
+            pre = post - self.__offset
             if pre < pre_start:
                 if self.__wrap:
                     pre += group_size
@@ -187,13 +188,13 @@ class ShiftConnector(AbstractGenerateConnectorOnMachine,
         return block
 
     def __repr__(self):
-        return (f"ShiftConnector(shift={self.__shift}, wrap={self.__wrap}, "
+        return (f"offsetConnector(offset={self.__offset}, wrap={self.__wrap}, "
                 f"n_neurons_per_group={self.__n_neurons_per_group})")
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self) -> int:
-        return ConnectorIDs.SHIFT_CONNECTOR.value
+        return ConnectorIDs.ONE_TO_ONE_OFFSET_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
@@ -201,7 +202,7 @@ class ShiftConnector(AbstractGenerateConnectorOnMachine,
         n_values = self.__n_neurons_per_group
         if n_values is None:
             n_values = synapse_info.n_pre_neurons
-        return numpy.array([self.__shift, int(self.__wrap), n_values],
+        return numpy.array([self.__offset, int(self.__wrap), n_values],
                            dtype=uint32)
 
     @property
@@ -217,12 +218,12 @@ class ShiftConnector(AbstractGenerateConnectorOnMachine,
         if (synapse_info.pre_population.size !=
                 synapse_info.post_population.size):
             raise NotImplementedError(
-                "ShiftConnector is only designed to be used with "
+                "OneToOneOffsetConnector is only designed to be used with "
                 "populations that are the same size as each other")
         if self.__n_neurons_per_group is not None:
             if self.__n_neurons_per_group > synapse_info.pre_population.size:
                 raise ValueError(
-                    "ShiftConnector cannot be used with a group size "
+                    "OneToOneOffsetConnector cannot be used with a group size "
                     "larger than the population size")
             if ((synapse_info.post_population.size /
                  self.__n_neurons_per_group) !=
@@ -235,6 +236,6 @@ class ShiftConnector(AbstractGenerateConnectorOnMachine,
         n_values = self.__n_neurons_per_group
         if n_values is None:
             n_values = synapse_info.n_pre_neurons
-        if n_values < abs(self.__shift):
+        if n_values < abs(self.__offset):
             raise ValueError(
-                "The shift must be smaller than the number of neurons")
+                "The offset must be smaller than the number of neurons")
