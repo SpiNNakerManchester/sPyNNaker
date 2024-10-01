@@ -235,7 +235,7 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self) -> int:
-        return ConnectorIDs.WTA_CONNECTOR.value
+        return ConnectorIDs.ALL_BUT_ME_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(

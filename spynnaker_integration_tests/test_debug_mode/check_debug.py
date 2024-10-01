@@ -145,3 +145,9 @@ class CheckDebug(BaseTestCase):
         self.assertIn("ds3.sqlite3", found)
 
         sim.end()
+
+    def emptyrun(self):
+        """ Chech there is no error on run not done """
+        sim.setup(timestep=1.0)
+        sim.run(10)
+        sim.end()
