@@ -151,4 +151,3 @@ class CheckDebug(BaseTestCase):
         sim.setup(timestep=1.0)
         sim.run(10)
         sim.end()
-
