@@ -20,3 +20,6 @@ class TestDebug(CheckDebug):
 
     def test_debug(self):
         self.runsafe(self.debug)
+
+    def test_empty_run(self):
+        self.emptyrun()
