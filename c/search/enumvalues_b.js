@@ -4,5 +4,6 @@ var searchData=
   ['offset_5fto_5fd_1',['OFFSET_TO_D',['../munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55baad87c155efc7814564f9b47dfb651b3f',1,'munich_protocol.h']]],
   ['offset_5fto_5ff_2',['OFFSET_TO_F',['../munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55ba964ef105cedcef1b651c6a4e58e33302',1,'munich_protocol.h']]],
   ['offset_5fto_5fi_3',['OFFSET_TO_I',['../munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55baa890a0ce75c6dee9ecbac3a2c87220cc',1,'munich_protocol.h']]],
-  ['one_5fto_5fone_4',['ONE_TO_ONE',['../connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceadaccc17f840cc67d0e9c1a9a331b2fb4',1,'connection_generator.c']]]
+  ['one_5fto_5fone_4',['ONE_TO_ONE',['../connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceadaccc17f840cc67d0e9c1a9a331b2fb4',1,'connection_generator.c']]],
+  ['one_5fto_5fone_5foffset_5',['ONE_TO_ONE_OFFSET',['../connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceacbe6e6733aa9aa1e9c82abaee3c875cc',1,'connection_generator.c']]]
 ];

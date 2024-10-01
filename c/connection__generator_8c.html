@@ -97,6 +97,7 @@ $(function() {
 <code>#include &quot;<a class="el" href="connection__generator__fixed__post_8h_source.html">connection_generators/connection_generator_fixed_post.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="connection__generator__kernel_8h_source.html">connection_generators/connection_generator_kernel.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="connection__generator__all__but__me_8h_source.html">connection_generators/connection_generator_all_but_me.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="connection__generator__one__to__one__offset_8h_source.html">connection_generators/connection_generator_one_to_one_offset.h</a>&quot;</code><br />
 </div>
 <p><a href="connection__generator_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -122,7 +123,8 @@ Enumerations</h2></td></tr>
 , <a class="el" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fcea53c6e691e7db9eceefc0fb37cb724cd2">KERNEL</a>
 , <a class="el" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fcea37abc5f972bd9d81bd02f1ede4200e1e">ALL_BUT_ME</a>
 , <br />
-&#160;&#160;<a class="el" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceab1144285d7382feeb4687af0263e2467">N_CONNECTION_GENERATORS</a>
+&#160;&#160;<a class="el" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceacbe6e6733aa9aa1e9c82abaee3c875cc">ONE_TO_ONE_OFFSET</a>
+, <a class="el" href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fceab1144285d7382feeb4687af0263e2467">N_CONNECTION_GENERATORS</a>
 <br />
  }</td></tr>
 <tr class="memdesc:aaf105ae5beaca1dee30ae54530691fce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Known "hashes" of connection generators.  <a href="connection__generator_8c.html#aaf105ae5beaca1dee30ae54530691fce">More...</a><br /></td></tr>
@@ -164,7 +166,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p>A "class" for connection generators. </p>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00052">52</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00054">54</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -209,7 +211,7 @@ Frees any data for the generator. </td></tr>
 <div class="textblock"><p>The data for a connection generator. </p>
 <p>Connection generator "object". </p>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00067">67</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00069">69</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -260,11 +262,13 @@ data</td>
 </td></tr>
 <tr><td class="fieldname"><a id="aaf105ae5beaca1dee30ae54530691fcea37abc5f972bd9d81bd02f1ede4200e1e" name="aaf105ae5beaca1dee30ae54530691fcea37abc5f972bd9d81bd02f1ede4200e1e"></a>ALL_BUT_ME&#160;</td><td class="fielddoc"><p>AllButMe connection generator. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="aaf105ae5beaca1dee30ae54530691fceacbe6e6733aa9aa1e9c82abaee3c875cc" name="aaf105ae5beaca1dee30ae54530691fceacbe6e6733aa9aa1e9c82abaee3c875cc"></a>ONE_TO_ONE_OFFSET&#160;</td><td class="fielddoc"><p>One-to-one offset connection generator. </p>
+</td></tr>
 <tr><td class="fieldname"><a id="aaf105ae5beaca1dee30ae54530691fceab1144285d7382feeb4687af0263e2467" name="aaf105ae5beaca1dee30ae54530691fceab1144285d7382feeb4687af0263e2467"></a>N_CONNECTION_GENERATORS&#160;</td><td class="fielddoc"><p>The number of known generators. </p>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00039">39</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00040">40</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 
 </div>
 </div>
@@ -305,7 +309,7 @@ data</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An initialised connection generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00108">108</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00114">114</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 
 </div>
 </div>
@@ -417,7 +421,7 @@ data</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of connections generated </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00136">136</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00142">142</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 
 </div>
 </div>
@@ -445,7 +449,7 @@ data</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00149">149</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00155">155</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 
 </div>
 </div>
@@ -472,14 +476,14 @@ data</td>
 
 <p>An Array of known generators. </p>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00073">73</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00075">75</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Oct 1 2024 07:05:17 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
+Generated on Tue Oct 1 2024 09:36:05 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
 </small></address>
 </body>
 </html>

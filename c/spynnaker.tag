@@ -9321,6 +9321,7 @@
     <includes id="connection__generator__fixed__post_8h" name="connection_generator_fixed_post.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_fixed_post.h</includes>
     <includes id="connection__generator__kernel_8h" name="connection_generator_kernel.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_kernel.h</includes>
     <includes id="connection__generator__all__but__me_8h" name="connection_generator_all_but_me.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_all_but_me.h</includes>
+    <includes id="connection__generator__one__to__one__offset_8h" name="connection_generator_one_to_one_offset.h" local="yes" import="no" module="no" objc="no">connection_generators/connection_generator_one_to_one_offset.h</includes>
     <class kind="struct">connection_generator_info</class>
     <class kind="struct">connection_generator</class>
     <member kind="enumvalue">
@@ -9369,6 +9370,12 @@
       <name>ALL_BUT_ME</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
       <anchor>aaf105ae5beaca1dee30ae54530691fcea37abc5f972bd9d81bd02f1ede4200e1e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ONE_TO_ONE_OFFSET</name>
+      <anchorfile>connection__generator_8c.html</anchorfile>
+      <anchor>aaf105ae5beaca1dee30ae54530691fceacbe6e6733aa9aa1e9c82abaee3c875cc</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
@@ -9684,6 +9691,34 @@
       <name>connection_generator_one_to_one_generate</name>
       <anchorfile>connection__generator__one__to__one_8h.html</anchorfile>
       <anchor>a0995920e464679529f2a804431341768</anchor>
+      <arglist>(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>connection_generator_one_to_one_offset.h</name>
+    <path>src/synapse_expander/connection_generators/</path>
+    <filename>connection__generator__one__to__one__offset_8h.html</filename>
+    <includes id="generator__types_8h" name="generator_types.h" local="no" import="no" module="no" objc="no">synapse_expander/generator_types.h</includes>
+    <class kind="struct">one_to_one_offset</class>
+    <member kind="function" static="yes">
+      <type>static void *</type>
+      <name>connection_generator_one_to_one_offset_initialise</name>
+      <anchorfile>connection__generator__one__to__one__offset_8h.html</anchorfile>
+      <anchor>abd82ca23db097928f4fe102a41947f41</anchor>
+      <arglist>(void **region)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>connection_generator_one_to_one_offset_free</name>
+      <anchorfile>connection__generator__one__to__one__offset_8h.html</anchorfile>
+      <anchor>a9f85017bebf3e21261dfea7c13b62e40</anchor>
+      <arglist>(void *generator)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>connection_generator_one_to_one_offset_generate</name>
+      <anchorfile>connection__generator__one__to__one__offset_8h.html</anchorfile>
+      <anchor>a681bc34d927a125bb5d63f62051f7683</anchor>
       <arglist>(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</arglist>
     </member>
   </compound>
@@ -13016,6 +13051,11 @@
     <name>normal_params</name>
     <filename>param__generator__normal_8h.html</filename>
     <anchor>structnormal__params</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>one_to_one_offset</name>
+    <filename>connection__generator__one__to__one__offset_8h.html</filename>
+    <anchor>structone__to__one__offset</anchor>
   </compound>
   <compound kind="struct">
     <name>packet_firing_data_t</name>
