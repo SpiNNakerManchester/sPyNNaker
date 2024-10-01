@@ -37,6 +37,8 @@ from .synapse_dynamics_structural_common import (
     DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
     DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
+from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
+from .synapse_dynamics_weight_changer import SynapseDynamicsWeightChanger
 
 if TYPE_CHECKING:
     from pacman.model.graphs import AbstractVertex
@@ -172,6 +174,13 @@ class SynapseDynamicsStructuralSTDP(
     @overrides(AbstractPlasticSynapseDynamics.merge)
     def merge(self, synapse_dynamics: AbstractSynapseDynamics
               ) -> SynapseDynamicsStructuralSTDP:
+
+        if isinstance(synapse_dynamics, (SynapseDynamicsWeightChangable,
+                                         SynapseDynamicsWeightChanger)):
+            raise SynapticConfigurationException(
+                "Weight Changer and Structural Plasticity are not currently"
+                " compatible")
+
         # If dynamics is Neuromodulation, merge with other neuromodulation,
         # and then return ourselves, as neuromodulation can't be used by
         # itself

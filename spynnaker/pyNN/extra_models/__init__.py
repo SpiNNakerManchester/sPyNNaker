@@ -18,7 +18,9 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceVogels2011 as Vogels2011Rule,
     TimingDependencePfisterSpikeTriplet as PfisterSpikeTriplet)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsNeuromodulation as Neuromodulation)
+    SynapseDynamicsNeuromodulation as Neuromodulation,
+    SynapseDynamicsWeightChangable as WeightChangeable,
+    SynapseDynamicsWeightChanger as WeightChanger)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditiveTriplet)
 from spynnaker.pyNN.models.neuron.builds import (
@@ -62,5 +64,8 @@ __all__ = [
     'IFTruncDelta',
 
     # Connectors
-    'AllButMeConnector'
+    'AllButMeConnector',
+
+    # Weight changeable synapse dynamics
+    'WeightChangeable', 'WeightChanger'
     ]
