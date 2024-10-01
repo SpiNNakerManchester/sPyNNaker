@@ -48,7 +48,8 @@ static void *connection_generator_one_to_one_offset_initialise(UNUSED void **reg
 	*params = *params_sdram;
 	*region = &params_sdram[1];
 
-	log_debug("one_to_one_offset connector, one_to_one_offset = %u, wrap = %u, n_neurons_per_group = %u",
+	log_debug("one_to_one_offset connector, one_to_one_offset = %u, wrap = %u, "
+			"n_neurons_per_group = %u",
 			params->offset, params->wrap, params->n_neurons_per_group);
 
 	return params;
