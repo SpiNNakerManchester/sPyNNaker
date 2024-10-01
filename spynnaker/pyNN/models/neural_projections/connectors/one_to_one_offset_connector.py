@@ -86,18 +86,16 @@ class OneToOneOffsetConnector(
         self.__wrap = wrap
 
     def __n_connections(self, synapse_info: SynapseInformation):
-        if self.__n_neurons_per_group is None:
-            if self.__wrap:
-                # If there is a wrap, there will always be a next connection
-                return synapse_info.n_pre_neurons
-            # If there isn't a wrap, there are always offset less connections
-            return synapse_info.n_pre_neurons - abs(self.__offset)
-
         if self.__wrap:
             # If there is a wrap, there will always be a next connection
-            return self.__n_neurons_per_group
-        # If there isn't a wrap, there are always offset less
-        return self.__n_neurons_per_group - abs(self.__offset)
+            return synapse_info.n_pre_neurons
+
+        n_groups = 1
+        if self.__n_neurons_per_group is not None:
+            n_groups = synapse_info.n_pre_neurons // self.__n_neurons_per_group
+
+        # If there isn't a wrap, there are always offset less per group
+        return synapse_info.n_pre_neurons - (n_groups * abs(self.__offset))
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
