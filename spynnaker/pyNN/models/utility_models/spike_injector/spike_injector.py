@@ -16,13 +16,15 @@ from typing import Optional
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .spike_injector_vertex import SpikeInjectorVertex
 
 _population_parameters = {
     "port": None,
     "virtual_key": None,
     "reserve_reverse_ip_tag": False,
-    "splitter": None
+    "splitter": None,
+    "partition_id": SPIKE_PARTITION_ID
 }
 
 
@@ -40,8 +42,8 @@ class SpikeInjector(AbstractPyNNModel):
             self, n_neurons: int, label: str, *,
             port: Optional[int] = None, virtual_key: Optional[int] = None,
             reserve_reverse_ip_tag: bool = False,
-            splitter: Optional[AbstractSplitterCommon] = None
-            ) -> SpikeInjectorVertex:
+            splitter: Optional[AbstractSplitterCommon] = None,
+            partition_id: str = SPIKE_PARTITION_ID) -> SpikeInjectorVertex:
         """
         :param int port:
         :param int virtual_key:
@@ -49,9 +51,10 @@ class SpikeInjector(AbstractPyNNModel):
         :param splitter:
         :type splitter:
             ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
+        :param str partition_id:
         """
         # pylint: disable=arguments-differ
         max_atoms_per_core = self.get_model_max_atoms_per_dimension_per_core()
         return SpikeInjectorVertex(
             n_neurons, label, port, virtual_key,
-            reserve_reverse_ip_tag, splitter, max_atoms_per_core)
+            reserve_reverse_ip_tag, splitter, max_atoms_per_core, partition_id)

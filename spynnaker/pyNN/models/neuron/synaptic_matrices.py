@@ -34,7 +34,6 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities.bit_field_utilities import (
@@ -289,10 +288,11 @@ class SynapticMatrices(object):
             # pylint: disable=protected-access
             app_edge = proj._projection_edge
             synapse_info = proj._synapse_information
-            app_key_info = self.__app_key_and_mask(app_edge)
+            app_key_info = self.__app_key_and_mask(app_edge, synapse_info)
             if app_key_info is None:
                 continue
-            d_app_key_info = self.__delay_app_key_and_mask(app_edge)
+            d_app_key_info = self.__delay_app_key_and_mask(
+                app_edge, synapse_info)
             app_matrix = SynapticMatrixApp(
                 synapse_info, app_edge, self.__n_synapse_types,
                 self.__regions.synaptic_matrix, self.__max_atoms_per_core,
@@ -450,13 +450,14 @@ class SynapticMatrices(object):
 
     def __get_app_key_and_mask(
             self, r_info: AppVertexRoutingInfo, n_stages: int,
-            pre_vertex: PopulationApplicationVertex):
+            pre_vertex: PopulationApplicationVertex, partition_id: str):
         """
         Get a key and mask for an incoming application vertex as a whole.
 
         :param RoutingInfo r_info: The routing information for the vertex
         :param int n_stages: The number of delay stages
         :param PopulationApplicationVertex pre_vertex: The pre-vertex
+        :param str partition_id: The partition identifier
         :rtype: AppKeyInfo
         """
         if isinstance(pre_vertex, ApplicationVirtualVertex):
@@ -468,7 +469,7 @@ class SynapticMatrices(object):
             mask_size = r_info.n_bits_atoms
             core_mask = (2 ** allocator_bits_needed(
                 len(r_info.vertex.splitter.get_out_going_vertices(
-                    SPIKE_PARTITION_ID)))) - 1
+                    partition_id)))) - 1
             n_atoms = min(pre_vertex.get_max_atoms_per_core(),
                           pre_vertex.n_atoms)
 
@@ -478,42 +479,50 @@ class SynapticMatrices(object):
             n_colour_bits=pre_vertex.n_colour_bits)
 
     def __app_key_and_mask(
-            self, app_edge: ProjectionApplicationEdge) -> Optional[AppKeyInfo]:
+            self, app_edge: ProjectionApplicationEdge,
+            s_info: SynapseInformation) -> Optional[AppKeyInfo]:
         """
         Get a key and mask for an incoming application vertex as a whole.
 
         :param ProjectionApplicationEdge app_edge:
             The application edge to get the key and mask of
+        :param SynapseInformation s_info:
+            The synapse information of the projection
         """
         routing_info = SpynnakerDataView.get_routing_infos()
         r_info = routing_info.get_routing_info_from_pre_vertex(
-            app_edge.pre_vertex, SPIKE_PARTITION_ID)
+            app_edge.pre_vertex, s_info.partition_id)
         if not isinstance(r_info, AppVertexRoutingInfo):
             return None
-        return self.__get_app_key_and_mask(r_info, 1, app_edge.pre_vertex)
+        return self.__get_app_key_and_mask(
+            r_info, 1, app_edge.pre_vertex, s_info.partition_id)
 
     def __delay_app_key_and_mask(
-            self, app_edge: ProjectionApplicationEdge) -> Optional[AppKeyInfo]:
+            self, app_edge: ProjectionApplicationEdge,
+            s_info: SynapseInformation) -> Optional[AppKeyInfo]:
         """
         Get a key and mask for a whole incoming delayed application
         vertex, or return `None` if no delay edge exists.
 
         :param ProjectionApplicationEdge app_edge:
             The application edge to get the key and mask of
+        :param SynapseInformation s_info:
+            The synapse information of the projection
         """
         delay_edge = app_edge.delay_edge
         if delay_edge is None:
             return None
         routing_info = SpynnakerDataView.get_routing_infos()
         r_info = routing_info.get_routing_info_from_pre_vertex(
-            delay_edge.pre_vertex, SPIKE_PARTITION_ID)
+            delay_edge.pre_vertex, s_info.partition_id)
         if not isinstance(r_info, AppVertexRoutingInfo):
             return None
 
         # We use the app_edge pre-vertex max atoms here as the delay vertex
         # is split according to this
         return self.__get_app_key_and_mask(
-            r_info, app_edge.n_delay_stages, app_edge.pre_vertex)
+            r_info, app_edge.n_delay_stages, app_edge.pre_vertex,
+            s_info.partition_id)
 
     def get_connections_from_machine(
             self, placement: Placement, app_edge: ProjectionApplicationEdge,

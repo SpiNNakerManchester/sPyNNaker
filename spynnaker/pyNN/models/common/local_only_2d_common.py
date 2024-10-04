@@ -18,7 +18,6 @@ from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.common.mdslice import MDSlice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 #: The number of bits in a short value
@@ -76,12 +75,13 @@ def get_delay_for_source(incoming):
     return pre_vertex, local_delay, delay_stage
 
 
-def get_rinfo_for_spike_source(pre_vertex):
+def get_rinfo_for_spike_source(pre_vertex, partition_id):
     """
     Get the routing information for the source of a projection in the
-    SPIKE_PARTITION_ID partition.
+    given partition.
 
     :param ApplicationVertex pre_vertex: The source of incoming data
+    :param str partition_id: The partition ID to get the routing info from
     :return: Routing information, core mask, core mask shift
     :rtype: AppVertexRoutingInfo, int, int
     """
@@ -89,10 +89,9 @@ def get_rinfo_for_spike_source(pre_vertex):
 
     # Find the routing information
     r_info = routing_info.get_routing_info_from_pre_vertex(
-            pre_vertex, SPIKE_PARTITION_ID)
+            pre_vertex, partition_id)
 
-    n_cores = len(r_info.vertex.splitter.get_out_going_vertices(
-            SPIKE_PARTITION_ID))
+    n_cores = len(r_info.vertex.splitter.get_out_going_vertices(partition_id))
 
     # If there is 1 core, we don't use the core mask
     # If there is a virtual vertex, these also don't use core masks
@@ -112,14 +111,14 @@ def get_sources_for_target(app_vertex):
     :param AbstractPopulationVertex app_vertex: The vertex being targeted
     :return:
         A dict of source ApplicationVertex to list of source information
-    :rtype: dict(ApplicationVertex, list(Source))
+    :rtype: dict(tuple(ApplicationVertex, str), list(Source))
     """
     sources = defaultdict(list)
     for incoming in app_vertex.incoming_projections:
         pre_vertex, local_delay, delay_stage = get_delay_for_source(
             incoming)
         source = Source(incoming, local_delay, delay_stage)
-        sources[pre_vertex].append(source)
+        sources[pre_vertex, incoming.identifier].append(source)
     return sources
 
 

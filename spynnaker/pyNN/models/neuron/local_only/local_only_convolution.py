@@ -14,7 +14,7 @@
 from __future__ import annotations
 from math import ceil
 from typing import (
-    Dict, Iterable, List, cast, TYPE_CHECKING)
+    Dict, Iterable, List, Tuple, cast, TYPE_CHECKING)
 
 import numpy
 from numpy import floating, uint32
@@ -78,7 +78,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         # Store the sources to avoid recalculation
         self.__cached_sources: Dict[ApplicationVertex, Dict[
-                PopulationApplicationVertex, List[Source]]] = dict()
+                Tuple(PopulationApplicationVertex, str),
+                List[Source]]] = dict()
 
     @property
     def _delay(self) -> float:
@@ -155,7 +156,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         source_data = list()
         connector_data: List[NDArray[uint32]] = list()
         weight_data = list()
-        for pre_vertex, source_infos in sources.items():
+        for (pre_vertex, part_id), source_infos in sources.items():
 
             # Add connectors as needed
             first_conn_index = len(connector_data)
@@ -182,7 +183,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
             # Get the source routing information
             r_info, core_mask, mask_shift = get_rinfo_for_spike_source(
-                pre_vertex)
+                pre_vertex, part_id)
 
             # Get the width / height per core / last_core
             first_slice, last_slice = get_first_and_last_slice(pre_vertex)
@@ -249,7 +250,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     def __get_sources_for_target(
             self, app_vertex: AbstractPopulationVertex) -> Dict[
-                PopulationApplicationVertex, List[Source]]:
+                Tuple(PopulationApplicationVertex, str), List[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.
@@ -258,7 +259,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         :return:
             A dict of source PopulationApplicationVertex to list of source
             information
-        :rtype: dict(PopulationApplicationVertex, list(Source))
+        :rtype: dict(tuple(PopulationApplicationVertex, str), list(Source))
         """
         sources = self.__cached_sources.get(app_vertex)
         if sources is None:

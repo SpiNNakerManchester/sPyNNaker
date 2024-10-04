@@ -14,7 +14,7 @@
 from __future__ import annotations
 from math import ceil
 from typing import (
-    Dict, List, Iterable, cast, TYPE_CHECKING)
+    Dict, List, Iterable, Tuple, cast, TYPE_CHECKING)
 
 import numpy
 from numpy import floating, uint32
@@ -74,7 +74,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         """
         # Store the sources to avoid recalculation
         self.__cached_sources: Dict[ApplicationVertex, Dict[
-                ApplicationVertex, List[Source]]] = dict()
+                Tuple(ApplicationVertex, str), List[Source]]] = dict()
 
         super().__init__(delay)
         if not isinstance(self.delay, (float, int)):
@@ -154,7 +154,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         connector_data: List[NDArray[uint32]] = list()
         source_data = list()
         n_connectors = 0
-        for pre_vertex, source_infos in sources.items():
+        for (pre_vertex, part_id), source_infos in sources.items():
             first_conn_index = len(connector_data)
             for source in source_infos:
                 # pylint: disable=protected-access
@@ -167,7 +167,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
             # Get the source routing information
             r_info, core_mask, mask_shift = get_rinfo_for_spike_source(
-                pre_vertex)
+                pre_vertex, part_id)
 
             # Get the width / height per core / last_core
             first_slice, last_slice = get_first_and_last_slice(pre_vertex)
@@ -231,8 +231,9 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         :param AbstractPopulationVertex app_vertex: The vertex being targeted
         :return:
-            A dict of source ApplicationVertex to list of source information
-        :rtype: dict(ApplicationVertex, list(Source))
+            A dict of source ApplicationVertex and partition id to list of
+            source information
+        :rtype: dict(tuple(ApplicationVertex, str), list(Source))
         """
         sources = self.__cached_sources.get(app_vertex)
         if sources is None:

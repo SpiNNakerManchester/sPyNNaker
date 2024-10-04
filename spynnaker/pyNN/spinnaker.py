@@ -478,8 +478,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 d_vertices, d_edges = delay_support_adder()
                 for vertex in d_vertices:
                     self.__writer.add_vertex(vertex)
-                for edge in d_edges:
-                    self.__writer.add_edge(edge, constants.SPIKE_PARTITION_ID)
+                for edge, partition_id in d_edges:
+                    self.__writer.add_edge(edge, partition_id)
                 return
             raise ConfigurationException(
                 f"Unexpected cfg setting delay_support_adder: {name}")

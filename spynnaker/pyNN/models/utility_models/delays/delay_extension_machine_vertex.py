@@ -31,7 +31,6 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 from .delay_extension_vertex import DelayExtensionVertex
 
@@ -297,14 +296,14 @@ class DelayExtensionMachineVertex(
 
         routing_infos = SpynnakerDataView.get_routing_infos()
         key = routing_infos.get_first_key_from_pre_vertex(
-            vertex, SPIKE_PARTITION_ID)
+            vertex, self.app_vertex.partition.identifier)
 
         srcs = self.app_vertex.source_vertex.splitter.get_out_going_vertices(
-            SPIKE_PARTITION_ID)
+            self.app_vertex.partition.identifier)
         for source_vertex in srcs:
             if source_vertex.vertex_slice == self.vertex_slice:
                 r_info = routing_infos.get_routing_info_from_pre_vertex(
-                    source_vertex, SPIKE_PARTITION_ID)
+                    source_vertex, self.app_vertex.partition.identifier)
                 assert (r_info is not None)
                 incoming_key = r_info.key
                 incoming_mask = r_info.mask
