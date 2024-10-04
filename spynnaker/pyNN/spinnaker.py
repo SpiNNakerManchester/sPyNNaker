@@ -52,7 +52,6 @@ from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_selector)
-from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 
