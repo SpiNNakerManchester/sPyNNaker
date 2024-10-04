@@ -79,7 +79,8 @@ class _DelaySupportAdder(object):
             self._app_to_delay_map[vertex.partition] = vertex
             for edge in vertex.outgoing_edges:
                 self._delay_post_edge_map[
-                    vertex, edge.post_vertex, vertex.partition] = edge
+                    vertex, edge.post_vertex,
+                    vertex.partition.identifier] = edge
         progress.update(1)
 
         # go through all partitions.
