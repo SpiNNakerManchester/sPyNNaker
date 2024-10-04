@@ -78,7 +78,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         # Store the sources to avoid recalculation
         self.__cached_sources: Dict[ApplicationVertex, Dict[
-                Tuple(PopulationApplicationVertex, str),
+                Tuple[PopulationApplicationVertex, str],
                 List[Source]]] = dict()
 
     @property
@@ -250,7 +250,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     def __get_sources_for_target(
             self, app_vertex: AbstractPopulationVertex) -> Dict[
-                Tuple(PopulationApplicationVertex, str), List[Source]]:
+                Tuple[PopulationApplicationVertex, str], List[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.

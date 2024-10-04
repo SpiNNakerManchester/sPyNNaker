@@ -28,14 +28,14 @@ from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 
 def delay_support_adder() -> Tuple[
-        Sequence[DelayExtensionVertex], Sequence[ApplicationEdge]]:
+        Sequence[DelayExtensionVertex], Sequence[Tuple[ApplicationEdge, str]]]:
     """
     Adds the delay extensions to the application graph, now that all the
     splitter objects have been set.
 
     :return: The delay vertices and delay edges that were added
     :rtype: tuple(list(DelayExtensionVertex), list(DelayedApplicationEdge or
-        DelayAfferentApplicationEdge))
+        DelayAfferentApplicationEdge, str))
     """
     adder = _DelaySupportAdder()
     # pylint: disable=protected-access

@@ -74,7 +74,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         """
         # Store the sources to avoid recalculation
         self.__cached_sources: Dict[ApplicationVertex, Dict[
-                Tuple(ApplicationVertex, str), List[Source]]] = dict()
+                Tuple[ApplicationVertex, str], List[Source]]] = dict()
 
         super().__init__(delay)
         if not isinstance(self.delay, (float, int)):
