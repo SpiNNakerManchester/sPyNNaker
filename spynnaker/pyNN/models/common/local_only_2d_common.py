@@ -58,12 +58,13 @@ def get_delay_for_source(incoming):
         along with the delay stage and locally-handled delay value
 
     :param Projection incoming: The incoming projection to get the delay from
-    :return: The vertex, the local delay, the delay stage
-    :rtype: ApplicationVertex, int, int
+    :return: The vertex, the local delay, the delay stage, the partition id
+    :rtype: ApplicationVertex, int, int, str
     """
     # pylint: disable=protected-access
     app_edge = incoming._projection_edge
-    delay = incoming._synapse_information.synapse_dynamics.delay
+    s_info = incoming._synapse_information
+    delay = s_info.synapse_dynamics.delay
     steps = delay * SpynnakerDataView.get_simulation_time_step_per_ms()
     max_delay = app_edge.post_vertex.splitter.max_support_delay()
     local_delay = steps % max_delay
@@ -72,7 +73,7 @@ def get_delay_for_source(incoming):
     if steps > max_delay:
         delay_stage = (steps // max_delay) - 1
         pre_vertex = app_edge.delay_edge.pre_vertex
-    return pre_vertex, local_delay, delay_stage
+    return pre_vertex, local_delay, delay_stage, s_info.partition_id
 
 
 def get_rinfo_for_spike_source(pre_vertex, partition_id):
@@ -115,10 +116,10 @@ def get_sources_for_target(app_vertex):
     """
     sources = defaultdict(list)
     for incoming in app_vertex.incoming_projections:
-        pre_vertex, local_delay, delay_stage = get_delay_for_source(
+        pre_vertex, local_delay, delay_stage, part_id = get_delay_for_source(
             incoming)
         source = Source(incoming, local_delay, delay_stage)
-        sources[pre_vertex, incoming.identifier].append(source)
+        sources[pre_vertex, part_id].append(source)
     return sources
 
 
