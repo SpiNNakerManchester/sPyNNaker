@@ -67,7 +67,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             SpikeSourceArrayVertex(
                 n_neurons=3, spike_times=spike_list,
                 label="test", max_atoms_per_core=None, model=None,
-                splitter=None, n_colour_bits=None, 
+                splitter=None, n_colour_bits=None,
                 partition_id=SPIKE_PARTITION_ID)
             found = False
             for record in lc.records:
@@ -83,7 +83,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             v = SpikeSourceArrayVertex(
                 n_neurons=3, spike_times=None,
                 label="test", max_atoms_per_core=None, model=None,
-                splitter=None, n_colour_bits=None, 
+                splitter=None, n_colour_bits=None,
                 partition_id=SPIKE_PARTITION_ID)
             v.set_parameter_values("spike_times", [34] * 35)
             found = False
@@ -99,7 +99,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             SpikeSourceArrayVertex(
                 n_neurons=1, spike_times=[37] * 109,
                 label="test", max_atoms_per_core=None, model=None,
-                splitter=None, n_colour_bits=None, 
+                splitter=None, n_colour_bits=None,
                 partition_id=SPIKE_PARTITION_ID)
             found = False
             for record in lc.records:
