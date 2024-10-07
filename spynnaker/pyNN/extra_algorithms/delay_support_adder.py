@@ -34,8 +34,6 @@ def delay_support_adder() -> Tuple[
     splitter objects have been set.
 
     :return: The delay vertices and delay edges that were added
-    :rtype: tuple(list(DelayExtensionVertex), list(DelayedApplicationEdge or
-        DelayAfferentApplicationEdge, str))
     """
     adder = _DelaySupportAdder()
     # pylint: disable=protected-access
