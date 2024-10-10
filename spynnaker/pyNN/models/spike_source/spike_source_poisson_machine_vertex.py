@@ -506,8 +506,7 @@ class SpikeSourcePoissonMachineVertex(
 
         # Write Key info for this core:
         routing_info = SpynnakerDataView.get_routing_infos()
-        key = routing_info.get_first_key_from_pre_vertex(
-            self, constants.SPIKE_PARTITION_ID)
+        key = routing_info.get_single_first_key_from_pre_vertex(self)
         keys: Union[Sequence[int], numpy.ndarray]
         if key is None:
             spec.write_value(0)
@@ -520,11 +519,10 @@ class SpikeSourcePoissonMachineVertex(
         incoming_mask = 0
         if self._pop_vertex.incoming_control_edge is not None:
             routing_info = SpynnakerDataView.get_routing_infos()
-            r_info = routing_info.get_routing_info_from_pre_vertex(
+            r_info = routing_info.get_safe_routing_info_from_pre_vertex(
                 self._pop_vertex.incoming_control_edge.pre_vertex,
                 LIVE_POISSON_CONTROL_PARTITION_ID)
-            if r_info:
-                incoming_mask = ~r_info.mask & 0xFFFFFFFF
+            incoming_mask = ~r_info.mask & 0xFFFFFFFF
         spec.write_value(incoming_mask)
 
         # Write the number of seconds per timestep (unsigned long fract)

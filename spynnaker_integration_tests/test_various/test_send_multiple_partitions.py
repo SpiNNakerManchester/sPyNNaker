@@ -48,7 +48,7 @@ class TestSendMultiplePartitions(BaseTestCase):
             synapse_type=sim.StaticSynapse(weight=5.0))
         proj_2 = sim.Projection(
             source_2, target, sim.FromListConnector([(0, 1)]),
-            synapse_type=sim.StaticSynapse(weight=5.0), partition_id="Test")
+            synapse_type=sim.StaticSynapse(weight=5.0), partition_id="Bacon")
         proj_3 = sim.Projection(
             injector, target, sim.FromListConnector([(0, 2)]),
             synapse_type=sim.StaticSynapse(weight=5.0), partition_id="Inject")

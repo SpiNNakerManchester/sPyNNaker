@@ -119,17 +119,15 @@ def get_bitfield_key_map_data(
     routing_infos = SpynnakerDataView.get_routing_infos()
     sources = []
     for in_edge, part_id in _unique_edges(incoming_projections):
-        key = routing_infos.get_first_key_from_pre_vertex(
+        key = routing_infos.get_safe_first_key_from_pre_vertex(
             in_edge.pre_vertex, part_id)
-        if key is not None:
-            sources.append([key, in_edge.pre_vertex.n_atoms])
+        sources.append([key, in_edge.pre_vertex.n_atoms])
         if in_edge.delay_edge is not None:
-            delay_key = routing_infos.get_first_key_from_pre_vertex(
+            delay_key = routing_infos.get_safe_first_key_from_pre_vertex(
                 in_edge.delay_edge.pre_vertex, part_id)
-            if delay_key is not None:
-                n_delay_atoms = (
-                    in_edge.pre_vertex.n_atoms * in_edge.n_delay_stages)
-                sources.append([delay_key, n_delay_atoms])
+            n_delay_atoms = (
+                in_edge.pre_vertex.n_atoms * in_edge.n_delay_stages)
+            sources.append([delay_key, n_delay_atoms])
 
     if not sources:
         return numpy.array([], dtype=uint32)

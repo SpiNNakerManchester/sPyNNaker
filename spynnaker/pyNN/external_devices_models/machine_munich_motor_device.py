@@ -154,11 +154,8 @@ class MachineMunichMotorDevice(
 
         # Get the key
         routing_info = SpynnakerDataView.get_routing_infos()
-        edge_key = routing_info.get_first_key_from_pre_vertex(
+        edge_key = routing_info.get_safe_first_key_from_pre_vertex(
             placement.vertex, self.MOTOR_PARTITION_ID)
-        if edge_key is None:
-            raise SpynnakerException(
-                "This motor should have one outgoing edge to the robot")
 
         # write params to memory
         spec.switch_write_focus(region=self._PARAMS_REGION)

@@ -289,8 +289,6 @@ class SynapticMatrices(object):
             app_edge = proj._projection_edge
             synapse_info = proj._synapse_information
             app_key_info = self.__app_key_and_mask(app_edge, synapse_info)
-            if app_key_info is None:
-                continue
             d_app_key_info = self.__delay_app_key_and_mask(
                 app_edge, synapse_info)
             app_matrix = SynapticMatrixApp(
@@ -490,10 +488,9 @@ class SynapticMatrices(object):
             The synapse information of the projection
         """
         routing_info = SpynnakerDataView.get_routing_infos()
-        r_info = routing_info.get_routing_info_from_pre_vertex(
+        r_info = routing_info.get_safe_routing_info_from_pre_vertex(
             app_edge.pre_vertex, s_info.partition_id)
-        if not isinstance(r_info, AppVertexRoutingInfo):
-            return None
+        assert isinstance(r_info, AppVertexRoutingInfo)
         return self.__get_app_key_and_mask(
             r_info, 1, app_edge.pre_vertex, s_info.partition_id)
 
@@ -513,10 +510,9 @@ class SynapticMatrices(object):
         if delay_edge is None:
             return None
         routing_info = SpynnakerDataView.get_routing_infos()
-        r_info = routing_info.get_routing_info_from_pre_vertex(
+        r_info = routing_info.get_safe_routing_info_from_pre_vertex(
             delay_edge.pre_vertex, s_info.partition_id)
-        if not isinstance(r_info, AppVertexRoutingInfo):
-            return None
+        assert isinstance(r_info, AppVertexRoutingInfo)
 
         # We use the app_edge pre-vertex max atoms here as the delay vertex
         # is split according to this
