@@ -36,11 +36,10 @@ class TestSendMultiplePartitions(BaseTestCase):
         sim.setup(1.0)
         source_1 = sim.Population(1, sim.SpikeSourceArray(spike_times=[0]))
         source_2 = sim.Population(
-            1, sim.SpikeSourceArray(spike_times=[5]), partition_id="Test")
+            1, sim.SpikeSourceArray(spike_times=[5]))
         injector = sim.Population(
             1, sim.external_devices.SpikeInjector(
-                database_notify_port_num=conn.local_port), label="Inject",
-            partition_id="Inject")
+                database_notify_port_num=conn.local_port), label="Inject")
         target = sim.Population(3, sim.IF_curr_exp())
         target.record("spikes")
         proj_1 = sim.Projection(
@@ -48,7 +47,7 @@ class TestSendMultiplePartitions(BaseTestCase):
             synapse_type=sim.StaticSynapse(weight=5.0))
         proj_2 = sim.Projection(
             source_2, target, sim.FromListConnector([(0, 1)]),
-            synapse_type=sim.StaticSynapse(weight=5.0), partition_id="Bacon")
+            synapse_type=sim.StaticSynapse(weight=5.0), partition_id="Test")
         proj_3 = sim.Projection(
             injector, target, sim.FromListConnector([(0, 2)]),
             synapse_type=sim.StaticSynapse(weight=5.0), partition_id="Inject")
