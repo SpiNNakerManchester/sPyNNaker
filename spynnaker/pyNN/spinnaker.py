@@ -52,7 +52,6 @@ from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_selector)
-from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 
@@ -478,8 +477,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 d_vertices, d_edges = delay_support_adder()
                 for vertex in d_vertices:
                     self.__writer.add_vertex(vertex)
-                for edge in d_edges:
-                    self.__writer.add_edge(edge, constants.SPIKE_PARTITION_ID)
+                for edge, partition_id in d_edges:
+                    self.__writer.add_edge(edge, partition_id)
                 return
             raise ConfigurationException(
                 f"Unexpected cfg setting delay_support_adder: {name}")

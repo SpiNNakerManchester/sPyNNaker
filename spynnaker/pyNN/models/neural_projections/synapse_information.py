@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import List, Sequence, TYPE_CHECKING, Union
+from typing import List, Sequence, TYPE_CHECKING, Union, Optional
 from spinn_utilities.config_holder import get_config_bool
 from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
@@ -21,6 +21,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractGenerateOnMachine)
 from spynnaker.pyNN.types import (Delay_Types, Weight_Types)
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.populations import Population, PopulationView
     from spynnaker.pyNN.models.neuron import ConnectionHolder
@@ -47,7 +48,8 @@ class SynapseInformation(object):
         "__delays",
         "__pre_run_connection_holders",
         "__synapse_type_from_dynamics",
-        "__download_on_pause")
+        "__download_on_pause",
+        "__partition_id")
 
     def __init__(self, connector: AbstractConnector,
                  pre_population: Union[Population, PopulationView],
@@ -58,7 +60,8 @@ class SynapseInformation(object):
                  synapse_type_from_dynamics: bool,
                  weights: Weight_Types = None,
                  delays: Delay_Types = None,
-                 download_on_pause: bool = False):
+                 download_on_pause: bool = False,
+                 partition_id: Optional[str] = None):
         """
         :param AbstractConnector connector:
             The connector connected to the synapse
@@ -82,6 +85,10 @@ class SynapseInformation(object):
         :type delays: float or list(float) or ~numpy.ndarray(float) or None
         :param bool download_on_pause:
             Whether to download the synapse matrix when the simulation pauses
+        :param partition_id:
+            The partition id for the application edge when not standard; if
+            None, the standard SPIKE_PARTITION_ID is used
+        :type partition_id: str or None
         """
         self.__connector = connector
         self.__pre_population = pre_population
@@ -96,6 +103,7 @@ class SynapseInformation(object):
         self.__delays = delays
         self.__synapse_type_from_dynamics = synapse_type_from_dynamics
         self.__download_on_pause = download_on_pause
+        self.__partition_id = partition_id or SPIKE_PARTITION_ID
 
         # Make a list of holders to be updated
         self.__pre_run_connection_holders: List[ConnectionHolder] = list()
@@ -309,3 +317,12 @@ class SynapseInformation(object):
             Whether to download the synapse matrix when the simulation pauses
         """
         self.__download_on_pause = download_on_pause
+
+    @property
+    def partition_id(self) -> str:
+        """
+        The partition id for the application edge
+
+        :rtype: str
+        """
+        return self.__partition_id

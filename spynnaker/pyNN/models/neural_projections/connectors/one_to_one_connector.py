@@ -30,8 +30,6 @@ from pacman.model.graphs.common import Slice
 
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
@@ -197,9 +195,9 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
             target_vertex: ApplicationVertex) -> Sequence[
                 Tuple[MachineVertex, Sequence[MachineVertex]]]:
         src_vtxs = source_vertex.splitter.get_out_going_vertices(
-            SPIKE_PARTITION_ID)
+            s_info.partition_id)
         tgt_vtxs = target_vertex.splitter.get_in_coming_vertices(
-            SPIKE_PARTITION_ID)
+            s_info.partition_id)
 
         # If doing a view, we must be single dimensional, so use old method
         if s_info.prepop_is_view or s_info.postpop_is_view:

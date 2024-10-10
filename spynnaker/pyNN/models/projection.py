@@ -47,7 +47,6 @@ from spynnaker.pyNN.models.populations import Population, PopulationView
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractHasParameterNames)
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker._version import __version__
 
 if TYPE_CHECKING:
@@ -87,7 +86,8 @@ class Projection(object):
             source: None = None, receptor_type: str = "excitatory",
             space: Optional[PyNNSpace] = None,
             label: Optional[str] = None,
-            download_synapses: bool = False):
+            download_synapses: bool = False,
+            partition_id: Optional[str] = None):
         """
         :param ~spynnaker.pyNN.models.populations.PopulationBase \
                 pre_synaptic_population:
@@ -170,13 +170,14 @@ class Projection(object):
             pre_is_view, post_is_view, synapse_dynamics,
             synapse_id, receptor_type, synapse_id_from_dynamics,
             synapse_dynamics.weight, synapse_dynamics.delay,
-            download_synapses)
+            download_synapses, partition_id)
 
         # Set projection information in connector
         connector.set_projection_information(self.__synapse_information)
 
         # Find out if there is an existing edge between the populations
-        edge_to_merge = self._find_existing_edge(pre_vertex, post_vertex)
+        edge_to_merge = self._find_existing_edge(
+            pre_vertex, post_vertex, self.__synapse_information.partition_id)
         if edge_to_merge is not None:
             # If there is an existing edge, add the connector
             edge_to_merge.add_synapse_information(self.__synapse_information)
@@ -187,7 +188,8 @@ class Projection(object):
                 pre_vertex, post_vertex, self.__synapse_information,
                 label=label)
             SpynnakerDataView.add_edge(
-                self.__projection_edge, SPIKE_PARTITION_ID)
+                self.__projection_edge,
+                self.__synapse_information.partition_id)
 
         # Ensure the connector is happy
         synapse_dynamics.validate_connection(
@@ -439,8 +441,8 @@ class Projection(object):
 
     def _find_existing_edge(
             self, pre_synaptic_vertex: ApplicationVertex,
-            post_synaptic_vertex: ApplicationVertex) -> Optional[
-                ProjectionApplicationEdge]:
+            post_synaptic_vertex: ApplicationVertex,
+            partition_id: str) -> Optional[ProjectionApplicationEdge]:
         """
         Searches though the graph's edges to locate any
         edge which has the same post- and pre- vertex
@@ -451,6 +453,7 @@ class Projection(object):
         :param post_synaptic_vertex: The destination vertex of the multapse
         :type post_synaptic_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
+        :param str partition_id: The partition ID of the edge to find
         :return: `None` or the edge going to these vertices.
         :rtype: ~.ApplicationEdge
         """
@@ -461,6 +464,8 @@ class Projection(object):
 
         # Partitions and Partition.edges will be OrderedSet but may be empty
         for partition in partitions:
+            if partition.identifier != partition_id:
+                continue
             for edge in partition.edges:
                 if edge.post_vertex == post_synaptic_vertex:
                     return edge

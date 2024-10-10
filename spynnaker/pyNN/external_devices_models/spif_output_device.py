@@ -170,7 +170,7 @@ class SPIFOutputDevice(
         :rtype: int
         """
         r_infos = SpynnakerDataView.get_routing_infos()
-        return r_infos.get_first_key_from_pre_vertex(
+        return r_infos.get_safe_first_key_from_pre_vertex(
             self.__incoming_partitions[index].pre_vertex,
             self.__incoming_partitions[index].identifier)
 
@@ -182,7 +182,7 @@ class SPIFOutputDevice(
         :rtype: int
         """
         r_infos = SpynnakerDataView.get_routing_infos()
-        return r_infos.get_routing_info_from_pre_vertex(
+        return r_infos.get_safe_routing_info_from_pre_vertex(
             self.__incoming_partitions[index].pre_vertex,
             self.__incoming_partitions[index].identifier).mask
 
@@ -190,7 +190,7 @@ class SPIFOutputDevice(
         """ Get the payload for the command to set the distiller mask
         """
         r_infos = SpynnakerDataView.get_routing_infos()
-        return ~r_infos.get_routing_info_from_pre_vertex(
+        return ~r_infos.get_safe_routing_info_from_pre_vertex(
             self.__incoming_partitions[index].pre_vertex,
             self.__incoming_partitions[index].identifier).mask & 0xFFFFFFFF
 
@@ -245,15 +245,13 @@ class SPIFOutputDevice(
                     atom_keys = m_vertex.app_vertex.get_atom_key_map(
                         m_vertex, part.identifier, routing_infos)
                 else:
-                    r_info = routing_infos.get_routing_info_from_pre_vertex(
-                        m_vertex, part.identifier)
-                    # r_info could be None if there are no outgoing edges,
-                    # at which point there is nothing to do here anyway
-                    if r_info is not None:
-                        vertex_slice = m_vertex.vertex_slice
-                        keys = get_keys(r_info.key, vertex_slice)
-                        start = vertex_slice.lo_atom
-                        atom_keys = [(i, k) for i, k in enumerate(keys, start)]
+                    r_info = \
+                        routing_infos.get_safe_routing_info_from_pre_vertex(
+                            m_vertex, part.identifier)
+                    vertex_slice = m_vertex.vertex_slice
+                    keys = get_keys(r_info.key, vertex_slice)
+                    start = vertex_slice.lo_atom
+                    atom_keys = [(i, k) for i, k in enumerate(keys, start)]
 
                 atom_keys_mapped = list((i, key | ((k & mask) >> shift))
                                         for i, k in atom_keys)

@@ -42,7 +42,6 @@ from spynnaker.pyNN.types import (
     Delay_Types, is_scalar, Weight_Delay_Types, Weight_Types)
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
@@ -678,7 +677,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         # whole source
         return [(m_vertex, [source_vertex])
                 for m_vertex in target_vertex.splitter.get_in_coming_vertices(
-                    SPIKE_PARTITION_ID)]
+                    s_info.partition_id)]
 
     def connect(self, projection: Projection):
         """

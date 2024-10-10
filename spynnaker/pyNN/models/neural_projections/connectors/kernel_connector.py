@@ -36,7 +36,6 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.types import (
     Delay_Types, Weight_Delay_Types, Weight_Types)
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
@@ -533,9 +532,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return [
             (t_vert,
              [s_vert for s_vert in src_splitter.get_out_going_vertices(
-                 SPIKE_PARTITION_ID) if self.__connects(s_vert, t_vert)])
+                 s_info.partition_id) if self.__connects(s_vert, t_vert)])
             for t_vert in target_vertex.splitter.get_in_coming_vertices(
-                SPIKE_PARTITION_ID)]
+                s_info.partition_id)]
 
     def __connects(self, src_machine_vertex: MachineVertex,
                    dest_machine_vertex: MachineVertex) -> bool:

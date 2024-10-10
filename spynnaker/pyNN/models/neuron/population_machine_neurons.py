@@ -33,7 +33,6 @@ from spinn_front_end_common.interface.ds import (
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import AbstractNeuronExpandable
 from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
@@ -219,8 +218,8 @@ class PopulationMachineNeurons(
         """
         # Get and store the key
         routing_info = SpynnakerDataView.get_routing_infos()
-        key = routing_info.get_first_key_from_pre_vertex(
-            cast(AbstractVertex, self), SPIKE_PARTITION_ID)
+        key = routing_info.get_single_first_key_from_pre_vertex(
+            cast(AbstractVertex, self))
         if key is not None:
             self._set_key(key)
 

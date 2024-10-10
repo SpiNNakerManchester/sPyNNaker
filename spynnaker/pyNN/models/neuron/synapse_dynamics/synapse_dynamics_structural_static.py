@@ -26,7 +26,6 @@ from pacman.model.graphs.common import Slice
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.types import Weight_Types
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 
 from .abstract_synapse_dynamics_structural import (
@@ -358,7 +357,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         # Things change, so assume all connected
         return [(m_vertex, [source_vertex])
                 for m_vertex in target_vertex.splitter.get_in_coming_vertices(
-                    SPIKE_PARTITION_ID)]
+                    s_info.partition_id)]
 
     @property
     @overrides(AbstractSynapseDynamics.is_combined_core_capable)

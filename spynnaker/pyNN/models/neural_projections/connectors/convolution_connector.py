@@ -38,7 +38,6 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.models.common.local_only_2d_common import get_div_const
 
 from .abstract_connector import AbstractConnector
@@ -368,14 +367,14 @@ class ConvolutionConnector(AbstractConnector):
             return super(ConvolutionConnector, self).get_connected_vertices(
                 s_info, source_vertex, target_vertex)
         pre_vertices = numpy.array(
-            source_vertex.splitter.get_out_going_vertices(SPIKE_PARTITION_ID))
+            source_vertex.splitter.get_out_going_vertices(s_info.partition_id))
         post_slice_ranges = self.__pre_as_post_slice_ranges(
             m_vertex.vertex_slice for m_vertex in pre_vertices)
         hlf_k_w, hlf_k_h = numpy.array(self.__kernel_weights.shape) // 2
 
         connected: List[Tuple[MachineVertex, List[MachineVertex]]] = []
         for post in target_vertex.splitter.get_in_coming_vertices(
-                SPIKE_PARTITION_ID):
+                s_info.partition_id):
             post_slice = post.vertex_slice
             post_slice_x = post_slice.get_slice(0)
             post_slice_y = post_slice.get_slice(1)

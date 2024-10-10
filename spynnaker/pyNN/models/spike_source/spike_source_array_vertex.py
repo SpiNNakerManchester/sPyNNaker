@@ -39,7 +39,6 @@ from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.common import (
     ParameterHolder, PopulationApplicationVertex)
 from spynnaker.pyNN.models.common.types import (Names, Spikes)
-from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 
@@ -134,7 +133,6 @@ class SpikeSourceArrayVertex(
             n_keys=n_neurons, label=label,
             max_atoms_per_core=max_atoms_per_core,
             send_buffer_times=_send_buffer_times(spike_times, time_step),
-            send_buffer_partition_id=constants.SPIKE_PARTITION_ID,
             splitter=splitter)
 
         self._check_spike_density(spike_times)

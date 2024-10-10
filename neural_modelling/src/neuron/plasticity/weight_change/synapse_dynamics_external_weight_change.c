@@ -160,6 +160,8 @@ static inline updatable_synapse_t process_plastic_synapse(
             } else {
                 synapse.weight = (weight_t) new_weight;
             }
+			log_info("Weight changed to %d for pre-neuron %u, post-neuron %u",
+					synapse.weight, pre_spike, s.index);
             log_debug("        Weight now %d", synapse.weight);
             *changed = 1;
 
@@ -198,7 +200,7 @@ static inline void process_weight_update(
     const uint32_t *words = (uint32_t *) synapse_row_plastic_controls(fixed_region);
     uint32_t pre_spike = plastic_region_address->pre_spike;
 
-	log_debug("Weight change update for pre-neuron %u", pre_spike);
+	log_info("Weight change update for pre-neuron %u", pre_spike);
 
     // Loop through synapses
     for (; n_synapses > 0; n_synapses--) {
@@ -210,7 +212,7 @@ static inline void process_weight_update(
         uint32_t neuron_index = synapse_row_sparse_index(word,
         		synapse_index_mask);
 
-        log_debug("    Adding weight change %d to post-neuron %u",
+        log_info("    Adding weight change %d to post-neuron %u",
 						weight_change, neuron_index);
 
         // Get post event history of this neuron
