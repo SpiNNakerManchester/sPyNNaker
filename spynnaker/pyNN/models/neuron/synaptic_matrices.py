@@ -478,7 +478,7 @@ class SynapticMatrices(object):
 
     def __app_key_and_mask(
             self, app_edge: ProjectionApplicationEdge,
-            s_info: SynapseInformation) -> Optional[AppKeyInfo]:
+            s_info: SynapseInformation) -> AppKeyInfo:
         """
         Get a key and mask for an incoming application vertex as a whole.
 
