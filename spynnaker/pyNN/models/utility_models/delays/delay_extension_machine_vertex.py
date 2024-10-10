@@ -295,8 +295,7 @@ class DelayExtensionMachineVertex(
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
         routing_infos = SpynnakerDataView.get_routing_infos()
-        key = routing_infos.get_single_first_key_from_pre_vertex(
-            vertex, self.app_vertex.partition.identifier)
+        key = routing_infos.get_single_first_key_from_pre_vertex(vertex)
 
         srcs = self.app_vertex.source_vertex.splitter.get_out_going_vertices(
             self.app_vertex.partition.identifier)
