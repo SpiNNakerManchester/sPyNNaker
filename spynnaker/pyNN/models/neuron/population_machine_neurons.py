@@ -217,9 +217,7 @@ class PopulationMachineNeurons(
             The shifts to apply to convert ring buffer values to S1615 values
         """
         # Get and store the key
-        routing_info = SpynnakerDataView.get_routing_infos()
-        key = routing_info.get_single_first_key_from_pre_vertex(
-            cast(AbstractVertex, self))
+        key = self.__find_default_key()
         if key is not None:
             self._set_key(key)
 
@@ -232,6 +230,22 @@ class PopulationMachineNeurons(
         # Write the other parameters
         self._neuron_data.write_data(
             spec, self._vertex_slice, self._neuron_regions)
+
+    def __find_default_key(self) -> int:
+        routing_info = SpynnakerDataView.get_routing_infos()
+        if not self._pop_vertex.extra_partitions:
+            return routing_info.get_single_first_key_from_pre_vertex(
+                cast(AbstractVertex, self))
+        partition_ids = set(
+            routing_info.get_partitions_outgoing_from_vertex(self))
+        partition_ids = partition_ids - set(self._pop_vertex.extra_partitions)
+        if len(partition_ids) > 1:
+            raise ValueError(
+                "Multiple outgoing partitions found, cannot determine key")
+        if len(partition_ids) == 0:
+            return None
+        return routing_info.get_safe_first_key_from_pre_vertex(
+            self, next(iter(partition_ids)))
 
     def _rewrite_neuron_data_spec(self, spec: DataSpecificationReloader):
         """

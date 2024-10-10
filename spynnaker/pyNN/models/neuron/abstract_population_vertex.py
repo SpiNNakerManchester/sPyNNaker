@@ -223,7 +223,8 @@ class AbstractPopulationVertex(
         "__read_initial_values",
         "__have_read_initial_values",
         "__last_parameter_read_time",
-        "__n_colour_bits")
+        "__n_colour_bits",
+        "__extra_partitions")
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -254,7 +255,8 @@ class AbstractPopulationVertex(
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel, drop_late_spikes: bool,
             splitter: Optional[SplitterAbstractPopulationVertex],
-            seed: Optional[int], n_colour_bits: Optional[int]):
+            seed: Optional[int], n_colour_bits: Optional[int],
+            extra_partitions: Optional[List[str]]=None):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
@@ -282,6 +284,9 @@ class AbstractPopulationVertex(
             The Population seed, used to ensure the same random generation
             on each run.
         :param int n_colour_bits: The number of colour bits to use
+        :param extra_partitions:
+            Extra partitions that are to be sent by the vertex
+        :type extra_partitions: list(str) or None
         """
         # pylint: disable=too-many-arguments
         super().__init__(label, max_atoms_per_core, splitter)
@@ -387,6 +392,13 @@ class AbstractPopulationVertex(
         self.__read_initial_values = False
         self.__have_read_initial_values = False
         self.__last_parameter_read_time: Optional[float] = None
+        self.__extra_partitions = extra_partitions
+
+    @property
+    def extra_partitions(self) -> List[str]:
+        if self.__extra_partitions is None:
+            return []
+        return self.__extra_partitions
 
     @property  # type: ignore[override]
     @overrides(PopulationApplicationVertex.splitter)
