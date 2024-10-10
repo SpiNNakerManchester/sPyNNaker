@@ -61,7 +61,6 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     AbstractMaxSpikes, SendsSynapticInputsOverSDRAM,
     ReceivesSynapticInputsOverSDRAM)
-from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID)
 
