@@ -115,8 +115,7 @@ class SpikeSourceArrayVertex(
             max_atoms_per_core: Union[int, Tuple[int, ...]],
             model: SpikeSourceArray,
             splitter: Optional[AbstractSplitterCommon],
-            n_colour_bits: Optional[int],
-            partition_id: str):
+            n_colour_bits: Optional[int]):
         # pylint: disable=too-many-arguments
         self.__model_name = "SpikeSourceArray"
         self.__model = model
@@ -134,7 +133,6 @@ class SpikeSourceArrayVertex(
             n_keys=n_neurons, label=label,
             max_atoms_per_core=max_atoms_per_core,
             send_buffer_times=_send_buffer_times(spike_times, time_step),
-            send_buffer_partition_id=partition_id,
             splitter=splitter)
 
         self._check_spike_density(spike_times)
