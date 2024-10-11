@@ -41,6 +41,21 @@ FILTER_HEADER_WORDS = 2
 BIT_IN_A_WORD = 32.0
 
 
+
+def is_sdram_poisson_source(app_edge):
+    """ Determine if a given app edge is a poisson source being sent over SDRAM
+        as it can likely be discounted if so
+    """
+    # Avoid circular import
+    # pylint: disable=import-outside-toplevel
+    from spynnaker.pyNN.extra_algorithms.splitter_components import (
+        SplitterPoissonDelegate)
+    if isinstance(app_edge.pre_vertex.splitter, SplitterPoissonDelegate):
+        if app_edge.pre_vertex.splitter.send_over_sdram:
+            return True
+    return False
+
+
 def _unique_edges(projections: Iterable[Projection]) -> Iterable[
         Tuple[ProjectionApplicationEdge, str]]:
     """
@@ -55,9 +70,7 @@ def _unique_edges(projections: Iterable[Projection]) -> Iterable[
         # pylint: disable=protected-access
         edge = proj._projection_edge
         synapse_info = proj._synapse_information
-        # If there are no outgoing vertices, we should discount this edge
-        if not edge.pre_vertex.splitter.get_out_going_vertices(
-                synapse_info.partition_id):
+        if is_sdram_poisson_source(edge):
             continue
         if (edge, synapse_info.partition_id) not in seen_edges:
             seen_edges.add((edge, synapse_info.partition_id))

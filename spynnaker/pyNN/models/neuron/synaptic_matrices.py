@@ -38,7 +38,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region, get_bitfield_key_map_data,
-    write_bitfield_init_data)
+    write_bitfield_init_data, is_sdram_poisson_source)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 
@@ -289,7 +289,7 @@ class SynapticMatrices(object):
             # pylint: disable=protected-access
             app_edge = proj._projection_edge
             synapse_info = proj._synapse_information
-            if self.__is_sdram_poisson_source(app_edge):
+            if is_sdram_poisson_source(app_edge):
                 continue
             app_key_info = self.__app_key_and_mask(app_edge, synapse_info)
             d_app_key_info = self.__delay_app_key_and_mask(
@@ -523,16 +523,6 @@ class SynapticMatrices(object):
             r_info, app_edge.n_delay_stages, app_edge.pre_vertex,
             s_info.partition_id)
 
-    def __is_sdram_poisson_source(self, app_edge):
-        # Avoid circular import
-        # pylint: disable=import-outside-toplevel
-        from spynnaker.pyNN.extra_algorithms.splitter_components import (
-            SplitterPoissonDelegate)
-        if isinstance(app_edge.pre_vertex.splitter, SplitterPoissonDelegate):
-            if app_edge.pre_vertex.splitter.send_over_sdram:
-                return True
-        return False
-
     def get_connections_from_machine(
             self, placement: Placement, app_edge: ProjectionApplicationEdge,
             synapse_info: SynapseInformation) -> Sequence[NDArray]:
@@ -549,7 +539,7 @@ class SynapticMatrices(object):
             :py:const:`~.NUMPY_CONNECTORS_DTYPE`
         :rtype: list(~numpy.ndarray)
         """
-        if self.__is_sdram_poisson_source(app_edge):
+        if is_sdram_poisson_source(app_edge):
             return cast(SpikeSourcePoissonVertex, app_edge.pre_vertex)\
                 .read_connections(synapse_info)
         matrix = self.__matrices[app_edge, synapse_info]
