@@ -55,6 +55,10 @@ def _unique_edges(projections: Iterable[Projection]) -> Iterable[
         # pylint: disable=protected-access
         edge = proj._projection_edge
         synapse_info = proj._synapse_information
+        # If there are no outgoing vertices, we should discount this edge
+        if not edge.pre_vertex.splitter.get_out_going_vertices(
+                synapse_info.partition_id):
+            continue
         if (edge, synapse_info.partition_id) not in seen_edges:
             seen_edges.add((edge, synapse_info.partition_id))
             yield edge, synapse_info.partition_id

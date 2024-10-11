@@ -63,6 +63,8 @@ from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM)
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID)
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    NUMPY_CONNECTORS_DTYPE, ConnectionsArray)
 
 if TYPE_CHECKING:
     from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
@@ -605,6 +607,32 @@ class SpikeSourcePoissonMachineVertex(
                     # Skip the start and duration as they can't change
                     offset += PARAMS_WORDS_PER_RATE * BYTES_PER_WORD
                 self._pop_vertex.rates.set_value_by_id(i, numpy.array(rates))
+
+    def read_connections(
+            self, synapse_info: SynapseInformation) -> ConnectionsArray:
+        size = self.vertex_slice.n_atoms * SDRAM_EDGE_PARAMS_BYTES_PER_WEIGHT
+        placement = SpynnakerDataView().get_placement_of_vertex(self)
+        addr = locate_memory_region_for_placement(
+            placement, self._PoissonSpikeSourceRegions.SDRAM_EDGE_PARAMS)
+        addr += SDRAM_EDGE_PARAMS_BASE_BYTES
+        data = SpynnakerDataView().read_memory(
+            placement.x, placement.y, addr, size)
+        weights_encoded = numpy.frombuffer(data, dtype=uint16).astype(float)
+        weight_scales = (
+                next(iter(cast(AbstractEdgePartition,
+                               self.__sdram_partition).edges))
+                .post_vertex.weight_scales)
+        weights = weights_encoded / weight_scales[synapse_info.synapse_type]
+        connections = numpy.zeros(
+            self.vertex_slice.n_atoms, dtype=NUMPY_CONNECTORS_DTYPE)
+        connections["source"] = numpy.arange(
+            self.vertex_slice.lo_atom, self.vertex_slice.hi_atom + 1)
+        connections["target"] = numpy.arange(
+            self.vertex_slice.lo_atom, self.vertex_slice.hi_atom + 1)
+        connections["weight"] = weights
+        connections["delay"] = \
+            SpynnakerDataView().get_simulation_time_step_ms()
+        return connections
 
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge) -> int:

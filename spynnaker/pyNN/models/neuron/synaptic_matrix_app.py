@@ -93,7 +93,7 @@ class SynapticMatrixApp(object):
             self, synapse_info: SynapseInformation,
             app_edge: ProjectionApplicationEdge, n_synapse_types: int,
             synaptic_matrix_region: int, max_atoms_per_core: int,
-            all_syn_block_sz: int, app_key_info: AppKeyInfo,
+            all_syn_block_sz: int, app_key_info: Optional[AppKeyInfo],
             delay_app_key_info: Optional[AppKeyInfo],
             weight_scales: NDArray[floating]):
         """

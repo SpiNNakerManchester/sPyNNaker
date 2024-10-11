@@ -53,6 +53,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+from spynnaker.pyNN.types import Delay_Types
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
     import (
         SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
@@ -506,7 +507,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             pre_vertex = cast(SpikeSourcePoissonVertex, edge.pre_vertex)
             conn = proj._synapse_information.connector
             dynamics = proj._synapse_information.synapse_dynamics
-            if self.is_direct_poisson_source(pre_vertex, conn, dynamics):
+            delay = proj._synapse_information.delays
+            if self.is_direct_poisson_source(
+                    pre_vertex, conn, dynamics, delay):
                 # Create the direct Poisson vertices here; the splitter
                 # for the Poisson will create any others as needed
                 for vertex_slice in self._get_fixed_slices():
@@ -534,11 +537,13 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         pre_vertex = edge.pre_vertex
         connector = projection._synapse_information.connector
         dynamics = projection._synapse_information.synapse_dynamics
-        return self.is_direct_poisson_source(pre_vertex, connector, dynamics)
+        delay = projection._synapse_information.delays
+        return self.is_direct_poisson_source(
+            pre_vertex, connector, dynamics, delay)
 
     def is_direct_poisson_source(
             self, pre_vertex: ApplicationVertex, connector: AbstractConnector,
-            dynamics: AbstractSynapseDynamics) -> bool:
+            dynamics: AbstractSynapseDynamics, delay: Delay_Types) -> bool:
         """
         Determine if a given Poisson source can be created by this splitter.
 
@@ -552,6 +557,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             The synapse dynamics in use in the Projection
         :type dynamics:
             ~spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics
+        :param delay:
+            The delay in use in the Projection
         :rtype: bool
         """
         return (isinstance(pre_vertex, SpikeSourcePoissonVertex) and
@@ -559,7 +566,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 len(pre_vertex.outgoing_projections) == 1 and
                 pre_vertex.n_atoms == self.governed_app_vertex.n_atoms and
                 isinstance(connector, OneToOneConnector) and
-                isinstance(dynamics, SynapseDynamicsStatic))
+                isinstance(dynamics, SynapseDynamicsStatic) and
+                delay == SpynnakerDataView().get_simulation_time_step_ms())
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self) -> Sequence[Slice]:

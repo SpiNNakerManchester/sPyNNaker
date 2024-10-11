@@ -288,6 +288,8 @@ class SynapticMatrices(object):
             # pylint: disable=protected-access
             app_edge = proj._projection_edge
             synapse_info = proj._synapse_information
+            if self.__is_sdram_poisson_source(app_edge):
+                continue
             app_key_info = self.__app_key_and_mask(app_edge, synapse_info)
             d_app_key_info = self.__delay_app_key_and_mask(
                 app_edge, synapse_info)
@@ -478,7 +480,7 @@ class SynapticMatrices(object):
 
     def __app_key_and_mask(
             self, app_edge: ProjectionApplicationEdge,
-            s_info: SynapseInformation) -> AppKeyInfo:
+            s_info: SynapseInformation) -> Optional[AppKeyInfo]:
         """
         Get a key and mask for an incoming application vertex as a whole.
 
@@ -520,6 +522,16 @@ class SynapticMatrices(object):
             r_info, app_edge.n_delay_stages, app_edge.pre_vertex,
             s_info.partition_id)
 
+    def __is_sdram_poisson_source(self, app_edge):
+        # Avoid circular import
+        # pylint: disable=import-outside-toplevel
+        from spynnaker.pyNN.extra_algorithms.splitter_components import (
+            SplitterPoissonDelegate)
+        if isinstance(app_edge.pre_vertex.splitter, SplitterPoissonDelegate):
+            if app_edge.pre_vertex.splitter.send_over_sdram:
+                return True
+        return False
+
     def get_connections_from_machine(
             self, placement: Placement, app_edge: ProjectionApplicationEdge,
             synapse_info: SynapseInformation) -> Sequence[NDArray]:
@@ -536,6 +548,8 @@ class SynapticMatrices(object):
             :py:const:`~.NUMPY_CONNECTORS_DTYPE`
         :rtype: list(~numpy.ndarray)
         """
+        if self.__is_sdram_poisson_source(app_edge):
+            return app_edge.pre_vertex.read_connections(synapse_info)
         matrix = self.__matrices[app_edge, synapse_info]
         return matrix.get_connections(placement)
 
