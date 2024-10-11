@@ -14,7 +14,8 @@
 from __future__ import annotations
 from collections.abc import Container
 import ctypes
-from typing import List, NamedTuple, Sequence, Set, Union, cast, TYPE_CHECKING
+from typing import (
+    List, NamedTuple, Sequence, Set, Union, Optional, cast, TYPE_CHECKING)
 
 import numpy
 
@@ -231,13 +232,14 @@ class PopulationMachineNeurons(
         self._neuron_data.write_data(
             spec, self._vertex_slice, self._neuron_regions)
 
-    def __find_default_key(self) -> int:
+    def __find_default_key(self) -> Optional[int]:
         routing_info = SpynnakerDataView.get_routing_infos()
         if not self._pop_vertex.extra_partitions:
             return routing_info.get_single_first_key_from_pre_vertex(
                 cast(AbstractVertex, self))
         partition_ids = set(
-            routing_info.get_partitions_outgoing_from_vertex(self))
+            routing_info.get_partitions_outgoing_from_vertex(
+                cast(AbstractVertex, self)))
         partition_ids = partition_ids - set(self._pop_vertex.extra_partitions)
         if len(partition_ids) > 1:
             raise ValueError(
@@ -245,7 +247,7 @@ class PopulationMachineNeurons(
         if len(partition_ids) == 0:
             return None
         return routing_info.get_safe_first_key_from_pre_vertex(
-            self, next(iter(partition_ids)))
+            cast(AbstractVertex, self), next(iter(partition_ids)))
 
     def _rewrite_neuron_data_spec(self, spec: DataSpecificationReloader):
         """

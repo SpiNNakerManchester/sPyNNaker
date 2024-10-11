@@ -14,7 +14,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import (
-    Dict, List, NamedTuple, Optional, Sequence, Tuple, TYPE_CHECKING)
+    Dict, List, NamedTuple, Optional, Sequence, Tuple, TYPE_CHECKING, cast)
 
 import numpy
 from numpy import floating, uint32
@@ -40,6 +40,7 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region, get_bitfield_key_map_data,
     write_bitfield_init_data)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 
 from .synaptic_matrix_app import SynapticMatrixApp
 
@@ -549,7 +550,8 @@ class SynapticMatrices(object):
         :rtype: list(~numpy.ndarray)
         """
         if self.__is_sdram_poisson_source(app_edge):
-            return app_edge.pre_vertex.read_connections(synapse_info)
+            return cast(SpikeSourcePoissonVertex, app_edge.pre_vertex)\
+                .read_connections(synapse_info)
         matrix = self.__matrices[app_edge, synapse_info]
         return matrix.get_connections(placement)
 
