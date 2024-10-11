@@ -256,7 +256,7 @@ class AbstractPopulationVertex(
             pynn_model: AbstractPyNNNeuronModel, drop_late_spikes: bool,
             splitter: Optional[SplitterAbstractPopulationVertex],
             seed: Optional[int], n_colour_bits: Optional[int],
-            extra_partitions: Optional[List[str]]=None):
+            extra_partitions: Optional[List[str]] = None):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
