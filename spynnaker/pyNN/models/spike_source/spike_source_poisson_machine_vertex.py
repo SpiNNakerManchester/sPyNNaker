@@ -610,6 +610,13 @@ class SpikeSourcePoissonMachineVertex(
 
     def read_connections(
             self, synapse_info: SynapseInformation) -> ConnectionsArray:
+        """
+        Read the connections from the machine.
+
+        :param SynapseInformation synapse_info:
+            The synapse information being read
+        :return: The connections read back
+        """
         size = self.vertex_slice.n_atoms * SDRAM_EDGE_PARAMS_BYTES_PER_WEIGHT
         placement = SpynnakerDataView().get_placement_of_vertex(self)
         addr = locate_memory_region_for_placement(

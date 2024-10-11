@@ -396,6 +396,7 @@ class AbstractPopulationVertex(
 
     @property
     def extra_partitions(self) -> List[str]:
+        """ The extra partitions that are to be sent by the vertex. """
         if self.__extra_partitions is None:
             return []
         return self.__extra_partitions

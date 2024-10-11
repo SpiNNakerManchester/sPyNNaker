@@ -700,6 +700,10 @@ class SpikeSourcePoissonVertex(
     def read_connections(
             self, synapse_info: SynapseInformation) -> List[ConnectionsArray]:
         """ Read Poisson connections from the machine
+
+        :param SynapseInformation synapse_info:
+            The synapse information of the data being read
+        :return: The set of connections from all machine vertices
         """
         connections = list()
         for m_vertex in self.machine_vertices:
