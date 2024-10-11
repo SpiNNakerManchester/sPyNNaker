@@ -41,7 +41,6 @@ FILTER_HEADER_WORDS = 2
 BIT_IN_A_WORD = 32.0
 
 
-
 def is_sdram_poisson_source(app_edge):
     """ Determine if a given app edge is a poisson source being sent over SDRAM
         as it can likely be discounted if so
