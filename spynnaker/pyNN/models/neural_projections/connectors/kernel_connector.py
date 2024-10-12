@@ -52,7 +52,7 @@ _Kernel: TypeAlias = Union[
     float, int, List[float], NDArray[numpy.floating], RandomDistribution]
 
 HEIGHT, WIDTH = 0, 1
-N_KERNEL_PARAMS = 8
+N_KERNEL_PARAMS = 9
 
 
 class ConvolutionKernel(ndarray):
@@ -521,7 +521,12 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     @overrides(
         AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self) -> int:
-        return N_KERNEL_PARAMS * BYTES_PER_WORD
+        size = N_KERNEL_PARAMS * BYTES_PER_WORD
+        if self._krn_weights is not None:
+            size += len(self._krn_weights) * BYTES_PER_WORD
+        if self._krn_delays is not None:
+            size += len(self._krn_delays) * BYTES_PER_WORD
+        return size
 
     @overrides(AbstractGenerateConnectorOnMachine.get_connected_vertices)
     def get_connected_vertices(
