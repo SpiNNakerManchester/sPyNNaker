@@ -523,9 +523,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     def gen_connector_params_size_in_bytes(self) -> int:
         size = N_KERNEL_PARAMS * BYTES_PER_WORD
         if self._krn_weights is not None:
-            size += len(self._krn_weights) * BYTES_PER_WORD
+            size += sum(len(x) for x in self._krn_weights) * BYTES_PER_WORD
         if self._krn_delays is not None:
-            size += len(self._krn_delays) * BYTES_PER_WORD
+            size += sum(len(x) for x in self._krn_delays) * BYTES_PER_WORD
         return size
 
     @overrides(AbstractGenerateConnectorOnMachine.get_connected_vertices)
