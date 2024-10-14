@@ -235,10 +235,10 @@ class PopulationMachineNeurons(
     def __find_default_key(self) -> Optional[int]:
         routing_info = SpynnakerDataView.get_routing_infos()
         if not self._pop_vertex.extra_partitions:
-            return routing_info.get_single_first_key_from_pre_vertex(
+            return routing_info.get_single_key_from(
                 cast(AbstractVertex, self))
         partition_ids = set(
-            routing_info.get_partitions_outgoing_from_vertex(
+            routing_info.get_partitions_from(
                 cast(AbstractVertex, self)))
         partition_ids = partition_ids - set(self._pop_vertex.extra_partitions)
         if len(partition_ids) > 1:
@@ -246,7 +246,7 @@ class PopulationMachineNeurons(
                 "Multiple outgoing partitions found, cannot determine key")
         if len(partition_ids) == 0:
             return None
-        return routing_info.get_safe_first_key_from_pre_vertex(
+        return routing_info.get_key_from(
             cast(AbstractVertex, self), next(iter(partition_ids)))
 
     def _rewrite_neuron_data_spec(self, spec: DataSpecificationReloader):

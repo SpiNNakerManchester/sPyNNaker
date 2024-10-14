@@ -153,7 +153,7 @@ class MachineMunichMotorDevice(
 
         # Get the key
         routing_info = SpynnakerDataView.get_routing_infos()
-        edge_key = routing_info.get_safe_first_key_from_pre_vertex(
+        edge_key = routing_info.get_key_from(
             placement.vertex, self.MOTOR_PARTITION_ID)
 
         # write params to memory

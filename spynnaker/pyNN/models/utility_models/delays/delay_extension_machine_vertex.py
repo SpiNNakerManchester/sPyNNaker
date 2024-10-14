@@ -295,13 +295,13 @@ class DelayExtensionMachineVertex(
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
         routing_infos = SpynnakerDataView.get_routing_infos()
-        key = routing_infos.get_single_first_key_from_pre_vertex(vertex)
+        key = routing_infos.get_single_key_from(vertex)
 
         srcs = self.app_vertex.source_vertex.splitter.get_out_going_vertices(
             self.app_vertex.partition.identifier)
         for source_vertex in srcs:
             if source_vertex.vertex_slice == self.vertex_slice:
-                r_info = routing_infos.get_safe_routing_info_from_pre_vertex(
+                r_info = routing_infos.get_info_from(
                     source_vertex, self.app_vertex.partition.identifier)
                 incoming_key = r_info.key
                 incoming_mask = r_info.mask

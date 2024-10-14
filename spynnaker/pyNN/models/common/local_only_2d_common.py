@@ -89,7 +89,7 @@ def get_rinfo_for_spike_source(pre_vertex, partition_id):
     routing_info = SpynnakerDataView.get_routing_infos()
 
     # Find the routing information
-    r_info = routing_info.get_safe_routing_info_from_pre_vertex(
+    r_info = routing_info.get_info_from(
             pre_vertex, partition_id)
 
     n_cores = len(r_info.vertex.splitter.get_out_going_vertices(partition_id))
