@@ -18,7 +18,7 @@ var searchData=
   ['post_5fevents_2eh_15',['post_events.h',['../post__events_8h.html',1,'']]],
   ['post_5fevents_5fwith_5fda_2eh_16',['post_events_with_da.h',['../post__events__with__da_8h.html',1,'']]],
   ['post_5fevents_5fwith_5fweight_5fchange_2eh_17',['post_events_with_weight_change.h',['../post__events__with__weight__change_8h.html',1,'']]],
-  ['profile_5ftags_2eh_18',['profile_tags.h',['../spike__source_2poisson_2profile__tags_8h.html',1,'(Global Namespace)'],['../neuron_2profile__tags_8h.html',1,'(Global Namespace)']]],
+  ['profile_5ftags_2eh_18',['profile_tags.h',['../neuron_2profile__tags_8h.html',1,'(Global Namespace)'],['../spike__source_2poisson_2profile__tags_8h.html',1,'(Global Namespace)']]],
   ['profiler_2ec_19',['profiler.c',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/profiler_8c.html',1,'']]],
   ['profiler_2eh_20',['profiler.h',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/profiler_8h.html',1,'']]]
 ];
