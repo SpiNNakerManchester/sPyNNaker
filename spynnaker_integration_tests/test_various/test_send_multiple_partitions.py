@@ -31,7 +31,7 @@ class TestSendMultiplePartitions(BaseTestCase):
     def do_run(self):
         conn = sim.external_devices.SpynnakerLiveSpikesConnection(
             send_labels=["Inject"], local_port=None)
-        conn.add_start_callback("Inject", self.send_spike)
+        conn.add_start_resume_callback("Inject", self.send_spike)
 
         sim.setup(1.0)
         source_1 = sim.Population(1, sim.SpikeSourceArray(spike_times=[0]))
@@ -67,13 +67,13 @@ class TestSendMultiplePartitions(BaseTestCase):
         print(weights_3)
 
         # There should be a spike to each neuron
-        assert len(spikes[0]) == 1
-        assert len(spikes[1]) == 1
-        assert len(spikes[2]) == 1
+        self.assertEqual(len(spikes[0]), 1)
+        self.assertEqual(len(spikes[1]), 1)
+        self.assertEqual(len(spikes[2]), 1)
 
-        assert numpy.array_equal(weights_1, ([0, 0, 5.0], ))
-        assert numpy.array_equal(weights_2, ([0, 1, 5.0], ))
-        assert numpy.array_equal(weights_3, ([0, 2, 5.0], ))
+        self.assertListEqual(list(weights_1), [[0, 0, 5.0]])
+        self.assertListEqual(list(weights_2), [[0, 1, 5.0]])
+        self.assertListEqual(list(weights_3), [[0, 2, 5.0]])
 
     def test_run(self):
         self.runsafe(self.do_run)
