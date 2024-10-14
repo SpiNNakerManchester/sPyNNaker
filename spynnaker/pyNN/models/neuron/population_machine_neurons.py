@@ -14,7 +14,8 @@
 from __future__ import annotations
 from collections.abc import Container
 import ctypes
-from typing import List, NamedTuple, Sequence, Set, Union, cast, TYPE_CHECKING
+from typing import (
+    List, NamedTuple, Sequence, Set, Union, Optional, cast, TYPE_CHECKING)
 
 import numpy
 
@@ -33,7 +34,6 @@ from spinn_front_end_common.interface.ds import (
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import AbstractNeuronExpandable
 from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
@@ -218,9 +218,7 @@ class PopulationMachineNeurons(
             The shifts to apply to convert ring buffer values to S1615 values
         """
         # Get and store the key
-        routing_info = SpynnakerDataView.get_routing_infos()
-        key = routing_info.get_first_key_from_pre_vertex(
-            cast(AbstractVertex, self), SPIKE_PARTITION_ID)
+        key = self.__find_default_key()
         if key is not None:
             self._set_key(key)
 
@@ -233,6 +231,23 @@ class PopulationMachineNeurons(
         # Write the other parameters
         self._neuron_data.write_data(
             spec, self._vertex_slice, self._neuron_regions)
+
+    def __find_default_key(self) -> Optional[int]:
+        routing_info = SpynnakerDataView.get_routing_infos()
+        if not self._pop_vertex.extra_partitions:
+            return routing_info.get_single_key_from(
+                cast(AbstractVertex, self))
+        partition_ids = set(
+            routing_info.get_partitions_from(
+                cast(AbstractVertex, self)))
+        partition_ids = partition_ids - set(self._pop_vertex.extra_partitions)
+        if len(partition_ids) > 1:
+            raise ValueError(
+                "Multiple outgoing partitions found, cannot determine key")
+        if len(partition_ids) == 0:
+            return None
+        return routing_info.get_key_from(
+            cast(AbstractVertex, self), next(iter(partition_ids)))
 
     def _rewrite_neuron_data_spec(self, spec: DataSpecificationReloader):
         """

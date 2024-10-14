@@ -30,7 +30,6 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.exceptions import SpynnakerException
 
 
 class MachineMunichMotorDevice(
@@ -154,11 +153,8 @@ class MachineMunichMotorDevice(
 
         # Get the key
         routing_info = SpynnakerDataView.get_routing_infos()
-        edge_key = routing_info.get_first_key_from_pre_vertex(
+        edge_key = routing_info.get_key_from(
             placement.vertex, self.MOTOR_PARTITION_ID)
-        if edge_key is None:
-            raise SpynnakerException(
-                "This motor should have one outgoing edge to the robot")
 
         # write params to memory
         spec.switch_write_focus(region=self._PARAMS_REGION)

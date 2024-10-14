@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 import math
-from typing import Iterable, Optional, TYPE_CHECKING
+from typing import Iterable, Optional, TYPE_CHECKING, Tuple
 
 import numpy
 from numpy import uint32
@@ -22,7 +22,6 @@ from numpy.typing import NDArray
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.data import SpynnakerDataView
 
 if TYPE_CHECKING:
@@ -42,21 +41,39 @@ FILTER_HEADER_WORDS = 2
 BIT_IN_A_WORD = 32.0
 
 
+def is_sdram_poisson_source(app_edge):
+    """ Determine if a given app edge is a poisson source being sent over SDRAM
+        as it can likely be discounted if so
+    """
+    # Avoid circular import
+    # pylint: disable=import-outside-toplevel
+    from spynnaker.pyNN.extra_algorithms.splitter_components import (
+        SplitterPoissonDelegate)
+    if isinstance(app_edge.pre_vertex.splitter, SplitterPoissonDelegate):
+        if app_edge.pre_vertex.splitter.send_over_sdram:
+            return True
+    return False
+
+
 def _unique_edges(projections: Iterable[Projection]) -> Iterable[
-        ProjectionApplicationEdge]:
+        Tuple[ProjectionApplicationEdge, str]]:
     """
     Get the unique application edges of a collection of projections.
 
     :param iterable(~spynnaker.pyNN.models.projection.Projection) projections:
         The projections to examine.
-    :rtype: iterable(ProjectionApplicationEdge)
+    :rtype: iterable(tuple(ProjectionApplicationEdge, str))
     """
     seen_edges = set()
     for proj in projections:
-        edge = proj._projection_edge  # pylint: disable=protected-access
-        if edge not in seen_edges:
-            seen_edges.add(edge)
-            yield edge
+        # pylint: disable=protected-access
+        edge = proj._projection_edge
+        synapse_info = proj._synapse_information
+        if is_sdram_poisson_source(edge):
+            continue
+        if (edge, synapse_info.partition_id) not in seen_edges:
+            seen_edges.add((edge, synapse_info.partition_id))
+            yield edge, synapse_info.partition_id
 
 
 def get_sdram_for_bit_field_region(
@@ -72,7 +89,7 @@ def get_sdram_for_bit_field_region(
     :rtype: int
     """
     sdram = FILTER_HEADER_WORDS * BYTES_PER_WORD
-    for in_edge in _unique_edges(incoming_projections):
+    for in_edge, _part_id in _unique_edges(incoming_projections):
         n_atoms = in_edge.pre_vertex.n_atoms
         n_words_for_atoms = int(math.ceil(n_atoms / BIT_IN_A_WORD))
         sdram += (FILTER_INFO_WORDS + n_words_for_atoms) * BYTES_PER_WORD
@@ -96,7 +113,7 @@ def get_sdram_for_keys(incoming_projections: Iterable[Projection]) -> int:
     """
     # basic sdram
     sdram = 0
-    for in_edge in _unique_edges(incoming_projections):
+    for in_edge, _part_id in _unique_edges(incoming_projections):
         sdram += BYTES_PER_WORD
         if in_edge.n_delay_stages:
             sdram += BYTES_PER_WORD
@@ -117,18 +134,16 @@ def get_bitfield_key_map_data(
     # Gather the source vertices that target this core
     routing_infos = SpynnakerDataView.get_routing_infos()
     sources = []
-    for in_edge in _unique_edges(incoming_projections):
-        key = routing_infos.get_first_key_from_pre_vertex(
-            in_edge.pre_vertex, SPIKE_PARTITION_ID)
-        if key is not None:
-            sources.append([key, in_edge.pre_vertex.n_atoms])
+    for in_edge, part_id in _unique_edges(incoming_projections):
+        key = routing_infos.get_key_from(
+            in_edge.pre_vertex, part_id)
+        sources.append([key, in_edge.pre_vertex.n_atoms])
         if in_edge.delay_edge is not None:
-            delay_key = routing_infos.get_first_key_from_pre_vertex(
-                in_edge.delay_edge.pre_vertex, SPIKE_PARTITION_ID)
-            if delay_key is not None:
-                n_delay_atoms = (
-                    in_edge.pre_vertex.n_atoms * in_edge.n_delay_stages)
-                sources.append([delay_key, n_delay_atoms])
+            delay_key = routing_infos.get_key_from(
+                in_edge.delay_edge.pre_vertex, part_id)
+            n_delay_atoms = (
+                in_edge.pre_vertex.n_atoms * in_edge.n_delay_stages)
+            sources.append([delay_key, n_delay_atoms])
 
     if not sources:
         return numpy.array([], dtype=uint32)

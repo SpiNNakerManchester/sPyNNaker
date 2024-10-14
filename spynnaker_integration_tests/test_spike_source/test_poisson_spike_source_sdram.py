@@ -74,15 +74,16 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
         self.assertAlmostEqual(expected, float(count) / float(n_neurons),
                                delta=tolerance)
 
-    def make_delta_pop(self, n_neurons, ssp, weight):
+    def make_delta_pop(self, n_neurons, ssp, weight, delay=1.0):
         pop_1 = sim.Population(
             n_neurons, sim.IF_curr_delta(**PARAMS), label='pop_1',
             splitter=SplitterAbstractPopulationVertexNeuronsSynapses(1))
         pop_1.initialize(v=0)
         pop_1.record("v")
-        sim.Projection(ssp, pop_1, sim.OneToOneConnector(),
-                       sim.StaticSynapse(weight=weight, delay=1.0))
-        return pop_1
+        proj = sim.Projection(
+            ssp, pop_1, sim.OneToOneConnector(),
+            sim.StaticSynapse(weight=weight, delay=delay))
+        return pop_1, proj
 
     def recording_poisson_spikes_rate_0(self):
         sim.setup(timestep=1.0, min_delay=1.0)
@@ -92,16 +93,71 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
         ssp = sim.Population(
             n_neurons, sim.SpikeSourcePoisson, {'rate': 0}, label='ssp')
         ssp.record("spikes")
-        pop_1 = self.make_delta_pop(n_neurons, ssp, 1.0)
+        pop_1, proj = self.make_delta_pop(n_neurons, ssp, 1.0)
 
         sim.run(2000)
         v = pop_1.get_data("v").segments[0].filter(name='v')[0]
         spikes = ssp.get_data("spikes").segments[0].spiketrains
+        conns = list(proj.get(["weight", "delay"], format="list"))
+        is_poisson_direct = (
+            proj._projection_edge.pre_vertex.splitter.send_over_sdram)
         sim.end()
-        self.check_rate(n_neurons, v, 1.0, 0.0, spikes, 2000, 0, 1.0)
+        assert is_poisson_direct
+        self.check_rate(n_neurons, v, 1.0, 0.0, spikes, 2.0, 0, 1.0)
+        for i, j, w, d in conns:
+            assert i == j
+            assert w == 1.0
+            assert d == 1.0
 
     def test_recording_poisson_spikes_rate_0(self):
         self.runsafe(self.recording_poisson_spikes_rate_0)
+
+    def poisson_sdram_with_delay(self):
+        sim.setup(timestep=1.0, min_delay=1.0)
+        n_neurons = 100  # number of neurons in each population
+        sim.set_number_of_neurons_per_core(sim.IF_curr_delta, n_neurons / 2)
+
+        ssp = sim.Population(
+            n_neurons, sim.SpikeSourcePoisson, {'rate': 100}, label='ssp')
+        ssp.record("spikes")
+        _pop_1, proj = self.make_delta_pop(n_neurons, ssp, 1.0, delay=17)
+
+        sim.run(2000)
+        conns = list(proj.get(["weight", "delay"], format="list"))
+        is_poisson_direct = (
+            proj._projection_edge.pre_vertex.splitter.send_over_sdram)
+        sim.end()
+        assert not is_poisson_direct
+        # Can't really check the rate here as we expect it not use SDRAM!
+        for i, j, w, d in conns:
+            assert i == j
+            assert w == 1.0
+            assert d == 17.0
+
+    def poisson_sdram_with_delay_different_ts(self):
+        sim.setup(timestep=0.1, min_delay=1.0)
+        n_neurons = 100  # number of neurons in each population
+        sim.set_number_of_neurons_per_core(sim.IF_curr_delta, n_neurons / 2)
+
+        ssp = sim.Population(
+            n_neurons, sim.SpikeSourcePoisson, {'rate': 100}, label='ssp')
+        ssp.record("spikes")
+        _pop_1, proj = self.make_delta_pop(n_neurons, ssp, 1.0, delay=1.0)
+
+        sim.run(2000)
+        conns = list(proj.get(["weight", "delay"], format="list"))
+        is_poisson_direct = (
+            proj._projection_edge.pre_vertex.splitter.send_over_sdram)
+        sim.end()
+        assert not is_poisson_direct
+        # Can't really check the rate here as we expect it not use SDRAM!
+        for i, j, w, d in conns:
+            assert i == j
+            assert w == 1.0
+            assert d == 1.0
+
+    def test_poisson_sdram_with_delay(self):
+        self.runsafe(self.poisson_sdram_with_delay)
 
     def check_rates(self, rates, seconds, seed):
         n_neurons = 100
@@ -114,15 +170,16 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
                 label='inputSpikes_{}'.format(rate),
                 additional_parameters={"seed": seed})
             ssp.record("spikes")
-            target = self.make_delta_pop(n_neurons, ssp, weight)
-            pops[rate] = (ssp, target)
+            target, proj = self.make_delta_pop(n_neurons, ssp, weight)
+            pops[rate] = (ssp, target, proj)
         sim.run(seconds * 1000)
         v = {}
         spikes = {}
         max_spikes = {}
         max_weight = {}
+        is_direct = {}
         for rate in rates:
-            ssp, target = pops[rate]
+            ssp, target, proj = pops[rate]
             v[rate] = target.get_data("v").segments[0].filter(name='v')[0]
             spikes[rate] = ssp.get_data("spikes").segments[0].spiketrains
 
@@ -132,8 +189,11 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
             max_w = 65535 / weight_scale
             max_weight[rate] = max_w
             max_spikes[rate] = int(max_w / weight)
+            is_direct[rate] = (
+                proj._projection_edge.pre_vertex.splitter.send_over_sdram)
         sim.end()
         for rate in rates:
+            assert is_direct[rate]
             self.check_rate(
                 n_neurons, v[rate], weight, rate, spikes[rate],
                 seconds, max_spikes[rate], max_weight[rate])

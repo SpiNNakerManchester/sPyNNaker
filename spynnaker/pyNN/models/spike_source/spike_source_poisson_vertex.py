@@ -46,6 +46,8 @@ from spynnaker.pyNN.models.common import (
     ParameterHolder, PopulationApplicationVertex)
 from spynnaker.pyNN.models.common.types import Names
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    ConnectionsArray)
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
     get_sdram_edge_params_bytes, get_expander_rates_bytes, get_params_bytes)
@@ -53,6 +55,7 @@ if TYPE_CHECKING:
     from spinn_utilities.ranged.abstract_sized import Selector
     from .spike_source_poisson import SpikeSourcePoisson
     from .spike_source_poisson_variable import SpikeSourcePoissonVariable
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.common.types import Values
 
@@ -693,3 +696,16 @@ class SpikeSourcePoissonVertex(
     @property
     def n_colour_bits(self) -> int:
         return self.__n_colour_bits
+
+    def read_connections(
+            self, synapse_info: SynapseInformation) -> List[ConnectionsArray]:
+        """ Read Poisson connections from the machine
+
+        :param SynapseInformation synapse_info:
+            The synapse information of the data being read
+        :return: The set of connections from all machine vertices
+        """
+        connections = list()
+        for m_vertex in self.machine_vertices:
+            connections.append(m_vertex.read_connections(synapse_info))
+        return connections

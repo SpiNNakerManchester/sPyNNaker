@@ -92,6 +92,8 @@ class ExternalDeviceLifControlVertex(
         # pylint: disable=too-many-arguments
         if drop_late_spikes is None:
             drop_late_spikes = False
+        extra_partition_ids = [
+            dev.device_control_partition_id for dev in devices]
         super().__init__(
             n_neurons=len(devices),
             label=f"ext_dev{devices}" if label is None else label,
@@ -102,7 +104,7 @@ class ExternalDeviceLifControlVertex(
             incoming_spike_buffer_size=incoming_spike_buffer_size,
             neuron_impl=neuron_impl, pynn_model=pynn_model,
             drop_late_spikes=drop_late_spikes, splitter=splitter, seed=seed,
-            n_colour_bits=n_colour_bits)
+            n_colour_bits=n_colour_bits, extra_partitions=extra_partition_ids)
 
         if not devices:
             raise ConfigurationException("No devices specified")

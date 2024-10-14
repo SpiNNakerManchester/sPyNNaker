@@ -82,7 +82,8 @@ class SpynnakerExternalDevicePluginManager(object):
             notify: bool = True, use_payload_prefix: bool = True,
             payload_prefix: Optional[int] = None, payload_right_shift: int = 0,
             number_of_packets_sent_per_time_step: int = 0,
-            translate_keys: bool = False):
+            translate_keys: bool = False,
+            partition_ids: Optional[Iterable[str]] = None):
         """
         Output the spikes from a given population from SpiNNaker as they
         occur in the simulation.
@@ -154,6 +155,9 @@ class SpynnakerExternalDevicePluginManager(object):
         # Use the mask to remove the colour from non-translated keys
         received_key_mask = 0xFFFFFFFF & ~((2 ** n_colour_bits) - 1)
 
+        if partition_ids is None:
+            partition_ids = [SPIKE_PARTITION_ID]
+
         params = LivePacketGatherParameters(
             port=port, hostname=host, tag=tag, strip_sdp=strip_sdp,
             use_prefix=use_prefix, key_prefix=key_prefix,
@@ -168,7 +172,7 @@ class SpynnakerExternalDevicePluginManager(object):
             translate_keys=translate_keys,
             translated_key_right_shift=translated_key_right_shift)
         SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker(
-            population._vertex, params, [SPIKE_PARTITION_ID])
+            population._vertex, params, partition_ids)
 
         if notify:
             SpynnakerExternalDevicePluginManager.add_database_socket_address(
@@ -268,8 +272,7 @@ class SpynnakerExternalDevicePluginManager(object):
         controller = ReverseIpTagMultiCastSource(
             n_keys=vertex.n_atoms, label=control_label,
             receive_port=receive_port,
-            reserve_reverse_ip_tag=reserve_reverse_ip_tag,
-            injection_partition_id=LIVE_POISSON_CONTROL_PARTITION_ID)
+            reserve_reverse_ip_tag=reserve_reverse_ip_tag)
         SpynnakerExternalDevicePluginManager.add_application_vertex(controller)
         edge = SpynnakerExternalDevicePluginManager.add_edge(
             controller, vertex, LIVE_POISSON_CONTROL_PARTITION_ID)

@@ -88,7 +88,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
         :rtype: int
         """
         routing_info = SpynnakerDataView.get_routing_infos()
-        key = routing_info.get_first_key_from_pre_vertex(
+        key = routing_info.get_key_from(
             self, SPIKE_PARTITION_ID)
         return key
 

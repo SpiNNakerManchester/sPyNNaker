@@ -424,11 +424,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     def get_atom_key_map(
             self, pre_vertex: MachineVertex, partition_id: str,
             routing_info: RoutingInfo) -> Iterable[Tuple[int, int]]:
-        base_key = routing_info.get_first_key_from_pre_vertex(
+        base_key = routing_info.get_key_from(
             pre_vertex, partition_id)
-        # This might happen if there are no edges
-        if base_key is None:
-            base_key = 0
         vertex_slice = pre_vertex.vertex_slice
         keys = get_keys(base_key, vertex_slice, self.n_colour_bits)
         return zip(vertex_slice.get_raster_ids(), keys)

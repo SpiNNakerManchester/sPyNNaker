@@ -81,7 +81,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             v = SpikeSourceArrayVertex(
                 n_neurons=3, spike_times=None,
                 label="test", max_atoms_per_core=None, model=None,
-                splitter=None, n_colour_bits=None)
+                splitter=None, n_colour_bits=None,)
             v.set_parameter_values("spike_times", [34] * 35)
             found = False
             for record in lc.records:

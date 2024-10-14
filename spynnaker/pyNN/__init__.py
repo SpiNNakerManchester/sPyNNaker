@@ -52,6 +52,7 @@ from spinn_front_end_common.utilities.exceptions import (
 from spynnaker.pyNN.random_distribution import RandomDistribution
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 # connections
 # noinspection PyUnresolvedReferences
@@ -357,7 +358,8 @@ def Projection(
         synapse_type: Optional[AbstractStaticSynapseDynamics] = None,
         source: None = None, receptor_type: str = "excitatory",
         space: Optional[Space] = None, label: Optional[str] = None,
-        download_synapses: bool = False) -> SpiNNakerProjection:
+        download_synapses: bool = False,
+        partition_id: str = SPIKE_PARTITION_ID) -> SpiNNakerProjection:
     """
     Used to support PEP 8 spelling correctly.
 
@@ -376,6 +378,7 @@ def Projection(
     :param label: the label
     :type label: str or None
     :param bool download_synapses: whether to download synapses
+    :param str partition_id: the partition id to use for the projection
     :return: a projection object for SpiNNaker
     :rtype: ~spynnaker.pyNN.models.projection.Projection
     """
@@ -384,7 +387,8 @@ def Projection(
         pre_synaptic_population=presynaptic_population,
         post_synaptic_population=postsynaptic_population, connector=connector,
         synapse_type=synapse_type, source=source, receptor_type=receptor_type,
-        space=space, label=label, download_synapses=download_synapses)
+        space=space, label=label, download_synapses=download_synapses,
+        partition_id=partition_id)
 
 
 def _create_overloaded_functions(spinnaker_simulator: SpiNNaker):

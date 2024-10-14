@@ -35,7 +35,6 @@ from spinn_front_end_common.utilities.constants import (
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
@@ -278,7 +277,7 @@ class SynapseDynamicsStructuralCommon(
 
             # Number of incoming vertices
             out_verts = app_edge.pre_vertex.splitter.get_out_going_vertices(
-                SPIKE_PARTITION_ID)
+                synapse_info.partition_id)
             spec.write_value(len(out_verts), data_type=DataType.UINT16)
 
             # Controls - currently just if this is a self connection or not
@@ -305,9 +304,8 @@ class SynapseDynamicsStructuralCommon(
             spec.write_value(app_edge.pre_vertex.n_atoms)
             # Machine edge information
             for sub, m_vertex in enumerate(out_verts):
-                r_info = routing_info.get_routing_info_from_pre_vertex(
-                    m_vertex, SPIKE_PARTITION_ID)
-                assert r_info is not None
+                r_info = routing_info.get_info_from(
+                    m_vertex, synapse_info.partition_id)
                 vertex_slice = m_vertex.vertex_slice
                 spec.write_value(r_info.key)
                 spec.write_value(r_info.mask)

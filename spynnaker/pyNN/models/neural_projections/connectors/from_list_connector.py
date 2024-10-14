@@ -34,7 +34,6 @@ from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.types import Delay_Types, Weight_Delay_Types, Weight_Types
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
@@ -508,9 +507,9 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         # Divide the targets into bins based on post slices
         post_slices = [m.vertex_slice
                        for m in target_vertex.splitter.get_in_coming_vertices(
-                           SPIKE_PARTITION_ID)]
+                           s_info.partition_id)]
         pre_vertices = source_vertex.splitter.get_out_going_vertices(
-            SPIKE_PARTITION_ID)
+            s_info.partition_id)
         pre_slices = [m.vertex_slice for m in pre_vertices]
 
         post_mapping = self.__id_to_m_vertex_index(
@@ -549,7 +548,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                       if (s_vert.vertex_slice.lo_atom,
                           m_vert.vertex_slice.lo_atom) in split_counts])
             for m_vert in target_vertex.splitter.get_in_coming_vertices(
-                SPIKE_PARTITION_ID)
+                s_info.partition_id)
         ]
 
     def _apply_parameters_to_synapse_type(
