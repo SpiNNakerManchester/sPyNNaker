@@ -15,7 +15,6 @@
 # limitations under the License.
 
 from time import sleep
-import numpy
 from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as sim
 
