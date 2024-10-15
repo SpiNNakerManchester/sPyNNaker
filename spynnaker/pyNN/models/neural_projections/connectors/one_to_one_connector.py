@@ -200,14 +200,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
             s_info.partition_id)
 
         # If doing a view, we must be single dimensional, so use old method
-        if s_info.prepop_is_view or s_info.postpop_is_view:
-
-            # Check again here in case the rules change elsewhere
-            if (len(s_info.pre_vertex.atoms_shape) > 1 or
-                    len(s_info.post_vertex.atoms_shape) > 1):
-                raise ConfigurationException(
-                    "The OneToOneConnector does not support PopulationView "
-                    "connections between vertices with more than 1 dimension")
+        if (len(s_info.pre_vertex.atoms_shape) == 1 and
+                len(s_info.post_vertex.atoms_shape) == 1):
 
             pre_lo = 0
             pre_hi = source_vertex.n_atoms - 1
@@ -224,6 +218,13 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
                      [s_vert for s_vert in src_vtxs if self.__connects(
                           s_vert, pre_lo, pre_hi, t_vert, post_lo, post_hi)])
                     for t_vert in tgt_vtxs]
+
+        if s_info.prepop_is_view or s_info.postpop_is_view:
+
+            # Check again here in case the rules change elsewhere
+            raise ConfigurationException(
+                "The OneToOneConnector does not support PopulationView "
+                "connections between vertices with more than 1 dimension")
 
         # Check for cross over of pre- and post- rasters, as that is how the
         # connector works
