@@ -26,4 +26,4 @@ pacman="../PACMAN/pacman"
 spalloc="../spalloc/spalloc_client"
 fec="../SpiNNFrontEndCommon/spinn_front_end_common"
 
-mypy $utils $machine $man $pacman $spalloc $fec spynnaker
+mypy --python-version 3.8 $utils $machine $man $pacman $spalloc $fec spynnaker
