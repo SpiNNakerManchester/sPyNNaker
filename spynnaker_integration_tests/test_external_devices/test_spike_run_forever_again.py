@@ -66,7 +66,7 @@ def do_run():
 class TestSpikeRunForeverAgain(BaseTestCase):
 
     def test_run(self):
-        self.runsafe(do_run())
+        self.runsafe(do_run)
 
 
 if __name__ == "__main__":
