@@ -185,8 +185,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 """):
             t_str = self._string(row[self._REC_DATETIME])
             time = datetime.strptime(t_str, "%Y-%m-%d %H:%M:%S.%f")
-            return (row[self._SEGMENT_NUMBER], time, row[self._T_STOP], row[self._DT],
-                    self._string(row[self._SIMULATOR]))
+            return (row[self._SEGMENT_NUMBER], time, row[self._T_STOP],
+                    row[self._DT], self._string(row[self._SIMULATOR]))
         raise ConfigurationException(
             "No recorded data. Did the simulation run?")
 

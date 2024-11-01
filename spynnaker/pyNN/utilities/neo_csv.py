@@ -71,8 +71,8 @@ class NeoCsv(object):
 
     def _csv_variable_metdata(
             self, csv_writer: CSVWriter, variable_type: str, variable: str,
-            t_start: float, t_stop: Optional[float], sampling_interval_ms: float,
-            units: Optional[str]):
+            t_start: float, t_stop: Optional[float],
+            sampling_interval_ms: float, units: Optional[str]) -> None:
         """
         Writes the metadata for a variable to CSV
 
@@ -80,7 +80,7 @@ class NeoCsv(object):
         :param str variable_type:
         :param str variable:
         :param float t_start:
-        :param float t_stop:
+        :param t_stop:
         :param float sampling_interval_ms:
         :param str units:
         """
