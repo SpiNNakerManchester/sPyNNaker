@@ -14,7 +14,7 @@
 from time import sleep
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
-
+from spynnaker.pyNN.utilities.neo_convertor import count_spikes
 
 spike_receive_count = 0
 spike_send_count = 0
@@ -52,6 +52,7 @@ def do_run():
         label="sender")
     pop = sim.Population(
         1, sim.IF_curr_exp(), label="pop_1")
+    pop.record("spikes")
     sim.Projection(ssa, pop, sim.OneToOneConnector(),
                    sim.StaticSynapse(weight=5, delay=1))
     sim.external_devices.activate_live_output_for(
@@ -59,8 +60,12 @@ def do_run():
 
     for _ in range(5):
         sim.external_devices.run_forever()
+    neo = pop.get_data("spikes")
+    spikes = count_spikes(neo)
+    pop.write_data("test.csv", "spikes")
+
     sim.end()
-    print(spike_send_count, spike_receive_count)
+    print(spike_send_count, spike_receive_count, spikes)
 
 
 class TestSpikeRunForeverAgain(BaseTestCase):
