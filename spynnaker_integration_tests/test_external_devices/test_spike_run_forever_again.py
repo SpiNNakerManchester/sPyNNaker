@@ -52,7 +52,11 @@ def do_run():
         label="sender")
     pop = sim.Population(
         1, sim.IF_curr_exp(), label="pop_1")
-    pop.record("spikes")
+    input_pop = sim.Population(
+        1, sim.SpikeSourceArray(
+            spike_times=[0, 2, 4, 6, 8, 10, 12, 14, 16, 18]),
+        label="input")
+    input_pop.record("spikes")
     sim.Projection(ssa, pop, sim.OneToOneConnector(),
                    sim.StaticSynapse(weight=5, delay=1))
     sim.external_devices.activate_live_output_for(
@@ -62,7 +66,6 @@ def do_run():
         sim.external_devices.run_forever()
     neo = pop.get_data("spikes")
     spikes = count_spikes(neo)
-    pop.write_data("test.csv", "spikes")
 
     sim.end()
     print(spike_send_count, spike_receive_count, spikes)
