@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
+import sys
 from typing import cast, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
 from pacman.utilities.utility_calls import get_keys
@@ -41,7 +43,8 @@ class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
     @overrides(ReverseIPTagMulticastSourceMachineVertex._fill_send_buffer_1d)
     def _fill_send_buffer_1d(self, key_base: int):
         first_time_step = SpynnakerDataView.get_first_machine_time_step()
-        end_time_step = SpynnakerDataView.get_current_run_timesteps()
+        end_time_step = (
+                SpynnakerDataView.get_current_run_timesteps() or sys.maxsize)
         if first_time_step == end_time_step:
             return
         if self._send_buffer_times is None or self._send_buffer is None:
@@ -50,14 +53,15 @@ class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
             key_base, self.vertex_slice, self._pop_vertex.n_colour_bits)
         colour_mask = (2 ** self._pop_vertex.n_colour_bits) - 1
         for tick in sorted(self._send_buffer_times):
-            if self._is_in_range(tick, first_time_step, end_time_step):
+            if first_time_step <= tick <= end_time_step:
                 self._send_buffer.add_keys(
                     tick, keys + (tick & colour_mask))
 
     @overrides(ReverseIPTagMulticastSourceMachineVertex._fill_send_buffer_2d)
     def _fill_send_buffer_2d(self, key_base: int):
         first_time_step = SpynnakerDataView.get_first_machine_time_step()
-        end_time_step = SpynnakerDataView.get_current_run_timesteps()
+        end_time_step = (
+                SpynnakerDataView.get_current_run_timesteps() or sys.maxsize)
         if first_time_step == end_time_step:
             return
         if self._send_buffer_times is None or self._send_buffer is None:
@@ -67,6 +71,6 @@ class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
         colour_mask = (2 ** self._pop_vertex.n_colour_bits) - 1
         for atom in range(self.vertex_slice.n_atoms):
             for tick in sorted(self._send_buffer_times[atom]):
-                if self._is_in_range(tick, first_time_step, end_time_step):
+                if first_time_step <= tick <= end_time_step:
                     self._send_buffer.add_key(
                         tick, keys[atom] + (tick & colour_mask))
