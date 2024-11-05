@@ -33,49 +33,57 @@ def sim_control(label, sender):
 def receive_spikes(label, time, neuron_ids):
     global spike_receive_count
     spike_receive_count += len(neuron_ids)
-    for neuron_id in neuron_ids:
-        print("Received spike at time", time, "from", label, "-", neuron_id)
+    # for neuron_id in neuron_ids:
+    #    print("Received spike at time", time, "from", label, "-", neuron_id)
 
-
-def do_run():
-
-    conn = sim.external_devices.SpynnakerLiveSpikesConnection(
-        receive_labels=["pop_1"], send_labels=["sender"], local_port=None)
-    conn.add_receive_callback("pop_1", receive_spikes)
-    conn.add_start_resume_callback("sender", sim_control)
-
-    # initial call to set up the front end (pynn requirement)
-    sim.setup(timestep=1.0, min_delay=1.0)
-    ssa = sim.Population(
-        1, sim.external_devices.SpikeInjector(
-            database_notify_port_num=conn.local_port),
-        label="sender")
-    pop = sim.Population(
-        1, sim.IF_curr_exp(), label="pop_1")
-    input_pop = sim.Population(
-        1, sim.SpikeSourceArray(
-            spike_times=[0, 2, 4, 6, 8, 10, 12, 14, 16, 18]),
-        label="input")
-    input_pop.record("spikes")
-    sim.Projection(ssa, pop, sim.OneToOneConnector(),
-                   sim.StaticSynapse(weight=5, delay=1))
-    sim.external_devices.activate_live_output_for(
-        pop, database_notify_port_num=conn.local_port)
-
-    for _ in range(5):
-        sim.external_devices.run_forever()
-    neo = pop.get_data("spikes")
-    spikes = count_spikes(neo)
-
-    sim.end()
-    print(spike_send_count, spike_receive_count, spikes)
 
 
 class TestSpikeRunForeverAgain(BaseTestCase):
 
+    def do_run(self):
+        conn = sim.external_devices.SpynnakerLiveSpikesConnection(
+            receive_labels=["pop_1"], send_labels=["sender"], local_port=None)
+        conn.add_receive_callback("pop_1", receive_spikes)
+        conn.add_start_resume_callback("sender", sim_control)
+
+        # initial call to set up the front end (pynn requirement)
+        sim.setup(timestep=1.0, min_delay=1.0)
+        ssa = sim.Population(
+            1, sim.external_devices.SpikeInjector(
+                database_notify_port_num=conn.local_port),
+            label="sender")
+        pop = sim.Population(
+            1, sim.IF_curr_exp(), label="pop_1")
+        pop.record("spikes")
+        spike_times = [0, 2, 4, 8, 16, 32, 64, 128, 256]
+        input_pop = sim.Population(
+            1, sim.SpikeSourceArray(
+                spike_times=spike_times),
+            label="input")
+        input_pop.record("spikes")
+        sim.Projection(ssa, pop, sim.OneToOneConnector(),
+                       sim.StaticSynapse(weight=5, delay=1))
+        sim.external_devices.activate_live_output_for(
+            pop, database_notify_port_num=conn.local_port)
+
+        n_loops = 5
+        for _ in range(n_loops):
+            sim.external_devices.run_forever()
+
+        neo = pop.get_data("spikes")
+        pop_spikes = count_spikes(neo)
+
+        neo = input_pop.get_data("spikes")
+        input_spikes = count_spikes(neo)
+
+        sim.end()
+        self.assertEqual(spike_send_count, spike_receive_count)
+        self.assertEqual(spike_send_count, pop_spikes)
+        print(input_spikes, len(spike_times) * n_loops)
+
     def test_run(self):
-        self.runsafe(do_run)
+        self.runsafe(self.do_run)
 
 
-if __name__ == "__main__":
-    do_run()
+if __name__ == '__main__':
+    TestSpikeRunForeverAgain().do_run()
