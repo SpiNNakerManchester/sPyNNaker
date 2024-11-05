@@ -37,7 +37,6 @@ def receive_spikes(label, time, neuron_ids):
     #    print("Received spike at time", time, "from", label, "-", neuron_id)
 
 
-
 class TestSpikeRunForeverAgain(BaseTestCase):
 
     def do_run(self):
