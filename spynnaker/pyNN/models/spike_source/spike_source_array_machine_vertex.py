@@ -53,7 +53,7 @@ class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
             key_base, self.vertex_slice, self._pop_vertex.n_colour_bits)
         colour_mask = (2 ** self._pop_vertex.n_colour_bits) - 1
         for tick in sorted(self._send_buffer_times):
-            if first_time_step <= tick <= end_time_step:
+            if first_time_step <= tick < end_time_step:
                 self._send_buffer.add_keys(
                     tick, keys + (tick & colour_mask))
 
@@ -71,6 +71,6 @@ class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
         colour_mask = (2 ** self._pop_vertex.n_colour_bits) - 1
         for atom in range(self.vertex_slice.n_atoms):
             for tick in sorted(self._send_buffer_times[atom]):
-                if first_time_step <= tick <= end_time_step:
+                if first_time_step <= tick < end_time_step:
                     self._send_buffer.add_key(
                         tick, keys[atom] + (tick & colour_mask))
