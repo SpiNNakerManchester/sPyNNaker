@@ -68,8 +68,6 @@ def do_run():
 class TestSpikeRunForeverAgain(BaseTestCase):
 
     def test_run(self):
-        raise unittest.SkipTest(
-            "Run forever needs to set the current timestep")
         self.runsafe(do_run)
 
 
