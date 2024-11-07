@@ -27,8 +27,7 @@ MODELS = IF_curr_exp \
          IF_curr_delta_fixed_prob \
          IF_trunc_delta \
          IF_curr_alpha \
-         IF_cond_exp_stoc \
-         IF_curr_exp_sEMD
+         IF_cond_exp_stoc
 
 ifneq ($(SPYNNAKER_DEBUG), DEBUG)
     MODELS += external_device_lif_control \
@@ -49,7 +48,8 @@ ifneq ($(SPYNNAKER_DEBUG), DEBUG)
               IF_curr_delta_stdp_mad_nearest_pair_additive \
               IF_curr_exp_stdp_mad_recurrent_pre_stochastic_multiplicative \
               IF_curr_exp_stdp_mad_pfister_triplet_additive \
-              IF_curr_exp_weight_change
+              IF_curr_exp_weight_change \
+              IF_curr_exp_sEMD
 endif
 
 all:
