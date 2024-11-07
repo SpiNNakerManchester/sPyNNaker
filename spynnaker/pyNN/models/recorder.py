@@ -235,7 +235,7 @@ class Recorder(object):
             If the recording not setup correctly
         """
         SpynnakerDataView.check_user_can_act()
-        with NeoBufferDatabase.segement_db(1) as db:
+        with NeoBufferDatabase.segement_db(0) as db:
             block = db.get_empty_block(self.__population.label, annotations)
 
         for previous in range(SpynnakerDataView.get_segment_counter()):
@@ -266,7 +266,7 @@ class Recorder(object):
             If the recording not setup correctly
         """
         pop_label = self.__population.label
-        with NeoBufferDatabase.segement_db(1) as db:
+        with NeoBufferDatabase.segement_db(0) as db:
             db.csv_block_metadata(csv_file, pop_label, annotations)
 
         for segment in range(SpynnakerDataView.get_segment_counter()):
