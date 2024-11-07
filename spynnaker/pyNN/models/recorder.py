@@ -43,7 +43,6 @@ class Recorder(object):
     """
 
     __slots__ = (
-        "__data_cache",
         "__population",
         "__vertex",
         "__write_to_files_indicators")
@@ -65,7 +64,6 @@ class Recorder(object):
             'gsyn_exc': None,
             'gsyn_inh': None,
             'v': None}
-        self.__data_cache: Dict[int, str] = {}
 
     @property
     def write_to_files_indicators(self) -> Mapping[str, _IoDest]:
@@ -237,11 +235,7 @@ class Recorder(object):
             If the recording not setup correctly
         """
         SpynnakerDataView.check_user_can_act()
-        if self.__data_cache:
-            dbfile = next(iter(self.__data_cache.values()))
-        else:
-            dbfile = None   # use current
-        with NeoBufferDatabase(dbfile) as db:
+        with NeoBufferDatabase.segement_db(1) as db:
             block = db.get_empty_block(self.__population.label, annotations)
 
         for previous in range(SpynnakerDataView.get_segment_counter()):
@@ -272,18 +266,11 @@ class Recorder(object):
             If the recording not setup correctly
         """
         pop_label = self.__population.label
-        if self.__data_cache:
-            dbfile = next(iter(self.__data_cache.values()))
-        else:
-            dbfile = None   # use current
-        with NeoBufferDatabase(dbfile) as db:
+        with NeoBufferDatabase.segement_db(1) as db:
             db.csv_block_metadata(csv_file, pop_label, annotations)
 
         for segment in range(SpynnakerDataView.get_segment_counter()):
-            if segment not in self.__data_cache:
-                logger.warning("No Data available for Segment {}", segment)
-                continue
-            with NeoBufferDatabase(self.__data_cache[segment]) as db:
+            with NeoBufferDatabase.segement_db(segment) as db:
                 db.csv_segment(
                     csv_file, pop_label, variables, view_indexes)
 
@@ -296,16 +283,6 @@ class Recorder(object):
             else:
                 db.csv_segment(
                     csv_file, pop_label, variables, view_indexes)
-
-    def cache_data(self) -> None:
-        """
-        Store data for later extraction.
-        """
-        variables = self.__vertex.get_recording_variables()
-        if variables:
-            segment_number = SpynnakerDataView.get_segment_counter()
-            self.__data_cache[segment_number] = \
-                NeoBufferDatabase.default_database_file()
 
     def __append_current_segment(
             self, block: neo.Block, variables: Names,
@@ -335,17 +312,7 @@ class Recorder(object):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
         """
-        if segment_number not in self.__data_cache:
-            logger.warning("No Data available for Segment {}", segment_number)
-            segment = neo.Segment(
-                name=f"segment{segment_number}",
-                description="Empty",
-                rec_datetime=datetime.now())
-            block.segments.append(segment)
-            return
-
-        with NeoBufferDatabase(
-                self.__data_cache[segment_number], read_only=False) as db:
+        with NeoBufferDatabase.segement_db(segment_number) as db:
             db.add_segment(
                 block, self.__population.label, variables, view_indexes)
             if clear:

@@ -66,6 +66,7 @@ if TYPE_CHECKING:
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
+segment_cache: Dict[int, str] = {}
 
 class NeoBufferDatabase(BufferDatabase, NeoCsv):
     """
@@ -95,7 +96,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             return str(value)
 
     def __init__(self, database_file: Optional[str] = None,
-                 read_only: Optional[bool] = None):
+                 read_only: bool = None):
         """
         :param database_file:
             The name of a file that contains (or will contain) an SQLite
@@ -115,11 +116,21 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 read_only = True
 
         super().__init__(database_file, read_only=read_only)
-        with open(self.__NEO_DDL_FILE, encoding="utf-8") as f:
-            sql = f.read()
 
-        # pylint: disable=no-member
-        self._SQLiteDB__db.executescript(sql)  # type: ignore[attr-defined]
+        global segment_cache
+        segment = SpynnakerDataView.get_segment_counter()
+        if (segment not in segment_cache or
+                segment_cache[segment] != database_file):
+            with open(self.__NEO_DDL_FILE, encoding="utf-8") as f:
+                sql = f.read()
+            # pylint: disable=no-member
+            self._SQLiteDB__db.executescript(sql)  # type: ignore[attr-defined]
+            segment_cache[segment] = database_file
+
+    @classmethod
+    def segement_db(cls, segment_number: int) -> NeoBufferDatabase:
+        database_file = segment_cache[segment_number]
+        return NeoBufferDatabase(database_file)
 
     def write_segment_metadata(self) -> None:
         """
@@ -450,10 +461,36 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         (_, datatype, _, _, sampling_interval_ms, _, units, _) = info
         return (datatype, sampling_interval_ms, units)
 
+    def find_units(self, pop_label: str, variable: str) -> Optional[str]:
+        """
+        Gets the metadata ID for this population and recording label
+        combination.
+
+        :param str pop_label: The label for the population of interest
+
+            .. note::
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
+                duplicate values
+
+        :param str variable:
+        :return: data_type, sampling_interval_ms, units
+        :rtype: Optional[str]
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording metadata not setup correctly
+        """
+        info = self.__get_recording_metadata(pop_label, variable)
+        if info is None:
+            return None
+        else:
+            (_, _, _, _, _, _, units, _) = info
+        return units
+
     def __get_recording_metadata(
-            self, pop_label: str, variable: str) -> Tuple[
+            self, pop_label: str, variable: str) -> Optional[Tuple[
                 int, Optional[DataType], BufferDataType, float, float, int,
-                Optional[str], int]:
+                Optional[str], int]]:
         """
         Gets the metadata id for this population and recording label
         combination.
@@ -495,8 +532,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             return (row["rec_id"], data_type, buffered_type, row["t_start"],
                     row["sampling_interval_ms"], row["pop_size"], units,
                     row["n_colour_bits"])
-        raise ConfigurationException(
-            f"No metadata for {variable} on {pop_label}")
+        return None
 
     def __get_region_metadata(self, rec_id: int) -> Iterable[Tuple[
             int, Optional[NDArray[integer]], Slice, Optional[bool], int, int]]:
@@ -1047,9 +1083,12 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         # called to trigger the virtual data warning if applicable
         self.__get_segment_info()
+        metadata = self.__get_recording_metadata(pop_label, variable)
+        if metadata is None:
+            return numpy.empty((0, 0), dtype=float)
         (rec_id, data_type, buffered_type, _, sampling_interval_ms,
-         pop_size, _, n_colour_bits) = \
-            self.__get_recording_metadata(pop_label, variable)
+         pop_size, _, n_colour_bits) = metadata
+
         if buffered_type == BufferDataType.MATRIX:
             assert data_type is not None
             return self.__get_recorded_pynn7(
@@ -1077,8 +1116,13 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         # called to trigger the virtual data warning if applicable
         self.__get_segment_info()
-        (rec_id, _, buffered_type, _, _, pop_size, _, n_colour_bits) = \
-            self.__get_recording_metadata(pop_label, SPIKES)
+        metadata = self.__get_recording_metadata(pop_label, SPIKES)
+        if metadata is None:
+            return 0
+
+        (rec_id, _, buffered_type, _, _, pop_size, _,
+         n_colour_bits) = metadata
+
         if view_indexes is None:
             view_indexes = range(pop_size)
 
@@ -1110,9 +1154,13 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
+        metadata = self.__get_recording_metadata(pop_label, variable)
+        if metadata is None:
+            return
+
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
-         pop_size, units, n_colour_bits) = \
-            self.__get_recording_metadata(pop_label, variable)
+         pop_size, units, n_colour_bits) = metadata
+
 
         if buffer_type == BufferDataType.MATRIX:
             assert data_type is not None
@@ -1160,9 +1208,13 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :type view_indexes: None, ~numpy.array or list(int)
         :param float t_stop:
         """
+        metadata = self.__get_recording_metadata(pop_label, variable)
+        if metadata is None:
+            return
+
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
-         pop_size, units, n_colour_bits) = \
-            self.__get_recording_metadata(pop_label, variable)
+         pop_size, units, n_colour_bits) = metadata
+
 
         if buffer_type == BufferDataType.MATRIX:
             assert data_type is not None
