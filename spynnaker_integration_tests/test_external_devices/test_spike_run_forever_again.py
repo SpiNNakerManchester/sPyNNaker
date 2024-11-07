@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import unittest
-
 from time import sleep
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
@@ -68,8 +66,6 @@ def do_run():
 class TestSpikeRunForeverAgain(BaseTestCase):
 
     def test_run(self):
-        raise unittest.SkipTest(
-            "Run forever needs to set the current timestep")
         self.runsafe(do_run)
 
 
