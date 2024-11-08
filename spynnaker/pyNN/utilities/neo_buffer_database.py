@@ -97,7 +97,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             return str(value)
 
     def __init__(self, database_file: Optional[str] = None,
-                 read_only: bool = None):
+                 read_only: Optional[bool] = None):
         """
         :param database_file:
             The name of a file that contains (or will contain) an SQLite
@@ -420,30 +420,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 """, (pop_label,)):
             results.append(self._string(row["variable"]))
         return tuple(results)
-
-    def get_recording_metadata(self, pop_label: str, variable: str) -> Tuple[
-            Optional[DataType], float, Optional[str]]:
-        """
-        Gets the metadata ID for this population and recording label
-        combination.
-
-        :param str pop_label: The label for the population of interest
-
-            .. note::
-                This is actually the label of the Application Vertex.
-                Typically the Population label, corrected for `None` or
-                duplicate values
-
-        :param str variable:
-        :return: data_type, sampling_interval_ms, units
-        :rtype: tuple(DataType, float, str)
-        :raises \
-            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
-            If the recording metadata not setup correctly
-        """
-        info = self.__get_recording_metadata(pop_label, variable)
-        (_, datatype, _, _, sampling_interval_ms, _, units, _) = info
-        return (datatype, sampling_interval_ms, units)
 
     def find_units(self, pop_label: str, variable: str) -> Optional[str]:
         """
@@ -1102,7 +1078,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         self.__get_segment_info()
         metadata = self.__get_recording_metadata(pop_label, SPIKES)
         if metadata is None:
-            return 0
+            return {}
 
         (rec_id, _, buffered_type, _, _, pop_size, _,
          n_colour_bits) = metadata
