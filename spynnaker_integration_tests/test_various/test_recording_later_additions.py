@@ -112,7 +112,7 @@ class TestRecordingLaterAdditions(BaseTestCase):
         self.assertEqual(20, len(v_c_1[0]),
                          "Expected 20 voltage readings for pop_c segment 1")
         sc_c = pop_c.get_spike_counts()
-        self.assertEqual({0: 2}, sc_c,"spike counts for pop_c")
+        self.assertEqual({0: 2}, sc_c, "spike counts for pop_c")
         pop_c.write_data("test_c.csv", ["spikes", "v"])
         sim.end()
 
