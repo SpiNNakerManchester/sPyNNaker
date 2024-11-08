@@ -68,7 +68,7 @@ class TestRecordingLaterAdditions(BaseTestCase):
         self.assertEqual(20, len(v_a_1[0]),
                          "Expected 20 voltage readings for pop_a segment 1")
         sc_a = pop_a.get_spike_counts()
-        self.assertEqual({0:2}, sc_a, "spike counts for pop_a ")
+        self.assertEqual({0: 2}, sc_a, "spike counts for pop_a ")
         pop_a.write_data("test_a.csv", ["spikes", "v"])
 
         neo_b = pop_b.get_data(variables=["spikes", "v"])
@@ -89,7 +89,7 @@ class TestRecordingLaterAdditions(BaseTestCase):
         self.assertEqual(20, len(v_b_1[0]),
                          "Expected 20 voltage readings for pop_b segment 1")
         sc_b = pop_b.get_spike_counts()
-        self.assertEqual({0:2}, sc_b, "spike counts for pop_a ")
+        self.assertEqual({0: 2}, sc_b, "spike counts for pop_a ")
         pop_b.write_data("test_b.csv", ["spikes", "v"])
 
         neo_c = pop_c.get_data(variables=["spikes", "v"])
@@ -112,7 +112,7 @@ class TestRecordingLaterAdditions(BaseTestCase):
         self.assertEqual(20, len(v_c_1[0]),
                          "Expected 20 voltage readings for pop_c segment 1")
         sc_c = pop_c.get_spike_counts()
-        self.assertEqual({0:2}, sc_c, "spike counts for pop_c ")
+        self.assertEqual({0: 2}, sc_c,"spike counts for pop_c")
         pop_c.write_data("test_c.csv", ["spikes", "v"])
         sim.end()
 

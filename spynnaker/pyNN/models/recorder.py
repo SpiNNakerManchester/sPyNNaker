@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from datetime import datetime
 import logging
 from typing import (
     Any, Collection, Dict, Mapping, Optional, Sequence, Union, TYPE_CHECKING)
@@ -326,7 +325,8 @@ class Recorder(object):
         """
         with NeoBufferDatabase.segement_db(segment_number) as db:
             if block is None:
-                block = db.get_empty_block(self.__population.label, annotations)
+                block = db.get_empty_block(
+                    self.__population.label, annotations)
             if block is not None:
                 db.add_segment(
                     block, self.__population.label, variables, view_indexes,

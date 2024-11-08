@@ -68,6 +68,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 segment_cache: Dict[int, str] = {}
 
+
 class NeoBufferDatabase(BufferDatabase, NeoCsv):
     """
     Extra support for Neo on top of the Database for SQLite 3.
@@ -1148,7 +1149,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
          pop_size, units, n_colour_bits) = metadata
 
-
         if buffer_type == BufferDataType.MATRIX:
             assert data_type is not None
             signal_array, indexes = self.__get_matrix_data(
@@ -1202,7 +1202,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
          pop_size, units, n_colour_bits) = metadata
 
-
         if buffer_type == BufferDataType.MATRIX:
             assert data_type is not None
             self._csv_variable_metdata(
@@ -1229,7 +1228,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self._csv_spike_data(csv_writer, spikes, indexes)
 
     def get_empty_block(self, pop_label: str,
-                          annotations: Annotations) -> Optional[neo.Block]:
+                        annotations: Annotations) -> Optional[neo.Block]:
         """
         :param str pop_label: The label for the population of interest
 
