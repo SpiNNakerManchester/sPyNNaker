@@ -27,7 +27,7 @@ def check_end_is_called(request):
         return
     try:
         sim.end()
-    except Exception:  # pylint: disable=broad-except
+    except Exception as ex:  # pylint: disable=broad-except
         # Ignore anything that comes from this
         pass
     raise Exception(f"Simulation has not been stopped in {request.function}!")

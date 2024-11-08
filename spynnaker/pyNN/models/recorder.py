@@ -326,10 +326,11 @@ class Recorder(object):
         """
         with NeoBufferDatabase.segement_db(segment_number) as db:
             if block is None:
-                db.get_empty_block(self.__population.label, annotations)
+                block = db.get_empty_block(self.__population.label, annotations)
             if block is not None:
                 db.add_segment(
                     block, self.__population.label, variables, view_indexes,
                     allow_missing=True)
                 if clear:
                     db.clear_data(self.__population.label, variables)
+            return block
