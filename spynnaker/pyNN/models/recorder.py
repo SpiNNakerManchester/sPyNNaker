@@ -235,17 +235,15 @@ class Recorder(object):
             If the recording not setup correctly
         """
         SpynnakerDataView.check_user_can_act()
-        with NeoBufferDatabase.segement_db(0) as db:
-            block = db.get_empty_block(self.__population.label, annotations)
 
+        block: Optional[neo.Block] = None
         for previous in range(SpynnakerDataView.get_segment_counter()):
-            self.__append_previous_segment(
-                block, previous, variables, view_indexes, clear)
+            block = self.__append_previous_segment(
+                block, previous, variables, view_indexes, clear, annotations)
 
         # add to the segments the new block
-        self.__append_current_segment(block, variables, view_indexes, clear)
-
-        return block
+        return self.__append_current_segment(
+            block, variables, view_indexes, clear, annotations)
 
     def csv_neo_block(
             self, csv_file: str, variables: Optional[Names],
@@ -266,13 +264,16 @@ class Recorder(object):
             If the recording not setup correctly
         """
         pop_label = self.__population.label
-        with NeoBufferDatabase.segement_db(0) as db:
-            db.csv_block_metadata(csv_file, pop_label, annotations)
 
+        wrote_metadata = False
         for segment in range(SpynnakerDataView.get_segment_counter()):
             with NeoBufferDatabase.segement_db(segment) as db:
-                db.csv_segment(
-                    csv_file, pop_label, variables, view_indexes)
+                if not wrote_metadata:
+                    wrote_metadata = db.csv_block_metadata(
+                        csv_file, pop_label, annotations)
+                if wrote_metadata:
+                    db.csv_segment(
+                        csv_file, pop_label, variables, view_indexes)
 
         with NeoBufferDatabase() as db:
             if SpynnakerDataView.is_reset_last():
@@ -286,13 +287,20 @@ class Recorder(object):
 
     def __append_current_segment(
             self, block: neo.Block, variables: Names,
-            view_indexes: Optional[Sequence[int]], clear: bool):
+            view_indexes: Optional[Sequence[int]], clear: bool,
+            annotations: Optional[Dict[str, Any]]) -> neo.Block:
         """
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
         """
         with NeoBufferDatabase() as db:
+            if block is None:
+                block = db.get_empty_block(
+                    self.__population.label, annotations)
+                if block is None:
+                    raise ConfigurationException(
+                        f"No data for {self.__population.label}")
             if SpynnakerDataView.is_reset_last():
                 logger.warning(
                     "Due to the call directly after reset, "
@@ -300,20 +308,28 @@ class Recorder(object):
                     SpynnakerDataView.get_segment_counter() - 1)
             else:
                 db.add_segment(
-                    block, self.__population.label, variables, view_indexes)
+                    block, self.__population.label, variables, view_indexes,
+                    allow_missing=False)
                 if clear:
                     db.clear_data(self.__population.label, variables)
+            return block
 
     def __append_previous_segment(
-            self, block: neo.Block, segment_number: int, variables: Names,
-            view_indexes: Optional[Sequence[int]], clear: bool):
+            self, block: Optional[neo.Block], segment_number: int,
+            variables: Names, view_indexes: Optional[Sequence[int]],
+            clear: bool,
+            annotations: Optional[Dict[str, Any]]) -> Optional[neo.Block]:
         """
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
         """
         with NeoBufferDatabase.segement_db(segment_number) as db:
-            db.add_segment(
-                block, self.__population.label, variables, view_indexes)
-            if clear:
-                db.clear_data(self.__population.label, variables)
+            if block is None:
+                db.get_empty_block(self.__population.label, annotations)
+            if block is not None:
+                db.add_segment(
+                    block, self.__population.label, variables, view_indexes,
+                    allow_missing=True)
+                if clear:
+                    db.clear_data(self.__population.label, variables)

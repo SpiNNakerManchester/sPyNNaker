@@ -314,8 +314,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         assert rowid is not None, "recording must have been inserted"
         return rowid
 
-    def __get_population_metadata(
-            self, pop_label: str) -> Tuple[int, int, str]:
+    def get_population_metadata(
+            self, pop_label: str) -> Optional[Tuple[int, int, str]]:
         """
         Gets the metadata for the population with this label
 
@@ -341,26 +341,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 """, (pop_label,)):
             return (int(row["pop_size"]), int(row["first_id"]),
                     self._string(row["description"]))
-        raise ConfigurationException(f"No metadata for {pop_label}")
-
-    def get_population_metadata(self, pop_label: str) -> Tuple[int, int, str]:
-        """
-        Gets the metadata for the population with this label
-
-        :param str pop_label: The label for the population of interest
-
-            .. note::
-                This is actually the label of the Application Vertex.
-                Typically the Population label, corrected for `None` or
-                duplicate values
-
-        :return: population size, first id and description
-        :rtype: (int, int, str)
-        :raises \
-            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
-            If the recording metadata not setup correctly
-        """
-        return self.__get_population_metadata(pop_label)
+        return None
 
     def get_recording_populations(self) -> Tuple[str, ...]:
         """
@@ -1136,27 +1117,33 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __add_data(
             self, pop_label: str, variable: str,
-            segment: neo.Segment, view_indexes: ViewIndices, t_stop: float):
+            segment: neo.Segment, view_indexes: ViewIndices, t_stop: float,
+            allow_missing: bool) -> None:
         """
         Gets the data as a Numpy array for one population and variable.
 
-        :param str pop_label: The label for the population of interest
+        :param pop_label: The label for the population of interest
 
             .. note::
                 This is actually the label of the Application Vertex.
                 Typically the Population label, corrected for `None` or
                 duplicate values
 
-        :param str variable:
-        :param ~neo.core.Segment segment: Segment to add data to
-        :param float t_stop:
+        :param variable:
+        :param segment: Segment to add data to
+        :param t_stop:
+        :param allow_missing: If True silently skips is variable not recorded
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
         metadata = self.__get_recording_metadata(pop_label, variable)
         if metadata is None:
-            return
+            if allow_missing:
+                return
+            else:
+                raise ConfigurationException(
+                    f"No data for {pop_label=} {variable=}")
 
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
          pop_size, units, n_colour_bits) = metadata
@@ -1241,8 +1228,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 rec_id, view_indexes, buffer_type, n_colour_bits, variable)
             self._csv_spike_data(csv_writer, spikes, indexes)
 
-    def __get_empty_block(
-            self, pop_label: str, annotations: Annotations) -> neo.Block:
+    def get_empty_block(self, pop_label: str,
+                          annotations: Annotations) -> Optional[neo.Block]:
         """
         :param str pop_label: The label for the population of interest
 
@@ -1259,39 +1246,19 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param annotations: annotations to put on the neo block
         :type annotations: None or dict(str, ...)
         :return: The Neo block
-        :rtype: ~neo.core.Block
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
         _, _, _, dt, simulator = self.__get_segment_info()
-        pop_size, first_id, description = \
-            self.__get_population_metadata(pop_label)
+        metadata = self.get_population_metadata(pop_label)
+        if metadata is None:
+            return None
+        pop_size, first_id, description = metadata
+
         return self._insert_empty_block(
             pop_label, description, pop_size, first_id, dt, simulator,
             annotations)
-
-    def get_empty_block(self, pop_label: str,
-                        annotations: Annotations = None) -> neo.Block:
-        """
-        Creates a block with just metadata but not data segments.
-
-        :param str pop_label: The label for the population of interest
-
-            .. note::
-                This is actually the label of the Application Vertex.
-                Typically the Population label, corrected for `None` or
-                duplicate values
-
-        :param annotations: annotations to put on the neo block
-        :type annotations: None or dict(str, ...)
-        :return: The Neo block
-        :rtype: ~neo.core.Block
-        :raises \
-            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
-            If the recording metadata not setup correctly
-        """
-        return self.__get_empty_block(pop_label, annotations)
 
     def get_full_block(
             self, pop_label: str, variables: Names, view_indexes: ViewIndices,
@@ -1317,8 +1284,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :return: The Neo block
         :rtype: ~neo.core.Block
         """
-        block = self.__get_empty_block(pop_label, annotations)
-        self.__add_segment(block, pop_label, variables, view_indexes)
+        block = self.get_empty_block(pop_label, annotations)
+        self.add_segment(block, pop_label, variables, view_indexes,
+                         allow_missing=False)
         return block
 
     def csv_segment(
@@ -1361,7 +1329,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def csv_block_metadata(
             self, csv_file: str, pop_label: str,
-            annotations: Annotations = None):
+            annotations: Annotations = None) -> bool:
         """
         Writes the data including metadata to a CSV file.
         Overwrites any previous data in the file.
@@ -1380,40 +1348,20 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
+        _, _, _, dt, _ = self.__get_segment_info()
+        metadata = self.get_population_metadata(pop_label)
+        if metadata is None:
+            return False
+
+        pop_size, first_id, description = metadata
         with open(csv_file, 'w', newline='',  encoding="utf-8") as csvfile:
             csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"',
                                     quoting=csv.QUOTE_MINIMAL)
 
-            _, _, _, dt, _ = self.__get_segment_info()
-            pop_size, first_id, description = \
-                self.__get_population_metadata(pop_label)
             self._csv_block_metadata(
                 csv_writer, pop_label, dt, pop_size, first_id, description,
                 annotations)
-
-    def add_segment(
-            self, block: neo.Block, pop_label: str, variables: Names,
-            view_indexes: ViewIndices = None):
-        """
-        Adds a segment to the block.
-
-        :param str pop_label: The label for the population of interest
-
-            .. note::
-                This is actually the label of the Application Vertex.
-                Typically the Population label, corrected for `None` or
-                duplicate values
-
-        :param variables:
-            One or more variable names or `None` for all available
-        :type variables: str, list(str) or None
-        :param view_indexes: List of neurons IDs to include or `None` for all
-        :type view_indexes: None or list(int)
-        :raises \
-            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
-            If the recording metadata not setup correctly
-        """
-        self.__add_segment(block, pop_label, variables, view_indexes)
+        return True
 
     def __clean_variables(
             self, variables: Names, pop_label: str) -> Tuple[str, ...]:
@@ -1428,14 +1376,14 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         else:
             return vs
 
-    def __add_segment(
+    def add_segment(
             self, block: neo.Block, pop_label: str,
-            variables: Names, view_indexes: ViewIndices):
+            variables: Names, view_indexes: ViewIndices, allow_missing: bool):
         """
         Adds a segment to the block.
 
-        :param  ~neo.core.Block block:
-        :param str pop_label: The label for the population of interest
+        :param  block:
+        :param pop_label: The label for the population of interest
 
             .. note::
                 This is actually the label of the Application Vertex.
@@ -1444,9 +1392,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         :param variables:
             One or more variable names or `None` for all available
-        :type variables: str, list(str) or None
         :param view_indexes: List of neurons IDs to include or `None` for all
-        :type view_indexes: None or list(int)
+        :param allow_missing: If True silently skips any variables not recorded
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
@@ -1457,8 +1404,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             block, segment_number, rec_datetime)
 
         for variable in self.__clean_variables(variables, pop_label):
-            self.__add_data(
-                pop_label, variable, segment, view_indexes, t_stop)
+            self.__add_data(pop_label, variable, segment, view_indexes,
+                            t_stop, allow_missing)
 
     def clear_data(self, pop_label: str, variables: Names):
         """
