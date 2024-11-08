@@ -118,7 +118,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         super().__init__(database_file, read_only=read_only)
 
-        global segment_cache
         segment = SpynnakerDataView.get_segment_counter()
         if (segment not in segment_cache or
                 segment_cache[segment] != database_file):
@@ -130,6 +129,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     @classmethod
     def segement_db(cls, segment_number: int) -> NeoBufferDatabase:
+        """
+        Retrieves a NeoBufferDatabase for thi segment.
+        """
         database_file = segment_cache[segment_number]
         return NeoBufferDatabase(database_file)
 
