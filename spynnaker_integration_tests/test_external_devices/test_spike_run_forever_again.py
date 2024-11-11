@@ -20,6 +20,7 @@ spike_receive_count = 0
 spike_send_count = 0
 max_spike = 0
 
+
 def sim_control(label, sender):
     global spike_send_count
     sleep(0.1)
@@ -38,7 +39,6 @@ def receive_spikes(label, time, neuron_ids):
     #    print("Received spike at time", time, "from", label, "-", neuron_id)
 
 
-
 class TestSpikeRunForeverAgain(BaseTestCase):
 
     def do_run(self):
@@ -46,7 +46,6 @@ class TestSpikeRunForeverAgain(BaseTestCase):
             receive_labels=["pop_1"], send_labels=["sender"], local_port=None)
         conn.add_receive_callback("pop_1", receive_spikes)
         conn.add_start_resume_callback("sender", sim_control)
-
 
         # initial call to set up the front end (pynn requirement)
         sim.setup(timestep=1.0, min_delay=1.0)
