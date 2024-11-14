@@ -324,7 +324,7 @@ class Recorder(object):
             If the recording not setup correctly
         """
         with NeoBufferDatabase.segement_db(
-                segment_number, read_only = not clear) as db:
+                segment_number, read_only=not clear) as db:
             if block is None:
                 block = db.get_empty_block(
                     self.__population.label, annotations)
