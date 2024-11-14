@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from datetime import datetime
 import logging
 from typing import (
     Any, Collection, Dict, Mapping, Optional, Sequence, Union, TYPE_CHECKING)
@@ -43,7 +42,6 @@ class Recorder(object):
     """
 
     __slots__ = (
-        "__data_cache",
         "__population",
         "__vertex",
         "__write_to_files_indicators")
@@ -65,7 +63,6 @@ class Recorder(object):
             'gsyn_exc': None,
             'gsyn_inh': None,
             'v': None}
-        self.__data_cache: Dict[int, str] = {}
 
     @property
     def write_to_files_indicators(self) -> Mapping[str, _IoDest]:
@@ -237,21 +234,15 @@ class Recorder(object):
             If the recording not setup correctly
         """
         SpynnakerDataView.check_user_can_act()
-        if self.__data_cache:
-            dbfile = next(iter(self.__data_cache.values()))
-        else:
-            dbfile = None   # use current
-        with NeoBufferDatabase(dbfile) as db:
-            block = db.get_empty_block(self.__population.label, annotations)
 
+        block: Optional[neo.Block] = None
         for previous in range(SpynnakerDataView.get_segment_counter()):
-            self.__append_previous_segment(
-                block, previous, variables, view_indexes, clear)
+            block = self.__append_previous_segment(
+                block, previous, variables, view_indexes, clear, annotations)
 
         # add to the segments the new block
-        self.__append_current_segment(block, variables, view_indexes, clear)
-
-        return block
+        return self.__append_current_segment(
+            block, variables, view_indexes, clear, annotations)
 
     def csv_neo_block(
             self, csv_file: str, variables: Optional[Names],
@@ -272,20 +263,16 @@ class Recorder(object):
             If the recording not setup correctly
         """
         pop_label = self.__population.label
-        if self.__data_cache:
-            dbfile = next(iter(self.__data_cache.values()))
-        else:
-            dbfile = None   # use current
-        with NeoBufferDatabase(dbfile) as db:
-            db.csv_block_metadata(csv_file, pop_label, annotations)
 
+        wrote_metadata = False
         for segment in range(SpynnakerDataView.get_segment_counter()):
-            if segment not in self.__data_cache:
-                logger.warning("No Data available for Segment {}", segment)
-                continue
-            with NeoBufferDatabase(self.__data_cache[segment]) as db:
-                db.csv_segment(
-                    csv_file, pop_label, variables, view_indexes)
+            with NeoBufferDatabase.segement_db(segment) as db:
+                if not wrote_metadata:
+                    wrote_metadata = db.csv_block_metadata(
+                        csv_file, pop_label, annotations)
+                if wrote_metadata:
+                    db.csv_segment(
+                        csv_file, pop_label, variables, view_indexes)
 
         with NeoBufferDatabase() as db:
             if SpynnakerDataView.is_reset_last():
@@ -297,25 +284,22 @@ class Recorder(object):
                 db.csv_segment(
                     csv_file, pop_label, variables, view_indexes)
 
-    def cache_data(self) -> None:
-        """
-        Store data for later extraction.
-        """
-        variables = self.__vertex.get_recording_variables()
-        if variables:
-            segment_number = SpynnakerDataView.get_segment_counter()
-            self.__data_cache[segment_number] = \
-                NeoBufferDatabase.default_database_file()
-
     def __append_current_segment(
             self, block: neo.Block, variables: Names,
-            view_indexes: Optional[Sequence[int]], clear: bool):
+            view_indexes: Optional[Sequence[int]], clear: bool,
+            annotations: Optional[Dict[str, Any]]) -> neo.Block:
         """
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
         """
         with NeoBufferDatabase() as db:
+            if block is None:
+                block = db.get_empty_block(
+                    self.__population.label, annotations)
+                if block is None:
+                    raise ConfigurationException(
+                        f"No data for {self.__population.label}")
             if SpynnakerDataView.is_reset_last():
                 logger.warning(
                     "Due to the call directly after reset, "
@@ -323,30 +307,30 @@ class Recorder(object):
                     SpynnakerDataView.get_segment_counter() - 1)
             else:
                 db.add_segment(
-                    block, self.__population.label, variables, view_indexes)
+                    block, self.__population.label, variables, view_indexes,
+                    allow_missing=False)
                 if clear:
                     db.clear_data(self.__population.label, variables)
+            return block
 
     def __append_previous_segment(
-            self, block: neo.Block, segment_number: int, variables: Names,
-            view_indexes: Optional[Sequence[int]], clear: bool):
+            self, block: Optional[neo.Block], segment_number: int,
+            variables: Names, view_indexes: Optional[Sequence[int]],
+            clear: bool,
+            annotations: Optional[Dict[str, Any]]) -> Optional[neo.Block]:
         """
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
         """
-        if segment_number not in self.__data_cache:
-            logger.warning("No Data available for Segment {}", segment_number)
-            segment = neo.Segment(
-                name=f"segment{segment_number}",
-                description="Empty",
-                rec_datetime=datetime.now())
-            block.segments.append(segment)
-            return
-
-        with NeoBufferDatabase(
-                self.__data_cache[segment_number], read_only=False) as db:
-            db.add_segment(
-                block, self.__population.label, variables, view_indexes)
-            if clear:
-                db.clear_data(self.__population.label, variables)
+        with NeoBufferDatabase.segement_db(segment_number) as db:
+            if block is None:
+                block = db.get_empty_block(
+                    self.__population.label, annotations)
+            if block is not None:
+                db.add_segment(
+                    block, self.__population.label, variables, view_indexes,
+                    allow_missing=True)
+                if clear:
+                    db.clear_data(self.__population.label, variables)
+            return block

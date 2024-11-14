@@ -791,12 +791,6 @@ class Population(PopulationBase):
         """
         return self.__vertex.n_atoms
 
-    def _cache_data(self) -> None:
-        """
-        Store data for later extraction.
-        """
-        self.__recorder.cache_data()
-
     @staticmethod
     def __create_model(
             cell_class: _CellTypeArg,
