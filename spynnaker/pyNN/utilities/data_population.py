@@ -122,8 +122,7 @@ class DataPopulation(object):
     def find_units(self, variable: str) -> Optional[str]:
         # pylint: disable=missing-function-docstring
         with NeoBufferDatabase(self.__database_file) as db:
-            (_, _, units) = db.get_recording_metadata(self.__label, variable)
-        return units
+            return db.find_units(self.__label, variable)
 
     def __len__(self) -> int:
         return self._size
