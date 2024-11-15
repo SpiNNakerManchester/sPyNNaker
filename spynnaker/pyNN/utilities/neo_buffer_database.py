@@ -130,12 +130,13 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             segment_cache[segment] = database_file
 
     @classmethod
-    def segement_db(cls, segment_number: int) -> NeoBufferDatabase:
+    def segement_db(cls, segment_number: int,
+                    read_only: Optional[bool] = None) -> NeoBufferDatabase:
         """
         Retrieves a NeoBufferDatabase for this segment.
         """
         database_file = segment_cache[segment_number]
-        return NeoBufferDatabase(database_file)
+        return NeoBufferDatabase(database_file, read_only)
 
     def write_segment_metadata(self) -> None:
         """
