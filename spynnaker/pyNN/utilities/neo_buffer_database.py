@@ -1079,7 +1079,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         self.__get_segment_info()
         metadata = self.__get_recording_metadata(pop_label, SPIKES)
         if metadata is None:
-            return {}
+            if SpynnakerDataView.is_ran_last():
+                raise ConfigurationException(
+                    f"{pop_label} did not record spikes")
 
         (rec_id, _, buffered_type, _, _, pop_size, _,
          n_colour_bits) = metadata
@@ -1291,7 +1293,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If the recording metadata not setup correctly
         """
         if not os.path.isfile(csv_file):
-            raise SpynnakerException("PLease call csv_block_metadata first")
+            raise SpynnakerException("Please call csv_block_metadata first")
         with open(csv_file, 'a', newline='', encoding="utf-8") as csvfile:
             csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"',
                                     quoting=csv.QUOTE_MINIMAL)
