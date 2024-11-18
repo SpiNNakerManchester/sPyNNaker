@@ -1079,9 +1079,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         self.__get_segment_info()
         metadata = self.__get_recording_metadata(pop_label, SPIKES)
         if metadata is None:
-            if SpynnakerDataView.is_ran_last():
-                raise ConfigurationException(
-                    f"{pop_label} did not record spikes")
+            raise ConfigurationException(
+                f"{pop_label} did not record spikes")
 
         (rec_id, _, buffered_type, _, _, pop_size, _,
          n_colour_bits) = metadata
@@ -1159,7 +1158,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __read_and_csv_data(
             self, pop_label: str, variable: str, csv_writer: CSVWriter,
-            view_indexes: ViewIndices, t_stop: float, allow_missing=False):
+            view_indexes: ViewIndices, t_stop: float, allow_missing: bool):
         """
         Reads the data for one variable and adds it to the CSV file.
 
@@ -1175,6 +1174,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param view_indexes:
         :type view_indexes: None, ~numpy.array or list(int)
         :param float t_stop:
+        :param allow_missing: Flag to say if data for missing variable
+            should raise an exception
         """
         metadata = self.__get_recording_metadata(pop_label, variable)
         if metadata is None:
