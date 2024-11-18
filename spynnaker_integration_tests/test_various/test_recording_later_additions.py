@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import os
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 
 
 class TestRecordingLaterAdditions(BaseTestCase):
 
-    def do_simple(self):
+    def do_later_additions(self):
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 
@@ -31,19 +32,58 @@ class TestRecordingLaterAdditions(BaseTestCase):
                        synapse_type=sim.StaticSynapse(weight=5, delay=1))
         pop_a.record(["spikes", "v"])
 
+        pop_b = sim.Population(1, sim.IF_curr_exp(), label="pop_b")
+        sim.Projection(input_pop, pop_b, sim.OneToOneConnector(),
+                       synapse_type=sim.StaticSynapse(weight=5, delay=1))
+
         pop_c = sim.Population(1, sim.IF_curr_exp(), label="pop_c")
         sim.Projection(input_pop, pop_c, sim.OneToOneConnector(),
                        synapse_type=sim.StaticSynapse(weight=5, delay=1))
         pop_c.record(["spikes"])
+
         sim.run(10)
+
+        # Did not record all these should fail
+        with self.assertRaises(ConfigurationException):
+            pop_b.get_data(variables=["spikes", "v"])
+        with self.assertRaises(ConfigurationException):
+            pop_b.get_spike_counts()
+        with self.assertRaises(ConfigurationException):
+            pop_b.write_data("test_b_bad.csv", ["spikes", "v"])
+        with self.assertRaises(ConfigurationException):
+            pop_c.get_data(variables=["spikes", "v"])
+        with self.assertRaises(ConfigurationException):
+            pop_c.write_data("test_c_bad.csv", ["spikes", "v"])
+
         sim.reset()
 
-        pop_b = sim.Population(1, sim.IF_curr_exp(), label="pop_b")
-        sim.Projection(input_pop, pop_b, sim.OneToOneConnector(),
-                       synapse_type=sim.StaticSynapse(weight=5, delay=1))
-        pop_b.record(["spikes", "v"])
+        # No recording from previous segment so should fail
+        with self.assertRaises(ConfigurationException):
+            pop_b.get_data(variables=["spikes", "v"])
+        with self.assertRaises(ConfigurationException):
+            pop_b.write_data("test_b_bad.csv", ["spikes", "v"])
+        # Only includes this segment so should fail
+        with self.assertRaises(ConfigurationException):
+            pop_b.get_spike_counts()
+        # Some recording from previous will wok
+        pop_c.get_data(variables=["spikes", "v"])
+        pop_c.write_data("test_c_1.csv", ["spikes", "v"])
 
+        pop_b.record(["spikes", "v"])
         pop_c.record(["v"])
+
+        # No recording from previous segment so should fail
+        with self.assertRaises(ConfigurationException):
+            pop_b.get_data(variables=["spikes", "v"])
+        with self.assertRaises(ConfigurationException):
+            pop_b.write_data("test_b_bad.csv", ["spikes", "v"])
+        # Only includes this segment so should fail
+        with self.assertRaises(ConfigurationException):
+            pop_b.get_spike_counts()
+        # Some recording from previous will wok
+        pop_c.get_data(variables=["spikes", "v"])
+        pop_c.write_data("test_c_1.csv", ["spikes", "v"])
+
         sim.run(20)
 
         neo_a = pop_a.get_data(variables=["spikes", "v"])
@@ -116,5 +156,18 @@ class TestRecordingLaterAdditions(BaseTestCase):
         pop_c.write_data("test_c.csv", ["spikes", "v"])
         sim.end()
 
-    def test_simple(self):
-        self.runsafe(self.do_simple)
+    def cleanup(self, file):
+        try:
+            if os.path.exists(file):
+                os.remove(file)
+        except Exception:
+            pass
+
+    def test_later_additions(self):
+        self.cleanup("test_a.csv")
+        self.cleanup("test_b.csv")
+        self.cleanup("test_b_bad.csv")
+        self.cleanup("test_c.csv")
+        self.cleanup("test_c_1.csv")
+        self.cleanup("test_c_bad.csv")
+        self.runsafe(self.do_later_additions)

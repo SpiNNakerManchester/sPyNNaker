@@ -1079,7 +1079,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         self.__get_segment_info()
         metadata = self.__get_recording_metadata(pop_label, SPIKES)
         if metadata is None:
-            return {}
+            raise ConfigurationException(
+                f"{pop_label} did not record spikes")
 
         (rec_id, _, buffered_type, _, _, pop_size, _,
          n_colour_bits) = metadata
@@ -1157,7 +1158,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __read_and_csv_data(
             self, pop_label: str, variable: str, csv_writer: CSVWriter,
-            view_indexes: ViewIndices, t_stop: float):
+            view_indexes: ViewIndices, t_stop: float, allow_missing: bool):
         """
         Reads the data for one variable and adds it to the CSV file.
 
@@ -1173,10 +1174,16 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param view_indexes:
         :type view_indexes: None, ~numpy.array or list(int)
         :param float t_stop:
+        :param allow_missing: Flag to say if data for missing variable
+            should raise an exception
         """
         metadata = self.__get_recording_metadata(pop_label, variable)
         if metadata is None:
-            return
+            if allow_missing:
+                return
+            else:
+                raise ConfigurationException(
+                    f"No data for {pop_label=} {variable=}")
 
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
          pop_size, units, n_colour_bits) = metadata
@@ -1269,7 +1276,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def csv_segment(
             self, csv_file: str, pop_label: str, variables: Names,
-            view_indexes: ViewIndices = None):
+            view_indexes: ViewIndices, allow_missing: bool):
         """
         Writes the data including metadata to a CSV file.
 
@@ -1291,7 +1298,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If the recording metadata not setup correctly
         """
         if not os.path.isfile(csv_file):
-            raise SpynnakerException("PLease call csv_block_metadata first")
+            raise SpynnakerException("Please call csv_block_metadata first")
         with open(csv_file, 'a', newline='', encoding="utf-8") as csvfile:
             csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"',
                                     quoting=csv.QUOTE_MINIMAL)
@@ -1302,8 +1309,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 csv_writer, segment_number, rec_datetime)
 
             for variable in self.__clean_variables(variables, pop_label):
-                self.__read_and_csv_data(
-                    pop_label, variable, csv_writer, view_indexes, t_stop)
+                self.__read_and_csv_data(pop_label, variable, csv_writer,
+                                         view_indexes, t_stop, allow_missing)
 
     def csv_block_metadata(
             self, csv_file: str, pop_label: str,
