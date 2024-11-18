@@ -271,18 +271,30 @@ class Recorder(object):
                     wrote_metadata = db.csv_block_metadata(
                         csv_file, pop_label, annotations)
                 if wrote_metadata:
-                    db.csv_segment(
-                        csv_file, pop_label, variables, view_indexes)
+                    db.csv_segment(csv_file, pop_label, variables,
+                                   view_indexes, allow_missing=True)
 
-        with NeoBufferDatabase() as db:
-            if SpynnakerDataView.is_reset_last():
+        if SpynnakerDataView.is_reset_last():
+            if wrote_metadata:
                 logger.warning(
                     "Due to the call directly after reset, "
                     "the data will only contain {} segments",
                     SpynnakerDataView.get_segment_counter() - 1)
+                return
             else:
-                db.csv_segment(
-                    csv_file, pop_label, variables, view_indexes)
+                raise ConfigurationException(
+                    f"Unable to write data for {pop_label}")
+
+        with NeoBufferDatabase() as db:
+            if not wrote_metadata:
+                wrote_metadata = db.csv_block_metadata(
+                    csv_file, pop_label, annotations)
+            if wrote_metadata:
+                db.csv_segment(csv_file, pop_label, variables,
+                               view_indexes, allow_missing=False)
+            else:
+                raise ConfigurationException(
+                    f"Unable to write data for {pop_label}")
 
     def __append_current_segment(
             self, block: neo.Block, variables: Names,

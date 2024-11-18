@@ -1159,7 +1159,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __read_and_csv_data(
             self, pop_label: str, variable: str, csv_writer: CSVWriter,
-            view_indexes: ViewIndices, t_stop: float):
+            view_indexes: ViewIndices, t_stop: float, allow_missing=False):
         """
         Reads the data for one variable and adds it to the CSV file.
 
@@ -1178,7 +1178,11 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         metadata = self.__get_recording_metadata(pop_label, variable)
         if metadata is None:
-            return
+            if allow_missing:
+                return
+            else:
+                raise ConfigurationException(
+                    f"No data for {pop_label=} {variable=}")
 
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
          pop_size, units, n_colour_bits) = metadata
@@ -1271,7 +1275,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def csv_segment(
             self, csv_file: str, pop_label: str, variables: Names,
-            view_indexes: ViewIndices = None):
+            view_indexes: ViewIndices, allow_missing: bool):
         """
         Writes the data including metadata to a CSV file.
 
@@ -1304,8 +1308,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 csv_writer, segment_number, rec_datetime)
 
             for variable in self.__clean_variables(variables, pop_label):
-                self.__read_and_csv_data(
-                    pop_label, variable, csv_writer, view_indexes, t_stop)
+                self.__read_and_csv_data(pop_label, variable, csv_writer,
+                                         view_indexes, t_stop, allow_missing)
 
     def csv_block_metadata(
             self, csv_file: str, pop_label: str,
