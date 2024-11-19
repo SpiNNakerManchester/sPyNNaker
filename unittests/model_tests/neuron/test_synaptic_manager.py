@@ -83,7 +83,7 @@ class _MockTransceiverinOut(MockableTransceiver):
         return (-1, -1)
 
     @overrides(Transceiver.get_region_base_address)
-    def get_region_base_address(self, x: int, y: int, p: int):
+    def get_region_base_address(self, x: int, y: int, p: int) -> int:
         return 0
 
     @overrides(MockableTransceiver.read_memory)
