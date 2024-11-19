@@ -30,6 +30,8 @@ import quantities
 import neo  # type: ignore[import]
 
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.logger_utils import warn_once
+
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 
 
@@ -170,19 +172,22 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             The database must be writable for this to work!
         """
         t_stop = SpynnakerDataView.get_current_run_time_ms()
+        if t_stop == 0:
+            if SpynnakerDataView.get_current_run_timesteps() is None:
+                return
         self.execute(
             """
             UPDATE segment
             SET t_stop = ?
             """, (t_stop,))
 
-    def __get_segment_info(self) -> Tuple[int, datetime, float, float, str]:
+    def __get_segment_info(
+            self) -> Tuple[int, datetime, Optional[float], float, str]:
         """
         Gets the metadata for the segment.
 
         :return: segment number, record time, last run time recorded,
             simulator timestep in ms, simulator name
-        :rtype: tuple(int, ~datetime.datetime, float, float, str)
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
@@ -195,14 +200,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 """):
             t_str = self._string(row[self._REC_DATETIME])
             time = datetime.strptime(t_str, "%Y-%m-%d %H:%M:%S.%f")
-            if row[self._T_STOP] is None:
-                t_stop = 0.0
-                logger.warning("Data from a virtual run will be empty")
-            else:
-                t_stop = row[self._T_STOP]
-            return (row[self._SEGMENT_NUMBER], time, t_stop, row[self._DT],
-                    self._string(row[self._SIMULATOR]))
-        raise ConfigurationException(
+            return (row[self._SEGMENT_NUMBER], time, row[self._T_STOP],
+                    row[self._DT], self._string(row[self._SIMULATOR]))
+            raise ConfigurationException(
             "No recorded data. Did the simulation run?")
 
     def __get_simulation_time_step_ms(self) -> float:
@@ -1152,13 +1152,22 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 rec_id, view_indexes, buffer_type,
                 n_colour_bits, variable)
             sampling_rate = 1000 / sampling_interval_ms * quantities.Hz
+            if t_stop is None:
+                if len(spikes) == 0:
+                    t_stop = 0
+                    warn_once(logger, "No spike data. Setting end time to 0")
+                else:
+                    t_stop = numpy.amax(spikes, 0)[1]
+                    warn_once(logger, "Unknown how long the simulation ran. "
+                                      "So using max spike as stop time")
             self._insert_spike_data(
                 view_indexes, segment, spikes, t_start, t_stop,
                 sampling_rate)
 
     def __read_and_csv_data(
             self, pop_label: str, variable: str, csv_writer: CSVWriter,
-            view_indexes: ViewIndices, t_stop: float, allow_missing: bool):
+            view_indexes: ViewIndices, t_stop: Optional[float],
+            allow_missing: bool):
         """
         Reads the data for one variable and adds it to the CSV file.
 
@@ -1173,7 +1182,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param ~csv.writer csv_writer: Open CSV writer to write to
         :param view_indexes:
         :type view_indexes: None, ~numpy.array or list(int)
-        :param float t_stop:
+        :param t_stop:
         :param allow_missing: Flag to say if data for missing variable
             should raise an exception
         """
