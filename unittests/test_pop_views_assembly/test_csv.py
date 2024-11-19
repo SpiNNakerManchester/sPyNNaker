@@ -62,7 +62,8 @@ class TestCSV(BaseTestCase):
         with NeoBufferDatabase(my_buffer) as db:
             db.csv_block_metadata(
                 my_csv, "pop_1", annotations={"foo": 12, "bar": 34})
-            db.csv_segment(my_csv, "pop_1", variables="all")
+            db.csv_segment(my_csv, "pop_1", variables="all",
+                           view_indexes=None, allow_missing=False)
 
         neo = NeoCsv().read_csv(my_csv)
         # All annotations converted to String and not back
@@ -88,7 +89,7 @@ class TestCSV(BaseTestCase):
             db.csv_block_metadata(my_csv, "pop_1", annotations=None)
             db.csv_segment(
                 my_csv, "pop_1", variables=["spikes", "v"],
-                view_indexes=[2, 4, 7, 8])
+                view_indexes=[2, 4, 7, 8], allow_missing=False)
 
         neo = NeoCsv().read_csv(my_csv)
 
@@ -109,7 +110,8 @@ class TestCSV(BaseTestCase):
         my_csv = os.path.join(my_dir, "test_over_view.csv")
         with NeoBufferDatabase(my_buffer) as db:
             db.csv_block_metadata(my_csv, "pop_1", annotations=None)
-            db.csv_segment(my_csv, "pop_1", variables="all")
+            db.csv_segment(my_csv, "pop_1", variables="all",
+                           view_indexes=None, allow_missing=False)
 
         neo = NeoCsv().read_csv(my_csv)
         spikes = neo_convertor.convert_spikes(neo)
@@ -129,8 +131,8 @@ class TestCSV(BaseTestCase):
         my_csv = os.path.join(my_dir, "test_over_sub_view.csv")
         with NeoBufferDatabase(my_buffer) as db:
             db.csv_block_metadata(my_csv, "pop_1", annotations=None)
-            db.csv_segment(
-                my_csv, "pop_1", variables="all", view_indexes=[2, 4])
+            db.csv_segment(my_csv, "pop_1", variables="all",
+                           view_indexes=[2, 4], allow_missing=False)
 
         neo = NeoCsv().read_csv(my_csv)
         spikes = neo_convertor.convert_spikes(neo)
@@ -150,8 +152,8 @@ class TestCSV(BaseTestCase):
         my_csv = os.path.join(my_dir, "test_no_intersection.csv")
         with NeoBufferDatabase(my_buffer) as db:
             db.csv_block_metadata(my_csv, "pop_1", annotations=None)
-            db.csv_segment(
-                my_csv, "pop_1", variables="all", view_indexes=[4, 6])
+            db.csv_segment(my_csv, "pop_1", variables="all",
+                           view_indexes=[4, 6], allow_missing=False)
 
         neo = NeoCsv().read_csv(my_csv)
         spikes = neo_convertor.convert_spikes(neo)
@@ -170,7 +172,8 @@ class TestCSV(BaseTestCase):
         my_csv = os.path.join(my_dir, "test_rewiring.csv")
         with NeoBufferDatabase(my_buffer) as db:
             db.csv_block_metadata(my_csv, "pop_1", annotations=None)
-            db.csv_segment(my_csv, "pop_1", variables="all")
+            db.csv_segment(my_csv, "pop_1", variables="all",
+                           view_indexes=None, allow_missing=False)
         neo = NeoCsv().read_csv(my_csv)
         formation_events = neo.segments[0].events[0]
         elimination_events = neo.segments[0].events[1]
