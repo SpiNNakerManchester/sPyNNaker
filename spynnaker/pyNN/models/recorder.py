@@ -265,7 +265,7 @@ class Recorder(object):
         pop_label = self.__population.label
 
         wrote_metadata = False
-        for segment in range(SpynnakerDataView.get_reset_counter()):
+        for segment in range(SpynnakerDataView.get_reset_number()):
             with NeoBufferDatabase.segement_db(segment) as db:
                 if not wrote_metadata:
                     wrote_metadata = db.csv_block_metadata(
@@ -279,7 +279,7 @@ class Recorder(object):
                 logger.warning(
                     "Due to the call directly after reset, "
                     "the data will only contain {} segments",
-                    SpynnakerDataView.get_reset_counter() - 1)
+                    SpynnakerDataView.get_reset_number() - 1)
                 return
             else:
                 raise ConfigurationException(
