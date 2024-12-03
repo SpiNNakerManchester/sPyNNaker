@@ -66,8 +66,6 @@ if TYPE_CHECKING:
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
-segment_cache: Dict[int, str] = {}
-
 
 class NeoBufferDatabase(BufferDatabase, NeoCsv):
     """
@@ -116,24 +114,22 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             if read_only is None:
                 read_only = True
 
+        existed = os.path.exists(database_file)
         super().__init__(database_file, read_only=read_only)
 
-        segment = SpynnakerDataView.get_reset_number()
-        if (segment not in segment_cache or
-                segment_cache[segment] != database_file):
+        if not existed:
             with open(self.__NEO_DDL_FILE, encoding="utf-8") as f:
                 sql = f.read()
             # pylint: disable=no-member
             self._SQLiteDB__db.executescript(sql)  # type: ignore[attr-defined]
-            segment_cache[segment] = database_file
 
     @classmethod
-    def segement_db(cls, segment_number: int,
-                    read_only: Optional[bool] = None) -> NeoBufferDatabase:
+    def reset_db(cls, reset_number: int,
+                 read_only: Optional[bool] = None) -> NeoBufferDatabase:
         """
         Retrieves a NeoBufferDatabase for this segment.
         """
-        database_file = segment_cache[segment_number]
+        database_file = cls.reset_file(reset_number)
         return NeoBufferDatabase(database_file, read_only)
 
     def write_segment_metadata(self) -> None:

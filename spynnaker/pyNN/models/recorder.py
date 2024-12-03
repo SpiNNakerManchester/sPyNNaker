@@ -266,7 +266,7 @@ class Recorder(object):
 
         wrote_metadata = False
         for segment in range(SpynnakerDataView.get_reset_number()):
-            with NeoBufferDatabase.segement_db(segment) as db:
+            with NeoBufferDatabase.reset_db(segment) as db:
                 if not wrote_metadata:
                     wrote_metadata = db.csv_block_metadata(
                         csv_file, pop_label, annotations)
@@ -335,7 +335,7 @@ class Recorder(object):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
         """
-        with NeoBufferDatabase.segement_db(
+        with NeoBufferDatabase.reset_db(
                 segment_number, read_only=not clear) as db:
             if block is None:
                 block = db.get_empty_block(
