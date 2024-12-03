@@ -20,8 +20,8 @@ import os
 import re
 import struct
 from typing import (
-    Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
-    TYPE_CHECKING)
+    Any, Collection, Dict, Iterable, List, Optional, Sequence, Set, Tuple,
+    TYPE_CHECKING, Union)
 
 import numpy
 from numpy import floating, integer, uint8, uint32
@@ -65,6 +65,8 @@ if TYPE_CHECKING:
     Annotations = Optional[Dict[str, Any]]
 
 logger = FormatAdapter(logging.getLogger(__name__))
+
+seen_files: Set[str] = set()
 
 
 class NeoBufferDatabase(BufferDatabase, NeoCsv):
@@ -114,10 +116,11 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             if read_only is None:
                 read_only = True
 
-        existed = os.path.exists(database_file)
         super().__init__(database_file, read_only=read_only)
 
-        if not existed:
+        if database_file not in seen_files:
+            # The file may exist if opened by another class but will need DDL
+            seen_files.add(database_file)
             with open(self.__NEO_DDL_FILE, encoding="utf-8") as f:
                 sql = f.read()
             # pylint: disable=no-member
