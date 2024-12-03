@@ -20,8 +20,8 @@ import os
 import re
 import struct
 from typing import (
-    Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
-    TYPE_CHECKING)
+    Any, Collection, Dict, Iterable, List, Optional, Sequence, Set, Tuple,
+    TYPE_CHECKING, Union)
 
 import numpy
 from numpy import floating, integer, uint8, uint32
@@ -66,7 +66,7 @@ if TYPE_CHECKING:
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
-segment_cache: Dict[int, str] = {}
+seen_files: Set[str] = set()
 
 
 class NeoBufferDatabase(BufferDatabase, NeoCsv):
@@ -118,22 +118,21 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         super().__init__(database_file, read_only=read_only)
 
-        segment = SpynnakerDataView.get_segment_counter()
-        if (segment not in segment_cache or
-                segment_cache[segment] != database_file):
+        if database_file not in seen_files:
+            # The file may exist if opened by another class but will need DDL
+            seen_files.add(database_file)
             with open(self.__NEO_DDL_FILE, encoding="utf-8") as f:
                 sql = f.read()
             # pylint: disable=no-member
             self._SQLiteDB__db.executescript(sql)  # type: ignore[attr-defined]
-            segment_cache[segment] = database_file
 
     @classmethod
-    def segement_db(cls, segment_number: int,
-                    read_only: Optional[bool] = None) -> NeoBufferDatabase:
+    def reset_db(cls, reset_number: int,
+                 read_only: Optional[bool] = None) -> NeoBufferDatabase:
         """
         Retrieves a NeoBufferDatabase for this segment.
         """
-        database_file = segment_cache[segment_number]
+        database_file = cls.reset_file(reset_number)
         return NeoBufferDatabase(database_file, read_only)
 
     def write_segment_metadata(self) -> None:
@@ -154,7 +153,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 dt, simulator)
             VALUES (?, ?, ?, ?, ?)
             """, (SpynnakerDataView.get_simulation_time_step_ms(),
-                  SpynnakerDataView.get_segment_counter(),
+                  SpynnakerDataView.get_reset_number(),
                   datetime.now(),
                   SpynnakerDataView.get_simulation_time_step_ms(),
                   SpynnakerDataView.get_sim_name()))

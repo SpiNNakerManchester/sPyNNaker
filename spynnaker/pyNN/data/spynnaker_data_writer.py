@@ -47,15 +47,11 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
 
     @overrides(FecDataWriter._hard_reset)
     def _hard_reset(self) -> None:
-        if not self.is_soft_reset():
-            # Only increase it if this is a hard not following a soft
-            self.__spy_data._segment_counter += 1
         FecDataWriter._hard_reset(self)
         self.__spy_data._hard_reset()
 
     @overrides(FecDataWriter._soft_reset)
     def _soft_reset(self) -> None:
-        self.__spy_data._segment_counter += 1
         FecDataWriter._soft_reset(self)
         self.__spy_data._soft_reset()
 

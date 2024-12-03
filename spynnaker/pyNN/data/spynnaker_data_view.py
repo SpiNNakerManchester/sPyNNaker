@@ -50,8 +50,7 @@ class _SpynnakerDataModel(object):
         "_min_delay",
         "_neurons_per_core_set",
         "_populations",
-        "_projections",
-        "_segment_counter")
+        "_projections")
 
     def __new__(cls) -> '_SpynnakerDataModel':
         if cls.__singleton is not None:
@@ -72,7 +71,6 @@ class _SpynnakerDataModel(object):
         self._neurons_per_core_set: Set[Type[AbstractPyNNModel]] = set()
         self._populations: Set[Population] = set()
         self._projections: Set[Projection] = set()
-        self._segment_counter = 0
 
     def _hard_reset(self) -> None:
         """
@@ -254,16 +252,6 @@ class SpynnakerDataView(FecDataView):
 
         neuron_type.set_model_max_atoms_per_dimension_per_core(max_permitted)
         cls.__spy_data._neurons_per_core_set.add(neuron_type)
-
-    @classmethod
-    def get_segment_counter(cls) -> int:
-        """
-        The number of the current recording segment being generated.
-
-        :return: the segment counter
-        :rtype: int
-        """
-        return cls.__spy_data._segment_counter
 
     @classmethod
     def get_sim_name(cls) -> str:
