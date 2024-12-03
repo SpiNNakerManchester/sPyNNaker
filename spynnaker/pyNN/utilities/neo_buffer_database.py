@@ -118,7 +118,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         super().__init__(database_file, read_only=read_only)
 
-        segment = SpynnakerDataView.get_segment_counter()
+        segment = SpynnakerDataView.get_reset_number()
         if (segment not in segment_cache or
                 segment_cache[segment] != database_file):
             with open(self.__NEO_DDL_FILE, encoding="utf-8") as f:
@@ -154,7 +154,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 dt, simulator)
             VALUES (?, ?, ?, ?, ?)
             """, (SpynnakerDataView.get_simulation_time_step_ms(),
-                  SpynnakerDataView.get_segment_counter(),
+                  SpynnakerDataView.get_reset_number(),
                   datetime.now(),
                   SpynnakerDataView.get_simulation_time_step_ms(),
                   SpynnakerDataView.get_sim_name()))

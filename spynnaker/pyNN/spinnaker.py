@@ -271,7 +271,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :return: the segment counter
         :rtype: int
         """
-        return self.__writer.get_segment_counter()
+        return self.__writer.get_reset_number()
 
     @segment_counter.setter
     def segment_counter(self, _):
