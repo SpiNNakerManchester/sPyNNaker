@@ -236,7 +236,7 @@ class Recorder(object):
         SpynnakerDataView.check_user_can_act()
 
         block: Optional[neo.Block] = None
-        for previous in range(SpynnakerDataView.get_segment_counter()):
+        for previous in range(SpynnakerDataView.get_reset_number()):
             block = self.__append_previous_segment(
                 block, previous, variables, view_indexes, clear, annotations)
 
@@ -265,7 +265,7 @@ class Recorder(object):
         pop_label = self.__population.label
 
         wrote_metadata = False
-        for segment in range(SpynnakerDataView.get_segment_counter()):
+        for segment in range(SpynnakerDataView.get_reset_number()):
             with NeoBufferDatabase.segement_db(segment) as db:
                 if not wrote_metadata:
                     wrote_metadata = db.csv_block_metadata(
@@ -279,7 +279,7 @@ class Recorder(object):
                 logger.warning(
                     "Due to the call directly after reset, "
                     "the data will only contain {} segments",
-                    SpynnakerDataView.get_segment_counter() - 1)
+                    SpynnakerDataView.get_reset_number() - 1)
                 return
             else:
                 raise ConfigurationException(
@@ -316,7 +316,7 @@ class Recorder(object):
                 logger.warning(
                     "Due to the call directly after reset, "
                     "the data will only contain {} segments",
-                    SpynnakerDataView.get_segment_counter() - 1)
+                    SpynnakerDataView.get_reset_number() - 1)
             else:
                 db.add_segment(
                     block, self.__population.label, variables, view_indexes,

@@ -181,20 +181,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # Stop any currently running SpiNNaker application
         self.stop()
 
-    def reset(self) -> None:
-        """
-        Reset the state of the current network to time t = 0.
-        """
-        if not self.__writer.is_ran_last():
-            if not self.__writer.is_ran_ever():
-                logger.error("Ignoring the reset before the run")
-            else:
-                logger.error("Ignoring the repeated reset call")
-            return
-
-        # Call superclass implementation
-        AbstractSpinnakerBase.reset(self)
-
     @property
     def state(self) -> 'SpiNNaker':
         """
@@ -285,7 +271,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :return: the segment counter
         :rtype: int
         """
-        return self.__writer.get_segment_counter()
+        return self.__writer.get_reset_number()
 
     @segment_counter.setter
     def segment_counter(self, _):
