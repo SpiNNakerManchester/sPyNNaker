@@ -14,8 +14,6 @@
 
 import os
 import numpy
-import sqlite3
-import unittest
 import pyNN.spiNNaker as p
 from spinn_front_end_common.interface.provenance import ProvenanceReader
 from spinn_front_end_common.utilities.report_functions import EnergyReport
