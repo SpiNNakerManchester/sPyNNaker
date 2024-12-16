@@ -257,8 +257,8 @@ class PopulationNeuronsMachineVertex(
         return ids
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(
-            self, spec: DataSpecificationGenerator, placement: Placement):
+    def generate_data_specification(self, spec: DataSpecificationGenerator,
+                                    placement: Placement) -> None:
         assert self.__sdram_partition is not None
         rec_regions = self._pop_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
