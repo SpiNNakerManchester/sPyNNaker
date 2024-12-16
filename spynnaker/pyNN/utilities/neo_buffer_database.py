@@ -318,8 +318,28 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         assert rowid is not None, "recording must have been inserted"
         return rowid
 
-    def get_population_metadata(
-            self, pop_label: str) -> Optional[Tuple[int, int, str]]:
+    def has_population_metadata(self, pop_label: str) -> bool:
+        """
+        Check if there is Metadata for the population with this label
+
+        :param str pop_label: The label for the population of interest
+
+            .. note::
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
+                duplicate values
+        """
+        for row in self.cursor().execute(
+                """
+                SELECT pop_size
+                FROM population
+                WHERE label = ?
+                LIMIT 1
+                """, (pop_label,)):
+            return True
+        return False
+
+    def get_population_metadata(self, pop_label: str) -> Tuple[int, int, str]:
         """
         Gets the metadata for the population with this label
 
@@ -345,7 +365,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 """, (pop_label,)):
             return (int(row["pop_size"]), int(row["first_id"]),
                     self._string(row["description"]))
-        return None
+        raise ConfigurationException(f"There is no Metadata for {pop_label}")
 
     def get_recording_populations(self) -> Tuple[str, ...]:
         """
@@ -1236,8 +1256,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If the recording metadata not setup correctly
         """
         _, _, _, dt, simulator = self.__get_segment_info()
-        metadata = self.get_population_metadata(pop_label)
-        if metadata is None:
+        if self.has_population_metadata(pop_label):
+            metadata = self.get_population_metadata(pop_label)
+        else:
             return None
         pop_size, first_id, description = metadata
 
@@ -1334,8 +1355,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If the recording metadata not setup correctly
         """
         _, _, _, dt, _ = self.__get_segment_info()
-        metadata = self.get_population_metadata(pop_label)
-        if metadata is None:
+        if self.has_population_metadata(pop_label):
+            metadata = self.get_population_metadata(pop_label)
+        else:
             return False
 
         pop_size, first_id, description = metadata
