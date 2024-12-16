@@ -140,8 +140,8 @@ class PopulationSynapsesMachineVertexLead(
             self, label, x, y, p, provenance_data)
 
     @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)
-    def regenerate_data_specification(
-            self, spec: DataSpecificationReloader, placement: Placement):
+    def regenerate_data_specification(self, spec: DataSpecificationReloader,
+                                      placement: Placement) -> None:
         # We don't need to do anything here because the originally written
         # data can be used again
         pass
@@ -151,7 +151,7 @@ class PopulationSynapsesMachineVertexLead(
         return self.__regenerate_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
-    def set_reload_required(self, new_value: bool):
+    def set_reload_required(self, new_value: bool) -> None:
         self.__regenerate_data = new_value
 
     @overrides(PopulationMachineSynapses.set_do_synapse_regeneration)

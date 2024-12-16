@@ -281,9 +281,9 @@ class PopulationNeuronsMachineVertex(
 
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
-    def regenerate_data_specification(
-            self, spec: DataSpecificationReloader, placement: Placement):
-        # Write the other parameters
+    def regenerate_data_specification(self, spec: DataSpecificationReloader,
+                                      placement: Placement) -> None:
+       # Write the other parameters
         self._rewrite_neuron_data_spec(spec)
 
         # close spec
@@ -294,7 +294,7 @@ class PopulationNeuronsMachineVertex(
         return self.__regenerate_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
-    def set_reload_required(self, new_value: bool):
+    def set_reload_required(self, new_value: bool) -> None:
         self.__regenerate_data = new_value
 
     @property

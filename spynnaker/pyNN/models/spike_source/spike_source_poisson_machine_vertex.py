@@ -335,12 +335,12 @@ class SpikeSourcePoissonMachineVertex(
         return SpynnakerDataView.get_first_machine_time_step() == 0
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
-    def set_reload_required(self, new_value: bool):
+    def set_reload_required(self, new_value: bool) -> None:
         self.__rate_changed = new_value
 
     @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)
-    def regenerate_data_specification(
-            self, spec: DataSpecificationReloader, placement: Placement):
+    def regenerate_data_specification(self, spec: DataSpecificationReloader,
+                                      placement: Placement) -> None:
         # write rates
         self._write_poisson_rates(spec)
 
