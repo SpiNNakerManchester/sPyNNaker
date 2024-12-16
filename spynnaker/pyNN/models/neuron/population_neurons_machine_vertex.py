@@ -283,7 +283,7 @@ class PopulationNeuronsMachineVertex(
         AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec: DataSpecificationReloader,
                                       placement: Placement) -> None:
-       # Write the other parameters
+        # Write the other parameters
         self._rewrite_neuron_data_spec(spec)
 
         # close spec
