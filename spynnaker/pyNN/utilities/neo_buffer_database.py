@@ -329,7 +329,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 Typically the Population label, corrected for `None` or
                 duplicate values
         """
-        for row in self.cursor().execute(
+        for _ in self.cursor().execute(
                 """
                 SELECT pop_size
                 FROM population
