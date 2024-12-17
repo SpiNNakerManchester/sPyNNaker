@@ -136,8 +136,8 @@ class MachineMunichMotorDevice(
                     "or decrease the number of neurons per core.")
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(
-            self, spec: DataSpecificationGenerator, placement: Placement):
+    def generate_data_specification(self, spec: DataSpecificationGenerator,
+                                    placement: Placement) -> None:
         # reserve regions
         self.reserve_memory_regions(spec)
 
