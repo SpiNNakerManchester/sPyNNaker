@@ -225,7 +225,8 @@ __simulator: Optional[SpiNNaker] = None
 def distance(src_cell: IDMixin, tgt_cell: IDMixin,
              mask: Optional[NDArray] = None,
              scale_factor: float = 1.0, offset: float = 0.0,
-             periodic_boundaries=None) -> float:
+             periodic_boundaries: Optional[Tuple[
+                 Optional[Tuple[int, int]]]] = None) -> float:
     """
     Return the Euclidean distance between two cells.
 
@@ -254,7 +255,8 @@ def setup(timestep: Optional[Union[float, Literal["auto"]]] = None,
           database_socket_addresses: Optional[Iterable[SocketAddress]] = None,
           time_scale_factor: Optional[int] = None,
           n_chips_required: Optional[int] = None,
-          n_boards_required: Optional[int] = None, **extra_params) -> int:
+          n_boards_required: Optional[int] = None,
+          **extra_params: Any ) -> int:
     """
     The main method needed to be called to make the PyNN 0.8 setup.
     Needs to be called before any other function
@@ -391,7 +393,7 @@ def Projection(
         partition_id=partition_id)
 
 
-def _create_overloaded_functions(spinnaker_simulator: SpiNNaker):
+def _create_overloaded_functions(spinnaker_simulator: SpiNNaker) -> None:
     """
     Creates functions that the main PyNN interface supports
     (given from PyNN)
@@ -417,7 +419,7 @@ def _create_overloaded_functions(spinnaker_simulator: SpiNNaker):
     __pynn["record"] = pynn_common.build_record(spinnaker_simulator)
 
 
-def end(_=True) -> None:
+def end(_: Any = True) -> None:
     """
     Cleans up the SpiNNaker machine and software
 
@@ -456,7 +458,7 @@ def list_standard_models() -> List[str]:
 
 def set_number_of_neurons_per_core(
         neuron_type: Type,
-        max_permitted: Optional[Union[int, Tuple[int, ...]]]):
+        max_permitted: Optional[Union[int, Tuple[int, ...]]]) -> None:
     """
     Sets a ceiling on the number of neurons of a given model that can be
     placed on a single core.
@@ -495,7 +497,7 @@ def set_number_of_neurons_per_core(
 
 def connect(pre: Population, post: Population, weight: float = 0.0,
             delay: Optional[float] = None, receptor_type: Optional[str] = None,
-            p: int = 1, rng: Optional[NumpyRNG] = None):
+            p: int = 1, rng: Optional[NumpyRNG] = None) -> None:
     """
     Builds a projection.
 
@@ -586,7 +588,7 @@ def get_time_step() -> float:
     return float(__pynn["get_time_step"]())
 
 
-def initialize(cells: PopulationBase, **initial_values):
+def initialize(cells: PopulationBase, **initial_values: Any) -> None:
     """
     Sets cells to be initialised to the given values.
 
@@ -653,7 +655,7 @@ def record(variables: Union[str, Sequence[str]], source: PopulationBase,
                             annotations)
 
 
-def reset(annotations: Optional[Dict[str, Any]] = None):
+def reset(annotations: Optional[Dict[str, Any]] = None) -> None:
     """
     Resets the simulation to t = 0.
 
@@ -666,7 +668,7 @@ def reset(annotations: Optional[Dict[str, Any]] = None):
     __pynn["reset"](annotations)
 
 
-def run(simtime: float, callbacks=None) -> float:
+def run(simtime: float, callbacks: Optional[Callable] = None) -> float:
     """
     The run() function advances the simulation for a given number of
     milliseconds.

@@ -32,7 +32,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 _existing_connections = dict()
 
 
-def get_pushbot_wifi_connection(remote_host, remote_port=56000):
+def get_pushbot_wifi_connection(remote_host: str, remote_port: int = 56000):
     """
     Get an existing connection to a PushBot, or make a new one.
 

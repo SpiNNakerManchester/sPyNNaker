@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List
+
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
     PushBotTranslator)
-from spynnaker.pyNN.external_devices_models import ExternalDeviceLifControl
+from spynnaker.pyNN.external_devices_models import (
+    AbstractMulticastControllableDevice, ExternalDeviceLifControl)
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
     get_pushbot_wifi_connection)
+from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
+    MunichIoSpiNNakerLinkProtocol)
 
 
 class PushBotLifEthernet(ExternalDeviceLifControl):
@@ -47,13 +52,15 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(
-            self, protocol, devices, pushbot_ip_address,
-            pushbot_port=56000,
-
+            self, protocol: MunichIoSpiNNakerLinkProtocol,
+            devices: List[AbstractMulticastControllableDevice],
+            pushbot_ip_address: str, pushbot_port: int = 56000,
             # default params for the neuron model type
-            tau_m=20.0, cm=1.0, v_rest=0.0, v_reset=0.0, tau_syn_E=5.0,
-            tau_syn_I=5.0, tau_refrac=0.1, i_offset=0.0, v=0.0,
-            isyn_exc=0.0, isyn_inh=0.0):
+            tau_m: float = 20.0, cm: float = 1.0, v_rest: float = 0.0,
+            v_reset: float = 0.0, tau_syn_E: float = 5.0,
+            tau_syn_I: float = 5.0, tau_refrac: float = 0.1,
+            i_offset: float = 0.0, v: float = 0.0, isyn_exc: float = 0.0,
+            isyn_inh: float = 0.0):
         # pylint: disable=too-many-arguments
 
         translator = PushBotTranslator(

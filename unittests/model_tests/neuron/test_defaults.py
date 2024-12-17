@@ -165,3 +165,6 @@ def _check_warnings(lc, expected, not_expected):
     print("Found warnings for variables {}".format(warning_variables))
     assert all(item in warning_variables for item in expected)
     assert all(item not in warning_variables for item in not_expected)
+
+def test_push_bot_led_device():
+    claimed_defaults =

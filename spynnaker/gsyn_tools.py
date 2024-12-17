@@ -15,6 +15,8 @@
 import os
 import spynnaker.pyNN.utilities.utility_calls as utility_calls
 
+# TODO No use case found for this code
+# mypy: disable-error-code="no-untyped-def"
 
 def check_gsyn(gsyn1, gsyn2):
     """
