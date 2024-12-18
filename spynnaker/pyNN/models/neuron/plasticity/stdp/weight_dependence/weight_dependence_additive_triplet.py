@@ -22,6 +22,8 @@ from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationBase)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
+from spynnaker.pyNN.models.defaults import defaults
+
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
 
@@ -29,6 +31,7 @@ from .abstract_weight_dependence import AbstractWeightDependence
 _SPACE_PER_SYNAPSE_TYPE = 6 * BYTES_PER_WORD
 
 
+@defaults
 class WeightDependenceAdditiveTriplet(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
     """
@@ -41,15 +44,10 @@ class WeightDependenceAdditiveTriplet(
         "__w_min")
     __PARAM_NAMES = ('w_min', 'w_max', 'A3_plus', 'A3_minus')
 
-    default_parameters = {'w_min': 0.0, 'w_max': 1.0, 'A3_plus': 0.01,
-                          'A3_minus': 0.01}
-
     # noinspection PyPep8Naming
     def __init__(
-            self, w_min: float = default_parameters['w_min'],
-            w_max: float = default_parameters['w_max'],
-            A3_plus: float = default_parameters['A3_plus'],
-            A3_minus: float = default_parameters['A3_minus']):
+            self, w_min: float = 0.0, w_max: float = 1.0,
+            A3_plus: float = 0.01, A3_minus: float = 0.01):
         """
         :param float w_min: :math:`w^{min}`
         :param float w_max: :math:`w^{max}`

@@ -12,15 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List
+from typing import Iterable, List, Literal, Optional, Union
+from typing_extensions import TypeAlias
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
+
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utility_models import MultiCastCommand
+
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.defaults import defaults
 
 # robot with 7 7 1
 
@@ -49,6 +55,7 @@ def get_spike_value_from_robot_retina(key: int) -> int:
     return (key >> 14) & 0x1
 
 
+@defaults
 class MunichRetinaDevice(
         ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex,
         AbstractSendMeMulticastCommandsVertex):
@@ -72,30 +79,28 @@ class MunichRetinaDevice(
 
     UP_POLARITY = "UP"
     DOWN_POLARITY = "DOWN"
-    MERGED_POLARITY = "MERGED"
+    MERGED_POLARITY: Literal["MERGED"] = "MERGED"
+    _T_POLARITY: TypeAlias = \
+        Union[Literal["UP"], Literal["DOWN"], Literal["MERGED"], None]
 
     #: Select the left retina
     LEFT_RETINA = "LEFT"
     #: Select the right retina
     RIGHT_RETINA = "RIGHT"
     _RETINAS = frozenset((LEFT_RETINA, RIGHT_RETINA))
-
-    default_parameters = {
-        'label': "MunichRetinaDevice",
-        'polarity': None,
-        'board_address': None}
+    _T_RETINAS: TypeAlias = Union[Literal["LEFT"], Literal["RIGHT"]]
 
     def __init__(
-            self, retina_key, spinnaker_link_id, position,
-            label=default_parameters['label'],
-            polarity=default_parameters['polarity'],
-            board_address=default_parameters['board_address']):
+            self, retina_key: int, spinnaker_link_id: int,
+            position: _T_RETINAS, label: str = "MunichRetinaDevice",
+            polarity: _T_POLARITY = None,
+            board_address: Optional[str] = None):
         """
         :param int retina_key:
         :param int spinnaker_link_id:
             The SpiNNaker link to which the retina is connected
         :param str position: ``LEFT`` or ``RIGHT``
-        :param str label:
+        :param label:
         :param str polarity: ``UP``, ``DOWN`` or ``MERGED``
         :param board_address:
         :type board_address: str or None

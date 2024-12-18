@@ -26,12 +26,15 @@ from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.defaults import defaults
+
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
+@defaults
 class SpikeInjectorVertex(
         ReverseIpTagMultiCastSource, PopulationApplicationVertex,
         SupportsStructure):
@@ -42,9 +45,6 @@ class SpikeInjectorVertex(
     __slots__ = (
         "__spike_recorder",
         "__structure")
-
-    default_parameters = {
-        'label': "spikeInjector", 'port': None, 'virtual_key': None}
 
     SPIKE_RECORDING_REGION_ID = 0
 
