@@ -62,10 +62,10 @@ def get_map_from_init(
         _check_args(skip, default_args, init_method)
 
     as_dict = {arg: value
-            for arg, value in zip(default_args, default_values)
-            if ((arg != "self") and
-                (skip is None or arg not in skip) and
-                (include is None or arg in include))}
+               for arg, value in zip(default_args, default_values)
+               if ((arg != "self") and
+                   (skip is None or arg not in skip) and
+                   (include is None or arg in include))}
     return MappingProxyType(as_dict)
 
 
