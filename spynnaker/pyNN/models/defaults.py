@@ -61,11 +61,12 @@ def get_map_from_init(
     if skip is not None:
         _check_args(skip, default_args, init_method)
 
-    return MappingProxyType({arg: value
+    as_dict = {arg: value
             for arg, value in zip(default_args, default_values)
             if ((arg != "self") and
                 (skip is None or arg not in skip) and
-                (include is None or arg in include))})
+                (include is None or arg in include))}
+    return MappingProxyType(as_dict)
 
 
 def default_parameters(parameters: Iterable[str]) -> Callable:
