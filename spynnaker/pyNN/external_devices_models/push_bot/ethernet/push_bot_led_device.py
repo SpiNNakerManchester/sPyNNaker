@@ -23,7 +23,7 @@ from spinn_front_end_common.utility_models import MultiCastCommand
 
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotLED)
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.protocols import MunichIoEthernetProtocol
 
 from .push_bot_device import PushBotEthernetDevice
 
@@ -35,13 +35,13 @@ class PushBotEthernetLEDDevice(
     """
 
     def __init__(
-            self, led, protocol: MunichIoSpiNNakerLinkProtocol,
+            self, led, protocol: MunichIoEthernetProtocol,
             start_active_time_front=None, start_active_time_back=None,
             start_total_period=None, start_frequency=None,
             timesteps_between_send=None):
         """
         :param PushBotLED led: The LED to control
-        :param MunichIoSpiNNakerLinkProtocol protocol:
+        :param protocol:
             The protocol instance to get commands from
         :param int start_active_time_front:
             The "active time" to set for the front LED at the start

@@ -23,7 +23,7 @@ from spinn_front_end_common.utility_models import MultiCastCommand
 
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotMotor)
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.protocols import MunichIoEthernetProtocol
 
 from .push_bot_device import PushBotEthernetDevice
 
@@ -34,7 +34,7 @@ class PushBotEthernetMotorDevice(
     The motor of a PushBot.
     """
 
-    def __init__(self, motor, protocol: MunichIoSpiNNakerLinkProtocol,
+    def __init__(self, motor, protocol: MunichIoEthernetProtocol,
                  timesteps_between_send=None):
         """
         :param PushBotMotor motor: indicates which motor to control
@@ -53,7 +53,7 @@ class PushBotEthernetMotorDevice(
 
     @overrides(PushBotEthernetDevice.set_command_protocol)
     def set_command_protocol(
-            self, command_protocol: MunichIoSpiNNakerLinkProtocol):
+            self, command_protocol: MunichIoEthernetProtocol):
         self.__command_protocol = command_protocol
 
     @property

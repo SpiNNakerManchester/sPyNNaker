@@ -16,7 +16,7 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.external_devices_models import (
     AbstractMulticastControllableDevice, SendType)
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.protocols import MunichIoEthernetProtocol
 
 
 # The default timestep to use for first send.  Avoids clashes with other
@@ -31,11 +31,11 @@ class PushBotEthernetDevice(
     """
 
     def __init__(
-            self, protocol: MunichIoSpiNNakerLinkProtocol, device,
+            self, protocol: MunichIoEthernetProtocol, device,
             uses_payload, time_between_send,
             first_send_timestep=_DEFAULT_FIRST_SEND_TIMESTEP):
         """
-        :param MunichIoSpiNNakerLinkProtocol protocol:
+        :param protocol:
             The protocol instance to get commands from
         :param AbstractPushBotOutputDevice device:
             The Enum instance of the device to control
@@ -96,22 +96,19 @@ class PushBotEthernetDevice(
         return self.__first_send_timestep
 
     @property
-    def protocol(self) -> MunichIoSpiNNakerLinkProtocol:
+    def protocol(self) -> MunichIoEthernetProtocol:
         """
         The protocol instance, for use in the subclass.
-
-        :rtype: MunichIoSpiNNakerLinkProtocol
         """
         return self.__protocol
 
     @abstractmethod
     def set_command_protocol(
-            self, command_protocol: MunichIoSpiNNakerLinkProtocol):
+            self, command_protocol: MunichIoEthernetProtocol):
         """
         Set the protocol use to send setup and shutdown commands,
         separately from the protocol used to control the device.
 
-        :param MunichIoSpiNNakerLinkProtocol command_protocol:
-            The protocol to use for this device
+        :param command_protocol: The protocol to use for this device
         """
         raise NotImplementedError

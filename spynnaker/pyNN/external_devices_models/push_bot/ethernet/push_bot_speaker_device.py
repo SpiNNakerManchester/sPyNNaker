@@ -23,7 +23,7 @@ from spinn_front_end_common.utility_models import MultiCastCommand
 
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotSpeaker)
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.protocols import MunichIoEthernetProtocol
 
 from .push_bot_device import PushBotEthernetDevice
 
@@ -35,13 +35,12 @@ class PushBotEthernetSpeakerDevice(
     """
 
     def __init__(
-            self, speaker, protocol: MunichIoSpiNNakerLinkProtocol,
+            self, speaker, protocol: MunichIoEthernetProtocol,
             start_active_time=0, start_total_period=0, start_frequency=0,
             start_melody=None, timesteps_between_send=None):
         """
         :param PushBotSpeaker speaker: The speaker to control
-        :param MunichIoSpiNNakerLinkProtocol protocol:
-            The protocol instance to get commands from
+        :param protocol: The protocol instance to get commands from
         :param int start_active_time: The "active time" to set at the start
         :param int start_total_period: The "total period" to set at the start
         :param int start_frequency: The "frequency" to set at the start
@@ -66,7 +65,7 @@ class PushBotEthernetSpeakerDevice(
 
     @overrides(PushBotEthernetDevice.set_command_protocol)
     def set_command_protocol(
-            self, command_protocol: MunichIoSpiNNakerLinkProtocol):
+            self, command_protocol: MunichIoEthernetProtocol):
         self.__command_protocol = command_protocol
 
     @property

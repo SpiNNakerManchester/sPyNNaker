@@ -23,7 +23,7 @@ from spinn_front_end_common.utility_models import MultiCastCommand
 
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotLaser)
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.protocols import MunichIoEthernetProtocol
 
 from .push_bot_device import PushBotEthernetDevice
 
@@ -35,12 +35,12 @@ class PushBotEthernetLaserDevice(
     """
 
     def __init__(
-            self, laser, protocol: MunichIoSpiNNakerLinkProtocol,
+            self, laser, protocol: MunichIoEthernetProtocol,
             start_active_time=None, start_total_period=None,
             start_frequency=None, timesteps_between_send=None):
         """
         :param PushBotLaser laser: The PushBotLaser value to control
-        :param MunichIoEthernetProtocol protocol:
+        :param protocol:
             The protocol instance to get commands from
         :param int start_active_time:
             The "active time" value to send at the start
