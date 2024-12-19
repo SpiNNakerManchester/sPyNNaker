@@ -21,6 +21,8 @@ from spynnaker.pyNN.external_devices_models import (
     AbstractMulticastControllableDevice, ExternalDeviceLifControl)
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
     get_pushbot_wifi_connection)
+from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
+    MunichIoSpiNNakerLinkProtocol)
 
 
 class PushBotLifEthernet(ExternalDeviceLifControl):
@@ -28,7 +30,7 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
     Leaky integrate and fire neuron with an exponentially decaying
     current input.
 
-    :param MunichIoEthernetProtocol protocol:
+    :param MunichIoSpiNNakerLinkProtocol protocol:
         How to talk to the bot.
     :param iterable(AbstractMulticastControllableDevice) devices:
         The devices on the bot that we are interested in.
@@ -49,10 +51,9 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
     __slots__ = ()
 
 
-    # See https://github.com/SpiNNakerManchester/sPyNNaker/issues/1520
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(
-            self, protocol: Any,
+            self, protocol: MunichIoSpiNNakerLinkProtocol,
             devices: List[AbstractMulticastControllableDevice],
             pushbot_ip_address: str, pushbot_port: int = 56000,
             # default params for the neuron model type

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -35,16 +35,18 @@ class PushBotEthernetSpeakerDevice(
     """
 
     def __init__(
-            self, speaker, protocol: MunichIoSpiNNakerLinkProtocol,
-            start_active_time=0, start_total_period=0, start_frequency=0,
-            start_melody=None, timesteps_between_send=None):
+            self, speaker: PushBotSpeaker,
+            protocol: MunichIoSpiNNakerLinkProtocol,
+            start_active_time: int = 0, start_total_period: int = 0,
+            start_frequency: Optional[int] = 0, start_melody: Optional[int] = None,
+            timesteps_between_send: Optional[int] = None):
         """
         :param PushBotSpeaker speaker: The speaker to control
         :param MunichIoSpiNNakerLinkProtocol protocol:
             The protocol instance to get commands from
         :param int start_active_time: The "active time" to set at the start
         :param int start_total_period: The "total period" to set at the start
-        :param int start_frequency: The "frequency" to set at the start
+        :param start_frequency: The "frequency" to set at the start
         :param int start_melody: The "melody" to set at the start
         :param int timesteps_between_send:
             The number of timesteps between sending commands to the device,
@@ -66,7 +68,7 @@ class PushBotEthernetSpeakerDevice(
 
     @overrides(PushBotEthernetDevice.set_command_protocol)
     def set_command_protocol(
-            self, command_protocol: MunichIoSpiNNakerLinkProtocol):
+            self, command_protocol: MunichIoSpiNNakerLinkProtocol) -> None:
         self.__command_protocol = command_protocol
 
     @property

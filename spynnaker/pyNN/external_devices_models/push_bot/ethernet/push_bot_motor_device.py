@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -24,7 +24,6 @@ from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotMotor)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
-
 from .push_bot_device import PushBotEthernetDevice
 
 
@@ -34,13 +33,14 @@ class PushBotEthernetMotorDevice(
     The motor of a PushBot.
     """
 
-    def __init__(self, motor, protocol: MunichIoSpiNNakerLinkProtocol,
-                 timesteps_between_send=None):
+    def __init__(self, motor: PushBotMotor,
+                 protocol: MunichIoSpiNNakerLinkProtocol,
+                 timesteps_between_send: Optional[int] = None):
         """
         :param PushBotMotor motor: indicates which motor to control
         :param MunichIoSpiNNakerLinkProtocol protocol:
             The protocol used to control the device
-        :param int timesteps_between_send:
+        :param timesteps_between_send:
             The number of timesteps between sending commands to the device,
             or `None` to use the default
         """
@@ -53,7 +53,7 @@ class PushBotEthernetMotorDevice(
 
     @overrides(PushBotEthernetDevice.set_command_protocol)
     def set_command_protocol(
-            self, command_protocol: MunichIoSpiNNakerLinkProtocol):
+            self, command_protocol: MunichIoSpiNNakerLinkProtocol) -> None:
         self.__command_protocol = command_protocol
 
     @property

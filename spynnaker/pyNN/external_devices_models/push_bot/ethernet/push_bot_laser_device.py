@@ -68,7 +68,7 @@ class PushBotEthernetLaserDevice(
 
     @overrides(PushBotEthernetDevice.set_command_protocol)
     def set_command_protocol(
-            self, command_protocol: MunichIoSpiNNakerLinkProtocol):
+            self, command_protocol: MunichIoSpiNNakerLinkProtocol) -> None:
         self.__command_protocol = command_protocol
 
     @property

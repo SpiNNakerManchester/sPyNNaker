@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.external_devices_models import AbstractEthernetSensor
 from spynnaker.pyNN.external_devices_models.push_bot import (
     AbstractPushBotRetinaDevice)
-
+from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
+    PushBotRetinaResolution)
+from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 from .push_bot_retina_connection import PushBotRetinaConnection
 from .push_bot_translator import PushBotTranslator
 from .push_bot_wifi_connection import get_pushbot_wifi_connection
@@ -31,17 +33,21 @@ class PushBotEthernetRetinaDevice(
     A PushBot retina over Ethernet
     """
     def __init__(
-            self, protocol, resolution, pushbot_ip_address, pushbot_port=56000,
-            injector_port=None, local_host=None, local_port=None,
-            retina_injector_label="PushBotRetinaInjector"):
+            self, protocol: MunichIoSpiNNakerLinkProtocol,
+            resolution: PushBotRetinaResolution,
+            pushbot_ip_address: str, pushbot_port: int = 56000,
+            injector_port: Optional[int] = None,
+            local_host: Optional[str] = None,
+            local_port: Optional[int] = None,
+            retina_injector_label: str = "PushBotRetinaInjector"):
         """
         :param MunichIoEthernetProtocol protocol:
         :param PushBotRetinaResolution resolution:
         :param str pushbot_ip_address:
         :param int pushbot_port:
-        :param int injector_port:
-        :param str local_host:
-        :param int local_port:
+        :param injector_port:
+        :param local_host:
+        :param local_port:
         :param str retina_injector_label:
         """
         # pylint: disable=too-many-arguments

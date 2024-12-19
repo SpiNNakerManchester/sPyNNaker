@@ -19,6 +19,9 @@ from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
     PushBotEthernetLaserDevice)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.defaults import defaults
+from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
+    PushBotLaser)
+from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 
 
 @defaults
@@ -31,7 +34,8 @@ class PushBotSpiNNakerLinkLaserDevice(
     __slots__ = ()
 
     def __init__(
-            self, laser, protocol, spinnaker_link_id,
+            self, laser: PushBotLaser,
+            protocol: MunichIoSpiNNakerLinkProtocol, spinnaker_link_id: int,
             n_neurons: int = 1,
             label: Optional[str] = None,
             board_address: Optional[str] = None,
