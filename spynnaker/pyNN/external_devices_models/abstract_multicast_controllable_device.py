@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from enum import Enum
+from typing import Optional
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
@@ -95,7 +96,7 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def device_control_timesteps_between_sending(self) -> int:
+    def device_control_timesteps_between_sending(self) -> Optional[int]:
         """
         The number of timesteps between sending commands to the device.
         This defines the "sampling interval" for the device.
@@ -124,10 +125,8 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
         return 1
 
     @property
-    def device_control_first_send_timestep(self) -> int:
+    def device_control_first_send_timestep(self) -> Optional[int]:
         """
         The first timestep that the device should send in (0 by default).
-
-        :rtype: int
         """
         return 0

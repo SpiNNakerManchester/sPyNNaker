@@ -26,6 +26,7 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.defaults import defaults
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightAccumulator)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
@@ -34,6 +35,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
 from .abstract_timing_dependence import AbstractTimingDependence
 
 
+@defaults
 class TimingDependenceRecurrent(AbstractTimingDependence):
     """
     A timing dependence STDP rule based on recurrences.
@@ -51,18 +53,11 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         'accumulator_depression', 'accumulator_potentiation',
         'mean_pre_window', 'mean_post_window', 'dual_fsm')
 
-    default_parameters = {
-        'accumulator_depression': -6, 'accumulator_potentiation': 6,
-        'mean_pre_window': 35.0, 'mean_post_window': 35.0, 'dual_fsm': True}
-
     def __init__(
-            self, accumulator_depression: int = cast(int, default_parameters[
-                'accumulator_depression']),
-            accumulator_potentiation: int = cast(int, default_parameters[
-                'accumulator_potentiation']),
-            mean_pre_window: float = default_parameters['mean_pre_window'],
-            mean_post_window: float = default_parameters['mean_post_window'],
-            dual_fsm: bool = cast(bool, default_parameters['dual_fsm']),
+            self, accumulator_depression: int = -6,
+            accumulator_potentiation: int = 6,
+            mean_pre_window: float = 35.0, mean_post_window: float = 35.0,
+            dual_fsm: bool = True,
             A_plus: float = 0.01, A_minus: float = 0.01):
         """
         :param int accumulator_depression:

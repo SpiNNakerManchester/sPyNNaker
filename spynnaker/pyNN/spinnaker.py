@@ -15,7 +15,7 @@
 import logging
 import math
 import os
-from typing import Collection, Optional, Union, cast
+from typing import Any, Collection, Optional, Union, cast
 
 from lazyarray import __version__ as lazyarray_version
 from typing_extensions import Literal
@@ -24,6 +24,7 @@ from neo import __version__ as neo_version
 from quantities import __version__ as quantities_version
 from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
+from typing_extensions import Never
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import (
@@ -130,7 +131,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return cast(SpynnakerDataWriter, self._data_writer)
 
     def _clear_and_run(self, run_time: Optional[float],
-                       sync_time: float = 0.0):
+                       sync_time: float = 0.0) -> None:
         """
         Clears the projections and Run the model created.
 
@@ -154,7 +155,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         for projection in self.__writer.iterate_projections():
             projection._clear_cache()
 
-    def run(self, run_time: Optional[float], sync_time: float = 0.0):
+    def run(self, run_time: Optional[float], sync_time: float = 0.0) -> None:
         """
         Run the simulation for a span of simulation time.
 
@@ -162,7 +163,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         self._clear_and_run(run_time, sync_time)
 
-    def run_until(self, tstop: float):
+    def run_until(self, tstop: float) -> None:
         """
         Run the simulation until the given simulation time.
 
@@ -205,7 +206,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return 0
 
     @mpi_rank.setter
-    def mpi_rank(self, new_value):
+    def mpi_rank(self, new_value: int) -> None:
         """
          sPyNNaker does not use this value meaningfully.
 
@@ -226,7 +227,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return 1
 
     @num_processes.setter
-    def num_processes(self, new_value):
+    def num_processes(self, new_value: int) -> None:
         """
         sPyNNaker does not use this value meaningfully.
 
@@ -244,7 +245,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return self.__writer.get_simulation_time_step_ms()
 
     @dt.setter
-    def dt(self, _):
+    def dt(self, _: Any) -> Never:
         """
         We do not support setting the time step except during setup.
 
@@ -274,7 +275,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return self.__writer.get_reset_number()
 
     @segment_counter.setter
-    def segment_counter(self, _):
+    def segment_counter(self, _: Any) -> Never:
         """
         We do not support externally altering the segment counter
 
@@ -305,7 +306,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return self.__recorders
 
     @recorders.setter
-    def recorders(self, new_value: Collection[Recorder]):
+    def recorders(self, new_value: Collection[Recorder]) -> None:
         """
         Setter for the internal recorders object
 
@@ -316,7 +317,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     def _set_up_timings(
             self, timestep: Optional[float], min_delay: Union[
                 int, float, None],
-            time_scale_factor: Optional[int]):
+            time_scale_factor: Optional[int]) -> None:
         """
         :param timestep: machine_time_Step in milliseconds
         :type timestep: float or None
@@ -372,7 +373,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         super().stop()
 
     @staticmethod
-    def register_binary_search_path(search_path: str):
+    def register_binary_search_path(search_path: str) -> None:
         """
         Register an additional binary search path for executables.
 

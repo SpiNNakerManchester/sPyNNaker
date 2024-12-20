@@ -41,7 +41,7 @@ class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
         return n_keys * n_colours
 
     @overrides(ReverseIPTagMulticastSourceMachineVertex._fill_send_buffer_1d)
-    def _fill_send_buffer_1d(self, key_base: int):
+    def _fill_send_buffer_1d(self, key_base: int) -> None:
         first_time_step = SpynnakerDataView.get_first_machine_time_step()
         end_time_step = (
                 SpynnakerDataView.get_current_run_timesteps() or sys.maxsize)
@@ -58,7 +58,7 @@ class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
                     tick, keys + (tick & colour_mask))
 
     @overrides(ReverseIPTagMulticastSourceMachineVertex._fill_send_buffer_2d)
-    def _fill_send_buffer_2d(self, key_base: int):
+    def _fill_send_buffer_2d(self, key_base: int) -> None:
         first_time_step = SpynnakerDataView.get_first_machine_time_step()
         end_time_step = (
                 SpynnakerDataView.get_current_run_timesteps() or sys.maxsize)

@@ -23,6 +23,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.defaults import defaults
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     get_exp_lut_array)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
@@ -31,6 +32,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
 from .abstract_timing_dependence import AbstractTimingDependence
 
 
+@defaults
 class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     """
     A timing dependence STDP rule based on nearest pairs.
@@ -43,10 +45,8 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
         "__a_plus",
         "__a_minus")
     __PARAM_NAMES = ('tau_plus', 'tau_minus')
-    default_parameters = {'tau_plus': 20.0, 'tau_minus': 20.0}
 
-    def __init__(self, tau_plus: float = default_parameters['tau_plus'],
-                 tau_minus: float = default_parameters['tau_minus'],
+    def __init__(self, tau_plus: float = 20.0, tau_minus: float = 20.0,
                  A_plus: float = 0.01, A_minus: float = 0.01):
         r"""
         :param float tau_plus: :math:`\tau_+`
