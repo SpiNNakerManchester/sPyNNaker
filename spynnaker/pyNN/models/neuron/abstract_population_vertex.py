@@ -467,7 +467,7 @@ class AbstractPopulationVertex(
     @overrides(PopulationApplicationVertex.
                set_max_atoms_per_dimension_per_core)
     def set_max_atoms_per_dimension_per_core(
-            self, new_value: Union[None, int, Tuple[int, ...]]):
+            self, new_value: Union[None, int, Tuple[int, ...]]) -> None:
         if new_value is not None:
             max_atoms = self.__synapse_dynamics.absolute_max_atoms_per_core
             if numpy.prod(new_value) > max_atoms:

@@ -132,8 +132,8 @@ class SPIFOutputDevice(
         return (v & (v - 1) == 0) and (v != 0)
 
     @overrides(ApplicationFPGAVertex.add_incoming_edge)
-    def add_incoming_edge(
-            self, edge: ApplicationEdge, partition: ApplicationEdgePartition):
+    def add_incoming_edge(self, edge: ApplicationEdge,
+                          partition: ApplicationEdgePartition) -> None:
         # Only add edges from PopulationApplicationVertices
         if not isinstance(edge.pre_vertex, PopulationApplicationVertex):
             if not isinstance(edge.pre_vertex, CommandSender):
