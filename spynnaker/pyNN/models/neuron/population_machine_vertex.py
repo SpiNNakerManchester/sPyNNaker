@@ -321,8 +321,8 @@ class PopulationMachineVertex(
         return ids
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(
-            self, spec: DataSpecificationGenerator, placement: Placement):
+    def generate_data_specification(self, spec: DataSpecificationGenerator,
+                                    placement: Placement) -> None:
         rec_regions = self._pop_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
         rec_regions.extend(self._pop_vertex.synapse_recorder.get_region_sizes(
@@ -340,8 +340,8 @@ class PopulationMachineVertex(
 
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
-    def regenerate_data_specification(
-            self, spec: DataSpecificationReloader, placement: Placement):
+    def regenerate_data_specification(self, spec: DataSpecificationReloader,
+                                      placement: Placement) -> None:
         if self.__regenerate_neuron_data:
             self._rewrite_neuron_data_spec(spec)
             self.__regenerate_neuron_data = False
@@ -360,7 +360,7 @@ class PopulationMachineVertex(
         return self.__regenerate_neuron_data or self.__regenerate_synapse_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
-    def set_reload_required(self, new_value: bool):
+    def set_reload_required(self, new_value: bool) -> None:
         # These are set elsewhere once data is generated
         pass
 
