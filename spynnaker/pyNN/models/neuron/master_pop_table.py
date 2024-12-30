@@ -79,7 +79,7 @@ def _make_array(ctype: Type[_T], n_items: int) -> ctypes.Array[_T]:
     :return: a ctype array
     :rtype: _ctypes.PyCArrayType
     """
-    array_type = ctype * n_items
+    array_type = ctype * n_items # type: ignore
     return array_type()
 
 
