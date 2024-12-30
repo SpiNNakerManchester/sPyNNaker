@@ -102,6 +102,16 @@ class TestDataPopulation(BaseTestCase):
         spiketrains = neo.segments[0].spiketrains
         assert 2 == len(spiketrains)
 
+    def test_id_to_index(self):
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
+        self.assertEqual(2, pop.id_to_index(2))
+        self.assertEqual([3, 4], pop.id_to_index([3, 4]))
+        self.assertEqual(2, pop.index_to_id(2))
+        self.assertEqual([3, 4], pop.index_to_id([3, 4]))
+
     def test_get_spikes_view_missing(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "view_data.sqlite3")

@@ -257,8 +257,8 @@ class PopulationNeuronsMachineVertex(
         return ids
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(
-            self, spec: DataSpecificationGenerator, placement: Placement):
+    def generate_data_specification(self, spec: DataSpecificationGenerator,
+                                    placement: Placement) -> None:
         assert self.__sdram_partition is not None
         rec_regions = self._pop_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
@@ -281,8 +281,8 @@ class PopulationNeuronsMachineVertex(
 
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
-    def regenerate_data_specification(
-            self, spec: DataSpecificationReloader, placement: Placement):
+    def regenerate_data_specification(self, spec: DataSpecificationReloader,
+                                      placement: Placement) -> None:
         # Write the other parameters
         self._rewrite_neuron_data_spec(spec)
 
@@ -294,7 +294,7 @@ class PopulationNeuronsMachineVertex(
         return self.__regenerate_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
-    def set_reload_required(self, new_value: bool):
+    def set_reload_required(self, new_value: bool) -> None:
         self.__regenerate_data = new_value
 
     @property
