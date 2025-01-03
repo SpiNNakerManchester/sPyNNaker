@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Iterable, Tuple, List
+from typing import Dict, Iterable, List, Optional, Tuple
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
@@ -30,6 +30,7 @@ from spinn_front_end_common.utility_models.command_sender import CommandSender
 from spinn_front_end_common.utility_models import MultiCastCommand
 
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager)
@@ -65,17 +66,19 @@ class SPIFOutputDevice(
     __slots__ = ("__incoming_partitions", "__create_database",
                  "__output_key_shift", "__output_key_and_mask")
 
-    def __init__(self, board_address=None, chip_coords=None, label=None,
-                 create_database=True, database_notify_host=None,
-                 database_notify_port_num=None, database_ack_port_num=None,
-                 output_key_shift=24):
+    def __init__(self, board_address: Optional[str] = None,
+                 chip_coords: Optional[Tuple[int, int]] = None,
+                 label: Optional[str] = None,
+                 create_database: bool = True,
+                 database_notify_host: Optional[str] = None,
+                 database_notify_port_num: Optional[int] = None,
+                 database_ack_port_num: Optional[int] = None,
+                 output_key_shift: int = 24):
         """
         :param board_address: The board IP address of the SPIF device
-        :type board_address: int or None
         :param chip_coords: The chip coordinates of the SPIF device
         :type chip_coords: tuple(int, int) or None
         :param label: The label to give the SPIF device
-        :type label: int or None
         :param bool create_database:
             Whether the database will be used to decode keys or not
         :param database_notify_host: The host that will read the database
@@ -87,7 +90,7 @@ class SPIFOutputDevice(
             The port to listen on for responses from the host reading the
             database
         :type database_ack_port_num: int or None
-        :param int proj_index_shift:
+        :param int output_key_shift:
             The shift to apply to the population indices when added to the key
         """
         super(SPIFOutputDevice, self).__init__(
@@ -96,7 +99,7 @@ class SPIFOutputDevice(
                 SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address,
                 chip_coords),
             label=label)
-        self.__incoming_partitions = list()
+        self.__incoming_partitions: List[ApplicationEdgePartition] = list()
         # Force creation of the database, to be used in the read side of things
         if create_database:
             set_config("Database", "create_database", "True")
@@ -105,9 +108,11 @@ class SPIFOutputDevice(
                 database_ack_port_num)
         self.__create_database = create_database
         self.__output_key_shift = output_key_shift
-        self.__output_key_and_mask = dict()
+        self.__output_key_and_mask: \
+            Dict[PopulationApplicationVertex, Tuple[int, int]] = dict()
 
-    def set_output_key_and_mask(self, population, key, mask):
+    def set_output_key_and_mask(
+            self, population: Population, key: int, mask: int) -> None:
         """ Set the output key to be written into packets when received by
             SPIF, and the mask to apply before adding the key.  The key should
             be the exact value that will be "or'ed" with the packet after
@@ -123,7 +128,7 @@ class SPIFOutputDevice(
         # pylint: disable=protected-access
         self.__output_key_and_mask[population._vertex] = (key, mask)
 
-    def __is_power_of_2(self, v):
+    def __is_power_of_2(self, v: int) -> bool:
         """ Determine if a value is a power of 2.
 
         :param int v: The value to test
@@ -162,7 +167,7 @@ class SPIFOutputDevice(
         if self.__create_database and len(self.__incoming_partitions) == 1:
             SpynnakerDataView.add_live_output_device(self)
 
-    def _get_set_key_payload(self, index):
+    def _get_set_key_payload(self, index: int) -> int:
         """
         Get the payload for the command to set the router key.
 
@@ -174,7 +179,7 @@ class SPIFOutputDevice(
             self.__incoming_partitions[index].pre_vertex,
             self.__incoming_partitions[index].identifier)
 
-    def _get_set_mask_payload(self, index):
+    def _get_set_mask_payload(self, index: int) -> int:
         """
         Get the payload for the command to set the router mask.
 
@@ -186,7 +191,7 @@ class SPIFOutputDevice(
             self.__incoming_partitions[index].pre_vertex,
             self.__incoming_partitions[index].identifier).mask
 
-    def _get_set_dist_mask_payload(self, index):
+    def _get_set_dist_mask_payload(self, index: int) -> int:
         """ Get the payload for the command to set the distiller mask
         """
         r_infos = SpynnakerDataView.get_routing_infos()
@@ -201,10 +206,12 @@ class SPIFOutputDevice(
         # we don't know the key or mask of the incoming link...
         commands = list()
         for i, part in enumerate(self.__incoming_partitions):
+            pop_vertex = part.pre_vertex
+            assert isinstance(pop_vertex, PopulationApplicationVertex)
             commands.append(set_xp_key_delayed(i, self._get_set_key_payload))
             commands.append(set_xp_mask_delayed(i, self._get_set_mask_payload))
-            if part.pre_vertex in self.__output_key_and_mask:
-                key, mask = self.__output_key_and_mask[part.pre_vertex]
+            if pop_vertex in self.__output_key_and_mask:
+                key, mask = self.__output_key_and_mask[pop_vertex]
                 commands.append(set_distiller_key(i, key))
                 commands.append(set_distiller_mask(i, mask))
             else:
@@ -213,7 +220,7 @@ class SPIFOutputDevice(
                 commands.append(set_distiller_mask_delayed(
                     i, self._get_set_dist_mask_payload))
             commands.append(set_distiller_shift(
-                i, part.pre_vertex.n_colour_bits))
+                i, pop_vertex.n_colour_bits))
         return commands
 
     @property
@@ -232,12 +239,14 @@ class SPIFOutputDevice(
         all_keys: Dict[MachineVertex, List[Tuple[int, int]]] = dict()
         routing_infos = SpynnakerDataView.get_routing_infos()
         for i, part in enumerate(self.__incoming_partitions):
-            if part.pre_vertex in self.__output_key_and_mask:
-                key, mask = self.__output_key_and_mask[part.pre_vertex]
+            pop_vertex = part.pre_vertex
+            assert isinstance(pop_vertex, PopulationApplicationVertex)
+            if pop_vertex in self.__output_key_and_mask:
+                key, mask = self.__output_key_and_mask[pop_vertex]
             else:
                 key = i << self.__output_key_shift
                 mask = self._get_set_dist_mask_payload(i)
-            shift = part.pre_vertex.n_colour_bits
+            shift = pop_vertex.n_colour_bits
             for m_vertex in part.pre_vertex.splitter.get_out_going_vertices(
                     part.identifier):
                 atom_keys: Iterable[Tuple[int, int]] = list()
