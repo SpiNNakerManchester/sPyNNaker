@@ -61,7 +61,7 @@ class TestPowerMonitoring(BaseTestCase):
         # Did we output power provenance data, as requested?
         exec_times = set()
         with ProvenanceReader() as reader:
-            for row in reader.execute(
+            for row in reader.cursor().execute(
                     "SELECT the_value "
                     "FROM power_provenance "
                     "WHERE description = 'Exec time (seconds)'"):
