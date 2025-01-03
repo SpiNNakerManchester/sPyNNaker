@@ -38,7 +38,6 @@ def receive_spikes(label, time, neuron_ids):
 
 
 def do_run():
-
     conn = sim.external_devices.SpynnakerLiveSpikesConnection(
         receive_labels=["pop_1"], send_labels=["sender"], local_port=None)
     conn.add_receive_callback("pop_1", receive_spikes)

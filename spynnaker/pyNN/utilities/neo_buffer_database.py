@@ -202,8 +202,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 t_stop = row[self._T_STOP]
             return (row[self._SEGMENT_NUMBER], time, t_stop, row[self._DT],
                     self._string(row[self._SIMULATOR]))
-        raise ConfigurationException(
-            "No recorded data. Did the simulation run?")
+        raise ConfigurationException("No data. Did the simulation run?")
 
     def __get_simulation_time_step_ms(self) -> float:
         """
