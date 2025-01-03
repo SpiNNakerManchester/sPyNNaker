@@ -147,7 +147,7 @@ class DelayExtensionMachineVertex(
                parse_extra_provenance_items)
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         (n_received, n_processed, n_added, n_sent, n_overflows, n_delays,
          n_sat, n_bad_neuron, n_bad_keys, n_late_spikes, max_bg,
          n_bg_overloads) = provenance_data
@@ -267,8 +267,8 @@ class DelayExtensionMachineVertex(
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(
-            self, spec: DataSpecificationGenerator, placement: Placement):
+    def generate_data_specification(self, spec: DataSpecificationGenerator,
+                                    placement: Placement) -> None:
         vertex = placement.vertex
 
         # Reserve memory:
