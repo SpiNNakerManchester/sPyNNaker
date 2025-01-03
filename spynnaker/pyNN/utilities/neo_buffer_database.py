@@ -149,7 +149,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             The database must be writable for this to work!
         """
         # t_stop intentionally left None to show no run data
-        self.execute(
+        self.cursor().execute(
             """
             INSERT INTO segment(
                 simulation_time_step_ms, segment_number, rec_datetime,
@@ -175,7 +175,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         if t_stop == 0:
             if SpynnakerDataView.get_current_run_timesteps() is None:
                 return
-        self.execute(
+        self.cursor().execute(
             """
             UPDATE segment
             SET t_stop = ?
@@ -192,7 +192,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        for row in self.execute(
+        for row in self.cursor().execute(
                 """
                 SELECT segment_number, rec_datetime, t_stop, dt, simulator
                 FROM segment
@@ -215,7 +215,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :rtype: float
         :return: The timestep
         """
-        for row in self.execute(
+        for row in self.cursor().execute(
                 """
                 SELECT simulation_time_step_ms
                 FROM segment
@@ -244,14 +244,14 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             the population to record for
         :return: The ID
         """
-        for row in self.execute(
+        for row in self.cursor().execute(
                 """
                 SELECT pop_id FROM population
                 WHERE label = ?
                 LIMIT 1
                 """, (pop_label,)):
             return row["pop_id"]
-        self.execute(
+        self.cursor().execute(
             """
             INSERT INTO population(
                 label, first_id, description, pop_size)
@@ -294,7 +294,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param int n_colour_bits:
         :return: The ID
         """
-        for row in self.execute(
+        for row in self.cursor().execute(
                 """
                 SELECT rec_id FROM recording_view
                 WHERE label = ? AND variable = ?
@@ -306,7 +306,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             data_type_name = data_type.name
         else:
             data_type_name = None
-        self.execute(
+        self.cursor().execute(
             """
             INSERT INTO recording(
                 pop_id, variable, data_type, buffered_type, t_start,
@@ -318,8 +318,28 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         assert rowid is not None, "recording must have been inserted"
         return rowid
 
-    def get_population_metadata(
-            self, pop_label: str) -> Optional[Tuple[int, int, str]]:
+    def has_population_metadata(self, pop_label: str) -> bool:
+        """
+        Check if there is Metadata for the population with this label
+
+        :param str pop_label: The label for the population of interest
+
+            .. note::
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
+                duplicate values
+        """
+        for _ in self.cursor().execute(
+                """
+                SELECT pop_size
+                FROM population
+                WHERE label = ?
+                LIMIT 1
+                """, (pop_label,)):
+            return True
+        return False
+
+    def get_population_metadata(self, pop_label: str) -> Tuple[int, int, str]:
         """
         Gets the metadata for the population with this label
 
@@ -336,7 +356,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        for row in self.execute(
+        for row in self.cursor().execute(
                 """
                 SELECT pop_size, first_id, description
                 FROM population
@@ -345,7 +365,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 """, (pop_label,)):
             return (int(row["pop_size"]), int(row["first_id"]),
                     self._string(row["description"]))
-        return None
+        raise ConfigurationException(f"There is no Metadata for {pop_label}")
 
     def get_recording_populations(self) -> Tuple[str, ...]:
         """
@@ -361,7 +381,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :rtype: list(str)
         """
         results = []
-        for row in self.execute(
+        for row in self.cursor().execute(
                 """
                 SELECT label
                 FROM population
@@ -412,7 +432,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :return: List of variable names
         """
         results: List[str] = []
-        for row in self.execute(
+        for row in self.cursor().execute(
                 """
                 SELECT variable
                 FROM recording_view
@@ -473,7 +493,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        for row in self.execute(
+        for row in self.cursor().execute(
                 """
                 SELECT rec_id,  data_type, buffered_type,  t_start,
                        sampling_interval_ms, pop_size, units, n_colour_bits
@@ -506,7 +526,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         index = 0
         # Need to put the rows in a list to get them to persist.
-        for row in list(self.execute(
+        for row in list(self.cursor().execute(
                 """
                 SELECT region_id, recording_neurons_st, vertex_slice, base_key
                 FROM region_metadata
@@ -1245,8 +1265,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If the recording metadata not setup correctly
         """
         _, _, _, dt, simulator = self.__get_segment_info()
-        metadata = self.get_population_metadata(pop_label)
-        if metadata is None:
+        if self.has_population_metadata(pop_label):
+            metadata = self.get_population_metadata(pop_label)
+        else:
             return None
         pop_size, first_id, description = metadata
 
@@ -1343,8 +1364,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If the recording metadata not setup correctly
         """
         _, _, _, dt, _ = self.__get_segment_info()
-        metadata = self.get_population_metadata(pop_label)
-        if metadata is None:
+        if self.has_population_metadata(pop_label):
+            metadata = self.get_population_metadata(pop_label)
+        else:
             return False
 
         pop_size, first_id, description = metadata
@@ -1421,7 +1443,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         variables = self.__clean_variables(variables, pop_label)
         region_ids = []
         for variable in variables:
-            self.execute(
+            self.cursor().execute(
                 """
                 UPDATE recording SET
                     t_start = ?
@@ -1431,7 +1453,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     WHERE label = ? AND variable = ?)
                 """, (t_start, pop_label, variable))
 
-            for row in self.execute(
+            for row in self.cursor().execute(
                """
                     SELECT region_id
                     FROM region_metadata NATURAL JOIN recording_view
@@ -1497,7 +1519,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 base_key = vertex.get_virtual_key()
             else:
                 base_key = None
-            self.execute(
+            self.cursor().execute(
                 """
                 INSERT INTO region_metadata(
                     rec_id, region_id, recording_neurons_st,

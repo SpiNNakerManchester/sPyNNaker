@@ -14,7 +14,8 @@
 from __future__ import annotations
 import logging
 from typing import (
-    Any, Dict, Iterable, Optional, overload, Sequence, Union, TYPE_CHECKING)
+    Any, cast, Dict, Iterable, Optional, overload, Sequence, Union,
+    TYPE_CHECKING)
 
 import numpy
 from numpy import floating
@@ -165,12 +166,13 @@ class DataPopulation(object):
             _, first_id, _ = db.get_population_metadata(self.__label)
         last_id = self._size + first_id
         if not numpy.iterable(id):
+            id = cast(int, id)
             if not first_id <= id <= last_id:
                 raise ValueError(
                     f"id should be in the range [{first_id},{last_id}], "
                     f"actually {id}")
             return int(id - first_id)  # assume IDs are consecutive
-        return id - first_id
+        return [_id - first_id for _id in id]
 
     @overload
     def index_to_id(self, index: int) -> int:
@@ -188,13 +190,14 @@ class DataPopulation(object):
         with NeoBufferDatabase(self.__database_file) as db:
             _, first_id, _ = db.get_population_metadata(self.__label)
         if not numpy.iterable(index):
+            index = cast(int, index)
             if index >= self._size:
                 raise ValueError(
                     f"indexes should be in the range [0,{self._size}],"
                     f" actually {index}")
             return int(index + first_id)
         # this assumes IDs are consecutive
-        return index + first_id
+        return [_index + first_id for _index in index]
 
     def __getitem__(self, index_or_slice: Selector) -> DataPopulation:
         """
