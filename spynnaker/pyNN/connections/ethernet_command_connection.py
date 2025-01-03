@@ -61,7 +61,8 @@ class EthernetCommandConnection(DatabaseConnection):
         self.__translator = translator
 
     def add_command_container(
-            self, command_container: AbstractSendMeMulticastCommandsVertex):
+            self,
+            command_container: AbstractSendMeMulticastCommandsVertex) -> None:
         """
         Add a command container.
 

@@ -154,7 +154,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
             self, spec: DataSpecificationBase, global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
         spec.write_array(self.__tau_minus_data)

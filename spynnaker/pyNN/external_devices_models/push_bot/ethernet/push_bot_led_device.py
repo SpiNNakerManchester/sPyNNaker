@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -35,21 +35,23 @@ class PushBotEthernetLEDDevice(
     """
 
     def __init__(
-            self, led, protocol: MunichIoSpiNNakerLinkProtocol,
-            start_active_time_front=None, start_active_time_back=None,
-            start_total_period=None, start_frequency=None,
-            timesteps_between_send=None):
+            self, led: PushBotLED, protocol: MunichIoSpiNNakerLinkProtocol,
+            start_active_time_front: Optional[int] = None,
+            start_active_time_back: Optional[int] = None,
+            start_total_period: Optional[int] = None,
+            start_frequency: Optional[int] = None,
+            timesteps_between_send: Optional[int] = None):
         """
         :param PushBotLED led: The LED to control
         :param MunichIoSpiNNakerLinkProtocol protocol:
             The protocol instance to get commands from
-        :param int start_active_time_front:
+        :param start_active_time_front:
             The "active time" to set for the front LED at the start
-        :param int start_active_time_back:
+        :param start_active_time_back:
             The "active time" to set for the back LED at the start
-        :param int start_total_period: The "total period" to set at the start
-        :param int start_frequency: The "frequency" to set at the start
-        :param int timesteps_between_send:
+        :param start_total_period: The "total period" to set at the start
+        :param start_frequency: The "frequency" to set at the start
+        :param timesteps_between_send:
             The number of timesteps between sending commands to the device,
             or `None` to use the default
         """
@@ -69,7 +71,7 @@ class PushBotEthernetLEDDevice(
 
     @overrides(PushBotEthernetDevice.set_command_protocol)
     def set_command_protocol(
-            self, command_protocol: MunichIoSpiNNakerLinkProtocol):
+            self, command_protocol: MunichIoSpiNNakerLinkProtocol) -> None:
         self.__command_protocol = command_protocol
 
     @property

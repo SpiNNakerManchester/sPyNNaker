@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import math
-from typing import Iterable, List, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import (
     ApplicationFPGAVertex, FPGAConnection)
 from pacman.model.graphs.common.slice import Slice
@@ -21,10 +23,12 @@ from pacman.model.graphs.machine import MachineFPGAVertex, MachineVertex
 from pacman.model.routing_info import BaseKeyAndMask, RoutingInfo
 from pacman.utilities.constants import BITS_IN_KEY
 from pacman.utilities.utility_calls import get_n_bits
+
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import MultiCastCommand
+
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SPIF_INPUT_FPGA_LINKS,
@@ -59,27 +63,19 @@ class SPIFInputDevice(
         "__input_mask",
         "__input_shift"]
 
-    def __init__(self, pipe, n_neurons, n_neurons_per_partition,
-                 base_key=None, board_address=None, chip_coords=None):
+    def __init__(self, pipe: int, n_neurons: int, n_neurons_per_partition: int,
+                 base_key: Optional[int] = None,
+                 board_address: Optional[str] = None,
+                 chip_coords: Optional[Tuple[int, int]] = None):
         """
 
         :param int pipe: Which pipe on SPIF the retina is connected to
         :param int n_neurons: The number of neurons in the device
-        :param int height: The height of the retina in pixels
-        :param int sub_width:
-            The width of rectangles to split the retina into for efficiency of
-            sending
-        :param int sub_height:
-            The height of rectangles to split the retina into for efficiency of
-            sending
+        :param n_neurons_per_partition: The number of neurons per partition
         :param base_key:
             The key that is common over the whole vertex,
             or None to use the pipe number as the key
         :type base_key: int or None
-        :param int input_x_shift:
-            The shift to get the x coordinate from the input keys sent to SPIF
-        :param int input_y_shift:
-            The shift to get the y coordinate from the input keys sent to SPIF
         :param board_address:
             The IP address of the board to which the FPGA is connected, or None
             to use the default board or chip_coords.  Note chip_coords will be
@@ -139,12 +135,13 @@ class SPIFInputDevice(
             self.__key_mask + (sub_mask << self.__index_shift))
 
         # A dictionary to get vertex index from FPGA and slice
-        self.__index_by_slice = dict()
+        self.__index_by_slice: Dict[Tuple[int, Slice], int] = dict()
 
         self.__pipe = pipe
-        self.__base_key = base_key
-        if self.__base_key is None:
+        if base_key is None:
             self.__base_key = SPIFInputDevice.__n_devices
+        else:
+            self.__base_key = base_key
         self.__base_key = self.__base_key << self.__neuron_bits
         SPIFInputDevice.__n_devices += 1
 
@@ -153,7 +150,7 @@ class SPIFInputDevice(
         self.__input_mask = (1 << self.__neuron_bits) - 1
         self.__input_shift = 0
 
-    def __is_power_of_2(self, v):
+    def __is_power_of_2(self, v: int) -> bool:
         """ Determine if a value is a power of 2
 
         :param int v: The value to test
@@ -161,7 +158,9 @@ class SPIFInputDevice(
         """
         return (v & (v - 1) == 0) and (v != 0)
 
-    def __incoming_fpgas(self, board_address, chip_coords):
+    def __incoming_fpgas(
+            self, board_address: Optional[str],
+            chip_coords: Optional[Tuple[int, int]]) -> List[FPGAConnection]:
         """ Get the incoming FPGA connections
 
         :rtype: list(FPGAConnection)
@@ -170,7 +169,9 @@ class SPIFInputDevice(
         return [FPGAConnection(SPIF_FPGA_ID, i, board_address, chip_coords)
                 for i in SPIF_INPUT_FPGA_LINKS]
 
-    def __outgoing_fpga(self, board_address, chip_coords):
+    def __outgoing_fpga(
+            self, board_address: Optional[str],
+            chip_coords: Optional[Tuple[int, int]]) -> FPGAConnection:
         """ Get the outgoing FPGA connection (for commands)
 
         :rtype: FGPA_Connection
@@ -178,7 +179,7 @@ class SPIFInputDevice(
         return FPGAConnection(
             SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address, chip_coords)
 
-    def __fpga_index(self, fpga_link_id):
+    def __fpga_index(self, fpga_link_id: int) -> int:
         # We use every other odd link, so we can work out the "index" of the
         # link in the list as follows
         return (fpga_link_id - 1) // 2
@@ -267,7 +268,7 @@ class SPIFInputDevice(
 
         return commands
 
-    def __spif_key(self, fpga_link_id):
+    def __spif_key(self, fpga_link_id: int) -> int:
         fpga = self.__fpga_index(fpga_link_id)
         return self.__base_key + fpga
 

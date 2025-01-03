@@ -96,7 +96,7 @@ def _create_views() -> None:
         db.cursor().execute(REDUNDANCY_SUMMARY)
 
 
-def _write_report(output: TextIO):
+def _write_report(output: TextIO) -> None:
     with ProvenanceReader() as db:
         for data in db.run_query("SELECT * FROM redundancy_by_core"):
             (_, _, _, source, _, filtered, invalid, _, redundant, total,

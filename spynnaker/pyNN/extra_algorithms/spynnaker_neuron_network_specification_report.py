@@ -115,7 +115,7 @@ def _generate_vertices(
 
 def _generate_edges(
         dot_diagram: gv.Digraph, vertex_ids: Dict[ApplicationVertex, str],
-        progress: ProgressBar):
+        progress: ProgressBar) -> None:
     """
     :param ~graphviz.Digraph dot_diagram:
     :param dict(~.ApplicationVertex,str) vertex_ids:

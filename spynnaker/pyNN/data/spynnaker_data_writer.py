@@ -58,7 +58,7 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
     def set_up_timings_and_delay(
             self, simulation_time_step_us: Optional[int],
             time_scale_factor: Optional[float],
-            min_delay: Optional[Union[int, float]]):
+            min_delay: Optional[Union[int, float]]) -> None:
         """
         :param simulation_time_step_us:
             An explicitly specified time step for the simulation in
@@ -80,7 +80,7 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
             self.__spy_data._min_delay = None
             raise
 
-    def _set_min_delay(self, min_delay: Optional[Union[int, float]]):
+    def _set_min_delay(self, min_delay: Optional[Union[int, float]]) -> None:
         """
         Sets a min delay or accepts `None` to use simulation_time_step_ms.
 

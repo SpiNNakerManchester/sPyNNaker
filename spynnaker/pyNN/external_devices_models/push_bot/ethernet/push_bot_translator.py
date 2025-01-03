@@ -63,7 +63,8 @@ class PushBotTranslator(AbstractEthernetTranslator):
         self.__pushbot_wifi_connection = pushbot_wifi_connection
 
     @overrides(AbstractEthernetTranslator.translate_control_packet)
-    def translate_control_packet(self, multicast_packet: MultiCastCommand):
+    def translate_control_packet(
+            self, multicast_packet: MultiCastCommand) -> None:
         # pylint: disable=too-many-statements, too-many-branches
         key = multicast_packet.key
         # disable retina

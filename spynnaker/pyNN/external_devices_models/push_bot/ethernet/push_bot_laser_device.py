@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -35,19 +35,21 @@ class PushBotEthernetLaserDevice(
     """
 
     def __init__(
-            self, laser, protocol: MunichIoSpiNNakerLinkProtocol,
-            start_active_time=None, start_total_period=None,
-            start_frequency=None, timesteps_between_send=None):
+            self, laser: PushBotLaser, protocol: MunichIoSpiNNakerLinkProtocol,
+            start_active_time: Optional[int] = None,
+            start_total_period: Optional[int] = None,
+            start_frequency: Optional[int] = None,
+            timesteps_between_send: Optional[int] = None):
         """
         :param PushBotLaser laser: The PushBotLaser value to control
         :param MunichIoEthernetProtocol protocol:
             The protocol instance to get commands from
-        :param int start_active_time:
+        :param start_active_time:
             The "active time" value to send at the start
-        :param int start_total_period:
+        :param start_total_period:
             The "total period" value to send at the start
-        :param int start_frequency: The "frequency" to send at the start
-        :param int timesteps_between_send:
+        :param start_frequency: The "frequency" to send at the start
+        :param timesteps_between_send:
             The number of timesteps between sending commands to the device,
             or `None` to use the default
         """
@@ -66,7 +68,7 @@ class PushBotEthernetLaserDevice(
 
     @overrides(PushBotEthernetDevice.set_command_protocol)
     def set_command_protocol(
-            self, command_protocol: MunichIoSpiNNakerLinkProtocol):
+            self, command_protocol: MunichIoSpiNNakerLinkProtocol) -> None:
         self.__command_protocol = command_protocol
 
     @property

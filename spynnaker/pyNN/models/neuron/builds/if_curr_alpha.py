@@ -14,6 +14,7 @@
 
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.defaults import default_initial_values
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.models.neuron.neuron_models import (
     NeuronModelLeakyIntegrateAndFire)
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeAlpha
@@ -75,10 +76,15 @@ class IFCurrAlpha(AbstractPyNNNeuronModelStandard):
         "v", "exc_response", "exc_exp_response", "inh_response",
         "inh_exp_response"})
     def __init__(
-            self, tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0,
-            v_thresh=-50.0, tau_syn_E=0.5, tau_syn_I=0.5, tau_refrac=0.1,
-            i_offset=0.0, v=-65.0, exc_response=0.0, exc_exp_response=0.0,
-            inh_response=0.0, inh_exp_response=0.0):
+            self, tau_m: ModelParameter = 20.0, cm: ModelParameter = 1.0,
+            v_rest: ModelParameter = -65.0, v_reset: ModelParameter = -65.0,
+            v_thresh: ModelParameter = -50.0, tau_syn_E: ModelParameter = 0.5,
+            tau_syn_I: ModelParameter = 0.5, tau_refrac: ModelParameter = 0.1,
+            i_offset: ModelParameter = 0.0, v: ModelParameter = -65.0,
+            exc_response: ModelParameter = 0.0,
+            exc_exp_response: ModelParameter = 0.0,
+            inh_response: ModelParameter = 0.0,
+            inh_exp_response: ModelParameter = 0.0):
         # pylint: disable=too-many-arguments
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)

@@ -88,7 +88,7 @@ def _plan_expansion() -> Tuple[
 
 
 def _fill_in_initial_data(expanded_pop_vertices: List[
-        Tuple[AbstractNeuronExpandable, Placement]]):
+        Tuple[AbstractNeuronExpandable, Placement]]) -> None:
     """
     Once expander has run, fill in the connection data.
 

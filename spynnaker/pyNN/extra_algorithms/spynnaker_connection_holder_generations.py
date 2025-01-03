@@ -60,7 +60,7 @@ class SpYNNakerConnectionHolderGenerator(object):
     def _generate_holder_for_edge(
             edge: ProjectionApplicationEdge, data_holders: Dict[
                 Tuple[ProjectionApplicationEdge, SynapseInformation],
-                ConnectionHolder]):
+                ConnectionHolder]) -> None:
         """
         :param ProjectionApplicationEdge edge:
         :param dict data_holders:
