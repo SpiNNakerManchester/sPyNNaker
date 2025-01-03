@@ -12,13 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Sequence
+from typing import Optional, Sequence
+
 from spinn_utilities.overrides import overrides
+
 from spinnman.model.enums import ExecutableType
+
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.placements import Placement
 from pacman.model.resources import ConstantSDRAM
+
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary)
 from spinn_front_end_common.abstract_models import (
@@ -29,6 +34,7 @@ from spinn_front_end_common.interface.provenance import (
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
+
 from spynnaker.pyNN.data import SpynnakerDataView
 
 
@@ -68,9 +74,10 @@ class MachineMunichMotorDevice(
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
 
     def __init__(
-            self, speed, sample_time, update_time, delay_time,
-            delta_threshold, continue_if_not_different,
-            label=None, app_vertex=None):
+            self, speed: int, sample_time: int, update_time: int,
+            delay_time: int, delta_threshold: int,
+            continue_if_not_different: bool, label: Optional[str] = None,
+            app_vertex: Optional[ApplicationVertex] = None):
         """
         :param int speed:
         :param int sample_time:
@@ -78,7 +85,7 @@ class MachineMunichMotorDevice(
         :param int delay_time:
         :param int delta_threshold:
         :param bool continue_if_not_different:
-        :param str label:
+        :param label:
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
         """
         super().__init__(
@@ -120,7 +127,7 @@ class MachineMunichMotorDevice(
         ProvidesProvenanceDataFromMachineImpl.parse_extra_provenance_items)
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         n_buffer_overflows, = provenance_data
 
         with ProvenanceWriter() as db:
@@ -169,7 +176,7 @@ class MachineMunichMotorDevice(
         # End-of-Spec:
         spec.end_specification()
 
-    def reserve_memory_regions(self, spec):
+    def reserve_memory_regions(self, spec: DataSpecificationGenerator) -> None:
         """
         Reserve SDRAM space for memory areas:
 
