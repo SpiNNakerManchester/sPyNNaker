@@ -12,10 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+
 from pyNN.random import NumpyRNG
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
+
 from spinn_front_end_common.interface.ds import DataType
+
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.random_distribution import RandomDistribution
@@ -36,7 +41,7 @@ class ThresholdTypeFixedProb(AbstractThresholdType):
     __slots__ = ("__v_thresh", "__p_thresh", "__random")
 
     def __init__(self, v_thresh: ModelParameter, p_thresh: ModelParameter,
-                 seed: int):
+                 seed: Optional[int]):
 
         """
         :param v_thresh: :math:`V_{thresh}`
