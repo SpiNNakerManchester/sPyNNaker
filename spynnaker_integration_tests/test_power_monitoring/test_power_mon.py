@@ -25,7 +25,7 @@ from spinnaker_testbase import BaseTestCase
 
 n_neurons = 200  # number of neurons in each population
 neurons_per_core = n_neurons / 2
-run_times = [5000]
+run_times = [10, 20, 30]
 # parameters for population 1 first run
 input_class = p.SpikeSourcePoisson
 start_time = 0
@@ -52,19 +52,21 @@ class TestPowerMonitoring(BaseTestCase):
         hist = numpy.histogram(spikes[:, 1], bins=[0, 5000, 10000])
         self.assertIsNotNone(hist, "must have a histogram")
         # Did we build the report file like we asked for in config file?
-        self.assertIn(EnergyReport._SUMMARY_FILENAME,
+        self.assertIn(EnergyReport.file_name(1),
+                      os.listdir(SpynnakerDataView.get_run_dir_path()))
+        self.assertIn(EnergyReport.file_name(2),
+                      os.listdir(SpynnakerDataView.get_run_dir_path()))
+        self.assertIn(EnergyReport.file_name(3),
                       os.listdir(SpynnakerDataView.get_run_dir_path()))
         # Did we output power provenance data, as requested?
-        num_chips = None
-        for row in self.query_provenance(
-                "SELECT the_value "
-                "FROM power_provenance "
-                "WHERE description = 'Num_chips' LIMIT 1"):
-            num_chips = row["the_value"]
-        self.assertIsNotNone(num_chips, "power provenance was not written")
+        exec_times = set()
+        with ProvenanceReader() as reader:
+            for row in reader.execute(
+                    "SELECT the_value "
+                    "FROM power_provenance "
+                    "WHERE description = 'Exec time (seconds)'"):
+                exec_times.add(row[0])
+        self.assertEqual(exec_times, set([0.01, 0.03, 0.06]))
 
-    @unittest.skip(
-        "https://github.com/SpiNNakerManchester/"
-        "SpiNNFrontEndCommon/issues/866")
     def test_power_monitoring(self):
         self.runsafe(self.do_run)
