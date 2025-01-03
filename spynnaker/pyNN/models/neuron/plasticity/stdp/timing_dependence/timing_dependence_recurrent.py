@@ -162,7 +162,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
             self, spec: DataSpecificationBase, global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         # Write parameters
         spec.write_value(data=self.__accumulator_depression_plus_one,
                          data_type=DataType.INT32)

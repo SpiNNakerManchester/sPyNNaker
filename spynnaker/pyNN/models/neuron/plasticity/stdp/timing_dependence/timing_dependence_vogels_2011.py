@@ -150,7 +150,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
             self, spec: DataSpecificationBase, global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         # Write alpha to spec
         fixed_point_alpha = float_to_fixed(self.__alpha)
         spec.write_value(data=fixed_point_alpha, data_type=DataType.INT32)

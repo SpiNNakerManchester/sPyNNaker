@@ -88,7 +88,7 @@ class AbstractTimingDependence(
     @abstractmethod
     def write_parameters(
             self, spec: DataSpecificationBase, global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         """
         Write the parameters of the rule to the spec.
 
