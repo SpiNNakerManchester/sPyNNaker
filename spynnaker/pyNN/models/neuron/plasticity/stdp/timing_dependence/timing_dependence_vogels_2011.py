@@ -65,7 +65,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
             SpynnakerDataView.get_simulation_time_step_ms(), self.__tau)
 
     @property
-    def alpha(self):
+    def alpha(self) -> float:
         r"""
         :math:`\alpha`
 
@@ -74,7 +74,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return self.__alpha
 
     @property
-    def tau(self):
+    def tau(self) -> float:
         r"""
         :math:`\tau`
 
@@ -83,7 +83,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return self.__tau
 
     @property
-    def A_plus(self):
+    def A_plus(self) -> float:
         r"""
         :math:`A^+`
 
@@ -92,11 +92,11 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return self.__a_plus
 
     @A_plus.setter
-    def A_plus(self, new_value):
+    def A_plus(self, new_value: float) -> None:
         self.__a_plus = new_value
 
     @property
-    def A_minus(self):
+    def A_minus(self) -> float:
         r"""
         :math:`A^-`
 
@@ -105,7 +105,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return self.__a_minus
 
     @A_minus.setter
-    def A_minus(self, new_value):
+    def A_minus(self, new_value: float) -> None:
         self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -116,7 +116,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
                 self.__alpha == timing_dependence.alpha)
 
     @property
-    def vertex_executable_suffix(self):
+    def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
 
@@ -125,7 +125,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return "vogels_2011"
 
     @property
-    def pre_trace_n_bytes(self):
+    def pre_trace_n_bytes(self) -> int:
         """
         The number of bytes used by the pre-trace of the rule per neuron.
 
@@ -139,7 +139,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return BYTES_PER_WORD + BYTES_PER_WORD * len(self.__tau_data)
 
     @property
-    def n_weight_terms(self):
+    def n_weight_terms(self) -> int:
         """
         The number of weight terms expected by this timing rule.
 
