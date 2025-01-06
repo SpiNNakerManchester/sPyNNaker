@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import cast, Iterable
+from typing import Iterable
 
 import numpy
 from numpy import floating
@@ -89,7 +89,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         return self.__a_plus
 
     @A_plus.setter
-    def A_plus(self, new_value: float):
+    def A_plus(self, new_value: float) -> None:
         self.__a_plus = new_value
 
     @property
@@ -102,7 +102,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         return self.__a_minus
 
     @A_minus.setter
-    def A_minus(self, new_value: float):
+    def A_minus(self, new_value: float) -> None:
         self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -180,7 +180,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         self._write_exp_dist_lut(spec, mean_post_timesteps)
 
     @staticmethod
-    def _write_exp_dist_lut(spec: DataSpecificationBase, mean: float):
+    def _write_exp_dist_lut(spec: DataSpecificationBase, mean: float) -> None:
         """
         :param .DataSpecificationGenerator spec:
         :param float mean:

@@ -112,7 +112,7 @@ class AbstractTimingDependence(
 
     @property
     @abstractmethod
-    def A_plus(self):
+    def A_plus(self) -> float:
         r"""
         :math:`A^+`
 
@@ -123,7 +123,7 @@ class AbstractTimingDependence(
 
     @property
     @abstractmethod
-    def A_minus(self):
+    def A_minus(self) -> float:
         r"""
         :math:`A^-`
 

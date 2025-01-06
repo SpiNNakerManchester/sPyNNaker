@@ -66,7 +66,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         self.__tau_minus_data = get_exp_lut_array(ts, self.__tau_minus)
 
     @property
-    def tau_plus(self):
+    def tau_plus(self) -> float:
         r"""
         :math:`\tau_+`
 
@@ -75,7 +75,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         return self.__tau_plus
 
     @property
-    def tau_minus(self):
+    def tau_minus(self) -> float:
         r"""
         :math:`\tau_-`
 
@@ -84,7 +84,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         return self.__tau_minus
 
     @property
-    def A_plus(self):
+    def A_plus(self) -> float:
         r"""
         :math:`A^+`
 
@@ -93,11 +93,11 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         return self.__a_plus
 
     @A_plus.setter
-    def A_plus(self, new_value):
+    def A_plus(self, new_value: float) -> None:
         self.__a_plus = new_value
 
     @property
-    def A_minus(self):
+    def A_minus(self) -> float:
         r"""
         :math:`A^-`
 
@@ -106,7 +106,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         return self.__a_minus
 
     @A_minus.setter
-    def A_minus(self, new_value):
+    def A_minus(self, new_value: float) -> None:
         self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -118,7 +118,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
                 self.__tau_minus == timing_dependence.tau_minus)
 
     @property
-    def vertex_executable_suffix(self):
+    def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
 
@@ -127,7 +127,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         return "pair"
 
     @property
-    def pre_trace_n_bytes(self):
+    def pre_trace_n_bytes(self) -> int:
         """
         The number of bytes used by the pre-trace of the rule per neuron.
 
@@ -143,7 +143,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
                                  len(self.__tau_minus_data))
 
     @property
-    def n_weight_terms(self):
+    def n_weight_terms(self) -> int:
         """
         The number of weight terms expected by this timing rule.
 
