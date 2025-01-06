@@ -180,7 +180,7 @@ class PopulationNeuronsMachineVertex(
         return self.__key is not None
 
     @overrides(PopulationMachineNeurons._set_key)
-    def _set_key(self, key: int):
+    def _set_key(self, key: int) -> None:
         self.__key = key
 
     @property
@@ -199,7 +199,8 @@ class PopulationNeuronsMachineVertex(
         return self.__max_atoms_per_core
 
     def set_sdram_partition(
-            self, sdram_partition: SourceSegmentedSDRAMMachinePartition):
+            self,
+            sdram_partition: SourceSegmentedSDRAMMachinePartition) -> None:
         """
         Set the SDRAM partition.  Must only be called once per instance.
 
@@ -232,7 +233,7 @@ class PopulationNeuronsMachineVertex(
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         self._parse_neuron_provenance(
             x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
 

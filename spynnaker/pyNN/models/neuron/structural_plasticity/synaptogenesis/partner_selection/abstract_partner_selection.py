@@ -46,7 +46,7 @@ class AbstractPartnerSelection(
         raise NotImplementedError
 
     @abstractmethod
-    def write_parameters(self, spec: DataSpecificationBase):
+    def write_parameters(self, spec: DataSpecificationBase) -> None:
         """
         Write the parameters of the rule to the spec.
 

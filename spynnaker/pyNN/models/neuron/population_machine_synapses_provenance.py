@@ -69,7 +69,7 @@ class PopulationMachineSynapsesProvenance(object):
 
     def _parse_synapse_provenance(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         """
         Extract and yield synapse provenance.
 

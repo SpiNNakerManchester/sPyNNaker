@@ -77,7 +77,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
                 partition_id)]
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, chip_counter: ChipCounter):
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         source_app_vertex = self.governed_app_vertex.source_vertex
         slices = source_app_vertex.splitter.get_out_going_slices()
 
@@ -99,7 +99,8 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
         return other_splitter.get_out_going_slices()
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
-    def set_governed_app_vertex(self, app_vertex: DelayExtensionVertex):
+    def set_governed_app_vertex(
+            self, app_vertex: DelayExtensionVertex) -> None:
         super().set_governed_app_vertex(app_vertex)
         if not isinstance(app_vertex, DelayExtensionVertex):
             raise PacmanConfigurationException(
@@ -109,7 +110,8 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
                 "correct splitter for your vertex and try again.")
 
     def create_machine_vertex(
-            self, source_app_vertex: ApplicationVertex, vertex_slice: Slice):
+            self, source_app_vertex: ApplicationVertex,
+            vertex_slice: Slice) -> DelayExtensionMachineVertex:
         """
         Creates a delay extension machine vertex and adds to the tracker.
 

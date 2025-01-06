@@ -135,8 +135,8 @@ class PopulationSynapsesMachineVertexLead(
     @overrides(PopulationSynapsesMachineVertexCommon._parse_synapse_provenance)
     def _parse_synapse_provenance(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
-        return PopulationMachineSynapses._parse_synapse_provenance(
+            provenance_data: Sequence[int]) -> None:
+        PopulationMachineSynapses._parse_synapse_provenance(
             self, label, x, y, p, provenance_data)
 
     @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)

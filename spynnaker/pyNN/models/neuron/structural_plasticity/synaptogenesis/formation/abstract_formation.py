@@ -45,7 +45,7 @@ class AbstractFormation(AbstractHasParameterNames, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def write_parameters(self, spec: DataSpecificationGenerator):
+    def write_parameters(self, spec: DataSpecificationGenerator) -> None:
         """
         Write the parameters of the rule to the spec.
 

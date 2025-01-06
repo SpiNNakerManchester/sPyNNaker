@@ -110,7 +110,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             "This Population does not support the reading of parameters")
 
     def set_parameter_values(
-            self, name: str, value: Values, selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None) -> None:
         """
         Set the values of a parameter for the whole Population or a subset
         if the selector is used.
@@ -153,7 +153,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             " variables")
 
     def set_initial_state_values(
-            self, name: str, value: Values, selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None) -> None:
         """
         Set the initial values of a state variable for the whole Population
         or a subset if the selector is used.
@@ -189,7 +189,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             " variables")
 
     def set_current_state_values(
-            self, name: str, value: Values, selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None) -> None:
         """
         Set the current values of a state variable for the whole Population
         or a subset if the selector is used.

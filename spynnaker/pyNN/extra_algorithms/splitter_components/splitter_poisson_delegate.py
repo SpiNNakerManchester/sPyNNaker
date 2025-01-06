@@ -52,7 +52,8 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
         return post_vertex.splitter.handles_source_vertex(proj)
 
     @overrides(SplitterFixedLegacy.set_governed_app_vertex)
-    def set_governed_app_vertex(self, app_vertex: SpikeSourcePoissonVertex):
+    def set_governed_app_vertex(
+            self, app_vertex: SpikeSourcePoissonVertex) -> None:
         if not isinstance(app_vertex, SpikeSourcePoissonVertex):
             raise PacmanConfigurationException(
                 f"The vertex {app_vertex} cannot be supported by the "
@@ -62,7 +63,7 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
         super().set_governed_app_vertex(app_vertex)
 
     @overrides(SplitterFixedLegacy.create_machine_vertices)
-    def create_machine_vertices(self, chip_counter: ChipCounter):
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         # If sending over SDRAM, let the target handle this
         if self.send_over_sdram:
             return

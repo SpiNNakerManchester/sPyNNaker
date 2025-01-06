@@ -386,7 +386,7 @@ class SynapticMatrixApp(object):
             self.__app_edge, self.__synapse_info, self.__max_row_info,
             max_pre_atoms_per_core, self.__max_atoms_per_core)
 
-    def read_generated_connection_holders(self, placement: Placement):
+    def read_generated_connection_holders(self, placement: Placement) -> None:
         """
         Read any pre-run connection holders after data has been generated.
 

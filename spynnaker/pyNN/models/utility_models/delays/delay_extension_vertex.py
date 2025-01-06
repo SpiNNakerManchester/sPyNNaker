@@ -120,7 +120,7 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
         return self.__n_delay_stages
 
     def set_new_n_delay_stages_and_delay_per_stage(
-            self, n_delay_stages: int, delay_per_stage: int):
+            self, n_delay_stages: int, delay_per_stage: int) -> None:
         """
         Sets the delays per stages. Verifies delay per stage is unchanged.
 
@@ -153,7 +153,7 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
         """
         return self.__partition.pre_vertex
 
-    def delay_params_size(self):
+    def delay_params_size(self) -> int:
         """
         The size of the delay parameters.
         """
@@ -166,7 +166,7 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
         """
         return self.__partition
 
-    def add_outgoing_edge(self, edge: DelayedApplicationEdge):
+    def add_outgoing_edge(self, edge: DelayedApplicationEdge) -> None:
         """
         Add an outgoing edge to the delay extension.
 

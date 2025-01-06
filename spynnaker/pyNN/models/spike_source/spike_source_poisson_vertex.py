@@ -396,7 +396,7 @@ class SpikeSourcePoissonVertex(
 
     @overrides(PopulationApplicationVertex.set_parameter_values)
     def set_parameter_values(
-            self, name: str, value: Values, selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None) -> None:
         self._check_parameters(name, self.__allowed_parameters)
         if self.__is_variable_rate:
             raise KeyError(f"Cannot set the {name} of a variable rate Poisson")

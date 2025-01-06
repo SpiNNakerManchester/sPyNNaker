@@ -35,7 +35,7 @@ class RandomSelection(AbstractPartnerSelection):
         return 0
 
     @overrides(AbstractPartnerSelection.write_parameters)
-    def write_parameters(self, spec: DataSpecificationBase):
+    def write_parameters(self, spec: DataSpecificationBase) -> None:
         pass
 
     @overrides(AbstractPartnerSelection.get_parameter_names)

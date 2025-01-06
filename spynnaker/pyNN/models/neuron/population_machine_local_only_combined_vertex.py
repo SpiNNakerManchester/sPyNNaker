@@ -206,7 +206,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
         return self.__key is not None
 
     @overrides(PopulationMachineNeurons._set_key)
-    def _set_key(self, key: int):
+    def _set_key(self, key: int) -> None:
         self.__key = key
 
     @property
@@ -248,7 +248,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         proc_offset = NeuronProvenance.N_ITEMS
         end_proc_offset = proc_offset + LocalOnlyProvenance.N_ITEMS
         self._parse_neuron_provenance(
@@ -306,7 +306,8 @@ class PopulationMachineLocalOnlyCombinedVertex(
         # End the writing of this specification:
         spec.end_specification()
 
-    def __write_local_only_data(self, spec: DataSpecificationGenerator):
+    def __write_local_only_data(
+            self, spec: DataSpecificationGenerator) -> None:
         spec.reserve_memory_region(
             self.REGIONS.LOCAL_ONLY, self.LOCAL_ONLY_SIZE, "local_only")
         spec.switch_write_focus(self.REGIONS.LOCAL_ONLY)
@@ -340,7 +341,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     def _parse_local_only_provenance(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         """
         Extract and yield local-only provenance.
 

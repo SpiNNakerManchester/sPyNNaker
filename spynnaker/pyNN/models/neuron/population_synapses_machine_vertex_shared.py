@@ -80,6 +80,6 @@ class PopulationSynapsesMachineVertexShared(
     @overrides(PopulationSynapsesMachineVertexCommon._parse_synapse_provenance)
     def _parse_synapse_provenance(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
-        return PopulationMachineSynapsesProvenance._parse_synapse_provenance(
+            provenance_data: Sequence[int]) -> None:
+        PopulationMachineSynapsesProvenance._parse_synapse_provenance(
             self, label, x, y, p, provenance_data)

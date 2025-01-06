@@ -45,8 +45,8 @@ class AbstractElimination(AbstractHasParameterNames, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def write_parameters(
-            self, spec: DataSpecificationGenerator, weight_scale: float):
+    def write_parameters(self, spec: DataSpecificationGenerator,
+                         weight_scale: float) -> None:
         """
         Write the parameters of the rule to the spec.
 

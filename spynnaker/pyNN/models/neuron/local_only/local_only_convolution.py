@@ -137,7 +137,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def write_parameters(
             self, spec: DataSpecificationGenerator, region: int,
             machine_vertex: PopulationMachineLocalOnlyCombinedVertex,
-            weight_scales: NDArray[floating]):
+            weight_scales: NDArray[floating]) -> None:
         # pylint: disable=unexpected-keyword-arg, protected-access
 
         # Get incoming sources for this vertex

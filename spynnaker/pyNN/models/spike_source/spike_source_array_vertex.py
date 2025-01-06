@@ -279,7 +279,7 @@ class SpikeSourceArrayVertex(
 
     @overrides(PopulationApplicationVertex.set_parameter_values)
     def set_parameter_values(
-            self, name: str, value: Spikes, selector: Selector = None):
+            self, name: str, value: Spikes, selector: Selector = None) -> None:
         self._check_parameters(name, {"spike_times"})
         self.__set_spike_buffer_times(value)
         self._spike_times.set_value_by_selector(

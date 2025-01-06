@@ -178,7 +178,8 @@ class PopulationSynapsesMachineVertexCommon(
         self.__partition_id: Optional[str] = None
 
     def set_sdram_partition(
-            self, sdram_partition: SourceSegmentedSDRAMMachinePartition):
+            self,
+            sdram_partition: SourceSegmentedSDRAMMachinePartition) -> None:
         """
         Set the SDRAM partition.  Must only be called once per instance.
 
@@ -194,7 +195,7 @@ class PopulationSynapsesMachineVertexCommon(
 
     def set_neuron_vertex_and_partition_id(
             self, neuron_vertex: PopulationNeuronsMachineVertex,
-            partition_id: str):
+            partition_id: str) -> None:
         """
         Set the neuron vertex and partition ID for the case with a
         self-connection.
@@ -225,7 +226,7 @@ class PopulationSynapsesMachineVertexCommon(
         assert ids is not None
         return ids
 
-    def _write_sdram_edge_spec(self, spec: DataSpecificationGenerator):
+    def _write_sdram_edge_spec(self, spec: DataSpecificationGenerator) -> None:
         """
         Write information about SDRAM Edge.
 
@@ -246,7 +247,7 @@ class PopulationSynapsesMachineVertexCommon(
         spec.write_value(get_config_int(
             "Simulation", "transfer_overhead_clocks"))
 
-    def _write_key_spec(self, spec: DataSpecificationGenerator):
+    def _write_key_spec(self, spec: DataSpecificationGenerator) -> None:
         """
         Write key configuration region.
 
@@ -287,7 +288,7 @@ class PopulationSynapsesMachineVertexCommon(
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         proc_offset = SynapseProvenance.N_ITEMS
         self._parse_synapse_provenance(
             label, x, y, p, provenance_data[:proc_offset])
@@ -297,7 +298,7 @@ class PopulationSynapsesMachineVertexCommon(
     @abstractmethod
     def _parse_synapse_provenance(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         """
         Extract and yield synapse provenance.
 
@@ -311,7 +312,7 @@ class PopulationSynapsesMachineVertexCommon(
 
     def _parse_spike_processing_fast_provenance(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         """
         Extract and yield spike processing provenance.
 

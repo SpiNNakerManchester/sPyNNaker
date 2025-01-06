@@ -130,7 +130,7 @@ class DistanceDependentFormation(AbstractFormation):
         return filtered_probabilities
 
     def distance(
-            self, x0: ArrayLike, x1: ArrayLike, metric) -> NDArray[floating]:
+            self, x0: ArrayLike, x1: ArrayLike, metric: str) -> NDArray[floating]:
         """
         Compute the distance between points x0 and x1 place on the grid
         using periodic boundary conditions.
@@ -160,7 +160,7 @@ class DistanceDependentFormation(AbstractFormation):
         return numpy.sqrt((delta ** 2).sum(axis=-1))
 
     @overrides(AbstractFormation.write_parameters)
-    def write_parameters(self, spec: DataSpecificationBase):
+    def write_parameters(self, spec: DataSpecificationBase) -> None:
         spec.write_array(self.__grid)
         # Work out the reciprocal, but zero them if >= 1 as they are not
         # representable as S031 in that case, and not used anyway

@@ -158,7 +158,8 @@ class ProjectionApplicationEdge(
         # post_vertex - this might be None if no long delays are present
         self.__delay_edge: Optional[DelayedApplicationEdge] = None
 
-    def add_synapse_information(self, synapse_information: SynapseInformation):
+    def add_synapse_information(
+            self, synapse_information: SynapseInformation) -> None:
         """
         :param SynapseInformation synapse_information:
         """
@@ -188,7 +189,7 @@ class ProjectionApplicationEdge(
         return self.__delay_edge
 
     @delay_edge.setter
-    def delay_edge(self, delay_edge: DelayedApplicationEdge):
+    def delay_edge(self, delay_edge: DelayedApplicationEdge) -> None:
         self.__delay_edge = delay_edge
 
     @property

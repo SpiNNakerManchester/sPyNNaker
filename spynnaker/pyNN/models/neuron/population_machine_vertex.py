@@ -231,7 +231,7 @@ class PopulationMachineVertex(
         return self.__key is not None
 
     @overrides(PopulationMachineNeurons._set_key)
-    def _set_key(self, key: int):
+    def _set_key(self, key: int) -> None:
         self.__key = key
 
     @property
@@ -278,7 +278,7 @@ class PopulationMachineVertex(
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         syn_offset = NeuronProvenance.N_ITEMS
         proc_offset = syn_offset + SynapseProvenance.N_ITEMS
         end_proc_offset = proc_offset + SpikeProcessingProvenance.N_ITEMS
@@ -366,7 +366,7 @@ class PopulationMachineVertex(
 
     def _parse_spike_processing_provenance(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         """
         Extract and yield spike processing provenance.
 

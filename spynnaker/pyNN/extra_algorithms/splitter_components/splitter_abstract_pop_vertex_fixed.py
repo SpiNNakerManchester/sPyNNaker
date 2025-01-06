@@ -69,7 +69,7 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
         self.__expect_delay_extension: Optional[bool] = None
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, chip_counter: ChipCounter):
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         app_vertex = self.governed_app_vertex
         app_vertex.synapse_recorder.add_region_offset(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
