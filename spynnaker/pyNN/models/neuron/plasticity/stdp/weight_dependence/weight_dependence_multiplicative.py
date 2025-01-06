@@ -97,7 +97,8 @@ class WeightDependenceMultiplicative(
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
             self, spec: DataSpecificationBase, global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating], n_weight_terms: int):
+            synapse_weight_scales: NDArray[floating],
+            n_weight_terms: int) -> None:
         if n_weight_terms != 1:
             raise NotImplementedError(
                 "Multiplicative weight dependence only supports single terms")
