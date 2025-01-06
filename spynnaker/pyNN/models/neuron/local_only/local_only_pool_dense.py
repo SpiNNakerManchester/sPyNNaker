@@ -73,7 +73,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             The delay used in the connection; by default 1 time step
         """
         # Store the sources to avoid recalculation
-        self.__cached_sources: Dict[ApplicationVertex, Dict[
+        self.__cached_sources: Dict[AbstractPopulationVertex, Dict[
                 Tuple[ApplicationVertex, str], List[Source]]] = dict()
 
         super().__init__(delay)
@@ -139,7 +139,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def write_parameters(
             self, spec: DataSpecificationGenerator, region: int,
             machine_vertex: PopulationMachineLocalOnlyCombinedVertex,
-            weight_scales: NDArray[floating]):
+            weight_scales: NDArray[floating]) -> None:
         # Get incoming sources for this vertex
         app_vertex = cast('AbstractPopulationVertex',
                           machine_vertex.app_vertex)

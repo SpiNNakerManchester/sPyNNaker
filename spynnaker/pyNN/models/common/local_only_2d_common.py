@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from math import ceil, log2, floor
+from typing import Final, Tuple, Union
 from collections import namedtuple, defaultdict
-from pacman.model.graphs.application import ApplicationVirtualVertex
+from pacman.model.graphs.application import (
+    ApplicationVertex, ApplicationVirtualVertex)
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.common.mdslice import MDSlice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 #: The number of bits in a short value
@@ -30,7 +33,7 @@ BITS_PER_BYTE = 8
 N_COLOUR_BITS_BITS = 3
 
 #: Key info size in bytes
-KEY_INFO_SIZE = 4 * BYTES_PER_WORD
+KEY_INFO_SIZE: Final[int] = 4 * BYTES_PER_WORD
 
 #: A source
 Source = namedtuple(
@@ -104,7 +107,7 @@ def get_rinfo_for_spike_source(pre_vertex, partition_id):
     return r_info, core_mask, mask_shift
 
 
-def get_sources_for_target(app_vertex):
+def get_sources_for_target(app_vertex: AbstractPopulationVertex):
     """
     Get all the application vertex sources that will hit the given application
     vertex.
@@ -123,7 +126,9 @@ def get_sources_for_target(app_vertex):
     return sources
 
 
-def get_first_and_last_slice(pre_vertex):
+def get_first_and_last_slice(
+        pre_vertex: ApplicationVertex) -> Union[
+            Tuple[Slice, Slice], Tuple[MDSlice, MDSlice]]:
     """
     Get the first and last slice of an application vertex.
 
