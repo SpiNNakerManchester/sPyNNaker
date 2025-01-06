@@ -14,6 +14,7 @@
 
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import defaults, default_initial_values
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 
 
 # pylint: disable=wrong-spelling-in-docstring
@@ -29,11 +30,17 @@ class EIFConductanceAlphaPopulation(object):
 
     # noinspection PyPep8Naming
     @default_initial_values({"v", "w", "gsyn_exc", "gsyn_inh"})
-    def __init__(self, tau_m=9.3667, cm=0.281, v_rest=-70.6,
-                 v_reset=-70.6, v_thresh=-50.4, tau_syn_E=5.0, tau_syn_I=0.5,
-                 tau_refrac=0.1, i_offset=0.0, a=4.0, b=0.0805, v_spike=-40.0,
-                 tau_w=144.0, e_rev_E=0.0, e_rev_I=-80.0, delta_T=2.0,
-                 v=-70.6, w=0.0, gsyn_exc=0.0, gsyn_inh=0.0):
+    def __init__(
+            self, tau_m: ModelParameter = 9.3667, cm: ModelParameter = 0.281,
+            v_rest: ModelParameter = -70.6, v_reset: ModelParameter = -70.6,
+            v_thresh: ModelParameter = -50.4, tau_syn_E: ModelParameter = 5.0,
+            tau_syn_I: ModelParameter = 0.5, tau_refrac: ModelParameter= 0.1,
+            i_offset: ModelParameter = 0.0, a: ModelParameter = 4.0,
+            b: ModelParameter = 0.0805, v_spike: ModelParameter = -40.0,
+            tau_w: ModelParameter = 144.0, e_rev_E: ModelParameter = 0.0,
+            e_rev_I: ModelParameter = -80.0, delta_T: ModelParameter = 2.0,
+            v: ModelParameter = -70.6, w: ModelParameter = 0.0,
+            gsyn_exc: ModelParameter = 0.0, gsyn_inh: ModelParameter = 0.0):
         # pylint: disable=too-many-arguments, unused-argument, invalid-name
         raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")

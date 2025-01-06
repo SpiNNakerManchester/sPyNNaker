@@ -52,7 +52,7 @@ class NeuronImplStocExpStable(AbstractNeuronImpl):
     def __init__(self, v_init: ModelParameter, v_reset: ModelParameter,
                  tau: ModelParameter, tau_refrac: ModelParameter,
                  bias: ModelParameter, refract_init: ModelParameter,
-                 seed: int):
+                 seed: Optional[int]):
 
         self._v_init = v_init
         self._v_reset = v_reset

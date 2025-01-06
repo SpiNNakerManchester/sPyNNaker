@@ -47,7 +47,7 @@ class NeuronImplStocExp(AbstractNeuronImpl):
     """
 
     def __init__(self, tau: ModelParameter, bias: ModelParameter,
-                 refract_init: ModelParameter, seed: int):
+                 refract_init: ModelParameter, seed: Optional[int]):
 
         self._tau = tau
         self._bias = bias
