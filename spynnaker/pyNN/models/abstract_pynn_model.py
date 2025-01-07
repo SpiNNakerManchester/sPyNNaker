@@ -15,14 +15,14 @@ from __future__ import annotations
 from collections import defaultdict
 import sys
 from typing import (
-    Any, Callable, Dict, FrozenSet, Optional, Sequence, Tuple, cast,
+    Any, Callable, cast, Dict, FrozenSet, Optional, Mapping, Sequence, Tuple,
     TYPE_CHECKING)
 import numpy
 from pyNN import descriptions
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod)
-from spynnaker.pyNN.models.defaults import get_dict_from_init
+from spynnaker.pyNN.models.defaults import get_map_from_init
 from spynnaker.pyNN.exceptions import SpynnakerException
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.population_application_vertex import (
@@ -105,18 +105,18 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
 
     @classproperty
     def default_parameters(  # pylint: disable=no-self-argument
-            cls) -> Dict[str, Any]:
+            cls) -> Mapping[str, Any]:
         """
         Get the default values for the parameters of the model.
 
         :rtype: dict(str, Any)
         """
         init, params, svars = cls.__get_init_params_and_svars(cast(type, cls))
-        return get_dict_from_init(init, skip=svars, include=params)
+        return get_map_from_init(init, skip=svars, include=params)
 
     @classproperty
     def default_initial_values(  # pylint: disable=no-self-argument
-            cls) -> Dict[str, Any]:
+            cls) -> Mapping[str, Any]:
         """
         Get the default initial values for the state variables of the model.
 
@@ -125,7 +125,7 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         init, params, svars = cls.__get_init_params_and_svars(cast(type, cls))
         if params is None and svars is None:
             return {}
-        return get_dict_from_init(init, skip=params, include=svars)
+        return get_map_from_init(init, skip=params, include=svars)
 
     @classmethod
     def get_parameter_names(cls) -> Sequence[str]:

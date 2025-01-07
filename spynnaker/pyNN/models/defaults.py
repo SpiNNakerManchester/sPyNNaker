@@ -18,7 +18,8 @@ Decorators to support default argument handling.
 
 import inspect
 import logging
-from typing import Any, Callable, Dict, FrozenSet, Iterable, List, Optional
+from types import MappingProxyType
+from typing import Any, Callable, FrozenSet, Iterable, List, Mapping, Optional
 from spinn_utilities.log import FormatAdapter
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -34,10 +35,10 @@ def _check_args(
                 f"no default value provided in {init_method}")
 
 
-def get_dict_from_init(
+def get_map_from_init(
         init_method: Callable,
         skip: Optional[FrozenSet[str]] = None,
-        include: Optional[FrozenSet[str]] = None) -> Dict[str, Any]:
+        include: Optional[FrozenSet[str]] = None) -> Mapping[str, Any]:
     """
     Get an argument initialisation dictionary by examining an
     ``__init__`` method or function.
@@ -46,7 +47,6 @@ def get_dict_from_init(
     :param frozenset(str) skip: The arguments to be skipped, if any
     :param frozenset(str) include: The arguments that must be present, if any
     :return: an initialisation dictionary
-    :rtype: dict(str, Any)
     """
     init_args = inspect.getfullargspec(init_method)
     n_defaults = 0 if init_args.defaults is None else len(init_args.defaults)
@@ -61,11 +61,12 @@ def get_dict_from_init(
     if skip is not None:
         _check_args(skip, default_args, init_method)
 
-    return {arg: value
-            for arg, value in zip(default_args, default_values)
-            if ((arg != "self") and
-                (skip is None or arg not in skip) and
-                (include is None or arg in include))}
+    as_dict = {arg: value
+               for arg, value in zip(default_args, default_values)
+               if ((arg != "self") and
+                   (skip is None or arg not in skip) and
+                   (include is None or arg in include))}
+    return MappingProxyType(as_dict)
 
 
 def default_parameters(parameters: Iterable[str]) -> Callable:
@@ -169,15 +170,15 @@ def defaults(cls: type) -> type:
     if hasattr(init, "_state_variables"):
         svars = getattr(init, "_state_variables")
     if params is None and svars is None:
-        cls.default_parameters = get_dict_from_init(init)
+        cls.default_parameters = get_map_from_init(init)
         cls.default_initial_values = {}
     elif params is None:
-        cls.default_parameters = get_dict_from_init(init, skip=svars)
-        cls.default_initial_values = get_dict_from_init(init, include=svars)
+        cls.default_parameters = get_map_from_init(init, skip=svars)
+        cls.default_initial_values = get_map_from_init(init, include=svars)
     elif svars is None:
-        cls.default_parameters = get_dict_from_init(init, include=params)
-        cls.default_initial_values = get_dict_from_init(init, skip=params)
+        cls.default_parameters = get_map_from_init(init, include=params)
+        cls.default_initial_values = get_map_from_init(init, skip=params)
     else:
-        cls.default_parameters = get_dict_from_init(init, include=params)
-        cls.default_initial_values = get_dict_from_init(init, include=svars)
+        cls.default_parameters = get_map_from_init(init, include=params)
+        cls.default_initial_values = get_map_from_init(init, include=svars)
     return cls
