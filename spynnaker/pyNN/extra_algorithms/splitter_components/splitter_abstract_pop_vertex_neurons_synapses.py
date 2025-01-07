@@ -14,7 +14,7 @@
 from collections import defaultdict
 import logging
 import math
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, cast
+from typing import Dict, List, Optional, Sequence, Set, Tuple, cast
 
 from numpy import floating
 from numpy.typing import NDArray
