@@ -107,6 +107,8 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
     from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+        AbstractGenerateOnMachine)
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray)
     from spynnaker.pyNN.models.projection import Projection
@@ -1423,6 +1425,8 @@ class AbstractPopulationVertex(
         if not synapse_info.may_generate_on_machine():
             return 0
 
+        dynamics = cast(AbstractGenerateOnMachine,
+                        synapse_info.synapse_dynamics)
         connector = cast(
             AbstractGenerateConnectorOnMachine, synapse_info.connector)
         return (
@@ -1430,7 +1434,7 @@ class AbstractPopulationVertex(
             + connector.gen_delay_params_size_in_bytes(synapse_info.delays)
             + connector.gen_weight_params_size_in_bytes(synapse_info.weights)
             + connector.gen_connector_params_size_in_bytes
-            + synapse_info.synapse_dynamics.gen_matrix_params_size_in_bytes)
+            + dynamics.gen_matrix_params_size_in_bytes)
 
     @property
     def synapse_executable_suffix(self) -> str:
