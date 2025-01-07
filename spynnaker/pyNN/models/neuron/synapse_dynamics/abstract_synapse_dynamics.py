@@ -252,7 +252,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
     def get_delay_maximum(
             self, connector: AbstractConnector,
-            synapse_info: SynapseInformation) -> Optional[float]:
+            synapse_info: SynapseInformation) -> float:
         """
         Get the maximum delay for the synapses.
         """
@@ -273,7 +273,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         return connector.get_delay_minimum(synapse_info)
 
     def get_delay_variance(
-            self, connector: AbstractConnector, delays: numpy.ndarray,
+            self, connector: AbstractConnector, delays: Delay_Types,
             synapse_info: SynapseInformation) -> float:
         """
         Get the variance in delay for the synapses.

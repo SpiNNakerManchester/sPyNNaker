@@ -63,6 +63,7 @@ if TYPE_CHECKING:
             AbstractElimination)
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray)
+    from spynnaker.pyNN.types import Delay_Types
     from .synapse_dynamics_structural_common import ConnectionsInfo
 
 
@@ -310,7 +311,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
 
     @overrides(SynapseDynamicsStatic.get_delay_maximum)
     def get_delay_maximum(self, connector: AbstractConnector,
-                          synapse_info: SynapseInformation) -> Optional[float]:
+                          synapse_info: SynapseInformation) -> float:
         d_m = super().get_delay_maximum(connector, synapse_info)
         if d_m is None:
             return self.__initial_delay
@@ -327,7 +328,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
 
     @overrides(SynapseDynamicsStatic.get_delay_variance)
     def get_delay_variance(
-            self, connector: AbstractConnector, delays: numpy.ndarray,
+            self, connector: AbstractConnector, delays: Delay_Types,
             synapse_info: SynapseInformation) -> float:
         return 0.0
 

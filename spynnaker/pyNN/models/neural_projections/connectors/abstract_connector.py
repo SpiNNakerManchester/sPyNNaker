@@ -167,13 +167,11 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_delay_maximum(
-            self, synapse_info: SynapseInformation) -> Optional[float]:
+            self, synapse_info: SynapseInformation) -> float:
         """
-        Get the maximum delay specified by the user in ms, or `None` if
-        unbounded.
+        Get the maximum delay specified by the user in ms,.
 
         :param SynapseInformation synapse_info: the synapse info
-        :rtype: int or None
         """
         raise NotImplementedError
 

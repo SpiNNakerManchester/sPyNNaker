@@ -1662,7 +1662,7 @@ class AbstractPopulationVertex(
         :rtype: tuple(int, bool)
         """
         # Find the maximum delay from incoming synapses
-        max_delay_ms = 0
+        max_delay_ms: float = 0
         for proj in self.incoming_projections:
             # pylint: disable=protected-access
             s_info = proj._synapse_information
@@ -1770,17 +1770,19 @@ class _Stats(object):
         n_conns = connector.get_n_connections_to_post_vertex_maximum(s_info)
         d_var = s_dynamics.get_delay_variance(connector, s_info.delays, s_info)
 
-        s_type_pos = s_dynamics.get_positive_synapse_index(proj)
-        w_mean_pos = s_dynamics.get_mean_positive_weight(proj)
-        w_var_pos = s_dynamics.get_variance_positive_weight(proj)
-        w_max_pos = s_dynamics.get_maximum_positive_weight(proj)
+        signed_dynamics = cast(AbstractSupportsSignedWeights,
+                          s_info.synapse_dynamics)
+        s_type_pos = signed_dynamics.get_positive_synapse_index(proj)
+        w_mean_pos = signed_dynamics.get_mean_positive_weight(proj)
+        w_var_pos = signed_dynamics.get_variance_positive_weight(proj)
+        w_max_pos = signed_dynamics.get_maximum_positive_weight(proj)
         self.__add_details(
             proj, s_type_pos, n_conns, w_mean_pos, w_var_pos, w_max_pos, d_var)
 
-        s_type_neg = s_dynamics.get_negative_synapse_index(proj)
-        w_mean_neg = -s_dynamics.get_mean_negative_weight(proj)
-        w_var_neg = -s_dynamics.get_variance_negative_weight(proj)
-        w_max_neg = -s_dynamics.get_minimum_negative_weight(proj)
+        s_type_neg = signed_dynamics.get_negative_synapse_index(proj)
+        w_mean_neg = -signed_dynamics.get_mean_negative_weight(proj)
+        w_var_neg = -signed_dynamics.get_variance_negative_weight(proj)
+        w_max_neg = -signed_dynamics.get_minimum_negative_weight(proj)
         self.__add_details(
             proj, s_type_neg, n_conns, w_mean_neg, w_var_neg, w_max_neg, d_var)
 
