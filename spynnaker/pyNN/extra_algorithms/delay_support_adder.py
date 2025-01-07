@@ -25,7 +25,7 @@ from spynnaker.pyNN.models.neural_projections import (
     DelayAfferentApplicationEdge)
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-from spynnaker.pyNN.models.neural_projections import SynapseInformation
+
 
 def delay_support_adder() -> Tuple[
         Sequence[DelayExtensionVertex], Sequence[Tuple[ApplicationEdge, str]]]:
@@ -187,18 +187,6 @@ class _DelaySupportAdder(object):
                 n_delay_stages, delay_per_stage)
         return delay_app_vertex
 
-    def __get_max_delay(self, synapse_info: SynapseInformation) -> float:
-        """
-        Gets the delay maximum from the synapse information.
-
-        :raise DelayExtensionException: if that delay is None
-        """
-        delay = synapse_info.synapse_dynamics.get_delay_maximum(
-                synapse_info.connector, synapse_info)
-        if delay is None:
-            raise DelayExtensionException("Unexpected None delay maximum!")
-        return delay
-
     def _check_delay_values(self, app_edge: ProjectionApplicationEdge)\
             -> Tuple[int, int, bool]:
         """
@@ -210,7 +198,8 @@ class _DelaySupportAdder(object):
         """
         # get max delay required
         max_delay_needed_ms = max(
-            self.__get_max_delay(synapse_info)
+            synapse_info.synapse_dynamics.get_delay_maximum(
+                synapse_info.connector, synapse_info)
             for synapse_info in app_edge.synapse_information)
 
         # get if the post vertex needs a delay extension
