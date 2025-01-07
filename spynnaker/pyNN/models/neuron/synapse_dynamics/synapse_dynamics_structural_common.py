@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 from typing import (
-    Dict, Iterable, List, Sequence, Tuple, Union, TYPE_CHECKING)
+    cast, Dict, Iterable, List, Sequence, Tuple, Union, TYPE_CHECKING)
 
 import numpy
 from numpy.typing import NDArray
@@ -157,11 +157,13 @@ class SynapseDynamicsStructuralCommon(
         self.partner_selection.write_parameters(spec)
         for proj in structural_projections:
             spec.comment(f"Writing formation parameters for {proj.label}")
-            dynamics = proj._synapse_information.synapse_dynamics
+            dynamics = cast(AbstractSynapseDynamicsStructural,
+                            proj._synapse_information.synapse_dynamics)
             dynamics.formation.write_parameters(spec)
         for proj in structural_projections:
             spec.comment(f"Writing elimination parameters for {proj.label}")
-            dynamics = proj._synapse_information.synapse_dynamics
+            dynamics = cast(AbstractSynapseDynamicsStructural,
+                            proj._synapse_information.synapse_dynamics)
             dynamics.elimination.write_parameters(
                 spec, weight_scales[proj._synapse_information.synapse_type])
 
@@ -273,7 +275,8 @@ class SynapseDynamicsStructuralCommon(
             synapse_info = proj._synapse_information
             pop_index[app_edge.pre_vertex, synapse_info] = index
             index += 1
-            dynamics = synapse_info.synapse_dynamics
+            dynamics = cast(AbstractSynapseDynamicsStructural,
+                            synapse_info.synapse_dynamics)
 
             # Number of incoming vertices
             out_verts = app_edge.pre_vertex.splitter.get_out_going_vertices(
@@ -406,7 +409,8 @@ class SynapseDynamicsStructuralCommon(
             incoming_projections)
         for proj in structural_projections:
             # pylint: disable=protected-access
-            dynamics = proj._synapse_information.synapse_dynamics
+            dynamics = cast(AbstractSynapseDynamicsStructural,
+                            proj._synapse_information.synapse_dynamics)
             app_edge = proj._projection_edge
             n_sub_edges += len(
                 app_edge.pre_vertex.splitter.get_out_going_slices())
