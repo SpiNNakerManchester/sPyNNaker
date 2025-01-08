@@ -14,7 +14,7 @@
 from collections import defaultdict
 import logging
 import math
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, cast
+from typing import Dict, List, Optional, Sequence, Set, Tuple, cast
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -591,8 +591,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def get_source_specific_in_coming_vertices(
             self, source_vertex: ApplicationVertex,
             partition_id: str) -> Sequence[
-                Tuple[MachineVertex, Sequence[Union[
-                    MachineVertex, ApplicationVertex]]]]:
+                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
         # If delayed get the real pre-vertex
         if isinstance(source_vertex, DelayExtensionVertex):
             pre_vertex = cast(
