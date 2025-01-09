@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from math import ceil, log2, floor
-from typing import Dict, Final, List, NamedTuple, Tuple, Union
+from typing import Dict, Final, List, NamedTuple, Tuple, TYPE_CHECKING, Union
 from collections import defaultdict
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationVirtualVertex)
@@ -20,10 +20,21 @@ from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.common.mdslice import MDSlice
 from pacman.model.routing_info import AppVertexRoutingInfo
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.models.projection import Projection
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.projection import Projection
+    #: A source
+    Source = NamedTuple("Source",
+                        [("projection", Projection), ("local_delay", int),
+                         ("delay_stage", int)])
+else:
+    from collections import namedtuple
+    #: A source
+    Source = namedtuple(
+        "Source", ["projection", "local_delay", "delay_stage"])
 
 #: The number of bits in a short value
 BITS_PER_SHORT = 16
@@ -37,10 +48,6 @@ N_COLOUR_BITS_BITS = 3
 #: Key info size in bytes
 KEY_INFO_SIZE: Final[int] = 4 * BYTES_PER_WORD
 
-#: A source
-Source = NamedTuple("Source",
-                    [("projection", Projection), ("local_delay", int),
-                     ("delay_stage", int)])
 
 def get_div_const(value: int) -> int:
     """ Get the values used to perform fast division by an integer constant
@@ -59,7 +66,7 @@ def get_div_const(value: int) -> int:
 
 
 def get_delay_for_source(
-        incoming: Projection) -> Tuple[ApplicationVertex, int, int ,str]:
+        incoming: "Projection") -> Tuple[ApplicationVertex, int, int ,str]:
     """ Get the vertex which will send data from a given source projection,
         along with the delay stage and locally-handled delay value
 
@@ -116,7 +123,7 @@ def get_rinfo_for_spike_source(
     return r_info, core_mask, mask_shift
 
 
-def get_sources_for_target(app_vertex: AbstractPopulationVertex) -> Dict[
+def get_sources_for_target(app_vertex: "AbstractPopulationVertex") -> Dict[
         Tuple[ApplicationVertex, str], List[Source]]:
     """
     Get all the application vertex sources that will hit the given application
