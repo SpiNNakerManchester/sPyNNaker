@@ -372,7 +372,7 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractPlasticSynapseDynamics.
                get_n_words_for_plastic_connections)
-    def get_n_words_for_plastic_connections(self, n_connections):
+    def get_n_words_for_plastic_connections(self, n_connections: int) -> int:
         """
         :param int n_connections:
         :rtype: int

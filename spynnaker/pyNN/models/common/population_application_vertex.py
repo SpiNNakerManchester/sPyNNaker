@@ -253,7 +253,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
     def set_recording(
             self, name: str, sampling_interval: Optional[float] = None,
-            indices: Optional[Collection[int]] = None):
+            indices: Optional[Collection[int]] = None) -> None:
         """
         Set a variable recording.
 
@@ -273,8 +273,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"{type(self)} has recording variables so should implement "
             f"set_recording")
 
-    def set_not_recording(
-            self, name: str, indices: Optional[Collection[int]] = None):
+    def set_not_recording(self, name: str,
+                          indices: Optional[Collection[int]] = None) -> None:
         """
         Set a variable not recording.
 
@@ -392,7 +392,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     # end of recording methods
 
     def inject(self, current_source: AbstractCurrentSource,
-               selector: Selector = None):
+               selector: Selector = None) -> None:
         """
         Inject a current source into this population.
 

@@ -318,7 +318,7 @@ class SpikeSourcePoissonVertex(
         self.__n_colour_bits = n_colour_bits
 
     @overrides(SupportsStructure.set_structure)
-    def set_structure(self, structure: BaseStructure):
+    def set_structure(self, structure: BaseStructure) -> None:
         self.__structure = structure
 
     @property
@@ -450,7 +450,7 @@ class SpikeSourcePoissonVertex(
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(
             self, name: str, sampling_interval: Optional[float] = None,
-            indices: Optional[Collection[int]] = None):
+            indices: Optional[Collection[int]] = None) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if sampling_interval is not None:
@@ -470,8 +470,8 @@ class SpikeSourcePoissonVertex(
         return []
 
     @overrides(PopulationApplicationVertex.set_not_recording)
-    def set_not_recording(
-            self, name: str, indices: Optional[Collection[int]] = None):
+    def set_not_recording(self, name: str,
+                          indices: Optional[Collection[int]] = None) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if indices is not None:
