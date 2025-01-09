@@ -34,7 +34,7 @@ class EIFConductanceAlphaPopulation(object):
             self, tau_m: ModelParameter = 9.3667, cm: ModelParameter = 0.281,
             v_rest: ModelParameter = -70.6, v_reset: ModelParameter = -70.6,
             v_thresh: ModelParameter = -50.4, tau_syn_E: ModelParameter = 5.0,
-            tau_syn_I: ModelParameter = 0.5, tau_refrac: ModelParameter= 0.1,
+            tau_syn_I: ModelParameter = 0.5, tau_refrac: ModelParameter = 0.1,
             i_offset: ModelParameter = 0.0, a: ModelParameter = 4.0,
             b: ModelParameter = 0.0805, v_spike: ModelParameter = -40.0,
             tau_w: ModelParameter = 144.0, e_rev_E: ModelParameter = 0.0,

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, List
+from typing import List
 
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
@@ -49,7 +49,6 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
     :param float isyn_inh: LIF neuron parameter (defaulted)
     """
     __slots__ = ()
-
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(

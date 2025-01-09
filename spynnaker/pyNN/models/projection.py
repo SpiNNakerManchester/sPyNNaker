@@ -60,7 +60,8 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def _we_dont_do_this_now(*args: Any) -> Never:  # pylint: disable=unused-argument
+def _we_dont_do_this_now(*args: Any
+                         ) -> Never:  # pylint: disable=unused-argument
     # pragma: no cover
     raise NotImplementedError("sPyNNaker does not currently do this")
 

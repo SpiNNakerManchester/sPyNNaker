@@ -129,8 +129,8 @@ class DistanceDependentFormation(AbstractFormation):
 
         return filtered_probabilities
 
-    def distance(
-            self, x0: ArrayLike, x1: ArrayLike, metric: str) -> NDArray[floating]:
+    def distance(self, x0: ArrayLike, x1: ArrayLike,
+                 metric: str) -> NDArray[floating]:
         """
         Compute the distance between points x0 and x1 place on the grid
         using periodic boundary conditions.

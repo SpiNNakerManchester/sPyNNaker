@@ -37,7 +37,7 @@ class PushBotEthernetDevice(
             self, protocol: MunichIoSpiNNakerLinkProtocol,
             device: AbstractPushBotOutputDevice,
             uses_payload: bool, time_between_send: Optional[int],
-            first_send_timestep: Optional[int] =_DEFAULT_FIRST_SEND_TIMESTEP):
+            first_send_timestep: Optional[int] = _DEFAULT_FIRST_SEND_TIMESTEP):
         """
         :param MunichIoSpiNNakerLinkProtocol protocol:
             The protocol instance to get commands from

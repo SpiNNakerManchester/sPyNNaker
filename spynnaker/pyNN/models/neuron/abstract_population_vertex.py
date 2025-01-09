@@ -13,10 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 from collections import defaultdict
-from functools import reduce
 import logging
 import math
-import operator
 from typing import (
     Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
     cast, TYPE_CHECKING)
@@ -1771,7 +1769,7 @@ class _Stats(object):
         d_var = s_dynamics.get_delay_variance(connector, s_info.delays, s_info)
 
         signed_dynamics = cast(AbstractSupportsSignedWeights,
-                          s_info.synapse_dynamics)
+                               s_info.synapse_dynamics)
         s_type_pos = signed_dynamics.get_positive_synapse_index(proj)
         w_mean_pos = signed_dynamics.get_mean_positive_weight(proj)
         w_var_pos = signed_dynamics.get_variance_positive_weight(proj)

@@ -38,7 +38,8 @@ class PushBotEthernetSpeakerDevice(
             self, speaker: PushBotSpeaker,
             protocol: MunichIoSpiNNakerLinkProtocol,
             start_active_time: int = 0, start_total_period: int = 0,
-            start_frequency: Optional[int] = 0, start_melody: Optional[int] = None,
+            start_frequency: Optional[int] = 0,
+            start_melody: Optional[int] = None,
             timesteps_between_send: Optional[int] = None):
         """
         :param PushBotSpeaker speaker: The speaker to control

@@ -66,7 +66,7 @@ def get_div_const(value: int) -> int:
 
 
 def get_delay_for_source(
-        incoming: "Projection") -> Tuple[ApplicationVertex, int, int ,str]:
+        incoming: "Projection") -> Tuple[ApplicationVertex, int, int, str]:
     """ Get the vertex which will send data from a given source projection,
         along with the delay stage and locally-handled delay value
 

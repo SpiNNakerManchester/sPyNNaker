@@ -143,7 +143,6 @@ class SpikeInjectorVertex(
             raise KeyError(f"Cannot record {name}")
         return 0
 
-
     @overrides(PopulationApplicationVertex.get_neurons_recording)
     def get_neurons_recording(
             self, name: str, vertex_slice: Slice) -> NDArray[numpy.integer]:

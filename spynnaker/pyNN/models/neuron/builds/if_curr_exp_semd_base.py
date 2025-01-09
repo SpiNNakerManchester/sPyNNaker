@@ -88,7 +88,7 @@ class IFCurrExpSEMDBase(AbstractPyNNNeuronModelStandard):
             v_rest: ModelParameter = -65.0, v_reset: ModelParameter = -65.0,
             v_thresh: ModelParameter = -50.0, tau_syn_E: ModelParameter = 5.0,
             tau_syn_E2: ModelParameter = 5.0, tau_syn_I: ModelParameter = 5.0,
-            tau_refrac: ModelParameter = 0.1, i_offset: ModelParameter =0.0,
+            tau_refrac: ModelParameter = 0.1, i_offset: ModelParameter = 0.0,
             v: ModelParameter = -65.0, isyn_exc: ModelParameter = 0.0,
             isyn_exc2: ModelParameter = 0.0, isyn_inh: ModelParameter = 0.0,
             multiplicator: ModelParameter = 0.0,

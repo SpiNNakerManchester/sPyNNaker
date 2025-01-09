@@ -16,7 +16,6 @@ from contextlib import contextmanager
 import logging
 import os
 from typing import Dict, Iterator, Tuple
-from typing_extensions import Never
 import numpy
 
 from spinn_utilities.log import FormatAdapter

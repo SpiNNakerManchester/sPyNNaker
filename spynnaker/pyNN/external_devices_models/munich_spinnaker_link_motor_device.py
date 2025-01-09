@@ -51,7 +51,7 @@ class MunichMotorDevice(
     def __init__(
             self, spinnaker_link_id: int, board_address: Optional[str] = None,
             speed: int = 30, sample_time: int = 4096, update_time: int = 512,
-            delay_time: int  = 5, delta_threshold: int = 23,
+            delay_time: int = 5, delta_threshold: int = 23,
             continue_if_not_different: bool = True,
             label: Optional[str] = None):
         """

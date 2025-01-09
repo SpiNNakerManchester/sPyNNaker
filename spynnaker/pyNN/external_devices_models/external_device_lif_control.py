@@ -26,7 +26,7 @@ from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 from spynnaker.pyNN.models.neuron.neuron_models import (
     NeuronModelLeakyIntegrateAndFire)
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
-from.abstract_ethernet_translator import AbstractEthernetTranslator
+from .abstract_ethernet_translator import AbstractEthernetTranslator
 from .abstract_multicast_controllable_device import (
     AbstractMulticastControllableDevice)
 from .external_device_lif_control_vertex import ExternalDeviceLifControlVertex
