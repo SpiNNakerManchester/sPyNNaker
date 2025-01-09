@@ -93,11 +93,11 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         return self.__a_plus
 
     @A_plus.setter
-    def A_plus(self, new_value) -> None:
+    def A_plus(self, new_value: float) -> None:
         self.__a_plus = new_value
 
     @property
-    def A_minus(self):
+    def A_minus(self) -> float:
         r"""
         :math:`A^-`
 
@@ -106,7 +106,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         return self.__a_minus
 
     @A_minus.setter
-    def A_minus(self, new_value) -> None:
+    def A_minus(self, new_value: float) -> None:
         self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)

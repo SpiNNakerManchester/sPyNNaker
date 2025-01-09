@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from math import ceil, log2, floor
-from typing import Final, Tuple, Union
-from collections import namedtuple, defaultdict
+from typing import Dict, Final, List, NamedTuple, Tuple, Union
+from collections import defaultdict
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationVirtualVertex)
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.common.mdslice import MDSlice
+from pacman.model.routing_info import AppVertexRoutingInfo
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.models.projection import Projection
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
@@ -36,11 +38,11 @@ N_COLOUR_BITS_BITS = 3
 KEY_INFO_SIZE: Final[int] = 4 * BYTES_PER_WORD
 
 #: A source
-Source = namedtuple(
-    "Source", ["projection", "local_delay", "delay_stage"])
+Source = NamedTuple("Source",
+                    [("projection", Projection), ("local_delay", int),
+                     ("delay_stage", int)])
 
-
-def get_div_const(value):
+def get_div_const(value: int) -> int:
     """ Get the values used to perform fast division by an integer constant
 
     :param int value: The value to be divided by
@@ -56,7 +58,8 @@ def get_div_const(value):
             + (sh1 << BITS_PER_SHORT) + m)
 
 
-def get_delay_for_source(incoming):
+def get_delay_for_source(
+        incoming: Projection) -> Tuple[ApplicationVertex, int, int ,str]:
     """ Get the vertex which will send data from a given source projection,
         along with the delay stage and locally-handled delay value
 
@@ -67,19 +70,24 @@ def get_delay_for_source(incoming):
     # pylint: disable=protected-access
     app_edge = incoming._projection_edge
     s_info = incoming._synapse_information
-    delay = s_info.synapse_dynamics.delay
+    # TODO do we need to support None float delay?
+    delay = float(s_info.synapse_dynamics.delay)
     steps = delay * SpynnakerDataView.get_simulation_time_step_per_ms()
     max_delay = app_edge.post_vertex.splitter.max_support_delay()
-    local_delay = steps % max_delay
+    local_delay = int(steps % max_delay)
     delay_stage = 0
-    pre_vertex = app_edge.pre_vertex
+    pre_vertex: ApplicationVertex = app_edge.pre_vertex
     if steps > max_delay:
-        delay_stage = (steps // max_delay) - 1
-        pre_vertex = app_edge.delay_edge.pre_vertex
+        delay_stage = int(steps // max_delay) - 1
+        edge = app_edge.delay_edge
+        assert edge is not None
+        pre_vertex = edge.pre_vertex
     return pre_vertex, local_delay, delay_stage, s_info.partition_id
 
 
-def get_rinfo_for_spike_source(pre_vertex, partition_id):
+def get_rinfo_for_spike_source(
+        pre_vertex: ApplicationVertex,
+        partition_id: str) -> Tuple[AppVertexRoutingInfo, int, int]:
     """
     Get the routing information for the source of a projection in the
     given partition.
@@ -95,6 +103,7 @@ def get_rinfo_for_spike_source(pre_vertex, partition_id):
     r_info = routing_info.get_info_from(
             pre_vertex, partition_id)
 
+    assert isinstance(r_info, AppVertexRoutingInfo)
     n_cores = len(r_info.vertex.splitter.get_out_going_vertices(partition_id))
 
     # If there is 1 core, we don't use the core mask
@@ -107,7 +116,8 @@ def get_rinfo_for_spike_source(pre_vertex, partition_id):
     return r_info, core_mask, mask_shift
 
 
-def get_sources_for_target(app_vertex: AbstractPopulationVertex):
+def get_sources_for_target(app_vertex: AbstractPopulationVertex) -> Dict[
+        Tuple[ApplicationVertex, str], List[Source]]:
     """
     Get all the application vertex sources that will hit the given application
     vertex.

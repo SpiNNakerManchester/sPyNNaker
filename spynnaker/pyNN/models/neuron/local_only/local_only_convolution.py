@@ -78,7 +78,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         # Store the sources to avoid recalculation
         self.__cached_sources: Dict[ApplicationVertex, Dict[
-                Tuple[PopulationApplicationVertex, str],
+                Tuple[ApplicationVertex, str],
                 List[Source]]] = dict()
 
     @property
@@ -158,6 +158,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         weight_data = list()
         for (pre_vertex, part_id), source_infos in sources.items():
 
+            assert isinstance(pre_vertex, PopulationApplicationVertex)
             # Add connectors as needed
             first_conn_index = len(connector_data)
             for source in source_infos:
@@ -250,7 +251,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     def __get_sources_for_target(
             self, app_vertex: AbstractPopulationVertex) -> Dict[
-                Tuple[PopulationApplicationVertex, str], List[Source]]:
+                Tuple[ApplicationVertex, str], List[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.
@@ -261,11 +262,13 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             information
         :rtype: dict(tuple(PopulationApplicationVertex, str), list(Source))
         """
-        sources = self.__cached_sources.get(app_vertex)
-        if sources is None:
+        _sources = self.__cached_sources.get(app_vertex)
+        if _sources is None:
             sources = get_sources_for_target(app_vertex)
             self.__cached_sources[app_vertex] = sources
-        return sources
+            return sources
+        else:
+            return _sources
 
     @staticmethod
     def __connector(projection: Projection) -> ConvolutionConnector:
