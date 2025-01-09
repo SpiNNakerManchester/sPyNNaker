@@ -17,12 +17,11 @@ import logging
 from typing import (
     Any, Callable, Dict, List, Optional, Sequence, Tuple, Union,
     cast, TYPE_CHECKING)
-from typing_extensions import Never
 
 import numpy
 from numpy import void
 from numpy.typing import NDArray
-from typing_extensions import Literal, TypeAlias
+from typing_extensions import Literal, Never, TypeAlias
 
 from pyNN.recording.files import BaseFile
 from pyNN.space import Space as PyNNSpace

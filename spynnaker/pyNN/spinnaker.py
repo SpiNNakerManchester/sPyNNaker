@@ -18,13 +18,13 @@ import os
 from typing import Any, Collection, Optional, Union, cast
 
 from lazyarray import __version__ as lazyarray_version
-from typing_extensions import Literal
 
 from neo import __version__ as neo_version
 from quantities import __version__ as quantities_version
 from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
-from typing_extensions import Never
+from typing_extensions import Literal, Never
+
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import (

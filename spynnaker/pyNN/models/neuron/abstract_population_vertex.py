@@ -74,6 +74,7 @@ from spynnaker.pyNN.models.neuron.population_machine_common import (
 from spynnaker.pyNN.models.neuron.population_machine_neurons import (
     NeuronRegions)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractGenerateOnMachine,
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural,
     AbstractSDRAMSynapseDynamics, AbstractSupportsSignedWeights,
     SynapseDynamicsStatic)
@@ -105,8 +106,6 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
     from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
-    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-        AbstractGenerateOnMachine)
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray)
     from spynnaker.pyNN.models.projection import Projection
