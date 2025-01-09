@@ -256,7 +256,7 @@ def setup(timestep: Optional[Union[float, Literal["auto"]]] = None,
           time_scale_factor: Optional[int] = None,
           n_chips_required: Optional[int] = None,
           n_boards_required: Optional[int] = None,
-          **extra_params: Any ) -> int:
+          **extra_params: Any) -> int:
     """
     The main method needed to be called to make the PyNN 0.8 setup.
     Needs to be called before any other function
