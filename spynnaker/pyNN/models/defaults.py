@@ -189,6 +189,12 @@ def defaults(cls: type) -> type:
 
 
 class AbstractProvidesDefaults(object):
+    """
+    Provides the default_parameters and default_initial_values properties
+
+    These will be filled in based on the @default_parameters and
+    @default_initial_values decorators with values read from the init.
+    """
 
     @classmethod
     def __fill_in_defaults(cls):
@@ -276,7 +282,7 @@ class AbstractProvidesDefaults(object):
         this will be all the init parameters with a default value
         less any defined in @default_parameters
 
-        If neither decorator is used this will be an emptuy Mapping
+        If neither decorator is used this will be an empty Mapping
         """
         cls.__fill_in_defaults()
         return cls.default_initial_values
