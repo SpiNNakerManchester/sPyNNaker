@@ -324,7 +324,7 @@ class PopulationMachineNeurons(
 
     def _write_current_source_parameters(
             self, spec: DataSpecificationBase):
-        n_atoms = self._vertex_slice.n_atoms
+        n_atoms: int = self._vertex_slice.n_atoms
 
         spec.comment(
             f"\nWriting Current Source Parameters for {n_atoms} Neurons:\n")
@@ -350,7 +350,7 @@ class PopulationMachineNeurons(
         if current_sources:
             # Array to keep track of the number of each type of current source
             # (there are four, but they are numbered 1 to 4, so five elements)
-            cs_index_array = [0, 0, 0, 0, 0]
+            cs_index_array: List[int] = [0, 0, 0, 0, 0]
 
             # Data sent to the machine will be current sources per neuron
             # This array will have the first entry indicating the number of
