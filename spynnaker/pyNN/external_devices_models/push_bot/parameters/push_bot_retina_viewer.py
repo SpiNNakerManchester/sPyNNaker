@@ -113,6 +113,9 @@ class PushBotRetinaViewer():
         except Exception:  # pylint: disable=broad-except
             _logger.exception("unexpected exception in drawing thread")
 
+    def __on_close(self, event):
+        self.__running = False
+
     def run_until_closed(self):
         """
         Run the viewer and simulation until the viewer is closed.
@@ -120,6 +123,7 @@ class PushBotRetinaViewer():
         run_thread = Thread(target=self.__run_sim_forever)
         run_thread.start()
         try:
+            self.__fig.canvas.mpl_connect('close_event', self.__on_close)
             self.__run(run_thread)
         finally:
             self.__sim.external_devices.request_stop()
