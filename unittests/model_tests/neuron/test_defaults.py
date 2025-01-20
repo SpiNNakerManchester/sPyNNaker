@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.defaults import (
     AbstractProvidesDefaults, default_parameters, default_initial_values)

@@ -209,9 +209,9 @@ class AbstractProvidesDefaults(object):
         default_args = ([] if init_args.args is None else
                         init_args.args[n_args - n_defaults:])
         if init_args.defaults is None:
-           default_values = []
+            default_values = []
         else:
-           default_values = init_args.defaults
+            default_values = init_args.defaults
 
         # get the keys based on the decorators
         if hasattr(init, "_parameters"):
