@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.defaults import defaults, default_initial_values
+from spynnaker.pyNN.models.defaults import (
+    AbstractProvidesDefaults, default_initial_values)
 
 
-@defaults
-class IFFacetsConductancePopulation(object):
+class IFFacetsConductancePopulation(AbstractProvidesDefaults):
     """
     Leaky integrate and fire neuron with conductance-based synapses and
     fixed threshold as it is resembled by the FACETS Hardware Stage 1.

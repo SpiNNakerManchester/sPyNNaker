@@ -19,7 +19,7 @@ from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, AbstractPyNNNeuronModelStandard)
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
-from spynnaker.pyNN.models.defaults import default_initial_values, defaults
+from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 
@@ -84,7 +84,6 @@ class _MyNeuronModel(AbstractStandardNeuronComponent):
         return None
 
 
-@defaults
 class FooBar(AbstractPyNNNeuronModelStandard):
     @default_initial_values({"foo", "bar"})
     def __init__(self, foo=1, bar=11):

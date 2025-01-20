@@ -15,21 +15,20 @@ from __future__ import annotations
 from collections import defaultdict
 import sys
 from typing import (
-    Any, Callable, cast, Dict, FrozenSet, Optional, Mapping, Sequence, Tuple,
-    TYPE_CHECKING)
+    Any, Dict, Optional, Sequence, Tuple, TYPE_CHECKING)
 import numpy
 from pyNN import descriptions
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod)
-from spynnaker.pyNN.models.defaults import get_map_from_init
+from spynnaker.pyNN.models.defaults import AbstractProvidesDefaults
 from spynnaker.pyNN.exceptions import SpynnakerException
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.population_application_vertex import (
         PopulationApplicationVertex)
 
 
-class AbstractPyNNModel(object, metaclass=AbstractBase):
+class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     """
     A Model that can be passed in to a Population object in PyNN.
     """
@@ -88,44 +87,6 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         :rtype: int
         """
         return sys.maxsize
-
-    @staticmethod
-    def __get_init_params_and_svars(the_cls: type) -> Tuple[
-            Callable, Optional[FrozenSet[str]], Optional[FrozenSet[str]]]:
-        init = getattr(the_cls, "__init__")
-        while hasattr(init, "_method"):
-            init = getattr(init, "_method")
-        params = None
-        if hasattr(init, "_parameters"):
-            params = getattr(init, "_parameters")
-        svars = None
-        if hasattr(init, "_state_variables"):
-            svars = getattr(init, "_state_variables")
-        return init, params, svars
-
-    @classproperty
-    def default_parameters(  # pylint: disable=no-self-argument
-            cls) -> Mapping[str, Any]:
-        """
-        Get the default values for the parameters of the model.
-
-        :rtype: dict(str, Any)
-        """
-        init, params, svars = cls.__get_init_params_and_svars(cast(type, cls))
-        return get_map_from_init(init, skip=svars, include=params)
-
-    @classproperty
-    def default_initial_values(  # pylint: disable=no-self-argument
-            cls) -> Mapping[str, Any]:
-        """
-        Get the default initial values for the state variables of the model.
-
-        :rtype: dict(str, Any)
-        """
-        init, params, svars = cls.__get_init_params_and_svars(cast(type, cls))
-        if params is None and svars is None:
-            return {}
-        return get_map_from_init(init, skip=params, include=svars)
 
     @classmethod
     def get_parameter_names(cls) -> Sequence[str]:

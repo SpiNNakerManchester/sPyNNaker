@@ -19,7 +19,9 @@ Decorators to support default argument handling.
 import inspect
 import logging
 from types import MappingProxyType
-from typing import Any, Callable, FrozenSet, Iterable, List, Mapping, Optional
+from typing import (
+    Any, Callable, FrozenSet, Iterable, List, Mapping, Optional)
+from spinn_utilities.classproperty import classproperty
 from spinn_utilities.log import FormatAdapter
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -67,7 +69,6 @@ def get_map_from_init(
                    (skip is None or arg not in skip) and
                    (include is None or arg in include))}
     return MappingProxyType(as_dict)
-
 
 def default_parameters(parameters: Iterable[str]) -> Callable:
     """
@@ -156,6 +157,8 @@ def defaults(cls: type) -> type:
     If neither are specified, it is assumed that all default arguments are
     parameters.
     """
+    logger.warning("@defaults is deprecated! "
+                   "Extend AbstractProvidesDefaults instead")
     if not inspect.isclass(cls):
         raise TypeError(f"{cls} is not a class")
     if not hasattr(cls, "__init__"):
@@ -182,3 +185,93 @@ def defaults(cls: type) -> type:
         cls.default_parameters = get_map_from_init(init, include=params)
         cls.default_initial_values = get_map_from_init(init, include=svars)
     return cls
+
+class AbstractProvidesDefaults(object):
+
+    @classmethod
+    def __fill_in_defaults(cls):
+        """
+        Fills in default_parameters and default_initial_values attributes
+        """
+        # get the init method
+        init = getattr(cls, "__init__")
+        # Find the real method as there may be decorators
+        while hasattr(init, "_method"):
+            init = getattr(init, "_method")
+
+        # read the values from the init method
+        init_args = inspect.getfullargspec(init)
+        n_defaults = 0 if init_args.defaults is None else len(
+            init_args.defaults)
+        n_args = 0 if init_args.args is None else len(init_args.args)
+        default_args = ([] if init_args.args is None else
+                        init_args.args[n_args - n_defaults:])
+        default_values = [] if init_args.defaults is None else init_args.defaults
+
+        # get the keys based on the decorators
+        if hasattr(init, "_parameters"):
+            params = getattr(init, "_parameters")
+            if hasattr(init, "_state_variables"):
+                svars = getattr(init, "_state_variables")
+                assert len(params.intersection(svars)) == 0
+            else:
+                svars = frozenset(svar for svar in default_args
+                                  if svar not in params)
+        else:
+            if hasattr(init, "_state_variables"):
+                svars = getattr(init, "_state_variables")
+                params = frozenset(param for param in default_args
+                                   if param not in svars)
+            else:
+                svars = frozenset()
+                params = set(default_args)
+
+        # Check all decorator values used
+        _check_args(params.union(svars), default_args, init)
+
+        # fill in the defaults so this method is only called once
+        cls.default_parameters: Mapping[str, Any] = {}
+        cls.default_initial_values: Mapping[str, Any] = {}
+        for arg, value in zip(default_args, default_values):
+            if arg in params:
+                cls.default_parameters[arg] = value
+            elif arg in svars:
+                cls.default_initial_values[arg] = value
+        cls.default_parameters = MappingProxyType(cls.default_parameters)
+        cls.default_initial_values = (
+            MappingProxyType(cls.default_initial_values))
+
+    @classproperty
+    def default_parameters(  # pylint: disable=no-self-argument
+            cls) -> Mapping[str, Any]:
+        """
+        Get the default values for the parameters of the model.
+
+        If a @default_parameters decorator is used
+        this will be the init default values for those keys
+
+        If no @default_parameters decorator is used
+        this will be all the init parameters with a default value
+        less any defined in @default_initial_values
+        """
+        cls.__fill_in_defaults()
+        return cls.default_parameters
+
+    @classproperty
+    def default_initial_values(  # pylint: disable=no-self-argument
+            cls) -> Mapping[str, Any]:
+        """
+        Get the default initial values for the state variables of the model.
+
+        If @default_initial_values decorator is used
+        this will be the init default values for those keys
+
+        If no @default_initial_values decorator is used
+        but a @default_parameters decorator was used
+        this will be all the init parameters with a default value
+        less any defined in @default_parameters
+
+        If neither decorator is used this will be an emptuy Mapping
+        """
+        cls.__fill_in_defaults()
+        return cls.default_initial_values
