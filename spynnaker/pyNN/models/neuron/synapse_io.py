@@ -350,9 +350,13 @@ def _get_row_data(
             max_row_n_synapses, max_atoms_per_core)
 
         # Blank the plastic data
+        fp_data: Union[NDArray[uint32], List[NDArray[uint32]]]
         fp_data = numpy.zeros((n_rows, 0), dtype=uint32)
+        pp_data: Union[NDArray[uint32], List[NDArray[uint32]]]
         pp_data = numpy.zeros((n_rows, 0), dtype=uint32)
+        fp_size:  NDArray[uint32]
         fp_size = numpy.zeros((n_rows, 1), dtype=uint32)
+        pp_size:  NDArray[uint32]
         pp_size = numpy.zeros((n_rows, 1), dtype=uint32)
     else:
         assert isinstance(synapse_dynamics, AbstractPlasticSynapseDynamics)
