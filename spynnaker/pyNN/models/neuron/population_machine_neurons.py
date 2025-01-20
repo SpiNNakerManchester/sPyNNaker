@@ -364,7 +364,8 @@ class PopulationMachineNeurons(
                 cs_id = current_source.current_source_id
 
                 # Only use IDs that are on this core
-                for i, raster_id in enumerate(self._vertex_slice.get_raster_ids()):
+                for i, raster_id in enumerate(
+                        self._vertex_slice.get_raster_ids()):
                     if self.__in_selector(
                             raster_id, current_source_id_list[current_source]):
                         # I think this is now right, but test it more...
