@@ -70,6 +70,7 @@ def get_map_from_init(
                    (include is None or arg in include))}
     return MappingProxyType(as_dict)
 
+
 def default_parameters(parameters: Iterable[str]) -> Callable:
     """
     Specifies arguments which are parameters.  Only works on the
@@ -186,6 +187,7 @@ def defaults(cls: type) -> type:
         cls.default_initial_values = get_map_from_init(init, include=svars)
     return cls
 
+
 class AbstractProvidesDefaults(object):
 
     @classmethod
@@ -206,7 +208,10 @@ class AbstractProvidesDefaults(object):
         n_args = 0 if init_args.args is None else len(init_args.args)
         default_args = ([] if init_args.args is None else
                         init_args.args[n_args - n_defaults:])
-        default_values = [] if init_args.defaults is None else init_args.defaults
+        if init_args.defaults is None:
+           default_values = []
+        else:
+           default_values = init_args.defaults
 
         # get the keys based on the decorators
         if hasattr(init, "_parameters"):
