@@ -387,7 +387,8 @@ class PopulationMachineNeurons(
 
             # Write the number of each type of current source
             for n in range(1, len(cs_index_array)):
-                spec.write_value(cs_index_array[n])
+                w = cs_index_array[n]
+                spec.write_value(w)
 
             # Now loop over the current sources and write the data required
             # for each type of current source
