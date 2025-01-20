@@ -113,6 +113,7 @@ def heat_plot(data_sets, ylabel=None, title=None):
 
 
 def _get_colour():
+    """ Yields a colour"""
     yield "b."
     yield "g."
     yield "r."
