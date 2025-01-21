@@ -351,7 +351,7 @@ def _get_row_data(
 
         # Blank the plastic data
         fp_data = numpy.zeros((n_rows, 0), dtype=uint32)
-        pp_data: Union[NDArray[uint32], List[NDArray[uint32]]]
+        pp_data = numpy.zeros((n_rows, 0), dtype=uint32)
         fp_size:  NDArray[uint32]
         fp_size = numpy.zeros((n_rows, 1), dtype=uint32)
         pp_size:  NDArray[uint32]
