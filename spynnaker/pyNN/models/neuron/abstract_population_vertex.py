@@ -1252,6 +1252,7 @@ class AbstractPopulationVertex(
             return self.__connection_cache[app_edge, synapse_info]
 
         # Start with something in the list so that concatenate works
+        connections: List[ConnectionsArray]
         connections = [numpy.zeros(0, dtype=NUMPY_CONNECTORS_DTYPE)]
         progress = ProgressBar(
             len(self.machine_vertices),

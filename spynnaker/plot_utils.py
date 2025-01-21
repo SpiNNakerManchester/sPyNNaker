@@ -17,6 +17,8 @@ import sys
 from types import ModuleType
 from typing import Optional
 import numpy as np
+from numpy.typing import NDArray
+
 # pylint: disable=invalid-name
 plt: Optional[ModuleType]
 try:
@@ -113,6 +115,7 @@ def heat_plot(data_sets, ylabel=None, title=None):
 
 
 def _get_colour():
+    """ Yields a colour"""
     yield "b."
     yield "g."
     yield "r."
@@ -184,7 +187,7 @@ def plot_spikes(spikes, title="spikes"):
 if __name__ == "__main__":
     spike_data = np.loadtxt("spikes.csv", delimiter=',')
     plot_spikes(spike_data)
-    doubled_spike_data = np.loadtxt("spikes.csv", delimiter=',')
+    doubled_spike_data: NDArray = np.loadtxt("spikes.csv", delimiter=',')
     for _i, doubled_spike_data_i in enumerate(doubled_spike_data):
         doubled_spike_data_i[0] = doubled_spike_data[_i][0] + 5
     plot_spikes([spike_data, doubled_spike_data])
