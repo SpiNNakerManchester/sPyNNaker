@@ -13,13 +13,13 @@
 # limitations under the License.
 
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.defaults import defaults, default_initial_values
+from spynnaker.pyNN.models.defaults import (
+    AbstractProvidesDefaults, default_initial_values)
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 
 
 # pylint: disable=wrong-spelling-in-docstring
-@defaults
-class EIFConductanceAlphaPopulation(object):
+class EIFConductanceAlphaPopulation(AbstractProvidesDefaults):
     """
     Exponential integrate and fire neuron with spike triggered and
     sub-threshold adaptation currents (isfa, ista reps.)

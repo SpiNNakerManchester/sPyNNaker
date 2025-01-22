@@ -19,11 +19,10 @@ from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
     AbstractPyNNNeuronModel)
-from spynnaker.pyNN.models.defaults import default_initial_values, defaults
+from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.exceptions import SpynnakerException
 
 
-@defaults
 class _MyPyNNModelImpl(AbstractPyNNModel):
 
     default_population_parameters = {}

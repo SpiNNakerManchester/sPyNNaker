@@ -13,12 +13,12 @@
 # limitations under the License.
 
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.defaults import defaults, default_initial_values
+from spynnaker.pyNN.models.defaults import (
+    AbstractProvidesDefaults, default_initial_values)
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 
 
-@defaults
-class HHCondExp(object):
+class HHCondExp(AbstractProvidesDefaults):
     """
     Single-compartment Hodgkin-Huxley model with exponentially decaying
     current input.
