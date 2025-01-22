@@ -21,12 +21,12 @@ from numpy.typing import NDArray
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractGenerateOnMachine)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
-    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-        AbstractGenerateOnMachine)
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
 
 # Address to indicate that the synaptic region is unused
