@@ -14,7 +14,6 @@
 from typing import Collection, Container, Iterable, List, Optional, Tuple
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.abstract_sized import Selector
-from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.routing_info import RoutingInfo
@@ -22,6 +21,7 @@ from pacman.utilities.utility_calls import get_keys
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import HasCustomAtomKeyMap
 from spinn_front_end_common.interface.ds import DataType
+from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
 from spynnaker.pyNN.models.common.parameter_holder import ParameterHolder
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
@@ -29,7 +29,8 @@ from .types import Names, Values
 
 
 # pylint: disable=abstract-method
-class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
+class PopulationApplicationVertex(
+    ColouredApplicationVertex, HasCustomAtomKeyMap):
     """
     A vertex that can be used in a Population.
 
@@ -410,14 +411,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             "This Population doesn't support injection")
 
     @property
+    @overrides(ColouredApplicationVertex.n_colour_bits)
     def n_colour_bits(self) -> int:
-        """
-        The number of colour bits sent by this vertex.
-
-        Assumed 0 unless overridden
-
-        :rtype: int
-        """
         return 0
 
     @overrides(HasCustomAtomKeyMap.get_atom_key_map)

@@ -17,6 +17,7 @@ from .abstract_has_delay_stages import AbstractHasDelayStages
 from .abstract_max_spikes import AbstractMaxSpikes
 from .abstract_synapse_expandable import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
+from .coloured_application_vertex import ColouredApplicationVertex
 from .sends_synaptic_inputs_over_sdram import SendsSynapticInputsOverSDRAM
 from .receives_synaptic_inputs_over_sdram import (
     ReceivesSynapticInputsOverSDRAM)
