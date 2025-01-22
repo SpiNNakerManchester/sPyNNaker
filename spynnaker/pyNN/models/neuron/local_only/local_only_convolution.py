@@ -30,6 +30,7 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_SHORT, BYTES_PER_WORD)
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
     ConvolutionConnector, AbstractConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -78,7 +79,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         # Store the sources to avoid recalculation
         self.__cached_sources: Dict[ApplicationVertex, Dict[
-                Tuple[ApplicationVertex, str],
+                Tuple[ColouredApplicationVertex, str],
                 List[Source]]] = dict()
 
     @property
@@ -251,7 +252,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     def __get_sources_for_target(
             self, app_vertex: AbstractPopulationVertex) -> Dict[
-                Tuple[ApplicationVertex, str], List[Source]]:
+                Tuple[ColouredApplicationVertex, str], List[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.

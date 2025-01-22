@@ -24,8 +24,8 @@ class ColouredApplicationVertex(ApplicationVertex):
 
     __slots__ = ()
 
-    @abstractmethod
     @property
+    @abstractmethod
     def n_colour_bits(self) -> int:
         """
         The number of colour bits sent by this vertex.

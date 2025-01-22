@@ -20,6 +20,7 @@ from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.common.mdslice import MDSlice
 from pacman.model.routing_info import AppVertexRoutingInfo
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
@@ -65,8 +66,8 @@ def get_div_const(value: int) -> int:
             + (sh1 << BITS_PER_SHORT) + m)
 
 
-def get_delay_for_source(
-        incoming: "Projection") -> Tuple[ApplicationVertex, int, int, str]:
+def get_delay_for_source(incoming: "Projection") -> Tuple[
+        ColouredApplicationVertex, int, int, str]:
     """ Get the vertex which will send data from a given source projection,
         along with the delay stage and locally-handled delay value
 
@@ -89,6 +90,7 @@ def get_delay_for_source(
         edge = app_edge.delay_edge
         assert edge is not None
         pre_vertex = edge.pre_vertex
+    assert isinstance(pre_vertex, ColouredApplicationVertex)
     return pre_vertex, local_delay, delay_stage, s_info.partition_id
 
 
@@ -124,7 +126,7 @@ def get_rinfo_for_spike_source(
 
 
 def get_sources_for_target(app_vertex: "AbstractPopulationVertex") -> Dict[
-        Tuple[ApplicationVertex, str], List[Source]]:
+        Tuple[ColouredApplicationVertex, str], List[Source]]:
     """
     Get all the application vertex sources that will hit the given application
     vertex.
