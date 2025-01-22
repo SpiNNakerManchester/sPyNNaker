@@ -20,8 +20,8 @@ import os
 import re
 import struct
 from typing import (
-    Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
-    TYPE_CHECKING)
+    Any, Collection, Dict, Iterable, List, Optional, Sequence, Set, Tuple,
+    TYPE_CHECKING, Union)
 
 import numpy
 from numpy import floating, integer, uint8, uint32
@@ -785,7 +785,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         data_set = set(data_indexes)
         indexes = [i for i in view_indexes if i in data_set]
         # check for missing and report
-        view_set = set(view_indexes)
+        view_set: Set[int] = set(view_indexes)
         missing = view_set.difference(data_indexes)
         if missing:
             logger.warning("No {} available for neurons {}",

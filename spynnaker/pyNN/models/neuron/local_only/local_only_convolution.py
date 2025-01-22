@@ -323,7 +323,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         pos_weights = conn.kernel_weights[conn.kernel_weights > 0]
         if len(pos_weights) == 0:
             return 0
-        return numpy.mean(pos_weights)
+        return float(numpy.mean(pos_weights))
 
     @overrides(AbstractSupportsSignedWeights.get_mean_negative_weight)
     def get_mean_negative_weight(
@@ -332,7 +332,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         neg_weights = conn.kernel_weights[conn.kernel_weights < 0]
         if len(neg_weights) == 0:
             return 0
-        return numpy.mean(neg_weights)
+        return float(numpy.mean(neg_weights))
 
     @overrides(AbstractSupportsSignedWeights.get_variance_positive_weight)
     def get_variance_positive_weight(
@@ -341,7 +341,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         pos_weights = conn.kernel_weights[conn.kernel_weights > 0]
         if len(pos_weights) == 0:
             return 0
-        return numpy.var(pos_weights)
+        return float(numpy.var(pos_weights))
 
     @overrides(AbstractSupportsSignedWeights.get_variance_negative_weight)
     def get_variance_negative_weight(
@@ -350,4 +350,4 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         neg_weights = conn.kernel_weights[conn.kernel_weights < 0]
         if len(neg_weights) == 0:
             return 0
-        return numpy.var(neg_weights)
+        return float(numpy.var(neg_weights))

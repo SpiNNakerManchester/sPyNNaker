@@ -246,6 +246,7 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
                            synapse_info.n_post_neurons)
         has_weights = int(self.__weights is not None)
         params = numpy.array([n_values, has_weights], dtype=uint32)
+        weights: NDArray[uint32]
         if self.__weights is None:
             weights = numpy.zeros(0, dtype=uint32)
         else:

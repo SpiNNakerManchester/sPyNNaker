@@ -317,14 +317,15 @@ class PopulationMachineNeurons(
         # Write the keys
         spec.write_array(keys)
 
-    def __in_selector(self, n: int, selector: Selector) -> bool:
+    def __in_selector(
+            self, n: Union[int, numpy.integer], selector: Selector) -> bool:
         if isinstance(selector, Container):
             return n in selector
         return n == selector
 
     def _write_current_source_parameters(
             self, spec: DataSpecificationBase):
-        n_atoms = self._vertex_slice.n_atoms
+        n_atoms: int = self._vertex_slice.n_atoms
 
         spec.comment(
             f"\nWriting Current Source Parameters for {n_atoms} Neurons:\n")
@@ -350,7 +351,7 @@ class PopulationMachineNeurons(
         if current_sources:
             # Array to keep track of the number of each type of current source
             # (there are four, but they are numbered 1 to 4, so five elements)
-            cs_index_array = [0, 0, 0, 0, 0]
+            cs_index_array: List[int] = [0, 0, 0, 0, 0]
 
             # Data sent to the machine will be current sources per neuron
             # This array will have the first entry indicating the number of
@@ -363,9 +364,10 @@ class PopulationMachineNeurons(
                 cs_id = current_source.current_source_id
 
                 # Only use IDs that are on this core
-                for i, n in enumerate(self._vertex_slice.get_raster_ids()):
+                for i, raster_id in enumerate(
+                        self._vertex_slice.get_raster_ids()):
                     if self.__in_selector(
-                            n, current_source_id_list[current_source]):
+                            raster_id, current_source_id_list[current_source]):
                         # I think this is now right, but test it more...
                         neuron_current_sources[i][0] += 1
                         neuron_current_sources[i].append(cs_id)
@@ -378,16 +380,16 @@ class PopulationMachineNeurons(
 
             # Now loop over the neurons on this core and write the current
             # source ID and index for sources attached to each neuron
-            for n in range(n_atoms):
-                n_current_sources = neuron_current_sources[n][0]
+            for atom in range(n_atoms):
+                n_current_sources = neuron_current_sources[atom][0]
                 spec.write_value(n_current_sources)
                 if n_current_sources != 0:
                     for csid in range(n_current_sources * 2):
-                        spec.write_value(neuron_current_sources[n][csid+1])
+                        spec.write_value(neuron_current_sources[atom][csid+1])
 
             # Write the number of each type of current source
-            for n in range(1, len(cs_index_array)):
-                spec.write_value(cs_index_array[n])
+            for cs_index in range(1, len(cs_index_array)):
+                spec.write_value(cs_index_array[cs_index])
 
             # Now loop over the current sources and write the data required
             # for each type of current source

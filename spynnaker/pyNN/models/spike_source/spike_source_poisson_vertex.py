@@ -292,7 +292,8 @@ class SpikeSourcePoissonVertex(
         self.__spike_recorder = MultiSpikeRecorder()
 
         if max_rate is None:
-            all_rates = list(_flatten(self.__data["rates"]))
+            all_rates: List[numpy.floating] = list(
+                _flatten(self.__data["rates"]))
             self.__max_rate = numpy.amax(all_rates) if all_rates else 0
         else:
             self.__max_rate = max_rate
