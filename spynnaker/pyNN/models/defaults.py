@@ -20,7 +20,7 @@ import inspect
 import logging
 from types import MappingProxyType
 from typing import (
-    Any, Callable, FrozenSet, Iterable, List, Mapping, Optional)
+    Any, Callable, FrozenSet, Iterable, List, Mapping, Optional, Tuple)
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.log import FormatAdapter
 
@@ -29,7 +29,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 def _check_args(
         args_to_find: FrozenSet[str], default_args: List[str],
-        init_method: Callable):
+        init_method: Callable) -> None:
     for arg in args_to_find:
         if arg not in default_args:
             raise AttributeError(
@@ -197,7 +197,7 @@ class AbstractProvidesDefaults(object):
     """
 
     @classmethod
-    def __fill_in_defaults(cls):
+    def __fill_in_defaults(cls) -> None:
         """
         Fills in default_parameters and default_initial_values attributes
         """
@@ -215,7 +215,7 @@ class AbstractProvidesDefaults(object):
         default_args = ([] if init_args.args is None else
                         init_args.args[n_args - n_defaults:])
         if init_args.defaults is None:
-            default_values = []
+            default_values: Tuple = ()
         else:
             default_values = init_args.defaults
 
@@ -241,16 +241,17 @@ class AbstractProvidesDefaults(object):
         _check_args(params.union(svars), default_args, init)
 
         # fill in the defaults so this method is only called once
-        cls.default_parameters: Mapping[str, Any] = {}
-        cls.default_initial_values: Mapping[str, Any] = {}
+        default_parameters = {}
+        default_initial_values = {}
         for arg, value in zip(default_args, default_values):
             if arg in params:
-                cls.default_parameters[arg] = value
+                default_parameters[arg] = value
             elif arg in svars:
-                cls.default_initial_values[arg] = value
-        cls.default_parameters = MappingProxyType(cls.default_parameters)
-        cls.default_initial_values = (
-            MappingProxyType(cls.default_initial_values))
+                default_initial_values[arg] = value
+        cls.default_parameters = MappingProxyType(  # type: ignore
+            default_parameters)
+        cls.default_initial_values = (MappingProxyType(  # type: ignore
+            default_initial_values))
 
     @classproperty
     def default_parameters(  # pylint: disable=no-self-argument
