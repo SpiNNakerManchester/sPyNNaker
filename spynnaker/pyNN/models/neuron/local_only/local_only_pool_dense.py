@@ -29,6 +29,7 @@ from spinn_front_end_common.interface.ds import (
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
     PoolDenseConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -74,7 +75,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         """
         # Store the sources to avoid recalculation
         self.__cached_sources: Dict[ApplicationVertex, Dict[
-                Tuple[ApplicationVertex, str], List[Source]]] = dict()
+                Tuple[ColouredApplicationVertex, str], List[Source]]] = dict()
 
         super().__init__(delay)
         if not isinstance(self.delay, (float, int)):
@@ -158,7 +159,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             first_conn_index = len(connector_data)
             for source in source_infos:
                 # pylint: disable=protected-access
-                conn = source.projection._synapse_information.connector
+                conn = cast(PoolDenseConnector,
+                            source.projection._synapse_information.connector)
                 app_edge = source.projection._projection_edge
                 connector_data.append(conn.get_local_only_data(
                     app_edge, source.local_delay, source.delay_stage,
@@ -224,7 +226,9 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.write_array(numpy.array(source_data, dtype=numpy.uint32))
         spec.write_array(numpy.concatenate(connector_data))
 
-    def __get_sources_for_target(self, app_vertex: AbstractPopulationVertex):
+    def __get_sources_for_target(
+            self, app_vertex: AbstractPopulationVertex) -> Dict[
+        Tuple[ColouredApplicationVertex, str], List[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.
