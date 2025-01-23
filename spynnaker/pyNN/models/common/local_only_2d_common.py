@@ -13,7 +13,7 @@
 # limitations under the License.
 from math import ceil, log2, floor
 from collections import namedtuple, defaultdict
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, TYPE_CHECKING
 
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationVirtualVertex)
@@ -24,8 +24,10 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
-from spynnaker.pyNN.models.projection import Projection
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.projection import Projection
 
 #: The number of bits in a short value
 BITS_PER_SHORT = 16
@@ -60,7 +62,7 @@ def get_div_const(value):
             + (sh1 << BITS_PER_SHORT) + m)
 
 
-def get_delay_for_source(incoming: Projection) -> Tuple[
+def get_delay_for_source(incoming: "Projection") -> Tuple[
         ColouredApplicationVertex, int, int, str]:
     """ Get the vertex which will send data from a given source projection,
         along with the delay stage and locally-handled delay value
