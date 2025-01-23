@@ -27,6 +27,7 @@ from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
     from spynnaker.pyNN.models.projection import Projection
 
 #: The number of bits in a short value
@@ -78,10 +79,12 @@ def get_delay_for_source(incoming: "Projection") -> Tuple[
     max_delay = app_edge.post_vertex.splitter.max_support_delay()
     local_delay = steps % max_delay
     delay_stage = 0
-    pre_vertex = app_edge.pre_vertex
+    pre_vertex: ColouredApplicationVertex = app_edge.pre_vertex
     if steps > max_delay:
         delay_stage = (steps // max_delay) - 1
-        pre_vertex = app_edge.delay_edge.pre_vertex
+        delay_edge = app_edge.delay_edge
+        assert delay_edge is not None
+        pre_vertex = delay_edge.pre_vertex
     assert isinstance(pre_vertex, ColouredApplicationVertex)
     return pre_vertex, local_delay, delay_stage, s_info.partition_id
 
@@ -114,7 +117,7 @@ def get_rinfo_for_spike_source(pre_vertex, partition_id):
     return r_info, core_mask, mask_shift
 
 
-def get_sources_for_target(app_vertex: ApplicationVertex) -> Dict[
+def get_sources_for_target(app_vertex: "AbstractPopulationVertex") -> Dict[
         Tuple[ColouredApplicationVertex, str], List[Source]]:
     """
     Get all the application vertex sources that will hit the given application
