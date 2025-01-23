@@ -228,7 +228,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     def __get_sources_for_target(
             self, app_vertex: AbstractPopulationVertex) -> Dict[
-        Tuple[ColouredApplicationVertex, str], List[Source]]:
+            Tuple[ColouredApplicationVertex, str], List[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.

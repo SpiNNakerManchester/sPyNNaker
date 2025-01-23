@@ -35,7 +35,6 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     ConvolutionConnector, AbstractConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.types import Weight_Delay_In_Types
 from spynnaker.pyNN.models.common.local_only_2d_common import (
     get_div_const, get_rinfo_for_spike_source, get_sources_for_target,

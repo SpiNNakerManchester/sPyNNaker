@@ -21,7 +21,6 @@ class ColouredApplicationVertex(ApplicationVertex):
     Indicates an application vertex that implements n_colour_bits.
     """
 
-
     __slots__ = ()
 
     @property
