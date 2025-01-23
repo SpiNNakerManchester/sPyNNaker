@@ -30,11 +30,11 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_SHORT, BYTES_PER_WORD)
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
     ConvolutionConnector, AbstractConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.types import Weight_Delay_In_Types
 from spynnaker.pyNN.models.common.local_only_2d_common import (
     get_div_const, get_rinfo_for_spike_source, get_sources_for_target,
@@ -78,7 +78,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         # Store the sources to avoid recalculation
         self.__cached_sources: Dict[ApplicationVertex, Dict[
-                Tuple[ApplicationVertex, str],
+                Tuple[ColouredApplicationVertex, str],
                 List[Source]]] = dict()
 
     @property
@@ -137,7 +137,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def write_parameters(
             self, spec: DataSpecificationGenerator, region: int,
             machine_vertex: PopulationMachineLocalOnlyCombinedVertex,
-            weight_scales: NDArray[floating]) -> None:
+            weight_scales: NDArray[floating]):
         # pylint: disable=unexpected-keyword-arg, protected-access
 
         # Get incoming sources for this vertex
@@ -158,7 +158,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         weight_data = list()
         for (pre_vertex, part_id), source_infos in sources.items():
 
-            assert isinstance(pre_vertex, PopulationApplicationVertex)
             # Add connectors as needed
             first_conn_index = len(connector_data)
             for source in source_infos:
@@ -251,7 +250,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     def __get_sources_for_target(
             self, app_vertex: AbstractPopulationVertex) -> Dict[
-                Tuple[ApplicationVertex, str], List[Source]]:
+                Tuple[ColouredApplicationVertex, str], List[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.
@@ -262,13 +261,11 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             information
         :rtype: dict(tuple(PopulationApplicationVertex, str), list(Source))
         """
-        _sources = self.__cached_sources.get(app_vertex)
-        if _sources is None:
+        sources = self.__cached_sources.get(app_vertex)
+        if sources is None:
             sources = get_sources_for_target(app_vertex)
             self.__cached_sources[app_vertex] = sources
-            return sources
-        else:
-            return _sources
+        return sources
 
     @staticmethod
     def __connector(projection: Projection) -> ConvolutionConnector:

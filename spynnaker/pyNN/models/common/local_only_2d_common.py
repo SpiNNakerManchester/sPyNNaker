@@ -12,29 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from math import ceil, log2, floor
-from typing import Dict, Final, List, NamedTuple, Tuple, TYPE_CHECKING, Union
-from collections import defaultdict
+from collections import namedtuple, defaultdict
+from typing import Dict, List, Tuple, TYPE_CHECKING, Union
+
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationVirtualVertex)
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.common.mdslice import MDSlice
 from pacman.model.routing_info import AppVertexRoutingInfo
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
     from spynnaker.pyNN.models.projection import Projection
-    #: A source
-    Source = NamedTuple("Source",
-                        [("projection", Projection), ("local_delay", int),
-                         ("delay_stage", int)])
-else:
-    from collections import namedtuple
-    #: A source
-    Source = namedtuple(
-        "Source", ["projection", "local_delay", "delay_stage"])
 
 #: The number of bits in a short value
 BITS_PER_SHORT = 16
@@ -46,7 +41,11 @@ BITS_PER_BYTE = 8
 N_COLOUR_BITS_BITS = 3
 
 #: Key info size in bytes
-KEY_INFO_SIZE: Final[int] = 4 * BYTES_PER_WORD
+KEY_INFO_SIZE = 4 * BYTES_PER_WORD
+
+#: A source
+Source = namedtuple(
+    "Source", ["projection", "local_delay", "delay_stage"])
 
 
 def get_div_const(value: int) -> int:
@@ -65,30 +64,28 @@ def get_div_const(value: int) -> int:
             + (sh1 << BITS_PER_SHORT) + m)
 
 
-def get_delay_for_source(
-        incoming: "Projection") -> Tuple[ApplicationVertex, int, int, str]:
+def get_delay_for_source(incoming: "Projection") -> Tuple[
+        ColouredApplicationVertex, int, int, str]:
     """ Get the vertex which will send data from a given source projection,
         along with the delay stage and locally-handled delay value
 
     :param Projection incoming: The incoming projection to get the delay from
     :return: The vertex, the local delay, the delay stage, the partition id
-    :rtype: ApplicationVertex, int, int, str
     """
     # pylint: disable=protected-access
     app_edge = incoming._projection_edge
     s_info = incoming._synapse_information
-    # TODO do we need to support None float delay?
-    delay = float(s_info.synapse_dynamics.delay)
+    delay = s_info.synapse_dynamics.delay
     steps = delay * SpynnakerDataView.get_simulation_time_step_per_ms()
     max_delay = app_edge.post_vertex.splitter.max_support_delay()
-    local_delay = int(steps % max_delay)
+    local_delay = steps % max_delay
     delay_stage = 0
-    pre_vertex: ApplicationVertex = app_edge.pre_vertex
+    pre_vertex: ColouredApplicationVertex = app_edge.pre_vertex
     if steps > max_delay:
-        delay_stage = int(steps // max_delay) - 1
-        edge = app_edge.delay_edge
-        assert edge is not None
-        pre_vertex = edge.pre_vertex
+        delay_stage = (steps // max_delay) - 1
+        delay_edge = app_edge.delay_edge
+        assert delay_edge is not None
+        pre_vertex = delay_edge.pre_vertex
     return pre_vertex, local_delay, delay_stage, s_info.partition_id
 
 
@@ -109,8 +106,8 @@ def get_rinfo_for_spike_source(
     # Find the routing information
     r_info = routing_info.get_info_from(
             pre_vertex, partition_id)
-
     assert isinstance(r_info, AppVertexRoutingInfo)
+
     n_cores = len(r_info.vertex.splitter.get_out_going_vertices(partition_id))
 
     # If there is 1 core, we don't use the core mask
@@ -124,7 +121,7 @@ def get_rinfo_for_spike_source(
 
 
 def get_sources_for_target(app_vertex: "AbstractPopulationVertex") -> Dict[
-        Tuple[ApplicationVertex, str], List[Source]]:
+        Tuple[ColouredApplicationVertex, str], List[Source]]:
     """
     Get all the application vertex sources that will hit the given application
     vertex.
@@ -143,9 +140,8 @@ def get_sources_for_target(app_vertex: "AbstractPopulationVertex") -> Dict[
     return sources
 
 
-def get_first_and_last_slice(
-        pre_vertex: ApplicationVertex) -> Union[
-            Tuple[Slice, Slice], Tuple[MDSlice, MDSlice]]:
+def get_first_and_last_slice(pre_vertex: ApplicationVertex) -> \
+        Union[Tuple[Slice, Slice], Tuple[MDSlice, MDSlice]]:
     """
     Get the first and last slice of an application vertex.
 

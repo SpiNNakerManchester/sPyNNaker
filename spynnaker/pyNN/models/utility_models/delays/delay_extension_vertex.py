@@ -18,6 +18,8 @@ from spinn_utilities.config_holder import get_config_bool
 from pacman.model.graphs.application import (
     ApplicationEdgePartition, ApplicationVertex)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
+from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
@@ -29,7 +31,7 @@ if TYPE_CHECKING:
 _DELAY_PARAM_HEADER_WORDS = 9
 
 
-class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
+class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
     """
     Provide delays to incoming spikes in multiples of the maximum delays
     of a neuron (typically 16 or 32).
@@ -86,7 +88,7 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
         return self.__partition.pre_vertex.n_atoms
 
     @property
-    @overrides(ApplicationVertex.atoms_shape)
+    @overrides(ColouredApplicationVertex.atoms_shape)
     def atoms_shape(self) -> Tuple[int, ...]:
         return self.__partition.pre_vertex.atoms_shape
 
@@ -182,8 +184,6 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
         return self.__outgoing_edges
 
     @property
+    @overrides(ColouredApplicationVertex.n_colour_bits)
     def n_colour_bits(self) -> int:
-        """
-        The number of bits for event colouring.
-        """
         return self.__n_colour_bits
