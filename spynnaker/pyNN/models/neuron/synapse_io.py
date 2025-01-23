@@ -19,6 +19,7 @@ import numpy
 from numpy import floating, integer, uint32
 from numpy.typing import NDArray
 
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -696,7 +697,9 @@ def _convert_delayed_data(
     return delayed_connections
 
 
-def __convert_sources_and_targets(connections, pre_vertex, post_vertex_slice):
+def __convert_sources_and_targets(
+        connections: ConnectionsArray, pre_vertex: ApplicationVertex,
+        post_vertex_slice: Slice) -> ConnectionsArray:
     connections["source"] = pre_vertex.get_raster_ordered_indices(
         connections["source"])
     connections["target"] = post_vertex_slice.get_raster_indices(

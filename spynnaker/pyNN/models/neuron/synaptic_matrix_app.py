@@ -300,7 +300,7 @@ class SynapticMatrixApp(object):
 
     def __get_padding(
             self, data_to_write: List[NDArray[uint32]],
-            expected_offset: int, block_addr: int):
+            expected_offset: int, block_addr: int) -> int:
         if expected_offset < block_addr:
             raise ValueError(
                 "The block address is already beyond where is expected!:"
@@ -352,7 +352,7 @@ class SynapticMatrixApp(object):
 
     def __update_connection_holders(
             self, data: NDArray[uint32], delayed_data: NDArray[uint32],
-            post_vertex_slice: Slice):
+            post_vertex_slice: Slice) -> None:
         """
         Fill in connections in the connection holders as they are created.
 
