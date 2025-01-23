@@ -200,6 +200,9 @@ class OneToOneOffsetConnector(
         n_values = self.__n_neurons_per_group
         if n_values is None:
             n_values = synapse_info.n_pre_neurons
+        assert self.__offset >= 0
+        assert self.__wrap >= 0
+        assert n_values >= 0
         return numpy.array([self.__offset, int(self.__wrap), n_values],
                            dtype=uint32)
 
