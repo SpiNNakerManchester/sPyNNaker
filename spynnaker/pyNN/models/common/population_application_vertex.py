@@ -34,7 +34,7 @@ from .types import Names, Values
 
 # pylint: disable=abstract-method
 class PopulationApplicationVertex(
-    ColouredApplicationVertex, HasCustomAtomKeyMap):
+        ColouredApplicationVertex, HasCustomAtomKeyMap):
     """
     A vertex that can be used in a Population.
 
