@@ -140,7 +140,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def write_parameters(
             self, spec: DataSpecificationGenerator, region: int,
             machine_vertex: PopulationMachineLocalOnlyCombinedVertex,
-            weight_scales: NDArray[floating]):
+            weight_scales: NDArray[floating]) -> None:
         # Get incoming sources for this vertex
         app_vertex = cast('AbstractPopulationVertex',
                           machine_vertex.app_vertex)
