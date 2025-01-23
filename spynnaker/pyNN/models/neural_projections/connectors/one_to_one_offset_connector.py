@@ -15,7 +15,7 @@ from __future__ import annotations
 from typing import Sequence, Optional, TYPE_CHECKING
 
 import numpy
-from numpy import uint32
+from numpy import int32, uint32
 from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
@@ -200,11 +200,9 @@ class OneToOneOffsetConnector(
         n_values = self.__n_neurons_per_group
         if n_values is None:
             n_values = synapse_info.n_pre_neurons
-        assert self.__offset >= 0
-        assert self.__wrap >= 0
-        assert n_values >= 0
-        return numpy.array([self.__offset, int(self.__wrap), n_values],
-                           dtype=uint32)
+        return numpy.array(
+            [int32(self.__offset).view(uint32), int(self.__wrap), n_values],
+            dtype=uint32)
 
     @property
     @overrides(
