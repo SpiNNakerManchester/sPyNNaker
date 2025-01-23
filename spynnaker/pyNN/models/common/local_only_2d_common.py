@@ -13,12 +13,13 @@
 # limitations under the License.
 from math import ceil, log2, floor
 from collections import namedtuple, defaultdict
-from typing import Dict, List, Tuple, TYPE_CHECKING
+from typing import Dict, List, Tuple, TYPE_CHECKING, Union
 
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationVirtualVertex)
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.common.mdslice import MDSlice
+from pacman.model.routing_info import AppVertexRoutingInfo
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
@@ -47,7 +48,7 @@ Source = namedtuple(
     "Source", ["projection", "local_delay", "delay_stage"])
 
 
-def get_div_const(value):
+def get_div_const(value: int) -> int:
     """ Get the values used to perform fast division by an integer constant
 
     :param int value: The value to be divided by
@@ -89,7 +90,9 @@ def get_delay_for_source(incoming: "Projection") -> Tuple[
     return pre_vertex, local_delay, delay_stage, s_info.partition_id
 
 
-def get_rinfo_for_spike_source(pre_vertex, partition_id):
+def get_rinfo_for_spike_source(
+        pre_vertex: ApplicationVertex,
+        partition_id: str) -> Tuple[AppVertexRoutingInfo, int, int]:
     """
     Get the routing information for the source of a projection in the
     given partition.
@@ -104,6 +107,7 @@ def get_rinfo_for_spike_source(pre_vertex, partition_id):
     # Find the routing information
     r_info = routing_info.get_info_from(
             pre_vertex, partition_id)
+    assert isinstance(r_info, AppVertexRoutingInfo)
 
     n_cores = len(r_info.vertex.splitter.get_out_going_vertices(partition_id))
 
@@ -137,7 +141,8 @@ def get_sources_for_target(app_vertex: "AbstractPopulationVertex") -> Dict[
     return sources
 
 
-def get_first_and_last_slice(pre_vertex):
+def get_first_and_last_slice(pre_vertex: ApplicationVertex) -> \
+        Union[Tuple[Slice, Slice], Tuple[MDSlice, MDSlice]]:
     """
     Get the first and last slice of an application vertex.
 
