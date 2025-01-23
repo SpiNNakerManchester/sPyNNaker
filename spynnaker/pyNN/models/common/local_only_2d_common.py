@@ -86,7 +86,6 @@ def get_delay_for_source(incoming: "Projection") -> Tuple[
         delay_edge = app_edge.delay_edge
         assert delay_edge is not None
         pre_vertex = delay_edge.pre_vertex
-    assert isinstance(pre_vertex, ColouredApplicationVertex)
     return pre_vertex, local_delay, delay_stage, s_info.partition_id
 
 
