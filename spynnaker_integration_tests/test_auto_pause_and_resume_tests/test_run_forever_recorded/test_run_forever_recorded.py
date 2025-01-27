@@ -20,10 +20,7 @@ from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager)
 
 
-
 def start_callback():
-    global run_count
-    print("Starting run {}".format(run_count))
     time.sleep(3.0)
     print("Ending Simulation")
     sim.external_devices.request_stop()
