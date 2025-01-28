@@ -66,17 +66,19 @@ class TestOneToOneOffsetConnector(BaseTestCase):
         assert len(conns_no_wrap) == 4
         assert len(conns_wrap) == 12
 
+        conns__no_wrap = [[int(i), int(j)] for i, j in conns_no_wrap]
         for i, j in conns_no_wrap:
-            group_i = int(i // 6)
-            group_j = int(j // 6)
+            group_i = i // 6
+            group_j = j // 6
             assert group_i == group_j
-            assert int(j) == int(i) + 4
+            assert j == i + 4
 
+        conns_wrap = [[int(i), int(j)] for i, j in conns_wrap]
         for i, j in conns_wrap:
-            group_i = int(i // 3)
-            group_j = int(j // 3)
+            group_i = i // 3
+            group_j = j // 3
             assert group_i == group_j
-            assert int(j) - (group_j * 3) == (int(i) - (group_i * 3) - 1) % 3
+            assert j - (group_j * 3) == (i - (group_i * 3) - 1) % 3
 
     def test_offset_groups(self):
         self.runsafe(self.check_offset_groups)
