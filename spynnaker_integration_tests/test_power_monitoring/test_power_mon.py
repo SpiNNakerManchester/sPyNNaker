@@ -14,7 +14,6 @@
 
 import os
 import numpy
-import sqlite3
 import pyNN.spiNNaker as p
 from spinn_front_end_common.interface.provenance import ProvenanceReader
 from spinn_front_end_common.utilities.report_functions import EnergyReport
@@ -34,11 +33,6 @@ synfire_run = SynfireRunner()
 
 
 class TestPowerMonitoring(BaseTestCase):
-    def query_provenance(self, query, *args):
-        prov_file = ProvenanceReader.get_last_run_database_path()
-        with sqlite3.connect(prov_file) as prov_db:
-            prov_db.row_factory = sqlite3.Row
-            return list(prov_db.execute(query, args))
 
     def do_run(self):
         synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,

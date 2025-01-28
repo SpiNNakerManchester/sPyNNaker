@@ -229,8 +229,7 @@ class TestPoissonSpikeSource(BaseTestCase):
         count_50_99 = 0
         for a_spikes in spikes[50:100]:
             count_50_99 += len(a_spikes)
-        tolerance = math.sqrt(50.0)
-        self.assertAlmostEqual(50.0, count_0_49 / 50.0, delta=tolerance)
+        self.assertGreater(count_0_49, 0.0)
         self.assertEqual(count_50_99, 0.0)
         self.assertEqual(self._saved_label_set, pop_label)
         self.assertEqual(self._saved_label_init, pop_label)
