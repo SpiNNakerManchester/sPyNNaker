@@ -33,6 +33,7 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.abstract_sized import AbstractSized
 
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+from spynnaker.pyNN.types import Selector
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 
 from .population_base import PopulationBase
@@ -46,10 +47,6 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.common import ParameterHolder
     from spynnaker.pyNN.models.common.types import Names, Values
     from spynnaker.pyNN.models.recorder import Recorder
-    #: :meta private:
-    Selector: TypeAlias = Union[
-        None, int, slice, List[int], List[bool], NDArray[bool_],
-        NDArray[integer]]
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

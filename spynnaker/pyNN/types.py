@@ -16,7 +16,7 @@
 Types (and related) that are useful for implementing connectors.
 """
 
-from typing import Iterable, Optional, Sequence, Union
+from typing import Iterable, Optional, Sequence, List, Union
 
 import numpy
 from numpy.typing import NDArray
@@ -38,7 +38,10 @@ Weight_Delay_In_Types: TypeAlias = Optional[Union[
     int, float, str, RandomDistribution, Iterable[int], Iterable[float]]]
 
 ViewIndices = Union[None, Sequence[int], NDArray[numpy.integer]]
-
+#: :meta private:
+Selector: TypeAlias = Union[
+    None, int, slice, List[int], List[bool], NDArray[numpy.bool_],
+    NDArray[numpy.integer]]
 
 def is_scalar(value: Weight_Delay_Types) -> TypeGuard[Union[int, float]]:
     """

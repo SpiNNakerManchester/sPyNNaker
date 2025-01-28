@@ -44,6 +44,7 @@ from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+from spynnaker.pyNN.types import Selector
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 
 from .population_base import PopulationBase
@@ -159,7 +160,7 @@ class Population(PopulationBase):
         for _id in range(self.__size):
             yield IDMixin(self, _id)
 
-    def __getitem__(self, index_or_slice) -> PopulationView:
+    def __getitem__(self, index_or_slice: Selector) -> PopulationView:
         if isinstance(index_or_slice, int):
             return IDMixin(self, index_or_slice)
         else:
