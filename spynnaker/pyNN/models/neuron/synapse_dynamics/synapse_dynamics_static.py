@@ -103,7 +103,7 @@ class SynapseDynamicsStatic(
     def write_parameters(
             self, spec: DataSpecificationBase, region: int,
             global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         # Nothing to do here
         pass
 

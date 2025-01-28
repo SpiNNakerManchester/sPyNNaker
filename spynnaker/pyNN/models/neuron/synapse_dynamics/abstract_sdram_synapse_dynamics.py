@@ -61,7 +61,7 @@ class AbstractSDRAMSynapseDynamics(
     def write_parameters(
             self, spec: DataSpecificationBase, region: int,
             global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         """
         Write the synapse parameters to the spec.
 

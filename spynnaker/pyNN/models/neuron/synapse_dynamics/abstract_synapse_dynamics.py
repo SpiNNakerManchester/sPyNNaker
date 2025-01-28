@@ -235,7 +235,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         raise InvalidParameterType(
             f"Type {type(self)} does not have parameter {key}")
 
-    def set_value(self, key: str, value: Any):
+    def set_value(self, key: str, value: Any) -> None:
         """
         Set a property.
 
@@ -382,7 +382,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         """
         Checks that the edge supports the connector.  Returns nothing; it
         is assumed that an Exception will be raised if anything is wrong.
