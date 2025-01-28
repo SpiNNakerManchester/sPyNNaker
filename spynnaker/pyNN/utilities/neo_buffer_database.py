@@ -48,6 +48,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.types import ViewIndices
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import SPIKES
 from spynnaker.pyNN.utilities.neo_csv import NeoCsv
@@ -59,8 +60,6 @@ if TYPE_CHECKING:
     from .data_population import DataPopulation
     #: :meta private:
     Names = Optional[ConcreteNames]
-    #: :meta private:
-    ViewIndices = Union[None, Sequence[int], NDArray[integer]]
     #: :meta private:
     Annotations = Optional[Dict[str, Any]]
 

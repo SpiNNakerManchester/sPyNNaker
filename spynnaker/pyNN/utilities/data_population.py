@@ -28,6 +28,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.models.populations import Population
+from spynnaker.pyNN.types import ViewIndices
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 from spynnaker.pyNN.models.common.types import Names
@@ -52,7 +53,8 @@ class DataPopulation(object):
         "_indexes",
         "_size")
 
-    def __init__(self, database_file: str, label: str, indexes=None):
+    def __init__(self, database_file: str, label: str,
+                 indexes: ViewIndices = None):
         self.__label = label
         self.__database_file = database_file
         # getting size right away also check the inputs or fails fast
@@ -62,9 +64,10 @@ class DataPopulation(object):
         self._indexes = indexes
 
     @overrides(Population.write_data)
-    def write_data(self, io: Union[str, neo.baseio.BaseIO],
-                   variables: Names = 'all', gather: bool = True,
-                   clear: bool = False, annotations: Annotations = None):
+    def write_data(
+            self, io: Union[str, neo.baseio.BaseIO],
+            variables: Names = 'all', gather: bool = True,
+            clear: bool = False, annotations: Annotations = None) -> None:
         # pylint: disable=missing-function-docstring,protected-access
         Population._check_params(gather, annotations)
         if clear:
