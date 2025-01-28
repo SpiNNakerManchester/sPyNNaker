@@ -75,7 +75,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
             self, spec: DataSpecificationBase, region: int,
             weight_scales: NDArray[floating],
             app_vertex: AbstractPopulationVertex,
-            vertex_slice: Slice, synaptic_matrices: SynapticMatrices):
+            vertex_slice: Slice, synaptic_matrices: SynapticMatrices) -> None:
         """
         Write structural plasticity parameters.
 

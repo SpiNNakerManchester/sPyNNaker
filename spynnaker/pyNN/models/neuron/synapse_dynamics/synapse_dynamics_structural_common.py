@@ -128,7 +128,7 @@ class SynapseDynamicsStructuralCommon(
             self, spec: DataSpecificationBase, region: int,
             weight_scales: NDArray[numpy.floating],
             app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
-            synaptic_matrices: SynapticMatrices):
+            synaptic_matrices: SynapticMatrices) -> None:
         spec.comment("Writing structural plasticity parameters")
         spec.switch_write_focus(region)
 
@@ -192,7 +192,7 @@ class SynapseDynamicsStructuralCommon(
     def __write_common_rewiring_data(
             self, spec: DataSpecificationBase,
             app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
-            n_pre_pops: int):
+            n_pre_pops: int) -> None:
         """
         Write the non-sub-population synapse parameters to the spec.
 
@@ -328,7 +328,7 @@ class SynapseDynamicsStructuralCommon(
     def __write_post_to_pre_table(
             self, spec: DataSpecificationBase, pop_index: _PopIndexType,
             subpop_index: _SubpopIndexType, lo_atom_index: _SubpopIndexType,
-            app_vertex: AbstractPopulationVertex, vertex_slice: Slice):
+            app_vertex: AbstractPopulationVertex, vertex_slice: Slice) -> None:
         """
         Post to pre table is basically the transpose of the synaptic matrix.
 
@@ -487,7 +487,7 @@ class SynapseDynamicsStructuralCommon(
         """
         raise NotImplementedError
 
-    def check_initial_delay(self, max_delay_ms: float):
+    def check_initial_delay(self, max_delay_ms: float) -> None:
         """
         Check that delays can be done without delay extensions.
 

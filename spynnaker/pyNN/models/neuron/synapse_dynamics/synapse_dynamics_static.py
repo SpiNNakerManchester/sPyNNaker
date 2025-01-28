@@ -146,12 +146,14 @@ class SynapseDynamicsStatic(
 
         return ff_data, ff_size
 
-    def _pad_row(self, rows, no_bytes_per_connection):
+    def _pad_row(self, rows: List[NDArray],
+                 no_bytes_per_connection: int) -> List[NDArray]:
         """
         :param list(~numpy.ndarray) rows:
         :param int no_bytes_per_connection:
         :rtype: list(~numpy.ndarray)
         """
+        assert self.__pad_to_length is not None
         return [
             numpy.concatenate([
                 row, numpy.zeros(numpy.clip(
