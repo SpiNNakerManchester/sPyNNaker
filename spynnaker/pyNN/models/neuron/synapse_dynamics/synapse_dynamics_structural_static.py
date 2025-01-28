@@ -224,7 +224,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
     def set_connections(
             self, connections: ConnectionsArray, post_vertex_slice: Slice,
             app_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         if not isinstance(synapse_info.synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
             return
