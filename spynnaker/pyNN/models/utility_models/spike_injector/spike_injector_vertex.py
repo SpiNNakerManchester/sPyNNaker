@@ -14,7 +14,7 @@
 
 import logging
 import sys
-from typing import (Collection, Dict, List, Optional, Tuple, Union)
+from typing import (Any, Collection, Dict, List, Optional, Tuple, Union)
 import numpy
 from numpy.typing import NDArray
 from pyNN.space import Grid2D, Grid3D, BaseStructure
@@ -150,7 +150,7 @@ class SpikeInjectorVertex(
             raise KeyError(f"Cannot record {name}")
         return vertex_slice.get_raster_ids()
 
-    def describe(self) -> Dict[str, Union[str, Dict[str, int]]]:
+    def describe(self) -> Dict[str, Union[str, Dict[str, Any]]]:
         """
         Returns a human-readable description of the cell or synapse type.
 

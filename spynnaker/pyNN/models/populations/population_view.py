@@ -129,7 +129,7 @@ class PopulationView(PopulationBase):
     def __getattr__(self, name: str) -> ParameterHolder:
         return self.__vertex.get_parameter_values(name, self.__indexes)
 
-    def __setattr__(self, name: str, value):
+    def __setattr__(self, name: str, value: Values) -> None:
         if name in self.__realslots__:
             object.__setattr__(self, name, value)
             return
@@ -228,7 +228,9 @@ class PopulationView(PopulationBase):
             NDArray[integer]]) -> 'PopulationView':
         ...
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: Union[
+            None, int, slice, List[int], List[bool], NDArray[bool_],
+            NDArray[integer]]) -> 'PopulationView':
         """
         Return either a single cell (ID object) from the Population,
         if index is an integer, or a subset of the cells
@@ -290,7 +292,7 @@ class PopulationView(PopulationBase):
         """
         return self.__vertex.conductance_based
 
-    def inject(self, current_source: AbstractCurrentSource):
+    def inject(self, current_source: AbstractCurrentSource) -> None:
         """
         Injects the specified current_source into this PopulationView.
 
@@ -299,8 +301,8 @@ class PopulationView(PopulationBase):
         """
         self.__vertex.inject(current_source, self.__indexes)
 
-    def describe(self, template='populationview_default.txt',
-                 engine='default'):
+    def describe(self, template: str = 'populationview_default.txt',
+                 engine: str = 'default') -> str:
         """
         Returns a human-readable description of the population view.
 
@@ -336,7 +338,7 @@ class PopulationView(PopulationBase):
         return self.__vertex.get_units(variable)
 
     def get(self, parameter_names: Names,
-            gather=False, simplify=True) -> ParameterHolder:
+            gather: bool = False, simplify: bool = True) -> ParameterHolder:
         """
         Get the values of the given parameters for every local cell in the
         population, or, if ``gather=True``, for all cells in the population.
@@ -364,7 +366,7 @@ class PopulationView(PopulationBase):
 
     def get_data(
             self, variables: Names = 'all',
-            gather=True, clear: bool = False, *,
+            gather: bool = True, clear: bool = False, *,
             annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
         """
         Return a Neo Block containing the data(spikes, state variables)
@@ -448,7 +450,9 @@ class PopulationView(PopulationBase):
             ) -> List[int]:
         ...
 
-    def id_to_index(self, id):  # pylint: disable=redefined-builtin
+    def id_to_index(
+            self, id: Union[int, Iterable[int]]) -> \
+            Union[int, List[int]]:  # pylint: disable=redefined-builtin
         """
         Given the ID(s) of cell(s) in the PopulationView, return its /
         their index / indices(order in the PopulationView).
@@ -473,7 +477,7 @@ class PopulationView(PopulationBase):
         """
         return [self.__indexes[index] for index in indices]
 
-    def initialize(self, **initial_values: Values):
+    def initialize(self, **initial_values: Values) -> None:
         """
         Set initial values of state variables, e.g. the membrane potential.
         Values passed to ``initialize()`` may be:
@@ -498,7 +502,7 @@ class PopulationView(PopulationBase):
             self.__vertex.set_initial_state_values(
                 variable, value, self.__indexes)
 
-    def set_state(self, **initial_values: Values):
+    def set_state(self, **initial_values: Values) -> None:
         """
         Set current values of state variables, e.g. the membrane potential.
         Values passed to ``set_state()`` may be:
@@ -528,7 +532,7 @@ class PopulationView(PopulationBase):
 
     def record(self, variables: Names,
                to_file: Union[None, str, neo.baseio.BaseIO] = None,
-               sampling_interval: Optional[int] = None):
+               sampling_interval: Optional[int] = None) -> None:
         # Type is technically wrong, but neo internals are awful
         """
         Record the specified variable or variables for all cells in the
@@ -569,7 +573,7 @@ class PopulationView(PopulationBase):
             self, indices,
             label=f"Random sample size {n} from {self.label}")
 
-    def set(self, **parameters: Values):
+    def set(self, **parameters: Values) -> None:
         """
         Set one or more parameters for every cell in the population.
         Values passed to `set()` may be:
@@ -599,8 +603,8 @@ class PopulationView(PopulationBase):
 
     def write_data(self, io: Union[str, neo.baseio.BaseIO],
                    variables: Names = 'all',
-                   gather=True, clear: bool = False,
-                   annotations: Optional[Dict[str, Any]] = None):
+                   gather: bool = True, clear: bool = False,
+                   annotations: Optional[Dict[str, Any]] = None) -> None:
         """
         Write recorded data to file, using one of the file formats
         supported by Neo.
@@ -672,7 +676,7 @@ class PopulationView(PopulationBase):
             return True
         return tuple(self.__indexes) == tuple(cont)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, PopulationView):
             return False
         return (self.__vertex == other._vertex and
@@ -681,7 +685,7 @@ class PopulationView(PopulationBase):
     def __str__(self) -> str:
         return str(self.__vertex) + str(self.__indexes)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return repr(self.__vertex) + str(self.__indexes)
 
 
@@ -713,13 +717,13 @@ class IDMixin(PopulationView):
             raise KeyError("Shouldn't come through here!")
         return self._vertex.get_parameter_values(name, self.id)
 
-    def __setattr__(self, name: str, value):
+    def __setattr__(self, name: str, value: Values) -> None:
         if name in self.__realslots__:
             object.__setattr__(self, name, value)
             return
         return self._vertex.set_parameter_values(name, value, self.id)
 
-    def get_initial_value(self, variable: str):
+    def get_initial_value(self, variable: str) -> ParameterHolder:
         """
         Get the initial value of a state variable of the cell.
 
@@ -733,7 +737,7 @@ class IDMixin(PopulationView):
         return self._vertex.get_initial_state_values(
             self._vertex.get_state_variables(), self.id)
 
-    def set_initial_value(self, variable: str, value: Values):
+    def set_initial_value(self, variable: str, value: Values) -> None:
         """
         Set the initial value of a state variable of the cell.
 
@@ -742,7 +746,7 @@ class IDMixin(PopulationView):
         """
         self._vertex.set_initial_state_values(variable, value, self.id)
 
-    def set_parameters(self, **parameters: Values):
+    def set_parameters(self, **parameters: Values) -> None:
         """
         Set cell parameters, given as a sequence of parameter=value arguments.
         """

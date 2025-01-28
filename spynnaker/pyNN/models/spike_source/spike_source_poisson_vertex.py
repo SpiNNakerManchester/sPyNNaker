@@ -332,7 +332,7 @@ class SpikeSourcePoissonVertex(
         # UGH! Mypy has been defeated!
         return cast(Any, self.__data["rates"])
 
-    def add_outgoing_projection(self, projection: Projection):
+    def add_outgoing_projection(self, projection: Projection) -> None:
         """
         Add an outgoing projection from this vertex.
 
@@ -378,7 +378,7 @@ class SpikeSourcePoissonVertex(
             placement = SpynnakerDataView.get_placement_of_vertex(m_vertex)
             m_vertex.read_parameters_from_machine(placement)
 
-    def __read_parameter(self, name: str, selector):
+    def __read_parameter(self, name: str, selector: Selector) -> Sequence:
         if (SpynnakerDataView.is_ran_last() and
                 SpynnakerDataView.has_transceiver()):
             self.__read_parameters_now()
@@ -599,7 +599,7 @@ class SpikeSourcePoissonVertex(
         return self.__seed
 
     @seed.setter
-    def seed(self, seed: int):
+    def seed(self, seed: int) -> None:
         self.__seed = seed
         self.__kiss_seed = dict()
         self.__rng = numpy.random.RandomState(seed)
@@ -619,7 +619,8 @@ class SpikeSourcePoissonVertex(
             self.__kiss_seed[vertex_slice] = create_mars_kiss_seeds(self.__rng)
         return self.__kiss_seed[vertex_slice]
 
-    def update_kiss_seed(self, vertex_slice: Slice, seed: Sequence[int]):
+    def update_kiss_seed(
+            self, vertex_slice: Slice, seed: Sequence[int]) -> None:
         """
         Updates a KISS seed from the machine.
 
@@ -641,7 +642,8 @@ class SpikeSourcePoissonVertex(
                 placement.x, placement.y, placement.p,
                 SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)
 
-    def describe(self):
+    def describe(
+            self) -> Dict[str, Union[str, ParameterHolder, Dict[str, Any]]]:
         """
         Return a human-readable description of the cell or synapse type.
 
@@ -663,7 +665,7 @@ class SpikeSourcePoissonVertex(
             "parameters": parameters,
         }
 
-    def set_live_poisson_control_edge(self, edge: ApplicationEdge):
+    def set_live_poisson_control_edge(self, edge: ApplicationEdge) -> None:
         """
         Sets the poisson generator.
 
