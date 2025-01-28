@@ -66,7 +66,7 @@ class TestOneToOneOffsetConnector(BaseTestCase):
         assert len(conns_no_wrap) == 4
         assert len(conns_wrap) == 12
 
-        conns__no_wrap = [[int(i), int(j)] for i, j in conns_no_wrap]
+        conns_no_wrap = [[int(i), int(j)] for i, j in conns_no_wrap]
         for i, j in conns_no_wrap:
             group_i = i // 6
             group_j = j // 6
