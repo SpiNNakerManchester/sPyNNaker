@@ -64,10 +64,10 @@ class DataPopulation(object):
         self._indexes = indexes
 
     @overrides(Population.write_data)
-    def write_data(
-            self, io: Union[str, neo.baseio.BaseIO],
-            variables: Names = 'all', gather: bool = True,
-            clear: bool = False, annotations: Annotations = None) -> None:
+    def write_data(self, io: Union[str, neo.baseio.BaseIO],
+                   variables: Names = 'all', gather: bool = True,
+                   clear: bool = False,
+                   annotations: Annotations = None) -> None:
         # pylint: disable=missing-function-docstring,protected-access
         Population._check_params(gather, annotations)
         if clear:

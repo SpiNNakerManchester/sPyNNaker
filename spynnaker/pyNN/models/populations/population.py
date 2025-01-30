@@ -43,6 +43,7 @@ from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.recorder import Recorder
+from spynnaker.pyNN.types import IoDest
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.types import Selector
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
@@ -205,24 +206,9 @@ class Population(PopulationBase):
         """
         return variable in self.__vertex.get_recordable_variables()
 
-    @overrides(PopulationBase.record, extend_doc=False)
-    def record(self, variables: Names, to_file: Optional[str] = None,
+    @overrides(PopulationBase.record)
+    def record(self, variables: Names, to_file: IoDest = None,
                sampling_interval: Optional[int] = None) -> None:
-        """
-        Record the specified variable or variables for all cells in the
-        Population or view.
-
-        :param variables: either a single variable name or a list of variable
-            names. For a given `celltype` class, `celltype.recordable` contains
-            a list of variables that can be recorded for that `celltype`.
-        :type variables: str or list(str)
-        :param to_file: a file to automatically record to (optional).
-            :py:meth:`write_data` will be automatically called when
-            `sim.end()` is called.
-        :type to_file: ~neo.io or ~neo.rawio or str
-        :param int sampling_interval: a value in milliseconds, and an integer
-            multiple of the simulation timestep.
-        """
         self.__recorder.record(
             variables, to_file, sampling_interval, indexes=None)
 
@@ -244,36 +230,10 @@ class Population(PopulationBase):
             self, indices,
             label=f"Random sample size {n} from {self.label}")
 
-    @overrides(PopulationBase.write_data, extend_doc=False)
+    @overrides(PopulationBase.write_data)
     def write_data(self, io: Union[str, BaseIO], variables: Names = 'all',
                    gather: bool = True, clear: bool = False,
                    annotations: Optional[Dict[str, Any]] = None) -> None:
-        """
-        Write recorded data to file, using one of the file formats
-        supported by Neo.
-
-        :param io:
-            a Neo IO instance, or a string for where to put a neo instance
-        :type io: neo.io.baseio.BaseIO or str
-        :param variables:
-            either a single variable name or a list of variable names.
-            Variables must have been previously recorded, otherwise an
-            Exception will be raised.
-        :type variables: str or list(str)
-        :param bool gather: Whether to bring all relevant data together.
-
-            .. note::
-                SpiNNaker always gathers.
-
-        :param bool clear:
-            clears the storage data if set to true after reading it back
-        :param annotations: annotations to put on the neo block
-        :type annotations: dict(str, ...)
-        :raises \
-            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
-            If the variable or variables have not been previously set to
-            record.
-        """
         self._check_params(gather, annotations)
 
         if isinstance(io, str):
@@ -529,13 +489,8 @@ class Population(PopulationBase):
             self.__vertex.get_state_variables())
 
     @property
-    def positions(self) -> NDArray[numpy.floating]:
-        """
-        The position array for structured populations.
-
-        :return: a 3xN array
-        :rtype: ~numpy.ndarray
-        """
+    @overrides(PopulationBase.positions)
+    def positions(self) -> NDArray[floating]:
         if self.__positions is None:
             if self.__structure is None:
                 raise ValueError("attempted to retrieve positions "
@@ -552,6 +507,7 @@ class Population(PopulationBase):
         self.__positions = positions
 
     @property
+    @overrides(PopulationBase.all_cells)
     def all_cells(self) -> List[IDMixin]:
         """
         :rtype: list(IDMixin)
@@ -559,10 +515,8 @@ class Population(PopulationBase):
         return [IDMixin(self, _id) for _id in range(self.__size)]
 
     @property
+    @overrides(PopulationBase.position_generator)
     def position_generator(self) -> Callable[[int], NDArray[numpy.floating]]:
-        """
-        :rtype: callable((int), ~numpy.ndarray)
-        """
         return lambda i: self.positions[:, i]
 
     @property
@@ -705,6 +659,7 @@ class Population(PopulationBase):
         # TODO: Need __getitem__
         _we_dont_do_this_now(cell_id)
 
+    @overrides(PopulationBase.inject)
     def inject(self, current_source: NeuronCurrentSource) -> None:
         """
         Connect a current source to all cells in the Population.
@@ -736,6 +691,7 @@ class Population(PopulationBase):
             "As label is used as an ID it can not be changed")
 
     @property
+    @overrides(PopulationBase.structure)
     def structure(self) -> Optional[BaseStructure]:
         """
         The structure for the population.
