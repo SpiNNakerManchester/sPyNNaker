@@ -15,8 +15,8 @@ from __future__ import annotations
 import logging
 import os
 from typing import (
-    Any, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple, Union,
-    overload, TYPE_CHECKING)
+    Any, Callable, Dict, Iterable, Iterator, List, Optional, overload,
+    Sequence, Tuple, TYPE_CHECKING, Union)
 
 import numpy
 from numpy import bool_, integer
@@ -25,6 +25,7 @@ from typing_extensions import TypeAlias
 
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
+from pyNN.space import BaseStructure
 import neo  # type: ignore[import]
 
 from spinn_utilities.log import FormatAdapter
@@ -46,6 +47,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.common import ParameterHolder
     from spynnaker.pyNN.models.common.types import Names, Values
     from spynnaker.pyNN.models.recorder import Recorder
+    from spynnaker.pyNN.types import IoDest
     #: :meta private:
     Selector: TypeAlias = Union[
         None, int, slice, List[int], List[bool], NDArray[bool_],
@@ -208,6 +210,7 @@ class PopulationView(PopulationBase):
         return self.__mask
 
     @property
+    @overrides(PopulationBase.all_cells)
     def all_cells(self) -> Sequence['IDMixin']:
         """
         An array containing the cell IDs of all neurons in the
@@ -266,6 +269,16 @@ class PopulationView(PopulationBase):
         """
         return len(self.__indexes)
 
+    @property
+    @overrides(PopulationBase.positions)
+    def positions(self) -> NDArray[numpy.floating]:
+        raise NotImplementedError("Not implemented for views")
+
+    @property
+    @overrides(PopulationBase.position_generator)
+    def position_generator(self) -> Callable[[int], NDArray[numpy.floating]]:
+        raise NotImplementedError("Not implemented for views")
+
     def all(self) -> Iterable['IDMixin']:
         """
         Iterator over cell IDs (on all MPI nodes).
@@ -293,7 +306,8 @@ class PopulationView(PopulationBase):
         """
         return self.__vertex.conductance_based
 
-    def inject(self, current_source: AbstractCurrentSource):
+    @overrides(PopulationBase.inject)
+    def inject(self, current_source: AbstractCurrentSource) -> None:
         """
         Injects the specified current_source into this PopulationView.
 
@@ -302,8 +316,8 @@ class PopulationView(PopulationBase):
         """
         self.__vertex.inject(current_source, self.__indexes)
 
-    def describe(self, template='populationview_default.txt',
-                 engine='default'):
+    def describe(self, template: str = 'populationview_default.txt',
+                 engine: str = 'default'):
         """
         Returns a human-readable description of the population view.
 
@@ -365,6 +379,7 @@ class PopulationView(PopulationBase):
         return self.__vertex.get_parameter_values(
             parameter_names, self.__indexes)
 
+    @overrides(PopulationBase.get_data)
     def get_data(
             self, variables: Names = 'all',
             gather=True, clear: bool = False, *,
@@ -529,30 +544,15 @@ class PopulationView(PopulationBase):
             self.__vertex.set_current_state_values(
                 variable, value, self.__indexes)
 
-    def record(self, variables: Names,
-               to_file: Union[None, str, neo.baseio.BaseIO] = None,
-               sampling_interval: Optional[int] = None):
-        # Type is technically wrong, but neo internals are awful
-        """
-        Record the specified variable or variables for all cells in the
-        Population or view.
-
-        :param variables: either a single variable name, or a list of variable
-            names, or ``all`` to record everything. For a given `celltype`
-            class, `celltype.recordable` contains a
-            list of variables that can be recorded for that `celltype`.
-        :type variables: str or list(str)
-        :param to_file:
-            If specified, should be a Neo IO instance and
-            :py:meth:`write_data`
-            will be automatically called when `sim.end()` is called.
-        :type to_file: ~neo.io or ~neo.rawio or str
-        :param int sampling_interval:
-            should be a value in milliseconds, and an integer multiple of the
-            simulation timestep.
-        """
+    @overrides(PopulationBase.record)
+    def record(self, variables: Names, to_file: IoDest = None,
+               sampling_interval: Optional[int] = None) -> None:
         self.__recorder.record(
             variables, to_file, sampling_interval, self.__indexes)
+
+    @overrides(PopulationBase.structure)
+    def structure(self) -> Optional[BaseStructure]:
+        raise NotImplementedError("Not implemented for views")
 
     def sample(
             self, n: int, rng: Optional[NumpyRNG] = None) -> 'PopulationView':
@@ -600,39 +600,11 @@ class PopulationView(PopulationBase):
             self.__vertex.set_parameter_values(
                 parameter, value, self.__indexes)
 
+    @overrides(PopulationBase.write_data)
     def write_data(self, io: Union[str, neo.baseio.BaseIO],
                    variables: Names = 'all',
-                   gather=True, clear: bool = False,
-                   annotations: Optional[Dict[str, Any]] = None):
-        """
-        Write recorded data to file, using one of the file formats
-        supported by Neo.
-
-        :param io: a Neo IO instance or the name of a file to write
-        :type io: neo.io.BaseIO or str
-        :param variables: either a single variable name or a list of variable
-            names. These must have been previously recorded, otherwise an
-            Exception will be raised.
-        :type variables: str or list(str)
-        :param bool gather: For parallel simulators, if this is True, all
-            data will be gathered to the master node and a single output file
-            created there. Otherwise, a file will be written on each node,
-            containing only data from the cells simulated on that node.
-
-            .. note::
-                SpiNNaker always gathers.
-
-        :param bool clear:
-            If this is True, recorded data will be deleted from the Population.
-        :param annotations: should be a dict containing simple data types such
-            as numbers and strings. The contents will be written into the
-            output data file as metadata.
-        :type annotations: dict(str, ...)
-        :raises \
-            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
-            If the variable or variables have not been previously set to
-            record.
-        """
+                   gather: bool = True, clear: bool = False,
+                   annotations: Optional[Dict[str, Any]] = None) -> None:
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
                            "as if gather was set to True.")

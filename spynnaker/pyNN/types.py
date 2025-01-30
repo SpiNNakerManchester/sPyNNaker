@@ -22,6 +22,7 @@ import numpy
 from numpy.typing import NDArray
 from typing_extensions import TypeAlias, TypeGuard
 
+import neo
 from pyNN.random import RandomDistribution
 
 #: The type of weights and delays provided by Synapse / SynapseInformation
@@ -36,6 +37,8 @@ Delay_Types: TypeAlias = \
 # Most things that can be considered floats (including int)  will work
 Weight_Delay_In_Types: TypeAlias = Optional[Union[
     int, float, str, RandomDistribution, Iterable[int], Iterable[float]]]
+
+IoDest: TypeAlias = Union[str, neo.baseio.BaseIO, None]
 
 
 def is_scalar(value: Weight_Delay_Types) -> TypeGuard[Union[int, float]]:

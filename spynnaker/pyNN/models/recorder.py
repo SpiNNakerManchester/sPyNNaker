@@ -26,12 +26,12 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+from spynnaker.pyNN.types import IoDest
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.types import Names
     from spynnaker.pyNN.models.populations import Population
     from spynnaker.pyNN.models.common import PopulationApplicationVertex
-    _IoDest: TypeAlias = Union[str, neo.baseio.BaseIO, None]
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -58,14 +58,14 @@ class Recorder(object):
         self.__vertex = vertex
 
         # file flags, allows separate files for the recorded variables
-        self.__write_to_files_indicators: Dict[str, _IoDest] = {
+        self.__write_to_files_indicators: Dict[str, IoDest] = {
             'spikes': None,
             'gsyn_exc': None,
             'gsyn_inh': None,
             'v': None}
 
     @property
-    def write_to_files_indicators(self) -> Mapping[str, _IoDest]:
+    def write_to_files_indicators(self) -> Mapping[str, IoDest]:
         """
         What variables should be written to files, and where should they
         be written.
@@ -75,7 +75,7 @@ class Recorder(object):
         return self.__write_to_files_indicators
 
     def record(
-            self, variables: Names, to_file: _IoDest,
+            self, variables: Names, to_file: IoDest,
             sampling_interval: Optional[int],
             indexes: Optional[Collection[int]]):
         """
@@ -132,7 +132,7 @@ class Recorder(object):
                         variable, sampling_interval, to_file, indexes)
 
     def __turn_on_all_record(
-            self, sampling_interval: Optional[int], to_file: _IoDest,
+            self, sampling_interval: Optional[int], to_file: IoDest,
             indexes: Optional[Collection[int]]):
         """
         :param int sampling_interval: the interval to record them
@@ -155,7 +155,7 @@ class Recorder(object):
 
     def turn_on_record(
             self, variable: str, sampling_interval: Optional[int] = None,
-            to_file: _IoDest = None,
+            to_file: IoDest = None,
             indexes: Optional[Collection[int]] = None):
         """
         Tell the vertex to record data.
