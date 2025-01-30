@@ -85,7 +85,7 @@ class OneToOneOffsetConnector(
         self.__offset = offset
         self.__wrap = wrap
 
-    def __n_connections(self, synapse_info: SynapseInformation):
+    def __n_connections(self, synapse_info: SynapseInformation) -> int:
         if self.__wrap:
             # If there is a wrap, there will always be a next connection
             return synapse_info.n_pre_neurons
@@ -185,7 +185,7 @@ class OneToOneOffsetConnector(
         block["synapse_type"] = synapse_type
         return block
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"offsetConnector(offset={self.__offset}, wrap={self.__wrap}, "
                 f"n_neurons_per_group={self.__n_neurons_per_group})")
 
@@ -213,7 +213,7 @@ class OneToOneOffsetConnector(
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         if (synapse_info.pre_population.size !=
                 synapse_info.post_population.size):
             raise NotImplementedError(

@@ -16,6 +16,7 @@ import logging
 import math
 import re
 from typing import Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING
+from typing_extensions import Never
 
 import numpy
 from numpy import float64, uint32, uint16, uint8
@@ -84,7 +85,11 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param bool safe: if True, check that weights and delays have valid
             values. If False, this check is skipped. (NB: SpiNNaker always
             checks.)
-        :param callable callback: Ignored
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         :param bool verbose:
         """
         if callback is not None:
@@ -97,7 +102,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         self.__min_delay = 0.0
         self.__param_seeds: Dict[Tuple[int, int], int] = dict()
 
-    def set_space(self, space: Space):
+    def set_space(self, space: Space) -> None:
         """
         Set the space object (allowed after instantiation).
 
@@ -105,7 +110,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         self.__space = space
 
-    def set_projection_information(self, synapse_info: SynapseInformation):
+    def set_projection_information(
+            self, synapse_info: SynapseInformation) -> None:
         """
         Sets a connectors projection info.
 
@@ -413,7 +419,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.array([copy_rd.next(1)], dtype=float64)
         return copy_rd.next(n_connections)
 
-    def _no_space_exception(self, values: Weight_Delay_Types, synapse_info):
+    def _no_space_exception(
+            self, values: Weight_Delay_Types, synapse_info) -> Never:
         """
         Returns a SpynnakerException about there being no space defined
 
@@ -427,7 +434,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             f"{synapse_info.pre_population}-"
             f"{synapse_info.post_population}")
 
-    def weight_type_exception(self, weights: Weight_Types):
+    def weight_type_exception(self, weights: Weight_Types) -> Never:
         """
         Returns an Exception explaining incorrect weight or delay type
 
@@ -452,7 +459,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         else:
             return SpynnakerException(f"Unrecognised weight {weights}")
 
-    def delay_type_exception(self, delays: Delay_Types):
+    def delay_type_exception(self, delays: Delay_Types) -> SpynnakerException:
         """
         Returns an Exception explaining incorrect delay type
 
@@ -677,7 +684,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 for m_vertex in target_vertex.splitter.get_in_coming_vertices(
                     s_info.partition_id)]
 
-    def connect(self, projection: Projection):
+    def connect(self, projection: Projection) -> Never:
         """
         Apply this connector to a projection.
 
@@ -715,7 +722,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         """
         Checks that the edge supports the connector.  Returns nothing; it
         is assumed that an Exception will be raised if anything is wrong.

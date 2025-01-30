@@ -86,7 +86,8 @@ class ConvolutionConnector(AbstractConnector):
                  pool_shape: _Shape = None, pool_stride: _Shape = None,
                  positive_receptor_type: str = "excitatory",
                  negative_receptor_type: str = "inhibitory",
-                 safe=True, verbose=False, callback=None, filter_edges=True):
+                 safe: bool = True, verbose: bool = False,
+                 callback: None = None, filter_edges: bool = True):
         """
         :param kernel_weights:
             The synaptic strengths, shared by neurons in the post population.
@@ -142,9 +143,13 @@ class ConvolutionConnector(AbstractConnector):
         :param str negative_receptor_type:
             The receptor type to add the negative weights to.  By default this
             is "``inhibitory``".
-        :param bool safe: (ignored)
-        :param bool verbose: (ignored)
-        :param callable callback: (ignored)
+        :param bool safe:
+        :param bool verbose:
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         :param bool filter_edges:
             Whether to filter the edges based on connectivity or not; filtered
             means that the receiving cores will receive fewer packets, whereas
@@ -294,7 +299,7 @@ class ConvolutionConnector(AbstractConnector):
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         pre = application_edge.pre_vertex
         post = application_edge.post_vertex
         if len(pre.atoms_shape) != 2 or len(post.atoms_shape) != 2:

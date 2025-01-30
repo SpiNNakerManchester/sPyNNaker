@@ -63,7 +63,7 @@ class DistanceDependentProbabilityConnector(
             self, d_expression: str, allow_self_connections: bool = True,
             n_connections: Optional[int] = None,
             rng: Optional[NumpyRNG] = None,
-            safe=True, verbose=False, callback=None):
+            safe: bool = True, verbose: bool = False, callback: None = None):
         """
         :param str d_expression:
             the right-hand side of a valid python expression for
@@ -89,6 +89,10 @@ class DistanceDependentProbabilityConnector(
             needed.
         :type rng: ~pyNN.random.NumpyRNG or None
         :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         """
         # :param ~pyNN.space.Space space:
         #    a Space object, needed if you wish to specify distance-dependent

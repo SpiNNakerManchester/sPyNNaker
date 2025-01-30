@@ -84,7 +84,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     def __init__(self, conn_list: Union[None, NDArray, List[Tuple[int, ...]]],
                  column_names: Optional[Sequence[str]] = None, *,
-                 safe=True, verbose=False, callback=None):
+                 safe: bool = True, verbose: bool = False,
+                 callback: None = None):
         """
         :param conn_list:
             A numpy array or a list of tuples, one tuple for each connection.
@@ -563,7 +564,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         out_of_range_targets = self.__targets >= synapse_info.n_post_neurons
         if any(out_of_range_targets):
             logger.warning(

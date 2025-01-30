@@ -55,7 +55,7 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             allow_self_connections: bool = True,
             n_connections: Optional[int] = None,
             rng: Optional[NumpyRNG] = None,
-            safe=True, callback=None, verbose=False):
+            safe: bool = True, callback: None = None, verbose: bool = False):
         """
         :param float degree:
             the region length where nodes will be connected locally

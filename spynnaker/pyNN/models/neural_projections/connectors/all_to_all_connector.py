@@ -43,8 +43,8 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
 
     __slots__ = ("__allow_self_connections", )
 
-    def __init__(self, allow_self_connections=True, safe=True,
-                 verbose=None, callback=None):
+    def __init__(self, allow_self_connections: bool = True, safe: bool  = True,
+                 verbose: bool = False, callback: None = None):
         """
         :param bool allow_self_connections:
             if the connector is used to connect a Population to itself, this
@@ -143,7 +143,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
         block["synapse_type"] = synapse_type
         return block
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "AllToAllConnector()"
 
     @property
@@ -154,7 +154,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
         return self.__allow_self_connections
 
     @allow_self_connections.setter
-    def allow_self_connections(self, new_value: bool):
+    def allow_self_connections(self, new_value: bool) -> None:
         self.__allow_self_connections = new_value
 
     @property

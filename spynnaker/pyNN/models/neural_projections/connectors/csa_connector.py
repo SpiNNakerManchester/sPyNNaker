@@ -50,7 +50,8 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         "__full_connection_set",
         "__full_cset")
 
-    def __init__(self, cset: CSet, safe=True, callback=None, verbose=False):
+    def __init__(self, cset: CSet, safe: bool = True, callback: None = None,
+                 verbose: bool = False):
         """
         :param csa.connset.CSet cset:
             A description of the connection set between populations

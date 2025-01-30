@@ -62,7 +62,7 @@ class IndexBasedProbabilityConnector(AbstractConnector,
     def __init__(
             self, index_expression: str, allow_self_connections: bool = True,
             rng: Optional[NumpyRNG] = None,
-            safe=True, callback=None, verbose=False):
+            safe: bool = True, callback: None = None, verbose: bool = False):
         """
         :param str index_expression:
             the right-hand side of a valid python expression for

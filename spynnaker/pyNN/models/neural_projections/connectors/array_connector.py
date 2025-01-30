@@ -42,8 +42,8 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         "__array_dims",
         "__n_total_connections")
 
-    def __init__(self, array: NDArray[uint8],
-                 safe=True, callback=None, verbose=False):
+    def __init__(self, array: NDArray[uint8], safe: bool = True,
+                 callback: None = None, verbose: bool = False):
         """
         :param array:
             An explicit Boolean matrix that specifies the connections
