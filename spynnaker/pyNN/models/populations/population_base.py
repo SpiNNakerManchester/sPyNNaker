@@ -78,7 +78,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @final
-    def __add__(self, other: PopulationBase) -> Never:
+    def __add__(self, other: PopulationBase) -> Never:  #pylint: disable=W0613
         """
         A Population / PopulationView can be added to another
         Population, PopulationView or Assembly, returning an Assembly.
@@ -204,7 +204,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         return sum(counts.values()) / len(counts)
 
     @final
-    def nearest(self, position: Any) -> Never:
+    def nearest(
+            self, position: Any) -> Never:   # pylint: disable=unused-argument
         """
         Return the neuron closest to the specified position.
 
@@ -299,7 +300,7 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @final
     def save_positions(
-            self, file: Any) -> Never:  # pylint: disable=redefined-builtin
+            self, file: Any) -> Never:  #pylint: disable=W0622,W0613
         """
         Save positions to file. The output format is index x y z
 

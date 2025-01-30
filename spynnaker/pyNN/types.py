@@ -22,7 +22,7 @@ import numpy
 from numpy.typing import NDArray
 from typing_extensions import TypeAlias, TypeGuard
 
-import neo
+import neo  # type: ignore[import]
 from pyNN.random import RandomDistribution
 
 #: The type of weights and delays provided by Synapse / SynapseInformation

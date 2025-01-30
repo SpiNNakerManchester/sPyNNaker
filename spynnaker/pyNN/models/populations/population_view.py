@@ -550,6 +550,7 @@ class PopulationView(PopulationBase):
         self.__recorder.record(
             variables, to_file, sampling_interval, self.__indexes)
 
+    @property
     @overrides(PopulationBase.structure)
     def structure(self) -> Optional[BaseStructure]:
         raise NotImplementedError("Not implemented for views")
@@ -741,3 +742,18 @@ class IDMixin(PopulationView):
         """
         # There are no MPI nodes!
         return True
+
+    @property
+    @overrides(PopulationBase.positions)
+    def positions(self) -> NDArray[numpy.floating]:
+        raise NotImplementedError("Not implemented for IDMixin")
+
+    @property
+    @overrides(PopulationBase.position_generator)
+    def position_generator(self) -> Callable[[int], NDArray[numpy.floating]]:
+        raise NotImplementedError("Not implemented for IDMixin")
+
+    @property
+    @overrides(PopulationBase.structure)
+    def structure(self) -> Optional[BaseStructure]:
+        raise NotImplementedError("Not implemented for IDMixin")
