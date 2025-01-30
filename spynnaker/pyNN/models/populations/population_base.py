@@ -32,8 +32,6 @@ from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.types import IoDest
 
-from .assembly import Assembly
-
 if TYPE_CHECKING:
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
     from spynnaker.pyNN.models.common.types import Names
@@ -42,7 +40,7 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def _we_dont_do_this_now(*args: Any) -> Never:  # pylint: disable=unused-argument
+def _we_dont_do_this_now() -> Never:
     # pragma: no cover
     raise NotImplementedError("sPyNNaker does not currently do this")
 
@@ -92,7 +90,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         :rtype: Assembly
         """
         # TODO: support assemblies
-        _we_dont_do_this_now(other)  # pragma: no cover
+        _we_dont_do_this_now()
 
     @abstractmethod
     def get_data(
@@ -214,7 +212,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             Currently unimplemented.
         """
         # TODO: support neuron positions and spaces
-        _we_dont_do_this_now(position)  # pragma: no cover
+        _we_dont_do_this_now()
 
     @property
     @abstractmethod
@@ -279,7 +277,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         .. warning::
             Currently unimplemented.
         """
-        _we_dont_do_this_now()  # pragma: no cover
+        _we_dont_do_this_now()
 
     @abstractmethod
     def record(self, variables: Names, to_file: IoDest = None,
@@ -309,7 +307,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             Currently unimplemented.
         """
         # TODO:
-        _we_dont_do_this_now(file)  # pragma: no cover
+        _we_dont_do_this_now()
         raise NotImplementedError
 
     @property
