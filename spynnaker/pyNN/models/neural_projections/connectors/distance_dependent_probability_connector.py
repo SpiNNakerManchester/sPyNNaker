@@ -110,7 +110,8 @@ class DistanceDependentProbabilityConnector(
                 " DistanceDependentProbabilityConnector on this platform")
 
     @overrides(AbstractConnector.set_projection_information)
-    def set_projection_information(self, synapse_info: SynapseInformation):
+    def set_projection_information(
+            self, synapse_info: SynapseInformation) -> None:
         super().set_projection_information(synapse_info)
         self._set_probabilities(synapse_info)
 

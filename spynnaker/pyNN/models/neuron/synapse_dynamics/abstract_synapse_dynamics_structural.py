@@ -96,7 +96,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     def set_connections(
             self, connections: ConnectionsArray, post_vertex_slice: Slice,
             app_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         """
         Set connections for structural plasticity.
 
