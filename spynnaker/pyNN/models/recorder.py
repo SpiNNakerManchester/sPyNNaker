@@ -14,10 +14,9 @@
 from __future__ import annotations
 import logging
 from typing import (
-    Any, Collection, Dict, Mapping, Optional, Sequence, Union, TYPE_CHECKING)
+    Any, Collection, Dict, Mapping, Optional, Sequence, TYPE_CHECKING)
 
 import neo  # type: ignore[import]
-from typing_extensions import TypeAlias
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
