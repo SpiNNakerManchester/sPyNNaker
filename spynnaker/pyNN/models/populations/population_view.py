@@ -382,7 +382,7 @@ class PopulationView(PopulationBase):
     @overrides(PopulationBase.get_data)
     def get_data(
             self, variables: Names = 'all',
-            gather=True, clear: bool = False, *,
+            gather: bool = True, clear: bool = False, *,
             annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
         """
         Return a Neo Block containing the data(spikes, state variables)
