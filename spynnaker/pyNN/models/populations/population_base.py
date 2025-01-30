@@ -14,11 +14,14 @@
 from __future__ import annotations
 import logging
 from typing import (
-    Any, Dict, Optional, Sequence, Tuple, Union, final,
-    TYPE_CHECKING)
+    Any, Callable, Dict, final, Optional, Sequence, Tuple, TYPE_CHECKING,
+    Union)
 
 from pyNN.space import BaseStructure
 import neo
+from numpy import floating
+from numpy.typing import NDArray
+from typing_extensions import Never
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
@@ -27,8 +30,7 @@ from spinn_utilities.logger_utils import warn_once
 from pacman.model.graphs.application import ApplicationVertex
 
 from spynnaker.pyNN.models.recorder import Recorder
-
-from .assembly import Assembly
+from spynnaker.pyNN.types import IoDest
 
 if TYPE_CHECKING:
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
@@ -38,7 +40,7 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
+def _we_dont_do_this_now() -> Never:
     # pragma: no cover
     raise NotImplementedError("sPyNNaker does not currently do this")
 
@@ -75,7 +77,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def __add__(self, other: PopulationBase) -> Assembly:
+    @final
+    def __add__(self, other: PopulationBase) -> Never:  # pylint: disable=W0613
         """
         A Population / PopulationView can be added to another
         Population, PopulationView or Assembly, returning an Assembly.
@@ -87,8 +90,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         :rtype: Assembly
         """
         # TODO: support assemblies
-        _we_dont_do_this_now(other)  # pragma: no cover
-        raise NotImplementedError
+        _we_dont_do_this_now()
 
     @abstractmethod
     def get_data(
@@ -140,7 +142,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def inject(self, current_source: NeuronCurrentSource):
+    def inject(self, current_source: NeuronCurrentSource) -> None:
         """
         Connect a current source to all cells in the Population.
 
@@ -201,7 +203,9 @@ class PopulationBase(object, metaclass=AbstractBase):
         counts = self.get_spike_counts()
         return sum(counts.values()) / len(counts)
 
-    def nearest(self, position):
+    @final
+    def nearest(
+            self, position: Any) -> Never:   # pylint: disable=unused-argument
         """
         Return the neuron closest to the specified position.
 
@@ -209,39 +213,33 @@ class PopulationBase(object, metaclass=AbstractBase):
             Currently unimplemented.
         """
         # TODO: support neuron positions and spaces
-        _we_dont_do_this_now(position)  # pragma: no cover
+        _we_dont_do_this_now()
 
     @property
-    def position_generator(self):
+    @abstractmethod
+    def position_generator(self) -> Callable[[int], NDArray[floating]]:
         """
-        .. note::
-            NO PyNN description of this method.
-
-        .. warning::
-            Currently unimplemented.
+        Returns a function to get the position for single id
         """
-        # TODO: support neuron positions and spaces
-        _we_dont_do_this_now()  # pragma: no cover
+        raise NotImplementedError
 
     @property
-    def positions(self):
+    @abstractmethod
+    def positions(self) -> NDArray[floating]:
         """
-        .. note::
-            NO PyNN description of this method.
+        The position array for structured populations.
 
-        .. warning::
-            Currently unimplemented.
 
-        :rtype: ~numpy.ndarray(tuple(float, float, float))
+        :return: a 3xN array
+        :rtype: ~numpy.ndarray
         """
-        # TODO: support neuron positions and spaces
-        _we_dont_do_this_now()  # pragma: no cover
+        raise NotImplementedError
 
     @abstractmethod
     def write_data(self, io: Union[str, neo.baseio.BaseIO],
                    variables: Names = 'all',
                    gather: bool = True, clear: bool = False,
-                   annotations: Optional[Dict[str, Any]] = None):
+                   annotations: Optional[Dict[str, Any]] = None) -> None:
         """
         Write recorded data to file, using one of the file formats
         supported by Neo.
@@ -271,7 +269,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         # pylint: disable=too-many-arguments
         raise NotImplementedError
 
-    def receptor_types(self):
+    @final
+    def receptor_types(self) -> Never:
         """
         .. note::
             NO PyNN description of this method.
@@ -279,11 +278,11 @@ class PopulationBase(object, metaclass=AbstractBase):
         .. warning::
             Currently unimplemented.
         """
-        _we_dont_do_this_now()  # pragma: no cover
+        _we_dont_do_this_now()
 
     @abstractmethod
-    def record(self, variables: Names, to_file: Optional[str] = None,
-               sampling_interval: Optional[int] = None):
+    def record(self, variables: Names, to_file: IoDest = None,
+               sampling_interval: Optional[int] = None) -> None:
         """
         Record the specified variable or variables for all cells in the
         Population or view.
@@ -291,7 +290,6 @@ class PopulationBase(object, metaclass=AbstractBase):
         :param variables: either a single variable name or a list of variable
             names. For a given `celltype` class, `celltype.recordable` contains
             a list of variables that can be recorded for that `celltype`.
-        :type variables: str or list(str)
         :param to_file: a file to automatically record to (optional).
             `write_data()` will be automatically called when `end()` is called.
         :type to_file: ~neo.io or ~neo.rawio or str
@@ -300,7 +298,9 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def save_positions(self, file):  # pylint: disable=redefined-builtin
+    @final
+    def save_positions(
+            self, file: Any) -> Never:  # pylint: disable=W0622,W0613
         """
         Save positions to file. The output format is index x y z
 
@@ -308,21 +308,17 @@ class PopulationBase(object, metaclass=AbstractBase):
             Currently unimplemented.
         """
         # TODO:
-        _we_dont_do_this_now(file)  # pragma: no cover
+        _we_dont_do_this_now()
         raise NotImplementedError
 
     @property
-    def structure(self) -> BaseStructure:
+    @abstractmethod
+    def structure(self) -> Optional[BaseStructure]:
         """
         The spatial structure of the parent Population.
 
-        .. warning::
-            Currently unimplemented.
-
         :rtype: ~pyNN.space.BaseStructure
         """
-        # TODO: support neuron positions and spaces
-        _we_dont_do_this_now()  # pragma: no cover
         raise NotImplementedError
 
     @property
