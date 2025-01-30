@@ -702,7 +702,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self, region_id: int, neurons: NDArray[integer],
             simulation_time_step_ms: float,
             spike_times: List[NDArray[floating]],
-            spike_ids: List[NDArray[integer]]):
+            spike_ids: List[NDArray[integer]]) -> None:
         """
         Adds spike data for this region to the lists.
 
@@ -932,7 +932,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self, region_id: int, vertex_slice: Slice,
             rewire_values: List[int], rewire_postids: List[int],
             rewire_preids: List[int], rewire_times: List[int],
-            sampling_interval_ms: float):
+            sampling_interval_ms: float) -> None:
         """
         Extracts rewires data for this region and adds it to the lists.
 
@@ -1177,7 +1177,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __read_and_csv_data(
             self, pop_label: str, variable: str, csv_writer: CSVWriter,
-            view_indexes: ViewIndices, t_stop: float, allow_missing: bool):
+            view_indexes: ViewIndices, t_stop: float,
+            allow_missing: bool) -> None:
         """
         Reads the data for one variable and adds it to the CSV file.
 
@@ -1296,7 +1297,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def csv_segment(
             self, csv_file: str, pop_label: str, variables: Names,
-            view_indexes: ViewIndices, allow_missing: bool):
+            view_indexes: ViewIndices, allow_missing: bool) -> None:
         """
         Writes the data including metadata to a CSV file.
 
@@ -1383,8 +1384,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             return vs
 
     def add_segment(
-            self, block: neo.Block, pop_label: str,
-            variables: Names, view_indexes: ViewIndices, allow_missing: bool):
+            self, block: neo.Block, pop_label: str, variables: Names,
+            view_indexes: ViewIndices, allow_missing: bool) -> None:
         """
         Adds a segment to the block.
 
@@ -1413,7 +1414,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self.__add_data(pop_label, variable, segment, view_indexes,
                             t_stop, allow_missing)
 
-    def clear_data(self, pop_label: str, variables: Names):
+    def clear_data(self, pop_label: str, variables: Names) -> None:
         """
         Clears the data for one population and given variables.
 
@@ -1469,7 +1470,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             for variable in population._vertex.get_recording_variables():
                 self.__write_metadata(population, variable)
 
-    def __write_metadata(self, population: Population, variable: str):
+    def __write_metadata(self, population: Population, variable: str) -> None:
         # pylint: disable=protected-access
         app_vertex = population._vertex
         assert app_vertex.label is not None

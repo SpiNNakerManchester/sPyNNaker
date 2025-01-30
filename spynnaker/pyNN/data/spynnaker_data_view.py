@@ -153,7 +153,7 @@ class SpynnakerDataView(FecDataView):
         return len(cls.__spy_data._projections)
 
     @classmethod
-    def add_projection(cls, projection: Projection):
+    def add_projection(cls, projection: Projection) -> None:
         """
         Called by each projection to add itself to the list.
 
@@ -199,7 +199,7 @@ class SpynnakerDataView(FecDataView):
         return len(cls.__spy_data._populations)
 
     @classmethod
-    def add_population(cls, population: Population):
+    def add_population(cls, population: Population) -> Tuple[int, int]:
         """
         Called by each population to add itself to the list.
 
@@ -237,7 +237,7 @@ class SpynnakerDataView(FecDataView):
     @classmethod
     def set_number_of_neurons_per_dimension_per_core(
             cls, neuron_type: Type[AbstractPyNNModel],
-            max_permitted: Optional[Union[Tuple[int, ...]]]):
+            max_permitted: Optional[Union[Tuple[int, ...]]]) -> None:
         """
         Sets a ceiling on the number of neurons of a given type that can be
         placed on a single core for each dimension.

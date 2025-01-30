@@ -115,7 +115,7 @@ class DistanceDependentProbabilityConnector(
         super().set_projection_information(synapse_info)
         self._set_probabilities(synapse_info)
 
-    def _set_probabilities(self, synapse_info: SynapseInformation):
+    def _set_probabilities(self, synapse_info: SynapseInformation) -> None:
         """
         :param SynapseInformation synapse_info:
         """
@@ -237,7 +237,7 @@ class DistanceDependentProbabilityConnector(
         block["synapse_type"] = synapse_type
         return block
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"DistanceDependentProbabilityConnector({self.__d_expression})"
 
     @property
@@ -248,7 +248,7 @@ class DistanceDependentProbabilityConnector(
         return self.__allow_self_connections
 
     @allow_self_connections.setter
-    def allow_self_connections(self, new_value: bool):
+    def allow_self_connections(self, new_value: bool) -> None:
         self.__allow_self_connections = new_value
 
     @property
@@ -261,5 +261,5 @@ class DistanceDependentProbabilityConnector(
         return self.__d_expression
 
     @d_expression.setter
-    def d_expression(self, new_value: str):
+    def d_expression(self, new_value: str) -> None:
         self.__d_expression = new_value

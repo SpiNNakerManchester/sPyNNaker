@@ -148,7 +148,7 @@ class NeuronImplStocExpStable(AbstractNeuronImpl):
         return variable in ("v", "ex_input", "in_input", "prob")
 
     @overrides(AbstractNeuronImpl.add_parameters)
-    def add_parameters(self, parameters: RangeDictionary):
+    def add_parameters(self, parameters: RangeDictionary) -> None:
         parameters[V_RESET] = self._v_reset
         parameters[TAU] = self._tau
         parameters[TAU_REFRAC] = self._tau_refrac
@@ -156,7 +156,7 @@ class NeuronImplStocExpStable(AbstractNeuronImpl):
         parameters[BIAS] = self._bias
 
     @overrides(AbstractNeuronImpl.add_state_variables)
-    def add_state_variables(self, state_variables: RangeDictionary):
+    def add_state_variables(self, state_variables: RangeDictionary) -> None:
         state_variables[V_INIT] = self._v_init
         state_variables[REFRACT_INIT] = self._refract_init
         state_variables[SEED0] = self._random

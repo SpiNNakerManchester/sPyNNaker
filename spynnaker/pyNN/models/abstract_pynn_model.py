@@ -39,7 +39,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
 
     @classmethod
     def set_model_max_atoms_per_dimension_per_core(
-            cls, n_atoms: Optional[Tuple[int, ...]] = None):
+            cls, n_atoms: Optional[Tuple[int, ...]] = None) -> None:
         """
         Set the default maximum number of atoms per dimension per core for
         this model.  This can be overridden by the individual Population.
@@ -142,7 +142,8 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         """
         return self.__class__.__name__
 
-    def describe(self, template='modeltype_default.txt', engine='default'):
+    def describe(self, template: Optional[str] = 'modeltype_default.txt',
+                 engine: str = 'default') -> str:
         """
         Returns a human-readable description of the population.
 

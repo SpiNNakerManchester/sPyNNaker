@@ -15,17 +15,19 @@
 """
 Utility package containing simple helper functions.
 """
+from collections.abc import Sized
 import logging
 import os
 import math
 from math import isnan
-from typing import List, Tuple
+from typing import cast, List, Optional, Tuple, Union
 
 import neo
+from neo.io.baseio import BaseIO  # type: ignore[import]
 import numpy
 from numpy import uint32, floating
 from numpy.typing import NDArray
-from pyNN.random import RandomDistribution
+from pyNN.random import AbstractRNG, RandomDistribution
 from scipy.stats import binom
 
 from spinn_utilities.log import FormatAdapter
@@ -72,7 +74,7 @@ STATS_BY_NAME = {
     'vonmises': RandomStatsVonmisesImpl()}
 
 
-def check_directory_exists_and_create_if_not(filename: str):
+def check_directory_exists_and_create_if_not(filename: str) -> None:
     """
     Create a parent directory for a file if it doesn't exist.
 
@@ -83,7 +85,9 @@ def check_directory_exists_and_create_if_not(filename: str):
         os.makedirs(directory)
 
 
-def convert_param_to_numpy(param, no_atoms: int) -> NDArray[floating]:
+def convert_param_to_numpy(
+        param: Union[RandomDistribution, float, List[float], NDArray],
+        no_atoms: int) -> NDArray[floating]:
     """
     Convert parameters into numpy arrays.
 
@@ -108,7 +112,7 @@ def convert_param_to_numpy(param, no_atoms: int) -> NDArray[floating]:
         return numpy.array([param] * no_atoms, dtype=floating)
 
     # Deal with multiple values, but not the correct number of them
-    if len(param) != no_atoms:
+    if len(cast(Sized, param)) != no_atoms:
         raise ConfigurationException(
             "The number of params does not equal with the number of atoms in"
             " the vertex")
@@ -116,8 +120,7 @@ def convert_param_to_numpy(param, no_atoms: int) -> NDArray[floating]:
     # Deal with the correct number of multiple values
     return numpy.array(param, dtype=floating)
 
-
-def convert_to(value, data_type: DataType) -> uint32:
+def convert_to(value: float, data_type: DataType) -> uint32:
     """
     Convert a value to a given data type.
 
@@ -234,7 +237,8 @@ def read_spikes_from_file(
 
 
 def get_probable_maximum_selected(
-        n_total_trials, n_trials, selection_prob, chance=(1.0 / 100.0)):
+        n_total_trials: int, n_trials: int, selection_prob: float,
+        chance: float =(1.0 / 100.0)) -> int:
     """
     Get the likely maximum number of items that will be selected from a
     set of `n_trials` from a total set of `n_total_trials`
@@ -251,7 +255,8 @@ def get_probable_maximum_selected(
 
 
 def get_probable_minimum_selected(
-        n_total_trials, n_trials, selection_prob, chance=(1.0 / 100.0)):
+        n_total_trials: int, n_trials: int, selection_prob: float,
+        chance: float = (1.0 / 100.0)) -> int:
     """
     Get the likely minimum number of items that will be selected from a
     set of `n_trials` from a total set of `n_total_trials`
@@ -261,7 +266,8 @@ def get_probable_minimum_selected(
     return binom.ppf(prob, n_trials, selection_prob)
 
 
-def get_probability_within_range(distribution, lower, upper):
+def get_probability_within_range(distribution: RandomDistribution,
+                                 lower: float, upper: float) -> float:
     """
     Get the probability that a value will fall within the given range for
     a given RandomDistribution.
@@ -274,7 +280,8 @@ def get_probability_within_range(distribution, lower, upper):
     return stats.cdf(distribution, upper) - stats.cdf(distribution, lower)
 
 
-def get_maximum_probable_value(distribution, n_items, chance=(1.0 / 100.0)):
+def get_maximum_probable_value(distribution: RandomDistribution, n_items: int,
+                               chance: float = (1.0 / 100.0)) -> float:
     """
     Get the likely maximum value of a RandomDistribution given a
     number of draws.
@@ -288,7 +295,8 @@ def get_maximum_probable_value(distribution, n_items, chance=(1.0 / 100.0)):
     return stats.ppf(distribution, prob)
 
 
-def get_minimum_probable_value(distribution, n_items, chance=(1.0 / 100.0)):
+def get_minimum_probable_value(distribution: RandomDistribution, n_items: int,
+                               chance: float = (1.0 / 100.0)) -> float:
     """
     Get the likely minimum value of a RandomDistribution given a
     number of draws.
@@ -300,7 +308,7 @@ def get_minimum_probable_value(distribution, n_items, chance=(1.0 / 100.0)):
     return stats.ppf(distribution, prob)
 
 
-def get_mean(distribution):
+def get_mean(distribution: RandomDistribution) -> float:
     """
     Get the mean of a RandomDistribution.
 
@@ -310,7 +318,7 @@ def get_mean(distribution):
     return stats.mean(distribution)
 
 
-def get_standard_deviation(distribution):
+def get_standard_deviation(distribution: RandomDistribution) -> float:
     """
     Get the standard deviation of a RandomDistribution.
 
@@ -320,7 +328,7 @@ def get_standard_deviation(distribution):
     return stats.std(distribution)
 
 
-def get_variance(distribution):
+def get_variance(distribution: RandomDistribution) -> float:
     """
     Get the variance of a RandomDistribution.
 
@@ -330,7 +338,7 @@ def get_variance(distribution):
     return stats.var(distribution)
 
 
-def high(distribution):
+def high(distribution: RandomDistribution) -> Optional[float]:
     """
     Gets the high or maximum boundary value for this distribution.
 
@@ -342,7 +350,7 @@ def high(distribution):
     return stats.high(distribution)
 
 
-def low(distribution):
+def low(distribution: RandomDistribution) -> Optional[float]:
     """
     Gets the high or minimum boundary value for this distribution.
 
@@ -367,7 +375,7 @@ def _validate_mars_kiss_64_seed(seed: List[int]) -> List[int]:
     return seed
 
 
-def create_mars_kiss_seeds(rng) -> Tuple[int, ...]:
+def create_mars_kiss_seeds(rng: numpy.random.RandomState) -> Tuple[int, ...]:
     """
     Generates and checks that the seed values generated by the given
     random number generator or seed to a random number generator are
@@ -388,7 +396,7 @@ def create_mars_kiss_seeds(rng) -> Tuple[int, ...]:
     return tuple(kiss_seed)
 
 
-def get_n_bits(n_values):
+def get_n_bits(n_values: int) -> int:
     """
     Determine how many bits are required for the given number of values.
 
@@ -403,7 +411,7 @@ def get_n_bits(n_values):
     return int(math.ceil(math.log2(n_values)))
 
 
-def get_time_to_write_us(n_bytes, n_cores):
+def get_time_to_write_us(n_bytes: int, n_cores: int) -> int:
     """
     Determine how long a write of a given number of bytes will take in us.
 
@@ -415,7 +423,7 @@ def get_time_to_write_us(n_bytes, n_cores):
     return int(math.ceil(seconds * MICRO_TO_SECOND_CONVERSION))
 
 
-def get_neo_io(file_or_folder):
+def get_neo_io(file_or_folder: str) -> BaseIO:
     """
     Hack for https://github.com/NeuralEnsemble/python-neo/issues/1287
 
@@ -439,7 +447,7 @@ def get_neo_io(file_or_folder):
         raise ex
 
 
-def report_non_spynnaker_pynn(msg):
+def report_non_spynnaker_pynn(msg: str) -> None:
     """
     Report a case of non-spynnaker-compatible PyNN being used.  This will warn
     or error depending on the configuration setting.
@@ -452,7 +460,7 @@ def report_non_spynnaker_pynn(msg):
         warn_once(logger, msg)
 
 
-def check_rng(rng, where):
+def check_rng(rng: AbstractRNG, where: str) -> None:
     """
     Check for non-None rng parameter since this is no longer compatible with
     sPyNNaker.  If not None, warn or error depending on a config value.

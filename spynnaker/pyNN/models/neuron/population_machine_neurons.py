@@ -186,8 +186,8 @@ class PopulationMachineNeurons(
         """
         raise NotImplementedError
 
-    def _parse_neuron_provenance(
-            self, x: int, y: int, p: int, provenance_data: Sequence[int]):
+    def _parse_neuron_provenance(self, x: int, y: int, p: int,
+                                 provenance_data: Sequence[int]) -> None:
         """
         Extract and yield neuron provenance.
 
@@ -208,7 +208,7 @@ class PopulationMachineNeurons(
 
     def _write_neuron_data_spec(
             self, spec: DataSpecificationGenerator,
-            ring_buffer_shifts: Sequence[int]):
+            ring_buffer_shifts: Sequence[int]) -> None:
         """
         Write the data specification of the neuron data.
 
@@ -249,7 +249,8 @@ class PopulationMachineNeurons(
         return routing_info.get_key_from(
             cast(AbstractVertex, self), next(iter(partition_ids)))
 
-    def _rewrite_neuron_data_spec(self, spec: DataSpecificationReloader):
+    def _rewrite_neuron_data_spec(
+            self, spec: DataSpecificationReloader) -> None:
         """
         Re-Write the data specification of the neuron data.
 
@@ -267,7 +268,7 @@ class PopulationMachineNeurons(
 
     def _write_neuron_core_parameters(
             self, spec: DataSpecificationGenerator,
-            ring_buffer_shifts: Sequence[int]):
+            ring_buffer_shifts: Sequence[int]) -> None:
         """
         Write the neuron parameters region.
 
@@ -324,7 +325,7 @@ class PopulationMachineNeurons(
         return n == selector
 
     def _write_current_source_parameters(
-            self, spec: DataSpecificationBase):
+            self, spec: DataSpecificationBase) -> None:
         n_atoms: int = self._vertex_slice.n_atoms
 
         spec.comment(
@@ -434,7 +435,7 @@ class PopulationMachineNeurons(
         return sorted(
             current_sources, key=lambda x: x.current_source_id)
 
-    def read_parameters_from_machine(self, placement: Placement):
+    def read_parameters_from_machine(self, placement: Placement) -> None:
         """
         Read the parameters and state of the neurons from the machine
         at the current time.
@@ -444,7 +445,8 @@ class PopulationMachineNeurons(
         """
         self._neuron_data.read_data(placement, self._neuron_regions)
 
-    def read_initial_parameters_from_machine(self, placement: Placement):
+    def read_initial_parameters_from_machine(
+            self, placement: Placement) -> None:
         """
         Read the parameters and state of the neurons from the machine
         as they were at the last time 0.
@@ -464,7 +466,7 @@ class PopulationMachineNeurons(
         return self._neuron_regions.neuron_builder
 
     @overrides(AbstractNeuronExpandable.read_generated_initial_values)
-    def read_generated_initial_values(self, placement: Placement):
+    def read_generated_initial_values(self, placement: Placement) -> None:
         # Only do this if we actually need the data now i.e. if someone has
         # requested that the data be read before calling run
         if self._pop_vertex.read_initial_values:

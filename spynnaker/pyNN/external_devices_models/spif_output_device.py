@@ -204,7 +204,7 @@ class SPIFOutputDevice(
     def start_resume_commands(self) -> Iterable[MultiCastCommand]:
         # The commands here are delayed, as at the time of providing them,
         # we don't know the key or mask of the incoming link...
-        commands = list()
+        commands: List[MultiCastCommand] = list()
         for i, part in enumerate(self.__incoming_partitions):
             pop_vertex = part.pre_vertex
             assert isinstance(pop_vertex, PopulationApplicationVertex)

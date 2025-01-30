@@ -88,7 +88,7 @@ class NeuronModelIzh(NeuronModel):
         self.__u_init = u_init
 
     @overrides(AbstractStandardNeuronComponent.add_parameters)
-    def add_parameters(self, parameters: RangeDictionary[float]):
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
         parameters[A] = self._convert(self.__a)
         parameters[B] = self._convert(self.__b)
         parameters[C] = self._convert(self.__c)
@@ -97,7 +97,8 @@ class NeuronModelIzh(NeuronModel):
         parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractStandardNeuronComponent.add_state_variables)
-    def add_state_variables(self, state_variables: RangeDictionary[float]):
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         state_variables[V] = self._convert(self.__v_init)
         state_variables[U] = self._convert(self.__u_init)
         state_variables[NEXT_H] = (

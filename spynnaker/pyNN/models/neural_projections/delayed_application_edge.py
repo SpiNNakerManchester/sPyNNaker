@@ -79,7 +79,8 @@ class DelayedApplicationEdge(ApplicationEdge):
         """
         return self.__synapse_information
 
-    def add_synapse_information(self, synapse_information: SynapseInformation):
+    def add_synapse_information(
+            self, synapse_information: SynapseInformation) -> None:
         """
         :param SynapseInformation synapse_information:
         """

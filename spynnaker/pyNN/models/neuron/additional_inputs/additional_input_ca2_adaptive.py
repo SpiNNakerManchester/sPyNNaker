@@ -63,13 +63,14 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         self.__i_alpha = i_alpha
 
     @overrides(AbstractAdditionalInput.add_parameters)
-    def add_parameters(self, parameters: RangeDictionary[float]):
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
         parameters[TAU_CA2] = self._convert(self.__tau_ca2)
         parameters[I_ALPHA] = self._convert(self.__i_alpha)
         parameters[TIME_STEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractAdditionalInput.add_state_variables)
-    def add_state_variables(self, state_variables: RangeDictionary[float]):
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         state_variables[I_CA2] = self._convert(self.__i_ca2)
 
     @property

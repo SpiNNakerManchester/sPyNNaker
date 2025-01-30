@@ -487,6 +487,7 @@ class SynapseDynamicsStructuralCommon(
         """
         raise NotImplementedError
 
+    @overrides(AbstractSynapseDynamicsStructural.check_initial_delay)
     def check_initial_delay(self, max_delay_ms: float) -> None:
         """
         Check that delays can be done without delay extensions.

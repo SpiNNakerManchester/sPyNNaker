@@ -19,8 +19,11 @@ Devices connected to the SpiNNaker peripheral interface (`SPIF`_).
 """
 
 from enum import IntEnum
-from spinn_front_end_common.utility_models import MultiCastCommand
+from typing import Callable, Optional
+
 from spinn_utilities.overrides import overrides
+
+from spinn_front_end_common.utility_models import MultiCastCommand
 
 _REPEATS = 2
 _DELAY_BETWEEN_REPEATS = 1
@@ -112,7 +115,8 @@ class SPIFRegister(IntEnum):
     # The distiller key shift register (6 distillers)
     DIST_SHIFT_BASE = 240
 
-    def cmd(self, payload=None, index=0):
+    def cmd(self, payload: Optional[int] = None,
+            index: int = 0) -> MultiCastCommand:
         """
         Make a command to send to a SPIF device to set a register value.
 
@@ -128,7 +132,9 @@ class SPIFRegister(IntEnum):
             _RC_KEY + self.value + index, payload, time=None, repeat=_REPEATS,
             delay_between_repeats=_DELAY_BETWEEN_REPEATS)
 
-    def delayed_command(self, get_payload, index=0):
+    def delayed_command(
+            self, get_payload: Callable[[int], int],
+            index: int  = 0) -> "_DelayedMultiCastCommand":
         """ Make a command to send to a SPIF device to set a register value,
             where the value itself is currently unknown
 
@@ -144,7 +150,7 @@ class SPIFRegister(IntEnum):
             delay_between_repeats=_DELAY_BETWEEN_REPEATS, index=index)
 
 
-def set_mapper_key(pipe, key):
+def set_mapper_key(pipe: int, key: int) -> MultiCastCommand:
     """
     Get a command to set the output base key for packets from SPIF.  This
     will be added to the keys determined by the mapper output.
@@ -156,7 +162,7 @@ def set_mapper_key(pipe, key):
     return SPIFRegister.MP_KEY_BASE.cmd(key, pipe)
 
 
-def set_field_mask(pipe, index, mask):
+def set_field_mask(pipe: int, index: int, mask: int) -> MultiCastCommand:
     """
     Get a command to set the mask of a mapper field on SPIF.  This masks
     off the bits of the field from the incoming UDP or USB packet values
@@ -170,7 +176,7 @@ def set_field_mask(pipe, index, mask):
     return SPIFRegister.MP_FLD_MASK_BASE.cmd(mask, (pipe * N_FIELDS) + index)
 
 
-def set_field_shift(pipe, index, shift):
+def set_field_shift(pipe: int, index: int, shift: int) -> MultiCastCommand:
     """
     Get a command to set the shift of a mapper field on SPIF.  This shifts
     the masked bits of the field from the incoming UDP or USB packet values
@@ -186,7 +192,7 @@ def set_field_shift(pipe, index, shift):
         shift, (pipe * N_FIELDS) + index)
 
 
-def set_field_limit(pipe, index, limit):
+def set_field_limit(pipe: int, index: int, limit: int) -> MultiCastCommand:
     """
     Get a command to set the limit of a mapper field on SPIF.  This sets
     a limit on the value of the field after shifting and masking.
@@ -200,7 +206,7 @@ def set_field_limit(pipe, index, limit):
         limit, (pipe * N_FIELDS) + index)
 
 
-def set_filter_value(pipe, index, value):
+def set_filter_value(pipe: int, index: int, value: int) -> MultiCastCommand:
     """
     Get a command to set the value of a filter of SPIF.  This will drop
     input events from the UDP or USB packets where filter value ==
@@ -215,7 +221,7 @@ def set_filter_value(pipe, index, value):
         value, (pipe * N_FILTERS) + index)
 
 
-def set_filter_mask(pipe, index, mask):
+def set_filter_mask(pipe: int, index: int, mask: int) -> MultiCastCommand:
     """
     Get a command to set the mask of a filter of SPIF.  This will drop
     input events from the UDP or USB packets where filter value ==
@@ -230,7 +236,7 @@ def set_filter_mask(pipe, index, mask):
         mask, (pipe * N_FILTERS) + index)
 
 
-def set_input_key(pipe, index, key):
+def set_input_key(pipe: int, index: int, key: int) -> MultiCastCommand:
     """
     Get a command to set the key of the FPGA input of SPIF.  This tells
     SPIF how to route the incoming packets after they have been assembled
@@ -245,7 +251,7 @@ def set_input_key(pipe, index, key):
     return SPIFRegister.IR_KEY_BASE.cmd(key, (pipe * N_INPUTS) + index)
 
 
-def set_input_mask(pipe, index, mask):
+def set_input_mask(pipe: int, index: int, mask: int) -> MultiCastCommand:
     """
     Get a command to set the mask of the FPGA input of SPIF.  This tells
     SPIF how to route the incoming packets after they have been assembled
@@ -260,7 +266,7 @@ def set_input_mask(pipe, index, mask):
     return SPIFRegister.IR_MASK_BASE.cmd(mask, (pipe * N_INPUTS) + index)
 
 
-def set_input_route(pipe, index, route):
+def set_input_route(pipe: int, index: int, route: int) -> MultiCastCommand:
     """
     Get a command to set the route of the FPGA input of SPIF.  This tells
     SPIF how to route the incoming packets after they have been assembled
@@ -278,7 +284,7 @@ def set_input_route(pipe, index, route):
     return SPIFRegister.IR_ROUTE_BASE.cmd(route, (pipe * N_INPUTS) + index)
 
 
-def set_distiller_key(index, key):
+def set_distiller_key(index: int, key: int) -> MultiCastCommand:
     """ Get a command to set the key of the distiller of the output via SPIF.
         This tells SPIF which bits to put at the top of the 32-bit output for
         each spike received on the given distiller channel, defined by the
@@ -291,7 +297,7 @@ def set_distiller_key(index, key):
     return SPIFRegister.DIST_KEY_BASE.cmd(key, index)
 
 
-def set_distiller_mask(index, mask):
+def set_distiller_mask(index: int, mask: int) -> MultiCastCommand:
     """ Get a command to set the mask of the distiller of the output via SPIF.
         This tells SPIF which bits to use from the key in the 32-bit output for
         each spike received on the given distiller channel, defined by the
@@ -304,7 +310,8 @@ def set_distiller_mask(index, mask):
     return SPIFRegister.DIST_MASK_BASE.cmd(mask, index)
 
 
-def set_distiller_mask_delayed(index, mask_func):
+def set_distiller_mask_delayed(
+        index: int, mask_func: Callable[[int], int]) -> MultiCastCommand:
     """ Get a command to set the mask of the distiller of the output via SPIF.
         This tells SPIF which bits to use from the key in the 32-bit output for
         each spike received on the given distiller channel, defined by the
@@ -318,7 +325,7 @@ def set_distiller_mask_delayed(index, mask_func):
     return SPIFRegister.DIST_MASK_BASE.delayed_command(mask_func, index)
 
 
-def set_distiller_shift(index, shift):
+def set_distiller_shift(index: int, shift: int) -> MultiCastCommand:
     """ Get a command to set the shift of the distiller of the output via SPIF.
         This tells SPIF how much to shift the key after masking but before
         applying the distiller key.
@@ -336,7 +343,8 @@ class _DelayedMultiCastCommand(MultiCastCommand):
     """
     __slots__ = ("__get_payload", "__index")
 
-    def __init__(self, key, get_payload, repeat, delay_between_repeats, index):
+    def __init__(self, key: int, get_payload: Callable[[int], int],
+                 repeat: int, delay_between_repeats: int, index: int):
         """
         :param int key: The key to send
         :param callable()->int get_payload:
@@ -403,7 +411,7 @@ class SpiNNFPGARegister(IntEnum):
     #: The base of the masks that can be sent out of SpiNNake (up to 6)
     XP_MASK_BASE = 48
 
-    def cmd(self, payload=None, index=0):
+    def cmd(self, payload: Optional[int] = None, index: int = 0) -> MultiCastCommand:
         """
         Make a command to send to the FPGA to set a register value.
 
@@ -419,7 +427,9 @@ class SpiNNFPGARegister(IntEnum):
             _LC_KEY + self.value + index, payload, time=None, repeat=_REPEATS,
             delay_between_repeats=_DELAY_BETWEEN_REPEATS)
 
-    def delayed_command(self, get_payload, index=0):
+    def delayed_command(
+            self, get_payload: Callable[[int], int],
+            index: int = 0) -> _DelayedMultiCastCommand:
         """
         Make a command to send to the FPGA to set a register value,
         where the value itself is currently unknown.
@@ -436,7 +446,7 @@ class SpiNNFPGARegister(IntEnum):
             delay_between_repeats=_DELAY_BETWEEN_REPEATS, index=index)
 
 
-def set_xp_key(index, key):
+def set_xp_key(index: int, key: int) -> MultiCastCommand:
     """ Get a command to set the key of the output via the FPGA.
         This tells the FPGA to route this key to the external device.
 
@@ -447,7 +457,9 @@ def set_xp_key(index, key):
     return SpiNNFPGARegister.XP_KEY_BASE.cmd(key, index)
 
 
-def set_xp_key_delayed(index, key_func):
+def set_xp_key_delayed(
+        index: int,
+        key_func: Callable[[int], int]) -> _DelayedMultiCastCommand:
     """ Get a command to set the key of the output via the FPGA later.
         This tells the FPGA to route this key to the external device.
 
@@ -458,7 +470,7 @@ def set_xp_key_delayed(index, key_func):
     return SpiNNFPGARegister.XP_KEY_BASE.delayed_command(key_func, index)
 
 
-def set_xp_mask(index, mask):
+def set_xp_mask(index: int, mask: int) -> MultiCastCommand:
     """ Get a command to set the mask the output via the FPGA.
         This tells the FPGA to route keys after using this mask to the external
         device.
@@ -470,7 +482,9 @@ def set_xp_mask(index, mask):
     return SpiNNFPGARegister.XP_MASK_BASE.cmd(mask, index)
 
 
-def set_xp_mask_delayed(index, mask_func):
+def set_xp_mask_delayed(
+        index: int,
+        mask_func: Callable[[int], int]) -> _DelayedMultiCastCommand:
     """ Get a command to set the mask of the output via the FPGA later.
         This tells the FPGA to route keys after using this mask to the external
         device.

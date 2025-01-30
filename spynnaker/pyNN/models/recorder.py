@@ -76,7 +76,7 @@ class Recorder(object):
     def record(
             self, variables: Names, to_file: IoDest,
             sampling_interval: Optional[int],
-            indexes: Optional[Collection[int]]):
+            indexes: Optional[Collection[int]]) -> None:
         """
         Turns on (or off) recording.
 
@@ -132,13 +132,12 @@ class Recorder(object):
 
     def __turn_on_all_record(
             self, sampling_interval: Optional[int], to_file: IoDest,
-            indexes: Optional[Collection[int]]):
+            indexes: Optional[Collection[int]]) -> None:
         """
         :param int sampling_interval: the interval to record them
         :param to_file: If set, a file to write to (by handle or name)
         :type to_file: neo.io.baseio.BaseIO or str or None
         :param indexes: List of indexes to record or `None` for all
-        :type indexes: list(int) or None
         :raises SimulatorRunningException: If `sim.run` is currently running
         :raises SimulatorNotSetupException: If called before `sim.setup`
         :raises SimulatorShutdownException: If called after `sim.end`
@@ -155,7 +154,7 @@ class Recorder(object):
     def turn_on_record(
             self, variable: str, sampling_interval: Optional[int] = None,
             to_file: IoDest = None,
-            indexes: Optional[Collection[int]] = None):
+            indexes: Optional[Collection[int]] = None) -> None:
         """
         Tell the vertex to record data.
 
@@ -205,7 +204,7 @@ class Recorder(object):
         return self.__vertex.label or "!!UNLABELLED VERTEX!!"
 
     def turn_off_all_recording(
-            self, indexes: Optional[Collection[int]] = None):
+            self, indexes: Optional[Collection[int]] = None) -> None:
         """
         Turns off recording, is used by a pop saying ``.record()``.
 
@@ -217,7 +216,7 @@ class Recorder(object):
 
     def extract_neo_block(
             self, variables: Names, view_indexes: Optional[Sequence[int]],
-            clear: bool, annotations: Optional[Dict[str, Any]]):
+            clear: bool, annotations: Optional[Dict[str, Any]]) -> neo.Block:
         """
         Extracts block from the vertices and puts them into a Neo block.
 
@@ -246,7 +245,7 @@ class Recorder(object):
     def csv_neo_block(
             self, csv_file: str, variables: Optional[Names],
             view_indexes: Optional[Sequence[int]] = None,
-            annotations: Optional[Dict[str, Any]] = None):
+            annotations: Optional[Dict[str, Any]] = None) -> None:
         """
         Extracts block from the vertices and puts them into a Neo block.
 

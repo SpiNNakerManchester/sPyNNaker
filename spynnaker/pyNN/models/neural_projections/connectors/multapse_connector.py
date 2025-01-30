@@ -203,13 +203,13 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             n_post_atoms / float(synapse_info.n_post_neurons),
             1.0)
         max_in_slice = max(utility_calls.get_probable_maximum_selected(
-            self.__num_synapses, self.__num_synapses, prob_in_slice), 1.0)
+            self.__num_synapses, self.__num_synapses, prob_in_slice), 1)
 
         # Similarly if the chance of there being one in a row is 0, there will
         # probably be 1
         prob_in_row = 1.0 / synapse_info.n_pre_neurons
         n_connections = max(utility_calls.get_probable_maximum_selected(
-            self.__num_synapses, max_in_slice, prob_in_row), 1.0)
+            self.__num_synapses, max_in_slice, prob_in_row), 1)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))

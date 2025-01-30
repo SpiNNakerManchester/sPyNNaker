@@ -72,7 +72,7 @@ class NeoCsv(object):
     def _csv_variable_metdata(
             self, csv_writer: CSVWriter, variable_type: str, variable: str,
             t_start: float, t_stop: float, sampling_interval_ms: float,
-            units: Optional[str]):
+            units: Optional[str]) -> None:
         """
         Writes the metadata for a variable to CSV
 
@@ -146,7 +146,8 @@ class NeoCsv(object):
             row = next(csv_reader)
         return numpy.asarray(rows, dtype=float64)
 
-    def __csv_indexes(self, indexes: NDArray[integer], csv_writer: CSVWriter):
+    def __csv_indexes(self, indexes: NDArray[integer],
+                      csv_writer: CSVWriter) -> None:
         """
         Writes the indexes for which there could be data to the CSV.
 
@@ -185,7 +186,7 @@ class NeoCsv(object):
     def _insert_spike_data(
             self, view_indexes: Iterable[int], segment: Segment,
             spikes: NDArray, t_start: float, t_stop: float,
-            sampling_rate: Quantity):
+            sampling_rate: Quantity) -> None:
         """
         Creates the SpikeTrains and inserts then into the segment
 
@@ -223,7 +224,7 @@ class NeoCsv(object):
             segment.spiketrains.append(spiketrain)
 
     def _csv_spike_data(self, csv_writer: CSVWriter, spikes: NDArray,
-                        indexes: NDArray[integer]):
+                        indexes: NDArray[integer]) -> None:
         """
         Writes the spikes to the CSV file.
 
@@ -235,8 +236,8 @@ class NeoCsv(object):
         csv_writer.writerows(spikes)
         csv_writer.writerow([])
 
-    def __read_spike_data(
-            self, csv_reader: CSVReader, segment: Segment, variable: str):
+    def __read_spike_data(self, csv_reader: CSVReader, segment: Segment,
+                          variable: str) -> None:
         """
         Reads spikes from the CSV file and add SpikeTrains to the segment.
 
@@ -260,7 +261,7 @@ class NeoCsv(object):
     def _insert_matrix_data(
             self, variable: str, segment: Segment, signal_array: NDArray,
             indexes: NDArray[integer], t_start: float, sampling_rate: Quantity,
-            units: Union[Quantity, str, None]):
+            units: Union[Quantity, str, None]) -> None:
         """
         Adds a data item that is an analog signal to a neo segment.
 
@@ -295,7 +296,7 @@ class NeoCsv(object):
 
     def _csv_matrix_data(
             self, csv_writer: CSVWriter, signal_array: NDArray,
-            indexes: NDArray[integer]):
+            indexes: NDArray[integer]) -> None:
         """
         Writes data to a CSV file.
 
@@ -308,7 +309,7 @@ class NeoCsv(object):
         csv_writer.writerow([])
 
     def __read_matrix_data(self, csv_reader: CSVReader, segment: Segment,
-                           variable: str):
+                           variable: str) -> None:
         """
         Reads matrix data and adds it to the segment.
 
@@ -327,7 +328,8 @@ class NeoCsv(object):
 
     def _insert_formation_events(
             self, segment: Segment, variable: str,
-            formation_times: List[Quantity], formation_labels: List[str]):
+            formation_times: List[Quantity],
+            formation_labels: List[str]) -> None:
         """
         Adds formation data to a neo segment.
 
@@ -347,7 +349,8 @@ class NeoCsv(object):
 
     def _insert_elimination_events(
             self, segment: Segment, variable: str,
-            elimination_times: List[Quantity], elimination_labels: List[str]):
+            elimination_times: List[Quantity],
+            elimination_labels: List[str]) -> None:
         """
         Adds elimination data to a neo segment.
 
@@ -365,8 +368,8 @@ class NeoCsv(object):
             array_annotations={})
         segment.events.append(elimination_event_array)
 
-    def _insert_neo_rewirings(
-            self, segment: Segment, event_array: NDArray, variable: str):
+    def _insert_neo_rewirings(self, segment: Segment, event_array: NDArray,
+                              variable: str) -> None:
         """
         Adds data that represent rewire events to a neo segment.
 
@@ -395,7 +398,8 @@ class NeoCsv(object):
         self._insert_elimination_events(
             segment, variable, elimination_times, elimination_labels)
 
-    def _csv_rewirings(self, csv_writer: CSVWriter, event_array: NDArray):
+    def _csv_rewirings(
+            self, csv_writer: CSVWriter, event_array: NDArray) -> None:
         """
         Adds data that represent rewires events to a CSV file.
 
@@ -443,7 +447,7 @@ class NeoCsv(object):
         return times, labels
 
     def __read_rewirings(self, csv_reader: CSVReader, segment: Segment,
-                         variable: str):
+                         variable: str) -> None:
         """
         Reads rewiring data from a CSV file and adds it to the segment.
 
@@ -493,7 +497,7 @@ class NeoCsv(object):
         return segment
 
     def _csv_segment_metadata(self, csv_writer: CSVWriter, segment_number: int,
-                              rec_datetime: datetime):
+                              rec_datetime: datetime) -> None:
         """
         Writes only the segment's metadata to CSV.
 
@@ -569,7 +573,7 @@ class NeoCsv(object):
     def _csv_block_metadata(
             self, csv_writer: CSVWriter, pop_label: str, t_stop: float,
             pop_size: int, first_id: int, description: str,
-            annotations: Annotations):
+            annotations: Annotations) -> None:
         """
         :param ~csv.writer csv_writer: Open CSV writer to write to
         :param str pop_label:

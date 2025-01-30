@@ -14,7 +14,7 @@
 from __future__ import annotations
 import logging
 from typing import (
-    Any, cast, Dict, Iterable, Optional, overload, Sequence, Union,
+    Any, cast, Dict, Iterable, List, Optional, overload, Sequence, Union,
     TYPE_CHECKING)
 
 import numpy
@@ -156,13 +156,13 @@ class DataPopulation(object):
 
     @overload
     def id_to_index(
-            self, id: Iterable[int]) -> Sequence[int]:  # @ReservedAssignment
+            self, id: Iterable[int]) -> List[int]:  # @ReservedAssignment
         # pylint: disable=redefined-builtin
         ...
 
     @overrides(Population.id_to_index)
     def id_to_index(self, id: Union[int, Iterable[int]]
-                    ) -> Union[int, Sequence[int]]:  # @ReservedAssignment
+                    ) -> Union[int, List[int]]:  # @ReservedAssignment
         # pylint: disable=missing-function-docstring,redefined-builtin
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
@@ -182,12 +182,12 @@ class DataPopulation(object):
         ...
 
     @overload
-    def index_to_id(self, index: Iterable[int]) -> Sequence[int]:
+    def index_to_id(self, index: Iterable[int]) -> List[int]:
         ...
 
     @overrides(Population.index_to_id)
     def index_to_id(self, index: Union[int, Iterable[int]]
-                    ) -> Union[int, Sequence[int]]:
+                    ) -> Union[int, List[int]]:
         # pylint: disable=missing-function-docstring
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:

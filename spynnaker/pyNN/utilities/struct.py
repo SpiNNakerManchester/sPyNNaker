@@ -189,7 +189,7 @@ class Struct(object):
 
     def __get_data_for_slice(
             self, data: NDArray, all_vals: AbstractList[float], name: str,
-            data_type: DataType, vertex_slice: Slice):
+            data_type: DataType, vertex_slice: Slice) -> None:
         """
         Get the data for a single value from a vertex slice.
         """
@@ -271,7 +271,7 @@ class Struct(object):
 
     def __gen_data_one_for_all(
             self, data: List[int], gen_data: List[NDArray[uint32]],
-            values: ValueMap, name: str, n_repeats: int):
+            values: ValueMap, name: str, n_repeats: int) -> None:
         """
         Generate data with a single value for all neurons.
         """
@@ -300,7 +300,7 @@ class Struct(object):
 
     def __gen_data_for_slice(
             self, data: List[int], gen_data: List[NDArray[uint32]],
-            values: ValueMap, name: str, vertex_slice: Slice):
+            values: ValueMap, name: str, vertex_slice: Slice) -> None:
         """
         Generate data with different values for each neuron.
         """
@@ -353,7 +353,7 @@ class Struct(object):
 
     def read_data(
             self, data: bytes, values: RangeDictionary, data_offset: int = 0,
-            vertex_slice: Optional[Slice] = None):
+            vertex_slice: Optional[Slice] = None) -> None:
         """
         Read a byte string of data and write to values.
 

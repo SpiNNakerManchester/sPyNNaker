@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Mapping, Optional, Sequence
+from typing import Any, Mapping, Optional, Sequence
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
@@ -111,7 +111,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
         return self.__n_steps_per_timestep
 
     @n_steps_per_timestep.setter
-    def n_steps_per_timestep(self, n_steps_per_timestep):
+    def n_steps_per_timestep(self, n_steps_per_timestep: int) -> None:
         self.__n_steps_per_timestep = n_steps_per_timestep
 
     @property
@@ -168,13 +168,13 @@ class NeuronImplStandard(AbstractNeuronImpl):
         return self._RECORDABLES.index(variable)
 
     @overrides(AbstractNeuronImpl.add_parameters)
-    def add_parameters(self, parameters: RangeDictionary):
+    def add_parameters(self, parameters: RangeDictionary) -> None:
         parameters[_STEPS_PER_TIMESTEP] = self.__n_steps_per_timestep
         for component in self.__components:
             component.add_parameters(parameters)
 
     @overrides(AbstractNeuronImpl.add_state_variables)
-    def add_state_variables(self, state_variables: RangeDictionary):
+    def add_state_variables(self, state_variables: RangeDictionary) -> None:
         for component in self.__components:
             component.add_state_variables(state_variables)
 
@@ -192,7 +192,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
     def is_conductance_based(self) -> bool:
         return isinstance(self.__input_type, InputTypeConductance)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Any:
         # Find the property in the components...
         for component in self.__components:
             if hasattr(component, key):

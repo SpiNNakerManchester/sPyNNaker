@@ -60,7 +60,7 @@ class PopulationApplicationVertex(
 
     @staticmethod
     def _check_names(names: Names, allowed: Container[str],
-                     type_of_thing: str):
+                     type_of_thing: str) -> None:
         """
         Check the list of names are allowed or not.
 
@@ -75,7 +75,7 @@ class PopulationApplicationVertex(
                 raise KeyError(f"{name} is not a recognized {type_of_thing}")
 
     @staticmethod
-    def _check_parameters(names: Names, allowed: Container[str]):
+    def _check_parameters(names: Names, allowed: Container[str]) -> None:
         """
         Check that parameters are allowed.
 
@@ -86,7 +86,7 @@ class PopulationApplicationVertex(
         PopulationApplicationVertex._check_names(names, allowed, "parameter")
 
     @staticmethod
-    def _check_variables(names: Names, allowed: Container[str]):
+    def _check_variables(names: Names, allowed: Container[str]) -> None:
         """
         Check that state variables are allowed.
 

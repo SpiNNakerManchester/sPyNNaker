@@ -63,7 +63,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         return self.__structs
 
     @abstractmethod
-    def add_parameters(self, parameters: RangeDictionary[float]):
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
         """
         Add the initial values of the parameters to the parameter holder.
 
@@ -73,7 +73,8 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def add_state_variables(self, state_variables: RangeDictionary[float]):
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         """
         Add the initial values of the state variables to the state
         variables holder.

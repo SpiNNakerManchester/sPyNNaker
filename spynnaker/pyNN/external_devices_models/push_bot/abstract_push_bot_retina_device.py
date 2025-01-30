@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utility_models import MultiCastCommand
 
+from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
+    PushBotRetinaResolution)
 
 class AbstractPushBotRetinaDevice(
         AbstractSendMeMulticastCommandsVertex):
@@ -25,12 +28,11 @@ class AbstractPushBotRetinaDevice(
     An abstraction of a silicon retina attached to a SpiNNaker system.
     """
 
-    def __init__(self, protocol, resolution):
+    def __init__(self, protocol: MunichIoSpiNNakerLinkProtocol,
+                 resolution: Optional[PushBotRetinaResolution]):
         """
         :param protocol:
-        :type protocol:
-            MunichIoEthernetProtocol or MunichIoSpiNNakerLinkProtocol
-        :param PushBotRetinaResolution resolution:
+        :param PushBotRetinaResolution:
         """
         self._protocol = protocol
         self._resolution = resolution

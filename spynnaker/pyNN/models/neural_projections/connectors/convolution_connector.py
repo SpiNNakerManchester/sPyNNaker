@@ -281,7 +281,7 @@ class ConvolutionConnector(AbstractConnector):
             raise SynapticConfigurationException(
                 f"Unrecognized padding {padding}")
 
-    def get_post_shape(self, shape: Tuple[int, ...]):
+    def get_post_shape(self, shape: Tuple[int, ...]) -> Tuple[int, ...]:
         """
         Get the shape of the post image given the pre-image shape.
         """

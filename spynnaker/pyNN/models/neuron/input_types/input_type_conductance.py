@@ -54,12 +54,13 @@ class InputTypeConductance(AbstractInputType):
         self.__e_rev_I = e_rev_I
 
     @overrides(AbstractInputType.add_parameters)
-    def add_parameters(self, parameters: RangeDictionary[float]):
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
         parameters[E_REV_E] = self._convert(self.__e_rev_E)
         parameters[E_REV_I] = self._convert(self.__e_rev_I)
 
     @overrides(AbstractInputType.add_state_variables)
-    def add_state_variables(self, state_variables: RangeDictionary[float]):
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         pass
 
     @overrides(AbstractInputType.get_global_weight_scale)

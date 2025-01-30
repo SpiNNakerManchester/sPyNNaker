@@ -253,7 +253,8 @@ class SpikeSourcePoissonMachineVertex(
     def _pop_vertex(self) -> SpikeSourcePoissonVertex:
         return cast('SpikeSourcePoissonVertex', self.app_vertex)
 
-    def set_sdram_partition(self, sdram_partition: AbstractSDRAMPartition):
+    def set_sdram_partition(
+            self, sdram_partition: AbstractSDRAMPartition) -> None:
         """
         Sets the SDRAM partition
 
@@ -275,7 +276,7 @@ class SpikeSourcePoissonMachineVertex(
                .parse_extra_provenance_items)
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         (n_saturations,) = provenance_data
         with ProvenanceWriter() as db:
             db.insert_core(
@@ -441,7 +442,7 @@ class SpikeSourcePoissonMachineVertex(
         # End-of-Spec:
         spec.end_specification()
 
-    def _write_poisson_rates(self, spec: DataSpecificationBase):
+    def _write_poisson_rates(self, spec: DataSpecificationBase) -> None:
         """
         Generate Rate data for Poisson spike sources.
 
@@ -487,7 +488,7 @@ class SpikeSourcePoissonMachineVertex(
 
         self.__rate_changed = False
 
-    def _write_poisson_parameters(self, spec: DataSpecificationBase):
+    def _write_poisson_parameters(self, spec: DataSpecificationBase) -> None:
         """
         Generate Parameter data for Poisson spike sources.
 
@@ -571,7 +572,7 @@ class SpikeSourcePoissonMachineVertex(
         return helpful_functions.locate_memory_region_for_placement(
             placement, self._PoissonSpikeSourceRegions.RATES_REGION)
 
-    def read_parameters_from_machine(self, placement: Placement):
+    def read_parameters_from_machine(self, placement: Placement) -> None:
         """
         Reads the poisson rates of the machine if they could have changed.
 

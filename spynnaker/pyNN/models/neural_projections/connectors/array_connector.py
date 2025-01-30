@@ -161,5 +161,5 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         block["synapse_type"] = synapse_type
         return block
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"ArrayConnector({self.__array})"

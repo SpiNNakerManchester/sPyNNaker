@@ -67,12 +67,13 @@ class ThresholdTypeFixedProb(AbstractThresholdType):
             "uniform", low=0, high=0xFFFFFFFF, rng=NumpyRNG(seed))
 
     @overrides(AbstractThresholdType.add_parameters)
-    def add_parameters(self, parameters: RangeDictionary[float]):
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
         parameters[V_THRESH] = self._convert(self.__v_thresh)
         parameters[P_THRESH] = self._convert(self.__p_thresh)
 
     @overrides(AbstractThresholdType.add_state_variables)
-    def add_state_variables(self, state_variables: RangeDictionary[float]):
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         state_variables[SEED0] = self.__random
         state_variables[SEED1] = self.__random
         state_variables[SEED2] = self.__random

@@ -196,7 +196,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def check_initial_delay(self, max_delay_ms: int):
+    def check_initial_delay(self, max_delay_ms: int) -> None:
         """
         Check that delays can be done without delay extensions.
 

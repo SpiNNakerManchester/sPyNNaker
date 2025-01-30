@@ -73,14 +73,15 @@ class SynapseTypeExponential(AbstractSynapseType):
         self.__isyn_inh = isyn_inh
 
     @overrides(AbstractSynapseType.add_parameters)
-    def add_parameters(self, parameters: RangeDictionary[float]):
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
         parameters[TAU_SYN_E] = self._convert(self.__tau_syn_E)
         parameters[TAU_SYN_I] = self._convert(self.__tau_syn_I)
         parameters[TIMESTEP_MS] = (
             SpynnakerDataView.get_simulation_time_step_ms())
 
     @overrides(AbstractSynapseType.add_state_variables)
-    def add_state_variables(self, state_variables: RangeDictionary[float]):
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         state_variables[ISYN_EXC] = self._convert(self.__isyn_exc)
         state_variables[ISYN_INH] = self._convert(self.__isyn_inh)
 

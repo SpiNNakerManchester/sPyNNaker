@@ -104,7 +104,7 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         super().set_projection_information(synapse_info)
         self._set_n_connections(synapse_info)
 
-    def _set_n_connections(self, synapse_info: SynapseInformation):
+    def _set_n_connections(self, synapse_info: SynapseInformation) -> None:
         """
         :param SynapseInformation synapse_info:
         """
@@ -210,6 +210,6 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
         return block
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return ("SmallWorldConnector"
                 f"(degree={self.__degree}, rewiring={self.__rewiring})")

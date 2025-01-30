@@ -72,7 +72,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
             live_packet_gather_label=None, send_labels=control_labels,
             local_host=local_host, local_port=local_port)
 
-    def add_poisson_label(self, label: str):
+    def add_poisson_label(self, label: str) -> None:
         """
         :param str label: The label of the Poisson source population.
         """
@@ -94,13 +94,13 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
 
     def __callback_wrapper(
             self, callback: _Callback, label: str,
-            connection: LiveEventConnection):
+            connection: LiveEventConnection) -> None:
         callback(self.__label(label), connection)
 
     def __init_callback_wrapper(
             self, callback: _InitCallback,
             label: str, vertex_size: int, run_time_ms: float,
-            machine_timestep_ms: float):
+            machine_timestep_ms: float) -> None:
         callback(self.__label(label), vertex_size, run_time_ms,
                  machine_timestep_ms)
 
@@ -146,7 +146,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
             self.__control_label(label), functools.partial(
                 self.__callback_wrapper, pause_stop_callback))
 
-    def set_rate(self, label: str, neuron_id: int, rate: float):
+    def set_rate(self, label: str, neuron_id: int, rate: float) -> None:
         """
         Set the rate of a Poisson neuron within a Poisson source.
 
@@ -156,8 +156,8 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         """
         self.set_rates(label, [(neuron_id, rate)])
 
-    def set_rates(
-            self, label: str, neuron_id_rates: Iterable[Tuple[int, float]]):
+    def set_rates(self, label: str,
+                  neuron_id_rates: Iterable[Tuple[int, float]]) -> None:
         """
         Set the rates of multiple Poisson neurons within a Poisson source.
 

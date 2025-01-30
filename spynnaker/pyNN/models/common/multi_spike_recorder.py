@@ -39,7 +39,7 @@ class MultiSpikeRecorder(object):
         return self.__record
 
     @record.setter
-    def record(self, record: bool):
+    def record(self, record: bool) -> None:
         self.__record = bool(record)
 
     def get_sdram_usage_in_bytes(

@@ -62,7 +62,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         self.__weight = self._convert_weight(weight)
         self.__check_out_weight(self.__weight, "weight")
 
-    def __check_in_type(self, value: Weight_Delay_In_Types, name: str):
+    def __check_in_type(self, value: Weight_Delay_In_Types, name: str) -> None:
         if value is None:
             return
         if isinstance(value, (int, float, str, RandomDistribution)):
@@ -82,7 +82,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             "Expected types are int, float, str, RandomDistribution "
             "and collections of type int or float")
 
-    def __check_out_weight(self, weight: Weight_Types, name: str):
+    def __check_out_weight(self, weight: Weight_Types, name: str) -> None:
         if weight is None:
             return
         if isinstance(weight, (int, float, str, RandomDistribution)):
@@ -99,7 +99,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             "Expected types are float, str, RandomDistribution "
             "and list of type float")
 
-    def __check_out_delay(self, delay: Delay_Types, name: str):
+    def __check_out_delay(self, delay: Delay_Types, name: str) -> None:
         if isinstance(delay, (float, (str, RandomDistribution))):
             return
         if isinstance(delay, numpy.ndarray):
