@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.defaults import (
-    defaults, default_parameters, default_initial_values)
+    AbstractProvidesDefaults, default_parameters, default_initial_values)
 from testfixtures import LogCapture  # type: ignore[import]
 import re
 # pylint: disable=no-member
@@ -24,8 +23,7 @@ import re
 def test_nothing():
     unittest_setup()
 
-    @defaults
-    class _AClass(object):
+    class _AClass(AbstractProvidesDefaults):
         def __init__(self, param_1=1, param_2=2, param_3=3):
             pass
     assert (_AClass.default_parameters == {
@@ -36,8 +34,7 @@ def test_nothing():
 def test_parameters():
     unittest_setup()
 
-    @defaults
-    class _AClass(object):
+    class _AClass(AbstractProvidesDefaults):
 
         @default_parameters({"param_1"})
         def __init__(self, param_1=1, param_2=2, param_3=3):
@@ -49,8 +46,7 @@ def test_parameters():
 def test_state_variables():
     unittest_setup()
 
-    @defaults
-    class _AClass(object):
+    class _AClass(AbstractProvidesDefaults):
 
         @default_initial_values({"param_1"})
         def __init__(self, param_1=1, param_2=2, param_3=3):
@@ -62,16 +58,14 @@ def test_state_variables():
 def test_both():
     unittest_setup()
 
-    @defaults
-    class _AClass(object):
+    class _AClass(AbstractProvidesDefaults):
 
         @default_parameters({"param_1"})
         @default_initial_values({"param_2"})
         def __init__(self, param_1=1, param_2=2, param_3=3):
             pass
 
-    @defaults
-    class _AnotherClass(object):
+    class _AnotherClass(AbstractProvidesDefaults):
 
         @default_initial_values({"param_1"})
         @default_parameters({"param_2"})
@@ -83,49 +77,16 @@ def test_both():
     assert _AnotherClass.default_initial_values == {"param_1": 1}
 
 
-def test_abstract():
-    unittest_setup()
-
-    class BaseClass(object, metaclass=AbstractBase):
-
-        @property
-        @staticmethod
-        @abstractmethod
-        def default_parameters():
-            pass
-
-        @property
-        @staticmethod
-        @abstractmethod
-        def default_initial_values():
-            pass
-
-    @defaults
-    class _AClass(BaseClass):
-
-        default_parameters = None
-        default_initial_values = None
-
-        def __init__(self, param="test"):
-            pass
-
-    assert _AClass.default_parameters == {"param": "test"}
-    assert _AClass.default_initial_values == {}
-    _AClass()
-
-
 def test_setting_state_variables():
     unittest_setup()
 
-    @defaults
-    class _AClass(object):
+    class _AClass(AbstractProvidesDefaults):
 
         @default_parameters({"param_1"})
         def __init__(self, param_1=1, param_2=2, param_3=3):
             pass
 
-    @defaults
-    class _AnotherClass(object):
+    class _AnotherClass(AbstractProvidesDefaults):
 
         @default_initial_values({"param_1"})
         def __init__(self, param_1=1, param_2=2, param_3=3):
