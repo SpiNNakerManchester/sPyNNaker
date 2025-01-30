@@ -39,7 +39,7 @@ Weight_Delay_In_Types: TypeAlias = Optional[Union[
     int, float, str, RandomDistribution, Iterable[int], Iterable[float]]]
 
 IoDest: TypeAlias = Union[
-    str, neo.baseio.BaseIO, None]  # pylint: disable=no_member
+    str, neo.baseio.BaseIO, None]  # pylint: disable=no-member
 
 
 def is_scalar(value: Weight_Delay_Types) -> TypeGuard[Union[int, float]]:
