@@ -420,7 +420,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         return copy_rd.next(n_connections)
 
     def _no_space_exception(
-            self, values: Weight_Delay_Types, synapse_info) -> Never:
+            self, values: Weight_Delay_Types,
+            synapse_info: SynapseInformation) -> SpynnakerException:
         """
         Returns a SpynnakerException about there being no space defined
 
@@ -434,7 +435,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
             f"{synapse_info.pre_population}-"
             f"{synapse_info.post_population}")
 
-    def weight_type_exception(self, weights: Weight_Types) -> Never:
+    def weight_type_exception(
+            self, weights: Weight_Types) -> SpynnakerException:
         """
         Returns an Exception explaining incorrect weight or delay type
 
