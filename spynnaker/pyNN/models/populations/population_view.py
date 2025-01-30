@@ -49,10 +49,6 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.types import Names, Values
     from spynnaker.pyNN.models.recorder import Recorder
     from spynnaker.pyNN.types import IoDest
-    #: :meta private:
-    Selector: TypeAlias = Union[
-        None, int, slice, List[int], List[bool], NDArray[bool_],
-        NDArray[integer]]
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
