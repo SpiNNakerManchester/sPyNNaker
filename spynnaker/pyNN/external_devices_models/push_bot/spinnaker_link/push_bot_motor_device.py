@@ -20,11 +20,9 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
     PushBotEthernetMotorDevice)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
-from spynnaker.pyNN.models.defaults import defaults
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 
 
-@defaults
 class PushBotSpiNNakerLinkMotorDevice(
         PushBotEthernetMotorDevice, ApplicationSpiNNakerLinkVertex,
         PopulationApplicationVertex):

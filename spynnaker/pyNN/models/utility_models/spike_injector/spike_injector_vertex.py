@@ -28,13 +28,11 @@ from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
-from spynnaker.pyNN.models.defaults import defaults
 
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-@defaults
 class SpikeInjectorVertex(
         ReverseIpTagMultiCastSource, PopulationApplicationVertex,
         SupportsStructure):

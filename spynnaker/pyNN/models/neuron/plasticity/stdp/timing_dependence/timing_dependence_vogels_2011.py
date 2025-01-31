@@ -25,7 +25,6 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.defaults import defaults
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     AbstractTimingDependence)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
@@ -34,7 +33,6 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     float_to_fixed, get_exp_lut_array)
 
 
-@defaults
 class TimingDependenceVogels2011(AbstractTimingDependence):
     """
     A timing dependence STDP rule due to Vogels (2011).

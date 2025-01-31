@@ -22,8 +22,6 @@ from spinn_front_end_common.interface.ds import (
     DataType, DataSpecificationBase)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.models.defaults import defaults
-
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
 
@@ -31,7 +29,6 @@ from .abstract_weight_dependence import AbstractWeightDependence
 _SPACE_PER_SYNAPSE_TYPE = 6 * BYTES_PER_WORD
 
 
-@defaults
 class WeightDependenceAdditiveTriplet(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
     """

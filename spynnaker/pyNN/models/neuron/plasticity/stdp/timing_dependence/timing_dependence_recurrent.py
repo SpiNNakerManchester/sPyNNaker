@@ -26,7 +26,6 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.defaults import defaults
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightAccumulator)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
@@ -35,7 +34,6 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
 from .abstract_timing_dependence import AbstractTimingDependence
 
 
-@defaults
 class TimingDependenceRecurrent(AbstractTimingDependence):
     """
     A timing dependence STDP rule based on recurrences.

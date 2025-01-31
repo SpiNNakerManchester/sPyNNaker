@@ -23,7 +23,6 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.defaults import defaults
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     get_exp_lut_array)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
@@ -32,7 +31,6 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
 from .abstract_timing_dependence import AbstractTimingDependence
 
 
-@defaults
 class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     """
     A timing dependence STDP rule based on nearest pairs.

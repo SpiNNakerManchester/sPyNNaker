@@ -26,7 +26,6 @@ from spinn_front_end_common.utility_models import MultiCastCommand
 
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
-from spynnaker.pyNN.models.defaults import defaults
 
 # robot with 7 7 1
 
@@ -55,7 +54,6 @@ def get_spike_value_from_robot_retina(key: int) -> int:
     return (key >> 14) & 0x1
 
 
-@defaults
 class MunichRetinaDevice(
         ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex,
         AbstractSendMeMulticastCommandsVertex):

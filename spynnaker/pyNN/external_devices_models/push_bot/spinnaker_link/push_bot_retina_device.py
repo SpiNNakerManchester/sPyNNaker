@@ -23,7 +23,6 @@ from spynnaker.pyNN.external_devices_models.push_bot import (
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotRetinaResolution)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
-from spynnaker.pyNN.models.defaults import defaults
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 
 
@@ -49,7 +48,6 @@ class DelayedPayloadMultiCastCommand(MultiCastCommand):
         return self.payload is not None
 
 
-@defaults
 class PushBotSpiNNakerLinkRetinaDevice(
         AbstractPushBotRetinaDevice, ApplicationSpiNNakerLinkVertex,
         PopulationApplicationVertex):
