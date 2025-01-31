@@ -120,6 +120,7 @@ def convert_param_to_numpy(
     # Deal with the correct number of multiple values
     return numpy.array(param, dtype=floating)
 
+
 def convert_to(value: float, data_type: DataType) -> uint32:
     """
     Convert a value to a given data type.
@@ -238,7 +239,7 @@ def read_spikes_from_file(
 
 def get_probable_maximum_selected(
         n_total_trials: int, n_trials: int, selection_prob: float,
-        chance: float =(1.0 / 100.0)) -> int:
+        chance: float = (1.0 / 100.0)) -> int:
     """
     Get the likely maximum number of items that will be selected from a
     set of `n_trials` from a total set of `n_total_trials`

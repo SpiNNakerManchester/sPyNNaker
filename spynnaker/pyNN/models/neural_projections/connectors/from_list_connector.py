@@ -178,8 +178,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             self, n_pre_atoms: int, n_post_atoms: int,
             post_slices: Sequence[Slice]) -> \
             Tuple[NDArray[integer], NDArray[integer],
-            Optional[NDArray[floating]],
-            Optional[NDArray[floating]]]:
+                  Optional[NDArray[floating]],
+                  Optional[NDArray[floating]]]:
         """
         :param list(~pacman.model.graphs.common.Slice) post_slices:
         """

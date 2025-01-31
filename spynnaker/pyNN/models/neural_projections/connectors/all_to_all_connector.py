@@ -43,7 +43,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
 
     __slots__ = ("__allow_self_connections", )
 
-    def __init__(self, allow_self_connections: bool = True, safe: bool  = True,
+    def __init__(self, allow_self_connections: bool = True, safe: bool = True,
                  verbose: bool = False, callback: None = None):
         """
         :param bool allow_self_connections:

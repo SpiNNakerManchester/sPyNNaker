@@ -64,7 +64,7 @@ _ParamDict: TypeAlias = Dict[str, Any]
 
 
 # Not in the class so pylint doesn't get confused about abstractness of methods
-def _we_dont_do_this_now(*args: Any) -> Never:  # pylint: disable=unused-argument
+def _we_dont_do_this_now(*a: Any) -> Never:  # pylint: disable=unused-argument
     # pragma: no cover
     raise NotImplementedError("sPyNNaker does not currently do this")
 
@@ -643,7 +643,7 @@ class Population(PopulationBase):
                     f"{self.__last_id - self.__first_id}], actually {index}")
             return int(index + self.__first_id)
         # this assumes IDs are consecutive
-        return  [_index + self.__first_id for _index in index]
+        return [_index + self.__first_id for _index in index]
 
     def id_to_local_index(self, cell_id: Union[int, Iterable[int]]) -> Never:
         """

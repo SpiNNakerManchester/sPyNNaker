@@ -22,6 +22,7 @@ from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotRetinaResolution)
 
+
 class AbstractPushBotRetinaDevice(
         AbstractSendMeMulticastCommandsVertex):
     """

@@ -47,6 +47,7 @@ Selector: TypeAlias = Union[
     None, int, slice, List[int], List[bool], NDArray[numpy.bool_],
     NDArray[numpy.integer]]
 
+
 def is_scalar(value: Weight_Delay_Types) -> TypeGuard[Union[int, float]]:
     """
     Are the weights or delays a simple integer or float?

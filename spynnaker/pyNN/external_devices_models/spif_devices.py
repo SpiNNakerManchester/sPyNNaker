@@ -134,7 +134,7 @@ class SPIFRegister(IntEnum):
 
     def delayed_command(
             self, get_payload: Callable[[int], int],
-            index: int  = 0) -> "_DelayedMultiCastCommand":
+            index: int = 0) -> "_DelayedMultiCastCommand":
         """ Make a command to send to a SPIF device to set a register value,
             where the value itself is currently unknown
 
@@ -411,7 +411,8 @@ class SpiNNFPGARegister(IntEnum):
     #: The base of the masks that can be sent out of SpiNNake (up to 6)
     XP_MASK_BASE = 48
 
-    def cmd(self, payload: Optional[int] = None, index: int = 0) -> MultiCastCommand:
+    def cmd(self, payload: Optional[int] = None,
+            index: int = 0) -> MultiCastCommand:
         """
         Make a command to send to the FPGA to set a register value.
 

@@ -21,7 +21,6 @@ from typing import (
 import numpy
 from numpy import bool_, integer
 from numpy.typing import NDArray
-from typing_extensions import TypeAlias
 
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
