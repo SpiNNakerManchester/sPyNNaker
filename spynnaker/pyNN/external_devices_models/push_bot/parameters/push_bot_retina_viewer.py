@@ -22,7 +22,6 @@ import numpy
 from spinn_utilities.log import FormatAdapter
 
 import spynnaker.pyNN.external_devices as external_devices
-from spynnaker.pyNN.__init__ import end, run
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotRetinaResolution)
 from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
@@ -45,7 +44,7 @@ class PushBotRetinaViewer():
         "__running", "__conn")
 
     def __init__(self, retina_resolution: PushBotRetinaResolution,
-                 label: str, sim: None):
+                 label: str, sim: None = None):
         if sim is not None:
             _logger.warning("PushBotRetinaViewer: sim=None is deprecated")
         pyplot.ion()
@@ -88,6 +87,9 @@ class PushBotRetinaViewer():
         self.__image_lock.release()
 
     def __run_sim_forever(self) -> None:
+        # UGLY but needed to avoid circular import
+        # pylint: disable=import-outside-toplevel
+        from pyNN.spiNNaker import end, run
         try:
             external_devices.run_forever()
             self.__running = False
@@ -98,6 +100,9 @@ class PushBotRetinaViewer():
             _logger.exception("unexpected exception in simulation thread")
 
     def __run_sim(self, run_time: float) -> None:
+        # UGLY but needed to avoid circular import
+        # pylint: disable=import-outside-toplevel
+        from pyNN.spiNNaker import end, run
         try:
             run(run_time)
             self.__running = False
