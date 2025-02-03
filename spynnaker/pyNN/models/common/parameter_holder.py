@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple,
-    Union, cast)
-from typing_extensions import TypeAlias
+    Any, Callable, cast, Dict, Iterable, Iterator, List, Optional, overload,
+    Tuple, Union)
 from pyNN.random import RandomDistribution
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged.abstract_sized import Selector
-_BaseValueType: TypeAlias = Union[List[int], List[float]]
 
 
 class ParameterHolder(object):
@@ -45,7 +43,7 @@ class ParameterHolder(object):
     def __init__(
             self, data_items_to_return: Union[str, Iterable[str]],
             get_call: Callable[[str, Selector], Union[
-                _BaseValueType, RandomDistribution]],
+                List[float], RandomDistribution]],
             selector: Selector = None):
         """
         :param data_items_to_return: A list of data fields to be returned
@@ -65,11 +63,10 @@ class ParameterHolder(object):
             self.__data_items_to_return = tuple(data_items_to_return)
             self.__single_key = None
         self.__get_call = get_call
-        self.__data_items: Optional[Dict[str, _BaseValueType]] = None
+        self.__data_items: Optional[Dict[str, List[float]]] = None
         self.__selector = selector
 
-    def _safe_read_values(self, parameter: str) -> Union[
-            _BaseValueType, int, float]:
+    def _safe_read_values(self, parameter: str) -> Union[List[float], float]:
         values = self.__get_call(parameter, self.__selector)
 
         # The values must be a single item, a list or a random distribution;
@@ -85,7 +82,7 @@ class ParameterHolder(object):
             return values[0]
         return values
 
-    def _get_data_items(self) -> Dict[str, _BaseValueType]:
+    def _get_data_items(self) -> Dict[str, List[float]]:
         """
         Merges the parameters and values in to the final data items
 
@@ -99,20 +96,34 @@ class ParameterHolder(object):
         if is_singleton(self.__data_items_to_return):
             key = cast(str, self.__data_items_to_return)
             self.__data_items = {
-                key: cast(_BaseValueType, self._safe_read_values(key))}
+                key: cast(List[float], self._safe_read_values(key))}
             return self.__data_items
 
         # If there are multiple items to return, form a list
         self.__data_items = {
-            param: cast(_BaseValueType, self._safe_read_values(param))
+            param: cast(List[float], self._safe_read_values(param))
             for param in self.__data_items_to_return}
 
         return self.__data_items
 
-    def __getitem__(self, s):
+    @overload
+    def __getitem__(self, s: int) -> float:
+        ...
+
+    @overload
+    def __getitem__(self, s: str) -> List[float]:
+        ...
+
+    def __getitem__(self, s: Union[int, str]) -> Union[float, List[float]]:
         data = self._get_data_items()
         if self.__single_key is not None:
+            if not isinstance(s, int):
+                raise KeyError("As there is only one array held "
+                               "only int parameter are valid")
             return data[self.__single_key][s]
+        if not isinstance(s, str):
+            raise KeyError("As multiple arrays held "
+                           "only str parameter are valid")
         return data[s]
 
     def __len__(self) -> int:
@@ -139,17 +150,11 @@ class ParameterHolder(object):
             return repr(data[self.__single_key])
         return repr(data)
 
-    def __contains__(self, item: str) -> bool:
+    def __contains__(self, item: Union[str, int]) -> bool:
         data = self._get_data_items()
         if self.__single_key is not None:
             return item in data[self.__single_key]
         return item in data
-
-    def __getattr__(self, name: str):
-        data = self._get_data_items()
-        if self.__single_key is not None:
-            return getattr(data[self.__single_key], name)
-        return getattr(data, name)
 
     def __eq__(self, other: Any) -> bool:
         data = self._get_data_items()
@@ -172,7 +177,7 @@ class ParameterHolder(object):
         data = self._get_data_items()
         return data.keys()
 
-    def values(self) -> Iterable[_BaseValueType]:
+    def values(self) -> Iterable[List[float]]:
         """
         The names and values of the data
 
@@ -181,7 +186,7 @@ class ParameterHolder(object):
         data = self._get_data_items()
         return data.values()
 
-    def items(self) -> Iterable[Tuple[str, _BaseValueType]]:
+    def items(self) -> Iterable[Tuple[str, List[float]]]:
         """
         The names and values of the data
 
