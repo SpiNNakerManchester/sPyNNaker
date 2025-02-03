@@ -244,15 +244,15 @@ class AbstractProvidesDefaults(object):
         _check_args(params.union(svars), default_args, init)
 
         # fill in the defaults so this method is only called once
-        defaults = {}
-        initials = {}
+        __defaults = {}
+        __initials = {}
         for arg, value in zip(default_args, default_values):
             if arg in params:
-                defaults[arg] = value
+                __defaults[arg] = value
             elif arg in svars:
-                initials[arg] = value
-        cls.__cashed_defaults = MappingProxyType(defaults)
-        cls.__cashed_initials = MappingProxyType(initials)
+                __initials[arg] = value
+        cls.__cashed_defaults = MappingProxyType(__defaults)
+        cls.__cashed_initials = MappingProxyType(__initials)
 
     @classproperty
     def default_parameters(  # pylint: disable=no-self-argument
