@@ -151,7 +151,7 @@ class SpikeInjectorVertex(
             raise KeyError(f"Cannot record {name}")
         return vertex_slice.get_raster_ids()
 
-    def describe(self) -> Dict[str, Union[str, Dict[str, Any]]]:
+    def describe(self) -> Dict[str, Union[str, Collection[str]]]:
         """
         Returns a human-readable description of the cell or synapse type.
 
