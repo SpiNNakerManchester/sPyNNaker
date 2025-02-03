@@ -89,7 +89,7 @@ class PushBotRetinaViewer():
     def __run_sim_forever(self) -> None:
         # UGLY but needed to avoid circular import
         # pylint: disable=import-outside-toplevel
-        from pyNN.spiNNaker import end, run
+        from pyNN.spiNNaker import end
         try:
             external_devices.run_forever()
             self.__running = False
