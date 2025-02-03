@@ -14,7 +14,7 @@
 
 import logging
 import sys
-from typing import (Any, Collection, Dict, List, Optional, Tuple, Union)
+from typing import (Collection, Dict, List, Optional, Tuple, Union)
 import numpy
 from numpy.typing import NDArray
 from pyNN.space import Grid2D, Grid3D, BaseStructure
