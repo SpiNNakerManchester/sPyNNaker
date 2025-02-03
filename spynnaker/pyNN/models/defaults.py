@@ -196,6 +196,9 @@ class AbstractProvidesDefaults(object):
     @default_initial_values decorators with values read from the init.
     """
 
+    __cashed_defaults: Optional[Mapping[str, Any]] = None
+    __cashed_initials: Optional[Mapping[str, Any]] = None
+
     @classmethod
     def __fill_in_defaults(cls) -> None:
         """
@@ -248,10 +251,8 @@ class AbstractProvidesDefaults(object):
                 default_parameters[arg] = value
             elif arg in svars:
                 default_initial_values[arg] = value
-        cls.default_parameters = (  # pylint: disable=redefined-outer-name
-            MappingProxyType(default_parameters))  # type: ignore
-        cls.default_initial_values = (  # pylint: disable=W0621 type: ignore
-            MappingProxyType(default_initial_values))
+        cls.__cashed_defaults = MappingProxyType(default_parameters)
+        cls.__cashed_initials = MappingProxyType(default_initial_values)
 
     @classproperty
     def default_parameters(  # pylint: disable=no-self-argument
@@ -266,8 +267,10 @@ class AbstractProvidesDefaults(object):
         this will be all the init parameters with a default value
         less any defined in @default_initial_values
         """
-        cls.__fill_in_defaults()
-        return cls.default_parameters
+        if cls.__cashed_defaults is None:
+            cls.__fill_in_defaults()
+            assert cls.__cashed_defaults is not None
+        return cls.__cashed_defaults
 
     @classproperty
     def default_initial_values(  # pylint: disable=no-self-argument
@@ -285,5 +288,7 @@ class AbstractProvidesDefaults(object):
 
         If neither decorator is used this will be an empty Mapping
         """
-        cls.__fill_in_defaults()
-        return cls.default_initial_values
+        if cls.__cashed_initials is None:
+            cls.__fill_in_defaults()
+            assert cls.__cashed_initials is not None
+        return cls.__cashed_initials
