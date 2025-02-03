@@ -109,7 +109,7 @@ class ConnectionHolder(object):
         self.__notify = notify
         self.__fixed_values = fixed_values
 
-    def add_connections(self, connections: ConnectionsArray):
+    def add_connections(self, connections: ConnectionsArray) -> None:
         """
         Add connections to the holder to be returned.
 
@@ -241,7 +241,8 @@ class ConnectionHolder(object):
 
         return self.__data_items
 
-    def __getitem__(self, s):
+    def __getitem__(self, s:int) -> Union[
+            numpy.floating, NDArray[numpy.floating]]:
         data = self._get_data_items()
         return data[s]
 
@@ -261,6 +262,11 @@ class ConnectionHolder(object):
         data = self._get_data_items()
         return data.__repr__()
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
+        """
+        Gets the attributes from the NDArray if applicable
+
+        :raises AttributeError: if the data in NDArray format. Ie list
+        """
         data = self._get_data_items()
         return getattr(data, name)
