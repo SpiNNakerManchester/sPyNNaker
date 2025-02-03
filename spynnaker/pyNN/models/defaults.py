@@ -248,11 +248,10 @@ class AbstractProvidesDefaults(object):
                 default_parameters[arg] = value
             elif arg in svars:
                 default_initial_values[arg] = value
-        # pylint: disable=redefined-outer-name
-        cls.default_parameters = MappingProxyType(  # type: ignore
-            default_parameters)
-        cls.default_initial_values = (MappingProxyType(  # type: ignore
-            default_initial_values))
+        cls.default_parameters = ( # pylint: disable=redefined-outer-name
+            MappingProxyType(default_parameters)) # type: ignore
+        cls.default_initial_values = ( # pylint: disable=W0621 type: ignore
+            MappingProxyType(default_initial_values))
 
     @classproperty
     def default_parameters(  # pylint: disable=no-self-argument
