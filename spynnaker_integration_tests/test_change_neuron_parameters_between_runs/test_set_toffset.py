@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import numpy
-import spynnaker.plot_utils as plot_utils
 import pyNN.spiNNaker as p
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
@@ -96,9 +95,8 @@ if __name__ == '__main__':
     gsyn = neo_convertor.convert_data(neo, "gsyn_exc")
 
     print(spikes)
-    plot_utils.plot_spikes(spikes)
-    plot_utils.heat_plot(v)
-    plot_utils.heat_plot(gsyn)
+    print(v)
+    print(gsyn)
 
     times = set(spikes[:, 1])
     print(n_neurons * len(times), len(spikes))

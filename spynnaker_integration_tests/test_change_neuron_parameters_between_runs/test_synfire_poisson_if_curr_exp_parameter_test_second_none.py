@@ -13,7 +13,6 @@
 # limitations under the License.
 import numpy
 import spynnaker.spike_checker as spike_checker
-import spynnaker.plot_utils as plot_utils
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import SynfireRunner
@@ -74,6 +73,7 @@ if __name__ == '__main__':
     _hist = numpy.histogram(_spikes_in[:, 1], bins=[0, 5000, 10000])
     print(_hist[0][0], _hist[0][1])
     _spikes_out = synfire_run.get_output_pop_spikes_numpy()
-    plot_utils.plot_spikes([_spikes_in, _spikes_out])
-    plot_utils.heat_plot(_v)
-    plot_utils.heat_plot(_gsyn)
+    print(_spikes_in)
+    print(_spikes_out)
+    print(_v)
+    print(_gsyn)
