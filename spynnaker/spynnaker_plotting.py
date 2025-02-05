@@ -36,7 +36,6 @@ try:
     _matplotlib_missing = False
 except ImportError:
     _matplotlib_missing = True
-    Axes = object
 
 TA_Data: TypeAlias = Union[List[SpikeTrain], SpikeTrainList, AnalogSignal,
                            NDArray, Block, Segment]
