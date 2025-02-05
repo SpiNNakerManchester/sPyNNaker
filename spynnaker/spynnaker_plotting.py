@@ -21,7 +21,6 @@ from typing import Any, Dict, List, Union
 from types import ModuleType
 
 from neo import SpikeTrain, Block, Segment, AnalogSignal
-#from neo.core import AnalogSignal, Block, Segment
 from neo.core.spiketrainlist import SpikeTrainList  # type: ignore[import]
 import numpy as np
 from numpy.typing import NDArray
