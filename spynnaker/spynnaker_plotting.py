@@ -138,7 +138,9 @@ def _heat_plot(axes: Axes, values: NDArray, label: str = '',
     _handle_options(axes, options)
     heat_map = axes.imshow(values, cmap='hot', interpolation='none',
                            origin='lower', aspect='auto')
-    axes.figure.colorbar(heat_map)
+    fig = axes.figure
+    assert fig is not None
+    fig.colorbar(heat_map)
     if label:
         plt.text(0.95, 0.95, label,
                  transform=axes.transAxes, ha='right', va='top',
