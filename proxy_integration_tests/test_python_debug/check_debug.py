@@ -13,6 +13,9 @@
 # limitations under the License.
 
 import os
+from unittest.case import SkipTest
+from requests.exceptions import ConnectionError
+
 from spinn_utilities.config_holder import get_config_bool
 
 from spinn_front_end_common.interface.interface_functions \
@@ -93,7 +96,11 @@ class CheckDebug(BaseTestCase):
             spike_times=[0]), label="input")
         sim.Projection(inp, pop, sim.AllToAllConnector(),
                        synapse_type=sim.StaticSynapse(weight=5))
-        sim.run(0)
+        try:
+            sim.run(0)
+        except ConnectionError:
+            raise SkipTest("DNS Error Monster!")
+
         pop.get_data("v")
         run0 = SpynnakerDataView.get_run_dir_path()
         found = os.listdir(run0)
