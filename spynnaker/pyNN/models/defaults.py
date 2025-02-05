@@ -241,8 +241,8 @@ class AbstractProvidesDefaults(object):
         _check_args(params.union(svars), default_args, init)
 
         # fill in the defaults so this method is only called once
-        cls.default_parameters: Mapping[str, Any] = {}
-        cls.default_initial_values: Mapping[str, Any] = {}
+        cls.default_parameters = {}
+        cls.default_initial_values = {}
         for arg, value in zip(default_args, default_values):
             if arg in params:
                 cls.default_parameters[arg] = value
