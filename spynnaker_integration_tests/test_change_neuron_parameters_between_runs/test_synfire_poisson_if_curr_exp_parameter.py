@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy
-import spynnaker.plot_utils as plot_utils
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import SynfireRunner
@@ -61,4 +60,4 @@ if __name__ == '__main__':
     spikes = synfire_run.get_output_pop_spikes_numpy()
     hist = numpy.histogram(spikes[:, 1], bins=[0, 5000, 10000])
     print(hist[0][0] * 10, hist[0][1])
-    plot_utils.plot_spikes(spikes)
+    print(spikes)
