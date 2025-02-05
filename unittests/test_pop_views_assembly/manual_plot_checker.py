@@ -1,0 +1,38 @@
+import os
+import matplotlib.pyplot as plt
+import pyNN.utility.plotting as plot
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+from spynnaker.spynnaker_plotting import SpynnakerPanel
+
+
+my_dir = os.path.dirname(os.path.abspath(__file__))
+my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+with NeoBufferDatabase(my_buffer) as db:
+    pop = db.get_population("pop_1")
+sneo = pop.get_data("spikes")
+neo = pop.get_data(["spikes", "v"])
+vneo = pop.get_data("v")
+spikes = neo.segments[0].spiketrains
+v = neo.segments[0].filter(name='v')[0]
+v_matrix = pop.spinnaker_get_data("v")
+print(v)
+
+plot.Figure(
+    # plot spikes (or in this case spike)
+    plot.Panel(spikes, yticks=True, markersize=5, xlim=(0, 35)),
+    SpynnakerPanel(spikes, yticks=True, xticks=True, markersize=4),
+    SpynnakerPanel(sneo, yticks=True, xticks=True, markersize=4),
+    SpynnakerPanel(sneo.segments[0], yticks=True, xticks=True, markersize=4),
+    # plot voltage for first ([0]) neuron
+    SpynnakerPanel(neo, yticks=True, xticks=True, markersize=4, name="spikes"),
+    plot.Panel(v, ylabel="Membrane potential (mV)",
+               data_labels=[pop.label], yticks=True, xlim=(0, 35)),
+    SpynnakerPanel(v, yticks=True, xticks=True, markersize=4),
+    SpynnakerPanel(vneo, yticks=True, xticks=True, markersize=4),
+    SpynnakerPanel(vneo.segments[0], yticks=True, xticks=True, markersize=4),
+    SpynnakerPanel(v_matrix, yticks=True, xticks=True, markersize=4),
+    SpynnakerPanel(neo, yticks=True, xticks=True, markersize=4, name="v"),
+    title="Simple Example",
+    annotations=f"Simulated with "
+)
+plt.show()
