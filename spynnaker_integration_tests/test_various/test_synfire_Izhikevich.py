@@ -17,7 +17,6 @@
 """
 Synfirechain-like example
 """
-import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
 import pyNN.spiNNaker as p
 from spynnaker.pyNN.utilities import neo_convertor
@@ -96,6 +95,5 @@ if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population
     (v, gsyn, spikes) = do_run(nNeurons)
     print(len(spikes))
-    plot_utils.plot_spikes(spikes)
-    plot_utils.heat_plot(v, title="v")
-    plot_utils.heat_plot(gsyn, title="gsyn")
+    print(v)
+    print(gsyn)
