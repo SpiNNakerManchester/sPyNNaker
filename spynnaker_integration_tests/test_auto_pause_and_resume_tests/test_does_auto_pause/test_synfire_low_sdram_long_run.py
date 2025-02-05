@@ -16,7 +16,6 @@
 Synfirechain-like example
 """
 from testfixtures import LogCapture  # type: ignore[import]
-import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import SynfireRunner
@@ -59,7 +58,5 @@ if __name__ == '__main__':
     v = synfire_run.get_output_pop_voltage_numpy()
     spikes = synfire_run.get_output_pop_spikes_numpy()
 
-    print(len(spikes))
-    plot_utils.plot_spikes(spikes)
-    plot_utils.heat_plot(v)
-    plot_utils.heat_plot(gsyn)
+    print(spikes)
+    print(v)

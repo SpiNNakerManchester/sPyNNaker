@@ -17,7 +17,6 @@
 """
 Synfirechain-like example
 """
-import spynnaker.plot_utils as plot_utils
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import do_synfire_npop
 
@@ -38,5 +37,4 @@ if __name__ == '__main__':
     results = do_synfire_npop(
         n_neurons, n_pops=n_pops, neurons_per_core=n_neurons)
     spikes = results
-    print(len(spikes))
-    plot_utils.plot_spikes(spikes)
+    print(spikes)

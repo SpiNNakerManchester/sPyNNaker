@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import spynnaker.plot_utils as plot_utils
 import pyNN.spiNNaker as p
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
@@ -74,10 +73,8 @@ if __name__ == '__main__':
     nNeurons = 600  # number of neurons in each population
     neo = do_run(nNeurons, 60)
     spikes = neo_convertor.convert_spikes(neo)
-    plot_utils.plot_spikes(spikes)
     print(spikes)
 
     neo = do_run(nNeurons, 70)
     spikes = neo_convertor.convert_spikes(neo)
-    plot_utils.plot_spikes(spikes)
     print(spikes)
