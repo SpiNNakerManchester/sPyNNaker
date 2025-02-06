@@ -49,7 +49,9 @@ def install_spynnaker_into(module: ModuleType) -> None:
 
     :param ~types.ModuleType module:
     """
-    spinnaker_dir = os.path.join(os.path.dirname(module.__file__), "spiNNaker")
+    _file = module.__file__
+    assert _file is not None
+    spinnaker_dir = os.path.join(os.path.dirname(_file), "spiNNaker")
     if not os.path.exists(spinnaker_dir):
         os.mkdir(spinnaker_dir)
 
