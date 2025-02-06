@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from decimal import Decimal
 from enum import Enum
 from typing import Optional
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
@@ -86,7 +87,7 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def device_control_max_value(self) -> float:
+    def device_control_max_value(self) -> Decimal:
         """
         The maximum value to send to the device.
 

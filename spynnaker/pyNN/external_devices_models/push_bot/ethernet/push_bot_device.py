@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from decimal import Decimal
 from typing import Optional
 
 from spinn_utilities.overrides import overrides
@@ -78,7 +79,7 @@ class PushBotEthernetDevice(
 
     @property
     @overrides(AbstractMulticastControllableDevice.device_control_max_value)
-    def device_control_max_value(self) -> float:
+    def device_control_max_value(self) -> Decimal:
         return self.__device.max_value
 
     @property
