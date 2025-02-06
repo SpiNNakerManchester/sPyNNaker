@@ -28,5 +28,5 @@ class BufferDataType(Enum):
     REWIRES = (auto())
     NOT_NEO = (auto())
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name

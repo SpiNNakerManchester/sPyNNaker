@@ -13,20 +13,20 @@
 # limitations under the License.
 
 from collections import defaultdict
+from typing import Any
 
 
 class ExtractedData(object):
     """
-    Data holder for all synaptic data being extracted in parallel.
+    This class is deprecated
     """
-    # @Chimp: play here to hearts content.
 
     __slots__ = ("__data", )
 
     def __init__(self):
         self.__data = defaultdict(dict)
 
-    def get(self, projection, attribute):
+    def get(self, projection: Any, attribute: Any) -> Any:
         """
         Allow getting data from a given projection and attribute.
 
@@ -42,7 +42,7 @@ class ExtractedData(object):
                 return self.__data[projection][attribute]
         return None
 
-    def set(self, projection, attribute, data):
+    def set(self, projection: Any, attribute: Any, data: Any) -> None:
         """
         Allow the addition of data from a projection and attribute.
 

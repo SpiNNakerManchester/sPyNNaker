@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Any
 
 class PyNNSynapseDynamics(object):
     """
@@ -19,7 +20,7 @@ class PyNNSynapseDynamics(object):
     """
     __slots__ = ("__slow", )
 
-    def __init__(self, slow=None, fast=None):
+    def __init__(self, slow: Any = None, fast: Any = None):
         if fast is not None:
             raise NotImplementedError(
                 "Fast synapse dynamics are not currently supported")
@@ -27,7 +28,7 @@ class PyNNSynapseDynamics(object):
         self.__slow = slow
 
     @property
-    def slow(self):
+    def slow(self) -> Any:
         """
         unused!
         """
