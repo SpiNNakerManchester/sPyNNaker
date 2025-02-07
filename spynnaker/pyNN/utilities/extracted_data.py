@@ -23,8 +23,8 @@ class ExtractedData(object):
 
     __slots__ = ("__data", )
 
-    def __init__(self):
-        self.__data = defaultdict(dict)
+    def __init__(self) -> None:
+        self.__data: Any = defaultdict(dict)
 
     def get(self, projection: Any, attribute: Any) -> Any:
         """
