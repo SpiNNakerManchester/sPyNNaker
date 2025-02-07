@@ -203,19 +203,6 @@ class SynapseDynamicsStructuralSTDP(
         # If everything matches, return ourselves as supreme!
         return self
 
-    def set_projection_parameter(self, param: str, value):
-        """
-        :param str param:
-        :param value:
-        """
-        for item in (self.partner_selection, self.__formation,
-                     self.__elimination):
-            if hasattr(item, param):
-                setattr(item, param, value)
-                break
-        else:
-            raise ValueError(f"Unknown parameter {param}")
-
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
     @overrides(SynapseDynamicsStructuralCommon.is_same_as)
     def is_same_as(self, synapse_dynamics: Union[
