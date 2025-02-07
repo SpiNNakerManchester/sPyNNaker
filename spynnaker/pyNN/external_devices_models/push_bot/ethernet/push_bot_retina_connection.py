@@ -106,7 +106,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         with self.__lock:
             self.__ready = False
 
-    def _receive_retina_data(self, data):
+    def _receive_retina_data(self, data: bytearray):
         """
         Receive retina packets from the PushBot and converts them into
         neuron spikes within the spike injector system.
@@ -134,7 +134,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
                         self.__next_data = data[i:i+1]
 
             # Filter out the usable data
-            data_filtered = numpy.fromstring(data_all, dtype=numpy.uint16)
+            data_filtered = numpy.frombuffer(data_all, dtype=numpy.uint16)
             y_values = (data_filtered >> self.__orig_y_shift) & self.__y_mask
             x_values = (data_filtered >> self.__orig_x_shift) & self.__x_mask
             polarity = (data_filtered >> _P_SHIFT) & _P_MASK
