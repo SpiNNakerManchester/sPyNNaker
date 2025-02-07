@@ -201,10 +201,12 @@ class SPIFOutputDevice(
         # we don't know the key or mask of the incoming link...
         commands = list()
         for i, part in enumerate(self.__incoming_partitions):
+            pop_vertex = part.pre_vertex
+            assert isinstance(pop_vertex, PopulationApplicationVertex)
             commands.append(set_xp_key_delayed(i, self._get_set_key_payload))
             commands.append(set_xp_mask_delayed(i, self._get_set_mask_payload))
-            if part.pre_vertex in self.__output_key_and_mask:
-                key, mask = self.__output_key_and_mask[part.pre_vertex]
+            if pop_vertex in self.__output_key_and_mask:
+                key, mask = self.__output_key_and_mask[pop_vertex]
                 commands.append(set_distiller_key(i, key))
                 commands.append(set_distiller_mask(i, mask))
             else:
@@ -213,7 +215,7 @@ class SPIFOutputDevice(
                 commands.append(set_distiller_mask_delayed(
                     i, self._get_set_dist_mask_payload))
             commands.append(set_distiller_shift(
-                i, part.pre_vertex.n_colour_bits))
+                i, pop_vertex.n_colour_bits))
         return commands
 
     @property
@@ -232,12 +234,14 @@ class SPIFOutputDevice(
         all_keys: Dict[MachineVertex, List[Tuple[int, int]]] = dict()
         routing_infos = SpynnakerDataView.get_routing_infos()
         for i, part in enumerate(self.__incoming_partitions):
-            if part.pre_vertex in self.__output_key_and_mask:
+            pop_vertex = part.pre_vertex
+            assert isinstance(pop_vertex, PopulationApplicationVertex)
+            if pop_vertex in self.__output_key_and_mask:
                 key, mask = self.__output_key_and_mask[part.pre_vertex]
             else:
                 key = i << self.__output_key_shift
                 mask = self._get_set_dist_mask_payload(i)
-            shift = part.pre_vertex.n_colour_bits
+            shift = pop_vertex.n_colour_bits
             for m_vertex in part.pre_vertex.splitter.get_out_going_vertices(
                     part.identifier):
                 atom_keys: Iterable[Tuple[int, int]] = list()
