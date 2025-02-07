@@ -112,7 +112,13 @@ class ParameterHolder(object):
     def __getitem__(self, s):
         data = self._get_data_items()
         if self.__single_key is not None:
+            if not isinstance(s, int):
+                raise KeyError("As there is only one array held "
+                               "only int parameter are valid")
             return data[self.__single_key][s]
+        if not isinstance(s, str):
+            raise KeyError("As multiple arrays held "
+                           "only str parameter are valid")
         return data[s]
 
     def __len__(self) -> int:
