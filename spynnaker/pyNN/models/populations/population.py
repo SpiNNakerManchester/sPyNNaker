@@ -16,8 +16,8 @@ import inspect
 import logging
 import os
 from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple,
-    Type, Union, final, overload, TYPE_CHECKING)
+    Any, Callable, cast, Dict, Iterable, Iterator, List, Optional, Sequence,
+    Tuple, Type, Union, final, overload, TYPE_CHECKING)
 
 import numpy
 from numpy import floating
@@ -590,11 +590,11 @@ class Population(PopulationBase):
 
     @overload
     def id_to_index(
-            self, id: Iterable[int]) -> Sequence[int]:  # @ReservedAssignment
+            self, id: Iterable[int]) -> List[int]:  # @ReservedAssignment
         ...
 
     def id_to_index(self, id: Union[int, Iterable[int]]
-                    ) -> Union[int, Sequence[int]]:  # @ReservedAssignment
+                    ) -> Union[int, List[int]]:  # @ReservedAssignment
         """
         Given the ID(s) of cell(s) in the Population, return its (their)
         index (order in the Population).
@@ -608,19 +608,20 @@ class Population(PopulationBase):
         """
         # pylint: disable=redefined-builtin
         if not numpy.iterable(id):
+            id = cast(int, id)
             if not self.__first_id <= id <= self.__last_id:
                 raise ValueError(
                     f"id should be in the range [{self.__first_id},"
                     f"{self.__last_id}], actually {id}")
             return int(id - self.__first_id)  # assume IDs are consecutive
-        return numpy.array(id) - self.__first_id
+        return [_id - self.__first_id for _id in id]
 
     @overload
     def index_to_id(self, index: int) -> int:
         ...
 
     @overload
-    def index_to_id(self, index: Iterable[int]) -> Sequence[int]:
+    def index_to_id(self, index: Iterable[int]) -> List[int]:
         ...
 
     def index_to_id(self, index: Union[int, Iterable[int]]
@@ -634,13 +635,14 @@ class Population(PopulationBase):
         :rtype: int or iterable(int)
         """
         if not numpy.iterable(index):
+            index = cast(int, index)
             if index > self.__last_id - self.__first_id:
                 raise ValueError(
                     "indexes should be in the range [0,"
                     f"{self.__last_id - self.__first_id}], actually {index}")
             return int(index + self.__first_id)
         # this assumes IDs are consecutive
-        return numpy.array(index) + self.__first_id
+        return [_index + self.__first_id for _index in index]
 
     def id_to_local_index(self, cell_id):
         """
