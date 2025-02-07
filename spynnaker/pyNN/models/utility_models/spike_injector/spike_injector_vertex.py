@@ -165,9 +165,9 @@ class SpikeInjectorVertex(
         context = {
             "name": "SpikeInjector",
             "default_parameters":
-                self.default_parameters,  # type: ignore[attr-defined]
+                self.default_parameters,
             "default_initial_values":
-                self.default_parameters,  # type: ignore[attr-defined]
+                self.default_parameters,
             "parameters": {
                 "port": self._eieio_params.receive_port,
                 "virtual_key": self._eieio_params.virtual_key},
