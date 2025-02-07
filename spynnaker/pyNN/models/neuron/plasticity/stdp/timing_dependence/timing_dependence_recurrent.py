@@ -51,18 +51,11 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         'accumulator_depression', 'accumulator_potentiation',
         'mean_pre_window', 'mean_post_window', 'dual_fsm')
 
-    default_parameters = {
-        'accumulator_depression': -6, 'accumulator_potentiation': 6,
-        'mean_pre_window': 35.0, 'mean_post_window': 35.0, 'dual_fsm': True}
-
     def __init__(
-            self, accumulator_depression: int = cast(int, default_parameters[
-                'accumulator_depression']),
-            accumulator_potentiation: int = cast(int, default_parameters[
-                'accumulator_potentiation']),
-            mean_pre_window: float = default_parameters['mean_pre_window'],
-            mean_post_window: float = default_parameters['mean_post_window'],
-            dual_fsm: bool = cast(bool, default_parameters['dual_fsm']),
+            self, accumulator_depression: int = -6,
+            accumulator_potentiation: int = 6,
+            mean_pre_window: float = 35.0, mean_post_window: float = 35.0,
+            dual_fsm: bool = True,
             A_plus: float = 0.01, A_minus: float = 0.01):
         """
         :param int accumulator_depression:

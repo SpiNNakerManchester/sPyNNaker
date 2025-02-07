@@ -44,9 +44,8 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         "__a_plus",
         "__a_minus")
     __PARAM_NAMES = ('alpha', 'tau')
-    default_parameters = {'tau': 20.0}
 
-    def __init__(self, alpha: float, tau: float = default_parameters['tau'],
+    def __init__(self, alpha: float, tau: float = 20.0,
                  A_plus: float = 0.01, A_minus: float = 0.01):
         r"""
         :param float alpha: :math:`\alpha`
