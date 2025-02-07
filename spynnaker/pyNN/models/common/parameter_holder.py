@@ -151,12 +151,6 @@ class ParameterHolder(object):
             return item in data[self.__single_key]
         return item in data
 
-    def __getattr__(self, name: str):
-        data = self._get_data_items()
-        if self.__single_key is not None:
-            return getattr(data[self.__single_key], name)
-        return getattr(data, name)
-
     def __eq__(self, other: Any) -> bool:
         data = self._get_data_items()
         if self.__single_key is not None:
