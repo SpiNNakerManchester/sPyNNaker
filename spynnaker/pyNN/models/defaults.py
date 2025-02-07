@@ -118,7 +118,12 @@ def default_initial_values(state_variables: Iterable[str]) -> Callable:
     :param iterable(str) state_variables:
         The names of the arguments that are state variables
     """
-    def wrap(method):
+    def wrap(method: Callable) -> Callable:
+        """
+        Wraps the init method with a check method
+        :param method: init method to wrap
+        :return:
+        """
         # pylint: disable=protected-access
         # Find the real method in case we use multiple of these decorators
         wrapped = method
@@ -126,26 +131,27 @@ def default_initial_values(state_variables: Iterable[str]) -> Callable:
             method = getattr(method, "_method")
 
         # Store the state variables of the method to be used later
-        method._state_variables = frozenset(state_variables)
+        method._state_variables = (  # type: ignore[attr-defined]
+            frozenset(state_variables))
         method_args = inspect.getfullargspec(method)
 
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> None:
             # Check for state variables that have been specified in cell_params
             args_provided = method_args.args[:len(args)]
             args_provided.extend([
                 arg for arg in kwargs if arg in method_args.args])
+            variables = method._state_variables  # type: ignore[attr-defined]
             for arg in args_provided:
-                if arg in method._state_variables:
+                if arg in variables:
                     logger.warning(
                         "Formal PyNN specifies that {} should be set using "
                         "initial_values not cell_params", arg)
             wrapped(*args, **kwargs)
 
         # Store the real method in the returned object
-        wrapper._method = method
+        wrapper._method = method  # type: ignore[attr-defined]
         return wrapper
     return wrap
-
 
 def defaults(cls: type) -> type:
     """
