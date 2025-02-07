@@ -266,7 +266,7 @@ class ConnectionHolder(object):
         """
         Gets the attributes from the NDArray if applicable
 
-        :raises AttributeError: if the data in NDArray format. Ie list
+        :raises AttributeError: If the data does not have this attribute.
         """
         data = self._get_data_items()
         return getattr(data, name)

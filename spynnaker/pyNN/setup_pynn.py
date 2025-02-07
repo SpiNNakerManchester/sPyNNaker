@@ -21,9 +21,8 @@ module.
 """
 
 import os
-# TODO: switch to packaging.version
-from packaging.version import Version
 from types import ModuleType
+from packaging.version import Version
 import pyNN
 
 # The version of PyNN that we really want
