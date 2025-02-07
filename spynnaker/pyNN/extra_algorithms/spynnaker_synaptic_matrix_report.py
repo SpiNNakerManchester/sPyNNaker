@@ -15,6 +15,7 @@
 from contextlib import contextmanager
 import logging
 import os
+import sys
 from typing import Dict, Tuple
 
 import numpy
@@ -37,7 +38,7 @@ def _print_all():
     Update the numpy print options to display everything.
     """
     print_opts = numpy.get_printoptions()
-    numpy.set_printoptions(threshold=numpy.nan)
+    numpy.set_printoptions(threshold=sys.maxsize)
     try:
         yield
     finally:
