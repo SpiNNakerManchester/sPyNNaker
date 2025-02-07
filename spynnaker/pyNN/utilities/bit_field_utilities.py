@@ -19,6 +19,8 @@ import numpy
 from numpy import uint32
 from numpy.typing import NDArray
 
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
+
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
@@ -49,8 +51,9 @@ def is_sdram_poisson_source(app_edge):
     # pylint: disable=import-outside-toplevel
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
         SplitterPoissonDelegate)
-    if isinstance(app_edge.pre_vertex.splitter, SplitterPoissonDelegate):
-        if app_edge.pre_vertex.splitter.send_over_sdram:
+    splitter: AbstractSplitterCommon = app_edge.pre_vertex.splitter
+    if isinstance(splitter, SplitterPoissonDelegate):
+        if splitter.send_over_sdram:
             return True
     return False
 
