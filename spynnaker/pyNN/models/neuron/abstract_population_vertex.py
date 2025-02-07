@@ -13,10 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 from collections import defaultdict
-from functools import reduce
 import logging
 import math
-import operator
 from typing import (
     Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
     cast, TYPE_CHECKING)
@@ -76,6 +74,7 @@ from spynnaker.pyNN.models.neuron.population_machine_common import (
 from spynnaker.pyNN.models.neuron.population_machine_neurons import (
     NeuronRegions)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractGenerateOnMachine,
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural,
     AbstractSDRAMSynapseDynamics, AbstractSupportsSignedWeights,
     SynapseDynamicsStatic)
@@ -138,15 +137,6 @@ _EXTRA_RECORDABLE_UNITS = {NeuronRecorder.SPIKES: "",
                            NeuronRecorder.REWIRING: ""}
 
 
-def _prod(iterable):
-    """
-    Finds the product of the iterable.
-
-    :param iterable iterable: Things to multiply together
-    """
-    return reduce(operator.mul, iterable, 1)
-
-
 def _all_gen(rd):
     """
     Determine if all the values of a ranged dictionary can be generated.
@@ -173,8 +163,9 @@ def _check_random_dists(rd):
     """
     for key in rd.keys():
         if is_singleton(rd[key]):
-            if isinstance(rd[key], RandomDistribution):
-                check_rng(rd[key].rng, f"RandomDistribtion for {key}")
+            a_rd = rd[key]
+            if isinstance(a_rd, RandomDistribution):
+                check_rng(a_rd.rng, f"RandomDistribtion for {key}")
         else:
             for _start, _stop, val in rd[key].iter_ranges():
                 if isinstance(val, RandomDistribution):
@@ -1429,6 +1420,8 @@ class AbstractPopulationVertex(
         if not synapse_info.may_generate_on_machine():
             return 0
 
+        dynamics = cast(AbstractGenerateOnMachine,
+                        synapse_info.synapse_dynamics)
         connector = cast(
             AbstractGenerateConnectorOnMachine, synapse_info.connector)
         return (
@@ -1436,7 +1429,7 @@ class AbstractPopulationVertex(
             + connector.gen_delay_params_size_in_bytes(synapse_info.delays)
             + connector.gen_weight_params_size_in_bytes(synapse_info.weights)
             + connector.gen_connector_params_size_in_bytes
-            + synapse_info.synapse_dynamics.gen_matrix_params_size_in_bytes)
+            + dynamics.gen_matrix_params_size_in_bytes)
 
     @property
     def synapse_executable_suffix(self) -> str:
@@ -1772,17 +1765,19 @@ class _Stats(object):
         n_conns = connector.get_n_connections_to_post_vertex_maximum(s_info)
         d_var = s_dynamics.get_delay_variance(connector, s_info.delays, s_info)
 
-        s_type_pos = s_dynamics.get_positive_synapse_index(proj)
-        w_mean_pos = s_dynamics.get_mean_positive_weight(proj)
-        w_var_pos = s_dynamics.get_variance_positive_weight(proj)
-        w_max_pos = s_dynamics.get_maximum_positive_weight(proj)
+        signed_dynamics = cast(AbstractSupportsSignedWeights,
+                               s_info.synapse_dynamics)
+        s_type_pos = signed_dynamics.get_positive_synapse_index(proj)
+        w_mean_pos = signed_dynamics.get_mean_positive_weight(proj)
+        w_var_pos = signed_dynamics.get_variance_positive_weight(proj)
+        w_max_pos = signed_dynamics.get_maximum_positive_weight(proj)
         self.__add_details(
             proj, s_type_pos, n_conns, w_mean_pos, w_var_pos, w_max_pos, d_var)
 
-        s_type_neg = s_dynamics.get_negative_synapse_index(proj)
-        w_mean_neg = -s_dynamics.get_mean_negative_weight(proj)
-        w_var_neg = -s_dynamics.get_variance_negative_weight(proj)
-        w_max_neg = -s_dynamics.get_minimum_negative_weight(proj)
+        s_type_neg = signed_dynamics.get_negative_synapse_index(proj)
+        w_mean_neg = -signed_dynamics.get_mean_negative_weight(proj)
+        w_var_neg = -signed_dynamics.get_variance_negative_weight(proj)
+        w_max_neg = -signed_dynamics.get_minimum_negative_weight(proj)
         self.__add_details(
             proj, s_type_neg, n_conns, w_mean_neg, w_var_neg, w_max_neg, d_var)
 
