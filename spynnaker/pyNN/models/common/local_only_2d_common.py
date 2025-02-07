@@ -78,11 +78,11 @@ def get_delay_for_source(incoming: "Projection") -> Tuple[
     delay = s_info.synapse_dynamics.delay
     steps = delay * SpynnakerDataView.get_simulation_time_step_per_ms()
     max_delay = app_edge.post_vertex.splitter.max_support_delay()
-    local_delay = steps % max_delay
-    delay_stage = 0
+    local_delay = int(steps % max_delay)
+    delay_stage: int = 0
     pre_vertex: ColouredApplicationVertex = app_edge.pre_vertex
     if steps > max_delay:
-        delay_stage = (steps // max_delay) - 1
+        delay_stage = int(steps // max_delay) - 1
         delay_edge = app_edge.delay_edge
         assert delay_edge is not None
         pre_vertex = delay_edge.pre_vertex
