@@ -142,9 +142,10 @@ class SPIFInputDevice(
         self.__index_by_slice = dict()
 
         self.__pipe = pipe
-        self.__base_key = base_key
         if self.__base_key is None:
             self.__base_key = SPIFInputDevice.__n_devices
+        else:
+            self.__base_key = base_key
         self.__base_key = self.__base_key << self.__neuron_bits
         SPIFInputDevice.__n_devices += 1
 
