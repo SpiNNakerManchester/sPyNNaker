@@ -102,7 +102,7 @@ class _DelaySupportAdder(object):
         """
         # figure the max delay and if we need a delay extension
         n_stages, steps_per_stage, need_delay_ext = self._check_delay_values(
-            edge, edge.synapse_information)
+            edge)
 
         # if we need a delay, add it to the app graph.
         if need_delay_ext:
@@ -187,21 +187,19 @@ class _DelaySupportAdder(object):
                 n_delay_stages, delay_per_stage)
         return delay_app_vertex
 
-    def _check_delay_values(self, app_edge, synapse_infos):
+    def _check_delay_values(self, app_edge):
         """
         Checks the delay required from the user defined max, the max delay
         supported by the post vertex splitter and the delay Extensions.
 
         :param ApplicationEdge app_edge: the undelayed application edge
-        :param iterable[SynapseInformation] synapse_infos:
-            the synapse information objects
         :return: tuple(n_delay_stages, delay_steps_per_stage, extension_needed)
         """
         # get max delay required
         max_delay_needed_ms = max(
             synapse_info.synapse_dynamics.get_delay_maximum(
                 synapse_info.connector, synapse_info)
-            for synapse_info in synapse_infos)
+            for synapse_info in app_edge.synapse_infos)
 
         # get if the post vertex needs a delay extension
         post_splitter = app_edge.post_vertex.splitter
