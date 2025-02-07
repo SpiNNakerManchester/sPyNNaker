@@ -241,7 +241,7 @@ class ConnectionHolder(object):
 
         return self.__data_items
 
-    def __getitem__(self, s:int) -> Union[
+    def __getitem__(self, s: int) -> Union[
             numpy.floating, NDArray[numpy.floating]]:
         data = self._get_data_items()
         return data[s]

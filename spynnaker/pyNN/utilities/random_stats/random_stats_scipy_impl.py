@@ -55,6 +55,6 @@ class RandomStatsScipyImpl(AbstractRandomStats):
 
     @overrides(AbstractRandomStats.low)
     def low(self, distribution: RandomDistribution) -> Optional[float]:
-       if "low" in distribution.parameters:
+        if "low" in distribution.parameters:
             return distribution.parameters['low']
-       return None
+        return None

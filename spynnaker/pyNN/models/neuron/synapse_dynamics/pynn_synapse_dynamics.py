@@ -14,6 +14,7 @@
 
 from typing import Any
 
+
 class PyNNSynapseDynamics(object):
     """
     This class is deprecated.

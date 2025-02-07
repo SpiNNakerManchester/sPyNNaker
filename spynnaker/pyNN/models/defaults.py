@@ -134,7 +134,7 @@ def default_initial_values(state_variables: Iterable[str]) -> Callable:
             method = getattr(method, "_method")
 
         # Store the state variables of the method to be used later
-        method._state_variables = ( # type: ignore[attr-defined]
+        method._state_variables = (  # type: ignore[attr-defined]
             frozenset(state_variables))
         method_args = inspect.getfullargspec(method)
 
