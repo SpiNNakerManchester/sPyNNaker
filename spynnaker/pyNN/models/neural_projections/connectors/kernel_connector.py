@@ -150,7 +150,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         :param bool verbose:
             Whether to output extra information about the connectivity to a
             CSV file
-        :param callable callback: (ignored)
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         """
         super().__init__(safe=safe, callback=callback, verbose=verbose)
         assert space is None, "non-None space unsupported"
@@ -458,7 +462,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             return float(numpy.var(self._krn_weights))
         return super().get_weight_variance(weights, synapse_info)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return \
             f"KernelConnector(shape_kernel[{self._kernel_w},{self._kernel_h}])"
 
@@ -574,7 +578,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         pre = application_edge.pre_vertex
         post = application_edge.post_vertex
         if len(pre.atoms_shape) != 1 or len(post.atoms_shape) != 1:

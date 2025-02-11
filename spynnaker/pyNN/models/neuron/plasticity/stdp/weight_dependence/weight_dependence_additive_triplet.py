@@ -41,15 +41,10 @@ class WeightDependenceAdditiveTriplet(
         "__w_min")
     __PARAM_NAMES = ('w_min', 'w_max', 'A3_plus', 'A3_minus')
 
-    default_parameters = {'w_min': 0.0, 'w_max': 1.0, 'A3_plus': 0.01,
-                          'A3_minus': 0.01}
-
     # noinspection PyPep8Naming
     def __init__(
-            self, w_min: float = default_parameters['w_min'],
-            w_max: float = default_parameters['w_max'],
-            A3_plus: float = default_parameters['A3_plus'],
-            A3_minus: float = default_parameters['A3_minus']):
+            self, w_min: float = 0.0, w_max: float = 1.0,
+            A3_plus: float = 0.01, A3_minus: float = 0.01):
         """
         :param float w_min: :math:`w^{min}`
         :param float w_max: :math:`w^{max}`
@@ -132,7 +127,8 @@ class WeightDependenceAdditiveTriplet(
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
             self, spec: DataSpecificationBase, global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating], n_weight_terms: int):
+            synapse_weight_scales: NDArray[floating],
+            n_weight_terms: int) -> None:
         # Loop through each synapse type
         for _ in synapse_weight_scales:
             # Scale the weights

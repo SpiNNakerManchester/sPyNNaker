@@ -14,8 +14,8 @@
 from __future__ import annotations
 from collections import Counter
 import logging
-from typing import (
-    Collection, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING)
+from typing import (Any, Collection, Dict, List, Optional, Sequence, Tuple,
+                    Union, TYPE_CHECKING)
 
 import numpy
 from numpy.typing import ArrayLike, NDArray
@@ -158,7 +158,7 @@ class SpikeSourceArrayVertex(
             assert sdram == machine_vertex.sdram_required
         return machine_vertex
 
-    def _check_spike_density(self, spike_times: Spikes):
+    def _check_spike_density(self, spike_times: Spikes) -> None:
         if _is_double_list(spike_times):
             self._check_density_double_list(spike_times)
         elif _is_single_list(spike_times):
@@ -168,7 +168,7 @@ class SpikeSourceArrayVertex(
         else:
             logger.warning("SpikeSourceArray has no spike times")
 
-    def _check_density_single_list(self, spike_times: _SingleList):
+    def _check_density_single_list(self, spike_times: _SingleList) -> None:
         counter = Counter(spike_times)
         top = counter.most_common(1)
         val, count = top[0]
@@ -186,7 +186,7 @@ class SpikeSourceArrayVertex(
                     "For example at time {}, {} spikes will be sent",
                     val, count * self.n_atoms)
 
-    def _check_density_double_list(self, spike_times: _DoubleList):
+    def _check_density_double_list(self, spike_times: _DoubleList) -> None:
         counter: Counter = Counter()
         for neuron_id in range(0, self.n_atoms):
             counter.update(spike_times[neuron_id])
@@ -200,7 +200,7 @@ class SpikeSourceArrayVertex(
                 val, count)
 
     @overrides(SupportsStructure.set_structure)
-    def set_structure(self, structure: BaseStructure):
+    def set_structure(self, structure: BaseStructure) -> None:
         self.__structure = structure
 
     @property
@@ -210,7 +210,7 @@ class SpikeSourceArrayVertex(
             return self.__structure.calculate_size(self.n_atoms)
         return super().atoms_shape
 
-    def _to_early_spikes_single_list(self, spike_times: _SingleList):
+    def _to_early_spikes_single_list(self, spike_times: _SingleList) -> None:
         """
         Checks if there is one or more spike_times before the current time.
 
@@ -228,7 +228,7 @@ class SpikeSourceArrayVertex(
                     self, current_time, float(spike_time))
                 return
 
-    def _check_spikes_double_list(self, spike_times: _DoubleList):
+    def _check_spikes_double_list(self, spike_times: _DoubleList) -> None:
         """
         Checks if there is one or more spike_times before the current time.
 
@@ -248,7 +248,7 @@ class SpikeSourceArrayVertex(
                         self, current_time, float(id_time))
                     return
 
-    def __set_spike_buffer_times(self, spike_times: Spikes):
+    def __set_spike_buffer_times(self, spike_times: Spikes) -> None:
         """
         Set the spike source array's buffer spike times.
         """
@@ -266,7 +266,7 @@ class SpikeSourceArrayVertex(
         self.send_buffer_times = _send_buffer_times(spike_times, time_step)
         self._check_spike_density(spike_times)
 
-    def __read_parameter(self, name: str, selector: Selector):
+    def __read_parameter(self, name: str, selector: Selector) -> Sequence:
         # pylint: disable=unused-argument
         # This can only be spike times
         return self._spike_times.get_values(selector)
@@ -279,7 +279,7 @@ class SpikeSourceArrayVertex(
 
     @overrides(PopulationApplicationVertex.set_parameter_values)
     def set_parameter_values(
-            self, name: str, value: Spikes, selector: Selector = None):
+            self, name: str, value: Spikes, selector: Selector = None) -> None:
         self._check_parameters(name, {"spike_times"})
         self.__set_spike_buffer_times(value)
         self._spike_times.set_value_by_selector(
@@ -317,7 +317,7 @@ class SpikeSourceArrayVertex(
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(
             self, name: str, sampling_interval: Optional[float] = None,
-            indices: Optional[Collection[int]] = None):
+            indices: Optional[Collection[int]] = None) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if sampling_interval is not None:
@@ -330,8 +330,8 @@ class SpikeSourceArrayVertex(
         SpynnakerDataView.set_requires_mapping()
 
     @overrides(PopulationApplicationVertex.set_not_recording)
-    def set_not_recording(
-            self, name: str, indices: Optional[Collection[int]] = None):
+    def set_not_recording(self, name: str,
+                          indices: Optional[Collection[int]] = None) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if indices is not None:
@@ -363,7 +363,8 @@ class SpikeSourceArrayVertex(
             raise KeyError(f"Cannot record {name}")
         return None
 
-    def describe(self):
+    def describe(
+            self) -> Dict[str, Union[str, ParameterHolder, Dict[str, Any]]]:
         """
         Returns a human-readable description of the cell or synapse type.
 

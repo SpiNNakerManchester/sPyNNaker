@@ -173,7 +173,7 @@ class SynapseDynamicsWeightChangable(
     def write_parameters(
             self, spec: DataSpecificationBase, region: int,
             global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         spec.comment("Writing Plastic Parameters")
 
         # Switch focus to the region:
@@ -374,7 +374,7 @@ class SynapseDynamicsWeightChangable(
     @overrides(AbstractPlasticSynapseDynamics.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         AbstractPlasticSynapseDynamics.validate_connection(
             self, application_edge, synapse_info)
         if not isinstance(synapse_info.connector,

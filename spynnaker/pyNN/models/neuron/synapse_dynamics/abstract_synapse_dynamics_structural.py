@@ -75,7 +75,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
             self, spec: DataSpecificationBase, region: int,
             weight_scales: NDArray[floating],
             app_vertex: AbstractPopulationVertex,
-            vertex_slice: Slice, synaptic_matrices: SynapticMatrices):
+            vertex_slice: Slice, synaptic_matrices: SynapticMatrices) -> None:
         """
         Write structural plasticity parameters.
 
@@ -96,7 +96,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     def set_connections(
             self, connections: ConnectionsArray, post_vertex_slice: Slice,
             app_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         """
         Set connections for structural plasticity.
 
@@ -196,7 +196,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def check_initial_delay(self, max_delay_ms: int):
+    def check_initial_delay(self, max_delay_ms: int) -> None:
         """
         Check that delays can be done without delay extensions.
 

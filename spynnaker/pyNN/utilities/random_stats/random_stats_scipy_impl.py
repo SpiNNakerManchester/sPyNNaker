@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
 import scipy.stats
+from spinn_utilities.overrides import overrides
+from pyNN.random import RandomDistribution
 from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
@@ -21,30 +24,37 @@ class RandomStatsScipyImpl(AbstractRandomStats):
     A Random Statistics object that uses scipy directly.
     """
 
-    def __init__(self, distribution_type):
+    def __init__(self, distribution_type: str):
         self._scipy_stats = getattr(scipy.stats, distribution_type)
 
-    def cdf(self, dist, v):
+    @overrides(AbstractRandomStats.cdf)
+    def cdf(self, dist: RandomDistribution, v: float) -> float:
         return self._scipy_stats.cdf(v, *dist.parameters)
 
-    def ppf(self, dist, p):
+    @overrides(AbstractRandomStats.ppf)
+    def ppf(self, dist: RandomDistribution, p: float) -> float:
         return self._scipy_stats.ppf(p, *dist.parameters)
 
-    def mean(self, dist):
+    @overrides(AbstractRandomStats.mean)
+    def mean(self, dist: RandomDistribution) -> float:
         return self._scipy_stats.mean(*dist.parameters)
 
-    def std(self, dist):
+    @overrides(AbstractRandomStats.std)
+    def std(self, dist: RandomDistribution) -> float:
         return self._scipy_stats.std(*dist.parameters)
 
-    def var(self, dist):
+    @overrides(AbstractRandomStats.var)
+    def var(self, dist: RandomDistribution) -> float:
         return self._scipy_stats.var(*dist.parameters)
 
-    def high(self, distribution):
+    @overrides(AbstractRandomStats.high)
+    def high(self, distribution: RandomDistribution) -> Optional[float]:
         if "high" in distribution.parameters:
             return distribution.parameters['high']
         return None
 
-    def low(self, distribution):
+    @overrides(AbstractRandomStats.low)
+    def low(self, distribution: RandomDistribution) -> Optional[float]:
         if "low" in distribution.parameters:
             return distribution.parameters['low']
         return None

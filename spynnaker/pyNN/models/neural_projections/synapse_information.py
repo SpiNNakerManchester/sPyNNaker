@@ -194,7 +194,7 @@ class SynapseInformation(object):
         return self.__postpop_is_view
 
     @property
-    def synapse_dynamics(self):
+    def synapse_dynamics(self) -> AbstractSynapseDynamics:
         """
         The dynamic behaviour of the synapse.
 
@@ -272,7 +272,7 @@ class SynapseInformation(object):
         return self.__pre_run_connection_holders
 
     def add_pre_run_connection_holder(
-            self, pre_run_connection_holder: ConnectionHolder):
+            self, pre_run_connection_holder: ConnectionHolder) -> None:
         """
         Add a connection holder that will be filled in before run.
 
@@ -309,7 +309,7 @@ class SynapseInformation(object):
         return self.__download_on_pause
 
     @download_on_pause.setter
-    def download_on_pause(self, download_on_pause: bool):
+    def download_on_pause(self, download_on_pause: bool) -> None:
         """
         Set whether to download the synapse matrix when the simulation pauses.
 

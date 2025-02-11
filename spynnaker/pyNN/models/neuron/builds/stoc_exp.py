@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.models.defaults import default_parameters
 from spynnaker.pyNN.models.neuron.implementations import NeuronImplStocExp
 
@@ -23,5 +26,7 @@ class StocExp(AbstractPyNNNeuronModel):
     """
 
     @default_parameters({"tau", "bias"})
-    def __init__(self, tau=10, bias=0, refract_init=0, seed=None):
+    def __init__(self, tau: ModelParameter = 10, bias: ModelParameter = 0,
+                 refract_init: ModelParameter = 0,
+                 seed: Optional[int] = None):
         super().__init__(NeuronImplStocExp(tau, bias, refract_init, seed))

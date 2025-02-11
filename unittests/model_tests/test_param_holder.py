@@ -35,6 +35,7 @@ class TestParamHolder(unittest.TestCase):
         self.assertEqual("{'foo': [1, 2, 3], 'bar': [4, 5, 6]}", str(ph))
         self.assertTrue("foo" in ph)
         self.assertFalse(1 in ph)
+        self.assertEqual(ph['foo'], [1, 2, 3])
 
     def test_sinle_item(self):
         ph = ParameterHolder("foo", get_mock)
@@ -42,3 +43,4 @@ class TestParamHolder(unittest.TestCase):
         self.assertEqual("[1, 2, 3]", str(ph))
         self.assertFalse("foo" in ph)
         self.assertTrue(2 in ph)
+        self.assertEqual(ph[1], 2)

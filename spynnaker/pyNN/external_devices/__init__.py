@@ -118,7 +118,7 @@ __all__ = [
 __simulator: Optional[SpiNNaker] = None
 
 
-def run_forever(sync_time: float = 0.0):
+def run_forever(sync_time: float = 0.0) -> None:
     """
     Supports running forever in PyNN 0.8/0.9 format.
 
@@ -134,7 +134,7 @@ def run_forever(sync_time: float = 0.0):
     __simulator.run(None, sync_time)
 
 
-def run_sync(run_time: float, sync_time: float):
+def run_sync(run_time: float, sync_time: float) -> None:
     """
     Run in steps of the given number of milliseconds pausing between
     for a signal to be sent from the host.
@@ -167,7 +167,7 @@ def request_stop() -> None:
 
 
 def register_database_notification_request(
-        hostname: str, notify_port: int, ack_port: int):
+        hostname: str, notify_port: int, ack_port: int) -> None:
     """
     Adds a socket system which is registered with the notification protocol.
 
@@ -360,7 +360,7 @@ def SpikeInjector(
     return ExternalDeviceSpikeInjector()
 
 
-def _set_simulator(simulator: SpiNNaker):
+def _set_simulator(simulator: SpiNNaker) -> None:
     """
     Should only be called by pyNN/__init__py setup method.
 

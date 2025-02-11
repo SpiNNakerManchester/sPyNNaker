@@ -19,6 +19,7 @@ import numpy
 from numpy import floating, integer, uint32
 from numpy.typing import NDArray
 
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -148,11 +149,13 @@ def get_max_row_info(
             max_undelayed_n_synapses)
         delayed_n_words = dynamics.get_n_words_for_static_connections(
             max_delayed_n_synapses)
-    else:
+    elif isinstance(dynamics, AbstractPlasticSynapseDynamics):
         undelayed_n_words = dynamics.get_n_words_for_plastic_connections(
             max_undelayed_n_synapses)
         delayed_n_words = dynamics.get_n_words_for_plastic_connections(
             max_delayed_n_synapses)
+    else:
+        raise TypeError(f"{dynamics=} has an unexpected type {type(dynamics)}")
 
     # Adjust for the allowed row lengths from the population table
     undelayed_max_n_words = _get_allowed_row_length(
@@ -432,11 +435,13 @@ def convert_to_connections(
         connections = _read_static_data(
             dynamics, n_pre_atoms, n_synapse_types, row_data, delayed,
             post_vertex_max_delay_ticks, max_atoms_per_core)
-    else:
+    elif isinstance(dynamics, AbstractPlasticSynapseDynamics):
         # Read plastic data
         connections = _read_plastic_data(
             dynamics, n_pre_atoms, n_synapse_types, row_data, delayed,
             post_vertex_max_delay_ticks, max_atoms_per_core)
+    else:
+        raise TypeError(f"{dynamics=} has unexpected type {type(dynamics)}")
 
     # There might still be no connections if the row was all padding
     if not connections.size:
@@ -692,7 +697,9 @@ def _convert_delayed_data(
     return delayed_connections
 
 
-def __convert_sources_and_targets(connections, pre_vertex, post_vertex_slice):
+def __convert_sources_and_targets(
+        connections: ConnectionsArray, pre_vertex: ApplicationVertex,
+        post_vertex_slice: Slice) -> ConnectionsArray:
     connections["source"] = pre_vertex.get_raster_ordered_indices(
         connections["source"])
     connections["target"] = post_vertex_slice.get_raster_indices(

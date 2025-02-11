@@ -45,7 +45,7 @@ class SpynnakerExternalDevicePluginManager(object):
     def add_database_socket_address(
             database_notify_host: Optional[str],
             database_notify_port_num: Optional[int],
-            database_ack_port_num: Optional[int]):
+            database_ack_port_num: Optional[int]) -> None:
         """
         :param database_notify_host:
             Host to talk to tell that the database (and application) is ready.
@@ -83,7 +83,7 @@ class SpynnakerExternalDevicePluginManager(object):
             payload_prefix: Optional[int] = None, payload_right_shift: int = 0,
             number_of_packets_sent_per_time_step: int = 0,
             translate_keys: bool = False,
-            partition_ids: Optional[Iterable[str]] = None):
+            partition_ids: Optional[Iterable[str]] = None) -> None:
         """
         Output the spikes from a given population from SpiNNaker as they
         occur in the simulation.
@@ -183,7 +183,7 @@ class SpynnakerExternalDevicePluginManager(object):
     def activate_live_output_to(
             population: Population,
             device: Union[Population, ApplicationVertex],
-            partition_id: str = SPIKE_PARTITION_ID):
+            partition_id: str = SPIKE_PARTITION_ID) -> None:
         """
         Activate the output of spikes from a population to an external device.
 
@@ -213,7 +213,7 @@ class SpynnakerExternalDevicePluginManager(object):
     def update_live_packet_gather_tracker(
             vertex_to_record_from: ApplicationVertex,
             params: LivePacketGatherParameters,
-            partition_ids: Iterable[str]):
+            partition_ids: Iterable[str]) -> None:
         """
         Add an edge from a vertex to the live packet gatherer, builds as
         needed and has all the parameters for the creation of the live
@@ -241,7 +241,7 @@ class SpynnakerExternalDevicePluginManager(object):
             database_notify_host: Optional[str] = None,
             database_notify_port_num: Optional[int] = None,
             database_ack_port_num: Optional[int] = None, notify: bool = True,
-            reserve_reverse_ip_tag: bool = False):
+            reserve_reverse_ip_tag: bool = False) -> None:
         """
         Add a live rate controller to a Poisson population.
 
@@ -302,7 +302,7 @@ class SpynnakerExternalDevicePluginManager(object):
         return edge
 
     @staticmethod
-    def add_application_vertex(vertex: ApplicationVertex):
+    def add_application_vertex(vertex: ApplicationVertex) -> None:
         """
         Adds an Application vertex to the user graph.
 

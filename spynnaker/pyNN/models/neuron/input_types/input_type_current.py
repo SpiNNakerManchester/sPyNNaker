@@ -28,11 +28,12 @@ class InputTypeCurrent(AbstractInputType):
         super().__init__([Struct([])], dict())
 
     @overrides(AbstractInputType.add_parameters)
-    def add_parameters(self, parameters: RangeDictionary[float]):
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
         pass
 
     @overrides(AbstractInputType.add_state_variables)
-    def add_state_variables(self, state_variables: RangeDictionary[float]):
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         pass
 
     @overrides(AbstractInputType.get_global_weight_scale)

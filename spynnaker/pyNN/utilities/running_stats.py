@@ -28,7 +28,7 @@ class RunningStats(object):
         self.__mean_2 = 0.0
         self.__n_items = 0
 
-    def add_item(self, x: Union[int, float]):
+    def add_item(self, x: Union[int, float]) -> None:
         """
         Adds an item to the running statistics.
 
@@ -45,7 +45,7 @@ class RunningStats(object):
         self.__mean += delta_n
         self.__mean_2 += term_1
 
-    def add_items(self, mean: float, variance: float, n_items: int):
+    def add_items(self, mean: float, variance: float, n_items: int) -> None:
         """
         Add a bunch of items (via their statistics).
 

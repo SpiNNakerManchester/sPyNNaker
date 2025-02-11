@@ -1,4 +1,6 @@
-# Copyright (c) 2015 The University of Manchester
+#!/bin/bash
+
+# Copyright (c) 2024 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,25 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
+# This bash assumes that other repositories are installed in paralled
 
+# requires the latest mypy
+# pip install --upgrade mypy
 
-class PyNNSynapseDynamics(object):
-    """
-    This class is deprecated.
-    """
-    __slots__ = ("__slow", )
+utils="../SpiNNUtils/spinn_utilities"
+machine="../SpiNNMachine/spinn_machine"
+man="../SpiNNMan/spinnman"
+pacman="../PACMAN/pacman"
+spalloc="../spalloc/spalloc_client"
+fec="../SpiNNFrontEndCommon/spinn_front_end_common"
 
-    def __init__(self, slow: Any = None, fast: Any = None):
-        if fast is not None:
-            raise NotImplementedError(
-                "Fast synapse dynamics are not currently supported")
-
-        self.__slow = slow
-
-    @property
-    def slow(self) -> Any:
-        """
-        unused!
-        """
-        return self.__slow
+mypy --python-version 3.8 --disallow-untyped-defs $utils $machine $man $pacman $spalloc $fec spynnaker

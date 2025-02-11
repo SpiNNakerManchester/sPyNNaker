@@ -70,12 +70,13 @@ def _handle_options(axes: Axes, options: Dict[str, Any]) -> None:
         axes.set_xlim(options.pop("xlim"))
 
 
-def _plot_spikes(axes, spike_times, neurons, label='', **options):
+def _plot_spikes(axes: Axes, spike_times: NDArray, neurons: NDArray,
+                 label: str = '', **options: Any) -> None:
     """
     Plots the spikes based on two lists.
 
     :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
-    :param list(~neo.core.SpikeTrain) spike_times: List of spike times
+    :param spike_times: List of spike times
     :param neurons: List of Neuron IDs
     :param str label: Label for the graph
     :param options: plotting options
@@ -91,7 +92,9 @@ def _plot_spikes(axes, spike_times, neurons, label='', **options):
                  bbox=dict(facecolor='white', alpha=1.0))
 
 
-def plot_spiketrains(axes, spiketrains, label='', **options):
+def plot_spiketrains(
+        axes: Axes, spiketrains: Union[List[SpikeTrain], SpikeTrainList],
+        label: str = '', **options: Any) -> None:
     """
     Plot all spike trains in a Segment in a raster plot.
 
@@ -110,7 +113,8 @@ def plot_spiketrains(axes, spiketrains, label='', **options):
     _plot_spikes(axes, spike_times, neurons, label=label, **options)
 
 
-def plot_spikes_numpy(axes, spikes, label='', **options):
+def plot_spikes_numpy(axes: Axes, spikes: NDArray, label: str = '',
+                      **options: Any) -> None:
     """
     Plot all spikes.
 
@@ -147,7 +151,8 @@ def _heat_plot(axes: Axes, values: NDArray, label: str = '',
                  bbox=dict(facecolor='white', alpha=1.0))
 
 
-def heat_plot_numpy(axes, data, label='', **options):
+def heat_plot_numpy(axes: Axes, data: NDArray, label: str = '',
+                    **options: Any) -> Any:
     """
     Plots neurons, times and values into a heat map.
 
@@ -166,7 +171,7 @@ def heat_plot_numpy(axes, data, label='', **options):
 
 
 def heat_plot_neo(axes: Axes, signal_array: AnalogSignal, label: str = '',
-                  **options: Any):
+                  **options: Any) -> None:
     """
     Plots neurons, times and values into a heat map.
 
@@ -264,7 +269,7 @@ class SpynnakerPanel(object):
         self.data_labels = options.pop("data_labels", repeat(None))
         self.line_properties = options.pop("line_properties", repeat({}))
 
-    def plot(self, axes: Axes):
+    def plot(self, axes: Axes) -> None:
         """
         Plot the Panel's data in the provided Axes/Subplot instance.
 

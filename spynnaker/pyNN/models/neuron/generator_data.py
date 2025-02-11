@@ -21,6 +21,8 @@ from numpy.typing import NDArray
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractGenerateOnMachine)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
@@ -64,7 +66,8 @@ class GeneratorData(object):
         # Get objects needed for the next bit
         connector = cast(AbstractGenerateConnectorOnMachine,
                          synapse_information.connector)
-        synapse_dynamics = synapse_information.synapse_dynamics
+        synapse_dynamics = cast(AbstractGenerateOnMachine,
+                                synapse_information.synapse_dynamics)
 
         # Create the data needed
         self.__data = list()

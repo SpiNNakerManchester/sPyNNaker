@@ -20,6 +20,7 @@ from numpy.typing import NDArray
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 
+from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
@@ -69,7 +70,7 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
         self.__expect_delay_extension: Optional[bool] = None
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, chip_counter: ChipCounter):
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         app_vertex = self.governed_app_vertex
         app_vertex.synapse_recorder.add_region_offset(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
@@ -122,7 +123,7 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
     def get_source_specific_in_coming_vertices(
             self, source_vertex: ApplicationVertex,
             partition_id: str) -> List[
-                Tuple[MachineVertex, Sequence[MachineVertex]]]:
+                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
         # Determine the real pre-vertex
         pre_vertex = source_vertex
         if isinstance(source_vertex, DelayExtensionVertex):
@@ -132,7 +133,7 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
 
         # Use the real pre-vertex to get the projections
         targets: Dict[MachineVertex, OrderedSet[
-            MachineVertex]] = defaultdict(OrderedSet)
+            AbstractVertex]] = defaultdict(OrderedSet)
         for proj in self.governed_app_vertex.get_incoming_projections_from(
                 pre_vertex):
             # pylint: disable=protected-access

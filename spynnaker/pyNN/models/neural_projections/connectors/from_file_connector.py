@@ -31,7 +31,8 @@ class FromFileConnector(FromListConnector):
 
     def __init__(
             self, file: Union[str, BaseFile],  # @ReservedAssignment
-            distributed=False, safe=True, callback=None, verbose=False):
+            distributed: bool = False, safe: bool = True,
+            callback: None = None, verbose: bool = False):
         """
         :param str file:
             Either an open file object or the filename of a file containing a
@@ -105,7 +106,7 @@ class FromFileConnector(FromListConnector):
                     file_reader.close()
         return numpy.concatenate(conns)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"FromFileConnector({self._file})"
 
     def get_reader(self, file: str) -> BaseFile:  # @ReservedAssignment

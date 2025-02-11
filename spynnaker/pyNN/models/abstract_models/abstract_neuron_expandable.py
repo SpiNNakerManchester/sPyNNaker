@@ -55,7 +55,7 @@ class AbstractNeuronExpandable(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def read_generated_initial_values(self, placement: Placement):
+    def read_generated_initial_values(self, placement: Placement) -> None:
         """
         Fill in any requested initial values.
 

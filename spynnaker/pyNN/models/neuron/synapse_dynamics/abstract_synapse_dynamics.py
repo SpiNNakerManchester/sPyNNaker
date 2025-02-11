@@ -62,7 +62,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         self.__weight = self._convert_weight(weight)
         self.__check_out_weight(self.__weight, "weight")
 
-    def __check_in_type(self, value: Weight_Delay_In_Types, name: str):
+    def __check_in_type(self, value: Weight_Delay_In_Types, name: str) -> None:
         if value is None:
             return
         if isinstance(value, (int, float, str, RandomDistribution)):
@@ -82,7 +82,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             "Expected types are int, float, str, RandomDistribution "
             "and collections of type int or float")
 
-    def __check_out_weight(self, weight: Weight_Types, name: str):
+    def __check_out_weight(self, weight: Weight_Types, name: str) -> None:
         if weight is None:
             return
         if isinstance(weight, (int, float, str, RandomDistribution)):
@@ -99,7 +99,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             "Expected types are float, str, RandomDistribution "
             "and list of type float")
 
-    def __check_out_delay(self, delay: Delay_Types, name: str):
+    def __check_out_delay(self, delay: Delay_Types, name: str) -> None:
         if isinstance(delay, (float, (str, RandomDistribution))):
             return
         if isinstance(delay, numpy.ndarray):
@@ -235,7 +235,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         raise InvalidParameterType(
             f"Type {type(self)} does not have parameter {key}")
 
-    def set_value(self, key: str, value: Any):
+    def set_value(self, key: str, value: Any) -> None:
         """
         Set a property.
 
@@ -252,7 +252,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
     def get_delay_maximum(
             self, connector: AbstractConnector,
-            synapse_info: SynapseInformation) -> Optional[float]:
+            synapse_info: SynapseInformation) -> float:
         """
         Get the maximum delay for the synapses.
         """
@@ -273,7 +273,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         return connector.get_delay_minimum(synapse_info)
 
     def get_delay_variance(
-            self, connector: AbstractConnector, delays: numpy.ndarray,
+            self, connector: AbstractConnector, delays: Delay_Types,
             synapse_info: SynapseInformation) -> float:
         """
         Get the variance in delay for the synapses.
@@ -382,7 +382,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         """
         Checks that the edge supports the connector.  Returns nothing; it
         is assumed that an Exception will be raised if anything is wrong.

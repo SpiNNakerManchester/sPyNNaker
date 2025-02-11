@@ -15,6 +15,7 @@
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import (
     AbstractProvidesDefaults, default_initial_values)
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 
 
 class IFFacetsConductancePopulation(AbstractProvidesDefaults):
@@ -29,8 +30,11 @@ class IFFacetsConductancePopulation(AbstractProvidesDefaults):
     # noinspection PyPep8Naming
     @default_initial_values({"v"})
     def __init__(
-            self, g_leak=40.0, tau_syn_E=30.0, tau_syn_I=30.0, v_thresh=-55.0,
-            v_rest=-65.0, e_rev_I=-80, v_reset=-80.0, v=-65.0):
+            self, g_leak: ModelParameter = 40.0,
+            tau_syn_E: ModelParameter = 30.0,
+            tau_syn_I: ModelParameter = 30.0, v_thresh: ModelParameter = -55.0,
+            v_rest: ModelParameter = -65.0, e_rev_I: ModelParameter = -80,
+            v_reset: ModelParameter = -80.0, v: ModelParameter = -65.0):
         # pylint: disable=too-many-arguments, unused-argument, invalid-name
         raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")

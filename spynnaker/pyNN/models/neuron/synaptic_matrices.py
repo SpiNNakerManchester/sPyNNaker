@@ -339,7 +339,7 @@ class SynapticMatrices(object):
             len(self.__bit_field_key_map) * BYTES_PER_WORD)
 
     def __write_pop_table(self, spec: DataSpecificationBase,
-                          poptable_ref: Optional[int] = None):
+                          poptable_ref: Optional[int] = None) -> None:
         assert self.__master_pop_data is not None
         master_pop_table_sz = len(self.__master_pop_data) * BYTES_PER_WORD
         spec.reserve_memory_region(
@@ -350,7 +350,7 @@ class SynapticMatrices(object):
 
     def write_synaptic_data(
             self, spec: DataSpecificationBase, post_vertex_slice: Slice,
-            references: SynapseRegionReferences):
+            references: SynapseRegionReferences) -> None:
         """
         Write the synaptic data for all incoming projections.
 
@@ -393,7 +393,7 @@ class SynapticMatrices(object):
 
     def __write_synapse_expander_data_spec(
             self, spec: DataSpecificationBase, post_vertex_slice: Slice,
-            connection_builder_ref: Optional[int] = None):
+            connection_builder_ref: Optional[int] = None) -> None:
         """
         Write the data spec for the synapse expander.
 
@@ -451,7 +451,8 @@ class SynapticMatrices(object):
 
     def __get_app_key_and_mask(
             self, r_info: AppVertexRoutingInfo, n_stages: int,
-            pre_vertex: PopulationApplicationVertex, partition_id: str):
+            pre_vertex: PopulationApplicationVertex,
+            partition_id: str) -> AppKeyInfo:
         """
         Get a key and mask for an incoming application vertex as a whole.
 
@@ -545,7 +546,7 @@ class SynapticMatrices(object):
         matrix = self.__matrices[app_edge, synapse_info]
         return matrix.get_connections(placement)
 
-    def read_generated_connection_holders(self, placement: Placement):
+    def read_generated_connection_holders(self, placement: Placement) -> None:
         """
         Fill in any pre-run connection holders for data which is generated
         on the machine, after it has been generated.

@@ -98,7 +98,8 @@ class WeightDependenceAdditive(
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
             self, spec: DataSpecificationBase, global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating], n_weight_terms: int):
+            synapse_weight_scales: NDArray[floating],
+            n_weight_terms: int) -> None:
         # Loop through each synapse type
         for _ in synapse_weight_scales:
             # Scale the weights

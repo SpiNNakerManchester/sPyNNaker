@@ -14,12 +14,14 @@
 
 from __future__ import annotations
 from enum import IntEnum
-from typing import Sequence, TYPE_CHECKING
+from typing import Optional, Sequence, TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 
 from spinnman.model.enums import ExecutableType
 
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.resources import AbstractSDRAM
 
@@ -105,15 +107,15 @@ class DelayExtensionMachineVertex(
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
-    def __init__(self, sdram: AbstractSDRAM, label, vertex_slice,
-                 app_vertex=None):
+    def __init__(self, sdram: AbstractSDRAM, label: str, vertex_slice: Slice,
+                 app_vertex: Optional[ApplicationVertex] = None):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM required by the vertex
         :param str label: The name of the vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex
-        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
+        :param app_vertex:
             The application vertex that caused this machine vertex to be
             created. If `None`, there is no such application vertex.
         """
@@ -313,7 +315,8 @@ class DelayExtensionMachineVertex(
         # End-of-Spec:
         spec.end_specification()
 
-    def _write_setup_info(self, spec, binary_name):
+    def _write_setup_info(
+            self, spec: DataSpecificationGenerator, binary_name: str) -> None:
         """
         :param ~data_specification.DataSpecificationGenerator spec:
         :param str binary_name: the binary name
@@ -324,13 +327,14 @@ class DelayExtensionMachineVertex(
             binary_name))
 
     def write_delay_parameters(
-            self, spec, vertex_slice, key, incoming_key, incoming_mask):
+            self, spec: DataSpecificationGenerator, vertex_slice: Slice,
+            key: Optional[int], incoming_key: int, incoming_mask: int) -> None:
         """
         Generate Delay Parameter data.
 
         :param ~data_specification.DataSpecificationGenerator spec:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param int key:
+        :param key:
         :param int incoming_key:
         :param int incoming_mask:
         """

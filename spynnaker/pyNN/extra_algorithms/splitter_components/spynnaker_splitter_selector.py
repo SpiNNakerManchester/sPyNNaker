@@ -60,7 +60,7 @@ def spynnaker_splitter_selector() -> None:
         spynnaker_vertex_selector(app_vertex)
 
 
-def spynnaker_vertex_selector(app_vertex: ApplicationVertex):
+def spynnaker_vertex_selector(app_vertex: ApplicationVertex) -> None:
     """
     Main point for selecting a splitter object for a given application vertex.
 

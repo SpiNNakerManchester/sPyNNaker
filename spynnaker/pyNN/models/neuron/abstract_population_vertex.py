@@ -13,10 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 from collections import defaultdict
-from functools import reduce
 import logging
 import math
-import operator
 from typing import (
     Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
     cast, TYPE_CHECKING)
@@ -76,6 +74,7 @@ from spynnaker.pyNN.models.neuron.population_machine_common import (
 from spynnaker.pyNN.models.neuron.population_machine_neurons import (
     NeuronRegions)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractGenerateOnMachine,
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural,
     AbstractSDRAMSynapseDynamics, AbstractSupportsSignedWeights,
     SynapseDynamicsStatic)
@@ -138,16 +137,7 @@ _EXTRA_RECORDABLE_UNITS = {NeuronRecorder.SPIKES: "",
                            NeuronRecorder.REWIRING: ""}
 
 
-def _prod(iterable):
-    """
-    Finds the product of the iterable.
-
-    :param iterable iterable: Things to multiply together
-    """
-    return reduce(operator.mul, iterable, 1)
-
-
-def _all_gen(rd):
+def _all_gen(rd: RangeDictionary) -> bool:
     """
     Determine if all the values of a ranged dictionary can be generated.
 
@@ -166,22 +156,24 @@ def _all_gen(rd):
     return True
 
 
-def _check_random_dists(rd):
+def _check_random_dists(rd: RangeDictionary) -> None:
     """
     Check all RandomDistribution instances in a range dictionary to see if
     they have the rng value set.
     """
     for key in rd.keys():
         if is_singleton(rd[key]):
-            if isinstance(rd[key], RandomDistribution):
-                check_rng(rd[key].rng, f"RandomDistribtion for {key}")
+            a_rd = rd[key]
+            if isinstance(a_rd, RandomDistribution):
+                check_rng(a_rd.rng, f"RandomDistribtion for {key}")
         else:
             for _start, _stop, val in rd[key].iter_ranges():
                 if isinstance(val, RandomDistribution):
                     check_rng(val.rng, f"RandomDistribution for {key}")
 
 
-def _is_structural(dynamics) -> TypeGuard[AbstractSynapseDynamicsStructural]:
+def _is_structural(dynamics: AbstractSynapseDynamics
+                   ) -> TypeGuard[AbstractSynapseDynamicsStructural]:
     return isinstance(dynamics, AbstractSynapseDynamicsStructural)
 
 
@@ -411,7 +403,7 @@ class AbstractPopulationVertex(
         return cast('SplitterAbstractPopulationVertex', s)
 
     @splitter.setter
-    def splitter(self, splitter: SplitterAbstractPopulationVertex):
+    def splitter(self, splitter: SplitterAbstractPopulationVertex) -> None:
         if self._splitter == splitter:
             return
         if self.has_splitter:
@@ -479,7 +471,7 @@ class AbstractPopulationVertex(
         super().set_max_atoms_per_dimension_per_core(new_value)
 
     @overrides(SupportsStructure.set_structure)
-    def set_structure(self, structure: BaseStructure):
+    def set_structure(self, structure: BaseStructure) -> None:
         self.__structure = structure
 
     @property
@@ -524,7 +516,8 @@ class AbstractPopulationVertex(
         return self.__synapse_dynamics
 
     @synapse_dynamics.setter
-    def synapse_dynamics(self, synapse_dynamics: AbstractSynapseDynamics):
+    def synapse_dynamics(
+            self, synapse_dynamics: AbstractSynapseDynamics) -> None:
         """
         Set the synapse dynamics.
 
@@ -541,7 +534,7 @@ class AbstractPopulationVertex(
             f"unhandled type of merged synapse dynamics: {type(merged)}"
         self.__synapse_dynamics = merged
 
-    def add_incoming_projection(self, projection: Projection):
+    def add_incoming_projection(self, projection: Projection) -> None:
         """
         Add a projection incoming to this vertex.
 
@@ -803,7 +796,7 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.set_parameter_values)
     def set_parameter_values(
-            self, name: str, value: Values, selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None) -> None:
         # If we have run, and not reset, we need to read the values back
         # so that we don't overwrite the state.  Note that a reset will
         # then make this a waste, but we can't see the future...
@@ -835,7 +828,7 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.set_initial_state_values)
     def set_initial_state_values(
-            self, name: str, value: Values, selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None) -> None:
         self._check_variables([name], set(self.__state_variables.keys()))
         if not SpynnakerDataView.is_ran_last():
             self.__state_variables[name].set_value_by_selector(
@@ -862,7 +855,7 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.set_current_state_values)
     def set_current_state_values(
-            self, name: str, value: Values, selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None) -> None:
         self._check_variables([name], set(self.__state_variables.keys()))
         # If we have run, and not reset, we need to read the values back
         # so that we don't overwrite all the state.  Note that a reset will
@@ -910,7 +903,7 @@ class AbstractPopulationVertex(
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(
             self, name: str, sampling_interval: Optional[float] = None,
-            indices: Optional[Collection[int]] = None):
+            indices: Optional[Collection[int]] = None) -> None:
         if self.__neuron_recorder.is_recordable(name):
             self.__neuron_recorder.set_recording(
                 name, True, sampling_interval, indices)
@@ -922,8 +915,8 @@ class AbstractPopulationVertex(
         SpynnakerDataView.set_requires_mapping()
 
     @overrides(PopulationApplicationVertex.set_not_recording)
-    def set_not_recording(
-            self, name: str, indices: Optional[Collection[int]] = None):
+    def set_not_recording(self, name: str,
+                          indices: Optional[Collection[int]] = None) -> None:
         if self.__neuron_recorder.is_recordable(name):
             self.__neuron_recorder.set_recording(name, False, indexes=indices)
         elif self.__synapse_recorder.is_recordable(name):
@@ -987,7 +980,7 @@ class AbstractPopulationVertex(
         return self.__ring_buffer_sigma
 
     @ring_buffer_sigma.setter
-    def ring_buffer_sigma(self, ring_buffer_sigma: float):
+    def ring_buffer_sigma(self, ring_buffer_sigma: float) -> None:
         self.__ring_buffer_sigma = ring_buffer_sigma
 
     @property
@@ -998,10 +991,11 @@ class AbstractPopulationVertex(
         return self.__spikes_per_second
 
     @spikes_per_second.setter
-    def spikes_per_second(self, spikes_per_second: float):
+    def spikes_per_second(self, spikes_per_second: float) -> None:
         self.__spikes_per_second = spikes_per_second
 
-    def set_synapse_dynamics(self, synapse_dynamics: AbstractSynapseDynamics):
+    def set_synapse_dynamics(
+            self, synapse_dynamics: AbstractSynapseDynamics) -> None:
         """
         Set the synapse dynamics of this population.
 
@@ -1016,7 +1010,7 @@ class AbstractPopulationVertex(
         """
         self.__connection_cache.clear()
 
-    def describe(self):
+    def describe(self) -> Dict[str, Union[str, Dict[str, Any]]]:
         """
         Get a human-readable description of the cell or synapse type.
 
@@ -1052,7 +1046,7 @@ class AbstractPopulationVertex(
     @overrides(PopulationApplicationVertex.inject)
     def inject(
             self, current_source: AbstractCurrentSource,
-            selector: Selector = None):
+            selector: Selector = None) -> None:
         self.__current_sources.append(current_source)
         self.__current_source_id_list[current_source] = selector
         # set the associated vertex (for multi-run case)
@@ -1082,7 +1076,7 @@ class AbstractPopulationVertex(
     def __str__(self) -> str:
         return f"{self.label} with {self.n_atoms} atoms"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
     @overrides(AbstractCanReset.reset_to_first_timestep)
@@ -1429,6 +1423,8 @@ class AbstractPopulationVertex(
         if not synapse_info.may_generate_on_machine():
             return 0
 
+        dynamics = cast(AbstractGenerateOnMachine,
+                        synapse_info.synapse_dynamics)
         connector = cast(
             AbstractGenerateConnectorOnMachine, synapse_info.connector)
         return (
@@ -1436,7 +1432,7 @@ class AbstractPopulationVertex(
             + connector.gen_delay_params_size_in_bytes(synapse_info.delays)
             + connector.gen_weight_params_size_in_bytes(synapse_info.weights)
             + connector.gen_connector_params_size_in_bytes
-            + synapse_info.synapse_dynamics.gen_matrix_params_size_in_bytes)
+            + dynamics.gen_matrix_params_size_in_bytes)
 
     @property
     def synapse_executable_suffix(self) -> str:
@@ -1615,7 +1611,7 @@ class AbstractPopulationVertex(
                 self.__rng)
         return self.__core_seeds[vertex_slice]
 
-    def copy_initial_state_variables(self, vertex_slice: Slice):
+    def copy_initial_state_variables(self, vertex_slice: Slice) -> None:
         """
         Copies the state variables into the initial state variables.
 
@@ -1664,7 +1660,7 @@ class AbstractPopulationVertex(
         :rtype: tuple(int, bool)
         """
         # Find the maximum delay from incoming synapses
-        max_delay_ms = 0
+        max_delay_ms: float = 0
         for proj in self.incoming_projections:
             # pylint: disable=protected-access
             s_info = proj._synapse_information
@@ -1750,7 +1746,7 @@ class _Stats(object):
         self.default_spikes_per_second = default_spikes_per_second
         self.ring_buffer_sigma = ring_buffer_sigma
 
-    def add_projection(self, projection: Projection):
+    def add_projection(self, projection: Projection) -> None:
         """
         Adds the projection.
 
@@ -1763,7 +1759,7 @@ class _Stats(object):
         else:
             self.__add_unsigned_projection(projection)
 
-    def __add_signed_projection(self, proj: Projection):
+    def __add_signed_projection(self, proj: Projection) -> None:
         # pylint: disable=protected-access
         s_info = proj._synapse_information
         connector = s_info.connector
@@ -1772,21 +1768,23 @@ class _Stats(object):
         n_conns = connector.get_n_connections_to_post_vertex_maximum(s_info)
         d_var = s_dynamics.get_delay_variance(connector, s_info.delays, s_info)
 
-        s_type_pos = s_dynamics.get_positive_synapse_index(proj)
-        w_mean_pos = s_dynamics.get_mean_positive_weight(proj)
-        w_var_pos = s_dynamics.get_variance_positive_weight(proj)
-        w_max_pos = s_dynamics.get_maximum_positive_weight(proj)
+        signed_dynamics = cast(AbstractSupportsSignedWeights,
+                               s_info.synapse_dynamics)
+        s_type_pos = signed_dynamics.get_positive_synapse_index(proj)
+        w_mean_pos = signed_dynamics.get_mean_positive_weight(proj)
+        w_var_pos = signed_dynamics.get_variance_positive_weight(proj)
+        w_max_pos = signed_dynamics.get_maximum_positive_weight(proj)
         self.__add_details(
             proj, s_type_pos, n_conns, w_mean_pos, w_var_pos, w_max_pos, d_var)
 
-        s_type_neg = s_dynamics.get_negative_synapse_index(proj)
-        w_mean_neg = -s_dynamics.get_mean_negative_weight(proj)
-        w_var_neg = -s_dynamics.get_variance_negative_weight(proj)
-        w_max_neg = -s_dynamics.get_minimum_negative_weight(proj)
+        s_type_neg = signed_dynamics.get_negative_synapse_index(proj)
+        w_mean_neg = -signed_dynamics.get_mean_negative_weight(proj)
+        w_var_neg = -signed_dynamics.get_variance_negative_weight(proj)
+        w_max_neg = -signed_dynamics.get_minimum_negative_weight(proj)
         self.__add_details(
             proj, s_type_neg, n_conns, w_mean_neg, w_var_neg, w_max_neg, d_var)
 
-    def __add_unsigned_projection(self, proj: Projection):
+    def __add_unsigned_projection(self, proj: Projection) -> None:
         # pylint: disable=protected-access
         s_info = proj._synapse_information
         s_type = s_info.synapse_type
@@ -1803,7 +1801,7 @@ class _Stats(object):
 
     def __add_details(
             self, proj: Projection, s_type: int, n_conns: int, w_mean: float,
-            w_var: float, w_max: float, d_var: float):
+            w_var: float, w_max: float, d_var: float) -> None:
         self.running_totals[s_type].add_items(
             w_mean * self.w_scale, w_var * self.w_scale_sq, n_conns)
         self.biggest_weight[s_type] = max(

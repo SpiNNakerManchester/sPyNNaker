@@ -63,7 +63,7 @@ class DistanceDependentProbabilityConnector(
             self, d_expression: str, allow_self_connections: bool = True,
             n_connections: Optional[int] = None,
             rng: Optional[NumpyRNG] = None,
-            safe=True, verbose=False, callback=None):
+            safe: bool = True, verbose: bool = False, callback: None = None):
         """
         :param str d_expression:
             the right-hand side of a valid python expression for
@@ -89,6 +89,10 @@ class DistanceDependentProbabilityConnector(
             needed.
         :type rng: ~pyNN.random.NumpyRNG or None
         :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         """
         # :param ~pyNN.space.Space space:
         #    a Space object, needed if you wish to specify distance-dependent
@@ -106,11 +110,12 @@ class DistanceDependentProbabilityConnector(
                 " DistanceDependentProbabilityConnector on this platform")
 
     @overrides(AbstractConnector.set_projection_information)
-    def set_projection_information(self, synapse_info: SynapseInformation):
+    def set_projection_information(
+            self, synapse_info: SynapseInformation) -> None:
         super().set_projection_information(synapse_info)
         self._set_probabilities(synapse_info)
 
-    def _set_probabilities(self, synapse_info: SynapseInformation):
+    def _set_probabilities(self, synapse_info: SynapseInformation) -> None:
         """
         :param SynapseInformation synapse_info:
         """
@@ -232,7 +237,7 @@ class DistanceDependentProbabilityConnector(
         block["synapse_type"] = synapse_type
         return block
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"DistanceDependentProbabilityConnector({self.__d_expression})"
 
     @property
@@ -243,7 +248,7 @@ class DistanceDependentProbabilityConnector(
         return self.__allow_self_connections
 
     @allow_self_connections.setter
-    def allow_self_connections(self, new_value: bool):
+    def allow_self_connections(self, new_value: bool) -> None:
         self.__allow_self_connections = new_value
 
     @property
@@ -256,5 +261,5 @@ class DistanceDependentProbabilityConnector(
         return self.__d_expression
 
     @d_expression.setter
-    def d_expression(self, new_value: str):
+    def d_expression(self, new_value: str) -> None:
         self.__d_expression = new_value

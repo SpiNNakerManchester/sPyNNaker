@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from decimal import Decimal
+from typing import Optional
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.external_devices_models import (
     AbstractMulticastControllableDevice, SendType)
+from spynnaker.pyNN.external_devices_models.push_bot import (
+    AbstractPushBotOutputDevice)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
-
 
 # The default timestep to use for first send.  Avoids clashes with other
 # control commands.
@@ -31,9 +35,10 @@ class PushBotEthernetDevice(
     """
 
     def __init__(
-            self, protocol: MunichIoSpiNNakerLinkProtocol, device,
-            uses_payload, time_between_send,
-            first_send_timestep=_DEFAULT_FIRST_SEND_TIMESTEP):
+            self, protocol: MunichIoSpiNNakerLinkProtocol,
+            device: AbstractPushBotOutputDevice,
+            uses_payload: bool, time_between_send: Optional[int],
+            first_send_timestep: Optional[int] = _DEFAULT_FIRST_SEND_TIMESTEP):
         """
         :param MunichIoSpiNNakerLinkProtocol protocol:
             The protocol instance to get commands from
@@ -74,13 +79,13 @@ class PushBotEthernetDevice(
 
     @property
     @overrides(AbstractMulticastControllableDevice.device_control_max_value)
-    def device_control_max_value(self) -> float:
+    def device_control_max_value(self) -> Decimal:
         return self.__device.max_value
 
     @property
     @overrides(AbstractMulticastControllableDevice
                .device_control_timesteps_between_sending)
-    def device_control_timesteps_between_sending(self) -> int:
+    def device_control_timesteps_between_sending(self) -> Optional[int]:
         return self.__time_between_send
 
     @property
@@ -92,7 +97,7 @@ class PushBotEthernetDevice(
     @property
     @overrides(AbstractMulticastControllableDevice
                .device_control_first_send_timestep)
-    def device_control_first_send_timestep(self) -> int:
+    def device_control_first_send_timestep(self) -> Optional[int]:
         return self.__first_send_timestep
 
     @property
@@ -106,7 +111,7 @@ class PushBotEthernetDevice(
 
     @abstractmethod
     def set_command_protocol(
-            self, command_protocol: MunichIoSpiNNakerLinkProtocol):
+            self, command_protocol: MunichIoSpiNNakerLinkProtocol) -> None:
         """
         Set the protocol use to send setup and shutdown commands,
         separately from the protocol used to control the device.

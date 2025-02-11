@@ -47,7 +47,7 @@ class EthernetControlConnection(LiveEventConnection):
             label, self._translate, translate_key=False)
 
     def add_translator(
-            self, label: str, translator: AbstractEthernetTranslator):
+            self, label: str, translator: AbstractEthernetTranslator) -> None:
         """
         Add another translator that routes via the LPG.
 
@@ -60,7 +60,8 @@ class EthernetControlConnection(LiveEventConnection):
         self.add_receive_no_time_callback(
             label, self._translate, translate_key=False)
 
-    def _translate(self, label: str, key: int, payload: Optional[int] = None):
+    def _translate(self, label: str, key: int,
+                   payload: Optional[int] = None) -> None:
         translator = self.__translators[label]
         if payload is None:
             translator.translate_control_packet(MultiCastCommand(key))

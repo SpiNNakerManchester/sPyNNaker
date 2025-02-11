@@ -11,8 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Iterable, List, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.machine import MachineFPGAVertex
 from pacman.model.graphs.application import (
     Application2DFPGAVertex, FPGAConnection)
@@ -21,10 +23,12 @@ from pacman.model.graphs.machine import MachineVertex
 from pacman.model.routing_info import BaseKeyAndMask, RoutingInfo
 from pacman.utilities.constants import BITS_IN_KEY
 from pacman.utilities.utility_calls import is_power_of_2
+
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import MultiCastCommand
+
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SPIF_INPUT_FPGA_LINKS,
@@ -65,15 +69,17 @@ class SPIFRetinaDevice(
         "__input_x_shift")
 
     @classmethod
-    def __issue_device_id(cls, base_key):
+    def __issue_device_id(cls, base_key: Optional[int]) -> int:
         if base_key is None:
             base_key = cls.__n_devices
         cls.__n_devices += 1
         return base_key
 
-    def __init__(self, pipe, width, height, sub_width, sub_height,
-                 base_key=None, input_x_shift=16, input_y_shift=0,
-                 board_address=None, chip_coords=None):
+    def __init__(self, pipe: int, width: int, height: int, sub_width: int,
+                 sub_height: int, base_key: Optional[int] = None,
+                 input_x_shift: int = 16, input_y_shift: int = 0,
+                 board_address: Optional[str] = None,
+                 chip_coords: Optional[Tuple[int, int]] = None):
         """
         :param int pipe: Which pipe on SPIF the retina is connected to
         :param int width: The width of the retina in pixels
@@ -162,7 +168,7 @@ class SPIFRetinaDevice(
             (self.X_MASK << self._source_x_shift))
 
         # A dictionary to get vertex index from FPGA and slice
-        self.__index_by_slice = dict()
+        self.__index_by_slice: Dict[Tuple[int, Slice], int] = dict()
 
         self.__pipe = pipe
         self.__base_key = self.__issue_device_id(base_key)
@@ -175,10 +181,13 @@ class SPIFRetinaDevice(
         self.__input_y_shift = self.__unsigned(input_y_shift - x_bits)
 
     @staticmethod
-    def __unsigned(n):
+    def __unsigned(n: int) -> int:
         return n & 0xFFFFFFFF
 
-    def __incoming_fpgas(self, board_address, chip_coords):
+    def __incoming_fpgas(
+            self, board_address: Optional[str],
+            chip_coords: Optional[Tuple[int, int]]) -> List[FPGAConnection]:
+
         """
         Get the incoming FPGA connections.
 
@@ -188,7 +197,9 @@ class SPIFRetinaDevice(
         return [FPGAConnection(SPIF_FPGA_ID, i, board_address, chip_coords)
                 for i in SPIF_INPUT_FPGA_LINKS]
 
-    def __outgoing_fpga(self, board_address, chip_coords):
+    def __outgoing_fpga(
+            self, board_address: Optional[str],
+            chip_coords: Optional[Tuple[int, int]]) -> FPGAConnection:
         """
         Get the outgoing FPGA connection (for commands).
 
@@ -197,7 +208,7 @@ class SPIFRetinaDevice(
         return FPGAConnection(
             SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address, chip_coords)
 
-    def __fpga_indices(self, fpga_link_id):
+    def __fpga_indices(self, fpga_link_id: int) -> Tuple[int, int]:
         # We use every other odd link, so we can work out the "index" of the
         # link in the list as follows, and we can then split the index into
         # x and y components
@@ -299,7 +310,7 @@ class SPIFRetinaDevice(
 
         return commands
 
-    def __spif_key(self, fpga_link_id):
+    def __spif_key(self, fpga_link_id: int) -> int:
         x, y = self.__fpga_indices(fpga_link_id)
         return ((self.__base_key << self._key_shift) +
                 (x << self._source_x_shift) +

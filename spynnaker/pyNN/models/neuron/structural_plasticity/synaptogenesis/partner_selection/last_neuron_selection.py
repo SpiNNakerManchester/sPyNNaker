@@ -26,7 +26,7 @@ class LastNeuronSelection(AbstractPartnerSelection):
 
     __slots__ = ("__spike_buffer_size", )
 
-    def __init__(self, spike_buffer_size=64):
+    def __init__(self, spike_buffer_size: int = 64):
         """
         :param spike_buffer_size: The size of the buffer for holding spikes
         """
@@ -42,7 +42,7 @@ class LastNeuronSelection(AbstractPartnerSelection):
         return 4
 
     @overrides(AbstractPartnerSelection.write_parameters)
-    def write_parameters(self, spec: DataSpecificationBase):
+    def write_parameters(self, spec: DataSpecificationBase) -> None:
         spec.write_value(self.__spike_buffer_size)
 
     @overrides(AbstractPartnerSelection.get_parameter_names)

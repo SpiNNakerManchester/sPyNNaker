@@ -56,7 +56,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     """
     __slots__ = ()
 
-    def __init__(self, safe=True, callback=None, verbose=False) -> None:
+    def __init__(self, safe: bool = True, callback: None = None,
+                 verbose: bool = False) -> None:
         """
         :param bool safe:
             If ``True``, check that weights and delays have valid values.
@@ -170,7 +171,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         block["synapse_type"] = synapse_type
         return block
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "OneToOneConnector()"
 
     @property

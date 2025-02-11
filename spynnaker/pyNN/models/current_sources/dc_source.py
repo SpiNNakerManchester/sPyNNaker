@@ -33,7 +33,8 @@ class DCSource(AbstractCurrentSource):
         "__parameters",
         "__parameter_types")
 
-    def __init__(self, amplitude=0.0, start=0.0, stop=0.0) -> None:
+    def __init__(self, amplitude: float = 0.0, start: float = 0.0,
+                 stop: float = 0.0) -> None:
         """
         :param float amplitude:
         :param float start:
@@ -62,7 +63,7 @@ class DCSource(AbstractCurrentSource):
         super().__init__()
 
     @overrides(AbstractCurrentSource.set_parameters)
-    def set_parameters(self, **parameters: CurrentParameter):
+    def set_parameters(self, **parameters: CurrentParameter) -> None:
         for key, value in parameters.items():
             if key not in self.__parameters:
                 # throw an exception

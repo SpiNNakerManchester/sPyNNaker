@@ -68,7 +68,7 @@ class AbstractGenerateConnectorOnMachine(
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         # If we can't generate on machine, we must be able to generate on host
         if not self.generate_on_machine(synapse_info):
             if not isinstance(self, AbstractGenerateConnectorOnHost):
@@ -116,7 +116,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         return param_generator_params(weights)
 
-    def gen_weight_params_size_in_bytes(self, weights) -> int:
+    def gen_weight_params_size_in_bytes(self, weights:  Weight_Types) -> int:
         """
         The size of the weight parameters in bytes.
 

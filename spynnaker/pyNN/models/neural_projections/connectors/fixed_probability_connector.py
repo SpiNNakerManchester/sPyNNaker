@@ -223,7 +223,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         return self._p_connect
 
     @p_connect.setter
-    def p_connect(self, new_value: float):
+    def p_connect(self, new_value: float) -> None:
         if not 0.0 <= new_value <= 1.0:
             raise ConfigurationException(
                 "The probability must be between 0 and 1 (inclusive)")
@@ -232,6 +232,6 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         if self.generate_on_machine(synapse_info):
             check_rng(self.__rng, "FixedProbabilityConnector")

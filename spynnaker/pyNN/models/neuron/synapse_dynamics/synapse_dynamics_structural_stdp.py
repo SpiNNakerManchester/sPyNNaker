@@ -60,6 +60,7 @@ if TYPE_CHECKING:
         AbstractConnector)
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray)
+    from spynnaker.pyNN.types import Delay_Types
     from .synapse_dynamics_structural_common import ConnectionsInfo
 
 
@@ -203,19 +204,6 @@ class SynapseDynamicsStructuralSTDP(
         # If everything matches, return ourselves as supreme!
         return self
 
-    def set_projection_parameter(self, param: str, value):
-        """
-        :param str param:
-        :param value:
-        """
-        for item in (self.partner_selection, self.__formation,
-                     self.__elimination):
-            if hasattr(item, param):
-                setattr(item, param, value)
-                break
-        else:
-            raise ValueError(f"Unknown parameter {param}")
-
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
     @overrides(SynapseDynamicsStructuralCommon.is_same_as)
     def is_same_as(self, synapse_dynamics: Union[
@@ -238,7 +226,7 @@ class SynapseDynamicsStructuralSTDP(
     def set_connections(
             self, connections: ConnectionsArray, post_vertex_slice: Slice,
             app_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         if not isinstance(synapse_info.synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
             return
@@ -317,7 +305,7 @@ class SynapseDynamicsStructuralSTDP(
     @overrides(SynapseDynamicsSTDP.get_delay_maximum)
     def get_delay_maximum(
             self, connector: AbstractConnector,
-            synapse_info: SynapseInformation) -> Optional[float]:
+            synapse_info: SynapseInformation) -> float:
         d_m = super().get_delay_maximum(connector, synapse_info)
         if d_m is None:
             return self.__initial_delay
@@ -333,7 +321,7 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.get_delay_variance)
     def get_delay_variance(
-            self, connector: AbstractConnector, delays: numpy.ndarray,
+            self, connector: AbstractConnector, delays: Delay_Types,
             synapse_info: SynapseInformation) -> float:
         return 0.0
 

@@ -44,7 +44,8 @@ class SplitterAbstractPopulationVertex(
 
     @final
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
-    def set_governed_app_vertex(self, app_vertex: AbstractPopulationVertex):
+    def set_governed_app_vertex(
+            self, app_vertex: AbstractPopulationVertex) -> None:
         if not isinstance(app_vertex, AbstractPopulationVertex):
             raise PacmanConfigurationException(
                 f"The vertex {app_vertex} cannot be supported by the "

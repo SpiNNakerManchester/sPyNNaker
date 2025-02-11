@@ -16,8 +16,8 @@ from typing import List
 from neo import AnalogSignal, Block, Segment, SpikeTrain
 
 
-def compare_spiketrain(
-        spiketrain1: SpikeTrain, spiketrain2: SpikeTrain, *, same_length=True):
+def compare_spiketrain(spiketrain1: SpikeTrain, spiketrain2: SpikeTrain, *,
+                       same_length: bool = True) -> None:
     """
     Checks two spike trains have the exact same data.
 
@@ -47,7 +47,7 @@ def compare_spiketrain(
 
 def compare_spiketrains(
         spiketrains1: List[SpikeTrain], spiketrains2: List[SpikeTrain], *,
-        same_data=True, same_length=True):
+        same_data: bool = True, same_length: bool = True) -> None:
     """
     Check two Lists of spike trains have the exact same data.
 
@@ -75,8 +75,8 @@ def compare_spiketrains(
         compare_spiketrain(spiketrain1, spiketrain2, same_length=same_length)
 
 
-def compare_analogsignal(
-        as1: AnalogSignal, as2: AnalogSignal, *, same_length=True):
+def compare_analogsignal(as1: AnalogSignal, as2: AnalogSignal, *,
+                         same_length: bool = True) -> None:
     """
     Compares two analog signal objects to see if they are the same.
 
@@ -137,7 +137,8 @@ def compare_analogsignal(
 
 
 def compare_segments(
-        seg1: Segment, seg2: Segment, *, same_data=True, same_length=True):
+        seg1: Segment, seg2: Segment, *, same_data: bool = True,
+        same_length: bool = True) -> None:
     """
     :param ~neo.core.Segment seg1: First Segment to check
     :param ~neo.core.Segment seg2: Second Segment to check
@@ -173,8 +174,8 @@ def compare_segments(
 
 
 def compare_blocks(
-        neo1: Block, neo2: Block, *,
-        same_runs=True, same_data=True, same_length=True):
+        neo1: Block, neo2: Block, *, same_runs: bool = True,
+        same_data: bool = True, same_length: bool = True) -> None:
     """
     Compares two neo Blocks to see if they hold the same data.
 

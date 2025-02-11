@@ -141,7 +141,7 @@ class PopulationMachineCommon(
 
     def _write_common_data_spec(
             self, spec: DataSpecificationGenerator,
-            rec_regions: Sequence[int]):
+            rec_regions: Sequence[int]) -> None:
         """
         Write the data specification for the common regions.
 

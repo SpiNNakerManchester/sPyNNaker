@@ -20,7 +20,10 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.external_devices_models.push_bot import (
     AbstractPushBotRetinaDevice)
+from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
+    PushBotRetinaResolution)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 
 
 class DelayedPayloadMultiCastCommand(MultiCastCommand):
@@ -28,7 +31,7 @@ class DelayedPayloadMultiCastCommand(MultiCastCommand):
     A Hack to get the key after the zone allocator is run
     """
 
-    def __init__(self, key, vertex):
+    def __init__(self, key: int, vertex: 'PushBotSpiNNakerLinkRetinaDevice'):
         super().__init__(key)
         self._vertex = vertex
 
@@ -53,20 +56,19 @@ class PushBotSpiNNakerLinkRetinaDevice(
     """
     __slots__ = ("__new_key_command", )
 
-    default_parameters = {'label': None, 'board_address': None,
-                          'n_machine_vertices': 1}
-
     def __init__(
-            self, spinnaker_link_id, protocol, resolution,
-            board_address=default_parameters['board_address'],
-            label=default_parameters['label'],
-            n_machine_vertices=default_parameters['n_machine_vertices']):
+            self, spinnaker_link_id: int,
+            protocol: MunichIoSpiNNakerLinkProtocol,
+            resolution: PushBotRetinaResolution,
+            board_address: Optional[str] = None,
+            label: Optional[str] = None,
+            n_machine_vertices: int = 1):
         """
         :param int spinnaker_link_id:
         :param MunichIoSpiNNakerLinkProtocol protocol:
         :param PushBotRetinaResolution resolution:
-        :param str board_address:
-        :param str label:
+        :param board_address:
+        :param label:
         :param int n_machine_vertices:
         """
         super().__init__(protocol, resolution)
@@ -77,9 +79,10 @@ class PushBotSpiNNakerLinkRetinaDevice(
             n_machine_vertices=n_machine_vertices)
 
         # stores for the injection aspects
-        self.__new_key_command = None
+        self.__new_key_command: Optional[DelayedPayloadMultiCastCommand] = \
+            None
 
-    def new_key_command_payload(self):
+    def new_key_command_payload(self) -> int:
         """
         Support method to obtain the key after the key allocator has run
 

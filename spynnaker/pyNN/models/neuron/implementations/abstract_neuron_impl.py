@@ -142,7 +142,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def add_parameters(self, parameters: RangeDictionary):
+    def add_parameters(self, parameters: RangeDictionary) -> None:
         """
         Add the initial values of the parameters to the parameter holder.
 
@@ -152,7 +152,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def add_state_variables(self, state_variables: RangeDictionary):
+    def add_state_variables(self, state_variables: RangeDictionary) -> None:
         """
         Add the initial values of the state variables to the state
         variables holder.

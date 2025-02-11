@@ -63,7 +63,7 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     def write_parameters(
             self, spec: DataSpecificationGenerator, region: int,
             machine_vertex: PopulationMachineLocalOnlyCombinedVertex,
-            weight_scales: NDArray[floating]):
+            weight_scales: NDArray[floating]) -> None:
         """
         Write the parameters to the data specification for a vertex.
 

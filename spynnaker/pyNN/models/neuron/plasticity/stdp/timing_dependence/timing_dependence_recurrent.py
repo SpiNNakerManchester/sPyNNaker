@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import cast, Iterable
+from typing import Iterable
 
 import numpy
 from numpy import floating
@@ -51,18 +51,11 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         'accumulator_depression', 'accumulator_potentiation',
         'mean_pre_window', 'mean_post_window', 'dual_fsm')
 
-    default_parameters = {
-        'accumulator_depression': -6, 'accumulator_potentiation': 6,
-        'mean_pre_window': 35.0, 'mean_post_window': 35.0, 'dual_fsm': True}
-
     def __init__(
-            self, accumulator_depression: int = cast(int, default_parameters[
-                'accumulator_depression']),
-            accumulator_potentiation: int = cast(int, default_parameters[
-                'accumulator_potentiation']),
-            mean_pre_window: float = default_parameters['mean_pre_window'],
-            mean_post_window: float = default_parameters['mean_post_window'],
-            dual_fsm: bool = cast(bool, default_parameters['dual_fsm']),
+            self, accumulator_depression: int = -6,
+            accumulator_potentiation: int = 6,
+            mean_pre_window: float = 35.0, mean_post_window: float = 35.0,
+            dual_fsm: bool = True,
             A_plus: float = 0.01, A_minus: float = 0.01):
         """
         :param int accumulator_depression:
@@ -94,7 +87,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         return self.__a_plus
 
     @A_plus.setter
-    def A_plus(self, new_value: float):
+    def A_plus(self, new_value: float) -> None:
         self.__a_plus = new_value
 
     @property
@@ -107,7 +100,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         return self.__a_minus
 
     @A_minus.setter
-    def A_minus(self, new_value: float):
+    def A_minus(self, new_value: float) -> None:
         self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -167,7 +160,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
             self, spec: DataSpecificationBase, global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         # Write parameters
         spec.write_value(data=self.__accumulator_depression_plus_one,
                          data_type=DataType.INT32)
@@ -185,7 +178,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         self._write_exp_dist_lut(spec, mean_post_timesteps)
 
     @staticmethod
-    def _write_exp_dist_lut(spec: DataSpecificationBase, mean: float):
+    def _write_exp_dist_lut(spec: DataSpecificationBase, mean: float) -> None:
         """
         :param .DataSpecificationGenerator spec:
         :param float mean:

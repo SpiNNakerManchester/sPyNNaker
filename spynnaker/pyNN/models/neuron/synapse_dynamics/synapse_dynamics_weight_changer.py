@@ -106,7 +106,7 @@ class SynapseDynamicsWeightChanger(
     def write_parameters(
             self, spec: DataSpecificationBase, region: int,
             global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         # Should never be asked!
         pass
 
@@ -118,7 +118,7 @@ class SynapseDynamicsWeightChanger(
             f"Type {type(self)} does not have parameter {key}")
 
     @overrides(AbstractPlasticSynapseDynamics.set_value)
-    def set_value(self, key: str, value: float):
+    def set_value(self, key: str, value: float) -> None:
         if hasattr(self, key):
             setattr(self, key, value)
         raise InvalidParameterType(
@@ -288,7 +288,7 @@ class SynapseDynamicsWeightChanger(
     @overrides(AbstractPlasticSynapseDynamics.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         if (application_edge.pre_vertex.n_atoms !=
                 self.__synapse_info.pre_vertex.n_atoms):
             raise SynapticConfigurationException(

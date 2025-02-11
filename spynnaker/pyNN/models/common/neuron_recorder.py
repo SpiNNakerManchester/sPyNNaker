@@ -54,7 +54,7 @@ _RECORDED_FLAG = 0x80000000
 _NOT_RECORDED_FLAG = 0x00000000
 
 
-def get_sampling_interval(sampling_rate):
+def get_sampling_interval(sampling_rate: float) -> float:
     """
     Return the current sampling interval given a sampling rate.
 
@@ -183,7 +183,7 @@ class NeuronRecorder(object):
 
         self.__offset_added = False
 
-    def add_region_offset(self, offset: int):
+    def add_region_offset(self, offset: int) -> None:
         """
         Add an offset to the regions.
         Used when there are multiple recorders on a single core.
@@ -555,7 +555,7 @@ class NeuronRecorder(object):
                 f"max allowed which is {step * self._MAX_RATE}")
         return rate
 
-    def _check_indexes(self, indexes: Optional[Collection[int]]):
+    def _check_indexes(self, indexes: Optional[Collection[int]]) -> None:
         """
         :param set(int) indexes:
         """
@@ -584,14 +584,14 @@ class NeuronRecorder(object):
 
     def __check_per_timestep_params(
             self, variable: str, sampling_interval: Optional[float],
-            indexes: Optional[Collection[int]]):
+            indexes: Optional[Collection[int]]) -> None:
         """
         Check if certain parameters have been provided for a per-timestep
         variable and if so, raise an Exception.
 
         :param str variable:
-        :param int sampling_interval:
-        :param iterable(int) indexes:
+        :param sampling_interval:
+        :param indexes:
         """
         if sampling_interval is not None:
             raise ValueError(
@@ -603,14 +603,14 @@ class NeuronRecorder(object):
 
     def __check_events_per_core_params(
             self, variable: str, sampling_interval: Optional[float],
-            indexes: Optional[Collection[int]]):
+            indexes: Optional[Collection[int]]) -> None:
         """
         Check if certain parameters have been provided for an
         events-per-core variable and if so, raise an Exception.
 
         :param str variable:
-        :param int sampling_interval:
-        :param iterable(int) indexes:
+        :param sampling_interval:
+        :param indexes:
         """
         if sampling_interval is not None:
             raise ValueError(
@@ -622,11 +622,11 @@ class NeuronRecorder(object):
 
     def _turn_off_recording(
             self, variable: str, sampling_interval: Optional[float],
-            remove_indexes: Optional[Collection[int]]):
+            remove_indexes: Optional[Collection[int]]) -> None:
         """
         :param str variable:
-        :param int sampling_interval:
-        :param iterable(int) remove_indexes:
+        :param sampling_interval:
+        :param remove_indexes:
         """
         # If a per-timestep variable, remove it and return
         if variable in self.__per_timestep_variables:
@@ -678,10 +678,10 @@ class NeuronRecorder(object):
             self.__indexes[variable] = indexes
 
     def _check_complete_overwrite(
-            self, variable: str, indexes: Optional[Collection[int]]):
+            self, variable: str, indexes: Optional[Collection[int]]) -> None:
         """
         :param str variable:
-        :param iterable(int) indexes:
+        :param indexes:
         """
         if indexes is None:
             # overwriting all OK!
@@ -701,11 +701,11 @@ class NeuronRecorder(object):
 
     def _turn_on_recording(
             self, variable: str, sampling_interval: Optional[float],
-            indexes: Optional[Collection[int]]):
+            indexes: Optional[Collection[int]]) -> None:
         """
         :param str variable:
-        :param int sampling_interval:
-        :param iterable(int) indexes:
+        :param sampling_interval:
+        :param indexes:
         """
         # If a per-timestep variable, update
         if variable in self.__per_timestep_variables:
@@ -745,7 +745,7 @@ class NeuronRecorder(object):
 
     def set_recording(self, variable: str, new_state: bool,
                       sampling_interval: Optional[float] = None,
-                      indexes: Optional[Collection[int]] = None):
+                      indexes: Optional[Collection[int]] = None) -> None:
         """
         :param str variable: PyNN variable name
         :param bool new_state:
@@ -788,7 +788,7 @@ class NeuronRecorder(object):
 
     def write_neuron_recording_region(
             self, spec: DataSpecificationBase,
-            neuron_recording_region: int, vertex_slice: Slice):
+            neuron_recording_region: int, vertex_slice: Slice) -> None:
         """
         Recording data specification.
 
@@ -1078,7 +1078,7 @@ class NeuronRecorder(object):
 
     def __add_indices(
             self, data: List[NDArray[uint32]], variable: str, rate: int,
-            n_recording: int, vertex_slice: Slice):
+            n_recording: int, vertex_slice: Slice) -> None:
         """
         :param list(~numpy.ndarray) data:
         :param str variable:
@@ -1132,7 +1132,7 @@ class NeuronRecorder(object):
 
         return numpy.concatenate(data)
 
-    def set_max_rewires_per_ts(self, max_rewires_per_ts: int):
+    def set_max_rewires_per_ts(self, max_rewires_per_ts: int) -> None:
         """
         :param int max_rewires_per_ts: the maximum rewires per timestep
         """

@@ -60,7 +60,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
         self.__devices = devices
 
     @overrides(AbstractThresholdType.add_parameters)
-    def add_parameters(self, parameters: RangeDictionary[float]):
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
         parameters[_KEY] = self._convert([
             d.device_control_key for d in self.__devices])
         parameters[_SCALE] = self._convert([
@@ -76,6 +76,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
             d.device_control_send_type.value for d in self.__devices])
 
     @overrides(AbstractThresholdType.add_state_variables)
-    def add_state_variables(self, state_variables: RangeDictionary[float]):
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         state_variables[_TS_NEXT_SEND] = self._convert([
             d.device_control_first_send_timestep for d in self.__devices])

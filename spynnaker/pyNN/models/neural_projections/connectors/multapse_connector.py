@@ -61,7 +61,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
 
     def __init__(self, n: int, allow_self_connections: bool = True,
                  with_replacement: bool = True, rng: Optional[NumpyRNG] = None,
-                 safe=True, verbose=False, callback=None):
+                 safe: bool = True, verbose: bool = False,
+                 callback: None = None):
         """
         :param int n:
             This is the total number of synapses in the connection.
@@ -94,7 +95,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         self.__synapses_per_edge: Optional[NDArray[integer]] = None
         self.__rng = rng
 
-    def set_projection_information(self, synapse_info: SynapseInformation):
+    def set_projection_information(
+            self, synapse_info: SynapseInformation) -> None:
         super().set_projection_information(synapse_info)
         n_pairs = synapse_info.n_post_neurons * synapse_info.n_pre_neurons
         if not self.__with_replacement and self.__num_synapses > n_pairs:
@@ -150,7 +152,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
 
     def _update_synapses_per_post_vertex(
             self, post_slices: Sequence[Slice], n_pre_atoms: int,
-            rng: NumpyRNG):
+            rng: NumpyRNG) -> None:
         """
         :param list(~pacman.model.graphs.common.Slice) post_slices:
         """
@@ -201,13 +203,13 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             n_post_atoms / float(synapse_info.n_post_neurons),
             1.0)
         max_in_slice = max(utility_calls.get_probable_maximum_selected(
-            self.__num_synapses, self.__num_synapses, prob_in_slice), 1.0)
+            self.__num_synapses, self.__num_synapses, prob_in_slice), 1)
 
         # Similarly if the chance of there being one in a row is 0, there will
         # probably be 1
         prob_in_row = 1.0 / synapse_info.n_pre_neurons
         n_connections = max(utility_calls.get_probable_maximum_selected(
-            self.__num_synapses, max_in_slice, prob_in_row), 1.0)
+            self.__num_synapses, max_in_slice, prob_in_row), 1)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
@@ -279,7 +281,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         block["synapse_type"] = synapse_type
         return block
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"MultapseConnector({self.__num_synapses})"
 
     @property
@@ -307,6 +309,6 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         if self.generate_on_machine(synapse_info):
             utility_calls.check_rng(self.__rng, "MultapseConnector")

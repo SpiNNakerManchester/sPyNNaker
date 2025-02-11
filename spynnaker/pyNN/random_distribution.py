@@ -78,7 +78,7 @@ class RandomDistribution(pyNN.random.RandomDistribution):
     # Pylint is wrong about the super-delegation being useless
     def __init__(  # pylint: disable=useless-super-delegation
             self, distribution: str, parameters_pos: Optional[tuple] = None,
-            rng: Optional[NumpyRNG] = None, **parameters_named):
+            rng: Optional[NumpyRNG] = None, **parameters_named: float):
         """
         :param str distribution: the name of a random number distribution.
         :param parameters_pos:
@@ -99,5 +99,5 @@ class RandomDistribution(pyNN.random.RandomDistribution):
         """
         super().__init__(distribution, parameters_pos, rng, **parameters_named)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()

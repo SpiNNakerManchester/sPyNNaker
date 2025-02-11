@@ -40,7 +40,7 @@ PUSH_BOT_MOTOR_WITHOUT_UART_MASK = 0x7C0
 PUSH_BOT_MOTOR_UART_SHIFT = 0 + _OFFSET_TO_I
 
 
-def _munich_key(instr_id: int, dim=0, format_bit=0) -> int:
+def _munich_key(instr_id: int, dim: int = 0, format_bit: int = 0) -> int:
     return ((instr_id << _OFFSET_TO_I) | (format_bit << _OFFSET_TO_F) |
             (dim << _OFFSET_TO_D))
 
@@ -445,7 +445,8 @@ class MunichIoSpiNNakerLinkProtocol(object):
             command | self.__instance_key |
             (self.__uart_id << offset_to_uart_id))
 
-    def configure_master_key(self, new_key: int, time: Optional[int] = None):
+    def configure_master_key(self, new_key: int,
+                             time: Optional[int] = None) -> MultiCastCommand:
         """
         Get command to configure master key.
 
@@ -1446,13 +1447,13 @@ class MunichIoSpiNNakerLinkProtocol(object):
             RETINA_UART_SHIFT)
 
     def set_retina_transmission(
-            self, retina_key: RetinaKey = RetinaKey.NATIVE_128_X_128,
+            self, retina_key: Optional[RetinaKey] = RetinaKey.NATIVE_128_X_128,
             retina_payload: Optional[RetinaPayload] = None,
             time: Optional[int] = None) -> MultiCastCommand:
         """
         Set the retina transmission key.
 
-        :param RetinaKey retina_key: the new key for the retina
+        :param retina_key: the new key for the retina
         :param retina_payload:
             the new payload for the set retina key command packet
         :type retina_payload: RetinaPayload or None

@@ -61,7 +61,7 @@ class StepCurrentSource(AbstractCurrentSource):
         super().__init__()
 
     @overrides(AbstractCurrentSource.set_parameters)
-    def set_parameters(self, **parameters: CurrentParameter):
+    def set_parameters(self, **parameters: CurrentParameter) -> None:
         for key, value in parameters.items():
             if key not in self.__parameters:
                 # throw an exception

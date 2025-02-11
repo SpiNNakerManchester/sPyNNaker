@@ -20,7 +20,7 @@ import inspect
 import logging
 from types import MappingProxyType
 from typing import (
-    Any, Callable, FrozenSet, Iterable, List, Mapping, Optional)
+    Any, Callable, FrozenSet, Iterable, List, Mapping, Optional, Tuple)
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.log import FormatAdapter
 
@@ -29,7 +29,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 def _check_args(
         args_to_find: FrozenSet[str], default_args: List[str],
-        init_method: Callable):
+        init_method: Callable) -> None:
     for arg in args_to_find:
         if arg not in default_args:
             raise AttributeError(
@@ -80,7 +80,7 @@ def default_parameters(parameters: Iterable[str]) -> Callable:
     :param iterable(str) parameters:
         The names of the arguments that are parameters
     """
-    def wrap(method):
+    def wrap(method: Callable) -> Callable:
         # pylint: disable=protected-access
         # Find the real method in case we use multiple of these decorators
         wrapped = method
@@ -88,23 +88,25 @@ def default_parameters(parameters: Iterable[str]) -> Callable:
             method = getattr(method, "_method")
 
         # Set the parameters of the method to be used later
-        method._parameters = frozenset(parameters)
+        method._parameters = (  # type: ignore[attr-defined]
+            frozenset(parameters))
         method_args = inspect.getfullargspec(method)
 
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> None:
             # Check for state variables that have been specified in cell_params
             args_provided = method_args.args[:len(args)]
             args_provided.extend([
                 arg for arg in kwargs if arg in method_args.args])
+            parameters = method._parameters  # type: ignore[attr-defined]
             for arg in args_provided:
-                if arg not in method._parameters and arg != "self":
+                if arg not in parameters and arg != "self":
                     logger.warning(
                         "Formal PyNN specifies that {} should be set using "
                         "initial_values not cell_params", arg)
             wrapped(*args, **kwargs)
 
         # Store the real method in the returned object
-        wrapper._method = method
+        wrapper._method = method  # type: ignore[attr-defined]
         return wrapper
     return wrap
 
@@ -118,7 +120,13 @@ def default_initial_values(state_variables: Iterable[str]) -> Callable:
     :param iterable(str) state_variables:
         The names of the arguments that are state variables
     """
-    def wrap(method):
+    def wrap(method: Callable) -> Callable:
+        """
+        Wraps the init method with a check method
+
+        :param method: init method to wrap
+        :return:
+        """
         # pylint: disable=protected-access
         # Find the real method in case we use multiple of these decorators
         wrapped = method
@@ -126,23 +134,25 @@ def default_initial_values(state_variables: Iterable[str]) -> Callable:
             method = getattr(method, "_method")
 
         # Store the state variables of the method to be used later
-        method._state_variables = frozenset(state_variables)
+        method._state_variables = (  # type: ignore[attr-defined]
+            frozenset(state_variables))
         method_args = inspect.getfullargspec(method)
 
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> None:
             # Check for state variables that have been specified in cell_params
             args_provided = method_args.args[:len(args)]
             args_provided.extend([
                 arg for arg in kwargs if arg in method_args.args])
+            variables = method._state_variables  # type: ignore[attr-defined]
             for arg in args_provided:
-                if arg in method._state_variables:
+                if arg in variables:
                     logger.warning(
                         "Formal PyNN specifies that {} should be set using "
                         "initial_values not cell_params", arg)
             wrapped(*args, **kwargs)
 
         # Store the real method in the returned object
-        wrapper._method = method
+        wrapper._method = method  # type: ignore[attr-defined]
         return wrapper
     return wrap
 
@@ -196,8 +206,11 @@ class AbstractProvidesDefaults(object):
     @default_initial_values decorators with values read from the init.
     """
 
+    __cashed_defaults: Optional[Mapping[str, Any]] = None
+    __cashed_initials: Optional[Mapping[str, Any]] = None
+
     @classmethod
-    def __fill_in_defaults(cls):
+    def __fill_in_defaults(cls) -> None:
         """
         Fills in default_parameters and default_initial_values attributes
         """
@@ -215,7 +228,7 @@ class AbstractProvidesDefaults(object):
         default_args = ([] if init_args.args is None else
                         init_args.args[n_args - n_defaults:])
         if init_args.defaults is None:
-            default_values = []
+            default_values: Tuple = ()
         else:
             default_values = init_args.defaults
 
@@ -241,16 +254,15 @@ class AbstractProvidesDefaults(object):
         _check_args(params.union(svars), default_args, init)
 
         # fill in the defaults so this method is only called once
-        cls.default_parameters = {}
-        cls.default_initial_values = {}
+        __defaults = {}
+        __initials = {}
         for arg, value in zip(default_args, default_values):
             if arg in params:
-                cls.default_parameters[arg] = value
+                __defaults[arg] = value
             elif arg in svars:
-                cls.default_initial_values[arg] = value
-        cls.default_parameters = MappingProxyType(cls.default_parameters)
-        cls.default_initial_values = (
-            MappingProxyType(cls.default_initial_values))
+                __initials[arg] = value
+        cls.__cashed_defaults = MappingProxyType(__defaults)
+        cls.__cashed_initials = MappingProxyType(__initials)
 
     @classproperty
     def default_parameters(  # pylint: disable=no-self-argument
@@ -265,8 +277,10 @@ class AbstractProvidesDefaults(object):
         this will be all the init parameters with a default value
         less any defined in @default_initial_values
         """
-        cls.__fill_in_defaults()
-        return cls.default_parameters
+        if cls.__cashed_defaults is None:
+            cls.__fill_in_defaults()
+            assert cls.__cashed_defaults is not None
+        return cls.__cashed_defaults
 
     @classproperty
     def default_initial_values(  # pylint: disable=no-self-argument
@@ -284,5 +298,7 @@ class AbstractProvidesDefaults(object):
 
         If neither decorator is used this will be an empty Mapping
         """
-        cls.__fill_in_defaults()
-        return cls.default_initial_values
+        if cls.__cashed_initials is None:
+            cls.__fill_in_defaults()
+            assert cls.__cashed_initials is not None
+        return cls.__cashed_initials

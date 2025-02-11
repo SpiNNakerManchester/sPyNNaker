@@ -26,6 +26,9 @@ from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 from spynnaker.pyNN.models.neuron.neuron_models import (
     NeuronModelLeakyIntegrateAndFire)
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
+from .abstract_ethernet_translator import AbstractEthernetTranslator
+from .abstract_multicast_controllable_device import (
+    AbstractMulticastControllableDevice)
 from .external_device_lif_control_vertex import ExternalDeviceLifControlVertex
 from .threshold_type_multicast_device_control import (
     ThresholdTypeMulticastDeviceControl)
@@ -46,12 +49,15 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         "tau_m", "cm", "v_rest", "v_reset", "tau_syn_E", "tau_syn_I",
         "tau_refrac", "i_offset"})
     def __init__(
-            self, devices, create_edges, translator=None,
-
+            self, devices:  List[AbstractMulticastControllableDevice],
+            create_edges: bool,
+            translator: Optional[AbstractEthernetTranslator] = None,
             # default params for the neuron model type
-            tau_m=20.0, cm=1.0, v_rest=0.0, v_reset=0.0, tau_syn_E=5.0,
-            tau_syn_I=5.0, tau_refrac=0.1, i_offset=0.0, v=0.0,
-            isyn_exc=0.0, isyn_inh=0.0):
+            tau_m: float = 20.0, cm: float = 1.0, v_rest: float = 0.0,
+            v_reset: float = 0.0, tau_syn_E: float = 5.0,
+            tau_syn_I: float = 5.0, tau_refrac: float = 0.1,
+            i_offset: float = 0.0, v: float = 0.0, isyn_exc: float = 0.0,
+            isyn_inh: float = 0.0):
         """
         :param list(AbstractMulticastControllableDevice) devices:
             The AbstractMulticastControllableDevice instances to be controlled
