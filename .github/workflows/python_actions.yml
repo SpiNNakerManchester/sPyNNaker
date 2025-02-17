@@ -29,9 +29,9 @@ jobs:
       dependencies: SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc SpiNNFrontEndCommon TestBase
       ubuntu_packages: graphviz
       test_directories: unittests
-      coverage-package: spynnaker
-      flake8-packages: spynnaker unittests spynnaker_integration_tests proxy_integration_tests
-      pylint-packages: spynnaker
-      mypy-packages: unittests spynnaker_integration_tests proxy_integration_tests
-      mypy-full_packages: spynnaker
+      coverage_package: spynnaker
+      flake8_packages: spynnaker unittests spynnaker_integration_tests proxy_integration_tests
+      pylint_packages: spynnaker
+      mypy_packages: unittests spynnaker_integration_tests proxy_integration_tests
+      mypy_full_packages: spynnaker
       cfg_file: spynnaker
