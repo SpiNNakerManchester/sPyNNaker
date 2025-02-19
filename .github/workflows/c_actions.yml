@@ -26,7 +26,7 @@ jobs:
       uses: SpiNNakerManchester/SupportScripts/actions/prepare@action-dash
       with:
         checkout-dependencies: spinnaker_tools spinn_common SpiNNFrontEndCommon
-        install_dependencies: SpiNNUtils
+        install-dependencies: SpiNNUtils
         install-module: false
         install_check_tools: false
         ubuntu-packages: doxygen gcc-arm-none-eabi
@@ -103,7 +103,7 @@ jobs:
     - name: Prepare
       uses: SpiNNakerManchester/SupportScripts/actions/prepare@action-dash
       with:
-        install_dependencies: > 
+        install-dependencies: > 
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
           SpiNNFrontEndCommon TestBase
         install-module: true
