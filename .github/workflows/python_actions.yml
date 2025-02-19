@@ -28,7 +28,7 @@ jobs:
     with:
       dependencies: SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc SpiNNFrontEndCommon TestBase
       ubuntu-packages: graphviz
-      test_directories: unittests
+      test-directories: unittests
       coverage-package: spynnaker
       flake8-packages: spynnaker unittests spynnaker_integration_tests proxy_integration_tests
       pylint-packages: spynnaker
