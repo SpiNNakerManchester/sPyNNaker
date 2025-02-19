@@ -182,9 +182,9 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
                                     self.__n_pre)],
                                   fmt="%u,%u,%u")
                     for pre_neuron in self.__pre_neurons:
-                        numpy.savetxt(  # type: ignore[arg-type]
-                            file_handle, pre_neuron[None, :],
-                            fmt=("%u," * (self.__n_pre - 1) + "%u"))
+                        numpy.savetxt(file_handle,  # type: ignore[arg-type]
+                                      pre_neuron[None, :],
+                                      fmt=("%u," * (self.__n_pre - 1) + "%u"))
 
         return self.__pre_neurons
 

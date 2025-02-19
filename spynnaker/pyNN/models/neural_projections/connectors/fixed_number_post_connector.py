@@ -182,8 +182,9 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
                                     self.__n_post)],
                                   fmt="%u,%u,%u")
                     for post_neuron in self.__post_neurons:
-                        numpy.savetxt(  # type: ignore[arg-type]
-                            file_handle, post_neuron,
+                        numpy.savetxt(
+                            file_handle,  # type: ignore[arg-type]
+                            post_neuron,
                             fmt=("%u," * (self.__n_post - 1) + "%u"))
 
         return self.__post_neurons
