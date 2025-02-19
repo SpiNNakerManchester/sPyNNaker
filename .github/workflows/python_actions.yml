@@ -34,4 +34,4 @@ jobs:
       pylint-packages: spynnaker
       mypy-packages: unittests spynnaker_integration_tests proxy_integration_tests
       mypy-full_packages: spynnaker
-      cfg_file: spynnaker
+      cfg-file: spynnaker
