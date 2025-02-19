@@ -23,11 +23,11 @@ jobs:
     timeout-minutes: 10
     steps:
     - name: Prepare
-      uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
+      uses: SpiNNakerManchester/SupportScripts/actions/prepare@action-dash
       with:
         checkout_dependencies: spinnaker_tools spinn_common SpiNNFrontEndCommon
         install_dependencies: SpiNNUtils
-        install_module: false
+        install-module: false
         install_check_tools: false
         ubuntu_packages: doxygen gcc-arm-none-eabi
 
@@ -101,12 +101,12 @@ jobs:
 
     steps:
     - name: Prepare
-      uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
+      uses: SpiNNakerManchester/SupportScripts/actions/prepare@action-dash
       with:
         install_dependencies: > 
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
           SpiNNFrontEndCommon TestBase
-        install_module: true
+        install-module: true
         install_check_tools: false
         ubuntu_packages: graphviz
         cfg_file: spynnaker
