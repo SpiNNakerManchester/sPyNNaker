@@ -27,7 +27,7 @@ jobs:
     uses: SpiNNakerManchester/SupportScripts/.github/workflows/python_checks.yml@action-dash
     with:
       dependencies: SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc SpiNNFrontEndCommon TestBase
-      ubuntu_packages: graphviz
+      ubuntu-packages: graphviz
       test_directories: unittests
       coverage-package: spynnaker
       flake8-packages: spynnaker unittests spynnaker_integration_tests proxy_integration_tests

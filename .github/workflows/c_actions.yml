@@ -29,7 +29,7 @@ jobs:
         install_dependencies: SpiNNUtils
         install-module: false
         install_check_tools: false
-        ubuntu_packages: doxygen gcc-arm-none-eabi
+        ubuntu-packages: doxygen gcc-arm-none-eabi
 
     - name: Set environment variables
       run: |
@@ -108,7 +108,7 @@ jobs:
           SpiNNFrontEndCommon TestBase
         install-module: true
         install_check_tools: false
-        ubuntu_packages: graphviz
+        ubuntu-packages: graphviz
         cfg_file: spynnaker
 
     - name: Download Fec binaries
