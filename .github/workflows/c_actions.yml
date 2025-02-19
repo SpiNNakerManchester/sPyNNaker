@@ -28,7 +28,7 @@ jobs:
         checkout-dependencies: spinnaker_tools spinn_common SpiNNFrontEndCommon
         install-dependencies: SpiNNUtils
         install-module: false
-        install_check_tools: false
+        install-check-tools: false
         ubuntu-packages: doxygen gcc-arm-none-eabi
 
     - name: Set environment variables
@@ -107,7 +107,7 @@ jobs:
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
           SpiNNFrontEndCommon TestBase
         install-module: true
-        install_check_tools: false
+        install-check-tools: false
         ubuntu-packages: graphviz
         cfg-file: spynnaker
 
