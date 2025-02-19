@@ -33,5 +33,5 @@ jobs:
       flake8-packages: spynnaker unittests spynnaker_integration_tests proxy_integration_tests
       pylint-packages: spynnaker
       mypy-packages: unittests spynnaker_integration_tests proxy_integration_tests
-      mypy-full_packages: spynnaker
+      mypy-full-packages: spynnaker
       cfg-file: spynnaker
