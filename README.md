@@ -8,6 +8,7 @@ sPyNNaker - PyNN Simulations on SpiNNaker Hardware
 ==================================================
 This package provides common code for PyNN implementations for SpiNNaker.
 
+
 We have [user installation instructions](http://spinnakermanchester.github.io/)
 which describe in detail more about what is going on.
 
