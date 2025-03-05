@@ -74,10 +74,10 @@ class TestIndexBasedProbabilityConnector(BaseTestCase):
         self.check_weights(projection, n, expression, False)
         sim.end()
 
-    def test_self(self):
+    def test_self(self) -> None:
         self.check_connect(
             n=6, expression="(i+j)%3*0.5")
 
-    def test_other(self):
+    def test_other(self) -> None:
         self.check_connect_no_self(
             n=6, expression="(i+j)%3*0.5")

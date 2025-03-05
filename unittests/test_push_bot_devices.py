@@ -20,7 +20,7 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
 
 class Test(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
     def _test_device_enum(self, enum_class):
@@ -32,16 +32,16 @@ class Test(unittest.TestCase):
             item.max_value
             item.time_between_send
 
-    def test_laser_device(self):
+    def test_laser_device(self) -> None:
         self._test_device_enum(PushBotLaser)
 
-    def test_led_device(self):
+    def test_led_device(self) -> None:
         self._test_device_enum(PushBotLED)
 
-    def test_motor_device(self):
+    def test_motor_device(self) -> None:
         self._test_device_enum(PushBotMotor)
 
-    def test_speaker_device(self):
+    def test_speaker_device(self) -> None:
         self._test_device_enum(PushBotSpeaker)
 
 

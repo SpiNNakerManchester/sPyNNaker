@@ -45,7 +45,7 @@ class Sata2DifferentBoardsNoBoardAddressTest(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_sata_2_different_boards_no_board_address(self):
+    def test_sata_2_different_boards_no_board_address(self) -> None:
         do_run()
 
 

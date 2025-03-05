@@ -139,10 +139,10 @@ class MockSplitter(object):
         self.m_vertices = [MockMachineVertex(vertex_slice, app_vertex)
                            for vertex_slice in slices]
 
-    def get_out_going_slices(self):
+    def get_out_going_slices(self) -> None:
         return self.slices
 
-    def get_in_coming_slices(self):
+    def get_in_coming_slices(self) -> None:
         return self.slices
 
     def get_in_coming_vertices(self, partition_id):

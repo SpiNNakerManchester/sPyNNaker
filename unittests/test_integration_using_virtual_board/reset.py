@@ -18,7 +18,7 @@ from spinnaker_testbase import BaseTestCase
 
 class SynfireIfCurrExp(BaseTestCase):
 
-    def test_run(self):
+    def test_run(self) -> None:
         p.setup()
         cell_params_lif = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
                            'tau_refrac': 2.0, 'tau_syn_E': 5.0,

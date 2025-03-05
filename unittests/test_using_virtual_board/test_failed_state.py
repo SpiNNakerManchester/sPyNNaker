@@ -20,10 +20,10 @@ class TestFailedState(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_double_end(self):
+    def test_double_end(self) -> None:
         sim.setup(1.0)
         sim.end()
         sim.end()
 
-    def test_only_end(self):
+    def test_only_end(self) -> None:
         sim.end()

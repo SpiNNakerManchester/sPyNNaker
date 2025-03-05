@@ -52,7 +52,7 @@ class Sata2DifferentBoardsValidBoardAddress(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_sata_2_different_boards_valid_board_address(self):
+    def test_sata_2_different_boards_valid_board_address(self) -> None:
         do_run()
 
 

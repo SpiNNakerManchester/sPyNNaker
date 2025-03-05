@@ -42,21 +42,21 @@ class TestOneToOneConnector(BaseTestCase):
         self.check_weights(projection, sources, destinations)
         sim.end()
 
-    def test_same(self):
+    def test_same(self) -> None:
         self.check_other_connect(5, 5)
 
     # Does not work on VM
-    # def test_less_sources(self):
+    # def test_less_sources(self) -> None:
     #    self.check_other_connect(5, 10)
 
     # Does not work on VM
-    # def test_less_destinations(self):
+    # def test_less_destinations(self) -> None:
     #    self.check_other_connect(10, 5)
 
-    def test_many(self):
+    def test_many(self) -> None:
         self.check_other_connect(500, 500)
 
-    def test_get_before_run(self):
+    def test_get_before_run(self) -> None:
         sim.setup(1.0)
         pop1 = sim.Population(3, sim.IF_curr_exp(), label="pop1")
         pop2 = sim.Population(3, sim.IF_curr_exp(), label="pop2")

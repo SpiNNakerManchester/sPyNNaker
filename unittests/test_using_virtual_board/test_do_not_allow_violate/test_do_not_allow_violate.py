@@ -24,6 +24,6 @@ class TestDoNotAllowViolate(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_do_not_allow_violate(self):
+    def test_do_not_allow_violate(self) -> None:
         with self.assertRaises(ConfigurationException):
             sim.setup()   # remember pynn default is 0.1

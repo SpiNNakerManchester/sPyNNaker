@@ -32,7 +32,7 @@ class TestDebug(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def debug(self):
+    def debug(self) -> None:
         reports = [
             # write_energy_report does not happen on a virtual machine
             # "Detailed_energy_report.rpt",
@@ -93,7 +93,7 @@ class TestDebug(BaseTestCase):
             self.assertIn(report, found)
         self.assertIn("ds.sqlite3", found)
 
-    def test_debug(self):
+    def test_debug(self) -> None:
         self.runsafe(self.debug)
 
 

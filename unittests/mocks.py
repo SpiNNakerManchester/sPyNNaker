@@ -35,11 +35,11 @@ class MockPopulation(object):
     def label(self) -> str:
         return self.label
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         return "Population {}".format(self._label)
 
     @property
-    def _vertex(self):
+    def _vertex(self) -> None:
         return self._mock_vertex
 
 

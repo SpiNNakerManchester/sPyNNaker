@@ -25,7 +25,7 @@ from spynnaker.pyNN.models.neuron.implementations import (
 
 
 class EmptyNeuronComponent(AbstractStandardNeuronComponent):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__([], [])
 
     def add_parameters(self, parameters):
@@ -48,10 +48,10 @@ class EmptyNeuronComponent(AbstractStandardNeuronComponent):
 
 
 class EmptySynapseType(AbstractSynapseType, EmptyNeuronComponent):
-    def get_n_synapse_types(self):
+    def get_n_synapse_types(self) -> None:
         return 0
 
-    def get_synapse_targets(self):
+    def get_synapse_targets(self) -> None:
         return []
 
     def get_synapse_id_by_target(self, target):
@@ -92,12 +92,12 @@ class FooBar(AbstractPyNNNeuronModelStandard):
             EmptyNeuronComponent(), EmptySynapseType(), EmptyNeuronComponent())
 
     @property
-    def model(self):
+    def model(self) -> None:
         return self._model
 
 
 class MockNeuron(AbstractPopulationVertex):
-    def __init__(self):
+    def __init__(self) -> None:
         foo_bar = FooBar()
         super().__init__(
             n_neurons=5, label="Mock",

@@ -21,7 +21,7 @@ class ImportAllModule(unittest.TestCase):
 
     # no unittest_setup to check all imports work without it
 
-    def test_import_all(self):
+    def test_import_all(self) -> None:
         if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
             package_loader.load_module("spynnaker", remove_pyc_files=False)
         else:

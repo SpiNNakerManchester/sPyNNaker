@@ -22,7 +22,7 @@ class TestPopulation(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_properties(self):
+    def test_properties(self) -> None:
         n_neurons = 5
         label = "pop_1"
         sim.setup(timestep=1.0)
@@ -49,7 +49,7 @@ class TestPopulation(BaseTestCase):
         _ = pop_1.structure
         sim.end()
 
-    def test_position_generator(self):
+    def test_position_generator(self) -> None:
         n_neurons = 5
         label = "pop_1"
         sim.setup(timestep=1.0)
@@ -59,7 +59,7 @@ class TestPopulation(BaseTestCase):
         print(gen(0))
         sim.end()
 
-    def test_set(self):
+    def test_set(self) -> None:
         n_neurons = 5
         label = "pop_1"
         sim.setup(timestep=1.0)
@@ -67,7 +67,7 @@ class TestPopulation(BaseTestCase):
         pop_1.set(i_offset=2)
         sim.end()
 
-    def test_set_multiple(self):
+    def test_set_multiple(self) -> None:
         n_neurons = 5
         label = "pop_1"
         sim.setup(timestep=1.0)
@@ -75,7 +75,7 @@ class TestPopulation(BaseTestCase):
         pop_1.set(i_offset=[2, 3, 4, 5, 6])
         sim.end()
 
-    def test_set_multiple_via_indirect(self):
+    def test_set_multiple_via_indirect(self) -> None:
         n_neurons = 5
         label = "pop_1"
         sim.setup(timestep=1.0)
@@ -85,7 +85,7 @@ class TestPopulation(BaseTestCase):
         view.set(i_offset=[2, 3, 4])
         sim.end()
 
-    def test_selector(self):
+    def test_selector(self) -> None:
         n_neurons = 5
         label = "pop_1"
         sim.setup(timestep=1.0)
@@ -108,7 +108,7 @@ class TestPopulation(BaseTestCase):
             [-50.0, -50.0, -50.0], values["v_thresh"])
         sim.end()
 
-    def test_init_by_in(self):
+    def test_init_by_in(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp())
         assert [-65.0, -65.0, -65.0, -65.0] == pop.initial_values["v"]
@@ -118,7 +118,7 @@ class TestPopulation(BaseTestCase):
         assert -60 == pop[1].get_initial_value("v")
         sim.end()
 
-    def test_init_bad(self):
+    def test_init_bad(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp())
         with pytest.raises(Exception):
@@ -127,7 +127,7 @@ class TestPopulation(BaseTestCase):
             pop.get_initial_value(variable="NOT_THERE")
         sim.end()
 
-    def test_no_init(self):
+    def test_no_init(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.SpikeSourceArray())
         with pytest.raises(KeyError):
@@ -136,7 +136,7 @@ class TestPopulation(BaseTestCase):
             _ = pop.initial_values
         sim.end()
 
-    def test_initial_values(self):
+    def test_initial_values(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population.create(
             cellclass=sim.IF_curr_exp, cellparams=None, n=4)
@@ -146,7 +146,7 @@ class TestPopulation(BaseTestCase):
         assert {"v": [-65], "isyn_exc": [0], "isyn_inh": [0]} == initial_values
         sim.end()
 
-    def test_iter(self):
+    def test_iter(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
 
@@ -168,7 +168,7 @@ class TestPopulation(BaseTestCase):
 
         sim.end()
 
-    def test_base(self):
+    def test_base(self) -> None:
         n_neurons = 5
         label = "pop_1"
         sim.setup(timestep=1.0)

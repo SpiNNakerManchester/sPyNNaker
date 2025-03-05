@@ -23,7 +23,7 @@ class Test_IDMixin(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_simple(self):
+    def test_simple(self) -> None:
         n_neurons = 5
         label = "pop_1"
         sim.setup(timestep=1.0)
@@ -84,7 +84,7 @@ class Test_IDMixin(BaseTestCase):
 
         sim.end()
 
-    def test_get_set(self):
+    def test_get_set(self) -> None:
         n_neurons = 4
         label = "pop_1"
         sim.setup(timestep=1.0)
@@ -103,7 +103,7 @@ class Test_IDMixin(BaseTestCase):
         self.assertEqual([2, 4, 2, 4], pop_1.get("tau_m"))
         sim.end()
 
-    def test_view_of_view(self):
+    def test_view_of_view(self) -> None:
         n_neurons = 10
         sim.setup(timestep=1.0)
         pop_1 = sim.Population(n_neurons, sim.IF_curr_exp(), label="pop_1")
@@ -126,7 +126,7 @@ class Test_IDMixin(BaseTestCase):
         self.assertEqual(2, len(view4._indexes))
         sim.end()
 
-    def test_initial_value(self):
+    def test_initial_value(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
         self.assertEqual([-65, -65, -65, -65, -65], pop.initial_values["v"])
@@ -143,7 +143,7 @@ class Test_IDMixin(BaseTestCase):
         self.assertEqual([-64.9, -64.7], view.initial_values["v"])
         sim.end()
 
-    def test_projection(self):
+    def test_projection(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
         view = PopulationView(pop, [1, 3], label="Odds")
