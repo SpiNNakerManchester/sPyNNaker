@@ -36,7 +36,3 @@ class PopAdditionParamsTest(BaseTestCase):
 
     def test_a_run(self):
         self.runsafe(self.a_run)
-
-
-if __name__ == '__main__':
-    a_run()
