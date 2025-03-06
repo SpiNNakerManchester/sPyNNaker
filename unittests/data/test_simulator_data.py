@@ -72,7 +72,8 @@ class TestSimulatorData(unittest.TestCase):
             writer.set_up_timings_and_delay(2000, 1, 1)
 
         with self.assertRaises(TypeError):
-            writer.set_up_timings_and_delay(1000, 1, "baocn")
+            writer.set_up_timings_and_delay(
+                1000, 1, "baocn")  # type: ignore[arg-type]
 
     def test_mock(self) -> None:
         # check there is a value not what it is
@@ -96,17 +97,13 @@ class TestSimulatorData(unittest.TestCase):
         self.assertListEqual(
             [pop_1], list(SpynnakerDataView.iterate_populations()))
         self.assertEqual(1, SpynnakerDataView.get_n_populations())
-        # Hack to check internal data
-        # DO NOT COPY as unsupported
-        self.assertEqual(5, writer._SpynnakerDataWriter__spy_data._id_counter)
+        self.assertEqual(5, writer._get_id_counter())
         pop_2 = Population(size=15, cellclass=model)
 
         self.assertListEqual([pop_1, pop_2], sorted(
             SpynnakerDataView.iterate_populations(), key=lambda x: x.label))
         self.assertEqual(2, SpynnakerDataView.get_n_populations())
-        # Hack to check internal data
-        # DO NOT COPY as unsupported
-        self.assertEqual(20, writer._SpynnakerDataWriter__spy_data._id_counter)
+        self.assertEqual(20, writer._get_id_counter())
         pro_1 = Projection(
             pop_1, pop_2, OneToOneConnector(), receptor_type='excitatory')
         self.assertListEqual(
@@ -133,11 +130,11 @@ class TestSimulatorData(unittest.TestCase):
         self.assertListEqual([pro_1, pro_2], sorted(
             SpynnakerDataView.iterate_projections(), key=lambda x: x.label))
         self.assertEqual(2, SpynnakerDataView.get_n_projections())
-        self.assertEqual(20, writer._SpynnakerDataWriter__spy_data._id_counter)
+        self.assertEqual(20, writer._get_id_counter())   # type: ignore[arg-type]
         with self.assertRaises(TypeError):
-            writer.add_population("bacon")
+            writer.add_population("bacon")  # type: ignore[arg-type]
         with self.assertRaises(TypeError):
-            writer.add_projection("bacon")
+            writer.add_projection("bacon")  # type: ignore[arg-type]
 
     def test_sim_name(self) -> None:
         self.assertEqual(SpynnakerDataView.get_sim_name(), sim.name())
