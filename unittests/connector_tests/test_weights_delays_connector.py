@@ -12,14 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Any
+
 import numpy
 import pytest
+
 from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector)
-from unittests.mocks import MockPopulation
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.exceptions import SpynnakerException
+from unittests.mocks import MockConnector, MockPopulation, MockSynapseDynamics
 
 
 @pytest.mark.parametrize(
@@ -30,15 +33,15 @@ from spynnaker.pyNN.exceptions import SpynnakerException
         "ints",
         "floats"
     ])
-def test_good_values(weight, delay):
+def test_good_values(weight: float, delay: float) -> None:
     unittest_setup()
     connector = OneToOneConnector()
     synapse_info = SynapseInformation(
-            connector=None, pre_population=MockPopulation(10, "Pre"),
-            post_population=MockPopulation(10, "Post"), prepop_is_view=False,
-            postpop_is_view=False, synapse_dynamics=None,
-            synapse_type=None, receptor_type=None,
-            synapse_type_from_dynamics=False, weights=weight, delays=delay)
+        connector=MockConnector(), pre_population=MockPopulation(10, "Pre"),
+        post_population=MockPopulation(10, "Post"), prepop_is_view=False,
+        postpop_is_view=False, synapse_dynamics=MockSynapseDynamics(1,1),
+        synapse_type=1, receptor_type="bacon",
+        synapse_type_from_dynamics=False, weights=weight, delays=delay)
     assert delay == connector.get_delay_maximum(synapse_info)
     assert weight == connector.get_weight_maximum(synapse_info)
 
@@ -55,15 +58,15 @@ def test_good_values(weight, delay):
         "str",
         "weird types"
     ])
-def test_bad_values(weight, delay):
+def test_bad_values(weight: Any, delay: Any) -> None:
     unittest_setup()
     connector = OneToOneConnector()
     synapse_info = SynapseInformation(
-            connector=None, pre_population=MockPopulation(10, "Pre"),
-            post_population=MockPopulation(10, "Post"), prepop_is_view=False,
-            postpop_is_view=False, synapse_dynamics=None,
-            synapse_type=None, receptor_type=None,
-            synapse_type_from_dynamics=False, weights=weight, delays=delay)
+        connector=MockConnector(), pre_population=MockPopulation(10, "Pre"),
+        post_population=MockPopulation(10, "Post"), prepop_is_view=False,
+        postpop_is_view=False, synapse_dynamics=MockSynapseDynamics(1, 1),
+        synapse_type=1, receptor_type="bacon",
+        synapse_type_from_dynamics=False, weights=weight, delays=delay)
     try:
         connector.get_delay_maximum(synapse_info)
         raise NotImplementedError

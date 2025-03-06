@@ -12,7 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+
 from spinn_utilities.overrides import overrides
+
+from spynnaker.pyNN.models.neural_projections import (
+        SynapseInformation)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
 from spynnaker.pyNN.models.populations import Population
@@ -69,4 +76,33 @@ class MockSynapseDynamics(AbstractSynapseDynamics):
     @property
     @overrides(AbstractSynapseDynamics.is_combined_core_capable)
     def is_combined_core_capable(self) -> bool:
+        raise NotImplementedError
+
+
+class MockConnector(AbstractConnector):
+
+    @overrides(AbstractConnector.get_delay_maximum)
+    def get_delay_maximum(
+            self, synapse_info: SynapseInformation) -> float:
+        raise NotImplementedError
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(
+            self, synapse_info: SynapseInformation) -> Optional[float]:
+        raise NotImplementedError
+
+    @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
+    def get_n_connections_from_pre_vertex_maximum(
+            self, n_post_atoms: int, synapse_info: SynapseInformation,
+            min_delay: Optional[float] = None,
+            max_delay: Optional[float] = None) -> int:
+        raise NotImplementedError
+
+    @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
+    def get_n_connections_to_post_vertex_maximum(
+            self, synapse_info: SynapseInformation) -> int:
+        raise NotImplementedError
+
+    @overrides(AbstractConnector.get_weight_maximum)
+    def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
         raise NotImplementedError
