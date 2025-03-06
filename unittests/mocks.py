@@ -13,10 +13,12 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamics)
 from spynnaker.pyNN.models.populations import Population
 
 
-class MockPopulation(object):
+class MockPopulation(Population):
 
     def __init__(self, size, label, vertex=None):
         self._size = size
@@ -47,3 +49,24 @@ class MockVertex(object):
 
     def get_key_ordered_indices(self, indices):
         return indices
+
+
+class MockSynapseDynamics(AbstractSynapseDynamics):
+
+    @overrides(AbstractSynapseDynamics.merge)
+    def merge(self, synapse_dynamics: AbstractSynapseDynamics
+              ) -> AbstractSynapseDynamics:
+        raise NotImplementedError
+
+    @overrides(AbstractSynapseDynamics.get_vertex_executable_suffix)
+    def get_vertex_executable_suffix(self) -> str:
+        raise NotImplementedError
+
+    @overrides(AbstractSynapseDynamics.changes_during_run)
+    def changes_during_run(self) -> bool:
+        raise NotImplementedError
+
+    @property
+    @overrides(AbstractSynapseDynamics.is_combined_core_capable)
+    def is_combined_core_capable(self) -> bool:
+        raise NotImplementedError

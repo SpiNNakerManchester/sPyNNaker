@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Type
+
 import unittest
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotLaser, PushBotMotor, PushBotSpeaker, PushBotLED)
+
 
 
 class Test(unittest.TestCase):
@@ -23,7 +26,7 @@ class Test(unittest.TestCase):
     def setUp(self) -> None:
         unittest_setup()
 
-    def _test_device_enum(self, enum_class):
+    def _test_device_enum(self, enum_class: Type) -> None:
         for item in enum_class:
             print(item)
             item.value
