@@ -12,9 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List
+
 import numpy
+from numpy.typing import NDArray
 import pytest
+
 from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.machine import SimpleMachineVertex
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FromListConnector)
@@ -136,7 +141,7 @@ class MockSplitter(object):
 
     def __init__(self, slices, app_vertex):
         self.slices = slices
-        self.m_vertices = [MockMachineVertex(vertex_slice, app_vertex)
+        self.m_vertices = [SimpleMachineVertex(None, app_vertex, vertex_slice)
                            for vertex_slice in slices]
 
     def get_out_going_slices(self) -> None:
@@ -163,38 +168,32 @@ class MockAppVertex(object):
         return indices
 
 
-class MockMachineVertex(object):
-
-    def __init__(self, vertex_slice, app_vertex):
-        self.vertex_slice = vertex_slice
-        self.app_vertex = app_vertex
-
-
-def test_get_connected():
+def test_get_connected() -> None:
     unittest_setup()
     pairs = numpy.array([[0, 0], [1, 2], [2, 0], [3, 3], [2, 6], [1, 8],
                          [4, 1], [5, 0], [6, 2], [4, 8]])
     connector = FromListConnector(pairs)
     pre_slices = [Slice(0, 3), Slice(4, 6), Slice(7, 9)]
     post_slices = [Slice(0, 2), Slice(3, 5), Slice(6, 9)]
-    pre_vertex = MockAppVertex(10, pre_slices)
-    post_vertex = MockAppVertex(10, post_slices)
-    pre_pop = MockPopulation(10, "Pre", pre_vertex)
-    post_pop = MockPopulation(10, "Post", post_vertex)
+    pre_app_vertex = MockAppVertex(10, pre_slices)
+    post_app_vertex = MockAppVertex(10, post_slices)
+    pre_pop = MockPopulation(10, "Pre", pre_app_vertex)
+    post_pop = MockPopulation(10, "Post", post_app_vertex)
     s_info = SynapseInformation(None, pre_pop, post_pop, False, False,
                                 None, 1, None, None, 1.0, 1.0)
     connected = connector.get_connected_vertices(
-        s_info, pre_vertex, post_vertex)
+        s_info, pre_app_vertex, post_app_vertex)
 
     for post_vertex, pre_vertices in connected:
         post_slice = post_vertex.vertex_slice
-        for pre_vertex in pre_vertices:
-            pre_slice = pre_vertex.vertex_slice
+        for pre_mac_vertex in pre_vertices:
+            pre_slice = pre_mac_vertex.vertex_slice
             count = __get_n_connections(pairs, pre_slice, post_slice)
             assert count > 0
 
 
-def __get_n_connections(pairs, pre_slice, post_slice):
+def __get_n_connections(pairs: NDArray, pre_slice: Slice,
+                        post_slice: Slice) -> int:
     conns = pairs[(pairs[:, 0] >= pre_slice.lo_atom) &
                   (pairs[:, 0] <= pre_slice.hi_atom)]
     conns = conns[(conns[:, 1] >= post_slice.lo_atom) &
