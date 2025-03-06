@@ -30,10 +30,10 @@ import pyNN.spiNNaker as sim
 
 class TestSimulatorData(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_setup(self):
+    def test_setup(self) -> None:
         # What happens before setup depends on the previous test
         # Use manual_check to verify this without dependency
         writer = SpynnakerDataWriter.setup()
@@ -50,7 +50,7 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(100,  SpynnakerDataView.get_simulation_time_step_us())
         self.assertEqual(0.1, SpynnakerDataView.get_min_delay())
 
-    def test_min_delay(self):
+    def test_min_delay(self) -> None:
         writer = SpynnakerDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             SpynnakerDataView.get_min_delay()
@@ -74,12 +74,12 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(TypeError):
             writer.set_up_timings_and_delay(1000, 1, "baocn")
 
-    def test_mock(self):
+    def test_mock(self) -> None:
         # check there is a value not what it is
         self.assertIsNotNone(SpynnakerDataView.get_app_id())
         self.assertIsNotNone(SpynnakerDataView.get_min_delay())
 
-    def test_populations_and_projections(self):
+    def test_populations_and_projections(self) -> None:
         writer = SpynnakerDataWriter.setup()
         writer.set_up_timings_and_delay(1000, 1, 1)
         self.assertListEqual(
@@ -139,6 +139,6 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(TypeError):
             writer.add_projection("bacon")
 
-    def test_sim_name(self):
+    def test_sim_name(self) -> None:
         self.assertEqual(SpynnakerDataView.get_sim_name(), sim.name())
         self.assertIn("sPyNNaker", SpynnakerDataView.get_sim_name())

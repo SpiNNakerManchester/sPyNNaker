@@ -34,7 +34,7 @@ class Test_Max_Cores(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_uncapped(self):
+    def test_uncapped(self) -> None:
         sim.setup(timestep=1, min_delay=1)
         pop = sim.Population(500, sim.IF_curr_exp)
         vertex = pop._Population__vertex
@@ -59,7 +59,7 @@ class Test_Max_Cores(BaseTestCase):
         self.assertEqual(200, vertex.get_max_atoms_per_core())
         sim.end()
 
-    def test_model_cap(self):
+    def test_model_cap(self) -> None:
         sim.setup(timestep=1, min_delay=1)
         pop1 = sim.Population(500, sim.IF_curr_exp)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 50)
@@ -70,7 +70,7 @@ class Test_Max_Cores(BaseTestCase):
         self.assertEqual(50, vertex2.get_max_atoms_per_core())
         sim.end()
 
-    def test_raise_sim_cap(self):
+    def test_raise_sim_cap(self) -> None:
         sim.setup(timestep=1, min_delay=1)
         pop1 = sim.Population(500, sim.IF_curr_exp)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)

@@ -77,7 +77,7 @@ class SynfireIzhikevich(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_run(self):
+    def test_run(self) -> None:
         nNeurons = 200  # number of neurons in each population
         do_run(nNeurons)
 

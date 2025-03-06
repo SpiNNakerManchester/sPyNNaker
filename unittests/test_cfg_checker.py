@@ -21,10 +21,10 @@ from spynnaker.pyNN.config_setup import unittest_setup
 
 class TestCfgChecker(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_config_checks(self):
+    def test_config_checks(self) -> None:
         unittests = os.path.dirname(__file__)
         parent = os.path.dirname(unittests)
         spynnaker_dir = spynnaker.__path__[0]

@@ -47,7 +47,7 @@ class TestCSV(BaseTestCase):
                 spikes_expected.append((row[0], row[1]))
         cls.spikes_expected = numpy.array(spikes_expected)
 
-    def test_write(self):
+    def test_write(self) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "all_data.sqlite3")
         my_csv = os.path.join(my_dir, "test_write.csv")
@@ -80,7 +80,7 @@ class TestCSV(BaseTestCase):
         packets = neo.segments[0].filter(name='packets-per-timestep')[0]
         assert numpy.array_equal(packets,  packets_expected)
 
-    def test_view(self):
+    def test_view(self) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "all_data.sqlite3")
         my_csv = os.path.join(my_dir, "test_view.csv")
@@ -104,7 +104,7 @@ class TestCSV(BaseTestCase):
         assert v.shape == target.shape
         assert numpy.array_equal(v.magnitude,  target)
 
-    def test_over_view(self):
+    def test_over_view(self) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "view_data.sqlite3")
         my_csv = os.path.join(my_dir, "test_over_view.csv")
@@ -125,7 +125,7 @@ class TestCSV(BaseTestCase):
         assert v.shape == target.shape
         assert numpy.array_equal(v, target)
 
-    def test_over_sub_view(self):
+    def test_over_sub_view(self) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "view_data.sqlite3")
         my_csv = os.path.join(my_dir, "test_over_sub_view.csv")
@@ -146,7 +146,7 @@ class TestCSV(BaseTestCase):
         assert v.shape == target.shape
         assert numpy.array_equal(v, target)
 
-    def test_no_intersection(self):
+    def test_no_intersection(self) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "view_data.sqlite3")
         my_csv = os.path.join(my_dir, "test_no_intersection.csv")
@@ -164,7 +164,7 @@ class TestCSV(BaseTestCase):
         v = neo.segments[0].filter(name='v')[0].magnitude
         self.assertEqual(0, len(v))
 
-    def test_rewiring(self):
+    def test_rewiring(self) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "rewiring_data.sqlite3")
         my_labels = os.path.join(my_dir, "rewiring_labels.txt")

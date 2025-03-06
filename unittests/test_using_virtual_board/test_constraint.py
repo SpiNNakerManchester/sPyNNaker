@@ -22,7 +22,7 @@ class TestConstraint(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_placement_constraint(self):
+    def test_placement_constraint(self) -> None:
         """
         test the get_placements call.
 

@@ -80,7 +80,7 @@ class TestFromFileConnector(BaseTestCase):
         except OSError:
             pass
 
-    def test_simple(self):
+    def test_simple(self) -> None:
         as_list = [
             (0, 0, 0.1, 10),
             (3, 0, 0.2, 11),
@@ -90,7 +90,7 @@ class TestFromFileConnector(BaseTestCase):
         ]
         self.check_other_connect(as_list)
 
-    def test_list_too_big(self):
+    def test_list_too_big(self) -> None:
         as_list = [
             (0, 0, 0.1, 10),
             (13, 0, 0.2, 11),
@@ -100,7 +100,7 @@ class TestFromFileConnector(BaseTestCase):
         ]
         self.check_other_connect(as_list)
 
-    def test_no_delays(self):
+    def test_no_delays(self) -> None:
         as_list = [
             (0, 0, 0.1),
             (3, 0, 0.2),
@@ -111,7 +111,7 @@ class TestFromFileConnector(BaseTestCase):
         self.check_other_connect(
             as_list, header='columns = ["i", "j", "weight"]', d_index=None)
 
-    def test_no_weight(self):
+    def test_no_weight(self) -> None:
         as_list = [
             (0, 0, 10),
             (3, 0, 11),
@@ -123,7 +123,7 @@ class TestFromFileConnector(BaseTestCase):
             as_list, header='columns = ["i", "j", "delay"]', d_index=2,
             w_index=None)
 
-    def test_invert(self):
+    def test_invert(self) -> None:
         as_list = [
             (0, 0, 10, 0.1),
             (3, 0, 11, 0.2),
@@ -135,7 +135,7 @@ class TestFromFileConnector(BaseTestCase):
             as_list, header='columns = ["i", "j", "delay", "weight"]',
             w_index=3, d_index=2)
 
-    def test_big(self):
+    def test_big(self) -> None:
         sources = 200
         destinations = 300
         aslist = []

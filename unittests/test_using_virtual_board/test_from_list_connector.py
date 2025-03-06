@@ -68,7 +68,7 @@ class TestFromListConnector(BaseTestCase):
             projection, aslist, w_index, d_index, sources, destinations)
         sim.end()
 
-    def test_simple(self):
+    def test_simple(self) -> None:
         as_list = [
             (0, 0, 0.1, 10),
             (3, 0, 0.2, 11),
@@ -78,7 +78,7 @@ class TestFromListConnector(BaseTestCase):
         ]
         self.check_other_connect(as_list)
 
-    def test_list_too_big(self):
+    def test_list_too_big(self) -> None:
         as_list = [
             (0, 0, 0.1, 10),
             (13, 0, 0.2, 11),
@@ -88,7 +88,7 @@ class TestFromListConnector(BaseTestCase):
         ]
         self.check_other_connect(as_list)
 
-    def test_no_delays(self):
+    def test_no_delays(self) -> None:
         as_list = [
             (0, 0, 0.1),
             (3, 0, 0.2),
@@ -99,7 +99,7 @@ class TestFromListConnector(BaseTestCase):
         self.check_other_connect(
             as_list, column_names=["weight"], d_index=None)
 
-    def test_no_weight(self):
+    def test_no_weight(self) -> None:
         as_list = [
             (0, 0, 10),
             (3, 0, 11),
@@ -110,7 +110,7 @@ class TestFromListConnector(BaseTestCase):
         self.check_other_connect(
             as_list, column_names=["delay"], d_index=2, w_index=None)
 
-    def test_invert(self):
+    def test_invert(self) -> None:
         as_list = [
             (0, 0, 10, 0.1),
             (3, 0, 11, 0.2),
@@ -121,7 +121,7 @@ class TestFromListConnector(BaseTestCase):
         self.check_other_connect(
             as_list, column_names=["delay", "weight"], w_index=3, d_index=2)
 
-    def test_big(self):
+    def test_big(self) -> None:
         sources = 200
         destinations = 300
         aslist = []
@@ -133,7 +133,7 @@ class TestFromListConnector(BaseTestCase):
             aslist, column_names=None, w_index=2, d_index=3, sources=sources,
             destinations=destinations)
 
-    def test_get_before_run(self):
+    def test_get_before_run(self) -> None:
         sim.setup(1.0)
         pop1 = sim.Population(3, sim.IF_curr_exp(), label="pop1")
         pop2 = sim.Population(3, sim.IF_curr_exp(), label="pop2")
@@ -146,7 +146,7 @@ class TestFromListConnector(BaseTestCase):
         self.assertEqual(1, len(weights))
         sim.end()
 
-    def test_using_static_synapse_singles(self):
+    def test_using_static_synapse_singles(self) -> None:
         sim.setup(timestep=1.0)
         input = sim.Population(2, sim.SpikeSourceArray([0]), label="input")
         pop = sim.Population(2, sim.IF_curr_exp(), label="pop")
@@ -161,7 +161,7 @@ class TestFromListConnector(BaseTestCase):
             for j in range(2):
                 self.assertAlmostEqual(weights[i][j], target[i][j], places=3)
 
-    def test_using_half_static_synapse_singles(self):
+    def test_using_half_static_synapse_singles(self) -> None:
         sim.setup(timestep=1.0)
         input = sim.Population(2, sim.SpikeSourceArray([0]), label="input")
         pop = sim.Population(2, sim.IF_curr_exp(), label="pop")
@@ -177,7 +177,7 @@ class TestFromListConnector(BaseTestCase):
             for j in range(2):
                 self.assertAlmostEqual(weights[i][j], target[i][j], places=3)
 
-    def test_using_static_synapse_doubles(self):
+    def test_using_static_synapse_doubles(self) -> None:
         sim.setup(timestep=1.0)
         input = sim.Population(2, sim.SpikeSourceArray([0]), label="input")
         pop = sim.Population(2, sim.IF_curr_exp(), label="pop")
