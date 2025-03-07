@@ -59,7 +59,7 @@ class SynapseDynamicsStatic(
 
     def __init__(
             self, weight: _Weight = StaticSynapse.default_parameters['weight'],
-            delay: Weight_Delay_In_Types = None,
+            delay: _Weight = None,
             pad_to_length: Optional[int] = None):
 
         """
