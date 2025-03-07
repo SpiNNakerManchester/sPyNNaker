@@ -14,9 +14,14 @@
 
 import pytest
 import sys
+
 from spinn_utilities.classproperty import classproperty
+from spinn_utilities.overrides import overrides
+
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+from spynnaker.pyNN.models.common.population_application_vertex import (
+        PopulationApplicationVertex)
 from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
     AbstractPyNNNeuronModel)
 from spynnaker.pyNN.models.defaults import default_initial_values
@@ -28,15 +33,17 @@ class _MyPyNNModelImpl(AbstractPyNNModel):
     default_population_parameters = {}
 
     @default_initial_values({"svar"})
-    def __init__(self, param=1.0, svar=2.0):
+    def __init__(self, param: float = 1.0, svar: float = 2.0):
         pass
 
     @classproperty
-    def absolute_max_atoms_per_core(cls):  # @NoSelf
+    def absolute_max_atoms_per_core(cls) -> int:  # @NoSelf
         return 1000
 
-    def create_vertex(self, n_neurons, label):
-        return None
+    @overrides(AbstractPyNNModel.create_vertex)
+    def create_vertex(
+            self, n_neurons: int, label: str) -> PopulationApplicationVertex:
+        raise NotImplementedError
 
 
 class _MyNeuronModelImpl(AbstractPyNNNeuronModel):
@@ -47,7 +54,7 @@ class _MyOtherNeuronModel(_MyNeuronModelImpl):
     pass
 
 
-def test_max_atoms_per_core():
+def test_max_atoms_per_core() -> None:
     unittest_setup()
     with pytest.raises(SpynnakerException):
         _MyPyNNModelImpl.set_model_max_atoms_per_dimension_per_core(2000)
@@ -68,7 +75,7 @@ def test_max_atoms_per_core():
         _MyPyNNModelImpl.set_model_max_atoms_per_dimension_per_core((100, 100))
 
 
-def test_reset_max_atoms_per_core():
+def test_reset_max_atoms_per_core() -> None:
     unittest_setup()
     _MyNeuronModelImpl.set_model_max_atoms_per_dimension_per_core(20)
     _MyNeuronModelImpl.set_model_max_atoms_per_dimension_per_core()
@@ -80,7 +87,7 @@ def test_reset_max_atoms_per_core():
             1000)
 
 
-def test_defaults():
+def test_defaults() -> None:
     unittest_setup()
     assert _MyPyNNModelImpl.default_initial_values == {"svar": 2.0}
     assert _MyPyNNModelImpl.default_parameters == {"param": 1.0}
