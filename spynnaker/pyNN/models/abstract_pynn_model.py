@@ -15,7 +15,7 @@ from __future__ import annotations
 from collections import defaultdict
 import sys
 from typing import (
-    Any, Dict, Optional, Sequence, Tuple, TYPE_CHECKING)
+    Any, cast, Dict, Optional, Sequence, Tuple, TYPE_CHECKING, Union)
 import numpy
 from pyNN import descriptions
 from spinn_utilities.classproperty import classproperty
@@ -39,7 +39,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
 
     @classmethod
     def set_model_max_atoms_per_dimension_per_core(
-            cls, n_atoms: Optional[Tuple[int, ...]] = None) -> None:
+            cls, n_atoms: Union[None, int, Tuple[int, ...]] = None) -> None:
         """
         Set the default maximum number of atoms per dimension per core for
         this model.  This can be overridden by the individual Population.
@@ -55,11 +55,23 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         :type n_atoms: int or tuple or None
         """
         abs_max = cls.absolute_max_atoms_per_core
-        if n_atoms is not None and numpy.prod(n_atoms) > abs_max:
-            raise SpynnakerException(
-                "The absolute maximum neurons per core for this model is"
-                f" {abs_max}")
-        AbstractPyNNModel._max_atoms_per_core[cls] = n_atoms
+        if n_atoms is None:
+            AbstractPyNNModel._max_atoms_per_core[cls] = None
+        elif numpy.isscalar(n_atoms):
+            if n_atoms > abs_max:
+                raise SpynnakerException(
+                    "The absolute maximum neurons per core for this"
+                    f" model is {abs_max}")
+            max_atoms_int: int = int(cast(int, n_atoms))
+            AbstractPyNNModel._max_atoms_per_core[cls] = (max_atoms_int, )
+        else:
+            if numpy.prod(n_atoms) > abs_max:
+                raise SpynnakerException(
+                    "The absolute maximum sum of neurons per core for this"
+                    f" model is {abs_max}")
+            max_atoms_tuple: Tuple[int, ...] = cast(
+                Tuple[int, ...],  n_atoms)
+            AbstractPyNNModel._max_atoms_per_core[cls] = max_atoms_tuple
 
     @classmethod
     def get_model_max_atoms_per_dimension_per_core(cls) -> Tuple[int, ...]:
@@ -73,8 +85,8 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         if max_stored is not None:
             return max_stored
 
-        # Otherwise return the absolute maximum
-        return cls.absolute_max_atoms_per_core
+        # Otherwise return the absolute maximum assuming 1D
+        return (cls.absolute_max_atoms_per_core, )
 
     @classproperty
     def absolute_max_atoms_per_core(  # pylint: disable=no-self-argument

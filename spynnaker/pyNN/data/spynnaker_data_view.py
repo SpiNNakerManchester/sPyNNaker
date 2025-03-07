@@ -237,7 +237,7 @@ class SpynnakerDataView(FecDataView):
     @classmethod
     def set_number_of_neurons_per_dimension_per_core(
             cls, neuron_type: Type[AbstractPyNNModel],
-            max_permitted: Optional[Union[Tuple[int, ...]]]) -> None:
+            max_permitted: Union[None, int, Tuple[int, ...]]) -> None:
         """
         Sets a ceiling on the number of neurons of a given type that can be
         placed on a single core for each dimension.
