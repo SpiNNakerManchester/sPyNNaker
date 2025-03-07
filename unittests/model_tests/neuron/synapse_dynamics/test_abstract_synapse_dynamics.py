@@ -63,11 +63,11 @@ class TestAbstractSynapseDynamics(unittest.TestCase):
         # Only some connectors support list
         synapse = SynapseDynamicsStatic(delay=[1, 2, 3], weight=[4, 5, 6])
         delay = synapse.delay
-        self.assertEqual(ndarray, type(delay))
+        assert isinstance(delay, ndarray)
         for d in delay:
             self.assertEqual(float64, type(d))
         weight = synapse.weight
-        self.assertEqual(ndarray, type(weight))
+        assert isinstance(weight, ndarray)
         for w in weight:
             self.assertEqual(float64, type(w))
 
@@ -76,11 +76,11 @@ class TestAbstractSynapseDynamics(unittest.TestCase):
         synapse = SynapseDynamicsStatic(
             delay=array([1, 2, 3]), weight=array([4, 5, 6]))
         delay = synapse.delay
-        self.assertEqual(ndarray, type(delay))
+        assert isinstance(delay, ndarray)
         for d in delay:
             self.assertEqual(float64, type(d))
         weight = synapse.weight
-        self.assertEqual(ndarray, type(weight))
+        assert isinstance(weight, ndarray)
         for w in weight:
             self.assertEqual(float64, type(w))
 
@@ -89,11 +89,11 @@ class TestAbstractSynapseDynamics(unittest.TestCase):
         synapse = SynapseDynamicsStatic(
             delay=[1.1, 2.2, 3.3], weight=[4.4, 5.5, 6.6])
         delay = synapse.delay
-        self.assertEqual(ndarray, type(delay))
+        assert isinstance(delay, ndarray)
         for d in delay:
             self.assertEqual(float64, type(d))
         weight = synapse.weight
-        self.assertEqual(ndarray, type(weight))
+        assert isinstance(weight, ndarray)
         for w in weight:
             self.assertEqual(float64, type(w))
 
@@ -102,11 +102,11 @@ class TestAbstractSynapseDynamics(unittest.TestCase):
         synapse = SynapseDynamicsStatic(
             delay=array([1.1, 2.2, 3.3]), weight=array([4.4, 5.5, 6.6]))
         delay = synapse.delay
-        self.assertEqual(ndarray, type(delay))
+        assert isinstance(delay, ndarray)
         for d in delay:
             self.assertEqual(float64, type(d))
         weight = synapse.weight
-        self.assertEqual(ndarray, type(weight))
+        assert isinstance(weight, ndarray)
         for w in weight:
             self.assertEqual(float64, type(w))
 
@@ -122,4 +122,5 @@ class TestAbstractSynapseDynamics(unittest.TestCase):
 
     def test_bad_type(self) -> None:
         with self.assertRaises(TypeError):
-            SynapseDynamicsStatic(delay=bytes(), weight=1)
+            SynapseDynamicsStatic(
+                delay=bytes(), weight=1)  # type: ignore[arg-type]

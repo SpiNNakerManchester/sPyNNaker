@@ -28,15 +28,15 @@ from pyNN.random import RandomDistribution
 #: The type of weights and delays provided by Synapse / SynapseInformation
 # Combined types (where value could be either)
 Weight_Delay_Types: TypeAlias = Optional[Union[
-    int, float, str, RandomDistribution, NDArray[numpy.float64]]]
+    float, str, RandomDistribution, NDArray[numpy.float64]]]
 Weight_Types: TypeAlias = Optional[Union[
-    int, float, str, RandomDistribution, NDArray[numpy.float64]]]
+    float, str, RandomDistribution, NDArray[numpy.float64]]]
 Delay_Types: TypeAlias = \
     Union[float, str, RandomDistribution, NDArray[numpy.float64]]
 # These are the Types we know are coming in.
 # Most things that can be considered floats (including int)  will work
 Weight_Delay_In_Types: TypeAlias = Optional[Union[
-    int, float, str, RandomDistribution, Iterable[int], Iterable[float]]]
+    float, str, RandomDistribution, Iterable[float], NDArray[numpy.float64]]]
 
 IoDest: TypeAlias = Union[
     str, neo.baseio.BaseIO, None]  # pylint: disable=no-member
