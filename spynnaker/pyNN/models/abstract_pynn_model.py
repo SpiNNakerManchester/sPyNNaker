@@ -52,7 +52,6 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         set the maximum on each Population.
 
         :param n_atoms: The new maximum, or `None` for the largest possible
-        :type n_atoms: int or tuple or None
         """
         abs_max = cls.absolute_max_atoms_per_core
         if n_atoms is None:
@@ -77,8 +76,6 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     def get_model_max_atoms_per_dimension_per_core(cls) -> Tuple[int, ...]:
         """
         Get the maximum number of atoms per dimension per core for this model.
-
-        :rtype: int or tuple or None
         """
         # If there is a stored value, use it
         max_stored = AbstractPyNNModel._max_atoms_per_core.get(cls)

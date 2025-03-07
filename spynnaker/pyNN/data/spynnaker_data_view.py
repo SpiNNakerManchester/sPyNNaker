@@ -244,7 +244,6 @@ class SpynnakerDataView(FecDataView):
 
         :param type neuron_type: neuron type
         :param max_permitted: the number to set to in each dimension
-        :type max_permitted: tuple or None
         """
         cls.check_valid_simulator()
         if not issubclass(neuron_type, AbstractPyNNModel):
