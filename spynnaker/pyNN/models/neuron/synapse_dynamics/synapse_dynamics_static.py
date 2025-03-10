@@ -28,7 +28,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE)
-from spynnaker.pyNN.types import Weight_Delay_In_Types as _Weight
+from spynnaker.pyNN.types import Weight_Delay_In_Types as _InTypes
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
@@ -58,8 +58,8 @@ class SynapseDynamicsStatic(
         "__pad_to_length"]
 
     def __init__(
-            self, weight: _Weight = StaticSynapse.default_parameters['weight'],
-            delay: Weight_Delay_In_Types = None,
+            self, weight: _InTypes = StaticSynapse.default_parameters['weight'],
+            delay: _InTypes = None,
             pad_to_length: Optional[int] = None):
 
         """
