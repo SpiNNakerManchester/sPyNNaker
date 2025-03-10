@@ -14,7 +14,11 @@
 
 import csv
 import os
+from typing import List, Tuple
+
 import numpy
+from numpy.typing import NDArray
+
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.utilities import neo_convertor
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
@@ -27,8 +31,12 @@ def trim_spikes(spikes, indexes):
 
 class TestCSV(BaseTestCase):
 
+    spikes_expected: List[Tuple[int, int]] = []
+    v_expected: NDArray
+
     @classmethod
     def setUpClass(cls):
+        global spikes_expected, v_expected
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_v = os.path.join(my_dir, "v.csv")
         v_expected = []
@@ -56,8 +64,8 @@ class TestCSV(BaseTestCase):
         with open(my_packets) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                row = list(map(lambda x: float(x), row))
-                packets_expected.append(row)
+                floats = list(map(lambda x: float(x), row))
+                packets_expected.append(floats)
 
         with NeoBufferDatabase(my_buffer) as db:
             db.csv_block_metadata(

@@ -31,4 +31,4 @@ class TestCfgChecker(unittest.TestCase):
         spynnaker_it = os.path.join(parent, "spynnaker_integration_tests")
         run_config_checks(
             directories=[spynnaker_dir, spynnaker_it, unittests],
-            special_nones=("info", "debug"))
+            special_nones=["info", "debug"])

@@ -14,8 +14,9 @@
 
 from testfixtures import LogCapture  # type: ignore[import]
 import unittest
-from spynnaker.pyNN.models.spike_source import SpikeSourceArrayVertex
 import pyNN.spiNNaker as sim
+from spynnaker.pyNN.models.spike_source import (
+    SpikeSourceArray, SpikeSourceArrayVertex)
 
 
 class TestSpikeSourceArrayVertex(unittest.TestCase):
@@ -27,8 +28,8 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
         with LogCapture() as lc:
             v = SpikeSourceArrayVertex(
                 n_neurons=5, spike_times=[], label="test",
-                max_atoms_per_core=None, model=None, splitter=None,
-                n_colour_bits=None)
+                max_atoms_per_core=10, model=SpikeSourceArray(),
+                splitter=None, n_colour_bits=None)
         found = False
         for record in lc.records:
             if "no spike" in str(record.msg):
@@ -38,20 +39,20 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
         v.set_parameter_values("spike_times", [1, 2, 3], [1, 3])
         self.assertSequenceEqual(
             [[], [1, 2, 3], [], [1, 2, 3], []],
-            v.get_parameter_values("spike_times"))
+            list(v.get_parameter_values("spike_times")))
 
     def test_singleton_list(self) -> None:
         v = SpikeSourceArrayVertex(
             n_neurons=5, spike_times=[1, 11, 22],
-            label="test", max_atoms_per_core=None, model=None, splitter=None,
-            n_colour_bits=None)
+            label="test", max_atoms_per_core=10, model=SpikeSourceArray(),
+            splitter=None, n_colour_bits=None)
         v.set_parameter_values("spike_times", [2, 12, 32])
 
     def test_double_list(self) -> None:
         SpikeSourceArrayVertex(
             n_neurons=3, spike_times=[[1], [11], [22]],
-            label="test", max_atoms_per_core=None, model=None, splitter=None,
-            n_colour_bits=None)
+            label="test", max_atoms_per_core=10, model=SpikeSourceArray(),
+            splitter=None, n_colour_bits=None)
 
     def test_big_double_list(self) -> None:
         spike_list1 = [1, 2, 6, 8, 9]
@@ -65,7 +66,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
         with LogCapture() as lc:
             SpikeSourceArrayVertex(
                 n_neurons=3, spike_times=spike_list,
-                label="test", max_atoms_per_core=None, model=None,
+                label="test", max_atoms_per_core=10, model=SpikeSourceArray(),
                 splitter=None, n_colour_bits=None)
             found = False
             for record in lc.records:
@@ -79,8 +80,8 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
     def test_shared_list_big(self) -> None:
         with LogCapture() as lc:
             v = SpikeSourceArrayVertex(
-                n_neurons=3, spike_times=None,
-                label="test", max_atoms_per_core=None, model=None,
+                n_neurons=3, spike_times=[],
+                label="test", max_atoms_per_core=10, model=SpikeSourceArray(),
                 splitter=None, n_colour_bits=None,)
             v.set_parameter_values("spike_times", [34] * 35)
             found = False
@@ -95,7 +96,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
         with LogCapture() as lc:
             SpikeSourceArrayVertex(
                 n_neurons=1, spike_times=[37] * 109,
-                label="test", max_atoms_per_core=None, model=None,
+                label="test", max_atoms_per_core=10, model=SpikeSourceArray(),
                 splitter=None, n_colour_bits=None)
             found = False
             for record in lc.records:
