@@ -299,8 +299,8 @@ class TestDataPopulation(BaseTestCase):
         with open(my_packets) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                row = list(map(lambda x: float(x), row))
-                packets_expected.append(row)
+                floats = list(map(lambda x: float(x), row))
+                packets_expected.append(floats)
 
         assert numpy.array_equal(packets,  packets_expected)
 
