@@ -66,11 +66,11 @@ class Test_IDMixin(BaseTestCase):
 
         self.assertEqual(2, len(view))
 
-        iterator = view.all()
-        self.assertEqual(1, next(iterator).id)
-        self.assertEqual(3, next(iterator).id)
+        iterator2 = view.all()
+        self.assertEqual(1, next(iterator2).id)
+        self.assertEqual(3, next(iterator2).id)
         with pytest.raises(StopIteration):
-            next(iterator)
+            next(iterator2)
 
         self.assertEqual(view.conductance_based, pop_1.conductance_based)
 

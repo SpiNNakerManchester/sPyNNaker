@@ -15,9 +15,13 @@
 import csv
 import os
 import pickle
-import numpy
-import pytest
 import shutil
+from typing import List, Tuple
+
+import numpy
+from numpy.typing import NDArray
+import pytest
+
 from spinn_front_end_common.utilities.base_database import BaseDatabase
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -45,6 +49,9 @@ def copy_db(data_file):
 
 
 class TestGetting(BaseTestCase):
+
+    spikes_expected: List[Tuple[int, int]] = []
+    v_expected: NDArray
 
     @classmethod
     def setUpClass(cls):
@@ -272,7 +279,7 @@ class TestGetting(BaseTestCase):
         with open(my_packets) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                row = list(map(lambda x: float(x), row))
-                packets_expected.append(row)
+                floats = list(map(lambda x: float(x), row))
+                packets_expected.append(floats)
 
         assert numpy.array_equal(packets,  packets_expected)

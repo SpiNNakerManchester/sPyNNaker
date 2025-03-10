@@ -15,8 +15,12 @@
 import csv
 import os
 import pickle
+from typing import List, Tuple
+
 import numpy
+from numpy.typing import NDArray
 import pytest
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities import neo_convertor
@@ -30,6 +34,9 @@ def trim_spikes(spikes, indexes):
 
 
 class TestDataPopulation(BaseTestCase):
+
+    spikes_expected: List[Tuple[int, int]] = []
+    v_expected: NDArray
 
     @classmethod
     def setUpClass(cls):
@@ -231,7 +238,7 @@ class TestDataPopulation(BaseTestCase):
 
         with pytest.raises(ConfigurationException):
             # Only one type of data at a time is supported
-            pop.spinnaker_get_data(["v", "spikes"])
+            pop.spinnaker_get_data(["v", "spikes"])  # type: ignore[arg-type]
 
     def test_spinnaker_get_data_view(self) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
@@ -251,7 +258,7 @@ class TestDataPopulation(BaseTestCase):
                              f"{time}{neuron}")
         with pytest.raises(ConfigurationException):
             # Only one type of data at a time is supported
-            pop.spinnaker_get_data(["v", "spikes"])
+            pop.spinnaker_get_data(["v", "spikes"])  # type: ignore[arg-type]
 
     def test_rewiring(self) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
