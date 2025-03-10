@@ -12,9 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional, Sequence
+
 import pytest
-import numpy
 import pyNN.spiNNaker as sim
+
+from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged import RangeDictionary
+
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, AbstractPyNNNeuronModelStandard)
@@ -26,7 +31,7 @@ from spynnaker.pyNN.models.neuron.implementations import (
 
 class EmptyNeuronComponent(AbstractStandardNeuronComponent):
     def __init__(self) -> None:
-        super().__init__([], [])
+        super().__init__([], {})
 
     def add_parameters(self, parameters):
         pass
@@ -34,27 +39,18 @@ class EmptyNeuronComponent(AbstractStandardNeuronComponent):
     def add_state_variables(self, state_variables):
         pass
 
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
-        return numpy.zeros(dtype="uint32")
-
-    def update_values(self, values, parameters, state_variables):
-        pass
-
-    def has_variable(self, variable):
-        return False
-
-    def get_units(self, variable):
-        return None
-
 
 class EmptySynapseType(AbstractSynapseType, EmptyNeuronComponent):
-    def get_n_synapse_types(self) -> None:
+    @overrides(AbstractSynapseType.get_n_synapse_types)
+    def get_n_synapse_types(self) -> int:
         return 0
 
-    def get_synapse_targets(self) -> None:
+    @overrides(AbstractSynapseType.get_synapse_targets)
+    def get_synapse_targets(self) -> Sequence[str]:
         return []
 
-    def get_synapse_id_by_target(self, target):
+    @overrides(AbstractSynapseType.get_synapse_id_by_target)
+    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         return None
 
 
@@ -64,24 +60,15 @@ class _MyNeuronModel(AbstractStandardNeuronComponent):
         self._foo = foo
         self._bar = bar
 
+    @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters):
         pass
 
-    def add_state_variables(self, state_variables):
+    @overrides(AbstractStandardNeuronComponent.add_state_variables)
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         state_variables["foo"] = self._foo
         state_variables["bar"] = self._bar
-
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
-        return numpy.zeros(dtype="uint32")
-
-    def update_values(self, values, parameters, state_variables):
-        pass
-
-    def has_variable(self, variable):
-        return False
-
-    def get_units(self, variable):
-        return None
 
 
 class FooBar(AbstractPyNNNeuronModelStandard):
@@ -91,20 +78,16 @@ class FooBar(AbstractPyNNNeuronModelStandard):
             "FooBar", "foobar.aplx", _MyNeuronModel(foo, bar),
             EmptyNeuronComponent(), EmptySynapseType(), EmptyNeuronComponent())
 
-    @property
-    def model(self) -> None:
-        return self._model
-
 
 class MockNeuron(AbstractPopulationVertex):
     def __init__(self) -> None:
         foo_bar = FooBar()
         super().__init__(
             n_neurons=5, label="Mock",
-            max_atoms_per_core=None, spikes_per_second=None,
+            max_atoms_per_core=4, spikes_per_second=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
             max_expected_summed_weight=None,
-            neuron_impl=foo_bar.model, pynn_model=foo_bar,
+            neuron_impl=foo_bar._model, pynn_model=foo_bar,
             drop_late_spikes=True, splitter=None, seed=None,
             n_colour_bits=None)
 
