@@ -167,11 +167,10 @@ class Population(PopulationBase):
         else:
             return PopulationView(self, index_or_slice)
 
-    def all(self) -> Iterable[PopulationView]:
+    def all(self) -> Iterator[PopulationView]:
         """
         Iterator over cell IDs on all MPI nodes.
 
-        :rtype: iterable(IDMixin)
         """
         for _id in range(self.__size):
             yield IDMixin(self, _id)
