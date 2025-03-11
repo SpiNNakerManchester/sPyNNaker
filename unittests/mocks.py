@@ -13,9 +13,11 @@
 # limitations under the License.
 
 from typing import Optional
+from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
 
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.neural_projections import (
         SynapseInformation)
 from spynnaker.pyNN.models.neural_projections.connectors import (
@@ -39,23 +41,32 @@ class MockPopulation(Population):
     def size(self) -> int:
         return self._size
 
-    @property
-    @overrides(Population.label)
-    def label(self) -> str:
-        return self.label
-
-    def __repr__(self) -> None:
+    def __repr__(self) -> str:
         return "Population {}".format(self._label)
 
     @property
-    def _vertex(self) -> None:
+    @overrides(Population._vertex)
+    def _vertex(self) -> PopulationApplicationVertex:
         return self._mock_vertex
 
 
-class MockVertex(object):
+class MockVertex(PopulationApplicationVertex):
 
-    def get_key_ordered_indices(self, indices):
+    @overrides(PopulationApplicationVertex.get_key_ordered_indices)
+    def get_key_ordered_indices(
+            self, indices: Optional[NDArray] = None) -> NDArray:
+        assert indices is not None
         return indices
+
+    @property
+    @overrides(PopulationApplicationVertex.n_colour_bits)
+    def n_colour_bits(self) -> int:
+        raise NotImplementedError
+
+    @property
+    @overrides(PopulationApplicationVertex.n_atoms)
+    def n_atoms(self) -> int:
+        raise NotImplementedError
 
 
 class MockSynapseDynamics(AbstractSynapseDynamics):
@@ -69,6 +80,7 @@ class MockSynapseDynamics(AbstractSynapseDynamics):
     def get_vertex_executable_suffix(self) -> str:
         raise NotImplementedError
 
+    @property
     @overrides(AbstractSynapseDynamics.changes_during_run)
     def changes_during_run(self) -> bool:
         raise NotImplementedError

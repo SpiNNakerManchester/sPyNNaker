@@ -154,8 +154,8 @@ class TestSetRecord(BaseTestCase):
             "gsyn_inh": DataType.S1615}
 
         recorder = NeuronRecorder(
-            ["v", "gsyn_exc", "gsyn_inh"], data_types, ["spikes"], 5, [], [],
-            [], [])
+            ["v", "gsyn_exc", "gsyn_inh"], data_types, ["spikes"], 5, [], {},
+            [], {})
         recorder.set_recording("spikes", True)
         self.assertCountEqual(["spikes"], recorder.recording_variables)
         recorder.set_recording("spikes", False, indexes=[2, 4])
