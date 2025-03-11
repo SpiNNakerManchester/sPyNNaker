@@ -13,7 +13,7 @@
 # limitations under the License.
 import shutil
 import struct
-from typing import BinaryIO, List, Optional, Sequence, Tuple, Union
+from typing import Any, BinaryIO, List, Optional, Sequence, Tuple, Union
 import unittest
 from tempfile import mkdtemp
 import numpy
@@ -99,11 +99,11 @@ class _MockTransceiverinOut(MockableTransceiver):
         return datum
 
 
-def say_false(self, *args, **kwargs):
+def say_false(self, *args: Any, **kwargs: Any) -> bool:
     return False
 
 
-def test_write_data_spec():
+def test_write_data_spec() -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = SpynnakerDataWriter.mock()
@@ -155,10 +155,6 @@ def test_write_data_spec():
         synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
         bitfield_filter=8,
         synaptic_matrix=1, pop_table=3, connection_builder=4)
-    references = SynapseRegions(
-        synapse_params=None, synapse_dynamics=None, structural_dynamics=None,
-        bitfield_filter=None, synaptic_matrix=None, pop_table=None,
-        connection_builder=None)
     synaptic_matrices = SynapticMatrices(
         post_pop._vertex, regions, max_atoms_per_core=10,
         weight_scales=[32, 32], all_syn_block_sz=10000)
@@ -167,7 +163,7 @@ def test_write_data_spec():
     with DsSqlliteDatabase() as ds_db:
         spec = DataSpecificationGenerator(0, 0, 3, post_vertex, ds_db)
         synaptic_matrices.write_synaptic_data(
-            spec, post_vertex_slice, references)
+            spec, post_vertex_slice, SynapseRegionReferences())
 
     writer.set_transceiver(_MockTransceiverinOut())
     load_application_data_specs()
@@ -223,7 +219,7 @@ def test_write_data_spec():
         shutil.rmtree(report_folder, ignore_errors=True)
 
 
-def test_set_synapse_dynamics():
+def test_set_synapse_dynamics() -> None:
     raise unittest.SkipTest("needs fixing")
     unittest_setup()
     post_app_model = IFCurrExpBase()

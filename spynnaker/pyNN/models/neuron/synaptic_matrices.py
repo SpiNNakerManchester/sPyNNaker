@@ -41,7 +41,7 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
     write_bitfield_init_data, is_sdram_poisson_source)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-
+from spynnaker.pyNN.types import WeightScales
 from .synaptic_matrix_app import SynapticMatrixApp
 
 if TYPE_CHECKING:
@@ -176,12 +176,11 @@ class SynapticMatrices(object):
     def __init__(
             self, app_vertex: AbstractPopulationVertex,
             regions: SynapseRegions, max_atoms_per_core: int,
-            weight_scales: NDArray[floating], all_syn_block_sz: int):
+            weight_scales: WeightScales, all_syn_block_sz: int):
         """
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
         :param SynapseRegions regions: The synapse regions to use
         :param int max_atoms_per_core:
-        :param list(float) weight_scales:
         :param int all_syn_block_sz:
         """
         self.__app_vertex = app_vertex
@@ -400,8 +399,6 @@ class SynapticMatrices(object):
         :param ~.DataSpecificationGenerator spec:
             The specification to write to
         :param list(GeneratorData) generator_data: The data to be written
-        :param weight_scales: scaling of weights on each synapse
-        :type weight_scales: list(int or float)
         """
         if self.__generated_data is None:
             if connection_builder_ref is not None:

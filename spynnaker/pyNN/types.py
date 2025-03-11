@@ -47,6 +47,7 @@ Selector: TypeAlias = Union[
     None, int, slice, List[int], List[bool], NDArray[numpy.bool_],
     NDArray[numpy.integer]]
 
+WeightScales: TypeAlias = Union[NDArray[numpy.floating], Sequence[float]]
 
 def is_scalar(value: Weight_Delay_Types) -> TypeGuard[Union[int, float]]:
     """
