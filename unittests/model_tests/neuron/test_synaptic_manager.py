@@ -488,7 +488,7 @@ def test_pop_based_master_pop_table_standard(
             synaptic_matrix=None, pop_table=None, connection_builder=None)
         synaptic_matrices = SynapticMatrices(
             post_pop._vertex, regions, max_atoms_per_core=neurons_per_core,
-            weight_scales=[32, 32], all_syn_block_sz=10000000)
+            weight_scales=numpy.array([32, 32]), all_syn_block_sz=10000000)
         synaptic_matrices.generate_data()
         synaptic_matrices.write_synaptic_data(
             spec, post_vertex_slice, references)
