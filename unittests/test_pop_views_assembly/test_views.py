@@ -139,7 +139,8 @@ class Test_IDMixin(BaseTestCase):
         self.assertEqual([-65, -60, -65, -60, -65], pop.initial_values["v"])
         self.assertEqual([-60, -60], view.initial_values["v"])
         self.assertEqual([-60, -65], view2.initial_values["v"])
-        view.initialize(v=lambda i: -65 + i / 10.0)
+        # Does work but a super weird edge case
+        view.initialize(v=lambda i: -65 + i / 10.0)  # type: ignore[arg-type]
         self.assertEqual([-64.9, -64.7], view.initial_values["v"])
         sim.end()
 
