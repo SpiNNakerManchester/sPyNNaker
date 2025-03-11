@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List
+
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.defaults import (
     AbstractProvidesDefaults, default_parameters, default_initial_values)
@@ -20,76 +22,88 @@ import re
 # pylint: disable=no-member
 
 
-def test_nothing():
+def test_nothing() -> None:
     unittest_setup()
 
     class _AClass(AbstractProvidesDefaults):
-        def __init__(self, param_1=1, param_2=2, param_3=3):
+        def __init__(
+                self, param_1: int = 1, param_2: int = 2,
+                param_3: int = 3) -> None:
             pass
+
     assert (_AClass.default_parameters == {
         "param_1": 1, "param_2": 2, "param_3": 3})
     assert _AClass.default_initial_values == {}
 
 
-def test_parameters():
+def test_parameters() -> None:
     unittest_setup()
 
     class _AClass(AbstractProvidesDefaults):
 
         @default_parameters({"param_1"})
-        def __init__(self, param_1=1, param_2=2, param_3=3):
+        def __init__(
+                self, param_1: int = 1, param_2: int = 2, param_3: int = 3) -> None:
             pass
+
     assert _AClass.default_parameters == {"param_1": 1}
     assert _AClass.default_initial_values == {"param_2": 2, "param_3": 3}
 
 
-def test_state_variables():
+def test_state_variables() -> None:
     unittest_setup()
 
     class _AClass(AbstractProvidesDefaults):
 
         @default_initial_values({"param_1"})
-        def __init__(self, param_1=1, param_2=2, param_3=3):
+        def __init__(self, param_1: int = 1, param_2: int = 2,
+                     param_3: int = 3) -> None:
             pass
+
     assert _AClass.default_initial_values == {"param_1": 1}
     assert _AClass.default_parameters == {"param_2": 2, "param_3": 3}
 
 
-def test_both():
+def test_both() -> None:
     unittest_setup()
 
     class _AClass(AbstractProvidesDefaults):
 
         @default_parameters({"param_1"})
         @default_initial_values({"param_2"})
-        def __init__(self, param_1=1, param_2=2, param_3=3):
+        def __init__(self, param_1: int = 1, param_2: int = 2,
+                     param_3: int = 3) -> None:
             pass
 
     class _AnotherClass(AbstractProvidesDefaults):
 
         @default_initial_values({"param_1"})
         @default_parameters({"param_2"})
-        def __init__(self, param_1=1, param_2=2, param_3=3):
+        def __init__(self, param_1: int = 1, param_2: int = 2,
+                     param_3: int = 3) -> None:
             pass
+
     assert _AClass.default_parameters == {"param_1": 1}
     assert _AClass.default_initial_values == {"param_2": 2}
     assert _AnotherClass.default_parameters == {"param_2": 2}
     assert _AnotherClass.default_initial_values == {"param_1": 1}
 
 
-def test_setting_state_variables():
+def test_setting_state_variables() -> None:
     unittest_setup()
 
     class _AClass(AbstractProvidesDefaults):
 
         @default_parameters({"param_1"})
-        def __init__(self, param_1=1, param_2=2, param_3=3):
+        def __init__(self, param_1: int = 1, param_2: int = 2,
+                     param_3: int = 3) -> None:
             pass
 
     class _AnotherClass(AbstractProvidesDefaults):
 
         @default_initial_values({"param_1"})
-        def __init__(self, param_1=1, param_2=2, param_3=3):
+        def __init__(self, param_1: int = 1, param_2: int = 2,
+                     param_3: int = 3) -> None:
             pass
 
     with LogCapture() as lc:
@@ -113,7 +127,7 @@ def test_setting_state_variables():
         _AnotherClass(param_3=3)
 
 
-def _check_warnings(lc, expected, not_expected):
+def _check_warnings(lc: LogCapture, expected: List[str], not_expected: List[str]) -> None:
     line_matcher = re.compile(
         "Formal PyNN specifies that (.*) should be set using initial_values"
         " not cell_params")

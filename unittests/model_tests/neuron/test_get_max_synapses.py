@@ -21,7 +21,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
 import pyNN.spiNNaker as sim
 
 
-def test_get_max_synapses():
+def test_get_max_synapses() -> None:
     unittest_setup()
     sim.setup()
     d = SynapseDynamicsSTDP(timing_dependence=TimingDependenceSpikePair(),

@@ -13,7 +13,7 @@
 # limitations under the License.
 import shutil
 import struct
-from typing import BinaryIO, Optional, Tuple, Union
+from typing import BinaryIO, List, Optional, Sequence, Tuple, Union
 import unittest
 from tempfile import mkdtemp
 import numpy
@@ -34,7 +34,7 @@ from spinn_front_end_common.interface.interface_functions import (
     load_application_data_specs)
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neuron.synaptic_matrices import (
-    SynapticMatrices, SynapseRegions)
+    SynapticMatrices, SynapseRegions, SynapseRegionReferences)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
     SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic,
@@ -431,14 +431,16 @@ def test_set_synapse_dynamics():
         (range(100), [], 10000, 5, None)
     ])
 def test_pop_based_master_pop_table_standard(
-        undelayed_indices_connected, delayed_indices_connected,
-        n_pre_neurons, neurons_per_core, max_delay):
+        undelayed_indices_connected: Sequence[int],
+        delayed_indices_connected: Sequence[int],
+        n_pre_neurons: int, neurons_per_core: int,
+        max_delay: Optional[int]) -> None:
     unittest_setup()
     set_config("Machine", "versions", VersionStrings.FOUR_PLUS.text)
     writer = SpynnakerDataWriter.mock()
 
     # Build a from list connector with the delays we want
-    connections = []
+    connections: List[Tuple[int, int, int, Optional[int]]] = []
     connections.extend([(i * neurons_per_core + j, j, 0, 10)
                         for i in undelayed_indices_connected
                         for j in range(100)])
@@ -482,21 +484,18 @@ def test_pop_based_master_pop_table_standard(
             synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
             bitfield_filter=8,
             synaptic_matrix=1, pop_table=3, connection_builder=4)
-        references = SynapseRegions(
-            synapse_params=None, synapse_dynamics=None,
-            structural_dynamics=None, bitfield_filter=None,
-            synaptic_matrix=None, pop_table=None, connection_builder=None)
         synaptic_matrices = SynapticMatrices(
             post_pop._vertex, regions, max_atoms_per_core=neurons_per_core,
-            weight_scales=[32, 32], all_syn_block_sz=10000000)
+            weight_scales=numpy.array([32, 32]), all_syn_block_sz=10000000)
         synaptic_matrices.generate_data()
         synaptic_matrices.write_synaptic_data(
-            spec, post_vertex_slice, references)
+            spec, post_vertex_slice, SynapseRegionReferences())
 
         # Read the population table and check entries
         info = list(db.get_region_pointers_and_content(1, 0, 3))
     region, _, region_data = info[1]
     assert region == 3
+    assert region_data is not None
     mpop_data = numpy.frombuffer(region_data, dtype="uint8").view("uint32")
     n_entries = mpop_data[0]
     n_addresses = mpop_data[1]
