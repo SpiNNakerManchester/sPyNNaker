@@ -461,7 +461,7 @@ def convert_to_connections(
 def read_all_synapses(
         data: NDArray[uint32], delayed_data: NDArray[uint32],
         synapse_info: SynapseInformation, n_synapse_types: int,
-        weight_scales: NDArray[floating], post_vertex_slice: Slice,
+        weight_scales: WeightScales, post_vertex_slice: Slice,
         n_pre_atoms: int, post_vertex_max_delay_ticks: int,
         max_row_info: MaxRowInfo, max_atoms_per_core: int
         ) -> ConnectionsArray:
@@ -477,7 +477,7 @@ def read_all_synapses(
         The synapse info that generated the synapses
     :param int n_synapse_types:
         The total number of synapse types available
-    :param list(float) weight_scales:
+    :param weight_scales:
         A weight scale for each synapse type
     :param int n_pre_atoms: The number of atoms in the pre-vertex
     :param ~pacman.model.graphs.common.Slice post_vertex_slice:
