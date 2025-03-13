@@ -99,7 +99,7 @@ class _MockTransceiverinOut(MockableTransceiver):
         return datum
 
 
-def say_false(self, *args: Any, **kwargs: Any) -> bool:
+def say_false(*args: Any, **kwargs: Any) -> bool:
     return False
 
 
@@ -108,7 +108,8 @@ def test_write_data_spec() -> None:
     set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = SpynnakerDataWriter.mock()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
-    AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
+    AbstractGenerateConnectorOnMachine.\
+        generate_on_machine = (say_false)   # type: ignore[method-assign]
 
     set_config("Machine", "enable_advanced_monitor_support", "False")
     set_config("Java", "use_java", "False")
