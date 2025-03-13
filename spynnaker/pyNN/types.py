@@ -44,7 +44,7 @@ IoDest: TypeAlias = Union[
 ViewIndices = Union[None, Sequence[int], NDArray[numpy.integer]]
 #: :meta private:
 Selector: TypeAlias = Union[
-    None, int, slice, List[int], List[bool], NDArray[numpy.bool_],
+    None, int, slice, Sequence[int], List[bool], NDArray[numpy.bool_],
     NDArray[numpy.integer]]
 
 WeightScales: TypeAlias = Union[NDArray[numpy.floating], Sequence[float]]

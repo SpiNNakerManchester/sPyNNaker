@@ -199,9 +199,6 @@ class PopulationView(PopulationBase):
     def mask(self) -> Selector:
         """
         The selector mask that was used to create this view.
-
-        :rtype: None or slice or int or list(bool) or list(int) or
-            ~numpy.ndarray(bool) or ~numpy.ndarray(int)
         """
         return self.__mask
 
