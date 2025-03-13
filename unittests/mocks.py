@@ -12,20 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
+from typing import List, Mapping, Optional, Sequence, Tuple, Union
 from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged import RangeDictionary
 
+from spinn_front_end_common.interface.ds import DataType
+
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    SplitterAbstractPopulationVertex)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.neural_projections import (
         SynapseInformation)
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
+from spynnaker.pyNN.models.neuron import AbstractPopulationVertex, \
+    AbstractPyNNNeuronModel
+from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
 from spynnaker.pyNN.models.populations import Population
-
+from spynnaker.pyNN.utilities.struct import Struct
 
 class MockPopulation(Population):
 
@@ -67,6 +75,112 @@ class MockVertex(PopulationApplicationVertex):
     @overrides(PopulationApplicationVertex.n_atoms)
     def n_atoms(self) -> int:
         raise NotImplementedError
+
+
+class MockNeuronImp(AbstractNeuronImpl):
+    @property
+    @overrides(AbstractNeuronImpl.model_name)
+    def model_name(self) -> str:
+        raise NotImplementedError
+
+    @property
+    @overrides(AbstractNeuronImpl.binary_name)
+    def binary_name(self) -> str:
+        raise NotImplementedError
+
+    @property
+    @overrides(AbstractNeuronImpl.structs)
+    def structs(self) -> Sequence[Struct]:
+        raise NotImplementedError
+
+    @overrides(AbstractNeuronImpl.get_global_weight_scale)
+    def get_global_weight_scale(self) -> float:
+        raise NotImplementedError
+
+    @overrides(AbstractNeuronImpl.get_n_synapse_types)
+    def get_n_synapse_types(self) -> int:
+        raise NotImplementedError
+
+    @overrides(AbstractNeuronImpl.get_synapse_id_by_target)
+    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+        raise NotImplementedError
+
+    @overrides(AbstractNeuronImpl.get_synapse_targets)
+    def get_synapse_targets(self) -> Sequence[str]:
+        raise NotImplementedError
+
+    @overrides(AbstractNeuronImpl.get_recordable_variables)
+    def get_recordable_variables(self) -> Sequence[str]:
+        return []
+
+    @overrides(AbstractNeuronImpl.get_recordable_units)
+    def get_recordable_units(self, variable: str) -> str:
+        raise NotImplementedError
+
+    @overrides(AbstractNeuronImpl.get_recordable_data_types)
+    def get_recordable_data_types(self) -> Mapping[str, DataType]:
+        return {}
+
+    @overrides(AbstractNeuronImpl.is_recordable)
+    def is_recordable(self, variable: str) -> bool:
+        raise NotImplementedError
+
+    @overrides(AbstractNeuronImpl.get_recordable_variable_index)
+    def get_recordable_variable_index(self, variable: str) -> int:
+        raise NotImplementedError
+
+    @overrides(AbstractNeuronImpl.add_parameters)
+    def add_parameters(self, parameters: RangeDictionary) -> None:
+        pass
+
+    @overrides(AbstractNeuronImpl.add_state_variables)
+    def add_state_variables(self,
+                            state_variables: RangeDictionary) -> None:
+        pass
+
+    @overrides(AbstractNeuronImpl.get_units)
+    def get_units(self, variable: str) -> str:
+        raise NotImplementedError
+
+    @property
+    @overrides(AbstractNeuronImpl.is_conductance_based)
+    def is_conductance_based(self) -> bool:
+        raise NotImplementedError
+
+
+class MockApvVertex(AbstractPopulationVertex):
+
+    def __init__(
+            self, *, n_neurons: int = 1, label: str = "test",
+            max_atoms_per_core: Union[int, Tuple[int, ...]] = 255,
+            spikes_per_second: Optional[float] = None,
+            ring_buffer_sigma: Optional[float] = None,
+            max_expected_summed_weight: Optional[List[float]] = None,
+            incoming_spike_buffer_size: Optional[int] = None,
+            neuron_impl: Optional[AbstractNeuronImpl] = None,
+            pynn_model: Optional[AbstractPyNNNeuronModel] = None,
+            drop_late_spikes: bool = False,
+            splitter: Optional[SplitterAbstractPopulationVertex] = None,
+            seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
+            extra_partitions: Optional[List[str]] = None):
+        if neuron_impl is None:
+            if pynn_model is not None:
+                neuron_impl = pynn_model._model
+            else:
+                neuron_impl = MockNeuronImp()
+        if pynn_model is None:
+            pynn_model = AbstractPyNNNeuronModel(model=neuron_impl)
+        super().__init__(
+            n_neurons=n_neurons, label=label,
+            max_atoms_per_core=max_atoms_per_core,
+            spikes_per_second=spikes_per_second,
+            ring_buffer_sigma=ring_buffer_sigma,
+            max_expected_summed_weight=max_expected_summed_weight,
+            incoming_spike_buffer_size=incoming_spike_buffer_size,
+            neuron_impl=neuron_impl,
+            pynn_model=pynn_model, drop_late_spikes=drop_late_spikes,
+            splitter=splitter, seed=seed, n_colour_bits=n_colour_bits,
+            extra_partitions=extra_partitions)
 
 
 class MockSynapseDynamics(AbstractSynapseDynamics):
