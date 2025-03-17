@@ -23,45 +23,24 @@ from spinn_utilities.ranged import RangeDictionary
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, AbstractPyNNNeuronModelStandard)
-from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
+from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
+
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 
+from unittests.mocks import (
+    MockInputType, MockSynapseType, MockThresholdType)
 
-class EmptyNeuronComponent(AbstractStandardNeuronComponent):
-    def __init__(self) -> None:
+
+class _MyNeuronModel(NeuronModel):
+    def __init__(self, foo: int, bar: int):
         super().__init__([], {})
-
-    def add_parameters(self, parameters):
-        pass
-
-    def add_state_variables(self, state_variables):
-        pass
-
-
-class EmptySynapseType(AbstractSynapseType, EmptyNeuronComponent):
-    @overrides(AbstractSynapseType.get_n_synapse_types)
-    def get_n_synapse_types(self) -> int:
-        return 0
-
-    @overrides(AbstractSynapseType.get_synapse_targets)
-    def get_synapse_targets(self) -> Sequence[str]:
-        return []
-
-    @overrides(AbstractSynapseType.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
-        return None
-
-
-class _MyNeuronModel(AbstractStandardNeuronComponent):
-    def __init__(self, foo, bar):
-        super().__init__([], [])
         self._foo = foo
         self._bar = bar
 
     @overrides(AbstractStandardNeuronComponent.add_parameters)
-    def add_parameters(self, parameters):
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
         pass
 
     @overrides(AbstractStandardNeuronComponent.add_state_variables)
@@ -73,10 +52,10 @@ class _MyNeuronModel(AbstractStandardNeuronComponent):
 
 class FooBar(AbstractPyNNNeuronModelStandard):
     @default_initial_values({"foo", "bar"})
-    def __init__(self, foo=1, bar=11):
+    def __init__(self, foo:int = 1, bar: int = 11):
         super().__init__(
             "FooBar", "foobar.aplx", _MyNeuronModel(foo, bar),
-            EmptyNeuronComponent(), EmptySynapseType(), EmptyNeuronComponent())
+            MockInputType(), MockSynapseType(), MockThresholdType())
 
 
 class MockNeuron(AbstractPopulationVertex):
@@ -92,7 +71,7 @@ class MockNeuron(AbstractPopulationVertex):
             n_colour_bits=None)
 
 
-def test_initializable():
+def test_initializable() -> None:
     unittest_setup()
     sim.setup(1.0)
     neuron = MockNeuron()
@@ -101,7 +80,7 @@ def test_initializable():
     assert [11, 11, 11, 11, 11] == neuron.get_initial_state_values("bar")
 
 
-def test_init_by_in():
+def test_init_by_in() -> None:
     unittest_setup()
     sim.setup(1.0)
     neuron = MockNeuron()
@@ -114,16 +93,17 @@ def test_init_by_in():
     assert 12 == neuron.get_initial_state_values("foo", selector=2)
 
 
-def test_init_bad():
+def test_init_bad() -> None:
     unittest_setup()
     neuron = MockNeuron()
     with pytest.raises(KeyError):
         neuron.get_initial_state_values("badvariable")
     with pytest.raises(KeyError):
-        assert 1 == neuron.set_initial_state_values("anotherbad", "junk")
+        assert 1 == neuron.set_initial_state_values(
+            "anotherbad", "junk")  # type: ignore[arg-type]
 
 
-def test_initial_values():
+def test_initial_values()  -> None:
     unittest_setup()
     sim.setup(1.0)
     neuron = MockNeuron()

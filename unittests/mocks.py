@@ -29,11 +29,17 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex, \
     AbstractPyNNNeuronModel
-from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractNeuronImpl, AbstractStandardNeuronComponent)
+from spynnaker.pyNN.models.neuron.input_types import AbstractInputType
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
+from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
+from spynnaker.pyNN.models.neuron.threshold_types import (
+    AbstractThresholdType)
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.utilities.struct import Struct
+from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
 
 class MockPopulation(Population):
 
@@ -232,3 +238,46 @@ class MockConnector(AbstractConnector):
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
         raise NotImplementedError
+
+
+class MockNeuronComponent(AbstractStandardNeuronComponent):
+    def __init__(self) -> None:
+        super().__init__([], {})
+
+    @overrides(AbstractStandardNeuronComponent.add_parameters)
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
+        pass
+
+    @overrides(AbstractStandardNeuronComponent.add_state_variables)
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
+        pass
+
+
+class MockInputType(MockNeuronComponent, AbstractInputType):
+
+    @overrides(AbstractInputType.get_global_weight_scale)
+    def get_global_weight_scale(self) -> float:
+       raise NotImplementedError
+
+
+class MockThresholdType(MockNeuronComponent, AbstractThresholdType):
+    pass
+
+
+class MockSynapseType(MockNeuronComponent, AbstractSynapseType):
+    @overrides(AbstractSynapseType.get_n_synapse_types)
+    def get_n_synapse_types(self) -> int:
+        raise NotImplementedError
+        return 0
+
+    @overrides(AbstractSynapseType.get_synapse_targets)
+    def get_synapse_targets(self) -> Sequence[str]:
+        raise NotImplementedError
+        return []
+
+    @overrides(AbstractSynapseType.get_synapse_id_by_target)
+    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+        raise NotImplementedError
+        return None
+
