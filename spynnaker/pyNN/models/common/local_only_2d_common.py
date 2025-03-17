@@ -28,6 +28,7 @@ from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron import PopulationVertex
     from spynnaker.pyNN.models.projection import Projection
 
 #: The number of bits in a short value
