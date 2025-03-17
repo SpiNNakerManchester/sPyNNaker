@@ -99,7 +99,7 @@ from .synapse_io import get_max_row_info
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterAbstractPopulationVertex)
+        SplitterPopulationVertex)
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
     from spynnaker.pyNN.models.neural_projections import (
         SynapseInformation, ProjectionApplicationEdge)
@@ -245,7 +245,7 @@ class PopulationVertex(
             incoming_spike_buffer_size: Optional[int],
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel, drop_late_spikes: bool,
-            splitter: Optional[SplitterAbstractPopulationVertex],
+            splitter: Optional[SplitterPopulationVertex],
             seed: Optional[int], n_colour_bits: Optional[int],
             extra_partitions: Optional[List[str]] = None):
         """
@@ -270,7 +270,7 @@ class PopulationVertex(
         :param AbstractPyNNNeuronModel pynn_model:
             The PyNN neuron model that this vertex is working on behalf of.
         :param splitter: splitter object
-        :type splitter: SplitterAbstractPopulationVertex or None
+        :type splitter: SplitterPopulationVertex or None
         :param seed:
             The Population seed, used to ensure the same random generation
             on each run.
@@ -394,15 +394,15 @@ class PopulationVertex(
 
     @property  # type: ignore[override]
     @overrides(PopulationApplicationVertex.splitter)
-    def splitter(self) -> SplitterAbstractPopulationVertex:
+    def splitter(self) -> SplitterPopulationVertex:
         s = self._splitter
         if s is None:
             raise PacmanConfigurationException(
                 f"The splitter object on {self._label} has not yet been set.")
-        return cast('SplitterAbstractPopulationVertex', s)
+        return cast('SplitterPopulationVertex', s)
 
     @splitter.setter
-    def splitter(self, splitter: SplitterAbstractPopulationVertex) -> None:
+    def splitter(self, splitter: SplitterPopulationVertex) -> None:
         if self._splitter == splitter:
             return
         if self.has_splitter:
@@ -412,7 +412,7 @@ class PopulationVertex(
         # Circularity
         # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.extra_algorithms.splitter_components import (
-            SplitterAbstractPopulationVertex as ValidSplitter)
+            SplitterPopulationVertex as ValidSplitter)
         if not isinstance(splitter, ValidSplitter):
             raise PacmanConfigurationException(
                 f"The splitter object on {self._label} must be set to one "

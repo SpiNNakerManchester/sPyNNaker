@@ -29,7 +29,7 @@ from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 MAX_RING_BUFFER_BITS = 14
 
 
-class SplitterAbstractPopulationVertex(
+class SplitterPopulationVertex(
         AbstractSplitterCommon[PopulationVertex],
         AbstractSpynnakerSplitterDelay):
     """

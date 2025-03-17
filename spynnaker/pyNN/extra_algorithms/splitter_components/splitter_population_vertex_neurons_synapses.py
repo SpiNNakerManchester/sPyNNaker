@@ -78,7 +78,7 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
 
 from .splitter_poisson_delegate import SplitterPoissonDelegate
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
-from .splitter_abstract_pop_vertex import SplitterAbstractPopulationVertex
+from .splitter_population_vertex import SplitterPopulationVertex
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
 
@@ -92,8 +92,8 @@ MAX_RING_BUFFER_BITS = 14
 _MAX_CORES = 15
 
 
-class SplitterAbstractPopulationVertexNeuronsSynapses(
-        SplitterAbstractPopulationVertex, AbstractSupportsOneToOneSDRAMInput):
+class SplitterPopulationVertexNeuronsSynapses(
+        SplitterPopulationVertex, AbstractSupportsOneToOneSDRAMInput):
     """
     Splits an :py:class:`PopulationVertex` so that there are separate
     neuron cores each being fed by one or more synapse cores.  Incoming
@@ -818,7 +818,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 BYTES_PER_WORD))
         return sdram
 
-    @overrides(SplitterAbstractPopulationVertex._update_max_delay)
+    @overrides(SplitterPopulationVertex._update_max_delay)
     def _update_max_delay(self) -> None:
         # Find the maximum delay from incoming synapses
         self._max_delay, needs_delay_extension = \

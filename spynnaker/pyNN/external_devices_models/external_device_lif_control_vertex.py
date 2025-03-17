@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
     from .abstract_ethernet_translator import AbstractEthernetTranslator
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterAbstractPopulationVertex)
+        SplitterPopulationVertex)
 
 
 class ExternalDeviceLifControlVertex(
@@ -65,7 +65,7 @@ class ExternalDeviceLifControlVertex(
             max_expected_summed_weight: Optional[List[float]] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: Optional[bool] = None,
-            splitter: Optional[SplitterAbstractPopulationVertex] = None,
+            splitter: Optional[SplitterPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None):
         """
         :param list(AbstractMulticastControllableDevice) devices:
@@ -86,7 +86,7 @@ class ExternalDeviceLifControlVertex(
         :param float ring_buffer_sigma:
         :param int incoming_spike_buffer_size:
         :param splitter: splitter from application vertices to machine vertices
-        :type splitter: SplitterAbstractPopulationVertex or None
+        :type splitter: SplitterPopulationVertex or None
         :param int n_colour_bits: The number of colour bits to use
         """
         # pylint: disable=too-many-arguments

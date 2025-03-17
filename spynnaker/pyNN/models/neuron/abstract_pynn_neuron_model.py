@@ -20,7 +20,7 @@ from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterAbstractPopulationVertex)
+        SplitterPopulationVertex)
 
 # The maximum atoms per core is the master population table row length to
 # make it easier when all-to-all-connector is used
@@ -62,7 +62,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             max_expected_summed_weight: Optional[List[float]] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: Optional[bool] = None,
-            splitter: Optional[SplitterAbstractPopulationVertex] = None,
+            splitter: Optional[SplitterPopulationVertex] = None,
             seed: Optional[int] = None,
             n_colour_bits: Optional[int] = None) -> PopulationVertex:
         """
@@ -71,7 +71,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         :param int incoming_spike_buffer_size:
         :param bool drop_late_spikes:
         :param splitter:
-        :type splitter: SplitterAbstractPopulationVertex or None
+        :type splitter: SplitterPopulationVertex or None
         :param int seed:
         :param int n_colour_bits:
         """

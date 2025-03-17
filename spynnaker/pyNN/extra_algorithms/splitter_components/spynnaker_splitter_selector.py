@@ -25,11 +25,11 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron import PopulationVertex
 from spynnaker.pyNN.models.spike_source import (
     SpikeSourceArrayVertex, SpikeSourcePoissonVertex)
-from .splitter_abstract_pop_vertex_fixed import (
-    SplitterAbstractPopulationVertexFixed)
+from .splitter_population_vertex_fixed import (
+    SplitterPopulationVertexFixed)
 from .splitter_poisson_delegate import SplitterPoissonDelegate
-from .splitter_abstract_pop_vertex_neurons_synapses import (
-    SplitterAbstractPopulationVertexNeuronsSynapses)
+from .splitter_population_vertex_neurons_synapses import (
+    SplitterPopulationVertexNeuronsSynapses)
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 
 PROGRESS_BAR_NAME = "Adding Splitter selectors where appropriate"
@@ -44,7 +44,7 @@ def spynnaker_splitter_selector() -> None:
     Add a splitter to every vertex that doesn't already have one.
 
     The default for :py:class:`PopulationVertex` is the
-    :py:class:`SplitterAbstractPopulationVertexFixed`.
+    :py:class:`SplitterPopulationVertexFixed`.
     The default for external device splitters are
     :py:class:`~pacman.model.partitioner_splitters.SplitterExternalDevice`.
     The default for the rest is the
@@ -73,10 +73,10 @@ def spynnaker_vertex_selector(app_vertex: ApplicationVertex) -> None:
     if not app_vertex.has_splitter:
         if isinstance(app_vertex, PopulationVertex):
             if app_vertex.combined_core_capable:
-                app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
+                app_vertex.splitter = SplitterPopulationVertexFixed()
             else:
                 app_vertex.splitter = (
-                    SplitterAbstractPopulationVertexNeuronsSynapses(
+                    SplitterPopulationVertexNeuronsSynapses(
                         app_vertex.n_synapse_cores_required))
         elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
             app_vertex.splitter = SplitterExternalDevice()
