@@ -34,21 +34,24 @@ from spynnaker.pyNN.models.neuron.implementations import (
 from spynnaker.pyNN.models.neuron.input_types import AbstractInputType
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
-from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
 from spynnaker.pyNN.models.neuron.threshold_types import (
     AbstractThresholdType)
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
 
+
 class MockPopulation(Population):
 
-    def __init__(self, size, label, vertex=None):
+    def __init__(self, size: int, label: str,
+                 vertex: Optional[PopulationApplicationVertex]=None):
         self._size = size
         self._label = label
-        self._mock_vertex = vertex
+        self._mock_vertex: PopulationApplicationVertex
         if vertex is None:
             self._mock_vertex = MockVertex()
+        else:
+            self._mock_vertex = vertex
 
     @property
     @overrides(Population.size)

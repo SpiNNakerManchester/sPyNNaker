@@ -15,7 +15,7 @@ import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run():
+def do_run() -> None:
     p.setup(1.0)
     n_neurons = 2
 

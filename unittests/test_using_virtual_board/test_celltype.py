@@ -14,9 +14,10 @@
 
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 
-def before_run(nNeurons):
+def before_run(nNeurons: int) -> AbstractPyNNModel:
     p.setup(timestep=1, min_delay=1)
 
     neuron_parameters = {'cm': 0.25, 'i_offset': 2, 'tau_m': 10.0,

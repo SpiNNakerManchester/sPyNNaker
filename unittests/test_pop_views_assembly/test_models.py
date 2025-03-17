@@ -78,7 +78,7 @@ class TestPopulation(BaseTestCase):
     def test_model_fail_to_set_neuron_param_function(self) -> None:
         n_neurons = 5
 
-        def _silly_funct():
+        def _silly_funct() -> int:
             return 5
 
         value = _silly_funct()

@@ -16,7 +16,7 @@ import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run():
+def do_run() -> None:
     p.setup(0.1)
     runtime = 50
     populations = []

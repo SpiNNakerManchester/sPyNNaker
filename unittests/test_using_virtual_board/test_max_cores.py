@@ -17,7 +17,7 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spinnaker_testbase import BaseTestCase
 
 
-def before_run(nNeurons):
+def before_run(nNeurons: int) -> None:
     sim.setup(timestep=1, min_delay=1)
 
     neuron_parameters = {'cm': 0.25, 'i_offset': 2, 'tau_m': 10.0,

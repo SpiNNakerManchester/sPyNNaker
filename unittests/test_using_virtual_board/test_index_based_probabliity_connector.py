@@ -15,13 +15,16 @@
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 
+from spynnaker.pyNN.models.projection import Projection
+
 WEIGHT = 5
 DELAY = 2
 
 
 class TestIndexBasedProbabilityConnector(BaseTestCase):
 
-    def check_weights(self, projection, n, expression, allow_self_connections):
+    def check_weights(self, projection: Projection, n: int, expression: str,
+                      allow_self_connections: bool) -> None:
         weights = projection.get(["weight"], "list")
         pairs = [(s, d) for (s, d, _) in weights]
         must_count = 0
@@ -45,7 +48,7 @@ class TestIndexBasedProbabilityConnector(BaseTestCase):
         # Check not all the maybes connected
         self.assertGreaterEqual(len(weights), must_count)
 
-    def check_connect(self, n, expression):
+    def check_connect(self, n: int, expression: str) -> None:
         sim.setup(1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 10)
         pop1 = sim.Population(
@@ -60,7 +63,7 @@ class TestIndexBasedProbabilityConnector(BaseTestCase):
         self.check_weights(projection, n, expression, True)
         sim.end()
 
-    def check_connect_no_self(self, n, expression):
+    def check_connect_no_self(self, n: int, expression: str) -> None:
         sim.setup(1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 10)
         pop = sim.Population(n, sim.IF_curr_exp(), label="pop")

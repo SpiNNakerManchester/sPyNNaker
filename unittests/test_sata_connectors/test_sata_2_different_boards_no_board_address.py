@@ -20,7 +20,7 @@ import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run():
+def do_run() -> None:
     # Setup
     p.setup(timestep=1.0)
 

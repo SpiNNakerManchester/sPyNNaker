@@ -30,7 +30,8 @@ from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FromListConnector)
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
-from unittests.mocks import MockConnector, MockPopulation, MockSynapseDynamics
+from unittests.mocks import (
+    MockConnector, MockPopulation, MockSynapseDynamics, MockVertex)
 
 
 @pytest.mark.parametrize(
@@ -192,7 +193,7 @@ class MockSplitter(AbstractSplitterCommon):
         raise NotImplementedError
 
 
-class MockAppVertex(ApplicationVertex):
+class MockAppVertex(MockVertex):
 
     def __init__(self, n_atoms: int, slices: List[Slice]):
         super().__init__(splitter = MockSplitter(slices, self))

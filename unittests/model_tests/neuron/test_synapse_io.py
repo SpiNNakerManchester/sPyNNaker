@@ -29,7 +29,8 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditive)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceSpikePair)
-from unittests.mocks import MockApvVertex, MockConnector, MockPopulation, MockVertex
+from unittests.mocks import (
+    MockApvVertex, MockConnector, MockPopulation, MockVertex)
 
 # No unittest_setup as sim.setup must be called before SynapseDynamicsStatic
 

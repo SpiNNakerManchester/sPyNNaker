@@ -30,7 +30,8 @@ class TestMultipleStdpMechsOnSameNeuron(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def run_multiple_stdp_mechs_on_same_neuron(self, mode="same"):
+    def run_multiple_stdp_mechs_on_same_neuron(
+            self, mode: str = "same") -> None:
         p.setup(timestep=1.0, min_delay=1.0)
         nNeurons = 200  # number of neurons in each population
 

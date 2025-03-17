@@ -94,7 +94,7 @@ class ExternalDeviceLifControlVertex(
             drop_late_spikes = False
         extra_partition_ids = [
             dev.device_control_partition_id for dev in devices]
-        super().__init__(
+        super(). __init__(
             n_neurons=len(devices),
             label=f"ext_dev{devices}" if label is None else label,
             max_atoms_per_core=max_atoms_per_core,
