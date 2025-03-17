@@ -95,7 +95,7 @@ _MAX_CORES = 15
 class SplitterAbstractPopulationVertexNeuronsSynapses(
         SplitterAbstractPopulationVertex, AbstractSupportsOneToOneSDRAMInput):
     """
-    Splits an :py:class:`AbstractPopulationVertex` so that there are separate
+    Splits an :py:class:`PopulationVertex` so that there are separate
     neuron cores each being fed by one or more synapse cores.  Incoming
     one-to-one Poisson cores are also added here if they meet the criteria.
     """

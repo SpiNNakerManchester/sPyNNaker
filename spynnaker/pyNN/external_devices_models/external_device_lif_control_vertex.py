@@ -21,7 +21,7 @@ from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.abstract_models import (
     AbstractVertexWithEdgeToDependentVertices, HasCustomAtomKeyMap)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron import PopulationVertex
 from .abstract_ethernet_controller import AbstractEthernetController
 from .abstract_multicast_controllable_device import (
     AbstractMulticastControllableDevice)
@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
 
 class ExternalDeviceLifControlVertex(
-        AbstractPopulationVertex,
+        PopulationVertex,
         AbstractEthernetController,
         AbstractVertexWithEdgeToDependentVertices,
         HasCustomAtomKeyMap):
@@ -164,7 +164,7 @@ class ExternalDeviceLifControlVertex(
         device = self.__devices[partition_id]
         return [(index, device.device_control_key)]
 
-    @overrides(AbstractPopulationVertex.get_fixed_key_and_mask)
+    @overrides(PopulationVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(
             self, partition_id: str) -> Optional[BaseKeyAndMask]:
         return BaseKeyAndMask(

@@ -22,7 +22,7 @@ from spinn_front_end_common.interface.splitter_selectors import (
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron import PopulationVertex
 from spynnaker.pyNN.models.spike_source import (
     SpikeSourceArrayVertex, SpikeSourcePoissonVertex)
 from .splitter_abstract_pop_vertex_fixed import (
@@ -43,7 +43,7 @@ def spynnaker_splitter_selector() -> None:
     """
     Add a splitter to every vertex that doesn't already have one.
 
-    The default for :py:class:`AbstractPopulationVertex` is the
+    The default for :py:class:`PopulationVertex` is the
     :py:class:`SplitterAbstractPopulationVertexFixed`.
     The default for external device splitters are
     :py:class:`~pacman.model.partitioner_splitters.SplitterExternalDevice`.
@@ -71,7 +71,7 @@ def spynnaker_vertex_selector(app_vertex: ApplicationVertex) -> None:
         application vertex to give a splitter object to
     """
     if not app_vertex.has_splitter:
-        if isinstance(app_vertex, AbstractPopulationVertex):
+        if isinstance(app_vertex, PopulationVertex):
             if app_vertex.combined_core_capable:
                 app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
             else:

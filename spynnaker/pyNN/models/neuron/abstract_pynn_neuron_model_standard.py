@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
     from spynnaker.pyNN.models.neuron.threshold_types import (
         AbstractThresholdType)
-    from .abstract_population_vertex import AbstractPopulationVertex
+    from .population_vertex import PopulationVertex
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
         SplitterAbstractPopulationVertex)
 
@@ -79,7 +79,7 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterAbstractPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
-            n_steps_per_timestep: int = 1) -> AbstractPopulationVertex:
+            n_steps_per_timestep: int = 1) -> PopulationVertex:
         """
         :param int n_steps_per_timestep:
         """

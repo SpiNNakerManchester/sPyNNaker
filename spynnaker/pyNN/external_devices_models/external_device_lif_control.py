@@ -18,7 +18,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterAbstractPopulationVertex)
 from spynnaker.pyNN.models.neuron import (
-    AbstractPopulationVertex, AbstractPyNNNeuronModelStandard)
+    PopulationVertex, AbstractPyNNNeuronModelStandard)
 from spynnaker.pyNN.models.defaults import (
     default_initial_values, default_parameters)
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
@@ -115,7 +115,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterAbstractPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
-            n_steps_per_timestep: int = 1) -> AbstractPopulationVertex:
+            n_steps_per_timestep: int = 1) -> PopulationVertex:
         if n_neurons != len(self._devices):
             raise ConfigurationException(
                 "Number of neurons does not match number of "

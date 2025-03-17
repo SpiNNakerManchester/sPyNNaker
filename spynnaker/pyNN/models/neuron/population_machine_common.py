@@ -39,7 +39,7 @@ from spinn_front_end_common.interface.profiling import (
     AbstractHasProfileData, ProfileData)
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 if TYPE_CHECKING:
-    from .abstract_population_vertex import AbstractPopulationVertex
+    from .population_vertex import PopulationVertex
 
 
 class CommonRegions(NamedTuple):
@@ -80,13 +80,13 @@ class PopulationMachineCommon(
         "__binary_file_name")
 
     def __init__(
-            self, label: str, app_vertex: AbstractPopulationVertex,
+            self, label: str, app_vertex: PopulationVertex,
             vertex_slice: Slice, sdram: AbstractSDRAM, regions: CommonRegions,
             n_provenance_items: int, profile_tags: Mapping[int, str],
             binary_file_name: str):
         """
         :param str label: The label of the vertex
-        :param AbstractPopulationVertex app_vertex:
+        :param PopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
@@ -112,8 +112,8 @@ class PopulationMachineCommon(
         return self.__sdram
 
     @property
-    def _pop_vertex(self) -> AbstractPopulationVertex:
-        return cast('AbstractPopulationVertex', self._app_vertex)
+    def _pop_vertex(self) -> PopulationVertex:
+        return cast('PopulationVertex', self._app_vertex)
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)

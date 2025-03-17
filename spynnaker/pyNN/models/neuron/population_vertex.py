@@ -177,7 +177,7 @@ def _is_structural(dynamics: AbstractSynapseDynamics
     return isinstance(dynamics, AbstractSynapseDynamicsStructural)
 
 
-class AbstractPopulationVertex(
+class PopulationVertex(
         PopulationApplicationVertex, AbstractAcceptsIncomingSynapses,
         AbstractCanReset, SupportsStructure):
     """
@@ -417,7 +417,7 @@ class AbstractPopulationVertex(
         if not isinstance(splitter, ValidSplitter):
             raise PacmanConfigurationException(
                 f"The splitter object on {self._label} must be set to one "
-                "capable of handling an AbstractPopulationVertex.")
+                "capable of handling an PopulationVertex.")
         self._splitter = cast(Any, splitter)
         splitter.set_governed_app_vertex(self)
 
@@ -1838,7 +1838,7 @@ class _Stats(object):
         stats = self.running_totals[s_type]
         rates = self.rate_stats[s_type]
         # pylint: disable=protected-access
-        w_max = AbstractPopulationVertex._ring_buffer_expected_upper_bound(
+        w_max = PopulationVertex._ring_buffer_expected_upper_bound(
             stats.mean, stats.standard_deviation, rates.mean,
             stats.n_items, self.ring_buffer_sigma)
         w_max = min(w_max, self.total_weights[s_type])

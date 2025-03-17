@@ -28,7 +28,6 @@ from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
     from spynnaker.pyNN.models.projection import Projection
 
 #: The number of bits in a short value
@@ -122,13 +121,13 @@ def get_rinfo_for_spike_source(
     return r_info, core_mask, mask_shift
 
 
-def get_sources_for_target(app_vertex: "AbstractPopulationVertex") -> Dict[
+def get_sources_for_target(app_vertex: "PopulationVertex") -> Dict[
         Tuple[ColouredApplicationVertex, str], List[Source]]:
     """
     Get all the application vertex sources that will hit the given application
     vertex.
 
-    :param AbstractPopulationVertex app_vertex: The vertex being targeted
+    :param PopulationVertex app_vertex: The vertex being targeted
     :return:
         A dict of source ApplicationVertex to list of source information
     :rtype: dict(tuple(ApplicationVertex, str), list(Source))

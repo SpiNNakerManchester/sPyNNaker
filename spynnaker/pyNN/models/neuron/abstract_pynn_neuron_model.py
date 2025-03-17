@@ -14,7 +14,7 @@
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron import PopulationVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 if TYPE_CHECKING:
@@ -64,7 +64,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterAbstractPopulationVertex] = None,
             seed: Optional[int] = None,
-            n_colour_bits: Optional[int] = None) -> AbstractPopulationVertex:
+            n_colour_bits: Optional[int] = None) -> PopulationVertex:
         """
         :param float spikes_per_second:
         :param float ring_buffer_sigma:
@@ -77,7 +77,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         """
         # pylint: disable=arguments-differ
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
-        return AbstractPopulationVertex(
+        return PopulationVertex(
             n_neurons=n_neurons, label=label, max_atoms_per_core=max_atoms,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,

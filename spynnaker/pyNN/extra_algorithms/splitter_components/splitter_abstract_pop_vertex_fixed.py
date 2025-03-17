@@ -59,7 +59,7 @@ MAX_RING_BUFFER_BITS = 14
 
 class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
     """
-    Handles the splitting of the :py:class:`AbstractPopulationVertex`
+    Handles the splitting of the :py:class:`PopulationVertex`
     using fixed slices.
     """
 

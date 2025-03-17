@@ -46,7 +46,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron import (
         PopulationMachineLocalOnlyCombinedVertex)
-    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.neuron import PopulationVertex
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
         AbstractSynapseDynamics)
 
@@ -142,7 +142,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             machine_vertex: PopulationMachineLocalOnlyCombinedVertex,
             weight_scales: NDArray[floating]) -> None:
         # Get incoming sources for this vertex
-        app_vertex = cast('AbstractPopulationVertex',
+        app_vertex = cast('PopulationVertex',
                           machine_vertex.app_vertex)
         sources = self.__get_sources_for_target(app_vertex)
 
@@ -227,13 +227,13 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.write_array(numpy.concatenate(connector_data))
 
     def __get_sources_for_target(
-            self, app_vertex: AbstractPopulationVertex) -> Dict[
+            self, app_vertex: PopulationVertex) -> Dict[
             Tuple[ColouredApplicationVertex, str], List[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.
 
-        :param AbstractPopulationVertex app_vertex: The vertex being targeted
+        :param PopulationVertex app_vertex: The vertex being targeted
         :return:
             A dict of source ApplicationVertex and partition id to list of
             source information
