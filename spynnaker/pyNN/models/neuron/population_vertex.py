@@ -182,7 +182,6 @@ class PopulationVertex(
         AbstractCanReset, SupportsStructure):
     """
     Underlying vertex model for Neural Populations.
-    Not actually abstract.
     """
 
     __slots__ = (
