@@ -25,35 +25,36 @@ from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.neo_csv import NeoCsv
 
 
-def trim_spikes(spikes, indexes):
+def trim_spikes(spikes: NDArray[numpy.floating],
+                indexes: List[int]) -> List[List[numpy.floating]]:
     return [[n, t] for [n, t] in spikes if n in indexes]
 
 
 class TestCSV(BaseTestCase):
 
-    spikes_expected: List[Tuple[int, int]] = []
+    spikes_expected: NDArray[numpy.floating] = numpy.array([])
     v_expected: NDArray
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         global spikes_expected, v_expected
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_v = os.path.join(my_dir, "v.csv")
-        v_expected = []
+        v_expected_l: List[List[float]] = []
         with open(my_v) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                row = list(map(lambda x: float(x), row))
-                v_expected.append(row)
-        cls.v_expected = numpy.array(v_expected)
+                row_f = list(map(lambda x: float(x), row))
+                v_expected_l.append(row_f)
+        cls.v_expected = numpy.array(v_expected_l)
         my_spikes = os.path.join(my_dir, "spikes.csv")
-        spikes_expected = []
+        spikes_expected_l = []
         with open(my_spikes) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                row = list(map(lambda x: float(x), row))
-                spikes_expected.append((row[0], row[1]))
-        cls.spikes_expected = numpy.array(spikes_expected)
+                floats = list(map(lambda x: float(x), row))
+                spikes_expected_l.append((floats[0], floats[1]))
+        cls.spikes_expected = numpy.array(spikes_expected_l)
 
     def test_write(self) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
@@ -102,15 +103,15 @@ class TestCSV(BaseTestCase):
         neo = NeoCsv().read_csv(my_csv)
 
         spikes = neo_convertor.convert_spikes(neo)
-        target = trim_spikes(self.spikes_expected, [2, 4, 7, 8])
-        assert numpy.array_equal(spikes, target)
+        target_s = trim_spikes(self.spikes_expected, [2, 4, 7, 8])
+        assert numpy.array_equal(spikes, target_s)
         spiketrains = neo.segments[0].spiketrains
         assert 4 == len(spiketrains)
 
         v = neo.segments[0].filter(name='v')[0]
-        target = self.v_expected[:, [2, 4, 7, 8]]
-        assert v.shape == target.shape
-        assert numpy.array_equal(v.magnitude,  target)
+        target_v = self.v_expected[:, [2, 4, 7, 8]]
+        assert v.shape == target_v.shape
+        assert numpy.array_equal(v.magnitude,  target_v)
 
     def test_over_view(self) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
@@ -123,15 +124,15 @@ class TestCSV(BaseTestCase):
 
         neo = NeoCsv().read_csv(my_csv)
         spikes = neo_convertor.convert_spikes(neo)
-        target = trim_spikes(self.spikes_expected, [1, 2])
-        assert numpy.array_equal(spikes, target)
+        target_s = trim_spikes(self.spikes_expected, [1, 2])
+        assert numpy.array_equal(spikes, target_s)
         spiketrains = neo.segments[0].spiketrains
         assert 2 == len(spiketrains)
 
         v = neo.segments[0].filter(name='v')[0].magnitude
-        target = self.v_expected[:, [1, 2]]
-        assert v.shape == target.shape
-        assert numpy.array_equal(v, target)
+        target_v = self.v_expected[:, [1, 2]]
+        assert v.shape == target_v.shape
+        assert numpy.array_equal(v, target_v)
 
     def test_over_sub_view(self) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
@@ -144,15 +145,15 @@ class TestCSV(BaseTestCase):
 
         neo = NeoCsv().read_csv(my_csv)
         spikes = neo_convertor.convert_spikes(neo)
-        target = trim_spikes(self.spikes_expected, [2])
-        assert numpy.array_equal(spikes, target)
+        target_s = trim_spikes(self.spikes_expected, [2])
+        assert numpy.array_equal(spikes, target_s)
         spiketrains = neo.segments[0].spiketrains
         assert 1 == len(spiketrains)
 
         v = neo.segments[0].filter(name='v')[0].magnitude
-        target = self.v_expected[:, [2]]
-        assert v.shape == target.shape
-        assert numpy.array_equal(v, target)
+        target_v = self.v_expected[:, [2]]
+        assert v.shape == target_v.shape
+        assert numpy.array_equal(v, target_v)
 
     def test_no_intersection(self) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))

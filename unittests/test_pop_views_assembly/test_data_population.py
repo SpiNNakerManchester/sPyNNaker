@@ -29,34 +29,35 @@ from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from .make_test_data import N_NEURONS
 
 
-def trim_spikes(spikes, indexes):
+def trim_spikes(spikes: NDArray[numpy.floating],
+                indexes: List[int]) -> List[List[numpy.floating]]:
     return [[n, t] for [n, t] in spikes if n in indexes]
 
 
 class TestDataPopulation(BaseTestCase):
 
-    spikes_expected: List[Tuple[int, int]] = []
+    spikes_expected: NDArray[numpy.floating] = numpy.array([])
     v_expected: NDArray
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_v = os.path.join(my_dir, "v.csv")
-        v_expected = []
+        v_expected_l = []
         with open(my_v) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                row = list(map(lambda x: float(x), row))
-                v_expected.append(row)
-        cls.v_expected = numpy.array(v_expected)
+                floats = list(map(lambda x: float(x), row))
+                v_expected_l.append(floats)
+        cls.v_expected = numpy.array(v_expected_l)
         my_spikes = os.path.join(my_dir, "spikes.csv")
-        spikes_expected = []
+        spikes_expected_l: List[Tuple[float, float]] = []
         with open(my_spikes) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                row = list(map(lambda x: float(x), row))
-                spikes_expected.append((row[0], row[1]))
-        cls.spikes_expected = numpy.array(spikes_expected)
+                floats = list(map(lambda x: float(x), row))
+                spikes_expected_l.append((floats[0], floats[1]))
+        cls.spikes_expected = numpy.array(spikes_expected_l)
 
     def test_simple_spikes(self) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
@@ -223,18 +224,18 @@ class TestDataPopulation(BaseTestCase):
 
         v = pop.spinnaker_get_data("v")
         assert len(v) == 35 * N_NEURONS
-        target = self.v_expected
+        target_v = self.v_expected
         for neuron, time, val in v:
-            self.assertEqual(val, target[int(time), int(neuron)],
+            self.assertEqual(val, target_v[int(time), int(neuron)],
                              f"{time}{neuron}")
 
         view = pop[4, 2]
         spikes = view.spinnaker_get_data("spikes")
-        target = trim_spikes(self.spikes_expected, [4, 2])
-        assert numpy.array_equal(spikes, target)
+        target_s = trim_spikes(self.spikes_expected, [4, 2])
+        assert numpy.array_equal(spikes, target_s)
 
         spikes = pop.spinnaker_get_data("spikes", view_indexes=[4, 2])
-        assert numpy.array_equal(spikes, target)
+        assert numpy.array_equal(spikes, target_s)
 
         with pytest.raises(ConfigurationException):
             # Only one type of data at a time is supported
@@ -247,14 +248,14 @@ class TestDataPopulation(BaseTestCase):
             pop = db.get_population("pop_1")
 
         spikes = pop.spinnaker_get_data("spikes")
-        target = trim_spikes(self.spikes_expected, [1, 2])
-        assert numpy.array_equal(spikes, target)
+        target_s = trim_spikes(self.spikes_expected, [1, 2])
+        assert numpy.array_equal(spikes, target_s)
 
         v = pop.spinnaker_get_data("v")
         assert len(v) == 35 * 2
-        target = self.v_expected
+        target_v = self.v_expected
         for neuron, time, val in v:
-            self.assertEqual(val, target[int(time), int(neuron)],
+            self.assertEqual(val, target_v[int(time), int(neuron)],
                              f"{time}{neuron}")
         with pytest.raises(ConfigurationException):
             # Only one type of data at a time is supported

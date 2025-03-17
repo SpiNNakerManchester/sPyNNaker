@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List
 import unittest
+from spinn_utilities.ranged.abstract_sized import Selector
 from spynnaker.pyNN.models.common import ParameterHolder
 
-
-def get_mock(parameter, selector):
+def get_mock(parameter: str, selector: Selector) -> List[float]:
     if parameter == "foo":
         return [1, 2, 3]
     if parameter == "bar":

@@ -32,7 +32,8 @@ from spinnaker_testbase import BaseTestCase
 from .make_test_data import N_NEURONS
 
 
-def trim_spikes(spikes, indexes):
+def trim_spikes(spikes: NDArray[numpy.floating],
+                indexes: List[int]) -> List[List[numpy.floating]]:
     return [[n, t] for [n, t] in spikes if n in indexes]
 
 
@@ -40,7 +41,7 @@ _VIEW_DATA = "view_data.sqlite3"
 _ALL_DATA = "all_data.sqlite3"
 
 
-def copy_db(data_file):
+def copy_db(data_file: str) -> None:
     run_buffer = BaseDatabase.default_database_file()
     my_dir = os.path.dirname(os.path.abspath(__file__))
     my_buffer = os.path.join(my_dir, data_file)
@@ -50,28 +51,28 @@ def copy_db(data_file):
 
 class TestGetting(BaseTestCase):
 
-    spikes_expected: List[Tuple[int, int]] = []
+    spikes_expected: NDArray[numpy.floating] = numpy.array([])
     v_expected: NDArray
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_v = os.path.join(my_dir, "v.csv")
         v_expected = []
         with open(my_v) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                row = list(map(lambda x: float(x), row))
-                v_expected.append(row)
+                floats = list(map(lambda x: float(x), row))
+                v_expected.append(floats)
         cls.v_expected = numpy.array(v_expected)
         my_spikes = os.path.join(my_dir, "spikes.csv")
-        spikes_expected = []
+        spikes_expected_l = []
         with open(my_spikes) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                row = list(map(lambda x: float(x), row))
-                spikes_expected.append((row[0], row[1]))
-        cls.spikes_expected = numpy.array(spikes_expected)
+                floats = list(map(lambda x: float(x), row))
+                spikes_expected_l.append((floats[0], floats[1]))
+        cls.spikes_expected = numpy.array(spikes_expected_l)
 
     def test_simple_spikes(self) -> None:
         sim.setup(timestep=1.0)
