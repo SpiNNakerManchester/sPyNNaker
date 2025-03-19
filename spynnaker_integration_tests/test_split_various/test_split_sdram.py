@@ -13,7 +13,7 @@
 # limitations under the License.
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexNeuronsSynapses)
+    SplitterPopulationVertexNeuronsSynapses)
 from spinnaker_testbase import BaseTestCase
 
 
@@ -26,7 +26,7 @@ def run_sdram_split():
     post_pop = sim.Population(
         600, sim.IF_cond_exp, label="post",
         additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(
+            "splitter": SplitterPopulationVertexNeuronsSynapses(
                 1, 64, False)})
 
     pre_pop.set_max_atoms_per_core(20000)

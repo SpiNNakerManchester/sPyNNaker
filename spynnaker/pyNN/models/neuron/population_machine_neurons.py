@@ -39,7 +39,7 @@ from spynnaker.pyNN.models.abstract_models import AbstractNeuronExpandable
 from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
 from spynnaker.pyNN.utilities.utility_calls import convert_to
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.neuron import PopulationVertex
     from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
 
@@ -85,14 +85,14 @@ class PopulationMachineNeurons(
 
     @property
     @abstractmethod
-    def _pop_vertex(self) -> AbstractPopulationVertex:
+    def _pop_vertex(self) -> PopulationVertex:
         """
         The application vertex of the machine vertex.
 
         .. note::
             This is likely to be available via the MachineVertex.
 
-        :rtype: AbstractPopulationVertex
+        :rtype: PopulationVertex
         """
         raise NotImplementedError
 
