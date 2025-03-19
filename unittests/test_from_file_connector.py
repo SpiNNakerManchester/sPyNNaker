@@ -57,7 +57,7 @@ from unittests.mocks import MockSynapseDynamics, MockPopulation
         "3-elements-extra"
     ])
 def test_connector(
-        clist:Optional[NDArray], column_names: Optional[List[str]],
+        clist: Optional[NDArray], column_names: Optional[List[str]],
         weights: int, delays: int, expected_clist: Optional[NDArray],
         expected_weights: List[int], expected_delays: List[int],
         expected_extra_parameters: Optional[NDArray],
@@ -100,7 +100,7 @@ def test_connector(
     synapse_info = SynapseInformation(
         connector=connector, pre_population=pre_pop,
         post_population=MockPopulation(10, "Post"), prepop_is_view=False,
-        postpop_is_view=False, synapse_dynamics=MockSynapseDynamics(1,1),
+        postpop_is_view=False, synapse_dynamics=MockSynapseDynamics(1, 1),
         synapse_type=0, receptor_type="",
         synapse_type_from_dynamics=False, weights=weights, delays=delays)
     block = connector.create_synaptic_block(

@@ -15,7 +15,7 @@ from __future__ import annotations
 from typing import List, Optional, Tuple, TYPE_CHECKING
 
 import numpy
-from numpy import floating, uint32
+from numpy import uint32
 from numpy.typing import NDArray
 
 from pacman.model.graphs.common import Slice

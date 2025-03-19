@@ -39,7 +39,7 @@ def test_good_values(weight: float, delay: float) -> None:
     synapse_info = SynapseInformation(
         connector=MockConnector(), pre_population=MockPopulation(10, "Pre"),
         post_population=MockPopulation(10, "Post"), prepop_is_view=False,
-        postpop_is_view=False, synapse_dynamics=MockSynapseDynamics(1,1),
+        postpop_is_view=False, synapse_dynamics=MockSynapseDynamics(1, 1),
         synapse_type=1, receptor_type="bacon",
         synapse_type_from_dynamics=False, weights=weight, delays=delay)
     assert delay == connector.get_delay_maximum(synapse_info)

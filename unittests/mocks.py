@@ -44,7 +44,7 @@ from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
 class MockPopulation(Population):
 
     def __init__(self, size: int, label: str,
-                 vertex: Optional[PopulationApplicationVertex]=None):
+                 vertex: Optional[PopulationApplicationVertex] = None):
         self._size = size
         self._label = label
         self._mock_vertex: PopulationApplicationVertex
@@ -261,7 +261,7 @@ class MockInputType(MockNeuronComponent, AbstractInputType):
 
     @overrides(AbstractInputType.get_global_weight_scale)
     def get_global_weight_scale(self) -> float:
-       raise NotImplementedError
+        raise NotImplementedError
 
 
 class MockThresholdType(MockNeuronComponent, AbstractThresholdType):
@@ -272,15 +272,11 @@ class MockSynapseType(MockNeuronComponent, AbstractSynapseType):
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self) -> int:
         raise NotImplementedError
-        return 0
 
     @overrides(AbstractSynapseType.get_synapse_targets)
     def get_synapse_targets(self) -> Sequence[str]:
         raise NotImplementedError
-        return []
 
     @overrides(AbstractSynapseType.get_synapse_id_by_target)
     def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         raise NotImplementedError
-        return None
-

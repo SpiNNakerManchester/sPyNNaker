@@ -130,7 +130,7 @@ class TestSimulatorData(unittest.TestCase):
         self.assertListEqual([pro_1, pro_2], sorted(
             SpynnakerDataView.iterate_projections(), key=lambda x: x.label))
         self.assertEqual(2, SpynnakerDataView.get_n_projections())
-        self.assertEqual(20, writer._get_id_counter())   # type: ignore[arg-type]
+        self.assertEqual(20, writer._get_id_counter())
         with self.assertRaises(TypeError):
             writer.add_population("bacon")  # type: ignore[arg-type]
         with self.assertRaises(TypeError):

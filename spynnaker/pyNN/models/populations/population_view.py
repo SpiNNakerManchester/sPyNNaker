@@ -15,7 +15,7 @@ from __future__ import annotations
 import logging
 import os
 from typing import (
-    Any, Callable, Dict, Generator, Iterable, Iterator, List, Optional,
+    Any, Callable, Dict, Iterable, Iterator, List, Optional,
     overload, Sequence, Tuple, TYPE_CHECKING, Union)
 
 import numpy

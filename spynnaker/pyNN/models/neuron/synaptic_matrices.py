@@ -13,12 +13,11 @@
 # limitations under the License.
 from __future__ import annotations
 from dataclasses import dataclass
-from decimal import Decimal
 from typing import (
     Dict, List, NamedTuple, Optional, Sequence, Tuple, TYPE_CHECKING, cast)
 
 import numpy
-from numpy import floating, uint32
+from numpy import uint32
 from numpy.typing import NDArray
 
 from pacman.model.graphs.common import Slice

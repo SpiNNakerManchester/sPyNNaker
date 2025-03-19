@@ -16,7 +16,7 @@ import csv
 import os
 import pickle
 import shutil
-from typing import List, Tuple
+from typing import List
 
 import numpy
 from numpy.typing import NDArray

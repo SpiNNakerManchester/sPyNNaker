@@ -60,7 +60,7 @@ from unittests.mocks import (
         "3-elements-extra"
     ])
 def test_connector(
-        clist:Optional[NDArray], column_names: Optional[List[str]],
+        clist: Optional[NDArray], column_names: Optional[List[str]],
         weights: int, delays: int, expected_clist: Optional[NDArray],
         expected_weights: List[int], expected_delays: List[int],
         expected_extra_parameters: Optional[NDArray],
@@ -95,7 +95,7 @@ def test_connector(
     synapse_info = SynapseInformation(
             connector=MockConnector(), pre_population=pre_pop,
             post_population=MockPopulation(10, "Post"), prepop_is_view=False,
-            postpop_is_view=False, synapse_dynamics=MockSynapseDynamics(1,1),
+            postpop_is_view=False, synapse_dynamics=MockSynapseDynamics(1, 1),
             synapse_type=1, receptor_type="bacon",
             synapse_type_from_dynamics=False, weights=weights, delays=delays)
     block = connector.create_synaptic_block(
@@ -162,11 +162,11 @@ class MockSplitter(AbstractSplitterCommon):
             for vertex_slice in slices]
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
-    def get_out_going_slices(self) ->  Sequence[Slice]:
+    def get_out_going_slices(self) -> Sequence[Slice]:
         return self.slices
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
-    def get_in_coming_slices(self) ->  Sequence[Slice]:
+    def get_in_coming_slices(self) -> Sequence[Slice]:
         return self.slices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
@@ -196,7 +196,7 @@ class MockSplitter(AbstractSplitterCommon):
 class MockAppVertex(MockVertex):
 
     def __init__(self, n_atoms: int, slices: List[Slice]):
-        super().__init__(splitter = MockSplitter(slices, self))
+        super().__init__(splitter=MockSplitter(slices, self))
         self._n_atoms = n_atoms
 
     @overrides(ApplicationVertex.get_key_ordered_indices)
@@ -212,6 +212,7 @@ class MockAppVertex(MockVertex):
     def n_atoms(self) -> int:
         return self._n_atoms
 
+
 def test_get_connected() -> None:
     unittest_setup()
     pairs = numpy.array([[0, 0], [1, 2], [2, 0], [3, 3], [2, 6], [1, 8],
@@ -225,7 +226,7 @@ def test_get_connected() -> None:
     post_pop = MockPopulation(10, "Post", post_app_vertex)
     s_info = SynapseInformation(
         MockConnector(), pre_pop, post_pop, False, False,
-        MockSynapseDynamics(1, 1),1, "bacon", False, 1.0, 1.0)
+        MockSynapseDynamics(1, 1), 1, "bacon", False, 1.0, 1.0)
     connected = connector.get_connected_vertices(
         s_info, pre_app_vertex, post_app_vertex)
 

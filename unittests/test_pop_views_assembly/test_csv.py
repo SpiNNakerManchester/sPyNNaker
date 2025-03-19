@@ -14,7 +14,7 @@
 
 import csv
 import os
-from typing import List, Tuple
+from typing import List
 
 import numpy
 from numpy.typing import NDArray

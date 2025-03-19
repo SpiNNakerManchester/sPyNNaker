@@ -55,7 +55,7 @@ class SpinnakerLink2DifferentBoardsValidBoardAddressTest(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_spinnaker_link_2_different_boards_valid_board_address(self) -> None:
+    def test_valid_board_address(self) -> None:
         do_run()
 
 

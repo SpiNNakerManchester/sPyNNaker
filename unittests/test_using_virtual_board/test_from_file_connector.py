@@ -69,7 +69,7 @@ class TestFromFileConnector(BaseTestCase):
 
     def check_other_connect(
             self, aslist: AsList,
-            header:Optional[str] = None, w_index: Optional[int] = 2,
+            header: Optional[str] = None, w_index: Optional[int] = 2,
             d_index: Optional[int] = 3, sources: int = 6,
             destinations: int = 8) -> None:
         _, name = tempfile.mkstemp(".temp")

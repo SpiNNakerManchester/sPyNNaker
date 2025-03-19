@@ -20,7 +20,6 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotLaser, PushBotMotor, PushBotSpeaker, PushBotLED)
 
 
-
 class Test(unittest.TestCase):
 
     def setUp(self) -> None:

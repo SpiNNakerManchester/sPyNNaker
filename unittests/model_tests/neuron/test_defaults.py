@@ -42,8 +42,8 @@ def test_parameters() -> None:
     class _AClass(AbstractProvidesDefaults):
 
         @default_parameters({"param_1"})
-        def __init__(
-                self, param_1: int = 1, param_2: int = 2, param_3: int = 3) -> None:
+        def __init__(self, param_1: int = 1, param_2: int = 2,
+                     param_3: int = 3) -> None:
             pass
 
     assert _AClass.default_parameters == {"param_1": 1}
@@ -127,7 +127,8 @@ def test_setting_state_variables() -> None:
         _AnotherClass(param_3=3)
 
 
-def _check_warnings(lc: LogCapture, expected: List[str], not_expected: List[str]) -> None:
+def _check_warnings(lc: LogCapture, expected: List[str],
+                    not_expected: List[str]) -> None:
     line_matcher = re.compile(
         "Formal PyNN specifies that (.*) should be set using initial_values"
         " not cell_params")

@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Sequence
-
 import pytest
 import pyNN.spiNNaker as sim
 
@@ -52,7 +50,7 @@ class _MyNeuronModel(NeuronModel):
 
 class FooBar(AbstractPyNNNeuronModelStandard):
     @default_initial_values({"foo", "bar"})
-    def __init__(self, foo:int = 1, bar: int = 11):
+    def __init__(self, foo: int = 1, bar: int = 11):
         super().__init__(
             "FooBar", "foobar.aplx", _MyNeuronModel(foo, bar),
             MockInputType(), MockSynapseType(), MockThresholdType())
@@ -103,7 +101,7 @@ def test_init_bad() -> None:
             "anotherbad", "junk")  # type: ignore[arg-type]
 
 
-def test_initial_values()  -> None:
+def test_initial_values() -> None:
     unittest_setup()
     sim.setup(1.0)
     neuron = MockNeuron()

@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple, Union, TYPE_CHECKING
 
 import numpy
-from numpy import floating, integer, uint32
+from numpy import integer, uint32
 from numpy.typing import NDArray
 
 from pacman.model.graphs.application import ApplicationVertex
