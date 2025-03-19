@@ -20,7 +20,7 @@ from spinn_utilities.ranged import RangeDictionary
 
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import (
-    AbstractPopulationVertex, AbstractPyNNNeuronModelStandard)
+    PopulationVertex, AbstractPyNNNeuronModelStandard)
 from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
 
 from spynnaker.pyNN.models.defaults import default_initial_values
@@ -56,7 +56,7 @@ class FooBar(AbstractPyNNNeuronModelStandard):
             MockInputType(), MockSynapseType(), MockThresholdType())
 
 
-class MockNeuron(AbstractPopulationVertex):
+class MockNeuron(PopulationVertex):
     def __init__(self) -> None:
         foo_bar = FooBar()
         super().__init__(

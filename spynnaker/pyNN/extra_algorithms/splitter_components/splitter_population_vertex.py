@@ -20,7 +20,7 @@ from pacman.model.graphs.common import Slice
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.utilities.algorithm_utilities\
     .partition_algorithm_utilities import get_multidimensional_slices
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron import PopulationVertex
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 
 
@@ -29,11 +29,11 @@ from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 MAX_RING_BUFFER_BITS = 14
 
 
-class SplitterAbstractPopulationVertex(
-        AbstractSplitterCommon[AbstractPopulationVertex],
+class SplitterPopulationVertex(
+        AbstractSplitterCommon[PopulationVertex],
         AbstractSpynnakerSplitterDelay):
     """
-    Abstract base class of splitters for :py:class:`AbstractPopulationVertex`.
+    Abstract base class of splitters for :py:class:`PopulationVertex`.
     """
     __slots__ = ("_max_delay", "__slices")
 
@@ -45,12 +45,12 @@ class SplitterAbstractPopulationVertex(
     @final
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(
-            self, app_vertex: AbstractPopulationVertex) -> None:
-        if not isinstance(app_vertex, AbstractPopulationVertex):
+            self, app_vertex: PopulationVertex) -> None:
+        if not isinstance(app_vertex, PopulationVertex):
             raise PacmanConfigurationException(
                 f"The vertex {app_vertex} cannot be supported by the "
                 f"{self.__class__.__name__} as the only vertex "
-                "supported by this splitter is a AbstractPopulationVertex. "
+                "supported by this splitter is a PopulationVertex. "
                 "Please use the correct splitter for your vertex and try "
                 "again.")
         super().set_governed_app_vertex(app_vertex)

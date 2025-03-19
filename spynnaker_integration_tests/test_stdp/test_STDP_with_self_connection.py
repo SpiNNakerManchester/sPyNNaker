@@ -15,7 +15,7 @@
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexNeuronsSynapses)
+    SplitterPopulationVertexNeuronsSynapses)
 
 
 def stdp_with_self_connection():
@@ -27,7 +27,7 @@ def stdp_with_self_connection():
     main_pop = sim.Population(
         64, sim.IF_curr_exp, label='main',
         additional_parameters={
-            'splitter': SplitterAbstractPopulationVertexNeuronsSynapses(1)})
+            'splitter': SplitterPopulationVertexNeuronsSynapses(1)})
 
     delay1 = sim.RandomDistribution('uniform', (2, 3))
     delayself = sim.RandomDistribution('uniform', (5, 6))

@@ -33,7 +33,7 @@ if TYPE_CHECKING:
         .elimination import AbstractElimination
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
-    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.neuron import PopulationVertex
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
 
@@ -74,7 +74,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     def write_structural_parameters(
             self, spec: DataSpecificationBase, region: int,
             weight_scales: NDArray[floating],
-            app_vertex: AbstractPopulationVertex,
+            app_vertex: PopulationVertex,
             vertex_slice: Slice, synaptic_matrices: SynapticMatrices) -> None:
         """
         Write structural plasticity parameters.

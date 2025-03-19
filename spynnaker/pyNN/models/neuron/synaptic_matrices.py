@@ -45,8 +45,8 @@ from spynnaker.pyNN.types import WeightScales
 from .synaptic_matrix_app import SynapticMatrixApp
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
-        AbstractPopulationVertex)
+    from spynnaker.pyNN.models.neuron.population_vertex import (
+        PopulationVertex)
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
 
@@ -174,7 +174,7 @@ class SynapticMatrices(object):
         "__max_gen_data")
 
     def __init__(
-            self, app_vertex: AbstractPopulationVertex,
+            self, app_vertex: PopulationVertex,
             regions: SynapseRegions, max_atoms_per_core: int,
             weight_scales: WeightScales, all_syn_block_sz: int):
         """

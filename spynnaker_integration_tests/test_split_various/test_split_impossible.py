@@ -14,7 +14,7 @@
 import pyNN.spiNNaker as sim
 import pytest
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexNeuronsSynapses)
+    SplitterPopulationVertexNeuronsSynapses)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spinnaker_testbase import BaseTestCase
 
@@ -24,7 +24,7 @@ def mission_impossible():
 
     # Can't do that many neurons and delays together
     sim.Population(128, sim.IF_curr_exp(), additional_parameters={
-        "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(
+        "splitter": SplitterPopulationVertexNeuronsSynapses(
             1, 128, False)})
 
     with pytest.raises(SynapticConfigurationException):
@@ -37,7 +37,7 @@ def mission_impossible_2():
     # Can't do structural on multiple synapse cores
     source = sim.Population(1, sim.SpikeSourcePoisson(rate=10))
     pop = sim.Population(128, sim.IF_curr_exp(), additional_parameters={
-        "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(
+        "splitter": SplitterPopulationVertexNeuronsSynapses(
             2)})
 
     sim.Projection(source, pop, sim.FromListConnector([]),
