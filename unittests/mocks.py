@@ -21,13 +21,13 @@ from spinn_utilities.ranged import RangeDictionary
 from spinn_front_end_common.interface.ds import DataType
 
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertex)
+    SplitterPopulationVertex)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.neural_projections import (
         SynapseInformation)
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex, \
+from spynnaker.pyNN.models.neuron import PopulationVertex, \
     AbstractPyNNNeuronModel
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractNeuronImpl, AbstractStandardNeuronComponent)
@@ -157,7 +157,7 @@ class MockNeuronImp(AbstractNeuronImpl):
         raise NotImplementedError
 
 
-class MockApvVertex(AbstractPopulationVertex):
+class MockApvVertex(PopulationVertex):
 
     def __init__(
             self, *, n_neurons: int = 1, label: str = "test",
@@ -169,7 +169,7 @@ class MockApvVertex(AbstractPopulationVertex):
             neuron_impl: Optional[AbstractNeuronImpl] = None,
             pynn_model: Optional[AbstractPyNNNeuronModel] = None,
             drop_late_spikes: bool = False,
-            splitter: Optional[SplitterAbstractPopulationVertex] = None,
+            splitter: Optional[SplitterPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
             extra_partitions: Optional[List[str]] = None):
         if neuron_impl is None:
