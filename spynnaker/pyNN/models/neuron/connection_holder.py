@@ -25,7 +25,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
 
 _ItemType: TypeAlias = numpy.floating
 _Items: TypeAlias = Union[Tuple[NDArray[_ItemType], ...], NDArray[_ItemType],
-        Tuple[List[numpy.floating], ...]]
+                          Tuple[List[numpy.floating], ...]]
 
 
 def _is_listable(value: Any) -> TypeGuard[Sequence[Any]]:
