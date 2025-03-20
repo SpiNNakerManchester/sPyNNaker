@@ -26,7 +26,7 @@ CELL_PARAMS_LIF = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
 class SynfireRunner(object):
     # pylint: disable=too-many-arguments, attribute-defined-outside-init
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.__init_object_state()
 
     def do_run(
@@ -189,6 +189,30 @@ class SynfireRunner(object):
 
             All three/four values will repeated once per run is requested
         """
+        assert spike_times is None
+        assert spike_times_list is None
+        assert weight_to_spike == 2.0
+        assert constraint is None
+        assert cell_params == CELL_PARAMS_LIF
+        assert reset == False
+        assert new_pop == False
+        assert record_input_spikes == False
+        assert record_input_spikes_7 == False
+        assert get_spikes is None
+        assert spike_path is None
+        assert v_sampling_rate is None
+        assert get_gsyn_exc is None
+        assert get_gsyn_inh is None
+        assert gsyn_path_exc is None
+        assert gsyn_path_inh is None
+        assert gsyn_exc_sampling_rate is None
+        assert gsyn_exc_sampling_rate is None
+        assert gsyn_inh_sampling_rate is None
+        assert get_all is False
+        assert use_spike_connections is None
+        assert end_before_print is None
+        assert randomise_v_init == False
+
         self.__init_object_state()
 
         # Initialise/verify various values
@@ -260,7 +284,7 @@ class SynfireRunner(object):
 
         return results
 
-    def __init_object_state(self):
+    def __init_object_state(self) -> None:
         """ Initialises the object's internal state. """
         self._recorded_v_list = []
         self._recorded_v_7 = None
@@ -472,98 +496,98 @@ class SynfireRunner(object):
 
         return results
 
-    def get_output_pop_gsyn_exc_neo(self):
+    def get_output_pop_gsyn_exc_neo(self) -> None:
         return self._recorded_gsyn_exc_list[0]
 
-    def get_output_pop_gsyn_exc_numpy(self):
+    def get_output_pop_gsyn_exc_numpy(self) -> None:
         gsyn_exc_neo = self._recorded_gsyn_exc_list[0]
         return neo_convertor.convert_data(gsyn_exc_neo, "gsyn_exc")
 
-    def get_output_pop_gsyn_exc_list(self):
+    def get_output_pop_gsyn_exc_list(self) -> None:
         return self._recorded_gsyn_exc_list
 
-    def get_output_pop_gsyn_exc_list_numpy(self):
+    def get_output_pop_gsyn_exc_list_numpy(self) -> None:
         return list(map(neo_convertor.convert_gsyn_exc_list,
                         self._recorded_gsyn_exc_list))
 
-    def get_output_pop_gsyn_exc_7(self):
+    def get_output_pop_gsyn_exc_7(self) -> None:
         return self._recorded_gsyn_exc_7
 
-    def get_output_pop_gsyn_inh_list(self):
+    def get_output_pop_gsyn_inh_list(self) -> None:
         return self._recorded_gsyn_inh_list
 
-    def get_output_pop_gsyn_inh_list_numpy(self):
+    def get_output_pop_gsyn_inh_list_numpy(self) -> None:
         return list(map(neo_convertor.convert_gsyn_inh_list,
                         self._recorded_gsyn_inh_list))
 
-    def get_output_pop_gsyn_inh_neo(self):
+    def get_output_pop_gsyn_inh_neo(self) -> None:
         return self._recorded_gsyn_inh_list[0]
 
-    def get_output_pop_gsyn_inh_numpy(self):
+    def get_output_pop_gsyn_inh_numpy(self) -> None:
         gsyn_inh_neo = self._recorded_gsyn_inh_list[0]
         return neo_convertor.convert_data(gsyn_inh_neo, "gsyn_exc")
 
-    def get_output_pop_gsyn_inh_7(self):
+    def get_output_pop_gsyn_inh_7(self) -> None:
         return self._recorded_gsyn_inh_7
 
-    def get_output_pop_voltage_list(self):
+    def get_output_pop_voltage_list(self) -> None:
         return self._recorded_v_list
 
-    def get_output_pop_voltage_list_numpy(self):
+    def get_output_pop_voltage_list_numpy(self) -> None:
         return list(map(neo_convertor.convert_v_list,
                         self._recorded_v_list))
 
-    def get_output_pop_voltage_neo(self):
+    def get_output_pop_voltage_neo(self) -> None:
         return self._recorded_v_list[0]
 
-    def get_output_pop_voltage_numpy(self):
+    def get_output_pop_voltage_numpy(self) -> None:
         v_neo = self._recorded_v_list[0]
         return neo_convertor.convert_data(v_neo, "v")
 
-    def get_output_pop_voltage_7(self):
+    def get_output_pop_voltage_7(self) -> None:
         return self._recorded_v_7
 
-    def get_output_pop_spikes_list(self):
+    def get_output_pop_spikes_list(self) -> None:
         return self._recorded_spikes_list
 
-    def get_output_pop_spikes_list_numpy(self):
+    def get_output_pop_spikes_list_numpy(self) -> None:
         return list(map(
             neo_convertor.convert_spikes, self._recorded_spikes_list))
 
-    def get_output_pop_spikes_neo(self):
+    def get_output_pop_spikes_neo(self) -> None:
         return self._recorded_spikes_list[0]
 
-    def get_output_pop_spikes_numpy(self):
+    def get_output_pop_spikes_numpy(self) -> None:
         spikes = self._recorded_spikes_list[0]
         return neo_convertor.convert_spikes(spikes)
 
-    def get_output_pop_spikes_7(self):
+    def get_output_pop_spikes_7(self) -> None:
         return self._recorded_spikes_7
 
-    def get_output_pop_all_list(self):
+    def get_output_pop_all_list(self) -> None:
         return self._recorded_all_list
 
-    def get_output_pop_all_neo(self):
+    def get_output_pop_all_neo(self) -> None:
         return self._recorded_all_list[0]
 
-    def get_spike_source_spikes_list(self):
+    def get_spike_source_spikes_list(self) -> None:
         return self._input_spikes_recorded_list
 
-    def get_spike_source_spikes_list_numpy(self):
+    def get_spike_source_spikes_list_numpy(self) -> None:
         return list(map(neo_convertor.convert_spikes,
                         self._input_spikes_recorded_list))
 
-    def get_spike_source_spikes_neo(self):
+    def get_spike_source_spikes_neo(self) -> None:
         return self._input_spikes_recorded_list[0]
 
-    def get_spike_source_spikes_numpy(self):
+    def get_spike_source_spikes_numpy(self) -> None:
         spikes = self._input_spikes_recorded_list[0]
         return neo_convertor.convert_spikes(spikes)
 
-    def get_spike_source_spikes_7(self):
+    def get_spike_source_spikes_7(self) -> None:
         return self._input_spikes_recorded_7
 
-    def get_weights(self):
+    def get_weights(self) -> None:
         """
         :return:
             If not recorded, returns None.
@@ -577,7 +601,7 @@ class SynfireRunner(object):
             return self._weights[0]
         return self._weights
 
-    def get_delay(self):
+    def get_delay(self) -> None:
         """
         :return:
             If not recorded, returns None.
