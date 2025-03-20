@@ -213,7 +213,7 @@ class SynfireRunner(object):
         assert gsyn_inh_sampling_rate is None
         assert get_all is False
         assert use_spike_connections is True
-        assert end_before_print is None
+        assert end_before_print is False
         assert randomise_v_init is False
 
         self.__init_object_state()
