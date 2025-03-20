@@ -27,7 +27,7 @@ class TestSendMultiplePartitions(BaseTestCase):
 
     # Added to check that the delay expander runs; a previous fix
     # for a related issue inadvertently turned it off for this type of case
-    def do_run(self):
+    def do_run(self) -> None:
         conn = sim.external_devices.SpynnakerLiveSpikesConnection(
             send_labels=["Inject"], local_port=None)
         conn.add_start_resume_callback("Inject", self.send_spike)
@@ -74,5 +74,5 @@ class TestSendMultiplePartitions(BaseTestCase):
         self.assertListEqual(list(weights_2), [[0, 1, 5.0]])
         self.assertListEqual(list(weights_3), [[0, 2, 5.0]])
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)

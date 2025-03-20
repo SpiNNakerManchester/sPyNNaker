@@ -39,7 +39,7 @@ def do_run():
 
 
 class ReuseConnectorTest(BaseTestCase):
-    def check_run(self):
+    def check_run(self) -> None:
         proj_1_list, proj_2_list = do_run()
         # any checks go here
         test_1_list = []
@@ -52,7 +52,7 @@ class ReuseConnectorTest(BaseTestCase):
             self.assertEqual(test_1_list[0][i], proj_1_list[0][i])
             self.assertEqual(test_2_list[0][i], proj_2_list[0][i])
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.check_run)
 
 

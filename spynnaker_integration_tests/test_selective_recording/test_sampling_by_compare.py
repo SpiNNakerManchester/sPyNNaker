@@ -367,7 +367,7 @@ def compare(current, full, rate, indexes):
 
 class TestSampling(BaseTestCase):
     """
-    def test_big_with_rate(self):
+    def test_big_with_rate(self) -> None:
         simtime = 20000
         n_neurons = 500
         run_and_compare_script(
@@ -378,7 +378,7 @@ class TestSampling(BaseTestCase):
             record_inh=True, inh_rate=5,
             tolerance=simtime-2)
 
-    def test_big_with_rec_index(self):
+    def test_big_with_rec_index(self) -> None:
         simtime = 20000
         n_neurons = 500
         run_and_compare_script(
@@ -391,7 +391,7 @@ class TestSampling(BaseTestCase):
             record_inh=True, inh_rate=1,
             inh_rec_indexes=range(0, n_neurons, 4))
 
-    def test_big_with_get_index(self):
+    def test_big_with_get_index(self) -> None:
         simtime = 20000
         n_neurons = 500
         run_and_compare_script(
@@ -404,7 +404,7 @@ class TestSampling(BaseTestCase):
             record_inh=True, inh_rate=1,
             inh_get_indexes=range(0, n_neurons, 4))
 
-    def test_big_with_both(self):
+    def test_big_with_both(self) -> None:
         simtime = 20000
         n_neurons = 500
         run_and_compare_script(
@@ -417,7 +417,7 @@ class TestSampling(BaseTestCase):
             record_inh=True, inh_rate=2,
             inh_rec_indexes=range(0, n_neurons, 4))
 
-    def test_medium_split(self):
+    def test_medium_split(self) -> None:
         simtime = 5000
         n_neurons = 500
         run_and_compare_script(
@@ -430,7 +430,7 @@ class TestSampling(BaseTestCase):
             record_inh=True, inh_rate=2,
             inh_rec_indexes=range(0, n_neurons, 4))
 
-    def test_rec_medium(self):
+    def test_rec_medium(self) -> None:
         simtime = 5000
         n_neurons = 500
         run_and_compare_script(
@@ -443,7 +443,7 @@ class TestSampling(BaseTestCase):
             record_inh=True, inh_rate=2,
             inh_rec_indexes=range(0, n_neurons, 4))
 
-    def test_get_medium(self):
+    def test_get_medium(self) -> None:
         simtime = 5000
         n_neurons = 500
         run_and_compare_script(
@@ -457,7 +457,7 @@ class TestSampling(BaseTestCase):
             inh_get_indexes=range(0, n_neurons, 4))
     """
 
-    def test_mixed_medium(self):
+    def test_mixed_medium(self) -> None:
         simtime = 500
         n_neurons = 300
         run_and_compare_script(
@@ -474,7 +474,7 @@ class TestSampling(BaseTestCase):
             inh_get_indexes=range(2, n_neurons, 4))
 
     """
-    def test_one(self):
+    def test_one(self) -> None:
         simtime = 500
         n_neurons = 300
         run_and_compare_script(

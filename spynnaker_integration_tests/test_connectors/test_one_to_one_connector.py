@@ -93,39 +93,39 @@ class TestOneToOneConnector(BaseTestCase):
             assert len(spikes[i]) == 1
             assert spikes[i][0] > (i % 100)
 
-    def test_pre_same_as_post(self):
+    def test_pre_same_as_post(self) -> None:
         self.do_one_to_one_test(10, 23, 23)
 
-    def test_pre_bigger_than_post(self):
+    def test_pre_bigger_than_post(self) -> None:
         self.do_one_to_one_test(10, 100, 23)
 
-    def test_post_bigger_than_pre(self):
+    def test_post_bigger_than_pre(self) -> None:
         self.do_one_to_one_test(10, 23, 100)
 
-    def test_post_bigger_than_pre_cond(self):
+    def test_post_bigger_than_pre_cond(self) -> None:
         self.do_one_to_one_cond_test(10, 5, 4)
 
-    def test_3d_same(self):
+    def test_3d_same(self) -> None:
         self.do_one_to_one_nd_test(
             (3, 2, 4), 6 * 8 * 8, sim.Grid3D(6/8, 6/8),
             (3, 2, 4), 6 * 8 * 8, sim.Grid3D(6/8, 6/8))
 
-    def test_2d_different_split(self):
+    def test_2d_different_split(self) -> None:
         self.do_one_to_one_nd_test(
             (2, 3), 6 * 9, sim.Grid2D(6 / 9),
             (3, 9), 6 * 9, sim.Grid2D(6 / 9))
 
-    def test_2d_pre_bigger_than_post(self):
+    def test_2d_pre_bigger_than_post(self) -> None:
         self.do_one_to_one_nd_test(
             (2, 3), 6 * 9, sim.Grid2D(6 / 9),
             (3, 3), 3 * 6, sim.Grid2D(3 / 6))
 
-    def test_2d_post_bigger_than_pre(self):
+    def test_2d_post_bigger_than_pre(self) -> None:
         self.do_one_to_one_nd_test(
             (2, 3), 6 * 9, sim.Grid2D(6 / 9),
             (3, 3), 3 * 6, sim.Grid2D(3 / 6))
 
-    def test_2d_to_1d(self):
+    def test_2d_to_1d(self) -> None:
         self.do_one_to_one_nd_test(
             (2, 3), 8 * 6, sim.Grid2D(8 / 6),
             8, 8 * 6, None)

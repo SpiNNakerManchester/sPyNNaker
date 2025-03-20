@@ -136,7 +136,7 @@ class SmallWorldConnectorTest(BaseTestCase):
         for i in range(25):
             self.assertEqual(25, len(three_step_connected[i]))
 
-    def a_run(self):
+    def a_run(self) -> None:
         v, spikes, weights = do_run(plot=False)
         # any checks go here
         v_test = neo_convertor.convert_data(v, name='v')
@@ -147,7 +147,7 @@ class SmallWorldConnectorTest(BaseTestCase):
         self.assertGreater(8250, len(spikes_test))
         self.check_weights(weights)
 
-    def test_a_run(self):
+    def test_a_run(self) -> None:
         self.runsafe(self.a_run)
 
 

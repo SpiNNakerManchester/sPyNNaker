@@ -125,13 +125,13 @@ class DistanceDependentWeightsAndDelaysTest(BaseTestCase):
             delay = round(2.0 + (2.0 * dist))
             self.assertEqual(delay, conn[3])
 
-    def a_run(self):
+    def a_run(self) -> None:
         exc_weights_delays, inh_weights_delays = do_run(plot=False)
         # any checks go here
         self.check_exc_weights(exc_weights_delays)
         self.check_inh_weights(inh_weights_delays)
 
-    def test_a_run(self):
+    def test_a_run(self) -> None:
         self.runsafe(self.a_run)
 
 

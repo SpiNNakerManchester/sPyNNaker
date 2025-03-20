@@ -22,7 +22,7 @@ class TestSTDPRandomRun(BaseTestCase):
     # same thing being loaded twice, both with data generated off and on the
     # machine
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(1.0)
         pop = sim.Population(1, sim.IF_curr_exp(i_offset=5.0), label="pop")
         pop.record("spikes")
@@ -55,5 +55,5 @@ class TestSTDPRandomRun(BaseTestCase):
         assert numpy.array_equal(weights_1_2, weights_2_2)
         assert numpy.array_equal(spikes_1, spikes_2)
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)

@@ -117,5 +117,5 @@ def split_potentiation_and_depression():
 
 class TestSTDPPairAdditive(BaseTestCase):
 
-    def test_split_potentiation_and_depression(self):
+    def test_split_potentiation_and_depression(self) -> None:
         self.runsafe(split_potentiation_and_depression)

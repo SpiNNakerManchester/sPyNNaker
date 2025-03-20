@@ -41,7 +41,7 @@ def receive_spikes(label, time, neuron_ids):
 
 class TestSpikeRunForeverAgain(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         conn = sim.external_devices.SpynnakerLiveSpikesConnection(
             receive_labels=["pop_1"], send_labels=["sender"], local_port=None)
         conn.add_receive_callback("pop_1", receive_spikes)
@@ -98,7 +98,7 @@ class TestSpikeRunForeverAgain(BaseTestCase):
         self.assertEqual(len(expected_ssa_spikes), n_input_spikes)
         self.assertEqual(n_pop2_spikes, n_input_spikes)
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)
 
 

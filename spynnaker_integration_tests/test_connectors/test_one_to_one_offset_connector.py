@@ -21,7 +21,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestOneToOneOffsetConnector(BaseTestCase):
 
-    def check_offset(self):
+    def check_offset(self) -> None:
         timestep = 1.0
         sim.setup(timestep=timestep)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 2)
@@ -45,10 +45,10 @@ class TestOneToOneOffsetConnector(BaseTestCase):
         for i, j in conns_wrap:
             assert j == (i + 3) % 11
 
-    def test_offset(self):
+    def test_offset(self) -> None:
         self.runsafe(self.check_offset)
 
-    def check_offset_groups(self):
+    def check_offset_groups(self) -> None:
         sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
         pop = sim.Population(12, sim.IF_curr_exp())
@@ -80,10 +80,10 @@ class TestOneToOneOffsetConnector(BaseTestCase):
             assert group_i == group_j
             assert j - (group_j * 3) == (i - (group_i * 3) - 1) % 3
 
-    def test_offset_groups(self):
+    def test_offset_groups(self) -> None:
         self.runsafe(self.check_offset_groups)
 
-    def check_offset_offline(self):
+    def check_offset_offline(self) -> None:
         sim.setup(timestep=1)
         pop = sim.Population(11, sim.IF_curr_exp())
         conn_no_wrap = sim.extra_models.OneToOneOffsetConnector(
@@ -112,10 +112,10 @@ class TestOneToOneOffsetConnector(BaseTestCase):
         assert numpy.array_equal(conns_no_wrap, offline_conns_no_wrap)
         assert numpy.array_equal(conns_wrap, offline_conns_wrap)
 
-    def test_offset_offline(self):
+    def test_offset_offline(self) -> None:
         self.runsafe(self.check_offset_offline)
 
-    def check_offset_wrong_number_of_neurons(self):
+    def check_offset_wrong_number_of_neurons(self) -> None:
         sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(11, sim.IF_curr_exp())
@@ -126,10 +126,10 @@ class TestOneToOneOffsetConnector(BaseTestCase):
                     3, False, n_neurons_per_group=3))
         sim.end()
 
-    def test_offset_wrong_number_of_neurons(self):
+    def test_offset_wrong_number_of_neurons(self) -> None:
         self.runsafe(self.check_offset_wrong_number_of_neurons)
 
-    def check_offset_diff_number_of_neurons(self):
+    def check_offset_diff_number_of_neurons(self) -> None:
         sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(12, sim.IF_curr_exp())
@@ -140,10 +140,10 @@ class TestOneToOneOffsetConnector(BaseTestCase):
                     2, True, n_neurons_per_group=3))
         sim.end()
 
-    def test_offset_diff_number_of_neurons(self):
+    def test_offset_diff_number_of_neurons(self) -> None:
         self.runsafe(self.check_offset_diff_number_of_neurons)
 
-    def check_offset_wrong_offset(self):
+    def check_offset_wrong_offset(self) -> None:
         sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(12, sim.IF_curr_exp())
@@ -154,5 +154,5 @@ class TestOneToOneOffsetConnector(BaseTestCase):
                     12, True, n_neurons_per_group=3))
         sim.end()
 
-    def test_offset_wrong_offset(self):
+    def test_offset_wrong_offset(self) -> None:
         self.runsafe(self.check_offset_wrong_offset)

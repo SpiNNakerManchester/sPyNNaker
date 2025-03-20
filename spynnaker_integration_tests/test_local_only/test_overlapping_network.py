@@ -32,46 +32,46 @@ class TestTranslator(AbstractEthernetTranslator):
 class TestDevice(AbstractMulticastControllableDevice):
 
     @property
-    def device_control_partition_id(self):
+    def device_control_partition_id(self) -> None:
         # This should be unique to the device, but is otherwise unimportant
         return "Test"
 
     @property
-    def device_control_key(self):
+    def device_control_key(self) -> None:
         # This should be unique to the device so higher than 262144
         return 262145
 
     @property
-    def device_control_uses_payload(self):
+    def device_control_uses_payload(self) -> None:
         # This returns True to receive the voltage,
         # or False if only the key is desired
         return True
 
     @property
-    def device_control_min_value(self):
+    def device_control_min_value(self) -> None:
         # Return the minimum value accepted by the device.  If the membrane
         # voltage is below this value, this value will be used.
         return 0
 
     @property
-    def device_control_max_value(self):
+    def device_control_max_value(self) -> None:
         # Return the maximum value accepted by the device.  If the membrane
         # voltage is above this value, this value will be used.
         return 100
 
     @property
-    def device_control_timesteps_between_sending(self):
+    def device_control_timesteps_between_sending(self) -> None:
         # The number of timesteps between sending values.  Controls the
         # update rate of the value.
         return 10
 
     @property
-    def device_control_send_type(self):
+    def device_control_send_type(self) -> None:
         # The type of the value - one of the SendType values
         return SendType.SEND_TYPE_ACCUM
 
     @property
-    def device_control_scaling_factor(self):
+    def device_control_scaling_factor(self) -> None:
         # The amount to multiply the voltage by before transmission
         return 1.0
 
@@ -145,7 +145,7 @@ def do_run():
 
 class TestOverlappingNetwork(BaseTestCase):
 
-    def test_run(self):
+    def test_run(self) -> None:
         try:
             self.runsafe(do_run)
         except KeyError as ke:

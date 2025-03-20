@@ -119,7 +119,7 @@ def triplet_additive():
 
 class TestSTDPPairAdditive(BaseTestCase):
 
-    def test_triplet_additive(self):
+    def test_triplet_additive(self) -> None:
         self.runsafe(triplet_additive)
 
 

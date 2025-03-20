@@ -20,7 +20,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestRecordingLaterAdditions(BaseTestCase):
 
-    def do_later_additions(self):
+    def do_later_additions(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 
@@ -163,7 +163,7 @@ class TestRecordingLaterAdditions(BaseTestCase):
         except Exception:
             pass
 
-    def test_later_additions(self):
+    def test_later_additions(self) -> None:
         self.cleanup("test_a.csv")
         self.cleanup("test_b.csv")
         self.cleanup("test_b_bad.csv")

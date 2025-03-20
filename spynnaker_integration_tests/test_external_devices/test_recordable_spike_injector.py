@@ -34,7 +34,7 @@ class TestRecordableSpikeInjector(BaseTestCase):
             connection.send_spike(label, neuron_id)
             time.sleep(0.001)
 
-    def recordable_spike_injector(self):
+    def recordable_spike_injector(self) -> None:
         # pylint: disable=no-member
         p.setup(1.0)
         pop = p.Population(
@@ -74,7 +74,7 @@ class TestRecordableSpikeInjector(BaseTestCase):
             else:
                 assert index in spike_trains
 
-    def test_recordable_spike_injector(self):
+    def test_recordable_spike_injector(self) -> None:
         self.runsafe(self.recordable_spike_injector)
 
 

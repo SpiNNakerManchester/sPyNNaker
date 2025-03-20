@@ -19,7 +19,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestViews(BaseTestCase):
 
-    def set_with_views(self):
+    def set_with_views(self) -> None:
         sim.setup(1.0)
         pop = sim.Population(5, sim.IF_curr_exp, {}, label="pop")
         pop.set(i_offset=1.0)
@@ -38,7 +38,7 @@ class TestViews(BaseTestCase):
             -65., -64.02465820, -63.09686279, -62.21432495, -61.37481689]
         assert numpy.allclose(v1[:, 2], expected)
 
-    def test_initial_value_random(self):
+    def test_initial_value_random(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1", seed=85524)
         self.assertEqual([-65, -65, -65, -65, -65], pop.initial_values["v"])
@@ -52,5 +52,5 @@ class TestViews(BaseTestCase):
             self.assertLessEqual(val, -55.0)
         sim.end()
 
-    def test_set_with_views(self):
+    def test_set_with_views(self) -> None:
         self.runsafe(self.set_with_views)

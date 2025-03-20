@@ -265,13 +265,13 @@ def variable_rate_100us():
 
 class TestCreatePoissons(BaseTestCase):
 
-    def test_variable_rate_options(self):
+    def test_variable_rate_options(self) -> None:
         self.runsafe(variable_rate_options)
 
-    def test_rate_reset(self):
+    def test_rate_reset(self) -> None:
         self.runsafe(variable_rate_reset)
 
-    def test_variable_rate_100us(self):
+    def test_variable_rate_100us(self) -> None:
         self.runsafe(variable_rate_100us)
 
 

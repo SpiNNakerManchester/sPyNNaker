@@ -34,31 +34,31 @@ class TestAllToAllConnector(BaseTestCase):
         self.check_weights(projection, sources, destinations)
         sim.end()
 
-    def same(self):
+    def same(self) -> None:
         self.check_other_connect(5, 5)
 
-    def test_same(self):
+    def test_same(self) -> None:
         self.runsafe(self.same)
 
-    def less_sources(self):
+    def less_sources(self) -> None:
         self.check_other_connect(5, 10)
 
-    def test_less_sources(self):
+    def test_less_sources(self) -> None:
         self.runsafe(self.less_sources)
 
-    def less_destinations(self):
+    def less_destinations(self) -> None:
         self.check_other_connect(10, 5)
 
-    def test_less_destinations(self):
+    def test_less_destinations(self) -> None:
         self.runsafe(self.less_destinations)
 
-    def many(self):
+    def many(self) -> None:
         self.check_other_connect(500, 500)
 
-    def test_many(self):
+    def test_many(self) -> None:
         self.runsafe(self.many)
 
-    def get_before_run(self):
+    def get_before_run(self) -> None:
         sim.setup(1.0)
         pop1 = sim.Population(3, sim.IF_curr_exp(), label="pop1")
         pop2 = sim.Population(3, sim.IF_curr_exp(), label="pop2")
@@ -72,10 +72,10 @@ class TestAllToAllConnector(BaseTestCase):
         self.assertEqual(9, length)
         sim.end()
 
-    def test_get_before_run(self):
+    def test_get_before_run(self) -> None:
         self.runsafe(self.get_before_run)
 
-    def using_static_synapse_singles(self):
+    def using_static_synapse_singles(self) -> None:
         sim.setup(timestep=1.0)
         input = sim.Population(2, sim.SpikeSourceArray([0]), label="input")
         pop = sim.Population(2, sim.IF_curr_exp(), label="pop")
@@ -90,10 +90,10 @@ class TestAllToAllConnector(BaseTestCase):
             for j in range(2):
                 self.assertAlmostEqual(weights[i][j], target[i][j], places=3)
 
-    def test_using_static_synapse_singles(self):
+    def test_using_static_synapse_singles(self) -> None:
         self.runsafe(self.using_static_synapse_singles)
 
-    def using_population_views(self):
+    def using_population_views(self) -> None:
         sim.setup(timestep=1.0)
         input = sim.Population(4, sim.SpikeSourceArray([0]), label="input")
         pop = sim.Population(4, sim.IF_curr_exp(), label="pop")
@@ -106,7 +106,7 @@ class TestAllToAllConnector(BaseTestCase):
                   [2, 3, 0.5, 2.]]
         self.assertCountEqual(weights, target)
 
-    def test_using_population_views(self):
+    def test_using_population_views(self) -> None:
         self.runsafe(self.using_population_views)
 
     def do_all_to_all_nd_test(
@@ -130,16 +130,16 @@ class TestAllToAllConnector(BaseTestCase):
             for j in range(post_size):
                 assert (i, j) in conns
 
-    def test_3d_to_1d(self):
+    def test_3d_to_1d(self) -> None:
         self.do_all_to_all_nd_test(
             (3, 2, 4), 9 * 4 * 8, sim.Grid3D(9 / 4, 9 / 8),
             11, 100, None)
 
-    def test_2d(self):
+    def test_2d(self) -> None:
         self.do_all_to_all_nd_test((3, 5), 9 * 10, sim.Grid2D(9 / 10),
                                    (2, 4), 6 * 8, sim.Grid2D(6 / 8))
 
-    def test_1d_to_2d(self):
+    def test_1d_to_2d(self) -> None:
         self.do_all_to_all_nd_test(6, 90, None,
                                    (3, 4), 9 * 8, sim.Grid2D(9 / 8))
 
@@ -164,10 +164,10 @@ class TestAllToAllConnector(BaseTestCase):
                 else:
                     assert (i, j) in conns
 
-    def test_3d_no_self_connect(self):
+    def test_3d_no_self_connect(self) -> None:
         self.do_all_to_all_nd_self_test(
             (2, 3, 4), 6 * 6 * 8, sim.Grid3D(6 / 6, 6 / 8), self_connect=False)
 
-    def test_2d_self_connect(self):
+    def test_2d_self_connect(self) -> None:
         self.do_all_to_all_nd_self_test(
             (3, 5), 6 * 15, sim.Grid2D(6 / 15), self_connect=True)

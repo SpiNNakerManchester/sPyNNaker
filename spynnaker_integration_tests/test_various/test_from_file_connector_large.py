@@ -102,7 +102,7 @@ def do_run(plot):
 
 class FromFileConnectorLargeTest(BaseTestCase):
 
-    def make_file(self):
+    def make_file(self) -> None:
         connection_list = []
         for i in range(255):
             connection_list.append(
@@ -116,14 +116,14 @@ class FromFileConnectorLargeTest(BaseTestCase):
 
         numpy.savetxt(path, connection_list)
 
-    def do_run(self):
+    def do_run(self) -> None:
         self.make_file()
         v, spikes = do_run(plot=False)
         # any checks go here
         spikes_test = neo_convertor.convert_spikes(spikes)
         self.assertEqual(2, len(spikes_test))
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)
 
 

@@ -149,7 +149,7 @@ def do_run():
 
 class NetworkFakeRetinaInput(BaseTestCase):
 
-    def check_run(self):
+    def check_run(self) -> None:
         (capture_spikes, layer_1_spikes, layer_2_spikes) = do_run()
         # Print what happened
         for neuron_id in range(len(capture_spikes)):
@@ -183,7 +183,7 @@ class NetworkFakeRetinaInput(BaseTestCase):
         # TODO convert this into something that can be asserted or checked?
         print("Passed!")
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.check_run)
 
 

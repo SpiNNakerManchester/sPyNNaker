@@ -26,7 +26,7 @@ neurons_per_core = n_neurons / 2
 
 class TestCoresAndBinariesRecording(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 
@@ -67,5 +67,5 @@ class TestCoresAndBinariesRecording(BaseTestCase):
                 "iobuf_for_chip_0_0_processor_id_{}.txt".format(processor),
                 provenance_files)
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)

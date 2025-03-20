@@ -22,7 +22,7 @@ from spynnaker.pyNN.data import SpynnakerDataView
 
 class TestCoresAndBinariesRecording(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.SpikeSourceArray, 1)
 
@@ -59,5 +59,5 @@ class TestCoresAndBinariesRecording(BaseTestCase):
                 "iobuf_for_chip_0_0_processor_id_{}.txt".format(processor),
                 app_iobuf_files)
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)

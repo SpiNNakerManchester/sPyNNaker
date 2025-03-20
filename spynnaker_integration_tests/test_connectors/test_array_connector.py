@@ -177,7 +177,7 @@ def do_larger_array(plot):
 
 class ArrayConnectorTest(BaseTestCase):
 
-    def a_run(self):
+    def a_run(self) -> None:
         v, spikes, v2, spikes2 = do_run(plot=False)
         # any checks go here
         spikes_test = neo_convertor.convert_spikes(spikes)
@@ -185,17 +185,17 @@ class ArrayConnectorTest(BaseTestCase):
         self.assertEqual(263, len(spikes_test))
         self.assertEqual(263, len(spikes_test2))
 
-    def test_a_run(self):
+    def test_a_run(self) -> None:
         self.runsafe(self.a_run)
 
-    def larger_array(self):
+    def larger_array(self) -> None:
         v, spikes, conns = do_larger_array(plot=False)
         # checks go here
         spikes_test = neo_convertor.convert_spikes(spikes)
         self.assertEqual(4032, len(conns))
         self.assertEqual(640, len(spikes_test))
 
-    def test_larger_array(self):
+    def test_larger_array(self) -> None:
         self.runsafe(self.larger_array)
 
     def do_array_nd_test(
@@ -226,11 +226,11 @@ class ArrayConnectorTest(BaseTestCase):
         assert numpy.array_equal(numpy.sort(random_conns, axis=0),
                                  numpy.sort(conns, axis=0))
 
-    def test_3d_to_1d_array(self):
+    def test_3d_to_1d_array(self) -> None:
         self.do_array_nd_test((5, 2, 1), 10 * 6 * 4, p.Grid3D(10 / 6, 10 / 4),
                               12, 40, None)
 
-    def test_2d_to_2d_array(self):
+    def test_2d_to_2d_array(self) -> None:
         self.do_array_nd_test((3, 4), 9 * 8, p.Grid2D(9 / 8),
                               (1, 2), 5 * 6, p.Grid2D(5 / 6))
 

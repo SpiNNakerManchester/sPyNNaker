@@ -18,7 +18,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestFromListConnectorMixed(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(1.0)
         pre = sim.Population(2, sim.IF_curr_exp())
         post = sim.Population(2, sim.IF_curr_exp())
@@ -56,7 +56,7 @@ class TestFromListConnectorMixed(BaseTestCase):
                 self.assertAlmostEqual(
                     conns2[i][j+2], target2[i][j+2], places=3)
 
-    def test_from_list_connector_mixed(self):
+    def test_from_list_connector_mixed(self) -> None:
         self.runsafe(self.do_run)
 
     def do_list_nd_run(
@@ -87,12 +87,12 @@ class TestFromListConnectorMixed(BaseTestCase):
 
         assert len(diff) == 0
 
-    def test_list_3d_to_1d(self):
+    def test_list_3d_to_1d(self) -> None:
         self.do_list_nd_run(
             (3, 4, 2), 3 * 8 * 8, sim.Grid3D(3 / 8, 3 / 8),
             11, 30, None)
 
-    def test_list_2d(self):
+    def test_list_2d(self) -> None:
         self.do_list_nd_run(
             (5, 3), 10 * 15, sim.Grid2D(10 / 15),
             (1, 6), 6 * 24, sim.Grid2D(6 / 24))

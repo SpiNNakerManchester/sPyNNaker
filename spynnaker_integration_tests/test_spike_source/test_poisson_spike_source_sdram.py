@@ -85,7 +85,7 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
             sim.StaticSynapse(weight=weight, delay=delay))
         return pop_1, proj
 
-    def recording_poisson_spikes_rate_0(self):
+    def recording_poisson_spikes_rate_0(self) -> None:
         sim.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 100  # number of neurons in each population
         sim.set_number_of_neurons_per_core(sim.IF_curr_delta, n_neurons / 2)
@@ -109,10 +109,10 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
             assert w == 1.0
             assert d == 1.0
 
-    def test_recording_poisson_spikes_rate_0(self):
+    def test_recording_poisson_spikes_rate_0(self) -> None:
         self.runsafe(self.recording_poisson_spikes_rate_0)
 
-    def poisson_sdram_with_delay(self):
+    def poisson_sdram_with_delay(self) -> None:
         sim.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 100  # number of neurons in each population
         sim.set_number_of_neurons_per_core(sim.IF_curr_delta, n_neurons / 2)
@@ -134,7 +134,7 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
             assert w == 1.0
             assert d == 17.0
 
-    def poisson_sdram_with_delay_different_ts(self):
+    def poisson_sdram_with_delay_different_ts(self) -> None:
         sim.setup(timestep=0.1, min_delay=1.0)
         n_neurons = 100  # number of neurons in each population
         sim.set_number_of_neurons_per_core(sim.IF_curr_delta, n_neurons / 2)
@@ -156,7 +156,7 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
             assert w == 1.0
             assert d == 1.0
 
-    def test_poisson_sdram_with_delay(self):
+    def test_poisson_sdram_with_delay(self) -> None:
         self.runsafe(self.poisson_sdram_with_delay)
 
     def check_rates(self, rates, seconds, seed):
@@ -198,18 +198,18 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
                 n_neurons, v[rate], weight, rate, spikes[rate],
                 seconds, max_spikes[rate], max_weight[rate])
 
-    def recording_poisson_spikes_rate_fast(self):
+    def recording_poisson_spikes_rate_fast(self) -> None:
         self.check_rates(
             [10.24, 20.48, 40.96, 81.92, 163.84, 327.68, 655.36, 1310.72], 10,
             0)
 
-    def test_recording_poisson_spikes_rate_fast(self):
+    def test_recording_poisson_spikes_rate_fast(self) -> None:
         self.runsafe(self.recording_poisson_spikes_rate_fast)
 
-    def recording_poisson_spikes_rate_slow(self):
+    def recording_poisson_spikes_rate_slow(self) -> None:
         self.check_rates(
             [0, 0.01, 0.02, 0.04, 0.08, 0.16, 0.32, 0.64, 1.28, 2.56, 5.12],
             100, 0)
 
-    def test_recording_poisson_spikes_rate_slow(self):
+    def test_recording_poisson_spikes_rate_slow(self) -> None:
         self.runsafe(self.recording_poisson_spikes_rate_slow)

@@ -18,8 +18,8 @@ from spynnaker_integration_tests.test_debug_mode.check_debug import (
 
 class TestDebug(CheckDebug):
 
-    def test_debug(self):
+    def test_debug(self) -> None:
         self.runsafe(self.debug)
 
-    def test_empty_run(self):
+    def test_empty_run(self) -> None:
         self.emptyrun()

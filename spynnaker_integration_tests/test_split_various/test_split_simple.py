@@ -73,7 +73,7 @@ def run_simple_split():
 
 class TestSplitSimple(BaseTestCase):
 
-    def test_run_simple_split(self):
+    def test_run_simple_split(self) -> None:
         self.runsafe(run_simple_split)
 
 

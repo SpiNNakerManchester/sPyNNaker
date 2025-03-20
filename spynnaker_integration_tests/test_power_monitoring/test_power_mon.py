@@ -34,7 +34,7 @@ synfire_run = SynfireRunner()
 
 class TestPowerMonitoring(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                            run_times=run_times, input_class=input_class,
                            start_time=start_time, duration=duration, rate=rate,
@@ -61,5 +61,5 @@ class TestPowerMonitoring(BaseTestCase):
                 exec_times.add(row[0])
         self.assertEqual(exec_times, set([0.01, 0.03, 0.06]))
 
-    def test_power_monitoring(self):
+    def test_power_monitoring(self) -> None:
         self.runsafe(self.do_run)

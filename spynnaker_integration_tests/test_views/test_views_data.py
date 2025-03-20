@@ -20,7 +20,7 @@ from spynnaker.pyNN.utilities import neo_convertor
 
 class TestViews(BaseTestCase):
 
-    def set_with_views(self):
+    def set_with_views(self) -> None:
         sim.setup(timestep=1.0)
 
         # create two pops that behave identical
@@ -131,5 +131,5 @@ class TestViews(BaseTestCase):
             assert (v1matrix[int(time)][int(id)] == val)
         assert (numpy.array_equal(v2partconvert, v2parttuple))
 
-    def test_set_with_views(self):
+    def test_set_with_views(self) -> None:
         self.runsafe(self.set_with_views)

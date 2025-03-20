@@ -20,7 +20,7 @@ import unittest
 
 class TestSTDPNearestPairAdditive(BaseTestCase):
 
-    def potentiation_and_depression(self):
+    def potentiation_and_depression(self) -> None:
         p.setup(1)
         runtime = 100
         initial_run = 1000  # to negate any initial conditions
@@ -139,7 +139,7 @@ class TestSTDPNearestPairAdditive(BaseTestCase):
         self.assertTrue(numpy.allclose(
                         weights[0], new_weight_exact, atol=0.001))
 
-    def test_potentiation_and_depression(self):
+    def test_potentiation_and_depression(self) -> None:
         self.runsafe(self.potentiation_and_depression)
 
 

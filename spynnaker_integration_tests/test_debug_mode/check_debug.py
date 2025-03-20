@@ -46,7 +46,7 @@ class CheckDebug(BaseTestCase):
     """
     that it does not crash in debug mode. All reports on.
     """
-    def debug(self):
+    def debug(self) -> None:
         # pylint: disable=protected-access
         reports = [
             # write_energy_report
@@ -146,7 +146,7 @@ class CheckDebug(BaseTestCase):
 
         sim.end()
 
-    def emptyrun(self):
+    def emptyrun(self) -> None:
         """ Chech there is no error on run not done """
         sim.setup(timestep=1.0)
         sim.run(10)

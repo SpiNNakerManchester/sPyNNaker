@@ -25,7 +25,7 @@ import unittest
 
 class UDPSCAMPConnection(SCAMPConnection):
 
-    def get_receive_method(self):
+    def get_receive_method(self) -> None:
         return self.receive
 
 
@@ -51,7 +51,7 @@ class TestLiveGatherTranslator(BaseTestCase):
         reprogram_tag(self.conn, tag=1, strip=True)
         self.listener.start()
 
-    def live_spike_receive_translated(self):
+    def live_spike_receive_translated(self) -> None:
         self.stored_data = list()
 
         db_conn = DatabaseConnection(local_port=None)
@@ -79,7 +79,7 @@ class TestLiveGatherTranslator(BaseTestCase):
             self.assertEqual(key >> 16, self.PREFIX)
             self.assertEqual(1000 + ((key & 0xFFFF) * 10), time)
 
-    def test_live_spike_receive_translated(self):
+    def test_live_spike_receive_translated(self) -> None:
         self.runsafe(self.live_spike_receive_translated)
 
 

@@ -18,7 +18,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestSampling(BaseTestCase):
 
-    def test_thrtytwo(self):
+    def test_thrtytwo(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 

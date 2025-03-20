@@ -19,7 +19,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestStochasticModels(BaseTestCase):
 
-    def run_stoc_exp(self):
+    def run_stoc_exp(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(100, sim.extra_models.StocExp())
         pop.record("spikes")
@@ -35,7 +35,7 @@ class TestStochasticModels(BaseTestCase):
             self.assertTrue(len(s) > 0)
             self.assertTrue(len(s) < 750)
 
-    def run_stoc_exp_stable(self):
+    def run_stoc_exp_stable(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(100, sim.extra_models.StocExpStable())
         pop.record("spikes")
@@ -49,7 +49,7 @@ class TestStochasticModels(BaseTestCase):
             self.assertTrue(len(s) > 0)
             self.assertTrue(len(s) < 500)
 
-    def run_stoc_sigma(self):
+    def run_stoc_sigma(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(100, sim.extra_models.StocSigma())
         pop.record("spikes")
@@ -63,11 +63,11 @@ class TestStochasticModels(BaseTestCase):
             self.assertTrue(len(s) > 0)
             self.assertTrue(len(s) < 750)
 
-    def test_stoc_exp(self):
+    def test_stoc_exp(self) -> None:
         self.runsafe(self.run_stoc_exp)
 
-    def test_stoc_exp_stable(self):
+    def test_stoc_exp_stable(self) -> None:
         self.runsafe(self.run_stoc_exp_stable)
 
-    def test_stoc_sigma(self):
+    def test_stoc_sigma(self) -> None:
         self.runsafe(self.run_stoc_sigma)

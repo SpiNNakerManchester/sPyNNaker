@@ -144,7 +144,7 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
             singles[d].add(s)
         return singles
 
-    def run_1_core(self):
+    def run_1_core(self) -> None:
         spikes, weights = do_run([6, 6], 6)
 
         single_connected = self.directly_connected(weights)
@@ -158,7 +158,7 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
 
         self.assertDictEqual(self.S_DICT, single_connected)
 
-    def run_many_core_2_2(self):
+    def run_many_core_2_2(self) -> None:
         spikes, weights = do_run([2, 2], 6)
 
         single_connected = self.directly_connected(weights)
@@ -169,7 +169,7 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
         for spike_train, first in zip(spikes, self.FIRSTS):
             self.assertAlmostEqual(first, spike_train[0].magnitude, delta=1)
 
-    def run_many_core_3_3(self):
+    def run_many_core_3_3(self) -> None:
         spikes, weights = do_run([3, 3], 6)
         # Not sure checking spike len is telling us much
         for spike_train, first in zip(spikes, self.FIRSTS):
@@ -178,11 +178,11 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
         single_connected = self.directly_connected(weights)
         self.assertDictEqual(self.S_DICT, single_connected)
 
-    def test_1_core(self):
+    def test_1_core(self) -> None:
         self.runsafe(self.run_1_core)
 
-    def test_many_core_2_2(self):
+    def test_many_core_2_2(self) -> None:
         self.runsafe(self.run_many_core_2_2)
 
-    def test_many_core_3_3(self):
+    def test_many_core_3_3(self) -> None:
         self.runsafe(self.run_many_core_3_3)

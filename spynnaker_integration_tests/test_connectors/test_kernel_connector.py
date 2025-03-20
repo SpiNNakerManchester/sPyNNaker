@@ -68,7 +68,7 @@ class TestKernelConnector(BaseTestCase):
 
         return weightsdelays
 
-    def test_oddsquarek_run(self):
+    def test_oddsquarek_run(self) -> None:
         (psh, psw, ksh, ksw) = (4, 4, 3, 3)
         weightsdelays = self.do_run(psh, psw, ksh, ksw)
         # Checks go here
@@ -82,7 +82,7 @@ class TestKernelConnector(BaseTestCase):
 #         self.assertSequenceEqual(list10, weightsdelays[1])
 #         self.assertSequenceEqual(list11, weightsdelays[5])
 
-    def test_evensquarek_run(self):
+    def test_evensquarek_run(self) -> None:
         (psh, psw, ksh, ksw) = (4, 4, 2, 2)
         weightsdelays = self.do_run(psh, psw, ksh, ksw)
         # Checks go here
@@ -92,7 +92,7 @@ class TestKernelConnector(BaseTestCase):
         [self.assertEqual(list01[i], weightsdelays[1][i]) for i in range(4)]
         [self.assertEqual(list03[i], weightsdelays[5][i]) for i in range(4)]
 
-    def test_nonsquarek_run(self):
+    def test_nonsquarek_run(self) -> None:
         (psh, psw, ksh, ksw) = (4, 4, 1, 3)
         weightsdelays = self.do_run(psh, psw, ksh, ksw)
         # Checks go here
@@ -102,7 +102,7 @@ class TestKernelConnector(BaseTestCase):
         [self.assertEqual(list10[i], weightsdelays[1][i]) for i in range(4)]
         [self.assertEqual(list42[i], weightsdelays[5][i]) for i in range(4)]
 
-    def test_bigger_nonsquarep_run(self):
+    def test_bigger_nonsquarep_run(self) -> None:
         (psh, psw, ksh, ksw) = (32, 16, 3, 3)
         weightsdelays = self.do_run(psh, psw, ksh, ksw)
         # Checks go here

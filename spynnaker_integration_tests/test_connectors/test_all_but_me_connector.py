@@ -22,7 +22,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestAllButMeConnector(BaseTestCase):
 
-    def check_all_but_me(self):
+    def check_all_but_me(self) -> None:
         weight = 5.0
         timestep = 1.0
         sim.setup(timestep=timestep)
@@ -40,10 +40,10 @@ class TestAllButMeConnector(BaseTestCase):
         for index, (i, j) in enumerate(permutations(range(11), 2)):
             assert conns[index] == [i, j, weight, timestep]
 
-    def test_all_but_me(self):
+    def test_all_but_me(self) -> None:
         self.runsafe(self.check_all_but_me)
 
-    def check_all_but_me_groups(self):
+    def check_all_but_me_groups(self) -> None:
         sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
         pop = sim.Population(12, sim.IF_curr_exp())
@@ -62,10 +62,10 @@ class TestAllButMeConnector(BaseTestCase):
         print(groups)
         assert numpy.array_equal(conns, groups)
 
-    def test_all_but_me_groups(self):
+    def test_all_but_me_groups(self) -> None:
         self.runsafe(self.check_all_but_me_groups)
 
-    def check_all_but_me_offline(self):
+    def check_all_but_me_offline(self) -> None:
         sim.setup(timestep=1)
         pop = sim.Population(11, sim.IF_curr_exp())
         conn = sim.extra_models.AllButMeConnector()
@@ -87,10 +87,10 @@ class TestAllButMeConnector(BaseTestCase):
         assert numpy.array_equal(conns, groups)
         assert numpy.array_equal(conns, offline_conns)
 
-    def test_all_but_me_offline(self):
+    def test_all_but_me_offline(self) -> None:
         self.runsafe(self.check_all_but_me_offline)
 
-    def check_all_but_me_weights(self):
+    def check_all_but_me_weights(self) -> None:
         sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(11, sim.IF_curr_exp())
@@ -110,10 +110,10 @@ class TestAllButMeConnector(BaseTestCase):
         print(groups)
         assert numpy.array_equal(conns, groups)
 
-    def test_all_but_me_weights(self):
+    def test_all_but_me_weights(self) -> None:
         self.runsafe(self.check_all_but_me_weights)
 
-    def check_all_but_me_wrong_number_of_neurons(self):
+    def check_all_but_me_wrong_number_of_neurons(self) -> None:
         sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(11, sim.IF_curr_exp())
@@ -124,10 +124,10 @@ class TestAllButMeConnector(BaseTestCase):
                     n_neurons_per_group=3))
         sim.end()
 
-    def test_all_but_me_wrong_number_of_neurons(self):
+    def test_all_but_me_wrong_number_of_neurons(self) -> None:
         self.runsafe(self.check_all_but_me_wrong_number_of_neurons)
 
-    def check_all_but_me_diff_number_of_neurons(self):
+    def check_all_but_me_diff_number_of_neurons(self) -> None:
         sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(12, sim.IF_curr_exp())
@@ -138,10 +138,10 @@ class TestAllButMeConnector(BaseTestCase):
                     n_neurons_per_group=3))
         sim.end()
 
-    def test_all_but_me_diff_number_of_neurons(self):
+    def test_all_but_me_diff_number_of_neurons(self) -> None:
         self.runsafe(self.check_all_but_me_diff_number_of_neurons)
 
-    def check_all_but_me_wrong_number_of_weights(self):
+    def check_all_but_me_wrong_number_of_weights(self) -> None:
         sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 3)
         pre = sim.Population(12, sim.IF_curr_exp())
@@ -152,5 +152,5 @@ class TestAllButMeConnector(BaseTestCase):
                     n_neurons_per_group=3, weights=[10]))
         sim.end()
 
-    def test_all_but_me_wrong_number_of_weights(self):
+    def test_all_but_me_wrong_number_of_weights(self) -> None:
         self.runsafe(self.check_all_but_me_wrong_number_of_weights)

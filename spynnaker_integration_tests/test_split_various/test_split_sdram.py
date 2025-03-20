@@ -41,7 +41,7 @@ def run_sdram_split():
 
 class TestSplitSDRAM(BaseTestCase):
 
-    def test_run_simple_split(self):
+    def test_run_simple_split(self) -> None:
         self.runsafe(run_sdram_split)
 
 

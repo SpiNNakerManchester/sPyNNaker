@@ -66,26 +66,26 @@ class TestFixedTotalNumberConnector(BaseTestCase):
         if not with_replace:
             assert len(numpy.unique(conns, axis=0)) == len(conns)
 
-    def test_fixed_number_1d(self):
+    def test_fixed_number_1d(self) -> None:
         self.do_fixed_total_nd_run(7, 100, None, 8, 50, None, 10, True)
 
-    def test_fixed_number_1d_no_replace(self):
+    def test_fixed_number_1d_no_replace(self) -> None:
         self.do_fixed_total_nd_run(7, 100, None, 8, 50, None, 10, False)
 
-    def test_fixed_number_3d_to_1d(self):
+    def test_fixed_number_3d_to_1d(self) -> None:
         self.do_fixed_total_nd_run(
             (3, 4, 2), 3 * 8 * 8, sim.Grid3D(3 / 8, 3 / 8),
             11, 30, None, 100, True)
 
-    def test_fixed_number_3d_to_1d_no_replace(self):
+    def test_fixed_number_3d_to_1d_no_replace(self) -> None:
         self.do_fixed_total_nd_run(
             (3, 4, 2), 3 * 8 * 8, sim.Grid3D(3 / 8, 3 / 8),
             11, 30, None, 100, False)
 
-    def test_fixed_number_2d_no_self(self):
+    def test_fixed_number_2d_no_self(self) -> None:
         self.do_fixed_total_nd_run_no_self(
             (5, 3), 10 * 15, sim.Grid2D(10 / 15), 75, True)
 
-    def test_fixed_number_2d_no_self_no_replace(self):
+    def test_fixed_number_2d_no_self_no_replace(self) -> None:
         self.do_fixed_total_nd_run_no_self(
             (5, 3), 10 * 15, sim.Grid2D(10 / 15), 75, False)

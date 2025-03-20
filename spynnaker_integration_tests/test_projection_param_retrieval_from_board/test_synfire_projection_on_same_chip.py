@@ -28,7 +28,7 @@ get_delays = True
 
 class SynfireProjectionOnSameChip(BaseTestCase):
 
-    def get_before_and_after(self):
+    def get_before_and_after(self) -> None:
         synfire_run = SynfireRunner()
         synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                            weight_to_spike=weight_to_spike, delay=delay,
@@ -45,7 +45,7 @@ class SynfireProjectionOnSameChip(BaseTestCase):
         self.assertEqual(n_neurons, len(delays[1]))
         self.assertTrue(numpy.allclose(delays[0][0][2], delays[1][0][2]))
 
-    def test_get_before_and_after(self):
+    def test_get_before_and_after(self) -> None:
         self.runsafe(self.get_before_and_after)
 
 

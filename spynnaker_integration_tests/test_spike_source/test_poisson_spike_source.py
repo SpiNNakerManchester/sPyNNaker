@@ -60,19 +60,19 @@ class TestPoissonSpikeSource(BaseTestCase):
 
         self.check_spikes(n_neurons, neo, 5)
 
-    def recording_poisson_spikes_no_zero(self):
+    def recording_poisson_spikes_no_zero(self) -> None:
         self.recording_poisson_spikes(False)
 
-    def test_recording_poisson_spikes_no_zero(self):
+    def test_recording_poisson_spikes_no_zero(self) -> None:
         self.runsafe(self.recording_poisson_spikes_no_zero)
 
-    def recording_poisson_spikes_with_zero(self):
+    def recording_poisson_spikes_with_zero(self) -> None:
         self.recording_poisson_spikes(True)
 
-    def test_recording_poisson_spikes_with_zero(self):
+    def test_recording_poisson_spikes_with_zero(self) -> None:
         self.runsafe(self.recording_poisson_spikes_with_zero)
 
-    def recording_poisson_spikes_big(self):
+    def recording_poisson_spikes_big(self) -> None:
         sim.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 2560  # number of neurons in each population
 
@@ -102,10 +102,10 @@ class TestPoissonSpikeSource(BaseTestCase):
 
         self.check_spikes(n_neurons, neo, 5)
 
-    def test_recording_poisson_spikes_big(self):
+    def test_recording_poisson_spikes_big(self) -> None:
         self.runsafe(self.recording_poisson_spikes_big)
 
-    def recording_poisson_spikes_rate_0(self):
+    def recording_poisson_spikes_rate_0(self) -> None:
         sim.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 256  # number of neurons in each population
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, n_neurons / 2)
@@ -136,7 +136,7 @@ class TestPoissonSpikeSource(BaseTestCase):
 
         self.check_spikes(n_neurons, neo, 0)
 
-    def test_recording_poisson_spikes_rate_0(self):
+    def test_recording_poisson_spikes_rate_0(self) -> None:
         self.runsafe(self.recording_poisson_spikes_rate_0)
 
     def check_rates(self, rates, seconds, seed):
@@ -159,23 +159,23 @@ class TestPoissonSpikeSource(BaseTestCase):
         for rate in rates:
             self.check_spikes(n_neurons, spikes[rate], rate*seconds)
 
-    def recording_poisson_spikes_rate_fast(self):
+    def recording_poisson_spikes_rate_fast(self) -> None:
         self.check_rates(
             [10.24, 20.48, 40.96, 81.92, 163.84, 327.68, 655.36, 1310.72], 10,
             0)
 
-    def test_recording_poisson_spikes_rate_fast(self):
+    def test_recording_poisson_spikes_rate_fast(self) -> None:
         self.runsafe(self.recording_poisson_spikes_rate_fast)
 
-    def recording_poisson_spikes_rate_slow(self):
+    def recording_poisson_spikes_rate_slow(self) -> None:
         self.check_rates(
             [0, 0.01, 0.02, 0.04, 0.08, 0.16, 0.32, 0.64, 1.28, 2.56, 5.12],
             100, 0)
 
-    def test_recording_poisson_spikes_rate_slow(self):
+    def test_recording_poisson_spikes_rate_slow(self) -> None:
         self.runsafe(self.recording_poisson_spikes_rate_slow)
 
-    def poisson_live_rates(self):
+    def poisson_live_rates(self) -> None:
 
         self._saved_label_init = None
         self._saved_vertex_size = None
@@ -238,10 +238,10 @@ class TestPoissonSpikeSource(BaseTestCase):
         self.assertEqual(self._saved_vertex_size, n_neurons)
         self.assertEqual(self._saved_run_time_ms, runtime)
 
-    def test_poisson_live_rates(self):
+    def test_poisson_live_rates(self) -> None:
         self.runsafe(self.poisson_live_rates)
 
-    def poisson_multi_run_change_rate(self):
+    def poisson_multi_run_change_rate(self) -> None:
 
         n_p = 2
         sim.setup(timestep=1.0)
@@ -260,10 +260,10 @@ class TestPoissonSpikeSource(BaseTestCase):
 
         sim.end()
 
-    def test_poisson_multi_run_change_rate(self):
+    def test_poisson_multi_run_change_rate(self) -> None:
         self.runsafe(self.poisson_multi_run_change_rate)
 
-    def poisson_higher_rate(self):
+    def poisson_higher_rate(self) -> None:
         sim.setup(timestep=1.0)
         pop_src = sim.Population(
             100, sim.SpikeSourcePoisson(rate=1000), label="src")
@@ -273,5 +273,5 @@ class TestPoissonSpikeSource(BaseTestCase):
         sim.end()
         self.check_spikes(100, neo, 10000)
 
-    def test_poisson_higher_rate(self):
+    def test_poisson_higher_rate(self) -> None:
         self.runsafe(self.poisson_higher_rate)

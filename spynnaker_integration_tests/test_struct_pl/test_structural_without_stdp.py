@@ -92,7 +92,7 @@ def structural_without_stdp():
 
 class TestStructuralWithoutSTDP(BaseTestCase):
 
-    def test_structural_without_stdp(self):
+    def test_structural_without_stdp(self) -> None:
         self.runsafe(structural_without_stdp)
 
 

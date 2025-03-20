@@ -45,32 +45,32 @@ class CSAConnectorTest(BaseTestCase):
                                  numpy.sort(conns, axis=0))
         return conns
 
-    def test_1d_one_to_one(self):
+    def test_1d_one_to_one(self) -> None:
         conns = self.do_csa_nd_test(4, 25, None, 6, 35, None, csa.oneToOne)
         assert all(i == j for (i, j) in conns)
 
-    def test_1d_from_list(self):
+    def test_1d_from_list(self) -> None:
         conns = self.do_csa_nd_test(
             4, 10, None, 6, 10, None, [(i, i + 1 % 10) for i in range(10)])
         assert all(j == i + 1 % 10 for (i, j) in conns)
 
-    def test_1d_random(self):
+    def test_1d_random(self) -> None:
         conns = self.do_csa_nd_test(
             4, 10, None, 6, 10, None, csa.random(0.05))
         assert len(conns) > 0
 
-    def test_1d_block_random(self):
+    def test_1d_block_random(self) -> None:
         conns = self.do_csa_nd_test(
             3, 10, None, 4, 10, None,
             csa.block(2, 5) * csa.random(0.5) * csa.random(0.3))
         assert len(conns) > 0
 
-    def test_2d(self):
+    def test_2d(self) -> None:
         self.do_csa_nd_test(
             (2, 6), 12 * 18, p.Grid2D(12 / 18),
             (3, 3), 6 * 12, p.Grid2D(6 / 12), csa.block(3, 1) * csa.full)
 
-    def test_3d_to_1d(self):
+    def test_3d_to_1d(self) -> None:
         self.do_csa_nd_test(
             (1, 4, 3), 4 * 4 * 6, p.Grid3D(4 / 4, 4 / 6),
             30, 96, None, csa.block(4, 4) * csa.random(0.5))

@@ -28,7 +28,7 @@ def a_run():
 
 class PopAdditionParamsTest(BaseTestCase):
 
-    def a_run(self):
+    def a_run(self) -> None:
         n_neurons = 100  # number of neurons in each population
 
         p.setup(timestep=1.0, min_delay=1.0)
@@ -41,7 +41,7 @@ class PopAdditionParamsTest(BaseTestCase):
                 lc.records,
                 "additional_parameter bacon will be ignored", 'WARNING', 1)
 
-    def test_a_run(self):
+    def test_a_run(self) -> None:
         self.runsafe(a_run)
 
 

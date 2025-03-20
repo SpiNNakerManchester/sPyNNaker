@@ -53,7 +53,7 @@ def stdp_with_self_connection():
 
 class TestSTDPWithSelfConnection(BaseTestCase):
 
-    def test_stdp_with_self_connection(self):
+    def test_stdp_with_self_connection(self) -> None:
         self.runsafe(stdp_with_self_connection)
 
 

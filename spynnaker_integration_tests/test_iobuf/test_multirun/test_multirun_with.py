@@ -27,7 +27,7 @@ class TestIobuffMultirun(BaseTestCase):
                 placement.x, placement.y, placement.p))
         return os.path.getsize(iofile)
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(timestep=1.0, min_delay=1.0)
         prov_path = SpynnakerDataView.get_app_provenance_dir_path()
         pop = sim.Population(10, sim.IF_curr_exp(), label='pop_1')
@@ -70,5 +70,5 @@ class TestIobuffMultirun(BaseTestCase):
         size8 = self.check_size(prov_patha, placement)
         self.assertEqual(size8, size6)
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)

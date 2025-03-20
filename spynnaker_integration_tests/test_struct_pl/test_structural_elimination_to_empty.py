@@ -64,7 +64,7 @@ def structural_eliminate_to_empty():
 
 class TestStructuralEliminateToEmpty(BaseTestCase):
 
-    def test_structural_eliminate_to_empty(self):
+    def test_structural_eliminate_to_empty(self) -> None:
         self.runsafe(structural_eliminate_to_empty)
 
 

@@ -18,7 +18,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestSimpleScript(BaseTestCase):
 
-    def simple_script(self):
+    def simple_script(self) -> None:
         # A simple script that should work whatever we do, but only if the
         # SDRAM is worked out correctly!
         p.setup(1.0)
@@ -32,5 +32,5 @@ class TestSimpleScript(BaseTestCase):
         p.run(200)
         p.end()
 
-    def test_simple_script(self):
+    def test_simple_script(self) -> None:
         self.runsafe(self.simple_script)

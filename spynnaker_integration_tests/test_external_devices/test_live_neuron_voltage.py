@@ -45,35 +45,35 @@ class Device(AbstractMulticastControllableDevice):
         self.__partition = partition
 
     @property
-    def device_control_key(self):
+    def device_control_key(self) -> None:
         return self.__key
 
     @property
-    def device_control_max_value(self):
+    def device_control_max_value(self) -> None:
         return DataType.S1615.max
 
     @property
-    def device_control_min_value(self):
+    def device_control_min_value(self) -> None:
         return DataType.S1615.min
 
     @property
-    def device_control_partition_id(self):
+    def device_control_partition_id(self) -> None:
         return self.__partition
 
     @property
-    def device_control_scaling_factor(self):
+    def device_control_scaling_factor(self) -> None:
         return 1.0
 
     @property
-    def device_control_send_type(self):
+    def device_control_send_type(self) -> None:
         return SendType.SEND_TYPE_ACCUM
 
     @property
-    def device_control_timesteps_between_sending(self):
+    def device_control_timesteps_between_sending(self) -> None:
         return self.__time_between_sending
 
     @property
-    def device_control_uses_payload(self):
+    def device_control_uses_payload(self) -> None:
         return True
 
 
@@ -138,7 +138,7 @@ def live_neuron_voltage():
 
 class TestLiveNeuronVoltage(BaseTestCase):
 
-    def test_live_neuron_voltage(self):
+    def test_live_neuron_voltage(self) -> None:
         self.runsafe(live_neuron_voltage)
 
 

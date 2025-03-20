@@ -59,13 +59,13 @@ def do_run(nNeurons, neurons_per_core):
 
 class BigMultiProcessorSpikeSourcePrint(BaseTestCase):
 
-    def seventy(self):
+    def seventy(self) -> None:
         nNeurons = 600  # number of neurons in each population
         neo = do_run(nNeurons, 70)
         spike_count = neo_convertor.count_spikes(neo)
         self.assertEqual(spike_count, 7200)
 
-    def test_seventy(self):
+    def test_seventy(self) -> None:
         self.runsafe(self.seventy)
 
 

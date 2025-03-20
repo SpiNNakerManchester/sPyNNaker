@@ -41,7 +41,7 @@ def hacked_receive_chip_info(self, scp_read_chip_info_response):
 
 class TestAllow(BaseTestCase):
 
-    def test_with_actual_ip_address(self):
+    def test_with_actual_ip_address(self) -> None:
         sim.setup(timestep=1.0, n_boards_required=6)
         self.assert_not_spin_three()
 

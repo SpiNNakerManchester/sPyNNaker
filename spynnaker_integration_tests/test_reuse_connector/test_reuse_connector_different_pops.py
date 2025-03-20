@@ -43,7 +43,7 @@ def do_run():
 
 
 class ReuseConnectorDifferentPopsTest(BaseTestCase):
-    def check_run(self):
+    def check_run(self) -> None:
         proj_1_list, proj_2_list = do_run()
         # Check the lists are the correct length and
         # have the correct weights / delays
@@ -54,7 +54,7 @@ class ReuseConnectorDifferentPopsTest(BaseTestCase):
         self.assertEqual(1.0, proj_2_list[0][2])
         self.assertEqual(3.0, proj_2_list[0][3])
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.check_run)
 
 

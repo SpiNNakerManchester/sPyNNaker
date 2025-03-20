@@ -20,7 +20,7 @@ from spynnaker.pyNN.data import SpynnakerDataView
 
 class MachineTest(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         # pylint: disable=protected-access,no-member
         sim.setup(timestep=1.0, n_boards_required=2)
         pop = sim.Population(3, sim.IF_curr_exp(), label="pop_1")
@@ -130,5 +130,5 @@ class MachineTest(BaseTestCase):
 
         sim.end()
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)

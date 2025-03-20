@@ -98,10 +98,10 @@ def do_run():
 
 class TestPoolDense(BaseTestCase):
 
-    def check_run(self):
+    def check_run(self) -> None:
         (v, spikes) = do_run()
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.check_run)
 
 

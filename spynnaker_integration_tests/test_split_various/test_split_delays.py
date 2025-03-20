@@ -98,7 +98,7 @@ def run_delayed_split():
 
 class TestSplitDelays(BaseTestCase):
 
-    def test_run_simple_split(self):
+    def test_run_simple_split(self) -> None:
         self.runsafe(run_delayed_split)
 
 

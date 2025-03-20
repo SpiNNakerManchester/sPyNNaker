@@ -23,7 +23,7 @@ class TestMultipleStdpMechsOnSameNeuron(BaseTestCase):
     """
     tests the get spikes given a simulation at 0.1 ms time steps
     """
-    def run_multiple_stdp_mechs_on_same_neuron(self):
+    def run_multiple_stdp_mechs_on_same_neuron(self) -> None:
         p.setup(timestep=1.0, min_delay=1.0)
         nNeurons = 200  # number of neurons in each population
 
@@ -123,7 +123,7 @@ class TestMultipleStdpMechsOnSameNeuron(BaseTestCase):
                            synapse_type=stdp_model3)
         projections.append(pop)
 
-    def test_multiple_stdp_mechs_on_same_neuron(self):
+    def test_multiple_stdp_mechs_on_same_neuron(self) -> None:
         with self.assertRaises(SynapticConfigurationException):
             self.runsafe(self.run_multiple_stdp_mechs_on_same_neuron())
         # We have to end here as the exception happens before end

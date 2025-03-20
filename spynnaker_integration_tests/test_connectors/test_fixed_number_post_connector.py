@@ -72,37 +72,37 @@ class TestFixedNumberPostConnector(BaseTestCase):
                            allow_self_connections=True)
         sim.end()
 
-    def test_replace_self(self):
+    def test_replace_self(self) -> None:
         with_replacement = True
         allow_self_connections = True
         self.check_self_connect(
             DESTINATIONS-3, with_replacement, allow_self_connections)
 
-    def test_replace_no_self(self):
+    def test_replace_no_self(self) -> None:
         with_replacement = True
         allow_self_connections = False
         self.check_self_connect(
             DESTINATIONS-3, with_replacement, allow_self_connections)
 
-    def test_no_replace_self(self):
+    def test_no_replace_self(self) -> None:
         with_replacement = True
         allow_self_connections = True
         self.check_self_connect(
             DESTINATIONS-3, with_replacement, allow_self_connections)
 
-    def test_no_replace_no_self(self):
+    def test_no_replace_no_self(self) -> None:
         with_replacement = True
         allow_self_connections = False
         self.check_self_connect(
             DESTINATIONS-3, with_replacement, allow_self_connections)
 
-    def test_all_no_replace_self(self):
+    def test_all_no_replace_self(self) -> None:
         with_replacement = False
         allow_self_connections = True
         self.check_self_connect(DESTINATIONS, with_replacement,
                                 allow_self_connections)
 
-    def test_all_no_replace_no_self(self):
+    def test_all_no_replace_no_self(self) -> None:
         with_replacement = False
         allow_self_connections = False
         with self.assertRaises(SpynnakerException):
@@ -111,32 +111,32 @@ class TestFixedNumberPostConnector(BaseTestCase):
         # We have to end here as the exception happens before end
         sim.end()
 
-    def test_with_many_replace_self(self):
+    def test_with_many_replace_self(self) -> None:
         with_replacement = True
         allow_self_connections = True
         self.check_self_connect(
             DESTINATIONS+5, with_replacement, allow_self_connections)
 
-    def test_replace_other(self):
+    def test_replace_other(self) -> None:
         with_replacement = True
         self.check_other_connect(DESTINATIONS-3, with_replacement)
 
-    def test_no_replace_other(self):
+    def test_no_replace_other(self) -> None:
         with_replacement = False
         self.check_other_connect(DESTINATIONS-3, with_replacement)
 
-    def test_replace_other_many(self):
+    def test_replace_other_many(self) -> None:
         with_replacement = True
         self.check_other_connect(DESTINATIONS+3, with_replacement)
 
-    def test_no_replace_other_too_many(self):
+    def test_no_replace_other_too_many(self) -> None:
         with_replacement = False
         with self.assertRaises(SpynnakerException):
             self.check_other_connect(DESTINATIONS+3, with_replacement)
         # We have to end here as the exception happens before end
         sim.end()
 
-    def test_get_before_run(self):
+    def test_get_before_run(self) -> None:
         sim.setup(1.0)
         pop1 = sim.Population(3, sim.IF_curr_exp(), label="pop1")
         pop2 = sim.Population(3, sim.IF_curr_exp(), label="pop2")
@@ -149,7 +149,7 @@ class TestFixedNumberPostConnector(BaseTestCase):
         self.assertEqual(6, len(weights))
         sim.end()
 
-    def test_check_connection_estimates(self):
+    def test_check_connection_estimates(self) -> None:
         # Test that the estimates for connections per neuron/vertex work
         sim.setup(timestep=1.0)
         n_neurons = 25
@@ -202,14 +202,14 @@ class TestFixedNumberPostConnector(BaseTestCase):
         assert all(numpy.bincount(conns[:, 0]) == fixed_n)
         assert all(i != j for i, j in conns)
 
-    def test_fixed_number_1d(self):
+    def test_fixed_number_1d(self) -> None:
         self.do_fixed_number_nd_run(7, 100, None, 8, 50, None, 10)
 
-    def test_fixed_number_3d_to_1d(self):
+    def test_fixed_number_3d_to_1d(self) -> None:
         self.do_fixed_number_nd_run(
             (3, 4, 2), 3 * 8 * 8, sim.Grid3D(3 / 8, 3 / 8),
             11, 30, None, 11)
 
-    def test_fixed_number_2d_no_self(self):
+    def test_fixed_number_2d_no_self(self) -> None:
         self.do_fixed_number_nd_run_no_self(
             (5, 3), 10 * 15, sim.Grid2D(10 / 15), 50)

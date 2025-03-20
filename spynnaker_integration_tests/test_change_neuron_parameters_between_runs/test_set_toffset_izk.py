@@ -50,7 +50,7 @@ def do_run(n_neurons, n_cores, i_offset2, i_offset3):
 class TestSetTOffset(BaseTestCase):
     expected = [2011., 2148., 2288., 2427., 2565., 2703., 2844., 2982.]
 
-    def one_core(self):
+    def one_core(self) -> None:
         n_neurons = 32
         n_cores = 1
         neo = do_run(n_neurons, n_cores, 2, 4)
@@ -58,7 +58,7 @@ class TestSetTOffset(BaseTestCase):
         for spiketrain in spiketrains:
             assert numpy.array_equal(spiketrain.magnitude, self.expected)
 
-    def test_one_core(self):
+    def test_one_core(self) -> None:
         self.runsafe(self.one_core)
 
 

@@ -102,5 +102,5 @@ def split_structural_without_stdp():
 
 class TestStructuralWithoutSTDP(BaseTestCase):
 
-    def test_split_structural_without_stdp(self):
+    def test_split_structural_without_stdp(self) -> None:
         self.runsafe(split_structural_without_stdp)

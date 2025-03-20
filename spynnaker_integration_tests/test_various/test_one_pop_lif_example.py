@@ -51,7 +51,7 @@ def do_run(nNeurons):
 
 
 class OnePopLifExample(BaseTestCase):
-    def do_run(self):
+    def do_run(self) -> None:
         nNeurons = 5  # number of neurons in each population
         (v, gsyn, spikes) = do_run(nNeurons)
         self.assertEqual(5, len(spikes))
@@ -66,5 +66,5 @@ class OnePopLifExample(BaseTestCase):
         self.assertEqual(spikes[4][0], 4)
         self.assertEqual(spikes[4][1], 72)
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)

@@ -20,7 +20,7 @@ import numpy
 
 class ParamsSetAsList(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         nNeurons = 500
         p.setup(timestep=1.0, min_delay=1.0)
 
@@ -70,5 +70,5 @@ class ParamsSetAsList(BaseTestCase):
         self.assertGreater(len(set(pop_1.get("v_thresh"))), nNeurons/2)
         p.end()
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)

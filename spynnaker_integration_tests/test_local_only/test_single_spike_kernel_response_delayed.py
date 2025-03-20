@@ -99,12 +99,12 @@ def do_run(plot):
 
 class SingleSpikeKernelResponse(BaseTestCase):
 
-    def check_run(self):
+    def check_run(self) -> None:
         (ratios, kernel_ratios) = do_run(plot=False)
         is_close = numpy.isclose(ratios, kernel_ratios, rtol=0.01)
         assert (all(is_close))
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.check_run)
 
 

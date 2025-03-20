@@ -36,7 +36,7 @@ synfire_run = SynfireRunner()
 
 class TestSynfirePoissonIfCurrExpParameterTestSecondNone(BaseTestCase):
 
-    def second_none(self):
+    def second_none(self) -> None:
         synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                            run_times=run_times,
                            use_wrap_around_connections=wrap_around,
@@ -54,7 +54,7 @@ class TestSynfirePoissonIfCurrExpParameterTestSecondNone(BaseTestCase):
                                                            len(input_spikes),
                                                            wrap_around=False)
 
-    def test_second_none(self):
+    def test_second_none(self) -> None:
         self.runsafe(self.second_none)
 
 

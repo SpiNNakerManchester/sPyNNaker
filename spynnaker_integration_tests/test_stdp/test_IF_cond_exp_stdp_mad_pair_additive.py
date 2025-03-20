@@ -22,7 +22,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestIFCondExpSTDPPairAdditive(BaseTestCase):
 
-    def potentiation_and_depression(self):
+    def potentiation_and_depression(self) -> None:
         p.setup(1)
         runtime = 100
         initial_run = 1000  # to negate any initial conditions
@@ -112,7 +112,7 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
 
         self.assertTrue(numpy.allclose(weights, new_weight_exact, rtol=0.001))
 
-    def test_potentiation_and_depression(self):
+    def test_potentiation_and_depression(self) -> None:
         self.runsafe(self.potentiation_and_depression)
 
 

@@ -48,7 +48,7 @@ def run_forever_not_recorded():
 
 
 class MyTestCase(BaseTestCase):
-    def test_run_forever_recorded(self):
+    def test_run_forever_recorded(self) -> None:
         self.runsafe(run_forever_not_recorded)
 
 

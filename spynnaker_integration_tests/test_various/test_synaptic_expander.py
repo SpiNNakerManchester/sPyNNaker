@@ -174,10 +174,10 @@ def run_bad_normal_clipping():
 
 class TestSynapticExpander(BaseTestCase):
 
-    def test_script(self):
+    def test_script(self) -> None:
         self.runsafe(run_script)
 
-    def test_bad_normal_clipping(self):
+    def test_bad_normal_clipping(self) -> None:
         with self.assertRaises(SpiNNManCoresNotInStateException):
             run_bad_normal_clipping()
 

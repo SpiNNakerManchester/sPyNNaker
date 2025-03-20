@@ -29,7 +29,7 @@ def a_run():
 
 class PopAdditionParamsTest(BaseTestCase):
 
-    def test_a_run(self):
+    def test_a_run(self) -> None:
         self.runsafe(a_run)
 
 

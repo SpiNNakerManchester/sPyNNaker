@@ -44,12 +44,12 @@ def do_test_multistep():
 
 class TestMultiStep(BaseTestCase):
 
-    def do_test_multistep(self):
+    def do_test_multistep(self) -> None:
         v_01, spikes_01, v_005, spikes_005 = do_test_multistep()
         assert numpy.array_equal(v_01, v_005)
         assert numpy.allclose(spikes_01, spikes_005)
 
-    def test_do_test_multistep(self):
+    def test_do_test_multistep(self) -> None:
         self.runsafe(self.do_test_multistep)
 
 

@@ -85,7 +85,7 @@ def structural_shared():
 
 class TestStructuralShared(BaseTestCase):
 
-    def test_structural_shared(self):
+    def test_structural_shared(self) -> None:
         self.runsafe(structural_shared)
 
 

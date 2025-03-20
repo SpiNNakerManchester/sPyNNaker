@@ -51,8 +51,8 @@ def mission_impossible_2():
 
 class TestSplitImpossible(BaseTestCase):
 
-    def test_mission_impossible(self):
+    def test_mission_impossible(self) -> None:
         self.runsafe(mission_impossible)
 
-    def test_mission_impossible_2(self):
+    def test_mission_impossible_2(self) -> None:
         self.runsafe(mission_impossible_2)

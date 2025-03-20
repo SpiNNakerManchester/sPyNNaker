@@ -44,12 +44,12 @@ class IndexBasedProbabilityConnectorTest(BaseTestCase):
         assert numpy.array_equal(numpy.sort(expected_conns, axis=1),
                                  numpy.sort(conns, axis=1))
 
-    def test_2d_index(self):
+    def test_2d_index(self) -> None:
         self.do_index_nd_test(
             (2, 3), 6 * 12, p.Grid2D(6 / 12),
             (4, 1), 8 * 3, p.Grid2D(8 / 3))
 
-    def test_3d_index(self):
+    def test_3d_index(self) -> None:
         self.do_index_nd_test(
             (2, 3, 5), 6 * 12 * 10, p.Grid3D(6 / 12, 6 / 10),
             (4, 1, 2), 8 * 3 * 4, p.Grid3D(8 / 3, 8 / 4))

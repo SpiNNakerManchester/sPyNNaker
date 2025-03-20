@@ -33,7 +33,7 @@ class TestResetNewInput(BaseTestCase):
                               expected_spikes,
                               simtime, pop.label, i)
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, neurons_per_core)
 
@@ -53,5 +53,5 @@ class TestResetNewInput(BaseTestCase):
         self.check_data(pop_1, len(input_spikes2), simtime, 1)
         sim.end()
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)

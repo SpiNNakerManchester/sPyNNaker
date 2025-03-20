@@ -71,7 +71,7 @@ def do_run():
 
 class TestMaxWeight(BaseTestCase):
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(do_run)
 
 

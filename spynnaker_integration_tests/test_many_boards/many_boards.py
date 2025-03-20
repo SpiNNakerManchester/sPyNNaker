@@ -38,7 +38,7 @@ class ManyBoards(BaseTestCase):
         pop.record("all")
         return pop
 
-    def setup(self):
+    def setup(self) -> None:
         sim.setup(timestep=1.0, n_boards_required=self.n_boards)
         try:
             machine = sim.get_machine()
@@ -67,7 +67,7 @@ class ManyBoards(BaseTestCase):
                 y = chip.y
             self._pops.append(self.add_pop(x, y, self.n_neurons, input_pop))
 
-    def report_file(self):
+    def report_file(self) -> None:
         if get_config_bool("Java", "use_java"):
             style = "java_"
         else:
@@ -79,7 +79,7 @@ class ManyBoards(BaseTestCase):
         return "{}_n_boards={}_n_neurons={}_simtime={}".format(
             style, self.n_boards, self.n_neurons, self.simtime)
 
-    def do_run(self):
+    def do_run(self) -> None:
         self.setup()
         report_file = self.report_file()
         t_before = time.time()

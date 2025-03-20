@@ -172,10 +172,10 @@ def potentiation_and_depression():
 
 class TestSTDPPairAdditive(BaseTestCase):
 
-    def test_potentiation_and_depression(self):
+    def test_potentiation_and_depression(self) -> None:
         self.runsafe(potentiation_and_depression)
 
-    def test_post_spike_same_time(self):
+    def test_post_spike_same_time(self) -> None:
         self.runsafe(post_spike_same_time)
 
 

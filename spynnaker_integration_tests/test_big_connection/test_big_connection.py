@@ -21,7 +21,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestBigConnection(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         sources = 300
         destinations = 300
         aslist = []
@@ -49,7 +49,7 @@ class TestBigConnection(BaseTestCase):
         self.assertEqual(sources * destinations, len(spikes))
         sim.end()
 
-    def do_big(self):
+    def do_big(self) -> None:
         report_file = self.report_file()
         t_before = time.time()
 
@@ -62,7 +62,7 @@ class TestBigConnection(BaseTestCase):
             "total run time was: {} seconds\n".format(t_after-t_before),
             report_file)
 
-    def report_file(self):
+    def report_file(self) -> None:
         if get_config_bool("Java", "use_java"):
             style = "java_"
         else:

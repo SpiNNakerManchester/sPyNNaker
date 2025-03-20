@@ -34,7 +34,7 @@ class TestMultiExtract(BaseTestCase):
                               expected_spikes, simtime, pop.label, i)
         neo_compare.compare_blocks(neo, early_neo, same_length=False)
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, neurons_per_core)
 
@@ -53,5 +53,5 @@ class TestMultiExtract(BaseTestCase):
         self.check_data(pop_1, expected_spikes, simtime, early_neo)
         sim.end()
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)
