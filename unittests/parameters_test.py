@@ -20,23 +20,23 @@ import pyNN.spiNNaker as p
 
 class TestParameters(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_class_default_parameters(self):
+    def test_class_default_parameters(self) -> None:
         self.assertEqual(IFCondExpBase.default_parameters,
                          p.IF_cond_exp.default_parameters)
 
-    def test_module_default_parameters(self):
+    def test_module_default_parameters(self) -> None:
         module = p.IF_cond_exp()
         self.assertEqual(IFCondExpBase.default_parameters,
                          module.default_parameters)
 
-    def test_class_get_parameter_names(self):
+    def test_class_get_parameter_names(self) -> None:
         self.assertEqual(IFCondExpBase.default_parameters.keys(),
                          p.IF_cond_exp.get_parameter_names())
 
-    def test_module_get_parameter_names(self):
+    def test_module_get_parameter_names(self) -> None:
         module = p.IF_cond_exp()
         self.assertEqual(IFCondExpBase.default_parameters.keys(),
                          module.get_parameter_names())
