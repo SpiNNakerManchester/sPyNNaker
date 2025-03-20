@@ -27,4 +27,5 @@ spalloc="../spalloc/spalloc_client"
 fec="../SpiNNFrontEndCommon/spinn_front_end_common"
 test_base="../TestBase/spinnaker_testbase"
 
-mypy --python-version 3.8 --disallow-untyped-defs $utils $machine $man $pacman $spalloc $fec $test_base spynnaker unittests
+mypy --python-version 3.8 --disallow-untyped-defs $utils $machine $man $pacman $spalloc $fec $test_base spynnaker unittests spynnaker_integration_tests
+
