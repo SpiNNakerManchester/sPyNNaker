@@ -14,8 +14,12 @@
 
 from collections import defaultdict
 import decimal
+from typing import List
+
 import numpy
 import pyNN.spiNNaker as p
+
+from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import DataType
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetTranslator, AbstractMulticastControllableDevice, SendType)
@@ -39,49 +43,59 @@ class Translator(AbstractEthernetTranslator):
 
 class Device(AbstractMulticastControllableDevice):
 
-    def __init__(self, key, time_betweeen_sending, partition):
+    def __init__(self, key: int, time_betweeen_sending: int, partition: str):
         self.__key = key
         self.__time_between_sending = time_betweeen_sending
         self.__partition = partition
 
     @property
-    def device_control_key(self) -> None:
+    @overrides(AbstractMulticastControllableDevice.device_control_key)
+    def device_control_key(self) -> int:
         return self.__key
 
     @property
-    def device_control_max_value(self) -> None:
+    @overrides(AbstractMulticastControllableDevice.device_control_max_value)
+    def device_control_max_value(self) -> decimal.Decimal:
         return DataType.S1615.max
 
     @property
-    def device_control_min_value(self) -> None:
-        return DataType.S1615.min
+    @overrides(AbstractMulticastControllableDevice.device_control_min_value)
+    def device_control_min_value(self) ->  float:
+        return float(DataType.S1615.min)
 
     @property
-    def device_control_partition_id(self) -> None:
+    @overrides(AbstractMulticastControllableDevice.device_control_partition_id)
+    def device_control_partition_id(self) -> str:
         return self.__partition
 
     @property
-    def device_control_scaling_factor(self) -> None:
-        return 1.0
+    @overrides(AbstractMulticastControllableDevice.
+               device_control_scaling_factor)
+    def device_control_scaling_factor(self) -> int:
+        return 1
 
     @property
-    def device_control_send_type(self) -> None:
+    @overrides(AbstractMulticastControllableDevice.device_control_send_type)
+    def device_control_send_type(self) -> SendType:
         return SendType.SEND_TYPE_ACCUM
 
     @property
-    def device_control_timesteps_between_sending(self) -> None:
+    @overrides(AbstractMulticastControllableDevice.
+               device_control_timesteps_between_sending)
+    def device_control_timesteps_between_sending(self) -> int:
         return self.__time_between_sending
 
     @property
-    def device_control_uses_payload(self) -> None:
+    @overrides(AbstractMulticastControllableDevice.device_control_uses_payload)
+    def device_control_uses_payload(self) -> bool:
         return True
 
 
-def spike_receiver(label, time, spikes):
+def spike_receiver(label: str, time: int, spikes: List[int]):
     print(f"Received spikes {spikes} from {label} at time {time}")
 
 
-def live_neuron_voltage():
+def live_neuron_voltage() -> None:
     p.setup(1.0)
     run_time = 1000.0
     create_edges = False
