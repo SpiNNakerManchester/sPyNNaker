@@ -18,13 +18,14 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model.enums import ExecutableType
 from spinnman.model import ExecutableTargets
-from spinnman.model.enums import CPUState, UserRegister
+from spinnman.model.enums import CPUState
 from pacman.model.placements import Placement
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
+from spinnman.model.enums.user_registers import UserRegister
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -75,9 +76,8 @@ def _plan_expansion() -> Tuple[ExecutableTargets, List[Placement], float]:
 
     max_data = 0
     max_bit_field = 0
-    progress = ProgressBar(
-        SpynnakerDataView.get_n_placements(), "Preparing to Expand Synapses")
-    for placement in progress.over(SpynnakerDataView.iterate_placemements()):
+    to_write: List[Tuple[int, int, int, UserRegister, int]] = []
+    for placement in SpynnakerDataView.iterate_placemements():
         # Add all machine vertices of the population vertex to ones
         # that need synapse expansion
         vertex = placement.vertex
@@ -88,11 +88,13 @@ def _plan_expansion() -> Tuple[ExecutableTargets, List[Placement], float]:
                     executable_type=ExecutableType.SYSTEM)
                 expanded_placements.append(placement)
                 # Write the region to USER1, as that is the best we can do
-                txrx.write_user(
-                    placement.x, placement.y, placement.p, UserRegister.USER_1,
-                    vertex.connection_generator_region)
+                to_write.append((
+                    *placement.location, UserRegister.USER_1,
+                    vertex.connection_generator_region))
                 max_data = max(max_data, vertex.max_gen_data)
                 max_bit_field = max(max_bit_field, vertex.bit_field_size)
+
+    txrx.write_user_many(to_write, "Preparing to Expand Synapses")
 
     # Allow 1 seconds per ~1000 synapses, with minimum of 2 seconds
     timeout = max(2.0, max_data / 1000.0)
