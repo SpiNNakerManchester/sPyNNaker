@@ -191,7 +191,6 @@ class SynfireRunner(object):
         """
         assert spike_times is None
         assert spike_times_list is None
-        assert weight_to_spike == 2.0
         assert cell_class == p.IF_curr_exp
         assert constraint is None
         assert cell_params == CELL_PARAMS_LIF
@@ -203,13 +202,10 @@ class SynfireRunner(object):
         assert spike_path is None
         assert get_v is None
         assert v_path is None
-        assert v_sampling_rate is None
         assert get_gsyn_exc is None
         assert get_gsyn_inh is None
         assert gsyn_path_exc is None
         assert gsyn_path_inh is None
-        assert gsyn_exc_sampling_rate is None
-        assert gsyn_exc_sampling_rate is None
         assert gsyn_inh_sampling_rate is None
         assert get_all is False
         assert use_spike_connections is True
