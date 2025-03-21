@@ -16,16 +16,14 @@ from typing import List, Tuple
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.progress_bar import ProgressBar
-from spinnman.model.enums import ExecutableType
+from spinnman.model.enums import ExecutableType, CPUState, UserRegister
 from spinnman.model import ExecutableTargets
-from spinnman.model.enums import CPUState
 from pacman.model.placements import Placement
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractNeuronExpandable, NEURON_EXPANDER_APLX)
-from spinnman.model.enums.user_registers import UserRegister
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
