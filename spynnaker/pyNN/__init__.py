@@ -472,7 +472,7 @@ def set_number_of_neurons_per_core(
     dimensions, it is recommended to set this to `None` here and then
     set the maximum on each Population.
 
-    :param type(AbstractPopulationVertex) neuron_type: neuron type
+    :param type(PopulationVertex) neuron_type: neuron type
     :param max_permitted: the number to set to
     :type max_permitted: int or tuple or None
     """

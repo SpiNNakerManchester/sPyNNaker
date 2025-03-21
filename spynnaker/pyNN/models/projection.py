@@ -42,7 +42,7 @@ from spynnaker.pyNN.models.neural_projections import (
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FromListConnector)
 from spynnaker.pyNN.models.neuron import (
-    AbstractPopulationVertex, ConnectionHolder)
+    PopulationVertex, ConnectionHolder)
 from spynnaker.pyNN.models.populations import Population, PopulationView
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractHasParameterNames)
@@ -136,8 +136,7 @@ class Projection(object):
         connector.set_space(space)
 
         pre_vertex = pre_synaptic_population._vertex
-        post_vertex = cast(AbstractPopulationVertex,
-                           post_synaptic_population._vertex)
+        post_vertex = cast(PopulationVertex, post_synaptic_population._vertex)
 
         if not isinstance(post_vertex, AbstractAcceptsIncomingSynapses):
             raise ConfigurationException(
@@ -211,7 +210,7 @@ class Projection(object):
 
         # If the target is a population, add to the list of incoming
         # projections
-        if isinstance(post_vertex, AbstractPopulationVertex):
+        if isinstance(post_vertex, PopulationVertex):
             post_vertex.add_incoming_projection(self)
 
         # If the source is a poisson, add to the list of outgoing projections

@@ -17,7 +17,7 @@ import numpy
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import (
-    AbstractPopulationVertex, AbstractPyNNNeuronModelStandard)
+    PopulationVertex, AbstractPyNNNeuronModelStandard)
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.implementations import (
@@ -96,7 +96,7 @@ class FooBar(AbstractPyNNNeuronModelStandard):
         return self._model
 
 
-class MockNeuron(AbstractPopulationVertex):
+class MockNeuron(PopulationVertex):
     def __init__(self):
         foo_bar = FooBar()
         super().__init__(
