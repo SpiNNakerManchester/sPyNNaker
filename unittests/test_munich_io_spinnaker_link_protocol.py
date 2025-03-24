@@ -22,10 +22,10 @@ from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
 
 class TestMunichIOSpinnakerLinkProtocol(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_call_each_method(self):
+    def test_call_each_method(self) -> None:
         protocol = MunichIoSpiNNakerLinkProtocol(
             mode=MUNICH_MODES.PUSH_BOT)
         protocol.add_payload_logic_to_current_output(0)
@@ -81,7 +81,7 @@ class TestMunichIOSpinnakerLinkProtocol(unittest.TestCase):
         protocol.set_retina_transmission(RetinaKey.FIXED_KEY)
         protocol.turn_off_sensor_reporting(0)
 
-    def test_read_each_property(self):
+    def test_read_each_property(self) -> None:
         # Explicit instance key for testability
         protocol = MunichIoSpiNNakerLinkProtocol(
             mode=MUNICH_MODES.PUSH_BOT, uart_id=1,

@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple, Union, TYPE_CHECKING
 
 import numpy
-from numpy import floating, integer, uint32
+from numpy import integer, uint32
 from numpy.typing import NDArray
 
 from pacman.model.graphs.application import ApplicationVertex
@@ -33,6 +33,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractPlasticSynapseDynamics)
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE, ConnectionsArray)
+from spynnaker.pyNN.types import WeightScales
 
 from .master_pop_table import MasterPopTableAsBinarySearch
 
@@ -217,7 +218,7 @@ def _get_allowed_row_length(
 def get_synapses(
         connections: ConnectionsArray, synapse_info: SynapseInformation,
         n_delay_stages: int, n_synapse_types: int,
-        weight_scales: NDArray[floating], app_edge: ProjectionApplicationEdge,
+        weight_scales: WeightScales, app_edge: ProjectionApplicationEdge,
         max_row_info: MaxRowInfo, gen_undelayed: bool, gen_delayed: bool,
         max_atoms_per_core: int) -> Tuple[_RowData, _RowData]:
     """
@@ -233,8 +234,7 @@ def get_synapses(
         The number of delay stages in total to be represented
     :param int n_synapse_types:
         The number of synapse types in total to be represented
-    :param list(float) weight_scales:
-        The scaling of the weights for each synapse type
+    :param weight_scales: The scaling of the weights for each synapse type
     :param ~pacman.model.graphs.application.ApplicationEdge app_edge:
         The incoming machine edge that the synapses are on
     :param MaxRowInfo max_row_info:
@@ -391,7 +391,7 @@ def _get_row_data(
 def convert_to_connections(
         synapse_info: SynapseInformation, post_vertex_slice: Slice,
         n_pre_atoms: int, max_row_length: int, n_synapse_types: int,
-        weight_scales: NDArray[floating], data: Union[bytes, NDArray, None],
+        weight_scales: WeightScales, data: Union[bytes, NDArray, None],
         delayed: bool, post_vertex_max_delay_ticks: int,
         max_atoms_per_core: int) -> ConnectionsArray:
     """
@@ -407,7 +407,7 @@ def convert_to_connections(
         The length of each row in the data
     :param int n_synapse_types:
         The number of synapse types in total
-    :param list(float) weight_scales:
+    :param weight_scales:
         The weight scaling of each synapse type
     :param bytearray data:
         The raw data containing the synapses
@@ -461,7 +461,7 @@ def convert_to_connections(
 def read_all_synapses(
         data: NDArray[uint32], delayed_data: NDArray[uint32],
         synapse_info: SynapseInformation, n_synapse_types: int,
-        weight_scales: NDArray[floating], post_vertex_slice: Slice,
+        weight_scales: WeightScales, post_vertex_slice: Slice,
         n_pre_atoms: int, post_vertex_max_delay_ticks: int,
         max_row_info: MaxRowInfo, max_atoms_per_core: int
         ) -> ConnectionsArray:
@@ -477,7 +477,7 @@ def read_all_synapses(
         The synapse info that generated the synapses
     :param int n_synapse_types:
         The total number of synapse types available
-    :param list(float) weight_scales:
+    :param weight_scales:
         A weight scale for each synapse type
     :param int n_pre_atoms: The number of atoms in the pre-vertex
     :param ~pacman.model.graphs.common.Slice post_vertex_slice:
@@ -638,13 +638,13 @@ def _read_plastic_data(
 
 
 def _rescale_connections(
-        connections: ConnectionsArray, weight_scales: NDArray[floating],
+        connections: ConnectionsArray, weight_scales: WeightScales,
         synapse_info: SynapseInformation) -> ConnectionsArray:
     """
     Scale the connection data into machine values.
 
     :param ~numpy.ndarray connections: The connections to be rescaled
-    :param list(float) weight_scales: The weight scale of each synapse type
+    :param weight_scales: The weight scale of each synapse type
     :param SynapseInformation synapse_info:
         The synapse information of the connections
     """

@@ -20,7 +20,7 @@ import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run():
+def do_run() -> None:
     # Setup
     p.setup(timestep=1.0)
 
@@ -45,7 +45,7 @@ class Sata2DifferentBoardsNoBoardAddressTest(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_sata_2_different_boards_no_board_address(self):
+    def test_sata_2_different_boards_no_board_address(self) -> None:
         do_run()
 
 
