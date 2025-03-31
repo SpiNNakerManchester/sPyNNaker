@@ -26,8 +26,10 @@ class MachineTest(BaseTestCase):
         pop = sim.Population(3, sim.IF_curr_exp(), label="pop_1")
         # HACK to directly read the underlying models to avoid triggering
         # various autodetection systems. DO NOT COPY AS UNSUPPORTED!
-        MachineDataModel = SpynnakerDataView._MachineDataView__data
-        UtilsDataModel = SpynnakerDataView._UtilsDataView__data
+        MachineDataModel = (SpynnakerDataView.
+                _MachineDataView__data)   # type: ignore[attr-defined]
+        UtilsDataModel = (SpynnakerDataView.
+                _UtilsDataView__data)  # type: ignore[attr-defined]
         self.assertIsNone(MachineDataModel._machine)
         self.assertEqual(
             ResetStatus.SETUP, UtilsDataModel._reset_status, "setup")
