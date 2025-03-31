@@ -75,12 +75,8 @@ class TestKernelConnector(BaseTestCase):
         self.assertEqual(25, len(weightsdelays))
         list10 = (1, 0, 5.0, 20.0)
         list11 = (1, 1, 7.0, 10.0)
-        [self.assertEqual(list10[i], weightsdelays[1][i]) for i in range(4)]
-        [self.assertEqual(list11[i], weightsdelays[5][i]) for i in range(4)]
-        # NOTE: you can probably replace the above in later versions of python3
-        #       with the following, but in 3.5 it generates a FutureWarning
-#         self.assertSequenceEqual(list10, weightsdelays[1])
-#         self.assertSequenceEqual(list11, weightsdelays[5])
+        self.assertSequenceEqual(list10, weightsdelays[1])
+        self.assertSequenceEqual(list11, weightsdelays[5])
 
     def test_evensquarek_run(self) -> None:
         (psh, psw, ksh, ksw) = (4, 4, 2, 2)
@@ -89,8 +85,8 @@ class TestKernelConnector(BaseTestCase):
         self.assertEqual(9, len(weightsdelays))
         list01 = (0, 1, 5.0, 20.0)
         list03 = (0, 3, 7.0, 10.0)
-        [self.assertEqual(list01[i], weightsdelays[1][i]) for i in range(4)]
-        [self.assertEqual(list03[i], weightsdelays[5][i]) for i in range(4)]
+        self.assertSequenceEqual(list01, weightsdelays[1])
+        self.assertSequenceEqual(list03, weightsdelays[5])
 
     def test_nonsquarek_run(self) -> None:
         (psh, psw, ksh, ksw) = (4, 4, 1, 3)
@@ -99,8 +95,8 @@ class TestKernelConnector(BaseTestCase):
         self.assertEqual(10, len(weightsdelays))
         list10 = (1, 0, 7.0, 10.0)
         list42 = (4, 2, 5.0, 20.0)
-        [self.assertEqual(list10[i], weightsdelays[1][i]) for i in range(4)]
-        [self.assertEqual(list42[i], weightsdelays[5][i]) for i in range(4)]
+        self.assertSequenceEqual(list10, weightsdelays[1])
+        self.assertSequenceEqual(list42, weightsdelays[5])
 
     def test_bigger_nonsquarep_run(self) -> None:
         (psh, psw, ksh, ksw) = (32, 16, 3, 3)
@@ -109,5 +105,5 @@ class TestKernelConnector(BaseTestCase):
         self.assertEqual(1081, len(weightsdelays))
         list10 = (1, 0, 5.0, 20.0)
         list11 = (1, 1, 7.0, 10.0)
-        [self.assertEqual(list10[i], weightsdelays[1][i]) for i in range(4)]
-        [self.assertEqual(list11[i], weightsdelays[5][i]) for i in range(4)]
+        self.assertSequenceEqual(list10, weightsdelays[1])
+        self.assertSequenceEqual(list11, weightsdelays[5])
