@@ -49,20 +49,7 @@ class TestBigConnection(BaseTestCase):
         self.assertEqual(sources * destinations, len(spikes))
         sim.end()
 
-    def do_big(self) -> None:
-        report_file = self.report_file()
-        t_before = time.time()
-
-        self.do_run()
-
-        t_after = time.time()
-        results = self.get_run_time_of_BufferExtractor()
-        self.report(results, report_file)
-        self.report(
-            "total run time was: {} seconds\n".format(t_after-t_before),
-            report_file)
-
-    def report_file(self) -> None:
+    def report_file(self) -> str:
         if get_config_bool("Java", "use_java"):
             style = "java_"
         else:
