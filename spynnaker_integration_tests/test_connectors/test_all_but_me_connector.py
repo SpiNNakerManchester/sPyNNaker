@@ -13,6 +13,8 @@
 # limitations under the License.
 import pyNN.spiNNaker as sim
 from itertools import permutations
+from typing import List
+
 import pytest
 import numpy
 
@@ -52,7 +54,7 @@ class TestAllButMeConnector(BaseTestCase):
         sim.run(0)
         conns = list(proj.get([], format="list"))
         sim.end()
-        groups = list()
+        groups: List[List[int]] = list()
         for group_start in range(0, 12, 3):
             group_end = min(12, group_start + 3)
             neurons_in_group = range(group_start, group_end)

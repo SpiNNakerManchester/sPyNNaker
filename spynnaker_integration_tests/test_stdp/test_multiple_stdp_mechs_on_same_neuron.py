@@ -125,6 +125,6 @@ class TestMultipleStdpMechsOnSameNeuron(BaseTestCase):
 
     def test_multiple_stdp_mechs_on_same_neuron(self) -> None:
         with self.assertRaises(SynapticConfigurationException):
-            self.runsafe(self.run_multiple_stdp_mechs_on_same_neuron())
+            self.runsafe(self.run_multiple_stdp_mechs_on_same_neuron)
         # We have to end here as the exception happens before end
         p.end()

@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from typing import Callable, List, Tuple
 import pyNN.spiNNaker as p
 
 from spinnman.connections import ConnectionListener
@@ -25,7 +27,9 @@ import unittest
 
 class UDPSCAMPConnection(SCAMPConnection):
 
-    def get_receive_method(self) -> None:
+    # hacked method which does not act like super
+    def get_receive_method(  # type: ignore[override]
+            self) -> Callable[[], bytes]:
         return self.receive
 
 
@@ -52,7 +56,7 @@ class TestLiveGatherTranslator(BaseTestCase):
         self.listener.start()
 
     def live_spike_receive_translated(self) -> None:
-        self.stored_data = list()
+        self.stored_data: List[Tuple[int, int]] = list()
 
         db_conn = DatabaseConnection(local_port=None)
         db_conn.add_database_callback(self.database_callback)

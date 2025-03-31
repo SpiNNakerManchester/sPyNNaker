@@ -99,13 +99,13 @@ class TestSTDPNearestPairAdditive(BaseTestCase):
 
         # Get the spikes and time differences that will be considered by
         # the simulation (as the last pre-spike will be considered differently)
-        pre_spikes = numpy.array(pre_spikes)
-        last_pre_spike = pre_spikes[-1]
+        pre_spikes_n = numpy.array(pre_spikes)
+        last_pre_spike = pre_spikes_n[-1]
         considered_post_spikes = post_spikes[post_spikes < last_pre_spike]
         considered_post_spikes += plastic_delay
         potentiation_times = list()
         depression_times = list()
-        for time in pre_spikes:
+        for time in pre_spikes_n:
             post_times = considered_post_spikes[considered_post_spikes > time]
             if len(post_times) > 0:
                 last_time = post_times[0]
@@ -114,18 +114,16 @@ class TestSTDPNearestPairAdditive(BaseTestCase):
             if len(post_times) > 0:
                 last_time = post_times[-1]
                 depression_times.append(last_time - time)
-        potentiation_times = numpy.array(potentiation_times)
-        depression_times = numpy.array(depression_times)
 
         # Work out the exact weight according to the multiplicative rule
         potentiations = (max_weight - initial_weight) * a_plus * numpy.exp(
-            (potentiation_times / tau_plus))
+            ( numpy.array(potentiation_times) / tau_plus))
         depressions = (initial_weight - min_weight) * a_minus * numpy.exp(
-            (depression_times / tau_minus))
+            (numpy.array(depression_times) / tau_minus))
         new_weight_exact = \
             initial_weight + numpy.sum(potentiations) - numpy.sum(depressions)
 
-        # print("Pre neuron spikes at: {}".format(pre_spikes))
+        # print("Pre neuron spikes at: {}".format(pre_spikes_n))
         # print("Post-neuron spikes at: {}".format(post_spikes))
         target_spikes = [1014,  1032, 1053]
         self.assertListEqual(list(post_spikes), target_spikes)

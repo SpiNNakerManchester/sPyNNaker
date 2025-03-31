@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List
 import numpy
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
@@ -95,7 +96,7 @@ class TestViews(BaseTestCase):
             assert (spikes1neo[id] == spikes2allneo[id])
         for id in [0, 1, 5, 6, 7, 9]:
             assert (len(spikes2allneo[id]) == 0)
-        s2e = [[2, 9.], [3, 10.], [4, 11.], [8, 15]]
+        s2e: List[List[float]] = [[2, 9.], [3, 10.], [4, 11.], [8, 15]]
         assert (numpy.array_equal(spikes2alltuple, s2e))
         assert (numpy.array_equal(spikes2viewtuple, s2e))
 
