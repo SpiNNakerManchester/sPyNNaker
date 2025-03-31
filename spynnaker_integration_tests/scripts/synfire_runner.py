@@ -72,7 +72,7 @@ class SynfireRunner(object):
             get_all: Literal[False] = False,
             use_spike_connections: Literal[True] = True,
             use_wrap_around_connections: bool = True,
-            get_weights: Literal[False] = False, get_delays: bool = False,
+            get_weights: bool = False, get_delays: bool = False,
             end_before_print: Literal[False] = False,
             randomise_v_init: Literal[False] = False) -> Tuple:
         """
@@ -616,34 +616,16 @@ class SynfireRunner(object):
     def get_spike_source_spikes_7(self) -> Any:
         return self._input_spikes_recorded_7
 
-    def get_weights(self) -> Union[None, ConnectionHolder,
-                                   List[ConnectionHolder]]:
+    def get_weights(self) -> List[ConnectionHolder]:
         """
-        :return:
-            If not recorded, returns None.
-            If recorded once, returns a numpy array.
-            If recorded more than once, returns a list of numpy arrays.
-        :rtype: None or ~numpy.ndarray or list(~numpy.ndarray)
+        List of weights Connectionholders
         """
-        if len(self._weights) == 0:
-            return None
-        if len(self._weights) == 1:
-            return self._weights[0]
         return self._weights
 
-    def get_delay(self) -> Union[None, ConnectionHolder,
-                                 List[ConnectionHolder]]:
+    def get_delay(self) -> List[ConnectionHolder]:
         """
-        :return:
-            If not recorded, returns None.
-            If recorded once, returns a numpy array.
-            If recorded more than once, returns a list of numpy arrays.
-        :rtype: None or ~numpy.ndarray or list(~numpy.ndarray)
+        List of delay Connectionholders
         """
-        if len(self._delays) == 0:
-            return None
-        if len(self._delays) == 1:
-            return self._delays[0]
         return self._delays
 
     def _get_data(
