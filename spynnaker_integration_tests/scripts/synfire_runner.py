@@ -38,7 +38,7 @@ class SynfireRunner(object):
         self.__init_object_state()
 
     def do_run(
-            self, n_neurons: int, time_step: int = 1,
+            self, n_neurons: int, time_step: float = 1,
             input_class: Type = p.SpikeSourceArray,
             spike_times: Optional[List[List[int]]] = None,
             rate: Optional[float] = None, start_time: Optional[int] = None,
@@ -46,7 +46,7 @@ class SynfireRunner(object):
             spike_times_list: None = None,
             placement_constraint: Optional[Tuple[int, int]] = None,
             weight_to_spike: float = 2.0, delay: float = 17,
-            neurons_per_core: int = 10,
+            neurons_per_core: Optional[int] = 10,
             cell_class: Type = p.IF_curr_exp,
             constraint: None = None,
             cell_params: Dict[str, float] = CELL_PARAMS_LIF,
@@ -60,14 +60,14 @@ class SynfireRunner(object):
             spike_path: None = None, record_7: bool = False,
             record_v: bool = True, get_v: Optional[bool] = None, v_path: None = None,
             record_v_7: bool = False,
-            v_sampling_rate: None = None, record_gsyn_exc: bool = True,
+            v_sampling_rate: Optional[int] = None, record_gsyn_exc: bool = True,
             record_gsyn_inh: bool = True,
             get_gsyn_exc: Optional[bool] = None,
             get_gsyn_inh: Optional[bool] = None,
             gsyn_path_exc: None = None, gsyn_path_inh: None = None,
             record_gsyn_exc_7: bool = False,
             record_gsyn_inh_7: Literal[False] = False,
-            gsyn_exc_sampling_rate: None = None,
+            gsyn_exc_sampling_rate: Optional[int] = None,
             gsyn_inh_sampling_rate: None = None,
             get_all: Literal[False] = False,
             use_spike_connections: Literal[True] = True,
@@ -291,7 +291,7 @@ class SynfireRunner(object):
         self._recorded_v_list: List[neo.Block] = []
         self._recorded_v_7: Optional[NDArray[floating]] = None
         self._recorded_spikes_list: List[neo.Block] = []
-        self._recorded_spikes_7 = Optional[NDArray[floating]]
+        self._recorded_spikes_7: Optional[NDArray[floating]] = None
         self._recorded_gsyn_exc_list: List[neo.Block] = []
         self._recorded_gsyn_exc_7: Optional[NDArray[floating]] = None
         self._recorded_gsyn_inh_list: List[neo.Block] = []
@@ -533,7 +533,8 @@ class SynfireRunner(object):
             neo_convertor.convert_gsyn_exc_list,  # type: ignore[arg-type]
             self._recorded_gsyn_exc_list))
 
-    def get_output_pop_gsyn_exc_7(self) -> Optional[NDArray[floating]]:
+    def get_output_pop_gsyn_exc_7(self) -> NDArray[floating]:
+        assert self._recorded_gsyn_exc_7 is not None
         return self._recorded_gsyn_exc_7
 
     def get_output_pop_gsyn_inh_list(self) -> List[neo.block]:
@@ -569,10 +570,12 @@ class SynfireRunner(object):
         v_neo = self._recorded_v_list[0]
         return neo_convertor.convert_data(v_neo, "v")
 
-    def get_output_pop_voltage_7(self) -> Optional[NDArray[floating]]:
+    def get_output_pop_voltage_7(self) -> NDArray[floating]:
+        assert self._recorded_v_7 is not None
         return self._recorded_v_7
 
-    def get_output_pop_spikes_list(self) -> Optional[List[neo.Block]]:
+    def get_output_pop_spikes_list(self) -> List[neo.Block]:
+        assert self._recorded_spikes_list is not None
         return self._recorded_spikes_list
 
     def get_output_pop_spikes_list_numpy(self) -> List[NDArray]:
@@ -586,7 +589,8 @@ class SynfireRunner(object):
         spikes = self._recorded_spikes_list[0]
         return neo_convertor.convert_spikes(spikes)
 
-    def get_output_pop_spikes_7(self) -> Any:
+    def get_output_pop_spikes_7(self) -> NDArray[floating]:
+        assert self._recorded_spikes_7 is not None
         return self._recorded_spikes_7
 
     def get_output_pop_all_list(self) -> List[neo.Block]:

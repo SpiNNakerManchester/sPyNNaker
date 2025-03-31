@@ -28,7 +28,7 @@ from spynnaker_integration_tests.scripts import SynfireRunner
 n_neurons = 200  # number of neurons in each population
 delay = 17
 runtime = 5000
-neurons_per_core = n_neurons/2
+neurons_per_core = n_neurons//2
 placement_constraint = (0, 0)
 expected_spikes = 263
 spike_file = "200_17_spikes.csv"

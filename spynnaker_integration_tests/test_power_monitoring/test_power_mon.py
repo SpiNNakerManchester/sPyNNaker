@@ -22,7 +22,7 @@ from spynnaker_integration_tests.scripts import SynfireRunner
 from spinnaker_testbase import BaseTestCase
 
 n_neurons = 200  # number of neurons in each population
-neurons_per_core = n_neurons / 2
+neurons_per_core = n_neurons // 2
 run_times = [10, 20, 30]
 # parameters for population 1 first run
 input_class = p.SpikeSourcePoisson

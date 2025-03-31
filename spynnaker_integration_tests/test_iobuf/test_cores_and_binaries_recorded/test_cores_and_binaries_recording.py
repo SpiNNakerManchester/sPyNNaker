@@ -21,7 +21,7 @@ from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 
 n_neurons = 200  # number of neurons in each population
 simtime = 500
-neurons_per_core = n_neurons / 2
+neurons_per_core = n_neurons // 2
 
 
 class TestCoresAndBinariesRecording(BaseTestCase):

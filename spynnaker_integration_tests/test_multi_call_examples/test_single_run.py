@@ -17,7 +17,7 @@ from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import check_data
 
 n_neurons = 2  # number of neurons in each population
-neurons_per_core = n_neurons / 2
+neurons_per_core = n_neurons // 2
 simtime = 200
 
 

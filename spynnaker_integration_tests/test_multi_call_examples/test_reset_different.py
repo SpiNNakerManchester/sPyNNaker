@@ -19,7 +19,7 @@ from spynnaker_integration_tests.scripts import check_neuron_data
 from spynnaker.pyNN.utilities.neo_csv import NeoCsv
 
 n_neurons = 20  # number of neurons in each population
-neurons_per_core = n_neurons / 2
+neurons_per_core = n_neurons // 2
 simtime = 200
 
 

@@ -18,7 +18,7 @@ from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import SynfireRunner
 
 n_neurons = 200  # number of neurons in each population
-neurons_per_core = int(n_neurons / 2)
+neurons_per_core = n_neurons // 2
 run_times = [5000, 5000]
 wrap_around = False
 # parameters for population 1 first run
