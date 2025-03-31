@@ -37,7 +37,7 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
         max_weight = 0.5
         min_weight = 0
 
-        pre_spikes = [10, 50]
+        pre_spikes = numpy.array([10, 50])
         extra_spikes = [30]
 
         for i in range(len(pre_spikes)):
