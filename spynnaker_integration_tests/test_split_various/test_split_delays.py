@@ -18,7 +18,7 @@ import numpy
 from spinnaker_testbase import BaseTestCase
 
 
-def run_delayed_split():
+def run_delayed_split() -> None:
     sim.setup(0.1, time_scale_factor=1)
     source = sim.Population(10, sim.SpikeSourceArray(spike_times=[0]))
     target_1 = sim.Population(

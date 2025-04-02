@@ -14,13 +14,15 @@
 
 import os
 import pyNN.spiNNaker as sim
+
+from pacman.model.placements import Placement
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.data import SpynnakerDataView
 
 
 class TestIobuffMultirun(BaseTestCase):
 
-    def check_size(self, prov_path, placement):
+    def check_size(self, prov_path: str, placement: Placement) -> int:
         iofile = os.path.join(
             prov_path,
             "iobuf_for_chip_{}_{}_processor_id_{}.txt".format(

@@ -14,13 +14,16 @@
 
 from collections import defaultdict
 import decimal
-from typing import List
+from typing import Dict, List
 
 import numpy
 import pyNN.spiNNaker as p
 
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import DataType
+from spinn_front_end_common.utility_models import MultiCastCommand
+
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetTranslator, AbstractMulticastControllableDevice, SendType)
 from spinnaker_testbase import BaseTestCase
@@ -28,18 +31,20 @@ from spinnaker_testbase import BaseTestCase
 
 class Translator(AbstractEthernetTranslator):
 
-    def __init__(self, devices):
+    def __init__(self, devices: List["Device"]):
         self.__keys = {device.device_control_key for device in devices}
-        self.voltages = defaultdict(list)
+        self.voltages: Dict[int, List[float]] = defaultdict(list)
 
-    def translate_control_packet(self, multicast_packet):
+    @overrides(AbstractEthernetTranslator.translate_control_packet)
+    def translate_control_packet(
+            self, multicast_packet: MultiCastCommand) -> None:
         if multicast_packet.key not in self.__keys:
             raise ValueError("Unknown key {} received".format(
                 multicast_packet.key))
         voltage = multicast_packet.payload
+        assert voltage is not None
         self.voltages[multicast_packet.key].append(
             (float)(decimal.Decimal(voltage) / DataType.S1615.scale))
-
 
 class Device(AbstractMulticastControllableDevice):
 
@@ -91,7 +96,7 @@ class Device(AbstractMulticastControllableDevice):
         return True
 
 
-def spike_receiver(label: str, time: int, spikes: List[int]):
+def spike_receiver(label: str, time: int, spikes: List[int]) -> None:
     print(f"Received spikes {spikes} from {label} at time {time}")
 
 

@@ -12,11 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from decimal import Decimal
-import pyNN.spiNNaker as p
+
 import numpy
+import pyNN.spiNNaker as p
 from pyNN.space import Grid2D
-from spinn_front_end_common.interface.ds import DataType
+
 from spinn_utilities.overrides import overrides
+
+from spinn_front_end_common.interface.ds import DataType
+from spinn_front_end_common.utility_models import MultiCastCommand
+
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetTranslator, AbstractMulticastControllableDevice)
 from spinnaker_testbase.base_test_case import BaseTestCase
@@ -26,9 +31,13 @@ from spynnaker.pyNN.external_devices_models \
 
 class TestTranslator(AbstractEthernetTranslator):
 
-    def translate_control_packet(self, multicast_packet):
+    @overrides(AbstractEthernetTranslator.translate_control_packet)
+    def translate_control_packet(
+            self, multicast_packet: MultiCastCommand) -> None:
+        payload = multicast_packet.payload
+        assert payload is not None
         print(f"Received key={multicast_packet.key},"
-              f" voltage={multicast_packet.payload / DataType.S1615.max}")
+              f" voltage={payload / DataType.S1615.max}")
 
 
 class TestDevice(AbstractMulticastControllableDevice):
@@ -88,7 +97,7 @@ class TestDevice(AbstractMulticastControllableDevice):
         return 1
 
 
-def do_run():
+def do_run() -> None:
 
     # Setup the simulation
     p.setup(1.0)

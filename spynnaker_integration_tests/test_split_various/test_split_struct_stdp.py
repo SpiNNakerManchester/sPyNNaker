@@ -20,7 +20,7 @@ from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterPopulationVertexNeuronsSynapses)
 
 
-def split_structural_with_stdp():
+def split_structural_with_stdp() -> None:
     p.setup(1.0)
     pre_spikes = numpy.array(range(0, 10, 2))
     pre_spikes_last_neuron = pre_spikes[pre_spikes > 0]
@@ -31,9 +31,9 @@ def split_structural_with_stdp():
     w_min = 0.0
     w_max = 5.0
     w_init_1 = 5.0
-    delay_1 = 2.0
+    delay_1 = 2
     w_init_2 = 4.0
-    delay_2 = 1.0
+    delay_2 = 1
     stim = p.Population(1, p.SpikeSourceArray(pre_spikes), label="stim")
     pop = p.Population(
         1, p.IF_curr_exp(), label="pop", additional_parameters={

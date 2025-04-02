@@ -11,11 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from spinnaker_testbase import BaseTestCase
+from typing import List, Tuple
+
 import pyNN.spiNNaker as sim
+from neo.core import AnalogSignal
+from neo.core.spiketrainlist import SpikeTrainList
 import numpy
+
+from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPopulationVertexNeuronsSynapses)
+    SplitterPoissonDelegate, SplitterPopulationVertexNeuronsSynapses)
+from spynnaker.pyNN.models.neuron import PopulationVertex
+from spynnaker.pyNN.models.populations import Population
+from spynnaker.pyNN.models.projection import Projection
 
 # Parameters designed to make the delta neuron count spikes in voltage
 PARAMS = {
@@ -31,8 +39,9 @@ PARAMS = {
 class TestPoissonSpikeSourceSDRAM(BaseTestCase):
 
     def check_rate(
-            self, n_neurons, v, weight, rate, spikes, seconds,
-            max_spikes_per_ts, max_weight):
+            self, n_neurons: int, v: AnalogSignal, weight: float, rate: float,
+            spikes: SpikeTrainList, seconds: float, max_spikes_per_ts: int,
+            max_weight: float) -> None:
         runtime = seconds * 1000
 
         spikes_by_time = []
@@ -74,7 +83,8 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
         self.assertAlmostEqual(expected, float(count) / float(n_neurons),
                                delta=tolerance)
 
-    def make_delta_pop(self, n_neurons, ssp, weight, delay=1.0):
+    def make_delta_pop(self, n_neurons: int, ssp: Population, weight: float,
+                       delay: float=1.0) -> Tuple[Population, Projection]:
         pop_1 = sim.Population(
             n_neurons, sim.IF_curr_delta(**PARAMS), label='pop_1',
             splitter=SplitterPopulationVertexNeuronsSynapses(1))
@@ -99,8 +109,9 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
         v = pop_1.get_data("v").segments[0].filter(name='v')[0]
         spikes = ssp.get_data("spikes").segments[0].spiketrains
         conns = list(proj.get(["weight", "delay"], format="list"))
-        is_poisson_direct = (
-            proj._projection_edge.pre_vertex.splitter.send_over_sdram)
+        splitter = proj._projection_edge.pre_vertex.splitter
+        assert isinstance(splitter, SplitterPoissonDelegate)
+        is_poisson_direct = (splitter.send_over_sdram)
         sim.end()
         assert is_poisson_direct
         self.check_rate(n_neurons, v, 1.0, 0.0, spikes, 2.0, 0, 1.0)
@@ -124,8 +135,9 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
 
         sim.run(2000)
         conns = list(proj.get(["weight", "delay"], format="list"))
-        is_poisson_direct = (
-            proj._projection_edge.pre_vertex.splitter.send_over_sdram)
+        splitter = proj._projection_edge.pre_vertex.splitter
+        assert isinstance(splitter, SplitterPoissonDelegate)
+        is_poisson_direct = (splitter.send_over_sdram)
         sim.end()
         assert not is_poisson_direct
         # Can't really check the rate here as we expect it not use SDRAM!
@@ -146,8 +158,9 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
 
         sim.run(2000)
         conns = list(proj.get(["weight", "delay"], format="list"))
-        is_poisson_direct = (
-            proj._projection_edge.pre_vertex.splitter.send_over_sdram)
+        splitter = proj._projection_edge.pre_vertex.splitter
+        assert isinstance(splitter, SplitterPoissonDelegate)
+        is_poisson_direct = (splitter.send_over_sdram)
         sim.end()
         assert not is_poisson_direct
         # Can't really check the rate here as we expect it not use SDRAM!
@@ -159,7 +172,7 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
     def test_poisson_sdram_with_delay(self) -> None:
         self.runsafe(self.poisson_sdram_with_delay)
 
-    def check_rates(self, rates, seconds, seed):
+    def check_rates(self, rates: List[float], seconds: int, seed: int) -> None:
         n_neurons = 100
         weight = 2.0
         sim.setup(timestep=1.0)
@@ -184,13 +197,15 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
             spikes[rate] = ssp.get_data("spikes").segments[0].spiketrains
 
             vtx = target._vertex
+            assert isinstance(vtx, PopulationVertex)
             weight_scale = vtx.get_weight_scales(
                 vtx.get_ring_buffer_shifts())[0]
             max_w = 65535 / weight_scale
             max_weight[rate] = max_w
             max_spikes[rate] = int(max_w / weight)
-            is_direct[rate] = (
-                proj._projection_edge.pre_vertex.splitter.send_over_sdram)
+            splitter = proj._projection_edge.pre_vertex.splitter
+            assert isinstance(splitter, SplitterPoissonDelegate)
+            is_direct[rate] = (splitter.send_over_sdram)
         sim.end()
         for rate in rates:
             assert is_direct[rate]

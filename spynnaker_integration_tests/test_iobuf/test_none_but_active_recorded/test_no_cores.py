@@ -23,7 +23,7 @@ from spynnaker.pyNN.data import SpynnakerDataView
 
 class TestNoIobufDuringRun(BaseTestCase):
 
-    def check_for_iobufs(self, prov_path):
+    def check_for_iobufs(self, prov_path: str) -> bool:
         return any("iobuf" in filename and ".txt" in filename
                    for filename in os.listdir(prov_path))
 

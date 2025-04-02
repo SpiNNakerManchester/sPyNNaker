@@ -13,10 +13,14 @@
 # limitations under the License.
 
 import pyNN.spiNNaker as sim
-from spynnaker.pyNN.utilities import neo_compare
+import neo
+
 from spinnaker_testbase import BaseTestCase
-from spynnaker_integration_tests.scripts import check_neuron_data
+
+from spynnaker.pyNN.models.populations import Population
+from spynnaker.pyNN.utilities import neo_compare
 from spynnaker.pyNN.utilities.neo_csv import NeoCsv
+from spynnaker_integration_tests.scripts import check_neuron_data
 
 n_neurons = 20  # number of neurons in each population
 neurons_per_core = n_neurons // 2
@@ -25,7 +29,8 @@ simtime = 200
 
 class TestResetDifferent(BaseTestCase):
 
-    def check_data(self, neo, pop, expected_spikes, simtime):
+    def check_data(self, neo: neo.Block, pop: Population,
+                   expected_spikes: int, simtime: int) -> None:
         spikes = neo.segments[0].spiketrains
         v = neo.segments[0].filter(name="v")[0]
         gsyn_exc = neo.segments[0].filter(name="gsyn_exc")[0]

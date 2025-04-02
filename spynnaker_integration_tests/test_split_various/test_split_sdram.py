@@ -17,12 +17,11 @@ from spynnaker.pyNN.extra_algorithms.splitter_components import (
 from spinnaker_testbase import BaseTestCase
 
 
-def run_sdram_split():
+def run_sdram_split() -> None:
     sim.setup(1.0)
 
-    spikeArray = {'spike_times': []}
     pre_pop = sim.Population(
-        21000, sim.SpikeSourceArray(**spikeArray), label="pre")
+        21000, sim.SpikeSourceArray(spike_times=[]), label="pre")
     post_pop = sim.Population(
         600, sim.IF_cond_exp, label="post",
         additional_parameters={

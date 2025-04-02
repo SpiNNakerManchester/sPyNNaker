@@ -11,19 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import numpy
+from numpy.typing import NDArray
 import pyNN.spiNNaker as p
+import scipy
+
+from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     DURATION_FOREVER)
-from spinnaker_testbase import BaseTestCase
-import scipy
-import numpy
 
 
-def array(value):
+def array(value: NDArray) -> NDArray:
     return numpy.array(value).reshape(-1)
 
 
-def variable_rate_options():
+def variable_rate_options() -> None:
     """ Test the various options that can be passed to a variable rate Poisson
     """
     p.setup(1.0)
@@ -179,7 +181,7 @@ def variable_rate_options():
                 assert n_spikes <= (expected + tolerance)
 
 
-def variable_rate_reset():
+def variable_rate_reset() -> None:
     """ Test the ways of changing rates and ensure that they don't change the\
         results
     """
@@ -225,7 +227,7 @@ def variable_rate_reset():
         assert numpy.array_equal(s2, s3)
 
 
-def variable_rate_100us():
+def variable_rate_100us() -> None:
     """ Test that the source works at 0.1ms timesteps
     """
     rates = [1, 10, 100]

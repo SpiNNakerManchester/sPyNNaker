@@ -17,7 +17,7 @@ from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterPopulationVertexNeuronsSynapses)
 
 
-def split_structural_without_stdp():
+def split_structural_without_stdp() -> None:
     p.setup(1.0)
     stim = p.Population(1, p.SpikeSourceArray(range(10)), label="stim")
 

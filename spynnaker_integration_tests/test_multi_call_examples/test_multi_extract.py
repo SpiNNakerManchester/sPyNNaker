@@ -13,6 +13,9 @@
 # limitations under the License.
 
 import pyNN.spiNNaker as sim
+import neo
+
+from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.utilities import neo_compare
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import check_neuron_data
@@ -24,7 +27,8 @@ simtime = 1000
 
 class TestMultiExtract(BaseTestCase):
 
-    def check_data(self, pop, expected_spikes, simtime, early_neo):
+    def check_data(self, pop: Population, expected_spikes: int, simtime: int,
+                   early_neo: neo.Block) -> None:
         neo = pop.get_data("all")
         spikes = neo.segments[0].spiketrains
         v = neo.segments[0].filter(name="v")[0]

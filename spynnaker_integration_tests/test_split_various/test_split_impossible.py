@@ -19,7 +19,7 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spinnaker_testbase import BaseTestCase
 
 
-def mission_impossible():
+def mission_impossible() -> None:
     sim.setup(0.1, time_scale_factor=1)
 
     # Can't do that many neurons and delays together
@@ -31,7 +31,7 @@ def mission_impossible():
         sim.run(100)
 
 
-def mission_impossible_2():
+def mission_impossible_2() -> None:
     sim.setup(0.1, time_scale_factor=1)
 
     # Can't do structural on multiple synapse cores

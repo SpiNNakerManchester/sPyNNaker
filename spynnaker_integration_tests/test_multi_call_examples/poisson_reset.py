@@ -17,7 +17,7 @@ from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterPopulationVertexNeuronsSynapses)
 
 
-def test_possion_reset():
+def test_possion_reset() -> None:
     """ Check that DSG still does the right thing after reset
     """
     sim.setup(1.0)

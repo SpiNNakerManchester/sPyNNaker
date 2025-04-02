@@ -20,17 +20,17 @@ from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager)
 
 
-def start_callback():
+def start_callback() -> None:
     time.sleep(3.0)
     print("Ending Simulation")
     sim.external_devices.request_stop()
 
 
-def stop_callback():
+def stop_callback() -> None:
     print("Stopping")
 
 
-def run_forever_recorded():
+def run_forever_recorded() -> None:
     sim.setup(1.0)
     source_spikes = range(0, 5000, 100)
     stim = sim.Population(1, sim.SpikeSourceArray(source_spikes))
