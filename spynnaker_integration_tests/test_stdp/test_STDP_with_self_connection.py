@@ -18,7 +18,7 @@ from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterPopulationVertexNeuronsSynapses)
 
 
-def stdp_with_self_connection():
+def stdp_with_self_connection() -> None:
 
     sim.setup(timestep=1.0)
 

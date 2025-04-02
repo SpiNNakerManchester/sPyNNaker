@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List, Tuple
+from neo.core.spiketrainlist import SpikeTrainList
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 
@@ -36,7 +38,7 @@ synParameters = {
 
 
 # Network and simulation
-def record_weights_using_callback():
+def record_weights_using_callback() -> Tuple[ List[List[int]], SpikeTrainList]:
 
     ######################################
     # Setup

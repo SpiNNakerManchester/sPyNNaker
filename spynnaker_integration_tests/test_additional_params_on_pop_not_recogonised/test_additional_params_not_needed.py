@@ -16,7 +16,7 @@ from spinnaker_testbase import BaseTestCase
 from testfixtures import LogCapture  # type: ignore[import]
 
 
-def a_run():
+def a_run() -> None:
     n_neurons = 100  # number of neurons in each population
 
     p.setup(timestep=1.0, min_delay=1.0)

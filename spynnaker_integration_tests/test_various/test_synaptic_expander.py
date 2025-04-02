@@ -21,7 +21,7 @@ from collections import defaultdict
 import math
 
 
-def run_script():
+def run_script() -> None:
     p.setup(1.0)
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 3)
 
@@ -155,7 +155,7 @@ def check_fixed_total(total, conns):
     assert len(conns) == total
 
 
-def run_bad_normal_clipping():
+def run_bad_normal_clipping() -> None:
     p.setup(timestep=1.0)
 
     pop_1 = p.Population(4, p.IF_curr_exp(), label="pop_1")

@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Tuple
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 
-def do_run():
+def do_run() -> Tuple[ConnectionHolder, ConnectionHolder]:
 
     p.setup(timestep=1.0)
     inp = p.Population(1, p.SpikeSourceArray(spike_times=[0]))
@@ -49,8 +51,16 @@ class ReuseConnectorTest(BaseTestCase):
         self.assertEqual(1, len(proj_1_list))
         self.assertEqual(1, len(proj_2_list))
         for i in range(4):
-            self.assertEqual(test_1_list[0][i], proj_1_list[0][i])
-            self.assertEqual(test_2_list[0][i], proj_2_list[0][i])
+            test_1 = test_1_list[0]
+            assert isinstance(test_1, list)
+            proj_1 = proj_1_list[0]
+            assert isinstance(proj_1, list)
+            self.assertEqual(test_1[i], proj_1[i])
+            test_2 = test_2_list[0]
+            assert isinstance(test_2, list)
+            proj_2 = proj_2_list[0]
+            assert isinstance(proj_2, list)
+            self.assertEqual(test_2[i], proj_2[i])
 
     def test_run(self) -> None:
         self.runsafe(self.check_run)

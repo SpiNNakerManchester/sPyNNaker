@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Tuple
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 
-def do_run():
+def do_run() -> Tuple[ConnectionHolder, ConnectionHolder]:
 
     p.setup(timestep=1.0)
     # The larger population needs to be first for this test
@@ -49,10 +51,14 @@ class ReuseConnectorDifferentPopsTest(BaseTestCase):
         # have the correct weights / delays
         self.assertEqual(100, len(proj_1_list))
         self.assertEqual(25, len(proj_2_list))
-        self.assertEqual(2.0, proj_1_list[0][2])
-        self.assertEqual(4.0, proj_1_list[0][3])
-        self.assertEqual(1.0, proj_2_list[0][2])
-        self.assertEqual(3.0, proj_2_list[0][3])
+        proj_1 = proj_1_list[0]
+        assert isinstance(proj_1, list)
+        self.assertEqual(2.0, proj_1[2])
+        self.assertEqual(4.0, proj_1[3])
+        proj_2 = proj_2_list[0]
+        assert isinstance(proj_2, list)
+        self.assertEqual(1.0, proj_2[2])
+        self.assertEqual(3.0, proj_2[3])
 
     def test_run(self) -> None:
         self.runsafe(self.check_run)

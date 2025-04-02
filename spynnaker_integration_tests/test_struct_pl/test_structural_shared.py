@@ -16,7 +16,7 @@ import pyNN.spiNNaker as p
 import numpy
 
 
-def structural_shared():
+def structural_shared() -> None:
     p.setup(1.0)
     pre_spikes = numpy.array(range(0, 10, 2))
     A_plus = 0.01

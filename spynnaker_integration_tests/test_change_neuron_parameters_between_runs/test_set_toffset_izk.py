@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from neo.core import Block
 import numpy
 import pyNN.spiNNaker as p
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(n_neurons, n_cores, i_offset2, i_offset3):
+def do_run(n_neurons: int, n_cores: int, i_offset2: int,
+           i_offset3: int) -> Block:
     p.setup(timestep=1.0, min_delay=1.0)
     p.set_number_of_neurons_per_core(p.Izhikevich, n_neurons / n_cores)
     cell_params_izk = {'a': 0.02,

@@ -20,7 +20,7 @@ from spinnaker_testbase import BaseTestCase
 import numpy
 
 
-def post_spike_same_time():
+def post_spike_same_time() -> None:
     """ Check that the offsets between send times of different spike source
         arrays don't change the outcome of STDP
     """
@@ -67,7 +67,7 @@ def post_spike_same_time():
     p.end()
 
     new_weight_exact = calculate_spike_pair_additive_stdp_weight(
-        pre_spikes, post_spikes, initial_weight, plastic_delay,
+        numpy.array(pre_spikes), post_spikes, initial_weight, plastic_delay,
         a_plus, a_minus, tau_plus, tau_minus)
 
     print(weights_1)
@@ -80,7 +80,7 @@ def post_spike_same_time():
     assert numpy.allclose(weights_1, new_weight_exact, rtol=0.001)
 
 
-def potentiation_and_depression():
+def potentiation_and_depression() -> None:
     p.setup(1)
     runtime = 100
     initial_run = 1000  # to negate any initial conditions
@@ -158,7 +158,7 @@ def potentiation_and_depression():
     p.end()
 
     new_weight_exact = calculate_spike_pair_additive_stdp_weight(
-        pre_spikes, post_spikes, initial_weight, plastic_delay,
+        numpy.array(pre_spikes), post_spikes, initial_weight, plastic_delay,
         a_plus, a_minus, tau_plus, tau_minus)
 
     print("Pre neuron spikes at: {}".format(pre_spikes))

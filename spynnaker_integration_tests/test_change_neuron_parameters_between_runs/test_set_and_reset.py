@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from numpy.typing import NDArray
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 
 
 class TestNoChange(BaseTestCase):
 
-    def check_from_65(self, v):
+    def check_from_65(self, v: NDArray) -> None:
         for i in range(0, len(v), 5):
             assert -65. == v[i+0][2]
             assert -64.024658203125 == v[i+1][2]
@@ -26,7 +27,7 @@ class TestNoChange(BaseTestCase):
             assert -62.214324951171875 == v[i+3][2]
             assert -61.37481689453125 == v[i+4][2]
 
-    def check_from_60(self, v):
+    def check_from_60(self, v: NDArray) -> None:
         assert -60. == v[0][2]
         assert -59.26849365234375 == v[1][2]
         assert -58.5726318359375 == v[2][2]

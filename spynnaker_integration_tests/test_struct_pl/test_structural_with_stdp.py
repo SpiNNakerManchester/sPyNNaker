@@ -18,7 +18,7 @@ import pyNN.spiNNaker as p
 import numpy
 
 
-def structural_with_stdp():
+def structural_with_stdp() -> None:
     p.setup(1.0)
     pre_spikes = numpy.array(range(0, 10, 2))
     pre_spikes_last_neuron = pre_spikes[pre_spikes > 0]
@@ -29,9 +29,9 @@ def structural_with_stdp():
     w_min = 0.0
     w_max = 5.0
     w_init_1 = 5.0
-    delay_1 = 2.0
+    delay_1 = 2
     w_init_2 = 4.0
-    delay_2 = 1.0
+    delay_2 = 1
     stim = p.Population(1, p.SpikeSourceArray(pre_spikes), label="stim")
     pop = p.Population(1, p.IF_curr_exp(), label="pop")
     pop_2 = p.Population(1, p.IF_curr_exp(), label="pop_2")
@@ -103,11 +103,11 @@ def structural_with_stdp():
     print(conns_4)
 
     w_final_1 = calculate_spike_pair_additive_stdp_weight(
-        pre_spikes_last_neuron, spikes_1[0], w_init_1, delay_1,
+        numpy.array(pre_spikes_last_neuron), spikes_1[0], w_init_1, delay_1,
         A_plus, A_minus, tau_plus, tau_minus)
     w_final_2 = calculate_spike_pair_additive_stdp_weight(
-        pre_spikes, spikes_2[0], w_init_2, delay_2, A_plus, A_minus,
-        tau_plus, tau_minus)
+        numpy.array(pre_spikes), spikes_2[0], w_init_2, delay_2, A_plus,
+        A_minus, tau_plus, tau_minus)
     print(w_final_1, spikes_1[0])
     print(w_final_2, spikes_2[0])
 

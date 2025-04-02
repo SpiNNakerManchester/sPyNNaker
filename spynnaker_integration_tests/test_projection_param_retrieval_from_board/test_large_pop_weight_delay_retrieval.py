@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+from typing import Tuple
+
 import numpy
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
-import os
+from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 sources = 1000  # number of neurons in each population
 targets = 2000
@@ -23,7 +26,9 @@ weight_to_spike = 2.0
 delay = 1
 
 
-def do_run():
+def do_run() -> Tuple[ConnectionHolder, ConnectionHolder, ConnectionHolder,
+                      ConnectionHolder, ConnectionHolder, ConnectionHolder,
+                      ConnectionHolder, ConnectionHolder]:
     p.setup(timestep=1.0, min_delay=1.0)
 
     cell_params_lif = {'cm': 0.25,  # nF
@@ -105,47 +110,29 @@ class LargePopWeightDelayRetrival(BaseTestCase):
         self.assertTrue(numpy.allclose(pre_delays_array, post_delays_array))
         self.assertTrue(numpy.allclose(pre_weights_array, post_weights_array))
         for i in range(sources*targets):
-            self.assertEqual(pre_weights_list[i][2], pre_weights_array
-                             [pre_weights_list[i][0]][pre_weights_list[i][1]])
-            self.assertEqual(pre_delays_list[i][2], pre_delays_array
-                             [pre_delays_list[i][0]][pre_delays_list[i][1]])
+            pre_weights = pre_weights_list[i]
+            assert isinstance(pre_weights, list)
+            pre_weights_a = pre_weights_array[int(pre_weights[0])]
+            assert isinstance(pre_weights_a, list)
+            self.assertEqual(pre_weights[2],
+                             pre_weights_a[int(pre_weights[1])])
+            pre_delays = pre_delays_list[i]
+            assert isinstance(pre_delays, list)
+            pre_delays_a = pre_delays_array[int(pre_delays[0])]
+            assert isinstance(pre_delays_a, list)
+            self.assertEqual(pre_delays[2], pre_delays_a[int(pre_delays[1])])
+            post_weights = post_weights_list[i]
+            assert isinstance(post_weights, list)
+            post_weights_a = post_weights_array[int(post_weights[0])]
+            assert isinstance(post_weights_a, list)
             self.assertEqual(
-                post_weights_list[i][2], post_weights_array
-                [post_weights_list[i][0]][post_weights_list[i][1]])
-            self.assertEqual(post_delays_list[i][2], post_delays_array
-                             [post_delays_list[i][0]][post_delays_list[i][1]])
+                post_weights[2], post_weights_a[int(post_weights[1])])
+            post_delays = post_delays_list[i]
+            assert isinstance(post_delays, list)
+            post_delays_a = post_delays_array[int(post_delays[0])]
+            assert isinstance(post_delays_a, list)
+            self.assertEqual(post_delays[2],
+                             post_delays_a[int(post_delays[1])])
 
     def test_compare_before_and_after(self) -> None:
         self.runsafe(self.compare_before_and_after)
-
-
-if __name__ == '__main__':
-    (pre_delays_array, pre_delays_list, pre_weights_array,
-        pre_weights_list, post_delays_array, post_delays_list,
-        post_weights_array, post_weights_list) = do_run()
-    print("array")
-    print(pre_delays_array.shape)
-    print(pre_delays_array[0])
-    print("list")
-    print(len(pre_delays_list))
-    print(len(pre_delays_list[0]))
-    print("array")
-    print(pre_weights_array.shape)
-    print(pre_weights_array[0])
-    print("list")
-    print(len(pre_weights_list))
-    print(len(pre_weights_list[0]))
-    print("array")
-    print(post_delays_array.shape)
-    print(post_delays_array[0].shape)
-    print("list")
-    print(len(post_delays_list))
-    print(len(post_delays_list[0]))
-    print("array")
-    print(post_weights_array.shape)
-    print(post_weights_array[0])
-    print("list")
-    print(len(post_weights_list))
-    print(len(post_weights_list[0]))
-    with open("test_file.txt", encoding="utf-8") as f:
-        print(numpy.loadtxt(f))

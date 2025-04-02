@@ -18,7 +18,7 @@ from pyNN.space import Grid2D
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run():
+def do_run() -> None:
     shape = numpy.array([10, 10])
     n_input = numpy.prod(shape)
     pool_shape = numpy.array([2, 2])

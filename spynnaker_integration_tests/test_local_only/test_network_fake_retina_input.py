@@ -11,10 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import List, Tuple
+from random import randint
 
+from neo.core.spiketrainlist import SpikeTrainList
 import pyNN.spiNNaker as p
 from pyNN.space import Grid2D
-from random import randint
+
 from spinnaker_testbase import BaseTestCase
 
 # Used if send_fake_spikes is True
@@ -33,12 +36,12 @@ SUB_HEIGHT = 16
 WEIGHT = 5
 
 
-def get_retina_input():
+def get_retina_input() -> List[List[int]]:
     """ This is used to create random input as a spike array
     """
 
     time = int(sleep_time * 1000)
-    spikes_to_send = [[] for _ in range(WIDTH * HEIGHT)]
+    spikes_to_send: List[List[int]] = [[] for _ in range(WIDTH * HEIGHT)]
     for _ in range(n_packets):
         n_spikes = randint(10, 100)
         for _ in range(n_spikes):
@@ -87,7 +90,7 @@ def find_square_of_spikes(x, y, time, spikes, s_label, t_label):
     return spikes, found_spikes
 
 
-def do_run():
+def do_run() -> Tuple[SpikeTrainList, SpikeTrainList, SpikeTrainList]:
     # Set up PyNN
     p.setup(1.0)
 

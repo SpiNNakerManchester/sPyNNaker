@@ -22,7 +22,7 @@ import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run():
+def do_run() -> None:
     p.setup(timestep=1.0)
     weight = math.sqrt(2.0)
     random_delay = p.RandomDistribution("uniform", low=1, high=16)

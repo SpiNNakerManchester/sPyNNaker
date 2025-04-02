@@ -15,7 +15,7 @@ from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as p
 
 
-def structural_without_stdp():
+def structural_without_stdp() -> None:
     p.setup(1.0)
     stim = p.Population(1, p.SpikeSourceArray(range(10)), label="stim")
 
