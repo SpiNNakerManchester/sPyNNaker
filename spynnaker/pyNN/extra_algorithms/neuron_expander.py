@@ -16,9 +16,8 @@ from typing import List, Tuple
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.progress_bar import ProgressBar
-from spinnman.model.enums import ExecutableType
+from spinnman.model.enums import ExecutableType, CPUState, UserRegister
 from spinnman.model import ExecutableTargets
-from spinnman.model.enums import CPUState, UserRegister
 from pacman.model.placements import Placement
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
@@ -65,11 +64,8 @@ def _plan_expansion() -> Tuple[
     expander_cores = ExecutableTargets()
     expanded_pop_vertices: List[
         Tuple[AbstractNeuronExpandable, Placement]] = list()
-
-    progress = ProgressBar(
-        SpynnakerDataView.get_n_placements(),
-        "Preparing to Expand Neuron Data")
-    for placement in progress.over(SpynnakerDataView.iterate_placemements()):
+    to_write: List[Tuple[int, int, int, UserRegister, int]] = []
+    for placement in SpynnakerDataView.iterate_placemements():
         # Add all machine vertices of the population vertex to ones
         # that need synapse expansion
         vertex = placement.vertex
@@ -80,10 +76,11 @@ def _plan_expansion() -> Tuple[
                     neuron_bin, placement.x, placement.y, placement.p,
                     executable_type=ExecutableType.SYSTEM)
                 # Write the region to USER1, as that is the best we can do
-                txrx.write_user(
-                    placement.x, placement.y, placement.p, UserRegister.USER_1,
-                    vertex.neuron_generator_region)
+                to_write.append((
+                    *placement.location, UserRegister.USER_1,
+                    vertex.neuron_generator_region))
 
+    txrx.write_user_many(to_write, "preparing to expand neuron data")
     return expander_cores, expanded_pop_vertices
 
 
