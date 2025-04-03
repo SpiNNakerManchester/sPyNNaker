@@ -15,12 +15,15 @@
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 
+from spynnaker.pyNN.models.projection import Projection
+
 
 class TestOneToOneConnector(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def check_weights(self, projection, sources, destinations):
+    def check_weights(self, projection: Projection, sources: int,
+                      destinations: int) -> None:
         weights = projection.get(["weight"], "list")
         last_source = -1
         for (source, destination, _) in weights:
@@ -31,7 +34,7 @@ class TestOneToOneConnector(BaseTestCase):
             self.assertLess(destination, sources)
         self.assertEqual(len(weights), min(sources, destinations))
 
-    def check_other_connect(self, sources, destinations):
+    def check_other_connect(self, sources: int, destinations: int) -> None:
         sim.setup(1.0)
         pop1 = sim.Population(sources, sim.IF_curr_exp(), label="pop1")
         pop2 = sim.Population(destinations, sim.IF_curr_exp(), label="pop2")
@@ -42,21 +45,21 @@ class TestOneToOneConnector(BaseTestCase):
         self.check_weights(projection, sources, destinations)
         sim.end()
 
-    def test_same(self):
+    def test_same(self) -> None:
         self.check_other_connect(5, 5)
 
     # Does not work on VM
-    # def test_less_sources(self):
+    # def test_less_sources(self) -> None:
     #    self.check_other_connect(5, 10)
 
     # Does not work on VM
-    # def test_less_destinations(self):
+    # def test_less_destinations(self) -> None:
     #    self.check_other_connect(10, 5)
 
-    def test_many(self):
+    def test_many(self) -> None:
         self.check_other_connect(500, 500)
 
-    def test_get_before_run(self):
+    def test_get_before_run(self) -> None:
         sim.setup(1.0)
         pop1 = sim.Population(3, sim.IF_curr_exp(), label="pop1")
         pop2 = sim.Population(3, sim.IF_curr_exp(), label="pop2")

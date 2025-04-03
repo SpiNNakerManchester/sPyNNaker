@@ -22,7 +22,7 @@ import pyNN.spiNNaker as sim
 N_NEURONS = 9
 
 
-def make_data(do_view):
+def make_data(do_view: bool) -> None:
     sim.setup(timestep=1.0)
     sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
 
@@ -75,7 +75,7 @@ def make_data(do_view):
     shutil.copyfile(run_buffer, my_buffer)
 
 
-def make_rewires():
+def make_rewires() -> None:
     sim.setup(1.0)
     sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
     stim = sim.Population(9, sim.SpikeSourceArray(range(10)), label="stim")

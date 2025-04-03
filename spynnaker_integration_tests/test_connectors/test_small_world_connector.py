@@ -16,7 +16,7 @@ import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 from pyNN.utility.plotting import Figure, Panel
 from pyNN.random import NumpyRNG
-import matplotlib.pyplot as plt  # type: ignore[import]
+import matplotlib.pyplot as plt
 from spynnaker.pyNN.utilities import neo_convertor
 
 

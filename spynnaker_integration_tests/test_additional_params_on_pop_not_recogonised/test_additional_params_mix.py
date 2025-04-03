@@ -16,19 +16,6 @@ from spinnaker_testbase import BaseTestCase
 from testfixtures import LogCapture  # type: ignore[import]
 
 
-def a_run():
-    n_neurons = 100  # number of neurons in each population
-
-    p.setup(timestep=1.0, min_delay=1.0)
-    pop = p.Population(
-        n_neurons, p.IF_curr_exp(), label='pop_1',
-        additional_parameters={
-            "spikes_per_second": "bacon",
-            "bacon": "bacon"})
-    assert pop._vertex.spikes_per_second == "bacon"
-    p.end()
-
-
 class PopAdditionParamsTest(BaseTestCase):
 
     def a_run(self):
@@ -45,10 +32,7 @@ class PopAdditionParamsTest(BaseTestCase):
             self.assert_logs_messages(
                 lc.records,
                 "additional_parameter bacon will be ignored", 'WARNING', 1)
+        p.end()
 
     def test_a_run(self):
-        self.runsafe(a_run)
-
-
-if __name__ == '__main__':
-    a_run()
+        self.runsafe(self.a_run)

@@ -23,7 +23,7 @@ class Test_IDMixin(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_simple(self):
+    def test_simple(self) -> None:
         n_neurons = 5
         label = "pop_1"
         sim.setup(timestep=1.0)
@@ -66,11 +66,11 @@ class Test_IDMixin(BaseTestCase):
 
         self.assertEqual(2, len(view))
 
-        iterator = view.all()
-        self.assertEqual(1, next(iterator).id)
-        self.assertEqual(3, next(iterator).id)
+        iterator2 = view.all()
+        self.assertEqual(1, next(iterator2).id)
+        self.assertEqual(3, next(iterator2).id)
         with pytest.raises(StopIteration):
-            next(iterator)
+            next(iterator2)
 
         self.assertEqual(view.conductance_based, pop_1.conductance_based)
 
@@ -84,7 +84,7 @@ class Test_IDMixin(BaseTestCase):
 
         sim.end()
 
-    def test_get_set(self):
+    def test_get_set(self) -> None:
         n_neurons = 4
         label = "pop_1"
         sim.setup(timestep=1.0)
@@ -103,7 +103,7 @@ class Test_IDMixin(BaseTestCase):
         self.assertEqual([2, 4, 2, 4], pop_1.get("tau_m"))
         sim.end()
 
-    def test_view_of_view(self):
+    def test_view_of_view(self) -> None:
         n_neurons = 10
         sim.setup(timestep=1.0)
         pop_1 = sim.Population(n_neurons, sim.IF_curr_exp(), label="pop_1")
@@ -126,7 +126,7 @@ class Test_IDMixin(BaseTestCase):
         self.assertEqual(2, len(view4._indexes))
         sim.end()
 
-    def test_initial_value(self):
+    def test_initial_value(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
         self.assertEqual([-65, -65, -65, -65, -65], pop.initial_values["v"])
@@ -139,11 +139,12 @@ class Test_IDMixin(BaseTestCase):
         self.assertEqual([-65, -60, -65, -60, -65], pop.initial_values["v"])
         self.assertEqual([-60, -60], view.initial_values["v"])
         self.assertEqual([-60, -65], view2.initial_values["v"])
-        view.initialize(v=lambda i: -65 + i / 10.0)
+        # Does work but a super weird edge case
+        view.initialize(v=lambda i: -65 + i / 10.0)  # type: ignore[arg-type]
         self.assertEqual([-64.9, -64.7], view.initial_values["v"])
         sim.end()
 
-    def test_projection(self):
+    def test_projection(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
         view = PopulationView(pop, [1, 3], label="Odds")

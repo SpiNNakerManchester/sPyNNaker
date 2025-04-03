@@ -15,9 +15,13 @@
 import csv
 import os
 import pickle
-import numpy
-import pytest
 import shutil
+from typing import List
+
+import numpy
+from numpy.typing import NDArray
+import pytest
+
 from spinn_front_end_common.utilities.base_database import BaseDatabase
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -28,7 +32,8 @@ from spinnaker_testbase import BaseTestCase
 from .make_test_data import N_NEURONS
 
 
-def trim_spikes(spikes, indexes):
+def trim_spikes(spikes: NDArray[numpy.floating],
+                indexes: List[int]) -> List[List[numpy.floating]]:
     return [[n, t] for [n, t] in spikes if n in indexes]
 
 
@@ -36,7 +41,7 @@ _VIEW_DATA = "view_data.sqlite3"
 _ALL_DATA = "all_data.sqlite3"
 
 
-def copy_db(data_file):
+def copy_db(data_file: str) -> None:
     run_buffer = BaseDatabase.default_database_file()
     my_dir = os.path.dirname(os.path.abspath(__file__))
     my_buffer = os.path.join(my_dir, data_file)
@@ -46,27 +51,30 @@ def copy_db(data_file):
 
 class TestGetting(BaseTestCase):
 
+    spikes_expected: NDArray[numpy.floating] = numpy.array([])
+    v_expected: NDArray
+
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_v = os.path.join(my_dir, "v.csv")
         v_expected = []
         with open(my_v) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                row = list(map(lambda x: float(x), row))
-                v_expected.append(row)
+                floats = list(map(lambda x: float(x), row))
+                v_expected.append(floats)
         cls.v_expected = numpy.array(v_expected)
         my_spikes = os.path.join(my_dir, "spikes.csv")
-        spikes_expected = []
+        spikes_expected_l = []
         with open(my_spikes) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                row = list(map(lambda x: float(x), row))
-                spikes_expected.append((row[0], row[1]))
-        cls.spikes_expected = numpy.array(spikes_expected)
+                floats = list(map(lambda x: float(x), row))
+                spikes_expected_l.append((floats[0], floats[1]))
+        cls.spikes_expected = numpy.array(spikes_expected_l)
 
-    def test_simple_spikes(self):
+    def test_simple_spikes(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         copy_db(_ALL_DATA)
@@ -91,7 +99,7 @@ class TestGetting(BaseTestCase):
 
         sim.end()
 
-    def test_get_spikes_by_index(self):
+    def test_get_spikes_by_index(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         pop.record("spikes")
@@ -106,7 +114,7 @@ class TestGetting(BaseTestCase):
 
         sim.end()
 
-    def test_get_spikes_by_view(self):
+    def test_get_spikes_by_view(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         copy_db(_ALL_DATA)
@@ -122,7 +130,7 @@ class TestGetting(BaseTestCase):
 
         sim.end()
 
-    def test_get_spikes_view_missing(self):
+    def test_get_spikes_view_missing(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         copy_db(_VIEW_DATA)
@@ -141,7 +149,7 @@ class TestGetting(BaseTestCase):
 
         sim.end()
 
-    def test_get_v_view(self):
+    def test_get_v_view(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         pop.record("spikes")
@@ -156,7 +164,7 @@ class TestGetting(BaseTestCase):
 
         sim.end()
 
-    def test_get_v_missing(self):
+    def test_get_v_missing(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         pop[1:3].record("v")
@@ -174,7 +182,7 @@ class TestGetting(BaseTestCase):
 
         sim.end()
 
-    def test_get_spike_counts(self):
+    def test_get_spike_counts(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         pop.record("spikes")
@@ -191,7 +199,7 @@ class TestGetting(BaseTestCase):
 
         sim.end()
 
-    def test_write(self):
+    def test_write(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         pop.record(["spikes", "v"])
@@ -213,7 +221,7 @@ class TestGetting(BaseTestCase):
 
         sim.end()
 
-    def test_spinnaker_get_data(self):
+    def test_spinnaker_get_data(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         pop.record("v")
@@ -226,7 +234,7 @@ class TestGetting(BaseTestCase):
             pop.spinnaker_get_data(["v", "spikes"])
         sim.end()
 
-    def test_rewiring(self):
+    def test_rewiring(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         pop.record("rewiring")
@@ -257,7 +265,7 @@ class TestGetting(BaseTestCase):
         with self.assertRaises(SpynnakerException):
             neo = view.get_data("rewiring")
 
-    def test_packets(self):
+    def test_packets(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         pop.record("packets-per-timestep")
@@ -272,7 +280,7 @@ class TestGetting(BaseTestCase):
         with open(my_packets) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                row = list(map(lambda x: float(x), row))
-                packets_expected.append(row)
+                floats = list(map(lambda x: float(x), row))
+                packets_expected.append(floats)
 
         assert numpy.array_equal(packets,  packets_expected)
