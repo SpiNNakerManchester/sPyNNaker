@@ -38,7 +38,6 @@ def send_sync(label, conn):
     """ Send "continue" signal after a delay and update the current segment
     """
     global sim_finished
-    global n_spikes
     while not sim_finished:
         sleep(0.1)
         if not sim_finished:
@@ -65,7 +64,6 @@ def test_live_sync():
         and checking that the right spikes only arrive after synchronisation
     """
     global sim_finished
-    global n_spikes
     conn = SpynnakerLiveSpikesConnection(
         receive_labels=["ssa"], local_port=None)
     conn.add_receive_callback("ssa", recv)
