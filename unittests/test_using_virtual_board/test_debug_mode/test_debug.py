@@ -16,6 +16,8 @@ import os
 import unittest
 import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
+from spinn_front_end_common.utilities.report_functions.reports import (
+    get_path_router_reports)
 from spinn_front_end_common.utilities.report_functions.network_specification \
     import _FILENAME as network_specification_file_name
 from spinnaker_testbase import BaseTestCase
@@ -33,14 +35,15 @@ class TestDebug(BaseTestCase):
     # NO unittest_setup() as sim.setup is called
 
     def debug(self):
+        sim.setup(1.0)
         reports = [
             # write_energy_report does not happen on a virtual machine
             # "Detailed_energy_report.rpt",
             # "energy_summary_report.rpt",
             # write_text_specs = False
             "data_spec_text_files",
-            # write_router_reports
-            reports_names._ROUTING_FILENAME,
+
+            get_path_router_reports(),
             # write_partitioner_reports
             reports_names._PARTITIONING_FILENAME,
             # write_application_graph_placer_report
@@ -77,7 +80,7 @@ class TestDebug(BaseTestCase):
             # # Can't check for that; graph generation might not work because
             # # of system configuration
             ]
-        sim.setup(1.0)
+
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
         pop.record("v")
         inp = sim.Population(1, sim.SpikeSourceArray(
