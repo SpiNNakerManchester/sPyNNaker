@@ -15,10 +15,15 @@ from __future__ import annotations
 import logging
 from typing import (
     Iterator, Optional, Set, Tuple, Type, Union, TYPE_CHECKING)
+
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.logger_utils import warn_once
+
 from spinn_front_end_common.data import FecDataView
+
 from spynnaker import _version
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.populations import Population
@@ -249,6 +254,12 @@ class SpynnakerDataView(FecDataView):
         if not issubclass(neuron_type, AbstractPyNNModel):
             raise TypeError(f"{neuron_type} is not an AbstractPyNNModel")
 
+        if SpynnakerDataView.get_n_populations() > 0:
+            warn_once(logger,
+                      "set_number_of_neurons_per_dimension_per_core "
+                      "only affects Populations not yet made. "
+                      "Either move the set to the beginning of the script "
+                      "or consider using Population.set_max_atoms_per_core")
         neuron_type.set_model_max_atoms_per_dimension_per_core(max_permitted)
         cls.__spy_data._neurons_per_core_set.add(neuron_type)
         cls.set_requires_mapping()
