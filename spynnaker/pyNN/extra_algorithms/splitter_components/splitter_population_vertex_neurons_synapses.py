@@ -255,7 +255,6 @@ class SplitterPopulationVertexNeuronsSynapses(
                 vertex_slice, neuron_sdram, label, index, rb_shifts,
                 weight_scales, neuron_data, atoms_per_core)
             sdram = neuron_sdram
-            # chip_counter.add_core(neuron_sdram)
 
             # Keep track of synapse vertices for each neuron vertex and
             # resources used by each core (neuron core is added later)
@@ -271,7 +270,6 @@ class SplitterPopulationVertexNeuronsSynapses(
                     neuron_vertex, atoms_per_core,
                     synaptic_matrices)
             sdram += lead_synapse_core_sdram
-            # chip_counter.add_core(lead_synapse_core_sdram)
 
             # Do the remaining synapse cores
             for i in range(1, self.__n_synapse_vertices):
@@ -280,8 +278,6 @@ class SplitterPopulationVertexNeuronsSynapses(
                     shared_synapse_core_sdram, feedback_partition,
                     synapse_vertices, neuron_vertex)
                 sdram += shared_synapse_core_sdram
-                # chip_counter.add_core(shared_synapse_core_sdram)
-            chip_counter.add_core(sdram, n_cores=self.__n_synapse_vertices + 1)
 
             # Add resources for Poisson vertices up to core limit
             poisson_vertices = incoming_direct_poisson[vertex_slice]
@@ -289,7 +285,12 @@ class SplitterPopulationVertexNeuronsSynapses(
             added_poisson_vertices: List[SpikeSourcePoissonMachineVertex] = []
             for poisson_vertex, _possion_edge in poisson_vertices:
                 added_poisson_vertices.append(poisson_vertex)
-                chip_counter.add_core(poisson_vertex.sdram_required)
+                sdram += poisson_vertex.sdram_required
+
+            # Add the cores
+            n_cores = (
+                self.__n_synapse_vertices + len(added_poisson_vertices) + 1)
+            chip_counter.add_core(sdram, n_cores=n_cores)
 
             # Create an SDRAM edge partition
             source_vertices = added_poisson_vertices + synapse_vertices
