@@ -22,6 +22,8 @@ from spinn_front_end_common.interface.interface_functions \
     import load_using_advanced_monitors
 import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
+from spinn_front_end_common.utilities.report_functions.reports import (
+    get_path_router_reports)
 from spinn_front_end_common.utilities.report_functions.network_specification \
     import _FILENAME as network_specification_file_name
 from spinn_front_end_common.utilities.report_functions.drift_report import (
@@ -57,8 +59,7 @@ class CheckDebug(BaseTestCase):
             # EnergyReport._SUMMARY_FILENAME,
             # write_text_specs = False
             "data_spec_text_files",
-            # write_router_reports
-            reports_names._ROUTING_FILENAME,
+            get_path_router_reports(),
             # write_partitioner_reports
             reports_names._PARTITIONING_FILENAME,
             # write_application_graph_placer_report

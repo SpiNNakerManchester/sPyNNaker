@@ -19,6 +19,8 @@ from spinn_front_end_common.interface.interface_functions \
     import load_using_advanced_monitors
 import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
+from spinn_front_end_common.utilities.report_functions.reports import (
+    get_path_router_reports)
 from spinn_front_end_common.utilities.report_functions.network_specification \
     import _FILENAME as network_specification_file_name
 from spinn_front_end_common.utilities.report_functions.drift_report import (
@@ -47,6 +49,7 @@ class CheckDebug(BaseTestCase):
     that it does not crash in debug mode. All reports on.
     """
     def debug(self):
+        sim.setup(1.0)
         # pylint: disable=protected-access
         reports = [
             # write_energy_report
@@ -54,8 +57,7 @@ class CheckDebug(BaseTestCase):
             # EnergyReport._SUMMARY_FILENAME,
             # write_text_specs = False
             "data_spec_text_files",
-            # write_router_reports
-            reports_names._ROUTING_FILENAME,
+            get_path_router_reports(),
             # write_partitioner_reports
             reports_names._PARTITIONING_FILENAME,
             # write_application_graph_placer_report
@@ -86,7 +88,6 @@ class CheckDebug(BaseTestCase):
             fixed_route_report,
             ]
 
-        sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
         pop.record("v")
         inp = sim.Population(1, sim.SpikeSourceArray(
