@@ -14,7 +14,7 @@
 
 import os
 from spinn_utilities.config_holder import (
-    clear_cfg_files, set_cfg_files)
+    clear_cfg_files, set_cfg_files, print_configs)
 from spinn_front_end_common.interface.config_setup import (
     add_default_cfg, add_spinnaker_cfg)
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
@@ -62,3 +62,8 @@ def add_spynnaker_cfg() -> None:
     """
     add_spinnaker_cfg()  # This add its dependencies too
     add_default_cfg(os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))
+
+
+if __name__ == '__main__':
+    setup_configs()
+    print_configs()
