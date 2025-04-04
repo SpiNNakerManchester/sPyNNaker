@@ -516,7 +516,7 @@ class PopulationVertex(
         # 1 for extra monitor
         max_n_cores = (
             version.max_cores_per_chip -
-            (version.n_scamp_cores  + _N_OTHER_CORES))
+            (version.n_scamp_cores + _N_OTHER_CORES))
 
         # So how many synapses can be processed accounting for timescale?
         synapses_per_core_per_sim_second = (

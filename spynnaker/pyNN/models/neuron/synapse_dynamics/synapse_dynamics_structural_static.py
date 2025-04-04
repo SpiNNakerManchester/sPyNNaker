@@ -354,6 +354,6 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
 
     @property
     @overrides(AbstractStaticSynapseDynamics.synapses_per_second)
-    def synapses_per_second(self)->int:
+    def synapses_per_second(self) -> int:
         return (super().synapses_per_second -
                 super().reduction_synapses_per_second)
