@@ -524,16 +524,16 @@ class PopulationVertex(
             SpynnakerDataView().get_time_scale_factor())
 
         # Add up the number of incoming synapse processes expected
-        synapses_per_second = 0
-        poisson_synapses_per_second = 0
+        synapses_per_second: int = 0
+        poisson_synapses_per_second: int = 0
         for pre_vertex, projs in self.__incoming_projections.items():
             spikes_per_second = self.__spikes_per_second
             if isinstance(pre_vertex, AbstractMaxSpikes):
-                rate = math.ceil(pre_vertex.max_spikes_per_second())
+                rate = pre_vertex.max_spikes_per_second()
                 if rate > 0:
                     spikes_per_second = rate
 
-            pre_synapses_per_second = 0
+            pre_synapses_per_second: int = 0
             for proj in projs:
                 # pylint: disable=protected-access
                 s_info = proj._synapse_information
@@ -542,7 +542,7 @@ class PopulationVertex(
                     self.get_max_atoms_per_core(), s_info)
                 # The number of synapses is the number of connections from each
                 # pre-neuron to each post-neuron
-                pre_synapses_per_second += (
+                pre_synapses_per_second += math.ceil(
                     n_conns * spikes_per_second * pre_vertex.n_atoms)
 
             if self._is_direct_poisson(pre_vertex, projs):
