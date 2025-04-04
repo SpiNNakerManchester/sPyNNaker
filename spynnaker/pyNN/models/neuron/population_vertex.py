@@ -485,12 +485,6 @@ class PopulationVertex(
         neuron-synapse core, or if a split synapse-core is more
         appropriate.
 
-        .. note::
-            This is currently based only on the ITCM available, not
-            on the incoming synapses, but could be combined with
-            n_synapse_cores_required to determine if, and how-many, synapse
-            cores are needed.
-
         :rtype: bool
         """
         if not self.__synapse_dynamics.is_combined_core_capable:
@@ -503,10 +497,6 @@ class PopulationVertex(
         """
         The estimated number of synapse cores required, when using a
         split synapse-neuron core model.
-
-        .. note::
-            This is currently hard-coded but could be updated to work
-            this out based on the number of incoming synapses.
 
         :rtype: int
         """
@@ -573,7 +563,7 @@ class PopulationVertex(
         return min(max_n_cores, n_synapse_cores)
 
     def _is_direct_poisson(self, pre_vertex: PopulationApplicationVertex,
-                           projs: List[Projection]):
+                           projs: List[Projection]) -> bool:
         # The only way to avoid circular imports!
         # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.extra_algorithms.splitter_components\
