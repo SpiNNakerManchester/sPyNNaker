@@ -28,7 +28,6 @@ n_spikes.append(0)
 def recv(label, time, neuron_ids):
     """ Receive spikes and add the number received to the current segment count
     """
-    global n_spikes
     print("Time: {}; Received spikes from {}:{}".format(
         time, label, neuron_ids))
     n_spikes[len(n_spikes) - 1] += len(neuron_ids)
@@ -64,6 +63,7 @@ def test_live_sync():
         and checking that the right spikes only arrive after synchronisation
     """
     global sim_finished
+    global n_spikes
     conn = SpynnakerLiveSpikesConnection(
         receive_labels=["ssa"], local_port=None)
     conn.add_receive_callback("ssa", recv)
