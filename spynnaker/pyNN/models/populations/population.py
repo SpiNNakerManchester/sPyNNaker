@@ -737,8 +737,6 @@ class Population(PopulationBase):
                     f"Set the max_atoms_per_core to {max_atoms_per_core} "
                     f"blocked as the current limit for the model is {cap}")
         self.__vertex.set_max_atoms_per_dimension_per_core(max_atoms_per_core)
-        # state that something has changed in the population
-        SpynnakerDataView.set_requires_mapping()
 
     @property
     def size(self) -> int:
