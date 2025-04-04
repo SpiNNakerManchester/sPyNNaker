@@ -535,6 +535,7 @@ class PopulationVertex(
 
             pre_synapses_per_second = 0
             for proj in projs:
+                # pylint: disable=protected-access
                 s_info = proj._synapse_information
                 connector = s_info.connector
                 n_conns = connector.get_n_connections_from_pre_vertex_maximum(
@@ -556,7 +557,8 @@ class PopulationVertex(
         # The number of Poisson cores that will be needed
         n_poisson_cores = len(self.incoming_poisson_projections)
 
-        # If we can definitely do the Poissons directly, lets recommend this
+        # If we can definitely do the Poisson vertices directly,
+        # lets recommend this
         if n_synapse_cores + n_poisson_cores < max_n_cores:
             return n_synapse_cores
 
