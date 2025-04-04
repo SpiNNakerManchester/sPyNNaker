@@ -31,8 +31,8 @@ from spinn_front_end_common.utilities.helpful_functions import (
 
 from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
-    AbstractPopulationVertex)
+from spynnaker.pyNN.models.neuron.population_vertex import (
+    PopulationVertex)
 from spynnaker.pyNN.models.neuron.population_machine_neurons import (
     NeuronRegions)
 
@@ -83,7 +83,7 @@ class NeuronData(object):
         # Whether to generate things on the machine
         "__gen_on_machine")
 
-    def __init__(self, app_vertex: AbstractPopulationVertex):
+    def __init__(self, app_vertex: PopulationVertex):
         self.__app_vertex = app_vertex
         self.__neuron_data: Optional[NDArray[uint32]] = None
         self.__neuron_recording_data: Optional[NDArray[uint32]] = None

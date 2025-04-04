@@ -99,7 +99,7 @@ from .synapse_io import get_max_row_info
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterAbstractPopulationVertex)
+        SplitterPopulationVertex)
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
     from spynnaker.pyNN.models.neural_projections import (
         SynapseInformation, ProjectionApplicationEdge)
@@ -177,12 +177,11 @@ def _is_structural(dynamics: AbstractSynapseDynamics
     return isinstance(dynamics, AbstractSynapseDynamicsStructural)
 
 
-class AbstractPopulationVertex(
+class PopulationVertex(
         PopulationApplicationVertex, AbstractAcceptsIncomingSynapses,
         AbstractCanReset, SupportsStructure):
     """
     Underlying vertex model for Neural Populations.
-    Not actually abstract.
     """
 
     __slots__ = (
@@ -246,7 +245,7 @@ class AbstractPopulationVertex(
             incoming_spike_buffer_size: Optional[int],
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel, drop_late_spikes: bool,
-            splitter: Optional[SplitterAbstractPopulationVertex],
+            splitter: Optional[SplitterPopulationVertex],
             seed: Optional[int], n_colour_bits: Optional[int],
             extra_partitions: Optional[List[str]] = None):
         """
@@ -271,7 +270,7 @@ class AbstractPopulationVertex(
         :param AbstractPyNNNeuronModel pynn_model:
             The PyNN neuron model that this vertex is working on behalf of.
         :param splitter: splitter object
-        :type splitter: SplitterAbstractPopulationVertex or None
+        :type splitter: SplitterPopulationVertex or None
         :param seed:
             The Population seed, used to ensure the same random generation
             on each run.
@@ -395,15 +394,15 @@ class AbstractPopulationVertex(
 
     @property  # type: ignore[override]
     @overrides(PopulationApplicationVertex.splitter)
-    def splitter(self) -> SplitterAbstractPopulationVertex:
+    def splitter(self) -> SplitterPopulationVertex:
         s = self._splitter
         if s is None:
             raise PacmanConfigurationException(
                 f"The splitter object on {self._label} has not yet been set.")
-        return cast('SplitterAbstractPopulationVertex', s)
+        return cast('SplitterPopulationVertex', s)
 
     @splitter.setter
-    def splitter(self, splitter: SplitterAbstractPopulationVertex) -> None:
+    def splitter(self, splitter: SplitterPopulationVertex) -> None:
         if self._splitter == splitter:
             return
         if self.has_splitter:
@@ -413,11 +412,11 @@ class AbstractPopulationVertex(
         # Circularity
         # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.extra_algorithms.splitter_components import (
-            SplitterAbstractPopulationVertex as ValidSplitter)
+            SplitterPopulationVertex as ValidSplitter)
         if not isinstance(splitter, ValidSplitter):
             raise PacmanConfigurationException(
                 f"The splitter object on {self._label} must be set to one "
-                "capable of handling an AbstractPopulationVertex.")
+                "capable of handling an PopulationVertex.")
         self._splitter = cast(Any, splitter)
         splitter.set_governed_app_vertex(self)
 
@@ -1838,7 +1837,7 @@ class _Stats(object):
         stats = self.running_totals[s_type]
         rates = self.rate_stats[s_type]
         # pylint: disable=protected-access
-        w_max = AbstractPopulationVertex._ring_buffer_expected_upper_bound(
+        w_max = PopulationVertex._ring_buffer_expected_upper_bound(
             stats.mean, stats.standard_deviation, rates.mean,
             stats.n_items, self.ring_buffer_sigma)
         w_max = min(w_max, self.total_weights[s_type])

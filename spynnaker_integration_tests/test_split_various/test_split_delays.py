@@ -13,7 +13,7 @@
 # limitations under the License.
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexNeuronsSynapses)
+    SplitterPopulationVertexNeuronsSynapses)
 import numpy
 from spinnaker_testbase import BaseTestCase
 
@@ -23,19 +23,19 @@ def run_delayed_split():
     source = sim.Population(10, sim.SpikeSourceArray(spike_times=[0]))
     target_1 = sim.Population(
         10, sim.IF_curr_exp(), label="target_1", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(1)})
+            "splitter": SplitterPopulationVertexNeuronsSynapses(1)})
     target_1.record("spikes")
     target_2 = sim.Population(
         10, sim.IF_curr_exp(), label="target_2", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(2)})
+            "splitter": SplitterPopulationVertexNeuronsSynapses(2)})
     target_2.record("spikes")
     target_3 = sim.Population(
         10, sim.IF_curr_exp(), label="target_3", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(3)})
+            "splitter": SplitterPopulationVertexNeuronsSynapses(3)})
     target_3.record("spikes")
     target_4 = sim.Population(
         10, sim.IF_curr_exp(), label="target_4", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(3)})
+            "splitter": SplitterPopulationVertexNeuronsSynapses(3)})
     target_4.record("spikes")
 
     # Try from list, which means host generated

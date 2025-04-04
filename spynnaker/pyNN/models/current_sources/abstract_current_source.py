@@ -19,8 +19,8 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_front_end_common.interface.ds import DataType
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.populations import Population, PopulationBase
-    from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
-        AbstractPopulationVertex)
+    from spynnaker.pyNN.models.neuron.population_vertex import (
+        PopulationVertex)
 
 #: General type of parameters to current sources.
 #: Individual parameters will only be one of these!
@@ -50,7 +50,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         "__population")
 
     def __init__(self) -> None:
-        self.__app_vertex: Optional[AbstractPopulationVertex] = None
+        self.__app_vertex: Optional[PopulationVertex] = None
         self.__population: Optional[Population] = None
 
     def inject_into(self, cells: PopulationBase) -> None:
@@ -62,20 +62,20 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         # Call the population method to pass the source in
         cells.inject(self)
 
-    def set_app_vertex(self, vertex: AbstractPopulationVertex) -> None:
+    def set_app_vertex(self, vertex: PopulationVertex) -> None:
         """
         Set the application vertex associated with the current source.
 
-        :param AbstractPopulationVertex vertex: The population vertex
+        :param PopulationVertex vertex: The population vertex
         """
         self.__app_vertex = vertex
 
     @property
-    def app_vertex(self) -> Optional[AbstractPopulationVertex]:
+    def app_vertex(self) -> Optional[PopulationVertex]:
         """
         The application vertex associated with the current source.
 
-        :rtype: AbstractPopulationVertex
+        :rtype: PopulationVertex
         """
         return self.__app_vertex
 

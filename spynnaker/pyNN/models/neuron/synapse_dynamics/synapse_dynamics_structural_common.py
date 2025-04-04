@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neural_projections import (
         SynapseInformation)
-    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.neuron import PopulationVertex
     from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray)
@@ -57,7 +57,7 @@ if TYPE_CHECKING:
 
     #: :meta private:
     ConnectionsInfo: TypeAlias = Dict[
-        Tuple[AbstractPopulationVertex, int],
+        Tuple[PopulationVertex, int],
         List[Tuple[ConnectionsArray, ProjectionApplicationEdge,
                    SynapseInformation]]]
 
@@ -127,7 +127,7 @@ class SynapseDynamicsStructuralCommon(
     def write_structural_parameters(
             self, spec: DataSpecificationBase, region: int,
             weight_scales: NDArray[numpy.floating],
-            app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
+            app_vertex: PopulationVertex, vertex_slice: Slice,
             synaptic_matrices: SynapticMatrices) -> None:
         spec.comment("Writing structural plasticity parameters")
         spec.switch_write_focus(region)
@@ -191,7 +191,7 @@ class SynapseDynamicsStructuralCommon(
 
     def __write_common_rewiring_data(
             self, spec: DataSpecificationBase,
-            app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
+            app_vertex: PopulationVertex, vertex_slice: Slice,
             n_pre_pops: int) -> None:
         """
         Write the non-sub-population synapse parameters to the spec.
@@ -260,7 +260,7 @@ class SynapseDynamicsStructuralCommon(
             list(~pacman.model.graphs.machine.MachineEdge))
         :param dict(int,float) weight_scales:
         :param SynapticMatrices synaptic_matrices:
-        :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
+        :rtype: dict(tuple(PopulationVertex,SynapseInformation),int)
         """
         spec.comment("Writing pre-population info")
         pop_index: _PopIndexType = dict()
@@ -328,14 +328,14 @@ class SynapseDynamicsStructuralCommon(
     def __write_post_to_pre_table(
             self, spec: DataSpecificationBase, pop_index: _PopIndexType,
             subpop_index: _SubpopIndexType, lo_atom_index: _SubpopIndexType,
-            app_vertex: AbstractPopulationVertex, vertex_slice: Slice) -> None:
+            app_vertex: PopulationVertex, vertex_slice: Slice) -> None:
         """
         Post to pre table is basically the transpose of the synaptic matrix.
 
         :param ~data_specification.DataSpecificationGenerator spec:
         :param pop_index:
         :type pop_index:
-            dict(tuple(AbstractPopulationVertex,SynapseInformation), int)
+            dict(tuple(PopulationVertex,SynapseInformation), int)
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
             the vertex for which data specs are being prepared
         :param ~pacman.model.graphs.common.Slice vertex_slice:

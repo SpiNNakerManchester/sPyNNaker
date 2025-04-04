@@ -38,7 +38,7 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, HasSynapses)
 
-from .abstract_population_vertex import AbstractPopulationVertex
+from .population_vertex import PopulationVertex
 from .population_machine_synapses_provenance import (
     PopulationMachineSynapsesProvenance)
 from .synaptic_matrices import SynapseRegions, SynapseRegionReferences
@@ -63,14 +63,14 @@ class PopulationMachineSynapses(
 
     @property
     @abstractmethod
-    def _pop_vertex(self) -> AbstractPopulationVertex:
+    def _pop_vertex(self) -> PopulationVertex:
         """
         The application vertex of the machine vertex.
 
         .. note::
             This is likely to be available via the MachineVertex.
 
-        :rtype: AbstractPopulationVertex
+        :rtype: PopulationVertex
         """
         raise NotImplementedError
 

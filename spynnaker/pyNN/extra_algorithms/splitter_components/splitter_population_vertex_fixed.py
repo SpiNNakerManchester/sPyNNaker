@@ -49,17 +49,18 @@ from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.population_machine_common import (
     PopulationMachineCommon)
 
-from .splitter_abstract_pop_vertex import SplitterAbstractPopulationVertex
+from .splitter_population_vertex import SplitterPopulationVertex
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 
 # The maximum number of bits for the ring buffer index that are likely to
-# fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
+# fit in DTCM (14-bits = 16,384 16-bit ring
+# buffer entries = 32Kb DTCM
 MAX_RING_BUFFER_BITS = 14
 
 
-class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
+class SplitterPopulationVertexFixed(SplitterPopulationVertex):
     """
-    Handles the splitting of the :py:class:`AbstractPopulationVertex`
+    Handles the splitting of the :py:class:`PopulationVertex`
     using fixed slices.
     """
 
@@ -308,13 +309,13 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
                            self.governed_app_vertex.incoming_projections))
         return sdram
 
-    @overrides(SplitterAbstractPopulationVertex.
+    @overrides(SplitterPopulationVertex.
                reset_called)  # type: ignore[has-type]
     def reset_called(self) -> None:
         super().reset_called()
         self.__expect_delay_extension = None
 
-    @overrides(SplitterAbstractPopulationVertex._update_max_delay)
+    @overrides(SplitterPopulationVertex._update_max_delay)
     def _update_max_delay(self) -> None:
         # Find the maximum delay from incoming synapses
         self._max_delay, self.__expect_delay_extension = \

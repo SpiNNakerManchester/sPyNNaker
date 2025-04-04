@@ -14,7 +14,7 @@
 import pyNN.spiNNaker as sim
 from spinn_front_end_common.data.fec_data_view import FecDataView
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexNeuronsSynapses)
+    SplitterPopulationVertexNeuronsSynapses)
 
 
 def test_possion_reset():
@@ -24,7 +24,7 @@ def test_possion_reset():
     noise = sim.Population(100, sim.SpikeSourcePoisson(
         rate=10.0), label="Noise")
     pop = sim.Population(100, sim.IF_curr_exp(), additional_parameters={
-        "splitter": SplitterAbstractPopulationVertexNeuronsSynapses()})
+        "splitter": SplitterPopulationVertexNeuronsSynapses()})
     sim.Projection(noise, pop, sim.OneToOneConnector(), sim.StaticSynapse(1.0))
 
     sim.run(1000)

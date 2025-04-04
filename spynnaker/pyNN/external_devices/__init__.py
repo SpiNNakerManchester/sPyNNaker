@@ -63,7 +63,7 @@ from spynnaker.pyNN.models.utility_models.spike_injector import (
     SpikeInjector as ExternalDeviceSpikeInjector)
 from spynnaker.pyNN import protocols
 from spynnaker.pyNN.spinnaker import SpiNNaker
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron import PopulationVertex
 
 
 # useful functions
@@ -184,13 +184,13 @@ __ethernet_control_connection: Optional[EthernetControlConnection] = None
 
 
 def __vtx(population: Population) -> Tuple[
-        AbstractPopulationVertex, AbstractEthernetController, str]:
+        PopulationVertex, AbstractEthernetController, str]:
     vertex = population._vertex  # pylint: disable=protected-access
-    if isinstance(vertex, AbstractPopulationVertex):
+    if isinstance(vertex, PopulationVertex):
         v = vertex
     else:
         raise TypeError(
-            "Vertex must be an instance of AbstractPopulationVertex")
+            "Vertex must be an instance of PopulationVertex")
     if isinstance(vertex, AbstractEthernetController):
         c = vertex
     else:

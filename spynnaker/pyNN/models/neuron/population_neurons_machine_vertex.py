@@ -43,7 +43,7 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
-from .abstract_population_vertex import AbstractPopulationVertex
+from .population_vertex import PopulationVertex
 
 # Size of SDRAM params = 1 word for address + 1 word for size
 # + 1 word for n_neurons + 1 word for n_synapse_types
@@ -121,7 +121,7 @@ class PopulationNeuronsMachineVertex(
 
     def __init__(
             self, sdram: AbstractSDRAM, label: str,
-            app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
+            app_vertex: PopulationVertex, vertex_slice: Slice,
             slice_index: int, ring_buffer_shifts: Sequence[int],
             weight_scales: NDArray[floating],
             neuron_data: NeuronData, max_atoms_per_core: int):
@@ -129,7 +129,7 @@ class PopulationNeuronsMachineVertex(
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex
         :param str label: The label of the vertex
-        :param AbstractPopulationVertex app_vertex:
+        :param PopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
@@ -215,12 +215,12 @@ class PopulationNeuronsMachineVertex(
         self.__sdram_partition = sdram_partition
 
     @staticmethod
-    def __get_binary_file_name(app_vertex: AbstractPopulationVertex) -> str:
+    def __get_binary_file_name(app_vertex: PopulationVertex) -> str:
         """
         Get the local binary filename for this vertex.  Static because at
         the time this is needed, the local app_vertex is not set.
 
-        :param AbstractPopulationVertex app_vertex:
+        :param PopulationVertex app_vertex:
             The associated application vertex
         :rtype: str
         """

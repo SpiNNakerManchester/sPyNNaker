@@ -83,7 +83,7 @@ class SynfireRunner(object):
         :type constraint: AbstractConstraint
         :param cell_class: class to be used for the main population.\
             Not used by any test at the moment
-        :type cell_class: AbstractPopulationVertex
+        :type cell_class: PopulationVertex
         :param cell_params: values for the main population.\
             Not used by any test at the moment.\
             Note: the values must match what is expected by the cellclass

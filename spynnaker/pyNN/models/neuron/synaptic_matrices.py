@@ -45,8 +45,8 @@ from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from .synaptic_matrix_app import SynapticMatrixApp
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
-        AbstractPopulationVertex)
+    from spynnaker.pyNN.models.neuron.population_vertex import (
+        PopulationVertex)
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
 
@@ -174,7 +174,7 @@ class SynapticMatrices(object):
         "__max_gen_data")
 
     def __init__(
-            self, app_vertex: AbstractPopulationVertex,
+            self, app_vertex: PopulationVertex,
             regions: SynapseRegions, max_atoms_per_core: int,
             weight_scales: NDArray[floating], all_syn_block_sz: int):
         """
@@ -444,7 +444,7 @@ class SynapticMatrices(object):
             # if converted to an int, so we use U3232 here instead (as there
             # can be scales larger than U1616.max in conductance-based models)
             dtype = DataType.U3232
-            spec.write_value(data=min(w, dtype.max), data_type=dtype)
+            spec.write_value(data=min(dtype.max, w), data_type=dtype)
 
         spec.write_array(self.__generated_data)
         spec.write_array(self.__bit_field_key_map)

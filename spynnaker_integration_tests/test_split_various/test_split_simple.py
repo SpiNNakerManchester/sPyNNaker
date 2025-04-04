@@ -13,7 +13,7 @@
 # limitations under the License.
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPoissonDelegate, SplitterAbstractPopulationVertexNeuronsSynapses)
+    SplitterPoissonDelegate, SplitterPopulationVertexNeuronsSynapses)
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from spinnaker_testbase import BaseTestCase
 import numpy
@@ -36,7 +36,7 @@ def run_simple_split():
     rand_source.record("spikes")
     target = sim.Population(
         50, sim.IF_curr_exp(), additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(3)})
+            "splitter": SplitterPopulationVertexNeuronsSynapses(3)})
     target.record(["spikes", "packets-per-timestep"])
     sim.Projection(
         one_to_one_source, target, sim.OneToOneConnector(),

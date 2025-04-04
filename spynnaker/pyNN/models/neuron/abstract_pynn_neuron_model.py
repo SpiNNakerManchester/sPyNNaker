@@ -14,13 +14,13 @@
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, TYPE_CHECKING
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron import PopulationVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterAbstractPopulationVertex)
+        SplitterPopulationVertex)
 
 # The maximum atoms per core is the master population table row length to
 # make it easier when all-to-all-connector is used
@@ -62,22 +62,22 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             max_expected_summed_weight: Optional[List[float]] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: Optional[bool] = None,
-            splitter: Optional[SplitterAbstractPopulationVertex] = None,
+            splitter: Optional[SplitterPopulationVertex] = None,
             seed: Optional[int] = None,
-            n_colour_bits: Optional[int] = None) -> AbstractPopulationVertex:
+            n_colour_bits: Optional[int] = None) -> PopulationVertex:
         """
         :param float spikes_per_second:
         :param float ring_buffer_sigma:
         :param int incoming_spike_buffer_size:
         :param bool drop_late_spikes:
         :param splitter:
-        :type splitter: SplitterAbstractPopulationVertex or None
+        :type splitter: SplitterPopulationVertex or None
         :param int seed:
         :param int n_colour_bits:
         """
         # pylint: disable=arguments-differ
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
-        return AbstractPopulationVertex(
+        return PopulationVertex(
             n_neurons=n_neurons, label=label, max_atoms_per_core=max_atoms,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,

@@ -29,7 +29,7 @@ if TYPE_CHECKING:
         SynapseDynamicsSTDP, SynapseDynamicsNeuromodulation)
     from spynnaker.pyNN.models.neural_projections import (
         SynapseInformation, DelayedApplicationEdge)
-    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.neuron import PopulationVertex
 
 
 class _Dynamics:
@@ -127,7 +127,7 @@ def are_dynamics_neuromodulation(
 class ProjectionApplicationEdge(
         ApplicationEdge, AbstractProvidesLocalProvenanceData):
     """
-    An edge which terminates on an :py:class:`AbstractPopulationVertex`.
+    An edge which terminates on an :py:class:`PopulationVertex`.
     """
     __slots__ = (
         "__delay_edge",
@@ -136,12 +136,12 @@ class ProjectionApplicationEdge(
 
     def __init__(
             self, pre_vertex: PopulationApplicationVertex,
-            post_vertex: AbstractPopulationVertex,
+            post_vertex: PopulationVertex,
             synapse_information: SynapseInformation,
             label: Optional[str] = None):
         """
         :param PopulationApplicationVertex pre_vertex:
-        :param AbstractPopulationVertex post_vertex:
+        :param PopulationVertex post_vertex:
         :param SynapseInformation synapse_information:
             The synapse information on this edge
         :param str label:
@@ -223,5 +223,5 @@ class ProjectionApplicationEdge(
 
     @property
     @overrides(ApplicationEdge.post_vertex)
-    def post_vertex(self) -> AbstractPopulationVertex:
-        return cast('AbstractPopulationVertex', super().post_vertex)
+    def post_vertex(self) -> PopulationVertex:
+        return cast('PopulationVertex', super().post_vertex)

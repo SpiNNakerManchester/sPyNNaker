@@ -34,7 +34,7 @@ from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .synaptic_matrices import SynapseRegions
 from .population_machine_synapses_provenance import SynapseProvenance
 if TYPE_CHECKING:
-    from .abstract_population_vertex import AbstractPopulationVertex
+    from .population_vertex import PopulationVertex
     from .population_neurons_machine_vertex import (
         PopulationNeuronsMachineVertex)
 
@@ -158,12 +158,12 @@ class PopulationSynapsesMachineVertexCommon(
 
     def __init__(
             self, sdram: AbstractSDRAM, label: str,
-            app_vertex: AbstractPopulationVertex, vertex_slice: Slice):
+            app_vertex: PopulationVertex, vertex_slice: Slice):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex
         :param str label: The label of the vertex
-        :param AbstractPopulationVertex app_vertex:
+        :param PopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
@@ -207,12 +207,12 @@ class PopulationSynapsesMachineVertexCommon(
         self.__partition_id = partition_id
 
     @staticmethod
-    def __get_binary_file_name(app_vertex: AbstractPopulationVertex) -> str:
+    def __get_binary_file_name(app_vertex: PopulationVertex) -> str:
         """
         Get the local binary filename for this vertex.  Static because at
         the time this is needed, the local `app_vertex` is not set.
 
-        :param AbstractPopulationVertex app_vertex:
+        :param PopulationVertex app_vertex:
             The associated application vertex
         :rtype: str
         """

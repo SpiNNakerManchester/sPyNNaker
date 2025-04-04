@@ -24,7 +24,7 @@ from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, DelayedApplicationEdge,
     DelayAfferentApplicationEdge)
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron import PopulationVertex
 
 
 def delay_support_adder() -> Tuple[
@@ -55,7 +55,7 @@ class _DelaySupportAdder(object):
         self._app_to_delay_map: Dict[
             ApplicationEdgePartition, DelayExtensionVertex] = dict()
         self._delay_post_edge_map: Dict[
-            Tuple[DelayExtensionVertex, AbstractPopulationVertex, str],
+            Tuple[DelayExtensionVertex, PopulationVertex, str],
             DelayedApplicationEdge] = dict()
         self._new_edges: List[Tuple[ApplicationEdge, str]] = list()
         self._new_vertices: List[DelayExtensionVertex] = list()

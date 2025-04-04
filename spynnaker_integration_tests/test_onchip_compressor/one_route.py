@@ -17,7 +17,7 @@ from spinn_front_end_common.interface.provenance import GlobalProvenance
 from spynnaker.pyNN.exceptions import ConfigurationException
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexFixed)
+    SplitterPopulationVertexFixed)
 
 
 def find_good_chip(machine, n_target):
@@ -55,7 +55,7 @@ def do_one_run():
         pop = sim.Population(
             n_neurons, sim.IF_curr_exp(), label="target_{}".format(t),
             additional_parameters={
-                "splitter": SplitterAbstractPopulationVertexFixed()})
+                "splitter": SplitterPopulationVertexFixed()})
         pop.add_placement_constraint(x=target_x, y=target_y)
         targets.append(pop)
 
@@ -64,7 +64,7 @@ def do_one_run():
         sources.append(sim.Population(
             n_neurons, sim.IF_curr_exp(), label="source_{}".format(s),
             additional_parameters={
-                "splitter": SplitterAbstractPopulationVertexFixed()}))
+                "splitter": SplitterPopulationVertexFixed()}))
 
     for s in range(n_source):
         for t in range(n_target):

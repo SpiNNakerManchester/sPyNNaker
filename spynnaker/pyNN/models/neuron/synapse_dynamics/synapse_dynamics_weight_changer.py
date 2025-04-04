@@ -72,8 +72,8 @@ class SynapseDynamicsWeightChanger(
         # dynamics can change over time
         # Import here required to avoid circular imports
         # pylint: disable=import-outside-toplevel
-        from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-        self.__post_vertex = cast(AbstractPopulationVertex,
+        from spynnaker.pyNN.models.neuron import PopulationVertex
+        self.__post_vertex = cast(PopulationVertex,
                                   self.__synapse_info.post_vertex)
 
     @overrides(AbstractPlasticSynapseDynamics.merge)

@@ -28,7 +28,6 @@ n_spikes.append(0)
 def recv(label, time, neuron_ids):
     """ Receive spikes and add the number received to the current segment count
     """
-    global n_spikes
     print("Time: {}; Received spikes from {}:{}".format(
         time, label, neuron_ids))
     n_spikes[len(n_spikes) - 1] += len(neuron_ids)
@@ -38,7 +37,6 @@ def send_sync(label, conn):
     """ Send "continue" signal after a delay and update the current segment
     """
     global sim_finished
-    global n_spikes
     while not sim_finished:
         sleep(0.1)
         if not sim_finished:
