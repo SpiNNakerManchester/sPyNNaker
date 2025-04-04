@@ -398,3 +398,11 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         # By default, just ask the connector
         synapse_info.connector.validate_connection(
             application_edge, synapse_info)
+
+    @property
+    @abstractmethod
+    def synapses_per_second(self) -> int:
+        """
+        Approximate number of synapses that can be processed per second
+        """
+        raise NotImplementedError

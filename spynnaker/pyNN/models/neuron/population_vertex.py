@@ -136,6 +136,10 @@ _EXTRA_RECORDABLE_UNITS = {NeuronRecorder.SPIKES: "",
                            NeuronRecorder.PACKETS: "",
                            NeuronRecorder.REWIRING: ""}
 
+# The number of non-synapse cores that are likely needed (neuron core +
+# extra monitor in general)
+_N_OTHER_CORES = 2
+
 
 def _all_gen(rd: RangeDictionary) -> bool:
     """
@@ -358,7 +362,8 @@ class PopulationVertex(
         # Set up for incoming
         self.__incoming_projections: Dict[
             PopulationApplicationVertex, List[Projection]] = defaultdict(list)
-        self.__incoming_poisson_projections: List[Projection] = list()
+        self.__incoming_poisson_projections: Dict[
+            SpikeSourcePoissonVertex, Projection] = dict()
         self.__max_row_info: Dict[
             Tuple[ProjectionApplicationEdge, SynapseInformation, int],
             MaxRowInfo] = dict()
@@ -488,7 +493,10 @@ class PopulationVertex(
 
         :rtype: bool
         """
-        return self.__synapse_dynamics.is_combined_core_capable
+        if not self.__synapse_dynamics.is_combined_core_capable:
+            return False
+        # If the time-step is less than 1, use multiple cores
+        return SpynnakerDataView().get_simulation_time_step_ms() >= 1.0
 
     @property
     def n_synapse_cores_required(self) -> int:
@@ -502,7 +510,82 @@ class PopulationVertex(
 
         :rtype: int
         """
-        return 1
+        version = SpynnakerDataView().get_machine_version()
+
+        # The maximum number of cores minus 1 for the neuron core, and minus
+        # 1 for extra monitor
+        max_n_cores = (
+            version.max_cores_per_chip -
+            (version.n_scamp_cores  + _N_OTHER_CORES))
+
+        # So how many synapses can be processed accounting for timescale?
+        synapses_per_core_per_sim_second = (
+            self.__synapse_dynamics.synapses_per_second *
+            SpynnakerDataView().get_time_scale_factor())
+
+        # Add up the number of incoming synapse processes expected
+        synapses_per_second = 0
+        poisson_synapses_per_second = 0
+        for pre_vertex, projs in self.__incoming_projections.items():
+            spikes_per_second = self.__spikes_per_second
+            if isinstance(pre_vertex, AbstractMaxSpikes):
+                rate = pre_vertex.max_spikes_per_second()
+                if rate > 0:
+                    spikes_per_second = rate
+
+            pre_synapses_per_second = 0
+            for proj in projs:
+                s_info = proj._synapse_information
+                connector = s_info.connector
+                n_conns = connector.get_n_connections_from_pre_vertex_maximum(
+                    self.get_max_atoms_per_core(), s_info)
+                # The number of synapses is the number of connections from each
+                # pre-neuron to each post-neuron
+                pre_synapses_per_second += (
+                    n_conns * spikes_per_second * pre_vertex.n_atoms)
+
+            if self._is_direct_poisson(pre_vertex, projs):
+                poisson_synapses_per_second += pre_synapses_per_second
+            else:
+                synapses_per_second += pre_synapses_per_second
+
+        # How many cores are needed to process the non-direct-poisson synapses?
+        n_synapse_cores = math.ceil(
+            synapses_per_second / synapses_per_core_per_sim_second)
+
+        # The number of Poisson cores that will be needed
+        n_poisson_cores = len(self.incoming_poisson_projections)
+
+        # If we can definitely do the Poissons directly, lets recommend this
+        if n_synapse_cores + n_poisson_cores < max_n_cores:
+            return n_synapse_cores
+
+        # Otherwise, we should consider how many more cores we need for the
+        # Poisson input spikes
+        n_synapse_cores = math.ceil(
+            (synapses_per_second + poisson_synapses_per_second) /
+            synapses_per_core_per_sim_second)
+
+        # If the number of cores needed is more than the maximum, use the
+        # maximum
+        return min(max_n_cores, n_synapse_cores)
+
+    def _is_direct_poisson(self, pre_vertex: PopulationApplicationVertex,
+                           projs: List[Projection]):
+        # The only way to avoid circular imports!
+        # pylint: disable=import-outside-toplevel
+        from spynnaker.pyNN.extra_algorithms.splitter_components\
+            .splitter_utils import is_direct_poisson_source
+        if not isinstance(pre_vertex, SpikeSourcePoissonVertex):
+            return False
+        if len(projs) != 1:
+            return False
+        proj = projs[0]
+        # pylint: disable=protected-access
+        s_info = proj._synapse_information
+        return is_direct_poisson_source(
+            self, pre_vertex, s_info.connector, s_info.synapse_dynamics,
+            s_info.delays)
 
     @property
     def synapse_dynamics(self) -> AbstractSynapseDynamics:
@@ -549,7 +632,12 @@ class PopulationVertex(
         if pre_vertex == self:
             self.__self_projection = projection
         if isinstance(pre_vertex, SpikeSourcePoissonVertex):
-            self.__incoming_poisson_projections.append(projection)
+            # Only keep these when there is only one projection to this
+            # vertex, as otherwise not interesting
+            if pre_vertex not in self.__incoming_poisson_projections:
+                self.__incoming_poisson_projections[pre_vertex] = projection
+            else:
+                del self.__incoming_poisson_projections[pre_vertex]
 
     @property
     def self_projection(self) -> Optional[Projection]:
@@ -1245,8 +1333,8 @@ class PopulationVertex(
             return self.__connection_cache[app_edge, synapse_info]
 
         # Start with something in the list so that concatenate works
-        connections: List[ConnectionsArray]
-        connections = [numpy.zeros(0, dtype=NUMPY_CONNECTORS_DTYPE)]
+        connections: List[ConnectionsArray] = [
+            numpy.zeros(0, dtype=NUMPY_CONNECTORS_DTYPE)]
         progress = ProgressBar(
             len(self.machine_vertices),
             f"Getting synaptic data between {app_edge.pre_vertex.label} "
@@ -1582,10 +1670,11 @@ class PopulationVertex(
         """
         The projections that target this population vertex which
         originate from a Poisson source.
-
-        :rtype: iterable(~spynnaker.pyNN.models.projection.Projection)
         """
-        return self.__incoming_poisson_projections
+        # Filter to just those that have one outgoing projection
+        iterator = self.__incoming_poisson_projections.items()
+        return [proj for pre_vertex, proj in iterator
+                if len(pre_vertex.outgoing_projections) == 1]
 
     @property
     def pop_seed(self) -> Sequence[int]:

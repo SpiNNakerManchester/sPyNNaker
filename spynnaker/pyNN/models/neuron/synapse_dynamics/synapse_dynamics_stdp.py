@@ -644,3 +644,10 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
     def pad_to_length(self) -> Optional[int]:
         return self.__pad_to_length
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.synapses_per_second)
+    def synapses_per_second(self) -> int:
+        # From Synapse-Centric Mapping of Cortical Models to the SpiNNaker
+        # Neuromorphic Architecture
+        return 1400000

@@ -36,10 +36,6 @@ from pacman.utilities.utility_objs import ChipCounter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.models.projection import Projection
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamics)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.neuron import (
@@ -53,7 +49,6 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
-from spynnaker.pyNN.types import Delay_Types
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
     import (
         SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
@@ -64,8 +59,6 @@ from spynnaker.pyNN.utilities.constants import (
     SYNAPSE_SDRAM_PARTITION_ID, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    OneToOneConnector)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.master_pop_table import (
@@ -76,7 +69,6 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
     import (
         SpikeSourcePoissonMachineVertex)
 
-from .splitter_poisson_delegate import SplitterPoissonDelegate
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from .splitter_population_vertex import SplitterPopulationVertex
 from .abstract_supports_one_to_one_sdram_input import (
@@ -262,7 +254,8 @@ class SplitterPopulationVertexNeuronsSynapses(
             neuron_vertex = self.__add_neuron_core(
                 vertex_slice, neuron_sdram, label, index, rb_shifts,
                 weight_scales, neuron_data, atoms_per_core)
-            chip_counter.add_core(neuron_sdram)
+            sdram = neuron_sdram
+            # chip_counter.add_core(neuron_sdram)
 
             # Keep track of synapse vertices for each neuron vertex and
             # resources used by each core (neuron core is added later)
@@ -277,7 +270,8 @@ class SplitterPopulationVertexNeuronsSynapses(
                     label, rb_shifts, weight_scales, synapse_vertices,
                     neuron_vertex, atoms_per_core,
                     synaptic_matrices)
-            chip_counter.add_core(lead_synapse_core_sdram)
+            sdram += lead_synapse_core_sdram
+            # chip_counter.add_core(lead_synapse_core_sdram)
 
             # Do the remaining synapse cores
             for i in range(1, self.__n_synapse_vertices):
@@ -285,7 +279,9 @@ class SplitterPopulationVertexNeuronsSynapses(
                     syn_label, i, vertex_slice, synapse_references,
                     shared_synapse_core_sdram, feedback_partition,
                     synapse_vertices, neuron_vertex)
-                chip_counter.add_core(shared_synapse_core_sdram)
+                sdram += shared_synapse_core_sdram
+                # chip_counter.add_core(shared_synapse_core_sdram)
+            chip_counter.add_core(sdram, n_cores=self.__n_synapse_vertices + 1)
 
             # Add resources for Poisson vertices up to core limit
             poisson_vertices = incoming_direct_poisson[vertex_slice]
@@ -493,6 +489,10 @@ class SplitterPopulationVertexNeuronsSynapses(
 
         :param str label: Base label to give to the Poisson cores
         """
+        # The only way to avoid circular imports is to import here
+        # pylint: disable=import-outside-toplevel
+        from spynnaker.pyNN.extra_algorithms.splitter_components\
+            .splitter_utils import is_direct_poisson_source
         self.__poisson_sources = set()
         incoming_direct_poisson: Dict[Slice, List[Tuple[
             SpikeSourcePoissonMachineVertex,
@@ -508,8 +508,8 @@ class SplitterPopulationVertexNeuronsSynapses(
             conn = proj._synapse_information.connector
             dynamics = proj._synapse_information.synapse_dynamics
             delay = proj._synapse_information.delays
-            if self.is_direct_poisson_source(
-                    pre_vertex, conn, dynamics, delay):
+            if is_direct_poisson_source(self.governed_app_vertex, pre_vertex,
+                                        conn, dynamics, delay):
                 # Create the direct Poisson vertices here; the splitter
                 # for the Poisson will create any others as needed
                 for vertex_slice in self._get_fixed_slices():
@@ -532,42 +532,19 @@ class SplitterPopulationVertexNeuronsSynapses(
         if self.__too_many_cores:
             return False
 
+        # The only way to avoid circular imports is to import here
+        # pylint: disable=import-outside-toplevel
+        from spynnaker.pyNN.extra_algorithms.splitter_components\
+            .splitter_utils import is_direct_poisson_source
+
         # pylint: disable=protected-access
         edge = projection._projection_edge
         pre_vertex = edge.pre_vertex
         connector = projection._synapse_information.connector
         dynamics = projection._synapse_information.synapse_dynamics
         delay = projection._synapse_information.delays
-        return self.is_direct_poisson_source(
-            pre_vertex, connector, dynamics, delay)
-
-    def is_direct_poisson_source(
-            self, pre_vertex: ApplicationVertex, connector: AbstractConnector,
-            dynamics: AbstractSynapseDynamics, delay: Delay_Types) -> bool:
-        """
-        Determine if a given Poisson source can be created by this splitter.
-
-        :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:
-            The vertex sending into the Projection
-        :param connector:
-            The connector in use in the Projection
-        :type connector:
-            ~spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector
-        :param dynamics:
-            The synapse dynamics in use in the Projection
-        :type dynamics:
-            ~spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics
-        :param delay:
-            The delay in use in the Projection
-        :rtype: bool
-        """
-        return (isinstance(pre_vertex, SpikeSourcePoissonVertex) and
-                isinstance(pre_vertex.splitter, SplitterPoissonDelegate) and
-                len(pre_vertex.outgoing_projections) == 1 and
-                pre_vertex.n_atoms == self.governed_app_vertex.n_atoms and
-                isinstance(connector, OneToOneConnector) and
-                isinstance(dynamics, SynapseDynamicsStatic) and
-                delay == SpynnakerDataView().get_simulation_time_step_ms())
+        return is_direct_poisson_source(
+            self.governed_app_vertex, pre_vertex, connector, dynamics, delay)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self) -> Sequence[Slice]:
