@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import cast
+from typing import cast, List
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex)
@@ -56,8 +56,22 @@ def spynnaker_splitter_selector() -> None:
         string_describing_what_being_progressed=PROGRESS_BAR_NAME,
         total_number_of_things_to_do=SpynnakerDataView.get_n_vertices())
 
-    for app_vertex in progress_bar.over(SpynnakerDataView.iterate_vertices()):
+    remaining: List[ApplicationVertex] = []
+    for app_vertex in SpynnakerDataView.iterate_vertices():
+        # Do Poisson first
+        if isinstance(app_vertex, SpikeSourcePoissonVertex):
+            if _is_multidimensional(app_vertex):
+                app_vertex.splitter = SplitterFixedLegacy()
+            else:
+                app_vertex.splitter = SplitterPoissonDelegate()
+            progress_bar.update()
+        else:
+            remaining.append(app_vertex)
+
+    for app_vertex in remaining:
         spynnaker_vertex_selector(app_vertex)
+        progress_bar.update()
+    progress_bar.end()
 
 
 def spynnaker_vertex_selector(app_vertex: ApplicationVertex) -> None:
@@ -85,10 +99,7 @@ def spynnaker_vertex_selector(app_vertex: ApplicationVertex) -> None:
         elif isinstance(app_vertex, SpikeSourceArrayVertex):
             app_vertex.splitter = SplitterFixedLegacy()
         elif isinstance(app_vertex, SpikeSourcePoissonVertex):
-            if _is_multidimensional(app_vertex):
-                app_vertex.splitter = SplitterFixedLegacy()
-            else:
-                app_vertex.splitter = SplitterPoissonDelegate()
+            raise Exception("These should be done already!")
         else:  # go to basic selector. it might know what to do
             vertex_selector(app_vertex)
     if isinstance(app_vertex, AbstractAcceptsIncomingSynapses):
