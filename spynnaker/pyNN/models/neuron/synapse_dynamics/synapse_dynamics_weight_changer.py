@@ -310,6 +310,6 @@ class SynapseDynamicsWeightChanger(
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.synapses_per_second)
-    def synapses_per_second(self)->int:
+    def synapses_per_second(self) -> int:
         # This should never end up being requested!
         raise NotImplementedError

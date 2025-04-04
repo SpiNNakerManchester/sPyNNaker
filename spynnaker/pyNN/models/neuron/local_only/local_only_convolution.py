@@ -351,6 +351,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @property
     @overrides(AbstractLocalOnly.synapses_per_second)
-    def synapses_per_second(self)->int:
+    def synapses_per_second(self) -> int:
         # This is a guess!
         return 15000000
