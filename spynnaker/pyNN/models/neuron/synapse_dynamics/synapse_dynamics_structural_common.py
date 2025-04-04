@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from __future__ import annotations
+import math
 from typing import (
     cast, Dict, Iterable, List, Sequence, Tuple, Union, TYPE_CHECKING)
 
@@ -526,4 +527,4 @@ class SynapseDynamicsStructuralCommon(
         """
         # Guess that each rewiring attempt takes the same as 17 synapses,
         # based on ~250 cycles per rewiring attempt, and 15 cycles per synapse
-        return 17 * self.f_rew
+        return math.ceil(17 * self.f_rew)

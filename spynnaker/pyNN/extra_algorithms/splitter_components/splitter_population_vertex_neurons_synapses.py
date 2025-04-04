@@ -244,17 +244,12 @@ class SplitterPopulationVertexNeuronsSynapses(
             weight_scales, all_syn_block_sz)
         neuron_data = NeuronData(self.governed_app_vertex)
 
-        # Keep track of the SDRAM for each group of vertices
-        total_sdram = neuron_sdram + lead_synapse_core_sdram
-        for _ in range(self.__n_synapse_vertices - 1):
-            total_sdram += shared_synapse_core_sdram
-
         for index, vertex_slice in enumerate(self._get_fixed_slices()):
             # Create the neuron vertex for the slice
             neuron_vertex = self.__add_neuron_core(
                 vertex_slice, neuron_sdram, label, index, rb_shifts,
                 weight_scales, neuron_data, atoms_per_core)
-            sdram = neuron_sdram
+            sdram: AbstractSDRAM = neuron_sdram
 
             # Keep track of synapse vertices for each neuron vertex and
             # resources used by each core (neuron core is added later)
@@ -307,7 +302,7 @@ class SplitterPopulationVertexNeuronsSynapses(
                 source_vertex.set_sdram_partition(sdram_partition)
 
             self.__same_chip_groups.append(
-                ([*source_vertices, neuron_vertex], total_sdram))
+                ([*source_vertices, neuron_vertex], sdram))
 
         self.__incoming_vertices = [
             [self.__synapse_verts_by_neuron[neuron][index]

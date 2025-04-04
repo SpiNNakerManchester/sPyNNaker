@@ -529,7 +529,7 @@ class PopulationVertex(
         for pre_vertex, projs in self.__incoming_projections.items():
             spikes_per_second = self.__spikes_per_second
             if isinstance(pre_vertex, AbstractMaxSpikes):
-                rate = pre_vertex.max_spikes_per_second()
+                rate = math.ceil(pre_vertex.max_spikes_per_second())
                 if rate > 0:
                     spikes_per_second = rate
 
