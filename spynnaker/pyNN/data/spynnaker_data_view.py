@@ -262,7 +262,6 @@ class SpynnakerDataView(FecDataView):
                       "or consider using Population.set_max_atoms_per_core")
         neuron_type.set_model_max_atoms_per_dimension_per_core(max_permitted)
         cls.__spy_data._neurons_per_core_set.add(neuron_type)
-        cls.set_requires_mapping()
 
     @classmethod
     def get_sim_name(cls) -> str:
