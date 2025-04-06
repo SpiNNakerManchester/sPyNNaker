@@ -30,7 +30,8 @@ class TestMultipleStdpMechsOnSameNeuron(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def run_multiple_stdp_mechs_on_same_neuron(self, mode="same"):
+    def run_multiple_stdp_mechs_on_same_neuron(
+            self, mode: str = "same") -> None:
         p.setup(timestep=1.0, min_delay=1.0)
         nNeurons = 200  # number of neurons in each population
 
@@ -150,20 +151,20 @@ class TestMultipleStdpMechsOnSameNeuron(BaseTestCase):
                            synapse_type=stdp_model3)
         projections.append(pop)
 
-    def test_test_multiple_stdp_mechs_on_same_neuron(self):
+    def test_test_multiple_stdp_mechs_on_same_neuron(self) -> None:
         self.run_multiple_stdp_mechs_on_same_neuron(mode="same")
 
-    def test_weight_dependence(self):
+    def test_weight_dependence(self) -> None:
         with self.assertRaises(SynapticConfigurationException):
             self.run_multiple_stdp_mechs_on_same_neuron(
                 mode="weight_dependence")
 
-    def test_wmin(self):
+    def test_wmin(self) -> None:
         with self.assertRaises(SynapticConfigurationException):
             self.run_multiple_stdp_mechs_on_same_neuron(
                 mode="wmin")
 
-    def test_tau(self):
+    def test_tau(self) -> None:
         with self.assertRaises(SynapticConfigurationException):
             self.run_multiple_stdp_mechs_on_same_neuron(
                 mode="tau")

@@ -22,7 +22,7 @@ class TestConstraint(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_placement_constraint(self):
+    def test_placement_constraint(self) -> None:
         """
         test the get_placements call.
 
@@ -32,7 +32,8 @@ class TestConstraint(BaseTestCase):
         # pick and XY in the middle of the board
         x = (width + 1) // 3
         y = (height + 1) // 3
-        set_config("Reports", "write_application_graph_placer_report", True)
+        set_config("Reports", "write_application_graph_placer_report",
+                   str(True))
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 50)
 
         pop_1 = sim.Population(200, sim.IF_curr_exp(), label="pop_1")

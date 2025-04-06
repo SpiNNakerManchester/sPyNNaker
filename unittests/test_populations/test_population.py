@@ -19,7 +19,7 @@ import pyNN.spiNNaker as sim
 # NO unittest_step as sim.setup call is needed before creating a Population
 
 
-def test_selector():
+def test_selector() -> None:
     sim.setup()
     model = IFCurrExpBase()
     pop_1 = Population(
@@ -41,7 +41,7 @@ def test_selector():
     assert [-50.0, -50.0, -50.0] == values["v_thresh"]
 
 
-def test_round():
+def test_round() -> None:
     sim.setup()
     model = IFCurrExpBase()
     pop_1 = Population(
