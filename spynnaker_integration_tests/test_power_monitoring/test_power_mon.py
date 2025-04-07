@@ -18,8 +18,7 @@ import pyNN.spiNNaker as p
 from spinn_utilities.config_holder import get_report_path
 from spinn_front_end_common.interface.provenance import ProvenanceReader
 from spinn_front_end_common.utilities.report_functions.energy_report import (
-    EnergyReport, PATH_ENERGY_REPORT)
-from spynnaker.pyNN.data import SpynnakerDataView
+    PATH_ENERGY_REPORT)
 from spynnaker_integration_tests.scripts import SynfireRunner
 from spinnaker_testbase import BaseTestCase
 
