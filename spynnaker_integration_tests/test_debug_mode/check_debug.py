@@ -63,7 +63,6 @@ class CheckDebug(BaseTestCase):
             # write_text_specs = False
             "data_spec_text_files",
             # write_routing_table_reports
-            reports_names._ROUTING_TABLE_DIR,
             reports_names._C_ROUTING_TABLE_DIR,
             reports_names._COMPARED_FILENAME,
             # write_memory_map_report
@@ -143,6 +142,7 @@ class CheckDebug(BaseTestCase):
         self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_CORE)
         self.assert_report(reports_names.PATH_SDRAM_USAGE)
         self.assert_report(reports_names.PATH_ROUTER_INFO_REPORT)
+        self.assert_report(reports_names.PATH_UNCOMPRESSED)
         self.assertIn("data3.sqlite3", found)
         self.assertIn("ds3.sqlite3", found)
 
