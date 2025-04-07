@@ -62,8 +62,6 @@ class CheckDebug(BaseTestCase):
             # EnergyReport._SUMMARY_FILENAME,
             # write_text_specs = False
             "data_spec_text_files",
-            # write_routing_table_reports
-            reports_names._C_ROUTING_TABLE_DIR,
             reports_names._COMPARED_FILENAME,
             # write_memory_map_report
             memory_map_on_host_report,
@@ -136,6 +134,7 @@ class CheckDebug(BaseTestCase):
         found = os.listdir(SpynnakerDataView.get_run_dir_path())
         for report in reports:
             self.assertIn(report, found)
+        self.assert_report(reports_names.PATH_COMPRESSED)
         self.assert_report(reports_names.PATH_ROUTER_REPORTS)
         self.assert_report(reports_names.PATH_PARTITIONER_REPORTS)
         self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_VERTEX)
