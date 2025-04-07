@@ -14,10 +14,9 @@
 
 import os
 import unittest
+from spinn_utilities.config_holder import get_report_path
 import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
-from spinn_front_end_common.utilities.report_functions.reports import (
-    get_path_router_reports)
 from spinn_front_end_common.utilities.report_functions.network_specification \
     import _FILENAME as network_specification_file_name
 from spinnaker_testbase import BaseTestCase
@@ -34,6 +33,11 @@ class TestDebug(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
+    def assert_report(self, option):
+        path = get_report_path(option)
+        if not os.path.exists(path):
+            raise AssertionError(f"Unable to find report for {option}")
+
     def debug(self):
         sim.setup(1.0)
         reports = [
@@ -42,8 +46,6 @@ class TestDebug(BaseTestCase):
             # "energy_summary_report.rpt",
             # write_text_specs = False
             "data_spec_text_files",
-
-            get_path_router_reports(),
             # write_partitioner_reports
             reports_names._PARTITIONING_FILENAME,
             # write_application_graph_placer_report
@@ -95,6 +97,7 @@ class TestDebug(BaseTestCase):
         for report in reports:
             self.assertIn(report, found)
         self.assertIn("ds.sqlite3", found)
+        self.assert_report(reports_names.PATH_ROUTER_REPORTS)
 
     def test_debug(self):
         self.runsafe(self.debug)

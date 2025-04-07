@@ -16,14 +16,12 @@ import os
 from unittest.case import SkipTest
 from requests.exceptions import ConnectionError
 
-from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.config_holder import get_config_bool, get_report_path
 
 from spinn_front_end_common.interface.interface_functions \
     import load_using_advanced_monitors
 import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
-from spinn_front_end_common.utilities.report_functions.reports import (
-    get_path_router_reports)
 from spinn_front_end_common.utilities.report_functions.network_specification \
     import _FILENAME as network_specification_file_name
 from spinn_front_end_common.utilities.report_functions.drift_report import (
@@ -51,6 +49,12 @@ class CheckDebug(BaseTestCase):
     """
     that it does not crash in debug mode. All reports on.
     """
+
+    def assert_report(self, option):
+        path = get_report_path(option)
+        if not os.path.exists(path):
+            raise AssertionError(f"Unable to find report for {option}")
+
     def debug(self):
         # pylint: disable=protected-access
         reports = [
@@ -59,7 +63,6 @@ class CheckDebug(BaseTestCase):
             # EnergyReport._SUMMARY_FILENAME,
             # write_text_specs = False
             "data_spec_text_files",
-            get_path_router_reports(),
             # write_partitioner_reports
             reports_names._PARTITIONING_FILENAME,
             # write_application_graph_placer_report
@@ -115,6 +118,7 @@ class CheckDebug(BaseTestCase):
                     DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
         for report in reports:
             self.assertIn(report, found)
+        self.assert_report(reports_names.PATH_ROUTER_REPORTS)
         self.assertIn("data.sqlite3", found)
         self.assertIn("ds.sqlite3", found)
 
