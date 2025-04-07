@@ -46,9 +46,6 @@ class TestDebug(BaseTestCase):
             # "energy_summary_report.rpt",
             # write_text_specs = False
             "data_spec_text_files",
-            # write_application_graph_placer_report
-            reports_names._PLACEMENT_VTX_GRAPH_FILENAME,
-            reports_names._PLACEMENT_CORE_GRAPH_FILENAME,
             reports_names._SDRAM_FILENAME,
             # repeats reports_names._SDRAM_FILENAME,
             # write_router_info_report
@@ -97,6 +94,8 @@ class TestDebug(BaseTestCase):
         self.assertIn("ds.sqlite3", found)
         self.assert_report(reports_names.PATH_ROUTER_REPORTS)
         self.assert_report(reports_names.PATH_PARTITIONER_REPORTS)
+        self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_VERTEX)
+        self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_CORE)
 
     def test_debug(self):
         self.runsafe(self.debug)

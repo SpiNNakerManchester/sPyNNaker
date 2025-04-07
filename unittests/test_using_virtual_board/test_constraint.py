@@ -14,6 +14,8 @@
 
 import pyNN.spiNNaker as sim
 from spinn_utilities.config_holder import set_config
+from spinn_front_end_common.utilities.report_functions.reports import (
+    WRITE_PLACEMENT_REPORTS)
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 
@@ -32,7 +34,7 @@ class TestConstraint(BaseTestCase):
         # pick and XY in the middle of the board
         x = (width + 1) // 3
         y = (height + 1) // 3
-        set_config("Reports", "write_application_graph_placer_report", True)
+        set_config("Reports", WRITE_PLACEMENT_REPORTS, True)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 50)
 
         pop_1 = sim.Population(200, sim.IF_curr_exp(), label="pop_1")
