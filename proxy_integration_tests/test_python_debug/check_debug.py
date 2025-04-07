@@ -63,8 +63,6 @@ class CheckDebug(BaseTestCase):
             # EnergyReport._SUMMARY_FILENAME,
             # write_text_specs = False
             "data_spec_text_files",
-            # write_partitioner_reports
-            reports_names._PARTITIONING_FILENAME,
             # write_application_graph_placer_report
             reports_names._PLACEMENT_VTX_GRAPH_FILENAME,
             reports_names._PLACEMENT_CORE_GRAPH_FILENAME,
@@ -119,6 +117,7 @@ class CheckDebug(BaseTestCase):
         for report in reports:
             self.assertIn(report, found)
         self.assert_report(reports_names.PATH_ROUTER_REPORTS)
+        self.assert_report(reports_names.PATH_PARTITIONER_REPORTS)
         self.assertIn("data.sqlite3", found)
         self.assertIn("ds.sqlite3", found)
 

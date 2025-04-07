@@ -46,8 +46,6 @@ class TestDebug(BaseTestCase):
             # "energy_summary_report.rpt",
             # write_text_specs = False
             "data_spec_text_files",
-            # write_partitioner_reports
-            reports_names._PARTITIONING_FILENAME,
             # write_application_graph_placer_report
             reports_names._PLACEMENT_VTX_GRAPH_FILENAME,
             reports_names._PLACEMENT_CORE_GRAPH_FILENAME,
@@ -98,6 +96,7 @@ class TestDebug(BaseTestCase):
             self.assertIn(report, found)
         self.assertIn("ds.sqlite3", found)
         self.assert_report(reports_names.PATH_ROUTER_REPORTS)
+        self.assert_report(reports_names.PATH_PARTITIONER_REPORTS)
 
     def test_debug(self):
         self.runsafe(self.debug)
