@@ -63,8 +63,6 @@ class CheckDebug(BaseTestCase):
             # EnergyReport._SUMMARY_FILENAME,
             # write_text_specs = False
             "data_spec_text_files",
-            # write_application_graph_placer_report
-            reports_names._SDRAM_FILENAME,
             # repeats reports_names._SDRAM_FILENAME,
             # write_router_info_report
             reports_names._VIRTKEY_FILENAME,
@@ -118,6 +116,7 @@ class CheckDebug(BaseTestCase):
         self.assert_report(reports_names.PATH_PARTITIONER_REPORTS)
         self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_VERTEX)
         self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_CORE)
+        self.assert_report(reports_names.PATH_SDRAM_USAGE)
         self.assertIn("data.sqlite3", found)
         self.assertIn("ds.sqlite3", found)
 

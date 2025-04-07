@@ -46,7 +46,6 @@ class TestDebug(BaseTestCase):
             # "energy_summary_report.rpt",
             # write_text_specs = False
             "data_spec_text_files",
-            reports_names._SDRAM_FILENAME,
             # repeats reports_names._SDRAM_FILENAME,
             # write_router_info_report
             reports_names._VIRTKEY_FILENAME,
@@ -96,6 +95,7 @@ class TestDebug(BaseTestCase):
         self.assert_report(reports_names.PATH_PARTITIONER_REPORTS)
         self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_VERTEX)
         self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_CORE)
+        self.assert_report(reports_names.PATH_SDRAM_USAGE)
 
     def test_debug(self):
         self.runsafe(self.debug)
