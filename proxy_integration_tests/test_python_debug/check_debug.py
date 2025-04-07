@@ -63,7 +63,6 @@ class CheckDebug(BaseTestCase):
             # EnergyReport._SUMMARY_FILENAME,
             # write_text_specs = False
             "data_spec_text_files",
-            reports_names._COMPARED_FILENAME,
             # write_memory_map_report
             memory_map_on_host_report,
             # write_network_specification_report
@@ -107,12 +106,13 @@ class CheckDebug(BaseTestCase):
         for report in reports:
             self.assertIn(report, found)
         self.assert_report(reports_names.PATH_COMPRESSED)
-        self.assert_report(reports_names.PATH_ROUTER_REPORTS)
+        self.assert_report(reports_names.PATH_COMPRESSION_COMPARISON)
         self.assert_report(reports_names.PATH_PARTITIONER_REPORTS)
         self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_VERTEX)
         self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_CORE)
-        self.assert_report(reports_names.PATH_SDRAM_USAGE)
+        self.assert_report(reports_names.PATH_ROUTER_REPORTS)
         self.assert_report(reports_names.PATH_ROUTER_INFO_REPORT)
+        self.assert_report(reports_names.PATH_SDRAM_USAGE)
         self.assert_report(reports_names.PATH_UNCOMPRESSED)
         self.assertIn("data.sqlite3", found)
         self.assertIn("ds.sqlite3", found)
