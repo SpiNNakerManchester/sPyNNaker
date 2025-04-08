@@ -17,8 +17,6 @@ import unittest
 
 from spinn_utilities.config_holder import get_report_path
 
-from spinn_front_end_common.utilities.report_functions.network_specification \
-    import _FILENAME as network_specification_file_name
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.extra_algorithms.\
@@ -55,8 +53,6 @@ class TestDebug(BaseTestCase):
             # routing_tables_from_machine_report,
             # write_memory_map_report
             # ??? used by MachineExecuteDataSpecification but not called ???
-            # write_network_specification_report
-            network_specification_file_name,
             "data.sqlite3",
             # write_algorithm_timings
             # "provenance_data/pacman.xml"  = different test
@@ -86,6 +82,7 @@ class TestDebug(BaseTestCase):
             self.assertIn(report, found)
         self.assert_report("path_application_graph_placer_report_vertex")
         self.assert_report("path_application_graph_placer_report_core")
+        self.assert_report("path_network_specification_report")
         self.assert_report("path_partitioner_reports")
         self.assert_report("path_router_info_report")
         self.assert_report("path_router_reports")
