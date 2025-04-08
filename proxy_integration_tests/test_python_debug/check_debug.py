@@ -21,8 +21,6 @@ from spinn_utilities.config_holder import (
 
 from spinn_front_end_common.interface.interface_functions \
     import load_using_advanced_monitors
-import spinn_front_end_common.utilities.report_functions.reports as \
-    reports_names
 from spinn_front_end_common.utilities.report_functions.network_specification \
     import _FILENAME as network_specification_file_name
 from spinn_front_end_common.utilities.report_functions.drift_report import (
