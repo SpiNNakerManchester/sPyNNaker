@@ -60,8 +60,6 @@ class TestDebug(BaseTestCase):
             # write_network_specification_report
             network_specification_file_name,
             "data.sqlite3",
-            # write_tag_allocation_reports
-            reports_names._TAGS_FILENAME,
             # write_algorithm_timings
             # "provenance_data/pacman.xml"  = different test
             # write_board_chip_report not on a virtual board
@@ -94,6 +92,7 @@ class TestDebug(BaseTestCase):
         self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_VERTEX)
         self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_CORE)
         self.assert_report(reports_names.PATH_SDRAM_USAGE)
+        self.assert_report(reports_names.PATH_TAG_ALLOCATION)
         self.assert_report(reports_names.PATH_ROUTER_INFO_REPORT)
 
     def test_debug(self):

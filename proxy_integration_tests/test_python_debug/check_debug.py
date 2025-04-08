@@ -68,8 +68,6 @@ class CheckDebug(BaseTestCase):
             # write_network_specification_report
             network_specification_file_name,
             "provenance_data",
-            # write_tag_allocation_reports
-            reports_names._TAGS_FILENAME,
             # write_drift_report_end or start
             CLOCK_DRIFT_REPORT,
             # write_board_chip_report
@@ -114,6 +112,7 @@ class CheckDebug(BaseTestCase):
         self.assert_report(reports_names.PATH_ROUTER_INFO_REPORT)
         self.assert_report(reports_names.PATH_SDRAM_USAGE)
         self.assert_report(reports_names.PATH_SUMMARY_REPORT)
+        self.assert_report(reports_names.PATH_TAG_ALLOCATION)
         self.assert_report(reports_names.PATH_UNCOMPRESSED)
         self.assertIn("data.sqlite3", found)
         self.assertIn("ds.sqlite3", found)
