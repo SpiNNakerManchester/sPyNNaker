@@ -21,8 +21,6 @@ from spinn_utilities.config_holder import (
 
 from spinn_front_end_common.interface.interface_functions \
     import load_using_advanced_monitors
-from spinn_front_end_common.utilities.report_functions.network_specification \
-    import _FILENAME as network_specification_file_name
 from spinn_front_end_common.utilities.report_functions.drift_report import (
     CLOCK_DRIFT_REPORT)
 from spinn_front_end_common.utilities.report_functions.board_chip_report \
@@ -66,8 +64,6 @@ class CheckDebug(BaseTestCase):
             # write_text_specs = False
             "data_spec_text_files",
             # repeats reports_names._SDRAM_FILENAME,
-            # write_network_specification_report
-            network_specification_file_name,
             "provenance_data",
             # write_drift_report_end or start
             CLOCK_DRIFT_REPORT,
