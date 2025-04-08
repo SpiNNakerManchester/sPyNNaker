@@ -56,7 +56,8 @@ class CheckDebug(BaseTestCase):
             path = get_report_path(option)
             print(f"found {option} at {path}")
             if not os.path.exists(path):
-                raise AssertionError(f"Unable to find report for {option}")
+                raise AssertionError(
+                    f"Unable to find report for {option} {path}")
 
     def debug(self):
         # pylint: disable=protected-access
