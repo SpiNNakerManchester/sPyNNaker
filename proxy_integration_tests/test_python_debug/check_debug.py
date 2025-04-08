@@ -16,7 +16,7 @@ import os
 from unittest.case import SkipTest
 from requests.exceptions import ConnectionError
 
-from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.config_holder import get_config_bool, get_report_path
 
 from spinn_front_end_common.interface.interface_functions \
     import load_using_advanced_monitors
@@ -27,8 +27,7 @@ from spinn_front_end_common.utilities.report_functions.network_specification \
 from spinn_front_end_common.utilities.report_functions.drift_report import (
     CLOCK_DRIFT_REPORT)
 from spinn_front_end_common.utilities.report_functions.\
-    memory_map_on_host_report import _FOLDER_NAME as \
-    memory_map_on_host_report
+    memory_map_on_host_report import PATH_MEMORY_MAP_REPORT
 # from spinn_front_end_common.utilities.report_functions.energy_report \
 #    import EnergyReport
 from spinn_front_end_common.utilities.report_functions.board_chip_report \
@@ -49,6 +48,12 @@ class CheckDebug(BaseTestCase):
     """
     that it does not crash in debug mode. All reports on.
     """
+
+    def assert_report(self, option):
+        path = get_report_path(option)
+        if not os.path.exists(path):
+            raise AssertionError(f"Unable to find report for {option}")
+
     def debug(self):
         # pylint: disable=protected-access
         reports = [
@@ -57,28 +62,9 @@ class CheckDebug(BaseTestCase):
             # EnergyReport._SUMMARY_FILENAME,
             # write_text_specs = False
             "data_spec_text_files",
-            # write_router_reports
-            reports_names._ROUTING_FILENAME,
-            # write_partitioner_reports
-            reports_names._PARTITIONING_FILENAME,
-            # write_application_graph_placer_report
-            reports_names._PLACEMENT_VTX_GRAPH_FILENAME,
-            reports_names._PLACEMENT_CORE_GRAPH_FILENAME,
-            reports_names._SDRAM_FILENAME,
-            # repeats reports_names._SDRAM_FILENAME,
-            # write_router_info_report
-            reports_names._VIRTKEY_FILENAME,
-            # write_routing_table_reports
-            reports_names._ROUTING_TABLE_DIR,
-            reports_names._C_ROUTING_TABLE_DIR,
-            reports_names._COMPARED_FILENAME,
-            # write_memory_map_report
-            memory_map_on_host_report,
             # write_network_specification_report
             network_specification_file_name,
             "provenance_data",
-            # write_tag_allocation_reports
-            reports_names._TAGS_FILENAME,
             # write_drift_report_end or start
             CLOCK_DRIFT_REPORT,
             # write_board_chip_report
@@ -114,6 +100,18 @@ class CheckDebug(BaseTestCase):
                     DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
         for report in reports:
             self.assertIn(report, found)
+        self.assert_report(PATH_MEMORY_MAP_REPORT)
+        self.assert_report(reports_names.PATH_COMPRESSED)
+        self.assert_report(reports_names.PATH_COMPRESSION_COMPARISON)
+        self.assert_report(reports_names.PATH_PARTITIONER_REPORTS)
+        self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_VERTEX)
+        self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_CORE)
+        self.assert_report(reports_names.PATH_ROUTER_REPORTS)
+        self.assert_report(reports_names.PATH_ROUTER_INFO_REPORT)
+        self.assert_report(reports_names.PATH_SDRAM_USAGE)
+        self.assert_report(reports_names.PATH_SUMMARY_REPORT)
+        self.assert_report(reports_names.PATH_TAG_ALLOCATION)
+        self.assert_report(reports_names.PATH_UNCOMPRESSED)
         self.assertIn("data.sqlite3", found)
         self.assertIn("ds.sqlite3", found)
 

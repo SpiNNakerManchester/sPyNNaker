@@ -14,6 +14,7 @@
 
 import os
 import unittest
+from spinn_utilities.config_holder import get_report_path
 import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
 from spinn_front_end_common.utilities.report_functions.network_specification \
@@ -32,24 +33,20 @@ class TestDebug(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
+    def assert_report(self, option):
+        path = get_report_path(option)
+        if not os.path.exists(path):
+            raise AssertionError(f"Unable to find report for {option}")
+
     def debug(self):
+        sim.setup(1.0)
         reports = [
             # write_energy_report does not happen on a virtual machine
             # "Detailed_energy_report.rpt",
             # "energy_summary_report.rpt",
             # write_text_specs = False
             "data_spec_text_files",
-            # write_router_reports
-            reports_names._ROUTING_FILENAME,
-            # write_partitioner_reports
-            reports_names._PARTITIONING_FILENAME,
-            # write_application_graph_placer_report
-            reports_names._PLACEMENT_VTX_GRAPH_FILENAME,
-            reports_names._PLACEMENT_CORE_GRAPH_FILENAME,
-            reports_names._SDRAM_FILENAME,
             # repeats reports_names._SDRAM_FILENAME,
-            # write_router_info_report
-            reports_names._VIRTKEY_FILENAME,
             # write_routing_table_reports not on a virtual boad
             # reports_names._ROUTING_TABLE_DIR,
             # reports_names._C_ROUTING_TABLE_DIR,
@@ -58,13 +55,10 @@ class TestDebug(BaseTestCase):
             # "routing_compression_checker_report.rpt",
             # write_routing_tables_from_machine_report not on a virtual board
             # routing_tables_from_machine_report,
-            # write_memory_map_report
             # ??? used by MachineExecuteDataSpecification but not called ???
             # write_network_specification_report
             network_specification_file_name,
             "data.sqlite3",
-            # write_tag_allocation_reports
-            reports_names._TAGS_FILENAME,
             # write_algorithm_timings
             # "provenance_data/pacman.xml"  = different test
             # write_board_chip_report not on a virtual board
@@ -77,7 +71,7 @@ class TestDebug(BaseTestCase):
             # # Can't check for that; graph generation might not work because
             # # of system configuration
             ]
-        sim.setup(1.0)
+
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
         pop.record("v")
         inp = sim.Population(1, sim.SpikeSourceArray(
@@ -92,6 +86,13 @@ class TestDebug(BaseTestCase):
         for report in reports:
             self.assertIn(report, found)
         self.assertIn("ds.sqlite3", found)
+        self.assert_report(reports_names.PATH_ROUTER_REPORTS)
+        self.assert_report(reports_names.PATH_PARTITIONER_REPORTS)
+        self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_VERTEX)
+        self.assert_report(reports_names.PATH_PLACEMENT_REPORTS_CORE)
+        self.assert_report(reports_names.PATH_SDRAM_USAGE)
+        self.assert_report(reports_names.PATH_TAG_ALLOCATION)
+        self.assert_report(reports_names.PATH_ROUTER_INFO_REPORT)
 
     def test_debug(self):
         self.runsafe(self.debug)
