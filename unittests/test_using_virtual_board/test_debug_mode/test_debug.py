@@ -14,6 +14,9 @@
 
 import os
 import unittest
+
+from spinn_utilities.config_holder import get_report_path
+
 import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
 from spinn_front_end_common.utilities.report_functions.network_specification \
@@ -32,6 +35,11 @@ class TestDebug(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
+    def assert_report(self, option):
+        path = get_report_path(option)
+        if not os.path.exists(path):
+            raise AssertionError(f"Unable to find report for {option}")
+
     def debug(self):
         reports = [
             # write_energy_report does not happen on a virtual machine
@@ -39,17 +47,6 @@ class TestDebug(BaseTestCase):
             # "energy_summary_report.rpt",
             # write_text_specs = False
             "data_spec_text_files",
-            # write_router_reports
-            reports_names._ROUTING_FILENAME,
-            # write_partitioner_reports
-            reports_names._PARTITIONING_FILENAME,
-            # write_application_graph_placer_report
-            reports_names._PLACEMENT_VTX_GRAPH_FILENAME,
-            reports_names._PLACEMENT_CORE_GRAPH_FILENAME,
-            reports_names._SDRAM_FILENAME,
-            # repeats reports_names._SDRAM_FILENAME,
-            # write_router_info_report
-            reports_names._VIRTKEY_FILENAME,
             # write_routing_table_reports not on a virtual boad
             # reports_names._ROUTING_TABLE_DIR,
             # reports_names._C_ROUTING_TABLE_DIR,
@@ -63,8 +60,6 @@ class TestDebug(BaseTestCase):
             # write_network_specification_report
             network_specification_file_name,
             "data.sqlite3",
-            # write_tag_allocation_reports
-            reports_names._TAGS_FILENAME,
             # write_algorithm_timings
             # "provenance_data/pacman.xml"  = different test
             # write_board_chip_report not on a virtual board
@@ -91,6 +86,14 @@ class TestDebug(BaseTestCase):
         found = os.listdir(SpynnakerDataView.get_run_dir_path())
         for report in reports:
             self.assertIn(report, found)
+        self.assert_report("path_application_graph_placer_report_vertex")
+        self.assert_report("path_application_graph_placer_report_core")
+        self.assert_report("path_partitioner_reports")
+        self.assert_report("path_router_info_report")
+        self.assert_report("path_router_reports")
+        self.assert_report("path_sdram_usage_report_per_chip")
+        self.assert_report("path_tag_allocation_reports")
+        self.assert_report("path_uncompressed")
         self.assertIn("ds.sqlite3", found)
 
     def test_debug(self):
