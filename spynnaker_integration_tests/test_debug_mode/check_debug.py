@@ -61,7 +61,6 @@ class CheckDebug(BaseTestCase):
             "data_spec_text_files",
             # repeats reports_names._SDRAM_FILENAME,
             # write_routing_table_reports
-            network_specification_file_name,
             "provenance_data",
             # write_drift_report_end or start
             CLOCK_DRIFT_REPORT,
