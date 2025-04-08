@@ -27,8 +27,7 @@ from spinn_front_end_common.utilities.report_functions.network_specification \
 from spinn_front_end_common.utilities.report_functions.drift_report import (
     CLOCK_DRIFT_REPORT)
 from spinn_front_end_common.utilities.report_functions.\
-    memory_map_on_host_report import _FOLDER_NAME as \
-    memory_map_on_host_report
+    memory_map_on_host_report import PATH_MEMORY_MAP_REPORT
 # from spinn_front_end_common.utilities.report_functions.energy_report \
 #    import EnergyReport
 from spinn_front_end_common.utilities.report_functions.board_chip_report \
@@ -63,8 +62,6 @@ class CheckDebug(BaseTestCase):
             # EnergyReport._SUMMARY_FILENAME,
             # write_text_specs = False
             "data_spec_text_files",
-            # write_memory_map_report
-            memory_map_on_host_report,
             # write_network_specification_report
             network_specification_file_name,
             "provenance_data",
@@ -103,6 +100,7 @@ class CheckDebug(BaseTestCase):
                     DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
         for report in reports:
             self.assertIn(report, found)
+        self.assert_report(PATH_MEMORY_MAP_REPORT)
         self.assert_report(reports_names.PATH_COMPRESSED)
         self.assert_report(reports_names.PATH_COMPRESSION_COMPARISON)
         self.assert_report(reports_names.PATH_PARTITIONER_REPORTS)

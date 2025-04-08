@@ -55,7 +55,6 @@ class TestDebug(BaseTestCase):
             # "routing_compression_checker_report.rpt",
             # write_routing_tables_from_machine_report not on a virtual board
             # routing_tables_from_machine_report,
-            # write_memory_map_report
             # ??? used by MachineExecuteDataSpecification but not called ???
             # write_network_specification_report
             network_specification_file_name,
