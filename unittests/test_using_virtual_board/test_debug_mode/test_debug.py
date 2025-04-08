@@ -17,8 +17,6 @@ import unittest
 
 from spinn_utilities.config_holder import get_report_path
 
-import spinn_front_end_common.utilities.report_functions.reports as \
-    reports_names
 from spinn_front_end_common.utilities.report_functions.network_specification \
     import _FILENAME as network_specification_file_name
 from spinnaker_testbase import BaseTestCase

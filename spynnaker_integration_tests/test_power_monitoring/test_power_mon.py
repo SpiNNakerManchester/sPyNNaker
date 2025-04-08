@@ -19,11 +19,9 @@ import pyNN.spiNNaker as p
 from spinn_utilities.config_holder import get_report_path
 
 from spinn_front_end_common.interface.provenance import ProvenanceReader
-from spinn_front_end_common.utilities.report_functions import EnergyReport
 
 from spinnaker_testbase import BaseTestCase
 
-from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker_integration_tests.scripts import SynfireRunner
 
 n_neurons = 200  # number of neurons in each population
