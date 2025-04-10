@@ -15,7 +15,7 @@
 import os
 import unittest
 
-from spinn_utilities.config_holder import get_report_path
+from spinn_utilities.config_holder import config_options, get_report_path
 
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -31,10 +31,17 @@ class TestDebug(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def assert_report(self, option):
-        path = get_report_path(option)
-        if not os.path.exists(path):
-            raise AssertionError(f"Unable to find report for {option} {path}")
+    def assert_reports(self):
+        for option in config_options("Reports"):
+            if not option.startswith("path"):
+                continue
+            if option in ["pathenergyreport", "pathmemorymapreport"]:
+                continue
+            path = get_report_path(option)
+            print(f"found {option} at {path}")
+            if not os.path.exists(path):
+                raise AssertionError(
+                    f"Unable to find report for {option} {path}")
 
     def debug(self):
         reports = [
@@ -80,15 +87,7 @@ class TestDebug(BaseTestCase):
         found = os.listdir(SpynnakerDataView.get_run_dir_path())
         for report in reports:
             self.assertIn(report, found)
-        self.assert_report("path_application_graph_placer_report_vertex")
-        self.assert_report("path_application_graph_placer_report_core")
-        self.assert_report("path_network_specification_report")
-        self.assert_report("path_partitioner_reports")
-        self.assert_report("path_router_info_report")
-        self.assert_report("path_router_reports")
-        self.assert_report("path_sdram_usage_report_per_chip")
-        self.assert_report("path_tag_allocation_reports")
-        self.assert_report("path_uncompressed")
+        self.assert_reports()
         self.assertIn("ds.sqlite3", found)
 
     def test_debug(self):
