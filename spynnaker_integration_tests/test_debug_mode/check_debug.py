@@ -14,17 +14,15 @@
 
 import os
 from spinn_utilities.config_holder import (
-    config_options, get_config_bool, get_report_path)
+    config_options, get_report_path)
 
-from spinn_front_end_common.interface.interface_functions \
-    import load_using_advanced_monitors
 from spinn_front_end_common.utilities.report_functions.drift_report import (
     CLOCK_DRIFT_REPORT)
 from spinn_front_end_common.utilities.report_functions.\
     fixed_route_from_machine_report import REPORT_NAME as fixed_route_report
-from spinn_front_end_common.utility_models import \
-     DataSpeedUpPacketGatherMachineVertex
 from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.config_setup import cfg_paths_skipped
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_neuron_network_specification_report import (
@@ -37,27 +35,13 @@ class CheckDebug(BaseTestCase):
     that it does not crash in debug mode. All reports on.
     """
     def assert_reports(self):
+        skipped = cfg_paths_skipped()
         for option in config_options("Reports"):
-            if not option.startswith("path"):
-                continue
-
-            if option == "pathenergyreport":
-                # path_energy_report
-                continue
-
-            if option in ["pathdataspeedupreportsrouters",
-                          "pathdataspeedupreportsspeeds"]:
-                # not run without advancd monitors
-                if not get_config_bool("Machine",
-                                       "enable_advanced_monitor_support"):
+            for option in config_options("Reports"):
+                if not option.startswith("path"):
                     continue
-                # not run when using java
-                if get_config_bool("Java", "use_java"):
+                if option in skipped:
                     continue
-                if option == "pathdataspeedupreportsspeeds":
-                    # report only created if loading using advanced monitors
-                    if not load_using_advanced_monitors():
-                        continue
 
             path = get_report_path(option)
             print(f"found {option} at {path}")

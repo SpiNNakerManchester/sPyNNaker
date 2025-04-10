@@ -18,6 +18,7 @@ import unittest
 from spinn_utilities.config_holder import config_options, get_report_path
 
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.config_setup import cfg_paths_skipped
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_neuron_network_specification_report import (_GRAPH_NAME)
@@ -32,10 +33,11 @@ class TestDebug(BaseTestCase):
     # NO unittest_setup() as sim.setup is called
 
     def assert_reports(self):
+        skipped = cfg_paths_skipped()
         for option in config_options("Reports"):
             if not option.startswith("path"):
                 continue
-            if option in ["pathenergyreport", "pathmemorymapreport"]:
+            if option in skipped:
                 continue
             path = get_report_path(option)
             print(f"found {option} at {path}")
