@@ -67,8 +67,6 @@ class CheckDebug(BaseTestCase):
             "provenance_data",
             # write_drift_report_end or start
             CLOCK_DRIFT_REPORT,
-            # write_board_chip_report
-            AREA_CODE_REPORT_NAME,
             _GRAPH_NAME,
             # graphviz exe may not be installed so there will be no image file
             # _GRAPH_NAME + "." + _GRAPH_FORMAT,
