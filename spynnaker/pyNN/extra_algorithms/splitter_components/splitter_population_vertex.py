@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from typing import List, Optional, final
-from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import Slice
@@ -24,22 +23,16 @@ from spynnaker.pyNN.models.neuron import PopulationVertex
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 
 
-# The maximum number of bits for the ring buffer index that are likely to
-# fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
-MAX_RING_BUFFER_BITS = 14
-
-
 class SplitterPopulationVertex(
         AbstractSplitterCommon[PopulationVertex],
         AbstractSpynnakerSplitterDelay):
     """
     Abstract base class of splitters for :py:class:`PopulationVertex`.
     """
-    __slots__ = ("_max_delay", "__slices")
+    __slots__ = ("__slices")
 
-    def __init__(self, max_delay: Optional[int]) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self._max_delay = max_delay
         self.__slices: Optional[List[Slice]] = None
 
     @final
@@ -60,21 +53,14 @@ class SplitterPopulationVertex(
         self._max_delay = None
         self.__slices = None
 
-    @abstractmethod
-    def _update_max_delay(self) -> None:
-        """
-        Find the maximum delay from incoming synapses.
-        Must set `_max_delay`, and must not set it to `None`.
-        """
-        raise NotImplementedError
-
     @final
     @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
     def max_support_delay(self) -> int:
-        if self._max_delay is None:
-            self._update_max_delay()
-        assert self._max_delay is not None
-        return self._max_delay
+        return self.governed_app_vertex.max_delay_steps
+
+    @overrides(AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex)
+    def accepts_edges_from_delay_vertex(self) -> bool:
+        return self.governed_app_vertex.allow_delay_extension
 
     @final
     def _get_fixed_slices(self) -> List[Slice]:

@@ -85,7 +85,7 @@ from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import (
-    POSSION_SIGMA_SUMMATION_LIMIT)
+    POSSION_SIGMA_SUMMATION_LIMIT, MAX_RING_BUFFER_BITS)
 from spynnaker.pyNN.utilities.utility_calls import (
     create_mars_kiss_seeds, check_rng)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
@@ -219,7 +219,11 @@ class PopulationVertex(
         "__have_read_initial_values",
         "__last_parameter_read_time",
         "__n_colour_bits",
-        "__extra_partitions")
+        "__extra_partitions",
+        "__n_synapse_cores",
+        "__allow_delay_extensions",
+        "__max_delay_ms",
+        "__max_delay_slots_available")
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -243,6 +247,8 @@ class PopulationVertex(
     def __init__(
             self, *, n_neurons: int, label: str,
             max_atoms_per_core: Union[int, Tuple[int, ...]],
+            n_synapse_cores: Optional[int],
+            allow_delay_extensions: bool,
             spikes_per_second: Optional[float],
             ring_buffer_sigma: Optional[float],
             max_expected_summed_weight: Optional[List[float]],
@@ -257,6 +263,12 @@ class PopulationVertex(
         :param str label: The label on the population
         :param int max_atoms_per_core:
             The maximum number of atoms (neurons) per SpiNNaker core.
+        :param n_synapse_cores:
+            The number of synapse cores to use: 0 for combined core,
+            or None for automatic determination
+        :type n_synapse_cores: int or None
+        :param bool allow_delay_extensions:
+            Whether delay extensions should be allowed or not
         :param spikes_per_second: Expected spike rate
         :type spikes_per_second: float or None
         :param ring_buffer_sigma:
@@ -390,6 +402,11 @@ class PopulationVertex(
         self.__last_parameter_read_time: Optional[float] = None
         self.__extra_partitions = extra_partitions
 
+        self.__n_synapse_cores = n_synapse_cores
+        self.__allow_delay_extensions = allow_delay_extensions
+        self.__max_delay_ms: Optional[float] = None
+        self.__max_delay_slots_available: Optional[int] = None
+
     @property
     def extra_partitions(self) -> List[str]:
         """ The extra partitions that are to be sent by the vertex. """
@@ -500,6 +517,12 @@ class PopulationVertex(
 
         :rtype: int
         """
+        self.__update_n_synapse_cores()
+        return self.__n_synapse_cores
+
+    def __update_n_synapse_cores(self):
+        if self.__n_synapse_cores is not None:
+            return
         version = SpynnakerDataView().get_machine_version()
 
         # The maximum number of cores minus 1 for the neuron core, and minus
@@ -550,17 +573,59 @@ class PopulationVertex(
         # If we can definitely do the Poisson vertices directly,
         # lets recommend this
         if n_synapse_cores + n_poisson_cores < max_n_cores:
-            return n_synapse_cores
+            self.__n_synapse_cores = n_synapse_cores
+        else:
 
-        # Otherwise, we should consider how many more cores we need for the
-        # Poisson input spikes
-        n_synapse_cores = math.ceil(
-            (synapses_per_second + poisson_synapses_per_second) /
-            synapses_per_core_per_sim_second)
+            # Otherwise, we should consider how many more cores we need for the
+            # Poisson input spikes
+            n_synapse_cores = math.ceil(
+                (synapses_per_second + poisson_synapses_per_second) /
+                synapses_per_core_per_sim_second)
 
-        # If the number of cores needed is more than the maximum, use the
-        # maximum
-        return min(max_n_cores, n_synapse_cores)
+            # If the number of cores needed is more than the maximum, use the
+            # maximum
+            self.__n_synapse_cores = min(max_n_cores, n_synapse_cores)
+
+    @property
+    def max_delay_steps(self) -> int:
+        """
+        The maximum number of delay steps supported on a core.
+        """
+        self.__update_max_delay()
+        return self.__max_delay_slots_available
+
+    @property
+    def allow_delay_extension(self) -> bool:
+        """
+        Whether delay extension should be allowed or not.
+        """
+        if not self.__allow_delay_extensions:
+            return False
+        # Determine if we *expect* a delay extension; if not disallow
+        self.__update_max_delay()
+        delay_available_ms = (
+            self.__max_delay_slots_available *
+            SpynnakerDataView().get_simulation_time_step_ms())
+        return delay_available_ms >= self.__max_delay_ms
+
+    def __update_max_delay(self) -> None:
+        if self.__max_delay_ms is not None:
+            return
+
+        # Find the maximum delay from incoming synapses
+        self.__max_delay_ms = 0
+        for proj in self.incoming_projections:
+            # pylint: disable=protected-access
+            s_info = proj._synapse_information
+            proj_max_delay = s_info.synapse_dynamics.get_delay_maximum(
+                s_info.connector, s_info)
+            self.__max_delay_ms = max(self.__max_delay_ms, proj_max_delay)
+
+        # Find the maximum possible delay on this core
+        n_atom_bits = self.get_n_atom_bits()
+        n_synapse_bits = get_n_bits(self.neuron_impl.get_n_synapse_types())
+        n_delay_bits = MAX_RING_BUFFER_BITS - (n_atom_bits + n_synapse_bits)
+        self.__max_delay_slots_available = 2 ** n_delay_bits
 
     def _is_direct_poisson(self, pre_vertex: PopulationApplicationVertex,
                            projs: List[Projection]) -> bool:
@@ -1726,41 +1791,6 @@ class PopulationVertex(
     def n_colour_bits(self) -> int:
         return self.__n_colour_bits
 
-    def get_max_delay(self, max_ring_buffer_bits: int) -> Tuple[int, bool]:
-        """
-        Get the maximum delay and whether a delay extension is needed
-        for a given maximum number of ring buffer bits.
-
-        :param int max_ring_buffer_bits:
-            The maximum number of bits that can be used for the ring buffer
-            identifier (i.e. delay, synapse type, neuron index)
-        :return:
-            Tuple of the maximum delay supported on the core and whether
-            a delay extension is needed to support delays
-        :rtype: tuple(int, bool)
-        """
-        # Find the maximum delay from incoming synapses
-        max_delay_ms: float = 0
-        for proj in self.incoming_projections:
-            # pylint: disable=protected-access
-            s_info = proj._synapse_information
-            proj_max_delay = s_info.synapse_dynamics.get_delay_maximum(
-                s_info.connector, s_info)
-            max_delay_ms = max(max_delay_ms, proj_max_delay)
-        max_delay_steps = math.ceil(
-            max_delay_ms / SpynnakerDataView.get_simulation_time_step_ms())
-        max_delay_bits = get_n_bits(max_delay_steps)
-
-        # Find the maximum possible delay
-        n_atom_bits = self.get_n_atom_bits()
-        n_synapse_bits = get_n_bits(
-            self.neuron_impl.get_n_synapse_types())
-        n_delay_bits = max_ring_buffer_bits - (n_atom_bits + n_synapse_bits)
-
-        # Pick the smallest between the two, so that not too many bits are used
-        final_n_delay_bits = min(n_delay_bits, max_delay_bits)
-        return 2 ** final_n_delay_bits, max_delay_bits > final_n_delay_bits
-
     def get_n_atom_bits(self) -> int:
         """
         :rtype: int
@@ -1787,6 +1817,25 @@ class PopulationVertex(
         _check_random_dists(self.__parameters)
         _check_random_dists(self.__state_variables)
         return True
+
+    def set_n_synapse_cores(self, n_synapse_cores: Optional[int]) -> None:
+        """
+        Set the number of synapse cores.
+
+        :param n_synapse_cores:
+            The number of synapse cores to use; 0 for a combined core, or None
+            to allow the system to choose
+        """
+        self.__n_synapse_cores = n_synapse_cores
+
+    def set_allow_delay_extensions(self, allow_delay_extensions: bool) -> None:
+        """
+        Set whether delay extensions are allowed.
+
+        :param allow_delay_extensions:
+            Whether to allow delay extensions
+        """
+        self.__allow_delay_extensions = allow_delay_extensions
 
 
 class _Stats(object):
@@ -1924,3 +1973,4 @@ class _Stats(object):
         w_max = min(w_max, self.total_weights[s_type])
         w_max = max(w_max, self.biggest_weight[s_type])
         return w_max
+

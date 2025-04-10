@@ -27,6 +27,7 @@ from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.populations import Population
+    from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access
@@ -54,6 +55,8 @@ class _SpynnakerDataModel(object):
         "_id_counter",
         "_min_delay",
         "_neurons_per_core_set",
+        "_n_synapse_cores_set",
+        "_allow_delay_extensions_set",
         "_populations",
         "_projections")
 
@@ -74,6 +77,9 @@ class _SpynnakerDataModel(object):
         self._min_delay: Optional[float] = None
         # Using a dict to verify if later could be stored here only
         self._neurons_per_core_set: Set[Type[AbstractPyNNModel]] = set()
+        self._n_synapse_cores_set: Set[Type[AbstractPyNNNeuronModel]] = set()
+        self._allow_delay_extensions_set: Set[Type[
+            AbstractPyNNNeuronModel]] = set()
         self._populations: Set[Population] = set()
         self._projections: Set[Projection] = set()
 
@@ -262,6 +268,60 @@ class SpynnakerDataView(FecDataView):
                       "or consider using Population.set_max_atoms_per_core")
         neuron_type.set_model_max_atoms_per_dimension_per_core(max_permitted)
         cls.__spy_data._neurons_per_core_set.add(neuron_type)
+
+    @classmethod
+    def set_number_of_synapse_cores(
+            cls, neuron_type: Type[AbstractPyNNNeuronModel],
+            n_synapse_cores: Optional[int]) -> None:
+        """
+        Sets the number of synapse cores that will be used for a given neuron
+        type.
+
+        :param neuron_type: neuron type
+        :param n_synapse_cores:
+            the number of synapse cores to use; 0 for a combined core, and None
+            to allow the system to choose
+        """
+        cls.check_valid_simulator()
+        # Avoid circular dependency
+        # py
+        from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
+        if not issubclass(neuron_type, AbstractPyNNNeuronModel):
+            raise TypeError(f"{neuron_type} is not an AbstractPyNNNeuronModel")
+
+        if SpynnakerDataView.get_n_populations() > 0:
+            warn_once(logger,
+                      "set_number_of_synapse_cores "
+                      "only affects Populations not yet made. "
+                      "Either move the set to the beginning of the script "
+                      "or consider using Population.set_n_synapse_cores")
+        neuron_type.set_model_n_synapse_cores(n_synapse_cores)
+        cls.__spy_data._n_synapse_cores_set.add(neuron_type)
+
+    @classmethod
+    def set_allow_delay_extensions(
+            cls, neuron_type: Type[AbstractPyNNNeuronModel],
+            allow_delay_extensions: bool) -> None:
+        """
+        Sets whether to allow delay extensions for a given neuron type.
+
+        :param neuron_type: neuron type
+        :param allow_delay_extensions:
+            whether to allow delay extensions for this neuron type
+        """
+        cls.check_valid_simulator()
+        from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
+        if not issubclass(neuron_type, AbstractPyNNNeuronModel):
+            raise TypeError(f"{neuron_type} is not an AbstractPyNNNeuronModel")
+
+        if SpynnakerDataView.get_n_populations() > 0:
+            warn_once(logger,
+                      "set_allow_delay_extensions "
+                      "only affects Populations not yet made. "
+                      "Either move the set to the beginning of the script "
+                      "or consider using Population.set_n_synapse_cores")
+        neuron_type.set_model_allow_delay_extensions(allow_delay_extensions)
+        cls.__spy_data._allow_delay_extensions_set.add(neuron_type)
 
     @classmethod
     def get_sim_name(cls) -> str:

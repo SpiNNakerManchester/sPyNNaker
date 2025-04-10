@@ -34,6 +34,8 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     """
 
     __slots__ = ()
+
+    # The maximum number of atoms per core for PyNN models
     _max_atoms_per_core: Dict[type, Optional[Tuple[int, ...]]] = defaultdict(
         lambda: None)
 

@@ -16,7 +16,7 @@ from typing import Any, Dict, List, Optional, cast, TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
-from .abstract_pynn_neuron_model import (
+from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
     AbstractPyNNNeuronModel, _population_parameters as APNM_default_params)
 
 if TYPE_CHECKING:
@@ -27,9 +27,9 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
     from spynnaker.pyNN.models.neuron.threshold_types import (
         AbstractThresholdType)
-    from .population_vertex import PopulationVertex
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
         SplitterPopulationVertex)
+    from .population_vertex import PopulationVertex
 
 _population_parameters: Dict[str, Any] = dict(APNM_default_params)
 _population_parameters["n_steps_per_timestep"] = 1

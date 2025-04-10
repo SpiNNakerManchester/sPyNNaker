@@ -188,6 +188,7 @@ __all__ = [
     # Stuff that we define
     'end', 'setup', 'run', 'run_until', 'run_for', 'num_processes', 'rank',
     'reset', 'set_number_of_neurons_per_core',
+    'set_number_of_neurons_per_core', 'set_allow_delay_extensions',
     'Projection',
     'get_current_time', 'create', 'connect', 'get_time_step', 'get_min_delay',
     'get_max_delay', 'initialize', 'list_standard_models', 'name',
@@ -490,6 +491,31 @@ def set_number_of_neurons_per_core(
 
     SpynnakerDataView.set_number_of_neurons_per_dimension_per_core(
         neuron_type, max_neurons)
+
+
+def set_number_of_synapse_cores(
+        neuron_type: Type, n_synapse_cores: Optional[int]) -> None:
+    """
+    Sets the number of synapse cores for a model.
+
+    :param neuron_type: The model implementation
+    :param n_synapse_cores:
+        The number of synapse cores; 0 to force combined cores, and None to
+        allow the system to choose
+    """
+    SpynnakerDataView.set_number_of_synapse_cores(neuron_type, n_synapse_cores)
+
+
+def set_allow_delay_extensions(
+        neuron_type: Type, allow_delay_extensions: bool) -> None:
+    """
+    Sets whether to allow delay extensions for a model.
+
+    :param neuron_type: The model implementation
+    :param allow_delay_extensions: Whether to allow delay extensions
+    """
+    SpynnakerDataView.set_allow_delay_extensions(
+        neuron_type, allow_delay_extensions)
 
 
 # These methods will defer to PyNN methods if a simulator exists

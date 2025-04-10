@@ -40,8 +40,50 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     """
     __slots__ = ("__model", )
 
+    # The number of synapse cores for PyNN models that use PopulationVertex
+    # or None to determine based on time-step
+    _n_synapse_cores: Dict[type, Optional[int]] = {}
+
+    # Whether to allow delay extensions when using PyNN models that use
+    # PopulationVertex
+    _allow_delay_extensions: Dict[type, bool] = {}
+
     #: Population parameters for neuron models.
     default_population_parameters = _population_parameters
+
+    @classmethod
+    def set_model_n_synapse_cores(cls, n_synapse_cores: Optional[int]) -> None:
+        """
+        Set the number of synapse cores for a model.
+
+        :param n_synapse_cores:
+            The number of synapse cores; 0 to force combined cores, and None to
+            allow the system to choose
+        """
+        cls._n_synapse_cores[cls] = n_synapse_cores
+
+    @classmethod
+    def get_model_n_synapse_cores(cls) -> Optional[int]:
+        """
+        Get the number of synapse cores for the model.
+        """
+        return cls._n_synapse_cores.get(cls, None)
+
+    @classmethod
+    def set_model_allow_delay_extensions(cls, allow: bool) -> None:
+        """
+        Set whether to allow delay extensions for a model.
+
+        :param allow: Whether to allow delay extensions
+        """
+        cls._allow_delay_extensions[cls] = allow
+
+    @classmethod
+    def get_model_allow_delay_extensions(cls) -> bool:
+        """
+        Get whether to allow delay extensions for the model.
+        """
+        return cls._allow_delay_extensions.get(cls, True)
 
     def __init__(self, model: AbstractNeuronImpl):
         """
@@ -77,8 +119,12 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         """
         # pylint: disable=arguments-differ
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
+        n_synapse_cores = self.get_model_n_synapse_cores()
+        allow_delay_extensions = self.get_model_allow_delay_extensions()
         return PopulationVertex(
             n_neurons=n_neurons, label=label, max_atoms_per_core=max_atoms,
+            n_synapse_cores=n_synapse_cores,
+            allow_delay_extensions=allow_delay_extensions,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             max_expected_summed_weight=max_expected_summed_weight,
