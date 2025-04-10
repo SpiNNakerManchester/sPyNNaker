@@ -46,9 +46,25 @@ class CheckDebug(BaseTestCase):
         for option in config_options("Reports"):
             if not option.startswith("path"):
                 continue
+
             if option == "pathenergyreport":
-                # path_energy_report
+                # enegry reports not run in debug mode
                 continue
+
+            if option in ["pathdataspeedupreportsrouters",
+                          "pathdataspeedupreportsspeeds"]:
+                # not run without advancd monitors
+                if not get_config_bool("Machine",
+                                       "enable_advanced_monitor_support"):
+                    continue
+                # not run when using java
+                if get_config_bool("Java", "use_java"):
+                    continue
+                if option == "pathdataspeedupreportsspeeds":
+                    # report only created if loading using advanced monitors
+                    if not load_using_advanced_monitors():
+                        continue
+
             path = get_report_path(option)
             print(f"found {option} at {path}")
             if not os.path.exists(path):
@@ -88,14 +104,6 @@ class CheckDebug(BaseTestCase):
         pop.get_data("v")
         run0 = SpynnakerDataView.get_run_dir_path()
         found = os.listdir(run0)
-        if (get_config_bool("Machine", "enable_advanced_monitor_support")
-                and not get_config_bool("Java", "use_java")):
-            # write_data_speed_up_report
-            reports.append(
-                DataSpeedUpPacketGatherMachineVertex.OUT_REPORT_NAME)
-            if load_using_advanced_monitors():
-                reports.append(
-                    DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
         for report in reports:
             self.assertIn(report, found)
         self.assertIn("data.sqlite3", found)

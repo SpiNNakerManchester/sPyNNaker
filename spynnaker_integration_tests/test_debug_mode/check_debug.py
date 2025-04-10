@@ -20,8 +20,6 @@ from spinn_front_end_common.interface.interface_functions \
     import load_using_advanced_monitors
 from spinn_front_end_common.utilities.report_functions.drift_report import (
     CLOCK_DRIFT_REPORT)
-from spinn_front_end_common.utilities.report_functions.board_chip_report \
-    import AREA_CODE_REPORT_NAME
 from spinn_front_end_common.utilities.report_functions.\
     fixed_route_from_machine_report import REPORT_NAME as fixed_route_report
 from spinn_front_end_common.utility_models import \
@@ -42,9 +40,25 @@ class CheckDebug(BaseTestCase):
         for option in config_options("Reports"):
             if not option.startswith("path"):
                 continue
+
             if option == "pathenergyreport":
                 # path_energy_report
                 continue
+
+            if option in ["pathdataspeedupreportsrouters",
+                          "pathdataspeedupreportsspeeds"]:
+                # not run without advancd monitors
+                if not get_config_bool("Machine",
+                                       "enable_advanced_monitor_support"):
+                    continue
+                # not run when using java
+                if get_config_bool("Java", "use_java"):
+                    continue
+                if option == "pathdataspeedupreportsspeeds":
+                    # report only created if loading using advanced monitors
+                    if not load_using_advanced_monitors():
+                        continue
+
             path = get_report_path(option)
             print(f"found {option} at {path}")
             if not os.path.exists(path):
@@ -81,14 +95,6 @@ class CheckDebug(BaseTestCase):
         pop.get_data("v")
         run0 = SpynnakerDataView.get_run_dir_path()
         found = os.listdir(run0)
-        if (get_config_bool("Machine", "enable_advanced_monitor_support")
-                and not get_config_bool("Java", "use_java")):
-            # write_data_speed_up_report
-            reports.append(
-                DataSpeedUpPacketGatherMachineVertex.OUT_REPORT_NAME)
-            if load_using_advanced_monitors():
-                reports.append(
-                    DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
         for report in reports:
             self.assertIn(report, found)
         self.assert_reports()
