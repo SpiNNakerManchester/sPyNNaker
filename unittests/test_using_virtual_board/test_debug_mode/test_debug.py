@@ -47,11 +47,6 @@ class TestDebug(BaseTestCase):
 
     def debug(self):
         reports = [
-            # write_energy_report does not happen on a virtual machine
-            # "Detailed_energy_report.rpt",
-            # "energy_summary_report.rpt",
-            # write_text_specs = False
-            "data_spec_text_files",
             # write_routing_table_reports not on a virtual boad
             # reports_names._ROUTING_TABLE_DIR,
             # reports_names._C_ROUTING_TABLE_DIR,

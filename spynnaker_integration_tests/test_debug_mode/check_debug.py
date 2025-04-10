@@ -16,8 +16,6 @@ import os
 from spinn_utilities.config_holder import (
     config_options, get_report_path)
 
-from spinn_front_end_common.utilities.report_functions.drift_report import (
-    CLOCK_DRIFT_REPORT)
 from spinn_front_end_common.utilities.report_functions.\
     fixed_route_from_machine_report import REPORT_NAME as fixed_route_report
 from spinnaker_testbase import BaseTestCase
@@ -52,16 +50,7 @@ class CheckDebug(BaseTestCase):
     def debug(self):
         # pylint: disable=protected-access
         reports = [
-            # write_energy_report
-            # EnergyReport._DETAILED_FILENAME,
-            # EnergyReport._SUMMARY_FILENAME,
-            # write_text_specs = False
-            "data_spec_text_files",
-            # repeats reports_names._SDRAM_FILENAME,
-            # write_routing_table_reports
             "provenance_data",
-            # write_drift_report_end or start
-            CLOCK_DRIFT_REPORT,
             _GRAPH_NAME,
             _GRAPH_NAME + "." +
             _GRAPH_FORMAT,
