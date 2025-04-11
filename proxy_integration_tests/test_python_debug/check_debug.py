@@ -51,8 +51,6 @@ class CheckDebug(BaseTestCase):
     def debug(self):
         # pylint: disable=protected-access
         reports = [
-            # repeats reports_names._SDRAM_FILENAME,
-            "provenance_data",
             _GRAPH_NAME,
             # graphviz exe may not be installed so there will be no image file
             # _GRAPH_NAME + "." + _GRAPH_FORMAT,

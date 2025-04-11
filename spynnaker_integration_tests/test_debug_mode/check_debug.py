@@ -50,7 +50,6 @@ class CheckDebug(BaseTestCase):
     def debug(self):
         # pylint: disable=protected-access
         reports = [
-            "provenance_data",
             _GRAPH_NAME,
             _GRAPH_NAME + "." +
             _GRAPH_FORMAT,
