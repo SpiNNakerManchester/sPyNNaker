@@ -506,8 +506,10 @@ class PopulationVertex(
         """
         if not self.__synapse_dynamics.is_combined_core_capable:
             return False
-        # If the time-step is less than 1, use multiple cores
-        return SpynnakerDataView().get_simulation_time_step_ms() >= 1.0
+        # If the time-step is less than 1, use multiple cores if needed
+        if SpynnakerDataView().get_simulation_time_step_ms() < 1.0:
+            return self.n_synapse_cores_required == 0
+        return True
 
     @property
     def n_synapse_cores_required(self) -> int:
