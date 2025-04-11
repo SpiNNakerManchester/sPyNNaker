@@ -14,11 +14,11 @@
 
 import os
 import unittest
-import spinn_front_end_common.utilities.report_functions.reports as \
-    reports_names
-from spinn_front_end_common.utilities.report_functions.network_specification \
-    import _FILENAME as network_specification_file_name
+
+from spinn_utilities.config_holder import config_options, get_report_path
+
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.config_setup import cfg_paths_skipped
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_neuron_network_specification_report import (_GRAPH_NAME)
@@ -32,24 +32,21 @@ class TestDebug(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
+    def assert_reports(self):
+        skipped = cfg_paths_skipped()
+        for option in config_options("Reports"):
+            if not option.startswith("path"):
+                continue
+            if option in skipped:
+                continue
+            path = get_report_path(option)
+            print(f"found {option} at {path}")
+            if not os.path.exists(path):
+                raise AssertionError(
+                    f"Unable to find report for {option} {path}")
+
     def debug(self):
         reports = [
-            # write_energy_report does not happen on a virtual machine
-            # "Detailed_energy_report.rpt",
-            # "energy_summary_report.rpt",
-            # write_text_specs = False
-            "data_spec_text_files",
-            # write_router_reports
-            reports_names._ROUTING_FILENAME,
-            # write_partitioner_reports
-            reports_names._PARTITIONING_FILENAME,
-            # write_application_graph_placer_report
-            reports_names._PLACEMENT_VTX_GRAPH_FILENAME,
-            reports_names._PLACEMENT_CORE_GRAPH_FILENAME,
-            reports_names._SDRAM_FILENAME,
-            # repeats reports_names._SDRAM_FILENAME,
-            # write_router_info_report
-            reports_names._VIRTKEY_FILENAME,
             # write_routing_table_reports not on a virtual boad
             # reports_names._ROUTING_TABLE_DIR,
             # reports_names._C_ROUTING_TABLE_DIR,
@@ -60,11 +57,7 @@ class TestDebug(BaseTestCase):
             # routing_tables_from_machine_report,
             # write_memory_map_report
             # ??? used by MachineExecuteDataSpecification but not called ???
-            # write_network_specification_report
-            network_specification_file_name,
             "data.sqlite3",
-            # write_tag_allocation_reports
-            reports_names._TAGS_FILENAME,
             # write_algorithm_timings
             # "provenance_data/pacman.xml"  = different test
             # write_board_chip_report not on a virtual board
@@ -91,6 +84,7 @@ class TestDebug(BaseTestCase):
         found = os.listdir(SpynnakerDataView.get_run_dir_path())
         for report in reports:
             self.assertIn(report, found)
+        self.assert_reports()
         self.assertIn("ds.sqlite3", found)
 
     def test_debug(self):
