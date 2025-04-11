@@ -79,7 +79,10 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
-            n_steps_per_timestep: int = 1) -> PopulationVertex:
+            n_steps_per_timestep: int = 1,
+            neurons_per_core: Optional[int] = None,
+            n_synapse_cores: Optional[int] = None,
+            allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
         """
         :param int n_steps_per_timestep:
         """
@@ -93,4 +96,6 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             max_expected_summed_weight=max_expected_summed_weight,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
             drop_late_spikes=drop_late_spikes,
-            splitter=splitter, seed=seed, n_colour_bits=n_colour_bits)
+            splitter=splitter, seed=seed, n_colour_bits=n_colour_bits,
+            neurons_per_core=neurons_per_core, n_synapse_cores=n_synapse_cores,
+            allow_delay_extensions=allow_delay_extensions)

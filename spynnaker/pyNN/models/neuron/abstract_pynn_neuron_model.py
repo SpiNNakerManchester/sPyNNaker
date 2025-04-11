@@ -106,7 +106,10 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterPopulationVertex] = None,
             seed: Optional[int] = None,
-            n_colour_bits: Optional[int] = None) -> PopulationVertex:
+            n_colour_bits: Optional[int] = None,
+            neurons_per_core: Optional[int] = None,
+            n_synapse_cores: Optional[int] = None,
+            allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
         """
         :param float spikes_per_second:
         :param float ring_buffer_sigma:
@@ -118,11 +121,16 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         :param int n_colour_bits:
         """
         # pylint: disable=arguments-differ
-        max_atoms = self.get_model_max_atoms_per_dimension_per_core()
-        n_synapse_cores = self.get_model_n_synapse_cores()
-        allow_delay_extensions = self.get_model_allow_delay_extensions()
+        if neurons_per_core is None:
+            neurons_per_core = \
+                self.get_model_max_atoms_per_dimension_per_core()
+        if n_synapse_cores is None:
+            n_synapse_cores = self.get_model_n_synapse_cores()
+        if allow_delay_extensions is None:
+            allow_delay_extensions = self.get_model_allow_delay_extensions()
         return PopulationVertex(
-            n_neurons=n_neurons, label=label, max_atoms_per_core=max_atoms,
+            n_neurons=n_neurons, label=label,
+            max_atoms_per_core=neurons_per_core,
             n_synapse_cores=n_synapse_cores,
             allow_delay_extensions=allow_delay_extensions,
             spikes_per_second=spikes_per_second,

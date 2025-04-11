@@ -115,7 +115,10 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
-            n_steps_per_timestep: int = 1) -> PopulationVertex:
+            n_steps_per_timestep: int = 1,
+            neurons_per_core: Optional[int] = None,
+            n_synapse_cores: Optional[int] = None,
+            allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
         if n_neurons != len(self._devices):
             raise ConfigurationException(
                 "Number of neurons does not match number of "
@@ -123,12 +126,19 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         model = self._model
         assert isinstance(model, NeuronImplStandard)
         model.n_steps_per_timestep = n_steps_per_timestep
-        max_atoms = self.get_model_max_atoms_per_dimension_per_core()
+        if neurons_per_core is None:
+            neurons_per_core = \
+                self.get_model_max_atoms_per_dimension_per_core()
+        if n_synapse_cores is None:
+            n_synapse_cores = self.get_model_n_synapse_cores()
+        if allow_delay_extensions is None:
+            allow_delay_extensions = self.get_model_allow_delay_extensions()
         return ExternalDeviceLifControlVertex(
             devices=self._devices, create_edges=self._create_edges,
-            max_atoms_per_core=max_atoms, neuron_impl=model, pynn_model=self,
-            translator=self._translator, spikes_per_second=spikes_per_second,
-            label=label, ring_buffer_sigma=ring_buffer_sigma,
+            max_atoms_per_core=neurons_per_core, neuron_impl=model,
+            pynn_model=self, translator=self._translator,
+            spikes_per_second=spikes_per_second, label=label,
+            ring_buffer_sigma=ring_buffer_sigma,
             max_expected_summed_weight=max_expected_summed_weight,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
             drop_late_spikes=drop_late_spikes, splitter=splitter, seed=seed,
