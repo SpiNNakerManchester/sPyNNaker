@@ -1973,4 +1973,3 @@ class _Stats(object):
         w_max = min(w_max, self.total_weights[s_type])
         w_max = max(w_max, self.biggest_weight[s_type])
         return w_max
-

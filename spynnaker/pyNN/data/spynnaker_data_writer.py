@@ -93,8 +93,8 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
                 if self.get_time_scale_factor() > 1.0:
                     logger.warning(
                         "A timestep was entered that has forced SpiNNaker to "
-                        "automatically slow the simulation down from real time "
-                        f"by a factor of {time_scale_factor}.")
+                        "automatically slow the simulation down from real "
+                        f"time by a factor of {time_scale_factor}.")
             else:
                 self.set_up_timings(simulation_time_step_us, time_scale_factor)
             self._set_min_delay(min_delay)
