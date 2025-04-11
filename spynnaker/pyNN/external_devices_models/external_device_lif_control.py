@@ -135,8 +135,10 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             allow_delay_extensions = self.get_model_allow_delay_extensions()
         return ExternalDeviceLifControlVertex(
             devices=self._devices, create_edges=self._create_edges,
-            max_atoms_per_core=neurons_per_core, neuron_impl=model,
-            pynn_model=self, translator=self._translator,
+            max_atoms_per_core=neurons_per_core,
+            n_synapse_cores=n_synapse_cores,
+            allow_delay_extensions=allow_delay_extensions,
+            neuron_impl=model, pynn_model=self, translator=self._translator,
             spikes_per_second=spikes_per_second, label=label,
             ring_buffer_sigma=ring_buffer_sigma,
             max_expected_summed_weight=max_expected_summed_weight,
