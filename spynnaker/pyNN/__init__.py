@@ -188,7 +188,7 @@ __all__ = [
     # Stuff that we define
     'end', 'setup', 'run', 'run_until', 'run_for', 'num_processes', 'rank',
     'reset', 'set_number_of_neurons_per_core',
-    'set_number_of_neurons_per_core', 'set_allow_delay_extensions',
+    'set_number_of_synapse_cores', 'set_allow_delay_extensions',
     'Projection',
     'get_current_time', 'create', 'connect', 'get_time_step', 'get_min_delay',
     'get_max_delay', 'initialize', 'list_standard_models', 'name',
