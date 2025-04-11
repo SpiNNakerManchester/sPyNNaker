@@ -15,12 +15,12 @@
 import logging
 import math
 from typing import Optional, Union
+from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.data.fec_data_writer import FecDataWriter
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from .spynnaker_data_view import SpynnakerDataView, _SpynnakerDataModel
-from spinn_utilities.config_holder import get_config_int
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access

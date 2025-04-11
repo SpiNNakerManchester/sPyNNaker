@@ -284,7 +284,7 @@ class SpynnakerDataView(FecDataView):
         """
         cls.check_valid_simulator()
         # Avoid circular dependency
-        # py
+        # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
         if not issubclass(neuron_type, AbstractPyNNNeuronModel):
             raise TypeError(f"{neuron_type} is not an AbstractPyNNNeuronModel")
@@ -310,6 +310,8 @@ class SpynnakerDataView(FecDataView):
             whether to allow delay extensions for this neuron type
         """
         cls.check_valid_simulator()
+        # Avoid circular dependency
+        # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
         if not issubclass(neuron_type, AbstractPyNNNeuronModel):
             raise TypeError(f"{neuron_type} is not an AbstractPyNNNeuronModel")
