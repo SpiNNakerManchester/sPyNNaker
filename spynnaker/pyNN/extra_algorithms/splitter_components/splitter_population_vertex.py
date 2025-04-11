@@ -29,7 +29,7 @@ class SplitterPopulationVertex(
     """
     Abstract base class of splitters for :py:class:`PopulationVertex`.
     """
-    __slots__ = ("__slices")
+    __slots__ = ("__slices", )
 
     def __init__(self) -> None:
         super().__init__()
