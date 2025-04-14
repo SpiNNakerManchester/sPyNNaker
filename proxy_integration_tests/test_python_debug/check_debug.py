@@ -19,8 +19,6 @@ from requests.exceptions import ConnectionError
 from spinn_utilities.config_holder import (
     config_options, get_report_path)
 
-from spinn_front_end_common.utilities.report_functions.\
-    fixed_route_from_machine_report import REPORT_NAME as fixed_route_report
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.config_setup import cfg_paths_skipped
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -53,8 +51,6 @@ class CheckDebug(BaseTestCase):
         reports = [
             _GRAPH_NAME,
             # graphviz exe may not be installed so there will be no image file
-            # _GRAPH_NAME + "." + _GRAPH_FORMAT,
-            fixed_route_report,
             ]
 
         sim.setup(1.0)
