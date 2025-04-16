@@ -46,13 +46,6 @@ class CheckDebug(BaseTestCase):
                     f"Unable to find report for {option} {path}")
 
     def debug(self):
-        # pylint: disable=protected-access
-        reports = [
-            _GRAPH_NAME,
-            _GRAPH_NAME + "." +
-            _GRAPH_FORMAT,
-            ]
-
         sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
         pop.record("v")
@@ -64,11 +57,7 @@ class CheckDebug(BaseTestCase):
         pop.get_data("v")
         run0 = SpynnakerDataView.get_run_dir_path()
         found = os.listdir(run0)
-        for report in reports:
-            self.assertIn(report, found)
         self.assert_reports()
-        self.assertIn("data.sqlite3", found)
-        self.assertIn("ds.sqlite3", found)
 
         sim.run(10)  # second run
         pop.get_data("v")
@@ -79,18 +68,12 @@ class CheckDebug(BaseTestCase):
         # check get works directly after a reset
         pop.get_data("v")
         sim.run(10)
-        found = os.listdir(SpynnakerDataView.get_run_dir_path())
-        self.assertIn("data1.sqlite3", found)
-        self.assertNotIn("ds1.sqlite3", found)
 
         sim.reset()  # soft with dsg
         SpynnakerDataView.set_requires_data_generation()
         sim.run(10)
         pop.get_data("v")
         self.assertEqual(run0, SpynnakerDataView.get_run_dir_path())
-        found = os.listdir(run0)
-        self.assertIn("data2.sqlite3", found)
-        self.assertIn("ds2.sqlite3", found)
         # No point in checking files they are already there
 
         sim.reset()  # hard
@@ -98,12 +81,7 @@ class CheckDebug(BaseTestCase):
         sim.run(10)
         pop.get_data("v")
         self.assertNotEqual(run0, SpynnakerDataView.get_run_dir_path())
-        found = os.listdir(SpynnakerDataView.get_run_dir_path())
-        for report in reports:
-            self.assertIn(report, found)
         self.assert_reports()
-        self.assertIn("data3.sqlite3", found)
-        self.assertIn("ds3.sqlite3", found)
 
         sim.end()
 

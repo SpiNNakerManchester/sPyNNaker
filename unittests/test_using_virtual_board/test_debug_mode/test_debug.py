@@ -20,8 +20,6 @@ from spinn_utilities.config_holder import config_options, get_report_path
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.config_setup import cfg_paths_skipped
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.extra_algorithms.\
-    spynnaker_neuron_network_specification_report import (_GRAPH_NAME)
 import pyNN.spiNNaker as sim
 
 
@@ -46,30 +44,6 @@ class TestDebug(BaseTestCase):
                     f"Unable to find report for {option} {path}")
 
     def debug(self):
-        reports = [
-            # write_routing_table_reports not on a virtual boad
-            # reports_names._ROUTING_TABLE_DIR,
-            # reports_names._C_ROUTING_TABLE_DIR,
-            # reports_names._COMPARED_FILENAME,
-            # write_routing_compression_checker_report not on a virtual board
-            # "routing_compression_checker_report.rpt",
-            # write_routing_tables_from_machine_report not on a virtual board
-            # routing_tables_from_machine_report,
-            # write_memory_map_report
-            # ??? used by MachineExecuteDataSpecification but not called ???
-            "data.sqlite3",
-            # write_algorithm_timings
-            # "provenance_data/pacman.xml"  = different test
-            # write_board_chip_report not on a virtual board
-            # BoardChipReport.AREA_CODE_REPORT_NAME,
-            # write_data_speed_up_report not on a virtual board
-            # DataSpeedUpPacketGatherMachineVertex.REPORT_NAME
-            _GRAPH_NAME,
-            # # TODO why svg when default is png
-            # _GRAPH_NAME + ".svg"
-            # # Can't check for that; graph generation might not work because
-            # # of system configuration
-            ]
         sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
         pop.record("v")
@@ -81,11 +55,7 @@ class TestDebug(BaseTestCase):
         pop.get_data("v")
         sim.end()
 
-        found = os.listdir(SpynnakerDataView.get_run_dir_path())
-        for report in reports:
-            self.assertIn(report, found)
         self.assert_reports()
-        self.assertIn("ds.sqlite3", found)
 
     def test_debug(self):
         self.runsafe(self.debug)

@@ -22,9 +22,6 @@ from spinn_utilities.config_holder import (
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.config_setup import cfg_paths_skipped
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.extra_algorithms.\
-    spynnaker_neuron_network_specification_report import (
-        _GRAPH_NAME)
 import pyNN.spiNNaker as sim
 
 
@@ -47,12 +44,6 @@ class CheckDebug(BaseTestCase):
                     f"Unable to find report for {option} {path}")
 
     def debug(self):
-        # pylint: disable=protected-access
-        reports = [
-            _GRAPH_NAME,
-            # graphviz exe may not be installed so there will be no image file
-            ]
-
         sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
         pop.record("v")
@@ -66,16 +57,9 @@ class CheckDebug(BaseTestCase):
             raise SkipTest("DNS Error Monster!")
 
         pop.get_data("v")
-        run0 = SpynnakerDataView.get_run_dir_path()
-        found = os.listdir(run0)
-        for report in reports:
-            self.assertIn(report, found)
-        self.assertIn("data.sqlite3", found)
-        self.assertIn("ds.sqlite3", found)
         self.assert_reports()
 
         sim.run(10)  # second run
         pop.get_data("v")
-        self.assertEqual(run0, SpynnakerDataView.get_run_dir_path())
 
         sim.end()
