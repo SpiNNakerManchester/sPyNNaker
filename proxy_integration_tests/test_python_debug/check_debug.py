@@ -21,7 +21,6 @@ from spinn_utilities.config_holder import (
 
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.config_setup import cfg_paths_skipped
-from spynnaker.pyNN.data import SpynnakerDataView
 import pyNN.spiNNaker as sim
 
 

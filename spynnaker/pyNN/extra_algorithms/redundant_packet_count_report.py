@@ -21,7 +21,6 @@ from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.interface.provenance import (
     ProvenanceReader, ProvenanceWriter)
 
-from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))

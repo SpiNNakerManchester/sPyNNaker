@@ -20,9 +20,6 @@ from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.config_setup import cfg_paths_skipped
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.extra_algorithms.\
-    spynnaker_neuron_network_specification_report import (
-        _GRAPH_NAME, _GRAPH_FORMAT)
 import pyNN.spiNNaker as sim
 
 
@@ -56,7 +53,6 @@ class CheckDebug(BaseTestCase):
         sim.run(0)
         pop.get_data("v")
         run0 = SpynnakerDataView.get_run_dir_path()
-        found = os.listdir(run0)
         self.assert_reports()
 
         sim.run(10)  # second run
