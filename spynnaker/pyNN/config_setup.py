@@ -72,5 +72,7 @@ def add_spynnaker_cfg() -> None:
 def cfg_paths_skipped() -> Set[str]:
     """
     Set of cfg path that would not be found based on other cfg settings
+
+    Assuming mode = Debug
     """
     return fec_cfg_paths_skipped()
