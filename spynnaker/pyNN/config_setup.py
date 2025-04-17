@@ -16,7 +16,7 @@ import os
 from typing import Set
 
 from spinn_utilities.config_holder import (
-    clear_cfg_files, set_cfg_files)
+    clear_cfg_files, set_cfg_files, print_configs)
 from spinn_front_end_common.interface.config_setup import (
     add_default_cfg, add_spinnaker_cfg)
 from spinn_front_end_common.interface.config_setup import (
@@ -76,3 +76,8 @@ def cfg_paths_skipped() -> Set[str]:
     Assuming mode = Debug
     """
     return fec_cfg_paths_skipped()
+
+
+if __name__ == '__main__':
+    setup_configs()
+    print_configs()
