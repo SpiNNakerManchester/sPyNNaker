@@ -76,8 +76,3 @@ def cfg_paths_skipped() -> Set[str]:
     Assuming mode = Debug
     """
     return fec_cfg_paths_skipped()
-
-
-if __name__ == '__main__':
-    setup_configs()
-    print_configs()
