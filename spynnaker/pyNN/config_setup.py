@@ -111,7 +111,6 @@ def print_configs() -> None:
                 print("\t\t", value)
 
 
-
 if __name__ == '__main__':
     setup_configs()
     print_configs()
