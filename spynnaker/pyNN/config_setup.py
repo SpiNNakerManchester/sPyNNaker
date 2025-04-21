@@ -18,7 +18,7 @@ from typing import Set
 from spinn_utilities.config_holder import (
     clear_cfg_files, get_default_cfgs, set_cfg_files)
 from spinn_utilities.configs.camel_case_config_parser import (
-    CamelCaseConfigParser, TypedConfigParser)
+    TypedConfigParser)
 from spinn_front_end_common.interface.config_setup import (
     add_default_cfg, add_spinnaker_cfg)
 from spinn_front_end_common.interface.config_setup import (
@@ -85,7 +85,7 @@ def print_configs() -> None:
     To BE MOVED
     :return:
     """
-    config1 = CamelCaseConfigParser()
+    config1 = TypedConfigParser()
     config1.read(get_default_cfgs())
     for section in config1:
         if section == "DEFAULT":
