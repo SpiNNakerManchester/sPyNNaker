@@ -15,7 +15,8 @@
 import os
 import unittest
 
-from spinn_utilities.config_holder import config_options, get_report_path
+from spinn_utilities.config_holder import (
+    config_options, config_sections, get_report_path, get_timestamp_path)
 
 from spinnaker_testbase import BaseTestCase
 
@@ -33,16 +34,20 @@ class TestDebug(BaseTestCase):
 
     def assert_reports(self):
         skipped = cfg_paths_skipped()
-        for option in config_options("Reports"):
-            if not option.startswith("path"):
-                continue
-            if option in skipped:
-                continue
-            path = get_report_path(option)
-            print(f"found {option} at {path}")
-            if not os.path.exists(path):
-                raise AssertionError(
-                    f"Unable to find report for {option} {path}")
+        for section in config_sections():
+            for option in config_options(section):
+                if option in skipped:
+                    continue
+                if option.startswith("path"):
+                    path = get_report_path(section=section, option=option)
+                elif option.startswith("tpath"):
+                    path = get_timestamp_path(section=section, option=option)
+                else:
+                    continue
+                print(f"found {option} at {path}")
+                if not os.path.exists(path):
+                    raise AssertionError(
+                        f"Unable to find report for {option} {path}")
 
     def debug(self):
         sim.setup(1.0)
