@@ -198,10 +198,13 @@ class PopulationNeuronsMachineVertex(
     def _max_atoms_per_core(self) -> int:
         return self.__max_atoms_per_core
 
-    @overrides(SendsSynapticInputsOverSDRAM.set_sdram_partition)
     def set_sdram_partition(
             self,
             sdram_partition: SourceSegmentedSDRAMMachinePartition) -> None:
+        """ Sets the SDRAM Partition to receive data from.
+
+        :param sdram_partition: The partition to receive data from.
+        """
         if self.__sdram_partition is not None:
             raise SynapticConfigurationException(
                 "Trying to set SDRAM partition more than once")
