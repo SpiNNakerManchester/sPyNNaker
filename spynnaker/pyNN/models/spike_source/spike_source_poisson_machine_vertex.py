@@ -246,7 +246,8 @@ class SpikeSourcePoissonMachineVertex(
             label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__is_recording = is_recording
         self.__sdram = sdram
-        self.__sdram_partition: Optional[SourceSegmentedSDRAMMachinePartition] = None
+        self.__sdram_partition: Optional[
+            SourceSegmentedSDRAMMachinePartition] = None
         self.__rate_changed = True
 
     @property
