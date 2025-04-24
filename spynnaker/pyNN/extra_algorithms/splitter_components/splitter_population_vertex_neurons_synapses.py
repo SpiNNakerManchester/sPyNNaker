@@ -104,7 +104,7 @@ class SplitterPopulationVertexNeuronsSynapses(
         # The application vertex sources that are neuromodulators
         "__neuromodulators")
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self.__next_synapse_index = 0
@@ -195,7 +195,7 @@ class SplitterPopulationVertexNeuronsSynapses(
                 vertex_slice, neuron_sdram, label, index, rb_shifts,
                 weight_scales, neuron_data, atoms_per_core)
             sdram: AbstractSDRAM = neuron_sdram
-            source_vertices = list()
+            source_vertices: List[MachineVertex] = list()
 
             # Add the first vertex
             synapse_references, syn_label, feedback_partition, lead_vtx = \
@@ -286,7 +286,7 @@ class SplitterPopulationVertexNeuronsSynapses(
             neuron_vertex: PopulationNeuronsMachineVertex,
             atoms_per_core: int, synaptic_matrices: SynapticMatrices) -> Tuple[
                 SynapseRegionReferences, str,
-                Optional[MulticastEdgePartition]]:
+                Optional[MulticastEdgePartition], MachineVertex]:
         """
         Add the first synapse core for a neuron core.  This core will
         generate all the synaptic data required.
@@ -308,8 +308,8 @@ class SplitterPopulationVertexNeuronsSynapses(
             The neuron vertex the synapses will feed into
         :param int atoms_per_core: The maximum atoms per core
         :return: References to the synapse regions that can be used by a shared
-            synapse core, and the basic label for the synapse cores
-        :rtype: tuple(SynapseRegionReferences, str)
+            synapse core, the basic label for the synapse cores,
+            the feedback partition (if needed), and the lead synapse core
         """
         synapse_references = SynapseRegionReferences(
             *SpynnakerDataView.get_next_ds_references(7))

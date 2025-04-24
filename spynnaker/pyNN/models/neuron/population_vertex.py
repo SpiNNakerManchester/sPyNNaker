@@ -520,21 +520,22 @@ class PopulationVertex(
         :rtype: int
         """
         self.__update_n_synapse_cores()
+        assert self.__n_synapse_cores is not None
         return self.__n_synapse_cores
 
-    def __update_n_synapse_cores(self):
+    def __update_n_synapse_cores(self) -> None:
         if self.__n_synapse_cores is not None:
             return
         version = SpynnakerDataView().get_machine_version()
 
         # The maximum number of cores minus 1 for the neuron core, and minus
         # 1 for extra monitor
-        max_n_cores = (
+        max_n_cores: int = (
             version.max_cores_per_chip -
             (version.n_scamp_cores + _N_OTHER_CORES))
 
         # So how many synapses can be processed accounting for timescale?
-        synapses_per_core_per_sim_second = (
+        synapses_per_core_per_sim_second: float = (
             self.__synapse_dynamics.synapses_per_second *
             SpynnakerDataView().get_time_scale_factor())
 
@@ -594,6 +595,7 @@ class PopulationVertex(
         The maximum number of delay steps supported on a core.
         """
         self.__update_max_delay()
+        assert self.__max_delay_slots_available is not None
         return self.__max_delay_slots_available
 
     @property
@@ -605,6 +607,8 @@ class PopulationVertex(
             return False
         # Determine if we *expect* a delay extension; if not disallow
         self.__update_max_delay()
+        assert self.__max_delay_ms is not None
+        assert self.__max_delay_slots_available is not None
         delay_available_ms = (
             self.__max_delay_slots_available *
             SpynnakerDataView().get_simulation_time_step_ms())

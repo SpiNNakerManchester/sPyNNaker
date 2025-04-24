@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, List
+from typing import Optional, List, Union, Tuple
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
@@ -116,7 +116,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             splitter: Optional[SplitterPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
             n_steps_per_timestep: int = 1,
-            neurons_per_core: Optional[int] = None,
+            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
             n_synapse_cores: Optional[int] = None,
             allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
         if n_neurons != len(self._devices):

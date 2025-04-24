@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, cast, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, cast, TYPE_CHECKING, Union, Tuple
 
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
@@ -80,7 +80,7 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             splitter: Optional[SplitterPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
             n_steps_per_timestep: int = 1,
-            neurons_per_core: Optional[int] = None,
+            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
             n_synapse_cores: Optional[int] = None,
             allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
         """
