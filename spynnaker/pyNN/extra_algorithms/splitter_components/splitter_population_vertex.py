@@ -14,6 +14,7 @@
 
 from typing import List, Optional, final
 from spinn_utilities.overrides import overrides
+from spinn_utilities.abstract_base import AbstractBase
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import Slice
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
@@ -25,7 +26,7 @@ from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 
 class SplitterPopulationVertex(
         AbstractSplitterCommon[PopulationVertex],
-        AbstractSpynnakerSplitterDelay):
+        AbstractSpynnakerSplitterDelay, metaclass=AbstractBase):
     """
     Abstract base class of splitters for :py:class:`PopulationVertex`.
     """
