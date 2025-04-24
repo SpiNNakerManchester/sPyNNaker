@@ -49,6 +49,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+from spynnaker.pyNN.models.abstract_models import SendsSynapticInputsOverSDRAM
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
     import (
         SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
@@ -196,6 +197,7 @@ class SplitterPopulationVertexNeuronsSynapses(
                 weight_scales, neuron_data, atoms_per_core)
             sdram: AbstractSDRAM = neuron_sdram
             source_vertices: List[MachineVertex] = list()
+            source_sdram_vertices: List[SendsSynapticInputsOverSDRAM] = list()
 
             # Add the first vertex
             synapse_references, syn_label, feedback_partition, lead_vtx = \
@@ -205,6 +207,7 @@ class SplitterPopulationVertexNeuronsSynapses(
                     atoms_per_core, synaptic_matrices)
             sdram += lead_synapse_core_sdram
             source_vertices.append(lead_vtx)
+            source_sdram_vertices.append(lead_vtx)
 
             # Do the remaining synapse cores
             for i in range(1, n_synapse_cores):
@@ -214,11 +217,13 @@ class SplitterPopulationVertexNeuronsSynapses(
                     neuron_vertex)
                 sdram += shared_synapse_core_sdram
                 source_vertices.append(shared_vtx)
+                source_sdram_vertices.append(shared_vtx)
 
             # Add resources for Poisson vertices
             poisson_vertices = incoming_direct_poisson[vertex_slice]
             for poisson_vertex, _possion_edge in poisson_vertices:
                 source_vertices.append(poisson_vertex)
+                source_sdram_vertices.append(poisson_vertex)
                 sdram += poisson_vertex.sdram_required
 
             # Add the cores
@@ -236,7 +241,8 @@ class SplitterPopulationVertexNeuronsSynapses(
                 sdram_partition.add_edge(SDRAMMachineEdge(
                     source_vertex, neuron_vertex,
                     f"SDRAM {source_vertex.label}-->{neuron_vertex.label}"))
-                source_vertex.set_sdram_partition(sdram_partition)
+            for source_vertex_over_sdram in source_sdram_vertices:
+                source_vertex_over_sdram.set_sdram_partition(sdram_partition)
 
             self.__same_chip_groups.append(
                 ([*source_vertices, neuron_vertex], sdram))
@@ -286,7 +292,8 @@ class SplitterPopulationVertexNeuronsSynapses(
             neuron_vertex: PopulationNeuronsMachineVertex,
             atoms_per_core: int, synaptic_matrices: SynapticMatrices) -> Tuple[
                 SynapseRegionReferences, str,
-                Optional[MulticastEdgePartition], MachineVertex]:
+                Optional[MulticastEdgePartition],
+                PopulationSynapsesMachineVertexLead]:
         """
         Add the first synapse core for a neuron core.  This core will
         generate all the synaptic data required.
