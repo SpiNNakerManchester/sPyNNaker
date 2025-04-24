@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import Iterable, List, Optional, Sequence, Tuple, TYPE_CHECKING,\
-    Union
+from typing import (
+    Iterable, List, Optional, Sequence, Tuple, TYPE_CHECKING, Union)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationVirtualVertex)
