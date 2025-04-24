@@ -77,5 +77,5 @@ class SplitterPopulationVertex(
 
     @abstractmethod
     def machine_vertices_for_recording(
-            self, variable_to_record:str) -> Iterable[MachineVertex]:
+            self, variable_to_record: str) -> Iterable[MachineVertex]:
         raise NotImplementedError
