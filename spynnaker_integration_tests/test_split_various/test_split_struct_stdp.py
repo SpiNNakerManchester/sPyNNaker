@@ -16,8 +16,6 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as p
 import numpy
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPopulationVertexNeuronsSynapses)
 
 
 def split_structural_with_stdp():
@@ -35,18 +33,10 @@ def split_structural_with_stdp():
     w_init_2 = 4.0
     delay_2 = 1.0
     stim = p.Population(1, p.SpikeSourceArray(pre_spikes), label="stim")
-    pop = p.Population(
-        1, p.IF_curr_exp(), label="pop", additional_parameters={
-            "splitter": SplitterPopulationVertexNeuronsSynapses(1)})
-    pop_2 = p.Population(
-        1, p.IF_curr_exp(), label="pop_2", additional_parameters={
-            "splitter": SplitterPopulationVertexNeuronsSynapses(1)})
-    pop_3 = p.Population(
-        1, p.IF_curr_exp(), label="pop_3", additional_parameters={
-            "splitter": SplitterPopulationVertexNeuronsSynapses(1)})
-    pop_4 = p.Population(
-        1, p.IF_curr_exp(), label="pop_4", additional_parameters={
-            "splitter": SplitterPopulationVertexNeuronsSynapses(1)})
+    pop = p.Population(1, p.IF_curr_exp(), label="pop", n_synapse_cores=1)
+    pop_2 = p.Population(1, p.IF_curr_exp(), label="pop_2", n_synapse_cores=1)
+    pop_3 = p.Population(1, p.IF_curr_exp(), label="pop_3", n_synapse_cores=1)
+    pop_4 = p.Population(1, p.IF_curr_exp(), label="pop_4", n_synapse_cores=1)
     pop.record("spikes")
     pop_2.record("spikes")
     proj = p.Projection(

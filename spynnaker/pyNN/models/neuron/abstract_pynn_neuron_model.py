@@ -30,7 +30,9 @@ _population_parameters: Dict[str, Any] = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
     "max_expected_summed_weight": None,
     "incoming_spike_buffer_size": None, "drop_late_spikes": None,
-    "splitter": None, "seed": None, "n_colour_bits": None
+    "splitter": None, "seed": None, "n_colour_bits": None,
+    "n_synapse_cores": None, "allow_delay_extensions": True,
+    "neurons_per_core": None,
 }
 
 
