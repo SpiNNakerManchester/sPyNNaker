@@ -612,7 +612,7 @@ class PopulationVertex(
         delay_available_ms = (
             self.__max_delay_slots_available *
             SpynnakerDataView().get_simulation_time_step_ms())
-        return delay_available_ms >= self.__max_delay_ms
+        return delay_available_ms < self.__max_delay_ms
 
     def __update_max_delay(self) -> None:
         if self.__max_delay_ms is not None:
