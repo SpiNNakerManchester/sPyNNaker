@@ -86,7 +86,7 @@ def spynnaker_vertex_selector(app_vertex: ApplicationVertex) -> None:
     """
     if not app_vertex.has_splitter:
         if isinstance(app_vertex, PopulationVertex):
-            if app_vertex.combined_core_capable:
+            if app_vertex.use_combined_core:
                 app_vertex.splitter = SplitterPopulationVertexFixed()
             else:
                 app_vertex.splitter = SplitterPopulationVertexNeuronsSynapses()

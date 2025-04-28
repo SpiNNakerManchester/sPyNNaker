@@ -223,6 +223,17 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
+    @property
+    @abstractmethod
+    def is_split_core_capable(self) -> bool:
+        """
+        Whether the synapse dynamics can run on a core split from
+        the neuron, or if only a combined core is possible.
+
+        :rtype: bool
+        """
+        raise NotImplementedError
+
     def get_value(self, key: str) -> Any:
         """
         Get a property.

@@ -359,6 +359,11 @@ class SynapseDynamicsStructuralSTDP(
         return False
 
     @property
+    @overrides(AbstractSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return True
+
+    @property
     @overrides(AbstractSynapseDynamics.synapses_per_second)
     def synapses_per_second(self) -> int:
         return (super().synapses_per_second -

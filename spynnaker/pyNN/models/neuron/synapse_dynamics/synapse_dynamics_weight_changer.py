@@ -266,6 +266,11 @@ class SynapseDynamicsWeightChanger(
     def is_combined_core_capable(self) -> bool:
         return True
 
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return True
+
     @overrides(AbstractPlasticSynapseDynamics.get_weight_maximum)
     def get_weight_maximum(
             self, connector: AbstractConnector,

@@ -367,6 +367,11 @@ class SynapseDynamicsWeightChangable(
         return True
 
     @property
+    @overrides(AbstractPlasticSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return True
+
+    @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
     def pad_to_length(self) -> Optional[int]:
         return None

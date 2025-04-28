@@ -95,3 +95,8 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     @overrides(AbstractSynapseDynamics.is_combined_core_capable)
     def is_combined_core_capable(self) -> bool:
         return True
+
+    @property
+    @overrides(AbstractSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return False

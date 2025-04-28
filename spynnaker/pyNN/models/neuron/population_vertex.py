@@ -496,24 +496,35 @@ class PopulationVertex(
         self.__structure = structure
 
     @property
-    def combined_core_capable(self) -> bool:
+    def use_combined_core(self) -> bool:
         """
-        Whether the vertex can manage to operate on a combined
+        Whether the vertex should operate on a combined
         neuron-synapse core, or if a split synapse-core is more
         appropriate.
 
         :rtype: bool
         """
+        # If we can't use a combined core, use a split core
         if not self.__synapse_dynamics.is_combined_core_capable:
             return False
+
+        # If we can't use a split core, use a combined core
+        if not self.__synapse_dynamics.is_split_core_capable:
+            return True
 
         # If the user has chosen to have a synapse core, add one
         if self.__n_synapse_cores is not None and self.__n_synapse_cores > 0:
             return False
 
-        # If the time-step is less than 1, use multiple cores if needed
+        # If the time-step is less than 1, use combined core if no synapse
+        # cores are needed, otherwise use split core
+        # TODO: Look at if it is possible to include neurons in a combined
+        # core calculation and update to allow a choice of combined core if
+        # neurons and synapses fit on a single core
         if SpynnakerDataView().get_simulation_time_step_ms() < 1.0:
             return self.n_synapse_cores_required == 0
+
+        # If the timestep is 1 or greater, use a combined core generally
         return True
 
     @property

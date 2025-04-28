@@ -338,6 +338,11 @@ class SynapseDynamicsNeuromodulation(
         return False
 
     @property
+    @overrides(AbstractPlasticSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return True
+
+    @property
     @overrides(AbstractPlasticSynapseDynamics.synapses_per_second)
     def synapses_per_second(self) -> int:
         # This should never end up being requested!

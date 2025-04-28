@@ -248,6 +248,11 @@ class SynapseDynamicsStatic(
         return True
 
     @property
+    @overrides(AbstractStaticSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return True
+
+    @property
     @overrides(AbstractStaticSynapseDynamics.synapses_per_second)
     def synapses_per_second(self) -> int:
         # From Synapse-Centric Mapping of Cortical Models to the SpiNNaker
