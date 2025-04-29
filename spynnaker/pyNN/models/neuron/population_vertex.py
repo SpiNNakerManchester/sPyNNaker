@@ -569,11 +569,17 @@ class PopulationVertex(
             for proj in projs:
                 # pylint: disable=protected-access
                 s_info = proj._synapse_information
-                connector = s_info.connector
-                n_conns = connector.get_n_connections_from_pre_vertex_maximum(
-                    self.get_max_atoms_per_core(), s_info)
+                dynamics = s_info.synapse_dynamics
+                conn = s_info.connector
+                n_conns: Optional[int] = None
+                if isinstance(dynamics, AbstractSDRAMSynapseDynamics):
+                    n_conns = dynamics.pad_to_length
+                if n_conns is None:
+                    n_conns = conn.get_n_connections_from_pre_vertex_maximum(
+                        self.get_max_atoms_per_core(), s_info)
                 # The number of synapses is the number of connections from each
                 # pre-neuron to each post-neuron
+                assert n_conns is not None
                 pre_synapses_per_second += math.ceil(
                     n_conns * spikes_per_second * pre_vertex.n_atoms)
 
