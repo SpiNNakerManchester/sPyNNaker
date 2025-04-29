@@ -614,6 +614,19 @@ class PopulationVertex(
         assert self.__max_delay_slots_available is not None
         return self.__max_delay_slots_available
 
+    def max_delay_steps_incoming(self) -> int:
+        """
+        The maximum delay steps needed to handle incoming synapses,
+        accounting for delay extensions.
+        """
+        self.__update_max_delay()
+        assert self.__max_delay_ms is not None
+        assert self.__max_delay_slots_available is not None
+        max_incoming_slots = math.ceil(
+            self.__max_delay_ms /
+            SpynnakerDataView().get_simulation_time_step_ms())
+        return min(max_incoming_slots, self.__max_delay_slots_available)
+
     @property
     def allow_delay_extension(self) -> bool:
         """

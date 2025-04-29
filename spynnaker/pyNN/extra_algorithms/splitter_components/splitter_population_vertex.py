@@ -57,7 +57,7 @@ class SplitterPopulationVertex(
     @final
     @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
     def max_support_delay(self) -> int:
-        return self.governed_app_vertex.max_delay_steps
+        return self.governed_app_vertex.max_delay_steps_incoming
 
     @overrides(AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex)
     def accepts_edges_from_delay_vertex(self) -> bool:
