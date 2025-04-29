@@ -31,7 +31,7 @@ _population_parameters: Dict[str, Any] = {
     "max_expected_summed_weight": None,
     "incoming_spike_buffer_size": None, "drop_late_spikes": None,
     "splitter": None, "seed": None, "n_colour_bits": None,
-    "n_synapse_cores": None, "allow_delay_extensions": True,
+    "n_synapse_cores": None, "allow_delay_extensions": None,
     "neurons_per_core": None,
 }
 
