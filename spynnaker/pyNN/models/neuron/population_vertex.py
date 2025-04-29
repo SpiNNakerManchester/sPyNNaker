@@ -614,6 +614,7 @@ class PopulationVertex(
         assert self.__max_delay_slots_available is not None
         return self.__max_delay_slots_available
 
+    @property
     def max_delay_steps_incoming(self) -> int:
         """
         The maximum delay steps needed to handle incoming synapses,
