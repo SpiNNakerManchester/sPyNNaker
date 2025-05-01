@@ -42,7 +42,9 @@ class TestCfgChecker(unittest.TestCase):
         unittest_dir = os.path.dirname(abs_class_file)
         spynnaker_dir = os.path.dirname(unittest_dir)
         parent_dir = os.path.dirname(spynnaker_dir)
-        target_dir = os.path.join(parent_dir , "SpiNNakerManchester.github.io", "spynnaker", "9.0.0")
+        target_dir = os.path.join(
+            parent_dir,
+            "SpiNNakerManchester.github.io", "spynnaker", "9.0.0")
         if os.path.exists(target_dir):
             target = os.path.join(target_dir, "cfg.md")
         else:
@@ -50,6 +52,4 @@ class TestCfgChecker(unittest.TestCase):
             target = os.path.join(unittest_dir, 'test.md')
 
         documentor = ConfigDocumentor()
-        #documentor.print_section("Logging")
-        #documentor.print_configs()
         documentor.md_configs(target)
