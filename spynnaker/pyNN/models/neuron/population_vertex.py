@@ -631,9 +631,9 @@ class PopulationVertex(
         self.__update_max_delay()
         assert self.__max_delay_ms is not None
         assert self.__max_delay_slots_available is not None
-        max_incoming_slots = math.ceil(
+        max_incoming_slots = 2 ** get_n_bits(math.ceil(
             self.__max_delay_ms /
-            SpynnakerDataView().get_simulation_time_step_ms())
+            SpynnakerDataView().get_simulation_time_step_ms()))
         return min(max_incoming_slots, self.__max_delay_slots_available)
 
     @property
