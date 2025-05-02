@@ -37,7 +37,6 @@ class TestCSV(BaseTestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        global spikes_expected, v_expected
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_v = os.path.join(my_dir, "v.csv")
         v_expected_l: List[List[float]] = []
