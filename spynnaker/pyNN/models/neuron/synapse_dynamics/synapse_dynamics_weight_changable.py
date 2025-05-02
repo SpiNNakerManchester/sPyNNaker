@@ -391,3 +391,11 @@ class SynapseDynamicsWeightChangable(
             raise SynapticConfigurationException(
                 "WeightChangable only works with on-machine generated "
                 "connectors at present")
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.synapses_per_second)
+    def synapses_per_second(self) -> int:
+        # From Synapse-Centric Mapping of Cortical Models to the SpiNNaker
+        # Neuromorphic Architecture; but adaapted since this does very little
+        # in terms of execution compared to STDP, but a bit more than static
+        return 10000000
