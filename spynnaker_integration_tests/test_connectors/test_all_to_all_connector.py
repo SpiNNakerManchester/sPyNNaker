@@ -11,19 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from typing import Optional, Tuple, Union
+
+from pyNN.space import BaseStructure
 import pyNN.spiNNaker as sim
+
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.projection import Projection
 
 
 class TestAllToAllConnector(BaseTestCase):
 
-    def check_weights(self, projection, sources, destinations):
+    def check_weights(self, projection: Projection, sources: int,
+                      destinations: int)-> None:
         weights = projection.get(["weight"], "list")
         s_d_set = set((s, d) for s, d, _ in weights)
         self.assertEqual(len(weights), sources * destinations)
         self.assertEqual(len(s_d_set), sources * destinations)
 
-    def check_other_connect(self, sources, destinations):
+    def check_other_connect(self, sources: int, destinations: int) -> None:
         sim.setup(1.0)
         pop1 = sim.Population(sources, sim.IF_curr_exp(), label="pop1")
         pop2 = sim.Population(destinations, sim.IF_curr_exp(), label="pop2")
@@ -110,8 +117,10 @@ class TestAllToAllConnector(BaseTestCase):
         self.runsafe(self.using_population_views)
 
     def do_all_to_all_nd_test(
-            self, neurons_per_core_pre, pre_size, pre_shape,
-            neurons_per_core_post, post_size, post_shape):
+            self, neurons_per_core_pre: Union[int, Tuple[int, ...]],
+            pre_size: int, pre_shape: Optional[BaseStructure],
+            neurons_per_core_post: Union[int, Tuple[int, ...]],
+            post_size: int, post_shape: Optional[BaseStructure]) -> None:
         sim.setup(1.0)
         pre = sim.Population(
             pre_size, sim.IF_curr_exp(), structure=pre_shape)
@@ -144,7 +153,8 @@ class TestAllToAllConnector(BaseTestCase):
                                    (3, 4), 9 * 8, sim.Grid2D(9 / 8))
 
     def do_all_to_all_nd_self_test(
-            self, neurons_per_core, size, shape, self_connect):
+            self, neurons_per_core: Tuple[int, ...], size: int,
+            shape: BaseStructure, self_connect: bool) -> None:
         sim.setup(1.0)
         pop = sim.Population(
             size, sim.IF_curr_exp(), structure=shape)

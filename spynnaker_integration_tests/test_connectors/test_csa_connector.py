@@ -11,8 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from typing import Optional, Tuple, Union
 import numpy
 import csa  # type: ignore[import]
+from pyNN.space import BaseStructure
 from spinnaker_testbase.base_test_case import BaseTestCase
 import pyNN.spiNNaker as p
 
@@ -20,8 +23,11 @@ import pyNN.spiNNaker as p
 class CSAConnectorTest(BaseTestCase):
 
     def do_csa_nd_test(
-            self, neurons_per_core_pre, pre_size, pre_shape,
-            neurons_per_core_post, post_size, post_shape, cset):
+            self, neurons_per_core_pre: Union[int, Tuple[int, ...]],
+            pre_size: int, pre_shape: Optional[BaseStructure],
+            neurons_per_core_post: Union[int, Tuple[int, ...]],
+            post_size: int, post_shape: Optional[BaseStructure],
+            cset: csa.connset.Mask) -> numpy.typing.NDArray:
         p.setup(1.0)
         pre = p.Population(
             pre_size, p.IF_curr_exp(), structure=pre_shape)
