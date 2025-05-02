@@ -221,6 +221,7 @@ class PopulationVertex(
         "__n_colour_bits",
         "__extra_partitions",
         "__n_synapse_cores",
+        "__n_synapse_cores_param",
         "__allow_delay_extensions",
         "__max_delay_ms",
         "__max_delay_slots_available")
@@ -403,6 +404,7 @@ class PopulationVertex(
         self.__extra_partitions = extra_partitions
 
         self.__n_synapse_cores = n_synapse_cores
+        self.__n_synapse_cores_param = n_synapse_cores
         self.__allow_delay_extensions = allow_delay_extensions
         self.__max_delay_ms: Optional[float] = None
         self.__max_delay_slots_available: Optional[int] = None
@@ -725,6 +727,9 @@ class PopulationVertex(
         # Reset the ring buffer shifts as a projection has been added
         SpynnakerDataView.set_requires_mapping()
         self.__max_row_info.clear()
+        self.__max_delay_ms = None
+        self.__max_delay_slots_available = None
+        self.__n_synapse_cores = self.__n_synapse_cores_param
         # pylint: disable=protected-access
         pre_vertex = projection._projection_edge.pre_vertex
         self.__incoming_projections[pre_vertex].append(projection)
