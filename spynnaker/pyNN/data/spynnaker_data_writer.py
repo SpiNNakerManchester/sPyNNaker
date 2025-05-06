@@ -18,6 +18,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.data.fec_data_writer import FecDataWriter
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from .spynnaker_data_view import SpynnakerDataView, _SpynnakerDataModel
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -116,5 +117,4 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
         """
         FecDataWriter.shut_down(self)
         # Clears all previously added ceiling on the number of neurons per core
-        for neuron_type in self.__spy_data._neurons_per_core_set:
-            neuron_type.set_model_max_atoms_per_dimension_per_core()
+        AbstractPyNNModel.reset_all()

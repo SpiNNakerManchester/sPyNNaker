@@ -488,8 +488,7 @@ def set_number_of_neurons_per_core(
             max_perm: Tuple[int, ...] = cast(Tuple[int, ...], max_permitted)
             max_neurons = tuple(int(m) for m in max_perm)
 
-    SpynnakerDataView.set_number_of_neurons_per_dimension_per_core(
-        neuron_type, max_neurons)
+    neuron_type.set_model_max_atoms_per_dimension_per_core(max_neurons)
 
 
 # These methods will defer to PyNN methods if a simulator exists

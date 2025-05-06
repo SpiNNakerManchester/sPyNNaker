@@ -98,6 +98,10 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         return sys.maxsize
 
     @classmethod
+    def reset_all(cls):
+        _max_atoms_per_core = defaultdict(lambda: None)
+
+    @classmethod
     def get_parameter_names(cls) -> Sequence[str]:
         """
         Get the names of the parameters of the model.
