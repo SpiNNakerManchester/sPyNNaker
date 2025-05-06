@@ -11,10 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from typing import Optional, Tuple, Union
+
 import numpy
+from pyNN.space import BaseStructure
 import pyNN.spiNNaker as sim
-from spynnaker.pyNN.exceptions import SpynnakerException
+
 from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.models.projection import Projection
 
 SOURCES = 5
 DESTINATIONS = 10
@@ -22,8 +29,9 @@ DESTINATIONS = 10
 
 class TestFixedNumberPostConnector(BaseTestCase):
 
-    def check_weights(self, projection, connections, with_replacement,
-                      allow_self_connections):
+    def check_weights(
+            self, projection: Projection, connections: int,
+            with_replacement: bool, allow_self_connections: bool) -> None:
         weights = projection.get(["weight"], "list")
         last_source = -1
         last_destination = -1
@@ -44,7 +52,8 @@ class TestFixedNumberPostConnector(BaseTestCase):
         self.assertEqual(connections, count)
 
     def check_self_connect(
-            self, connections, with_replacement, allow_self_connections):
+            self, connections: int, with_replacement: bool,
+            allow_self_connections: bool) -> None:
         sim.setup(1.0)
         pop = sim.Population(DESTINATIONS, sim.IF_curr_exp(), label="pop")
         synapse_type = sim.StaticSynapse(weight=5, delay=1)
@@ -58,7 +67,8 @@ class TestFixedNumberPostConnector(BaseTestCase):
                            allow_self_connections)
         sim.end()
 
-    def check_other_connect(self, connections, with_replacement):
+    def check_other_connect(
+            self, connections: int, with_replacement: bool) -> None:
         sim.setup(1.0)
         pop1 = sim.Population(SOURCES, sim.IF_curr_exp(), label="pop1")
         pop2 = sim.Population(DESTINATIONS, sim.IF_curr_exp(), label="pop2")
@@ -165,8 +175,10 @@ class TestFixedNumberPostConnector(BaseTestCase):
         sim.end()
 
     def do_fixed_number_nd_run(
-            self, neurons_per_core_pre, pre_size, pre_shape,
-            neurons_per_core_post, post_size, post_shape, fixed_n):
+            self, neurons_per_core_pre: Union[int, Tuple[int, ...]],
+            pre_size: int, pre_shape: Optional[BaseStructure],
+            neurons_per_core_post: int, post_size: int,
+            post_shape: Optional[BaseStructure], fixed_n: int) -> None:
         sim.setup(1.0)
         pre = sim.Population(
             pre_size, sim.IF_curr_exp(), structure=pre_shape)
@@ -185,7 +197,8 @@ class TestFixedNumberPostConnector(BaseTestCase):
         assert all(numpy.bincount(conns[:, 0]) == fixed_n)
 
     def do_fixed_number_nd_run_no_self(
-            self, neurons_per_core, size, shape, fixed_n):
+            self, neurons_per_core: Tuple[int, ...], size: int,
+            shape: BaseStructure, fixed_n: int) -> None:
         sim.setup(1.0)
         pop = sim.Population(
             size, sim.IF_curr_exp(), structure=shape)
