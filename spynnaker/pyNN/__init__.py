@@ -41,6 +41,7 @@ from neo import Block
 
 from spinn_utilities.exceptions import SimulatorNotSetupException
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.socket_address import SocketAddress
 
@@ -489,8 +490,11 @@ def set_number_of_neurons_per_core(
             max_perm: Tuple[int, ...] = cast(Tuple[int, ...], max_permitted)
             max_neurons = tuple(int(m) for m in max_perm)
 
-    SpynnakerDataView.set_number_of_neurons_per_dimension_per_core(
-        neuron_type, max_neurons)
+    neuron_type.set_number_of_neurons_per_dimension_per_core(max_neurons)
+    if SpynnakerDataView.get_n_populations() > 0:
+        warn_once(logger,
+                  "set_number_of_neurons_per_core "
+                  "only affects Populations not yet made.")
 
 
 def set_number_of_synapse_cores(
@@ -503,7 +507,11 @@ def set_number_of_synapse_cores(
         The number of synapse cores; 0 to force combined cores, and None to
         allow the system to choose
     """
-    SpynnakerDataView.set_number_of_synapse_cores(neuron_type, n_synapse_cores)
+    neuron_type.set_number_of_synapse_cores(n_synapse_cores)
+    if SpynnakerDataView.get_n_populations() > 0:
+        warn_once(logger,
+                  "set_number_of_synapse_cores "
+                  "only affects Populations not yet made.")
 
 
 def set_allow_delay_extensions(
@@ -514,8 +522,11 @@ def set_allow_delay_extensions(
     :param neuron_type: The model implementation
     :param allow_delay_extensions: Whether to allow delay extensions
     """
-    SpynnakerDataView.set_allow_delay_extensions(
-        neuron_type, allow_delay_extensions)
+    neuron_type.set_allow_delay_extensions(allow_delay_extensions)
+    if SpynnakerDataView.get_n_populations() > 0:
+        warn_once(logger,
+                  "set_allow_delay_extensions "
+                  "only affects Populations not yet made.")
 
 
 # These methods will defer to PyNN methods if a simulator exists

@@ -87,6 +87,13 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         """
         return cls._allow_delay_extensions.get(cls, True)
 
+    @classmethod
+    @overrides(AbstractPyNNModel.reset_all)
+    def reset_all(cls) -> None:
+        super().reset_all()
+        AbstractPyNNNeuronModel._n_synapse_cores.clear()
+        AbstractPyNNNeuronModel._allow_delay_extensions.clear()
+
     def __init__(self, model: AbstractNeuronImpl):
         """
         :param AbstractNeuronImpl model: The model implementation

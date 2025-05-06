@@ -87,6 +87,13 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         # Otherwise return the absolute maximum assuming 1D
         return (cls.absolute_max_atoms_per_core, )
 
+    @classmethod
+    def reset_all(cls) -> None:
+        """
+        Reset the maximum values for all classes.
+        """
+        AbstractPyNNModel._max_atoms_per_core.clear()
+
     @classproperty
     def absolute_max_atoms_per_core(  # pylint: disable=no-self-argument
             cls) -> int:
