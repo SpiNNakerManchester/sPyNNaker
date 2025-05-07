@@ -20,9 +20,9 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.data.fec_data_writer import FecDataWriter
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from .spynnaker_data_view import SpynnakerDataView, _SpynnakerDataModel
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import AbstractPyNNNeuronModel
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
+from .spynnaker_data_view import SpynnakerDataView, _SpynnakerDataModel
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access

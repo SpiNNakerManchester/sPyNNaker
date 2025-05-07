@@ -490,7 +490,7 @@ def set_number_of_neurons_per_core(
             max_perm: Tuple[int, ...] = cast(Tuple[int, ...], max_permitted)
             max_neurons = tuple(int(m) for m in max_perm)
 
-    neuron_type.set_number_of_neurons_per_dimension_per_core(max_neurons)
+    neuron_type.set_model_max_atoms_per_dimension_per_core(max_neurons)
     if SpynnakerDataView.get_n_populations() > 0:
         warn_once(logger,
                   "set_number_of_neurons_per_core "
@@ -507,7 +507,7 @@ def set_number_of_synapse_cores(
         The number of synapse cores; 0 to force combined cores, and None to
         allow the system to choose
     """
-    neuron_type.set_number_of_synapse_cores(n_synapse_cores)
+    neuron_type.set_model_n_synapse_cores(n_synapse_cores)
     if SpynnakerDataView.get_n_populations() > 0:
         warn_once(logger,
                   "set_number_of_synapse_cores "
@@ -522,7 +522,7 @@ def set_allow_delay_extensions(
     :param neuron_type: The model implementation
     :param allow_delay_extensions: Whether to allow delay extensions
     """
-    neuron_type.set_allow_delay_extensions(allow_delay_extensions)
+    neuron_type.set_model_allow_delay_extensions(allow_delay_extensions)
     if SpynnakerDataView.get_n_populations() > 0:
         warn_once(logger,
                   "set_allow_delay_extensions "

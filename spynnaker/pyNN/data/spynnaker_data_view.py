@@ -24,7 +24,6 @@ from spynnaker import _version
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.populations import Population
-    from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access
