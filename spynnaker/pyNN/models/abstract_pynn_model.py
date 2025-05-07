@@ -41,6 +41,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
 
     @classmethod
     def verify_may_set(cls, method: str) -> bool:
+        SpynnakerDataView.check_user_can_act()
         if SpynnakerDataView.get_n_populations() == 0:
             return
         raise SpynnakerException(

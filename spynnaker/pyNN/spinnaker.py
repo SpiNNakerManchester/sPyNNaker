@@ -53,8 +53,8 @@ from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_selector)
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
-
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -125,6 +125,10 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             db.insert_version("quantities_version", quantities_version)
             db.insert_version("neo_version", neo_version)
             db.insert_version("lazyarray_version", lazyarray_version)
+
+        # Clears all previously added ceiling on the number of neurons per core
+        AbstractPyNNModel.reset_all()
+
 
     @property
     def __writer(self) -> SpynnakerDataWriter:
