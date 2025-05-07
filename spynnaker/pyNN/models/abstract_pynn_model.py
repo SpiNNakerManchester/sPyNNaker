@@ -42,6 +42,14 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
 
     @classmethod
     def verify_may_set(cls, param: str) -> bool:
+        """ If a Population has been created, this method will raise an
+            exception; used to avoid setting global limits after a Population
+            has been created.
+
+        :param str param:
+            The parameter name that can be used to set the value being changed
+            in the Population constructor instead.
+        """
         SpynnakerDataView.check_user_can_act()
         if SpynnakerDataView.get_n_populations() == 0:
             return
