@@ -41,7 +41,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         lambda: None)
 
     @classmethod
-    def verify_may_set(cls, param: str) -> bool:
+    def verify_may_set(cls, param: str) -> None:
         """ If a Population has been created, this method will raise an
             exception; used to avoid setting global limits after a Population
             has been created.
