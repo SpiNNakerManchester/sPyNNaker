@@ -129,7 +129,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # Clears all previously added ceiling on the number of neurons per core
         AbstractPyNNModel.reset_all()
 
-
     @property
     def __writer(self) -> SpynnakerDataWriter:
         return cast(SpynnakerDataWriter, self._data_writer)
