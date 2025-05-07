@@ -111,7 +111,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
 
     @classmethod
     def reset_all(cls):
-        _max_atoms_per_core = defaultdict(lambda: None)
+        AbstractPyNNModel._max_atoms_per_core = defaultdict(lambda: None)
 
     @classmethod
     def get_parameter_names(cls) -> Sequence[str]:
