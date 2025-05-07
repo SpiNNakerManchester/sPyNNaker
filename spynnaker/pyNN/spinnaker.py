@@ -43,6 +43,8 @@ from spynnaker import _version
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import setup_configs
 from spynnaker.pyNN.models.recorder import Recorder
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.extra_algorithms import (
@@ -125,6 +127,12 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             db.insert_version("quantities_version", quantities_version)
             db.insert_version("neo_version", neo_version)
             db.insert_version("lazyarray_version", lazyarray_version)
+
+        # Clears all previously added ceiling on the number of neurons per core
+        AbstractPyNNModel.reset_all()
+        # Clears all previously added ceiling on the number of synapse cores
+        # and allowing of delay extensions
+        AbstractPyNNNeuronModel.reset_all()
 
     @property
     def __writer(self) -> SpynnakerDataWriter:

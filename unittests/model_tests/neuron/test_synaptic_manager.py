@@ -452,7 +452,6 @@ def test_pop_based_master_pop_table_standard(
     post_pop = p.Population(
         256, p.IF_curr_exp(), label="Post",
         splitter=SplitterPopulationVertexFixed())
-    p.IF_curr_exp.set_model_max_atoms_per_dimension_per_core(neurons_per_core)
     pre_pop = p.Population(
         n_pre_neurons, p.IF_curr_exp(), label="Pre",
         splitter=SplitterPopulationVertexFixed())

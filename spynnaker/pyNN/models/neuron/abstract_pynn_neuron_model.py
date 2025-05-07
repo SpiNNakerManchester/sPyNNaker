@@ -62,6 +62,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             The number of synapse cores; 0 to force combined cores, and None to
             allow the system to choose
         """
+        cls.verify_may_set(param="n_synapse_cores")
         cls._n_synapse_cores[cls] = n_synapse_cores
 
     @classmethod
@@ -78,6 +79,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
 
         :param allow: Whether to allow delay extensions
         """
+        cls.verify_may_set(param="allow_delay_extensions")
         cls._allow_delay_extensions[cls] = allow
 
     @classmethod
