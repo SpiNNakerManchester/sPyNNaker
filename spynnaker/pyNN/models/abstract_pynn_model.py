@@ -44,7 +44,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         if SpynnakerDataView.get_n_populations() == 0:
             return
         raise SpynnakerException(
-            f"Global {method} is not supported after a Population has been "
+            f"Global set is not supported after a Population has been "
             f"created. Either move it above the creation of the Populations "
             f"or call {method} on each Population it applies to.")
 
