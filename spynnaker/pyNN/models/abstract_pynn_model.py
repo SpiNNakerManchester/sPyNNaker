@@ -21,6 +21,8 @@ from pyNN import descriptions
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod)
+
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.defaults import AbstractProvidesDefaults
 from spynnaker.pyNN.exceptions import SpynnakerException
 if TYPE_CHECKING:
@@ -38,6 +40,15 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         lambda: None)
 
     @classmethod
+    def verify_may_set(cls, method: str) -> bool:
+        if SpynnakerDataView.get_n_populations() == 0:
+            return
+        raise SpynnakerException(
+            f"Global {method} is not supported after a Population has been "
+            f"created. Either move it above the creation of the Populations "
+            f"or call {method} on each Population it applies to.")
+
+    @classmethod
     def set_model_max_atoms_per_dimension_per_core(
             cls, n_atoms: Union[None, int, Tuple[int, ...]] = None) -> None:
         """
@@ -53,6 +64,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
 
         :param n_atoms: The new maximum, or `None` for the largest possible
         """
+        cls.verify_may_set(method="set_number_of_neurons_per_core")
         abs_max = cls.absolute_max_atoms_per_core
         if n_atoms is None:
             AbstractPyNNModel._max_atoms_per_core[cls] = None

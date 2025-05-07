@@ -13,16 +13,13 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-from typing import (
-    Iterator, Optional, Set, Tuple, Type, Union, TYPE_CHECKING)
+from typing import Iterator, Optional, Set, Tuple, TYPE_CHECKING
 
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.logger_utils import warn_once
 
 from spinn_front_end_common.data import FecDataView
 
 from spynnaker import _version
-from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
