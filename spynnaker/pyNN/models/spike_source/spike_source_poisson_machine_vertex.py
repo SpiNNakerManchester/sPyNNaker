@@ -258,6 +258,9 @@ class SpikeSourcePoissonMachineVertex(
     def set_sdram_partition(
             self,
             sdram_partition: SourceSegmentedSDRAMMachinePartition) -> None:
+        if self.__sdram_partition is not None:
+            raise SynapticConfigurationException(
+                "Cannot set SDRAM partition again")
         self.__sdram_partition = sdram_partition
 
     @property

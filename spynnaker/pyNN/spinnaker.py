@@ -128,10 +128,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             db.insert_version("neo_version", neo_version)
             db.insert_version("lazyarray_version", lazyarray_version)
 
-        # Clears all previously added ceiling on the number of neurons per core
-        AbstractPyNNModel.reset_all()
-        # Clears all previously added ceiling on the number of synapse cores
-        # and allowing of delay extensions
+        # Clears all previously added ceiling on the number of neurons per
+        # core, the number of synapse cores and allowing of delay extensions
         AbstractPyNNNeuronModel.reset_all()
 
     @property

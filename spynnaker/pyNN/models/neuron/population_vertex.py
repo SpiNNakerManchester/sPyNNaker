@@ -136,10 +136,6 @@ _EXTRA_RECORDABLE_UNITS = {NeuronRecorder.SPIKES: "",
                            NeuronRecorder.PACKETS: "",
                            NeuronRecorder.REWIRING: ""}
 
-# The number of non-synapse cores that are likely needed (neuron core +
-# extra monitor in general)
-_N_OTHER_CORES = 2
-
 
 def _all_gen(rd: RangeDictionary) -> bool:
     """
@@ -260,41 +256,35 @@ class PopulationVertex(
             seed: Optional[int], n_colour_bits: Optional[int],
             extra_partitions: Optional[List[str]] = None):
         """
-        :param int n_neurons: The number of neurons in the population
-        :param str label: The label on the population
-        :param int max_atoms_per_core:
+        :param n_neurons: The number of neurons in the population
+        :param label: The label on the population
+        :param max_atoms_per_core:
             The maximum number of atoms (neurons) per SpiNNaker core.
         :param n_synapse_cores:
             The number of synapse cores to use: 0 for combined core,
             or None for automatic determination
-        :type n_synapse_cores: int or None
-        :param bool allow_delay_extensions:
+        :param allow_delay_extensions:
             Whether delay extensions should be allowed or not
         :param spikes_per_second: Expected spike rate
-        :type spikes_per_second: float or None
         :param ring_buffer_sigma:
             How many SD above the mean to go for upper bound of ring buffer
             size; a good starting choice is 5.0. Given length of simulation
             we can set this for approximate number of saturation events.
-        :type ring_buffer_sigma: float or None
         :param max_expected_summed_weight:
             The maximum expected summed weights for each synapse type.
         :param incoming_spike_buffer_size:
-        :type incoming_spike_buffer_size: int or None
-        :param bool drop_late_spikes: control flag for dropping late packets.
-        :param AbstractNeuronImpl neuron_impl:
+        :param drop_late_spikes: control flag for dropping late packets.
+        :param neuron_impl:
             The (Python side of the) implementation of the neurons themselves.
-        :param AbstractPyNNNeuronModel pynn_model:
+        :param pynn_model:
             The PyNN neuron model that this vertex is working on behalf of.
         :param splitter: splitter object
-        :type splitter: SplitterPopulationVertex or None
         :param seed:
             The Population seed, used to ensure the same random generation
             on each run.
-        :param int n_colour_bits: The number of colour bits to use
+        :param n_colour_bits: The number of colour bits to use
         :param extra_partitions:
             Extra partitions that are to be sent by the vertex
-        :type extra_partitions: list(str) or None
         """
         # pylint: disable=too-many-arguments
         super().__init__(label, max_atoms_per_core, splitter)
@@ -376,7 +366,7 @@ class PopulationVertex(
         self.__incoming_projections: Dict[
             PopulationApplicationVertex, List[Projection]] = defaultdict(list)
         self.__incoming_poisson_projections: Dict[
-            SpikeSourcePoissonVertex, Projection] = dict()
+            SpikeSourcePoissonVertex, Projection] = defaultdict(list)
         self.__max_row_info: Dict[
             Tuple[ProjectionApplicationEdge, SynapseInformation, int],
             MaxRowInfo] = dict()
@@ -508,10 +498,27 @@ class PopulationVertex(
         """
         # If we can't use a combined core, use a split core
         if not self.__synapse_dynamics.is_combined_core_capable:
+            if not self.__synapse_dynamics.is_split_core_capable:
+                raise SynapticConfigurationException(
+                    f"The synapse dynamics {self.__synapse_dynamics} cannot"
+                    " work on a split or a combined core! Fix the dynamics or"
+                    " replace with one that works.")
+            if (self.__n_synapse_cores is not None and
+                    self.__n_synapse_cores == 0):
+                raise SynapticConfigurationException(
+                    f"The synapse dynamics {self.__synapse_dynamics} must be"
+                    " run using a synapse core separate from a neuron core."
+                    " Please set the number of synapse cores to 1 or greater.")
             return False
 
         # If we can't use a split core, use a combined core
         if not self.__synapse_dynamics.is_split_core_capable:
+            if (self.__n_synapse_cores is not None and
+                    self.__n_synapse_cores > 0):
+                raise SynapticConfigurationException(
+                    f"The synapse dynamics {self.__synapse_dynamics} must be"
+                    " run using a combined synapse-neuron core."
+                    " Please set the number of synapse cores to 0.")
             return True
 
         # If the user has chosen to have a synapse core, add one
@@ -537,20 +544,19 @@ class PopulationVertex(
 
         :rtype: int
         """
-        self.__update_n_synapse_cores()
-        assert self.__n_synapse_cores is not None
-        return self.__n_synapse_cores
+        return self.__update_n_synapse_cores()
 
-    def __update_n_synapse_cores(self) -> None:
+    def __update_n_synapse_cores(self) -> int:
         if self.__n_synapse_cores is not None:
-            return
+            return self.__n_synapse_cores
         version = SpynnakerDataView().get_machine_version()
+        n_monitors = SpynnakerDataView().get_all_monitor_cores()
 
         # The maximum number of cores minus 1 for the neuron core, and minus
-        # 1 for extra monitor
+        # the number of monitors
         max_n_cores: int = (
             version.max_cores_per_chip -
-            (version.n_scamp_cores + _N_OTHER_CORES))
+            (version.n_scamp_cores + n_monitors + 1))
 
         # So how many synapses can be processed accounting for timescale?
         synapses_per_core_per_sim_second: float = (
@@ -601,26 +607,27 @@ class PopulationVertex(
         # lets recommend this
         if n_synapse_cores + n_poisson_cores < max_n_cores:
             self.__n_synapse_cores = n_synapse_cores
-        else:
+            return n_synapse_cores
 
-            # Otherwise, we should consider how many more cores we need for the
-            # Poisson input spikes
-            n_synapse_cores = math.ceil(
-                (synapses_per_second + poisson_synapses_per_second) /
-                synapses_per_core_per_sim_second)
+        # Otherwise, we should consider how many more cores we need for the
+        # Poisson input spikes
+        n_synapse_cores = math.ceil(
+            (synapses_per_second + poisson_synapses_per_second) /
+            synapses_per_core_per_sim_second)
 
-            # If the number of cores needed is more than the maximum, use the
-            # maximum
-            self.__n_synapse_cores = min(max_n_cores, n_synapse_cores)
+        # If the number of cores needed is more than the maximum, use the
+        # maximum
+        self.__n_synapse_cores = min(max_n_cores, n_synapse_cores)
+        assert self.__n_synapse_cores is not None
+        return self.__n_synapse_cores
 
     @property
     def max_delay_steps(self) -> int:
         """
         The maximum number of delay steps supported on a core.
         """
-        self.__update_max_delay()
-        assert self.__max_delay_slots_available is not None
-        return self.__max_delay_slots_available
+        _max_delay_ms, max_delay_slots_available = self.__update_max_delay()
+        return max_delay_slots_available
 
     @property
     def max_delay_steps_incoming(self) -> int:
@@ -628,13 +635,11 @@ class PopulationVertex(
         The maximum delay steps needed to handle incoming synapses,
         accounting for delay extensions.
         """
-        self.__update_max_delay()
-        assert self.__max_delay_ms is not None
-        assert self.__max_delay_slots_available is not None
+        max_delay_ms, max_delay_slots_available = self.__update_max_delay()
         max_incoming_slots = 2 ** get_n_bits(math.ceil(
-            self.__max_delay_ms /
+            max_delay_ms /
             SpynnakerDataView().get_simulation_time_step_ms()))
-        return min(max_incoming_slots, self.__max_delay_slots_available)
+        return min(max_incoming_slots, max_delay_slots_available)
 
     @property
     def allow_delay_extension(self) -> bool:
@@ -644,17 +649,17 @@ class PopulationVertex(
         if not self.__allow_delay_extensions:
             return False
         # Determine if we *expect* a delay extension; if not disallow
-        self.__update_max_delay()
-        assert self.__max_delay_ms is not None
-        assert self.__max_delay_slots_available is not None
+        max_delay_ms, max_delay_slots_available = self.__update_max_delay()
         delay_available_ms = (
-            self.__max_delay_slots_available *
+            max_delay_slots_available *
             SpynnakerDataView().get_simulation_time_step_ms())
-        return delay_available_ms < self.__max_delay_ms
+        return delay_available_ms < max_delay_ms
 
-    def __update_max_delay(self) -> None:
+    def __update_max_delay(self) -> Tuple[float, int]:
         if self.__max_delay_ms is not None:
-            return
+            # Can't have one without the other
+            assert self.__max_delay_slots_available is not None
+            return self.__max_delay_ms, self.__max_delay_slots_available
 
         # Find the maximum delay from incoming synapses
         self.__max_delay_ms = 0
@@ -670,6 +675,8 @@ class PopulationVertex(
         n_synapse_bits = get_n_bits(self.neuron_impl.get_n_synapse_types())
         n_delay_bits = MAX_RING_BUFFER_BITS - (n_atom_bits + n_synapse_bits)
         self.__max_delay_slots_available = 2 ** n_delay_bits
+
+        return self.__max_delay_ms, self.__max_delay_slots_available
 
     def _is_direct_poisson(self, pre_vertex: PopulationApplicationVertex,
                            projs: List[Projection]) -> bool:
@@ -736,12 +743,7 @@ class PopulationVertex(
         if pre_vertex == self:
             self.__self_projection = projection
         if isinstance(pre_vertex, SpikeSourcePoissonVertex):
-            # Only keep these when there is only one projection to this
-            # vertex, as otherwise not interesting
-            if pre_vertex not in self.__incoming_poisson_projections:
-                self.__incoming_poisson_projections[pre_vertex] = projection
-            else:
-                del self.__incoming_poisson_projections[pre_vertex]
+            self.__incoming_poisson_projections[pre_vertex].append(projection)
 
     @property
     def self_projection(self) -> Optional[Projection]:
@@ -1773,12 +1775,11 @@ class PopulationVertex(
     def incoming_poisson_projections(self) -> Sequence[Projection]:
         """
         The projections that target this population vertex which
-        originate from a Poisson source.
+        originate from a Poisson source which has only one outgoing projection
         """
         # Filter to just those that have one outgoing projection
-        iterator = self.__incoming_poisson_projections.items()
-        return [proj for pre_vertex, proj in iterator
-                if len(pre_vertex.outgoing_projections) == 1]
+        iterator = self.__incoming_poisson_projections.values()
+        return [projs[0] for projs in iterator if len(projs) == 1]
 
     @property
     def pop_seed(self) -> Sequence[int]:

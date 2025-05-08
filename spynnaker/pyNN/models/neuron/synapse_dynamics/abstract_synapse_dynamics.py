@@ -414,6 +414,9 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     @abstractmethod
     def synapses_per_second(self) -> int:
         """
-        Approximate number of synapses that can be processed per second
+        Approximate number of synapses that can be processed per second;
+        ideally as close to the truth as possible, but underestimate would
+        be ok.  Overestimation would potentially mean having to handle more
+        spikes than is possible, so overruns would occur.
         """
         raise NotImplementedError
