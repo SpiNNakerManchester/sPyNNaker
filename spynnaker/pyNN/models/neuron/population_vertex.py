@@ -676,6 +676,7 @@ class PopulationVertex(
         n_delay_bits = MAX_RING_BUFFER_BITS - (n_atom_bits + n_synapse_bits)
         self.__max_delay_slots_available = 2 ** n_delay_bits
 
+        assert self.__max_delay_slots_available is not None
         return self.__max_delay_ms, self.__max_delay_slots_available
 
     def _is_direct_poisson(self, pre_vertex: PopulationApplicationVertex,
