@@ -366,7 +366,7 @@ class PopulationVertex(
         self.__incoming_projections: Dict[
             PopulationApplicationVertex, List[Projection]] = defaultdict(list)
         self.__incoming_poisson_projections: Dict[
-            SpikeSourcePoissonVertex, Projection] = defaultdict(list)
+            SpikeSourcePoissonVertex, List[Projection]] = defaultdict(list)
         self.__max_row_info: Dict[
             Tuple[ProjectionApplicationEdge, SynapseInformation, int],
             MaxRowInfo] = dict()
