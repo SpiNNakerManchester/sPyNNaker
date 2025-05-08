@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy
+from pyNN.space import BaseStructure
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 
@@ -60,8 +62,10 @@ class TestFromListConnectorMixed(BaseTestCase):
         self.runsafe(self.do_run)
 
     def do_list_nd_run(
-            self, neurons_per_core_pre, pre_size, pre_shape,
-            neurons_per_core_post, post_size, post_shape):
+            self, neurons_per_core_pre: Tuple[int, ...], pre_size: int,
+            pre_shape: BaseStructure,
+            neurons_per_core_post: Union[int, Tuple[int, ...]],
+            post_size: int, post_shape: Optional[BaseStructure]) -> None:
         random_conns = numpy.random.randint(
             0, (pre_size, post_size), (100, 2))
         sim.setup(1.0)
@@ -80,10 +84,7 @@ class TestFromListConnectorMixed(BaseTestCase):
         sim.end()
 
         _nrows, ncols = conns.shape
-        dtype = {'names': ['f{}'.format(i) for i in range(ncols)],
-                 'formats': ncols * [conns.dtype]}
-
-        diff = numpy.setdiff1d(conns.view(dtype), random_conns.view(dtype))
+        diff = numpy.setdiff1d(conns, random_conns)
 
         assert len(diff) == 0
 
