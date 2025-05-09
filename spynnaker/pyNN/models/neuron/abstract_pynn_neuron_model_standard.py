@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, cast, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, cast, TYPE_CHECKING, Union, Tuple
 
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
-from .abstract_pynn_neuron_model import (
+from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
     AbstractPyNNNeuronModel, _population_parameters as APNM_default_params)
 
 if TYPE_CHECKING:
@@ -27,9 +27,9 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
     from spynnaker.pyNN.models.neuron.threshold_types import (
         AbstractThresholdType)
-    from .population_vertex import PopulationVertex
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
         SplitterPopulationVertex)
+    from .population_vertex import PopulationVertex
 
 _population_parameters: Dict[str, Any] = dict(APNM_default_params)
 _population_parameters["n_steps_per_timestep"] = 1
@@ -79,7 +79,10 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
-            n_steps_per_timestep: int = 1) -> PopulationVertex:
+            n_steps_per_timestep: int = 1,
+            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
+            n_synapse_cores: Optional[int] = None,
+            allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
         """
         :param int n_steps_per_timestep:
         """
@@ -93,4 +96,6 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             max_expected_summed_weight=max_expected_summed_weight,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
             drop_late_spikes=drop_late_spikes,
-            splitter=splitter, seed=seed, n_colour_bits=n_colour_bits)
+            splitter=splitter, seed=seed, n_colour_bits=n_colour_bits,
+            neurons_per_core=neurons_per_core, n_synapse_cores=n_synapse_cores,
+            allow_delay_extensions=allow_delay_extensions)

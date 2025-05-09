@@ -223,6 +223,17 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
+    @property
+    @abstractmethod
+    def is_split_core_capable(self) -> bool:
+        """
+        Whether the synapse dynamics can run on a core split from
+        the neuron, or if only a combined core is possible.
+
+        :rtype: bool
+        """
+        raise NotImplementedError
+
     def get_value(self, key: str) -> Any:
         """
         Get a property.
@@ -398,3 +409,14 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         # By default, just ask the connector
         synapse_info.connector.validate_connection(
             application_edge, synapse_info)
+
+    @property
+    @abstractmethod
+    def synapses_per_second(self) -> int:
+        """
+        Approximate number of synapses that can be processed per second;
+        ideally as close to the truth as possible, but underestimate would
+        be OK.  Overestimation would potentially mean having to handle more
+        spikes than is possible, so overruns would occur.
+        """
+        raise NotImplementedError

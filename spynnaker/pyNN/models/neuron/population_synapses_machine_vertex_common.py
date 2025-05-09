@@ -177,17 +177,10 @@ class PopulationSynapsesMachineVertexCommon(
         self.__neuron_vertex: Optional[PopulationNeuronsMachineVertex] = None
         self.__partition_id: Optional[str] = None
 
+    @overrides(SendsSynapticInputsOverSDRAM.set_sdram_partition)
     def set_sdram_partition(
             self,
             sdram_partition: SourceSegmentedSDRAMMachinePartition) -> None:
-        """
-        Set the SDRAM partition.  Must only be called once per instance.
-
-        :param sdram_partition:
-            The SDRAM partition to receive synapses from
-        :type sdram_partition:
-            ~pacman.model.graphs.machine.SourceSegmentedSDRAMMachinePartition
-        """
         if self.__sdram_partition is not None:
             raise SynapticConfigurationException(
                 "Trying to set SDRAM partition more than once")

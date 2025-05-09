@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import pyNN.spiNNaker as sim
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPoissonDelegate, SplitterPopulationVertexNeuronsSynapses)
-from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from spinnaker_testbase import BaseTestCase
 import numpy
 
@@ -26,23 +23,21 @@ def run_simple_split() -> None:
     sim.set_number_of_neurons_per_core(sim.SpikeSourcePoisson, 10)
 
     one_to_one_source = sim.Population(
-        50, sim.SpikeSourcePoisson(rate=10000), additional_parameters={
-            "seed": 0,
-            "splitter": SplitterPoissonDelegate()})
+        50, sim.SpikeSourcePoisson(rate=10000), seed=0, label="one_to_one_src")
     rand_source = sim.Population(
-        50, sim.SpikeSourcePoisson(rate=10), additional_parameters={
-            "seed": 1,
-            "splitter": SplitterFixedLegacy()})
+        50, sim.SpikeSourcePoisson(rate=10), seed=1, label="rand_source")
     rand_source.record("spikes")
-    target = sim.Population(
-        50, sim.IF_curr_exp(), additional_parameters={
-            "splitter": SplitterPopulationVertexNeuronsSynapses(3)})
+    target = sim.Population(50, sim.IF_curr_exp(), n_synapse_cores=3)
     target.record(["spikes", "packets-per-timestep"])
+    target_2 = sim.Population(50, sim.IF_curr_exp(), n_synapse_cores=3)
     sim.Projection(
         one_to_one_source, target, sim.OneToOneConnector(),
         sim.StaticSynapse(weight=0.01))
     sim.Projection(
         rand_source, target, sim.OneToOneConnector(),
+        sim.StaticSynapse(weight=2.0))
+    sim.Projection(
+        rand_source, target_2, sim.OneToOneConnector(),
         sim.StaticSynapse(weight=2.0))
 
     sim.run(1000)

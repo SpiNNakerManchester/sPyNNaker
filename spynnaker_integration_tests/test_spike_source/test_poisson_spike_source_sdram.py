@@ -20,7 +20,7 @@ import numpy
 
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPoissonDelegate, SplitterPopulationVertexNeuronsSynapses)
+    SplitterPoissonDelegate)
 from spynnaker.pyNN.models.neuron import PopulationVertex
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.models.projection import Projection
@@ -87,7 +87,7 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
                        delay: float=1.0) -> Tuple[Population, Projection]:
         pop_1 = sim.Population(
             n_neurons, sim.IF_curr_delta(**PARAMS), label='pop_1',
-            splitter=SplitterPopulationVertexNeuronsSynapses(1))
+            n_synapse_cores=1)
         pop_1.initialize(v=0)
         pop_1.record("v")
         proj = sim.Projection(

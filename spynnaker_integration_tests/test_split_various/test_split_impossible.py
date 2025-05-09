@@ -13,21 +13,24 @@
 # limitations under the License.
 import pyNN.spiNNaker as sim
 import pytest
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPopulationVertexNeuronsSynapses)
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.exceptions import (
+    SynapticConfigurationException, DelayExtensionException)
 from spinnaker_testbase import BaseTestCase
 
 
 def mission_impossible() -> None:
     sim.setup(0.1, time_scale_factor=1)
+    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 128)
+    sim.set_number_of_synapse_cores(sim.IF_curr_exp, 1)
+    sim.set_allow_delay_extensions(sim.IF_curr_exp, False)
 
     # Can't do that many neurons and delays together
-    sim.Population(128, sim.IF_curr_exp(), additional_parameters={
-        "splitter": SplitterPopulationVertexNeuronsSynapses(
-            1, 128, False)})
+    pre = sim.Population(1, sim.SpikeSourcePoisson(rate=10))
+    post = sim.Population(128, sim.IF_curr_exp())
+    sim.Projection(pre, post, sim.OneToOneConnector(),
+                   sim.StaticSynapse(weight=5.0, delay=12.8))
 
-    with pytest.raises(SynapticConfigurationException):
+    with pytest.raises(DelayExtensionException):
         sim.run(100)
 
 
@@ -36,9 +39,7 @@ def mission_impossible_2() -> None:
 
     # Can't do structural on multiple synapse cores
     source = sim.Population(1, sim.SpikeSourcePoisson(rate=10))
-    pop = sim.Population(128, sim.IF_curr_exp(), additional_parameters={
-        "splitter": SplitterPopulationVertexNeuronsSynapses(
-            2)})
+    pop = sim.Population(128, sim.IF_curr_exp(), n_synapse_cores=2)
 
     sim.Projection(source, pop, sim.FromListConnector([]),
                    sim.StructuralMechanismStatic(

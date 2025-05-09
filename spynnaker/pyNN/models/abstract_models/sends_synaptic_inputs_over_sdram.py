@@ -12,10 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from pacman.model.graphs import AbstractSupportsSDRAMEdges
+from pacman.model.graphs.machine import (
+    SourceSegmentedSDRAMMachinePartition)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 # pylint: disable=abstract-method
-class SendsSynapticInputsOverSDRAM(AbstractSupportsSDRAMEdges):
+class SendsSynapticInputsOverSDRAM(
+        AbstractSupportsSDRAMEdges, metaclass=AbstractBase):
     """
-    A marker interface for an object that sends synaptic inputs over SDRAM.
+    An object that sends synaptic inputs over SDRAM.
     """
+
+    @abstractmethod
+    def set_sdram_partition(
+            self,
+            sdram_partition: SourceSegmentedSDRAMMachinePartition) -> None:
+        """
+        Set the SDRAM partition.  Must only be called once per instance.
+
+        :param sdram_partition:
+            The SDRAM partition to receive synapses from
+        :type sdram_partition:
+            ~pacman.model.graphs.machine.SourceSegmentedSDRAMMachinePartition
+        """
+        raise NotImplementedError

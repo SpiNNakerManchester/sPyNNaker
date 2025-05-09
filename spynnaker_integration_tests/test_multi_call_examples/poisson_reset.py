@@ -13,18 +13,16 @@
 # limitations under the License.
 import pyNN.spiNNaker as sim
 from spinn_front_end_common.data.fec_data_view import FecDataView
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPopulationVertexNeuronsSynapses)
 
 
 def test_possion_reset() -> None:
     """ Check that DSG still does the right thing after reset
     """
     sim.setup(1.0)
+    sim.set_number_of_synapse_cores(sim.IF_curr_exp, 1)
     noise = sim.Population(100, sim.SpikeSourcePoisson(
         rate=10.0), label="Noise")
-    pop = sim.Population(100, sim.IF_curr_exp(), additional_parameters={
-        "splitter": SplitterPopulationVertexNeuronsSynapses()})
+    pop = sim.Population(100, sim.IF_curr_exp())
     sim.Projection(noise, pop, sim.OneToOneConnector(), sim.StaticSynapse(1.0))
 
     sim.run(1000)
