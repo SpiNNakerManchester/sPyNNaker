@@ -213,6 +213,11 @@ class MockSynapseDynamics(AbstractSynapseDynamics):
     def is_combined_core_capable(self) -> bool:
         raise NotImplementedError
 
+    @property
+    @overrides(AbstractSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        raise NotImplementedError
+
 
 class MockConnector(AbstractConnector):
 
