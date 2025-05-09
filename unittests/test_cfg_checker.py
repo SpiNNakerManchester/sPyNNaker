@@ -14,7 +14,7 @@
 
 import os
 import unittest
-from spinn_utilities.config_holder import run_config_checks
+from spinn_utilities.configs.config_checker import ConfigChecker
 import spynnaker
 from spynnaker.pyNN.config_setup import unittest_setup
 
@@ -29,6 +29,4 @@ class TestCfgChecker(unittest.TestCase):
         parent = os.path.dirname(unittests)
         spynnaker_dir = spynnaker.__path__[0]
         spynnaker_it = os.path.join(parent, "spynnaker_integration_tests")
-        run_config_checks(
-            directories=[spynnaker_dir, spynnaker_it, unittests],
-            special_nones=("info", "debug"))
+        ConfigChecker([spynnaker_dir, spynnaker_it, unittests]).check()
