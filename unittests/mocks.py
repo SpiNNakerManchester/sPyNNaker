@@ -182,6 +182,8 @@ class MockApvVertex(PopulationVertex):
         super().__init__(
             n_neurons=n_neurons, label=label,
             max_atoms_per_core=max_atoms_per_core,
+            n_synapse_cores=None,
+            allow_delay_extensions=True,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             max_expected_summed_weight=max_expected_summed_weight,
