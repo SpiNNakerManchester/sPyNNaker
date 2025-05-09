@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from __future__ import annotations
+import math
 from typing import (
     cast, Dict, Iterable, List, Sequence, Tuple, Union, TYPE_CHECKING)
 
@@ -517,3 +518,13 @@ class SynapseDynamicsStructuralCommon(
                         self.p_rew * MICRO_TO_SECOND_CONVERSION))
 
         return max_rewires_per_ts
+
+    @property
+    def reduction_synapses_per_second(self) -> int:
+        """
+        Approximate fewer number of synapses that can be processed per second
+        as a result of rewiring cycles used.
+        """
+        # Guess that each rewiring attempt takes the same as 17 synapses,
+        # based on ~250 cycles per rewiring attempt, and 15 cycles per synapse
+        return math.ceil(17 * self.f_rew)

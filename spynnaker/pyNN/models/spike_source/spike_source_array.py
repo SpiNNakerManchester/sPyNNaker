@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
+from typing import Optional, Union, Tuple
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
@@ -25,7 +25,7 @@ class SpikeSourceArray(AbstractPyNNModel):
     Model that creates a Spike Source Array Vertex
     """
     default_population_parameters = {
-        "splitter": None, "n_colour_bits": None}
+        "splitter": None, "n_colour_bits": None, "neurons_per_core": None}
 
     def __init__(self, spike_times: Optional[Spikes] = None):
         if spike_times is None:
@@ -37,6 +37,7 @@ class SpikeSourceArray(AbstractPyNNModel):
     def create_vertex(
             self, n_neurons: int, label: str, *,
             splitter: Optional[AbstractSplitterCommon] = None,
+            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
             n_colour_bits: Optional[int] = None) -> SpikeSourceArrayVertex:
         """
         :param splitter:
@@ -45,10 +46,12 @@ class SpikeSourceArray(AbstractPyNNModel):
         :param int n_colour_bits:
         """
         # pylint: disable=arguments-differ
-        max_atoms = self.get_model_max_atoms_per_dimension_per_core()
+        if neurons_per_core is None:
+            neurons_per_core = \
+                self.get_model_max_atoms_per_dimension_per_core()
         return SpikeSourceArrayVertex(
-            n_neurons, self.__spike_times, label, max_atoms, self, splitter,
-            n_colour_bits)
+            n_neurons, self.__spike_times, label, neurons_per_core, self,
+            splitter, n_colour_bits)
 
     @property
     def _spike_times(self) -> Spikes:

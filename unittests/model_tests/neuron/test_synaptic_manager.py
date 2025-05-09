@@ -451,13 +451,10 @@ def test_pop_based_master_pop_table_standard(
     # a single vertex
     post_pop = p.Population(
         256, p.IF_curr_exp(), label="Post",
-        additional_parameters={
-            "splitter": SplitterPopulationVertexFixed()})
-    p.IF_curr_exp.set_model_max_atoms_per_dimension_per_core(neurons_per_core)
+        splitter=SplitterPopulationVertexFixed())
     pre_pop = p.Population(
         n_pre_neurons, p.IF_curr_exp(), label="Pre",
-        additional_parameters={
-            "splitter": SplitterPopulationVertexFixed()})
+        splitter=SplitterPopulationVertexFixed())
     p.Projection(
         pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 
