@@ -17,24 +17,11 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spinnaker_testbase import BaseTestCase
 
 
-def before_run(nNeurons):
-    sim.setup(timestep=1, min_delay=1)
-
-    neuron_parameters = {'cm': 0.25, 'i_offset': 2, 'tau_m': 10.0,
-                         'tau_refrac': 2.0, 'tau_syn_E': 0.5, 'tau_syn_I': 0.5,
-                         'v_reset': -65.0, 'v_rest': -65.0, 'v_thresh': -50.0}
-
-    pop = sim.Population(nNeurons, sim.IF_curr_exp, neuron_parameters,
-                         label='pop_1')
-
-    return pop.celltype
-
-
 class Test_Max_Cores(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_uncapped(self):
+    def test_uncapped(self) -> None:
         sim.setup(timestep=1, min_delay=1)
         pop = sim.Population(500, sim.IF_curr_exp)
         vertex = pop._Population__vertex
@@ -59,7 +46,7 @@ class Test_Max_Cores(BaseTestCase):
         self.assertEqual(200, vertex.get_max_atoms_per_core())
         sim.end()
 
-    def test_raise_sim_cap(self):
+    def test_raise_sim_cap(self) -> None:
         sim.setup(timestep=1, min_delay=1)
         pop1 = sim.Population(500, sim.IF_curr_exp)
         with self.assertRaises(SpynnakerException):

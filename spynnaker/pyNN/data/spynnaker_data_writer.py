@@ -131,3 +131,9 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
                 f'{self.get_simulation_time_step_ms()}')
 
         self.__spy_data._min_delay = min_delay
+
+    def _get_id_counter(self) -> int:
+        """
+        Testing method likely to change without notice!
+        """
+        return self.__spy_data._id_counter
