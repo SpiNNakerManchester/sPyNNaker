@@ -266,6 +266,11 @@ class SynapseDynamicsWeightChanger(
     def is_combined_core_capable(self) -> bool:
         return True
 
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return True
+
     @overrides(AbstractPlasticSynapseDynamics.get_weight_maximum)
     def get_weight_maximum(
             self, connector: AbstractConnector,
@@ -307,3 +312,9 @@ class SynapseDynamicsWeightChanger(
                 " changed")
         AbstractPlasticSynapseDynamics.validate_connection(
             self, application_edge, synapse_info)
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.synapses_per_second)
+    def synapses_per_second(self) -> int:
+        # This should never end up being requested!
+        raise NotImplementedError

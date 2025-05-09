@@ -29,7 +29,7 @@ from spinnman.model.enums import ExecutableType
 from pacman.model.graphs import AbstractEdgePartition
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import (
-    MachineVertex, AbstractSDRAMPartition, SDRAMMachineEdge)
+    MachineVertex, SourceSegmentedSDRAMMachinePartition, SDRAMMachineEdge)
 from pacman.model.placements import Placement
 from pacman.model.resources import AbstractSDRAM
 from pacman.utilities.utility_calls import get_keys
@@ -246,20 +246,21 @@ class SpikeSourcePoissonMachineVertex(
             label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__is_recording = is_recording
         self.__sdram = sdram
-        self.__sdram_partition: Optional[AbstractSDRAMPartition] = None
+        self.__sdram_partition: Optional[
+            SourceSegmentedSDRAMMachinePartition] = None
         self.__rate_changed = True
 
     @property
     def _pop_vertex(self) -> SpikeSourcePoissonVertex:
         return cast('SpikeSourcePoissonVertex', self.app_vertex)
 
+    @overrides(SendsSynapticInputsOverSDRAM.set_sdram_partition)
     def set_sdram_partition(
-            self, sdram_partition: AbstractSDRAMPartition) -> None:
-        """
-        Sets the SDRAM partition
-
-        :param AbstractSDRAMPartition sdram_partition:
-        """
+            self,
+            sdram_partition: SourceSegmentedSDRAMMachinePartition) -> None:
+        if self.__sdram_partition is not None:
+            raise SynapticConfigurationException(
+                "Cannot set SDRAM partition again")
         self.__sdram_partition = sdram_partition
 
     @property

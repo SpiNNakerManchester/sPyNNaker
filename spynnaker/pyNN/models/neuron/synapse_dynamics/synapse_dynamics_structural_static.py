@@ -351,3 +351,14 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
     @overrides(AbstractSynapseDynamics.is_combined_core_capable)
     def is_combined_core_capable(self) -> bool:
         return False
+
+    @property
+    @overrides(AbstractSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return True
+
+    @property
+    @overrides(AbstractStaticSynapseDynamics.synapses_per_second)
+    def synapses_per_second(self) -> int:
+        return (super().synapses_per_second -
+                super().reduction_synapses_per_second)

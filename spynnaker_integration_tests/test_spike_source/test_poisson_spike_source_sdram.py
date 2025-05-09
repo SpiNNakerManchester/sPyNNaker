@@ -14,8 +14,6 @@
 from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as sim
 import numpy
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPopulationVertexNeuronsSynapses)
 
 # Parameters designed to make the delta neuron count spikes in voltage
 PARAMS = {
@@ -77,7 +75,7 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
     def make_delta_pop(self, n_neurons, ssp, weight, delay=1.0):
         pop_1 = sim.Population(
             n_neurons, sim.IF_curr_delta(**PARAMS), label='pop_1',
-            splitter=SplitterPopulationVertexNeuronsSynapses(1))
+            n_synapse_cores=1)
         pop_1.initialize(v=0)
         pop_1.record("v")
         proj = sim.Projection(

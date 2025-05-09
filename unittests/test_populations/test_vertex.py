@@ -106,7 +106,8 @@ class MockNeuron(PopulationVertex):
             max_expected_summed_weight=None,
             neuron_impl=foo_bar.model, pynn_model=foo_bar,
             drop_late_spikes=True, splitter=None, seed=None,
-            n_colour_bits=None)
+            n_colour_bits=None, n_synapse_cores=None,
+            allow_delay_extensions=True)
 
 
 def test_initializable():

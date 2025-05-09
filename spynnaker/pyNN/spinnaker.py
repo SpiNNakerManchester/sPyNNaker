@@ -41,8 +41,9 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
-from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
+from spynnaker.pyNN.config_setup import setup_configs
 from spynnaker.pyNN.models.recorder import Recorder
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.extra_algorithms import (
@@ -125,6 +126,10 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             db.insert_version("quantities_version", quantities_version)
             db.insert_version("neo_version", neo_version)
             db.insert_version("lazyarray_version", lazyarray_version)
+
+        # Clears all previously added ceiling on the number of neurons per
+        # core, the number of synapse cores and allowing of delay extensions
+        AbstractPyNNNeuronModel.reset_all()
 
     @property
     def __writer(self) -> SpynnakerDataWriter:
@@ -326,6 +331,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :param time_scale_factor:
         :type time_scale_factor: int or None
         """
+
         # Get the standard values
         if timestep is None:
             self.__writer.set_up_timings_and_delay(
@@ -337,17 +343,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
         # Check the combination of machine time step and time scale factor
         if (self.__writer.get_simulation_time_step_ms() *
-                self.__writer.get_time_scale_factor() < 1):
-            if not get_config_bool(
-                    "Mode", "violate_1ms_wall_clock_restriction"):
-                raise ConfigurationException(
-                    "The combination of simulation time step and the machine "
-                    "time scale factor results in a wall clock timer tick "
-                    "that is currently not reliably supported by the"
-                    "SpiNNaker machine.  If you would like to override this"
-                    "behaviour (at your own risk), please add "
-                    "violate_1ms_wall_clock_restriction = True to the [Mode] "
-                    f"section of your .{CONFIG_FILE_NAME} file")
+                self.__writer.get_time_scale_factor() < 0.1):
             logger.warning(
                 "****************************************************")
             logger.warning(

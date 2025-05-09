@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Sequence, Union
+from typing import Optional, Sequence, Union, Tuple
 from spinn_utilities.overrides import overrides
 from spinn_utilities.classproperty import classproperty
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
@@ -21,7 +21,7 @@ from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
 
 _population_parameters = {
     "seed": None, "max_rate": None, "splitter": None,
-    "n_colour_bits": None}
+    "n_colour_bits": None, "neurons_per_core": None}
 
 # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
 # in terms of CPU (2900 at 10 times slow down is fine, but not at
@@ -55,6 +55,7 @@ class SpikeSourcePoisson(AbstractPyNNModel):
             self, n_neurons: int, label: str, *,
             seed: Optional[int] = None, max_rate: Optional[float] = None,
             splitter: Optional[AbstractSplitterCommon] = None,
+            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
             n_colour_bits: Optional[int] = None) -> SpikeSourcePoissonVertex:
         """
         :param float seed:
@@ -65,8 +66,10 @@ class SpikeSourcePoisson(AbstractPyNNModel):
         :param int n_colour_bits:
         """
         # pylint: disable=arguments-differ
-        max_atoms = self.get_model_max_atoms_per_dimension_per_core()
+        if neurons_per_core is None:
+            neurons_per_core = \
+                self.get_model_max_atoms_per_dimension_per_core()
         return SpikeSourcePoissonVertex(
-            n_neurons, label, seed, max_atoms, self,
+            n_neurons, label, seed, neurons_per_core, self,
             rate=self.__rate, start=self.__start, duration=self.__duration,
             max_rate=max_rate, splitter=splitter, n_colour_bits=n_colour_bits)
