@@ -223,6 +223,7 @@ class MockSynapseDynamics(AbstractSynapseDynamics):
     def synapses_per_second(self) -> int:
         raise NotImplementedError
 
+
 class MockConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_maximum)
