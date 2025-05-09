@@ -17,9 +17,11 @@ import pyNN.spiNNaker as p
 
 from spinnman.connections import ConnectionListener
 from spinnman.messages.eieio import read_eieio_data_message
+from spinnman.messages.eieio.data_messages import KeyPayloadDataElement
 from spinnman.connections.udp_packet_connections import SCAMPConnection
 from spinnman.utilities.utility_functions import reprogram_tag
-from spinn_front_end_common.utilities.database import DatabaseConnection
+from spinn_front_end_common.utilities.database import (
+    DatabaseConnection, DatabaseReader)
 from spinnman.messages.eieio.eieio_prefix import EIEIOPrefix
 from spinnaker_testbase.base_test_case import BaseTestCase
 import unittest
@@ -37,16 +39,17 @@ class TestLiveGatherTranslator(BaseTestCase):
 
     PREFIX = 0x1234
 
-    def recv(self, data):
+    def recv(self, data: bytes) -> None:
         message = read_eieio_data_message(data, 0)
         while message.is_next_element:
             element = message.next_element
+            assert isinstance(element, KeyPayloadDataElement)
             time = element.payload
             key = element.key
             self.stored_data.append((key, time))
             print(f"Received key {hex(key)} at time {time}")
 
-    def database_callback(self, db_reader):
+    def database_callback(self, db_reader: DatabaseReader) -> None:
         ip_addr = db_reader.get_ip_address(0, 0)
         self.conn = UDPSCAMPConnection(remote_host=ip_addr)
         print(f"Listening on port {self.conn.local_port}")

@@ -12,15 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from time import sleep
+from typing import List
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
 from spynnaker.pyNN.utilities.neo_convertor import count_spikes
 
 spike_receive_count = 0
 spike_send_count = 0
 
 
-def sim_control(label, sender):
+def sim_control(label: str, sender: SpynnakerLiveSpikesConnection) -> None:
     global spike_send_count
     sleep(0.1)
     for _ in range(100):
@@ -31,7 +33,7 @@ def sim_control(label, sender):
     sim.external_devices.request_stop()
 
 
-def receive_spikes(label, time, neuron_ids):
+def receive_spikes(label: str, time: int, neuron_ids: List[int]) -> None:
     global spike_receive_count
     spike_receive_count += len(neuron_ids)
 
