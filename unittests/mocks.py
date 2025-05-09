@@ -218,6 +218,10 @@ class MockSynapseDynamics(AbstractSynapseDynamics):
     def is_split_core_capable(self) -> bool:
         raise NotImplementedError
 
+    @property
+    @overrides(AbstractSynapseDynamics.synapses_per_second)
+    def synapses_per_second(self) -> int:
+        raise NotImplementedError
 
 class MockConnector(AbstractConnector):
 
