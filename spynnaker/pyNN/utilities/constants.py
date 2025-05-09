@@ -77,3 +77,7 @@ SYNAPSE_SDRAM_PARTITION_ID = "SDRAM Synaptic Inputs"
 
 #: The conservative amount of write bandwidth available on a chip
 WRITE_BANDWIDTH_BYTES_PER_SECOND = 250 * 1024 * 1024
+
+#: The maximum number of bits for the ring buffer index that are likely to
+#: fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
+MAX_RING_BUFFER_BITS = 14

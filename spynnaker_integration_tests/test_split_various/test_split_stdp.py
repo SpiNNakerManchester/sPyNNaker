@@ -18,8 +18,6 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spinnaker_testbase import BaseTestCase
 
 import numpy
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPopulationVertexNeuronsSynapses)
 
 
 def split_potentiation_and_depression():
@@ -57,8 +55,7 @@ def split_potentiation_and_depression():
 
     # Post-plastic-synapse population
     post_pop = p.Population(
-        1, p.IF_curr_exp(),  label="post", additional_parameters={
-            "splitter": SplitterPopulationVertexNeuronsSynapses(1)})
+        1, p.IF_curr_exp(), label="post", n_synapse_cores=1)
 
     # Create projections
     p.Projection(

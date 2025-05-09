@@ -17,7 +17,7 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spinnaker_testbase import BaseTestCase
 
 
-def before_run(nNeurons: int) -> None:
+def before_run(nNeurons):
     sim.setup(timestep=1, min_delay=1)
 
     neuron_parameters = {'cm': 0.25, 'i_offset': 2, 'tau_m': 10.0,
@@ -34,7 +34,7 @@ class Test_Max_Cores(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_uncapped(self) -> None:
+    def test_uncapped(self):
         sim.setup(timestep=1, min_delay=1)
         pop = sim.Population(500, sim.IF_curr_exp)
         vertex = pop._Population__vertex
@@ -59,21 +59,11 @@ class Test_Max_Cores(BaseTestCase):
         self.assertEqual(200, vertex.get_max_atoms_per_core())
         sim.end()
 
-    def test_model_cap(self) -> None:
+    def test_raise_sim_cap(self):
         sim.setup(timestep=1, min_delay=1)
         pop1 = sim.Population(500, sim.IF_curr_exp)
-        sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 50)
-        pop2 = sim.Population(500, sim.IF_curr_exp)
-        vertex1 = pop1._Population__vertex
-        self.assertEqual(256, vertex1.get_max_atoms_per_core())
-        vertex2 = pop2._Population__vertex
-        self.assertEqual(50, vertex2.get_max_atoms_per_core())
-        sim.end()
-
-    def test_raise_sim_cap(self) -> None:
-        sim.setup(timestep=1, min_delay=1)
-        pop1 = sim.Population(500, sim.IF_curr_exp)
-        sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
+        with self.assertRaises(SpynnakerException):
+            sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
         vertex1 = pop1._Population__vertex
         self.assertEqual(256, vertex1.get_max_atoms_per_core())
         pop1.set_max_atoms_per_core(50)

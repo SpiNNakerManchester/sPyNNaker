@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import Iterable, List, Optional, Sequence, Tuple, TYPE_CHECKING
+from typing import (
+    Iterable, List, Optional, Sequence, Tuple, TYPE_CHECKING, Union)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationVirtualVertex)
@@ -55,7 +56,10 @@ class ExternalDeviceLifControlVertex(
 
     def __init__(
             self, *, devices: Sequence[AbstractMulticastControllableDevice],
-            create_edges: bool, max_atoms_per_core: Tuple[int, ...],
+            create_edges: bool,
+            max_atoms_per_core: Union[int, Tuple[int, ...]],
+            n_synapse_cores: Optional[int],
+            allow_delay_extensions: bool,
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel,
             translator: Optional[AbstractEthernetTranslator] = None,
@@ -98,6 +102,8 @@ class ExternalDeviceLifControlVertex(
             n_neurons=len(devices),
             label=f"ext_dev{devices}" if label is None else label,
             max_atoms_per_core=max_atoms_per_core,
+            n_synapse_cores=n_synapse_cores,
+            allow_delay_extensions=allow_delay_extensions,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             max_expected_summed_weight=max_expected_summed_weight,

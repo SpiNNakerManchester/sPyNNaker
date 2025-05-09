@@ -247,3 +247,15 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.is_combined_core_capable)
     def is_combined_core_capable(self) -> bool:
         return True
+
+    @property
+    @overrides(AbstractStaticSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return True
+
+    @property
+    @overrides(AbstractStaticSynapseDynamics.synapses_per_second)
+    def synapses_per_second(self) -> int:
+        # From Synapse-Centric Mapping of Cortical Models to the SpiNNaker
+        # Neuromorphic Architecture
+        return 13000000
