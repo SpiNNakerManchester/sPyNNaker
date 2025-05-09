@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List, Tuple
 import numpy as np
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
@@ -20,8 +21,11 @@ from spinnaker_testbase import BaseTestCase
 class TestKernelConnector(BaseTestCase):
     # pylint: disable=expression-not-assigned
 
-    def do_run(self, psh, psw, ksh, ksw, pre_start=(0, 0), post_start=(0, 0),
-               pre_step=(1, 1), post_step=(1, 1)):
+    def do_run(self, psh: int, psw: int, ksh: int, ksw: int,
+               pre_start: Tuple[int, int]= (0, 0),
+               post_start: Tuple[int, int] = (0, 0),
+               pre_step: Tuple[int, int] = (1, 1),
+               post_step: Tuple[int, int] = (1, 1)) -> List[List[int]]:
         sim.setup(timestep=1.0)
 
         # determine population size and runtime from the kernel sizes

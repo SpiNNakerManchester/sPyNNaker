@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Tuple
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(m_size, n_atoms_side):
-
-    p.setup(timestep=1.0)
-
+def create_grid(n: int, label: str, dx=1.0, dy=1.0):
     cell_params_lif = {'cm': 0.25,
                        'i_offset': 0.0,
                        'tau_m': 20.0,
@@ -31,10 +29,14 @@ def do_run(m_size, n_atoms_side):
                        'v_thresh': -50.0
                        }
 
-    def create_grid(n, label, dx=1.0, dy=1.0):
-        grid_structure = p.Grid2D(dx=dx, dy=dy, x0=0.0, y0=0.0)
-        return p.Population(n*n, p.IF_curr_exp(**cell_params_lif),
-                            structure=grid_structure, label=label)
+    grid_structure = p.Grid2D(dx=dx, dy=dy, x0=0.0, y0=0.0)
+    return p.Population(n * n, p.IF_curr_exp(**cell_params_lif),
+                        structure=grid_structure, label=label)
+
+
+def do_run(m_size: Tuple[int, int], n_atoms_side: int) -> None:
+
+    p.setup(timestep=1.0)
 
     # Parameters
     weight_to_spike = 2.0

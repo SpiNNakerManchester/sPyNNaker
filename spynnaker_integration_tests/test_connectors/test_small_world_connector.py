@@ -12,18 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.spiNNaker as p
-from spinnaker_testbase import BaseTestCase
-from pyNN.utility.plotting import Figure, Panel
-from pyNN.random import NumpyRNG
+from collections import defaultdict
+from typing import Dict, Set, Tuple
+
 import matplotlib.pyplot as plt
+from neo import Block
+from pyNN.random import NumpyRNG
+import pyNN.spiNNaker as p
+from pyNN.utility.plotting import Figure, Panel
+
+from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.utilities import neo_convertor
 
 
-def do_run(plot):
-
-    p.setup(timestep=1.0)
-
+def create_grid(n: int, label: str, dx: float = 1.0,
+                dy: float = 1.0) -> Population:
     cell_params_lif = {'cm': 0.25,
                        'i_offset': 0.0,
                        'tau_m': 20.0,
@@ -34,11 +39,15 @@ def do_run(plot):
                        'v_rest': -65.0,
                        'v_thresh': -50.0
                        }
+    grid_structure = p.Grid2D(dx=dx, dy=dy, x0=0.0, y0=0.0)
+    return p.Population(n * n, p.IF_curr_exp(**cell_params_lif),
+                        structure=grid_structure, label=label)
 
-    def create_grid(n, label, dx=1.0, dy=1.0):
-        grid_structure = p.Grid2D(dx=dx, dy=dy, x0=0.0, y0=0.0)
-        return p.Population(n*n, p.IF_curr_exp(**cell_params_lif),
-                            structure=grid_structure, label=label)
+
+def do_run(plot: bool) -> Tuple[Block, Block, ConnectionHolder]:
+
+    p.setup(timestep=1.0)
+
 
     # Parameters
     n = 5
@@ -107,23 +116,24 @@ class SmallWorldConnectorTest(BaseTestCase):
                 (15, 6), (16, 9), (17, 9), (18, 9), (19, 6),
                 (20, 4), (21, 6), (22, 6), (23, 6), (24, 4)]
 
-    def directly_connected(self, weights):
-        from collections import defaultdict
-        singles = defaultdict(set)
+    def directly_connected(
+            self, weights: ConnectionHolder) -> Dict[int, Set[int]]:
+        singles: Dict[int, Set[int]] = defaultdict(set)
         for (s, d, _) in weights:
             singles[s].add(d)
             singles[d].add(s)
         return singles
 
-    def next_connected(self, previous, single):
-        current = dict()
+    def next_connected(self, previous: Dict[int, Set[int]],
+                       single: Dict[int, Set[int]]) -> Dict[int, Set[int]] :
+        current: Dict[int, Set[int]]  = dict()
         for i in range(25):
             current[i] = set(previous[i])
             for j in previous[i]:
                 current[i].update(single[j])
         return current
 
-    def check_weights(self, weights):
+    def check_weights(self, weights: ConnectionHolder) -> None:
         s_list = [s for (s, _, _) in weights]
         s_counts = [(i, s_list.count(i)) for i in range(25)]
         self.assertEqual(self.S_COUNTS, s_counts)
