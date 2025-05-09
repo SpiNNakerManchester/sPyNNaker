@@ -182,6 +182,8 @@ class MockApvVertex(PopulationVertex):
         super().__init__(
             n_neurons=n_neurons, label=label,
             max_atoms_per_core=max_atoms_per_core,
+            n_synapse_cores=None,
+            allow_delay_extensions=True,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             max_expected_summed_weight=max_expected_summed_weight,
@@ -211,6 +213,16 @@ class MockSynapseDynamics(AbstractSynapseDynamics):
     @property
     @overrides(AbstractSynapseDynamics.is_combined_core_capable)
     def is_combined_core_capable(self) -> bool:
+        raise NotImplementedError
+
+    @property
+    @overrides(AbstractSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        raise NotImplementedError
+
+    @property
+    @overrides(AbstractSynapseDynamics.synapses_per_second)
+    def synapses_per_second(self) -> int:
         raise NotImplementedError
 
 

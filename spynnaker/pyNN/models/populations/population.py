@@ -717,12 +717,13 @@ class Population(PopulationBase):
         self.__vertex.set_fixed_location(x, y, p)
 
     # NON-PYNN API CALL
-    def set_max_atoms_per_core(self, max_atoms_per_core: int) -> None:
+    def set_max_atoms_per_core(
+            self, max_atoms_per_core: Union[int, Tuple[int, ...]]) -> None:
         """
         Supports the setting of this population's max atoms per
         dimension per core.
 
-        :param int max_atoms_per_core:
+        :param max_atoms_per_core:
             the new value for the max atoms per dimension per core.
         :raises SimulatorRunningException: If `sim.run` is currently running
         :raises SimulatorNotSetupException: If called before `sim.setup`
