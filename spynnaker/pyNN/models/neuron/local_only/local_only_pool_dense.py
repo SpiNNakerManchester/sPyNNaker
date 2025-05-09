@@ -330,3 +330,9 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         if len(neg_weights) == 0:
             return 0
         return numpy.var(neg_weights)
+
+    @property
+    @overrides(AbstractLocalOnly.synapses_per_second)
+    def synapses_per_second(self) -> int:
+        # This is a guess!
+        return 15000000

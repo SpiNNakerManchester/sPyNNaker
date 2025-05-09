@@ -367,6 +367,11 @@ class SynapseDynamicsWeightChangable(
         return True
 
     @property
+    @overrides(AbstractPlasticSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return True
+
+    @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
     def pad_to_length(self) -> Optional[int]:
         return None
@@ -386,3 +391,11 @@ class SynapseDynamicsWeightChangable(
             raise SynapticConfigurationException(
                 "WeightChangable only works with on-machine generated "
                 "connectors at present")
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.synapses_per_second)
+    def synapses_per_second(self) -> int:
+        # From Synapse-Centric Mapping of Cortical Models to the SpiNNaker
+        # Neuromorphic Architecture; but adapted since this does very little
+        # in terms of execution compared to STDP, but a bit more than static
+        return 10000000

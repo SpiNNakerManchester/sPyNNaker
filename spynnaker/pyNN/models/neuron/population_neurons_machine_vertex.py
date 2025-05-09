@@ -201,13 +201,9 @@ class PopulationNeuronsMachineVertex(
     def set_sdram_partition(
             self,
             sdram_partition: SourceSegmentedSDRAMMachinePartition) -> None:
-        """
-        Set the SDRAM partition.  Must only be called once per instance.
+        """ Sets the SDRAM Partition to receive data from.
 
-        :param sdram_partition:
-            The SDRAM partition to receive synapses from
-        :type sdram_partition:
-            ~pacman.model.graphs.machine.SourceSegmentedSDRAMMachinePartition
+        :param sdram_partition: The partition to receive data from.
         """
         if self.__sdram_partition is not None:
             raise SynapticConfigurationException(
