@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List
 import numpy
 import pyNN.spiNNaker as sim
 from pyNN.space import Grid2D
@@ -29,7 +30,7 @@ def do_run() -> None:
     n_outputs = 20
     delay = 600
 
-    spike_array_times = [[] for _ in range(n_input)]
+    spike_array_times: List[List[int]] = [[] for _ in range(n_input)]
     kernel = numpy.array(
         [[[0 for _ in range(n_outputs)]
           for _ in range(shape[0] // pool_stride[0])]

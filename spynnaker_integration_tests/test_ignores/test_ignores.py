@@ -13,13 +13,20 @@
 # limitations under the License.
 
 from unittest import SkipTest
-from spinn_utilities.config_holder import set_config
-from spinnman.processes.get_machine_process import GetMachineProcess
-from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as sim
+from spinn_utilities.config_holder import set_config
+from spinn_utilities.overrides import overrides
+from spinnman.processes.get_machine_process import GetMachineProcess
+from spinnman.messages.scp.impl.get_chip_info_response import (
+    GetChipInfoResponse)
+from spinnaker_testbase import BaseTestCase
 
 
-def hacked_receive_chip_info(self, scp_read_chip_info_response):
+# HACK! Do not copy
+@overrides(GetMachineProcess._receive_chip_info)
+def _receive_chip_info(
+        self: GetMachineProcess,
+        scp_read_chip_info_response: GetChipInfoResponse) -> None:
     chip_info = scp_read_chip_info_response.chip_info
     self._chip_info[chip_info.x, chip_info.y] = chip_info
 
@@ -46,7 +53,7 @@ class TestAllow(BaseTestCase):
         self.assert_not_spin_three()
 
         # Hack in to set the ignores with used IP address
-        GetMachineProcess._receive_chip_info = hacked_receive_chip_info   # type: ignore[method-assign]  # noqa: E501
+        GetMachineProcess._receive_chip_info = _receive_chip_info   # type: ignore[method-assign]  # noqa: E501
 
         machine = sim.get_machine()
         sim.end()
@@ -101,7 +108,7 @@ class TestAllow(BaseTestCase):
 
 if __name__ == '__main__':
     # Hack in to set the ignores with used IP address
-    GetMachineProcess._receive_chip_info = hacked_receive_chip_info   # type: ignore[method-assign]  # noqa: E501
+    GetMachineProcess._receive_chip_info = _receive_chip_info   # type: ignore[method-assign]  # noqa: E501
 
     sim.setup(timestep=1.0, n_boards_required=6)
     machine = sim.get_machine()

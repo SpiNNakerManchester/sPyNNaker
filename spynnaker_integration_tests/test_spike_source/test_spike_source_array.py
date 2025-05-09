@@ -13,9 +13,10 @@
 # limitations under the License.
 
 import random
-from spinnaker_testbase import BaseTestCase
+from typing import List
 import numpy
 import pyNN.spiNNaker as p
+from spinnaker_testbase import BaseTestCase
 
 
 class TestSpikeSourceArray(BaseTestCase):
@@ -64,7 +65,7 @@ class TestSpikeSourceArray(BaseTestCase):
     def test_recording_1_element(self) -> None:
         self.runsafe(self.recording_1_element)
 
-    def recording_numerous_elements(self, run_zero):
+    def recording_numerous_elements(self, run_zero: bool) -> None:
         p.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 20  # number of neurons in each population
         p.set_number_of_neurons_per_core(p.IF_curr_exp, n_neurons / 2)
@@ -85,7 +86,7 @@ class TestSpikeSourceArray(BaseTestCase):
         projections = list()
 
         boxed_array = numpy.zeros(shape=(0, 2))
-        spike_array = list()
+        spike_array: List[List[int]] = list()
         for neuron_id in range(0, n_neurons):
             spike_array.append(list())
             for counter in range(0, 20):

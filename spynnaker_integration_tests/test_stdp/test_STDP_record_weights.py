@@ -13,12 +13,16 @@
 # limitations under the License.
 
 from typing import List, Tuple
+from neo import AnalogSignal
 from neo.core.spiketrainlist import SpikeTrainList
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spynnaker.pyNN.models.projection import Projection
 
 # Parameters:
-simulationParameters = {"simTime": 10, "timeStep": 1.0}
+simTime = 10
+timeStep = 1.0
 popNeurons = {"ILayer": 2, "LIFLayer": 2}
 ILSpike = [[1, 6, 11, 16, 21], []]
 neuronParameters = {
@@ -38,12 +42,13 @@ synParameters = {
 
 
 # Network and simulation
-def record_weights_using_callback() -> Tuple[ List[List[int]], SpikeTrainList]:
+def record_weights_using_callback() -> Tuple[ List[List[int]],
+        SpikeTrainList, AnalogSignal, List[ConnectionHolder]]:
 
     ######################################
     # Setup
     ######################################
-    sim.setup(timestep=simulationParameters["timeStep"])
+    sim.setup(timestep=timeStep)
 
     ######################################
     # Neuron pop
@@ -92,13 +97,12 @@ def record_weights_using_callback() -> Tuple[ List[List[int]], SpikeTrainList]:
     ######################################
     LIFLayer.record(["spikes", "v"])
     weightRecorderLIF_LIF = weight_recorder(
-        sampling_interval=simulationParameters["timeStep"],
-        projection=LIFLayer_LIFLayer_conn)
+        sampling_interval=timeStep, projection=LIFLayer_LIFLayer_conn)
 
     ######################################
     # Run simulation
     ######################################
-    sim.run(simulationParameters["simTime"], callbacks=[weightRecorderLIF_LIF])
+    sim.run(simTime, callbacks=[weightRecorderLIF_LIF])
 
     ######################################
     # Recall data
@@ -127,27 +131,28 @@ class weight_recorder(object):
     the projection at regular intervals.
     """
 
-    def __init__(self, sampling_interval, projection):
+    def __init__(self, sampling_interval: float, projection: Projection):
         self.interval = sampling_interval
         self.projection = projection
-        self._weights = []
+        self._weights: List[ConnectionHolder] = []
 
-    def __call__(self, t):
+    def __call__(self, t: float) -> float:
         self._weights.append(
             self.projection.get('weight', format='list', with_address=True))
         return t + self.interval
 
-    def get_weights(self) -> None:
+    def get_weights(self) -> List[ConnectionHolder]:
         return self._weights
 
 
 # Network and simulation
-def record_weights_using_multirun():
+def record_weights_using_multirun() -> Tuple[ List[List[int]],
+        SpikeTrainList, AnalogSignal, List[ConnectionHolder]]:
 
     ######################################
     # Setup
     ######################################
-    sim.setup(timestep=simulationParameters["timeStep"])
+    sim.setup(timestep=timeStep)
 
     ######################################
     # Neuron pop
@@ -201,7 +206,7 @@ def record_weights_using_multirun():
     ######################################
     w_LIFL_LIFL = []
     w_LIFL_LIFL.append(LIFLayer_LIFLayer_conn.get(["weight"], "list"))
-    for n in range(simulationParameters["simTime"]):
+    for n in range(simTime):
         sim.run(1)
         w_LIFL_LIFL.append(LIFLayer_LIFLayer_conn.get(["weight"], "list"))
 
