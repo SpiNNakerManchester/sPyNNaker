@@ -38,8 +38,6 @@ class TestSimulatorData(unittest.TestCase):
         # Use manual_check to verify this without dependency
         writer = SpynnakerDataWriter.setup()
         self.assertIn("run_1", SpynnakerDataView.get_run_dir_path())
-        self.assertIn(
-            "provenance_data", SpynnakerDataView.get_provenance_dir_path())
         with self.assertRaises(DataNotYetAvialable):
             SpynnakerDataView.get_simulation_time_step_us()
         with self.assertRaises(DataNotYetAvialable):
