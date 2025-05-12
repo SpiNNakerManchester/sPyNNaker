@@ -13,16 +13,20 @@
 # limitations under the License.
 
 import os
-import numpy
 import random
+from typing import Tuple
+
+import numpy
 import matplotlib.pyplot as plt
+from neo import Block
 from pyNN.utility.plotting import Figure, Panel
 import pyNN.spiNNaker as p
+
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(plot):
+def do_run(plot: bool) -> Block:
 
     p.setup(timestep=1.0)
 

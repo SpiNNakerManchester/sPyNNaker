@@ -11,13 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import sys
+from typing import Tuple
+
+from neo import Block
 import pyNN.spiNNaker as p
 import numpy
-import sys
+
 from spinnaker_testbase import BaseTestCase
 
 
-def run_network(timestep, steps_per_timestep):
+def run_network(
+        timestep: float, steps_per_timestep: int) -> Tuple[Block, Block]:
     p.setup(timestep, max_delay=1.0)
     pre = p.Population(1, p.SpikeSourceArray(range(0, 100, 10)))
     post = p.Population(1, p.IF_cond_exp(), additional_parameters={
@@ -32,7 +38,7 @@ def run_network(timestep, steps_per_timestep):
     return v, spikes
 
 
-def do_test_multistep():
+def do_test_multistep() -> Tuple[Block, Block, Block, Block]:
     v_005, spikes_005 = run_network(0.05, 1)
     v_005 = numpy.ravel(v_005.magnitude)[1::2][:-1]
     spikes_005 = numpy.round(spikes_005[0].times.magnitude + 0.025, 1)

@@ -14,12 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from neo import Block
 import pyNN.spiNNaker as p
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(nNeurons, neurons_per_core):
+def do_run(nNeurons: int, neurons_per_core: int) -> Block:
     cell_params_lif = {'cm': 0.25,  # nF
                        'i_offset': 0.0,
                        'tau_m': 10.0,
