@@ -14,23 +14,30 @@
 import random
 from threading import Condition
 import time
+from typing import List, Tuple
+
+from neo import Block
 import pyNN.spiNNaker as Frontend
-from spynnaker.pyNN.utilities import neo_convertor
+from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.external_devices import SpynnakerLiveSpikesConnection
+from spynnaker.pyNN.utilities import neo_convertor
 
 # Create a condition to avoid overlapping prints
 print_condition = Condition()
 
 
 # Create an initialisation method
-def init_pop(label, n_neurons, run_time_ms, machine_timestep_ms):
+def init_pop(label: str, n_neurons: int, run_time_ms: float,
+             machine_timestep_ms: float) -> None:
     print("{} has {} neurons".format(label, n_neurons))
     print("Simulation will run for {}ms at {}ms timesteps".format(
         run_time_ms, machine_timestep_ms))
 
 
 # Create a sender of packets for the forward population
-def send_input_forward(label, sender):
+def send_input_forward(label: str, sender: LiveEventConnection) -> None:
+    assert isinstance(sender, SpynnakerLiveSpikesConnection)
     for neuron_id in range(0, 100, 20):
         time.sleep(random.random() + 0.5)
         print_condition.acquire()
@@ -40,7 +47,8 @@ def send_input_forward(label, sender):
 
 
 # Create a sender of packets for the backward population
-def send_input_backward(label, sender):
+def send_input_backward(label: str, sender: LiveEventConnection) -> None:
+    assert isinstance(sender, SpynnakerLiveSpikesConnection)
     for neuron_id in range(0, 100, 20):
         real_id = 100 - neuron_id - 1
         time.sleep(random.random() + 0.5)
@@ -49,16 +57,15 @@ def send_input_backward(label, sender):
         print_condition.release()
         sender.send_spike(label, real_id)
 
-
 # Create a receiver of live spikes
-def receive_spikes(label, time, neuron_ids):
+def receive_spikes(label: str, time: int, neuron_ids: List[int]) -> None:
     for neuron_id in neuron_ids:
         print_condition.acquire()
         print("Received spike at time", time, "from", label, "-", neuron_id)
         print_condition.release()
 
 
-def do_run():
+def do_run() -> Tuple[Block, Block]:
     random.seed(0)
 
     # initial call to set up the front end (pynn requirement)

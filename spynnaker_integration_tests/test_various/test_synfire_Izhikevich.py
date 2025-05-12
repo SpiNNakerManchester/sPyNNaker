@@ -17,13 +17,15 @@
 """
 Synfirechain-like example
 """
-import spynnaker.spike_checker as spike_checker
+from typing import Tuple
+from numpy.typing import NDArray
 import pyNN.spiNNaker as p
-from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.utilities import neo_convertor
+import spynnaker.spike_checker as spike_checker
 
 
-def do_run(nNeurons):
+def do_run(nNeurons: int) -> Tuple[NDArray, NDArray, NDArray]:
     p.setup(timestep=1.0, min_delay=1.0)
     p.set_number_of_neurons_per_core(p.Izhikevich, 100)
 

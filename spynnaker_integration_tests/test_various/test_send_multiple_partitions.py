@@ -15,13 +15,16 @@
 # limitations under the License.
 
 from time import sleep
-from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as sim
+from spinn_front_end_common.utilities.connections import LiveEventConnection
+from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.external_devices import SpynnakerLiveSpikesConnection
 
 
 class TestSendMultiplePartitions(BaseTestCase):
 
-    def send_spike(self, label, conn):
+    def send_spike(self, label: str, conn: LiveEventConnection) -> None:
+        assert isinstance(conn, SpynnakerLiveSpikesConnection)
         sleep(0.1)
         conn.send_spike(label, 0)
 

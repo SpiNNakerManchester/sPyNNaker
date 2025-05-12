@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.spiNNaker as sim
+from typing import Tuple
+from neo import Block
 from spinnaker_testbase import BaseTestCase
+import pyNN.spiNNaker as sim
 # import neo_convertor
 
 
-def do_run():
+def do_run() -> Tuple[Block, Block]:
     sim.setup(timestep=1)
     pop_1 = sim.Population(1, sim.IF_curr_exp, {}, label="pop_1")
     inp = sim.Population(

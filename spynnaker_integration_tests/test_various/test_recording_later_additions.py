@@ -156,7 +156,7 @@ class TestRecordingLaterAdditions(BaseTestCase):
         pop_c.write_data("test_c.csv", ["spikes", "v"])
         sim.end()
 
-    def cleanup(self, file):
+    def cleanup(self, file: str) -> None:
         try:
             if os.path.exists(file):
                 os.remove(file)
