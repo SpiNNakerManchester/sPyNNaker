@@ -20,7 +20,7 @@ class TestProps(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_props(self):
+    def test_props(self) -> None:
         p.setup(timestep=1.0, min_delay=1.0)
 
         cell_params_lif = {'cm': 0.25,  # nF

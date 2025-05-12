@@ -14,9 +14,10 @@
 
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 
-def before_run(nNeurons):
+def before_run(nNeurons: int) -> AbstractPyNNModel:
     p.setup(timestep=1, min_delay=1)
 
     neuron_parameters = {'cm': 0.25, 'i_offset': 2, 'tau_m': 10.0,
@@ -33,7 +34,7 @@ class Test_celltype(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_before_run(self):
+    def test_before_run(self) -> None:
         nNeurons = 20  # number of neurons in each population
         celltype = before_run(nNeurons)
         self.assertEqual(p.IF_curr_exp, type(celltype))

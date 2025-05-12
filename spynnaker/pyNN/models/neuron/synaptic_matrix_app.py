@@ -15,7 +15,7 @@ from __future__ import annotations
 from typing import List, Optional, Tuple, TYPE_CHECKING
 
 import numpy
-from numpy import floating, uint32
+from numpy import uint32
 from numpy.typing import NDArray
 
 from pacman.model.graphs.common import Slice
@@ -31,6 +31,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnHost)
+from spynnaker.pyNN.types import WeightScales
 
 from .generator_data import GeneratorData
 from .synapse_io import read_all_synapses, convert_to_connections, get_synapses
@@ -95,7 +96,7 @@ class SynapticMatrixApp(object):
             synaptic_matrix_region: int, max_atoms_per_core: int,
             all_syn_block_sz: int, app_key_info: Optional[AppKeyInfo],
             delay_app_key_info: Optional[AppKeyInfo],
-            weight_scales: NDArray[floating]):
+            weight_scales: WeightScales):
         """
         :param SynapseInformation synapse_info:
             The projection synapse information
@@ -110,7 +111,7 @@ class SynapticMatrixApp(object):
             Application-level routing key information for undelayed vertices
         :param AppKeyInfo delay_app_key_info:
             Application-level routing key information for delayed vertices
-        :param list(float) weight_scales:
+        :param weight_scales:
             Weight scale for each synapse edge
         """
         self.__synapse_info = synapse_info

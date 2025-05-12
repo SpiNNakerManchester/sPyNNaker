@@ -20,7 +20,7 @@ class TestSimple(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_simple(self):
+    def test_simple(self) -> None:
         sim.setup(timestep=1.0, n_boards_required=1)
         sim.get_machine()
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)

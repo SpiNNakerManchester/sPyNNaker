@@ -13,15 +13,20 @@
 # limitations under the License.
 
 import tempfile
+from typing import Optional, List
+
 import numpy
+from numpy.typing import NDArray
 import pytest
+import pyNN.spiNNaker as sim
+
 from pacman.model.graphs.common.slice import Slice
+
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FromFileConnector)
-from unittests.mocks import MockPopulation
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
-import pyNN.spiNNaker as sim
 from unittests.connector_tests.test_from_list_connector import MockAppVertex
+from unittests.mocks import MockSynapseDynamics, MockPopulation
 
 # NO unittest_setup() as sim.setup is called
 
@@ -52,9 +57,11 @@ from unittests.connector_tests.test_from_list_connector import MockAppVertex
         "3-elements-extra"
     ])
 def test_connector(
-        clist, column_names, weights, delays, expected_clist, expected_weights,
-        expected_delays, expected_extra_parameters,
-        expected_extra_parameter_names):
+        clist: Optional[NDArray], column_names: Optional[List[str]],
+        weights: int, delays: int, expected_clist: Optional[NDArray],
+        expected_weights: List[int], expected_delays: List[int],
+        expected_extra_parameters: Optional[NDArray],
+        expected_extra_parameter_names: Optional[List[str]]) -> None:
     sim.setup()
     temp = tempfile.NamedTemporaryFile(delete=False)
     with temp as f:
@@ -65,25 +72,25 @@ def test_connector(
             header = 'columns = {}'.format(columns)
         if clist is not None and len(clist):
             numpy.savetxt(f, clist, header=header)
-        elif len(header):
-            f.write("# {}\n".format(header))
+        else:
+            assert len(header) == 0
 
     connector = FromFileConnector(temp.name)
     if expected_clist is not None:
         assert numpy.array_equal(connector.conn_list, expected_clist)
     else:
-        assert numpy.array_equal(connector.conn_list, clist)
+        assert numpy.array_equal(
+            connector.conn_list, clist)  # type: ignore[arg-type]
 
     # Check extra parameters are as expected
     extra_params = connector.get_extra_parameters()
     extra_param_names = connector.get_extra_parameter_names()
-    assert numpy.array_equal(extra_params, expected_extra_parameters)
-    assert numpy.array_equal(
-        extra_param_names, expected_extra_parameter_names)
     if extra_params is not None:
         assert len(extra_params.shape) == 2
+        assert extra_param_names is not None
         assert extra_params.shape[1] == len(extra_param_names)
         for i in range(len(extra_param_names)):
+            assert clist is not None
             assert extra_params[:, i].shape == (len(clist), )
 
     # Check weights and delays are used or ignored as expected
@@ -91,10 +98,10 @@ def test_connector(
     pre_pop = MockPopulation(10, "Pre", MockAppVertex(10, [pre_slice]))
     post_slice = Slice(0, 9)
     synapse_info = SynapseInformation(
-        connector=None, pre_population=pre_pop,
+        connector=connector, pre_population=pre_pop,
         post_population=MockPopulation(10, "Post"), prepop_is_view=False,
-        postpop_is_view=False, synapse_dynamics=None,
-        synapse_type=None, receptor_type=None,
+        postpop_is_view=False, synapse_dynamics=MockSynapseDynamics(1, 1),
+        synapse_type=0, receptor_type="",
         synapse_type_from_dynamics=False, weights=weights, delays=delays)
     block = connector.create_synaptic_block(
         [post_slice], post_slice, 1, synapse_info)

@@ -15,8 +15,8 @@ from __future__ import annotations
 import logging
 import os
 from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional, overload,
-    Sequence, Tuple, TYPE_CHECKING, Union)
+    Any, Callable, Dict, Iterable, Iterator, List, Optional,
+    overload, Sequence, Tuple, TYPE_CHECKING, Union)
 
 import numpy
 from numpy import bool_, integer
@@ -199,9 +199,6 @@ class PopulationView(PopulationBase):
     def mask(self) -> Selector:
         """
         The selector mask that was used to create this view.
-
-        :rtype: None or slice or int or list(bool) or list(int) or
-            ~numpy.ndarray(bool) or ~numpy.ndarray(int)
         """
         return self.__mask
 
@@ -277,11 +274,9 @@ class PopulationView(PopulationBase):
     def position_generator(self) -> Callable[[int], NDArray[numpy.floating]]:
         raise NotImplementedError("Not implemented for views")
 
-    def all(self) -> Iterable['IDMixin']:
+    def all(self) -> Iterator[IDMixin]:
         """
         Iterator over cell IDs (on all MPI nodes).
-
-        :rtype: iterable(IDMixin)
         """
         for idx in self.__indexes:
             yield IDMixin(self.__population, idx)

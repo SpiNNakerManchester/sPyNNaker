@@ -12,32 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import functools
 import numpy
 import pytest
 import random
 import sys
+from typing import Any, Callable
 from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractConnector, AbstractGenerateConnectorOnHost,
     FixedNumberPreConnector, FixedNumberPostConnector,
     FixedProbabilityConnector, IndexBasedProbabilityConnector)
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
-from unittests.mocks import MockPopulation
+from unittests.mocks import MockPopulation, MockSynapseDynamics
 
 
 @pytest.fixture(scope="module", params=[10, 100])
-def n_pre(request):
+def n_pre(request: Any) -> int:
     return request.param
 
 
 @pytest.fixture(scope="module", params=[10, 100])
-def n_post(request):
+def n_post(request: Any) -> int:
     return request.param
 
 
 @pytest.fixture(scope="module", params=[10])
-def n_in_slice(request):
+def n_in_slice(request: Any) -> int:
     return request.param
 
 
@@ -69,22 +72,24 @@ def n_in_slice(request):
         "FixedProbabilityConnector0.5-",
         "IndexBasedProbabilityConnector"]
     )
-def create_connector(request):
+def create_connector(request: Any) -> Callable[[], AbstractConnector]:
     return request.param
 
 
 @pytest.fixture(scope="module", params=[5])
-def weight(request):
+def weight(request: Any) -> int:
     return request.param
 
 
 @pytest.fixture(scope="module", params=[5])
-def delay(request):
+def delay(request: Any) -> int:
     return request.param
 
 
 def test_connectors(
-        n_pre, n_post, n_in_slice, create_connector, weight, delay):
+        n_pre: int, n_post: int, n_in_slice: int,
+        create_connector: Callable[[], AbstractConnector],
+        weight: int, delay: int) -> None:
     unittest_setup()
     max_target = 0
     max_source = 0
@@ -94,10 +99,11 @@ def test_connectors(
         numpy.random.seed(random.randint(0, 1000))
         connector = create_connector()
         synapse_info = SynapseInformation(
-            connector=None, pre_population=MockPopulation(n_pre, "Pre"),
+            connector=connector, pre_population=MockPopulation(n_pre, "Pre"),
             post_population=MockPopulation(n_post, "Post"),
             prepop_is_view=False, postpop_is_view=False,
-            synapse_dynamics=None, synapse_type=None, receptor_type=None,
+            synapse_dynamics=MockSynapseDynamics(1, 1),
+            synapse_type=0, receptor_type="",
             synapse_type_from_dynamics=False,
             weights=weight, delays=delay)
         connector.set_projection_information(synapse_info=synapse_info)
@@ -127,6 +133,7 @@ def test_connectors(
         else:
             assert (max_col_length == connector.
                     get_n_connections_to_post_vertex_maximum(synapse_info))
+        assert isinstance(connector, AbstractGenerateConnectorOnHost)
         synaptic_block = connector.create_synaptic_block(
             post_slices, post_vertex_slice, synapse_type, synapse_info)
         source_histogram = numpy.histogram(

@@ -17,7 +17,7 @@ import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(nNeurons):
+def do_run(nNeurons: int) -> None:
 
     p.setup(timestep=1.0, min_delay=1.0)
 
@@ -97,7 +97,7 @@ class ParamsSetAsList(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_run(self):
+    def test_run(self) -> None:
         do_run(225)  # number of neurons in each population
 
 

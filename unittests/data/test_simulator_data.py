@@ -30,10 +30,10 @@ import pyNN.spiNNaker as sim
 
 class TestSimulatorData(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_setup(self):
+    def test_setup(self) -> None:
         # What happens before setup depends on the previous test
         # Use manual_check to verify this without dependency
         writer = SpynnakerDataWriter.setup()
@@ -48,7 +48,7 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(100,  SpynnakerDataView.get_simulation_time_step_us())
         self.assertEqual(0.1, SpynnakerDataView.get_min_delay())
 
-    def test_min_delay(self):
+    def test_min_delay(self) -> None:
         writer = SpynnakerDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             SpynnakerDataView.get_min_delay()
@@ -70,14 +70,15 @@ class TestSimulatorData(unittest.TestCase):
             writer.set_up_timings_and_delay(2000, 1, 1)
 
         with self.assertRaises(TypeError):
-            writer.set_up_timings_and_delay(1000, 1, "baocn")
+            writer.set_up_timings_and_delay(
+                1000, 1, "baocn")  # type: ignore[arg-type]
 
-    def test_mock(self):
+    def test_mock(self) -> None:
         # check there is a value not what it is
         self.assertIsNotNone(SpynnakerDataView.get_app_id())
         self.assertIsNotNone(SpynnakerDataView.get_min_delay())
 
-    def test_populations_and_projections(self):
+    def test_populations_and_projections(self) -> None:
         writer = SpynnakerDataWriter.setup()
         writer.set_up_timings_and_delay(1000, 1, 1)
         self.assertListEqual(
@@ -94,17 +95,13 @@ class TestSimulatorData(unittest.TestCase):
         self.assertListEqual(
             [pop_1], list(SpynnakerDataView.iterate_populations()))
         self.assertEqual(1, SpynnakerDataView.get_n_populations())
-        # Hack to check internal data
-        # DO NOT COPY as unsupported
-        self.assertEqual(5, writer._SpynnakerDataWriter__spy_data._id_counter)
+        self.assertEqual(5, writer._get_id_counter())
         pop_2 = Population(size=15, cellclass=model)
 
         self.assertListEqual([pop_1, pop_2], sorted(
             SpynnakerDataView.iterate_populations(), key=lambda x: x.label))
         self.assertEqual(2, SpynnakerDataView.get_n_populations())
-        # Hack to check internal data
-        # DO NOT COPY as unsupported
-        self.assertEqual(20, writer._SpynnakerDataWriter__spy_data._id_counter)
+        self.assertEqual(20, writer._get_id_counter())
         pro_1 = Projection(
             pop_1, pop_2, OneToOneConnector(), receptor_type='excitatory')
         self.assertListEqual(
@@ -131,12 +128,12 @@ class TestSimulatorData(unittest.TestCase):
         self.assertListEqual([pro_1, pro_2], sorted(
             SpynnakerDataView.iterate_projections(), key=lambda x: x.label))
         self.assertEqual(2, SpynnakerDataView.get_n_projections())
-        self.assertEqual(20, writer._SpynnakerDataWriter__spy_data._id_counter)
+        self.assertEqual(20, writer._get_id_counter())
         with self.assertRaises(TypeError):
-            writer.add_population("bacon")
+            writer.add_population("bacon")  # type: ignore[arg-type]
         with self.assertRaises(TypeError):
-            writer.add_projection("bacon")
+            writer.add_projection("bacon")  # type: ignore[arg-type]
 
-    def test_sim_name(self):
+    def test_sim_name(self) -> None:
         self.assertEqual(SpynnakerDataView.get_sim_name(), sim.name())
         self.assertIn("sPyNNaker", SpynnakerDataView.get_sim_name())

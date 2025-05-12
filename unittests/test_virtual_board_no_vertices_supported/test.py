@@ -21,7 +21,7 @@ class TestNoVertices(BaseTestCase):
     # NO unittest_setup() as sim.setup is called
 
     @staticmethod
-    def test_run():
+    def test_run() -> None:
         p.setup(timestep=1.0, min_delay=1.0)
         p.run(100)
 

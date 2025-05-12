@@ -15,7 +15,7 @@
 import numpy
 import pyNN.spiNNaker as sim
 from pyNN.space import Grid2D
-import matplotlib.pyplot as plt  # type: ignore[import]
+import matplotlib.pyplot as plt
 from spinnaker_testbase import BaseTestCase
 
 

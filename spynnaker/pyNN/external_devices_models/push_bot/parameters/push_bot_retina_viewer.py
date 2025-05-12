@@ -16,7 +16,7 @@ from threading import Thread, RLock
 from time import sleep
 from typing import Any, List
 
-from matplotlib import pyplot  # type: ignore[import]
+from matplotlib import pyplot
 import numpy
 
 from spinn_utilities.log import FormatAdapter

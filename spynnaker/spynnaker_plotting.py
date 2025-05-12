@@ -30,8 +30,8 @@ from typing_extensions import TypeAlias
 plt: ModuleType
 try:
     from pyNN.utility.plotting import repeat
-    import matplotlib.pyplot  # type: ignore[import]
-    from matplotlib.axes import Axes  # type: ignore[import]
+    import matplotlib.pyplot
+    from matplotlib.axes import Axes
     plt = matplotlib.pyplot
     _matplotlib_missing = False
 except ImportError:

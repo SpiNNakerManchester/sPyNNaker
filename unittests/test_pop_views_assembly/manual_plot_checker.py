@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import os
-import matplotlib.pyplot as plt   # type: ignore[import]
+import matplotlib.pyplot as plt
 import pyNN.utility.plotting as plot
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.spynnaker_plotting import SpynnakerPanel

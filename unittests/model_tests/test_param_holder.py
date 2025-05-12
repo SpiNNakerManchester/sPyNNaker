@@ -12,11 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List
 import unittest
+from spinn_utilities.ranged.abstract_sized import Selector
 from spynnaker.pyNN.models.common import ParameterHolder
 
 
-def get_mock(parameter, selector):
+def get_mock(parameter: str, selector: Selector) -> List[float]:
+    assert selector is None
     if parameter == "foo":
         return [1, 2, 3]
     if parameter == "bar":
@@ -29,7 +32,7 @@ class TestParamHolder(unittest.TestCase):
 
     # NO unittest_setup() to make sure call works before setup
 
-    def test_mulitple_items(self):
+    def test_mulitple_items(self) -> None:
         ph = ParameterHolder(["foo", "bar"], get_mock)
         self.assertEqual(2, len(ph))
         self.assertEqual("{'foo': [1, 2, 3], 'bar': [4, 5, 6]}", str(ph))
@@ -37,7 +40,7 @@ class TestParamHolder(unittest.TestCase):
         self.assertFalse(1 in ph)
         self.assertEqual(ph['foo'], [1, 2, 3])
 
-    def test_sinle_item(self):
+    def test_sinle_item(self) -> None:
         ph = ParameterHolder("foo", get_mock)
         self.assertEqual(3, len(ph))
         self.assertEqual("[1, 2, 3]", str(ph))

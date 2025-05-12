@@ -12,14 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import tempfile
 import os
+from typing import List, Optional, Tuple, Union
+from typing_extensions import TypeAlias
+
 import numpy
 import pyNN.spiNNaker as sim
+
 from spinnaker_testbase import BaseTestCase
-import tempfile
+
+from spynnaker.pyNN.models.projection import Projection
 
 WEIGHT = 5
 DELAY = 2
+
+AsList3: TypeAlias = List[Tuple[int, int, float]]
+AsList4: TypeAlias = List[Tuple[int, int, float, float]]
+AsList: TypeAlias = Union[AsList3, AsList4]
 
 
 class TestFromFileConnector(BaseTestCase):
@@ -27,7 +37,9 @@ class TestFromFileConnector(BaseTestCase):
     # NO unittest_setup() as sim.setup is called
 
     def check_weights(
-            self, projection, aslist, w_index, d_index, sources, destinations):
+            self, projection: Projection,
+            aslist: AsList, w_index: Optional[int],
+            d_index: Optional[int], sources: int, destinations: int) -> None:
         from_pro = list(projection.get(["weight", "delay"], "list"))
         aslist.sort()
         as_index = 0
@@ -56,8 +68,10 @@ class TestFromFileConnector(BaseTestCase):
             as_index += 1
 
     def check_other_connect(
-            self, aslist, header=None, w_index=2, d_index=3, sources=6,
-            destinations=8):
+            self, aslist: AsList,
+            header: Optional[str] = None, w_index: Optional[int] = 2,
+            d_index: Optional[int] = 3, sources: int = 6,
+            destinations: int = 8) -> None:
         _, name = tempfile.mkstemp(".temp")
         if header:
             numpy.savetxt(name, aslist, header=header)
@@ -80,8 +94,8 @@ class TestFromFileConnector(BaseTestCase):
         except OSError:
             pass
 
-    def test_simple(self):
-        as_list = [
+    def test_simple(self) -> None:
+        as_list: AsList4 = [
             (0, 0, 0.1, 10),
             (3, 0, 0.2, 11),
             (2, 3, 0.3, 12),
@@ -90,8 +104,8 @@ class TestFromFileConnector(BaseTestCase):
         ]
         self.check_other_connect(as_list)
 
-    def test_list_too_big(self):
-        as_list = [
+    def test_list_too_big(self) -> None:
+        as_list: AsList4 = [
             (0, 0, 0.1, 10),
             (13, 0, 0.2, 11),
             (2, 13, 0.3, 12),
@@ -100,7 +114,7 @@ class TestFromFileConnector(BaseTestCase):
         ]
         self.check_other_connect(as_list)
 
-    def test_no_delays(self):
+    def test_no_delays(self) -> None:
         as_list = [
             (0, 0, 0.1),
             (3, 0, 0.2),
@@ -111,8 +125,8 @@ class TestFromFileConnector(BaseTestCase):
         self.check_other_connect(
             as_list, header='columns = ["i", "j", "weight"]', d_index=None)
 
-    def test_no_weight(self):
-        as_list = [
+    def test_no_weight(self) -> None:
+        as_list: List[Tuple[int, int, float]] = [
             (0, 0, 10),
             (3, 0, 11),
             (2, 3, 12),
@@ -123,8 +137,8 @@ class TestFromFileConnector(BaseTestCase):
             as_list, header='columns = ["i", "j", "delay"]', d_index=2,
             w_index=None)
 
-    def test_invert(self):
-        as_list = [
+    def test_invert(self) -> None:
+        as_list: List[Tuple[int, int, float, float]] = [
             (0, 0, 10, 0.1),
             (3, 0, 11, 0.2),
             (2, 3, 12, 0.3),
@@ -135,10 +149,10 @@ class TestFromFileConnector(BaseTestCase):
             as_list, header='columns = ["i", "j", "delay", "weight"]',
             w_index=3, d_index=2)
 
-    def test_big(self):
+    def test_big(self) -> None:
         sources = 200
         destinations = 300
-        aslist = []
+        aslist: AsList4 = []
         for s in range(sources):
             for d in range(destinations):
                 aslist.append((s, d, 5, 2))
