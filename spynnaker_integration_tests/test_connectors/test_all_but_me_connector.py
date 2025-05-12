@@ -110,7 +110,7 @@ class TestAllButMeConnector(BaseTestCase):
             zip(permutations(range(11), 2), weights))
         print(conns)
         print(groups)
-        assert numpy.array_equal(conns, groups)
+        assert numpy.array_equal(conns, groups)  # type: ignore[arg-type]
 
     def test_all_but_me_weights(self) -> None:
         self.runsafe(self.check_all_but_me_weights)
