@@ -119,7 +119,7 @@ class TestSTDPNearestPairAdditive(BaseTestCase):
         potentiations = a_plus * numpy.exp(
             (numpy.array(potentiation_times) / tau_plus))
         depressions = a_minus * numpy.exp(
-            ( numpy.array(depression_times) / tau_minus))
+            (numpy.array(depression_times) / tau_minus))
         new_weight_exact = \
             initial_weight + numpy.sum(potentiations) - numpy.sum(depressions)
 

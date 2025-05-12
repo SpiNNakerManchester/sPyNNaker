@@ -25,7 +25,8 @@ from spynnaker.pyNN.connections import SpynnakerPoissonControlConnection
 
 class TestPoissonSpikeSource(BaseTestCase):
 
-    def check_spikes(self, n_neurons: int, neo: Block, expected: float) -> None:
+    def check_spikes(
+            self, n_neurons: int, neo: Block, expected: float) -> None:
         spikes = neo.segments[0].spiketrains
         count = sum(len(s) for s in spikes)
         tolerance = math.sqrt(expected)

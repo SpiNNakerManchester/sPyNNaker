@@ -28,7 +28,7 @@ class TestFixedProbConnector(BaseTestCase):
             self, neurons_per_core_pre: Union[int, Tuple[int, ...]],
             pre_size: int, pre_shape: Optional[BaseStructure],
             neurons_per_core_post: int, post_size: int,
-            post_shape: Optional[BaseStructure], prob: float)-> None:
+            post_shape: Optional[BaseStructure], prob: float) -> None:
         sim.setup(1.0)
         pre = sim.Population(
             pre_size, sim.IF_curr_exp(), structure=pre_shape)

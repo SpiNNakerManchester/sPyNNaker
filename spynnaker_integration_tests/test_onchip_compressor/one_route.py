@@ -38,6 +38,7 @@ def find_good_chip(machine: Machine, n_target: int) -> Tuple[int, int]:
     raise SkipTest("No Chip found with You Need at least {} user processors"
                    .format(n_target))
 
+
 def do_one_run() -> None:
     n_source = 2000
     n_target = 16

@@ -57,6 +57,7 @@ def send_input_backward(label: str, sender: LiveEventConnection) -> None:
         print_condition.release()
         sender.send_spike(label, real_id)
 
+
 # Create a receiver of live spikes
 def receive_spikes(label: str, time: int, neuron_ids: List[int]) -> None:
     for neuron_id in neuron_ids:

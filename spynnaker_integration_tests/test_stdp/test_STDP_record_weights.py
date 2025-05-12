@@ -42,8 +42,9 @@ synParameters = {
 
 
 # Network and simulation
-def record_weights_using_callback() -> Tuple[ List[List[int]],
-        SpikeTrainList, AnalogSignal, List[ConnectionHolder]]:
+def record_weights_using_callback(
+        ) -> Tuple[List[List[int]], SpikeTrainList, AnalogSignal,
+                   List[ConnectionHolder]]:
 
     ######################################
     # Setup
@@ -146,8 +147,9 @@ class weight_recorder(object):
 
 
 # Network and simulation
-def record_weights_using_multirun() -> Tuple[ List[List[int]],
-        SpikeTrainList, AnalogSignal, List[ConnectionHolder]]:
+def record_weights_using_multirun(
+        ) -> Tuple[List[List[int]], SpikeTrainList, AnalogSignal,
+                   List[ConnectionHolder]]:
 
     ######################################
     # Setup

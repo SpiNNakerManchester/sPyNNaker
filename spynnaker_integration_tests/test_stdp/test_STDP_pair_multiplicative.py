@@ -66,8 +66,8 @@ def post_spike_same_time() -> None:
     p.end()
 
     new_weight_exact = calculate_spike_pair_multiplicative_stdp_weight(
-        numpy.array(pre_spikes), post_spikes, initial_weight, plastic_delay, min_weight,
-        max_weight, a_plus, a_minus, tau_plus, tau_minus)
+        numpy.array(pre_spikes), post_spikes, initial_weight, plastic_delay,
+        min_weight, max_weight, a_plus, a_minus, tau_plus, tau_minus)
 
     print(weights_1)
     print(weights_2)

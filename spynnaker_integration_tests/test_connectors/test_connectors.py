@@ -55,7 +55,7 @@ class ConnectorsTest(BaseTestCase):
                 counts.append(OVERFLOW)
         return counts
 
-    def calc_spikes_received(self, v: AnalogSignal) ->  List[List[int]]:
+    def calc_spikes_received(self, v: AnalogSignal) -> List[List[int]]:
         counts: List[List[int]] = list()
         counts.append(self.spike_received_count(v[2]))
         counts.append(self.spike_received_count(v[22]))
@@ -65,7 +65,7 @@ class ConnectorsTest(BaseTestCase):
         return counts
 
     def check_counts(self, counts: Union[List[List[int]], NDArray],
-                     connections: int, repeats: bool) -> None   :
+                     connections: int, repeats: bool) -> None:
         count = None
         for count in counts:
             if not repeats:

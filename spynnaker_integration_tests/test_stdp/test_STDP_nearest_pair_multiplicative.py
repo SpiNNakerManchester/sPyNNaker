@@ -117,7 +117,7 @@ class TestSTDPNearestPairAdditive(BaseTestCase):
 
         # Work out the exact weight according to the multiplicative rule
         potentiations = (max_weight - initial_weight) * a_plus * numpy.exp(
-            ( numpy.array(potentiation_times) / tau_plus))
+            (numpy.array(potentiation_times) / tau_plus))
         depressions = (initial_weight - min_weight) * a_minus * numpy.exp(
             (numpy.array(depression_times) / tau_minus))
         new_weight_exact = \

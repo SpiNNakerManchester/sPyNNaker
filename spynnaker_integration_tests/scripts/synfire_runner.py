@@ -15,7 +15,7 @@
 """
 Synfirechain-like example
 """
-from typing import Any, Dict, List, Literal, Optional, Tuple, Type, Union
+from typing import Any, Dict, List, Literal, Optional, Tuple, Type
 
 import neo
 from numpy import floating
@@ -50,18 +50,18 @@ class SynfireRunner(object):
             cell_class: Type = p.IF_curr_exp,
             constraint: None = None,
             cell_params: Dict[str, float] = CELL_PARAMS_LIF,
-            run_times: Optional[List[int]] = None, reset: Literal[False] = False,
-            extract_between_runs: bool = True,
+            run_times: Optional[List[int]] = None,
+            reset: Literal[False] = False, extract_between_runs: bool = True,
             set_between_runs: Optional[List[Tuple[int, str, float]]] = None,
             new_pop: Literal[False] = False,
             record_input_spikes: bool = False,
             record_input_spikes_7: Literal[False] = False,
             record: bool = True, get_spikes: Optional[bool] = None,
             spike_path: None = None, record_7: bool = False,
-            record_v: bool = True, get_v: Optional[bool] = None, v_path: None = None,
-            record_v_7: bool = False,
-            v_sampling_rate: Optional[int] = None, record_gsyn_exc: bool = True,
-            record_gsyn_inh: bool = True,
+            record_v: bool = True, get_v: Optional[bool] = None,
+            v_path: None = None, record_v_7: bool = False,
+            v_sampling_rate: Optional[int] = None,
+            record_gsyn_exc: bool = True, record_gsyn_inh: bool = True,
             get_gsyn_exc: Optional[bool] = None,
             get_gsyn_inh: Optional[bool] = None,
             gsyn_path_exc: None = None, gsyn_path_inh: None = None,

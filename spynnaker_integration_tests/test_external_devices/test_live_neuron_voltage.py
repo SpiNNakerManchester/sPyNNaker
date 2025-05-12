@@ -46,6 +46,7 @@ class Translator(AbstractEthernetTranslator):
         self.voltages[multicast_packet.key].append(
             (float)(decimal.Decimal(voltage) / DataType.S1615.scale))
 
+
 class Device(AbstractMulticastControllableDevice):
 
     def __init__(self, key: int, time_betweeen_sending: int, partition: str):
@@ -65,7 +66,7 @@ class Device(AbstractMulticastControllableDevice):
 
     @property
     @overrides(AbstractMulticastControllableDevice.device_control_min_value)
-    def device_control_min_value(self) ->  float:
+    def device_control_min_value(self) -> float:
         return float(DataType.S1615.min)
 
     @property

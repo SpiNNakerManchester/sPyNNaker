@@ -48,7 +48,6 @@ def do_run(plot: bool) -> Tuple[Block, Block, ConnectionHolder]:
 
     p.setup(timestep=1.0)
 
-
     # Parameters
     n = 5
     weight_to_spike = 2.0
@@ -125,8 +124,8 @@ class SmallWorldConnectorTest(BaseTestCase):
         return singles
 
     def next_connected(self, previous: Dict[int, Set[int]],
-                       single: Dict[int, Set[int]]) -> Dict[int, Set[int]] :
-        current: Dict[int, Set[int]]  = dict()
+                       single: Dict[int, Set[int]]) -> Dict[int, Set[int]]:
+        current: Dict[int, Set[int]] = dict()
         for i in range(25):
             current[i] = set(previous[i])
             for j in previous[i]:

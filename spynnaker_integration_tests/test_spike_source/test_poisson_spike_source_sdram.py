@@ -84,7 +84,7 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
                                delta=tolerance)
 
     def make_delta_pop(self, n_neurons: int, ssp: Population, weight: float,
-                       delay: float=1.0) -> Tuple[Population, Projection]:
+                       delay: float = 1.0) -> Tuple[Population, Projection]:
         pop_1 = sim.Population(
             n_neurons, sim.IF_curr_delta(**PARAMS), label='pop_1',
             n_synapse_cores=1)

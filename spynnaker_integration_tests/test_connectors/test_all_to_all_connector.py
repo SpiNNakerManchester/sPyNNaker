@@ -24,7 +24,7 @@ from spynnaker.pyNN.models.projection import Projection
 class TestAllToAllConnector(BaseTestCase):
 
     def check_weights(self, projection: Projection, sources: int,
-                      destinations: int)-> None:
+                      destinations: int) -> None:
         weights = projection.get(["weight"], "list")
         s_d_set = set((s, d) for s, d, _ in weights)
         self.assertEqual(len(weights), sources * destinations)

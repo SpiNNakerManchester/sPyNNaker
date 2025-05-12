@@ -18,7 +18,7 @@ from spynnaker.pyNN.models.populations import Population
 
 def check_neuron_data(
         spikes: SpikeTrain, v: AnalogSignal, exc: AnalogSignal,
-      expected_spikes: int, simtime: int, label: str, index: int) -> None:
+        expected_spikes: int, simtime: int, label: str, index: int) -> None:
 
     if len(spikes) != expected_spikes:
         raise AssertionError(

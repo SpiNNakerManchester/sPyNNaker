@@ -52,9 +52,10 @@ def run_script(
         record_inh: bool = False, inh_rate: Optional[int] = None,
         inh_rec_indexes: Optional[Sequence[int]] = None,
         inh_get_indexes: Optional[Sequence[int]] = None,
-        file_prefix: str = "") -> Tuple[Optional[SpikeTrainList],
-            Optional[AnalogSignal], Optional[AnalogSignal],
-            Optional[AnalogSignal]]:
+        file_prefix: str = ""
+        ) -> Tuple[Optional[SpikeTrainList],
+                   Optional[AnalogSignal], Optional[AnalogSignal],
+                   Optional[AnalogSignal]]:
 
     sim.setup(timestep=1)
 
@@ -218,7 +219,7 @@ def compare_results(
         v_indexes: Optional[Sequence[int]] = None,
         record_exc: bool = False, exc_rate: Optional[int] = None,
         exc_indexes: Optional[Sequence[int]] = None,
-        record_inh: bool = False, inh_rate: Optional[int]=None,
+        record_inh: bool = False, inh_rate: Optional[int] = None,
         inh_indexes: Optional[Sequence[int]] = None, full_prefix: str = "",
         tolerance: int = sys.maxsize) -> None:
     if record_spikes:
@@ -258,7 +259,7 @@ def merge_indexes(
 
 def run_and_compare_script(
         simtime: int, n_neurons: int, run_split: int = 1,
-        record_spikes: bool=False, spike_rate: Optional[int] = None,
+        record_spikes: bool = False, spike_rate: Optional[int] = None,
         spike_rec_indexes:  Optional[Sequence[int]] = None,
         spike_get_indexes: Optional[Sequence[int]] = None,
         record_v: bool = False, v_rate: Optional[int] = None,

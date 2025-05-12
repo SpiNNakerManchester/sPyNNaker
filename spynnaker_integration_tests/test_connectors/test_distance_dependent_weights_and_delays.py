@@ -23,6 +23,7 @@ from pyNN.random import NumpyRNG
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 
+
 def do_run(plot: bool) -> Tuple[ConnectionHolder, ConnectionHolder]:
 
     p.setup(timestep=1.0)

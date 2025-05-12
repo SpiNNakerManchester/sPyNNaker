@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Dict, List, Set, Tuple
+from typing import Dict, Set, Tuple
 from neo import Block
 import pyNN.spiNNaker as p
 from spynnaker.pyNN.models.neuron import ConnectionHolder
@@ -144,7 +144,8 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
               16, 16, 16, 17, 18, 21,
               21, 21, 21, 21, 21, 22]
 
-    def directly_connected(self, weights: ConnectionHolder) -> Dict[int, Set[int]]:
+    def directly_connected(
+            self, weights: ConnectionHolder) -> Dict[int, Set[int]]:
         singles = defaultdict(set)
         for (s, d, _) in weights:
             singles[s].add(d)

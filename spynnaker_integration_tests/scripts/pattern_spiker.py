@@ -127,7 +127,8 @@ class PatternSpiker(object):
     def check(
             self, pop: Population, simtime: int,
             spike_rate: Optional[int] = None,
-            spike_rec_indexes: Optional[List[int]] = None, v_rate: Optional[int] = None,
+            spike_rec_indexes: Optional[List[int]] = None,
+            v_rate: Optional[int] = None,
             v_rec_indexes: Optional[List[int]] = None, is_view: bool = False,
             missing: bool = False) -> None:
         if is_view:

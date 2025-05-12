@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import random
-import time
 from spinn_utilities.config_holder import get_config_bool
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase

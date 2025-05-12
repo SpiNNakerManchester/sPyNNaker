@@ -53,7 +53,8 @@ def test_weight_changer_limits() -> None:
         sim.extra_models.WeightChangeable(0.25, 4.5, weight=2.0, delay=1.0))
     changable_proj_2 = sim.Projection(
         pre, post, sim.OneToOneConnector(),
-        sim.extra_models.WeILSpikeightChangeable(0.25, 4.5, weight=1.5, delay=1.0))
+        sim.extra_models.WeILSpikeightChangeable(
+            0.25, 4.5, weight=1.5, delay=1.0))
 
     change_proj_1 = sim.Projection(
         changer_1, post, sim.OneToOneConnector(),
