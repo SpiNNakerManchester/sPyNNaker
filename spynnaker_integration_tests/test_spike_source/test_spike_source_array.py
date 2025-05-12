@@ -57,7 +57,7 @@ class TestSpikeSourceArray(BaseTestCase):
         p.run(5000)
 
         spike_array_spikes = populations[1].spinnaker_get_data("spikes")
-        boxed_array: ND = numpy.zeros(shape=(0, 2))
+        boxed_array: NDArray = numpy.zeros(shape=(0, 2))
         boxed_array = numpy.append(boxed_array, [[0, 0]], axis=0)
         numpy.testing.assert_array_equal(spike_array_spikes, boxed_array)
 
@@ -92,7 +92,7 @@ class TestSpikeSourceArray(BaseTestCase):
             spike_array.append(list())
             for counter in range(0, 20):
                 random_time = random.randint(0, 4999)
-                boxed_array2 = numpy.append(
+                boxed_array = numpy.append(
                     boxed_array, [[neuron_id, random_time]], axis=0)
                 spike_array[neuron_id].append(random_time)
         spike_array_params = {'spike_times': spike_array}
