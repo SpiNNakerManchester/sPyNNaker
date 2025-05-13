@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Generator
+from typing import Iterator
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -21,7 +21,7 @@ import pyNN.spiNNaker as sim
 
 
 @pytest.fixture(autouse=True)
-def check_end_is_called(request: SubRequest) -> Generator[None]:
+def check_end_is_called(request: SubRequest) -> Iterator[None]:
     """ Fixture for all tests, to make sure end is used!
     """
     yield
