@@ -113,24 +113,24 @@ class LargePopWeightDelayRetrival(BaseTestCase):
             pre_weights = pre_weights_list[i]
             assert isinstance(pre_weights, list)
             pre_weights_a = pre_weights_array[int(pre_weights[0])]
-            assert isinstance(pre_weights_a, list)
+            assert isinstance(pre_weights_a, numpy.ndarray)
             self.assertEqual(pre_weights[2],
                              pre_weights_a[int(pre_weights[1])])
             pre_delays = pre_delays_list[i]
             assert isinstance(pre_delays, list)
             pre_delays_a = pre_delays_array[int(pre_delays[0])]
-            assert isinstance(pre_delays_a, list)
+            assert isinstance(pre_delays_a, numpy.ndarray)
             self.assertEqual(pre_delays[2], pre_delays_a[int(pre_delays[1])])
             post_weights = post_weights_list[i]
             assert isinstance(post_weights, list)
             post_weights_a = post_weights_array[int(post_weights[0])]
-            assert isinstance(post_weights_a, list)
+            assert isinstance(post_weights_a, numpy.ndarray)
             self.assertEqual(
                 post_weights[2], post_weights_a[int(post_weights[1])])
             post_delays = post_delays_list[i]
             assert isinstance(post_delays, list)
             post_delays_a = post_delays_array[int(post_delays[0])]
-            assert isinstance(post_delays_a, list)
+            assert isinstance(post_delays_a, numpy.ndarray)
             self.assertEqual(post_delays[2],
                              post_delays_a[int(post_delays[1])])
 
