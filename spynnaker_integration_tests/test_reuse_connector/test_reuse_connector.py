@@ -52,12 +52,10 @@ class ReuseConnectorTest(BaseTestCase):
         self.assertEqual(1, len(proj_2_list))
         for i in range(4):
             test_1 = test_1_list[0]
-            assert isinstance(test_1, list)
             proj_1 = proj_1_list[0]
             assert isinstance(proj_1, list)
             self.assertEqual(test_1[i], proj_1[i])
             test_2 = test_2_list[0]
-            assert isinstance(test_2, list)
             proj_2 = proj_2_list[0]
             assert isinstance(proj_2, list)
             self.assertEqual(test_2[i], proj_2[i])
