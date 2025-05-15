@@ -52,8 +52,8 @@ from spinn_machine.machine import Machine
 from spinn_front_end_common.utilities.exceptions import (
     ConfigurationException)
 
-# Self import to check if copied into pyNN.spiNNaker
-import spynnaker.pyNN as _sim
+# Self import to check files if copied into pyNN.spiNNaker
+import spynnaker.pyNN as _sim  # pylint disable=import-self
 
 from spynnaker.pyNN.exceptions import SpynnakerException
 
