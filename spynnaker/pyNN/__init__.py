@@ -21,7 +21,9 @@ This package contains the profile of that code for PyNN 0.9.
 # pylint: disable=invalid-name
 
 # common imports
+import filecmp
 import logging
+import os
 from typing import (
     Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type,
     TypedDict, Union, cast)
@@ -49,6 +51,11 @@ from spinn_machine.machine import Machine
 
 from spinn_front_end_common.utilities.exceptions import (
     ConfigurationException)
+
+# Selt import to check if copied into pyNN.spiNNaker
+import spynnaker.pyNN as _sim
+
+from spynnaker.pyNN.exceptions import SpynnakerException
 
 from spynnaker.pyNN.random_distribution import RandomDistribution
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -137,6 +144,8 @@ from spynnaker.pyNN.models.current_sources import (
 
 from spynnaker.pyNN import external_devices
 from spynnaker.pyNN import extra_models
+
+from spynnaker.pyNN.setup_pynn import setup_pynn
 
 # big stuff
 from spynnaker.pyNN.spinnaker import SpiNNaker
@@ -745,3 +754,13 @@ def get_machine() -> Machine:
     """
     SpynnakerDataView.check_user_can_act()
     return SpynnakerDataView.get_machine()
+
+
+# Check copy in case being run from pyNN.spiNNaker
+indirect = os.path.abspath(_sim.__file__)
+direct = __file__
+if direct != indirect:
+    if not filecmp.cmp(direct, indirect):
+        setup_pynn()
+        raise SpynnakerException(
+            "pyNN.spiNNaker needed updating please restart your script")
