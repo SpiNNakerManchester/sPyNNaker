@@ -17,5 +17,5 @@ from .check_debug import CheckDebug
 
 class TestDebug(CheckDebug):
 
-    def test_debug(self):
+    def test_debug(self) -> None:
         self.runsafe(self.debug)
