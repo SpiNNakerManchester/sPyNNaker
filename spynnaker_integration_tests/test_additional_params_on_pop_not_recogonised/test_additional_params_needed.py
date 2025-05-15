@@ -15,7 +15,7 @@ import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 
-def a_run():
+def a_run() -> None:
     n_neurons = 100  # number of neurons in each population
 
     p.setup(timestep=1.0, min_delay=1.0)
@@ -29,7 +29,7 @@ def a_run():
 
 class PopAdditionParamsTest(BaseTestCase):
 
-    def test_a_run(self):
+    def test_a_run(self) -> None:
         self.runsafe(a_run)
 
 

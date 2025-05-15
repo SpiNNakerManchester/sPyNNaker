@@ -18,7 +18,7 @@ from spynnaker.pyNN.exceptions import (
 from spinnaker_testbase import BaseTestCase
 
 
-def mission_impossible():
+def mission_impossible() -> None:
     sim.setup(0.1, time_scale_factor=1)
     sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 128)
     sim.set_number_of_synapse_cores(sim.IF_curr_exp, 1)
@@ -34,7 +34,7 @@ def mission_impossible():
         sim.run(100)
 
 
-def mission_impossible_2():
+def mission_impossible_2() -> None:
     sim.setup(0.1, time_scale_factor=1)
 
     # Can't do structural on multiple synapse cores
@@ -52,8 +52,8 @@ def mission_impossible_2():
 
 class TestSplitImpossible(BaseTestCase):
 
-    def test_mission_impossible(self):
+    def test_mission_impossible(self) -> None:
         self.runsafe(mission_impossible)
 
-    def test_mission_impossible_2(self):
+    def test_mission_impossible_2(self) -> None:
         self.runsafe(mission_impossible_2)

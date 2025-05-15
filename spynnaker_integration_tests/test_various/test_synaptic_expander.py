@@ -12,16 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.spiNNaker as p
-from spinnman.exceptions import SpiNNManCoresNotInStateException
-import functools
-from spinnaker_testbase import BaseTestCase
-import numpy
 from collections import defaultdict
+import functools
 import math
+from typing import Dict, List
+
+import numpy
+import pyNN.spiNNaker as p
+
+from spinnman.exceptions import SpiNNManCoresNotInStateException
+from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 
-def run_script():
+def run_script() -> None:
     p.setup(1.0)
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 3)
 
@@ -96,7 +100,7 @@ def run_script():
     p.end()
 
 
-def check_params(param, result):
+def check_params(param: float, result: ConnectionHolder) -> None:
     if not isinstance(param, p.RandomDistribution):
         assert all(param == value for value in result)
     else:
@@ -112,33 +116,33 @@ def check_params(param, result):
             assert param.parameters["high"] >= maximum
 
 
-def check_one_to_one(n, conns):
+def check_one_to_one(n: int, conns: List[List[int]]) -> None:
     assert len(conns) == n
     assert all(pre == post for pre, post in conns)
 
 
-def conns_by_pre(conns):
+def conns_by_pre(conns: List[List[int]]) -> Dict[int, List[int]]:
     cbp = defaultdict(list)
     for pre, post in conns:
         cbp[pre].append(post)
     return cbp
 
 
-def conns_by_post(conns):
+def conns_by_post(conns: List[List[int]]) -> Dict[int, List[int]]:
     cbp = defaultdict(list)
     for pre, post in conns:
         cbp[post].append(pre)
     return cbp
 
 
-def check_all_to_all(n, conns):
+def check_all_to_all(n: int, conns: List[List[int]]) -> None:
     cbp = conns_by_pre(conns)
     assert len(cbp) == n
     for pre in cbp:
         assert numpy.array_equal(sorted(cbp[pre]), range(n))
 
 
-def check_fixed_prob(n, prob, conns):
+def check_fixed_prob(n: int, prob: float, conns: List[List[int]]) -> None:
     cbpre = conns_by_pre(conns)
     cbpost = conns_by_post(conns)
     expected = n * prob
@@ -151,11 +155,11 @@ def check_fixed_prob(n, prob, conns):
     assert avgpost <= (expected + error)
 
 
-def check_fixed_total(total, conns):
+def check_fixed_total(total: int, conns: List[List[int]]) -> None:
     assert len(conns) == total
 
 
-def run_bad_normal_clipping():
+def run_bad_normal_clipping() -> None:
     p.setup(timestep=1.0)
 
     pop_1 = p.Population(4, p.IF_curr_exp(), label="pop_1")
@@ -174,10 +178,10 @@ def run_bad_normal_clipping():
 
 class TestSynapticExpander(BaseTestCase):
 
-    def test_script(self):
+    def test_script(self) -> None:
         self.runsafe(run_script)
 
-    def test_bad_normal_clipping(self):
+    def test_bad_normal_clipping(self) -> None:
         with self.assertRaises(SpiNNManCoresNotInStateException):
             run_bad_normal_clipping()
 

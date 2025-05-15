@@ -29,11 +29,11 @@ class TestLongDelay(BaseTestCase):
     tests the run is split buy auto pause resume
     """
 
-    def test_run(self):
+    def test_run(self) -> None:
         synfire_run.do_run(n_neurons, delay=delay, run_times=[runtime])
         spikes = synfire_run.get_output_pop_spikes_numpy()
 
         self.assertEqual(59, len(spikes))
 
-    def more_runs(self):
+    def more_runs(self) -> None:
         self.runsafe(self.more_runs)

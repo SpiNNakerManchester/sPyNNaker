@@ -21,8 +21,8 @@ from spynnaker_integration_tests.test_onchip_compressor.one_route \
 
 class TestPairCompressor(BaseTestCase):
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(do_run)
 
-    def test_do_one_run(self):
+    def test_do_one_run(self) -> None:
         self.runsafe(do_one_run)

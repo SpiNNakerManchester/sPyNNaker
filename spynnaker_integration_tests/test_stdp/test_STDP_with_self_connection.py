@@ -16,7 +16,7 @@ import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 
 
-def stdp_with_self_connection():
+def stdp_with_self_connection() -> None:
 
     sim.setup(timestep=1.0)
 
@@ -49,7 +49,7 @@ def stdp_with_self_connection():
 
 class TestSTDPWithSelfConnection(BaseTestCase):
 
-    def test_stdp_with_self_connection(self):
+    def test_stdp_with_self_connection(self) -> None:
         self.runsafe(stdp_with_self_connection)
 
 

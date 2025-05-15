@@ -12,14 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import defaultdict
+from typing import Dict, Set, Tuple
+from neo import Block
 import pyNN.spiNNaker as p
+from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spynnaker.pyNN.models.populations import Population
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(m_size, n_atoms_side):
-
-    p.setup(timestep=1.0)
-
+def create_grid(
+        n: int, label: str, dx: float = 1.0, dy: float = 1.0) -> Population:
     cell_params_lif = {'cm': 0.25,
                        'i_offset': 0.0,
                        'tau_m': 20.0,
@@ -31,10 +34,15 @@ def do_run(m_size, n_atoms_side):
                        'v_thresh': -50.0
                        }
 
-    def create_grid(n, label, dx=1.0, dy=1.0):
-        grid_structure = p.Grid2D(dx=dx, dy=dy, x0=0.0, y0=0.0)
-        return p.Population(n*n, p.IF_curr_exp(**cell_params_lif),
-                            structure=grid_structure, label=label)
+    grid_structure = p.Grid2D(dx=dx, dy=dy, x0=0.0, y0=0.0)
+    return p.Population(n * n, p.IF_curr_exp(**cell_params_lif),
+                        structure=grid_structure, label=label)
+
+
+def do_run(m_size: Tuple[int, int],
+           n_atoms_side: int) -> Tuple[Block, ConnectionHolder]:
+
+    p.setup(timestep=1.0)
 
     # Parameters
     weight_to_spike = 2.0
@@ -136,16 +144,16 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
               16, 16, 16, 17, 18, 21,
               21, 21, 21, 21, 21, 22]
 
-    def directly_connected(self, weights):
-        from collections import defaultdict
+    def directly_connected(
+            self, weights: ConnectionHolder) -> Dict[int, Set[int]]:
         singles = defaultdict(set)
         for (s, d, _) in weights:
             singles[s].add(d)
             singles[d].add(s)
         return singles
 
-    def run_1_core(self):
-        spikes, weights = do_run([6, 6], 6)
+    def run_1_core(self) -> None:
+        spikes, weights = do_run((6, 6), 6)
 
         single_connected = self.directly_connected(weights)
         for spike_train in spikes:
@@ -158,8 +166,8 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
 
         self.assertDictEqual(self.S_DICT, single_connected)
 
-    def run_many_core_2_2(self):
-        spikes, weights = do_run([2, 2], 6)
+    def run_many_core_2_2(self) -> None:
+        spikes, weights = do_run((2, 2), 6)
 
         single_connected = self.directly_connected(weights)
         print(single_connected)
@@ -169,8 +177,8 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
         for spike_train, first in zip(spikes, self.FIRSTS):
             self.assertAlmostEqual(first, spike_train[0].magnitude, delta=1)
 
-    def run_many_core_3_3(self):
-        spikes, weights = do_run([3, 3], 6)
+    def run_many_core_3_3(self) -> None:
+        spikes, weights = do_run((3, 3), 6)
         # Not sure checking spike len is telling us much
         for spike_train, first in zip(spikes, self.FIRSTS):
             self.assertAlmostEqual(first, spike_train[0].magnitude, delta=1)
@@ -178,11 +186,11 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
         single_connected = self.directly_connected(weights)
         self.assertDictEqual(self.S_DICT, single_connected)
 
-    def test_1_core(self):
+    def test_1_core(self) -> None:
         self.runsafe(self.run_1_core)
 
-    def test_many_core_2_2(self):
+    def test_many_core_2_2(self) -> None:
         self.runsafe(self.run_many_core_2_2)
 
-    def test_many_core_3_3(self):
+    def test_many_core_3_3(self) -> None:
         self.runsafe(self.run_many_core_3_3)

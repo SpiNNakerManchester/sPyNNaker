@@ -19,7 +19,7 @@ from spynnaker.pyNN.data import SpynnakerDataView
 
 class TestOnlyCoresRecording(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(timestep=1.0, n_boards_required=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 
@@ -61,5 +61,5 @@ class TestOnlyCoresRecording(BaseTestCase):
         self.assertNotIn(
             "iobuf_for_chip_1_1_processor_id_2.txt", provenance_files)
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)

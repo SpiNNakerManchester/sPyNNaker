@@ -12,9 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List, Union
+
+from neo import AnalogSignal
 import numpy
+from numpy.typing import NDArray
 import pyNN.spiNNaker as sim
+from quantities import Quantity
+
+from spynnaker.pyNN import FixedTotalNumberConnector, OneToOneConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.models.projection import Projection
+from spynnaker.pyNN.models.populations import Population
 from spinnaker_testbase import BaseTestCase
 
 SOURCES = 5
@@ -24,10 +33,10 @@ OVERFLOW = 6
 
 class ConnectorsTest(BaseTestCase):
 
-    def test_onetoone_multicore_population_views(self):
+    def test_onetoone_multicore_population_views(self) -> None:
         self.runsafe(self.onetoone_multicore_population_views)
 
-    def spike_received_count(self, v_line):
+    def spike_received_count(self, v_line: Quantity) -> List[int]:
         counts = []
         for v in v_line:
             if v < -64:
@@ -46,8 +55,8 @@ class ConnectorsTest(BaseTestCase):
                 counts.append(OVERFLOW)
         return counts
 
-    def calc_spikes_received(self, v):
-        counts = list()
+    def calc_spikes_received(self, v: AnalogSignal) -> List[List[int]]:
+        counts: List[List[int]] = list()
         counts.append(self.spike_received_count(v[2]))
         counts.append(self.spike_received_count(v[22]))
         counts.append(self.spike_received_count(v[42]))
@@ -55,7 +64,8 @@ class ConnectorsTest(BaseTestCase):
         counts.append(self.spike_received_count(v[82]))
         return counts
 
-    def check_counts(self, counts, connections, repeats):
+    def check_counts(self, counts: Union[List[List[int]], NDArray],
+                     connections: int, repeats: bool) -> None:
         count = None
         for count in counts:
             if not repeats:
@@ -63,9 +73,11 @@ class ConnectorsTest(BaseTestCase):
         if max(count) < OVERFLOW:
             self.assertEqual(connections, sum(count))
 
-    def check_connection(self, projection, destination, connections, repeats,
-                         conn_type, n_destinations=DESTINATIONS):
-        neo = destination.get_data(["v"])
+    def check_connection(
+            self, projection: Projection, destination_pop: Population,
+            connections: int, repeats: bool, conn_type: str,
+            n_destinations: int = DESTINATIONS) -> None:
+        neo = destination_pop.get_data(["v"])
         v = neo.segments[0].filter(name="v")[0]
         weights = projection.get(["weight"], "list")
         counts = self.calc_spikes_received(v)
@@ -82,6 +94,7 @@ class ConnectorsTest(BaseTestCase):
                 print(expected)
                 raise AssertionError("Weights and v differ")
 
+        destination: int
         for (source, destination, _) in weights:
             self.assertLess(source, SOURCES)
             self.assertLess(destination, n_destinations)
@@ -109,8 +122,11 @@ class ConnectorsTest(BaseTestCase):
             if the_max < OVERFLOW:
                 self.assertEqual(connections, sum(map(sum, counts)))
 
-    def check_connector(self, connector, connections, repeats,
-                        conn_type="post", n_destinations=DESTINATIONS):
+    def check_connector(
+            self,
+            connector: Union[OneToOneConnector, FixedTotalNumberConnector],
+            connections: int, repeats: bool, conn_type: str = "post",
+            n_destinations: int = DESTINATIONS) -> None:
         sim.setup(1.0)
         # sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 2)
 
@@ -129,17 +145,17 @@ class ConnectorsTest(BaseTestCase):
             n_destinations)
         sim.end()
 
-    def one_to_one(self):
+    def one_to_one(self) -> None:
         connections = min(SOURCES, DESTINATIONS)
         with_replacement = False
         self.check_connector(
             sim.OneToOneConnector(), connections,  with_replacement,
             conn_type="one")
 
-    def test_one_to_one(self):
+    def test_one_to_one(self) -> None:
         self.runsafe(self.one_to_one)
 
-    def one_to_one_short_destination(self):
+    def one_to_one_short_destination(self) -> None:
         n_destinations = SOURCES-1
         connections = min(SOURCES, n_destinations)
         with_replacement = False
@@ -147,10 +163,10 @@ class ConnectorsTest(BaseTestCase):
             sim.OneToOneConnector(), connections, with_replacement,
             conn_type="one", n_destinations=4)
 
-    def test_one_to_one_short_destination(self):
+    def test_one_to_one_short_destination(self) -> None:
         self.runsafe(self.one_to_one_short_destination)
 
-    def total_connector_with_replacement(self):
+    def total_connector_with_replacement(self) -> None:
         connections = 20
         with_replacement = True
         self.check_connector(
@@ -158,10 +174,10 @@ class ConnectorsTest(BaseTestCase):
                 connections, with_replacement=with_replacement),
             connections,  with_replacement, conn_type="total")
 
-    def test_total_connector_with_replacement(self):
+    def test_total_connector_with_replacement(self) -> None:
         self.runsafe(self.total_connector_with_replacement)
 
-    def total_connector_no_replacement(self):
+    def total_connector_no_replacement(self) -> None:
         connections = 20
         with_replacement = False
         self.check_connector(
@@ -169,10 +185,10 @@ class ConnectorsTest(BaseTestCase):
                 connections, with_replacement=with_replacement),
             connections,  with_replacement, conn_type="total")
 
-    def test_total_connector_no_replacement(self):
+    def test_total_connector_no_replacement(self) -> None:
         self.runsafe(self.total_connector_no_replacement)
 
-    def total_connector_with_replacement_many(self):
+    def total_connector_with_replacement_many(self) -> None:
         connections = 60
         with_replacement = True
         self.check_connector(
@@ -180,10 +196,10 @@ class ConnectorsTest(BaseTestCase):
                 connections, with_replacement=with_replacement),
             connections,  with_replacement, conn_type="total")
 
-    def test_total_connector_with_replacement_many(self):
+    def test_total_connector_with_replacement_many(self) -> None:
         self.runsafe(self.total_connector_with_replacement_many)
 
-    def total_connector_too_many(self):
+    def total_connector_too_many(self) -> None:
         connections = 60
         with_replacement = False
         with self.assertRaises(SpynnakerException):
@@ -194,10 +210,10 @@ class ConnectorsTest(BaseTestCase):
         # We have to end here as the exception happens before end
         sim.end()
 
-    def test_total_connector_too_many(self):
+    def test_total_connector_too_many(self) -> None:
         self.runsafe(self.total_connector_too_many)
 
-    def multiple_connectors(self):
+    def multiple_connectors(self) -> None:
         n_destinations = 5
         sim.setup(1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 2)
@@ -226,10 +242,10 @@ class ConnectorsTest(BaseTestCase):
                     self.assertEqual(count[j], 1)
         sim.end()
 
-    def test_multiple_connectors(self):
+    def test_multiple_connectors(self) -> None:
         self.runsafe(self.multiple_connectors)
 
-    def onetoone_population_views(self):
+    def onetoone_population_views(self) -> None:
         sim.setup(timestep=1.0)
         in_pop = sim.Population(4, sim.SpikeSourceArray([0]), label="in_pop")
         pop = sim.Population(4, sim.IF_curr_exp(), label="pop")
@@ -241,10 +257,10 @@ class ConnectorsTest(BaseTestCase):
         target = [[1, 2, 0.5, 2.], [2, 3, 0.5, 2.]]
         self.assertCountEqual(weights, target)
 
-    def test_onetoone_population_views(self):
+    def test_onetoone_population_views(self) -> None:
         self.runsafe(self.onetoone_population_views)
 
-    def onetoone_multicore_population_views(self):
+    def onetoone_multicore_population_views(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 10)
         sim.set_number_of_neurons_per_core(sim.SpikeSourceArray, 10)
@@ -261,7 +277,7 @@ class ConnectorsTest(BaseTestCase):
                   [9, 12, 0.5, 2.], [10, 13, 0.5, 2.], [11, 14, 0.5, 2.]]
         self.assertCountEqual(weights, target)
 
-    def fixedprob_population_views(self):
+    def fixedprob_population_views(self) -> None:
         sim.setup(timestep=1.0)
         in_pop = sim.Population(4, sim.SpikeSourceArray([0]), label="in_pop")
         pop = sim.Population(4, sim.IF_curr_exp(), label="pop",
@@ -276,10 +292,10 @@ class ConnectorsTest(BaseTestCase):
         target = [[2, 2, 0.5, 2.0], [2, 3, 0.5, 2.0]]
         self.assertCountEqual(weights, target)
 
-    def test_fixedprob_population_views(self):
+    def test_fixedprob_population_views(self) -> None:
         self.runsafe(self.fixedprob_population_views)
 
-    def fixedpre_population_views(self):
+    def fixedpre_population_views(self) -> None:
         sim.setup(timestep=1.0)
         in_pop = sim.Population(4, sim.SpikeSourceArray([0]), label="in_pop")
         pop = sim.Population(4, sim.IF_curr_exp(), label="pop",
@@ -295,10 +311,10 @@ class ConnectorsTest(BaseTestCase):
                   [1, 1, 0.5, 2.0], [2, 2, 0.5, 2.0], [2, 3, 0.5, 2.0]]
         self.assertCountEqual(weights, target)
 
-    def test_fixedpre_population_views(self):
+    def test_fixedpre_population_views(self) -> None:
         self.runsafe(self.fixedpre_population_views)
 
-    def fixedpost_population_views(self):
+    def fixedpost_population_views(self) -> None:
         sim.setup(timestep=1.0)
         in_pop = sim.Population(4, sim.SpikeSourceArray([0]), label="in_pop")
         pop = sim.Population(4, sim.IF_curr_exp(), label="pop",
@@ -314,10 +330,10 @@ class ConnectorsTest(BaseTestCase):
                   [1, 3, 0.5, 2.0], [2, 1, 0.5, 2.0], [2, 2, 0.5, 2.0]]
         self.assertCountEqual(weights, target)
 
-    def test_fixedpost_population_views(self):
+    def test_fixedpost_population_views(self) -> None:
         self.runsafe(self.fixedpost_population_views)
 
-    def fixedtotal_population_views(self):
+    def fixedtotal_population_views(self) -> None:
         sim.setup(timestep=1.0)
         in_pop = sim.Population(4, sim.SpikeSourceArray([0]), label="in_pop")
         pop = sim.Population(4, sim.IF_curr_exp(), label="pop",
@@ -345,5 +361,5 @@ class ConnectorsTest(BaseTestCase):
         self.assertCountEqual(weights2, target2)
         self.assertEqual(len(weights2), n_conns)
 
-    def test_fixedtotal_population_views(self):
+    def test_fixedtotal_population_views(self) -> None:
         self.runsafe(self.fixedtotal_population_views)

@@ -12,15 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import math
+from typing import Tuple
+
 from unittest import SkipTest
-from spinn_front_end_common.interface.provenance import GlobalProvenance
-from spynnaker.pyNN.exceptions import ConfigurationException
 import pyNN.spiNNaker as sim
+
+from spinn_machine import Machine
+
+from spinn_front_end_common.interface.provenance import GlobalProvenance
+
+from spynnaker.pyNN.exceptions import ConfigurationException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterPopulationVertexFixed)
 
 
-def find_good_chip(machine, n_target):
+def find_good_chip(machine: Machine, n_target: int) -> Tuple[int, int]:
     for x in range(1, 8):
         for y in range(1, 8):
             chip = machine.get_chip_at(x, y)
@@ -33,7 +39,7 @@ def find_good_chip(machine, n_target):
                    .format(n_target))
 
 
-def do_one_run():
+def do_one_run() -> None:
     n_source = 2000
     n_target = 16
     n_neurons = 1
@@ -80,6 +86,6 @@ def do_one_run():
 
     sim.run(1)
     with GlobalProvenance() as db:
-        t = db.get_timer_provenance("Routing table loader")
-    assert t == "", "Routing table loader should not have run"
+        td = db.get_timer_provenance("Routing table loader")
+    assert td == "", "Routing table loader should not have run"
     sim.end()

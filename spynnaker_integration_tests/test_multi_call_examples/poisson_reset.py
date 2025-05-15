@@ -15,7 +15,7 @@ import pyNN.spiNNaker as sim
 from spinn_front_end_common.data.fec_data_view import FecDataView
 
 
-def test_possion_reset():
+def test_possion_reset() -> None:
     """ Check that DSG still does the right thing after reset
     """
     sim.setup(1.0)

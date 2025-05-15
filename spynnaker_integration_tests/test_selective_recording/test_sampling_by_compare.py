@@ -13,9 +13,14 @@
 # limitations under the License.
 
 import os
+from typing import List, Optional, Sequence, Tuple
 import sys
+
+from neo.core.spiketrainlist import SpikeTrainList
+from neo import AnalogSignal
 import numpy
 import pyNN.spiNNaker as sim
+
 from spynnaker.pyNN.models.populations import PopulationView
 from spinnaker_testbase import BaseTestCase
 
@@ -34,15 +39,23 @@ Which is why most tests are commented out.
 
 
 def run_script(
-        simtime, n_neurons, run_split=1,
-        record_spikes=False, spike_rate=None, spike_rec_indexes=None,
-        spike_get_indexes=None,
-        record_v=False, v_rate=None, v_rec_indexes=None,  v_get_indexes=None,
-        record_exc=False, exc_rate=None, exc_rec_indexes=None,
-        exc_get_indexes=None,
-        record_inh=False, inh_rate=None, inh_rec_indexes=None,
-        inh_get_indexes=None,
-        file_prefix=""):
+        simtime: int, n_neurons: int, run_split: int = 1,
+        record_spikes: bool = False, spike_rate: Optional[int] = None,
+        spike_rec_indexes: Optional[Sequence[int]] = None,
+        spike_get_indexes: Optional[Sequence[int]] = None,
+        record_v: bool = False, v_rate: Optional[int] = None,
+        v_rec_indexes: Optional[Sequence[int]] = None,
+        v_get_indexes: Optional[Sequence[int]] = None,
+        record_exc: bool = False, exc_rate: Optional[int] = None,
+        exc_rec_indexes: Optional[Sequence[int]] = None,
+        exc_get_indexes: Optional[Sequence[int]] = None,
+        record_inh: bool = False, inh_rate: Optional[int] = None,
+        inh_rec_indexes: Optional[Sequence[int]] = None,
+        inh_get_indexes: Optional[Sequence[int]] = None,
+        file_prefix: str = ""
+        ) -> Tuple[Optional[SpikeTrainList],
+                   Optional[AnalogSignal], Optional[AnalogSignal],
+                   Optional[AnalogSignal]]:
 
     sim.setup(timestep=1)
 
@@ -134,7 +147,8 @@ def run_script(
     return spikes, v,  exc, inh
 
 
-def compare_spikearrays(this, full, tolerance=False):
+def compare_spikearrays(this: List[float], full: List[float],
+                        tolerance: bool = False) -> float:
     if numpy.array_equal(this, full):
         return sys.maxsize
     if this[0] != full[0]:
@@ -173,18 +187,21 @@ def compare_spikearrays(this, full, tolerance=False):
         i2 += 1
     if lowest is None:
         lowest = sys.maxsize
+    assert lowest is not None
     return lowest
 
 
-def compare_spikes(file_path, full_path, simtime, n_neurons, spike_rate=1,
-                   spike_indexes=None, tolerance=sys.maxsize):
+def compare_spikes(file_path: str, full_path: str, simtime: int,
+                   n_neurons: int, spike_rate: int = 1,
+                   spike_indexes: Optional[Sequence[int]] = None,
+                   tolerance: int = sys.maxsize) -> float:
     this_spikes = read_spikes(file_path, simtime, n_neurons)
     full_spikes = read_spikes(full_path, simtime, n_neurons, rate=spike_rate,
                               indexes=spike_indexes)
     if len(this_spikes) != len(full_spikes):
         raise ValueError(f"Spikes different length this {len(this_spikes)} "
                          "full {len(full_spikes)}")
-    lowest = sys.maxsize
+    lowest: float = sys.maxsize
     for this, full in zip(this_spikes, full_spikes):
         low = compare_spikearrays(this, full)
         lowest = min(lowest, low)
@@ -195,15 +212,20 @@ def compare_spikes(file_path, full_path, simtime, n_neurons, spike_rate=1,
 
 
 def compare_results(
-        simtime, n_neurons,
-        record_spikes=False, spike_rate=None, spike_indexes=None,
-        record_v=False, v_rate=None, v_indexes=None,
-        record_exc=False, exc_rate=None, exc_indexes=None,
-        record_inh=False, inh_rate=None, inh_indexes=None, full_prefix="",
-        tolerance=sys.maxsize):
+        simtime: int, n_neurons: int,
+        record_spikes: bool = False, spike_rate: Optional[int] = None,
+        spike_indexes: Optional[Sequence[int]] = None,
+        record_v: bool = False, v_rate: Optional[int] = None,
+        v_indexes: Optional[Sequence[int]] = None,
+        record_exc: bool = False, exc_rate: Optional[int] = None,
+        exc_indexes: Optional[Sequence[int]] = None,
+        record_inh: bool = False, inh_rate: Optional[int] = None,
+        inh_indexes: Optional[Sequence[int]] = None, full_prefix: str = "",
+        tolerance: int = sys.maxsize) -> None:
     if record_spikes:
         file_path = "spikes.csv"
         full_path = full_prefix+"spikes.csv"
+        assert spike_rate is not None
         compare_spikes(file_path, full_path, simtime, n_neurons,
                        spike_rate, spike_indexes, tolerance)
     if record_v:
@@ -220,7 +242,9 @@ def compare_results(
         compare(file_path, full_path, inh_rate, inh_indexes)
 
 
-def merge_indexes(rec_indexes, get_indexes):
+def merge_indexes(
+        rec_indexes: Optional[Sequence[int]],
+        get_indexes: Optional[Sequence[int]]) -> Optional[Sequence[int]]:
     if rec_indexes is None:
         if get_indexes is None:
             return None
@@ -234,15 +258,20 @@ def merge_indexes(rec_indexes, get_indexes):
 
 
 def run_and_compare_script(
-        simtime, n_neurons, run_split=1,
-        record_spikes=False, spike_rate=None, spike_rec_indexes=None,
-        spike_get_indexes=None,
-        record_v=False, v_rate=None, v_rec_indexes=None, v_get_indexes=None,
-        record_exc=False, exc_rate=None, exc_rec_indexes=None,
-        exc_get_indexes=None,
-        record_inh=False, inh_rate=None, inh_rec_indexes=None,
-        inh_get_indexes=None,
-        tolerance=sys.maxsize):
+        simtime: int, n_neurons: int, run_split: int = 1,
+        record_spikes: bool = False, spike_rate: Optional[int] = None,
+        spike_rec_indexes:  Optional[Sequence[int]] = None,
+        spike_get_indexes: Optional[Sequence[int]] = None,
+        record_v: bool = False, v_rate: Optional[int] = None,
+        v_rec_indexes: Optional[Sequence[int]] = None,
+        v_get_indexes: Optional[Sequence[int]] = None,
+        record_exc: bool = False, exc_rate: Optional[int] = None,
+        exc_rec_indexes: Optional[Sequence[int]] = None,
+        exc_get_indexes: Optional[Sequence[int]] = None,
+        record_inh: bool = False, inh_rate: Optional[int] = None,
+        inh_rec_indexes: Optional[Sequence[int]] = None,
+        inh_get_indexes: Optional[Sequence[int]] = None,
+        tolerance: int = sys.maxsize) -> None:
     full_prefix = "{}_{}_".format(simtime, n_neurons)
     if (not os.path.exists(full_prefix + "spikes.csv") or
             not os.path.exists(full_prefix + "v.csv") or
@@ -284,7 +313,7 @@ def run_and_compare_script(
         full_prefix=full_prefix, tolerance=tolerance)
 
 
-def write_spikes(spikes, spike_file):
+def write_spikes(spikes: SpikeTrainList, spike_file: str) -> None:
     with open(spike_file, "w", encoding="utf-8") as f:
         for spiketrain in spikes:
             f.write("{}".format(spiketrain.annotations["source_index"]))
@@ -293,8 +322,9 @@ def write_spikes(spikes, spike_file):
             f.write("\n")
 
 
-def ordered_rounded_set(in_list, factor, simtime):
-    out_list = []
+def ordered_rounded_set(
+        in_list: List[str], factor: int, simtime: int) -> List[float]:
+    out_list: List[float] = []
     added = set()
     for s in in_list[1:]:
         raw = float(s)
@@ -305,12 +335,13 @@ def ordered_rounded_set(in_list, factor, simtime):
         if val < simtime and val not in added:
             out_list.append(val)
             added.add(val)
-    out_list.insert(0, in_list[0])
+    out_list.insert(0, float(in_list[0]))
     return out_list
 
 
-def read_spikes(name, simtime, n_neurons, rate=1, indexes=None):
-    spikes = []
+def read_spikes(name: str, simtime: int, n_neurons: int, rate: int = 1,
+                indexes: Optional[Sequence[int]] = None) -> List[List[float]]:
+    spikes: List[List[float]] = []
     with open(name, encoding="utf-8") as f:
         for line in f:
             parts = line.split(",")
@@ -326,7 +357,8 @@ def read_spikes(name, simtime, n_neurons, rate=1, indexes=None):
     return spikes
 
 
-def compare(current, full, rate, indexes):
+def compare(current: str, full: str, rate: Optional[int],
+            indexes: Optional[Sequence[int]]) -> None:
     """ Compares two data files to see if they contain similar data.\
     Ignores data not recorded due to sampling rate or indexes.
 
@@ -360,14 +392,18 @@ def compare(current, full, rate, indexes):
             if not numpy.array_equal(d1[i], d2_rate[i]):
                 for j in range(len(d1[i])):
                     if d1[i][j] != d2_rate[i][j]:
+                        if indexes is None:
+                            index_st = ""
+                        else:
+                            index_st = f"index{indexes[j]} "
                         raise ValueError(
-                            f"row {i} column{j} index{indexes[j]} "
+                            f"row {i} column{j} {index_st}"
                             f"current {d1[i][j]} full {d2_rate[i][j]}")
 
 
 class TestSampling(BaseTestCase):
     """
-    def test_big_with_rate(self):
+    def test_big_with_rate(self) -> None:
         simtime = 20000
         n_neurons = 500
         run_and_compare_script(
@@ -378,7 +414,7 @@ class TestSampling(BaseTestCase):
             record_inh=True, inh_rate=5,
             tolerance=simtime-2)
 
-    def test_big_with_rec_index(self):
+    def test_big_with_rec_index(self) -> None:
         simtime = 20000
         n_neurons = 500
         run_and_compare_script(
@@ -391,7 +427,7 @@ class TestSampling(BaseTestCase):
             record_inh=True, inh_rate=1,
             inh_rec_indexes=range(0, n_neurons, 4))
 
-    def test_big_with_get_index(self):
+    def test_big_with_get_index(self) -> None:
         simtime = 20000
         n_neurons = 500
         run_and_compare_script(
@@ -404,7 +440,7 @@ class TestSampling(BaseTestCase):
             record_inh=True, inh_rate=1,
             inh_get_indexes=range(0, n_neurons, 4))
 
-    def test_big_with_both(self):
+    def test_big_with_both(self) -> None:
         simtime = 20000
         n_neurons = 500
         run_and_compare_script(
@@ -417,7 +453,7 @@ class TestSampling(BaseTestCase):
             record_inh=True, inh_rate=2,
             inh_rec_indexes=range(0, n_neurons, 4))
 
-    def test_medium_split(self):
+    def test_medium_split(self) -> None:
         simtime = 5000
         n_neurons = 500
         run_and_compare_script(
@@ -430,7 +466,7 @@ class TestSampling(BaseTestCase):
             record_inh=True, inh_rate=2,
             inh_rec_indexes=range(0, n_neurons, 4))
 
-    def test_rec_medium(self):
+    def test_rec_medium(self) -> None:
         simtime = 5000
         n_neurons = 500
         run_and_compare_script(
@@ -443,7 +479,7 @@ class TestSampling(BaseTestCase):
             record_inh=True, inh_rate=2,
             inh_rec_indexes=range(0, n_neurons, 4))
 
-    def test_get_medium(self):
+    def test_get_medium(self) -> None:
         simtime = 5000
         n_neurons = 500
         run_and_compare_script(
@@ -457,7 +493,7 @@ class TestSampling(BaseTestCase):
             inh_get_indexes=range(0, n_neurons, 4))
     """
 
-    def test_mixed_medium(self):
+    def test_mixed_medium(self) -> None:
         simtime = 500
         n_neurons = 300
         run_and_compare_script(
@@ -474,7 +510,7 @@ class TestSampling(BaseTestCase):
             inh_get_indexes=range(2, n_neurons, 4))
 
     """
-    def test_one(self):
+    def test_one(self) -> None:
         simtime = 500
         n_neurons = 300
         run_and_compare_script(

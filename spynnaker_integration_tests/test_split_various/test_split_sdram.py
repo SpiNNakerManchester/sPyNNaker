@@ -15,12 +15,11 @@ import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 
 
-def run_sdram_split():
+def run_sdram_split() -> None:
     sim.setup(1.0)
 
-    spikeArray = {'spike_times': []}
     pre_pop = sim.Population(
-        21000, sim.SpikeSourceArray(**spikeArray), label="pre",
+        21000, sim.SpikeSourceArray(spike_times=[]), label="pre",
         neurons_per_core=20000)
     post_pop = sim.Population(
         600, sim.IF_cond_exp, label="post", neurons_per_core=64,
@@ -35,7 +34,7 @@ def run_sdram_split():
 
 class TestSplitSDRAM(BaseTestCase):
 
-    def test_run_simple_split(self):
+    def test_run_simple_split(self) -> None:
         self.runsafe(run_sdram_split)
 
 

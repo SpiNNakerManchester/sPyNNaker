@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from typing import Optional, Tuple, Union
 import numpy
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
@@ -22,9 +24,10 @@ DESTINATIONS = 10
 class TestFixedTotalNumberConnector(BaseTestCase):
 
     def do_fixed_total_nd_run(
-            self, neurons_per_core_pre, pre_size, pre_shape,
-            neurons_per_core_post, post_size, post_shape, n_fixed,
-            with_replace):
+            self, neurons_per_core_pre: Union[int, Tuple[int, ...]],
+            pre_size: int, pre_shape: Optional[sim.Grid3D],
+            neurons_per_core_post: int, post_size: int, post_shape: None,
+            n_fixed: int, with_replace: bool) -> None:
         sim.setup(1.0)
         pre = sim.Population(
             pre_size, sim.IF_curr_exp(), structure=pre_shape)
@@ -46,7 +49,8 @@ class TestFixedTotalNumberConnector(BaseTestCase):
             assert len(numpy.unique(conns, axis=0)) == len(conns)
 
     def do_fixed_total_nd_run_no_self(
-            self, neurons_per_core, size, shape, n_fixed, with_replace):
+            self, neurons_per_core: Tuple[int, ...], size: int,
+            shape: sim.Grid2D, n_fixed: int, with_replace: bool) -> None:
         sim.setup(1.0)
         pop = sim.Population(
             size, sim.IF_curr_exp(), structure=shape)
@@ -66,26 +70,26 @@ class TestFixedTotalNumberConnector(BaseTestCase):
         if not with_replace:
             assert len(numpy.unique(conns, axis=0)) == len(conns)
 
-    def test_fixed_number_1d(self):
+    def test_fixed_number_1d(self) -> None:
         self.do_fixed_total_nd_run(7, 100, None, 8, 50, None, 10, True)
 
-    def test_fixed_number_1d_no_replace(self):
+    def test_fixed_number_1d_no_replace(self) -> None:
         self.do_fixed_total_nd_run(7, 100, None, 8, 50, None, 10, False)
 
-    def test_fixed_number_3d_to_1d(self):
+    def test_fixed_number_3d_to_1d(self) -> None:
         self.do_fixed_total_nd_run(
             (3, 4, 2), 3 * 8 * 8, sim.Grid3D(3 / 8, 3 / 8),
             11, 30, None, 100, True)
 
-    def test_fixed_number_3d_to_1d_no_replace(self):
+    def test_fixed_number_3d_to_1d_no_replace(self) -> None:
         self.do_fixed_total_nd_run(
             (3, 4, 2), 3 * 8 * 8, sim.Grid3D(3 / 8, 3 / 8),
             11, 30, None, 100, False)
 
-    def test_fixed_number_2d_no_self(self):
+    def test_fixed_number_2d_no_self(self) -> None:
         self.do_fixed_total_nd_run_no_self(
             (5, 3), 10 * 15, sim.Grid2D(10 / 15), 75, True)
 
-    def test_fixed_number_2d_no_self_no_replace(self):
+    def test_fixed_number_2d_no_self_no_replace(self) -> None:
         self.do_fixed_total_nd_run_no_self(
             (5, 3), 10 * 15, sim.Grid2D(10 / 15), 75, False)

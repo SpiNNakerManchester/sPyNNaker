@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from spinnaker_testbase import BaseTestCase
+from typing import Tuple
 import pyNN.spiNNaker as p
+from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 
-def structural_formation_to_full():
+def structural_formation_to_full() -> Tuple[ConnectionHolder, int, int, str]:
     p.setup(1.0)
     stim = p.Population(4, p.SpikeSourceArray(range(10)), label="stim")
 
@@ -55,7 +57,8 @@ def structural_formation_to_full():
     return conns, num_forms, num_elims, first_f
 
 
-def structural_formation_to_full_with_reset():
+def structural_formation_to_full_with_reset(
+        ) -> Tuple[ConnectionHolder, int, int, str, str]:
     p.setup(1.0)
     stim = p.Population(4, p.SpikeSourceArray(range(10)), label="stim")
 
@@ -101,7 +104,7 @@ def structural_formation_to_full_with_reset():
 
 
 class TestStructuralFormationToFull(BaseTestCase):
-    def do_run(self):
+    def do_run(self) -> None:
         conns, num_forms, num_elims, first_f = structural_formation_to_full()
         # Should have built all-to-all connectivity
         all_to_all_conns = [
@@ -117,7 +120,7 @@ class TestStructuralFormationToFull(BaseTestCase):
         self.assertEqual(num_elims, 0)
         self.assertEqual(first_f, first_formation)
 
-    def do_run_with_reset(self):
+    def do_run_with_reset(self) -> None:
         conns, num_forms, num_forms2, first_f, first_f2 = \
             structural_formation_to_full_with_reset()
         # Should have built all-to-all connectivity
@@ -133,10 +136,10 @@ class TestStructuralFormationToFull(BaseTestCase):
         self.assertEqual(first_f, first_f2)
         self.assertEqual(first_f, first_formation)
 
-    def test_structural_formation_to_full(self):
+    def test_structural_formation_to_full(self) -> None:
         self.runsafe(self.do_run)
 
-    def test_structural_formation_to_full_with_reset(self):
+    def test_structural_formation_to_full_with_reset(self) -> None:
         self.runsafe(self.do_run_with_reset)
 
 

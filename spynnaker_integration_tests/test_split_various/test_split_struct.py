@@ -15,7 +15,7 @@ from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as p
 
 
-def split_structural_without_stdp():
+def split_structural_without_stdp() -> None:
     p.setup(1.0)
     stim = p.Population(1, p.SpikeSourceArray(range(10)), label="stim")
 
@@ -92,5 +92,5 @@ def split_structural_without_stdp():
 
 class TestStructuralWithoutSTDP(BaseTestCase):
 
-    def test_split_structural_without_stdp(self):
+    def test_split_structural_without_stdp(self) -> None:
         self.runsafe(split_structural_without_stdp)

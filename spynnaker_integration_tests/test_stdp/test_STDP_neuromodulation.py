@@ -21,7 +21,7 @@ import math
 
 class TestSTDPNeuromodulation(BaseTestCase):
 
-    def neuromodulation(self):
+    def neuromodulation(self) -> None:
 
         """
         Simple test for neuromodulated STDP.
@@ -142,7 +142,7 @@ class TestSTDPNeuromodulation(BaseTestCase):
         self.assertTrue(numpy.allclose(
                         weights[0][2], weight_exact, atol=0.02))
 
-    def test_neuromodulation(self):
+    def test_neuromodulation(self) -> None:
         self.runsafe(self.neuromodulation)
 
 

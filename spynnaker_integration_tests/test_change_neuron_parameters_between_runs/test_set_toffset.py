@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from neo.core import Block
 import numpy
 import pyNN.spiNNaker as p
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(n_neurons, n_cores, i_offset2, i_offset3):
+def do_run(n_neurons: int, n_cores: int, i_offset2: int,
+           i_offset3: int) -> Block:
     p.setup(timestep=1.0, min_delay=1.0)
     p.set_number_of_neurons_per_core(p.IF_curr_exp, n_neurons / n_cores)
 
@@ -63,7 +65,7 @@ class TestSetTOffset(BaseTestCase):
                 240., 245., 250., 255., 260., 265., 270., 275., 280., 285.,
                 290., 295.]
 
-    def one_core(self):
+    def one_core(self) -> None:
         n_neurons = 6
         n_cores = 1
         neo = do_run(n_neurons, n_cores, 1, 2)
@@ -71,10 +73,10 @@ class TestSetTOffset(BaseTestCase):
         for spiketrain in spiketrains:
             assert numpy.array_equal(spiketrain.magnitude, self.expected)
 
-    def test_one_core(self):
+    def test_one_core(self) -> None:
         self.runsafe(self.one_core)
 
-    def three_cores(self):
+    def three_cores(self) -> None:
         n_neurons = 6
         n_cores = 3
         neo = do_run(n_neurons, n_cores, 1, 2)
@@ -82,7 +84,7 @@ class TestSetTOffset(BaseTestCase):
         for spiketrain in spiketrains:
             assert numpy.array_equal(spiketrain.magnitude, self.expected)
 
-    def test_three_cores(self):
+    def test_three_cores(self) -> None:
         self.runsafe(self.three_cores)
 
 

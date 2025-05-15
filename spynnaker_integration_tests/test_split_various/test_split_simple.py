@@ -16,7 +16,7 @@ from spinnaker_testbase import BaseTestCase
 import numpy
 
 
-def run_simple_split():
+def run_simple_split() -> None:
     sim.setup(0.1, time_scale_factor=1)
     sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 16)
     # Note, this next one is ignored on one-to-one Poisson sources
@@ -68,7 +68,7 @@ def run_simple_split():
 
 class TestSplitSimple(BaseTestCase):
 
-    def test_run_simple_split(self):
+    def test_run_simple_split(self) -> None:
         self.runsafe(run_simple_split)
 
 

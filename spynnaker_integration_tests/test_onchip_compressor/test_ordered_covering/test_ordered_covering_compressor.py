@@ -19,5 +19,5 @@ from spynnaker_integration_tests.test_onchip_compressor.many_routes \
 
 class TestOrderedCoveringCompressor(BaseTestCase):
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(do_run)

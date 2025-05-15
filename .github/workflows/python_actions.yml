@@ -32,6 +32,6 @@ jobs:
       coverage-package: spynnaker
       flake8-packages: spynnaker unittests spynnaker_integration_tests proxy_integration_tests
       pylint-packages: spynnaker
-      mypy-packages:  spynnaker_integration_tests proxy_integration_tests
-      mypy-full-packages: spynnaker unittests
+      mypy-packages: proxy_integration_tests
+      mypy-full-packages: spynnaker unittests spynnaker_integration_tests
       cfg-file: spynnaker

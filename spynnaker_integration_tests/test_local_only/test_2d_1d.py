@@ -17,7 +17,7 @@ import pyNN.spiNNaker as pynn
 from pyNN.space import Grid2D
 
 
-def test_2d_1d():
+def test_2d_1d() -> None:
 
     pynn.setup()
 

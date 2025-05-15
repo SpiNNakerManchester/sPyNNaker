@@ -20,7 +20,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestIFCurrDeltaSTDP(BaseTestCase):
 
-    def mad_pair_additive_delta(self):
+    def mad_pair_additive_delta(self) -> None:
         timestep = 1
         spike_current = 20
         input_population_size = 2
@@ -116,7 +116,7 @@ class TestIFCurrDeltaSTDP(BaseTestCase):
 
         self.assertTrue(numpy.allclose(weights_exc, weights_inh, rtol=0.001))
 
-    def nearest_pair_additive_delta(self):
+    def nearest_pair_additive_delta(self) -> None:
         timestep = 1
         spike_current = 20
         input_population_size = 2
@@ -212,10 +212,10 @@ class TestIFCurrDeltaSTDP(BaseTestCase):
 
         self.assertTrue(numpy.allclose(weights_exc, weights_inh, rtol=0.001))
 
-    def test_mad_pair_additive_delta(self):
+    def test_mad_pair_additive_delta(self) -> None:
         self.runsafe(self.mad_pair_additive_delta)
 
-    def test_nearest_pair_additive_delta(self):
+    def test_nearest_pair_additive_delta(self) -> None:
         self.runsafe(self.nearest_pair_additive_delta)
 
 

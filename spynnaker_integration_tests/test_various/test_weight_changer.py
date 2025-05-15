@@ -16,7 +16,7 @@ import pyNN.spiNNaker as sim
 import numpy
 
 
-def test_weight_changer_limits():
+def test_weight_changer_limits() -> None:
     sim.setup(timestep=1.0)
     n_neurons = 5
     n_changes = 6
@@ -53,7 +53,8 @@ def test_weight_changer_limits():
         sim.extra_models.WeightChangeable(0.25, 4.5, weight=2.0, delay=1.0))
     changable_proj_2 = sim.Projection(
         pre, post, sim.OneToOneConnector(),
-        sim.extra_models.WeightChangeable(0.25, 4.5, weight=1.5, delay=1.0))
+        sim.extra_models.WeightChangeable(
+            0.25, 4.5, weight=1.5, delay=1.0))
 
     change_proj_1 = sim.Projection(
         changer_1, post, sim.OneToOneConnector(),
@@ -115,7 +116,7 @@ def test_weight_changer_limits():
         change = (change + 1) % n_neurons
 
 
-def test_weight_changer_diffs():
+def test_weight_changer_diffs() -> None:
     sim.setup(timestep=1.0)
 
     # Pre spikes at 5ms intervals

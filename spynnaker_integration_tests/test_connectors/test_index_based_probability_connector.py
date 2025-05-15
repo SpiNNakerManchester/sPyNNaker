@@ -11,7 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from typing import Tuple
 import numpy
+from pyNN.space import BaseStructure
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
@@ -19,8 +22,9 @@ from spinnaker_testbase import BaseTestCase
 class IndexBasedProbabilityConnectorTest(BaseTestCase):
 
     def do_index_nd_test(
-            self, neurons_per_core_pre, pre_size, pre_shape,
-            neurons_per_core_post, post_size, post_shape):
+            self, neurons_per_core_pre: Tuple[int, ...], pre_size: int,
+            pre_shape: BaseStructure, neurons_per_core_post: Tuple[int, ...],
+            post_size: int, post_shape: BaseStructure) -> None:
         p.setup(1.0)
         pre = p.Population(
             pre_size, p.IF_curr_exp(), structure=pre_shape)
@@ -44,12 +48,12 @@ class IndexBasedProbabilityConnectorTest(BaseTestCase):
         assert numpy.array_equal(numpy.sort(expected_conns, axis=1),
                                  numpy.sort(conns, axis=1))
 
-    def test_2d_index(self):
+    def test_2d_index(self) -> None:
         self.do_index_nd_test(
             (2, 3), 6 * 12, p.Grid2D(6 / 12),
             (4, 1), 8 * 3, p.Grid2D(8 / 3))
 
-    def test_3d_index(self):
+    def test_3d_index(self) -> None:
         self.do_index_nd_test(
             (2, 3, 5), 6 * 12 * 10, p.Grid3D(6 / 12, 6 / 10),
             (4, 1, 2), 8 * 3 * 4, p.Grid3D(8 / 3, 8 / 4))

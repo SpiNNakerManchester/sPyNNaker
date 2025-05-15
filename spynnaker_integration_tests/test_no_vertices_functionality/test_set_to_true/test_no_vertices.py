@@ -18,19 +18,19 @@ from spinnaker_testbase import BaseTestCase
 
 class TestNoVertices(BaseTestCase):
 
-    def do_no_run(self):
+    def do_no_run(self) -> None:
         p.setup(timestep=1.0, min_delay=1.0)
         p.end()
 
-    def test_no_run(self):
+    def test_no_run(self) -> None:
         self.runsafe(self.do_no_run)
 
-    def do_run(self):
+    def do_run(self) -> None:
         p.setup(timestep=1.0, min_delay=1.0)
         p.run(100)
         p.end()
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)
 
 

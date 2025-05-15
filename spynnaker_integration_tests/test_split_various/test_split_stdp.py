@@ -20,7 +20,7 @@ from spinnaker_testbase import BaseTestCase
 import numpy
 
 
-def split_potentiation_and_depression():
+def split_potentiation_and_depression() -> None:
     p.setup(1.0)
     runtime = 100
     initial_run = 1000  # to negate any initial conditions
@@ -98,7 +98,7 @@ def split_potentiation_and_depression():
     p.end()
 
     new_weight_exact = calculate_spike_pair_additive_stdp_weight(
-        pre_spikes, post_spikes, initial_weight, plastic_delay,
+        numpy.array(pre_spikes), post_spikes, initial_weight, plastic_delay,
         a_plus, a_minus, tau_plus, tau_minus)
 
     print("Pre neuron spikes at: {}".format(pre_spikes))
@@ -114,5 +114,5 @@ def split_potentiation_and_depression():
 
 class TestSTDPPairAdditive(BaseTestCase):
 
-    def test_split_potentiation_and_depression(self):
+    def test_split_potentiation_and_depression(self) -> None:
         self.runsafe(split_potentiation_and_depression)

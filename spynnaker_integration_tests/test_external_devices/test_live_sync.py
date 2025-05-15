@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.exceptions import SimulatorShutdownException
-import pyNN.spiNNaker as p
-from time import sleep
 import traceback
-from spynnaker.pyNN.data import SpynnakerDataView
+from time import sleep
+from typing import List
 
+import pyNN.spiNNaker as p
+
+from spinn_utilities.exceptions import SimulatorShutdownException
+
+from spinn_front_end_common.utilities.connections import LiveEventConnection
+
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.external_devices import SpynnakerLiveSpikesConnection
 
 sim_finished = False
@@ -25,7 +30,7 @@ n_spikes = list()
 n_spikes.append(0)
 
 
-def recv(label, time, neuron_ids):
+def recv(label: str, time: int, neuron_ids: List[int]) -> None:
     """ Receive spikes and add the number received to the current segment count
     """
     print("Time: {}; Received spikes from {}:{}".format(
@@ -33,7 +38,7 @@ def recv(label, time, neuron_ids):
     n_spikes[len(n_spikes) - 1] += len(neuron_ids)
 
 
-def send_sync(label, conn):
+def send_sync(label: str, conn: LiveEventConnection) -> None:
     """ Send "continue" signal after a delay and update the current segment
     """
     global sim_finished
@@ -51,14 +56,14 @@ def send_sync(label, conn):
                 traceback.print_exc()
 
 
-def stop(label, conn):
+def stop(label: str, conn: LiveEventConnection) -> None:
     """ Mark the simulation finished to stop sending the sync signal
     """
     global sim_finished
     sim_finished = True
 
 
-def test_live_sync():
+def test_live_sync() -> None:
     """ Test the synchronisation from host behaviour by receiving live spikes
         and checking that the right spikes only arrive after synchronisation
     """

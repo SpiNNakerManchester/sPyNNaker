@@ -21,7 +21,7 @@ class TestMultiBlobRecording(BaseTestCase):
     handle multiple BLOBs for a recording channel correctly.
     """
 
-    def test_multi_blob_recording(self):
+    def test_multi_blob_recording(self) -> None:
         timespan = 100
         size = 255
         n_runs = 5

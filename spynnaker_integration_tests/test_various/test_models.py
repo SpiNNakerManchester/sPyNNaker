@@ -18,7 +18,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestPopulation(BaseTestCase):
 
-    def test_model_fail_to_set_neuron_param_random_distribution(self):
+    def test_model_fail_to_set_neuron_param_random_distribution(self) -> None:
         n_neurons = 5
         range_low = -70
         range_high = -50

@@ -13,16 +13,19 @@
 # limitations under the License.
 
 import os
-import numpy
 import random
+
+import numpy
 import matplotlib.pyplot as plt
+from neo import Block
 from pyNN.utility.plotting import Figure, Panel
 import pyNN.spiNNaker as p
+
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(plot):
+def do_run(plot: bool) -> Block:
 
     p.setup(timestep=1.0)
 
@@ -102,7 +105,7 @@ def do_run(plot):
 
 class FromFileConnectorLargeTest(BaseTestCase):
 
-    def make_file(self):
+    def make_file(self) -> None:
         connection_list = []
         for i in range(255):
             connection_list.append(
@@ -116,14 +119,14 @@ class FromFileConnectorLargeTest(BaseTestCase):
 
         numpy.savetxt(path, connection_list)
 
-    def do_run(self):
+    def do_run(self) -> None:
         self.make_file()
         v, spikes = do_run(plot=False)
         # any checks go here
         spikes_test = neo_convertor.convert_spikes(spikes)
         self.assertEqual(2, len(spikes_test))
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)
 
 

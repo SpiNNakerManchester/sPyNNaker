@@ -11,23 +11,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from spinnaker_testbase import BaseTestCase
-import pyNN.spiNNaker as sim
 import math
 import time
+from typing import List
+from neo import Block
+import pyNN.spiNNaker as sim
+
+from spinnaker_testbase import BaseTestCase
+from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.connections import SpynnakerPoissonControlConnection
 
 
 class TestPoissonSpikeSource(BaseTestCase):
 
-    def check_spikes(self, n_neurons, neo, expected):
+    def check_spikes(
+            self, n_neurons: int, neo: Block, expected: float) -> None:
         spikes = neo.segments[0].spiketrains
         count = sum(len(s) for s in spikes)
         tolerance = math.sqrt(expected)
         self.assertAlmostEqual(expected, float(count) / float(n_neurons),
                                delta=tolerance)
 
-    def recording_poisson_spikes(self, run_zero):
+    def recording_poisson_spikes(self, run_zero: bool) -> None:
         sim.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 200  # number of neurons in each population
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, n_neurons / 2)
@@ -60,19 +66,19 @@ class TestPoissonSpikeSource(BaseTestCase):
 
         self.check_spikes(n_neurons, neo, 5)
 
-    def recording_poisson_spikes_no_zero(self):
+    def recording_poisson_spikes_no_zero(self) -> None:
         self.recording_poisson_spikes(False)
 
-    def test_recording_poisson_spikes_no_zero(self):
+    def test_recording_poisson_spikes_no_zero(self) -> None:
         self.runsafe(self.recording_poisson_spikes_no_zero)
 
-    def recording_poisson_spikes_with_zero(self):
+    def recording_poisson_spikes_with_zero(self) -> None:
         self.recording_poisson_spikes(True)
 
-    def test_recording_poisson_spikes_with_zero(self):
+    def test_recording_poisson_spikes_with_zero(self) -> None:
         self.runsafe(self.recording_poisson_spikes_with_zero)
 
-    def recording_poisson_spikes_big(self):
+    def recording_poisson_spikes_big(self) -> None:
         sim.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 2560  # number of neurons in each population
 
@@ -102,10 +108,10 @@ class TestPoissonSpikeSource(BaseTestCase):
 
         self.check_spikes(n_neurons, neo, 5)
 
-    def test_recording_poisson_spikes_big(self):
+    def test_recording_poisson_spikes_big(self) -> None:
         self.runsafe(self.recording_poisson_spikes_big)
 
-    def recording_poisson_spikes_rate_0(self):
+    def recording_poisson_spikes_rate_0(self) -> None:
         sim.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 256  # number of neurons in each population
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, n_neurons / 2)
@@ -136,10 +142,10 @@ class TestPoissonSpikeSource(BaseTestCase):
 
         self.check_spikes(n_neurons, neo, 0)
 
-    def test_recording_poisson_spikes_rate_0(self):
+    def test_recording_poisson_spikes_rate_0(self) -> None:
         self.runsafe(self.recording_poisson_spikes_rate_0)
 
-    def check_rates(self, rates, seconds, seed):
+    def check_rates(self, rates: List[float], seconds: int, seed: int) -> None:
         n_neurons = 100
         sim.setup(timestep=1.0)
         ssps = {}
@@ -159,23 +165,23 @@ class TestPoissonSpikeSource(BaseTestCase):
         for rate in rates:
             self.check_spikes(n_neurons, spikes[rate], rate*seconds)
 
-    def recording_poisson_spikes_rate_fast(self):
+    def recording_poisson_spikes_rate_fast(self) -> None:
         self.check_rates(
             [10.24, 20.48, 40.96, 81.92, 163.84, 327.68, 655.36, 1310.72], 10,
             0)
 
-    def test_recording_poisson_spikes_rate_fast(self):
+    def test_recording_poisson_spikes_rate_fast(self) -> None:
         self.runsafe(self.recording_poisson_spikes_rate_fast)
 
-    def recording_poisson_spikes_rate_slow(self):
+    def recording_poisson_spikes_rate_slow(self) -> None:
         self.check_rates(
             [0, 0.01, 0.02, 0.04, 0.08, 0.16, 0.32, 0.64, 1.28, 2.56, 5.12],
             100, 0)
 
-    def test_recording_poisson_spikes_rate_slow(self):
+    def test_recording_poisson_spikes_rate_slow(self) -> None:
         self.runsafe(self.recording_poisson_spikes_rate_slow)
 
-    def poisson_live_rates(self):
+    def poisson_live_rates(self) -> None:
 
         self._saved_label_init = None
         self._saved_vertex_size = None
@@ -184,18 +190,20 @@ class TestPoissonSpikeSource(BaseTestCase):
         self._saved_label_set = None
         self._saved_label_stop = None
 
-        def init(label, vertex_size, run_time_ms, machine_timestep_ms):
+        def init(label: str, vertex_size: int, run_time_ms: float,
+                 machine_timestep_ms: float) -> None:
             self._saved_label_init = label
             self._saved_vertex_size = vertex_size
             self._saved_run_time_ms = run_time_ms
             self._saved_machine_timestep_ms = machine_timestep_ms
 
-        def set_rates(label, conn):
+        def set_rates(
+                label: str, conn: SpynnakerPoissonControlConnection) -> None:
             time.sleep(1.0)
             conn.set_rates(label, [(i, 50) for i in range(50)])
             self._saved_label_set = label
 
-        def stop(label, _conn):
+        def stop(label: str, _conn: LiveEventConnection) -> None:
             self._saved_label_stop = label
 
         n_neurons = 100
@@ -238,10 +246,10 @@ class TestPoissonSpikeSource(BaseTestCase):
         self.assertEqual(self._saved_vertex_size, n_neurons)
         self.assertEqual(self._saved_run_time_ms, runtime)
 
-    def test_poisson_live_rates(self):
+    def test_poisson_live_rates(self) -> None:
         self.runsafe(self.poisson_live_rates)
 
-    def poisson_multi_run_change_rate(self):
+    def poisson_multi_run_change_rate(self) -> None:
 
         n_p = 2
         sim.setup(timestep=1.0)
@@ -260,10 +268,10 @@ class TestPoissonSpikeSource(BaseTestCase):
 
         sim.end()
 
-    def test_poisson_multi_run_change_rate(self):
+    def test_poisson_multi_run_change_rate(self) -> None:
         self.runsafe(self.poisson_multi_run_change_rate)
 
-    def poisson_higher_rate(self):
+    def poisson_higher_rate(self) -> None:
         sim.setup(timestep=1.0)
         pop_src = sim.Population(
             100, sim.SpikeSourcePoisson(rate=1000), label="src")
@@ -273,5 +281,5 @@ class TestPoissonSpikeSource(BaseTestCase):
         sim.end()
         self.check_spikes(100, neo, 10000)
 
-    def test_poisson_higher_rate(self):
+    def test_poisson_higher_rate(self) -> None:
         self.runsafe(self.poisson_higher_rate)
