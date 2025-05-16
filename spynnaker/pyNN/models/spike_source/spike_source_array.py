@@ -32,8 +32,7 @@ class SpikeSourceArray(AbstractPyNNModel):
             spike_times = []
         self.__spike_times = spike_times
 
-    @overrides(AbstractPyNNModel.create_vertex,
-               additional_arguments=default_population_parameters.keys())
+    @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
             self, n_neurons: int, label: str, *,
             splitter: Optional[AbstractSplitterCommon] = None,
