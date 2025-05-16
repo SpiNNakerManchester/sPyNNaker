@@ -106,7 +106,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     def _model(self) -> AbstractNeuronImpl:
         return self.__model
 
-    @overrides(AbstractPyNNModel.create_vertex)
+    @overrides(AbstractPyNNModel.create_vertex)  # type: ignore[has-type]
     def create_vertex(
             self, n_neurons: int, label: str, *,
             spikes_per_second: Optional[float] = None,
