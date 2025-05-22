@@ -79,7 +79,6 @@ class IFCurrDeltaCa2Adaptive(AbstractPyNNNeuronModelStandard):
             i_alpha: ModelParameter = 0.1, i_offset: ModelParameter = 0.0,
             v: ModelParameter = -65.0, isyn_exc: ModelParameter = 0.0,
             isyn_inh: ModelParameter = 0.0):
-        # pylint: disable=too-many-arguments
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeDelta(isyn_exc, isyn_inh)

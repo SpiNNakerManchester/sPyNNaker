@@ -141,7 +141,6 @@ class SynapseDynamicsWeightChanger(
             max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
                 NDArray[uint32], NDArray[uint32], NDArray[uint32],
                 NDArray[uint32]]:
-        # pylint: disable=too-many-arguments
         weights = numpy.rint(numpy.abs(connections["weight"]))
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1

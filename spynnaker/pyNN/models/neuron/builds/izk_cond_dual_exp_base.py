@@ -86,7 +86,6 @@ class IzkCondDualExpBase(AbstractPyNNNeuronModelStandard):
             e_rev_E: ModelParameter = 0.0, e_rev_I: ModelParameter = -70.0,
             isyn_exc: ModelParameter = 0.0, isyn_exc2: ModelParameter = 0.0,
             isyn_inh: ModelParameter = 0.0):
-        # pylint: disable=too-many-arguments
         neuron_model = NeuronModelIzh(a, b, c, d, v, u, i_offset)
         synapse_type = SynapseTypeDualExponential(
             tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2, isyn_inh)

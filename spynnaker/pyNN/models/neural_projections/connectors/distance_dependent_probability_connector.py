@@ -98,7 +98,6 @@ class DistanceDependentProbabilityConnector(
         #    a Space object, needed if you wish to specify distance-dependent
         #    weights or delays.
 
-        # pylint: disable=too-many-arguments
         super().__init__(safe, callback, verbose)
         self.__d_expression = d_expression
         self.__allow_self_connections = allow_self_connections

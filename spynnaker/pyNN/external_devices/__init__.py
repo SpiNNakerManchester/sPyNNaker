@@ -239,7 +239,7 @@ def EthernetControlPopulation(
     :rtype: ~spynnaker.pyNN.models.populations.Population
     :raises TypeError: If an invalid model class is used.
     """
-    # pylint: disable=too-many-arguments, global-statement
+    # pylint: disable=global-statement
     population = Population(n_neurons, model, label=label)
     vertex, aec, vertex_label = __vtx(population)
     translator = aec.get_message_translator()

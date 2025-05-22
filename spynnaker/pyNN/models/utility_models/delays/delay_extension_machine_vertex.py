@@ -338,8 +338,6 @@ class DelayExtensionMachineVertex(
         :param int incoming_key:
         :param int incoming_mask:
         """
-        # pylint: disable=too-many-arguments
-
         # Write spec with commands to construct required delay region:
         spec.comment(
             f"Writing Delay Parameters for {vertex_slice.n_atoms} Neurons:\n")

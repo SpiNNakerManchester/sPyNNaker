@@ -248,7 +248,6 @@ class SynapseDynamicsWeightChangable(
             " change-spike has been received, and so the weights might"
             " not be as expected")
 
-        # pylint: disable=too-many-arguments
         n_rows = len(fp_size)
 
         n_synapse_type_bits = get_n_bits(n_synapse_types)

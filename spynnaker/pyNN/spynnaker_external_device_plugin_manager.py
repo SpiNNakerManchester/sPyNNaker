@@ -141,7 +141,7 @@ class SpynnakerExternalDevicePluginManager(object):
             Whether the incoming keys from the cores should be translated
             to global keys rather than core-based keys
         """
-        # pylint: disable=too-many-arguments, too-many-locals, protected-access
+        # pylint: disable=too-many-locals, protected-access
         # get default params if none set
         if port is None:
             port = get_config_int("Recording", "live_spike_port")
@@ -264,7 +264,7 @@ class SpynnakerExternalDevicePluginManager(object):
         :param bool reserve_reverse_ip_tag: True if a reverse IP tag is to be
             used, False if SDP is to be used (default)
         """
-        # pylint: disable=too-many-arguments, protected-access
+        # pylint: disable=protected-access
         vertex = poisson_population._vertex
         if not isinstance(vertex, SpikeSourcePoissonVertex):
             raise TypeError("population must contain a SpikeSourcePoisson")

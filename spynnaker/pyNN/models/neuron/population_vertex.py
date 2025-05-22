@@ -286,7 +286,6 @@ class PopulationVertex(
         :param extra_partitions:
             Extra partitions that are to be sent by the vertex
         """
-        # pylint: disable=too-many-arguments
         super().__init__(label, max_atoms_per_core, splitter)
 
         self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")

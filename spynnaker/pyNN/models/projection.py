@@ -102,7 +102,6 @@ class Projection(object):
         :param str label:
         :param bool download_synapses:
         """
-        # pylint: disable=too-many-arguments
         if source is not None:
             raise NotImplementedError(
                 f"sPyNNaker {__version__} does not yet support "
@@ -261,7 +260,6 @@ class Projection(object):
             "last" is supported
         :return: values selected
         """
-        # pylint: disable=too-many-arguments
         if not gather:
             logger.warning("sPyNNaker always gathers from every core.")
         if multiple_synapses != 'last':
@@ -295,7 +293,6 @@ class Projection(object):
         :param bool gather: Ignored
         :param bool with_address:
         """
-        # pylint: disable=too-many-arguments
         if not gather:
             warn_once(
                 logger, "sPyNNaker only supports gather=True. We will run "

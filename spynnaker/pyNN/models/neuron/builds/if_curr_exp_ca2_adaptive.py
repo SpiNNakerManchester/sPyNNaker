@@ -90,7 +90,6 @@ class IFCurrExpCa2Adaptive(AbstractPyNNNeuronModelStandard):
             i_ca2: ModelParameter = 0.0, i_alpha: ModelParameter = 0.1,
             v: ModelParameter = -65.0, isyn_exc: ModelParameter = 0.0,
             isyn_inh: ModelParameter = 0.0):
-        # pylint: disable=too-many-arguments
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(

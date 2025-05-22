@@ -274,7 +274,6 @@ class NeoCsv(object):
         :param units: the units of the recorded value
         :type units: quantities.quantity.Quantity or str
         """
-        # pylint: disable=too-many-arguments
         block = segment.block
 
         first_id: int = block.annotations[self._FIRST_ID]

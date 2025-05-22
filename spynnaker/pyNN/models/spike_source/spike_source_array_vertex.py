@@ -116,7 +116,6 @@ class SpikeSourceArrayVertex(
             model: SpikeSourceArray,
             splitter: Optional[AbstractSplitterCommon],
             n_colour_bits: Optional[int]):
-        # pylint: disable=too-many-arguments
         self.__model_name = "SpikeSourceArray"
         self.__model = model
         self.__structure: Optional[BaseStructure] = None

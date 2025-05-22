@@ -123,7 +123,6 @@ class SynapseDynamicsStatic(
             n_synapse_types: int,
             max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
                 List[NDArray], NDArray]:
-        # pylint: disable=too-many-arguments
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
         n_synapse_type_bits = get_n_bits(n_synapse_types)

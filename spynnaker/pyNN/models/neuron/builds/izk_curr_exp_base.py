@@ -71,7 +71,6 @@ class IzkCurrExpBase(AbstractPyNNNeuronModelStandard):
             v: ModelParameter = -70.0, tau_syn_E: ModelParameter = 5.0,
             tau_syn_I: ModelParameter = 5.0, isyn_exc: ModelParameter = 0.0,
             isyn_inh: ModelParameter = 0.0):
-        # pylint: disable=too-many-arguments
         neuron_model = NeuronModelIzh(a, b, c, d, v, u, i_offset)
         synapse_type = SynapseTypeExponential(
             tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)

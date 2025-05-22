@@ -72,7 +72,6 @@ class IFCurrDeltaFixedProb(AbstractPyNNNeuronModelStandard):
             tau_refrac: ModelParameter = 0.0, i_offset: ModelParameter = 0.0,
             v: ModelParameter = 0.0, isyn_exc: ModelParameter = 0.0,
             isyn_inh: ModelParameter = 0.0, seed: Optional[int] = None):
-        # pylint: disable=too-many-arguments
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeDelta(isyn_exc, isyn_inh)

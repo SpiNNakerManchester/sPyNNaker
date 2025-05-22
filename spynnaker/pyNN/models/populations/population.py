@@ -112,8 +112,6 @@ class Population(PopulationBase):
             A nicer way of allowing additional things
         :type additional_kwargs: dict(str, ...)
         """
-        # pylint: disable=too-many-arguments
-
         # Deal with the kwargs!
         additional: _ParamDict = dict()
         if additional_parameters is not None:
