@@ -17,6 +17,11 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
+  jobs:
+    post_build:
+      - cd neural_modelling; doxygen ./Doxyfile
+      - mkdir -p ${READTHEDOCS_OUTPUT}html/neural_modelling/
+      - cp -a neural_modelling/html/* ${READTHEDOCS_OUTPUT}html/neural_modelling/
 sphinx:
   configuration: doc/source/conf.py
   builder: dirhtml
