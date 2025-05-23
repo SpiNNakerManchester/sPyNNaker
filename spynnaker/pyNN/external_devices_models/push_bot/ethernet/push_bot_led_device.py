@@ -55,7 +55,6 @@ class PushBotEthernetLEDDevice(
             The number of timesteps between sending commands to the device,
             or `None` to use the default
         """
-        # pylint: disable=too-many-arguments
         if not isinstance(led, PushBotLED):
             raise ConfigurationException(
                 "led parameter must be a PushBotLED value")

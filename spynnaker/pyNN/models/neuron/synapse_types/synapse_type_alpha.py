@@ -89,7 +89,6 @@ class SynapseTypeAlpha(AbstractSynapseType):
             {EXC_RESPONSE: "", EXC_EXP_RESPONSE: "", TAU_SYN_E: "ms",
              INH_RESPONSE: "", INH_EXP_RESPONSE: "", TAU_SYN_I: "ms"})
 
-        # pylint: disable=too-many-arguments
         self.__exc_response = exc_response
         self.__exc_exp_response = exc_exp_response
         # pylint: disable=invalid-name

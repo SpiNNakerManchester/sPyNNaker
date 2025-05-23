@@ -304,7 +304,7 @@ def setup(timestep: Optional[Union[float, Literal["auto"]]] = None,
         ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
         if both ``n_chips_required`` and ``n_boards_required`` are used.
     """
-    # pylint: disable=global-statement,too-many-arguments
+    # pylint: disable=global-statement
     # Check for "auto" values and None
     global __simulator
     if timestep is None:
@@ -395,7 +395,6 @@ def Projection(
     :return: a projection object for SpiNNaker
     :rtype: ~spynnaker.pyNN.models.projection.Projection
     """
-    # pylint: disable=too-many-arguments
     return SpiNNakerProjection(
         pre_synaptic_population=presynaptic_population,
         post_synaptic_population=postsynaptic_population, connector=connector,
@@ -555,7 +554,6 @@ def connect(pre: Population, post: Population, weight: float = 0.0,
     :param float p: probability
     :param ~pyNN.random.NumpyRNG rng: random number generator
     """
-    # pylint: disable=too-many-arguments
     SpynnakerDataView.check_user_can_act()
     __pynn["connect"](pre, post, weight, delay, receptor_type, p, rng)
 

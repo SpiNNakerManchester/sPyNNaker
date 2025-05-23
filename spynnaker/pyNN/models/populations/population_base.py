@@ -266,7 +266,6 @@ class PopulationBase(object, metaclass=AbstractBase):
         :param annotations: annotations to put on the Neo block
         :type annotations: None or dict(str, ...)
         """
-        # pylint: disable=too-many-arguments
         raise NotImplementedError
 
     @final

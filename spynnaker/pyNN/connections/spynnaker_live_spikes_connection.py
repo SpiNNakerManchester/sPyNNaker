@@ -47,7 +47,6 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
             the port that the toolchain will send the notification on (19999
             by default)
         """
-        # pylint: disable=too-many-arguments
         super().__init__(
             live_packet_gather_label, receive_labels, send_labels,
             local_host, local_port)

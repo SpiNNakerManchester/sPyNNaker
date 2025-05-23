@@ -206,8 +206,6 @@ def read_spikes_from_file(
         spike times.
     :rtype: numpy.ndarray(int, int)
     """
-    # pylint: disable=too-many-arguments
-
     # For backward compatibility as previous version tested for None rather
     # than having default values
     if min_atom is None:

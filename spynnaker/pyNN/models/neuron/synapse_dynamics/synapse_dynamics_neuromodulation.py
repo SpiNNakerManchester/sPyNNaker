@@ -219,7 +219,6 @@ class SynapseDynamicsNeuromodulation(
             max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
                 NDArray[uint32], NDArray[uint32], NDArray[uint32],
                 NDArray[uint32]]:
-        # pylint: disable=too-many-arguments
         weights = numpy.rint(
             numpy.abs(connections["weight"]) * STDP_FIXED_POINT_ONE)
         fixed_plastic = (

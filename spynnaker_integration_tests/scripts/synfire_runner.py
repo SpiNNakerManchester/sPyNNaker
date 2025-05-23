@@ -32,7 +32,7 @@ CELL_PARAMS_LIF = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
 
 
 class SynfireRunner(object):
-    # pylint: disable=too-many-arguments, attribute-defined-outside-init
+    # pylint: disable=attribute-defined-outside-init
 
     def __init__(self) -> None:
         self.__init_object_state()

@@ -241,7 +241,6 @@ class SpikeSourcePoissonMachineVertex(
             self, sdram: AbstractSDRAM, is_recording: bool,
             label: Optional[str], app_vertex: SpikeSourcePoissonVertex,
             vertex_slice: Slice):
-        # pylint: disable=too-many-arguments
         super().__init__(
             label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__is_recording = is_recording

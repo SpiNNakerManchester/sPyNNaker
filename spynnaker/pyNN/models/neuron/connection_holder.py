@@ -100,7 +100,6 @@ class ConnectionHolder(object):
             data requested
         :type notify: callable(ConnectionHolder, None) or None
         """
-        # pylint: disable=too-many-arguments
         self.__data_items_to_return = data_items_to_return
         self.__as_list = as_list
         self.__n_pre_atoms = n_pre_atoms

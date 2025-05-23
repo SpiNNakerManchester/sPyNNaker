@@ -63,7 +63,6 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
         :param int n_colour_bits: the number of bits for event colouring
         :param str label: the vertex label
         """
-        # pylint: disable=too-many-arguments
         super().__init__(
             label, POP_TABLE_MAX_ROW_LENGTH, splitter=None)
 
