@@ -39,7 +39,7 @@ Weight_Delay_In_Types: TypeAlias = Optional[Union[
     float, str, RandomDistribution, Iterable[float], NDArray[numpy.float64]]]
 
 IoDest: TypeAlias = Union[
-    str, neo.baseio.BaseIO, None]  # pylint: disable=no-member
+    str, neo.baseio.BaseIO, None]
 
 ViewIndices = Union[None, Sequence[int], NDArray[numpy.integer]]
 #: :meta private:
