@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 import logging
-from typing import Any, cast, List, Optional, Sequence, Tuple, TYPE_CHECKING
+from typing import Any, cast, Optional, Sequence, Tuple, TYPE_CHECKING
 
 import numpy
 
