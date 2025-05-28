@@ -63,12 +63,6 @@ _CellTypeArg: TypeAlias = Union[Type[AbstractPyNNModel], _CellType]
 _ParamDict: TypeAlias = Dict[str, Any]
 
 
-# Not in the class so pylint doesn't get confused about abstractness of methods
-def _we_dont_do_this_now(*a: Any) -> Never:  # pylint: disable=unused-argument
-    # pragma: no cover
-    raise NotImplementedError("sPyNNaker does not currently do this")
-
-
 class Population(PopulationBase):
     """
     PyNN population object.
@@ -655,8 +649,8 @@ class Population(PopulationBase):
         :type cell_id: int or iterable(int)
         :rtype: int or iterable(int)
         """
-        # TODO: Need __getitem__
-        _we_dont_do_this_now(cell_id)
+        raise NotImplementedError(
+            "sPyNNaker does not currently do id_to_local_index")
 
     @overrides(PopulationBase.inject)
     def inject(self, current_source: NeuronCurrentSource) -> None:

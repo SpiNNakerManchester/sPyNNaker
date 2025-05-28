@@ -40,11 +40,6 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def _we_dont_do_this_now() -> Never:
-    # pragma: no cover
-    raise NotImplementedError("sPyNNaker does not currently do this")
-
-
 class PopulationBase(object, metaclass=AbstractBase):
     r"""
     Shared methods between :py:class:`Population`\ s and
@@ -160,7 +155,8 @@ class PopulationBase(object, metaclass=AbstractBase):
 
         :rtype: bool
         """
-        # pylint: disable=unused-argument, redefined-builtin
+        _ = id
+        # pylint: redefined-builtin
         logger.warning("local calls do not really make sense on sPyNNaker so "
                        "is_local always returns True")
         return True
@@ -212,8 +208,9 @@ class PopulationBase(object, metaclass=AbstractBase):
         .. warning::
             Currently unimplemented.
         """
-        # TODO: support neuron positions and spaces
-        _we_dont_do_this_now()
+        _ = position
+        NotImplementedError("sPyNNaker does not currently do nearest")
+
 
     @property
     @abstractmethod
