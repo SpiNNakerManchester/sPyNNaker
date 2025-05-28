@@ -89,7 +89,6 @@ class _Dynamics:
 def are_dynamics_structural(
         synapse_dynamics: AbstractSynapseDynamics) -> TypeGuard[
             AbstractSynapseDynamicsStructural]:
-    # pylint: disable=isinstance-second-argument-not-valid-type
     """
     Checks if synapse_dynamics is a AbstractSynapseDynamicsStructural
 
