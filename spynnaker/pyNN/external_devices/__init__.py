@@ -278,7 +278,6 @@ def EthernetSensorPopulation(
         device: AbstractEthernetSensor, local_host: Optional[str] = None,
         database_notify_port_num: Optional[int] = None,
         database_ack_port_num: Optional[int] = None) -> Population:
-    # pylint: disable=invalid-name
     """
     Create a pyNN population which can be included in a network to
     receive spikes from a device connected to the host.
@@ -332,7 +331,6 @@ def SpikeInjector(
         notify: bool = True, database_notify_host: Optional[str] = None,
         database_notify_port_num: Optional[int] = None,
         database_ack_port_num: Optional[int] = None) -> AbstractPyNNModel:
-    # pylint: disable=invalid-name
     """
     Supports creating a spike injector that can be added to the
     application graph.
