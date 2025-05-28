@@ -206,7 +206,6 @@ def EthernetControlPopulation(
         local_host: Optional[str] = None, local_port: Optional[int] = None,
         database_notify_port_num: Optional[int] = None,
         database_ack_port_num: Optional[int] = None) -> Population:
-    # pylint: disable=invalid-name
     """
     Create a PyNN population that can be included in a network to
     control an external device which is connected to the host.
