@@ -59,12 +59,6 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def _we_dont_do_this_now(*args: Any
-                         ) -> Never:  # pylint: disable=unused-argument
-    # pragma: no cover
-    raise NotImplementedError("sPyNNaker does not currently do this")
-
-
 class Projection(object):
     """
     A container for all the connections of a given type (same synapse type and
@@ -530,7 +524,7 @@ class Projection(object):
         .. warning::
             Not implemented.
         """
-        _we_dont_do_this_now()
+        raise NotImplementedError("sPyNNaker does not currently do set")
 
     def size(self, gather: bool = True) -> Never:  # @UnusedVariable
         # pylint: disable=unused-argument
@@ -545,8 +539,7 @@ class Projection(object):
         :param bool gather:
             If False, only get the number of connections locally.
         """
-        # TODO
-        _we_dont_do_this_now()
+        raise NotImplementedError("sPyNNaker does not currently do size")
 
     def set_download_synapses(self, download_synapses: bool) -> None:
         """
