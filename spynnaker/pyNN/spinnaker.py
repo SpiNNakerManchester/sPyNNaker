@@ -376,7 +376,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
         :param str search_path: absolute search path for binaries
         """
-        # pylint: disable=protected-access
         SpynnakerDataView.register_binary_search_path(search_path)
 
     def _execute_write_neo_metadata(self) -> None:
