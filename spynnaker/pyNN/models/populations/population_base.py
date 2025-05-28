@@ -84,8 +84,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         :param PopulationBase other:
         :rtype: Assembly
         """
-        # TODO: support assemblies
-        _we_dont_do_this_now()
+        raise NotImplementedError("sPyNNaker does not support Assemblies")
 
     @abstractmethod
     def get_data(
@@ -211,7 +210,6 @@ class PopulationBase(object, metaclass=AbstractBase):
         _ = position
         NotImplementedError("sPyNNaker does not currently do nearest")
 
-
     @property
     @abstractmethod
     def position_generator(self) -> Callable[[int], NDArray[floating]]:
@@ -274,7 +272,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         .. warning::
             Currently unimplemented.
         """
-        _we_dont_do_this_now()
+        raise NotImplementedError()
 
     @abstractmethod
     def record(self, variables: Names, to_file: IoDest = None,
@@ -303,8 +301,6 @@ class PopulationBase(object, metaclass=AbstractBase):
         .. warning::
             Currently unimplemented.
         """
-        # TODO:
-        _we_dont_do_this_now()
         raise NotImplementedError
 
     @property
