@@ -28,7 +28,6 @@ class AbstractPushBotOutputDevice(Enum):
             self, value: int, protocol_property: property, min_value: int,
             max_value: Decimal, time_between_send: int,
             send_type: SendType = SendType.SEND_TYPE_INT):
-        # pylint: disable=protected-access
         self._value_ = value
         self._protocol_property = protocol_property
         self._min_value = min_value
