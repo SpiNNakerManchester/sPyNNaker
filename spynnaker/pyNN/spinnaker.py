@@ -296,7 +296,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :return: the name of the simulator.
         :rtype: str
         """
-        return _version._NAME  # pylint: disable=protected-access
+        return _version.NAME
 
     @property
     def recorders(self) -> Collection[Recorder]:

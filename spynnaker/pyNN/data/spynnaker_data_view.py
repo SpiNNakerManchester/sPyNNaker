@@ -241,4 +241,4 @@ class SpynnakerDataView(FecDataView):
 
         :rtype: str
         """
-        return _version._NAME   # pylint: disable=protected-access
+        return _version.NAME
