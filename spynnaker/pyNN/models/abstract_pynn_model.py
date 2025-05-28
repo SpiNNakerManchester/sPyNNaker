@@ -134,7 +134,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
 
         :rtype: list(str)
         """
-        return cls.default_parameters.keys()
+        return cls.default_parameters.keys()  # pylint: disable=no-member
 
     @classmethod
     def has_parameter(cls, name: str) -> bool:
