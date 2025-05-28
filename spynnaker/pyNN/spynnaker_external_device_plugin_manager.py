@@ -141,7 +141,7 @@ class SpynnakerExternalDevicePluginManager(object):
             Whether the incoming keys from the cores should be translated
             to global keys rather than core-based keys
         """
-        # pylint: disable=too-many-locals, protected-access
+        # pylint: disable=protected-access
         # get default params if none set
         if port is None:
             port = get_config_int("Recording", "live_spike_port")

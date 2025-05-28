@@ -94,8 +94,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             if `None` the cfg value is used
         :type timestep: float or None
         """
-        # pylint: disable=too-many-locals
-
         # change min delay auto to be the min delay supported by simulator
         if min_delay == "auto":
             min_delay = timestep
