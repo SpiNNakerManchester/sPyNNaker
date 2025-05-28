@@ -224,7 +224,7 @@ class SynapseDynamicsWeightChanger(
             synapse_info: SynapseInformation, max_row_info: MaxRowInfo,
             max_pre_atoms_per_core: int,
             max_post_atoms_per_core: int) -> NDArray[uint32]:
-        # pylint: disable=unused-argument
+        _ = (delayed_matrix_offset, synapse_info, max_pre_atoms_per_core)
         vertex = app_edge.post_vertex
         n_synapse_type_bits = get_n_bits(
             vertex.neuron_impl.get_n_synapse_types())

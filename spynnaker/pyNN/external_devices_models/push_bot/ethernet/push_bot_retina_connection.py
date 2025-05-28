@@ -106,15 +106,15 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         self.add_pause_stop_callback(
             retina_injector_label, self.__push_bot_stop)
 
-    # pylint: disable=unused-argument
     def __push_bot_start(
             self, label: str, connection: LiveEventConnection) -> None:
+        _ = (label, connection)
         with self.__lock:
             self.__ready = True
 
-    # pylint: disable=unused-argument
     def __push_bot_stop(
             self, label: str, connection: LiveEventConnection) -> None:
+        _ = (label, connection)
         with self.__lock:
             self.__ready = False
 

@@ -303,7 +303,8 @@ class SynapseDynamicsNeuromodulation(
             synapse_info: SynapseInformation, max_row_info: MaxRowInfo,
             max_pre_atoms_per_core: int,
             max_post_atoms_per_core: int) -> NDArray[uint32]:
-        # pylint: disable=unused-argument
+        _ = (delayed_matrix_offset, max_pre_atoms_per_core,
+             max_post_atoms_per_core)
         synapse_type = synapse_info.synapse_type
         return numpy.array([
             synaptic_matrix_offset, max_row_info.undelayed_max_words,

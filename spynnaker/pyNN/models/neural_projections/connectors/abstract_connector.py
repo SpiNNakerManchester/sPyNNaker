@@ -64,7 +64,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
     """
     Abstract class that all PyNN Connectors extend.
     """
-    # pylint: disable=unused-argument
 
     NUMPY_SYNAPSES_DTYPE = numpy.dtype(
         [("source", uint32), ("target", uint16),
@@ -117,6 +116,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         :param SynapseInformation synapse_info: the synapse info
         """
+        _ = synapse_info
         self.__min_delay = SpynnakerDataView.get_simulation_time_step_ms()
 
     def _get_delay_minimum(

@@ -266,8 +266,7 @@ class SpikeSourceArrayVertex(
         self._check_spike_density(spike_times)
 
     def __read_parameter(self, name: str, selector: Selector) -> Sequence:
-        # pylint: disable=unused-argument
-        # This can only be spike times
+        _ = name
         return self._spike_times.get_values(selector)
 
     @overrides(PopulationApplicationVertex.get_parameter_values)

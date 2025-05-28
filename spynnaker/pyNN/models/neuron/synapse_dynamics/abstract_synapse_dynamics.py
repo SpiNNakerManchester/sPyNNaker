@@ -337,7 +337,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param str target: The name of the synapse
         :rtype: int or None
         """
-        # pylint: disable=unused-argument
+        _ = target
         return None
 
     def get_connected_vertices(

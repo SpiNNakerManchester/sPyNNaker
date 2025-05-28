@@ -78,8 +78,8 @@ class PushBotRetinaViewer():
         """
         return self.__conn.local_port
 
-    # pylint: disable=unused-argument
     def __recv(self, label: str, time: int, spikes: List[int]) -> None:
+        _ = (label, time)
         np_spikes = numpy.array(spikes) & self.__without_polarity_mask
         x_vals, y_vals = numpy.divmod(np_spikes, self.__height)
         self.__image_lock.acquire()

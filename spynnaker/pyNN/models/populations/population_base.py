@@ -201,7 +201,7 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @final
     def nearest(
-            self, position: Any) -> Never:   # pylint: disable=unused-argument
+            self, position: Any) -> Never:
         """
         Return the neuron closest to the specified position.
 

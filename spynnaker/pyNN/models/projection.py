@@ -519,15 +519,14 @@ class Projection(object):
     # -----------------------------------------------------------------
 
     def set(self, **attributes: Any) -> Never:  # @UnusedVariable
-        # pylint: disable=unused-argument
         """
         .. warning::
             Not implemented.
         """
+        _ = (attributes)
         raise NotImplementedError("sPyNNaker does not currently do set")
 
     def size(self, gather: bool = True) -> Never:  # @UnusedVariable
-        # pylint: disable=unused-argument
         """
         Return the total number of connections.
 
@@ -539,6 +538,7 @@ class Projection(object):
         :param bool gather:
             If False, only get the number of connections locally.
         """
+        _ = gather
         raise NotImplementedError("sPyNNaker does not currently do size")
 
     def set_download_synapses(self, download_synapses: bool) -> None:
