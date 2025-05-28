@@ -116,7 +116,8 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         AbstractPyNNModel._max_atoms_per_core.clear()
 
     @classproperty
-    def absolute_max_atoms_per_core(cls) -> int:
+    def absolute_max_atoms_per_core(  # pylint: disable=no-self-argument
+            cls) -> int:
         """
         The absolute maximum number of atoms per core.
         This is an integer regardless of the number of dimensions
