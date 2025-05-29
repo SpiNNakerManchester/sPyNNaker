@@ -49,8 +49,6 @@ class SynapticMatrixApp(object):
     application edge.
     """
 
-    # pylint: disable=unused-private-member
-    # https://github.com/SpiNNakerManchester/sPyNNaker/issues/1201
     __slots__ = (
         # The synaptic info that these matrices are for
         "__synapse_info",
