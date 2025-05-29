@@ -66,6 +66,7 @@ class Projection(object):
     set parameters of those connections, including of plasticity mechanisms.
     """
     # "format" param name defined by PyNN/
+    # pylint: disable=redefined-builtin
     __slots__ = (
         "__projection_edge",
         "__synapse_information",
