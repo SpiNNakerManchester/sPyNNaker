@@ -84,7 +84,6 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             Whether to output extra information about the connectivity to a
             CSV file
         """
-        # pylint: disable=unused-private-member
         super().__init__(safe, callback, verbose)
         self.__rewiring = rewiring
         self.__degree = degree
