@@ -65,7 +65,6 @@ class SpikeSourcePoisson(AbstractPyNNModel):
             ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
         :param int n_colour_bits:
         """
-        # pylint: disable=arguments-differ
         if neurons_per_core is None:
             neurons_per_core = \
                 self.get_model_max_atoms_per_dimension_per_core()

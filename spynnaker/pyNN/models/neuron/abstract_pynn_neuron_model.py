@@ -131,7 +131,6 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         :param int seed:
         :param int n_colour_bits:
         """
-        # pylint: disable=arguments-differ
         if neurons_per_core is None:
             neurons_per_core = \
                 self.get_model_max_atoms_per_dimension_per_core()
