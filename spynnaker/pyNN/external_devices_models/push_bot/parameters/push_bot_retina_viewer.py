@@ -128,6 +128,7 @@ class PushBotRetinaViewer():
             _logger.exception("unexpected exception in drawing thread")
 
     def __on_close(self, event: Any) -> None:
+        _ = event
         self.__running = False
 
     def run_until_closed(self) -> None:
