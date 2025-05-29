@@ -155,7 +155,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         :rtype: bool
         """
         _ = id
-        # pylint: redefined-builtin
+        # pylint: disable=redefined-builtin
         logger.warning("local calls do not really make sense on sPyNNaker so "
                        "is_local always returns True")
         return True
@@ -208,7 +208,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             Currently unimplemented.
         """
         _ = position
-        NotImplementedError("sPyNNaker does not currently do nearest")
+        raise NotImplementedError("sPyNNaker does not currently do nearest")
 
     @property
     @abstractmethod
