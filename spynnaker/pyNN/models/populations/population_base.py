@@ -154,8 +154,8 @@ class PopulationBase(object, metaclass=AbstractBase):
 
         :rtype: bool
         """
-        _ = id
         # pylint: disable=redefined-builtin
+        _ = id
         logger.warning("local calls do not really make sense on sPyNNaker so "
                        "is_local always returns True")
         return True
