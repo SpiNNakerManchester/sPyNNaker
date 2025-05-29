@@ -737,6 +737,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             ~pacman.model.graphs.application.ApplicationEdge
         :param SynapseInformation synapse_info: The synaptic information
         """
+        _ = application_edge
         if ((synapse_info.prepop_is_view and
                 len(synapse_info.pre_vertex.atoms_shape) > 1) or
                 (synapse_info.postpop_is_view and
