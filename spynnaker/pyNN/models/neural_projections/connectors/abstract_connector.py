@@ -90,6 +90,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
             .. note::
                 Not supported by sPyNNaker.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         """
         if callback is not None:
             warn_once(logger, "sPyNNaker ignores connector callbacks.")
