@@ -56,24 +56,6 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     """
     __slots__ = ()
 
-    def __init__(self, safe: bool = True, callback: None = None,
-                 verbose: bool = False) -> None:
-        """
-        :param bool safe:
-            If ``True``, check that weights and delays have valid values.
-            If ``False``, this check is skipped.
-        :param callable callback:
-            if given, a callable that display a progress bar on the terminal.
-
-            .. note::
-                Not supported by sPyNNaker.
-        :param bool verbose:
-            Whether to output extra information about the connectivity to a
-            CSV file
-        """
-        # pylint: disable=useless-super-delegation
-        super().__init__(safe, callback, verbose)
-
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
         return self._get_delay_maximum(
