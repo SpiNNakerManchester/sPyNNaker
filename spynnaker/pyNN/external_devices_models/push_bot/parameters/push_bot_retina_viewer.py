@@ -112,7 +112,7 @@ class PushBotRetinaViewer():
         except Exception:  # pylint: disable=broad-except
             _logger.exception("unexpected exception in simulation thread")
 
-    def __run(self, run_thread: Any) -> None:
+    def __run(self) -> None:
         try:
             while self.__running and self.__fig.get_visible():
                 self.__image_lock.acquire()
@@ -138,7 +138,7 @@ class PushBotRetinaViewer():
         run_thread.start()
         try:
             self.__fig.canvas.mpl_connect('close_event', self.__on_close)
-            self.__run(run_thread)
+            self.__run()
         finally:
             external_devices.request_stop()
             run_thread.join()
@@ -150,6 +150,6 @@ class PushBotRetinaViewer():
         run_thread = Thread(target=self.__run_sim, args=[run_time])
         run_thread.start()
         try:
-            self.__run(run_thread)
+            self.__run()
         finally:
             run_thread.join()
