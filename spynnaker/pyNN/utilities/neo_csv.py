@@ -552,7 +552,6 @@ class NeoCsv(object):
         block = Block()
         block.name = pop_label
         block.description = description
-        # pylint: disable=no-member
         metadata: Dict[str, Any] = {}
         metadata[self._SIZE] = size
         metadata["first_index"] = 0
