@@ -242,7 +242,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.write_value(next_weight_index)
 
         # Write the data
-        # pylint: disable=unexpected-keyword-arg
         spec.write_array(numpy.array(source_data, dtype="uint32"))
         spec.write_array(numpy.concatenate(connector_data, dtype="uint32"))
         spec.write_array(
