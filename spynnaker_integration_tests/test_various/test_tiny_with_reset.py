@@ -62,7 +62,6 @@ class TinyTest(BaseTestCase):
 
 
 if __name__ == '__main__':
-    # pylint: disable=no-member
     _all1, _all2 = do_run()
     _spikes1 = neo_convertor.convert_spiketrains(_all1.segments[0].spiketrains)
     print(_spikes1)
