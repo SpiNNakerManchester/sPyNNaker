@@ -401,7 +401,6 @@ class SynapseDynamicsStructuralCommon(
             n_neurons: int) -> int:
         # Work out how many sub-edges we will end up with, as this is used
         # for key_atom_info
-        # pylint: disable=no-member
         param_sizes = (
             self.partner_selection.get_parameters_sdram_usage_in_bytes())
         n_sub_edges = 0
