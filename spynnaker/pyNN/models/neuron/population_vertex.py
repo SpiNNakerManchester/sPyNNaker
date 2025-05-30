@@ -1285,81 +1285,6 @@ class PopulationVertex(
             # generation
             self.__tell_neuron_vertices_to_regenerate()
 
-    @staticmethod
-    def _ring_buffer_expected_upper_bound(
-            weight_mean: float, weight_std_dev: float,
-            spikes_per_second: float, n_synapses_in: int,
-            sigma: float) -> float:
-        """
-        Provides expected upper bound on accumulated values in a ring
-        buffer element.
-
-        Requires an assessment of maximum Poisson input rate.
-
-        Assumes knowledge of mean and SD of weight distribution, fan-in
-        and timestep.
-
-        All arguments should be assumed real values except n_synapses_in
-        which will be an integer.
-
-        :param float weight_mean: Mean of weight distribution (in either nA or
-            microSiemens as required)
-        :param float weight_std_dev: SD of weight distribution
-        :param float spikes_per_second: Maximum expected Poisson rate in Hz
-        :param int machine_timestep: in us
-        :param int n_synapses_in: No of connected synapses
-        :param float sigma: How many SD above the mean to go for upper bound;
-            a good starting choice is 5.0. Given length of simulation we can
-            set this for approximate number of saturation events.
-        :rtype: float
-        """
-        # E[ number of spikes ] in a timestep
-        average_spikes_per_timestep = (
-            float(n_synapses_in * spikes_per_second) /
-            SpynnakerDataView.get_simulation_time_step_per_s())
-
-        # Exact variance contribution from inherent Poisson variation
-        poisson_variance = average_spikes_per_timestep * (weight_mean ** 2)
-
-        # Upper end of range for Poisson summation required below
-        # upper_bound needs to be an integer
-        upper_bound = int(round(average_spikes_per_timestep +
-                                POSSION_SIGMA_SUMMATION_LIMIT *
-                                math.sqrt(average_spikes_per_timestep)))
-
-        # pylint:disable=wrong-spelling-in-comment
-        # Closed-form exact solution for summation that gives the variance
-        # contributed by weight distribution variation when modulated by
-        # Poisson PDF.  Requires scipy.special for gamma and incomplete gamma
-        # functions. Beware: incomplete gamma doesn't work the same as
-        # Mathematica because (1) it's regularised and needs a further
-        # multiplication and (2) it's actually the complement that is needed
-        # i.e. 'gammaincc']
-
-        weight_variance = 0.0
-
-        if weight_std_dev > 0:
-            # pylint: disable=no-member
-            lngamma = special.gammaln(1 + upper_bound)
-            gammai = special.gammaincc(
-                1 + upper_bound, average_spikes_per_timestep)
-
-            big_ratio = (math.log(average_spikes_per_timestep) * upper_bound -
-                         lngamma)
-
-            if -701.0 < big_ratio < 701.0 and big_ratio != 0.0:
-                log_weight_variance = (
-                    -average_spikes_per_timestep +
-                    math.log(average_spikes_per_timestep) +
-                    2.0 * math.log(weight_std_dev) +
-                    math.log(math.exp(average_spikes_per_timestep) * gammai -
-                             math.exp(big_ratio)))
-                weight_variance = math.exp(log_weight_variance)
-
-        # upper bound calculation -> mean + n * SD
-        return ((average_spikes_per_timestep * weight_mean) +
-                (sigma * math.sqrt(poisson_variance + weight_variance)))
-
     def get_ring_buffer_shifts(self) -> List[int]:
         """
         Get the shift of the ring buffers for transfer of values into the
@@ -2000,6 +1925,81 @@ class _Stats(object):
                 spikes_per_second = rate
             spikes_per_tick = pre_vertex.max_spikes_per_ts()
         return spikes_per_tick, spikes_per_second
+
+    @staticmethod
+    def _ring_buffer_expected_upper_bound(
+            weight_mean: float, weight_std_dev: float,
+            spikes_per_second: float, n_synapses_in: int,
+            sigma: float) -> float:
+        """
+        Provides expected upper bound on accumulated values in a ring
+        buffer element.
+
+        Requires an assessment of maximum Poisson input rate.
+
+        Assumes knowledge of mean and SD of weight distribution, fan-in
+        and timestep.
+
+        All arguments should be assumed real values except n_synapses_in
+        which will be an integer.
+
+        :param float weight_mean: Mean of weight distribution (in either nA or
+            microSiemens as required)
+        :param float weight_std_dev: SD of weight distribution
+        :param float spikes_per_second: Maximum expected Poisson rate in Hz
+        :param int machine_timestep: in us
+        :param int n_synapses_in: No of connected synapses
+        :param float sigma: How many SD above the mean to go for upper bound;
+            a good starting choice is 5.0. Given length of simulation we can
+            set this for approximate number of saturation events.
+        :rtype: float
+        """
+        # E[ number of spikes ] in a timestep
+        average_spikes_per_timestep = (
+            float(n_synapses_in * spikes_per_second) /
+            SpynnakerDataView.get_simulation_time_step_per_s())
+
+        # Exact variance contribution from inherent Poisson variation
+        poisson_variance = average_spikes_per_timestep * (weight_mean ** 2)
+
+        # Upper end of range for Poisson summation required below
+        # upper_bound needs to be an integer
+        upper_bound = int(round(average_spikes_per_timestep +
+                                POSSION_SIGMA_SUMMATION_LIMIT *
+                                math.sqrt(average_spikes_per_timestep)))
+
+        # pylint:disable=wrong-spelling-in-comment
+        # Closed-form exact solution for summation that gives the variance
+        # contributed by weight distribution variation when modulated by
+        # Poisson PDF.  Requires scipy.special for gamma and incomplete gamma
+        # functions. Beware: incomplete gamma doesn't work the same as
+        # Mathematica because (1) it's regularised and needs a further
+        # multiplication and (2) it's actually the complement that is needed
+        # i.e. 'gammaincc']
+
+        weight_variance = 0.0
+
+        if weight_std_dev > 0:
+            # pylint: disable=no-member
+            lngamma = special.gammaln(1 + upper_bound)
+            gammai = special.gammaincc(
+                1 + upper_bound, average_spikes_per_timestep)
+
+            big_ratio = (math.log(average_spikes_per_timestep) * upper_bound -
+                         lngamma)
+
+            if -701.0 < big_ratio < 701.0 and big_ratio != 0.0:
+                log_weight_variance = (
+                    -average_spikes_per_timestep +
+                    math.log(average_spikes_per_timestep) +
+                    2.0 * math.log(weight_std_dev) +
+                    math.log(math.exp(average_spikes_per_timestep) * gammai -
+                             math.exp(big_ratio)))
+                weight_variance = math.exp(log_weight_variance)
+
+        # upper bound calculation -> mean + n * SD
+        return ((average_spikes_per_timestep * weight_mean) +
+                (sigma * math.sqrt(poisson_variance + weight_variance)))
 
     def get_max_weight(self, s_type: int) -> float:
         """
