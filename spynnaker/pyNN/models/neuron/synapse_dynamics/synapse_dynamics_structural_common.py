@@ -431,7 +431,6 @@ class SynapseDynamicsStructuralCommon(
         :rtype: str
         """
         name = "_structural"
-        # pylint: disable=no-member
         name += self.partner_selection.vertex_executable_suffix
         name += self.formation.vertex_executable_suffix
         name += self.elimination.vertex_executable_suffix
