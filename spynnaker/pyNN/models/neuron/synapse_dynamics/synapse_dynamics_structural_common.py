@@ -341,7 +341,6 @@ class SynapseDynamicsStructuralCommon(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The target slice
         """
-        # pylint: disable=unsubscriptable-object
         # Get connections for this post slice
         slice_conns = self.connections[app_vertex, vertex_slice.lo_atom]
         # Make a single large array of connections
