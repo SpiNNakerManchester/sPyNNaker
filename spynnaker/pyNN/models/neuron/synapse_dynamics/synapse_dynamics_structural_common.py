@@ -152,7 +152,7 @@ class SynapseDynamicsStructuralCommon(
             vertex_slice)
 
         # Write the component parameters
-        # pylint: disable=no-member, protected-access
+        # pylint: disable=protected-access
         spec.comment("Writing partner selection parameters")
         self.partner_selection.write_parameters(spec)
         for proj in structural_projections:
