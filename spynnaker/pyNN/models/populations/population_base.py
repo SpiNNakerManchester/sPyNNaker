@@ -293,14 +293,14 @@ class PopulationBase(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @final
-    def save_positions(
-            self, file: Any) -> Never:  # pylint: disable=W0622,W0613
+    def save_positions(self, file: Any) -> Never:  # pylint: disable=W0622
         """
         Save positions to file. The output format is index x y z
 
         .. warning::
             Currently unimplemented.
         """
+        _ = file
         raise NotImplementedError
 
     @property
