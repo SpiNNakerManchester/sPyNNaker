@@ -138,7 +138,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, spec: DataSpecificationGenerator, region: int,
             machine_vertex: PopulationMachineLocalOnlyCombinedVertex,
             weight_scales: NDArray[floating]) -> None:
-        # pylint: disable=unexpected-keyword-arg, protected-access
+        # pylint: disable=protected-access
 
         # Get incoming sources for this vertex
         app_vertex = machine_vertex._pop_vertex
