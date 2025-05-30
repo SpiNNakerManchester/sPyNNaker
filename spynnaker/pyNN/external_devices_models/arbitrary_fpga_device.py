@@ -41,7 +41,6 @@ class ArbitraryFPGADevice(ApplicationFPGAVertex, PopulationApplicationVertex):
         :param label:
         :type label: str or None
         """
-        # pylint: disable=too-many-arguments
         conn = FPGAConnection(
             fpga_id, fpga_link_id, board_address, chip_coords)
         super().__init__(n_neurons, [conn], conn, label)

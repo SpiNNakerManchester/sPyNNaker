@@ -46,7 +46,6 @@ class PushBotSpiNNakerLinkMotorDevice(
             The IP address of the board that the device is connected to
         :type board_address: str or None
         """
-        # pylint: disable=too-many-arguments
         super().__init__(motor, protocol)
         ApplicationSpiNNakerLinkVertex.__init__(
             self, spinnaker_link_id=spinnaker_link_id, n_atoms=n_neurons,

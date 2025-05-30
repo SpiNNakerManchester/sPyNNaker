@@ -271,7 +271,7 @@ class PopulationApplicationVertex(
         :type indices: list(int) or None
         :raises KeyError: if the variable cannot be recorded
         """
-        # pylint: disable=unused-argument
+        _ = (name, sampling_interval, indices)
         if not self.get_recordable_variables():
             raise KeyError("This Population does not support recording")
         raise NotImplementedError(
@@ -289,7 +289,7 @@ class PopulationApplicationVertex(
         :type indices: list(int) or None
         :raises KeyError: if the variable cannot be stopped from recording
         """
-        # pylint: disable=unused-argument
+        _ = (name, indices)
         if not self.get_recordable_variables():
             raise KeyError("This Population does not support recording")
         raise NotImplementedError(
@@ -387,7 +387,7 @@ class PopulationApplicationVertex(
             named variable within this slice
         :rtype: list(int)
         """
-        # pylint: disable=unused-argument
+        _ = (name, vertex_slice)
         if name not in self.get_recordable_variables():
             raise KeyError(f"{name} is not being recorded")
         raise NotImplementedError(

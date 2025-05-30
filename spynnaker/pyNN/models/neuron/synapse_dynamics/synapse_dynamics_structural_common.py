@@ -110,7 +110,6 @@ class SynapseDynamicsStructuralCommon(
         yield from [
             'initial_weight', 'initial_delay', 'f_rew', 'p_rew', 's_max',
             'with_replacement']
-        # pylint: disable=no-member
         yield from self.partner_selection.get_parameter_names()
         yield from self.formation.get_parameter_names()
         yield from self.elimination.get_parameter_names()
@@ -153,7 +152,7 @@ class SynapseDynamicsStructuralCommon(
             vertex_slice)
 
         # Write the component parameters
-        # pylint: disable=no-member, protected-access
+        # pylint: disable=protected-access
         spec.comment("Writing partner selection parameters")
         self.partner_selection.write_parameters(spec)
         for proj in structural_projections:
@@ -342,7 +341,6 @@ class SynapseDynamicsStructuralCommon(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The target slice
         """
-        # pylint: disable=unsubscriptable-object
         # Get connections for this post slice
         slice_conns = self.connections[app_vertex, vertex_slice.lo_atom]
         # Make a single large array of connections
@@ -402,7 +400,6 @@ class SynapseDynamicsStructuralCommon(
             n_neurons: int) -> int:
         # Work out how many sub-edges we will end up with, as this is used
         # for key_atom_info
-        # pylint: disable=no-member
         param_sizes = (
             self.partner_selection.get_parameters_sdram_usage_in_bytes())
         n_sub_edges = 0
@@ -432,7 +429,6 @@ class SynapseDynamicsStructuralCommon(
         :rtype: str
         """
         name = "_structural"
-        # pylint: disable=no-member
         name += self.partner_selection.vertex_executable_suffix
         name += self.formation.vertex_executable_suffix
         name += self.elimination.vertex_executable_suffix
@@ -497,7 +493,6 @@ class SynapseDynamicsStructuralCommon(
         :raises ValueError: if the delay is out of range
         """
         if isinstance(self.initial_delay, tuple):
-            # pylint: disable=unsubscriptable-object
             init_del = self.initial_delay
             if init_del[0] > max_delay_ms or init_del[1] > max_delay_ms:
                 raise ValueError(

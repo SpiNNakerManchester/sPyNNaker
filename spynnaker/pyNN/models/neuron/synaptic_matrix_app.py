@@ -49,8 +49,6 @@ class SynapticMatrixApp(object):
     application edge.
     """
 
-    # pylint: disable=unused-private-member
-    # https://github.com/SpiNNakerManchester/sPyNNaker/issues/1201
     __slots__ = (
         # The synaptic info that these matrices are for
         "__synapse_info",
@@ -80,9 +78,6 @@ class SynapticMatrixApp(object):
         "__delay_syn_mat_offset",
         # The index of the synaptic matrix within the master population table
         "__index",
-        # The index of the delayed synaptic matrix within the master population
-        # table
-        "__delay_index",
         # The number of bits to use for neuron IDs
         "__max_atoms_per_core",
         # The download index for the undelayed synaptic matrix
@@ -141,7 +136,6 @@ class SynapticMatrixApp(object):
         self.__syn_mat_offset: Optional[int] = None
         self.__delay_syn_mat_offset: Optional[int] = None
         self.__index: Optional[int] = None
-        self.__delay_index: Optional[int] = None
 
         self.__download_index: Optional[int] = None
         self.__download_delay_index: Optional[int] = None
@@ -231,7 +225,7 @@ class SynapticMatrixApp(object):
 
         # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.delayed_max_n_synapses == 0:
-            self.__delay_index = pop_table.add_invalid_application_entry(
+            pop_table.add_invalid_application_entry(
                 self.__delay_app_key_info.key_and_mask,
                 self.__delay_app_key_info.core_mask,
                 self.__delay_app_key_info.core_shift,
@@ -241,7 +235,7 @@ class SynapticMatrixApp(object):
 
         # Write a matrix for the whole application vertex
         block_addr = pop_table.get_next_allowed_address(block_addr)
-        self.__delay_index = pop_table.add_application_entry(
+        pop_table.add_application_entry(
             block_addr, self.__max_row_info.delayed_max_words,
             self.__delay_app_key_info.key_and_mask,
             self.__delay_app_key_info.core_mask,

@@ -27,7 +27,6 @@ class AbstractStaticSynapseDynamics(
     """
     Dynamics which don't change over time.
     """
-    # pylint: disable=too-many-arguments
 
     __slots__ = ()
 

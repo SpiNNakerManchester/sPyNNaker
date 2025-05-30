@@ -104,7 +104,6 @@ class ExternalFPGARetinaDevice(
         :param str label:
         :param str board_address:
         """
-        # pylint: disable=too-many-arguments
         fixed_n_neurons = self.get_n_neurons(mode, polarity)
         super().__init__(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,

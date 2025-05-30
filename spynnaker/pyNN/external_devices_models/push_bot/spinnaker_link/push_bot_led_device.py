@@ -61,7 +61,6 @@ class PushBotSpiNNakerLinkLEDDevice(
         :param start_frequency: The "frequency" to set at the start
         :type start_frequency: int or None
         """
-        # pylint: disable=too-many-arguments
         super().__init__(
             led, protocol, start_active_time_front, start_active_time_back,
             start_total_period, start_frequency)

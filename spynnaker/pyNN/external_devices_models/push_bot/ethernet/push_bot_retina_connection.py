@@ -77,7 +77,6 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         :param local_port:
         :type local_port: int or None
         """
-        # pylint: disable=too-many-arguments
         super().__init__(
             send_labels=[retina_injector_label], local_host=local_host,
             local_port=local_port)
@@ -107,15 +106,15 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         self.add_pause_stop_callback(
             retina_injector_label, self.__push_bot_stop)
 
-    # pylint: disable=unused-argument
     def __push_bot_start(
             self, label: str, connection: LiveEventConnection) -> None:
+        _ = (label, connection)
         with self.__lock:
             self.__ready = True
 
-    # pylint: disable=unused-argument
     def __push_bot_stop(
             self, label: str, connection: LiveEventConnection) -> None:
+        _ = (label, connection)
         with self.__lock:
             self.__ready = False
 

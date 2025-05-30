@@ -494,7 +494,6 @@ class SynapseDynamicsSTDP(
             pp_data: List[NDArray[uint32]], fp_size: NDArray[uint32],
             fp_data: List[NDArray[uint32]],
             max_atoms_per_core: int) -> ConnectionsArray:
-        # pylint: disable=too-many-arguments
         n_rows = len(fp_size)
 
         n_synapse_type_bits = get_n_bits(n_synapse_types)

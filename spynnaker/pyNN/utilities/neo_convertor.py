@@ -21,7 +21,6 @@ import quantities
 from quantities import UnitTime
 
 # needed as dealing with quantities
-# pylint: disable=c-extension-no-member
 
 
 def convert_analog_signal(

@@ -83,8 +83,6 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         :param float isyn_inh:
             (defaulted LIF neuron state variable initial value)
         """
-        # pylint: disable=too-many-arguments
-
         if not devices:
             raise ConfigurationException("No devices specified")
 

@@ -36,6 +36,6 @@ class IFCondAlpha(AbstractProvidesDefaults):
             tau_syn_I: ModelParameter = 0.5, tau_refrac: ModelParameter = 0.1,
             i_offset: ModelParameter = 0, v: ModelParameter = -65.0,
             gsyn_exc: ModelParameter = 0.0, gsyn_inh: ModelParameter = 0.0):
-        # pylint: disable=too-many-locals, unused-argument, invalid-name
+        # pylint: disable=unused-argument, invalid-name
         raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")

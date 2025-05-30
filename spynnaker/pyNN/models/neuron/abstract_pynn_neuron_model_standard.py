@@ -86,7 +86,6 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
         """
         :param int n_steps_per_timestep:
         """
-        # pylint: disable=arguments-differ
         cast(NeuronImplStandard,
              self._model).n_steps_per_timestep = n_steps_per_timestep
         return super().create_vertex(

@@ -103,7 +103,6 @@ class MunichRetinaDevice(
         :param board_address:
         :type board_address: str or None
         """
-        # pylint: disable=too-many-arguments
         if polarity is None:
             polarity = MunichRetinaDevice.MERGED_POLARITY
 

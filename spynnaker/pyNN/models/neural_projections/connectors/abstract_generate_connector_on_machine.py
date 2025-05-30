@@ -174,7 +174,7 @@ class AbstractGenerateConnectorOnMachine(
         :param SynapseInformation synapse_info: The synaptic information
         :rtype: ~numpy.ndarray(uint32)
         """
-        # pylint: disable=unused-argument
+        _ = synapse_info
         return numpy.zeros(0, dtype="uint32")
 
     @property

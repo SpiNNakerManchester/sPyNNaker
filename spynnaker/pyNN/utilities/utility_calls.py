@@ -206,8 +206,6 @@ def read_spikes_from_file(
         spike times.
     :rtype: numpy.ndarray(int, int)
     """
-    # pylint: disable=too-many-arguments
-
     # For backward compatibility as previous version tested for None rather
     # than having default values
     if min_atom is None:
@@ -438,7 +436,6 @@ def get_neo_io(file_or_folder: str) -> BaseIO:
         try:
             _, suffix = os.path.splitext(file_or_folder)
             suffix = suffix[1:].lower()
-            # pylint: disable=no-member
             if suffix in neo.io_by_extension:
                 writer_list = neo.io_by_extension[suffix]
                 return writer_list[0](file_or_folder)

@@ -104,7 +104,6 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             the port that the toolchain will send the notification on (19999
             by default)
         """
-        # pylint: disable=too-many-arguments
         super().__init__(
             self.__do_start_resume, self.__do_stop_pause,
             local_host=local_host, local_port=local_port)

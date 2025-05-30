@@ -48,7 +48,6 @@ def get_pushbot_wifi_connection(
 
 
 class PushBotWIFIConnection(Connection, Listenable):
-    # pylint: disable=wrong-spelling-in-docstring
     """
     A connection to a PushBot via Wi-Fi.
     """

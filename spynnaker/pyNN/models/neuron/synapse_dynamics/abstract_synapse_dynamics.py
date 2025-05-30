@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 import logging
-from typing import Any, cast, List, Optional, Sequence, Tuple, TYPE_CHECKING
+from typing import Any, cast, Optional, Sequence, Tuple, TYPE_CHECKING
 
 import numpy
 
@@ -329,21 +329,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return connector.get_weight_variance(weights, synapse_info)
 
-    def get_provenance_data(
-            self, pre_population_label: str,
-            post_population_label: str) -> List[Any]:
-        """
-        Get the provenance data from this synapse dynamics object.
-
-        :param str pre_population_label:
-        :param str post_population_label:
-        :rtype:
-            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
-        """
-        # pylint: disable=unused-argument
-        # TODO: is this a meaningful method any more; if so, what does it do?
-        return []
-
     def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         """
         Get the index of the synapse type based on the name, or `None`
@@ -352,7 +337,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param str target: The name of the synapse
         :rtype: int or None
         """
-        # pylint: disable=unused-argument
+        _ = target
         return None
 
     def get_connected_vertices(

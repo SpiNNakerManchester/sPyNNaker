@@ -85,7 +85,6 @@ class IFCurrAlpha(AbstractPyNNNeuronModelStandard):
             exc_exp_response: ModelParameter = 0.0,
             inh_response: ModelParameter = 0.0,
             inh_exp_response: ModelParameter = 0.0):
-        # pylint: disable=too-many-arguments
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
 
