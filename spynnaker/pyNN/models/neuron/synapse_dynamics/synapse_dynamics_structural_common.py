@@ -110,7 +110,6 @@ class SynapseDynamicsStructuralCommon(
         yield from [
             'initial_weight', 'initial_delay', 'f_rew', 'p_rew', 's_max',
             'with_replacement']
-        # pylint: disable=no-member
         yield from self.partner_selection.get_parameter_names()
         yield from self.formation.get_parameter_names()
         yield from self.elimination.get_parameter_names()
