@@ -41,8 +41,6 @@ class NeoCsv(object):
     Code to read a csv file and create a neo object.
 
     """
-    # pylint: disable=c-extension-no-member, no-member
-
     _POPULATION = "population"
     _DESCRIPTION = "description"
     _SIZE = "size"
