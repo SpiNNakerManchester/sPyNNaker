@@ -2013,8 +2013,7 @@ class _Stats(object):
 
         stats = self.running_totals[s_type]
         rates = self.rate_stats[s_type]
-        # pylint: disable=protected-access
-        w_max = PopulationVertex._ring_buffer_expected_upper_bound(
+        w_max = self._ring_buffer_expected_upper_bound(
             stats.mean, stats.standard_deviation, rates.mean,
             stats.n_items, self.ring_buffer_sigma)
         w_max = min(w_max, self.total_weights[s_type])
