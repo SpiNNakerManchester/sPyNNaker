@@ -148,7 +148,6 @@ def potentiation_and_depression() -> None:
 
     # Get the spikes
     post_spikes = numpy.array(
-        # pylint: disable=no-member
         post_pop.get_data('spikes').segments[0].spiketrains[0].magnitude)
 
     # End the simulation as all information gathered
