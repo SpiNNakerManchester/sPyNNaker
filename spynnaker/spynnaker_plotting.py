@@ -17,7 +17,7 @@ Plotting tools to be used together with
 https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/utility/plotting.py
 """
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, Final, List, Union
 from types import ModuleType
 
 from neo import SpikeTrain, Block, Segment, AnalogSignal
@@ -37,8 +37,8 @@ try:
 except ImportError:
     _matplotlib_missing = True
 
-TA_Data: TypeAlias = Union[List[SpikeTrain], SpikeTrainList, AnalogSignal,
-                           NDArray, Block, Segment]
+TA_Data: Final['TypeAlias'] = Union[
+    List[SpikeTrain], SpikeTrainList, AnalogSignal, NDArray, Block, Segment]
 
 
 def _handle_options(axes: Axes, options: Dict[str, Any]) -> None:

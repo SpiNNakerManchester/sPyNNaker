@@ -21,13 +21,13 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics, SynapseDynamicsStatic)
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from spynnaker.pyNN.types import Delay_Types
+from spynnaker.pyNN.types import DELAYS
 
 
 def is_direct_poisson_source(
         post_vertex: ApplicationVertex, pre_vertex: ApplicationVertex,
         connector: AbstractConnector, dynamics: AbstractSynapseDynamics,
-        delay: Delay_Types) -> bool:
+        delay: DELAYS) -> bool:
     """
     Determine if a given Poisson source can be created by this splitter.
 

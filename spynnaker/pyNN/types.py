@@ -16,7 +16,7 @@
 Types (and related) that are useful for implementing connectors.
 """
 
-from typing import Iterable, Optional, Sequence, List, Union
+from typing import Final, Iterable, Optional, Sequence, List, Union
 
 import numpy
 from numpy.typing import NDArray
@@ -27,15 +27,15 @@ from pyNN.random import RandomDistribution
 
 #: The type of weights and delays provided by Synapse / SynapseInformation
 # Combined types (where value could be either)
-Weight_Delay_Types: TypeAlias = Optional[Union[
+WEIGHTS_DELAYS: Final['TypeAlias'] = Optional[Union[
     float, str, RandomDistribution, NDArray[numpy.float64]]]
-Weight_Types: TypeAlias = Optional[Union[
+WEIGHTS: Final['TypeAlias'] = Optional[Union[
     float, str, RandomDistribution, NDArray[numpy.float64]]]
-Delay_Types: TypeAlias = \
+DELAYS: Final['TypeAlias'] = \
     Union[float, str, RandomDistribution, NDArray[numpy.float64]]
 # These are the Types we know are coming in.
 # Most things that can be considered floats (including int)  will work
-Weight_Delay_In_Types: TypeAlias = Optional[Union[
+WEIGHTS_DELAYS_IN: Final['TypeAlias'] = Optional[Union[
     float, str, RandomDistribution, Iterable[float], NDArray[numpy.float64]]]
 
 IoDest: TypeAlias = Union[
@@ -50,7 +50,7 @@ Selector: TypeAlias = Union[
 WeightScales: TypeAlias = Union[NDArray[numpy.floating], Sequence[float]]
 
 
-def is_scalar(value: Weight_Delay_Types) -> TypeGuard[Union[int, float]]:
+def is_scalar(value: WEIGHTS_DELAYS) -> TypeGuard[Union[int, float]]:
     """
     Are the weights or delays a simple integer or float?
     """
