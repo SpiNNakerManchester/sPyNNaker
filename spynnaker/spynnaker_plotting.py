@@ -37,7 +37,7 @@ try:
 except ImportError:
     _matplotlib_missing = True
 
-TA_Data: Final['TypeAlias'] = Union[
+TA_DATA: Final['TypeAlias'] = Union[
     List[SpikeTrain], SpikeTrainList, AnalogSignal, NDArray, Block, Segment]
 
 
@@ -255,7 +255,7 @@ class SpynnakerPanel(object):
     Whole Segments can be passed in only if they only contain one type of data.
     """
 
-    def __init__(self, *data: TA_Data, **options: Any):
+    def __init__(self, *data: TA_DATA, **options: Any):
         """
         :param data: One or more data series to be plotted.
         :type data: list(~neo.core.SpikeTrain) or ~neo.core.AnalogSignal
