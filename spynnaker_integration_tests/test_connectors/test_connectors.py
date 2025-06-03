@@ -66,7 +66,6 @@ class ConnectorsTest(BaseTestCase):
 
     def check_counts(self, counts: Union[List[List[int]], NDArray],
                      connections: int, repeats: bool) -> None:
-        count = None
         for count in counts:
             if not repeats:
                 self.assertEqual(1, max(count))

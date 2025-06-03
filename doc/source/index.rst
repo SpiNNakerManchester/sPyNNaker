@@ -1,6 +1,8 @@
 These pages document the python code for the sPyNNaker_ module
 which is part of the SpiNNaker_ Project.
 
+The neural_modelling_ module contains the documentation of the C code for this module.
+
 This code depends on SpiNNUtils_, SpiNNMachine_, SpiNNMan_, PACMAN_, SpiNNFrontEndCommon_
 (Combined_documentation_).
 
@@ -12,6 +14,7 @@ This code depends on SpiNNUtils_, SpiNNMachine_, SpiNNMan_, PACMAN_, SpiNNFrontE
 .. _PACMAN: https://pacman.readthedocs.io
 .. _SpiNNFrontEndCommon: https://spinnfrontendcommon.readthedocs.io
 .. _Combined_documentation: https://spinnakermanchester.readthedocs.io
+.. _neural_modelling: neural_modelling/
 
 sPyNNaker
 =========
