@@ -29,7 +29,7 @@ class CheckDebug(BaseTestCase):
     that it does not crash in debug mode. All reports on.
     """
 
-    def assert_reports(self):
+    def assert_reports(self) -> None:
         skipped = cfg_paths_skipped()
         for section in config_sections():
             for option in config_options(section):
@@ -46,7 +46,7 @@ class CheckDebug(BaseTestCase):
                     raise AssertionError(
                         f"Unable to find report for {option} {path}")
 
-    def debug(self):
+    def debug(self) -> None:
         sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
         pop.record("v")
