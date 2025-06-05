@@ -78,7 +78,7 @@ class DataPopulation(object):
         # write the neo block to the file
         io.write(bl=data)
 
-    @overrides(Population.describe, adds_typing=True)
+    @overrides(Population.describe)
     def describe(self, template: Optional[str] = None,
                  engine: Optional[Union[str, TemplateEngine]] = None
                  ) -> Union[str, Dict[str, Any]]:

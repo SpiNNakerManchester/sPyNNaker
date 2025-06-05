@@ -34,8 +34,7 @@ class SpikeInjector(AbstractPyNNModel):
 
     default_population_parameters = _population_parameters
 
-    @overrides(AbstractPyNNModel.create_vertex,
-               additional_arguments=_population_parameters.keys())
+    @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
             self, n_neurons: int, label: str, *,
             port: Optional[int] = None, virtual_key: Optional[int] = None,
