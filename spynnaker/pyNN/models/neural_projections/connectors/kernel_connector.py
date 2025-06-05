@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Dict, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
+from typing import (Dict, List, Final, Optional, Sequence, Tuple, Union,
+                    TYPE_CHECKING)
 
 import numpy
 from numpy import floating, integer, ndarray, uint32
@@ -35,7 +36,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.types import (
-    Delay_Types, Weight_Delay_Types, Weight_Types)
+    DELAYS, WEIGHTS_DELAYS, WEIGHTS)
 
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
@@ -46,9 +47,10 @@ from .abstract_generate_connector_on_host import (
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
-    _TwoD: TypeAlias = Union[List[int], Tuple[int, int]]
 
-_Kernel: TypeAlias = Union[
+
+_TWOD: Final['TypeAlias'] = Union[List[int], Tuple[int, int]]
+_KERNAL: Final['TypeAlias'] = Union[
     float, int, List[float], NDArray[numpy.floating], RandomDistribution]
 
 HEIGHT, WIDTH = 0, 1
@@ -97,14 +99,14 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         "_post_as_pre")
 
     def __init__(
-            self, shape_pre: _TwoD, shape_post: _TwoD, shape_kernel: _TwoD,
-            weight_kernel: Optional[_Kernel] = None,
-            delay_kernel: Optional[_Kernel] = None,
-            shape_common: Optional[_TwoD] = None,
-            pre_sample_steps_in_post: Optional[_TwoD] = None,
-            pre_start_coords_in_post: Optional[_TwoD] = None,
-            post_sample_steps_in_pre: Optional[_TwoD] = None,
-            post_start_coords_in_pre: Optional[_TwoD] = None,
+            self, shape_pre: _TWOD, shape_post: _TWOD, shape_kernel: _TWOD,
+            weight_kernel: Optional[_KERNAL] = None,
+            delay_kernel: Optional[_KERNAL] = None,
+            shape_common: Optional[_TWOD] = None,
+            pre_sample_steps_in_post: Optional[_TWOD] = None,
+            pre_start_coords_in_post: Optional[_TWOD] = None,
+            post_sample_steps_in_pre: Optional[_TWOD] = None,
+            post_start_coords_in_pre: Optional[_TWOD] = None,
             safe: bool = True, space: Optional[Space] = None,
             verbose: bool = False, callback: None = None):
         """
@@ -273,7 +275,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return (r, c)
 
     def __get_kernel_vals(self, values: Optional[Union[
-            _Kernel, Weight_Delay_Types]]) -> Optional[ConvolutionKernel]:
+            _KERNAL, WEIGHTS_DELAYS]]) -> Optional[ConvolutionKernel]:
         """
         Convert kernel values given into the correct format.
 
@@ -305,8 +307,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             f"{self._kernel_h} and width: {self._kernel_w}).")
 
     def __compute_statistics(
-            self, weights: Optional[Weight_Types],
-            delays: Optional[Delay_Types], post_vertex_slice: Slice,
+            self, weights: Optional[WEIGHTS],
+            delays: Optional[DELAYS], post_vertex_slice: Slice,
             n_pre_neurons: int) -> Tuple[
                 int, NDArray[uint32], NDArray[uint32], NDArray[floating],
                 NDArray[floating]]:
@@ -417,7 +419,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             synapse_info.delays, n_conns, synapse_info)
 
     @overrides(AbstractConnector.get_delay_variance)
-    def get_delay_variance(self, delays: Delay_Types,
+    def get_delay_variance(self, delays: DELAYS,
                            synapse_info: SynapseInformation) -> float:
         if self._krn_delays is not None:
             return float(numpy.var(self._krn_delays))
@@ -447,7 +449,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             synapse_info.weights, n_conns, synapse_info)
 
     @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(self, weights: Weight_Types,
+    def get_weight_mean(self, weights: WEIGHTS,
                         synapse_info: SynapseInformation) -> float:
         # Use the kernel weights if user has supplied them
         if self._krn_weights is not None:
@@ -455,7 +457,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return super().get_weight_mean(weights, synapse_info)
 
     @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(self, weights: Weight_Types,
+    def get_weight_variance(self, weights: WEIGHTS,
                             synapse_info: SynapseInformation) -> float:
         # Use the kernel weights if user has supplied them
         if self._krn_weights is not None:

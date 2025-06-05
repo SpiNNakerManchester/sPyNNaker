@@ -34,8 +34,8 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
     abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
-from spynnaker.pyNN.types import Weight_Types
-from spynnaker.pyNN.types import Weight_Delay_In_Types as _In_Types
+from spynnaker.pyNN.types import WEIGHTS
+from spynnaker.pyNN.types import WEIGHTS_DELAYS_IN as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE)
@@ -536,7 +536,7 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_variance)
     def get_weight_variance(
-           self, connector: AbstractConnector, weights: Weight_Types,
+           self, connector: AbstractConnector, weights: WEIGHTS,
             synapse_info: SynapseInformation) -> float:
         # Because the weights could all be changed to the maximum, the variance
         # has to be given as no variance
