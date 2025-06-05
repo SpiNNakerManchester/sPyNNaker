@@ -41,7 +41,7 @@ if TYPE_CHECKING:
         ConnectionsArray)
     from spynnaker.pyNN.models.neural_projections.connectors import (
         AbstractConnector)
-    from spynnaker.pyNN.types import Weight_Types
+    from spynnaker.pyNN.types import WEIGHTS
     from spynnaker.pyNN.models.projection import Projection
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
@@ -285,7 +285,7 @@ class SynapseDynamicsWeightChanger(
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_variance)
     def get_weight_variance(
-            self, connector: AbstractConnector, weights: Weight_Types,
+            self, connector: AbstractConnector, weights: WEIGHTS,
             synapse_info: SynapseInformation) -> float:
         return 0.0
 

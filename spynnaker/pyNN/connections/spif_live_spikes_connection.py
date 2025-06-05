@@ -15,7 +15,7 @@
 import logging
 import struct
 from threading import Thread
-from typing import Callable, Dict, Iterable, List, Optional, Set, Tuple
+from typing import Callable, Dict, Final, Iterable, List, Optional, Set, Tuple
 from typing_extensions import TypeAlias
 from spinn_utilities.log import FormatAdapter
 from spinnman.connections import ConnectionListener
@@ -24,9 +24,10 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.database import DatabaseConnection
 from spinn_front_end_common.utilities.database import DatabaseReader
 
-_EventCB: TypeAlias = Callable[[str, List[int]], None]
-_InitCB: TypeAlias = Callable[[str, int, float, float], None]
-_StartStopCB: TypeAlias = Callable[[str, 'SPIFLiveSpikesConnection'], None]
+_EVENT: Final['TypeAlias'] = Callable[[str, List[int]], None]
+_INIT: Final['TypeAlias'] = Callable[[str, int, float, float], None]
+_START_STOP: Final['TypeAlias'] = Callable[
+    [str, 'SPIFLiveSpikesConnection'], None]
 logger = FormatAdapter(logging.getLogger(__name__))
 
 _TWO_SKIP = struct.Struct("<2x")
@@ -118,10 +119,10 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         self.__spif_packet_size = events_per_packet * BYTES_PER_WORD
         self.__spif_packet_time_us = time_per_packet
         self.__key_to_atom_id_and_label: Dict[int, Tuple[int, int]] = dict()
-        self.__live_event_callbacks: List[List[Tuple[_EventCB, bool]]] = list()
-        self.__start_resume_callbacks: Dict[str, List[_StartStopCB]] = dict()
-        self.__pause_stop_callbacks: Dict[str, List[_StartStopCB]] = dict()
-        self.__init_callbacks: Dict[str, List[_InitCB]] = dict()
+        self.__live_event_callbacks: List[List[Tuple[_EVENT, bool]]] = list()
+        self.__start_resume_callbacks: Dict[str, List[_START_STOP]] = dict()
+        self.__pause_stop_callbacks: Dict[str, List[_START_STOP]] = dict()
+        self.__init_callbacks: Dict[str, List[_INIT]] = dict()
         if receive_labels is not None:
             for label in receive_labels:
                 self.__live_event_callbacks.append(list())
@@ -144,7 +145,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             self.__pause_stop_callbacks[label] = list()
             self.__init_callbacks[label] = list()
 
-    def add_init_callback(self, label: str, init_callback: _InitCB) -> None:
+    def add_init_callback(self, label: str, init_callback: _INIT) -> None:
         """
         Add a callback to be called to initialise a vertex.
 
@@ -161,7 +162,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         self.__init_callbacks[label].append(init_callback)
 
     def add_receive_callback(
-            self, label: str, live_event_callback: _EventCB,
+            self, label: str, live_event_callback: _EVENT,
             translate_key: bool = True) -> None:
         """
         Add a callback for the reception of live events from a vertex.
@@ -184,7 +185,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             (live_event_callback, translate_key))
 
     def add_start_resume_callback(
-            self, label: str, start_resume_callback: _StartStopCB) -> None:
+            self, label: str, start_resume_callback: _START_STOP) -> None:
         """
         Add a callback for the start and resume state of the simulation.
 
@@ -200,7 +201,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         self.__start_resume_callbacks[label].append(start_resume_callback)
 
     def add_pause_stop_callback(
-            self, label: str, pause_stop_callback: _StartStopCB) -> None:
+            self, label: str, pause_stop_callback: _START_STOP) -> None:
         """
         Add a callback for the pause and stop state of the simulation.
 
@@ -267,7 +268,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             self.__receiver_connection = None
 
     def __launch_thread(
-            self, kind: str, label: str, callback: _StartStopCB) -> None:
+            self, kind: str, label: str, callback: _START_STOP) -> None:
         thread = Thread(target=callback, args=(label, self), name=(
             f"{kind} callback thread for live_event_connection "
             f"{self._local_port}:{self._local_ip_address}"))

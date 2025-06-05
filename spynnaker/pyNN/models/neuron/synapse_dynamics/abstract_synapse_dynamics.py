@@ -29,7 +29,7 @@ from pacman.model.graphs.machine import MachineVertex
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.types import (
-    Delay_Types, Weight_Delay_In_Types, Weight_Types)
+    DELAYS, WEIGHTS_DELAYS_IN, WEIGHTS)
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
@@ -53,8 +53,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
     __slots__ = ("__delay", "__weight")
 
-    def __init__(self, delay: Weight_Delay_In_Types,
-                 weight: Weight_Delay_In_Types):
+    def __init__(self, delay: WEIGHTS_DELAYS_IN,
+                 weight: WEIGHTS_DELAYS_IN):
         self.__check_in_type(delay, "delay")
         self.__delay = self._round_delay(delay)
         self.__check_out_delay(self.__delay, "delay")
@@ -62,7 +62,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         self.__weight = self._convert_weight(weight)
         self.__check_out_weight(self.__weight, "weight")
 
-    def __check_in_type(self, value: Weight_Delay_In_Types, name: str) -> None:
+    def __check_in_type(self, value: WEIGHTS_DELAYS_IN, name: str) -> None:
         if value is None:
             return
         if isinstance(value, (int, float, str, RandomDistribution)):
@@ -82,7 +82,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             "Expected types are int, float, str, RandomDistribution "
             "and collections of type int or float")
 
-    def __check_out_weight(self, weight: Weight_Types, name: str) -> None:
+    def __check_out_weight(self, weight: WEIGHTS, name: str) -> None:
         if weight is None:
             return
         if isinstance(weight, (int, float, str, RandomDistribution)):
@@ -99,7 +99,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             "Expected types are float, str, RandomDistribution "
             "and list of type float")
 
-    def __check_out_delay(self, delay: Delay_Types, name: str) -> None:
+    def __check_out_delay(self, delay: DELAYS, name: str) -> None:
         if isinstance(delay, (float, (str, RandomDistribution))):
             return
         if isinstance(delay, numpy.ndarray):
@@ -149,7 +149,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @property
-    def weight(self) -> Weight_Types:
+    def weight(self) -> WEIGHTS:
         """
         The weight of connections.
 
@@ -157,7 +157,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return self.__weight
 
-    def _round_delay(self, delay: Weight_Delay_In_Types) -> Delay_Types:
+    def _round_delay(self, delay: WEIGHTS_DELAYS_IN) -> DELAYS:
         """
         Round the delays to multiples of full timesteps.
 
@@ -185,7 +185,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             return new_delay
         raise TypeError(f"{type(delay)=}")
 
-    def _convert_weight(self, weight: Weight_Delay_In_Types) -> Weight_Types:
+    def _convert_weight(self, weight: WEIGHTS_DELAYS_IN) -> WEIGHTS:
         """
         Convert the weights if numerical to (list of) float .
 
@@ -204,7 +204,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         return new_weight
 
     @property
-    def delay(self) -> Delay_Types:
+    def delay(self) -> DELAYS:
         """
         The delay of connections.
 
@@ -284,7 +284,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         return connector.get_delay_minimum(synapse_info)
 
     def get_delay_variance(
-            self, connector: AbstractConnector, delays: Delay_Types,
+            self, connector: AbstractConnector, delays: DELAYS,
             synapse_info: SynapseInformation) -> float:
         """
         Get the variance in delay for the synapses.
@@ -318,7 +318,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         return connector.get_weight_maximum(synapse_info)
 
     def get_weight_variance(
-           self, connector: AbstractConnector, weights: Weight_Types,
+           self, connector: AbstractConnector, weights: WEIGHTS,
             synapse_info: SynapseInformation) -> float:
         """
         Get the variance in weight for the synapses.

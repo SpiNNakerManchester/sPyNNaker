@@ -17,7 +17,7 @@ Plotting tools to be used together with
 https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/utility/plotting.py
 """
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, Final, List, Union
 from types import ModuleType
 
 from neo import SpikeTrain, Block, Segment, AnalogSignal
@@ -37,8 +37,8 @@ try:
 except ImportError:
     _matplotlib_missing = True
 
-TA_Data: TypeAlias = Union[List[SpikeTrain], SpikeTrainList, AnalogSignal,
-                           NDArray, Block, Segment]
+TA_DATA: Final['TypeAlias'] = Union[
+    List[SpikeTrain], SpikeTrainList, AnalogSignal, NDArray, Block, Segment]
 
 
 def _handle_options(axes: Axes, options: Dict[str, Any]) -> None:
@@ -254,7 +254,7 @@ class SpynnakerPanel(object):
     Whole Segments can be passed in only if they only contain one type of data.
     """
 
-    def __init__(self, *data: TA_Data, **options: Any):
+    def __init__(self, *data: TA_DATA, **options: Any):
         """
         :param data: One or more data series to be plotted.
         :type data: list(~neo.core.SpikeTrain) or ~neo.core.AnalogSignal
