@@ -24,7 +24,7 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.types import Weight_Delay_In_Types as _In_Types
+from spynnaker.pyNN.types import WEIGHTS_DELAYS_IN as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
@@ -60,7 +60,7 @@ if TYPE_CHECKING:
         AbstractConnector)
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray)
-    from spynnaker.pyNN.types import Delay_Types
+    from spynnaker.pyNN.types import DELAYS
     from .synapse_dynamics_structural_common import ConnectionsInfo
 
 
@@ -321,7 +321,7 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.get_delay_variance)
     def get_delay_variance(
-            self, connector: AbstractConnector, delays: Delay_Types,
+            self, connector: AbstractConnector, delays: DELAYS,
             synapse_info: SynapseInformation) -> float:
         return 0.0
 
