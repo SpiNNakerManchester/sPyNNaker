@@ -43,7 +43,6 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         This is typically used from a population to itself.
     """
     __slots__ = (
-        "__allow_self_connections",  # TODO: currently ignored
         "__degree",
         "__mask",
         "__n_connections",
@@ -64,6 +63,7 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             if the connector is used to connect a Population to itself, this
             flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
+            False is currently unsupported!
         :param n_connections:
             if specified, the number of efferent synaptic connections per
             neuron
@@ -84,11 +84,12 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             Whether to output extra information about the connectivity to a
             CSV file
         """
-        # pylint: disable=too-many-arguments, unused-private-member
         super().__init__(safe, callback, verbose)
         self.__rewiring = rewiring
         self.__degree = degree
-        self.__allow_self_connections = allow_self_connections
+        if not allow_self_connections:
+            raise NotImplementedError(
+                "disabling self connections currently not supported")
         self.__mask: Optional[NDArray] = None
         self.__n_connections = 0
         self.__rng = rng or NumpyRNG()

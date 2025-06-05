@@ -59,12 +59,6 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def _we_dont_do_this_now(*args: Any
-                         ) -> Never:  # pylint: disable=unused-argument
-    # pragma: no cover
-    raise NotImplementedError("sPyNNaker does not currently do this")
-
-
 class Projection(object):
     """
     A container for all the connections of a given type (same synapse type and
@@ -102,7 +96,6 @@ class Projection(object):
         :param str label:
         :param bool download_synapses:
         """
-        # pylint: disable=too-many-arguments
         if source is not None:
             raise NotImplementedError(
                 f"sPyNNaker {__version__} does not yet support "
@@ -261,7 +254,6 @@ class Projection(object):
             "last" is supported
         :return: values selected
         """
-        # pylint: disable=too-many-arguments
         if not gather:
             logger.warning("sPyNNaker always gathers from every core.")
         if multiple_synapses != 'last':
@@ -295,7 +287,6 @@ class Projection(object):
         :param bool gather: Ignored
         :param bool with_address:
         """
-        # pylint: disable=too-many-arguments
         if not gather:
             warn_once(
                 logger, "sPyNNaker only supports gather=True. We will run "
@@ -528,15 +519,14 @@ class Projection(object):
     # -----------------------------------------------------------------
 
     def set(self, **attributes: Any) -> Never:  # @UnusedVariable
-        # pylint: disable=unused-argument
         """
         .. warning::
             Not implemented.
         """
-        _we_dont_do_this_now()
+        _ = (attributes)
+        raise NotImplementedError("sPyNNaker does not currently do set")
 
     def size(self, gather: bool = True) -> Never:  # @UnusedVariable
-        # pylint: disable=unused-argument
         """
         Return the total number of connections.
 
@@ -548,8 +538,8 @@ class Projection(object):
         :param bool gather:
             If False, only get the number of connections locally.
         """
-        # TODO
-        _we_dont_do_this_now()
+        _ = gather
+        raise NotImplementedError("sPyNNaker does not currently do size")
 
     def set_download_synapses(self, download_synapses: bool) -> None:
         """

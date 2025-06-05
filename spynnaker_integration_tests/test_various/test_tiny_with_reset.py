@@ -47,7 +47,6 @@ def do_run() -> Tuple[Block, Block]:
 
 class TinyTest(BaseTestCase):
     def check_run(self) -> None:
-        # pylint: disable=no-member
         all1, all2 = do_run()
         spikes1 = neo_convertor.convert_spiketrains(
             all1.segments[0].spiketrains)
@@ -63,7 +62,6 @@ class TinyTest(BaseTestCase):
 
 
 if __name__ == '__main__':
-    # pylint: disable=no-member
     _all1, _all2 = do_run()
     _spikes1 = neo_convertor.convert_spiketrains(_all1.segments[0].spiketrains)
     print(_spikes1)

@@ -56,7 +56,6 @@ class _SpynnakerDataModel(object):
     def __new__(cls) -> '_SpynnakerDataModel':
         if cls.__singleton is not None:
             return cls.__singleton
-        # pylint: disable=protected-access
         obj = object.__new__(cls)
         cls.__singleton = obj
         obj._clear()
@@ -97,7 +96,6 @@ class SpynnakerDataView(FecDataView):
     Use this class wherever possible as it inherits all methods from all View
     classes.
     """
-    # pylint: disable=attribute-defined-outside-init
 
     __spy_data = _SpynnakerDataModel()
 
@@ -241,4 +239,4 @@ class SpynnakerDataView(FecDataView):
 
         :rtype: str
         """
-        return _version._NAME   # pylint: disable=protected-access
+        return _version.NAME

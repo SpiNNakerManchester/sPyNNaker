@@ -196,7 +196,6 @@ class SpikeSourcePoissonVertex(
             ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
         :param int n_colour_bits:
         """
-        # pylint: disable=too-many-arguments
         super().__init__(label, max_atoms_per_core, splitter)
 
         # atoms params

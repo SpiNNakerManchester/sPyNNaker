@@ -84,7 +84,6 @@ class FromFileConnector(FromListConnector):
             column_names = [column for column in column_names
                             if column not in ("i", "j")]
 
-        # pylint: disable=too-many-arguments
         super().__init__(
             conn_list, safe=safe, verbose=verbose,
             column_names=column_names, callback=callback)

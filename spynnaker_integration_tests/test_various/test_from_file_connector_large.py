@@ -83,7 +83,6 @@ def do_run(plot: bool) -> Block:
     spikes_exc = exc_pop.get_data('spikes')
 
     if plot:
-        # pylint: disable=no-member
         Figure(
             # raster plot of the presynaptic neurons' spike times
             Panel(spikes_exc.segments[0].spiketrains,

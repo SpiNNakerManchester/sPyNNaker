@@ -34,7 +34,6 @@ class TestSampling(BaseTestCase):
         sim.run(simtime)
 
         neo = pop_1.get_data(variables=["spikes", "v"])
-        # pylint: disable=no-member
         spikes = neo.segments[0].spiketrains
         # Include all the spiketrains as there is no outside index
         self.assertEqual(40, len(spikes))

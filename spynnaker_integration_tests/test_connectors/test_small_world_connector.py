@@ -88,7 +88,6 @@ def do_run(plot: bool) -> Tuple[Block, Block, ConnectionHolder]:
     spikes = small_world.get_data('spikes')
     weights = sw_pro.get('weight', 'list')
     if plot:
-        # pylint: disable=no-member
         Figure(
             # raster plot of the presynaptic neuron spike times
             Panel(spikes.segments[0].spiketrains,

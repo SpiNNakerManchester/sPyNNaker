@@ -23,7 +23,6 @@ pickle_path = "data.pickle"
 
 
 class TestRecordingOnOff(BaseTestCase):
-    # pylint: disable=no-member
 
     def record_all(self) -> None:
         sim.setup(timestep=1)

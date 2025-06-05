@@ -184,7 +184,6 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
         :param int n_atoms:
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
-        # pylint: disable=arguments-differ
         variable_sdram = self.__get_variable_sdram(n_atoms)
         constant_sdram = self.__get_constant_sdram(
             n_atoms, all_syn_block_sz, structural_sz)

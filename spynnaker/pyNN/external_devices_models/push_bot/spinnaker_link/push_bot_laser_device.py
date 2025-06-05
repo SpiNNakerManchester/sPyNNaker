@@ -57,7 +57,6 @@ class PushBotSpiNNakerLinkLaserDevice(
             The "total period" value to send at the start
         :param int start_frequency: The "frequency" to send at the start
         """
-        # pylint: disable=too-many-arguments
         super().__init__(
             laser, protocol, start_active_time,
             start_total_period, start_frequency)
