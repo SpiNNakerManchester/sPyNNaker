@@ -11,9 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from types import ModuleType
+from typing import List, Optional
 import numpy
 import math
-from spynnaker.pyNN.models.populations import PopulationView
+from neo import AnalogSignal
+from neo.core.spiketrainlist import SpikeTrainList
+
+from spynnaker.pyNN.models.populations import (Population, PopulationView)
 
 
 class PatternSpiker(object):
@@ -29,9 +35,12 @@ class PatternSpiker(object):
                  -50.73040771484375, -50.450927734375, -50.185089111328125]
     V_COUNT = len(V_PATTERN)
 
-    def create_population(self, sim, n_neurons, label,
-                          spike_rate=None, spike_rec_indexes=None,
-                          v_rate=None, v_rec_indexes=None):
+    def create_population(
+            self, sim: ModuleType, n_neurons: int, label: str,
+            spike_rate: Optional[int] = None,
+            spike_rec_indexes: Optional[List[int]] = None,
+            v_rate: Optional[int] = None,
+            v_rec_indexes: Optional[List[int]] = None) -> Population:
 
         v_start = self.V_PATTERN * int(math.ceil(n_neurons/self.V_COUNT))
         v_start = v_start[:n_neurons]
@@ -51,11 +60,13 @@ class PatternSpiker(object):
             view.record(['v'], sampling_interval=v_rate)
         return pop
 
-    def check_v(self, v, label, v_rate, v_rec_indexes, is_view, missing):
+    def check_v(self, v: AnalogSignal, label: str, v_rate: Optional[int],
+                v_rec_indexes: Optional[List[int]], is_view: bool,
+                missing: bool) -> None:
         if v_rate is None:
             v_rate = 1
         if v_rec_indexes is None:
-            v_rec_indexes = range(len(v[0]))
+            v_rec_indexes = list(range(len(v[0])))
         else:
             actual_indexes = list(v.annotations["channel_names"])
 
@@ -85,7 +96,9 @@ class PatternSpiker(object):
                             self.V_PATTERN[(t + neuron) % self.V_COUNT]))
 
     def check_spikes(
-            self, spikes, simtime, label, spike_rate, spike_rec_indexes):
+            self, spikes: SpikeTrainList, simtime: int, label: str,
+            spike_rate: Optional[int],
+            spike_rec_indexes: Optional[List[int]]) -> None:
         for neuron in range(len(spikes)):
             if spike_rec_indexes and neuron not in spike_rec_indexes:
                 continue
@@ -111,8 +124,13 @@ class PatternSpiker(object):
                         "Found {} but expected {}".format(
                             neuron, label, spikes[neuron], adjusted_spikes, ))
 
-    def check(self, pop, simtime, spike_rate=None, spike_rec_indexes=None,
-              v_rate=None, v_rec_indexes=None, is_view=False, missing=False):
+    def check(
+            self, pop: Population, simtime: int,
+            spike_rate: Optional[int] = None,
+            spike_rec_indexes: Optional[List[int]] = None,
+            v_rate: Optional[int] = None,
+            v_rec_indexes: Optional[List[int]] = None, is_view: bool = False,
+            missing: bool = False) -> None:
         if is_view:
             neo = pop.get_data("spikes")
             spikes = neo.segments[0].spiketrains

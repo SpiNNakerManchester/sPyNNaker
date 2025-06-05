@@ -99,12 +99,13 @@ class SynapseTypeAlpha(AbstractSynapseType):
         self.__tau_syn_I = tau_syn_I
 
     @overrides(AbstractSynapseType.add_parameters)
-    def add_parameters(self, parameters: RangeDictionary[float]):
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
         parameters[TAU_SYN_E] = self._convert(self.__tau_syn_E)
         parameters[TAU_SYN_I] = self._convert(self.__tau_syn_I)
 
     @overrides(AbstractSynapseType.add_state_variables)
-    def add_state_variables(self, state_variables: RangeDictionary[float]):
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         state_variables[EXC_RESPONSE] = self._convert(self.__exc_response)
         state_variables[EXC_EXP_RESPONSE] = self._convert(
             self.__exc_exp_response)
@@ -142,7 +143,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
         return self.__exc_response
 
     @exc_response.setter
-    def exc_response(self, exc_response: ModelParameter):
+    def exc_response(self, exc_response: ModelParameter) -> None:
         """
         Value as passed into the init.
 

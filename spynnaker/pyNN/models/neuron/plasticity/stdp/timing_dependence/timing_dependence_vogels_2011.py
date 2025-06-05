@@ -44,9 +44,8 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         "__a_plus",
         "__a_minus")
     __PARAM_NAMES = ('alpha', 'tau')
-    default_parameters = {'tau': 20.0}
 
-    def __init__(self, alpha: float, tau: float = default_parameters['tau'],
+    def __init__(self, alpha: float, tau: float = 20.0,
                  A_plus: float = 0.01, A_minus: float = 0.01):
         r"""
         :param float alpha: :math:`\alpha`
@@ -64,7 +63,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
             SpynnakerDataView.get_simulation_time_step_ms(), self.__tau)
 
     @property
-    def alpha(self):
+    def alpha(self) -> float:
         r"""
         :math:`\alpha`
 
@@ -73,7 +72,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return self.__alpha
 
     @property
-    def tau(self):
+    def tau(self) -> float:
         r"""
         :math:`\tau`
 
@@ -82,7 +81,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return self.__tau
 
     @property
-    def A_plus(self):
+    def A_plus(self) -> float:
         r"""
         :math:`A^+`
 
@@ -91,11 +90,11 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return self.__a_plus
 
     @A_plus.setter
-    def A_plus(self, new_value):
+    def A_plus(self, new_value: float) -> None:
         self.__a_plus = new_value
 
     @property
-    def A_minus(self):
+    def A_minus(self) -> float:
         r"""
         :math:`A^-`
 
@@ -104,7 +103,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return self.__a_minus
 
     @A_minus.setter
-    def A_minus(self, new_value):
+    def A_minus(self, new_value: float) -> None:
         self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -115,7 +114,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
                 self.__alpha == timing_dependence.alpha)
 
     @property
-    def vertex_executable_suffix(self):
+    def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
 
@@ -124,7 +123,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return "vogels_2011"
 
     @property
-    def pre_trace_n_bytes(self):
+    def pre_trace_n_bytes(self) -> int:
         """
         The number of bytes used by the pre-trace of the rule per neuron.
 
@@ -138,7 +137,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return BYTES_PER_WORD + BYTES_PER_WORD * len(self.__tau_data)
 
     @property
-    def n_weight_terms(self):
+    def n_weight_terms(self) -> int:
         """
         The number of weight terms expected by this timing rule.
 
@@ -149,7 +148,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
             self, spec: DataSpecificationBase, global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         # Write alpha to spec
         fixed_point_alpha = float_to_fixed(self.__alpha)
         spec.write_value(data=fixed_point_alpha, data_type=DataType.INT32)

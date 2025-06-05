@@ -15,19 +15,22 @@
 # limitations under the License.
 
 from time import sleep
-from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as sim
+from spinn_front_end_common.utilities.connections import LiveEventConnection
+from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.external_devices import SpynnakerLiveSpikesConnection
 
 
 class TestSendMultiplePartitions(BaseTestCase):
 
-    def send_spike(self, label, conn):
+    def send_spike(self, label: str, conn: LiveEventConnection) -> None:
+        assert isinstance(conn, SpynnakerLiveSpikesConnection)
         sleep(0.1)
         conn.send_spike(label, 0)
 
     # Added to check that the delay expander runs; a previous fix
     # for a related issue inadvertently turned it off for this type of case
-    def do_run(self):
+    def do_run(self) -> None:
         conn = sim.external_devices.SpynnakerLiveSpikesConnection(
             send_labels=["Inject"], local_port=None)
         conn.add_start_resume_callback("Inject", self.send_spike)
@@ -74,5 +77,5 @@ class TestSendMultiplePartitions(BaseTestCase):
         self.assertListEqual(list(weights_2), [[0, 1, 5.0]])
         self.assertListEqual(list(weights_3), [[0, 2, 5.0]])
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)

@@ -11,13 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
+
 import logging
 from typing import Final, TextIO, Tuple, cast
+
+from spinn_utilities.config_holder import get_report_path
 from spinn_utilities.log import FormatAdapter
+
 from spinn_front_end_common.interface.provenance import (
     ProvenanceReader, ProvenanceWriter)
-from spynnaker.pyNN.data import SpynnakerDataView
+
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -70,7 +73,6 @@ REDUNDANCY_SUMMARY: Final = """
     """
 
 
-_FILE_NAME = "redundant_packet_count.rpt"
 _N_PROV_ITEMS_NEEDED = 4
 _MAX = 100
 
@@ -79,7 +81,7 @@ def redundant_packet_count_report() -> None:
     """
     Writes a report detailing the redundant packet counts.
     """
-    file_name = os.path.join(SpynnakerDataView.get_run_dir_path(), _FILE_NAME)
+    file_name = get_report_path("path_redundant_packet_count_report")
 
     try:
         _create_views()
@@ -96,7 +98,7 @@ def _create_views() -> None:
         db.cursor().execute(REDUNDANCY_SUMMARY)
 
 
-def _write_report(output: TextIO):
+def _write_report(output: TextIO) -> None:
     with ProvenanceReader() as db:
         for data in db.run_query("SELECT * FROM redundancy_by_core"):
             (_, _, _, source, _, filtered, invalid, _, redundant, total,

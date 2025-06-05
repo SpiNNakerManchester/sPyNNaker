@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import logging
+import math
 from typing import Optional, Union
+from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.data.fec_data_writer import FecDataWriter
@@ -58,7 +60,7 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
     def set_up_timings_and_delay(
             self, simulation_time_step_us: Optional[int],
             time_scale_factor: Optional[float],
-            min_delay: Optional[Union[int, float]]):
+            min_delay: Optional[Union[int, float]]) -> None:
         """
         :param simulation_time_step_us:
             An explicitly specified time step for the simulation in
@@ -74,13 +76,33 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
         :type min_delay: int, float or None
         """
         try:
-            self.set_up_timings(simulation_time_step_us, time_scale_factor)
+
+            # If there isn't a time scale factor given, try to work it out
+            # on the basis that we can do 0.1ms steps in real time
+            if time_scale_factor is None:
+                # Need to do this early to ensure we have a value
+                if simulation_time_step_us is None:
+                    simulation_time_step_us = get_config_int(
+                        "Machine", "simulation_time_step")
+                default_time_scale_factor = max(
+                    1.0,
+                    math.ceil(simulation_time_step_us / 10000.0))
+                self.set_up_timings(
+                    simulation_time_step_us, time_scale_factor,
+                    default_time_scale_factor)
+                if self.get_time_scale_factor() > 1.0:
+                    logger.warning(
+                        "A timestep was entered that has forced SpiNNaker to "
+                        "automatically slow the simulation down from real "
+                        f"time by a factor of {time_scale_factor}.")
+            else:
+                self.set_up_timings(simulation_time_step_us, time_scale_factor)
             self._set_min_delay(min_delay)
         except ConfigurationException:
             self.__spy_data._min_delay = None
             raise
 
-    def _set_min_delay(self, min_delay: Optional[Union[int, float]]):
+    def _set_min_delay(self, min_delay: Optional[Union[int, float]]) -> None:
         """
         Sets a min delay or accepts `None` to use simulation_time_step_ms.
 
@@ -110,11 +132,8 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
 
         self.__spy_data._min_delay = min_delay
 
-    def shut_down(self) -> None:
+    def _get_id_counter(self) -> int:
         """
-        Records that shutdown has been called and clears neuron type limits.
+        Testing method likely to change without notice!
         """
-        FecDataWriter.shut_down(self)
-        # Clears all previously added ceiling on the number of neurons per core
-        for neuron_type in self.__spy_data._neurons_per_core_set:
-            neuron_type.set_model_max_atoms_per_dimension_per_core()
+        return self.__spy_data._id_counter

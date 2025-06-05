@@ -20,7 +20,7 @@ class SSANeuronClassNoEdgeTest(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_run(self):
+    def test_run(self) -> None:
         sim.setup()
 
         sim.Population(3, sim.SpikeSourceArray,

@@ -12,8 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from neo import AnalogSignal, SpikeTrain
+from spynnaker.pyNN.models.populations import Population
 
-def check_neuron_data(spikes, v, exc, expected_spikes, simtime, label, index):
+
+def check_neuron_data(
+        spikes: SpikeTrain, v: AnalogSignal, exc: AnalogSignal,
+        expected_spikes: int, simtime: int, label: str, index: int) -> None:
 
     if len(spikes) != expected_spikes:
         raise AssertionError(
@@ -56,7 +61,7 @@ def check_neuron_data(spikes, v, exc, expected_spikes, simtime, label, index):
                         index, t, t_delta, label, v[t], target_v - 1))
 
 
-def check_data(pop, expected_spikes, simtime):
+def check_data(pop: Population, expected_spikes: int, simtime: int) -> None:
     neo = pop.get_data("all")
     spikes = neo.segments[0].spiketrains
     v = neo.segments[0].filter(name="v")[0]

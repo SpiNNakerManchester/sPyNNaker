@@ -15,15 +15,16 @@
 import logging
 import math
 import os
-from typing import Collection, Optional, Union, cast
+from typing import Any, Collection, Optional, Union, cast
 
 from lazyarray import __version__ as lazyarray_version
-from typing_extensions import Literal
 
 from neo import __version__ as neo_version
 from quantities import __version__ as quantities_version
 from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
+from typing_extensions import Literal, Never
+
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import (
@@ -40,8 +41,9 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
-from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
+from spynnaker.pyNN.config_setup import setup_configs
 from spynnaker.pyNN.models.recorder import Recorder
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.extra_algorithms import (
@@ -125,12 +127,16 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             db.insert_version("neo_version", neo_version)
             db.insert_version("lazyarray_version", lazyarray_version)
 
+        # Clears all previously added ceiling on the number of neurons per
+        # core, the number of synapse cores and allowing of delay extensions
+        AbstractPyNNNeuronModel.reset_all()
+
     @property
     def __writer(self) -> SpynnakerDataWriter:
         return cast(SpynnakerDataWriter, self._data_writer)
 
     def _clear_and_run(self, run_time: Optional[float],
-                       sync_time: float = 0.0):
+                       sync_time: float = 0.0) -> None:
         """
         Clears the projections and Run the model created.
 
@@ -154,7 +160,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         for projection in self.__writer.iterate_projections():
             projection._clear_cache()
 
-    def run(self, run_time: Optional[float], sync_time: float = 0.0):
+    def run(self, run_time: Optional[float], sync_time: float = 0.0) -> None:
         """
         Run the simulation for a span of simulation time.
 
@@ -162,7 +168,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         self._clear_and_run(run_time, sync_time)
 
-    def run_until(self, tstop: float):
+    def run_until(self, tstop: float) -> None:
         """
         Run the simulation until the given simulation time.
 
@@ -205,7 +211,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return 0
 
     @mpi_rank.setter
-    def mpi_rank(self, new_value):
+    def mpi_rank(self, new_value: int) -> None:
         """
          sPyNNaker does not use this value meaningfully.
 
@@ -226,7 +232,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return 1
 
     @num_processes.setter
-    def num_processes(self, new_value):
+    def num_processes(self, new_value: int) -> None:
         """
         sPyNNaker does not use this value meaningfully.
 
@@ -244,7 +250,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return self.__writer.get_simulation_time_step_ms()
 
     @dt.setter
-    def dt(self, _):
+    def dt(self, _: Any) -> Never:
         """
         We do not support setting the time step except during setup.
 
@@ -274,7 +280,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return self.__writer.get_reset_number()
 
     @segment_counter.setter
-    def segment_counter(self, _):
+    def segment_counter(self, _: Any) -> Never:
         """
         We do not support externally altering the segment counter
 
@@ -305,7 +311,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return self.__recorders
 
     @recorders.setter
-    def recorders(self, new_value: Collection[Recorder]):
+    def recorders(self, new_value: Collection[Recorder]) -> None:
         """
         Setter for the internal recorders object
 
@@ -316,7 +322,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     def _set_up_timings(
             self, timestep: Optional[float], min_delay: Union[
                 int, float, None],
-            time_scale_factor: Optional[int]):
+            time_scale_factor: Optional[int]) -> None:
         """
         :param timestep: machine_time_Step in milliseconds
         :type timestep: float or None
@@ -325,6 +331,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :param time_scale_factor:
         :type time_scale_factor: int or None
         """
+
         # Get the standard values
         if timestep is None:
             self.__writer.set_up_timings_and_delay(
@@ -336,17 +343,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
         # Check the combination of machine time step and time scale factor
         if (self.__writer.get_simulation_time_step_ms() *
-                self.__writer.get_time_scale_factor() < 1):
-            if not get_config_bool(
-                    "Mode", "violate_1ms_wall_clock_restriction"):
-                raise ConfigurationException(
-                    "The combination of simulation time step and the machine "
-                    "time scale factor results in a wall clock timer tick "
-                    "that is currently not reliably supported by the"
-                    "SpiNNaker machine.  If you would like to override this"
-                    "behaviour (at your own risk), please add "
-                    "violate_1ms_wall_clock_restriction = True to the [Mode] "
-                    f"section of your .{CONFIG_FILE_NAME} file")
+                self.__writer.get_time_scale_factor() < 0.1):
             logger.warning(
                 "****************************************************")
             logger.warning(
@@ -372,7 +369,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         super().stop()
 
     @staticmethod
-    def register_binary_search_path(search_path: str):
+    def register_binary_search_path(search_path: str) -> None:
         """
         Register an additional binary search path for executables.
 

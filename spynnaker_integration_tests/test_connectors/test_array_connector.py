@@ -12,15 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import matplotlib.pyplot as plt  # type: ignore[import]
+from typing import Optional, Union, Tuple
+
+import matplotlib.pyplot as plt
+from neo import Block
 import numpy
+from pyNN.space import BaseStructure
 from pyNN.utility.plotting import Figure, Panel
 import pyNN.spiNNaker as p
+
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(plot):
+def do_run(plot: bool) -> Tuple[Block, Block, Block, Block]:
 
     p.setup(timestep=1.0)
 
@@ -119,7 +124,7 @@ def do_run(plot):
     return v, spikes, v2, spikes2
 
 
-def do_larger_array(plot):
+def do_larger_array(plot: bool) -> Tuple[Block, Block, Block]:
     p.setup(timestep=1.0)
 
     n_i = 64
@@ -177,7 +182,7 @@ def do_larger_array(plot):
 
 class ArrayConnectorTest(BaseTestCase):
 
-    def a_run(self):
+    def a_run(self) -> None:
         v, spikes, v2, spikes2 = do_run(plot=False)
         # any checks go here
         spikes_test = neo_convertor.convert_spikes(spikes)
@@ -185,22 +190,24 @@ class ArrayConnectorTest(BaseTestCase):
         self.assertEqual(263, len(spikes_test))
         self.assertEqual(263, len(spikes_test2))
 
-    def test_a_run(self):
+    def test_a_run(self) -> None:
         self.runsafe(self.a_run)
 
-    def larger_array(self):
+    def larger_array(self) -> None:
         v, spikes, conns = do_larger_array(plot=False)
         # checks go here
         spikes_test = neo_convertor.convert_spikes(spikes)
         self.assertEqual(4032, len(conns))
         self.assertEqual(640, len(spikes_test))
 
-    def test_larger_array(self):
+    def test_larger_array(self) -> None:
         self.runsafe(self.larger_array)
 
     def do_array_nd_test(
-            self, neurons_per_core_pre, pre_size, pre_shape,
-            neurons_per_core_post, post_size, post_shape):
+            self, neurons_per_core_pre: Tuple[int, ...], pre_size: int,
+            pre_shape: BaseStructure,
+            neurons_per_core_post: Union[int, Tuple[int, ...]],
+            post_size: int, post_shape: Optional[BaseStructure]) -> None:
         p.setup(1.0)
         pre = p.Population(
             pre_size, p.IF_curr_exp(), structure=pre_shape)
@@ -226,11 +233,11 @@ class ArrayConnectorTest(BaseTestCase):
         assert numpy.array_equal(numpy.sort(random_conns, axis=0),
                                  numpy.sort(conns, axis=0))
 
-    def test_3d_to_1d_array(self):
+    def test_3d_to_1d_array(self) -> None:
         self.do_array_nd_test((5, 2, 1), 10 * 6 * 4, p.Grid3D(10 / 6, 10 / 4),
                               12, 40, None)
 
-    def test_2d_to_2d_array(self):
+    def test_2d_to_2d_array(self) -> None:
         self.do_array_nd_test((3, 4), 9 * 8, p.Grid2D(9 / 8),
                               (1, 2), 5 * 6, p.Grid2D(5 / 6))
 

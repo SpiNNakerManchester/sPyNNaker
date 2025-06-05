@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from decimal import Decimal
 from enum import Enum
 from spynnaker.pyNN.external_devices_models\
     .abstract_multicast_controllable_device import (
@@ -24,8 +25,9 @@ class AbstractPushBotOutputDevice(Enum):
     """
 
     def __init__(
-            self, value, protocol_property, min_value, max_value,
-            time_between_send, send_type=SendType.SEND_TYPE_INT):
+            self, value: int, protocol_property: property, min_value: int,
+            max_value: Decimal, time_between_send: int,
+            send_type: SendType = SendType.SEND_TYPE_INT):
         # pylint: disable=too-many-arguments, protected-access
         self._value_ = value
         self._protocol_property = protocol_property
@@ -35,7 +37,7 @@ class AbstractPushBotOutputDevice(Enum):
         self._send_type = send_type
 
     @property
-    def protocol_property(self):
+    def protocol_property(self) -> property:
         """
         :rtype: property
         """
@@ -49,9 +51,9 @@ class AbstractPushBotOutputDevice(Enum):
         return self._min_value
 
     @property
-    def max_value(self) -> int:
+    def max_value(self) -> Decimal:
         """
-        :rtype: int
+        Max Value
         """
         return self._max_value
 

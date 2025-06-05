@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import time
+import pyNN.spiNNaker as sim
+
 from spinn_utilities.config_holder import get_config_bool
 from spinn_front_end_common.interface.provenance import GlobalProvenance
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import ConfigurationException
-import pyNN.spiNNaker as sim
+from spynnaker.pyNN.models.populations import Population
 from spynnaker_integration_tests.scripts import check_data
 from spinnaker_testbase import BaseTestCase
 
@@ -29,7 +31,8 @@ class ManyBoards(BaseTestCase):
     n_neurons = 400
     simtime = 600
 
-    def add_pop(self, x, y, n_neurons, input_pop):
+    def add_pop(self, x: int, y: int, n_neurons: int,
+                input_pop: Population) -> Population:
         pop = sim.Population(
             n_neurons, sim.IF_curr_exp(), label="pop_{}_{}".format(x, y))
         pop.add_placement_constraint(x=x, y=y)
@@ -38,7 +41,7 @@ class ManyBoards(BaseTestCase):
         pop.record("all")
         return pop
 
-    def setup(self):
+    def setup(self) -> None:
         sim.setup(timestep=1.0, n_boards_required=self.n_boards)
         try:
             machine = sim.get_machine()
@@ -67,7 +70,7 @@ class ManyBoards(BaseTestCase):
                 y = chip.y
             self._pops.append(self.add_pop(x, y, self.n_neurons, input_pop))
 
-    def report_file(self):
+    def report_file(self) -> str:
         if get_config_bool("Java", "use_java"):
             style = "java_"
         else:
@@ -79,7 +82,7 @@ class ManyBoards(BaseTestCase):
         return "{}_n_boards={}_n_neurons={}_simtime={}".format(
             style, self.n_boards, self.n_neurons, self.simtime)
 
-    def do_run(self):
+    def do_run(self) -> None:
         self.setup()
         report_file = self.report_file()
         t_before = time.time()

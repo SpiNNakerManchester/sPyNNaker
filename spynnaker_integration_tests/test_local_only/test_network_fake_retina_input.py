@@ -11,10 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import List, Tuple, Union
+from random import randint
 
+from neo.core.spiketrainlist import SpikeTrainList
 import pyNN.spiNNaker as p
 from pyNN.space import Grid2D
-from random import randint
+from quantities import Quantity
+
 from spinnaker_testbase import BaseTestCase
 
 # Used if send_fake_spikes is True
@@ -33,12 +37,12 @@ SUB_HEIGHT = 16
 WEIGHT = 5
 
 
-def get_retina_input():
+def get_retina_input() -> List[List[int]]:
     """ This is used to create random input as a spike array
     """
 
     time = int(sleep_time * 1000)
-    spikes_to_send = [[] for _ in range(WIDTH * HEIGHT)]
+    spikes_to_send: List[List[int]] = [[] for _ in range(WIDTH * HEIGHT)]
     for _ in range(n_packets):
         n_spikes = randint(10, 100)
         for _ in range(n_spikes):
@@ -47,18 +51,23 @@ def get_retina_input():
             packed_coord = (y * WIDTH) + x
             spikes_to_send[packed_coord].append(time)
             print(f"Sending x={x}, y={y}, packed={hex(packed_coord)}")
-            time += (sleep_time * 1000)
+            time += int(sleep_time * 1000)
     return spikes_to_send
 
 
-def find_next_spike_after(spike_times, time):
+def find_next_spike_after(
+        spike_times: Quantity,
+        time: int) -> Union[Tuple[int, Quantity], Tuple[None, None]]:
     for index, spike_time in enumerate(spike_times):
         if spike_time >= time:
             return index, spike_time
     return None, None
 
 
-def find_square_of_spikes(x, y, time, spikes, s_label, t_label):
+def find_square_of_spikes(
+        x: int, y: int, time: Quantity, spikes: SpikeTrainList, s_label: str,
+        t_label: str
+        ) -> Tuple[SpikeTrainList, List[Tuple[int, int, Quantity]]]:
     found_spikes = list()
     last_target_time = None
     for x_t in range(x - 1, x + 2):
@@ -87,7 +96,7 @@ def find_square_of_spikes(x, y, time, spikes, s_label, t_label):
     return spikes, found_spikes
 
 
-def do_run():
+def do_run() -> Tuple[SpikeTrainList, SpikeTrainList, SpikeTrainList]:
     # Set up PyNN
     p.setup(1.0)
 
@@ -149,7 +158,7 @@ def do_run():
 
 class NetworkFakeRetinaInput(BaseTestCase):
 
-    def check_run(self):
+    def check_run(self) -> None:
         (capture_spikes, layer_1_spikes, layer_2_spikes) = do_run()
         # Print what happened
         for neuron_id in range(len(capture_spikes)):
@@ -183,7 +192,7 @@ class NetworkFakeRetinaInput(BaseTestCase):
         # TODO convert this into something that can be asserted or checked?
         print("Passed!")
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.check_run)
 
 

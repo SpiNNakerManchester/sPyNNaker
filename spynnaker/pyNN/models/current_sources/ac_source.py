@@ -43,8 +43,9 @@ class ACSource(AbstractCurrentSource):
         "__parameters",
         "__parameter_types")
 
-    def __init__(self, start=0.0, stop=0.0, amplitude=0.0, offset=0.0,
-                 frequency=0.0, phase=0.0) -> None:
+    def __init__(self, start: float = 0.0, stop: float = 0.0,
+                 amplitude: float = 0.0, offset: float = 0.0,
+                 frequency: float = 0.0, phase: float = 0.0) -> None:
         """
         :param float start:
         :param float stop:
@@ -82,7 +83,7 @@ class ACSource(AbstractCurrentSource):
         super().__init__()
 
     @overrides(AbstractCurrentSource.set_parameters)
-    def set_parameters(self, **parameters: CurrentParameter):
+    def set_parameters(self, **parameters: CurrentParameter) -> None:
         for key, value in parameters.items():
             if key not in self.__parameters:
                 # throw an exception

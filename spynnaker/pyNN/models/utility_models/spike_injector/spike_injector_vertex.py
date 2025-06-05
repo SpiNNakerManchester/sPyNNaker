@@ -14,7 +14,7 @@
 
 import logging
 import sys
-from typing import Collection, List, Optional, Tuple, Union
+from typing import (Collection, Dict, List, Optional, Tuple, Union)
 import numpy
 from numpy.typing import NDArray
 from pyNN.space import Grid2D, Grid3D, BaseStructure
@@ -26,8 +26,9 @@ from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
+
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -67,7 +68,7 @@ class SpikeInjectorVertex(
         self.__structure: Optional[BaseStructure] = None
 
     @overrides(SupportsStructure.set_structure)
-    def set_structure(self, structure: BaseStructure):
+    def set_structure(self, structure: BaseStructure) -> None:
         self.__structure = structure
 
     @property
@@ -84,7 +85,7 @@ class SpikeInjectorVertex(
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(
             self, name: str, sampling_interval: Optional[float] = None,
-            indices: Optional[Collection[int]] = None):
+            indices: Optional[Collection[int]] = None) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if sampling_interval is not None:
@@ -103,8 +104,8 @@ class SpikeInjectorVertex(
         return []
 
     @overrides(PopulationApplicationVertex.set_not_recording)
-    def set_not_recording(
-            self, name: str, indices: Optional[Collection[int]] = None):
+    def set_not_recording(self, name: str,
+                          indices: Optional[Collection[int]] = None) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if indices is not None:
@@ -150,7 +151,7 @@ class SpikeInjectorVertex(
             raise KeyError(f"Cannot record {name}")
         return vertex_slice.get_raster_ids()
 
-    def describe(self):
+    def describe(self) -> Dict[str, Union[str, Collection[str]]]:
         """
         Returns a human-readable description of the cell or synapse type.
 
@@ -163,8 +164,10 @@ class SpikeInjectorVertex(
         """
         context = {
             "name": "SpikeInjector",
-            "default_parameters": self.default_parameters,
-            "default_initial_values": self.default_parameters,
+            "default_parameters":
+                self.default_parameters,
+            "default_initial_values":
+                self.default_parameters,
             "parameters": {
                 "port": self._eieio_params.receive_port,
                 "virtual_key": self._eieio_params.virtual_key},

@@ -21,7 +21,7 @@ class SupportsStructure(object, metaclass=AbstractBase):
     """
 
     @abstractmethod
-    def set_structure(self, structure: BaseStructure):
+    def set_structure(self, structure: BaseStructure) -> None:
         """
         Set the structure of the object.
 

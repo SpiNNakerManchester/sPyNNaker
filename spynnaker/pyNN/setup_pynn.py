@@ -21,15 +21,18 @@ module.
 """
 
 import os
-# TODO: switch to packaging.version
+import shutil
+from types import ModuleType
 from packaging.version import Version
 import pyNN
+import spynnaker.pyNN as sim
+
 
 # The version of PyNN that we really want
 _TARGET_PYNN_VERSION = "0.9"
 
 
-def version_satisfies(module, requirement):
+def version_satisfies(module: ModuleType, requirement: str) -> bool:
     """
     Perform a version check. This code could be smarter...
 
@@ -41,25 +44,26 @@ def version_satisfies(module, requirement):
     return Version(module.__version__) >= Version(requirement)
 
 
-def install_spynnaker_into(module):
+def install_spynnaker_into(module: ModuleType) -> None:
     """
     Do the actual installation by creating a package within the given
     module's implementation. This is very nasty!
 
     :param ~types.ModuleType module:
     """
-    spinnaker_dir = os.path.join(os.path.dirname(module.__file__), "spiNNaker")
+    _file = module.__file__
+    assert _file is not None
+    spinnaker_dir = os.path.join(os.path.dirname(_file), "spiNNaker")
     if not os.path.exists(spinnaker_dir):
         os.mkdir(spinnaker_dir)
 
-    spinnaker_init = os.path.join(spinnaker_dir, "__init__.py")
-    with open(spinnaker_init, "w", encoding="utf-8") as spinn_file:
-        spinn_file.write("from spynnaker.pyNN import *\n")
+    pynn_init = os.path.join(spinnaker_dir, "__init__.py")
+    spynnaker_init = os.path.abspath(sim.__file__)
+    shutil.copyfile(spynnaker_init, pynn_init)
+    print(f"Updated {pynn_init} to be the same as spynnaker.pyNN")
 
-    print(f"Created {spinnaker_init} to point to spynnaker.pyNN")
 
-
-def setup_pynn():
+def setup_pynn() -> None:
     """
     Checks pyNN version and creates the spynnaker model in pynn.
     """

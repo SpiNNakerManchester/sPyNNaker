@@ -19,7 +19,7 @@ from spynnaker_integration_tests.scripts import PatternSpiker
 
 class TestSampling(BaseTestCase):
 
-    def medium(self):
+    def medium(self) -> None:
         ps = PatternSpiker()
         sim.setup(timestep=1)
         simtime = 1000
@@ -40,10 +40,10 @@ class TestSampling(BaseTestCase):
                  v_rate=v_rate, v_rec_indexes=v_rec_indexes, is_view=False)
         sim.end()
 
-    def test_medium(self):
+    def test_medium(self) -> None:
         self.runsafe(self.medium)
 
-    def multirun(self):
+    def multirun(self) -> None:
         ps = PatternSpiker()
         sim.setup(timestep=1)
         simtime = 32
@@ -66,10 +66,10 @@ class TestSampling(BaseTestCase):
                  v_rate=v_rate, v_rec_indexes=v_rec_indexes, is_view=True)
         sim.end()
 
-    def test_multirun(self):
+    def test_multirun(self) -> None:
         self.runsafe(self.multirun)
 
-    def different_views(self):
+    def different_views(self) -> None:
         ps = PatternSpiker()
         sim.setup(timestep=1)
         simtime = 100
@@ -80,10 +80,10 @@ class TestSampling(BaseTestCase):
                  missing=True)
         sim.end()
 
-    def test_different_views(self):
+    def test_different_views(self) -> None:
         self.runsafe(self.different_views)
 
-    def standard(self):
+    def standard(self) -> None:
         ps = PatternSpiker()
         sim.setup(timestep=1)
         simtime = 100
@@ -92,10 +92,10 @@ class TestSampling(BaseTestCase):
         ps.check(pop, simtime)
         sim.end()
 
-    def test_standard(self):
+    def test_standard(self) -> None:
         self.runsafe(self.standard)
 
-    def one_core_no_recording(self):
+    def one_core_no_recording(self) -> None:
         sim.setup(timestep=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
 
@@ -121,5 +121,5 @@ class TestSampling(BaseTestCase):
         assert len(v) == 10
         assert all(len(v[i]) == 3 for i in range(0, 10))
 
-    def test_one_core_no_recording(self):
+    def test_one_core_no_recording(self) -> None:
         self.runsafe(self.one_core_no_recording)

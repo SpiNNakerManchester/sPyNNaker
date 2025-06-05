@@ -51,7 +51,8 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def set_synapse_dynamics(self, synapse_dynamics: AbstractSynapseDynamics):
+    def set_synapse_dynamics(
+            self, synapse_dynamics: AbstractSynapseDynamics) -> None:
         """
         Set the synapse dynamics of this vertex.
 
@@ -81,7 +82,8 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def verify_splitter(self, splitter: AbstractSpynnakerSplitterDelay):
+    def verify_splitter(
+            self, splitter: AbstractSpynnakerSplitterDelay) -> None:
         """
         Check that the splitter implements the API(s) expected by the
         SynapticMatrices

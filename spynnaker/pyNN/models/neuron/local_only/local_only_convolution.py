@@ -43,8 +43,8 @@ from spynnaker.pyNN.models.common.local_only_2d_common import (
 from .abstract_local_only import AbstractLocalOnly
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
-        AbstractPopulationVertex)
+    from spynnaker.pyNN.models.neuron.population_vertex import (
+        PopulationVertex)
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron import (
         PopulationMachineLocalOnlyCombinedVertex)
@@ -137,7 +137,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def write_parameters(
             self, spec: DataSpecificationGenerator, region: int,
             machine_vertex: PopulationMachineLocalOnlyCombinedVertex,
-            weight_scales: NDArray[floating]):
+            weight_scales: NDArray[floating]) -> None:
         # pylint: disable=unexpected-keyword-arg, protected-access
 
         # Get incoming sources for this vertex
@@ -249,13 +249,13 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             numpy.concatenate(weight_data, dtype="int16").view("uint32"))
 
     def __get_sources_for_target(
-            self, app_vertex: AbstractPopulationVertex) -> Dict[
+            self, app_vertex: PopulationVertex) -> Dict[
                 Tuple[ColouredApplicationVertex, str], List[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.
 
-        :param AbstractPopulationVertex app_vertex: The vertex being targeted
+        :param PopulationVertex app_vertex: The vertex being targeted
         :return:
             A dict of source PopulationApplicationVertex to list of source
             information
@@ -348,3 +348,9 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         if len(neg_weights) == 0:
             return 0
         return float(numpy.var(neg_weights))
+
+    @property
+    @overrides(AbstractLocalOnly.synapses_per_second)
+    def synapses_per_second(self) -> int:
+        # This is a guess!
+        return 15000000

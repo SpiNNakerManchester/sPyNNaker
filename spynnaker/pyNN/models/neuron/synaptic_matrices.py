@@ -17,7 +17,7 @@ from typing import (
     Dict, List, NamedTuple, Optional, Sequence, Tuple, TYPE_CHECKING, cast)
 
 import numpy
-from numpy import floating, uint32
+from numpy import uint32
 from numpy.typing import NDArray
 
 from pacman.model.graphs.common import Slice
@@ -41,12 +41,12 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
     write_bitfield_init_data, is_sdram_poisson_source)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-
+from spynnaker.pyNN.types import WeightScales
 from .synaptic_matrix_app import SynapticMatrixApp
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
-        AbstractPopulationVertex)
+    from spynnaker.pyNN.models.neuron.population_vertex import (
+        PopulationVertex)
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge, SynapseInformation)
 
@@ -174,14 +174,13 @@ class SynapticMatrices(object):
         "__max_gen_data")
 
     def __init__(
-            self, app_vertex: AbstractPopulationVertex,
+            self, app_vertex: PopulationVertex,
             regions: SynapseRegions, max_atoms_per_core: int,
-            weight_scales: NDArray[floating], all_syn_block_sz: int):
+            weight_scales: WeightScales, all_syn_block_sz: int):
         """
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
         :param SynapseRegions regions: The synapse regions to use
         :param int max_atoms_per_core:
-        :param list(float) weight_scales:
         :param int all_syn_block_sz:
         """
         self.__app_vertex = app_vertex
@@ -339,7 +338,7 @@ class SynapticMatrices(object):
             len(self.__bit_field_key_map) * BYTES_PER_WORD)
 
     def __write_pop_table(self, spec: DataSpecificationBase,
-                          poptable_ref: Optional[int] = None):
+                          poptable_ref: Optional[int] = None) -> None:
         assert self.__master_pop_data is not None
         master_pop_table_sz = len(self.__master_pop_data) * BYTES_PER_WORD
         spec.reserve_memory_region(
@@ -350,7 +349,7 @@ class SynapticMatrices(object):
 
     def write_synaptic_data(
             self, spec: DataSpecificationBase, post_vertex_slice: Slice,
-            references: SynapseRegionReferences):
+            references: SynapseRegionReferences) -> None:
         """
         Write the synaptic data for all incoming projections.
 
@@ -393,15 +392,13 @@ class SynapticMatrices(object):
 
     def __write_synapse_expander_data_spec(
             self, spec: DataSpecificationBase, post_vertex_slice: Slice,
-            connection_builder_ref: Optional[int] = None):
+            connection_builder_ref: Optional[int] = None) -> None:
         """
         Write the data spec for the synapse expander.
 
         :param ~.DataSpecificationGenerator spec:
             The specification to write to
         :param list(GeneratorData) generator_data: The data to be written
-        :param weight_scales: scaling of weights on each synapse
-        :type weight_scales: list(int or float)
         """
         if self.__generated_data is None:
             if connection_builder_ref is not None:
@@ -444,14 +441,15 @@ class SynapticMatrices(object):
             # if converted to an int, so we use U3232 here instead (as there
             # can be scales larger than U1616.max in conductance-based models)
             dtype = DataType.U3232
-            spec.write_value(data=min(w, dtype.max), data_type=dtype)
+            spec.write_value(data=float(min(dtype.max, w)), data_type=dtype)
 
         spec.write_array(self.__generated_data)
         spec.write_array(self.__bit_field_key_map)
 
     def __get_app_key_and_mask(
             self, r_info: AppVertexRoutingInfo, n_stages: int,
-            pre_vertex: PopulationApplicationVertex, partition_id: str):
+            pre_vertex: PopulationApplicationVertex,
+            partition_id: str) -> AppKeyInfo:
         """
         Get a key and mask for an incoming application vertex as a whole.
 
@@ -545,7 +543,7 @@ class SynapticMatrices(object):
         matrix = self.__matrices[app_edge, synapse_info]
         return matrix.get_connections(placement)
 
-    def read_generated_connection_holders(self, placement: Placement):
+    def read_generated_connection_holders(self, placement: Placement) -> None:
         """
         Fill in any pre-run connection holders for data which is generated
         on the machine, after it has been generated.

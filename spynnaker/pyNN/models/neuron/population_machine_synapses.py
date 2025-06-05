@@ -38,7 +38,7 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, HasSynapses)
 
-from .abstract_population_vertex import AbstractPopulationVertex
+from .population_vertex import PopulationVertex
 from .population_machine_synapses_provenance import (
     PopulationMachineSynapsesProvenance)
 from .synaptic_matrices import SynapseRegions, SynapseRegionReferences
@@ -63,14 +63,14 @@ class PopulationMachineSynapses(
 
     @property
     @abstractmethod
-    def _pop_vertex(self) -> AbstractPopulationVertex:
+    def _pop_vertex(self) -> PopulationVertex:
         """
         The application vertex of the machine vertex.
 
         .. note::
             This is likely to be available via the MachineVertex.
 
-        :rtype: AbstractPopulationVertex
+        :rtype: PopulationVertex
         """
         raise NotImplementedError
 
@@ -148,7 +148,7 @@ class PopulationMachineSynapses(
     def _write_synapse_data_spec(
             self, spec: DataSpecificationBase,
             ring_buffer_shifts: Sequence[int],
-            weight_scales: NDArray[floating], structural_sz: int):
+            weight_scales: NDArray[floating], structural_sz: int) -> None:
         """
         Write the data specification for the synapse data.
 
@@ -205,7 +205,7 @@ class PopulationMachineSynapses(
 
     def _write_synapse_parameters(
             self, spec: DataSpecificationBase,
-            ring_buffer_shifts: Sequence[int]):
+            ring_buffer_shifts: Sequence[int]) -> None:
         """
         Write the synapse parameters data region.
 
@@ -244,7 +244,7 @@ class PopulationMachineSynapses(
         return self._synaptic_matrices.gen_on_machine
 
     @overrides(AbstractSynapseExpandable.read_generated_connection_holders)
-    def read_generated_connection_holders(self, placement: Placement):
+    def read_generated_connection_holders(self, placement: Placement) -> None:
         self._synaptic_matrices.read_generated_connection_holders(placement)
 
     @property

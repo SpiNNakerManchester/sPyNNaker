@@ -43,10 +43,8 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
         "__a_plus",
         "__a_minus")
     __PARAM_NAMES = ('tau_plus', 'tau_minus')
-    default_parameters = {'tau_plus': 20.0, 'tau_minus': 20.0}
 
-    def __init__(self, tau_plus: float = default_parameters['tau_plus'],
-                 tau_minus: float = default_parameters['tau_minus'],
+    def __init__(self, tau_plus: float = 20.0, tau_minus: float = 20.0,
                  A_plus: float = 0.01, A_minus: float = 0.01):
         r"""
         :param float tau_plus: :math:`\tau_+`
@@ -92,7 +90,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
         return self.__a_plus
 
     @A_plus.setter
-    def A_plus(self, new_value: float):
+    def A_plus(self, new_value: float) -> None:
         self.__a_plus = new_value
 
     @property
@@ -105,7 +103,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
         return self.__a_minus
 
     @A_minus.setter
-    def A_minus(self, new_value: float):
+    def A_minus(self, new_value: float) -> None:
         self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -153,7 +151,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
             self, spec: DataSpecificationBase, global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
         spec.write_array(self.__tau_minus_data)

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Iterator, MutableMapping, Optional, Tuple, cast
+from typing_extensions import Never
 
 import numpy
 from numpy import uint32
@@ -30,8 +31,8 @@ from spinn_front_end_common.utilities.helpful_functions import (
 
 from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.neuron.abstract_population_vertex import (
-    AbstractPopulationVertex)
+from spynnaker.pyNN.models.neuron.population_vertex import (
+    PopulationVertex)
 from spynnaker.pyNN.models.neuron.population_machine_neurons import (
     NeuronRegions)
 
@@ -82,7 +83,7 @@ class NeuronData(object):
         # Whether to generate things on the machine
         "__gen_on_machine")
 
-    def __init__(self, app_vertex: AbstractPopulationVertex):
+    def __init__(self, app_vertex: PopulationVertex):
         self.__app_vertex = app_vertex
         self.__neuron_data: Optional[NDArray[uint32]] = None
         self.__neuron_recording_data: Optional[NDArray[uint32]] = None
@@ -136,9 +137,9 @@ class NeuronData(object):
         # If we get here, we know everything is generated on machine
         self.__gen_on_machine = True
 
-    def write_data(
-            self, spec: DataSpecificationBase, vertex_slice: Slice,
-            neuron_regions: NeuronRegions, gen_on_machine: bool = True):
+    def write_data(self, spec: DataSpecificationBase, vertex_slice: Slice,
+                   neuron_regions: NeuronRegions,
+                   gen_on_machine: bool = True) -> None:
         """
         Write the generated data.
 
@@ -271,8 +272,8 @@ class NeuronData(object):
             *self.__app_vertex.core_seed(vertex_slice),
             n_structs, vertex_slice.n_atoms], dtype=uint32)
 
-    def read_data(
-            self, placement: Placement, neuron_regions: NeuronRegions):
+    def read_data(self, placement: Placement,
+                  neuron_regions: NeuronRegions) -> None:
         """
         Read the current state of the data from the machine into the
         application vertex.
@@ -286,8 +287,8 @@ class NeuronData(object):
         self.__do_read_data(
             placement, neuron_regions.neuron_params, merged_dict)
 
-    def read_initial_data(
-            self, placement: Placement, neuron_regions: NeuronRegions):
+    def read_initial_data(self, placement: Placement,
+                          neuron_regions: NeuronRegions) -> None:
         """
         Read the initial state of the data from the machine into the
         application vertex.
@@ -301,8 +302,8 @@ class NeuronData(object):
         self.__do_read_data(
             placement, neuron_regions.initial_values, merged_dict)
 
-    def __do_read_data(
-            self, placement: Placement, region: int, results: '_MergedDict'):
+    def __do_read_data(self, placement: Placement, region: int,
+                       results: '_MergedDict') -> None:
         """
         Perform the reading of data.
 
@@ -360,7 +361,7 @@ class _MergedDict(MutableMapping[str, RangedList[float]]):
             return self.__params[key]
         return self.__state_vars[key]
 
-    def __setitem__(self, key: str, value: RangedList[float]):
+    def __setitem__(self, key: str, value: RangedList[float]) -> None:
         if key in self.__params:
             self.__params[key] = value
         elif key in self.__state_vars:
@@ -368,7 +369,7 @@ class _MergedDict(MutableMapping[str, RangedList[float]]):
         else:
             raise KeyError(f"No such key {key}")
 
-    def __delitem__(self, __v: str):
+    def __delitem__(self, __v: str) -> Never:
         raise NotImplementedError("items may not be deleted")
 
     def __iter__(self) -> Iterator[str]:

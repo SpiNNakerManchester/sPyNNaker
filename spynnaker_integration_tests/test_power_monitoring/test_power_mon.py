@@ -15,14 +15,17 @@
 import os
 import numpy
 import pyNN.spiNNaker as p
+
+from spinn_utilities.config_holder import get_report_path
+
 from spinn_front_end_common.interface.provenance import ProvenanceReader
-from spinn_front_end_common.utilities.report_functions import EnergyReport
-from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker_integration_tests.scripts import SynfireRunner
+
 from spinnaker_testbase import BaseTestCase
 
+from spynnaker_integration_tests.scripts import SynfireRunner
+
 n_neurons = 200  # number of neurons in each population
-neurons_per_core = n_neurons / 2
+neurons_per_core = int(n_neurons / 2)
 run_times = [10, 20, 30]
 # parameters for population 1 first run
 input_class = p.SpikeSourcePoisson
@@ -34,7 +37,12 @@ synfire_run = SynfireRunner()
 
 class TestPowerMonitoring(BaseTestCase):
 
-    def do_run(self):
+    def assert_report(self, n_run: int) -> None:
+        path = get_report_path("path_energy_report", n_run=n_run)
+        if not os.path.exists(path):
+            raise AssertionError(f"Unable to find report for run {n_run}")
+
+    def do_run(self) -> None:
         synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                            run_times=run_times, input_class=input_class,
                            start_time=start_time, duration=duration, rate=rate,
@@ -44,13 +52,12 @@ class TestPowerMonitoring(BaseTestCase):
         # Check spikes increase in second half by at least a factor of ten
         hist = numpy.histogram(spikes[:, 1], bins=[0, 5000, 10000])
         self.assertIsNotNone(hist, "must have a histogram")
+
         # Did we build the report file like we asked for in config file?
-        self.assertIn(EnergyReport.file_name(1),
-                      os.listdir(SpynnakerDataView.get_run_dir_path()))
-        self.assertIn(EnergyReport.file_name(2),
-                      os.listdir(SpynnakerDataView.get_run_dir_path()))
-        self.assertIn(EnergyReport.file_name(3),
-                      os.listdir(SpynnakerDataView.get_run_dir_path()))
+        self.assert_report(1)
+        self.assert_report(2)
+        self.assert_report(3)
+
         # Did we output power provenance data, as requested?
         exec_times = set()
         with ProvenanceReader() as reader:
@@ -61,5 +68,5 @@ class TestPowerMonitoring(BaseTestCase):
                 exec_times.add(row[0])
         self.assertEqual(exec_times, set([0.01, 0.03, 0.06]))
 
-    def test_power_monitoring(self):
+    def test_power_monitoring(self) -> None:
         self.runsafe(self.do_run)

@@ -52,8 +52,8 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
             live_packet_gather_label, receive_labels, send_labels,
             local_host, local_port)
 
-    def send_spike(
-            self, label: str, neuron_id: int, send_full_keys: bool = False):
+    def send_spike(self, label: str, neuron_id: int,
+                   send_full_keys: bool = False) -> None:
         """
         Send a spike from a single neuron.
 
@@ -68,7 +68,7 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
 
     def send_spikes(
             self, label: str, neuron_ids: List[int],
-            send_full_keys: bool = False):
+            send_full_keys: bool = False) -> None:
         """
         Send a number of spikes.
 

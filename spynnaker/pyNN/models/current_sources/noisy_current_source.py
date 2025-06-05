@@ -44,8 +44,9 @@ class NoisyCurrentSource(AbstractCurrentSource):
         "__parameters",
         "__parameter_types")
 
-    def __init__(self, mean=0.0, stdev=0.0, start=0.0, stop=0.0, dt=1.0,
-                 rng=None) -> None:
+    def __init__(self, mean: float = 0.0, stdev: float = 0.0,
+                 start: float = 0.0, stop: float = 0.0, dt: float = 1.0,
+                 rng: None = None) -> None:
         """
         :param float mean:
         :param float stdev:
@@ -92,7 +93,7 @@ class NoisyCurrentSource(AbstractCurrentSource):
         super().__init__()
 
     @overrides(AbstractCurrentSource.set_parameters)
-    def set_parameters(self, **parameters: CurrentParameter):
+    def set_parameters(self, **parameters: CurrentParameter) -> None:
         for key, value in parameters.items():
             if key not in self.__parameters:
                 # throw an exception

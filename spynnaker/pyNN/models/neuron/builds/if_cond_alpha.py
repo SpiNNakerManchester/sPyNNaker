@@ -15,6 +15,7 @@
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import (
     AbstractProvidesDefaults, default_initial_values)
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 
 
 class IFCondAlpha(AbstractProvidesDefaults):
@@ -28,9 +29,13 @@ class IFCondAlpha(AbstractProvidesDefaults):
     # noinspection PyPep8Naming
     @default_initial_values({"v", "gsyn_exc", "gsyn_inh"})
     def __init__(
-            self, tau_m=20, cm=1.0, e_rev_E=0.0, e_rev_I=-70.0, v_rest=-65.0,
-            v_reset=-65.0, v_thresh=-50.0, tau_syn_E=0.3, tau_syn_I=0.5,
-            tau_refrac=0.1, i_offset=0, v=-65.0, gsyn_exc=0.0, gsyn_inh=0.0):
+            self, tau_m: ModelParameter = 20, cm: ModelParameter = 1.0,
+            e_rev_E: ModelParameter = 0.0, e_rev_I: ModelParameter = -70.0,
+            v_rest: ModelParameter = -65.0, v_reset: ModelParameter = -65.0,
+            v_thresh: ModelParameter = -50.0, tau_syn_E: ModelParameter = 0.3,
+            tau_syn_I: ModelParameter = 0.5, tau_refrac: ModelParameter = 0.1,
+            i_offset: ModelParameter = 0, v: ModelParameter = -65.0,
+            gsyn_exc: ModelParameter = 0.0, gsyn_inh: ModelParameter = 0.0):
         # pylint: disable=too-many-locals, unused-argument, invalid-name
         raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")

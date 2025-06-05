@@ -34,7 +34,7 @@ from .population_synapses_machine_vertex_common import (
     PopulationSynapsesMachineVertexCommon)
 
 if TYPE_CHECKING:
-    from .abstract_population_vertex import AbstractPopulationVertex
+    from .population_vertex import PopulationVertex
     from spynnaker.pyNN.models.neuron.synaptic_matrices import (
         SynapseRegions, SynapseRegionReferences, SynapticMatrices)
 
@@ -60,7 +60,7 @@ class PopulationSynapsesMachineVertexLead(
 
     def __init__(
             self, sdram: AbstractSDRAM, label: str,
-            app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
+            app_vertex: PopulationVertex, vertex_slice: Slice,
             ring_buffer_shifts: Sequence[int],
             weight_scales: NDArray[floating], structural_sz: int,
             synapse_references: SynapseRegionReferences,
@@ -69,7 +69,7 @@ class PopulationSynapsesMachineVertexLead(
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex
         :param str label: The label of the vertex
-        :param AbstractPopulationVertex app_vertex:
+        :param PopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
@@ -135,8 +135,8 @@ class PopulationSynapsesMachineVertexLead(
     @overrides(PopulationSynapsesMachineVertexCommon._parse_synapse_provenance)
     def _parse_synapse_provenance(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
-        return PopulationMachineSynapses._parse_synapse_provenance(
+            provenance_data: Sequence[int]) -> None:
+        PopulationMachineSynapses._parse_synapse_provenance(
             self, label, x, y, p, provenance_data)
 
     @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)

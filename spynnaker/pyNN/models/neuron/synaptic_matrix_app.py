@@ -15,7 +15,7 @@ from __future__ import annotations
 from typing import List, Optional, Tuple, TYPE_CHECKING
 
 import numpy
-from numpy import floating, uint32
+from numpy import uint32
 from numpy.typing import NDArray
 
 from pacman.model.graphs.common import Slice
@@ -31,6 +31,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnHost)
+from spynnaker.pyNN.types import WeightScales
 
 from .generator_data import GeneratorData
 from .synapse_io import read_all_synapses, convert_to_connections, get_synapses
@@ -95,7 +96,7 @@ class SynapticMatrixApp(object):
             synaptic_matrix_region: int, max_atoms_per_core: int,
             all_syn_block_sz: int, app_key_info: Optional[AppKeyInfo],
             delay_app_key_info: Optional[AppKeyInfo],
-            weight_scales: NDArray[floating]):
+            weight_scales: WeightScales):
         """
         :param SynapseInformation synapse_info:
             The projection synapse information
@@ -110,7 +111,7 @@ class SynapticMatrixApp(object):
             Application-level routing key information for undelayed vertices
         :param AppKeyInfo delay_app_key_info:
             Application-level routing key information for delayed vertices
-        :param list(float) weight_scales:
+        :param weight_scales:
             Weight scale for each synapse edge
         """
         self.__synapse_info = synapse_info
@@ -300,7 +301,7 @@ class SynapticMatrixApp(object):
 
     def __get_padding(
             self, data_to_write: List[NDArray[uint32]],
-            expected_offset: int, block_addr: int):
+            expected_offset: int, block_addr: int) -> int:
         if expected_offset < block_addr:
             raise ValueError(
                 "The block address is already beyond where is expected!:"
@@ -352,7 +353,7 @@ class SynapticMatrixApp(object):
 
     def __update_connection_holders(
             self, data: NDArray[uint32], delayed_data: NDArray[uint32],
-            post_vertex_slice: Slice):
+            post_vertex_slice: Slice) -> None:
         """
         Fill in connections in the connection holders as they are created.
 
@@ -386,7 +387,7 @@ class SynapticMatrixApp(object):
             self.__app_edge, self.__synapse_info, self.__max_row_info,
             max_pre_atoms_per_core, self.__max_atoms_per_core)
 
-    def read_generated_connection_holders(self, placement: Placement):
+    def read_generated_connection_holders(self, placement: Placement) -> None:
         """
         Read any pre-run connection holders after data has been generated.
 

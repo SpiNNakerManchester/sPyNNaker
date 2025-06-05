@@ -170,7 +170,7 @@ class SynapseDynamicsNeuromodulation(
     def write_parameters(
             self, spec: DataSpecificationBase, region: int,
             global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         # Calculate constant component in Izhikevich's model weight update
         # function and write to SDRAM.
         weight_update_component = \
@@ -196,7 +196,7 @@ class SynapseDynamicsNeuromodulation(
             f"Type {type(self)} does not have parameter {key}")
 
     @overrides(AbstractPlasticSynapseDynamics.set_value)
-    def set_value(self, key: str, value: float):
+    def set_value(self, key: str, value: float) -> None:
         if hasattr(self, key):
             setattr(self, key, value)
         raise InvalidParameterType(
@@ -336,3 +336,14 @@ class SynapseDynamicsNeuromodulation(
     @overrides(AbstractPlasticSynapseDynamics.is_combined_core_capable)
     def is_combined_core_capable(self) -> bool:
         return False
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return True
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.synapses_per_second)
+    def synapses_per_second(self) -> int:
+        # This should never end up being requested!
+        raise NotImplementedError

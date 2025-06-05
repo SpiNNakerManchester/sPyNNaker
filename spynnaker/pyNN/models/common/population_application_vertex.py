@@ -60,7 +60,7 @@ class PopulationApplicationVertex(
 
     @staticmethod
     def _check_names(names: Names, allowed: Container[str],
-                     type_of_thing: str):
+                     type_of_thing: str) -> None:
         """
         Check the list of names are allowed or not.
 
@@ -75,7 +75,7 @@ class PopulationApplicationVertex(
                 raise KeyError(f"{name} is not a recognized {type_of_thing}")
 
     @staticmethod
-    def _check_parameters(names: Names, allowed: Container[str]):
+    def _check_parameters(names: Names, allowed: Container[str]) -> None:
         """
         Check that parameters are allowed.
 
@@ -86,7 +86,7 @@ class PopulationApplicationVertex(
         PopulationApplicationVertex._check_names(names, allowed, "parameter")
 
     @staticmethod
-    def _check_variables(names: Names, allowed: Container[str]):
+    def _check_variables(names: Names, allowed: Container[str]) -> None:
         """
         Check that state variables are allowed.
 
@@ -115,7 +115,7 @@ class PopulationApplicationVertex(
             "This Population does not support the reading of parameters")
 
     def set_parameter_values(
-            self, name: str, value: Values, selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None) -> None:
         """
         Set the values of a parameter for the whole Population or a subset
         if the selector is used.
@@ -158,7 +158,7 @@ class PopulationApplicationVertex(
             " variables")
 
     def set_initial_state_values(
-            self, name: str, value: Values, selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None) -> None:
         """
         Set the initial values of a state variable for the whole Population
         or a subset if the selector is used.
@@ -194,7 +194,7 @@ class PopulationApplicationVertex(
             " variables")
 
     def set_current_state_values(
-            self, name: str, value: Values, selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None) -> None:
         """
         Set the current values of a state variable for the whole Population
         or a subset if the selector is used.
@@ -258,7 +258,7 @@ class PopulationApplicationVertex(
 
     def set_recording(
             self, name: str, sampling_interval: Optional[float] = None,
-            indices: Optional[Collection[int]] = None):
+            indices: Optional[Collection[int]] = None) -> None:
         """
         Set a variable recording.
 
@@ -278,8 +278,8 @@ class PopulationApplicationVertex(
             f"{type(self)} has recording variables so should implement "
             f"set_recording")
 
-    def set_not_recording(
-            self, name: str, indices: Optional[Collection[int]] = None):
+    def set_not_recording(self, name: str,
+                          indices: Optional[Collection[int]] = None) -> None:
         """
         Set a variable not recording.
 
@@ -397,7 +397,7 @@ class PopulationApplicationVertex(
     # end of recording methods
 
     def inject(self, current_source: AbstractCurrentSource,
-               selector: Selector = None):
+               selector: Selector = None) -> None:
         """
         Inject a current source into this population.
 

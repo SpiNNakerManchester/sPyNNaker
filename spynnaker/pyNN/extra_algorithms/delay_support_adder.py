@@ -24,7 +24,7 @@ from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, DelayedApplicationEdge,
     DelayAfferentApplicationEdge)
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron import PopulationVertex
 
 
 def delay_support_adder() -> Tuple[
@@ -55,7 +55,7 @@ class _DelaySupportAdder(object):
         self._app_to_delay_map: Dict[
             ApplicationEdgePartition, DelayExtensionVertex] = dict()
         self._delay_post_edge_map: Dict[
-            Tuple[DelayExtensionVertex, AbstractPopulationVertex, str],
+            Tuple[DelayExtensionVertex, PopulationVertex, str],
             DelayedApplicationEdge] = dict()
         self._new_edges: List[Tuple[ApplicationEdge, str]] = list()
         self._new_vertices: List[DelayExtensionVertex] = list()
@@ -92,7 +92,7 @@ class _DelaySupportAdder(object):
 
     def __examine_edge_for_delays_to_add(
             self, edge: ProjectionApplicationEdge,
-            partition: ApplicationEdgePartition):
+            partition: ApplicationEdgePartition) -> None:
         """
         Look at a particular edge to see if it needs a delay vertex+edge
         inserted, and add it in if it does.
@@ -102,7 +102,7 @@ class _DelaySupportAdder(object):
         """
         # figure the max delay and if we need a delay extension
         n_stages, steps_per_stage, need_delay_ext = self._check_delay_values(
-            edge, edge.synapse_information)
+            edge)
 
         # if we need a delay, add it to the app graph.
         if need_delay_ext:
@@ -116,7 +116,7 @@ class _DelaySupportAdder(object):
     def _create_post_delay_edge(
             self, delay_app_vertex: DelayExtensionVertex,
             app_edge: ProjectionApplicationEdge,
-            partition_id: str):
+            partition_id: str) -> None:
         """
         Creates the edge between delay extension and post vertex. Stores
         for future loading to the application graph when safe to do so.
@@ -146,7 +146,7 @@ class _DelaySupportAdder(object):
     def _create_delay_app_vertex_and_pre_edge(
             self, app_outgoing_edge_partition: ApplicationEdgePartition,
             app_edge: ProjectionApplicationEdge, delay_per_stage: int,
-            n_delay_stages: int):
+            n_delay_stages: int) -> DelayExtensionVertex:
         """
         Creates the delay extension application vertex and the edge from the
         source vertex to this delay extension. Adds to the graph, as safe to
@@ -187,21 +187,20 @@ class _DelaySupportAdder(object):
                 n_delay_stages, delay_per_stage)
         return delay_app_vertex
 
-    def _check_delay_values(self, app_edge, synapse_infos):
+    def _check_delay_values(self, app_edge: ProjectionApplicationEdge)\
+            -> Tuple[int, int, bool]:
         """
         Checks the delay required from the user defined max, the max delay
         supported by the post vertex splitter and the delay Extensions.
 
         :param ApplicationEdge app_edge: the undelayed application edge
-        :param iterable[SynapseInformation] synapse_infos:
-            the synapse information objects
         :return: tuple(n_delay_stages, delay_steps_per_stage, extension_needed)
         """
         # get max delay required
         max_delay_needed_ms = max(
             synapse_info.synapse_dynamics.get_delay_maximum(
                 synapse_info.connector, synapse_info)
-            for synapse_info in synapse_infos)
+            for synapse_info in app_edge.synapse_information)
 
         # get if the post vertex needs a delay extension
         post_splitter = app_edge.post_vertex.splitter

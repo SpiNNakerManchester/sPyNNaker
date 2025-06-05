@@ -13,29 +13,19 @@
 # limitations under the License.
 from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as p
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexNeuronsSynapses)
 
 
-def split_structural_without_stdp():
+def split_structural_without_stdp() -> None:
     p.setup(1.0)
     stim = p.Population(1, p.SpikeSourceArray(range(10)), label="stim")
 
     # These populations should experience formation
-    pop = p.Population(
-        1, p.IF_curr_exp(), label="pop", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(1)})
-    pop_2 = p.Population(
-        1, p.IF_curr_exp(), label="pop_2", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(1)})
+    pop = p.Population(1, p.IF_curr_exp(), label="pop", n_synapse_cores=1)
+    pop_2 = p.Population(1, p.IF_curr_exp(), label="pop_2", n_synapse_cores=1)
 
     # These populations should experience elimination
-    pop_3 = p.Population(
-        1, p.IF_curr_exp(), label="pop_3", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(1)})
-    pop_4 = p.Population(
-        1, p.IF_curr_exp(), label="pop_4", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(1)})
+    pop_3 = p.Population(1, p.IF_curr_exp(), label="pop_3", n_synapse_cores=1)
+    pop_4 = p.Population(1, p.IF_curr_exp(), label="pop_4", n_synapse_cores=1)
 
     # Formation with last-neuron selection (0 probability elimination)
     proj = p.Projection(
@@ -102,5 +92,5 @@ def split_structural_without_stdp():
 
 class TestStructuralWithoutSTDP(BaseTestCase):
 
-    def test_split_structural_without_stdp(self):
+    def test_split_structural_without_stdp(self) -> None:
         self.runsafe(split_structural_without_stdp)

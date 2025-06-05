@@ -17,13 +17,13 @@ from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import check_data
 
 n_neurons = 20  # number of neurons in each population
-neurons_per_core = n_neurons / 2
+neurons_per_core = n_neurons // 2
 simtime = 1000
 
 
 class TestSmaller(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, neurons_per_core)
 
@@ -40,5 +40,5 @@ class TestSmaller(BaseTestCase):
         check_data(pop_1, expected_spikes, simtime)
         sim.end()
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)

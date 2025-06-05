@@ -16,7 +16,7 @@ import pyNN.spiNNaker as p
 import numpy
 
 
-def structural_shared():
+def structural_shared() -> None:
     p.setup(1.0)
     pre_spikes = numpy.array(range(0, 10, 2))
     A_plus = 0.01
@@ -85,7 +85,7 @@ def structural_shared():
 
 class TestStructuralShared(BaseTestCase):
 
-    def test_structural_shared(self):
+    def test_structural_shared(self) -> None:
         self.runsafe(structural_shared)
 
 

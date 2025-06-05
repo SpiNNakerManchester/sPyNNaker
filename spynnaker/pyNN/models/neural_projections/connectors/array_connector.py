@@ -42,8 +42,8 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         "__array_dims",
         "__n_total_connections")
 
-    def __init__(self, array: NDArray[uint8],
-                 safe=True, callback=None, verbose=False):
+    def __init__(self, array: NDArray[uint8], safe: bool = True,
+                 callback: None = None, verbose: bool = False):
         """
         :param array:
             An explicit Boolean matrix that specifies the connections
@@ -161,5 +161,5 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         block["synapse_type"] = synapse_type
         return block
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"ArrayConnector({self.__array})"

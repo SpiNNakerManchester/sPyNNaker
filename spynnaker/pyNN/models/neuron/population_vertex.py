@@ -13,10 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 from collections import defaultdict
-from functools import reduce
 import logging
 import math
-import operator
 from typing import (
     Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
     cast, TYPE_CHECKING)
@@ -76,6 +74,7 @@ from spynnaker.pyNN.models.neuron.population_machine_common import (
 from spynnaker.pyNN.models.neuron.population_machine_neurons import (
     NeuronRegions)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractGenerateOnMachine,
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural,
     AbstractSDRAMSynapseDynamics, AbstractSupportsSignedWeights,
     SynapseDynamicsStatic)
@@ -86,7 +85,7 @@ from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import (
-    POSSION_SIGMA_SUMMATION_LIMIT)
+    POSSION_SIGMA_SUMMATION_LIMIT, MAX_RING_BUFFER_BITS)
 from spynnaker.pyNN.utilities.utility_calls import (
     create_mars_kiss_seeds, check_rng)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
@@ -100,7 +99,7 @@ from .synapse_io import get_max_row_info
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterAbstractPopulationVertex)
+        SplitterPopulationVertex)
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
     from spynnaker.pyNN.models.neural_projections import (
         SynapseInformation, ProjectionApplicationEdge)
@@ -138,16 +137,7 @@ _EXTRA_RECORDABLE_UNITS = {NeuronRecorder.SPIKES: "",
                            NeuronRecorder.REWIRING: ""}
 
 
-def _prod(iterable):
-    """
-    Finds the product of the iterable.
-
-    :param iterable iterable: Things to multiply together
-    """
-    return reduce(operator.mul, iterable, 1)
-
-
-def _all_gen(rd):
+def _all_gen(rd: RangeDictionary) -> bool:
     """
     Determine if all the values of a ranged dictionary can be generated.
 
@@ -166,31 +156,32 @@ def _all_gen(rd):
     return True
 
 
-def _check_random_dists(rd):
+def _check_random_dists(rd: RangeDictionary) -> None:
     """
     Check all RandomDistribution instances in a range dictionary to see if
     they have the rng value set.
     """
     for key in rd.keys():
         if is_singleton(rd[key]):
-            if isinstance(rd[key], RandomDistribution):
-                check_rng(rd[key].rng, f"RandomDistribtion for {key}")
+            a_rd = rd[key]
+            if isinstance(a_rd, RandomDistribution):
+                check_rng(a_rd.rng, f"RandomDistribtion for {key}")
         else:
             for _start, _stop, val in rd[key].iter_ranges():
                 if isinstance(val, RandomDistribution):
                     check_rng(val.rng, f"RandomDistribution for {key}")
 
 
-def _is_structural(dynamics) -> TypeGuard[AbstractSynapseDynamicsStructural]:
+def _is_structural(dynamics: AbstractSynapseDynamics
+                   ) -> TypeGuard[AbstractSynapseDynamicsStructural]:
     return isinstance(dynamics, AbstractSynapseDynamicsStructural)
 
 
-class AbstractPopulationVertex(
+class PopulationVertex(
         PopulationApplicationVertex, AbstractAcceptsIncomingSynapses,
         AbstractCanReset, SupportsStructure):
     """
     Underlying vertex model for Neural Populations.
-    Not actually abstract.
     """
 
     __slots__ = (
@@ -224,7 +215,12 @@ class AbstractPopulationVertex(
         "__have_read_initial_values",
         "__last_parameter_read_time",
         "__n_colour_bits",
-        "__extra_partitions")
+        "__extra_partitions",
+        "__n_synapse_cores",
+        "__n_synapse_cores_param",
+        "__allow_delay_extensions",
+        "__max_delay_ms",
+        "__max_delay_slots_available")
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -248,45 +244,47 @@ class AbstractPopulationVertex(
     def __init__(
             self, *, n_neurons: int, label: str,
             max_atoms_per_core: Union[int, Tuple[int, ...]],
+            n_synapse_cores: Optional[int],
+            allow_delay_extensions: bool,
             spikes_per_second: Optional[float],
             ring_buffer_sigma: Optional[float],
             max_expected_summed_weight: Optional[List[float]],
             incoming_spike_buffer_size: Optional[int],
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel, drop_late_spikes: bool,
-            splitter: Optional[SplitterAbstractPopulationVertex],
+            splitter: Optional[SplitterPopulationVertex],
             seed: Optional[int], n_colour_bits: Optional[int],
             extra_partitions: Optional[List[str]] = None):
         """
-        :param int n_neurons: The number of neurons in the population
-        :param str label: The label on the population
-        :param int max_atoms_per_core:
+        :param n_neurons: The number of neurons in the population
+        :param label: The label on the population
+        :param max_atoms_per_core:
             The maximum number of atoms (neurons) per SpiNNaker core.
+        :param n_synapse_cores:
+            The number of synapse cores to use: 0 for combined core,
+            or None for automatic determination
+        :param allow_delay_extensions:
+            Whether delay extensions should be allowed or not
         :param spikes_per_second: Expected spike rate
-        :type spikes_per_second: float or None
         :param ring_buffer_sigma:
             How many SD above the mean to go for upper bound of ring buffer
             size; a good starting choice is 5.0. Given length of simulation
             we can set this for approximate number of saturation events.
-        :type ring_buffer_sigma: float or None
         :param max_expected_summed_weight:
             The maximum expected summed weights for each synapse type.
         :param incoming_spike_buffer_size:
-        :type incoming_spike_buffer_size: int or None
-        :param bool drop_late_spikes: control flag for dropping late packets.
-        :param AbstractNeuronImpl neuron_impl:
+        :param drop_late_spikes: control flag for dropping late packets.
+        :param neuron_impl:
             The (Python side of the) implementation of the neurons themselves.
-        :param AbstractPyNNNeuronModel pynn_model:
+        :param pynn_model:
             The PyNN neuron model that this vertex is working on behalf of.
         :param splitter: splitter object
-        :type splitter: SplitterAbstractPopulationVertex or None
         :param seed:
             The Population seed, used to ensure the same random generation
             on each run.
-        :param int n_colour_bits: The number of colour bits to use
+        :param n_colour_bits: The number of colour bits to use
         :param extra_partitions:
             Extra partitions that are to be sent by the vertex
-        :type extra_partitions: list(str) or None
         """
         # pylint: disable=too-many-arguments
         super().__init__(label, max_atoms_per_core, splitter)
@@ -367,7 +365,8 @@ class AbstractPopulationVertex(
         # Set up for incoming
         self.__incoming_projections: Dict[
             PopulationApplicationVertex, List[Projection]] = defaultdict(list)
-        self.__incoming_poisson_projections: List[Projection] = list()
+        self.__incoming_poisson_projections: Dict[
+            SpikeSourcePoissonVertex, List[Projection]] = defaultdict(list)
         self.__max_row_info: Dict[
             Tuple[ProjectionApplicationEdge, SynapseInformation, int],
             MaxRowInfo] = dict()
@@ -394,6 +393,12 @@ class AbstractPopulationVertex(
         self.__last_parameter_read_time: Optional[float] = None
         self.__extra_partitions = extra_partitions
 
+        self.__n_synapse_cores = n_synapse_cores
+        self.__n_synapse_cores_param = n_synapse_cores
+        self.__allow_delay_extensions = allow_delay_extensions
+        self.__max_delay_ms: Optional[float] = None
+        self.__max_delay_slots_available: Optional[int] = None
+
     @property
     def extra_partitions(self) -> List[str]:
         """ The extra partitions that are to be sent by the vertex. """
@@ -403,15 +408,15 @@ class AbstractPopulationVertex(
 
     @property  # type: ignore[override]
     @overrides(PopulationApplicationVertex.splitter)
-    def splitter(self) -> SplitterAbstractPopulationVertex:
+    def splitter(self) -> SplitterPopulationVertex:
         s = self._splitter
         if s is None:
             raise PacmanConfigurationException(
                 f"The splitter object on {self._label} has not yet been set.")
-        return cast('SplitterAbstractPopulationVertex', s)
+        return cast('SplitterPopulationVertex', s)
 
     @splitter.setter
-    def splitter(self, splitter: SplitterAbstractPopulationVertex):
+    def splitter(self, splitter: SplitterPopulationVertex) -> None:
         if self._splitter == splitter:
             return
         if self.has_splitter:
@@ -421,11 +426,11 @@ class AbstractPopulationVertex(
         # Circularity
         # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.extra_algorithms.splitter_components import (
-            SplitterAbstractPopulationVertex as ValidSplitter)
+            SplitterPopulationVertex as ValidSplitter)
         if not isinstance(splitter, ValidSplitter):
             raise PacmanConfigurationException(
                 f"The splitter object on {self._label} must be set to one "
-                "capable of handling an AbstractPopulationVertex.")
+                "capable of handling an PopulationVertex.")
         self._splitter = cast(Any, splitter)
         splitter.set_governed_app_vertex(self)
 
@@ -467,37 +472,68 @@ class AbstractPopulationVertex(
     @overrides(PopulationApplicationVertex.
                set_max_atoms_per_dimension_per_core)
     def set_max_atoms_per_dimension_per_core(
-            self, new_value: Union[None, int, Tuple[int, ...]]) -> None:
-        if new_value is not None:
-            max_atoms = self.__synapse_dynamics.absolute_max_atoms_per_core
-            if numpy.prod(new_value) > max_atoms:
-                raise SpynnakerException(
-                    "In the current configuration, the maximum number of"
-                    " neurons for each dimension must be such that the total"
-                    " number of neurons per core is less than or equal to"
-                    f" {max_atoms}")
+            self, new_value: Union[int, Tuple[int, ...]]) -> None:
+        max_atoms = self.__synapse_dynamics.absolute_max_atoms_per_core
+        if numpy.prod(new_value) > max_atoms:
+            raise SpynnakerException(
+                "In the current configuration, the maximum number of"
+                " neurons for each dimension must be such that the total"
+                " number of neurons per core is less than or equal to"
+                f" {max_atoms}")
         super().set_max_atoms_per_dimension_per_core(new_value)
 
     @overrides(SupportsStructure.set_structure)
-    def set_structure(self, structure: BaseStructure):
+    def set_structure(self, structure: BaseStructure) -> None:
         self.__structure = structure
 
     @property
-    def combined_core_capable(self) -> bool:
+    def use_combined_core(self) -> bool:
         """
-        Whether the vertex can manage to operate on a combined
+        Whether the vertex should operate on a combined
         neuron-synapse core, or if a split synapse-core is more
         appropriate.
 
-        .. note::
-            This is currently based only on the ITCM available, not
-            on the incoming synapses, but could be combined with
-            n_synapse_cores_required to determine if, and how-many, synapse
-            cores are needed.
-
         :rtype: bool
         """
-        return self.__synapse_dynamics.is_combined_core_capable
+        # If we can't use a combined core, use a split core
+        if not self.__synapse_dynamics.is_combined_core_capable:
+            if not self.__synapse_dynamics.is_split_core_capable:
+                raise SynapticConfigurationException(
+                    f"The synapse dynamics {self.__synapse_dynamics} cannot"
+                    " work on a split or a combined core! Fix the dynamics or"
+                    " replace with one that works.")
+            if (self.__n_synapse_cores is not None and
+                    self.__n_synapse_cores == 0):
+                raise SynapticConfigurationException(
+                    f"The synapse dynamics {self.__synapse_dynamics} must be"
+                    " run using a synapse core separate from a neuron core."
+                    " Please set the number of synapse cores to 1 or greater.")
+            return False
+
+        # If we can't use a split core, use a combined core
+        if not self.__synapse_dynamics.is_split_core_capable:
+            if (self.__n_synapse_cores is not None and
+                    self.__n_synapse_cores > 0):
+                raise SynapticConfigurationException(
+                    f"The synapse dynamics {self.__synapse_dynamics} must be"
+                    " run using a combined synapse-neuron core."
+                    " Please set the number of synapse cores to 0.")
+            return True
+
+        # If the user has chosen to have a synapse core, add one
+        if self.__n_synapse_cores is not None and self.__n_synapse_cores > 0:
+            return False
+
+        # If the time-step is less than 1, use combined core if no synapse
+        # cores are needed, otherwise use split core
+        # TODO: Look at if it is possible to include neurons in a combined
+        # core calculation and update to allow a choice of combined core if
+        # neurons and synapses fit on a single core
+        if SpynnakerDataView().get_simulation_time_step_ms() < 1.0:
+            return self.n_synapse_cores_required == 0
+
+        # If the timestep is 1 or greater, use a combined core generally
+        return True
 
     @property
     def n_synapse_cores_required(self) -> int:
@@ -505,13 +541,159 @@ class AbstractPopulationVertex(
         The estimated number of synapse cores required, when using a
         split synapse-neuron core model.
 
-        .. note::
-            This is currently hard-coded but could be updated to work
-            this out based on the number of incoming synapses.
-
         :rtype: int
         """
-        return 1
+        return self.__update_n_synapse_cores()
+
+    def __update_n_synapse_cores(self) -> int:
+        if self.__n_synapse_cores is not None:
+            return self.__n_synapse_cores
+        version = SpynnakerDataView().get_machine_version()
+        n_monitors = SpynnakerDataView().get_all_monitor_cores()
+
+        # The maximum number of cores minus 1 for the neuron core, and minus
+        # the number of monitors
+        max_n_cores: int = (
+            version.max_cores_per_chip -
+            (version.n_scamp_cores + n_monitors + 1))
+
+        # So how many synapses can be processed accounting for timescale?
+        synapses_per_core_per_sim_second: float = (
+            self.__synapse_dynamics.synapses_per_second *
+            SpynnakerDataView().get_time_scale_factor())
+
+        # Add up the number of incoming synapse processes expected
+        synapses_per_second: int = 0
+        poisson_synapses_per_second: int = 0
+        for pre_vertex, projs in self.__incoming_projections.items():
+            spikes_per_second = self.__spikes_per_second
+            if isinstance(pre_vertex, AbstractMaxSpikes):
+                rate = pre_vertex.max_spikes_per_second()
+                if rate > 0:
+                    spikes_per_second = rate
+
+            pre_synapses_per_second: int = 0
+            for proj in projs:
+                # pylint: disable=protected-access
+                s_info = proj._synapse_information
+                dynamics = s_info.synapse_dynamics
+                conn = s_info.connector
+                n_conns: Optional[int] = None
+                if isinstance(dynamics, AbstractSDRAMSynapseDynamics):
+                    n_conns = dynamics.pad_to_length
+                if n_conns is None:
+                    n_conns = conn.get_n_connections_from_pre_vertex_maximum(
+                        self.get_max_atoms_per_core(), s_info)
+                # The number of synapses is the number of connections from each
+                # pre-neuron to each post-neuron
+                assert n_conns is not None
+                pre_synapses_per_second += math.ceil(
+                    n_conns * spikes_per_second * pre_vertex.n_atoms)
+
+            if self._is_direct_poisson(pre_vertex, projs):
+                poisson_synapses_per_second += pre_synapses_per_second
+            else:
+                synapses_per_second += pre_synapses_per_second
+
+        # How many cores are needed to process the non-direct-poisson synapses?
+        n_synapse_cores = math.ceil(
+            synapses_per_second / synapses_per_core_per_sim_second)
+
+        # The number of Poisson cores that will be needed
+        n_poisson_cores = len(self.incoming_poisson_projections)
+
+        # If we can definitely do the Poisson vertices directly,
+        # lets recommend this
+        if n_synapse_cores + n_poisson_cores < max_n_cores:
+            self.__n_synapse_cores = n_synapse_cores
+            return n_synapse_cores
+
+        # Otherwise, we should consider how many more cores we need for the
+        # Poisson input spikes
+        n_synapse_cores = math.ceil(
+            (synapses_per_second + poisson_synapses_per_second) /
+            synapses_per_core_per_sim_second)
+
+        # If the number of cores needed is more than the maximum, use the
+        # maximum
+        self.__n_synapse_cores = min(max_n_cores, n_synapse_cores)
+        assert self.__n_synapse_cores is not None
+        return self.__n_synapse_cores
+
+    @property
+    def max_delay_steps(self) -> int:
+        """
+        The maximum number of delay steps supported on a core.
+        """
+        _max_delay_ms, max_delay_slots_available = self.__update_max_delay()
+        return max_delay_slots_available
+
+    @property
+    def max_delay_steps_incoming(self) -> int:
+        """
+        The maximum delay steps needed to handle incoming synapses,
+        accounting for delay extensions.
+        """
+        max_delay_ms, max_delay_slots_available = self.__update_max_delay()
+        max_incoming_slots = 2 ** get_n_bits(math.ceil(
+            max_delay_ms /
+            SpynnakerDataView().get_simulation_time_step_ms()))
+        return min(max_incoming_slots, max_delay_slots_available)
+
+    @property
+    def allow_delay_extension(self) -> bool:
+        """
+        Whether delay extension should be allowed or not.
+        """
+        if not self.__allow_delay_extensions:
+            return False
+        # Determine if we *expect* a delay extension; if not disallow
+        max_delay_ms, max_delay_slots_available = self.__update_max_delay()
+        delay_available_ms = (
+            max_delay_slots_available *
+            SpynnakerDataView().get_simulation_time_step_ms())
+        return delay_available_ms < max_delay_ms
+
+    def __update_max_delay(self) -> Tuple[float, int]:
+        if self.__max_delay_ms is not None:
+            # Can't have one without the other
+            assert self.__max_delay_slots_available is not None
+            return self.__max_delay_ms, self.__max_delay_slots_available
+
+        # Find the maximum delay from incoming synapses
+        self.__max_delay_ms = 0
+        for proj in self.incoming_projections:
+            # pylint: disable=protected-access
+            s_info = proj._synapse_information
+            proj_max_delay = s_info.synapse_dynamics.get_delay_maximum(
+                s_info.connector, s_info)
+            self.__max_delay_ms = max(self.__max_delay_ms, proj_max_delay)
+
+        # Find the maximum possible delay on this core
+        n_atom_bits = self.get_n_atom_bits()
+        n_synapse_bits = get_n_bits(self.neuron_impl.get_n_synapse_types())
+        n_delay_bits = MAX_RING_BUFFER_BITS - (n_atom_bits + n_synapse_bits)
+        self.__max_delay_slots_available = 2 ** n_delay_bits
+
+        assert self.__max_delay_slots_available is not None
+        return self.__max_delay_ms, self.__max_delay_slots_available
+
+    def _is_direct_poisson(self, pre_vertex: PopulationApplicationVertex,
+                           projs: List[Projection]) -> bool:
+        # The only way to avoid circular imports!
+        # pylint: disable=import-outside-toplevel
+        from spynnaker.pyNN.extra_algorithms.splitter_components\
+            .splitter_utils import is_direct_poisson_source
+        if not isinstance(pre_vertex, SpikeSourcePoissonVertex):
+            return False
+        if len(projs) != 1:
+            return False
+        proj = projs[0]
+        # pylint: disable=protected-access
+        s_info = proj._synapse_information
+        return is_direct_poisson_source(
+            self, pre_vertex, s_info.connector, s_info.synapse_dynamics,
+            s_info.delays)
 
     @property
     def synapse_dynamics(self) -> AbstractSynapseDynamics:
@@ -524,7 +706,8 @@ class AbstractPopulationVertex(
         return self.__synapse_dynamics
 
     @synapse_dynamics.setter
-    def synapse_dynamics(self, synapse_dynamics: AbstractSynapseDynamics):
+    def synapse_dynamics(
+            self, synapse_dynamics: AbstractSynapseDynamics) -> None:
         """
         Set the synapse dynamics.
 
@@ -541,7 +724,7 @@ class AbstractPopulationVertex(
             f"unhandled type of merged synapse dynamics: {type(merged)}"
         self.__synapse_dynamics = merged
 
-    def add_incoming_projection(self, projection: Projection):
+    def add_incoming_projection(self, projection: Projection) -> None:
         """
         Add a projection incoming to this vertex.
 
@@ -551,13 +734,16 @@ class AbstractPopulationVertex(
         # Reset the ring buffer shifts as a projection has been added
         SpynnakerDataView.set_requires_mapping()
         self.__max_row_info.clear()
+        self.__max_delay_ms = None
+        self.__max_delay_slots_available = None
+        self.__n_synapse_cores = self.__n_synapse_cores_param
         # pylint: disable=protected-access
         pre_vertex = projection._projection_edge.pre_vertex
         self.__incoming_projections[pre_vertex].append(projection)
         if pre_vertex == self:
             self.__self_projection = projection
         if isinstance(pre_vertex, SpikeSourcePoissonVertex):
-            self.__incoming_poisson_projections.append(projection)
+            self.__incoming_poisson_projections[pre_vertex].append(projection)
 
     @property
     def self_projection(self) -> Optional[Projection]:
@@ -803,7 +989,7 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.set_parameter_values)
     def set_parameter_values(
-            self, name: str, value: Values, selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None) -> None:
         # If we have run, and not reset, we need to read the values back
         # so that we don't overwrite the state.  Note that a reset will
         # then make this a waste, but we can't see the future...
@@ -835,7 +1021,7 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.set_initial_state_values)
     def set_initial_state_values(
-            self, name: str, value: Values, selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None) -> None:
         self._check_variables([name], set(self.__state_variables.keys()))
         if not SpynnakerDataView.is_ran_last():
             self.__state_variables[name].set_value_by_selector(
@@ -862,7 +1048,7 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.set_current_state_values)
     def set_current_state_values(
-            self, name: str, value: Values, selector: Selector = None):
+            self, name: str, value: Values, selector: Selector = None) -> None:
         self._check_variables([name], set(self.__state_variables.keys()))
         # If we have run, and not reset, we need to read the values back
         # so that we don't overwrite all the state.  Note that a reset will
@@ -910,7 +1096,7 @@ class AbstractPopulationVertex(
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(
             self, name: str, sampling_interval: Optional[float] = None,
-            indices: Optional[Collection[int]] = None):
+            indices: Optional[Collection[int]] = None) -> None:
         if self.__neuron_recorder.is_recordable(name):
             self.__neuron_recorder.set_recording(
                 name, True, sampling_interval, indices)
@@ -922,8 +1108,8 @@ class AbstractPopulationVertex(
         SpynnakerDataView.set_requires_mapping()
 
     @overrides(PopulationApplicationVertex.set_not_recording)
-    def set_not_recording(
-            self, name: str, indices: Optional[Collection[int]] = None):
+    def set_not_recording(self, name: str,
+                          indices: Optional[Collection[int]] = None) -> None:
         if self.__neuron_recorder.is_recordable(name):
             self.__neuron_recorder.set_recording(name, False, indexes=indices)
         elif self.__synapse_recorder.is_recordable(name):
@@ -987,7 +1173,7 @@ class AbstractPopulationVertex(
         return self.__ring_buffer_sigma
 
     @ring_buffer_sigma.setter
-    def ring_buffer_sigma(self, ring_buffer_sigma: float):
+    def ring_buffer_sigma(self, ring_buffer_sigma: float) -> None:
         self.__ring_buffer_sigma = ring_buffer_sigma
 
     @property
@@ -998,10 +1184,11 @@ class AbstractPopulationVertex(
         return self.__spikes_per_second
 
     @spikes_per_second.setter
-    def spikes_per_second(self, spikes_per_second: float):
+    def spikes_per_second(self, spikes_per_second: float) -> None:
         self.__spikes_per_second = spikes_per_second
 
-    def set_synapse_dynamics(self, synapse_dynamics: AbstractSynapseDynamics):
+    def set_synapse_dynamics(
+            self, synapse_dynamics: AbstractSynapseDynamics) -> None:
         """
         Set the synapse dynamics of this population.
 
@@ -1016,7 +1203,7 @@ class AbstractPopulationVertex(
         """
         self.__connection_cache.clear()
 
-    def describe(self):
+    def describe(self) -> Dict[str, Union[str, Dict[str, Any]]]:
         """
         Get a human-readable description of the cell or synapse type.
 
@@ -1052,7 +1239,7 @@ class AbstractPopulationVertex(
     @overrides(PopulationApplicationVertex.inject)
     def inject(
             self, current_source: AbstractCurrentSource,
-            selector: Selector = None):
+            selector: Selector = None) -> None:
         self.__current_sources.append(current_source)
         self.__current_source_id_list[current_source] = selector
         # set the associated vertex (for multi-run case)
@@ -1082,7 +1269,7 @@ class AbstractPopulationVertex(
     def __str__(self) -> str:
         return f"{self.label} with {self.n_atoms} atoms"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
     @overrides(AbstractCanReset.reset_to_first_timestep)
@@ -1252,8 +1439,8 @@ class AbstractPopulationVertex(
             return self.__connection_cache[app_edge, synapse_info]
 
         # Start with something in the list so that concatenate works
-        connections: List[ConnectionsArray]
-        connections = [numpy.zeros(0, dtype=NUMPY_CONNECTORS_DTYPE)]
+        connections: List[ConnectionsArray] = [
+            numpy.zeros(0, dtype=NUMPY_CONNECTORS_DTYPE)]
         progress = ProgressBar(
             len(self.machine_vertices),
             f"Getting synaptic data between {app_edge.pre_vertex.label} "
@@ -1429,6 +1616,8 @@ class AbstractPopulationVertex(
         if not synapse_info.may_generate_on_machine():
             return 0
 
+        dynamics = cast(AbstractGenerateOnMachine,
+                        synapse_info.synapse_dynamics)
         connector = cast(
             AbstractGenerateConnectorOnMachine, synapse_info.connector)
         return (
@@ -1436,7 +1625,7 @@ class AbstractPopulationVertex(
             + connector.gen_delay_params_size_in_bytes(synapse_info.delays)
             + connector.gen_weight_params_size_in_bytes(synapse_info.weights)
             + connector.gen_connector_params_size_in_bytes
-            + synapse_info.synapse_dynamics.gen_matrix_params_size_in_bytes)
+            + dynamics.gen_matrix_params_size_in_bytes)
 
     @property
     def synapse_executable_suffix(self) -> str:
@@ -1586,11 +1775,11 @@ class AbstractPopulationVertex(
     def incoming_poisson_projections(self) -> Sequence[Projection]:
         """
         The projections that target this population vertex which
-        originate from a Poisson source.
-
-        :rtype: iterable(~spynnaker.pyNN.models.projection.Projection)
+        originate from a Poisson source which has only one outgoing projection
         """
-        return self.__incoming_poisson_projections
+        # Filter to just those that have one outgoing projection
+        iterator = self.__incoming_poisson_projections.values()
+        return [projs[0] for projs in iterator if len(projs) == 1]
 
     @property
     def pop_seed(self) -> Sequence[int]:
@@ -1615,7 +1804,7 @@ class AbstractPopulationVertex(
                 self.__rng)
         return self.__core_seeds[vertex_slice]
 
-    def copy_initial_state_variables(self, vertex_slice: Slice):
+    def copy_initial_state_variables(self, vertex_slice: Slice) -> None:
         """
         Copies the state variables into the initial state variables.
 
@@ -1650,41 +1839,6 @@ class AbstractPopulationVertex(
     def n_colour_bits(self) -> int:
         return self.__n_colour_bits
 
-    def get_max_delay(self, max_ring_buffer_bits: int) -> Tuple[int, bool]:
-        """
-        Get the maximum delay and whether a delay extension is needed
-        for a given maximum number of ring buffer bits.
-
-        :param int max_ring_buffer_bits:
-            The maximum number of bits that can be used for the ring buffer
-            identifier (i.e. delay, synapse type, neuron index)
-        :return:
-            Tuple of the maximum delay supported on the core and whether
-            a delay extension is needed to support delays
-        :rtype: tuple(int, bool)
-        """
-        # Find the maximum delay from incoming synapses
-        max_delay_ms = 0
-        for proj in self.incoming_projections:
-            # pylint: disable=protected-access
-            s_info = proj._synapse_information
-            proj_max_delay = s_info.synapse_dynamics.get_delay_maximum(
-                s_info.connector, s_info)
-            max_delay_ms = max(max_delay_ms, proj_max_delay)
-        max_delay_steps = math.ceil(
-            max_delay_ms / SpynnakerDataView.get_simulation_time_step_ms())
-        max_delay_bits = get_n_bits(max_delay_steps)
-
-        # Find the maximum possible delay
-        n_atom_bits = self.get_n_atom_bits()
-        n_synapse_bits = get_n_bits(
-            self.neuron_impl.get_n_synapse_types())
-        n_delay_bits = max_ring_buffer_bits - (n_atom_bits + n_synapse_bits)
-
-        # Pick the smallest between the two, so that not too many bits are used
-        final_n_delay_bits = min(n_delay_bits, max_delay_bits)
-        return 2 ** final_n_delay_bits, max_delay_bits > final_n_delay_bits
-
     def get_n_atom_bits(self) -> int:
         """
         :rtype: int
@@ -1711,6 +1865,25 @@ class AbstractPopulationVertex(
         _check_random_dists(self.__parameters)
         _check_random_dists(self.__state_variables)
         return True
+
+    def set_n_synapse_cores(self, n_synapse_cores: Optional[int]) -> None:
+        """
+        Set the number of synapse cores.
+
+        :param n_synapse_cores:
+            The number of synapse cores to use; 0 for a combined core, or None
+            to allow the system to choose
+        """
+        self.__n_synapse_cores = n_synapse_cores
+
+    def set_allow_delay_extensions(self, allow_delay_extensions: bool) -> None:
+        """
+        Set whether delay extensions are allowed.
+
+        :param allow_delay_extensions:
+            Whether to allow delay extensions
+        """
+        self.__allow_delay_extensions = allow_delay_extensions
 
 
 class _Stats(object):
@@ -1750,7 +1923,7 @@ class _Stats(object):
         self.default_spikes_per_second = default_spikes_per_second
         self.ring_buffer_sigma = ring_buffer_sigma
 
-    def add_projection(self, projection: Projection):
+    def add_projection(self, projection: Projection) -> None:
         """
         Adds the projection.
 
@@ -1763,7 +1936,7 @@ class _Stats(object):
         else:
             self.__add_unsigned_projection(projection)
 
-    def __add_signed_projection(self, proj: Projection):
+    def __add_signed_projection(self, proj: Projection) -> None:
         # pylint: disable=protected-access
         s_info = proj._synapse_information
         connector = s_info.connector
@@ -1772,21 +1945,23 @@ class _Stats(object):
         n_conns = connector.get_n_connections_to_post_vertex_maximum(s_info)
         d_var = s_dynamics.get_delay_variance(connector, s_info.delays, s_info)
 
-        s_type_pos = s_dynamics.get_positive_synapse_index(proj)
-        w_mean_pos = s_dynamics.get_mean_positive_weight(proj)
-        w_var_pos = s_dynamics.get_variance_positive_weight(proj)
-        w_max_pos = s_dynamics.get_maximum_positive_weight(proj)
+        signed_dynamics = cast(AbstractSupportsSignedWeights,
+                               s_info.synapse_dynamics)
+        s_type_pos = signed_dynamics.get_positive_synapse_index(proj)
+        w_mean_pos = signed_dynamics.get_mean_positive_weight(proj)
+        w_var_pos = signed_dynamics.get_variance_positive_weight(proj)
+        w_max_pos = signed_dynamics.get_maximum_positive_weight(proj)
         self.__add_details(
             proj, s_type_pos, n_conns, w_mean_pos, w_var_pos, w_max_pos, d_var)
 
-        s_type_neg = s_dynamics.get_negative_synapse_index(proj)
-        w_mean_neg = -s_dynamics.get_mean_negative_weight(proj)
-        w_var_neg = -s_dynamics.get_variance_negative_weight(proj)
-        w_max_neg = -s_dynamics.get_minimum_negative_weight(proj)
+        s_type_neg = signed_dynamics.get_negative_synapse_index(proj)
+        w_mean_neg = -signed_dynamics.get_mean_negative_weight(proj)
+        w_var_neg = -signed_dynamics.get_variance_negative_weight(proj)
+        w_max_neg = -signed_dynamics.get_minimum_negative_weight(proj)
         self.__add_details(
             proj, s_type_neg, n_conns, w_mean_neg, w_var_neg, w_max_neg, d_var)
 
-    def __add_unsigned_projection(self, proj: Projection):
+    def __add_unsigned_projection(self, proj: Projection) -> None:
         # pylint: disable=protected-access
         s_info = proj._synapse_information
         s_type = s_info.synapse_type
@@ -1803,7 +1978,7 @@ class _Stats(object):
 
     def __add_details(
             self, proj: Projection, s_type: int, n_conns: int, w_mean: float,
-            w_var: float, w_max: float, d_var: float):
+            w_var: float, w_max: float, d_var: float) -> None:
         self.running_totals[s_type].add_items(
             w_mean * self.w_scale, w_var * self.w_scale_sq, n_conns)
         self.biggest_weight[s_type] = max(
@@ -1840,7 +2015,7 @@ class _Stats(object):
         stats = self.running_totals[s_type]
         rates = self.rate_stats[s_type]
         # pylint: disable=protected-access
-        w_max = AbstractPopulationVertex._ring_buffer_expected_upper_bound(
+        w_max = PopulationVertex._ring_buffer_expected_upper_bound(
             stats.mean, stats.standard_deviation, rates.mean,
             stats.n_items, self.ring_buffer_sigma)
         w_max = min(w_max, self.total_weights[s_type])

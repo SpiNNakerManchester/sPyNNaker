@@ -34,7 +34,7 @@ from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .synaptic_matrices import SynapseRegions
 from .population_machine_synapses_provenance import SynapseProvenance
 if TYPE_CHECKING:
-    from .abstract_population_vertex import AbstractPopulationVertex
+    from .population_vertex import PopulationVertex
     from .population_neurons_machine_vertex import (
         PopulationNeuronsMachineVertex)
 
@@ -158,12 +158,12 @@ class PopulationSynapsesMachineVertexCommon(
 
     def __init__(
             self, sdram: AbstractSDRAM, label: str,
-            app_vertex: AbstractPopulationVertex, vertex_slice: Slice):
+            app_vertex: PopulationVertex, vertex_slice: Slice):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex
         :param str label: The label of the vertex
-        :param AbstractPopulationVertex app_vertex:
+        :param PopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
@@ -177,16 +177,10 @@ class PopulationSynapsesMachineVertexCommon(
         self.__neuron_vertex: Optional[PopulationNeuronsMachineVertex] = None
         self.__partition_id: Optional[str] = None
 
+    @overrides(SendsSynapticInputsOverSDRAM.set_sdram_partition)
     def set_sdram_partition(
-            self, sdram_partition: SourceSegmentedSDRAMMachinePartition):
-        """
-        Set the SDRAM partition.  Must only be called once per instance.
-
-        :param sdram_partition:
-            The SDRAM partition to receive synapses from
-        :type sdram_partition:
-            ~pacman.model.graphs.machine.SourceSegmentedSDRAMMachinePartition
-        """
+            self,
+            sdram_partition: SourceSegmentedSDRAMMachinePartition) -> None:
         if self.__sdram_partition is not None:
             raise SynapticConfigurationException(
                 "Trying to set SDRAM partition more than once")
@@ -194,7 +188,7 @@ class PopulationSynapsesMachineVertexCommon(
 
     def set_neuron_vertex_and_partition_id(
             self, neuron_vertex: PopulationNeuronsMachineVertex,
-            partition_id: str):
+            partition_id: str) -> None:
         """
         Set the neuron vertex and partition ID for the case with a
         self-connection.
@@ -206,12 +200,12 @@ class PopulationSynapsesMachineVertexCommon(
         self.__partition_id = partition_id
 
     @staticmethod
-    def __get_binary_file_name(app_vertex: AbstractPopulationVertex) -> str:
+    def __get_binary_file_name(app_vertex: PopulationVertex) -> str:
         """
         Get the local binary filename for this vertex.  Static because at
         the time this is needed, the local `app_vertex` is not set.
 
-        :param AbstractPopulationVertex app_vertex:
+        :param PopulationVertex app_vertex:
             The associated application vertex
         :rtype: str
         """
@@ -225,7 +219,7 @@ class PopulationSynapsesMachineVertexCommon(
         assert ids is not None
         return ids
 
-    def _write_sdram_edge_spec(self, spec: DataSpecificationGenerator):
+    def _write_sdram_edge_spec(self, spec: DataSpecificationGenerator) -> None:
         """
         Write information about SDRAM Edge.
 
@@ -246,7 +240,7 @@ class PopulationSynapsesMachineVertexCommon(
         spec.write_value(get_config_int(
             "Simulation", "transfer_overhead_clocks"))
 
-    def _write_key_spec(self, spec: DataSpecificationGenerator):
+    def _write_key_spec(self, spec: DataSpecificationGenerator) -> None:
         """
         Write key configuration region.
 
@@ -287,7 +281,7 @@ class PopulationSynapsesMachineVertexCommon(
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         proc_offset = SynapseProvenance.N_ITEMS
         self._parse_synapse_provenance(
             label, x, y, p, provenance_data[:proc_offset])
@@ -297,7 +291,7 @@ class PopulationSynapsesMachineVertexCommon(
     @abstractmethod
     def _parse_synapse_provenance(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         """
         Extract and yield synapse provenance.
 
@@ -311,7 +305,7 @@ class PopulationSynapsesMachineVertexCommon(
 
     def _parse_spike_processing_fast_provenance(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         """
         Extract and yield spike processing provenance.
 

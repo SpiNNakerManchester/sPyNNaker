@@ -58,7 +58,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
     def __init__(
             self, n: int, *, allow_self_connections: bool = True,
             with_replacement: bool = False, rng: Optional[NumpyRNG] = None,
-            safe=True, verbose=False, callback=None):
+            safe: bool = True, verbose: bool = False, callback: None = None):
         """
         :param int n:
             number of random pre-synaptic neurons connected to output
@@ -100,7 +100,8 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         self.__pre_neurons: List[NDArray[integer]] = []
         self.__rng = rng
 
-    def set_projection_information(self, synapse_info: SynapseInformation):
+    def set_projection_information(
+            self, synapse_info: SynapseInformation) -> None:
         super().set_projection_information(synapse_info)
         if (not self.__with_replacement and
                 self.__n_pre > synapse_info.n_pre_neurons):
@@ -175,15 +176,15 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
                            f"{synapse_info.post_population.label}" \
                            f"_fixednumberpre-conn.csv"
                 with open(filename, 'w', encoding="utf-8") as file_handle:
-                    numpy.savetxt(file_handle,
+                    numpy.savetxt(file_handle,  # type: ignore[arg-type]
                                   [(synapse_info.n_pre_neurons,
                                     synapse_info.n_post_neurons,
                                     self.__n_pre)],
                                   fmt="%u,%u,%u")
                     for pre_neuron in self.__pre_neurons:
-                        numpy.savetxt(
-                            file_handle, pre_neuron[None, :],
-                            fmt=("%u," * (self.__n_pre - 1) + "%u"))
+                        numpy.savetxt(file_handle,  # type: ignore[arg-type]
+                                      pre_neuron[None, :],
+                                      fmt=("%u," * (self.__n_pre - 1) + "%u"))
 
         return self.__pre_neurons
 
@@ -260,7 +261,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         block["synapse_type"] = synapse_type
         return block
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"FixedNumberPreConnector({self.__n_pre})"
 
     @property
@@ -273,7 +274,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         return self.__allow_self_connections
 
     @allow_self_connections.setter
-    def allow_self_connections(self, new_value: bool):
+    def allow_self_connections(self, new_value: bool) -> None:
         self.__allow_self_connections = new_value
 
     @property
@@ -301,6 +302,6 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         if self.generate_on_machine(synapse_info):
             utility_calls.check_rng(self.__rng, "FixedNumberPreConnector")

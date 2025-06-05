@@ -72,8 +72,8 @@ class SynapseDynamicsWeightChanger(
         # dynamics can change over time
         # Import here required to avoid circular imports
         # pylint: disable=import-outside-toplevel
-        from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-        self.__post_vertex = cast(AbstractPopulationVertex,
+        from spynnaker.pyNN.models.neuron import PopulationVertex
+        self.__post_vertex = cast(PopulationVertex,
                                   self.__synapse_info.post_vertex)
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
@@ -106,7 +106,7 @@ class SynapseDynamicsWeightChanger(
     def write_parameters(
             self, spec: DataSpecificationBase, region: int,
             global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         # Should never be asked!
         pass
 
@@ -118,7 +118,7 @@ class SynapseDynamicsWeightChanger(
             f"Type {type(self)} does not have parameter {key}")
 
     @overrides(AbstractPlasticSynapseDynamics.set_value)
-    def set_value(self, key: str, value: float):
+    def set_value(self, key: str, value: float) -> None:
         if hasattr(self, key):
             setattr(self, key, value)
         raise InvalidParameterType(
@@ -266,6 +266,11 @@ class SynapseDynamicsWeightChanger(
     def is_combined_core_capable(self) -> bool:
         return True
 
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return True
+
     @overrides(AbstractPlasticSynapseDynamics.get_weight_maximum)
     def get_weight_maximum(
             self, connector: AbstractConnector,
@@ -288,7 +293,7 @@ class SynapseDynamicsWeightChanger(
     @overrides(AbstractPlasticSynapseDynamics.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         if (application_edge.pre_vertex.n_atoms !=
                 self.__synapse_info.pre_vertex.n_atoms):
             raise SynapticConfigurationException(
@@ -307,3 +312,9 @@ class SynapseDynamicsWeightChanger(
                 " changed")
         AbstractPlasticSynapseDynamics.validate_connection(
             self, application_edge, synapse_info)
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.synapses_per_second)
+    def synapses_per_second(self) -> int:
+        # This should never end up being requested!
+        raise NotImplementedError

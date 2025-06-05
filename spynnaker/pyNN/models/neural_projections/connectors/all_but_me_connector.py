@@ -78,8 +78,11 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
         :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
-        :param callback:
+        :param callable callback:
             if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
 
             .. note::
                 Not supported by sPyNNaker.
@@ -90,7 +93,7 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
         self.__check_weights(weights, n_neurons_per_group)
 
     def __check_weights(self, weights: Optional[NDArray[numpy.float64]],
-                        n_neurons_per_group: Optional[int]):
+                        n_neurons_per_group: Optional[int]) -> None:
         if weights is not None and n_neurons_per_group is not None:
             n_weights = n_neurons_per_group * (n_neurons_per_group - 1)
             if len(weights) != n_weights:
@@ -100,7 +103,7 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
                     f"({n_neurons_per_group} x ({n_neurons_per_group} - 1) = "
                     f"{n_weights})")
 
-    def __n_connections(self, synapse_info: SynapseInformation):
+    def __n_connections(self, synapse_info: SynapseInformation) -> int:
         # If not specified, use the smallest of the two populations
         if self.__n_neurons_per_group is None:
             n_values = min(synapse_info.n_pre_neurons,
@@ -229,7 +232,7 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
         block["synapse_type"] = synapse_type
         return block
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"WTAConnector(n_neuron_per_group={self.__n_neurons_per_group})"
 
     @property
@@ -265,7 +268,7 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         if (synapse_info.pre_population.size !=
                 synapse_info.post_population.size):
             # Probably works by implementation but there is no know need

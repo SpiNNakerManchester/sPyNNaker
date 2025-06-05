@@ -15,6 +15,7 @@
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.neuron_models import NeuronModelIFTrunc
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.models.neuron.input_types import InputTypeDelta
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeDelta
@@ -57,9 +58,11 @@ class IFTruncDelta(AbstractPyNNNeuronModelStandard):
     # noinspection PyPep8Naming
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(
-            self, tau_m=1.0, cm=1.0, v_reset=0.0,
-            v_thresh=1.0, tau_refrac=1.0, i_offset=0.0, v=0.0,
-            isyn_exc=0.0, isyn_inh=0.0):
+            self, tau_m: ModelParameter = 1.0, cm: ModelParameter = 1.0,
+            v_reset: ModelParameter = 0.0, v_thresh: ModelParameter = 1.0,
+            tau_refrac: ModelParameter = 1.0, i_offset: ModelParameter = 0.0,
+            v: ModelParameter = 0.0, isyn_exc: ModelParameter = 0.0,
+            isyn_inh: ModelParameter = 0.0):
         # pylint: disable=too-many-arguments
         neuron_model = NeuronModelIFTrunc(
             v, tau_m, cm, i_offset, v_reset, tau_refrac)

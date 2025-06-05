@@ -68,14 +68,15 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         self.__v_thresh = v_thresh
 
     @overrides(AbstractThresholdType.add_parameters)
-    def add_parameters(self, parameters: RangeDictionary[float]):
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
         parameters[DU_TH] = self._convert(self.__du_th)
         parameters[TAU_TH] = self._convert(self.__tau_th)
         parameters[V_THRESH] = self._convert(self.__v_thresh)
         parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractThresholdType.add_state_variables)
-    def add_state_variables(self, state_variables: RangeDictionary[float]):
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         pass
 
     @property

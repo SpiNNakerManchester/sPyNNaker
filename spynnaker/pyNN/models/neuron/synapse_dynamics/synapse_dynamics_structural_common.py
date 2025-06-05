@@ -13,8 +13,9 @@
 # limitations under the License.
 
 from __future__ import annotations
+import math
 from typing import (
-    Dict, Iterable, List, Sequence, Tuple, Union, TYPE_CHECKING)
+    cast, Dict, Iterable, List, Sequence, Tuple, Union, TYPE_CHECKING)
 
 import numpy
 from numpy.typing import NDArray
@@ -43,7 +44,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neural_projections import (
         SynapseInformation)
-    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.neuron import PopulationVertex
     from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray)
@@ -57,7 +58,7 @@ if TYPE_CHECKING:
 
     #: :meta private:
     ConnectionsInfo: TypeAlias = Dict[
-        Tuple[AbstractPopulationVertex, int],
+        Tuple[PopulationVertex, int],
         List[Tuple[ConnectionsArray, ProjectionApplicationEdge,
                    SynapseInformation]]]
 
@@ -127,8 +128,8 @@ class SynapseDynamicsStructuralCommon(
     def write_structural_parameters(
             self, spec: DataSpecificationBase, region: int,
             weight_scales: NDArray[numpy.floating],
-            app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
-            synaptic_matrices: SynapticMatrices):
+            app_vertex: PopulationVertex, vertex_slice: Slice,
+            synaptic_matrices: SynapticMatrices) -> None:
         spec.comment("Writing structural plasticity parameters")
         spec.switch_write_focus(region)
 
@@ -157,11 +158,13 @@ class SynapseDynamicsStructuralCommon(
         self.partner_selection.write_parameters(spec)
         for proj in structural_projections:
             spec.comment(f"Writing formation parameters for {proj.label}")
-            dynamics = proj._synapse_information.synapse_dynamics
+            dynamics = cast(AbstractSynapseDynamicsStructural,
+                            proj._synapse_information.synapse_dynamics)
             dynamics.formation.write_parameters(spec)
         for proj in structural_projections:
             spec.comment(f"Writing elimination parameters for {proj.label}")
-            dynamics = proj._synapse_information.synapse_dynamics
+            dynamics = cast(AbstractSynapseDynamicsStructural,
+                            proj._synapse_information.synapse_dynamics)
             dynamics.elimination.write_parameters(
                 spec, weight_scales[proj._synapse_information.synapse_type])
 
@@ -189,8 +192,8 @@ class SynapseDynamicsStructuralCommon(
 
     def __write_common_rewiring_data(
             self, spec: DataSpecificationBase,
-            app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
-            n_pre_pops: int):
+            app_vertex: PopulationVertex, vertex_slice: Slice,
+            n_pre_pops: int) -> None:
         """
         Write the non-sub-population synapse parameters to the spec.
 
@@ -258,7 +261,7 @@ class SynapseDynamicsStructuralCommon(
             list(~pacman.model.graphs.machine.MachineEdge))
         :param dict(int,float) weight_scales:
         :param SynapticMatrices synaptic_matrices:
-        :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
+        :rtype: dict(tuple(PopulationVertex,SynapseInformation),int)
         """
         spec.comment("Writing pre-population info")
         pop_index: _PopIndexType = dict()
@@ -273,7 +276,8 @@ class SynapseDynamicsStructuralCommon(
             synapse_info = proj._synapse_information
             pop_index[app_edge.pre_vertex, synapse_info] = index
             index += 1
-            dynamics = synapse_info.synapse_dynamics
+            dynamics = cast(AbstractSynapseDynamicsStructural,
+                            synapse_info.synapse_dynamics)
 
             # Number of incoming vertices
             out_verts = app_edge.pre_vertex.splitter.get_out_going_vertices(
@@ -325,14 +329,14 @@ class SynapseDynamicsStructuralCommon(
     def __write_post_to_pre_table(
             self, spec: DataSpecificationBase, pop_index: _PopIndexType,
             subpop_index: _SubpopIndexType, lo_atom_index: _SubpopIndexType,
-            app_vertex: AbstractPopulationVertex, vertex_slice: Slice):
+            app_vertex: PopulationVertex, vertex_slice: Slice) -> None:
         """
         Post to pre table is basically the transpose of the synaptic matrix.
 
         :param ~data_specification.DataSpecificationGenerator spec:
         :param pop_index:
         :type pop_index:
-            dict(tuple(AbstractPopulationVertex,SynapseInformation), int)
+            dict(tuple(PopulationVertex,SynapseInformation), int)
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
             the vertex for which data specs are being prepared
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -406,7 +410,8 @@ class SynapseDynamicsStructuralCommon(
             incoming_projections)
         for proj in structural_projections:
             # pylint: disable=protected-access
-            dynamics = proj._synapse_information.synapse_dynamics
+            dynamics = cast(AbstractSynapseDynamicsStructural,
+                            proj._synapse_information.synapse_dynamics)
             app_edge = proj._projection_edge
             n_sub_edges += len(
                 app_edge.pre_vertex.splitter.get_out_going_slices())
@@ -483,7 +488,8 @@ class SynapseDynamicsStructuralCommon(
         """
         raise NotImplementedError
 
-    def check_initial_delay(self, max_delay_ms: float):
+    @overrides(AbstractSynapseDynamicsStructural.check_initial_delay)
+    def check_initial_delay(self, max_delay_ms: float) -> None:
         """
         Check that delays can be done without delay extensions.
 
@@ -512,3 +518,13 @@ class SynapseDynamicsStructuralCommon(
                         self.p_rew * MICRO_TO_SECOND_CONVERSION))
 
         return max_rewires_per_ts
+
+    @property
+    def reduction_synapses_per_second(self) -> int:
+        """
+        Approximate fewer number of synapses that can be processed per second
+        as a result of rewiring cycles used.
+        """
+        # Guess that each rewiring attempt takes the same as 17 synapses,
+        # based on ~250 cycles per rewiring attempt, and 15 cycles per synapse
+        return math.ceil(17 * self.f_rew)

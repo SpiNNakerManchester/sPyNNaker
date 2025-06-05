@@ -18,7 +18,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestSpikeSourceArrayGetData(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         p.setup(timestep=1, min_delay=1)
 
         population = p.Population(1, p.SpikeSourceArray(spike_times=[[0]]),
@@ -30,5 +30,5 @@ class TestSpikeSourceArrayGetData(BaseTestCase):
         population.get_data("all")
         p.end()
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)

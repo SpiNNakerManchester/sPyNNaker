@@ -133,7 +133,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         self.__receiver_connection: Optional[UDPConnection] = None
         self.__error_keys: Set[int] = set()
 
-    def add_receive_label(self, label: str):
+    def add_receive_label(self, label: str) -> None:
         """
         :param str label:
         """
@@ -145,7 +145,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             self.__pause_stop_callbacks[label] = list()
             self.__init_callbacks[label] = list()
 
-    def add_init_callback(self, label: str, init_callback: _InitCB):
+    def add_init_callback(self, label: str, init_callback: _InitCB) -> None:
         """
         Add a callback to be called to initialise a vertex.
 
@@ -163,7 +163,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
 
     def add_receive_callback(
             self, label: str, live_event_callback: _EventCB,
-            translate_key: bool = True):
+            translate_key: bool = True) -> None:
         """
         Add a callback for the reception of live events from a vertex.
 
@@ -185,7 +185,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             (live_event_callback, translate_key))
 
     def add_start_resume_callback(
-            self, label: str, start_resume_callback: _StartStopCB):
+            self, label: str, start_resume_callback: _StartStopCB) -> None:
         """
         Add a callback for the start and resume state of the simulation.
 
@@ -201,7 +201,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         self.__start_resume_callbacks[label].append(start_resume_callback)
 
     def add_pause_stop_callback(
-            self, label: str, pause_stop_callback: _StartStopCB):
+            self, label: str, pause_stop_callback: _StartStopCB) -> None:
         """
         Add a callback for the pause and stop state of the simulation.
 
@@ -216,7 +216,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         """
         self.__pause_stop_callbacks[label].append(pause_stop_callback)
 
-    def __read_database_callback(self, db_reader: DatabaseReader):
+    def __read_database_callback(self, db_reader: DatabaseReader) -> None:
         """
         :param DatabaseReader db_reader:
         """
@@ -238,7 +238,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
                     label, vertex_size, run_time_ms, machine_timestep_ms)
 
     def __init_receivers(
-            self, db: DatabaseReader, vertex_sizes: Dict[str, int]):
+            self, db: DatabaseReader, vertex_sizes: Dict[str, int]) -> None:
         # Set up a single connection for receive
         if self.__receiver_connection is None:
             self.__receiver_connection = UDPConnection(
@@ -267,7 +267,8 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             self.__receiver_connection.close()
             self.__receiver_connection = None
 
-    def __launch_thread(self, kind: str, label: str, callback: _StartStopCB):
+    def __launch_thread(
+            self, kind: str, label: str, callback: _StartStopCB) -> None:
         thread = Thread(target=callback, args=(label, self), name=(
             f"{kind} callback thread for live_event_connection "
             f"{self._local_port}:{self._local_ip_address}"))
@@ -294,7 +295,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             for callback in callbacks:
                 self.__launch_thread("pause_stop", label, callback)
 
-    def __do_receive_packet(self, packet: bytes):
+    def __do_receive_packet(self, packet: bytes) -> None:
         # pylint: disable=broad-except
         logger.debug("Received packet")
         try:
@@ -302,7 +303,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         except Exception:
             logger.warning("problem handling received packet", exc_info=True)
 
-    def __handle_packet(self, packet: bytes):
+    def __handle_packet(self, packet: bytes) -> None:
         key_labels: Dict[int, List[int]] = dict()
         atoms_labels: Dict[int, List[int]] = dict()
         n_events = len(packet) // BYTES_PER_WORD
@@ -326,7 +327,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
                 else:
                     c_back(label, key_labels[label_id])
 
-    def __handle_unknown_key(self, key: int):
+    def __handle_unknown_key(self, key: int) -> None:
         if key not in self.__error_keys:
             self.__error_keys.add(key)
             logger.warning("Received unexpected key {}", key)

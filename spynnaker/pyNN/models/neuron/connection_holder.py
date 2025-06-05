@@ -24,7 +24,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     ConnectionsArray)
 
 _ItemType: TypeAlias = numpy.floating
-_Items: TypeAlias = Union[Tuple[NDArray[_ItemType], ...], NDArray[_ItemType]]
+_Items: TypeAlias = Union[Tuple[NDArray[_ItemType], ...], NDArray[_ItemType],
+                          Tuple[List[numpy.floating], ...]]
 
 
 def _is_listable(value: Any) -> TypeGuard[Sequence[Any]]:
@@ -109,7 +110,7 @@ class ConnectionHolder(object):
         self.__notify = notify
         self.__fixed_values = fixed_values
 
-    def add_connections(self, connections: ConnectionsArray):
+    def add_connections(self, connections: ConnectionsArray) -> None:
         """
         Add connections to the holder to be returned.
 
@@ -205,7 +206,7 @@ class ConnectionHolder(object):
                     connections[order][self.__data_items_to_return[0]]
 
             # Return in a format which can be understood by a FromListConnector
-            items: List[Any] = []
+            items: List[List[numpy.floating]] = []
             # NB: The types in here are all wrong, but that's
             for data_item in data_items:
                 if _is_listable(data_item):
@@ -241,7 +242,9 @@ class ConnectionHolder(object):
 
         return self.__data_items
 
-    def __getitem__(self, s):
+    def __getitem__(self, s: int) -> Union[
+            numpy.floating, NDArray[numpy.floating],
+            List[numpy.floating]]:
         data = self._get_data_items()
         return data[s]
 
@@ -261,6 +264,11 @@ class ConnectionHolder(object):
         data = self._get_data_items()
         return data.__repr__()
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
+        """
+        Gets the attributes from the NDArray if applicable
+
+        :raises AttributeError: If the data does not have this attribute.
+        """
         data = self._get_data_items()
         return getattr(data, name)

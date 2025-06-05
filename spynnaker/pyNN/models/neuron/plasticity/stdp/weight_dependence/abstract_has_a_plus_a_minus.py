@@ -27,7 +27,7 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
         self.__a_plus: float = 0.0
         self.__a_minus: float = 0.0
 
-    def set_a_plus_a_minus(self, a_plus: float, a_minus: float):
+    def set_a_plus_a_minus(self, a_plus: float, a_minus: float) -> None:
         """
         Set the values of :math:`A^+` and :math:`A^-`.
 
@@ -48,7 +48,7 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
         return self.__a_plus
 
     @A_plus.setter
-    def A_plus(self, new_value: float):
+    def A_plus(self, new_value: float) -> None:
         # pylint: disable=invalid-name
         self.__a_plus = new_value
 
@@ -63,6 +63,6 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
         return self.__a_minus
 
     @A_minus.setter
-    def A_minus(self, new_value: float):
+    def A_minus(self, new_value: float) -> None:
         # pylint: disable=invalid-name
         self.__a_minus = new_value

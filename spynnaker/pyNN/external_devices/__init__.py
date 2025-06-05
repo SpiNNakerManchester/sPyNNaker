@@ -63,7 +63,7 @@ from spynnaker.pyNN.models.utility_models.spike_injector import (
     SpikeInjector as ExternalDeviceSpikeInjector)
 from spynnaker.pyNN import protocols
 from spynnaker.pyNN.spinnaker import SpiNNaker
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron import PopulationVertex
 
 
 # useful functions
@@ -118,7 +118,7 @@ __all__ = [
 __simulator: Optional[SpiNNaker] = None
 
 
-def run_forever(sync_time: float = 0.0):
+def run_forever(sync_time: float = 0.0) -> None:
     """
     Supports running forever in PyNN 0.8/0.9 format.
 
@@ -134,7 +134,7 @@ def run_forever(sync_time: float = 0.0):
     __simulator.run(None, sync_time)
 
 
-def run_sync(run_time: float, sync_time: float):
+def run_sync(run_time: float, sync_time: float) -> None:
     """
     Run in steps of the given number of milliseconds pausing between
     for a signal to be sent from the host.
@@ -167,7 +167,7 @@ def request_stop() -> None:
 
 
 def register_database_notification_request(
-        hostname: str, notify_port: int, ack_port: int):
+        hostname: str, notify_port: int, ack_port: int) -> None:
     """
     Adds a socket system which is registered with the notification protocol.
 
@@ -184,13 +184,13 @@ __ethernet_control_connection: Optional[EthernetControlConnection] = None
 
 
 def __vtx(population: Population) -> Tuple[
-        AbstractPopulationVertex, AbstractEthernetController, str]:
+        PopulationVertex, AbstractEthernetController, str]:
     vertex = population._vertex  # pylint: disable=protected-access
-    if isinstance(vertex, AbstractPopulationVertex):
+    if isinstance(vertex, PopulationVertex):
         v = vertex
     else:
         raise TypeError(
-            "Vertex must be an instance of AbstractPopulationVertex")
+            "Vertex must be an instance of PopulationVertex")
     if isinstance(vertex, AbstractEthernetController):
         c = vertex
     else:
@@ -360,7 +360,7 @@ def SpikeInjector(
     return ExternalDeviceSpikeInjector()
 
 
-def _set_simulator(simulator: SpiNNaker):
+def _set_simulator(simulator: SpiNNaker) -> None:
     """
     Should only be called by pyNN/__init__py setup method.
 

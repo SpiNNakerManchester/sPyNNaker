@@ -136,7 +136,7 @@ class SynapseDynamicsSTDP(
             raise NotImplementedError("All delays must be dendritic!")
 
     def _merge_neuromodulation(
-            self, neuromodulation: SynapseDynamicsNeuromodulation):
+            self, neuromodulation: SynapseDynamicsNeuromodulation) -> None:
         if self.__neuromodulation is None:
             self.__neuromodulation = neuromodulation
         elif not self.__neuromodulation.is_neuromodulation_same_as(
@@ -204,7 +204,7 @@ class SynapseDynamicsSTDP(
             f"Type {type(self)} does not have parameter {key}")
 
     @overrides(AbstractPlasticSynapseDynamics.set_value)
-    def set_value(self, key: str, value: Any):
+    def set_value(self, key: str, value: Any) -> None:
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
                 setattr(obj, key, value)
@@ -214,21 +214,21 @@ class SynapseDynamicsSTDP(
             f"Type {type(self)} does not have parameter {key}")
 
     @property
-    def weight_dependence(self):
+    def weight_dependence(self) -> AbstractWeightDependence:
         """
-        :rtype: AbstractTimingDependence
+        The Weight Dependence component of the synapse dynamics.
         """
         return self.__weight_dependence
 
     @property
-    def timing_dependence(self):
+    def timing_dependence(self) -> AbstractTimingDependence:
         """
         :rtype: AbstractTimingDependence
         """
         return self.__timing_dependence
 
     @property
-    def dendritic_delay_fraction(self):
+    def dendritic_delay_fraction(self) -> float:
         """
         Settable.
 
@@ -237,11 +237,11 @@ class SynapseDynamicsSTDP(
         return self.__dendritic_delay_fraction
 
     @dendritic_delay_fraction.setter
-    def dendritic_delay_fraction(self, new_value):
+    def dendritic_delay_fraction(self, new_value: float) -> None:
         self.__dendritic_delay_fraction = new_value
 
     @property
-    def backprop_delay(self):
+    def backprop_delay(self) -> bool:
         """
         Settable.
 
@@ -250,7 +250,7 @@ class SynapseDynamicsSTDP(
         return self.__backprop_delay
 
     @backprop_delay.setter
-    def backprop_delay(self, backprop_delay):
+    def backprop_delay(self, backprop_delay: bool) -> None:
         self.__backprop_delay = bool(backprop_delay)
 
     @property
@@ -289,7 +289,8 @@ class SynapseDynamicsSTDP(
         name += timing_suffix + "_" + weight_suffix
         return name
 
-    def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
+    def get_parameters_sdram_usage_in_bytes(
+            self, n_neurons: int, n_synapse_types: int) -> int:
         """
         :param int n_neurons:
         :param int n_synapse_types:
@@ -309,7 +310,7 @@ class SynapseDynamicsSTDP(
     def write_parameters(
             self, spec: DataSpecificationBase, region: int,
             global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         spec.comment("Writing Plastic Parameters")
 
         # Switch focus to the region:
@@ -332,7 +333,7 @@ class SynapseDynamicsSTDP(
                 spec, region, global_weight_scale, synapse_weight_scales)
 
     @property
-    def _n_header_bytes(self):
+    def _n_header_bytes(self) -> int:
         """
         :rtype: int
         """
@@ -344,7 +345,8 @@ class SynapseDynamicsSTDP(
         # the number of bytes as a number of words
         return int(math.ceil(float(n_bytes) / BYTES_PER_WORD)) * BYTES_PER_WORD
 
-    def __get_n_connections(self, n_connections, check_length_padded=True):
+    def __get_n_connections(
+            self, n_connections: int, check_length_padded: bool = True) -> int:
         """
         :param int n_connections:
         :param bool check_length_padded:
@@ -370,7 +372,9 @@ class SynapseDynamicsSTDP(
 
         return fp_size_words + pp_size_words
 
-    def get_n_words_for_plastic_connections(self, n_connections):
+    @overrides(AbstractPlasticSynapseDynamics.
+               get_n_words_for_plastic_connections)
+    def get_n_words_for_plastic_connections(self, n_connections: int) -> int:
         """
         :param int n_connections:
         :rtype: int
@@ -445,7 +449,8 @@ class SynapseDynamicsSTDP(
 
         return fp_data, pp_data, fp_size, pp_size
 
-    def _pad_row(self, rows: List[NDArray], no_bytes_per_connection: int):
+    def _pad_row(self, rows: List[NDArray],
+                 no_bytes_per_connection: int) -> List[NDArray]:
         """
         :param list(~numpy.ndarray) rows:
         :param int no_bytes_per_connection:
@@ -636,6 +641,18 @@ class SynapseDynamicsSTDP(
         return self.__neuromodulation is None
 
     @property
+    @overrides(AbstractPlasticSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return True
+
+    @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
     def pad_to_length(self) -> Optional[int]:
         return self.__pad_to_length
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.synapses_per_second)
+    def synapses_per_second(self) -> int:
+        # From Synapse-Centric Mapping of Cortical Models to the SpiNNaker
+        # Neuromorphic Architecture
+        return 1400000

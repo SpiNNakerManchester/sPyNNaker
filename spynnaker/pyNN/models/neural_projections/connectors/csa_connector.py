@@ -50,7 +50,8 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         "__full_connection_set",
         "__full_cset")
 
-    def __init__(self, cset: CSet, safe=True, callback=None, verbose=False):
+    def __init__(self, cset: CSet, safe: bool = True, callback: None = None,
+                 verbose: bool = False):
         """
         :param csa.connset.CSet cset:
             A description of the connection set between populations
@@ -183,7 +184,8 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         block["synapse_type"] = synapse_type
         return block
 
-    def show_connection_set(self, n_pre_neurons: int, n_post_neurons: int):
+    def show_connection_set(
+            self, n_pre_neurons: int, n_post_neurons: int) -> None:
         """
         :param int n_pre_neurons:
         :param int n_post_neurons:
@@ -191,5 +193,5 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         # Yuck; this was supposed to be available to the user from scripts...
         csa.show(self.__full_connection_set, n_pre_neurons, n_post_neurons)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"CSAConnector({self.__full_cset})"

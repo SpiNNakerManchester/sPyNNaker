@@ -19,6 +19,9 @@ import numpy
 from numpy import uint32
 from numpy.typing import NDArray
 
+from pacman.model.graphs.application import ApplicationEdge
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
+
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
@@ -41,7 +44,7 @@ FILTER_HEADER_WORDS = 2
 BIT_IN_A_WORD = 32.0
 
 
-def is_sdram_poisson_source(app_edge):
+def is_sdram_poisson_source(app_edge: ApplicationEdge) -> bool:
     """ Determine if a given app edge is a poisson source being sent over SDRAM
         as it can likely be discounted if so
     """
@@ -49,8 +52,9 @@ def is_sdram_poisson_source(app_edge):
     # pylint: disable=import-outside-toplevel
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
         SplitterPoissonDelegate)
-    if isinstance(app_edge.pre_vertex.splitter, SplitterPoissonDelegate):
-        if app_edge.pre_vertex.splitter.send_over_sdram:
+    splitter: AbstractSplitterCommon = app_edge.pre_vertex.splitter
+    if isinstance(splitter, SplitterPoissonDelegate):
+        if splitter.send_over_sdram:
             return True
     return False
 
@@ -158,7 +162,8 @@ def get_bitfield_key_map_data(
 
 def write_bitfield_init_data(
         spec: DataSpecificationBase, bit_field_region: int,
-        n_bit_field_bytes: int, bit_field_region_ref: Optional[int] = None):
+        n_bit_field_bytes: int,
+        bit_field_region_ref: Optional[int] = None) -> None:
     """
     Writes the initialisation data needed for the bitfield generator.
 

@@ -27,10 +27,11 @@ jobs:
     uses: SpiNNakerManchester/SupportScripts/.github/workflows/python_checks.yml@main
     with:
       dependencies: SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc SpiNNFrontEndCommon TestBase
-      ubuntu_packages: graphviz
-      test_directories: unittests
+      ubuntu-packages: graphviz
+      test-directories: unittests
       coverage-package: spynnaker
       flake8-packages: spynnaker unittests spynnaker_integration_tests proxy_integration_tests
       pylint-packages: spynnaker
-      mypy-packages: spynnaker unittests spynnaker_integration_tests proxy_integration_tests
-      cfg_file: spynnaker
+      mypy-packages: proxy_integration_tests
+      mypy-full-packages: spynnaker unittests spynnaker_integration_tests
+      cfg-file: spynnaker

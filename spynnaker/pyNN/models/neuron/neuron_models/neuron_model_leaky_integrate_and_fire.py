@@ -99,7 +99,7 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModel):
         self.__tau_refrac = tau_refrac
 
     @overrides(AbstractStandardNeuronComponent.add_parameters)
-    def add_parameters(self, parameters: RangeDictionary[float]):
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
         parameters[V_REST] = self._convert(self.__v_rest)
         parameters[TAU_M] = self._convert(self.__tau_m)
         parameters[CM] = self._convert(self.__cm)
@@ -109,7 +109,8 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModel):
         parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractStandardNeuronComponent.add_state_variables)
-    def add_state_variables(self, state_variables: RangeDictionary[float]):
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         state_variables[V] = self._convert(self.__v_init)
         state_variables[REFRACT_TIMER] = 0
 

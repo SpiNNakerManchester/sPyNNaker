@@ -60,7 +60,7 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def read_generated_connection_holders(self, placement: Placement):
+    def read_generated_connection_holders(self, placement: Placement) -> None:
         """
         Fill in the connection holders.
 

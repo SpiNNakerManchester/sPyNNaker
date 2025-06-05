@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional, Tuple, Union
+from pyNN.space import BaseStructure
 import pyNN.spiNNaker as sim
 import numpy
 from spinnaker_testbase import BaseTestCase
@@ -23,7 +25,8 @@ DELAY = 1.0
 
 class TestOneToOneConnector(BaseTestCase):
 
-    def do_one_to_one_test(self, neurons_per_core, pre_size, post_size):
+    def do_one_to_one_test(self, neurons_per_core: int, pre_size: int,
+                           post_size: int) -> None:
         sim.setup(1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, neurons_per_core)
         pre = sim.Population(pre_size, sim.SpikeSourceArray(
@@ -45,7 +48,8 @@ class TestOneToOneConnector(BaseTestCase):
             assert len(spikes[i]) == 1
             assert spikes[i][0] > (i % 100)
 
-    def do_one_to_one_cond_test(self, neurons_per_core, pre_size, post_size):
+    def do_one_to_one_cond_test(self, neurons_per_core: int, pre_size: int,
+                                post_size: int) -> None:
         sim.setup(1.0)
         sim.set_number_of_neurons_per_core(sim.IF_cond_exp, neurons_per_core)
         pre = sim.Population(pre_size, sim.SpikeSourceArray(
@@ -68,8 +72,10 @@ class TestOneToOneConnector(BaseTestCase):
             assert spikes[i][0] > (i % 100)
 
     def do_one_to_one_nd_test(
-            self, neurons_per_core_pre, pre_size, pre_shape,
-            neurons_per_core_post, post_size, post_shape):
+            self, neurons_per_core_pre: Tuple[int, ...], pre_size: int,
+            pre_shape: BaseStructure,
+            neurons_per_core_post: Union[int, Tuple[int, ...]],
+            post_size: int, post_shape: Optional[BaseStructure]) -> None:
         sim.setup(1.0)
         pre = sim.Population(pre_size, sim.SpikeSourceArray(
             [[i % 100] for i in range(pre_size)]), structure=pre_shape)
@@ -93,39 +99,39 @@ class TestOneToOneConnector(BaseTestCase):
             assert len(spikes[i]) == 1
             assert spikes[i][0] > (i % 100)
 
-    def test_pre_same_as_post(self):
+    def test_pre_same_as_post(self) -> None:
         self.do_one_to_one_test(10, 23, 23)
 
-    def test_pre_bigger_than_post(self):
+    def test_pre_bigger_than_post(self) -> None:
         self.do_one_to_one_test(10, 100, 23)
 
-    def test_post_bigger_than_pre(self):
+    def test_post_bigger_than_pre(self) -> None:
         self.do_one_to_one_test(10, 23, 100)
 
-    def test_post_bigger_than_pre_cond(self):
+    def test_post_bigger_than_pre_cond(self) -> None:
         self.do_one_to_one_cond_test(10, 5, 4)
 
-    def test_3d_same(self):
+    def test_3d_same(self) -> None:
         self.do_one_to_one_nd_test(
             (3, 2, 4), 6 * 8 * 8, sim.Grid3D(6/8, 6/8),
             (3, 2, 4), 6 * 8 * 8, sim.Grid3D(6/8, 6/8))
 
-    def test_2d_different_split(self):
+    def test_2d_different_split(self) -> None:
         self.do_one_to_one_nd_test(
             (2, 3), 6 * 9, sim.Grid2D(6 / 9),
             (3, 9), 6 * 9, sim.Grid2D(6 / 9))
 
-    def test_2d_pre_bigger_than_post(self):
+    def test_2d_pre_bigger_than_post(self) -> None:
         self.do_one_to_one_nd_test(
             (2, 3), 6 * 9, sim.Grid2D(6 / 9),
             (3, 3), 3 * 6, sim.Grid2D(3 / 6))
 
-    def test_2d_post_bigger_than_pre(self):
+    def test_2d_post_bigger_than_pre(self) -> None:
         self.do_one_to_one_nd_test(
             (2, 3), 6 * 9, sim.Grid2D(6 / 9),
             (3, 3), 3 * 6, sim.Grid2D(3 / 6))
 
-    def test_2d_to_1d(self):
+    def test_2d_to_1d(self) -> None:
         self.do_one_to_one_nd_test(
             (2, 3), 8 * 6, sim.Grid2D(8 / 6),
             8, 8 * 6, None)

@@ -19,7 +19,7 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+    from spynnaker.pyNN.models.neuron import PopulationVertex
     from spynnaker.pyNN.models.utility_models.delays import (
         DelayExtensionVertex)
     from spynnaker.pyNN.models.neural_projections import (
@@ -36,7 +36,7 @@ class DelayedApplicationEdge(ApplicationEdge):
 
     def __init__(
             self, pre_vertex: DelayExtensionVertex,
-            post_vertex: AbstractPopulationVertex,
+            post_vertex: PopulationVertex,
             synapse_information: Union[
                 SynapseInformation, Iterable[SynapseInformation]],
             undelayed_edge: ProjectionApplicationEdge,
@@ -44,7 +44,7 @@ class DelayedApplicationEdge(ApplicationEdge):
         """
         :param DelayExtensionVertex pre_vertex:
             The delay extension at the start of the edge
-        :param AbstractPopulationVertex post_vertex:
+        :param PopulationVertex post_vertex:
             The target of the synapses
         :param synapse_information:
             The synapse information on this edge
@@ -69,8 +69,8 @@ class DelayedApplicationEdge(ApplicationEdge):
 
     @property
     @overrides(ApplicationEdge.post_vertex)
-    def post_vertex(self) -> AbstractPopulationVertex:
-        return cast('AbstractPopulationVertex', super().post_vertex)
+    def post_vertex(self) -> PopulationVertex:
+        return cast('PopulationVertex', super().post_vertex)
 
     @property
     def synapse_information(self) -> List[SynapseInformation]:
@@ -79,7 +79,8 @@ class DelayedApplicationEdge(ApplicationEdge):
         """
         return self.__synapse_information
 
-    def add_synapse_information(self, synapse_information: SynapseInformation):
+    def add_synapse_information(
+            self, synapse_information: SynapseInformation) -> None:
         """
         :param SynapseInformation synapse_information:
         """

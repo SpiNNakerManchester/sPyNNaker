@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import Iterable, List, Optional, Sequence, Tuple, TYPE_CHECKING
+from typing import (
+    Iterable, List, Optional, Sequence, Tuple, TYPE_CHECKING, Union)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     ApplicationVertex, ApplicationVirtualVertex)
@@ -21,7 +22,7 @@ from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.abstract_models import (
     AbstractVertexWithEdgeToDependentVertices, HasCustomAtomKeyMap)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron import PopulationVertex
 from .abstract_ethernet_controller import AbstractEthernetController
 from .abstract_multicast_controllable_device import (
     AbstractMulticastControllableDevice)
@@ -32,11 +33,11 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
     from .abstract_ethernet_translator import AbstractEthernetTranslator
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterAbstractPopulationVertex)
+        SplitterPopulationVertex)
 
 
 class ExternalDeviceLifControlVertex(
-        AbstractPopulationVertex,
+        PopulationVertex,
         AbstractEthernetController,
         AbstractVertexWithEdgeToDependentVertices,
         HasCustomAtomKeyMap):
@@ -55,7 +56,10 @@ class ExternalDeviceLifControlVertex(
 
     def __init__(
             self, *, devices: Sequence[AbstractMulticastControllableDevice],
-            create_edges: bool, max_atoms_per_core: Tuple[int, ...],
+            create_edges: bool,
+            max_atoms_per_core: Union[int, Tuple[int, ...]],
+            n_synapse_cores: Optional[int],
+            allow_delay_extensions: bool,
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel,
             translator: Optional[AbstractEthernetTranslator] = None,
@@ -65,7 +69,7 @@ class ExternalDeviceLifControlVertex(
             max_expected_summed_weight: Optional[List[float]] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: Optional[bool] = None,
-            splitter: Optional[SplitterAbstractPopulationVertex] = None,
+            splitter: Optional[SplitterPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None):
         """
         :param list(AbstractMulticastControllableDevice) devices:
@@ -86,7 +90,7 @@ class ExternalDeviceLifControlVertex(
         :param float ring_buffer_sigma:
         :param int incoming_spike_buffer_size:
         :param splitter: splitter from application vertices to machine vertices
-        :type splitter: SplitterAbstractPopulationVertex or None
+        :type splitter: SplitterPopulationVertex or None
         :param int n_colour_bits: The number of colour bits to use
         """
         # pylint: disable=too-many-arguments
@@ -98,6 +102,8 @@ class ExternalDeviceLifControlVertex(
             n_neurons=len(devices),
             label=f"ext_dev{devices}" if label is None else label,
             max_atoms_per_core=max_atoms_per_core,
+            n_synapse_cores=n_synapse_cores,
+            allow_delay_extensions=allow_delay_extensions,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             max_expected_summed_weight=max_expected_summed_weight,
@@ -164,7 +170,7 @@ class ExternalDeviceLifControlVertex(
         device = self.__devices[partition_id]
         return [(index, device.device_control_key)]
 
-    @overrides(AbstractPopulationVertex.get_fixed_key_and_mask)
+    @overrides(PopulationVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(
             self, partition_id: str) -> Optional[BaseKeyAndMask]:
         return BaseKeyAndMask(

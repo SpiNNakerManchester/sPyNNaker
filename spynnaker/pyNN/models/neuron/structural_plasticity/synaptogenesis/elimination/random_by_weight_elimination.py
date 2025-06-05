@@ -59,7 +59,7 @@ class RandomByWeightElimination(AbstractElimination):
 
     @overrides(AbstractElimination.write_parameters)
     def write_parameters(
-            self, spec: DataSpecificationBase, weight_scale: float):
+            self, spec: DataSpecificationBase, weight_scale: float) -> None:
         spec.write_value(int(self.__prob_elim_depressed * 0xFFFFFFFF))
         spec.write_value(int(self.__prob_elim_potentiated * 0xFFFFFFFF))
         spec.write_value(self.__threshold * weight_scale)

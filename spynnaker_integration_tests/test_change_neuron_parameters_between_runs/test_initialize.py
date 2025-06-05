@@ -18,7 +18,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestInitialize(BaseTestCase):
 
-    def set_initialize_between_runs(self):
+    def set_initialize_between_runs(self) -> None:
         runtime1 = 5
         runtime2 = 5
 
@@ -81,5 +81,5 @@ class TestInitialize(BaseTestCase):
         assert v1[runtime1][0] == -63.0
         assert v1[runtime1][1] == -63.0
 
-    def test_set_initial_value_between_runs(self):
+    def test_set_initial_value_between_runs(self) -> None:
         self.runsafe(self.set_initialize_between_runs)

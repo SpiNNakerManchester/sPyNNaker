@@ -50,7 +50,7 @@ _BITS_PER_BYTES = 8
 _CTYPES_N_BITS_SHIFT = 16
 
 
-def _n_bits(field) -> int:
+def _n_bits(field: ctypes._CField) -> int:
     """
     Get the number of bits in a field (ctypes doesn't do this).
 
@@ -151,7 +151,7 @@ _DELAY_SCALE = 2
 _UINT32_PTR = ctypes.POINTER(ctypes.c_uint32)
 
 
-def _to_numpy(array) -> NDArray[uint32]:
+def _to_numpy(array: ctypes.Array) -> NDArray[uint32]:
     """
     Convert a ctypes array to a numpy array of uint32.
 

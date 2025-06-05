@@ -13,22 +13,43 @@
 # limitations under the License.
 
 import os
+import sys
 import unittest
-from spinn_utilities.config_holder import run_config_checks
+
+from spinn_utilities.configs.config_checker import ConfigChecker
+from spinn_utilities.configs.config_documentor import ConfigDocumentor
+
 import spynnaker
 from spynnaker.pyNN.config_setup import unittest_setup
 
 
 class TestCfgChecker(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_config_checks(self):
+    def test_config_checks(self) -> None:
         unittests = os.path.dirname(__file__)
         parent = os.path.dirname(unittests)
         spynnaker_dir = spynnaker.__path__[0]
         spynnaker_it = os.path.join(parent, "spynnaker_integration_tests")
-        run_config_checks(
-            directories=[spynnaker_dir, spynnaker_it, unittests],
-            special_nones=("info", "debug"))
+        ConfigChecker([spynnaker_dir, spynnaker_it, unittests]).check()
+
+    def test_cfg_documentor(self) -> None:
+        class_file = sys.modules[self.__module__].__file__
+        assert class_file is not None
+        abs_class_file = os.path.abspath(class_file)
+        unittest_dir = os.path.dirname(abs_class_file)
+        spynnaker_dir = os.path.dirname(unittest_dir)
+        parent_dir = os.path.dirname(spynnaker_dir)
+        target_dir = os.path.join(
+            parent_dir,
+            "SpiNNakerManchester.github.io", "spynnaker", "9.0.0")
+        if os.path.exists(target_dir):
+            target = os.path.join(target_dir, "cfg.md")
+        else:
+            print(f"Unable to find {target_dir}")
+            target = os.path.join(unittest_dir, 'test.md')
+
+        documentor = ConfigDocumentor()
+        documentor.md_configs(target)

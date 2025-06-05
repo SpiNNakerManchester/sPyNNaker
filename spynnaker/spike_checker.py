@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List, Union
 import numpy
+from numpy.typing import NDArray
 
 
-def synfire_spike_checker(spikes, n_neurons):
+def synfire_spike_checker(spikes: Union[NDArray, List[NDArray]],
+                          n_neurons: int) -> None:
     """
     :param spikes: The spike data to check.
     :type spikes: ~numpy.ndarray or list(~numpy.ndarray)
@@ -40,7 +43,8 @@ def synfire_spike_checker(spikes, n_neurons):
 
 
 def synfire_multiple_lines_spike_checker(
-        spikes, n_neurons, lines, wrap_around=True):
+        spikes: NDArray, n_neurons: int, lines: int,
+        wrap_around: bool = True) -> None:
     """
     Checks that there are the expected number of spike lines
 

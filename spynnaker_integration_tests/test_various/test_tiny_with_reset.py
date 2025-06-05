@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Tuple
+from neo import Block
 import pyNN.spiNNaker as p
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run():
+def do_run() -> Tuple[Block, Block]:
     p.setup(timestep=1, min_delay=1)
 
     spiker = p.Population(1, p.SpikeSourceArray(spike_times=[[0]]),
@@ -44,7 +46,7 @@ def do_run():
 
 
 class TinyTest(BaseTestCase):
-    def check_run(self):
+    def check_run(self) -> None:
         # pylint: disable=no-member
         all1, all2 = do_run()
         spikes1 = neo_convertor.convert_spiketrains(
@@ -56,7 +58,7 @@ class TinyTest(BaseTestCase):
         v2 = neo_convertor.convert_data(all2, name="v", run=1)
         self.assertEqual(v1.all(), v2.all())
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.check_run)
 
 

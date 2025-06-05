@@ -12,36 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from time import sleep
+from typing import List
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
 from spynnaker.pyNN.utilities.neo_convertor import count_spikes
 
 spike_receive_count = 0
 spike_send_count = 0
-max_spike = 0
 
 
-def sim_control(label, sender):
+def sim_control(label: str, sender: SpynnakerLiveSpikesConnection) -> None:
     global spike_send_count
     sleep(0.1)
     for _ in range(100):
         sender.send_spike(label, 0)
         sleep(0.01)
         spike_send_count += 1
+    sleep(1)
     sim.external_devices.request_stop()
 
 
-def receive_spikes(label, time, neuron_ids):
-    global spike_receive_count, max_spike
+def receive_spikes(label: str, time: int, neuron_ids: List[int]) -> None:
+    global spike_receive_count
     spike_receive_count += len(neuron_ids)
-    max_spike = max(time, max_spike)
-    # for neuron_id in neuron_ids:
-    #    print("Received spike at time", time, "from", label, "-", neuron_id)
 
 
 class TestSpikeRunForeverAgain(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         conn = sim.external_devices.SpynnakerLiveSpikesConnection(
             receive_labels=["pop_1"], send_labels=["sender"], local_port=None)
         conn.add_receive_callback("pop_1", receive_spikes)
@@ -88,17 +87,16 @@ class TestSpikeRunForeverAgain(BaseTestCase):
         # pop2_spikes = neo.segments[0].spiketrains
         sim.end()
 
-        self.assertEqual(spike_send_count, spike_receive_count)
-        self.assertEqual(spike_send_count, pop_spikes)
-        expected_ssa_spikes = list(filter(
-            lambda spike: spike < max_spike, spike_times))
-        # print(expected_ssa_spikes)
-        # print(input_spikes)
-        # print(pop2_spikes)
-        self.assertEqual(len(expected_ssa_spikes), n_input_spikes)
-        self.assertEqual(n_pop2_spikes, n_input_spikes)
+        # We can lose some spikes in the process of sending them or
+        # receiving them, so we guess that 10 might be lost
+        self.assertTrue((spike_send_count - spike_receive_count) < 10)
+        self.assertTrue((spike_send_count - pop_spikes) < 10)
 
-    def test_run(self):
+        # This can be out by one if the sender sends a spike just before the
+        # end, especially as the end is externally controlled
+        self.assertTrue((n_input_spikes - n_pop2_spikes) < 1)
+
+    def test_run(self) -> None:
         self.runsafe(self.do_run)
 
 

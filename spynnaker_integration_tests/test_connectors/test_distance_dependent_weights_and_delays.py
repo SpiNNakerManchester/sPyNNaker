@@ -12,15 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.spiNNaker as p
 import math
-from spinnaker_testbase import BaseTestCase
+from typing import Tuple
+
+import matplotlib.pyplot as plt
+import pyNN.spiNNaker as p
 from pyNN.utility.plotting import Figure, Panel
 from pyNN.random import NumpyRNG
-import matplotlib.pyplot as plt  # type: ignore[import]
+
+from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 
-def do_run(plot):
+def do_run(plot: bool) -> Tuple[ConnectionHolder, ConnectionHolder]:
 
     p.setup(timestep=1.0)
 
@@ -100,7 +104,7 @@ def do_run(plot):
 class DistanceDependentWeightsAndDelaysTest(BaseTestCase):
     POSITIONS = [(i, j) for i in range(4) for j in range(4)]
 
-    def check_exc_weights(self, exc_weights_delays):
+    def check_exc_weights(self, exc_weights_delays: ConnectionHolder) -> None:
         for conn in exc_weights_delays:
             # delays are constant
             self.assertEqual(5, conn[3])
@@ -113,7 +117,7 @@ class DistanceDependentWeightsAndDelaysTest(BaseTestCase):
             # on SpiNNaker but in this case should be within 3 dp
             self.assertAlmostEqual(weight, conn[2], places=3)
 
-    def check_inh_weights(self, inh_weights_delays):
+    def check_inh_weights(self, inh_weights_delays: ConnectionHolder) -> None:
         for conn in inh_weights_delays:
             # weights are constant
             self.assertEqual(1.5, conn[2])
@@ -125,13 +129,13 @@ class DistanceDependentWeightsAndDelaysTest(BaseTestCase):
             delay = round(2.0 + (2.0 * dist))
             self.assertEqual(delay, conn[3])
 
-    def a_run(self):
+    def a_run(self) -> None:
         exc_weights_delays, inh_weights_delays = do_run(plot=False)
         # any checks go here
         self.check_exc_weights(exc_weights_delays)
         self.check_inh_weights(inh_weights_delays)
 
-    def test_a_run(self):
+    def test_a_run(self) -> None:
         self.runsafe(self.a_run)
 
 

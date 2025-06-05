@@ -12,10 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
+from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
+    PushBotMotor)
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
     PushBotEthernetMotorDevice)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 
 
 class PushBotSpiNNakerLinkMotorDevice(
@@ -26,23 +31,17 @@ class PushBotSpiNNakerLinkMotorDevice(
     """
     __slots__ = ()
 
-    default_parameters = {
-        'n_neurons': 1,
-        'label': None,
-        'board_address': None}
-
     def __init__(
-            self, motor, protocol, spinnaker_link_id,
-            n_neurons=default_parameters['n_neurons'],
-            label=default_parameters['label'],
-            board_address=default_parameters['board_address']):
+            self, motor: PushBotMotor, protocol: MunichIoSpiNNakerLinkProtocol,
+            spinnaker_link_id: int,  n_neurons: int = 1,
+            label: Optional[str] = None,  board_address: Optional[str] = None):
         """
         :param PushBotMotor motor: the motor to control
         :param MunichIoSpiNNakerLinkProtocol protocol:
             The protocol used to control the device
         :param int spinnaker_link_id: The SpiNNakerLink connected to
         :param int n_neurons: The number of neurons in the device
-        :param str label: The label of the device
+        :param label: The label of the device
         :param board_address:
             The IP address of the board that the device is connected to
         :type board_address: str or None

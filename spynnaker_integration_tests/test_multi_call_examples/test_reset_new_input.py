@@ -14,16 +14,18 @@
 
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.populations import Population
 from spynnaker_integration_tests.scripts import check_neuron_data
 
 n_neurons = 20  # number of neurons in each population
-neurons_per_core = n_neurons / 2
+neurons_per_core = n_neurons // 2
 simtime = 200
 
 
 class TestResetNewInput(BaseTestCase):
 
-    def check_data(self, pop, expected_spikes, simtime, segment):
+    def check_data(self, pop: Population, expected_spikes: int, simtime: int,
+                   segment: int) -> None:
         neo = pop.get_data("all")
         spikes = neo.segments[segment].spiketrains
         v = neo.segments[segment].filter(name="v")[0]
@@ -33,7 +35,7 @@ class TestResetNewInput(BaseTestCase):
                               expected_spikes,
                               simtime, pop.label, i)
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, neurons_per_core)
 
@@ -53,5 +55,5 @@ class TestResetNewInput(BaseTestCase):
         self.check_data(pop_1, len(input_spikes2), simtime, 1)
         sim.end()
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)

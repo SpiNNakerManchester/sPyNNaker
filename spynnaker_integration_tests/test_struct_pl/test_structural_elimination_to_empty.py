@@ -15,7 +15,7 @@ from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as p
 
 
-def structural_eliminate_to_empty():
+def structural_eliminate_to_empty() -> None:
     p.setup(1.0)
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 5)
     stim = p.Population(9, p.SpikeSourceArray(range(10)), label="stim")
@@ -64,7 +64,7 @@ def structural_eliminate_to_empty():
 
 class TestStructuralEliminateToEmpty(BaseTestCase):
 
-    def test_structural_eliminate_to_empty(self):
+    def test_structural_eliminate_to_empty(self) -> None:
         self.runsafe(structural_eliminate_to_empty)
 
 

@@ -71,7 +71,8 @@ class PoolDenseConnector(AbstractConnector):
                  pool_stride: Union[int, Tuple[int], None] = None,
                  positive_receptor_type: str = "excitatory",
                  negative_receptor_type: str = "inhibitory",
-                 safe=True, verbose=False, callback=None):
+                 safe: bool = True, verbose: bool = False,
+                 callback: None = None):
         """
         :param weights:
             The synaptic strengths. Can be:
@@ -105,7 +106,11 @@ class PoolDenseConnector(AbstractConnector):
             is "inhibitory".
         :param bool safe: (ignored)
         :param bool verbose: (ignored)
-        :param callable callback: (ignored)
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         """
         super().__init__(safe=safe, callback=callback, verbose=verbose)
         self.__weights = numpy.array(weights)
@@ -221,7 +226,7 @@ class PoolDenseConnector(AbstractConnector):
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         pre = application_edge.pre_vertex
         post = application_edge.post_vertex
         if len(pre.atoms_shape) != 2:

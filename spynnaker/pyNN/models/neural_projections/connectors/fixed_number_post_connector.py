@@ -61,7 +61,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     def __init__(
             self, n: int, *, allow_self_connections: bool = True,
             with_replacement: bool = False, rng: Optional[NumpyRNG] = None,
-            safe=True, verbose=False, callback=None):
+            safe: bool = True, verbose: bool = False, callback: None = None):
         """
         :param int n:
             number of random post-synaptic neurons connected to pre-neurons.
@@ -100,7 +100,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         self.__post_neurons_set = False
         self.__rng = rng
 
-    def set_projection_information(self, synapse_info: SynapseInformation):
+    def set_projection_information(
+            self, synapse_info: SynapseInformation) -> None:
         super().set_projection_information(synapse_info)
         if (not self.__with_replacement and
                 self.__n_post > synapse_info.n_post_neurons):
@@ -157,7 +158,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
                         self.__with_replacement)
         return post_neurons
 
-    def _get_post_neurons(self, synapse_info: SynapseInformation):
+    def _get_post_neurons(
+            self, synapse_info: SynapseInformation) -> List[NDArray[integer]]:
         """
         :param SynapseInformation synapse_info:
         :rtype: list(~numpy.ndarray)
@@ -174,14 +176,15 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
                            f"_fixednumberpost-conn.csv"
                 print('Output post-connectivity to ', filename)
                 with open(filename, 'w', encoding="utf-8") as file_handle:
-                    numpy.savetxt(file_handle,
+                    numpy.savetxt(file_handle,  # type: ignore[arg-type]
                                   [(synapse_info.n_pre_neurons,
                                     synapse_info.n_post_neurons,
                                     self.__n_post)],
                                   fmt="%u,%u,%u")
                     for post_neuron in self.__post_neurons:
                         numpy.savetxt(
-                            file_handle, post_neuron,
+                            file_handle,  # type: ignore[arg-type]
+                            post_neuron,
                             fmt=("%u," * (self.__n_post - 1) + "%u"))
 
         return self.__post_neurons
@@ -301,7 +304,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         block["synapse_type"] = synapse_type
         return block
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"FixedNumberPostConnector({self.__n_post})"
 
     @property
@@ -314,7 +317,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         return self.__allow_self_connections
 
     @allow_self_connections.setter
-    def allow_self_connections(self, new_value: bool):
+    def allow_self_connections(self, new_value: bool) -> None:
         self.__allow_self_connections = new_value
 
     @property
@@ -342,6 +345,6 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         if self.generate_on_machine(synapse_info):
             utility_calls.check_rng(self.__rng, "FixedNumberPostConnector")

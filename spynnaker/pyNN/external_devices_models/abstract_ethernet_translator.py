@@ -25,7 +25,8 @@ class AbstractEthernetTranslator(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def translate_control_packet(self, multicast_packet: MultiCastCommand):
+    def translate_control_packet(
+            self, multicast_packet: MultiCastCommand) -> None:
         """
         Translate a multicast packet received over Ethernet and send
         appropriate messages to the external device.

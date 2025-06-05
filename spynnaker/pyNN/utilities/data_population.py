@@ -14,7 +14,7 @@
 from __future__ import annotations
 import logging
 from typing import (
-    Any, cast, Dict, Iterable, Optional, overload, Sequence, Union,
+    Any, cast, Dict, Iterable, List, Optional, overload, Sequence, Union,
     TYPE_CHECKING)
 
 import numpy
@@ -28,6 +28,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.models.populations import Population
+from spynnaker.pyNN.types import ViewIndices
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 from spynnaker.pyNN.models.common.types import Names
@@ -52,7 +53,8 @@ class DataPopulation(object):
         "_indexes",
         "_size")
 
-    def __init__(self, database_file: str, label: str, indexes=None):
+    def __init__(self, database_file: str, label: str,
+                 indexes: ViewIndices = None):
         self.__label = label
         self.__database_file = database_file
         # getting size right away also check the inputs or fails fast
@@ -154,13 +156,13 @@ class DataPopulation(object):
 
     @overload
     def id_to_index(
-            self, id: Iterable[int]) -> Sequence[int]:  # @ReservedAssignment
+            self, id: Iterable[int]) -> List[int]:  # @ReservedAssignment
         # pylint: disable=redefined-builtin
         ...
 
     @overrides(Population.id_to_index)
     def id_to_index(self, id: Union[int, Iterable[int]]
-                    ) -> Union[int, Sequence[int]]:  # @ReservedAssignment
+                    ) -> Union[int, List[int]]:  # @ReservedAssignment
         # pylint: disable=missing-function-docstring,redefined-builtin
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
@@ -180,12 +182,12 @@ class DataPopulation(object):
         ...
 
     @overload
-    def index_to_id(self, index: Iterable[int]) -> Sequence[int]:
+    def index_to_id(self, index: Iterable[int]) -> List[int]:
         ...
 
     @overrides(Population.index_to_id)
     def index_to_id(self, index: Union[int, Iterable[int]]
-                    ) -> Union[int, Sequence[int]]:
+                    ) -> Union[int, List[int]]:
         # pylint: disable=missing-function-docstring
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:

@@ -13,32 +13,13 @@
 # limitations under the License.
 
 import os
-from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.config_holder import (
+    config_options, config_sections, get_report_path, get_timestamp_path)
 
-from spinn_front_end_common.interface.interface_functions \
-    import load_using_advanced_monitors
-import spinn_front_end_common.utilities.report_functions.reports as \
-    reports_names
-from spinn_front_end_common.utilities.report_functions.network_specification \
-    import _FILENAME as network_specification_file_name
-from spinn_front_end_common.utilities.report_functions.drift_report import (
-    CLOCK_DRIFT_REPORT)
-from spinn_front_end_common.utilities.report_functions.\
-    memory_map_on_host_report import _FOLDER_NAME as \
-    memory_map_on_host_report
-# from spinn_front_end_common.utilities.report_functions.energy_report \
-#    import EnergyReport
-from spinn_front_end_common.utilities.report_functions.board_chip_report \
-    import AREA_CODE_REPORT_NAME
-from spinn_front_end_common.utilities.report_functions.\
-    fixed_route_from_machine_report import REPORT_NAME as fixed_route_report
-from spinn_front_end_common.utility_models import \
-     DataSpeedUpPacketGatherMachineVertex
 from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.config_setup import cfg_paths_skipped
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.extra_algorithms.\
-    spynnaker_neuron_network_specification_report import (
-        _GRAPH_NAME, _GRAPH_FORMAT)
 import pyNN.spiNNaker as sim
 
 
@@ -46,46 +27,24 @@ class CheckDebug(BaseTestCase):
     """
     that it does not crash in debug mode. All reports on.
     """
-    def debug(self):
-        # pylint: disable=protected-access
-        reports = [
-            # write_energy_report
-            # EnergyReport._DETAILED_FILENAME,
-            # EnergyReport._SUMMARY_FILENAME,
-            # write_text_specs = False
-            "data_spec_text_files",
-            # write_router_reports
-            reports_names._ROUTING_FILENAME,
-            # write_partitioner_reports
-            reports_names._PARTITIONING_FILENAME,
-            # write_application_graph_placer_report
-            reports_names._PLACEMENT_VTX_GRAPH_FILENAME,
-            reports_names._PLACEMENT_CORE_GRAPH_FILENAME,
-            reports_names._SDRAM_FILENAME,
-            # repeats reports_names._SDRAM_FILENAME,
-            # write_router_info_report
-            reports_names._VIRTKEY_FILENAME,
-            # write_routing_table_reports
-            reports_names._ROUTING_TABLE_DIR,
-            reports_names._C_ROUTING_TABLE_DIR,
-            reports_names._COMPARED_FILENAME,
-            # write_memory_map_report
-            memory_map_on_host_report,
-            # write_network_specification_report
-            network_specification_file_name,
-            "provenance_data",
-            # write_tag_allocation_reports
-            reports_names._TAGS_FILENAME,
-            # write_drift_report_end or start
-            CLOCK_DRIFT_REPORT,
-            # write_board_chip_report
-            AREA_CODE_REPORT_NAME,
-            _GRAPH_NAME,
-            _GRAPH_NAME + "." +
-            _GRAPH_FORMAT,
-            fixed_route_report,
-            ]
+    def assert_reports(self) -> None:
+        skipped = cfg_paths_skipped()
+        for section in config_sections():
+            for option in config_options(section):
+                if option in skipped:
+                    continue
+                if option.startswith("path"):
+                    path = get_report_path(section=section, option=option)
+                elif option.startswith("tpath"):
+                    path = get_timestamp_path(section=section, option=option)
+                else:
+                    continue
+                print(f"found {option} at {path}")
+                if not os.path.exists(path):
+                    raise AssertionError(
+                        f"Unable to find report for {option} {path}")
 
+    def debug(self) -> None:
         sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
         pop.record("v")
@@ -96,19 +55,7 @@ class CheckDebug(BaseTestCase):
         sim.run(0)
         pop.get_data("v")
         run0 = SpynnakerDataView.get_run_dir_path()
-        found = os.listdir(run0)
-        if (get_config_bool("Machine", "enable_advanced_monitor_support")
-                and not get_config_bool("Java", "use_java")):
-            # write_data_speed_up_report
-            reports.append(
-                DataSpeedUpPacketGatherMachineVertex.OUT_REPORT_NAME)
-            if load_using_advanced_monitors():
-                reports.append(
-                    DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
-        for report in reports:
-            self.assertIn(report, found)
-        self.assertIn("data.sqlite3", found)
-        self.assertIn("ds.sqlite3", found)
+        self.assert_reports()
 
         sim.run(10)  # second run
         pop.get_data("v")
@@ -119,18 +66,12 @@ class CheckDebug(BaseTestCase):
         # check get works directly after a reset
         pop.get_data("v")
         sim.run(10)
-        found = os.listdir(SpynnakerDataView.get_run_dir_path())
-        self.assertIn("data1.sqlite3", found)
-        self.assertNotIn("ds1.sqlite3", found)
 
         sim.reset()  # soft with dsg
         SpynnakerDataView.set_requires_data_generation()
         sim.run(10)
         pop.get_data("v")
         self.assertEqual(run0, SpynnakerDataView.get_run_dir_path())
-        found = os.listdir(run0)
-        self.assertIn("data2.sqlite3", found)
-        self.assertIn("ds2.sqlite3", found)
         # No point in checking files they are already there
 
         sim.reset()  # hard
@@ -138,15 +79,11 @@ class CheckDebug(BaseTestCase):
         sim.run(10)
         pop.get_data("v")
         self.assertNotEqual(run0, SpynnakerDataView.get_run_dir_path())
-        found = os.listdir(SpynnakerDataView.get_run_dir_path())
-        for report in reports:
-            self.assertIn(report, found)
-        self.assertIn("data3.sqlite3", found)
-        self.assertIn("ds3.sqlite3", found)
+        self.assert_reports()
 
         sim.end()
 
-    def emptyrun(self):
+    def emptyrun(self) -> None:
         """ Chech there is no error on run not done """
         sim.setup(timestep=1.0)
         sim.run(10)

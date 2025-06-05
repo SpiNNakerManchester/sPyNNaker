@@ -16,7 +16,7 @@
 Types (and related) that are useful for implementing connectors.
 """
 
-from typing import Iterable, Optional, Union
+from typing import Iterable, Optional, Sequence, List, Union
 
 import numpy
 from numpy.typing import NDArray
@@ -28,18 +28,26 @@ from pyNN.random import RandomDistribution
 #: The type of weights and delays provided by Synapse / SynapseInformation
 # Combined types (where value could be either)
 Weight_Delay_Types: TypeAlias = Optional[Union[
-    int, float, str, RandomDistribution, NDArray[numpy.float64]]]
+    float, str, RandomDistribution, NDArray[numpy.float64]]]
 Weight_Types: TypeAlias = Optional[Union[
-    int, float, str, RandomDistribution, NDArray[numpy.float64]]]
+    float, str, RandomDistribution, NDArray[numpy.float64]]]
 Delay_Types: TypeAlias = \
     Union[float, str, RandomDistribution, NDArray[numpy.float64]]
 # These are the Types we know are coming in.
 # Most things that can be considered floats (including int)  will work
 Weight_Delay_In_Types: TypeAlias = Optional[Union[
-    int, float, str, RandomDistribution, Iterable[int], Iterable[float]]]
+    float, str, RandomDistribution, Iterable[float], NDArray[numpy.float64]]]
 
 IoDest: TypeAlias = Union[
     str, neo.baseio.BaseIO, None]  # pylint: disable=no-member
+
+ViewIndices = Union[None, Sequence[int], NDArray[numpy.integer]]
+#: :meta private:
+Selector: TypeAlias = Union[
+    None, int, slice, Sequence[int], List[bool], NDArray[numpy.bool_],
+    NDArray[numpy.integer]]
+
+WeightScales: TypeAlias = Union[NDArray[numpy.floating], Sequence[float]]
 
 
 def is_scalar(value: Weight_Delay_Types) -> TypeGuard[Union[int, float]]:

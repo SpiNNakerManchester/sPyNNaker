@@ -84,7 +84,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     def __init__(self, conn_list: Union[None, NDArray, List[Tuple[int, ...]]],
                  column_names: Optional[Sequence[str]] = None, *,
-                 safe=True, verbose=False, callback=None):
+                 safe: bool = True, verbose: bool = False,
+                 callback: None = None):
         """
         :param conn_list:
             A numpy array or a list of tuples, one tuple for each connection.
@@ -163,7 +164,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         else:
             return numpy.var(self.__delays)
 
-    def __id_to_m_vertex_index(self, n_atoms: int, slices: Sequence[Slice]):
+    def __id_to_m_vertex_index(
+            self, n_atoms: int, slices: Sequence[Slice]) -> NDArray[integer]:
         """ Produce an array that maps from a vertex atom id to the
             machine vertex index of the target
         """
@@ -174,7 +176,10 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     def _split_connections(
             self, n_pre_atoms: int, n_post_atoms: int,
-            post_slices: Sequence[Slice]):
+            post_slices: Sequence[Slice]) -> \
+            Tuple[NDArray[integer], NDArray[integer],
+                  Optional[NDArray[floating]],
+                  Optional[NDArray[floating]]]:
         """
         :param list(~pacman.model.graphs.common.Slice) post_slices:
         """
@@ -364,7 +369,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         block["synapse_type"] = synapse_type
         return block
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"FromListConnector(n_connections={len(self.__sources)})"
 
     @property
@@ -378,7 +383,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     @conn_list.setter
     def conn_list(self, conn_list: Union[
-            None, NDArray, List[Tuple[int, ...]]]):
+            None, NDArray, List[Tuple[int, ...]]]) -> None:
         if conn_list is None or len(conn_list) == 0:
             self.__conn_list = numpy.zeros((0, 2), dtype=uint32)
         else:
@@ -477,7 +482,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         return self.__column_names
 
     @column_names.setter
-    def column_names(self, column_names: Optional[Sequence[str]]):
+    def column_names(self, column_names: Optional[Sequence[str]]) -> None:
         self.__column_names = column_names
 
     def get_extra_parameters(self) -> Optional[NDArray]:
@@ -552,7 +557,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         ]
 
     def _apply_parameters_to_synapse_type(
-            self, synapse_type: AbstractSynapseDynamics):
+            self, synapse_type: AbstractSynapseDynamics) -> None:
         """
         :param AbstractStaticSynapseDynamics synapse_type:
         """
@@ -563,7 +568,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         out_of_range_targets = self.__targets >= synapse_info.n_post_neurons
         if any(out_of_range_targets):
             logger.warning(

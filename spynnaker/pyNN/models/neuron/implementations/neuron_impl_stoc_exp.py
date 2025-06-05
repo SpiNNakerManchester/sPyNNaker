@@ -47,7 +47,7 @@ class NeuronImplStocExp(AbstractNeuronImpl):
     """
 
     def __init__(self, tau: ModelParameter, bias: ModelParameter,
-                 refract_init: ModelParameter, seed: int):
+                 refract_init: ModelParameter, seed: Optional[int]):
 
         self._tau = tau
         self._bias = bias
@@ -137,13 +137,13 @@ class NeuronImplStocExp(AbstractNeuronImpl):
         return variable in ("v", "ex_input", "in_input", "prob")
 
     @overrides(AbstractNeuronImpl.add_parameters)
-    def add_parameters(self, parameters: RangeDictionary):
+    def add_parameters(self, parameters: RangeDictionary) -> None:
         parameters[TAU] = self._tau
         parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
         parameters[BIAS] = self._bias
 
     @overrides(AbstractNeuronImpl.add_state_variables)
-    def add_state_variables(self, state_variables: RangeDictionary):
+    def add_state_variables(self, state_variables: RangeDictionary) -> None:
         state_variables[REFRACT_INIT] = self._refract_init
         state_variables[SEED0] = self._random
         state_variables[SEED1] = self._random

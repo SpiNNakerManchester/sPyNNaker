@@ -43,11 +43,12 @@ class ThresholdTypeStatic(AbstractThresholdType):
         self.__v_thresh = v_thresh
 
     @overrides(AbstractThresholdType.add_parameters)
-    def add_parameters(self, parameters: RangeDictionary[float]):
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
         parameters[V_THRESH] = self._convert(self.__v_thresh)
 
     @overrides(AbstractThresholdType.add_state_variables)
-    def add_state_variables(self, state_variables: RangeDictionary[float]):
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         pass
 
     @property

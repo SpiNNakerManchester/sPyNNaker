@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable
+
 from spynnaker.pyNN.external_devices_models import ExternalDeviceLifControl
+from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
+    PushBotEthernetDevice)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 from spynnaker.pyNN.models.defaults import default_initial_values
 
@@ -41,12 +45,15 @@ class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(
-            self, protocol, devices,
+            self, protocol: MunichIoSpiNNakerLinkProtocol,
+            devices: Iterable[PushBotEthernetDevice],
 
             # default params for the neuron model type
-            tau_m=20.0, cm=1.0, v_rest=0.0, v_reset=0.0, tau_syn_E=5.0,
-            tau_syn_I=5.0, tau_refrac=0.1, i_offset=0.0, v=0.0,
-            isyn_exc=0.0, isyn_inh=0.0):
+            tau_m: float = 20.0, cm: float = 1.0, v_rest: float = 0.0,
+            v_reset: float = 0.0, tau_syn_E: float = 5.0,
+            tau_syn_I: float = 5.0, tau_refrac: float = 0.1,
+            i_offset: float = 0.0, v: float = 0.0, isyn_exc: float = 0.0,
+            isyn_inh: float = 0.0):
         # pylint: disable=too-many-arguments
 
         command_protocol = MunichIoSpiNNakerLinkProtocol(

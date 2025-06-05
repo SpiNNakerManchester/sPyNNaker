@@ -63,7 +63,7 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     def write_parameters(
             self, spec: DataSpecificationGenerator, region: int,
             machine_vertex: PopulationMachineLocalOnlyCombinedVertex,
-            weight_scales: NDArray[floating]):
+            weight_scales: NDArray[floating]) -> None:
         """
         Write the parameters to the data specification for a vertex.
 
@@ -95,3 +95,8 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     @overrides(AbstractSynapseDynamics.is_combined_core_capable)
     def is_combined_core_capable(self) -> bool:
         return True
+
+    @property
+    @overrides(AbstractSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return False

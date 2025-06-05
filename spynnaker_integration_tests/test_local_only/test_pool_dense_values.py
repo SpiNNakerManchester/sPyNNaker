@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List
 import numpy
 import pyNN.spiNNaker as sim
 from pyNN.space import Grid2D
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run():
+def do_run() -> None:
     shape = numpy.array([10, 10])
     n_input = numpy.prod(shape)
     pool_shape = numpy.array([2, 2])
@@ -29,7 +30,7 @@ def do_run():
     n_outputs = 20
     delay = 600
 
-    spike_array_times = [[] for _ in range(n_input)]
+    spike_array_times: List[List[int]] = [[] for _ in range(n_input)]
     kernel = numpy.array(
         [[[0 for _ in range(n_outputs)]
           for _ in range(shape[0] // pool_stride[0])]
@@ -86,10 +87,10 @@ def do_run():
 
 class TestPoolDense(BaseTestCase):
 
-    def check_run(self):
+    def check_run(self) -> None:
         do_run()
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.check_run)
 
 

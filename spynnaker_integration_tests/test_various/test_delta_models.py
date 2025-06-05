@@ -19,7 +19,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestDeltaModels(BaseTestCase):
 
-    def run_delta_fixed_prob(self):
+    def run_delta_fixed_prob(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(100, sim.extra_models.IFCurrDeltaFixedProb(
             i_offset=2.0, p_thresh=0.5))
@@ -34,7 +34,7 @@ class TestDeltaModels(BaseTestCase):
             self.assertTrue(len(s) > 250)
             self.assertTrue(len(s) < 750)
 
-    def run_delta_trunc(self):
+    def run_delta_trunc(self) -> None:
         sim.setup(timestep=1.0)
 
         test_spikes = sim.Population(100, sim.SpikeSourcePoisson(rate=100))
@@ -54,8 +54,8 @@ class TestDeltaModels(BaseTestCase):
             for v_m in v_n:
                 assert v_m >= 0.0
 
-    def test_delta_fixed_prob(self):
+    def test_delta_fixed_prob(self) -> None:
         self.runsafe(self.run_delta_fixed_prob)
 
-    def test_delta_trunc(self):
+    def test_delta_trunc(self) -> None:
         self.runsafe(self.run_delta_trunc)

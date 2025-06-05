@@ -21,7 +21,7 @@ from typing import (
 import numpy
 from numpy import void
 from numpy.typing import NDArray
-from typing_extensions import Literal, TypeAlias
+from typing_extensions import Literal, Never, TypeAlias
 
 from pyNN.recording.files import BaseFile
 from pyNN.space import Space as PyNNSpace
@@ -42,7 +42,7 @@ from spynnaker.pyNN.models.neural_projections import (
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FromListConnector)
 from spynnaker.pyNN.models.neuron import (
-    AbstractPopulationVertex, ConnectionHolder)
+    PopulationVertex, ConnectionHolder)
 from spynnaker.pyNN.models.populations import Population, PopulationView
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractHasParameterNames)
@@ -59,7 +59,8 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
+def _we_dont_do_this_now(*args: Any
+                         ) -> Never:  # pylint: disable=unused-argument
     # pragma: no cover
     raise NotImplementedError("sPyNNaker does not currently do this")
 
@@ -135,8 +136,7 @@ class Projection(object):
         connector.set_space(space)
 
         pre_vertex = pre_synaptic_population._vertex
-        post_vertex = cast(AbstractPopulationVertex,
-                           post_synaptic_population._vertex)
+        post_vertex = cast(PopulationVertex, post_synaptic_population._vertex)
 
         if not isinstance(post_vertex, AbstractAcceptsIncomingSynapses):
             raise ConfigurationException(
@@ -210,7 +210,7 @@ class Projection(object):
 
         # If the target is a population, add to the list of incoming
         # projections
-        if isinstance(post_vertex, AbstractPopulationVertex):
+        if isinstance(post_vertex, PopulationVertex):
             post_vertex.add_incoming_projection(self)
 
         # If the source is a poisson, add to the list of outgoing projections
@@ -242,7 +242,7 @@ class Projection(object):
     def get(self, attribute_names: Union[str, Sequence[str]],
             format: str,  # @ReservedAssignment
             gather: Literal[True] = True, with_address: bool = True,
-            multiple_synapses: Literal['last'] = 'last'):
+            multiple_synapses: Literal['last'] = 'last') -> ConnectionHolder:
         """
         Get a parameter/attribute of the projection.
 
@@ -276,7 +276,7 @@ class Projection(object):
             self, attribute_names: Union[str, Sequence[str]],
             file: Union[str, BaseFile],
             format: str = 'list',  # @ReservedAssignment
-            gather: Literal[True] = True, with_address: bool = True):
+            gather: Literal[True] = True, with_address: bool = True) -> None:
         """
         Print synaptic attributes (weights, delays, etc.) to file. In the
         array format, zeros are printed for non-existent connections.
@@ -322,7 +322,8 @@ class Projection(object):
             self, attribute_names: List[str],
             format: str,  # @ReservedAssignment
             with_address: bool,
-            notify: Optional[Callable[[ConnectionHolder], None]]):
+            notify: Optional[Callable[[ConnectionHolder], None]]
+            ) -> ConnectionHolder:
         """
         Internal data getter to add notify option.
 
@@ -366,8 +367,9 @@ class Projection(object):
             format == "list", data_items, fixed_values, notify=notify)
 
     @staticmethod
-    def __save_callback(save_file: Union[str, BaseFile],
-                        metadata: Dict[str, Any], data: ConnectionHolder):
+    def __save_callback(
+            save_file: Union[str, BaseFile],
+            metadata: Dict[str, Any], data: ConnectionHolder) -> None:
         """
         :param save_file:
         :type save_file: str or pyNN.recording.files.BaseFile
@@ -420,7 +422,7 @@ class Projection(object):
         """
         return self.__label
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"projection {self.__label}"
 
     # -----------------------------------------------------------------
@@ -475,7 +477,8 @@ class Projection(object):
     def _get_synaptic_data(
             self, as_list: bool, data_to_get: List[str],
             fixed_values: List[Tuple[str, int]],
-            notify: Optional[Callable[[ConnectionHolder], None]]):
+            notify: Optional[Callable[[ConnectionHolder], None]]
+            ) -> ConnectionHolder:
         """
         :param bool as_list:
         :param list(str) data_to_get:
@@ -524,7 +527,7 @@ class Projection(object):
 
     # -----------------------------------------------------------------
 
-    def set(self, **attributes):  # @UnusedVariable
+    def set(self, **attributes: Any) -> Never:  # @UnusedVariable
         # pylint: disable=unused-argument
         """
         .. warning::
@@ -532,7 +535,7 @@ class Projection(object):
         """
         _we_dont_do_this_now()
 
-    def size(self, gather=True):  # @UnusedVariable
+    def size(self, gather: bool = True) -> Never:  # @UnusedVariable
         # pylint: disable=unused-argument
         """
         Return the total number of connections.
@@ -548,7 +551,7 @@ class Projection(object):
         # TODO
         _we_dont_do_this_now()
 
-    def set_download_synapses(self, download_synapses):
+    def set_download_synapses(self, download_synapses: bool) -> None:
         """
         Set whether synapses should be downloaded when the simulation pauses.
 

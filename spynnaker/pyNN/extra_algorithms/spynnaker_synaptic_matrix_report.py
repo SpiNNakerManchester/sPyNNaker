@@ -11,12 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import sys
 from contextlib import contextmanager
 import logging
 import os
-from typing import Dict, Tuple
-
+from typing import Dict, Iterator, Tuple
 import numpy
 
 from spinn_utilities.log import FormatAdapter
@@ -32,12 +31,12 @@ _DIRNAME = "synaptic_matrix_reports"
 
 
 @contextmanager
-def _print_all():
+def _print_all() -> Iterator[None]:
     """
     Update the numpy print options to display everything.
     """
     print_opts = numpy.get_printoptions()
-    numpy.set_printoptions(threshold=numpy.nan)
+    numpy.set_printoptions(threshold=sys.maxsize)
     try:
         yield
     finally:
@@ -50,7 +49,8 @@ class SpYNNakerSynapticMatrixReport(object):
     """
 
     def __call__(self, connection_holder: Dict[Tuple[
-            ProjectionApplicationEdge, SynapseInformation], ConnectionHolder]):
+            ProjectionApplicationEdge, SynapseInformation], ConnectionHolder]
+                 ) -> None:
         """
         Convert synaptic matrix for every application edge.
 
@@ -85,7 +85,7 @@ class SpYNNakerSynapticMatrixReport(object):
             self, file_name: str, connection_holder:  Dict[Tuple[
                 ProjectionApplicationEdge, SynapseInformation],
                 ConnectionHolder],
-            edge: ProjectionApplicationEdge):
+            edge: ProjectionApplicationEdge) -> None:
         # open writer
         try:
             with open(file_name, "w", encoding="utf-8") as f:

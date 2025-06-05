@@ -15,7 +15,7 @@ from __future__ import annotations
 from collections import defaultdict
 import sys
 from typing import (
-    Any, Dict, Optional, Sequence, Tuple, TYPE_CHECKING)
+    Any, cast, Dict, Optional, Sequence, Tuple, TYPE_CHECKING, Union)
 import numpy
 from pyNN import descriptions
 from spinn_utilities.classproperty import classproperty
@@ -23,6 +23,7 @@ from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod)
 from spynnaker.pyNN.models.defaults import AbstractProvidesDefaults
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.data import SpynnakerDataView
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.population_application_vertex import (
         PopulationApplicationVertex)
@@ -34,12 +35,33 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     """
 
     __slots__ = ()
+
+    # The maximum number of atoms per core for PyNN models
     _max_atoms_per_core: Dict[type, Optional[Tuple[int, ...]]] = defaultdict(
         lambda: None)
 
     @classmethod
+    def verify_may_set(cls, param: str) -> None:
+        """ If a Population has been created, this method will raise an
+            exception; used to avoid setting global limits after a Population
+            has been created.
+
+        :param str param:
+            The parameter name that can be used to set the value being changed
+            in the Population constructor instead.
+        """
+        SpynnakerDataView.check_user_can_act()
+        if SpynnakerDataView.get_n_populations() == 0:
+            return
+        raise SpynnakerException(
+            "Global set is not supported after a Population has been "
+            "created. Either move it above the creation of all Populations "
+            f"or provide {param} during the creation of each Population it "
+            "applies to.")
+
+    @classmethod
     def set_model_max_atoms_per_dimension_per_core(
-            cls, n_atoms: Optional[Tuple[int, ...]] = None):
+            cls, n_atoms: Union[None, int, Tuple[int, ...]] = None) -> None:
         """
         Set the default maximum number of atoms per dimension per core for
         this model.  This can be overridden by the individual Population.
@@ -52,29 +74,46 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         set the maximum on each Population.
 
         :param n_atoms: The new maximum, or `None` for the largest possible
-        :type n_atoms: int or tuple or None
         """
+        cls.verify_may_set(param="neurons_per_core")
         abs_max = cls.absolute_max_atoms_per_core
-        if n_atoms is not None and numpy.prod(n_atoms) > abs_max:
-            raise SpynnakerException(
-                "The absolute maximum neurons per core for this model is"
-                f" {abs_max}")
-        AbstractPyNNModel._max_atoms_per_core[cls] = n_atoms
+        if n_atoms is None:
+            AbstractPyNNModel._max_atoms_per_core[cls] = None
+        elif numpy.isscalar(n_atoms):
+            if n_atoms > abs_max:
+                raise SpynnakerException(
+                    "The absolute maximum neurons per core for this"
+                    f" model is {abs_max}")
+            max_atoms_int: int = int(cast(int, n_atoms))
+            AbstractPyNNModel._max_atoms_per_core[cls] = (max_atoms_int, )
+        else:
+            if numpy.prod(n_atoms) > abs_max:
+                raise SpynnakerException(
+                    "The absolute maximum sum of neurons per core for this"
+                    f" model is {abs_max}")
+            max_atoms_tuple: Tuple[int, ...] = cast(
+                Tuple[int, ...],  n_atoms)
+            AbstractPyNNModel._max_atoms_per_core[cls] = max_atoms_tuple
 
     @classmethod
     def get_model_max_atoms_per_dimension_per_core(cls) -> Tuple[int, ...]:
         """
         Get the maximum number of atoms per dimension per core for this model.
-
-        :rtype: int or tuple or None
         """
         # If there is a stored value, use it
         max_stored = AbstractPyNNModel._max_atoms_per_core.get(cls)
         if max_stored is not None:
             return max_stored
 
-        # Otherwise return the absolute maximum
-        return cls.absolute_max_atoms_per_core
+        # Otherwise return the absolute maximum assuming 1D
+        return (cls.absolute_max_atoms_per_core, )
+
+    @classmethod
+    def reset_all(cls) -> None:
+        """
+        Reset the maximum values for all classes.
+        """
+        AbstractPyNNModel._max_atoms_per_core.clear()
 
     @classproperty
     def absolute_max_atoms_per_core(  # pylint: disable=no-self-argument
@@ -142,7 +181,8 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         """
         return self.__class__.__name__
 
-    def describe(self, template='modeltype_default.txt', engine='default'):
+    def describe(self, template: Optional[str] = 'modeltype_default.txt',
+                 engine: str = 'default') -> str:
         """
         Returns a human-readable description of the population.
 

@@ -18,11 +18,13 @@
 Synfirechain-like example
 """
 import numpy
+from numpy.typing import NDArray
 import pyNN.spiNNaker as p
 from spinnaker_testbase.root_test_case import RootTestCase
 
 
-def do_synfire_npop(nNeurons, n_pops, neurons_per_core, runtime=25000):
+def do_synfire_npop(nNeurons: int, n_pops: int, neurons_per_core: int,
+                    runtime: int = 25000) -> NDArray[numpy.floating]:
     """
     Runs the script Does the run based on the parameters
 

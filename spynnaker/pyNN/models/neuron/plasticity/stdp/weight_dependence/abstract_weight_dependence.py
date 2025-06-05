@@ -62,7 +62,8 @@ class AbstractWeightDependence(
     @abstractmethod
     def write_parameters(
             self, spec: DataSpecificationBase, global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating], n_weight_terms: int):
+            synapse_weight_scales: NDArray[floating],
+            n_weight_terms: int) -> None:
         """
         Write the parameters of the rule to the spec.
 

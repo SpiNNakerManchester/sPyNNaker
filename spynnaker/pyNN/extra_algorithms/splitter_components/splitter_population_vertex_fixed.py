@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from collections import defaultdict
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple, cast
+from typing import Dict, Iterable, List, Sequence, Tuple, cast
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -20,6 +20,7 @@ from numpy.typing import NDArray
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 
+from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
@@ -48,28 +49,17 @@ from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.population_machine_common import (
     PopulationMachineCommon)
 
-from .splitter_abstract_pop_vertex import SplitterAbstractPopulationVertex
-from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
-
-# The maximum number of bits for the ring buffer index that are likely to
-# fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
-MAX_RING_BUFFER_BITS = 14
+from .splitter_population_vertex import SplitterPopulationVertex
 
 
-class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
+class SplitterPopulationVertexFixed(SplitterPopulationVertex):
     """
-    Handles the splitting of the :py:class:`AbstractPopulationVertex`
+    Handles the splitting of the :py:class:`PopulationVertex`
     using fixed slices.
     """
 
-    __slots__ = ("__expect_delay_extension", )
-
-    def __init__(self) -> None:
-        super().__init__(None)
-        self.__expect_delay_extension: Optional[bool] = None
-
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, chip_counter: ChipCounter):
+    def create_machine_vertices(self, chip_counter: ChipCounter) -> None:
         app_vertex = self.governed_app_vertex
         app_vertex.synapse_recorder.add_region_offset(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
@@ -122,7 +112,7 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
     def get_source_specific_in_coming_vertices(
             self, source_vertex: ApplicationVertex,
             partition_id: str) -> List[
-                Tuple[MachineVertex, Sequence[MachineVertex]]]:
+                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
         # Determine the real pre-vertex
         pre_vertex = source_vertex
         if isinstance(source_vertex, DelayExtensionVertex):
@@ -132,7 +122,7 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
 
         # Use the real pre-vertex to get the projections
         targets: Dict[MachineVertex, OrderedSet[
-            MachineVertex]] = defaultdict(OrderedSet)
+            AbstractVertex]] = defaultdict(OrderedSet)
         for proj in self.governed_app_vertex.get_incoming_projections_from(
                 pre_vertex):
             # pylint: disable=protected-access
@@ -306,25 +296,3 @@ class SplitterAbstractPopulationVertexFixed(SplitterAbstractPopulationVertex):
                        get_sdram_for_bit_field_region(
                            self.governed_app_vertex.incoming_projections))
         return sdram
-
-    @overrides(SplitterAbstractPopulationVertex.
-               reset_called)  # type: ignore[has-type]
-    def reset_called(self) -> None:
-        super().reset_called()
-        self.__expect_delay_extension = None
-
-    @overrides(SplitterAbstractPopulationVertex._update_max_delay)
-    def _update_max_delay(self) -> None:
-        # Find the maximum delay from incoming synapses
-        self._max_delay, self.__expect_delay_extension = \
-            self.governed_app_vertex.get_max_delay(MAX_RING_BUFFER_BITS)
-
-    @overrides(AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex)
-    def accepts_edges_from_delay_vertex(self) -> bool:
-        if self.__expect_delay_extension is None:
-            self._update_max_delay()
-        if self.__expect_delay_extension:
-            return True
-        raise NotImplementedError(
-            "This call was unexpected as it was calculated that "
-            "the max needed delay was less that the max possible")

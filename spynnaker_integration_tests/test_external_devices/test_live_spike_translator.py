@@ -11,13 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from typing import Callable, List, Tuple
 import pyNN.spiNNaker as p
 
 from spinnman.connections import ConnectionListener
 from spinnman.messages.eieio import read_eieio_data_message
+from spinnman.messages.eieio.data_messages import KeyPayloadDataElement
 from spinnman.connections.udp_packet_connections import SCAMPConnection
 from spinnman.utilities.utility_functions import reprogram_tag
-from spinn_front_end_common.utilities.database import DatabaseConnection
+from spinn_front_end_common.utilities.database import (
+    DatabaseConnection, DatabaseReader)
 from spinnman.messages.eieio.eieio_prefix import EIEIOPrefix
 from spinnaker_testbase.base_test_case import BaseTestCase
 import unittest
@@ -25,7 +29,9 @@ import unittest
 
 class UDPSCAMPConnection(SCAMPConnection):
 
-    def get_receive_method(self):
+    # hacked method which does not act like super
+    def get_receive_method(  # type: ignore[override]
+            self) -> Callable[[], bytes]:
         return self.receive
 
 
@@ -33,16 +39,17 @@ class TestLiveGatherTranslator(BaseTestCase):
 
     PREFIX = 0x1234
 
-    def recv(self, data):
+    def recv(self, data: bytes) -> None:
         message = read_eieio_data_message(data, 0)
         while message.is_next_element:
             element = message.next_element
+            assert isinstance(element, KeyPayloadDataElement)
             time = element.payload
             key = element.key
             self.stored_data.append((key, time))
             print(f"Received key {hex(key)} at time {time}")
 
-    def database_callback(self, db_reader):
+    def database_callback(self, db_reader: DatabaseReader) -> None:
         ip_addr = db_reader.get_ip_address(0, 0)
         self.conn = UDPSCAMPConnection(remote_host=ip_addr)
         print(f"Listening on port {self.conn.local_port}")
@@ -51,8 +58,8 @@ class TestLiveGatherTranslator(BaseTestCase):
         reprogram_tag(self.conn, tag=1, strip=True)
         self.listener.start()
 
-    def live_spike_receive_translated(self):
-        self.stored_data = list()
+    def live_spike_receive_translated(self) -> None:
+        self.stored_data: List[Tuple[int, int]] = list()
 
         db_conn = DatabaseConnection(local_port=None)
         db_conn.add_database_callback(self.database_callback)
@@ -79,7 +86,7 @@ class TestLiveGatherTranslator(BaseTestCase):
             self.assertEqual(key >> 16, self.PREFIX)
             self.assertEqual(1000 + ((key & 0xFFFF) * 10), time)
 
-    def test_live_spike_receive_translated(self):
+    def test_live_spike_receive_translated(self) -> None:
         self.runsafe(self.live_spike_receive_translated)
 
 

@@ -13,9 +13,10 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-import os
 from typing import Dict, Set, Tuple, Type, TypeVar, TYPE_CHECKING
-from spinn_utilities.config_holder import get_config_str_or_none
+
+from spinn_utilities.config_holder import (
+    get_config_str_or_none, get_report_path)
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import ApplicationVertex
@@ -30,7 +31,6 @@ _RE = TypeVar("_RE", bound=RuntimeError)
 
 CUTOFF = 100
 _GRAPH_TITLE = "The graph of the network in graphical form"
-_GRAPH_NAME = "network_graph.gv"
 _GRAPH_FORMAT = "png"
 
 
@@ -82,15 +82,15 @@ def spynnaker_neuron_graph_network_specification_report() -> None:
     _generate_edges(dot_diagram, vertex_ids, progress)
 
     # write dot file and generate PDF
-    file_to_output = os.path.join(
-        SpynnakerDataView.get_run_dir_path(), _GRAPH_NAME)
-    progress.end()
+    file_to_output = get_report_path("path_network_graph")
 
     logger.info(f"rendering dot diagram {file_to_output}")
     try:
         dot_diagram.render(file_to_output, view=False, format=graph_format)
     except exe_not_found_exn:
         logger.exception("could not render diagram in {}", file_to_output)
+    finally:
+        progress.end()
 
 
 def _generate_vertices(
@@ -115,7 +115,7 @@ def _generate_vertices(
 
 def _generate_edges(
         dot_diagram: gv.Digraph, vertex_ids: Dict[ApplicationVertex, str],
-        progress: ProgressBar):
+        progress: ProgressBar) -> None:
     """
     :param ~graphviz.Digraph dot_diagram:
     :param dict(~.ApplicationVertex,str) vertex_ids:

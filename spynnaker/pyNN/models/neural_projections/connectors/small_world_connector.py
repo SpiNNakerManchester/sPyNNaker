@@ -55,7 +55,7 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             allow_self_connections: bool = True,
             n_connections: Optional[int] = None,
             rng: Optional[NumpyRNG] = None,
-            safe=True, callback=None, verbose=False):
+            safe: bool = True, callback: None = None, verbose: bool = False):
         """
         :param float degree:
             the region length where nodes will be connected locally
@@ -99,11 +99,12 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                 " SmallWorldConnector on this platform")
 
     @overrides(AbstractConnector.set_projection_information)
-    def set_projection_information(self, synapse_info: SynapseInformation):
+    def set_projection_information(
+            self, synapse_info: SynapseInformation) -> None:
         super().set_projection_information(synapse_info)
         self._set_n_connections(synapse_info)
 
-    def _set_n_connections(self, synapse_info: SynapseInformation):
+    def _set_n_connections(self, synapse_info: SynapseInformation) -> None:
         """
         :param SynapseInformation synapse_info:
         """
@@ -209,6 +210,6 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
         return block
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return ("SmallWorldConnector"
                 f"(degree={self.__degree}, rewiring={self.__rewiring})")

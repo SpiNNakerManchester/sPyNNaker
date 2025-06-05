@@ -173,7 +173,7 @@ class SynapseDynamicsWeightChangable(
     def write_parameters(
             self, spec: DataSpecificationBase, region: int,
             global_weight_scale: float,
-            synapse_weight_scales: NDArray[floating]):
+            synapse_weight_scales: NDArray[floating]) -> None:
         spec.comment("Writing Plastic Parameters")
 
         # Switch focus to the region:
@@ -367,6 +367,11 @@ class SynapseDynamicsWeightChangable(
         return True
 
     @property
+    @overrides(AbstractPlasticSynapseDynamics.is_split_core_capable)
+    def is_split_core_capable(self) -> bool:
+        return True
+
+    @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
     def pad_to_length(self) -> Optional[int]:
         return None
@@ -374,7 +379,7 @@ class SynapseDynamicsWeightChangable(
     @overrides(AbstractPlasticSynapseDynamics.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,
-            synapse_info: SynapseInformation):
+            synapse_info: SynapseInformation) -> None:
         AbstractPlasticSynapseDynamics.validate_connection(
             self, application_edge, synapse_info)
         if not isinstance(synapse_info.connector,
@@ -386,3 +391,11 @@ class SynapseDynamicsWeightChangable(
             raise SynapticConfigurationException(
                 "WeightChangable only works with on-machine generated "
                 "connectors at present")
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.synapses_per_second)
+    def synapses_per_second(self) -> int:
+        # From Synapse-Centric Mapping of Cortical Models to the SpiNNaker
+        # Neuromorphic Architecture; but adapted since this does very little
+        # in terms of execution compared to STDP, but a bit more than static
+        return 10000000

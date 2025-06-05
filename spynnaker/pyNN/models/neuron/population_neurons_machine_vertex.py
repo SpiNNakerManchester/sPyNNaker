@@ -43,7 +43,7 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
-from .abstract_population_vertex import AbstractPopulationVertex
+from .population_vertex import PopulationVertex
 
 # Size of SDRAM params = 1 word for address + 1 word for size
 # + 1 word for n_neurons + 1 word for n_synapse_types
@@ -121,7 +121,7 @@ class PopulationNeuronsMachineVertex(
 
     def __init__(
             self, sdram: AbstractSDRAM, label: str,
-            app_vertex: AbstractPopulationVertex, vertex_slice: Slice,
+            app_vertex: PopulationVertex, vertex_slice: Slice,
             slice_index: int, ring_buffer_shifts: Sequence[int],
             weight_scales: NDArray[floating],
             neuron_data: NeuronData, max_atoms_per_core: int):
@@ -129,7 +129,7 @@ class PopulationNeuronsMachineVertex(
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The SDRAM used by the vertex
         :param str label: The label of the vertex
-        :param AbstractPopulationVertex app_vertex:
+        :param PopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
@@ -180,7 +180,7 @@ class PopulationNeuronsMachineVertex(
         return self.__key is not None
 
     @overrides(PopulationMachineNeurons._set_key)
-    def _set_key(self, key: int):
+    def _set_key(self, key: int) -> None:
         self.__key = key
 
     @property
@@ -199,14 +199,11 @@ class PopulationNeuronsMachineVertex(
         return self.__max_atoms_per_core
 
     def set_sdram_partition(
-            self, sdram_partition: SourceSegmentedSDRAMMachinePartition):
-        """
-        Set the SDRAM partition.  Must only be called once per instance.
+            self,
+            sdram_partition: SourceSegmentedSDRAMMachinePartition) -> None:
+        """ Sets the SDRAM Partition to receive data from.
 
-        :param sdram_partition:
-            The SDRAM partition to receive synapses from
-        :type sdram_partition:
-            ~pacman.model.graphs.machine.SourceSegmentedSDRAMMachinePartition
+        :param sdram_partition: The partition to receive data from.
         """
         if self.__sdram_partition is not None:
             raise SynapticConfigurationException(
@@ -214,12 +211,12 @@ class PopulationNeuronsMachineVertex(
         self.__sdram_partition = sdram_partition
 
     @staticmethod
-    def __get_binary_file_name(app_vertex: AbstractPopulationVertex) -> str:
+    def __get_binary_file_name(app_vertex: PopulationVertex) -> str:
         """
         Get the local binary filename for this vertex.  Static because at
         the time this is needed, the local app_vertex is not set.
 
-        :param AbstractPopulationVertex app_vertex:
+        :param PopulationVertex app_vertex:
             The associated application vertex
         :rtype: str
         """
@@ -232,7 +229,7 @@ class PopulationNeuronsMachineVertex(
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(
             self, label: str, x: int, y: int, p: int,
-            provenance_data: Sequence[int]):
+            provenance_data: Sequence[int]) -> None:
         self._parse_neuron_provenance(
             x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
 

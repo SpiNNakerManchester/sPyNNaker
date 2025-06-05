@@ -13,12 +13,14 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-from typing import (
-    Iterator, Optional, Set, Tuple, Type, Union, TYPE_CHECKING)
+from typing import Iterator, Optional, Set, Tuple, TYPE_CHECKING
+
 from spinn_utilities.log import FormatAdapter
+
 from spinn_front_end_common.data import FecDataView
+
 from spynnaker import _version
-from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.populations import Population
@@ -48,7 +50,6 @@ class _SpynnakerDataModel(object):
         # Data values cached
         "_id_counter",
         "_min_delay",
-        "_neurons_per_core_set",
         "_populations",
         "_projections")
 
@@ -68,7 +69,6 @@ class _SpynnakerDataModel(object):
         self._id_counter = 0
         self._min_delay: Optional[float] = None
         # Using a dict to verify if later could be stored here only
-        self._neurons_per_core_set: Set[Type[AbstractPyNNModel]] = set()
         self._populations: Set[Population] = set()
         self._projections: Set[Projection] = set()
 
@@ -153,7 +153,7 @@ class SpynnakerDataView(FecDataView):
         return len(cls.__spy_data._projections)
 
     @classmethod
-    def add_projection(cls, projection: Projection):
+    def add_projection(cls, projection: Projection) -> None:
         """
         Called by each projection to add itself to the list.
 
@@ -199,7 +199,7 @@ class SpynnakerDataView(FecDataView):
         return len(cls.__spy_data._populations)
 
     @classmethod
-    def add_population(cls, population: Population):
+    def add_population(cls, population: Population) -> Tuple[int, int]:
         """
         Called by each population to add itself to the list.
 
@@ -233,25 +233,6 @@ class SpynnakerDataView(FecDataView):
         cls.__spy_data._id_counter += population.size
         cls.__spy_data._populations.add(population)
         return first_id, cls.__spy_data._id_counter-1
-
-    @classmethod
-    def set_number_of_neurons_per_dimension_per_core(
-            cls, neuron_type: Type[AbstractPyNNModel],
-            max_permitted: Optional[Union[Tuple[int, ...]]]):
-        """
-        Sets a ceiling on the number of neurons of a given type that can be
-        placed on a single core for each dimension.
-
-        :param type neuron_type: neuron type
-        :param max_permitted: the number to set to in each dimension
-        :type max_permitted: tuple or None
-        """
-        cls.check_valid_simulator()
-        if not issubclass(neuron_type, AbstractPyNNModel):
-            raise TypeError(f"{neuron_type} is not an AbstractPyNNModel")
-
-        neuron_type.set_model_max_atoms_per_dimension_per_core(max_permitted)
-        cls.__spy_data._neurons_per_core_set.add(neuron_type)
 
     @classmethod
     def get_sim_name(cls) -> str:
