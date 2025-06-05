@@ -19,7 +19,6 @@ from .abstract_multicast_controllable_device import (
     AbstractMulticastControllableDevice, SendType)
 from .arbitrary_fpga_device import ArbitraryFPGADevice
 from .external_device_lif_control import ExternalDeviceLifControl
-from .external_spinnaker_link_cochlea_device import ExternalCochleaDevice
 from .external_spinnaker_link_fpga_retina_device import (
     ExternalFPGARetinaDevice)
 from .machine_munich_motor_device import MachineMunichMotorDevice
@@ -35,8 +34,7 @@ from .spif_input_device import SPIFInputDevice
 __all__ = ["AbstractEthernetController", "AbstractEthernetSensor",
            "AbstractEthernetTranslator", "ArbitraryFPGADevice",
            "AbstractMulticastControllableDevice", "ExternalDeviceLifControl",
-           "ExternalCochleaDevice", "ExternalFPGARetinaDevice",
-           "MachineMunichMotorDevice",
+           "ExternalFPGARetinaDevice", "MachineMunichMotorDevice",
            "MunichMotorDevice", "MunichRetinaDevice", "SendType",
            "ThresholdTypeMulticastDeviceControl", "SPIFRetinaDevice",
            "ICUBRetinaDevice", "SPIFOutputDevice", "SPIFInputDevice"]
