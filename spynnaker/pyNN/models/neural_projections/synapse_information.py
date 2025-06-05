@@ -20,7 +20,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector, AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractGenerateOnMachine)
-from spynnaker.pyNN.types import (Delay_Types, Weight_Types)
+from spynnaker.pyNN.types import (DELAYS, WEIGHTS)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.populations import Population, PopulationView
@@ -58,8 +58,8 @@ class SynapseInformation(object):
                  synapse_dynamics: AbstractSynapseDynamics,
                  synapse_type: int, receptor_type: str,
                  synapse_type_from_dynamics: bool,
-                 weights: Weight_Types = None,
-                 delays: Delay_Types = None,
+                 weights: WEIGHTS = None,
+                 delays: DELAYS = None,
                  download_on_pause: bool = False,
                  partition_id: Optional[str] = None):
         """
@@ -222,7 +222,7 @@ class SynapseInformation(object):
         return self.__receptor_type
 
     @property
-    def weights(self) -> Weight_Types:
+    def weights(self) -> WEIGHTS:
         """
         The synaptic weights (if any).
 
@@ -231,7 +231,7 @@ class SynapseInformation(object):
         return self.__weights
 
     @property
-    def delays(self) -> Delay_Types:
+    def delays(self) -> DELAYS:
         """
         The total synaptic delays (if any).
 

@@ -24,7 +24,7 @@ from pacman.model.graphs.common import Slice
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.interface.ds import DataType
-from spynnaker.pyNN.types import Weight_Types
+from spynnaker.pyNN.types import WEIGHTS
 
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
@@ -168,7 +168,7 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
             synapse_info)
 
     @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(self, weights: Weight_Types,
+    def get_weight_mean(self, weights: WEIGHTS,
                         synapse_info: SynapseInformation) -> float:
         if self.__weights is None:
             return AbstractConnector.get_weight_mean(
@@ -177,7 +177,7 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
             return float(numpy.mean(numpy.abs(self.__weights)))
 
     @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(self, weights: Weight_Types,
+    def get_weight_variance(self, weights: WEIGHTS,
                             synapse_info: SynapseInformation) -> float:
         if self.__weights is None:
             return AbstractConnector.get_weight_variance(
