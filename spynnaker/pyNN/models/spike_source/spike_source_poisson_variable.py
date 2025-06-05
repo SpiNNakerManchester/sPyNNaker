@@ -51,8 +51,7 @@ class SpikeSourcePoissonVariable(AbstractPyNNModel):
             cls) -> int:
         return DEFAULT_MAX_ATOMS_PER_CORE
 
-    @overrides(AbstractPyNNModel.create_vertex,
-               additional_arguments=default_population_parameters.keys())
+    @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
             self, n_neurons: int, label: str, *, seed: Optional[int] = None,
             splitter: Optional[AbstractSplitterCommon] = None
