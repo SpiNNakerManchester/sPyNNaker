@@ -16,7 +16,7 @@ from enum import Enum
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 import numpy
-from numpy import uint8, uint32, integer
+from numpy import uint8, uint32
 from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
 from typing_extensions import TypeAlias
