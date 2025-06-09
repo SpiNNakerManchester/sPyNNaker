@@ -133,7 +133,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             self, synapse_info: SynapseInformation) -> List[NDArray[integer]]:
         rng = self.__rng or NumpyRNG()
         post_neurons: List[NDArray[integer]] = \
-            [numpy.empty([0], dtype=integer)] * synapse_info.n_pre_neurons
+            [numpy.empty([0])] * synapse_info.n_pre_neurons
         # Loop over all the pre neurons
         for m in range(synapse_info.n_pre_neurons):
             if post_neurons[m] is None:

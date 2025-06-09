@@ -133,8 +133,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
     def __build_pre_neurons(self, synapse_info: SynapseInformation) -> List[
             NDArray[integer]]:
         rng = self.__rng or NumpyRNG()
-        pre_neurons = [
-            numpy.zeros([0], dtype=integer)] * synapse_info.n_post_neurons
+        pre_neurons = [numpy.zeros([0])] * synapse_info.n_post_neurons
         # Loop over all the post neurons
         for m in range(synapse_info.n_post_neurons):
             # If the pre and post populations are the same

@@ -892,7 +892,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 pop_neurons.extend(neurons)
             else:
                 indexes.append(index)
-                neurons = numpy.array([index], dtype=integer)
+                neurons = numpy.array([index])
             times, data = self.__get_matrix_data_by_region(
                 region_id, neurons, data_type)
             if signal_array is None or pop_times is None:
