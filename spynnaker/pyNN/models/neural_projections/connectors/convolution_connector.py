@@ -463,7 +463,9 @@ class ConvolutionConnector(AbstractConnector):
         kernel_shape = self.__kernel_weights.shape
         ps_x, ps_y = 1, 1
         if self.__pool_stride is not None:
-            ps_x, ps_y = self.__pool_stride
+            ps_x_n, ps_y_n = self.__pool_stride
+            ps_x = int(ps_x_n)
+            ps_y = int(ps_y_n)
 
         # Do a new list for remaining connector details as uint16s
         pos_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
