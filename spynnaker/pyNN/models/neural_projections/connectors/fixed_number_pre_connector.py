@@ -246,7 +246,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         post_vertex_array = numpy.arange(lo, hi + 1)
         for n in range(lo, hi + 1):
             for pn in pre_neurons[n]:
-                pre_neurons_in_slice.append(int(pn))
+                pre_neurons_in_slice.append(pn)
                 post_neurons_in_slice.append(post_vertex_array[n - lo])
 
         block["source"] = pre_neurons_in_slice
