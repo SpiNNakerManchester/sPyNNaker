@@ -24,7 +24,7 @@ from typing import (
     TYPE_CHECKING, Union)
 
 import numpy
-from numpy import floating, integer, uint8, uint32
+from numpy import float64, floating, integer, uint8, uint32
 from numpy.typing import NDArray
 import quantities
 import neo  # type: ignore[import]
@@ -892,7 +892,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 pop_neurons.extend(neurons)
             else:
                 indexes.append(index)
-                neurons = numpy.array([index], dtype=integer)
+                neurons = numpy.array([index], dtype=uint32)
             times, data = self.__get_matrix_data_by_region(
                 region_id, neurons, data_type)
             if signal_array is None or pop_times is None:
@@ -904,7 +904,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             else:
                 raise NotImplementedError("times differ")
         if signal_array is None:
-            signal_array = numpy.zeros((0,), dtype=floating)
+            signal_array = numpy.zeros((0,), dtype=float64)
 
         if len(indexes) > 0:
             assert (len(pop_neurons) == 0)
@@ -993,7 +993,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 rewire_preids, rewire_times, sampling_interval_ms)
 
             if len(rewire_values) == 0:
-                return numpy.zeros((0, 4), dtype=integer)
+                return numpy.zeros((0, 4), dtype=uint32)
 
         result = numpy.column_stack(
             (rewire_times, rewire_preids, rewire_postids, rewire_values))

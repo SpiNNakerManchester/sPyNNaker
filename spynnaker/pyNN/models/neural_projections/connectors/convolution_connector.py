@@ -165,8 +165,9 @@ class ConvolutionConnector(AbstractConnector):
         self.__padding_shape = self.__decode_padding(padding)
         self.__filter_edges = filter_edges
 
+        self.__strides: NDArray[integer]
         if strides is None:
-            self.__strides = numpy.array((1, 1), dtype=integer)
+            self.__strides = numpy.array((1, 1), dtype=numpy.uint32)
         else:
             self.__strides = self.__to_2d_shape(strides, "strides")
         self.__pool_shape = self.__to_2d_shape(pool_shape, "pool_shape")
@@ -261,12 +262,12 @@ class ConvolutionConnector(AbstractConnector):
         if shape is None:
             return None
         if numpy.isscalar(shape):
-            return numpy.array([shape, shape], dtype=integer)
+            return numpy.array([shape, shape], dtype=uint32)
         assert isinstance(shape, tuple)
         if len(shape) == 1:
-            return numpy.array([shape[0], 1], dtype=integer)
+            return numpy.array([shape[0], 1], dtype=uint32)
         elif len(shape) == 2:
-            return numpy.array(shape, dtype=integer)
+            return numpy.array(shape, dtype=uint32)
         raise SynapticConfigurationException(
             f"{param_name} must be an int or a tuple(int, int)")
 
@@ -274,7 +275,7 @@ class ConvolutionConnector(AbstractConnector):
         if isinstance(padding, (int, Iterable)):
             return self.__to_2d_shape(padding, "padding")
         elif padding is None or padding is False:
-            return numpy.zeros(2, dtype=integer)
+            return numpy.zeros(2, dtype=uint32)
         elif padding:
             return self.__kernel_weights.shape // 2
         else:

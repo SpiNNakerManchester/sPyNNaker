@@ -25,7 +25,7 @@ from typing import cast, List, Optional, Tuple, Union
 import neo
 from neo.io.baseio import BaseIO  # type: ignore[import]
 import numpy
-from numpy import uint32, floating
+from numpy import uint32, float64, floating
 from numpy.typing import NDArray
 from pyNN.random import AbstractRNG, RandomDistribution
 from scipy.stats import binom
@@ -104,12 +104,12 @@ def convert_param_to_numpy(
         # that it is an array
         param_value = param.next(n=no_atoms)
         if hasattr(param_value, '__iter__'):
-            return numpy.array(param_value, dtype=floating)
-        return numpy.array([param_value], dtype=floating)
+            return numpy.array(param_value, dtype=float64)
+        return numpy.array([param_value], dtype=float64)
 
     # Deal with a single value by exploding to multiple values
     if not hasattr(param, '__iter__'):
-        return numpy.array([param] * no_atoms, dtype=floating)
+        return numpy.array([param] * no_atoms, dtype=float64)
 
     # Deal with multiple values, but not the correct number of them
     if len(cast(Sized, param)) != no_atoms:
@@ -118,7 +118,7 @@ def convert_param_to_numpy(
             " the vertex")
 
     # Deal with the correct number of multiple values
-    return numpy.array(param, dtype=floating)
+    return numpy.array(param, dtype=float64)
 
 
 def convert_to(value: float, data_type: DataType) -> uint32:
