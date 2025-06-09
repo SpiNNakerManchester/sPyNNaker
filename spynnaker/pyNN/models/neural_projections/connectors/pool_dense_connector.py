@@ -344,7 +344,7 @@ class PoolDenseConnector(AbstractConnector):
         if self.__pool_stride is not None:
             stride = self.__to_nd_shape(self.__pool_stride, n_dims, "")
             all_data.append(numpy.array(
-                [get_div_const(s) for s in stride], dtype=uint32))
+                [get_div_const(int(s)) for s in stride], dtype=uint32))
         else:
             all_data.append(numpy.array(
                 [get_div_const(1) for _ in range(n_dims)], dtype=uint32))
