@@ -88,7 +88,7 @@ def get_n_rates(vertex_slice: Slice, rate_data: Sequence[Sized]) -> int:
     """
     How many rates there are to be stored in total.
     """
-    return sum(len(rate_data[i]) for i in vertex_slice.get_raster_ids())
+    return sum(len(rate_data[int(i)]) for i in vertex_slice.get_raster_ids())
 
 
 def get_params_bytes(n_atoms: int) -> int:
@@ -608,7 +608,8 @@ class SpikeSourcePoissonMachineVertex(
                     rates.append(rate_int / DataType.S1615.scale)
                     # Skip the start and duration as they can't change
                     offset += PARAMS_WORDS_PER_RATE * BYTES_PER_WORD
-                self._pop_vertex.rates.set_value_by_id(i, numpy.array(rates))
+                self._pop_vertex.rates.set_value_by_id(
+                    int(i), numpy.array(rates))
 
     def read_connections(
             self, synapse_info: SynapseInformation) -> ConnectionsArray:
