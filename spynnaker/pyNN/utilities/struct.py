@@ -371,7 +371,6 @@ class Struct(object):
         :type array_size: int or None
         """
         n_items = 1
-        ids = numpy.zeros([0], dtype=integer)
         if vertex_slice is None:
             if self.__repeat_type != StructRepeat.GLOBAL:
                 raise ValueError(
