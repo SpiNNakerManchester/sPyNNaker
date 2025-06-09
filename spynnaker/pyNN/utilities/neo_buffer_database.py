@@ -1113,7 +1113,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             n_colour_bits, SPIKES)[0]
         counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
                                 minlength=pop_size)
-        return {i: counts[i] for i in view_indexes}
+        return {int(i): counts[int(i)] for i in view_indexes}
 
     def __add_data(
             self, pop_label: str, variable: str,

@@ -1098,7 +1098,8 @@ class NeuronRecorder(object):
             local_indexes: List[int] = list()
             # Add indices based on the raster ids
             index = 0
-            for index in vertex_slice.get_raster_ids():
+            for index_n in vertex_slice.get_raster_ids():
+                index = int(index_n)
                 if index in indexes:
                     # Recording so write the local index to record to
                     local_indexes.append(local_index)
