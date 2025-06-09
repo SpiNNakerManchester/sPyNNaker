@@ -441,7 +441,7 @@ class SynapticMatrices(object):
             # if converted to an int, so we use U3232 here instead (as there
             # can be scales larger than U1616.max in conductance-based models)
             dtype = DataType.U3232
-            spec.write_value(data=float(min(dtype.max, float(w))),
+            spec.write_value(data=float(min(dtype.max, cast(float, w))),
                              data_type=dtype)
 
         spec.write_array(self.__generated_data)
