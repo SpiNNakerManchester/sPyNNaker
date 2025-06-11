@@ -648,6 +648,9 @@ class PopulationVertex(
                     f"{self.synapse_core_binary_file_name}.")
                 return True
 
+            # Use the recommended mode
+            return use_combined
+
         # If the timestep is 1 or greater, use a combined core generally,
         # unless only a split core exists!
         if not self.combined_binary_exists:
