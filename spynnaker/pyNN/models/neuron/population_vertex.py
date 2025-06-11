@@ -525,7 +525,7 @@ class PopulationVertex(
         """
         # If we are in virtual machine mode, we can work without binaries
         # so easier to assume they exist
-        if SpynnakerDataView().is_virtual_machine_mode():
+        if get_config_bool("Machine", "virtual_board"):
             return True
         try:
             SpynnakerDataView().get_executable_path(
@@ -543,7 +543,7 @@ class PopulationVertex(
         """
         # If we are in virtual machine mode, we can work without binaries
         # so easier to assume they exist
-        if SpynnakerDataView().is_virtual_machine_mode():
+        if get_config_bool("Machine", "virtual_board"):
             return True
         try:
             SpynnakerDataView().get_executable_path(
