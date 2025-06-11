@@ -523,6 +523,10 @@ class PopulationVertex(
 
         :rtype: bool
         """
+        # If we are in virtual machine mode, we can work without binaries
+        # so easier to assume they exist
+        if SpynnakerDataView().is_virtual_machine_mode():
+            return True
         try:
             SpynnakerDataView().get_executable_path(
                 self.combined_binary_file_name)
@@ -537,6 +541,10 @@ class PopulationVertex(
 
         :rtype: bool
         """
+        # If we are in virtual machine mode, we can work without binaries
+        # so easier to assume they exist
+        if SpynnakerDataView().is_virtual_machine_mode():
+            return True
         try:
             SpynnakerDataView().get_executable_path(
                 self.neuron_core_binary_file_name)
