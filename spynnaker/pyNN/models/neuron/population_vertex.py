@@ -746,7 +746,16 @@ class PopulationVertex(
 
         # If the number of cores needed is more than the maximum, use the
         # maximum
-        self.__n_synapse_cores = min(max_n_cores, n_synapse_cores)
+        if n_synapse_cores > max_n_cores:
+            logger.warning(
+                f"Ideally this execution would need {n_synapse_cores} synapse "
+                f"cores, but only {max_n_cores} cores are available. This may "
+                "mean that the simulation does not work correctly. Potential "
+                "solutions include increasing the time_scale_factor, or "
+                "reducing the number of synapses incoming into each "
+                "population")
+            n_synapse_cores = max_n_cores
+        self.__n_synapse_cores = n_synapse_cores
         assert self.__n_synapse_cores is not None
         return self.__n_synapse_cores
 
