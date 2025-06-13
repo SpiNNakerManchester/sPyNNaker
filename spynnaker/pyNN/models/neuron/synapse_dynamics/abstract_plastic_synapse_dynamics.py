@@ -29,7 +29,6 @@ class AbstractPlasticSynapseDynamics(
     """
     Synapses which change over time.
     """
-    # pylint: disable=too-many-arguments
 
     __slots__ = ()
 

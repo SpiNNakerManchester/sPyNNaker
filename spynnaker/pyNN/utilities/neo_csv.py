@@ -41,8 +41,6 @@ class NeoCsv(object):
     Code to read a csv file and create a neo object.
 
     """
-    # pylint: disable=c-extension-no-member, no-member
-
     _POPULATION = "population"
     _DESCRIPTION = "description"
     _SIZE = "size"
@@ -274,7 +272,6 @@ class NeoCsv(object):
         :param units: the units of the recorded value
         :type units: quantities.quantity.Quantity or str
         """
-        # pylint: disable=too-many-arguments
         block = segment.block
 
         first_id: int = block.annotations[self._FIRST_ID]
@@ -555,7 +552,6 @@ class NeoCsv(object):
         block = Block()
         block.name = pop_label
         block.description = description
-        # pylint: disable=no-member
         metadata: Dict[str, Any] = {}
         metadata[self._SIZE] = size
         metadata["first_index"] = 0

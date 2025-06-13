@@ -255,7 +255,6 @@ def get_synapses(
     :rtype:
         tuple(~numpy.ndarray, ~numpy.ndarray)
     """
-    # pylint: disable=too-many-arguments
     # Get delays in timesteps
     max_delay = app_edge.post_vertex.splitter.max_support_delay()
 
@@ -343,7 +342,6 @@ def _get_row_data(
     :param int max_atoms_per_core: The maximum number of atoms per core
     :rtype: ~numpy.ndarray
     """
-    # pylint: disable=too-many-arguments
     fp_data: Union[NDArray[uint32], List[NDArray[uint32]]]
     pp_data: Union[NDArray[uint32], List[NDArray[uint32]]]
     if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics):

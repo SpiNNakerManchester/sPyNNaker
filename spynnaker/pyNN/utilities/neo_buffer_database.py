@@ -75,8 +75,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     This is the same database as used by BufferManager but with
     extra tables and access methods added.
     """
-    # pylint: disable=c-extension-no-member
-
     __N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
     __TWO_WORDS = struct.Struct("<II")
     __NEO_DDL_FILE = os.path.join(os.path.dirname(__file__), "db.sql")

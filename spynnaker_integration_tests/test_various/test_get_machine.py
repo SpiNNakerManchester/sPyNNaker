@@ -21,7 +21,7 @@ from spynnaker.pyNN.data import SpynnakerDataView
 class MachineTest(BaseTestCase):
 
     def do_run(self) -> None:
-        # pylint: disable=protected-access,no-member
+        # pylint: disable=protected-access
         sim.setup(timestep=1.0, n_boards_required=2)
         pop = sim.Population(3, sim.IF_curr_exp(), label="pop_1")
         # HACK to directly read the underlying models to avoid triggering

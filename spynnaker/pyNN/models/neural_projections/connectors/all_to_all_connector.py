@@ -130,7 +130,6 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
                 numpy.arange(0, post_vertex_slice.n_atoms),
                 synapse_info.n_pre_neurons)
 
-        # pylint: disable=protected-access
         block["source"] = sources
         block["target"] = targets
 
