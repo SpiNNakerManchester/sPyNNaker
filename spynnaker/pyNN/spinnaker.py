@@ -94,8 +94,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             if `None` the cfg value is used
         :type timestep: float or None
         """
-        # pylint: disable=too-many-arguments, too-many-locals
-
         # change min delay auto to be the min delay supported by simulator
         if min_delay == "auto":
             min_delay = timestep
@@ -298,7 +296,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :return: the name of the simulator.
         :rtype: str
         """
-        return _version._NAME  # pylint: disable=protected-access
+        return _version.NAME
 
     @property
     def recorders(self) -> Collection[Recorder]:
@@ -378,7 +376,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
         :param str search_path: absolute search path for binaries
         """
-        # pylint: disable=protected-access
         SpynnakerDataView.register_binary_search_path(search_path)
 
     def _execute_write_neo_metadata(self) -> None:

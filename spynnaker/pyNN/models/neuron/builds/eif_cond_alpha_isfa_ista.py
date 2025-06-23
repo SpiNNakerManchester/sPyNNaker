@@ -41,6 +41,6 @@ class EIFConductanceAlphaPopulation(AbstractProvidesDefaults):
             e_rev_I: ModelParameter = -80.0, delta_T: ModelParameter = 2.0,
             v: ModelParameter = -70.6, w: ModelParameter = 0.0,
             gsyn_exc: ModelParameter = 0.0, gsyn_inh: ModelParameter = 0.0):
-        # pylint: disable=too-many-arguments, unused-argument, invalid-name
+        # pylint: disable=unused-argument, invalid-name
         raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")

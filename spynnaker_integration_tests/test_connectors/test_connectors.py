@@ -231,7 +231,7 @@ class ConnectorsTest(BaseTestCase):
         destination.record("v")
         sim.run(100)
         neo = destination.get_data(["v"])
-        v = neo.segments[0].filter(name="v")[0]  # pylint: disable=no-member
+        v = neo.segments[0].filter(name="v")[0]
         counts = self.calc_spikes_received(v)
         for i, count in enumerate(counts):
             for j in range(n_destinations):

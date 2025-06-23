@@ -18,4 +18,4 @@ __version_year__ = "TBD"
 __version_day__ = "TBD"
 __version_name__ = "To Do"
 
-_NAME = f"sPyNNaker_under_version({__version__}-{__version_name__})"
+NAME = f"sPyNNaker_under_version({__version__}-{__version_name__})"
