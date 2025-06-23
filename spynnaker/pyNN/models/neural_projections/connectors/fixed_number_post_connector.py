@@ -133,7 +133,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             self, synapse_info: SynapseInformation) -> List[NDArray[integer]]:
         rng = self.__rng or NumpyRNG()
         post_neurons: List[NDArray[integer]] = \
-            [numpy.empty([0], dtype=integer)] * synapse_info.n_pre_neurons
+            [numpy.empty([0], dtype=uint32)] * synapse_info.n_pre_neurons
         # Loop over all the pre neurons
         for m in range(synapse_info.n_pre_neurons):
             if post_neurons[m] is None:
@@ -226,9 +226,9 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         # this post-vertex slice
         this_post_neuron_array = post_neurons[n]
 
-        return numpy.count_nonzero(numpy.logical_and(
+        return int(numpy.count_nonzero(numpy.logical_and(
             post_vertex_slice.lo_atom <= this_post_neuron_array,
-            this_post_neuron_array <= post_vertex_slice.hi_atom))
+            this_post_neuron_array <= post_vertex_slice.hi_atom)))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(

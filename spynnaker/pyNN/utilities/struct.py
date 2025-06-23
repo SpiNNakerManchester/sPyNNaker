@@ -16,7 +16,7 @@ from enum import Enum
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 import numpy
-from numpy import uint8, uint32, integer
+from numpy import integer, uint8, uint32
 from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
 from typing_extensions import TypeAlias
@@ -371,7 +371,7 @@ class Struct(object):
         :type array_size: int or None
         """
         n_items = 1
-        ids = numpy.zeros([0], dtype=integer)
+        ids: NDArray[integer] = numpy.zeros([0], dtype=uint32)
         if vertex_slice is None:
             if self.__repeat_type != StructRepeat.GLOBAL:
                 raise ValueError(
