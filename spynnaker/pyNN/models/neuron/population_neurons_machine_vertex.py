@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from enum import IntEnum
-import os
 import ctypes
 from typing import List, Optional, Sequence
 
@@ -147,7 +146,7 @@ class PopulationNeuronsMachineVertex(
         super().__init__(
             label, app_vertex, vertex_slice, sdram, self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS + NeuronMainProvenance.N_ITEMS,
-            self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
+            self._PROFILE_TAG_LABELS, app_vertex.neuron_core_binary_file_name)
         self.__key: Optional[int] = None
         self.__sdram_partition: Optional[
             SourceSegmentedSDRAMMachinePartition] = None
@@ -209,22 +208,6 @@ class PopulationNeuronsMachineVertex(
             raise SynapticConfigurationException(
                 "Trying to set SDRAM partition more than once")
         self.__sdram_partition = sdram_partition
-
-    @staticmethod
-    def __get_binary_file_name(app_vertex: PopulationVertex) -> str:
-        """
-        Get the local binary filename for this vertex.  Static because at
-        the time this is needed, the local app_vertex is not set.
-
-        :param PopulationVertex app_vertex:
-            The associated application vertex
-        :rtype: str
-        """
-        # Split binary name into title and extension
-        name, ext = os.path.splitext(app_vertex.neuron_impl.binary_name)
-
-        # Reunite title and extension and return
-        return name + "_neuron" + ext
 
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(

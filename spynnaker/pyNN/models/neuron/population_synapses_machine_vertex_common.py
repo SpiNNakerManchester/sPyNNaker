@@ -171,7 +171,7 @@ class PopulationSynapsesMachineVertexCommon(
         super().__init__(
             label, app_vertex, vertex_slice, sdram, self.COMMON_REGIONS,
             SynapseProvenance.N_ITEMS + SpikeProcessingFastProvenance.N_ITEMS,
-            self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
+            self._PROFILE_TAG_LABELS, app_vertex.synapse_core_binary_file_name)
         self.__sdram_partition: Optional[
             SourceSegmentedSDRAMMachinePartition] = None
         self.__neuron_vertex: Optional[PopulationNeuronsMachineVertex] = None
@@ -198,19 +198,6 @@ class PopulationSynapsesMachineVertexCommon(
         """
         self.__neuron_vertex = neuron_vertex
         self.__partition_id = partition_id
-
-    @staticmethod
-    def __get_binary_file_name(app_vertex: PopulationVertex) -> str:
-        """
-        Get the local binary filename for this vertex.  Static because at
-        the time this is needed, the local `app_vertex` is not set.
-
-        :param PopulationVertex app_vertex:
-            The associated application vertex
-        :rtype: str
-        """
-        # Reunite title and extension and return
-        return "synapses" + app_vertex.synapse_executable_suffix + ".aplx"
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self) -> Sequence[int]:

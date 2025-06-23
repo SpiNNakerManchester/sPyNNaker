@@ -13,7 +13,6 @@
 # limitations under the License.
 import ctypes
 from enum import IntEnum
-import os
 from typing import List, Optional, Sequence
 
 from numpy import floating
@@ -198,7 +197,7 @@ class PopulationMachineVertex(
             self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS +
             SpikeProcessingProvenance.N_ITEMS + MainProvenance.N_ITEMS,
-            self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
+            self._PROFILE_TAG_LABELS, app_vertex.combined_binary_file_name)
         self.__key: Optional[int] = None
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
@@ -258,22 +257,6 @@ class PopulationMachineVertex(
     @overrides(PopulationMachineSynapses._max_atoms_per_core)
     def _max_atoms_per_core(self) -> int:
         return self.__max_atoms_per_core
-
-    @staticmethod
-    def __get_binary_file_name(app_vertex: PopulationVertex) -> str:
-        """
-        Get the local binary filename for this vertex.  Static because at
-        the time this is needed, the local `app_vertex` is not set.
-
-        :param PopulationVertex app_vertex:
-            The associated application vertex
-        :rtype: str
-        """
-        # Split binary name into title and extension
-        name, ext = os.path.splitext(app_vertex.neuron_impl.binary_name)
-
-        # Reunite title and extension and return
-        return name + app_vertex.synapse_executable_suffix + ext
 
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(
