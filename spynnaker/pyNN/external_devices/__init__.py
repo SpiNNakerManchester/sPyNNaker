@@ -30,7 +30,7 @@ from spinn_front_end_common.utilities.utility_objs import (
     LivePacketGatherParameters)
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetController, AbstractEthernetSensor,
-    ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
+    ArbitraryFPGADevice, ExternalFPGARetinaDevice,
     MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl,
     SPIFRetinaDevice, ICUBRetinaDevice, SPIFOutputDevice, SPIFInputDevice)
 from spynnaker.pyNN import model_binaries
@@ -80,7 +80,7 @@ __all__ = [
     "EIEIOType",
 
     # General Devices
-    "ExternalCochleaDevice", "ExternalFPGARetinaDevice",
+    "ExternalFPGARetinaDevice",
     "MunichRetinaDevice", "MunichMotorDevice", "ArbitraryFPGADevice",
     "PushBotRetinaViewer", "ExternalDeviceLifControl", "SPIFRetinaDevice",
     "ICUBRetinaDevice", "SPIFOutputDevice", "SPIFInputDevice",
