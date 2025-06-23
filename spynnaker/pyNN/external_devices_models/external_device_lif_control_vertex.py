@@ -93,7 +93,6 @@ class ExternalDeviceLifControlVertex(
         :type splitter: SplitterPopulationVertex or None
         :param int n_colour_bits: The number of colour bits to use
         """
-        # pylint: disable=too-many-arguments
         if drop_late_spikes is None:
             drop_late_spikes = False
         extra_partition_ids = [

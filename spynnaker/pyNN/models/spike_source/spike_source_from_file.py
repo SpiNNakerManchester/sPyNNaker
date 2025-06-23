@@ -35,7 +35,6 @@ class SpikeSourceFromFile(SpikeSourceArray):
             min_atom: float = 0.0, max_atom: float = _inf,
             min_time: float = 0.0, max_time: float = _inf,
             split_value: str = "\t"):
-        # pylint: disable=too-many-arguments
         spike_times = utility_calls.read_spikes_from_file(
             spike_time_file, min_atom, max_atom, min_time, max_time,
             split_value)

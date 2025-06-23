@@ -19,7 +19,6 @@ from spinnaker_testbase import BaseTestCase
 
 
 class TestKernelConnector(BaseTestCase):
-    # pylint: disable=expression-not-assigned
 
     def do_run(self, psh: int, psw: int, ksh: int, ksw: int,
                pre_start: Tuple[int, int] = (0, 0),

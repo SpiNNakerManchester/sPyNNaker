@@ -61,8 +61,6 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
             tau_syn_I: float = 5.0, tau_refrac: float = 0.1,
             i_offset: float = 0.0, v: float = 0.0, isyn_exc: float = 0.0,
             isyn_inh: float = 0.0):
-        # pylint: disable=too-many-arguments
-
         translator = PushBotTranslator(
             protocol,
             get_pushbot_wifi_connection(pushbot_ip_address, pushbot_port))

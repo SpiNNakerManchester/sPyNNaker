@@ -50,7 +50,6 @@ class PushBotEthernetRetinaDevice(
         :param local_port:
         :param str retina_injector_label:
         """
-        # pylint: disable=too-many-arguments
         super().__init__(protocol, None)
         pushbot_wifi_connection = get_pushbot_wifi_connection(
             pushbot_ip_address, pushbot_port)
