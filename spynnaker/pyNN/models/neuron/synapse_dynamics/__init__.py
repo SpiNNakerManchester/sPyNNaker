@@ -21,7 +21,6 @@ from .abstract_synapse_dynamics_structural import (
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_supports_signed_weights import AbstractSupportsSignedWeights
-from .pynn_synapse_dynamics import PyNNSynapseDynamics
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_common import SynapseDynamicsStructuralCommon
@@ -40,7 +39,7 @@ __all__ = ("AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
            "AbstractSDRAMSynapseDynamics", "AbstractSynapseDynamicsStructural",
            "calculate_spike_pair_additive_stdp_weight",
            "calculate_spike_pair_multiplicative_stdp_weight",
-           "PyNNSynapseDynamics", "SynapseDynamicsStatic",
+           "SynapseDynamicsStatic",
            "SynapseDynamicsSTDP", "AbstractHasParameterNames",
            # Structural plasticity
            "SynapseDynamicsStructuralCommon",
