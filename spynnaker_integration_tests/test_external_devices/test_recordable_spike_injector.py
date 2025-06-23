@@ -37,7 +37,6 @@ class TestRecordableSpikeInjector(BaseTestCase):
             time.sleep(0.001)
 
     def recordable_spike_injector(self) -> None:
-        # pylint: disable=no-member
         p.setup(1.0)
         pop = p.Population(
             self._n_neurons, p.external_devices.SpikeInjector(), label="input")

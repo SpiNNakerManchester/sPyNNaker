@@ -36,7 +36,6 @@ def delay_support_adder() -> Tuple[
     :return: The delay vertices and delay edges that were added
     """
     adder = _DelaySupportAdder()
-    # pylint: disable=protected-access
     return adder.add_delays()
 
 

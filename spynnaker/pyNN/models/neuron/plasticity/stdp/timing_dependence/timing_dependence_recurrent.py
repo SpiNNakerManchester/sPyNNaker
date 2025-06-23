@@ -66,7 +66,6 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         :param float A_plus: :math:`A^+`
         :param float A_minus: :math:`A^-`
         """
-        # pylint: disable=too-many-arguments
         super().__init__(SynapseStructureWeightAccumulator())
         self.__accumulator_depression_plus_one = accumulator_depression + 1
         self.__accumulator_potentiation_minus_one = \

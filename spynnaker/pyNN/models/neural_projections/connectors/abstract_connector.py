@@ -64,7 +64,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
     """
     Abstract class that all PyNN Connectors extend.
     """
-    # pylint: disable=unused-argument
 
     NUMPY_SYNAPSES_DTYPE = numpy.dtype(
         [("source", uint32), ("target", uint16),
@@ -91,6 +90,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
             .. note::
                 Not supported by sPyNNaker.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         """
         if callback is not None:
             warn_once(logger, "sPyNNaker ignores connector callbacks.")
@@ -117,6 +118,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         :param SynapseInformation synapse_info: the synapse info
         """
+        _ = synapse_info
         self.__min_delay = SpynnakerDataView.get_simulation_time_step_ms()
 
     def _get_delay_minimum(
@@ -605,7 +607,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
         # Convert to native Python integer; provenance system assumption
         ncd = self.__n_clipped_delays.item()
         with ProvenanceWriter() as db:
-            # pylint: disable=expression-not-assigned
             db.insert_connector(
                 self.__pop_label(synapse_info.pre_population),
                 self.__pop_label(synapse_info.post_population),
@@ -737,6 +738,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             ~pacman.model.graphs.application.ApplicationEdge
         :param SynapseInformation synapse_info: The synaptic information
         """
+        _ = application_edge
         if ((synapse_info.prepop_is_view and
                 len(synapse_info.pre_vertex.atoms_shape) > 1) or
                 (synapse_info.postpop_is_view and
