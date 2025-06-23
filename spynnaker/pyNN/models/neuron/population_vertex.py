@@ -15,6 +15,7 @@ from __future__ import annotations
 from collections import defaultdict
 import logging
 import math
+import os
 from typing import (
     Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
     cast, TYPE_CHECKING)
@@ -487,6 +488,73 @@ class PopulationVertex(
         self.__structure = structure
 
     @property
+    def combined_binary_file_name(self) -> str:
+        """
+        The name of the combined binary file for the vertex.
+        """
+        # Split binary name into title and extension
+        name, ext = os.path.splitext(self.__neuron_impl.binary_name)
+
+        # Reunite title and extension and return
+        return name + self.synapse_executable_suffix + ext
+
+    @property
+    def neuron_core_binary_file_name(self) -> str:
+        """
+        The name of the neuron core binary file for the vertex.
+        """
+        # Split binary name into title and extension
+        name, ext = os.path.splitext(self.__neuron_impl.binary_name)
+
+        # Reunite title and extension and return
+        return name + "_neuron" + ext
+
+    @property
+    def synapse_core_binary_file_name(self) -> str:
+        """
+        The name of the synapse core binary file for the vertex.
+        """
+        return "synapses" + self.synapse_executable_suffix + ".aplx"
+
+    @property
+    def combined_binary_exists(self) -> bool:
+        """
+        Whether the combined binary file exists.
+
+        :rtype: bool
+        """
+        # If we are in virtual machine mode, we can work without binaries
+        # so easier to assume they exist
+        if get_config_bool("Machine", "virtual_board"):
+            return True
+        try:
+            SpynnakerDataView().get_executable_path(
+                self.combined_binary_file_name)
+            return True
+        except KeyError:
+            return False
+
+    @property
+    def split_binaries_exist(self) -> bool:
+        """
+        Whether the split binary files exist.
+
+        :rtype: bool
+        """
+        # If we are in virtual machine mode, we can work without binaries
+        # so easier to assume they exist
+        if get_config_bool("Machine", "virtual_board"):
+            return True
+        try:
+            SpynnakerDataView().get_executable_path(
+                self.neuron_core_binary_file_name)
+            SpynnakerDataView().get_executable_path(
+                self.synapse_core_binary_file_name)
+            return True
+        except KeyError:
+            return False
+
+    @property
     def use_combined_core(self) -> bool:
         """
         Whether the vertex should operate on a combined
@@ -495,6 +563,15 @@ class PopulationVertex(
 
         :rtype: bool
         """
+        # If there are no binaries at all, complain!
+        if not self.combined_binary_exists and not self.split_binaries_exist:
+            raise SynapticConfigurationException(
+                "This model has no binaries! Please compile the binaries"
+                f" {self.combined_binary_file_name} and/or"
+                f" ({self.synapse_core_binary_file_name} and"
+                f" {self.neuron_core_binary_file_name})"
+                " before running the simulation.")
+
         # If we can't use a combined core, use a split core
         if not self.__synapse_dynamics.is_combined_core_capable:
             if not self.__synapse_dynamics.is_split_core_capable:
@@ -508,6 +585,13 @@ class PopulationVertex(
                     f"The synapse dynamics {self.__synapse_dynamics} must be"
                     " run using a synapse core separate from a neuron core."
                     " Please set the number of synapse cores to 1 or greater.")
+            if not self.split_binaries_exist:
+                raise SynapticConfigurationException(
+                    "This model requires split binaries"
+                    f" {self.neuron_core_binary_file_name} and"
+                    f" {self.synapse_core_binary_file_name} but they do not "
+                    "exist. Please compile the split binaries before "
+                    "running the simulation.")
             return False
 
         # If we can't use a split core, use a combined core
@@ -518,11 +602,34 @@ class PopulationVertex(
                     f"The synapse dynamics {self.__synapse_dynamics} must be"
                     " run using a combined synapse-neuron core."
                     " Please set the number of synapse cores to 0.")
+            if not self.combined_binary_exists:
+                raise SynapticConfigurationException(
+                    "This model requires a combined binary"
+                    f" {self.combined_binary_file_name}, but it does not "
+                    "exist. Please compile the combined binary before "
+                    "running the simulation.")
             return True
 
         # If the user has chosen to have a synapse core, add one
         if self.__n_synapse_cores is not None and self.__n_synapse_cores > 0:
+            if not self.split_binaries_exist:
+                raise SynapticConfigurationException(
+                    "This model is configured to use split binaries"
+                    f" {self.neuron_core_binary_file_name} and"
+                    f" {self.synapse_core_binary_file_name} but they do not "
+                    "exist. Please compile the split binaries before "
+                    "running the simulation.")
             return False
+
+        # If the user has chosen to have no synapse cores, use a combined core
+        if self.__n_synapse_cores is not None and self.__n_synapse_cores == 0:
+            if not self.combined_binary_exists:
+                raise SynapticConfigurationException(
+                    "This model is configured to use a combined binary"
+                    f" {self.combined_binary_file_name}, but it does not "
+                    "exist. Please compile the combined binary before "
+                    "running the simulation.")
+            return True
 
         # If the time-step is less than 1, use combined core if no synapse
         # cores are needed, otherwise use split core
@@ -530,9 +637,32 @@ class PopulationVertex(
         # core calculation and update to allow a choice of combined core if
         # neurons and synapses fit on a single core
         if SpynnakerDataView().get_simulation_time_step_ms() < 1.0:
-            return self.n_synapse_cores_required == 0
+            use_combined = (self.n_synapse_cores_required == 0)
 
-        # If the timestep is 1 or greater, use a combined core generally
+            # We want combined, but it doesn't exist, so use split
+            # (which is fine)
+            if use_combined and not self.combined_binary_exists:
+                return False
+
+            # We want split, but it doesn't exist, so use combined, which needs
+            # a warning as it might not work at this time-step!
+            if not use_combined and not self.split_binaries_exist:
+                logger.warning(
+                    "The synapse dynamics are set to use a split core, but "
+                    "the split binaries do not exist. Using the combined "
+                    "core instead, but this may not work at this time-step. "
+                    "To avoid this warning please build the split binaries "
+                    f"{self.neuron_core_binary_file_name} and "
+                    f"{self.synapse_core_binary_file_name}.")
+                return True
+
+            # Use the recommended mode
+            return use_combined
+
+        # If the timestep is 1 or greater, use a combined core generally,
+        # unless only a split core exists!
+        if not self.combined_binary_exists:
+            return False
         return True
 
     @property
@@ -616,7 +746,16 @@ class PopulationVertex(
 
         # If the number of cores needed is more than the maximum, use the
         # maximum
-        self.__n_synapse_cores = min(max_n_cores, n_synapse_cores)
+        if n_synapse_cores > max_n_cores:
+            logger.warning(
+                f"Ideally this execution would need {n_synapse_cores} synapse "
+                f"cores, but only {max_n_cores} cores are available. This may "
+                "mean that the simulation does not work correctly. Potential "
+                "solutions include increasing the time_scale_factor, or "
+                "reducing the number of synapses incoming into each "
+                "population")
+            n_synapse_cores = max_n_cores
+        self.__n_synapse_cores = n_synapse_cores
         assert self.__n_synapse_cores is not None
         return self.__n_synapse_cores
 
