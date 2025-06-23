@@ -226,9 +226,9 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         # this post-vertex slice
         this_post_neuron_array = post_neurons[n]
 
-        return numpy.count_nonzero(numpy.logical_and(
+        return int(numpy.count_nonzero(numpy.logical_and(
             post_vertex_slice.lo_atom <= this_post_neuron_array,
-            this_post_neuron_array <= post_vertex_slice.hi_atom))
+            this_post_neuron_array <= post_vertex_slice.hi_atom)))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
