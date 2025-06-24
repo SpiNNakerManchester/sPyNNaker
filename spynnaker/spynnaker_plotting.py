@@ -20,7 +20,6 @@ https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/utility/plotting.py
 from typing import Any, Dict, Final, List, Union
 from types import ModuleType
 
-import numpy
 from neo import SpikeTrain, Block, Segment, AnalogSignal
 from neo.core.spiketrainlist import SpikeTrainList  # type: ignore[import]
 import numpy as np
@@ -161,8 +160,8 @@ def heat_plot_numpy(axes: Axes, data: NDArray, label: str = '',
     :param str label: Label for the graph
     :param options: plotting options
     """
-    neurons = data[:, 0].astype(numpy.uint32)
-    times = data[:, 1].astype(numpy.uint32)
+    neurons = data[:, 0].astype(np.uint32)
+    times = data[:, 1].astype(np.uint32)
     values = data[:, 2]
     info_array = np.empty((neurons.max() + 1, times.max() + 1))
     info_array[:] = np.nan
