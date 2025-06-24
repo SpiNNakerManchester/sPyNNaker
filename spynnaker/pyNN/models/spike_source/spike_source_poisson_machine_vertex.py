@@ -625,7 +625,8 @@ class SpikeSourcePoissonMachineVertex(
         addr += SDRAM_EDGE_PARAMS_BASE_BYTES
         data = SpynnakerDataView().read_memory(
             placement.x, placement.y, addr, size)
-        weights_encoded = numpy.frombuffer(data, dtype=uint16).astype(float)
+        weights_encoded = numpy.frombuffer(data, dtype=uint16).astype(
+            numpy.float64)
         weight_scales = (
                 next(iter(cast(AbstractEdgePartition,
                                self.__sdram_partition).edges))

@@ -295,7 +295,8 @@ class ConvolutionConnector(AbstractConnector):
                       (2 * self.__padding_shape))
 
         return tuple(int(i) for i in numpy.clip(
-            post_shape // self.__strides, 1, numpy.inf).astype(integer))
+            post_shape // self.__strides, 1, numpy.inf).astype(
+            numpy.uint32))
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(

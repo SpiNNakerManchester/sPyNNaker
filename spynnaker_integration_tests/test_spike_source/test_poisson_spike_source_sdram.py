@@ -48,7 +48,7 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
         for i in range(n_neurons):
             times, counts = numpy.unique(
                 spikes[i].magnitude, return_counts=True)
-            times = times.astype(int)
+            times = times.astype(numpy.uint32)
             indices = numpy.where(times < runtime - 2)[0]
             times = times[indices]
             counts = counts[indices]

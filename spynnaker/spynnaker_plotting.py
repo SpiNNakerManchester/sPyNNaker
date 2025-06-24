@@ -160,10 +160,10 @@ def heat_plot_numpy(axes: Axes, data: NDArray, label: str = '',
     :param str label: Label for the graph
     :param options: plotting options
     """
-    neurons = data[:, 0].astype(int)
-    times = data[:, 1].astype(int)
+    neurons = data[:, 0].astype(np.uint32)
+    times = data[:, 1].astype(np.uint32)
     values = data[:, 2]
-    info_array = np.empty((max(neurons) + 1, max(times) + 1))
+    info_array = np.empty((neurons.max() + 1, times.max() + 1))
     info_array[:] = np.nan
     info_array[neurons, times] = values
     _heat_plot(axes, info_array, label=label, **options)
