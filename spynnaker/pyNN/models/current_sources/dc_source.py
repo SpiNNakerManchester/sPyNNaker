@@ -36,9 +36,9 @@ class DCSource(AbstractCurrentSource):
     def __init__(self, amplitude: float = 0.0, start: float = 0.0,
                  stop: float = 0.0) -> None:
         """
-        :param float amplitude:
-        :param float start:
-        :param float stop:
+        :param amplitude:
+        :param start:
+        :param stop:
         """
         # There's probably no need to actually store these as you can't
         # access them directly in pynn anyway

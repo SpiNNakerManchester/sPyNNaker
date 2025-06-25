@@ -44,8 +44,6 @@ class _Dynamics:
     def structural(cls) -> Type[AbstractSynapseDynamicsStructural]:
         """
         Delayed import of AbstractSynapseDynamicsStructural
-
-        :rtype: type
         """
         if cls._Structural is None:
             # Avoid import loop by postponing this import
@@ -59,8 +57,6 @@ class _Dynamics:
     def stdp(cls) -> Type[SynapseDynamicsSTDP]:
         """
         Delayed import of SynapseDynamicsSTDP
-
-        :rtype: type
         """
         if cls._STDP is None:
             # Avoid import loop by postponing this import
@@ -74,8 +70,6 @@ class _Dynamics:
     def neuromodulation(cls) -> Type[SynapseDynamicsNeuromodulation]:
         """
         Delayed import of SynapseDynamicsNeuromodulation
-
-        :rtype: type
         """
         if cls._Neuromodulation is None:
             # Avoid import loop by postponing this import
@@ -93,8 +87,7 @@ def are_dynamics_structural(
     """
     Checks if synapse_dynamics is a AbstractSynapseDynamicsStructural
 
-    :param AbstractSynapseDynamics synapse_dynamics:
-    :rtype: bool
+    :param synapse_dynamics:
     """
     return isinstance(synapse_dynamics, _Dynamics.structural())
 
@@ -105,8 +98,7 @@ def are_dynamics_stdp(synapse_dynamics: AbstractSynapseDynamics) -> TypeGuard[
     """
     Checks if synapse_dynamics is a SynapseDynamicsSTD
 
-    :param AbstractSynapseDynamics synapse_dynamics:
-    :rtype: bool
+    :param synapse_dynamics:
     """
     return isinstance(synapse_dynamics, _Dynamics.stdp())
 
@@ -117,8 +109,7 @@ def are_dynamics_neuromodulation(
     """
     Checks if synapse_dynamics is a SynapseDynamicsNeuromodulation
 
-    :param AbstractSynapseDynamics synapse_dynamics:
-    :rtype: bool
+    :param synapse_dynamics:
     """
     # pylint: disable=isinstance-second-argument-not-valid-type
     return isinstance(synapse_dynamics, _Dynamics.neuromodulation())
@@ -140,11 +131,11 @@ class ProjectionApplicationEdge(
             synapse_information: SynapseInformation,
             label: Optional[str] = None):
         """
-        :param PopulationApplicationVertex pre_vertex:
-        :param PopulationVertex post_vertex:
-        :param SynapseInformation synapse_information:
+        :param pre_vertex:
+        :param post_vertex:
+        :param  synapse_information:
             The synapse information on this edge
-        :param str label:
+        :param label:
         """
         super().__init__(pre_vertex, post_vertex, label=label)
 
@@ -161,7 +152,7 @@ class ProjectionApplicationEdge(
     def add_synapse_information(
             self, synapse_information: SynapseInformation) -> None:
         """
-        :param SynapseInformation synapse_information:
+        :param synapse_information:
         """
         dynamics = synapse_information.synapse_dynamics
         is_neuromodulation = are_dynamics_neuromodulation(dynamics)
@@ -175,7 +166,7 @@ class ProjectionApplicationEdge(
     @property
     def synapse_information(self) -> List[SynapseInformation]:
         """
-        :rtype: list(SynapseInformation)
+        The synapse information on this edge
         """
         return self.__synapse_information
 
@@ -183,8 +174,6 @@ class ProjectionApplicationEdge(
     def delay_edge(self) -> Optional[DelayedApplicationEdge]:
         """
         Settable.
-
-        :rtype: DelayedApplicationEdge or None
         """
         return self.__delay_edge
 
@@ -196,15 +185,13 @@ class ProjectionApplicationEdge(
     def is_neuromodulation(self) -> bool:
         """
         Whether this edge is providing neuromodulation.
-
-        :rtype: bool
         """
         return self.__is_neuromodulation
 
     @property
     def n_delay_stages(self) -> int:
         """
-        :rtype: int
+        The maximum number of delay stages required
         """
         if self.__delay_edge is None:
             return 0

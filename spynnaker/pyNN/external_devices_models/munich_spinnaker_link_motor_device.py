@@ -55,18 +55,16 @@ class MunichMotorDevice(
             continue_if_not_different: bool = True,
             label: Optional[str] = None):
         """
-        :param int spinnaker_link_id:
+        :param spinnaker_link_id:
             The SpiNNaker link to which the motor is connected
         :param board_address:
-        :type board_address: str or None
-        :param int speed:
-        :param int sample_time:
-        :param int update_time:
-        :param int delay_time:
-        :param int delta_threshold:
-        :param bool continue_if_not_different:
-        :param str label:
-        :type label: str or None
+        :param speed:
+        :param sample_time:
+        :param update_time:
+        :param delay_time:
+        :param delta_threshold:
+        :param continue_if_not_different:
+        :param label:
         """
         m_vertex = MachineMunichMotorDevice(
             speed, sample_time, update_time, delay_time, delta_threshold,

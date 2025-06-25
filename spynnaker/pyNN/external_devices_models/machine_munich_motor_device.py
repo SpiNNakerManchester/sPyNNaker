@@ -79,14 +79,14 @@ class MachineMunichMotorDevice(
             continue_if_not_different: bool, label: Optional[str] = None,
             app_vertex: Optional[ApplicationVertex] = None):
         """
-        :param int speed:
-        :param int sample_time:
-        :param int update_time:
-        :param int delay_time:
-        :param int delta_threshold:
-        :param bool continue_if_not_different:
+        :param speed:
+        :param sample_time:
+        :param update_time:
+        :param delay_time:
+        :param delta_threshold:
+        :param continue_if_not_different:
         :param label:
-        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
+        :param app_vertex:
         """
         super().__init__(
             label=label, app_vertex=app_vertex,
@@ -185,7 +185,6 @@ class MachineMunichMotorDevice(
         #. area for end commands
 
         :param spec: The data specification to write to
-        :type spec: ~data_specification.DataSpecificationGenerator
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
 

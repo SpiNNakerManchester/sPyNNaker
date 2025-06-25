@@ -36,16 +36,14 @@ class EthernetCommandConnection(DatabaseConnection):
             local_host: Optional[str] = None,
             local_port: Optional[int] = NOTIFY_PORT):
         """
-        :param AbstractEthernetTranslator translator:
+        :param translator:
             A translator of multicast commands to device commands
         :param command_containers:
             A list of vertices that have commands to be sent at the start
             and end of simulation
-        :type command_containers:
-            list(~spinn_front_end_common.abstract_models.AbstractSendMeMulticastCommandsVertex)
-        :param str local_host:
+        :param local_host:
             The optional host to listen on for the start/resume message
-        :param int local_port:
+        :param local_port:
             The optional port to listen on for the stop/pause message
         """
         super().__init__(
@@ -69,8 +67,6 @@ class EthernetCommandConnection(DatabaseConnection):
         :param command_container:
             A vertex that has commands to be sent at the start and end of
             simulation
-        :type command_container:
-            ~spinn_front_end_common.abstract_models.AbstractSendMeMulticastCommandsVertex
         """
         if not isinstance(
                 command_container, AbstractSendMeMulticastCommandsVertex):

@@ -40,15 +40,15 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
             local_port: Optional[int] = NOTIFY_PORT,
             control_label_extension: str = "_control"):
         """
-        :param iterable(str) poisson_labels:
+        :param poisson_labels:
             Labels of Poisson populations to be controlled
-        :param str local_host: Optional specification of the local hostname or
+        :param local_host: Optional specification of the local hostname or
             IP address of the interface to listen on
-        :param int local_port:
+        :param local_port:
             Optional specification of the local port to listen on. Must match
             the port that the toolchain will send the notification on (19999
             by default)
-        :param str control_label_extension:
+        :param control_label_extension:
             The extra name added to the label of each Poisson source
         """
         self.__control_label_extension = control_label_extension
@@ -74,7 +74,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
 
     def add_poisson_label(self, label: str) -> None:
         """
-        :param str label: The label of the Poisson source population.
+        :param label: The label of the Poisson source population.
         """
         control = self.__convert_to_control_label(label)
         self.__control_label_to_label[control] = label
@@ -150,9 +150,9 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         """
         Set the rate of a Poisson neuron within a Poisson source.
 
-        :param str label: The label of the Population to set the rates of
-        :param int neuron_id: The neuron ID to set the rate of
-        :param float rate: The rate to set in Hz
+        :param label: The label of the Population to set the rates of
+        :param neuron_id: The neuron ID to set the rate of
+        :param rate: The rate to set in Hz
         """
         self.set_rates(label, [(neuron_id, rate)])
 
@@ -161,8 +161,8 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         """
         Set the rates of multiple Poisson neurons within a Poisson source.
 
-        :param str label: The label of the Population to set the rates of
-        :param list(tuple(int,float)) neuron_id_rates:
+        :param label: The label of the Population to set the rates of
+        :param neuron_id_rates:
             A list of tuples of (neuron ID, rate) to be set
         """
         control = self.__control_label(label)

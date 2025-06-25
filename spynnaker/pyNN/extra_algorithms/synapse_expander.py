@@ -65,7 +65,6 @@ def _plan_expansion() -> Tuple[ExecutableTargets, List[Placement], float]:
     :return: The places to load the synapse expander and delay expander
         executables, the target machine vertices to read synapses back from,
         and an estimated timeout for how long the expansion should be let run.
-    :rtype: tuple(~.ExecutableTargets, list(~.Placement), float)
     """
     synapse_bin = SpynnakerDataView.get_executable_path(SYNAPSE_EXPANDER_APLX)
     expander_cores = ExecutableTargets()

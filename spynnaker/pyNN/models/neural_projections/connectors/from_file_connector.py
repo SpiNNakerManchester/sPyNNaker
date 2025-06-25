@@ -34,7 +34,7 @@ class FromFileConnector(FromListConnector):
             distributed: bool = False, safe: bool = True,
             callback: None = None, verbose: bool = False):
         """
-        :param str file:
+        :param file:
             Either an open file object or the filename of a file containing a
             list of connections, in the format required by
             :py:class:`FromListConnector`.
@@ -45,8 +45,7 @@ class FromFileConnector(FromListConnector):
 
             .. note::
                 The header requires `#` at the beginning of the line.
-        :type file: str or ~io.FileIO
-        :param bool distributed:
+        :param distributed:
             Basic pyNN says:
 
                 if this is ``True``, then each node will read connections from
@@ -56,15 +55,15 @@ class FromFileConnector(FromListConnector):
             .. note::
                 Always leave this as ``False`` with sPyNNaker, which is not
                 MPI-based.
-        :param bool safe:
+        :param safe:
             Whether to check that weights and delays have valid values.
             If ``False``, this check is skipped.
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
                 Not supported by sPyNNaker.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
         """

@@ -118,7 +118,6 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
         :param ~pacman.model.graphs.machine.MachineVertex source_vertex:
             The source of the delay
         :return: machine vertex
-        :rtype: DelayExtensionMachineVertex
         """
         label = f"Delay extension for {source_app_vertex}"
         sdram = self.get_sdram_used_by_atoms()
@@ -132,8 +131,6 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
     def get_sdram_used_by_atoms(self) -> AbstractSDRAM:
         """
         Gets the amount of SDRAM used by the delay extension.
-
-        :rtype: ~pacman.model.resources.ConstantSDRAM
         """
         return ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
@@ -158,6 +155,5 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice to get the data for
-        :rtype: DelayExtensionMachineVertex
         """
         return self._machine_vertex_by_slice[vertex_slice]

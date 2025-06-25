@@ -31,8 +31,6 @@ class AbstractEthernetSensor(object, metaclass=AbstractBase):
     def get_n_neurons(self) -> int:
         """
         Get the number of neurons that will be sent out by the device.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -40,8 +38,6 @@ class AbstractEthernetSensor(object, metaclass=AbstractBase):
     def get_injector_parameters(self) -> Dict[str, Any]:
         """
         Get the parameters of the Spike Injector to use with this device.
-
-        :rtype: dict(str,Any)
         """
         raise NotImplementedError
 
@@ -49,8 +45,6 @@ class AbstractEthernetSensor(object, metaclass=AbstractBase):
     def get_injector_label(self) -> str:
         """
         Get the label to give to the Spike Injector.
-
-        :rtype: str
         """
         raise NotImplementedError
 
@@ -58,8 +52,6 @@ class AbstractEthernetSensor(object, metaclass=AbstractBase):
     def get_translator(self) -> AbstractEthernetTranslator:
         """
         Get a translator of multicast commands to Ethernet commands.
-
-        :rtype: AbstractEthernetTranslator
         """
         raise NotImplementedError
 
@@ -68,7 +60,5 @@ class AbstractEthernetSensor(object, metaclass=AbstractBase):
         """
         Get a Database Connection instance that this device uses to inject
         packets.
-
-        :rtype: SpynnakerLiveSpikesConnection
         """
         raise NotImplementedError

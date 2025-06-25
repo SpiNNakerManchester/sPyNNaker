@@ -35,8 +35,8 @@ class StepCurrentSource(AbstractCurrentSource):
     def __init__(
             self, times: Sequence[int] = (), amplitudes: Sequence[float] = ()):
         """
-        :param list(int) times:
-        :param list(float) amplitudes:
+        :param times:
+        :param amplitudes:
         """
         # There's probably no need to actually store these as you can't
         # access them directly in pynn anyway

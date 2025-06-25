@@ -38,7 +38,7 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
 
     def __init__(self, delay: WEIGHTS_DELAYS_IN):
         """
-        :param float delay:
+        :param delay:
             The delay used in the connection; by default 1 time step
         """
         # We don't have a weight here, it is in the connector
@@ -67,12 +67,10 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
         """
         Write the parameters to the data specification for a vertex.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The specification to write to
-        :param int region: region ID to write to
-        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
-            The machine vertex being targeted
-        :param list(float) weight_scales: Scale factors to apply to the weights
+        :param spec: The specification to write to
+        :param region: region ID to write to
+        :param machine_vertex: The machine vertex being targeted
+        :param weight_scales: Scale factors to apply to the weights
         """
         raise NotImplementedError
 
@@ -84,8 +82,6 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
         .. note::
             This is *not* constrained by the usual limits of the master
             population table.
-
-        :rtype: int
         """
         # A bit of an estimate for these local-only systems, which don't use
         # the master population table and so don't have the same limit

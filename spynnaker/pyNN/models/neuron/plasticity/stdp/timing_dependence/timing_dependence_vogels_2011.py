@@ -48,10 +48,10 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def __init__(self, alpha: float, tau: float = 20.0,
                  A_plus: float = 0.01, A_minus: float = 0.01):
         r"""
-        :param float alpha: :math:`\alpha`
-        :param float tau: :math:`\tau`
-        :param float A_plus: :math:`A^+`
-        :param float A_minus: :math:`A^-`
+        :param alpha: :math:`\alpha`
+        :param tau: :math:`\tau`
+        :param A_plus: :math:`A^+`
+        :param A_minus: :math:`A^-`
         """
         super().__init__(SynapseStructureWeightOnly())
         self.__alpha = alpha
@@ -66,8 +66,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def alpha(self) -> float:
         r"""
         :math:`\alpha`
-
-        :rtype: float
         """
         return self.__alpha
 
@@ -75,8 +73,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def tau(self) -> float:
         r"""
         :math:`\tau`
-
-        :rtype: float
         """
         return self.__tau
 
@@ -84,8 +80,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def A_plus(self) -> float:
         r"""
         :math:`A^+`
-
-        :rtype: float
         """
         return self.__a_plus
 
@@ -97,8 +91,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def A_minus(self) -> float:
         r"""
         :math:`A^-`
-
-        :rtype: float
         """
         return self.__a_minus
 
@@ -117,8 +109,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
-
-        :rtype: str
         """
         return "vogels_2011"
 
@@ -126,8 +116,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def pre_trace_n_bytes(self) -> int:
         """
         The number of bytes used by the pre-trace of the rule per neuron.
-
-        :rtype: int
         """
         # Trace entries consist of a single 16-bit number
         return BYTES_PER_SHORT
@@ -140,8 +128,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def n_weight_terms(self) -> int:
         """
         The number of weight terms expected by this timing rule.
-
-        :rtype: int
         """
         return 1
 

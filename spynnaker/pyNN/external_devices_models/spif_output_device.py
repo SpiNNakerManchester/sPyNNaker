@@ -77,19 +77,15 @@ class SPIFOutputDevice(
         """
         :param board_address: The board IP address of the SPIF device
         :param chip_coords: The chip coordinates of the SPIF device
-        :type chip_coords: tuple(int, int) or None
         :param label: The label to give the SPIF device
         :param bool create_database:
             Whether the database will be used to decode keys or not
         :param database_notify_host: The host that will read the database
-        :type database_notify_host: str or None
         :param database_notify_port_num:
             The port of the host that will read the database
-        :type database_notify_port_num: int or None
         :param database_ack_port_num:
             The port to listen on for responses from the host reading the
             database
-        :type database_ack_port_num: int or None
         :param int output_key_shift:
             The shift to apply to the population indices when added to the key
         """
@@ -121,9 +117,9 @@ class SPIFOutputDevice(
             will not be checked; please make sure you are using values that
             make sense!
 
-        :param Population population: The PyNN source Population
-        :param int key: The key to "or" with the incoming key *after* masking
-        :param int mask: The mask to "and" with the incoming SpiNNaker key
+        :param population: The PyNN source Population
+        :param key: The key to "or" with the incoming key *after* masking
+        :param mask: The mask to "and" with the incoming SpiNNaker key
         """
         # pylint: disable=protected-access
         self.__output_key_and_mask[population._vertex] = (key, mask)
@@ -131,8 +127,7 @@ class SPIFOutputDevice(
     def __is_power_of_2(self, v: int) -> bool:
         """ Determine if a value is a power of 2.
 
-        :param int v: The value to test
-        :rtype: bool
+        :param v: The value to test
         """
         return (v & (v - 1) == 0) and (v != 0)
 
@@ -171,8 +166,7 @@ class SPIFOutputDevice(
         """
         Get the payload for the command to set the router key.
 
-        :param int index: The index of key to get
-        :rtype: int
+        :param index: The index of key to get
         """
         r_infos = SpynnakerDataView.get_routing_infos()
         return r_infos.get_key_from(
@@ -183,8 +177,7 @@ class SPIFOutputDevice(
         """
         Get the payload for the command to set the router mask.
 
-        :param int index: The index of the mask to get
-        :rtype: int
+        :param index: The index of the mask to get
         """
         r_infos = SpynnakerDataView.get_routing_infos()
         return r_infos.get_info_from(

@@ -31,15 +31,12 @@ class ArbitraryFPGADevice(ApplicationFPGAVertex, PopulationApplicationVertex):
             board_address: Optional[str] = None,
             chip_coords: Optional[XY] = None, label: Optional[str] = None):
         """
-        :param int n_neurons: Number of neurons
-        :param int fpga_link_id:
-        :param int fpga_id:
+        :param n_neurons: Number of neurons
+        :param fpga_link_id:
+        :param fpga_id:
         :param board_address:
-        :type board_address: str or None
         :param chip_coords:
-        :type chip_coords: tuple(int, int) or None
         :param label:
-        :type label: str or None
         """
         conn = FPGAConnection(
             fpga_id, fpga_link_id, board_address, chip_coords)

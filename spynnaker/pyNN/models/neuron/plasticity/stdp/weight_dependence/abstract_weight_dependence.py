@@ -32,8 +32,7 @@ class AbstractWeightDependence(
         """
         Determine if this weight dependence is the same as another.
 
-        :param AbstractWeightDependence weight_dependence:
-        :rtype: bool
+        :param weight_dependence:
         """
         raise NotImplementedError
 
@@ -42,8 +41,6 @@ class AbstractWeightDependence(
     def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
-
-        :rtype: str
         """
         raise NotImplementedError
 
@@ -53,9 +50,8 @@ class AbstractWeightDependence(
         """
         Get the amount of SDRAM used by the parameters of this rule.
 
-        :param int n_synapse_types:
-        :param int n_weight_terms:
-        :rtype: int
+        :param n_synapse_types:
+        :param n_weight_terms:
         """
         raise NotImplementedError
 
@@ -67,13 +63,12 @@ class AbstractWeightDependence(
         """
         Write the parameters of the rule to the spec.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The specification to write to
-        :param float global_weight_scale: The weight scale applied globally
-        :param list(float) synapse_weight_scales:
+        :param spec: The specification to write to
+        :param global_weight_scale: The weight scale applied globally
+        :param synapse_weight_scales:
             The total weight scale applied to each synapse including the global
             weight scale
-        :param int n_weight_terms: The number of terms used by the synapse rule
+        :param n_weight_terms: The number of terms used by the synapse rule
         """
         raise NotImplementedError
 
@@ -83,7 +78,5 @@ class AbstractWeightDependence(
         """
         The maximum weight that will ever be set in a synapse as a result
         of this rule.
-
-        :rtype: float
         """
         raise NotImplementedError

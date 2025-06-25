@@ -47,12 +47,12 @@ class ACSource(AbstractCurrentSource):
                  amplitude: float = 0.0, offset: float = 0.0,
                  frequency: float = 0.0, phase: float = 0.0) -> None:
         """
-        :param float start:
-        :param float stop:
-        :param float amplitude:
-        :param float offset:
-        :param float frequency:
-        :param float phase:
+        :param start:
+        :param stop:
+        :param amplitude:
+        :param offset:
+        :param frequency:
+        :param phase:
         """
         # There's probably no need to actually store these as you can't
         # access them directly in pynn anyway
@@ -123,8 +123,6 @@ class ACSource(AbstractCurrentSource):
     def _get_frequency(self, frequency: CurrentParameter) -> float:
         """
         Convert frequency to radian-friendly value.
-
-        :rtype: float
         """
         if not isinstance(frequency, (int, float)):
             raise TypeError
@@ -135,8 +133,6 @@ class ACSource(AbstractCurrentSource):
     def _get_phase(self, phase: CurrentParameter) -> float:
         """
         Convert phase to radian-friendly value.
-
-        :rtype: float
         """
         if not isinstance(phase, (int, float)):
             raise TypeError

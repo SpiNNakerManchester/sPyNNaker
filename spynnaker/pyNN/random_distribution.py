@@ -80,15 +80,12 @@ class RandomDistribution(pyNN.random.RandomDistribution):
             self, distribution: str, parameters_pos: Optional[tuple] = None,
             rng: Optional[NumpyRNG] = None, **parameters_named: float):
         """
-        :param str distribution: the name of a random number distribution.
+        :param distribution: the name of a random number distribution.
         :param parameters_pos:
             parameters of the distribution, provided as a tuple. For the
             correct ordering, see `random.available_distributions`.
-        :type parameters_pos: tuple or None
         :param rng: the random number generator to use, if a specific one is
             desired (e.g., to provide a seed).
-        :type rng: ~pyNN.random.NumpyRNG or ~pyNN.random.GSLRNG or
-            ~pyNN.random.NativeRNG or None
         :param parameters_named:
             parameters of the distribution, provided as keyword arguments.
 

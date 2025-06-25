@@ -36,10 +36,9 @@ def version_satisfies(module: ModuleType, requirement: str) -> bool:
     """
     Perform a version check. This code could be smarter...
 
-    :param ~types.ModuleType module:
-    :param str requirement:
+    :param module:
+    :param requirement:
     :return: Whether the module's version satisfies the given requirement
-    :rtype: bool
     """
     return Version(module.__version__) >= Version(requirement)
 
@@ -49,7 +48,7 @@ def install_spynnaker_into(module: ModuleType) -> None:
     Do the actual installation by creating a package within the given
     module's implementation. This is very nasty!
 
-    :param ~types.ModuleType module:
+    :param module:
     """
     _file = module.__file__
     assert _file is not None

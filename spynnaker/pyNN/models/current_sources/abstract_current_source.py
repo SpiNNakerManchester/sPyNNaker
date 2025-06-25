@@ -57,7 +57,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         """
         Inject this source into the specified population cells.
 
-        :param PopulationBase cells: The cells to inject the source into
+        :param cells: The cells to inject the source into
         """
         # Call the population method to pass the source in
         cells.inject(self)
@@ -66,7 +66,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         """
         Set the application vertex associated with the current source.
 
-        :param PopulationVertex vertex: The population vertex
+        :param vertex: The population vertex
         """
         self.__app_vertex = vertex
 
@@ -74,8 +74,6 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
     def app_vertex(self) -> Optional[PopulationVertex]:
         """
         The application vertex associated with the current source.
-
-        :rtype: PopulationVertex
         """
         return self.__app_vertex
 
@@ -83,7 +81,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         """
         Set the population associated with the current source.
 
-        :param ~spynnaker.pyNN.models.populations.Population population:
+        :param population:
         """
         self.__population = population
 
@@ -91,8 +89,6 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
     def population(self) -> Optional[Population]:
         """
         The population associated with the current source.
-
-        :rtype: ~spynnaker.pyNN.models.populations.Population
         """
         return self.__population
 
@@ -110,8 +106,6 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
     def parameters(self) -> Mapping[str, CurrentParameter]:
         """
         The parameters of the current source.
-
-        :rtype: dict(str, Any)
         """
         raise NotImplementedError
 
@@ -120,8 +114,6 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
     def parameter_types(self) -> Mapping[str, DataType]:
         """
         The parameter types for the current source.
-
-        :rtype: dict(str, ~.DataType)
         """
         raise NotImplementedError
 
@@ -130,8 +122,6 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
     def current_source_id(self) -> int:
         """
         The ID of the current source.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -139,7 +129,5 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
     def get_sdram_usage_in_bytes(self) -> int:
         """
         The SDRAM usage in bytes of the current source.
-
-        :rtype: int
         """
         raise NotImplementedError

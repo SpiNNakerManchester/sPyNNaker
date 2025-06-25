@@ -32,7 +32,7 @@ class EIEIOSpikeRecorder(object):
     @property
     def record(self) -> bool:
         """
-        :rtype: bool
+        If the recorder is set to record
         """
         return self.__record
 

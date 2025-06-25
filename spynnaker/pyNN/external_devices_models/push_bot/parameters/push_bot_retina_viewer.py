@@ -73,8 +73,6 @@ class PushBotRetinaViewer():
     def port(self) -> int:
         """
         The port the connection is listening on.
-
-        :rtype: int
         """
         return self.__conn.local_port
 

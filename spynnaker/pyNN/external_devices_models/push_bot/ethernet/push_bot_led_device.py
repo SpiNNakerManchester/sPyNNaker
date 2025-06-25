@@ -42,8 +42,8 @@ class PushBotEthernetLEDDevice(
             start_frequency: Optional[int] = None,
             timesteps_between_send: Optional[int] = None):
         """
-        :param PushBotLED led: The LED to control
-        :param MunichIoSpiNNakerLinkProtocol protocol:
+        :param led: The LED to control
+        :param protocol:
             The protocol instance to get commands from
         :param start_active_time_front:
             The "active time" to set for the front LED at the start

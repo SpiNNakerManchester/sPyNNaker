@@ -45,26 +45,12 @@ class NeuronModelIzh(NeuronModel):
             i_offset: ModelParameter):
         """
         :param a: :math:`a`
-        :type a: float or iterable(float) or ~spynnaker.pyNN.RandomDistribution
-            or (mapping) function
         :param b: :math:`b`
-        :type b: float or iterable(float) or ~spynnaker.pyNN.RandomDistribution
-            or (mapping) function
         :param c: :math:`c`
-        :type c: float or iterable(float) or ~spynnaker.pyNN.RandomDistribution
-            or (mapping) function
         :param d: :math:`d`
-        :type d: float or iterable(float) or ~spynnaker.pyNN.RandomDistribution
-            or (mapping) function
         :param v_init: :math:`v_{init}`
-        :type v_init: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param u_init: :math:`u_{init}`
-        :type u_init: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param i_offset: :math:`I_{offset}`
-        :type i_offset: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([
@@ -108,8 +94,6 @@ class NeuronModelIzh(NeuronModel):
     def a(self) -> ModelParameter:
         """
         Settable model parameter: :math:`a`
-
-        :rtype: float
         """
         return self.__a
 
@@ -117,8 +101,6 @@ class NeuronModelIzh(NeuronModel):
     def b(self) -> ModelParameter:
         """
         Settable model parameter: :math:`b`
-
-        :rtype: float
         """
         return self.__b
 
@@ -126,8 +108,6 @@ class NeuronModelIzh(NeuronModel):
     def c(self) -> ModelParameter:
         """
         Settable model parameter: :math:`c`
-
-        :rtype: float
         """
         return self.__c
 
@@ -135,8 +115,6 @@ class NeuronModelIzh(NeuronModel):
     def d(self) -> ModelParameter:
         """
         Settable model parameter: :math:`d`
-
-        :rtype: float
         """
         return self.__d
 
@@ -144,8 +122,6 @@ class NeuronModelIzh(NeuronModel):
     def i_offset(self) -> ModelParameter:
         """
         Settable model parameter: :math:`I_{offset}`
-
-        :rtype: float
         """
         return self.__i_offset
 
@@ -153,8 +129,6 @@ class NeuronModelIzh(NeuronModel):
     def v_init(self) -> ModelParameter:
         """
         Settable model parameter: :math:`v_{init}`
-
-        :rtype: float
         """
         return self.__v_init
 
@@ -162,7 +136,5 @@ class NeuronModelIzh(NeuronModel):
     def u_init(self) -> ModelParameter:
         """
         Settable model parameter: :math:`u_{init}`
-
-        :rtype: float
         """
         return self.__u_init

@@ -66,14 +66,11 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
             An explicitly specified time step for the simulation in
             microseconds.
             If `None`, the value is read from the configuration
-        :type simulation_time_step_us: int or None
         :param time_scale_factor:
             An explicitly specified time scale factor for the simulation.
             If `None`, the value is read from the configuration
-        :type time_scale_factor: float or None
         :param min_delay:
             new value or `None` to say use simulation_time_step_ms
-        :type min_delay: int, float or None
         """
         try:
 
@@ -108,7 +105,6 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
 
         :param min_delay:
             new value or `None` to say use simulation_time_step_ms
-        :type min_delay: int, float or None
         """
         if min_delay is None:
             min_delay = self.get_simulation_time_step_ms()

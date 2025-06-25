@@ -81,22 +81,21 @@ class SPIFRetinaDevice(
                  board_address: Optional[str] = None,
                  chip_coords: Optional[Tuple[int, int]] = None):
         """
-        :param int pipe: Which pipe on SPIF the retina is connected to
-        :param int width: The width of the retina in pixels
-        :param int height: The height of the retina in pixels
-        :param int sub_width:
+        :param pipe: Which pipe on SPIF the retina is connected to
+        :param width: The width of the retina in pixels
+        :param height: The height of the retina in pixels
+        :param sub_width:
             The width of rectangles to split the retina into for efficiency of
             sending
-        :param int sub_height:
+        :param sub_height:
             The height of rectangles to split the retina into for efficiency of
             sending
         :param base_key:
             The key that is common over the whole vertex,
             or `None` to use the pipe number as the key
-        :type base_key: int or None
-        :param int input_x_shift:
+        :param input_x_shift:
             The shift to get the x coordinate from the input keys sent to SPIF
-        :param int input_y_shift:
+        :param input_y_shift:
             The shift to get the y coordinate from the input keys sent to SPIF
         :param board_address:
             The IP address of the board to which the FPGA is connected,
@@ -106,7 +105,6 @@ class SPIFRetinaDevice(
                 chip_coords will be used first if both are specified, with
                 board_address then being used if the coordinates don't connect
                 to an FPGA.
-        :type board_address: str or None
         :param chip_coords:
             The coordinates of the chip to which the FPGA is connected, or
             `None` to use the default board or board_address.
@@ -115,7 +113,6 @@ class SPIFRetinaDevice(
                 chip_coords will be used first if board_address is also
                 specified, with board_address then being used if the
                 coordinates don't connect to an FPGA.
-        :type chip_coords: tuple(int, int) or None
         """
         # Do some checks
         if sub_width < self.X_MASK + 1 or sub_height < self.Y_MASK + 1:

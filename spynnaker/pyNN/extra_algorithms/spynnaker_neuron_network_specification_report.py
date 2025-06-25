@@ -35,10 +35,6 @@ _GRAPH_FORMAT = "png"
 
 
 def _get_diagram(label: str) -> Tuple[gv.Digraph, Type[gv.ExecutableNotFound]]:
-    """
-    :param str label:
-    :rtype: tuple(~graphviz.Digraph, type)
-    """
     # pylint: disable=import-error,import-outside-toplevel
     try:
         import graphviz
@@ -56,7 +52,7 @@ def spynnaker_neuron_graph_network_specification_report() -> None:
     Produces a report describing the graph created from the neural
     populations and projections.
 
-    :param str report_folder: the report folder to put figure into
+    :param report_folder: the report folder to put figure into
     """
     # create holders for data
     dot_diagram, exe_not_found_exn = _get_diagram(_GRAPH_TITLE)
@@ -97,10 +93,7 @@ def _generate_vertices(
         dot_diagram: gv.Digraph,
         progress: ProgressBar) -> Dict[ApplicationVertex, str]:
     """
-    :param ~graphviz.Digraph dot_diagram:
-    :param ~.ProgressBar progress:
     :return: the mapping from vertex to ID for the generated vertices
-    :rtype: dict(~.ApplicationVertex,str)
     """
     vertex_ids: Dict[ApplicationVertex, str] = dict()
     for vertex_counter, vertex in progress.over(
@@ -116,11 +109,6 @@ def _generate_vertices(
 def _generate_edges(
         dot_diagram: gv.Digraph, vertex_ids: Dict[ApplicationVertex, str],
         progress: ProgressBar) -> None:
-    """
-    :param ~graphviz.Digraph dot_diagram:
-    :param dict(~.ApplicationVertex,str) vertex_ids:
-    :param ~.ProgressBar progress:
-    """
     for partition in progress.over(
             SpynnakerDataView.iterate_partitions(), False):
         for edge in partition.edges:

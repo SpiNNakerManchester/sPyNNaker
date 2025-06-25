@@ -77,14 +77,13 @@ class NeuronImplStandard(AbstractNeuronImpl):
             threshold_type: AbstractThresholdType,
             additional_input_type: Optional[AbstractAdditionalInput] = None):
         """
-        :param str model_name:
-        :param str binary:
-        :param AbstractNeuronModel neuron_model:
-        :param AbstractInputType input_type:
-        :param AbstractSynapseType synapse_type:
-        :param AbstractThresholdType threshold_type:
+        :param model_name:
+        :param binary:
+        :param neuron_model:
+        :param input_type:
+        :param synapse_type:
+        :param threshold_type:
         :param additional_input_type:
-        :type additional_input_type: AbstractAdditionalInput or None
         """
         self.__model_name = model_name
         self.__binary = binary
@@ -105,8 +104,6 @@ class NeuronImplStandard(AbstractNeuronImpl):
     def n_steps_per_timestep(self) -> int:
         """
         Get the last set n steps per timestep
-
-        :rtype: int
         """
         return self.__n_steps_per_timestep
 

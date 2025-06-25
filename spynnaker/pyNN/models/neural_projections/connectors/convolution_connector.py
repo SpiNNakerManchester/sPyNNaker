@@ -102,21 +102,17 @@ class ConvolutionConnector(AbstractConnector):
             * :py:class:`~spynnaker.pyNN.RandomDistribution`:
               `kernel_shape` must be provided; weights will be drawn from the
               distribution
-        :type kernel_weights:
-            int or list or ~numpy.ndarray or ~spynnaker.pyNN.RandomDistribution
         :param kernel_shape:
             The shape of the kernel if it cannot be determined from
             `kernel_weights`. If a single value is provided, a square kernel
             will be assumed.  If two values are provided, it will be assumed to
             be (n_rows, n_columns)
-        :type kernel_shape: int or tuple(int,int)
         :param strides:
             Spatial sampling frequency, jumps between the post neurons.
             This matches the meaning of standard ML packages.  If a single
             value is provided, the same stride will be used for rows and
             columns.  If two values are provided it will be assumed to be
             (stride_rows, stride_columns)
-        :type strides: int or tuple(int, int)
         :param padding:
             How many 'extra pixels' around the pre-population will be added,
             only zero-valued pixels are currently supported.  If a single
@@ -125,32 +121,29 @@ class ConvolutionConnector(AbstractConnector):
             `(padding_rows, padding_columns)`.  If True, automatic padding will
             be used based on the kernel shape.  If False or `None`, no padding
             will be used.
-        :type padding: bool or int or tuple(int, int) or None
         :param pool_shape:
             Area of pooling, only average pooling is supported (and seems to
             make sense). If a single value is provided, the pooling area will
             be square.  If two values are provided it will be assumed to be
             `(pooling_rows, pooling_columns)`.
-        :type pool_shape: int or tuple(int, int) or None
         :param pool_stride:
             Jumps between pooling regions. If a single value is provided, the
             same stride will be used for rows and columns.  If two values are
             provided it will be assumed to be `(stride_rows, stride_columns)`
-        :type pool_stride: int or tuple(int, int) or None
-        :param str positive_receptor_type:
+        :param positive_receptor_type:
             The receptor type to add the positive weights to.  By default this
             is "``excitatory``".
-        :param str negative_receptor_type:
+        :param negative_receptor_type:
             The receptor type to add the negative weights to.  By default this
             is "``inhibitory``".
-        :param bool safe:
-        :param bool verbose:
-        :param callable callback:
+        :param safe:
+        :param verbose:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
                 Not supported by sPyNNaker.
-        :param bool filter_edges:
+        :param filter_edges:
             Whether to filter the edges based on connectivity or not; filtered
             means that the receiving cores will receive fewer packets, whereas
             non-filtered means that receiving cores will receive all packets
@@ -184,8 +177,6 @@ class ConvolutionConnector(AbstractConnector):
     def positive_receptor_type(self) -> str:
         """
         The receptor type to add the positive weights to.
-
-        :rtype: str
         """
         return self.__positive_receptor_type
 
@@ -193,8 +184,6 @@ class ConvolutionConnector(AbstractConnector):
     def negative_receptor_type(self) -> str:
         """
          The receptor type to add the negative weights to.
-
-        :rtype: str
         """
         return self.__negative_receptor_type
 
@@ -202,8 +191,6 @@ class ConvolutionConnector(AbstractConnector):
     def kernel_weights(self) -> NDArray[float64]:
         """
         The weights for this connection.
-
-        :rtype: ndarray
         """
         return self.__kernel_weights
 
@@ -426,8 +413,6 @@ class ConvolutionConnector(AbstractConnector):
     def kernel_n_bytes(self) -> int:
         """
         Size of the weights in bytes
-
-        :rtype: int
         """
         n_weights = self.__kernel_weights.size
         return n_weights * BYTES_PER_SHORT
@@ -436,15 +421,13 @@ class ConvolutionConnector(AbstractConnector):
     def kernel_n_weights(self) -> int:
         """
         Size of the weights.
-
-        :rtype: int
         """
         return self.__kernel_weights.size
 
     @property
     def parameters_n_bytes(self) -> int:
         """
-        :rtype: int
+        The size of the connector struct in bytes
         """
         return CONNECTOR_CONFIG_SIZE
 
@@ -454,11 +437,10 @@ class ConvolutionConnector(AbstractConnector):
         """
         Gets the local only data
 
-        :param ProjectionApplicationEdge app_edge:
-        :param int local_delay:
-        :param int delay_stage:
-        :param int weight_index:
-        :rtype: ndarray
+        :param app_edge:
+        :param local_delay:
+        :param delay_stage:
+        :param weight_index:
         """
         # Get info about things
         kernel_shape = self.__kernel_weights.shape
@@ -489,9 +471,8 @@ class ConvolutionConnector(AbstractConnector):
         """
         Encode weights with weight scaling.
 
-        :param ProjectionApplicationEdge app_edge:
-        :param ndarray weight_scales:
-        :rtype: ndarray
+        :param app_edge:
+        :param weight_scales:
         """
         encoded_kernel_weights = self.__kernel_weights.flatten()
         neg_weights = encoded_kernel_weights < 0

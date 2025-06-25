@@ -35,12 +35,11 @@ class AbstractGenerateConnectorOnHost(object, metaclass=AbstractBase):
         """
         Create a synaptic block from the data.
 
-        :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param AbstractSynapseType synapse_type:
-        :param SynapseInformation synapse_info:
+        :param post_slices:
+        :param post_vertex_slice:
+        :param synapse_type:
+        :param synapse_info:
         :returns:
             The synaptic matrix data to go to the machine, as a Numpy array
-        :rtype: ~numpy.ndarray
         """
         raise NotImplementedError

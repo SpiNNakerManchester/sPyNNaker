@@ -59,12 +59,12 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
             self, tau_plus: float, tau_minus: float,
             tau_x: float, tau_y: float, A_plus: float, A_minus: float):
         r"""
-        :param float tau_plus: :math:`\tau_+`
-        :param float tau_minus: :math:`\tau_-`
-        :param float tau_x: :math:`\tau_x`
-        :param float tau_y: :math:`\tau_y`
-        :param float A_plus: :math:`A^+`
-        :param float A_minus: :math:`A^-`
+        :param tau_plus: :math:`\tau_+`
+        :param tau_minus: :math:`\tau_-`
+        :param tau_x: :math:`\tau_x`
+        :param tau_y: :math:`\tau_y`
+        :param A_plus: :math:`A^+`
+        :param A_minus: :math:`A^-`
         """
         super().__init__(SynapseStructureWeightOnly())
         self.__tau_plus = tau_plus
@@ -84,8 +84,6 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     def tau_plus(self) -> float:
         r"""
         :math:`\tau_+`
-
-        :rtype: float
         """
         return self.__tau_plus
 
@@ -93,8 +91,6 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     def tau_minus(self) -> float:
         r"""
         :math:`\tau_-`
-
-        :rtype: float
         """
         return self.__tau_minus
 
@@ -102,8 +98,6 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     def tau_x(self) -> float:
         r"""
         :math:`\tau_x`
-
-        :rtype: float
         """
         return self.__tau_x
 
@@ -111,8 +105,6 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     def tau_y(self) -> float:
         r"""
         :math:`\tau_y`
-
-        :rtype: float
         """
         return self.__tau_y
 
@@ -120,8 +112,6 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     def A_plus(self) -> float:
         r"""
         :math:`A^+`
-
-        :rtype: float
         """
         return self.__a_plus
 
@@ -133,8 +123,6 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     def A_minus(self) -> float:
         r"""
         :math:`A^-`
-
-        :rtype: float
         """
         return self.__a_minus
 
@@ -157,8 +145,6 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
-
-        :rtype: str
         """
         return "pfister_triplet"
 
@@ -166,8 +152,6 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     def pre_trace_n_bytes(self) -> int:
         """
         The number of bytes used by the pre-trace of the rule per neuron.
-
-        :rtype: int
         """
         # Triplet rule trace entries consists of two 16-bit traces - R1 and R2
         # (Note: this is the pre-trace size, not the post-trace size)
@@ -184,8 +168,6 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     def n_weight_terms(self) -> int:
         """
         The number of weight terms expected by this timing rule.
-
-        :rtype: int
         """
         return 2
 

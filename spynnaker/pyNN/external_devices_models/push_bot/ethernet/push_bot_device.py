@@ -40,14 +40,14 @@ class PushBotEthernetDevice(
             uses_payload: bool, time_between_send: Optional[int],
             first_send_timestep: Optional[int] = _DEFAULT_FIRST_SEND_TIMESTEP):
         """
-        :param MunichIoSpiNNakerLinkProtocol protocol:
+        :param protocol:
             The protocol instance to get commands from
-        :param AbstractPushBotOutputDevice device:
+        :param device:
             The Enum instance of the device to control
-        :param bool uses_payload:
+        :param uses_payload:
             True if the device uses a payload for control
-        :param int time_between_send: The timesteps between sending
-        :param int first_send_timestep: The first timestep to send
+        :param time_between_send: The timesteps between sending
+        :param first_send_timestep: The first timestep to send
         """
         self.__protocol = protocol
         self.__device = device
@@ -104,8 +104,6 @@ class PushBotEthernetDevice(
     def protocol(self) -> MunichIoSpiNNakerLinkProtocol:
         """
         The protocol instance, for use in the subclass.
-
-        :rtype: MunichIoSpiNNakerLinkProtocol
         """
         return self.__protocol
 
@@ -116,7 +114,6 @@ class PushBotEthernetDevice(
         Set the protocol use to send setup and shutdown commands,
         separately from the protocol used to control the device.
 
-        :param MunichIoSpiNNakerLinkProtocol command_protocol:
-            The protocol to use for this device
+        :param command_protocol: The protocol to use for this device
         """
         raise NotImplementedError

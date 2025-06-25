@@ -54,8 +54,6 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         An array containing the cell IDs of those neurons in the
         Population that exist on the local MPI node.
-
-        :rtype: list(int)
         """
         logger.warning("local calls do not really make sense on sPyNNaker so "
                        "local_cells just returns all_cells")
@@ -67,8 +65,6 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         An array containing the cell IDs of all neurons in the
         Population (all MPI nodes).
-
-        :rtype: list(int)
         """
         raise NotImplementedError
 
@@ -81,8 +77,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         .. warning::
             Currently unimplemented.
 
-        :param PopulationBase other:
-        :rtype: Assembly
+        :param other:
         """
         raise NotImplementedError("sPyNNaker does not support Assemblies")
 
@@ -99,8 +94,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             Either a single variable name or a list of variable names.
             Variables must have been previously recorded, otherwise an
             Exception will be raised.
-        :type variables: str or list(str)
-        :param bool gather: For parallel simulators, if this is True, all data
+        :param gather: For parallel simulators, if this is True, all data
             will be gathered to all nodes and the Neo Block will contain data
             from all nodes. Otherwise, the Neo Block will contain only data
             from the cells simulated on the local node.
@@ -108,11 +102,9 @@ class PopulationBase(object, metaclass=AbstractBase):
             .. note::
                 SpiNNaker always gathers.
 
-        :param bool clear:
+        :param clear:
             If this is True, recorded data will be deleted from the Population.
         :param annotations: annotations to put on the neo block
-        :type annotations: None or dict(str, ...)
-        :rtype: ~neo.core.Block
         """
         raise NotImplementedError
 
@@ -123,7 +115,7 @@ class PopulationBase(object, metaclass=AbstractBase):
 
         The dict keys are neuron IDs, not indices.
 
-        :param bool gather:
+        :param gather:
             For parallel simulators, if this is True, all data will be gathered
             to all nodes and the Neo Block will contain data from all nodes.
             Otherwise, the Neo Block will contain only data from the cells
@@ -131,8 +123,6 @@ class PopulationBase(object, metaclass=AbstractBase):
 
             .. note::
                 SpiNNaker always gathers.
-
-        :rtype: dict(int, int)
         """
         raise NotImplementedError
 
@@ -141,8 +131,6 @@ class PopulationBase(object, metaclass=AbstractBase):
         Connect a current source to all cells in the Population.
 
         :param current_source:
-        :type current_source:
-            ~pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource
         """
         raise NotImplementedError
 
@@ -151,8 +139,6 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         Indicates whether the cell with the given ID exists on the
         local MPI node.
-
-        :rtype: bool
         """
         # pylint: disable=redefined-builtin
         _ = id
@@ -165,8 +151,6 @@ class PopulationBase(object, metaclass=AbstractBase):
     def local_size(self) -> int:
         """
         The number of cells in the population on the local MPI node.
-
-        :rtype: int
         """
         logger.warning("local calls do not really make sense on sPyNNaker so "
                        "is_local always returns size")
@@ -180,7 +164,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         Returns the mean number of spikes per neuron.
 
-        :param bool gather:
+        :param gather:
             For parallel simulators, if this is True, all data will be gathered
             to all nodes and the Neo Block will contain data from all nodes.
             Otherwise, the Neo Block will contain only data from the cells
@@ -188,8 +172,6 @@ class PopulationBase(object, metaclass=AbstractBase):
 
             .. note::
                 SpiNNaker always gathers.
-
-        :rtype: float
         """
         if not gather:
             warn_once(
@@ -226,7 +208,6 @@ class PopulationBase(object, metaclass=AbstractBase):
 
 
         :return: a 3xN array
-        :rtype: ~numpy.ndarray
         """
         raise NotImplementedError
 
@@ -241,13 +222,11 @@ class PopulationBase(object, metaclass=AbstractBase):
 
         :param io:
             a Neo IO instance, or a string for where to put a Neo instance
-        :type io: ~neo.io or ~neo.rawio or str
         :param variables:
             either a single variable name or a list of variable names.
             Variables must have been previously recorded, otherwise an
             Exception will be raised.
-        :type variables: str or list(str)
-        :param bool gather: For parallel simulators, if this is True, all data
+        :param gather: For parallel simulators, if this is True, all data
             will be gathered to all nodes and the Neo Block will contain data
             from all nodes. Otherwise, the Neo Block will contain only data
             from the cells simulated on the local node. This is pointless on
@@ -256,10 +235,9 @@ class PopulationBase(object, metaclass=AbstractBase):
             .. note::
                 SpiNNaker always gathers.
 
-        :param bool clear:
+        :param clear:
             clears the storage data if set to true after reading it back
         :param annotations: annotations to put on the Neo block
-        :type annotations: None or dict(str, ...)
         """
         raise NotImplementedError
 
@@ -286,8 +264,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             a list of variables that can be recorded for that `celltype`.
         :param to_file: a file to automatically record to (optional).
             `write_data()` will be automatically called when `end()` is called.
-        :type to_file: ~neo.io or ~neo.rawio or str
-        :param int sampling_interval: a value in milliseconds, and an integer
+        :param sampling_interval: a value in milliseconds, and an integer
             multiple of the simulation timestep.
         """
         raise NotImplementedError
@@ -308,8 +285,6 @@ class PopulationBase(object, metaclass=AbstractBase):
     def structure(self) -> Optional[BaseStructure]:
         """
         The spatial structure of the parent Population.
-
-        :rtype: ~pyNN.space.BaseStructure
         """
         raise NotImplementedError
 
@@ -318,8 +293,6 @@ class PopulationBase(object, metaclass=AbstractBase):
     def _vertex(self) -> ApplicationVertex:
         """
         The underlying application vertex.
-
-        :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
         raise NotImplementedError
 
@@ -336,8 +309,6 @@ class PopulationBase(object, metaclass=AbstractBase):
     def _recorder(self) -> Recorder:
         """
         The recorder of the population.
-
-        :rtype: ~Recorder
         """
         raise NotImplementedError
 

@@ -68,9 +68,8 @@ def shape2word(
     """
     Combines two short values into 1 int by shifting the first 16 places
 
-    :param int short1: first 2 byte value
-    :param int short2: second 2 bytes value
-    :rtype: int
+    :param short1: first 2 byte value
+    :param short2: second 2 bytes value
     """
     return uint32(((uint32(short2) & 0xFFFF) << 16)
                   | (uint32(short1) & 0xFFFF))
@@ -113,46 +112,34 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         :param shape_pre:
             2D shape of the pre-population (rows/height, columns/width, usually
             the input image shape)
-        :type shape_pre: list(int) or tuple(int,int)
         :param shape_post:
             2D shape of the post-population (rows/height, columns/width)
-        :type shape_post: list(int) or tuple(int,int)
         :param shape_kernel:
             2D shape of the kernel (rows/height, columns/width)
-        :type shape_kernel: list(int) or tuple(int,int)
         :param weight_kernel: (optional)
             2D matrix of size shape_kernel describing the weights
-        :type weight_kernel: ~numpy.ndarray or ~pyNN.random.RandomDistribution
-            or int or float or list(int) or list(float) or None
         :param delay_kernel: (optional)
             2D matrix of size shape_kernel describing the delays
-        :type delay_kernel: ~numpy.ndarray or ~pyNN.random.RandomDistribution
-            or int or float or list(int) or list(float) or None
         :param shape_common: (optional)
             2D shape of common coordinate system (for both pre- and post-,
             usually the input image sizes)
-        :type shape_common: list(int) or tuple(int,int) or None
         :param pre_sample_steps_in_post: (optional)
             Sampling steps/jumps for pre-population <=> (stepX, stepY)
-        :type pre_sample_steps_in_post: None or list(int) or tuple(int,int)
         :param pre_start_coords_in_post: (optional)
             Starting row/column for pre-population sampling <=> (offX, offY)
-        :type pre_start_coords_in_post: None or list(int) or tuple(int,int)
         :param post_sample_steps_in_pre: (optional)
             Sampling steps/jumps for post-population <=> (stepX, stepY)
-        :type post_sample_steps_in_pre: None or list(int) or tuple(int,int)
         :param post_start_coords_in_pre: (optional)
             Starting row/column for post-population sampling <=> (offX, offY)
-        :type post_start_coords_in_pre: None or list(int) or tuple(int,int)
-        :param bool safe:
+        :param safe:
             Whether to check that weights and delays have valid values.
             If ``False``, this check is skipped.
-        :param ~pyNN.space.Space space:
+        :param space:
             Currently ignored; for future compatibility.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
@@ -226,8 +213,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         """
         Get a list of possible post-slice coordinates.
 
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
+        :param post_vertex_slice:
         """
         post = numpy.arange(
             post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1,
@@ -239,10 +225,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
                 NDArray[integer], NDArray[integer]]:
         """
         Get a map from post to pre-population coordinates.
-
-        :param ~numpy.ndarray post_r: rows
-        :param ~numpy.ndarray post_c: columns
-        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
         """
         return (self._post_start_h + post_r * self._post_step_h,
                 self._post_start_w + post_c * self._post_step_w)
@@ -251,9 +233,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             NDArray[integer], NDArray[integer]]:
         """
         Write post-population coordinates as pre-population coordinates.
-
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
         """
         # directly as the cache index
         if post_vertex_slice not in self._post_as_pre:
@@ -265,10 +244,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     def __pre_as_post(self, pre_r: int, pre_c: int) -> Tuple[int, int]:
         """
         Write pre-population coordinates as post-population coordinates.
-
-        :param int pre_r: row
-        :param int pre_c: column
-        :rtype: tuple(int,int)
         """
         r = ((pre_r - self._pre_start_h - 1) // self._pre_step_h) + 1
         c = ((pre_c - self._pre_start_w - 1) // self._pre_step_w) + 1
@@ -278,11 +253,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             _KERNAL, WEIGHTS_DELAYS]]) -> Optional[ConvolutionKernel]:
         """
         Convert kernel values given into the correct format.
-
-        :param values:
-        :type values: int or float or ~pyNN.random.RandomDistribution
-            or ~numpy.ndarray or ConvolutionKernel
-        :rtype: ~numpy.ndarray
         """
         if values is None:
             return None
@@ -314,14 +284,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
                 NDArray[floating]]:
         """
         Compute the relevant information required for the connections.
-
-        :param weights:
-        :type weights: int or float or ~pyNN.random.RandomDistribution or
-            ~numpy.ndarray or ConvolutionKernel
-        :param delays:
-        :type delays: int or float or ~pyNN.random.RandomDistribution or
-            ~numpy.ndarray or ConvolutionKernel
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         """
         # If __compute_statistics is called more than once, there's
         # no need to get the user-supplied weights and delays again

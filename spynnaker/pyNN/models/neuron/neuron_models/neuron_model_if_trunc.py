@@ -52,26 +52,12 @@ class NeuronModelIFTrunc(NeuronModel):
             tau_refrac: ModelParameter):
         r"""
         :param v_init: :math:`V_{init}`
-        :type v_init: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param v_rest: :math:`V_{rest}`
-        :type v_rest: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_m: :math:`\tau_{m}`
-        :type tau_m: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param cm: :math:`C_m`
-        :type cm: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param i_offset: :math:`I_{offset}`
-        :type i_offset: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param v_reset: :math:`V_{reset}`
-        :type v_reset: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_refrac: :math:`\tau_{refrac}`
-        :type tau_refrac: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([
@@ -114,8 +100,6 @@ class NeuronModelIFTrunc(NeuronModel):
     def v_init(self) -> ModelParameter:
         """
         Settable model parameter: :math:`V_{init}`
-
-        :rtype: float
         """
         return self.__v_init
 
@@ -123,8 +107,6 @@ class NeuronModelIFTrunc(NeuronModel):
     def tau_m(self) -> ModelParameter:
         r"""
         Settable model parameter: :math:`\tau_{m}`
-
-        :rtype: float
         """
         return self.__tau_m
 
@@ -132,8 +114,6 @@ class NeuronModelIFTrunc(NeuronModel):
     def cm(self) -> ModelParameter:
         """
         Settable model parameter: :math:`C_m`
-
-        :rtype: float
         """
         return self.__cm
 
@@ -141,8 +121,6 @@ class NeuronModelIFTrunc(NeuronModel):
     def i_offset(self) -> ModelParameter:
         """
         Settable model parameter: :math:`I_{offset}`
-
-        :rtype: float
         """
         return self.__i_offset
 
@@ -150,8 +128,6 @@ class NeuronModelIFTrunc(NeuronModel):
     def v_reset(self) -> ModelParameter:
         """
         Settable model parameter: :math:`V_{reset}`
-
-        :rtype: float
         """
         return self.__v_reset
 
@@ -159,7 +135,5 @@ class NeuronModelIFTrunc(NeuronModel):
     def tau_refrac(self) -> ModelParameter:
         r"""
         Settable model parameter: :math:`\tau_{refrac}`
-
-        :rtype: float
         """
         return self.__tau_refrac

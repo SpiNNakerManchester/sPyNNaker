@@ -139,8 +139,8 @@ def run_sync(run_time: float, sync_time: float) -> None:
     Run in steps of the given number of milliseconds pausing between
     for a signal to be sent from the host.
 
-    :param float run_time: The time in milliseconds to run the simulation for
-    :param float sync_time: The time in milliseconds to pause before allowing
+    :param run_time: The time in milliseconds to run the simulation for
+    :param sync_time: The time in milliseconds to pause before allowing
     """
     SpynnakerDataView.check_user_can_act()
     assert __simulator is not None, "no simulator set up"
@@ -171,9 +171,9 @@ def register_database_notification_request(
     """
     Adds a socket system which is registered with the notification protocol.
 
-    :param str hostname: hostname to connect to
-    :param int notify_port: UDP port number for the notify command
-    :param int ack_port: UDP port number for the acknowledge command
+    :param hostname: hostname to connect to
+    :param notify_port: UDP port number for the notify command
+    :param ack_port: UDP port number for the acknowledge command
     """
     SpynnakerDataView.add_database_socket_address(
         SocketAddress(hostname, notify_port, ack_port))
@@ -211,32 +211,26 @@ def EthernetControlPopulation(
     Create a PyNN population that can be included in a network to
     control an external device which is connected to the host.
 
-    :param int n_neurons: The number of neurons in the control population
+    :param n_neurons: The number of neurons in the control population
     :param type model:
         Class of a model that creates a vertex of type
         :py:class:`AbstractEthernetController`
     :param label: An optional label for the population
-    :type label: str or None
     :param local_host:
         The optional local host IP address to listen on for commands
-    :type local_host: str or None
     :param local_port: The optional local port to listen on for commands
-    :type local_port: int or None
     :param database_ack_port_num:
         The optional port to which responses to the database notification
         protocol are to be sent
-    :type database_ack_port_num: int or None
     :param database_notify_port_num:
         The optional port to which notifications from the database
         notification protocol are to be sent
-    :type database_notify_port_num: int or None
     :return:
         A pyNN Population which can be used as the target of a Projection.
 
         .. note::
             The Population can also be used as the source of a
             Projection, but it might not send spikes.
-    :rtype: ~spynnaker.pyNN.models.populations.Population
     :raises TypeError: If an invalid model class is used.
     """
     # pylint: disable=global-statement
@@ -284,25 +278,21 @@ def EthernetSensorPopulation(
     Create a pyNN population which can be included in a network to
     receive spikes from a device connected to the host.
 
-    :param AbstractEthernetSensor device: The sensor model
+    :param device: The sensor model
     :param local_host:
         The optional local host IP address to listen on for database
         notification
-    :type local_host: str or None
     :param database_ack_port_num:
         The optional port to which responses to the database notification
         protocol are to be sent
-    :type database_ack_port_num: int or None
     :param database_notify_port_num:
         The optional port to which notifications from the database
         notification protocol are to be sent
-    :type database_notify_port_num: int or None
     :return:
         A pyNN Population which can be used as the source of a Projection.
 
         .. note::
             The Population cannot be used as the target of a Projection.
-    :rtype: ~spynnaker.pyNN.models.populations.Population
     :raises TypeError: If an invalid model class is used.
     """
     if not isinstance(device, AbstractEthernetSensor):
@@ -338,20 +328,16 @@ def SpikeInjector(
     Supports creating a spike injector that can be added to the
     application graph.
 
-    :param bool notify: Whether to register for notifications
+    :param notify: Whether to register for notifications
     :param database_notify_host: the hostname for the device which is
         listening to the database notification.
-    :type database_notify_host: str or None
     :param database_ack_port_num: the port number to which a external device
         will acknowledge that they have finished reading the database and are
         ready for it to start execution
-    :type database_ack_port_num: int or None
     :param database_notify_port_num: The port number to which a external
         device will receive the database is ready command
-    :type database_notify_port_num: int or None
     :return: The spike injector model object that can be placed in a pyNN
         :py:class:`~spynnaker.pyNN.models.populations.Population`.
-    :rtype: AbstractPyNNModel
     """
     if notify:
         Plugins.add_database_socket_address(
@@ -366,7 +352,7 @@ def _set_simulator(simulator: SpiNNaker) -> None:
 
     Any other uses is not supported.
 
-    :param spynnaker.pyNN.spinnaker.SpiNNaker simulator:
+    :param simulator:
     """
     global __simulator  # pylint: disable=global-statement
     __simulator = simulator

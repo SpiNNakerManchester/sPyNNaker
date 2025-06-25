@@ -55,8 +55,6 @@ def _plan_expansion() -> Tuple[
         ExecutableTargets, List[Tuple[AbstractNeuronExpandable, Placement]]]:
     """
     Plan the expansion of neurons and set up the regions using USER1.
-
-    :rtype: tuple(ExecutableTargets, list(tuple(MachineVertex, Placement)))
     """
     neuron_bin = SpynnakerDataView.get_executable_path(NEURON_EXPANDER_APLX)
     txrx = SpynnakerDataView.get_transceiver()
@@ -89,10 +87,8 @@ def _fill_in_initial_data(expanded_pop_vertices: List[
     """
     Once expander has run, fill in the connection data.
 
-    :param list(MachineVertex, Placement) expanded_pop_vertices:
-        List of machine vertices to read data from
-    :param ~spinnman.transceiver.Transceiver transceiver:
-        How to talk to the machine
+    :param expanded_pop_vertices: List of machine vertices to read data from
+    :param transceiver: How to talk to the machine
     """
     progress = ProgressBar(
         len(expanded_pop_vertices), "Getting initial values")

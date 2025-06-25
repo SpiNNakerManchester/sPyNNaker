@@ -81,15 +81,15 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def __init__(self, safe: bool = True, callback: None = None,
                  verbose: bool = False):
         """
-        :param bool safe: if True, check that weights and delays have valid
+        :param safe: if True, check that weights and delays have valid
             values. If False, this check is skipped. (NB: SpiNNaker always
             checks.)
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
                 Not supported by sPyNNaker.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
         """
@@ -107,7 +107,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         Set the space object (allowed after instantiation).
 
-        :param ~pyNN.space.Space space:
+        :param space:
         """
         self.__space = space
 
@@ -116,7 +116,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         Sets a connectors projection info.
 
-        :param SynapseInformation synapse_info: the synapse info
+        :param synapse_info: the synapse info
         """
         _ = synapse_info
         self.__min_delay = SpynnakerDataView.get_simulation_time_step_ms()
@@ -128,8 +128,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the minimum delay given a float or RandomDistribution.
 
         :param delays: the delays
-        :type delays: ~spynnaker.pyNN.RandomDistribution or int or float or str
-        :param int n_connections: how many connections
+        :param n_connections: how many connections
         """
         if isinstance(delays, RandomDistribution):
             low_estimated_delay = utility_calls.get_minimum_probable_value(
@@ -152,10 +151,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
             synapse_info: SynapseInformation) -> float:
         """
         Get the maximum delay given a float or RandomDistribution.
-
-        :param delays:
-        :type delays: ~pyNN.random.RandomDistribution or int or float or str
-        :param int n_connections:
         """
         if isinstance(delays, RandomDistribution):
             max_estimated_delay = utility_calls.get_maximum_probable_value(
@@ -179,7 +174,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         Get the maximum delay specified by the user in ms,.
 
-        :param SynapseInformation synapse_info: the synapse info
+        :param synapse_info: the synapse info
         """
         raise NotImplementedError
 
@@ -190,8 +185,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the minimum delay specified by the user in ms, or `None` if
         unbounded.
 
-        :param SynapseInformation synapse_info:
-        :rtype: int or None
+        :param synapse_info:
         """
         raise NotImplementedError
 
@@ -201,8 +195,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the variance of the delays.
 
         :param delays:
-        :type delays: ~pyNN.random.RandomDistribution or int or float or str
-        :rtype: float
         """
         if isinstance(delays, RandomDistribution):
             return utility_calls.get_variance(delays)
@@ -222,12 +214,10 @@ class AbstractConnector(object, metaclass=AbstractBase):
         max_delay given given a float, RandomDistribution or list of delays.
 
         :param delays:
-        :type delays: spynnaker.pyNN.RandomDistribution or int or float or str
-        :param int n_total_connections:
-        :param int n_connections:
-        :param float min_delay:
-        :param float max_delay:
-        :rtype: int
+        :param n_total_connections:
+        :param n_connections:
+        :param min_delay:
+        :param max_delay:
         """
         if isinstance(delays, RandomDistribution):
             prob_in_range = utility_calls.get_probability_within_range(
@@ -273,12 +263,10 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Not all concrete connectors support omitting the delay range.
 
         :param delays:
-        :type delays: ~pyNN.random.RandomDistribution or int or float or str
-        :param int n_post_atoms:
-        :param SynapseInformation synapse_info:
-        :param float min_delay:
-        :param float max_delay:
-        :rtype: int
+        :param n_post_atoms:
+        :param synapse_info:
+        :param min_delay:
+        :param max_delay:
         """
         raise NotImplementedError
 
@@ -300,8 +288,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the mean of the weights.
 
         :param weights:
-        :type weights: ~pyNN.random.RandomDistribution or int or float or str
-        :rtype: float
         """
         if isinstance(weights, RandomDistribution):
             return abs(utility_calls.get_mean(weights))
@@ -317,11 +303,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
             synapse_info: SynapseInformation) -> float:
         """
         Get the maximum of the weights.
-
-        :param weights:
-        :type weights: ~pyNN.random.RandomDistribution or int or float or str
-        :param int n_connections:
-        :rtype: float
         """
         if isinstance(weights, RandomDistribution):
             mean_weight = utility_calls.get_mean(weights)
@@ -351,8 +332,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         Get the maximum of the weights for this connection.
 
-        :param SynapseInformation synapse_info:
-        :rtype: float
+        :param synapse_info:
         """
         raise NotImplementedError
 
@@ -362,8 +342,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the variance of the weights.
 
         :param weights:
-        :type weights: ~pyNN.random.RandomDistribution or int or float or str
-        :rtype: float
         """
         if isinstance(weights, RandomDistribution):
             return utility_calls.get_variance(weights)
@@ -382,8 +360,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         coordinates, and we assume the user has specified an expression
         such as `d[0] + d[2]`.
 
-        :param str d_expression:
-        :rtype: bool
+        :param d_expression:
         """
         regexpr = re.compile(r'.*d\[\d*\].*')
         return bool(regexpr.match(d_expression))
@@ -403,10 +380,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
             self, values: RandomDistribution, n_connections: int,
             post_vertex_slice: Slice) -> NDArray[float64]:
         """
-        :param ~pyNN.random.RandomDistribution values:
-        :param int n_connections:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :rtype: ~numpy.ndarray
+        :param values:
+        :param n_connections:
+        :param post_vertex_slice:
         """
         key = (id(post_vertex_slice), id(values))
         seed = self.__param_seeds.get(key, None)
@@ -429,7 +405,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         :param values:
         :param synapse_info:
-        :rtype: SpynnakerException
         """
         return SpynnakerException(
             f"Str Weights or delays {values} are distance-dependent "
@@ -489,15 +464,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
             targets: numpy.ndarray, n_connections: int, post_slice: Slice,
             synapse_info: SynapseInformation,
             weights: bool) -> NDArray[float64]:
-        """
-        :param values:
-        :type values: ~pyNN.random.RandomDistribution or int or float or str
-            or callable
-        :param int n_connections:
-        :param ~pacman.model.graphs.common.Slice post_slice:
-        :param SynapseInformation synapse_info:
-        :rtype: ~numpy.ndarray
-        """
         if isinstance(values, RandomDistribution):
             return self._generate_random_values(
                 values, n_connections, post_slice)
@@ -541,11 +507,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
             synapse_info: SynapseInformation) -> numpy.ndarray:
         """
         Generate weight values.
-
-        :param int n_connections:
-        :param ~pacman.model.graphs.common.Slice post_slice:
-        :param SynapseInformation synapse_info:
-        :rtype: ~numpy.ndarray
         """
         weights = self._generate_values(
             synapse_info.weights, sources, targets, n_connections, post_slice,
@@ -563,9 +524,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def _clip_delays(self, delays: NDArray[float64]) -> NDArray[float64]:
         """
         Clip delay values, keeping track of how many have been clipped.
-
-        :param ~numpy.ndarray delays:
-        :rtype: ~numpy.ndarray
         """
         # count values that could be clipped
         self.__n_clipped_delays = numpy.sum(delays < self.__min_delay)
@@ -581,11 +539,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
             synapse_info: SynapseInformation) -> numpy.ndarray:
         """
         Generate valid delay values.
-
-        :param int n_connections:
-        :param ~pacman.model.graphs.common.Slice post_slice:
-        :param SynapseInformation synapse_info:
-        :rtype: ~numpy.ndarray
         """
         delays = self._generate_values(
             synapse_info.delays, sources, targets, n_connections, post_slice,
@@ -624,7 +577,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
     @property
     def safe(self) -> bool:
         """
-        :rtype: bool
+        Safe value supplied. Note ignored by sPyNNaker
         """
         return self.__safe
 
@@ -636,8 +589,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def space(self) -> Optional[Space]:
         """
         The space object (may be updated after instantiation).
-
-        :rtype: ~pyNN.space.Space or None
         """
         return self.__space
 
@@ -646,14 +597,14 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         Set the space object (allowed after instantiation).
 
-        :param ~pyNN.space.Space new_value:
+        :param new_value:
         """
         self.__space = new_value
 
     @property
     def verbose(self) -> bool:
         """
-        :rtype: bool
+        verbose value supplied by user
         """
         return self.__verbose
 
@@ -669,17 +620,10 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the machine vertices that are connected to each other with
         this connector
 
-        :param SynapseInformation s_info:
-            The synapse information of the connection
+        :param s_info: The synapse information of the connection
         :param source_vertex: The source of the spikes
-        :type source_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
         :param target_vertex: The target of the spikes
-        :type target_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
         :return: A list of tuples of (target machine vertex, list of sources)
-        :rtype: list(tuple(~pacman.model.graphs.machine.MachineVertex,
-            list(~pacman.model.graphs.AbstractVertex)))
         """
         # By default, just return that the whole target connects to the
         # whole source
@@ -694,7 +638,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         .. warning::
             Do *not* call this! SpyNNaker does not work that way.
 
-        :param ~spynnaker.pyNN.models.projection.Projection projection:
+        :param projection:
         :raises SpynnakerException: Always. Method not supported; profiled out.
         """
         raise SpynnakerException("Standard pyNN connect method not supported")
@@ -706,9 +650,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         rounded; other values cause exceptions.
 
         :param size: The value to be rounded
-        :type size: int or float
-        :param str label: The type-name of the connection, for messages
-        :rtype: int
+        :param label: The type-name of the connection, for messages
         :raises SpynnakerException: If the size is non-integer and not close
         """
         if isinstance(size, int):
@@ -734,9 +676,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         on multi-dimensional vertices.
 
         :param application_edge: The edge of the connection
-        :type application_edge:
-            ~pacman.model.graphs.application.ApplicationEdge
-        :param SynapseInformation synapse_info: The synaptic information
+        :param synapse_info: The synaptic information
         """
         _ = application_edge
         if ((synapse_info.prepop_is_view and

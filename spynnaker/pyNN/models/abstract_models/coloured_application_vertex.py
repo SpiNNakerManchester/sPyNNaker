@@ -30,7 +30,5 @@ class ColouredApplicationVertex(ApplicationVertex):
         The number of colour bits sent by this vertex.
 
         Assumed 0 unless overridden
-
-        :rtype: int
         """
         raise NotImplementedError

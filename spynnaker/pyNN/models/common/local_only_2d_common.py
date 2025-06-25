@@ -51,9 +51,8 @@ Source = namedtuple(
 def get_div_const(value: int) -> int:
     """ Get the values used to perform fast division by an integer constant
 
-    :param int value: The value to be divided by
+    :param value: The value to be divided by
     :return: The values required encoded as fields of a 32-bit integer
-    :rtype: int
     """
     log_val = int(ceil(log2(value)))
     log_m_val = ((2 ** log_val) - value) / value
@@ -98,10 +97,9 @@ def get_rinfo_for_spike_source(
     Get the routing information for the source of a projection in the
     given partition.
 
-    :param ApplicationVertex pre_vertex: The source of incoming data
-    :param str partition_id: The partition ID to get the routing info from
+    :param pre_vertex: The source of incoming data
+    :param partition_id: The partition ID to get the routing info from
     :return: Routing information, core mask, core mask shift
-    :rtype: AppVertexRoutingInfo, int, int
     """
     routing_info = SpynnakerDataView.get_routing_infos()
 
@@ -131,7 +129,6 @@ def get_sources_for_target(app_vertex: "PopulationVertex") -> Dict[
     :param PopulationVertex app_vertex: The vertex being targeted
     :return:
         A dict of source ApplicationVertex to list of source information
-    :rtype: dict(tuple(ApplicationVertex, str), list(Source))
     """
     sources = defaultdict(list)
     for incoming in app_vertex.incoming_projections:
@@ -147,8 +144,7 @@ def get_first_and_last_slice(pre_vertex: ApplicationVertex) -> \
     """
     Get the first and last slice of an application vertex.
 
-    :param ApplicationVertex pre_vertex: The source vertex
-    :rtype: tuple(Slice, Slice) or tuple(MDSlice, MDSlice)
+    :param pre_vertex: The source vertex
     """
     if isinstance(pre_vertex, ApplicationVirtualVertex):
         if len(pre_vertex.atoms_shape) == 1:

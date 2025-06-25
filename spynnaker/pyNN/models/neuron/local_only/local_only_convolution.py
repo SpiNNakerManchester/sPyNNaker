@@ -71,7 +71,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def __init__(self, delay: WEIGHTS_DELAYS_IN = None):
 
         """
-        :param float delay:
+        :param delay:
             The delay used in the connection; by default 1 time step
         """
         super().__init__(delay)
@@ -255,11 +255,10 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         Get all the application vertex sources that will hit the given
         application vertex.
 
-        :param PopulationVertex app_vertex: The vertex being targeted
+        :param app_vertex: The vertex being targeted
         :return:
             A dict of source PopulationApplicationVertex to list of source
             information
-        :rtype: dict(tuple(PopulationApplicationVertex, str), list(Source))
         """
         sources = self.__cached_sources.get(app_vertex)
         if sources is None:

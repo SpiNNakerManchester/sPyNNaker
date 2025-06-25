@@ -45,21 +45,20 @@ class ICUBRetinaDevice(Application2DSpiNNakerLinkVertex):
                  spinnaker_link_id: int = 0,
                  board_address: Optional[str] = None):
         """
-        :param int base_key: The key that is common over the whole vertex
-        :param int width: The width of the retina in pixels
-        :param int height: The height of the retina in pixels
-        :param int sub_width:
+        :param base_key: The key that is common over the whole vertex
+        :param width: The width of the retina in pixels
+        :param height: The height of the retina in pixels
+        :param sub_width:
             The width of rectangles to split the retina into for efficiency of
             sending
-        :param int sub_height:
+        :param sub_height:
             The height of rectangles to split the retina into for efficiency of
             sending
-        :param int spinnaker_link_id:
+        :param spinnaker_link_id:
             The ID of the SpiNNaker link that the device is connected to
         :param board_address:
             The board to which the device is connected,
             or `None` for the first board
-        :type board_address: str or None
         """
         # Fake the width if not a power of 2, as we need this for the sake
         # of passing on to other 2D vertices.  This will map the pixels onto

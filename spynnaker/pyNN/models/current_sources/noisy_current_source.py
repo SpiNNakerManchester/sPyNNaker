@@ -48,11 +48,11 @@ class NoisyCurrentSource(AbstractCurrentSource):
                  start: float = 0.0, stop: float = 0.0, dt: float = 1.0,
                  rng: None = None) -> None:
         """
-        :param float mean:
-        :param float stdev:
-        :param float start:
-        :param float stop:
-        :param float dt:
+        :param mean:
+        :param stdev:
+        :param start:
+        :param stop:
+        :param dt:
         :param rng:
         """
         # There's probably no need to actually store these as you can't

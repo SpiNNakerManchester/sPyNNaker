@@ -64,7 +64,7 @@ class IndexBasedProbabilityConnector(AbstractConnector,
             rng: Optional[NumpyRNG] = None,
             safe: bool = True, callback: None = None, verbose: bool = False):
         """
-        :param str index_expression:
+        :param index_expression:
             the right-hand side of a valid python expression for
             probability, involving the indices of the pre- and
             post-populations,
@@ -72,23 +72,22 @@ class IndexBasedProbabilityConnector(AbstractConnector,
             distribution;
             the indices will be given as variables ``i`` and ``j`` when the
             expression is evaluated.
-        :param bool allow_self_connections:
+        :param allow_self_connections:
             if the connector is used to connect a Population to itself, this
             flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
         :param rng:
             Seeded random number generator, or ``None`` to make one when
             needed.
-        :type rng: ~pyNN.random.NumpyRNG or None
-        :param bool safe:
+        :param safe:
             Whether to check that weights and delays have valid values.
             If ``False``, this check is skipped.
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
                 Not supported by sPyNNaker.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
         """
@@ -100,9 +99,6 @@ class IndexBasedProbabilityConnector(AbstractConnector,
 
     def _update_probs_from_index_expression(
             self, synapse_info: SynapseInformation) -> NDArray:
-        """
-        :param SynapseInformation synapse_info:
-        """
         # note: this only needs to be done once
         if self.__probs is None:
             # numpy array of probabilities using the index_expression
@@ -216,8 +212,6 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         When the connector is used to connect a Population to itself, this
         flag determines whether a neuron is allowed to connect to itself,
         or only to other neurons in the Population.
-
-        :rtype: bool
         """
         return self.__allow_self_connections
 
@@ -231,8 +225,6 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         The right-hand side of a valid python expression for probability,
         involving the indices of the pre- and post-populations, that can
         be parsed by `eval()`, that computes a probability distribution.
-
-        :rtype: str
         """
         return self.__index_expression
 

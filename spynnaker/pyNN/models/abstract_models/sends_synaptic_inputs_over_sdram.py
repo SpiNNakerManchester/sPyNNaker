@@ -33,7 +33,5 @@ class SendsSynapticInputsOverSDRAM(
 
         :param sdram_partition:
             The SDRAM partition to receive synapses from
-        :type sdram_partition:
-            ~pacman.model.graphs.machine.SourceSegmentedSDRAMMachinePartition
         """
         raise NotImplementedError

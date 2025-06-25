@@ -53,18 +53,18 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def __init__(self, cset: CSet, safe: bool = True, callback: None = None,
                  verbose: bool = False):
         """
-        :param csa.connset.CSet cset:
+        :param cset:
             A description of the connection set between populations
-        :param bool safe:
+        :param safe:
             If ``True``, check that weights and delays have valid values.
             If ``False``, this check is skipped.
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
                 Not supported by sPyNNaker.
 
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
         :raises ImportError:
@@ -98,11 +98,6 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def _get_n_connections(
             self, post_vertex_slice: Slice,
             synapse_info: SynapseInformation) -> Tuple[int, CSet]:
-        """
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param SynapseInformation synapse_info:
-        :rtype: tuple(int, cset.connset.CSet)
-        """
         # do the work from self._cset in here
 
         # this is where the magic needs to happen somehow
@@ -187,8 +182,8 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def show_connection_set(
             self, n_pre_neurons: int, n_post_neurons: int) -> None:
         """
-        :param int n_pre_neurons:
-        :param int n_post_neurons:
+        :param n_pre_neurons:
+        :param n_post_neurons:
         """
         # Yuck; this was supposed to be available to the user from scripts...
         csa.show(self.__full_connection_set, n_pre_neurons, n_post_neurons)

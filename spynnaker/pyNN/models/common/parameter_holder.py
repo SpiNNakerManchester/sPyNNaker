@@ -47,13 +47,10 @@ class ParameterHolder(object):
             selector: Selector = None):
         """
         :param data_items_to_return: A list of data fields to be returned
-        :type data_items_to_return: list(str) or tuple(str)
         :param get_call: A function to call to read a value
-        :type get_call: callable(str, selector)->list
         :param selector: a description of the subrange to accept,
             or `None` for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
-        :type selector: None or slice or int or list(bool) or list(int)
         """
         self.__data_items_to_return: Union[str, Tuple[str, ...]]
         if isinstance(data_items_to_return, str):
@@ -85,8 +82,6 @@ class ParameterHolder(object):
     def _get_data_items(self) -> Dict[str, List[float]]:
         """
         Merges the parameters and values in to the final data items
-
-        :rtype: dict
         """
         # If there are already merged connections cached, return those
         if self.__data_items is not None:
@@ -171,8 +166,6 @@ class ParameterHolder(object):
     def keys(self) -> Iterable[str]:
         """
         The names of the data
-
-        :rtype: iter(str)
         """
         data = self._get_data_items()
         return data.keys()
@@ -180,8 +173,6 @@ class ParameterHolder(object):
     def values(self) -> Iterable[List[float]]:
         """
         The names and values of the data
-
-        :rtype: iter(list(float))
         """
         data = self._get_data_items()
         return data.values()
@@ -189,8 +180,6 @@ class ParameterHolder(object):
     def items(self) -> Iterable[Tuple[str, List[float]]]:
         """
         The names and values of the data
-
-        :rtype: iter(tuple(str, list(float)))
         """
         data = self._get_data_items()
         return data.items()

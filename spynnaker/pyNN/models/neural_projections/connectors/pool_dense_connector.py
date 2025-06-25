@@ -83,29 +83,24 @@ class PoolDenseConnector(AbstractConnector):
             * :py:class:`~numpy.ndarray`: As above for list
             * :py:class:`~spynnaker.pyNN.RandomDistribution`:
               weights will be drawn at random
-        :type weights:
-            int or float or list(int or float) or ~numpy.ndarray or
-            ~spynnaker.pyNN.RandomDistribution
         :param pool_shape:
             Shape of average pooling. If a single value is provided, it will
             be used for every dimension, otherwise must be the same number of
             values as there are dimensions in the source.
-        :type pool_shape: int or tuple(int) or None
         :param pool_stride:
             Jumps between pooling regions. If a single value is provided, the
             same stride will be used for all dimensions, otherwise must be
             the same number of values as there are dimensions in the source.
             If `None`, and pool_shape is provided, pool_stride will be set to
             pool_shape.
-        :type pool_stride: int or tuple(int) or None
-        :param str positive_receptor_type:
+        :param positive_receptor_type:
             The receptor type to add the positive weights to.  By default this
             is "excitatory".
-        :param str negative_receptor_type:
+        :param negative_receptor_type:
             The receptor type to add the negative weights to.  By default this
             is "inhibitory".
-        :param bool safe: (ignored)
-        :param bool verbose: (ignored)
+        :param safe: (ignored)
+        :param verbose: (ignored)
         :param callable callback:
             if given, a callable that display a progress bar on the terminal.
 
@@ -122,21 +117,21 @@ class PoolDenseConnector(AbstractConnector):
     @property
     def positive_receptor_type(self) -> str:
         """
-        :rtype: str
+        The receptor type to add the positive weights to
         """
         return self.__positive_receptor_type
 
     @property
     def negative_receptor_type(self) -> str:
         """
-        :rtype: str
+        The receptor type to add the negative weights to
         """
         return self.__negative_receptor_type
 
     @property
     def weights(self) -> NDArray:
         """
-        :rtype: ~numpy.ndarray
+        The synaptic strengths
         """
         return self.__weights
 
@@ -195,9 +190,6 @@ class PoolDenseConnector(AbstractConnector):
         The shape considering the stride
 
         :param pre_shape: tuple(int)
-        :type pool_shape: int, tuple(int) or None
-        :type pool_stride: int, tuple(int) or None
-        :rtype: ndarray
         """
         real_pool_shape = cls.__to_nd_shape_or_none(
             pool_shape, len(pre_shape), "pool_shape")
@@ -298,9 +290,8 @@ class PoolDenseConnector(AbstractConnector):
     def local_only_n_bytes(self, pre_shape: Tuple[int, ...],
                            n_post_atoms: int) -> int:
         """
-        :param tuple(int) pre_shape:
-        :param int n_post_atoms:
-        :rtype: int
+        :param pre_shape:
+        :param n_post_atoms:
         """
         n_weights = self.__get_n_weights(pre_shape, n_post_atoms)
         n_weights = n_weights + 1 if n_weights % 2 != 0 else n_weights
@@ -314,13 +305,13 @@ class PoolDenseConnector(AbstractConnector):
             delay_stage: int, post_vertex_slice: Slice,
             weight_scales: NDArray[floating]) -> NDArray[uint32]:
         """
-        :param ~data_specification.DataSpecificationGenerator spec:
-        :param ~pacman.model.graphs.application.ApplicationEdge app_edge:
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param int key:
-        :param int mask:
-        :param int n_colour_bits:
+        :param spec:
+        :param app_edge:
+        :param pre_vertex_slice:
+        :param post_vertex_slice:
+        :param key:
+        :param mask:
+        :param n_colour_bits:
         :param weight_scales:
         """
 

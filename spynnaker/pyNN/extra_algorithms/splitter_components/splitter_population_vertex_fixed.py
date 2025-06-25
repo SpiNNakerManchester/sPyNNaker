@@ -147,18 +147,6 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
             neuron_data: NeuronData) -> PopulationMachineCommon:
         """
         Create the machine vertex for a slice.
-
-        :param Slice vertex_slice:
-        :param AbstractSDRAM sdram:
-        :param str label:
-        :param int structural_sz:
-        :param list(list) ring_buffer_shifts:
-        :param ndarray weight_scales:
-        :param int index:
-        :param int max_atoms_per_core:
-        :param SynapticMatrices synaptic_matrices:
-        :param NeuronData neuron_data:
-        :rtype: PopulationMachineCommon
         """
         # If using local-only create a local-only vertex
         s_dynamics = self.governed_app_vertex.synapse_dynamics
@@ -180,9 +168,6 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
             structural_sz: int) -> AbstractSDRAM:
         """
         Gets the resources of a slice of atoms.
-
-        :param int n_atoms:
-        :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         variable_sdram = self.__get_variable_sdram(n_atoms)
         constant_sdram = self.__get_constant_sdram(
@@ -198,9 +183,8 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
         """
         Returns the variable SDRAM from the recorders.
 
-        :param int n_atoms: The number of atoms to account for
+        :param n_atoms: The number of atoms to account for
         :return: the variable SDRAM used by the neuron recorder
-        :rtype: VariableSDRAM
         """
         s_dynamics = self.governed_app_vertex.synapse_dynamics
         if isinstance(s_dynamics, AbstractSynapseDynamicsStructural):
@@ -218,8 +202,7 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
         """
         Returns the constant SDRAM used by the atoms.
 
-        :param int n_atoms: The number of atoms to account for
-        :rtype: ~pacman.model.resources.MultiRegionSDRAM
+        :param n_atoms: The number of atoms to account for
         """
         s_dynamics = self.governed_app_vertex.synapse_dynamics
         n_record = (
@@ -272,9 +255,7 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
         """
         Get the amount of fixed SDRAM used by synapse parts.
 
-        :param int n_atoms: The number of atoms to account for
-
-        :rtype: ~pacman.model.resources.MultiRegionSDRAM
+        :param n_atoms: The number of atoms to account for
         """
         regions = PopulationMachineVertex.SYNAPSE_REGIONS
         sdram = MultiRegionSDRAM()

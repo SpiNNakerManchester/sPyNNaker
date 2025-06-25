@@ -30,6 +30,5 @@ class AbstractInputType(
         Get the global weight scaling value.
 
         :return: The global weight scaling value
-        :rtype: float
         """
         raise NotImplementedError

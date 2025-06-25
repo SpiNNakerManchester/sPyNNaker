@@ -233,11 +233,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         Get all the application vertex sources that will hit the given
         application vertex.
 
-        :param PopulationVertex app_vertex: The vertex being targeted
+        :param app_vertex: The vertex being targeted
         :return:
             A dict of source ApplicationVertex and partition id to list of
             source information
-        :rtype: dict(tuple(ApplicationVertex, str), list(Source))
         """
         sources = self.__cached_sources.get(app_vertex)
         if sources is None:

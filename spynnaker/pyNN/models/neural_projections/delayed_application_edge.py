@@ -42,18 +42,13 @@ class DelayedApplicationEdge(ApplicationEdge):
             undelayed_edge: ProjectionApplicationEdge,
             label: Optional[str] = None):
         """
-        :param DelayExtensionVertex pre_vertex:
-            The delay extension at the start of the edge
-        :param PopulationVertex post_vertex:
-            The target of the synapses
+        :param pre_vertex: The delay extension at the start of the edge
+        :param post_vertex: The target of the synapses
         :param synapse_information:
             The synapse information on this edge
-        :type synapse_information:
-            SynapseInformation or iterable(SynapseInformation)
-        :param ProjectionApplicationEdge undelayed_edge:
+        :param undelayed_edge:
             The edge that is used for projections without extended delays
-        :param str label:
-            The edge label
+        :param label: The edge label
         """
         super().__init__(pre_vertex, post_vertex, label=label)
         if isinstance(synapse_information, Iterable):
@@ -75,14 +70,14 @@ class DelayedApplicationEdge(ApplicationEdge):
     @property
     def synapse_information(self) -> List[SynapseInformation]:
         """
-        :rtype: list(SynapseInformation)
+        The synapse information on this edge
         """
         return self.__synapse_information
 
     def add_synapse_information(
             self, synapse_information: SynapseInformation) -> None:
         """
-        :param SynapseInformation synapse_information:
+        Add more synapse information on this edge
         """
         self.__synapse_information.append(synapse_information)
 
@@ -90,7 +85,5 @@ class DelayedApplicationEdge(ApplicationEdge):
     def undelayed_edge(self) -> ProjectionApplicationEdge:
         """
         The edge for projections without extended delays.
-
-        :rtype: ProjectionApplicationEdge
         """
         return self.__undelayed_edge

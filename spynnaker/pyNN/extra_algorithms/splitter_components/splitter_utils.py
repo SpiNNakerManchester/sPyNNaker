@@ -31,19 +31,12 @@ def is_direct_poisson_source(
     """
     Determine if a given Poisson source can be created by this splitter.
 
-    :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:
-        The vertex sending into the Projection
-    :param connector:
-        The connector in use in the Projection
-    :type connector:
-        ~spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector
+    :param pre_vertex: The vertex sending into the Projection
+    :param connector: The connector in use in the Projection
     :param dynamics:
         The synapse dynamics in use in the Projection
-    :type dynamics:
-        ~spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics
     :param delay:
         The delay in use in the Projection
-    :rtype: bool
     """
     return (isinstance(pre_vertex, SpikeSourcePoissonVertex) and
             isinstance(pre_vertex.splitter, SplitterPoissonDelegate) and

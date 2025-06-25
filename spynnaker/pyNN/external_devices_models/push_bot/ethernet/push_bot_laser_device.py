@@ -41,9 +41,8 @@ class PushBotEthernetLaserDevice(
             start_frequency: Optional[int] = None,
             timesteps_between_send: Optional[int] = None):
         """
-        :param PushBotLaser laser: The PushBotLaser value to control
-        :param MunichIoEthernetProtocol protocol:
-            The protocol instance to get commands from
+        :param laser: The PushBotLaser value to control
+        :param protocol: The protocol instance to get commands from
         :param start_active_time:
             The "active time" value to send at the start
         :param start_total_period:

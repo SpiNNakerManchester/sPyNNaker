@@ -41,8 +41,6 @@ class ReceivesSynapticInputsOverSDRAM(
         """
         A list of scale factors to be applied to weights that get passed
         over SDRAM, one for each synapse type.
-
-        :rtype: list(int)
         """
         raise NotImplementedError
 
@@ -53,7 +51,5 @@ class ReceivesSynapticInputsOverSDRAM(
         The number of bytes to be sent over the channel.  This will be
         calculated using the above numbers, but also rounded up to a number
         of words, and with the number of neurons rounded up to a power of 2.
-
-        :rtype: int
         """
         raise NotImplementedError

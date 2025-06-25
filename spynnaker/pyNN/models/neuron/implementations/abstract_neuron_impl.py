@@ -30,8 +30,6 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
     def model_name(self) -> str:
         """
         The name of the model.
-
-        :rtype: str
         """
         raise NotImplementedError
 
@@ -40,8 +38,6 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
     def binary_name(self) -> str:
         """
         The name of the binary executable of this implementation.
-
-        :rtype: str
         """
         raise NotImplementedError
 
@@ -50,8 +46,6 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
     def structs(self) -> Sequence[Struct]:
         """
         A list of structures used by the implementation.
-
-        :rtype: list(Struct)
         """
         raise NotImplementedError
 
@@ -59,8 +53,6 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
     def get_global_weight_scale(self) -> float:
         """
         Get the weight scaling required by this model.
-
-        :rtype: float
         """
         raise NotImplementedError
 
@@ -68,8 +60,6 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
     def get_n_synapse_types(self) -> int:
         """
         Get the number of synapse types supported by the model.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -78,8 +68,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
         Get the ID of a synapse given the name.
 
-        :param str target: The name of the synapse
-        :rtype: int
+        :param target: The name of the synapse
         """
         raise NotImplementedError
 
@@ -87,8 +76,6 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
     def get_synapse_targets(self) -> Sequence[str]:
         """
         Get the target names of the synapse type.
-
-        :rtype: list(str)
         """
         raise NotImplementedError
 
@@ -96,8 +83,6 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
     def get_recordable_variables(self) -> Sequence[str]:
         """
         Get the names of the variables that can be recorded in this model.
-
-        :rtype: list(str)
         """
         raise NotImplementedError
 
@@ -106,7 +91,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
         Get the units of the given variable that can be recorded.
 
-        :param str variable: The name of the variable
+        :param variable: The name of the variable
         """
         raise NotImplementedError
 
@@ -116,7 +101,6 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         Get the data type of the variables that can be recorded.
 
         :return: dictionary of name of variable to data type of variable
-        :rtype: dict(str,~data_specification.enums.DataType)
         """
         raise NotImplementedError
 
@@ -125,8 +109,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
         Determine if the given variable can be recorded.
 
-        :param str variable: The name of the variable
-        :rtype: bool
+        :param variable: The name of the variable
         """
         raise NotImplementedError
 
@@ -136,8 +119,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         Get the index of the variable in the list of variables that can be
         recorded.
 
-        :param str variable: The name of the variable
-        :rtype: int
+        :param variable: The name of the variable
         """
         raise NotImplementedError
 
@@ -146,8 +128,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
         Add the initial values of the parameters to the parameter holder.
 
-        :param ~spinn_utilities.ranged.RangeDictionary parameters:
-            A holder of the parameters
+        :param parameters: A holder of the parameters
         """
         raise NotImplementedError
 
@@ -157,8 +138,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         Add the initial values of the state variables to the state
         variables holder.
 
-        :param ~spinn_utilities.ranged.RangeDictionary state_variables:
-            A holder of the state variables
+        :param state_variables: A holder of the state variables
         """
         raise NotImplementedError
 
@@ -167,8 +147,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
         Get the units of the given variable.
 
-        :param str variable: The name of the variable
-        :rtype: str
+        :param variable: The name of the variable
         """
         raise NotImplementedError
 
@@ -177,7 +156,5 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
     def is_conductance_based(self) -> bool:
         """
         Whether the model uses conductance.
-
-        :rtype: bool
         """
         raise NotImplementedError

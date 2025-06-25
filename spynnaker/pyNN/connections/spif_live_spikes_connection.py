@@ -85,22 +85,22 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
                  local_host: Optional[str] = None,
                  local_port: Optional[int] = None):
         """
-        :param iterable(str) receive_labels:
+        :param receive_labels:
             Labels of vertices from which live events will be received.
-        :param str spif_host: The location of the SPIF board receiving packets
-        :param int spif_port: The port of the SPIF board (default 3332)
-        :param int events_per_packet:
+        :param spif_host: The location of the SPIF board receiving packets
+        :param spif_port: The port of the SPIF board (default 3332)
+        :param events_per_packet:
             The maximum number of events in each packet.  SPIF will be
             configured to send a packet as soon as it reaches this size if not
             before (default is 32)
-        :param int time_per_packet:
+        :param time_per_packet:
             The maximum time between sending non-empty packets.  SPIF will be
             configured to send a packet that isn't empty after this many
             microseconds (default is 500)
-        :param str local_host:
+        :param local_host:
             Optional specification of the local hostname or IP address of the
             interface to listen on
-        :param int local_port:
+        :param local_port:
             Optional specification of the local port to listen on. Must match
             the port that the toolchain will send the notification on (19999
             by default)
@@ -149,7 +149,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         """
         Add a callback to be called to initialise a vertex.
 
-        :param str label:
+        :param abel:
             The label of the vertex to be notified about. Must be one of the
             vertices listed in the constructor
         :param init_callback: A function to be called to initialise the
@@ -157,7 +157,6 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             the number of neurons in the population, the run time of the
             simulation in milliseconds, and the simulation timestep in
             milliseconds
-        :type init_callback: callable(str, int, float, float) -> None
         """
         self.__init_callbacks[label].append(init_callback)
 
@@ -167,13 +166,12 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         """
         Add a callback for the reception of live events from a vertex.
 
-        :param str label: The label of the vertex to be notified about.
+        :param label: The label of the vertex to be notified about.
             Must be one of the vertices listed in the constructor
         :param live_event_callback: A function to be called when events are
             received. This should take as parameters the label of the vertex,
             and an array-like of atom IDs.
-        :type live_event_callback: callable(str, list(int)) -> None
-        :param bool translate_key:
+        :param translate_key:
             True if the key is to be converted to an atom ID, False if the
             key should stay a key
         """
@@ -189,14 +187,11 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         """
         Add a callback for the start and resume state of the simulation.
 
-        :param str label: the label of the function to be sent
+        :param label: the label of the function to be sent
         :param start_resume_callback: A function to be called when the start
             or resume message has been received. This function should take
             the label of the referenced vertex, and an instance of this
             class, which can be used to send events.
-        :type start_resume_callback: callable(str,
-            ~spinn_front_end_common.utilities.connections.LiveEventConnection)
-            -> None
         """
         self.__start_resume_callbacks[label].append(start_resume_callback)
 
@@ -205,21 +200,15 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         """
         Add a callback for the pause and stop state of the simulation.
 
-        :param str label: the label of the function to be sent
+        :param label: the label of the function to be sent
         :param pause_stop_callback: A function to be called when the pause
             or stop message has been received. This function should take the
             label of the referenced  vertex, and an instance of this class,
             which can be used to send events.
-        :type pause_stop_callback: callable(str,
-            ~spinn_front_end_common.utilities.connections.LiveEventConnection)
-            -> None
         """
         self.__pause_stop_callbacks[label].append(pause_stop_callback)
 
     def __read_database_callback(self, db_reader: DatabaseReader) -> None:
-        """
-        :param DatabaseReader db_reader:
-        """
         self.__handle_possible_rerun_state()
 
         vertex_sizes: Dict[str, int] = dict()

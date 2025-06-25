@@ -67,8 +67,6 @@ class SplitterPopulationVertex(
     def _get_fixed_slices(self) -> List[Slice]:
         """
         Get a list of fixed slices from the Application vertex.
-
-        :rtype: list(~pacman.model.graphs.common.Slice)
         """
         if self.__slices is not None:
             return self.__slices

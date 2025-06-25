@@ -39,8 +39,6 @@ class AbstractNeuronExpandable(object, metaclass=AbstractBase):
         .. note::
             The typical implementation for this method will be to ask the
             neuron data
-
-        :rtype: bool
         """
         raise NotImplementedError
 
@@ -49,8 +47,6 @@ class AbstractNeuronExpandable(object, metaclass=AbstractBase):
     def neuron_generator_region(self) -> int:
         """
         The region containing the parameters of neuron expansion.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -59,7 +55,6 @@ class AbstractNeuronExpandable(object, metaclass=AbstractBase):
         """
         Fill in any requested initial values.
 
-        :param ~pacman.model.placements.Placement placement:
-            Where the data is on the machine
+        :param placement: Where the data is on the machine
         """
         raise NotImplementedError

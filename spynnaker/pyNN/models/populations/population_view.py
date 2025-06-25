@@ -84,10 +84,8 @@ class PopulationView(PopulationBase):
             selector: Selector, label: Optional[str] = None):
         """
         :param parent: the population or view to make the view from
-        :type parent: ~spynnaker.pyNN.models.populations.Population or
-            ~spynnaker.pyNN.models.populations.PopulationView
-        :param PopulationApplicationVertex vertex: The actual underlying vertex
-        :param Recorder recorder: The recorder of the Population
+        :param vertex: The actual underlying vertex
+        :param recorder: The recorder of the Population
         :param selector: a slice or numpy mask array.
             The mask array should either be a Boolean array (ideally) of the
             same size as the parent,
@@ -140,8 +138,6 @@ class PopulationView(PopulationBase):
     def size(self) -> int:
         """
         The total number of neurons in the Population View.
-
-        :rtype: int
         """
         return len(self.__indexes)
 
@@ -149,8 +145,6 @@ class PopulationView(PopulationBase):
     def label(self) -> str:
         """
         A label for the Population View.
-
-        :rtype: str
         """
         return self.__label
 
@@ -158,8 +152,6 @@ class PopulationView(PopulationBase):
     def celltype(self) -> AbstractPyNNModel:
         """
         The type of neurons making up the underlying Population.
-
-        :rtype: AbstractPyNNModel
         """
         return self.__parent.celltype
 
@@ -167,8 +159,6 @@ class PopulationView(PopulationBase):
     def initial_values(self) -> ParameterHolder:
         """
         A dict containing the initial values of the state variables.
-
-        :rtype: InitialValuesHolder
         """
         return self.__vertex.get_initial_state_values(
             self.__vertex.get_state_variables(), self.__indexes)
@@ -177,8 +167,6 @@ class PopulationView(PopulationBase):
     def current_values(self) -> ParameterHolder:
         """
         A dict containing the current values of the state variables.
-
-        :rtype: InitialValuesHolder
         """
         warn_once(
             logger, "current_values is non-standard PyNN and therefore "
@@ -190,8 +178,6 @@ class PopulationView(PopulationBase):
     def parent(self) -> Union[Population, 'PopulationView']:
         """
         A reference to the parent Population (that this is a view of).
-
-        :rtype: ~spynnaker.pyNN.models.populations.Population
         """
         return self.__parent
 
@@ -208,8 +194,6 @@ class PopulationView(PopulationBase):
         """
         An array containing the cell IDs of all neurons in the
         Population (all MPI nodes).
-
-        :rtype: list(IDMixin)
         """
         return [IDMixin(self.__population, idx) for idx in self.__indexes]
 
@@ -240,8 +224,6 @@ class PopulationView(PopulationBase):
             ``p = Population(...)`` then
             ``p[2]`` is equivalent to ``p.__getitem__(2)``, and
             ``p[3:6]`` is equivalent to ``p.__getitem__(slice(3, 6))``
-
-        :rtype: IDMixin or ~.PopulationView
         """
         if isinstance(index, int):
             return IDMixin(self.__population, index)
@@ -250,8 +232,6 @@ class PopulationView(PopulationBase):
     def __iter__(self) -> Iterator['IDMixin']:
         """
         Iterator over cell IDs (on the local node).
-
-        :rtype: iterable(IDMixin)
         """
         for idx in self.__indexes:
             yield IDMixin(self.__population, idx)
@@ -259,8 +239,6 @@ class PopulationView(PopulationBase):
     def __len__(self) -> int:
         """
         Return the total number of cells in the population (all nodes).
-
-        :rtype: int
         """
         return len(self.__indexes)
 
@@ -284,8 +262,6 @@ class PopulationView(PopulationBase):
     def can_record(self, variable: str) -> bool:
         """
         Determine whether variable can be recorded from this population.
-
-        :rtype: bool
         """
         return variable in self.__vertex.get_recordable_variables()
 
@@ -294,8 +270,6 @@ class PopulationView(PopulationBase):
         """
         Whether the post-synaptic response is modelled as a
         change in conductance or a change in current.
-
-        :rtype: bool
         """
         return self.__vertex.conductance_based
 
@@ -304,7 +278,7 @@ class PopulationView(PopulationBase):
         """
         Injects the specified current_source into this PopulationView.
 
-        :param AbstractCurrentSource current_source:
+        :param current_source:
             the current source to be injected
         """
         self.__vertex.inject(current_source, self.__indexes)
@@ -320,10 +294,8 @@ class PopulationView(PopulationBase):
         If template is ``None``, then a dictionary containing the template
         context will be returned.
 
-        :param str template: Template filename
+        :param template: Template filename
         :param engine: Template substitution engine
-        :type engine: str or ~pyNN.descriptions.TemplateEngine or None
-        :rtype: str or dict
         """
         context = {"label": self.label,
                    "parent": self.parent.label,
@@ -339,9 +311,8 @@ class PopulationView(PopulationBase):
         .. warning::
             No PyNN description of this method.
 
-        :param str variable: The name of the variable
+        :param variable: The name of the variable
         :return: The units of the variable
-        :rtype: str
         """
         return self.__vertex.get_units(variable)
 
@@ -358,10 +329,8 @@ class PopulationView(PopulationBase):
             SpiNNaker always gathers.
 
         :param parameter_names:
-        :type parameter_names: str or list(str)
-        :param bool gather:
-        :param bool simplify:
-        :rtype: ParameterHolder
+        :param gather:
+        :param simplify:
         """
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
@@ -384,8 +353,7 @@ class PopulationView(PopulationBase):
         :param variables: Either a single variable name or a list of variable
             names. Variables must have been previously recorded, otherwise an
             Exception will be raised.
-        :type variables: str or list(str)
-        :param bool gather: For parallel simulators, if gather is True, all
+        :param gather: For parallel simulators, if gather is True, all
             data will be gathered to all nodes and the Neo Block will contain
             data from all nodes.
             Otherwise, the Neo Block will contain only data from the cells
@@ -394,11 +362,9 @@ class PopulationView(PopulationBase):
             .. note::
                 SpiNNaker always gathers.
 
-        :param bool clear:
+        :param clear:
             If True, recorded data will be deleted from the Population.
         :param annotations: annotations to put on the neo block
-        :type annotations: dict(str, ...)
-        :rtype: ~neo.core.Block
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the variable or variables have not been previously set to
@@ -421,10 +387,9 @@ class PopulationView(PopulationBase):
         SsPyNNaker specific method for getting data as a numpy array,
         instead of the Neo-based object
 
-        :param str variable: a single variable name
-        :param bool as_matrix: If set True the data is returned as a 2d matrix
+        :param variable: a single variable name
+        :param as_matrix: If set True the data is returned as a 2d matrix
         :return: array of the data
-        :rtype: ~numpy.ndarray
         """
         return self.__population.spinnaker_get_data(
             variable, as_matrix, self.__indexes)
@@ -444,8 +409,6 @@ class PopulationView(PopulationBase):
 
         The name "grandparent" is of course a little misleading, as it could
         be just the parent, or the great, great, great, ..., grandparent.
-
-        :rtype: ~spynnaker.pyNN.models.populations.Population
         """
         return self.__population
 
@@ -469,8 +432,6 @@ class PopulationView(PopulationBase):
         assert pv.id_to_index(pv[3]) == 3
 
         :param id:
-        :type id: int or list(int)
-        :rtype: int or list(int)
         """
         if isinstance(id, int):
             return self.__indexes.index(id)
@@ -481,8 +442,7 @@ class PopulationView(PopulationBase):
         Given an array of indices, return the indices in the parent
         population at the root of the tree.
 
-        :param list(int) indices:
-        :rtype: list(int)
+        :param indices:
         """
         return [self.__indexes[index] for index in indices]
 
@@ -556,9 +516,8 @@ class PopulationView(PopulationBase):
         Randomly sample `n` cells from the Population view, and return a
         new PopulationView object.
 
-        :param int n: The number of cells to select
-        :param ~pyNN.random.NumpyRNG rng: Random number generator
-        :rtype: ~spynnaker.pyNN.models.populations.PopulationView
+        :param n: The number of cells to select
+        :param rng: Random number generator
         """
         if not rng:
             rng = NumpyRNG()
@@ -665,8 +624,6 @@ class IDMixin(PopulationView):
     def get_parameters(self) -> ParameterHolder:
         """
         Return a dict of all cell parameters.
-
-        :rtype: dict(str, ...)
         """
         return self._vertex.get_parameter_values(
             self._vertex.get_parameters(), self.id)
@@ -675,7 +632,7 @@ class IDMixin(PopulationView):
     @property
     def id(self) -> int:
         """
-        :rtype: int
+        The lowest index in thos view
         """
         return self._indexes[0]
 
@@ -694,8 +651,7 @@ class IDMixin(PopulationView):
         """
         Get the initial value of a state variable of the cell.
 
-        :param str variable: The name of the variable
-        :rtype: float
+        :param variable: The name of the variable
         """
         return self._vertex.get_initial_state_values(variable, self.id)
 
@@ -708,8 +664,8 @@ class IDMixin(PopulationView):
         """
         Set the initial value of a state variable of the cell.
 
-        :param str variable: The name of the variable
-        :param float value: The value of the variable
+        :param variable: The name of the variable
+        :param value: The value of the variable
         """
         self._vertex.set_initial_state_values(variable, value, self.id)
 
@@ -723,8 +679,6 @@ class IDMixin(PopulationView):
     def as_view(self) -> PopulationView:
         """
         Return a PopulationView containing just this cell.
-
-        :rtype: ~spynnaker.pyNN.models.populations.PopulationView
         """
         return self
 
@@ -732,8 +686,6 @@ class IDMixin(PopulationView):
     def local(self) -> bool:
         """
         Whether this cell is local to the current MPI node.
-
-        :rtype: bool
         """
         # There are no MPI nodes!
         return True
