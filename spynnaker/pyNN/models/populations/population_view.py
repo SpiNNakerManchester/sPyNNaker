@@ -632,7 +632,7 @@ class IDMixin(PopulationView):
     @property
     def id(self) -> int:
         """
-        The lowest index in thos view
+        The lowest index in this view
         """
         return self._indexes[0]
 

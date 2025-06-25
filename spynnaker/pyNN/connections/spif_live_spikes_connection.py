@@ -149,7 +149,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         """
         Add a callback to be called to initialise a vertex.
 
-        :param abel:
+        :param label:
             The label of the vertex to be notified about. Must be one of the
             vertices listed in the constructor
         :param init_callback: A function to be called to initialise the
