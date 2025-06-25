@@ -611,8 +611,6 @@ class SplitterPopulationVertexNeuronsSynapses(
             structural_sz: int, dynamics_sz: int) -> MultiRegionSDRAM:
         """
         Get the SDRAM shared between synapse cores.
-
-        :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         regions = PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
         sdram = MultiRegionSDRAM()

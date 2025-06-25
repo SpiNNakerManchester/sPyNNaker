@@ -48,9 +48,9 @@ class Recorder(object):
     def __init__(
             self, population: Population, vertex: PopulationApplicationVertex):
         """
-        :param ~spynnaker.pyNN.models.populations.Population population:
+        :param population:
             the population to record for
-        :param ~pacman.model.graphs.application.ApplicationVertex vertex:
+        :param vertex:
             the SpiNNaker graph vertex used by the population
         """
         self.__population = population
@@ -68,8 +68,6 @@ class Recorder(object):
         """
         What variables should be written to files, and where should they
         be written.
-
-        :rtype: dict(str, neo.io.baseio.BaseIO or str or None)
         """
         return self.__write_to_files_indicators
 
@@ -84,17 +82,14 @@ class Recorder(object):
             names. For a given `celltype` class, `celltype.recordable` contains
             a list of variables that can be recorded for that `celltype`.
             Can also be ``None`` to reset the list of variables.
-        :type variables: str or list(str) or None
         :param to_file: a file to automatically record to (optional).
             :py:meth:`write_data` will be automatically called when
             `sim.end()` is called.
-        :type to_file: ~neo.io or ~neo.rawio or str
         :param int sampling_interval: a value in milliseconds, and an integer
             multiple of the simulation timestep.
         :param indexes: The indexes of neurons to record from.
             This is non-standard PyNN and equivalent to creating a view with
             these indexes and asking the View to record.
-        :type indexes: None or list(int)
         """
         if variables is None:  # reset the list of things to record
             if sampling_interval is not None:
@@ -134,9 +129,8 @@ class Recorder(object):
             self, sampling_interval: Optional[int], to_file: IoDest,
             indexes: Optional[Collection[int]]) -> None:
         """
-        :param int sampling_interval: the interval to record them
+        :param sampling_interval: the interval to record them
         :param to_file: If set, a file to write to (by handle or name)
-        :type to_file: neo.io.baseio.BaseIO or str or None
         :param indexes: List of indexes to record or `None` for all
         :raises SimulatorRunningException: If `sim.run` is currently running
         :raises SimulatorNotSetupException: If called before `sim.setup`
@@ -158,13 +152,11 @@ class Recorder(object):
         """
         Tell the vertex to record data.
 
-        :param str variable: The variable to record, supported variables to
+        :param variable: The variable to record, supported variables to
             record are: ``gsyn_exc``, ``gsyn_inh``, ``v``, ``spikes``.
-        :param int sampling_interval: the interval to record them
+        :param sampling_interval: the interval to record them
         :param to_file: If set, a file to write to (by handle or name)
-        :type to_file: neo.io.baseio.BaseIO or str or None
         :param indexes: List of indexes to record or `None` for all
-        :type indexes: list(int) or None
         :raises SimulatorRunningException: If `sim.run` is currently running
         :raises SimulatorNotSetupException: If called before `sim.setup`
         :raises SimulatorShutdownException: If called after `sim.end`
@@ -197,8 +189,6 @@ class Recorder(object):
     def recording_label(self) -> str:
         """
         The label from the vertex is applicable or a default.
-
-        :rtype: str
         """
         SpynnakerDataView.check_user_can_act()
         return self.__vertex.label or "!!UNLABELLED VERTEX!!"
@@ -209,7 +199,6 @@ class Recorder(object):
         Turns off recording, is used by a pop saying ``.record()``.
 
         :param indexes:
-        :type indexes: list or None
         """
         for variable in self.__vertex.get_recordable_variables():
             self.__vertex.set_not_recording(variable, indexes)
@@ -220,13 +209,12 @@ class Recorder(object):
         """
         Extracts block from the vertices and puts them into a Neo block.
 
-        :param list(str) variables: the variables to extract
-        :param slice view_indexes: the indexes to be included in the view
-        :param bool clear: if the variables should be cleared after reading
-        :param dict(str,object) annotations:
+        :param variables: the variables to extract
+        :param view_indexes: the indexes to be included in the view
+        :param clear: if the variables should be cleared after reading
+        :param annotations:
             annotations to put on the Neo block
         :return: The Neo block
-        :rtype: ~neo.core.Block
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
@@ -249,13 +237,12 @@ class Recorder(object):
         """
         Extracts block from the vertices and puts them into a Neo block.
 
-        :param str variables: the variables to extract
-        :param list(str) variables: the variables to extract
-        :param slice view_indexes: the indexes to be included in the view
-        :param dict(str,object) annotations:
+        :param variables: the variables to extract
+        :param variables: the variables to extract
+        :param view_indexes: the indexes to be included in the view
+        :param annotations:
             annotations to put on the Neo block
         :return: The Neo block
-        :rtype: ~neo.core.Block
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly

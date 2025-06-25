@@ -134,7 +134,6 @@ class ExternalFPGARetinaDevice(
     def get_n_neurons(mode: str, polarity: str) -> int:
         """
         :param mode: ``128`` or ``64`` or ``32`` or ``16``
-        :param parity: ``UP`` or ``DOWN`` or ``MERGED``
         """
         if mode == ExternalFPGARetinaDevice.MODE_128:
             if (polarity == ExternalFPGARetinaDevice.UP_POLARITY or

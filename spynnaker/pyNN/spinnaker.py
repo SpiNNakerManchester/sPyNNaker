@@ -218,7 +218,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             Meaningless on SpiNNaker, so we pretend there's one MPI process
 
         :return: Constant: 1
-        :rtype: int
         """
         return 1
 
@@ -359,7 +358,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         .. deprecated:: 7.0
             Use :py:meth:`SpynnakerDataView.register_binary_search_path`.
 
-        :param str search_path: absolute search path for binaries
+        :param search_path: absolute search path for binaries
         """
         SpynnakerDataView.register_binary_search_path(search_path)
 

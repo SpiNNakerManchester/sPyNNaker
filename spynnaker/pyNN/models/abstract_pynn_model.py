@@ -46,7 +46,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
             exception; used to avoid setting global limits after a Population
             has been created.
 
-        :param str param:
+        :param param:
             The parameter name that can be used to set the value being changed
             in the Population constructor instead.
         """
@@ -122,8 +122,6 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         The absolute maximum number of atoms per core.
         This is an integer regardless of the number of dimensions
         in any vertex.
-
-        :rtype: int
         """
         return sys.maxsize
 
@@ -131,8 +129,6 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     def get_parameter_names(cls) -> Sequence[str]:
         """
         Get the names of the parameters of the model.
-
-        :rtype: list(str)
         """
         return cls.default_parameters.keys()  # pylint: disable=no-member
 
@@ -141,8 +137,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         """
         Determine if the model has a parameter with the given name.
 
-        :param str name: The name of the parameter to check for
-        :rtype: bool
+        :param name: The name of the parameter to check for
         """
         return name in cls.default_parameters
 
@@ -165,10 +160,9 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         """
         Create a vertex for a population of the model.
 
-        :param int n_neurons: The number of neurons in the population
-        :param str label: The label to give to the vertex
+        :param n_neurons: The number of neurons in the population
+        :param label: The label to give to the vertex
         :return: An application vertex for the population
-        :rtype: PopulationApplicationVertex
         """
         raise NotImplementedError
 
@@ -176,8 +170,6 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     def name(self) -> str:
         """
         The name of this model.
-
-        :rtype: str
         """
         return self.__class__.__name__
 
@@ -193,10 +185,8 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         If ``template`` is ``None``, then a dictionary containing the template
         context will be returned.
 
-        :param str template: Template filename
+        :param template: Template filename
         :param engine: Template substitution engine
-        :type engine: str or ~pyNN.descriptions.TemplateEngine or None
-        :rtype: str or dict
         """
         context = {
             "name": self.name

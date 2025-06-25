@@ -135,7 +135,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
 
     def add_receive_label(self, label: str) -> None:
         """
-        :param str label:
+        :param label:
         """
         if label not in self.__receive_labels:
             self.__receive_labels.append(label)

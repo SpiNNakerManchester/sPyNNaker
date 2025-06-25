@@ -150,18 +150,14 @@ class SPIFInputDevice(
     def __is_power_of_2(self, v: int) -> bool:
         """ Determine if a value is a power of 2
 
-        :param int v: The value to test
-        :rtype: bool
+        :param v: The value to test
         """
         return (v & (v - 1) == 0) and (v != 0)
 
     def __incoming_fpgas(
             self, board_address: Optional[str],
             chip_coords: Optional[Tuple[int, int]]) -> List[FPGAConnection]:
-        """ Get the incoming FPGA connections
-
-        :rtype: list(FPGAConnection)
-        """
+        """ Get the incoming FPGA connections  """
         # We use every other odd link
         return [FPGAConnection(SPIF_FPGA_ID, i, board_address, chip_coords)
                 for i in SPIF_INPUT_FPGA_LINKS]
@@ -169,10 +165,7 @@ class SPIFInputDevice(
     def __outgoing_fpga(
             self, board_address: Optional[str],
             chip_coords: Optional[Tuple[int, int]]) -> FPGAConnection:
-        """ Get the outgoing FPGA connection (for commands)
-
-        :rtype: FGPA_Connection
-        """
+        """ Get the outgoing FPGA connection (for commands) """
         return FPGAConnection(
             SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address, chip_coords)
 

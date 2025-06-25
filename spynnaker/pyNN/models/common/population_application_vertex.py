@@ -101,7 +101,6 @@ class PopulationApplicationVertex(
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
-        :rtype: ParameterHolder
         :raise KeyError: if the parameter is not something that can be read
         """
         raise KeyError(

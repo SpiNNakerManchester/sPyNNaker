@@ -84,17 +84,15 @@ class Projection(object):
             download_synapses: bool = False,
             partition_id: Optional[str] = None):
         """
-        :param ~spynnaker.pyNN.models.populations.PopulationBase \
-                pre_synaptic_population:
-        :param ~spynnaker.pyNN.models.populations.PopulationBase \
-                post_synaptic_population:
-        :param AbstractConnector connector:
-        :param AbstractSynapseDynamics synapse_type:
-        :param None source: Unsupported; must be `None`
-        :param str receptor_type:
-        :param ~pyNN.space.Space space:
-        :param str label:
-        :param bool download_synapses:
+        :param pre_synaptic_population:
+        :param post_synaptic_population:
+        :param connector:
+        :param synapse_type:
+        :param source: Unsupported; must be `None`
+        :param receptor_type:
+        :param space:
+        :param label:
+        :param download_synapses:
         """
         if source is not None:
             raise NotImplementedError(
@@ -213,9 +211,8 @@ class Projection(object):
     @staticmethod
     def __check_population(param: _Pop) -> bool:
         """
-        :param ~spynnaker.pyNN.models.populations.PopulationBase param:
+        :param  param:
         :return: Whether the parameter is a view
-        :rtype: bool
         """
         if isinstance(param, Population):
             # Projections definitely work from Populations
@@ -243,12 +240,11 @@ class Projection(object):
             SpiNNaker always gathers.
 
         :param attribute_names: list of attributes to gather
-        :type attribute_names: str or iterable(str)
-        :param str format: ``"list"`` or ``"array"``
-        :param bool gather: gather over all nodes
-        :param bool with_address:
+        :param format: ``"list"`` or ``"array"``
+        :param gather: gather over all nodes
+        :param with_address:
             True if the source and target are to be included
-        :param str multiple_synapses:
+        :param multiple_synapses:
             What to do with the data if format="array" and if the multiple
             source-target pairs with the same values exist.  Currently only
             "last" is supported
@@ -280,12 +276,10 @@ class Projection(object):
             SpiNNaker always gathers.
 
         :param attribute_names:
-        :type attribute_names: str or list(str)
         :param file: filename or open handle (which will be closed)
-        :type file: str or pyNN.recording.files.BaseFile
-        :param str format:
-        :param bool gather: Ignored
-        :param bool with_address:
+        :param format:
+        :param gather: Ignored
+        :param with_address:
         """
         if not gather:
             warn_once(
@@ -319,10 +313,9 @@ class Projection(object):
         Internal data getter to add notify option.
 
         :param attribute_names: list of attributes to gather
-        :type attribute_names: str or iterable(str)
-        :param str format: ``"list"`` or ``"array"``
-        :param bool with_address:
-        :param callable(ConnectionHolder,None) notify:
+        :param format: ``"list"`` or ``"array"``
+        :param with_address:
+        :param notify:
         :return: values selected
         """
         # fix issue with 1 versus many
@@ -363,10 +356,8 @@ class Projection(object):
             metadata: Dict[str, Any], data: ConnectionHolder) -> None:
         """
         :param save_file:
-        :type save_file: str or pyNN.recording.files.BaseFile
-        :param dict(str,object) metadata:
+        :param metadata:
         :param data:
-        :type data: ConnectionHolder or numpy.ndarray
         """
         # Convert structured array to normal numpy array
         if hasattr(data, "dtype") and hasattr(data.dtype, "names"):
@@ -392,8 +383,6 @@ class Projection(object):
     def pre(self) -> _Pop:
         """
         The pre-population or population view.
-
-        :rtype: ~spynnaker.pyNN.models.populations.PopulationBase
         """
         return self._synapse_information.pre_population
 
@@ -401,15 +390,13 @@ class Projection(object):
     def post(self) -> _Pop:
         """
         The post-population or population view.
-
-        :rtype: ~spynnaker.pyNN.models.populations.PopulationBase
         """
         return self._synapse_information.post_population
 
     @property
     def label(self) -> str:
         """
-        :rtype: str
+        Label of this Projection
         """
         return self.__label
 
@@ -420,16 +407,10 @@ class Projection(object):
 
     @property
     def _synapse_information(self) -> SynapseInformation:
-        """
-        :rtype: SynapseInformation
-        """
         return self.__synapse_information
 
     @property
     def _projection_edge(self) -> ProjectionApplicationEdge:
-        """
-        :rtype: ProjectionApplicationEdge
-        """
         return self.__projection_edge
 
     def _find_existing_edge(
@@ -441,14 +422,9 @@ class Projection(object):
         edge which has the same post- and pre- vertex
 
         :param pre_synaptic_vertex: the source vertex of the multapse
-        :type pre_synaptic_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
         :param post_synaptic_vertex: The destination vertex of the multapse
-        :type post_synaptic_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param str partition_id: The partition ID of the edge to find
+        :param partition_id: The partition ID of the edge to find
         :return: `None` or the edge going to these vertices.
-        :rtype: ~.ApplicationEdge
         """
         # Find edges ending at the postsynaptic vertex
         partitions = (
@@ -470,13 +446,6 @@ class Projection(object):
             fixed_values: List[Tuple[str, int]],
             notify: Optional[Callable[[ConnectionHolder], None]]
             ) -> ConnectionHolder:
-        """
-        :param bool as_list:
-        :param list(str) data_to_get:
-        :param list(tuple(str,int)) fixed_values:
-        :param callable(ConnectionHolder,None) notify:
-        :rtype: ConnectionHolder
-        """
         post_vertex = self.__projection_edge.post_vertex
         pre_vertex = self.__projection_edge.pre_vertex
 
@@ -532,10 +501,11 @@ class Projection(object):
 
         .. note::
             SpiNNaker always gathers.
+
         .. warning::
             Not implemented.
 
-        :param bool gather:
+        :param gather:
             If False, only get the number of connections locally.
         """
         _ = gather
@@ -545,6 +515,6 @@ class Projection(object):
         """
         Set whether synapses should be downloaded when the simulation pauses.
 
-        :param bool download_synapses: Whether to download synapses or not
+        :param download_synapses: Whether to download synapses or not
         """
         self.__synapse_information.download_on_pause = download_synapses

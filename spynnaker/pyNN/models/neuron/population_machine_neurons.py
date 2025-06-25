@@ -104,8 +104,6 @@ class PopulationMachineNeurons(
 
         .. note::
             This is likely to be available via the MachineVertex.
-
-        :rtype: ~pacman.model.graphs.common.Slice
         """
         raise NotImplementedError
 
@@ -114,8 +112,6 @@ class PopulationMachineNeurons(
     def _slice_index(self) -> int:
         """
         The index of the slice of this vertex in the list of slices.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -124,8 +120,6 @@ class PopulationMachineNeurons(
     def _key(self) -> int:
         """
         The key for spikes.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -145,7 +139,7 @@ class PopulationMachineNeurons(
         .. note::
             This is required because this class cannot have any storage.
 
-        :param int key: The key to be set
+        :param key: The key to be set
         """
         raise NotImplementedError
 
@@ -154,8 +148,6 @@ class PopulationMachineNeurons(
     def _neuron_regions(self) -> NeuronRegions:
         """
         The region identifiers for the neuron regions.
-
-        :rtype: .NeuronRegions
         """
         raise NotImplementedError
 
@@ -164,8 +156,6 @@ class PopulationMachineNeurons(
     def _neuron_data(self) -> NeuronData:
         """
         The neuron data handler.
-
-        :rtype: NeuronData
         """
         raise NotImplementedError
 
@@ -174,8 +164,6 @@ class PopulationMachineNeurons(
     def _max_atoms_per_core(self) -> int:
         """
         The maximum number of atoms on a core, used for neuron data transfer.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -191,10 +179,10 @@ class PopulationMachineNeurons(
         """
         Extract and yield neuron provenance.
 
-        :param int x: x coordinate of the chip where this core
-        :param int y: y coordinate of the core where this core
-        :param int p: virtual id of the core
-        :param list(int) provenance_data: A list of data items to interpret
+        :param x: x coordinate of the chip where this core
+        :param y: y coordinate of the core where this core
+        :param p: virtual id of the core
+        :param provenance_data: A list of data items to interpret
         """
         neuron_prov = NeuronProvenance(*provenance_data)
         with ProvenanceWriter() as db:
@@ -212,9 +200,8 @@ class PopulationMachineNeurons(
         """
         Write the data specification of the neuron data.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The data specification to write to
-        :param list(int) ring_buffer_shifts:
+        :param spec: The data specification to write to
+        :param ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
         """
         # Get and store the key
@@ -254,9 +241,8 @@ class PopulationMachineNeurons(
         """
         Re-Write the data specification of the neuron data.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The data specification to write to
-        :param list(int) ring_buffer_shifts:
+        :param spec: The data specification to write to
+        :param ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
         """
         # Write the current source parameters
@@ -272,9 +258,8 @@ class PopulationMachineNeurons(
         """
         Write the neuron parameters region.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The data specification to write to
-        :param list(int) ring_buffer_shifts:
+        :param spec: The data specification to write to
+        :param ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
         """
         n_atoms = self._vertex_slice.n_atoms
@@ -440,8 +425,7 @@ class PopulationMachineNeurons(
         Read the parameters and state of the neurons from the machine
         at the current time.
 
-        :param ~pacman.model.placements.Placement placement:
-            Where to read the data from
+        :param placement: Where to read the data from
         """
         self._neuron_data.read_data(placement, self._neuron_regions)
 
@@ -451,8 +435,7 @@ class PopulationMachineNeurons(
         Read the parameters and state of the neurons from the machine
         as they were at the last time 0.
 
-        :param ~pacman.model.placements.Placement placement:
-            Where to read the data from
+        :param placement: Where to read the data from
         """
         self._neuron_data.read_initial_data(placement, self._neuron_regions)
 

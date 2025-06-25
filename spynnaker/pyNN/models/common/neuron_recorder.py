@@ -58,9 +58,8 @@ def get_sampling_interval(sampling_rate: float) -> float:
     """
     Return the current sampling interval given a sampling rate.
 
-    :param float sampling_rate: The sampling rate in time steps
+    :param sampling_rate: The sampling rate in time steps
     :return: Sampling interval in microseconds
-    :rtype: float
     """
     return sampling_rate * SpynnakerDataView.get_simulation_time_step_ms()
 
@@ -366,8 +365,7 @@ class NeuronRecorder(object):
         """
         Get the sampling interval of a variable.
 
-        :param str variable: The variable to get the sampling interval of
-        :rtype: float
+        :param variable: The variable to get the sampling interval of
         """
         if (variable in self.__per_timestep_variables or
                 variable in self.__events_per_core_variables):
@@ -439,7 +437,7 @@ class NeuronRecorder(object):
     @property
     def recording_variables(self) -> Iterable[str]:
         """
-        :rtype: iterable(str)
+        Names of the variables recording
         """
         for variable, rate in self.__sampling_rates.items():
             if rate > 0:

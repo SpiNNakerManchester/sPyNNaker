@@ -125,8 +125,6 @@ class ConnectionHolder(object):
     def connections(self) -> List[ConnectionsArray]:
         """
         The connections stored.
-
-        :rtype: list(~numpy.ndarray)
         """
         return self.__connections or []
 

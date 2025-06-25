@@ -252,7 +252,7 @@ def distance(src_cell: IDMixin, tgt_cell: IDMixin,
     :param scale_factor:
         allows for different units in the pre- and post-position
         (the post-synaptic position is multiplied by this quantity).
-    :param float offset:
+    :param offset:
     :param periodic_boundaries:
     """
     return _pynn_distance(
@@ -275,31 +275,22 @@ def setup(timestep: Optional[Union[float, Literal["auto"]]] = None,
     :param timestep:
         the time step of the simulations in microseconds;
         if `None`, the configuration value is used
-    :type timestep: float or None
     :param min_delay: the minimum delay of the simulation
-    :type min_delay: float or str
     :param max_delay: Ignored and logs a warning if provided
-    :type max_delay: float or str or None
     :param database_socket_addresses: the sockets used by external devices
         for the database notification protocol
-    :type database_socket_addresses:
-        iterable(~spinn_utilities.socket_address.SocketAddress)
     :param time_scale_factor: multiplicative factor to the machine time step
         (does not affect the neuron models accuracy)
-    :type time_scale_factor: int or None
     :param n_chips_required:
         Deprecated! Use n_boards_required instead.
         Must be `None` if n_boards_required specified.
-    :type n_chips_required: int or None
     :param n_boards_required:
         if you need to be allocated a machine (for spalloc) before building
         your graph, then fill this in with a general idea of the number of
         boards you need so that the spalloc system can allocate you a machine
         big enough for your needs.
-    :type n_boards_required: int or None
     :param extra_params: other keyword arguments used to configure PyNN
     :return: MPI rank (always 0 on SpiNNaker)
-    :rtype: int
     :raises \
         ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
         if both ``n_chips_required`` and ``n_boards_required`` are used.
@@ -662,7 +653,7 @@ def record(variables: Union[str, Sequence[str]], source: PopulationBase,
         variable names. For a given `celltype` class, `celltype.recordable`
         contains a list of variables that can be recorded for that `celltype`.
     :param source: where to record from
-    :param str filename: file name to write data to
+    :param filename: file name to write data to
     :param sampling_interval:
         how often to sample the recording, not ignored so far
     :param annotations: the annotations to data writers

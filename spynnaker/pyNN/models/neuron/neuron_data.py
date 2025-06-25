@@ -45,8 +45,6 @@ def _all_one_val_gen(rd: RangeDictionary[float]) -> bool:
     .. note::
         A random distribution is considered the same if the same distribution
         is used for all neurons.
-
-    :rtype: bool
     """
     for key in rd.keys():
         if is_singleton(rd[key]):
@@ -95,8 +93,6 @@ class NeuronData(object):
     def gen_on_machine(self) -> bool:
         """
         Whether the neuron data can be generated on the machine or not.
-
-        :rtype: bool
         """
         return self.__gen_on_machine
 
@@ -143,12 +139,10 @@ class NeuronData(object):
         """
         Write the generated data.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The data specification to write to
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The vertex slice to generate for
-        :param NeuronRegions neuron_regions: The regions to write to
-        :param bool gen_on_machine: Whether to allow generation on machine
+        :param spec: The data specification to write to
+        :param vertex_slice: The vertex slice to generate for
+        :param euron_regions: The regions to write to
+        :param gen_on_machine: Whether to allow generation on machine
         """
         if gen_on_machine:
             self.generate_data()
@@ -200,9 +194,7 @@ class NeuronData(object):
         """
         Get neuron parameter data for a slice.
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice to get the data for
-        :rtype: ~numpy.ndarray
+        :param vertex_slice: The slice to get the data for
         """
         structs = self.__app_vertex.neuron_impl.structs
         values = _MergedDict(self.__app_vertex.parameters,
@@ -216,9 +208,9 @@ class NeuronData(object):
         """
         Get the data for a structure.
 
-        :param Struct struct: The structure to get the data for
-        :param RangeDictionary values: The values to fill in the structure with
-        :param Slice vertex_slice: The slice to get the values for
+        :param struct: The structure to get the data for
+        :param values: The values to fill in the structure with
+        :param vertex_slice: The slice to get the values for
         """
         if struct.repeat_type == StructRepeat.GLOBAL:
             return struct.get_data(values)
@@ -229,9 +221,8 @@ class NeuronData(object):
         """
         Get the data to build neuron parameters with.
 
-        :param Slice vertex_slice: The slice to get the parameters for
+        :param vertex_slice: The slice to get the parameters for
         :return: The number of structures and the data
-        :rtype: tuple(int, numpy.ndarray)
         """
         structs = self.__app_vertex.neuron_impl.structs
         values = _MergedDict(self.__app_vertex.parameters,
@@ -246,9 +237,9 @@ class NeuronData(object):
         """
         Get the builder data for a structure.
 
-        :param Struct struct: The structure to get the data for
-        :param RangeDictionary values: The values to fill in the structure with
-        :param Slice vertex_slice: The slice to get the values for
+        :param struct: The structure to get the data for
+        :param values: The values to fill in the structure with
+        :param vertex_slice: The slice to get the values for
         """
         if struct.repeat_type == StructRepeat.GLOBAL:
             return struct.get_generator_data(values)
@@ -260,10 +251,9 @@ class NeuronData(object):
         """
         Get the header of the neuron builder region.
 
-        :param Slice vertex_slice: The slice to put in the header
-        :param int n_structs: The number of structures to generate
+        :param vertex_slice: The slice to put in the header
+        :param n_structs: The number of structures to generate
         :param NeuronRegions neuron_regions: The regions to point to
-        :rtype: numpy.ndarray
         """
         return numpy.array([
             neuron_regions.neuron_params,
@@ -278,9 +268,9 @@ class NeuronData(object):
         Read the current state of the data from the machine into the
         application vertex.
 
-        :param ~pacman.model.placements.Placement placement:
+        :param placement:
             The placement of the vertex to read
-        :param NeuronRegions neuron_regions: The regions to read from
+        :param neuron_regions: The regions to read from
         """
         merged_dict = _MergedDict(self.__app_vertex.parameters,
                                   self.__app_vertex.state_variables)
@@ -293,9 +283,9 @@ class NeuronData(object):
         Read the initial state of the data from the machine into the
         application vertex.
 
-        :param ~pacman.model.placements.Placement placement:
+        :param placement:
             The placement of the vertex to read
-        :param NeuronRegions neuron_regions: The regions to read from
+        :param neuron_regions: The regions to read from
         """
         merged_dict = _MergedDict(self.__app_vertex.parameters,
                                   self.__app_vertex.initial_state_variables)
@@ -307,10 +297,9 @@ class NeuronData(object):
         """
         Perform the reading of data.
 
-        :param ~pacman.model.placements.Placement placement:
-            Where the vertex is on the machine
-        :param int region: The region to read from
-        :param MergedDict results: Where to write the results to
+        :param placement: Where the vertex is on the machine
+        :param region: The region to read from
+        :param results: Where to write the results to
         """
         address = locate_memory_region_for_placement(placement, region)
         vertex_slice = placement.vertex.vertex_slice

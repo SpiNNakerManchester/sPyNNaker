@@ -128,7 +128,6 @@ class SpynnakerExternalDevicePluginManager(object):
         :param use_prefix:
             Determines if the spike packet will contain a common prefix for
             the spikes
-        :param label: The label of the gatherer vertex
         :param partition_ids:
             The names of the partitions to create edges for
         :param translate_keys:
@@ -213,7 +212,6 @@ class SpynnakerExternalDevicePluginManager(object):
         :param vertex_to_record_from:
         :param params:
         :param partition_ids:
-        :param translate_keys:
         """
         # add to the tracker
         SpynnakerDataView.add_live_packet_gatherer_parameters(

@@ -278,7 +278,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
         in the post vertex from neurons in the pre vertex.
 
         :param SynapseInformation synapse_info:
-        :rtype: int
         """
         raise NotImplementedError
 

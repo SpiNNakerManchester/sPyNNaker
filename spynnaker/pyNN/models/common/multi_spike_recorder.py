@@ -34,7 +34,7 @@ class MultiSpikeRecorder(object):
     @property
     def record(self) -> bool:
         """
-        :rtype: bool
+        If this recorder is recording or not
         """
         return self.__record
 

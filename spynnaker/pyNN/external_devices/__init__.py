@@ -212,7 +212,7 @@ def EthernetControlPopulation(
     control an external device which is connected to the host.
 
     :param n_neurons: The number of neurons in the control population
-    :param type model:
+    :param model:
         Class of a model that creates a vertex of type
         :py:class:`AbstractEthernetController`
     :param label: An optional label for the population

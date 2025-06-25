@@ -59,7 +59,7 @@ class AbstractPushBotOutputDevice(Enum):
     @property
     def time_between_send(self) -> int:
         """
-        :rtype: int
+        Time between sends
         """
         return self._time_between_send
 

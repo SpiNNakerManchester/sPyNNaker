@@ -112,6 +112,5 @@ class FromFileConnector(FromListConnector):
         Get a file reader object using the PyNN methods.
 
         :return: A pynn StandardTextFile or similar
-        :rtype: ~pyNN.recording.files.StandardTextFile
         """
         return StandardTextFile(file, mode="r")

@@ -444,9 +444,8 @@ def set_xp_key_delayed(
     """ Get a command to set the key of the output via the FPGA later.
         This tells the FPGA to route this key to the external device.
 
-    :param int index: The index of the channel to set (0-5)
-    :param callable(int)->int key_func: The function to call to get the key
-    :rtype: MulticastCommand
+    :param index: The index of the channel to set (0-5)
+    :param key_func: The function to call to get the key
     """
     return SpiNNFPGARegister.XP_KEY_BASE.delayed_command(key_func, index)
 

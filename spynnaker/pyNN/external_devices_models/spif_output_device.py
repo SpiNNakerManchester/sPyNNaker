@@ -78,7 +78,7 @@ class SPIFOutputDevice(
         :param board_address: The board IP address of the SPIF device
         :param chip_coords: The chip coordinates of the SPIF device
         :param label: The label to give the SPIF device
-        :param bool create_database:
+        :param create_database:
             Whether the database will be used to decode keys or not
         :param database_notify_host: The host that will read the database
         :param database_notify_port_num:
@@ -86,7 +86,7 @@ class SPIFOutputDevice(
         :param database_ack_port_num:
             The port to listen on for responses from the host reading the
             database
-        :param int output_key_shift:
+        :param output_key_shift:
             The shift to apply to the population indices when added to the key
         """
         super(SPIFOutputDevice, self).__init__(

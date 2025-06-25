@@ -187,8 +187,6 @@ class SPIFRetinaDevice(
 
         """
         Get the incoming FPGA connections.
-
-        :rtype: list(FPGAConnection)
         """
         # We use every other odd link
         return [FPGAConnection(SPIF_FPGA_ID, i, board_address, chip_coords)
@@ -199,8 +197,6 @@ class SPIFRetinaDevice(
             chip_coords: Optional[Tuple[int, int]]) -> FPGAConnection:
         """
         Get the outgoing FPGA connection (for commands).
-
-        :rtype: FGPA_Connection
         """
         return FPGAConnection(
             SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address, chip_coords)
