@@ -52,23 +52,11 @@ class SynapseTypeDualExponential(AbstractSynapseType):
             isyn_exc2: ModelParameter, isyn_inh: ModelParameter):
         r"""
         :param tau_syn_E: :math:`\tau^{syn}_{e_1}`
-        :type tau_syn_E: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_syn_E2: :math:`\tau^{syn}_{e_2}`
-        :type tau_syn_E2: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_syn_I: :math:`\tau^{syn}_i`
-        :type tau_syn_I: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param isyn_exc: :math:`I^{syn}_{e_1}`
-        :type isyn_exc: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param isyn_exc2: :math:`I^{syn}_{e_2}`
-        :type isyn_exc2: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param isyn_inh: :math:`I^{syn}_i`
-        :type isyn_inh: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([
@@ -127,8 +115,6 @@ class SynapseTypeDualExponential(AbstractSynapseType):
         # pylint: disable=invalid-name
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__tau_syn_E
 
@@ -137,8 +123,6 @@ class SynapseTypeDualExponential(AbstractSynapseType):
         # pylint: disable=invalid-name
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__tau_syn_E2
 
@@ -147,8 +131,6 @@ class SynapseTypeDualExponential(AbstractSynapseType):
         # pylint: disable=invalid-name
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__tau_syn_I
 
@@ -156,8 +138,6 @@ class SynapseTypeDualExponential(AbstractSynapseType):
     def isyn_exc(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__isyn_exc
 
@@ -165,8 +145,6 @@ class SynapseTypeDualExponential(AbstractSynapseType):
     def isyn_inh(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__isyn_inh
 
@@ -174,7 +152,5 @@ class SynapseTypeDualExponential(AbstractSynapseType):
     def isyn_exc2(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__isyn_exc2

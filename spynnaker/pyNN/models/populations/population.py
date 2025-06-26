@@ -852,7 +852,6 @@ class _VertexHolder(AbstractPyNNModel):
     def vertex(self) -> PopulationApplicationVertex:
         """
         The vertex passed into the init.
-        :return:
         """
         return self.__vertex
 

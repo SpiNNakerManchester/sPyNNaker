@@ -178,10 +178,10 @@ class SynapticMatrices(object):
             regions: SynapseRegions, max_atoms_per_core: int,
             weight_scales: WeightScales, all_syn_block_sz: int):
         """
-        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
-        :param SynapseRegions regions: The synapse regions to use
-        :param int max_atoms_per_core:
-        :param int all_syn_block_sz:
+        :param app_vertex:
+        :param regions: The synapse regions to use
+        :param max_atoms_per_core:
+        :param all_syn_block_sz:
         """
         self.__app_vertex = app_vertex
         self.__regions = regions
@@ -215,8 +215,6 @@ class SynapticMatrices(object):
     def max_gen_data(self) -> int:
         """
         The maximum amount of data to be generated for the synapses.
-
-        :rtype: int
         """
         return self.__max_gen_data
 
@@ -224,8 +222,6 @@ class SynapticMatrices(object):
     def bit_field_size(self) -> int:
         """
         The size of the bit field data.
-
-        :rtype: int
         """
         return self.__bit_field_size
 
@@ -236,8 +232,6 @@ class SynapticMatrices(object):
         written by the on-host synaptic generation, i.e. the start of
         the space that can be overwritten provided the synapse expander
         is run again.
-
-        :rtype: int
         """
         return self.__host_generated_block_addr
 
@@ -247,8 +241,6 @@ class SynapticMatrices(object):
         The size of the space used by the generated matrix, i.e. the
         space that can be overwritten provided the synapse expander
         is run again.
-
-        :rtype: int
         """
         return (self.__on_chip_generated_block_addr -
                 self.__host_generated_block_addr)
@@ -353,11 +345,11 @@ class SynapticMatrices(object):
         """
         Write the synaptic data for all incoming projections.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
+        :param spec:
             The spec to write to
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param post_vertex_slice:
             The slice of the post-vertex the matrix is for
-        :param SynapseRegionReferences references:
+        :param references:
             Regions which are referenced; each region which is not referenced
             can be `None`.
         """
@@ -396,9 +388,7 @@ class SynapticMatrices(object):
         """
         Write the data spec for the synapse expander.
 
-        :param ~.DataSpecificationGenerator spec:
-            The specification to write to
-        :param list(GeneratorData) generator_data: The data to be written
+        :param spec: The specification to write to
         """
         if self.__generated_data is None:
             if connection_builder_ref is not None:
@@ -453,11 +443,10 @@ class SynapticMatrices(object):
         """
         Get a key and mask for an incoming application vertex as a whole.
 
-        :param RoutingInfo r_info: The routing information for the vertex
-        :param int n_stages: The number of delay stages
-        :param PopulationApplicationVertex pre_vertex: The pre-vertex
-        :param str partition_id: The partition identifier
-        :rtype: AppKeyInfo
+        :param r_info: The routing information for the vertex
+        :param n_stages: The number of delay stages
+        :param pre_vertex: The pre-vertex
+        :param partition_id: The partition identifier
         """
         if isinstance(pre_vertex, ApplicationVirtualVertex):
             mask_size = 0
@@ -483,9 +472,9 @@ class SynapticMatrices(object):
         """
         Get a key and mask for an incoming application vertex as a whole.
 
-        :param ProjectionApplicationEdge app_edge:
+        :param app_edge:
             The application edge to get the key and mask of
-        :param SynapseInformation s_info:
+        :param s_info:
             The synapse information of the projection
         """
         routing_info = SpynnakerDataView.get_routing_infos()
@@ -502,9 +491,9 @@ class SynapticMatrices(object):
         Get a key and mask for a whole incoming delayed application
         vertex, or return `None` if no delay edge exists.
 
-        :param ProjectionApplicationEdge app_edge:
+        :param app_edge:
             The application edge to get the key and mask of
-        :param SynapseInformation s_info:
+        :param s_info:
             The synapse information of the projection
         """
         delay_edge = app_edge.delay_edge
@@ -527,15 +516,14 @@ class SynapticMatrices(object):
         """
         Get the synaptic connections from the machine.
 
-        :param ~pacman.model.placements.Placement placement:
+        :param placement:
             Where the vertices are on the machine
-        :param ProjectionApplicationEdge app_edge:
+        :param app_edge:
             The application edge of the projection
-        :param SynapseInformation synapse_info:
+        :param synapse_info:
             The synapse information of the projection
         :return: A list of arrays of connections, each with dtype
             :py:const:`~.NUMPY_CONNECTORS_DTYPE`
-        :rtype: list(~numpy.ndarray)
         """
         if is_sdram_poisson_source(app_edge):
             return cast(SpikeSourcePoissonVertex, app_edge.pre_vertex)\
@@ -548,7 +536,7 @@ class SynapticMatrices(object):
         Fill in any pre-run connection holders for data which is generated
         on the machine, after it has been generated.
 
-        :param ~pacman.model.placements.Placement placement:
+        :param placement:
             where the data is to be read from
         """
         for matrix in self.__on_machine_matrices:
@@ -558,8 +546,6 @@ class SynapticMatrices(object):
     def gen_on_machine(self) -> bool:
         """
         Whether any matrices need to be generated on the machine.
-
-        :rtype: bool
         """
         return self.__gen_on_machine
 
@@ -568,9 +554,9 @@ class SynapticMatrices(object):
         """
         Get the index of an incoming projection in the population table.
 
-        :param ProjectionApplicationEdge app_edge:
+        :param app_edge:
             The application edge of the projection
-        :param SynapseInformation synapse_info:
+        :param synapse_info:
             The synapse information of the projection
         """
         matrix = self.__matrices[app_edge, synapse_info]
@@ -581,8 +567,7 @@ class SynapticMatrices(object):
         """
         Get the regions that need to be downloaded.
 
-        :param ~pacman.model.placements.Placement placement:
-            The placement of the vertex
+        :param placement: The placement of the vertex
 
         :return: The index, the start address and the size of the regions
         """

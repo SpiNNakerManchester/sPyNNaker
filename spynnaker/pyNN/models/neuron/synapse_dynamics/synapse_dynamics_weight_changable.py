@@ -80,9 +80,8 @@ class SynapseDynamicsWeightChangable(
             weight: _In_Types = StaticSynapse.default_parameters['weight'],
             delay: _In_Types = None):
         """
-        :param float weight:
+        :param weight:
         :param delay: Use ``None`` to get the simulator default minimum delay.
-        :type delay: float or None
         """
         super().__init__(delay=delay, weight=weight)
         self.__weight_max = weight_max
@@ -152,20 +151,12 @@ class SynapseDynamicsWeightChangable(
 
     @overrides(AbstractPlasticSynapseDynamics.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self) -> str:
-        """
-        :rtype: str
-        """
         return "_weight_change"
 
     @overrides(AbstractPlasticSynapseDynamics.
                get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(
             self, n_neurons: int, n_synapse_types: int) -> int:
-        """
-        :param int n_neurons:
-        :param int n_synapse_types:
-        :rtype: int
-        """
         # The count of items, plus min and max for each synapse type
         return BYTES_PER_WORD + (BYTES_PER_SHORT * 2 * n_synapse_types)
 
@@ -194,8 +185,7 @@ class SynapseDynamicsWeightChangable(
                get_n_words_for_plastic_connections)
     def get_n_words_for_plastic_connections(self, n_connections: int) -> int:
         """
-        :param int n_connections:
-        :rtype: int
+        :param n_connections:
         """
         n_words = n_connections // 2
         if n_connections % 2 != 0:

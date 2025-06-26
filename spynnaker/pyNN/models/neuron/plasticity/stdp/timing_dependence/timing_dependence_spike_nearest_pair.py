@@ -47,10 +47,10 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     def __init__(self, tau_plus: float = 20.0, tau_minus: float = 20.0,
                  A_plus: float = 0.01, A_minus: float = 0.01):
         r"""
-        :param float tau_plus: :math:`\tau_+`
-        :param float tau_minus: :math:`\tau_-`
-        :param float A_plus: :math:`A^+`
-        :param float A_minus: :math:`A^-`
+        :param tau_plus: :math:`\tau_+`
+        :param tau_minus: :math:`\tau_-`
+        :param A_plus: :math:`A^+`
+        :param A_minus: :math:`A^-`
         """
         super().__init__(SynapseStructureWeightOnly())
         self.__tau_plus = tau_plus
@@ -66,8 +66,6 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     def tau_plus(self) -> float:
         r"""
         :math:`\tau_+`
-
-        :rtype: float
         """
         return self.__tau_plus
 
@@ -75,8 +73,6 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     def tau_minus(self) -> float:
         r"""
         :math:`\tau_-`
-
-        :rtype: float
         """
         return self.__tau_minus
 
@@ -84,8 +80,6 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     def A_plus(self) -> float:
         r"""
         :math:`A^+`
-
-        :rtype: float
         """
         return self.__a_plus
 
@@ -97,8 +91,6 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     def A_minus(self) -> float:
         r"""
         :math:`A^-`
-
-        :rtype: float
         """
         return self.__a_minus
 
@@ -118,8 +110,6 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
-
-        :rtype: str
         """
         return "nearest_pair"
 
@@ -127,8 +117,6 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     def pre_trace_n_bytes(self) -> int:
         """
         The number of bytes used by the pre-trace of the rule per neuron.
-
-        :rtype: int
         """
         # Pair rule requires no pre-synaptic trace when only the nearest
         # Neighbours are considered and, a single 16-bit R1 trace
@@ -143,8 +131,6 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     def n_weight_terms(self) -> int:
         """
         The number of weight terms expected by this timing rule.
-
-        :rtype: int
         """
         return 1
 

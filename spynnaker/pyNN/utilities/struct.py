@@ -70,12 +70,10 @@ class Struct(object):
         :param fields:
             The types and names of the fields, ordered as they appear in the
             structure.
-        :type fields: list(~data_specification.enums.DataType, str)
-        :param StructRepeat repeat_type: How the structure repeats
+        :param repeat_type: How the structure repeats
         :param default_values:
             Dict of field name -> value to use when values doesn't contain the
             field
-        :type default_values: dict(str, int or float) or None
         """
         self.__fields = fields
         self.__repeat_type = repeat_type
@@ -86,8 +84,6 @@ class Struct(object):
         """
         The types and names of the fields, ordered as they appear in the
         structure.
-
-        :rtype: list(~data_specification.enums.DataType, str)
         """
         return self.__fields
 
@@ -95,8 +91,6 @@ class Struct(object):
     def repeat_type(self) -> StructRepeat:
         """
         How the structure repeats.
-
-        :rtype: StructRepeat
         """
         return self.__repeat_type
 
@@ -104,8 +98,6 @@ class Struct(object):
     def numpy_dtype(self) -> numpy.dtype:
         """
         The numpy data type of the structure.
-
-        :rtype: ~numpy.dtype
         """
         return numpy.dtype(
             [(name, numpy.dtype(data_type.struct_encoding))
@@ -117,8 +109,7 @@ class Struct(object):
         Get the size of the structure in whole words in an array of given
         size (default 1 item).
 
-        :param int array_size: The number of elements in an array of structures
-        :rtype: int
+        :param array_size: The number of elements in an array of structures
         """
         datatype = self.numpy_dtype
         size_in_bytes = array_size * datatype.itemsize
@@ -130,12 +121,9 @@ class Struct(object):
         Get a numpy array of uint32 of data for the given values.
 
         :param values: The values to fill in the data with
-        :type values: dict(str, int or float or AbstractList)
         :param vertex_slice:
             The vertex slice to get the data for, or `None` if the structure is
             global.
-        :type vertex_slice: Slice or None
-        :rtype: ~numpy.ndarray(dtype="uint32")
         """
         n_items = 1
         if vertex_slice is None:
@@ -215,14 +203,11 @@ class Struct(object):
         """
         Get a numpy array of uint32 of data to generate the given values.
 
-        :param ~dict-like values:
-            The values to fill in the data with
+        :param values: The values to fill in the data with
         :param vertex_slice:
             The vertex slice or `None` for a structure with repeat_type global,
             or where a single value repeats for every neuron.  If this is not
             the case and vertex_slice is `None`, an error will be raised!
-        :type vertex_slice: Slice or None
-        :rtype: ~numpy.ndarray(dtype="uint32")
         """
         # Define n_repeats, which is either the total number of neurons
         # or a flag to indicate that the data repeats for each neuron
@@ -345,8 +330,6 @@ class Struct(object):
     def is_generatable(self) -> bool:
         """
         Whether the data inside could be generated on machine.
-
-        :rtype: bool
         """
         return all(type_has_generator(data_type)
                    for data_type, _name in self.__fields)
@@ -358,17 +341,9 @@ class Struct(object):
         Read a byte string of data and write to values.
 
         :param data: The data to be read
-        :type data: bytes or bytearray
-        :param ~spinn_utilities.ranged.RangeDictionary values:
-            The values to update with the read data
-        :param int data_offset:
+        :param values: The values to update with the read data
+        :param data_offset:
             Index of the byte at the start of the valid data.
-        :param int offset:
-            The first index into values to write to.
-        :param array_size:
-            The number of structure copies to read, or `None` if this is a
-            non-repeating structure.
-        :type array_size: int or None
         """
         n_items = 1
         ids: NDArray[integer] = numpy.zeros([0], dtype=uint32)

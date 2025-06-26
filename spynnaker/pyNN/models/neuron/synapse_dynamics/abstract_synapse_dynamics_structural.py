@@ -60,11 +60,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
         :param incoming_projections:
             The projections that target the vertex in question
-        :type incoming_projections:
-            list(~spynnaker.pyNN.models.projection.Projection)
-        :param int n_neurons:
+        :param n_neurons:
         :return: the size of the parameters, in bytes
-        :rtype: int
         :raises PacmanInvalidParameterException:
             If the parameters make no sense.
         """
@@ -79,16 +76,12 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         """
         Write structural plasticity parameters.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The data specification to write to
-        :param int region: region ID
-        :param list(float) weight_scales: Weight scaling for each synapse type
-        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
-            The target application vertex
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the target vertex to generate for
-        :param SynapticMatrices synaptic_matrices:
-            The synaptic matrices for this vertex
+        :param spec: The data specification to write to
+        :param region: region ID
+        :param weight_scales: Weight scaling for each synapse type
+        :param app_vertex: The target application vertex
+        :param vertex_slice: The slice of the target vertex to generate for
+        :param synaptic_matrices: The synaptic matrices for this vertex
         """
         raise NotImplementedError
 
@@ -100,10 +93,10 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         """
         Set connections for structural plasticity.
 
-        :param ~numpy.ndarray connections:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param ProjectionApplicationEdge app_edge:
-        :param SynapseInformation synapse_info:
+        :param connections:
+        :param post_vertex_slice:
+        :param app_edge:
+        :param synapse_info:
         """
         raise NotImplementedError
 
@@ -112,8 +105,6 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     def f_rew(self) -> float:
         """
         The frequency of rewiring.
-
-        :rtype: float
         """
         raise NotImplementedError
 
@@ -122,8 +113,6 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     def s_max(self) -> int:
         """
         The maximum number of synapses.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -132,8 +121,6 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     def with_replacement(self) -> bool:
         """
         Whether to allow replacement when creating synapses.
-
-        :rtype: bool
         """
         raise NotImplementedError
 
@@ -150,8 +137,6 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     def initial_weight(self) -> float:
         """
         The weight of a formed connection.
-
-        :rtype: float
         """
         raise NotImplementedError
 
@@ -160,8 +145,6 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     def initial_delay(self) -> InitialDelay:
         """
         The delay of a formed connection.
-
-        :rtype: float or (float, float)
         """
         raise NotImplementedError
 
@@ -170,8 +153,6 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     def partner_selection(self) -> AbstractPartnerSelection:
         """
         The partner selection rule.
-
-        :rtype: AbstractPartnerSelection
         """
         raise NotImplementedError
 
@@ -180,8 +161,6 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     def formation(self) -> AbstractFormation:
         """
         The formation rule.
-
-        :rtype: AbstractFormation
         """
         raise NotImplementedError
 
@@ -190,8 +169,6 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     def elimination(self) -> AbstractElimination:
         """
         The elimination rule.
-
-        :rtype: AbstractElimination
         """
         raise NotImplementedError
 
@@ -200,7 +177,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         """
         Check that delays can be done without delay extensions.
 
-        :param int max_delay_ms: The maximum delay supported, in milliseconds
+        :param max_delay_ms: The maximum delay supported, in milliseconds
         :raises Exception: if the delay is out of range
         """
         raise NotImplementedError
@@ -209,7 +186,5 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     def get_max_rewires_per_ts(self) -> int:
         """
         Get the max number of rewires per timestep.
-
-        :rtype: int
         """
         raise NotImplementedError

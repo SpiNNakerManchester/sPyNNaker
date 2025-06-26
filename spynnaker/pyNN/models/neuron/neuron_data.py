@@ -141,7 +141,7 @@ class NeuronData(object):
 
         :param spec: The data specification to write to
         :param vertex_slice: The vertex slice to generate for
-        :param euron_regions: The regions to write to
+        :param neuron_regions: The regions to write to
         :param gen_on_machine: Whether to allow generation on machine
         """
         if gen_on_machine:
@@ -253,7 +253,7 @@ class NeuronData(object):
 
         :param vertex_slice: The slice to put in the header
         :param n_structs: The number of structures to generate
-        :param NeuronRegions neuron_regions: The regions to point to
+        :param neuron_regions: The regions to point to
         """
         return numpy.array([
             neuron_regions.neuron_params,

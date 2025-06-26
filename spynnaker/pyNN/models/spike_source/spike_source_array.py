@@ -40,9 +40,7 @@ class SpikeSourceArray(AbstractPyNNModel):
             n_colour_bits: Optional[int] = None) -> SpikeSourceArrayVertex:
         """
         :param splitter:
-        :type splitter:
-            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
-        :param int n_colour_bits:
+        :param n_colour_bits:
         """
         if neurons_per_core is None:
             neurons_per_core = \

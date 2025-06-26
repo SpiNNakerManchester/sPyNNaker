@@ -51,11 +51,8 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
         """
         Get the size of the parameters in bytes.
 
-        :param int n_atoms: The number of atoms in the vertex
+        :param n_atoms: The number of atoms in the vertex
         :param incoming_projections: The projections to get the size of
-        :type incoming_projections:
-            list(~spynnaker.pyNN.models.projection.Projection)
-        :rtype: int
         """
         raise NotImplementedError
 

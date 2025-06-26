@@ -32,8 +32,8 @@ class DelayAfferentApplicationEdge(ApplicationEdge):
                  delay_vertex: DelayExtensionVertex,
                  label: Optional[str] = None):
         """
-        :param PopulationApplicationVertex pre_vertex:
-        :param DelayExtensionVertex delay_vertex:
-        :param str label:
+        :param pre_vertex:
+        :param delay_vertex:
+        :param label:
         """
         super().__init__(pre_vertex, delay_vertex, label=label)

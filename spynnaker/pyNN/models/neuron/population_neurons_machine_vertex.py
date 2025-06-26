@@ -125,23 +125,18 @@ class PopulationNeuronsMachineVertex(
             weight_scales: NDArray[floating],
             neuron_data: NeuronData, max_atoms_per_core: int):
         """
-        :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The SDRAM used by the vertex
-        :param str label: The label of the vertex
-        :param PopulationVertex app_vertex:
-            The associated application vertex
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the population that this implements
-        :param int slice_index:
+        :param sdram: The SDRAM used by the vertex
+        :param label: The label of the vertex
+        :param app_vertex: The associated application vertex
+        :param vertex_slice: The slice of the population that this implements
+        :param slice_index:
             The index of the slice in the ordered list of slices
-        :param list(int) ring_buffer_shifts:
+        :param ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
-        :param list(int) weight_scales:
+        :param weight_scales:
             The scaling to apply to weights to store them in the synapses
-        :param NeuronData neuron_data:
-            The handler of neuron data
-        :param int max_atoms_per_core:
-            The maximum number of atoms per core
+        :param neuron_data: The handler of neuron data
+        :param max_atoms_per_core: The maximum number of atoms per core
         """
         super().__init__(
             label, app_vertex, vertex_slice, sdram, self.COMMON_REGIONS,
@@ -287,9 +282,8 @@ class PopulationNeuronsMachineVertex(
         """
         Calculate the number of bytes needed for a transfer.
 
-        :param int n_neurons: number of neurons
-        :param int n_synapse_types: number of synapse types
-        :rtype: int
+        :param n_neurons: number of neurons
+        :param n_synapse_types: number of synapse types
         """
         n_bytes = (2 ** get_n_bits(n_neurons) *
                    n_synapse_types *

@@ -66,7 +66,7 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         """
         Get the connections from the machine post-run.
 
-        :param ApplicationEdge app_edge:
+        :param app_edge:
             The edge for which the data is being read
         :param synapse_info:
             The specific projection within the edge

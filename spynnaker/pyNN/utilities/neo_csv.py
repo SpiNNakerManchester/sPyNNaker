@@ -74,13 +74,13 @@ class NeoCsv(object):
         """
         Writes the metadata for a variable to CSV
 
-        :param ~csv.writer csv_writer: Open CSV writer to write to
-        :param str variable_type:
-        :param str variable:
-        :param float t_start:
-        :param float t_stop:
-        :param float sampling_interval_ms:
-        :param str units:
+        :param csv_writer: Open CSV writer to write to
+        :param variable_type:
+        :param variable:
+        :param t_start:
+        :param t_stop:
+        :param sampling_interval_ms:
+        :param units:
         """
         csv_writer.writerow([variable_type, variable])
         csv_writer.writerow([self._T_START, t_start * ms])
@@ -98,9 +98,8 @@ class NeoCsv(object):
 
         The String should be a float, a space and a Quantities label
 
-        :param str as_str: String representation of a quantity.
+        :param as_str: String representation of a quantity.
         :return: A Quantities object
-        :rtype: ~quantities.Quantity
         """
         parts = as_str.split(" ")
         return Quantity(float(parts[0]), units=parts[1])
@@ -113,10 +112,8 @@ class NeoCsv(object):
         A block is a number of rows each of exactly 2 values followed by an
         empty row
 
-        :param ~csv.reader csv_reader: Open CSV writer to read from
+        :param csv_reader: Open CSV writer to read from
         :return: t_start, t_stop, sampling_period, units
-        :rtype: tuple(~quantities.Quantity, ~quantities.Quantity,
-            ~quantities.Quantity, str)
         """
         metadata = self.__read_metadata(csv_reader)
         return (
@@ -133,9 +130,8 @@ class NeoCsv(object):
         All rows must have the same length.
         The assumption is that all values in the block represent floats.
 
-        :param ~csv.writer csv_writer: Open CSV writer to read from
+        :param csv_reader: Open CSV reader to read from
         :return: Numpy signal array of floats
-        :rtype: ~numpy.array
         """
         rows = []
         row = next(csv_reader)
@@ -158,8 +154,8 @@ class NeoCsv(object):
         no data below. This happens when the data is an empty array
         such as no spikes or rewires happened or the run was for time 0
 
-        :param ~csv.writer csv_writer: Open CSV writer to write to
-        :param list(int) indexes:
+        :param csv_writer: Open CSV writer to write to
+        :param indexes:
         """
         if len(indexes) > 0:
             csv_writer.writerow(indexes)
@@ -170,9 +166,8 @@ class NeoCsv(object):
         """
         Reads the index or NO_INTERSECTION string from the CSV
 
-        :param ~csv.writer csv_writer: Open CSV writer to read from
+        :param csv_reader: Open CSVreader to read from
         :return: list of indexes
-        :rtype: list(int)
         """
         row = next(csv_reader)
         assert len(row) > 0
@@ -188,19 +183,12 @@ class NeoCsv(object):
         """
         Creates the SpikeTrains and inserts then into the segment
 
-        :param str pop_label: The label for the population of interest
-
-            .. note::
-                This is actually the label of the Application Vertex.
-                Typically the Population label, corrected for `None` or
-                duplicate values
-
-        :param list(int) view_indexes:
-        :param Segment segment:
-        :param ~numpy.ndarray spikes:
-        :param float t_start:
-        :param float t_stop:
-        :param ~quantities.Quantity sampling_rate: Rate a neuron is recorded
+        :param view_indexes:
+        :param segment:
+        :param spikes:
+        :param t_start:
+        :param t_stop:
+        :param sampling_rate: Rate a neuron is recorded
         """
         block = segment.block
         first_id = block.annotations[self._FIRST_ID]
@@ -226,9 +214,9 @@ class NeoCsv(object):
         """
         Writes the spikes to the CSV file.
 
-        :param ~csv.writer csv_writer: Open CSV writer to write to
-        :param ~numpy.ndarray spikes:
-        :param list(int) indexes: The indexes for which there could be data
+        :param csv_writer: Open CSV writer to write to
+        :param spikes:
+        :param indexes: The indexes for which there could be data
         """
         self.__csv_indexes(indexes, csv_writer)
         csv_writer.writerows(spikes)
@@ -239,9 +227,9 @@ class NeoCsv(object):
         """
         Reads spikes from the CSV file and add SpikeTrains to the segment.
 
-        :param ~csv.reader csv_reader: Open CSV writer to read from
-        :param Segment segment:
-        :param str variable: Name of the variable being read
+        :param csv_reader: Open CSV writer to read from
+        :param segment:
+        :param variable: Name of the variable being read
         """
         try:
             t_start, t_stop, sampling_period, _ = \
@@ -263,14 +251,12 @@ class NeoCsv(object):
         """
         Adds a data item that is an analog signal to a neo segment.
 
-        :param str variable: the variable name
-        :param ~neo.core.Segment segment: Segment to add data to
-        :param ~numpy.ndarray signal_array: the raw signal data
-        :param list(int) indexes: The indexes for the data
-        :type t_start: float or int
-        :param ~quantities.Quantity sampling_rate: Rate a neuron is recorded
+        :param variable: the variable name
+        :param segment: Segment to add data to
+        :param signal_array: the raw signal data
+        :param indexes: The indexes for the data
+        :param sampling_rate: Rate a neuron is recorded
         :param units: the units of the recorded value
-        :type units: quantities.quantity.Quantity or str
         """
         block = segment.block
 
@@ -297,9 +283,9 @@ class NeoCsv(object):
         """
         Writes data to a CSV file.
 
-        :param ~csv.writer csv_writer: Open CSV writer to write to
-        :param ~numpy.ndarray signal_array: the raw signal data
-        :param list(int) indexes: The indexes for the data
+        :param csv_writer: Open CSV writer to write to
+        :param signal_array: the raw signal data
+        :param indexes: The indexes for the data
         """
         self.__csv_indexes(indexes, csv_writer)
         csv_writer.writerows(signal_array)
@@ -310,9 +296,9 @@ class NeoCsv(object):
         """
         Reads matrix data and adds it to the segment.
 
-        :param ~csv.reader csv_reader: Open CSV writer to read from
-        :param Segment segment:
-        :param str variable:
+        :param csv_reader: Open CSV writer to read from
+        :param segment:
+        :param variable:
         """
         t_start, _, sampling_period, units = \
             self.__read_variable_metadata(csv_reader)
@@ -330,10 +316,10 @@ class NeoCsv(object):
         """
         Adds formation data to a neo segment.
 
-        :param ~neo.core.Segment segment: Segment to add data to
-        :param str variable: the variable name
-        :param list[~quantities.Quantity] formation_times:
-        :param list[str] formation_labels:
+        :param segment: Segment to add data to
+        :param variable: the variable name
+        :param formation_times:
+        :param formation_labels:
         """
         formation_event_array = Event(
             times=formation_times,
@@ -351,10 +337,10 @@ class NeoCsv(object):
         """
         Adds elimination data to a neo segment.
 
-        :param ~neo.core.Segment segment: Segment to add data to
-        :param str variable: the variable name
-        :param list[~quantities.Quantity] elimination_times:
-        :param list[str] elimination_labels:
+        :param segment: Segment to add data to
+        :param variable: the variable name
+        :param elimination_times:
+        :param elimination_labels:
         """
         elimination_event_array = Event(
             times=elimination_times,
@@ -370,9 +356,9 @@ class NeoCsv(object):
         """
         Adds data that represent rewire events to a neo segment.
 
-        :param ~neo.core.Segment segment: Segment to add data to
-        :param ~numpy.ndarray event_array: the raw "event" data
-        :param str variable: the variable name
+        :param segment: Segment to add data to
+        :param event_array: the raw "event" data
+        :param variable: the variable name
         """
         formation_times: List[Quantity] = []
         formation_labels: List[str] = []
@@ -400,8 +386,8 @@ class NeoCsv(object):
         """
         Adds data that represent rewires events to a CSV file.
 
-        :param ~csv.writer csv_writer: Open CSV writer to write to
-        :param ~numpy.ndarray event_array: the raw "event" data
+        :param csv_writer: Open CSV writer to write to
+        :param event_array: the raw "event" data
         """
         formation: List[Tuple[Quantity, str]] = []
         elimination: List[Tuple[Quantity, str]] = []
@@ -429,9 +415,8 @@ class NeoCsv(object):
         """
         Reads formation or elimination data from the CSV file.
 
-        :param ~csv.reader csv_reader: Open CSV writer to read from
+        :param csv_reader: Open CSV writer to read from
         :return: A list of times and a list of labels
-        :rtype: tuple(list[~quantities.Quantity], list[str])
         """
         times: List[Quantity] = []
         labels: List[str] = []
@@ -448,9 +433,9 @@ class NeoCsv(object):
         """
         Reads rewiring data from a CSV file and adds it to the segment.
 
-        :param ~csv.reader csv_reader: Open CSV writer to read from
-        :param ~neo.core.Segment segment: Segment to add data to
-        :param str variable:
+        :param csv_reader: Open CSV writer to read from
+        :param segment: Segment to add data to
+        :param variable:
         """
         self.__read_metadata(csv_reader)
         row = next(csv_reader)
@@ -470,10 +455,6 @@ class NeoCsv(object):
         Creates an empty segment and adds it to the block.
 
         Unless other insert methods are called the segment will hold no data.
-
-        :param ~neo.core.Block block:
-        :param int segment_number:
-        :param datetime rec_datetime:
         """
         segment = Segment(
             name=f"segment{segment_number}",
@@ -500,9 +481,9 @@ class NeoCsv(object):
 
         Unless other CSV methods are called the CSV will hold no data.
 
-        :param ~csv.writer csv_writer: Open CSV writer to write to
-        :param int segment_number:
-        :param ~datetime.datetime rec_datetime:
+        :param csv_writer: Open CSV writer to write to
+        :param segment_number:
+        :param rec_datetime:
         """
         csv_writer.writerow([self._SEGMENT_NUMBER, segment_number])
         csv_writer.writerow([self._REC_DATETIME, rec_datetime])
@@ -515,9 +496,9 @@ class NeoCsv(object):
 
         Unless other read methods are called the segment will hold no data
 
-        :param ~csv.reader csv_reader: Open CSV writer to read from
-        :param ~neo.core.Block block:
-        :param str segment_number_st:
+        :param csv_reader: Open CSV writer to read from
+        :param block:
+        :param segment_number_st:
         """
         row = next(csv_reader)
         assert (row[0] == self._REC_DATETIME)
@@ -539,15 +520,7 @@ class NeoCsv(object):
         Does not actually "insert" the block anywhere.
         The insert name is aligned with other methods to create a full block
 
-        :param str pop_label:
-        :param str description:
-        :param int size:
-        :param int first_id:
-        :param float dt:
-        :param str simulator:
-        :param dict annotations:
         :return: a block with just metadata
-        :rtype: ~neo.core.Block
         """
         block = Block()
         block.name = pop_label
@@ -571,14 +544,13 @@ class NeoCsv(object):
             pop_size: int, first_id: int, description: str,
             annotations: Annotations) -> None:
         """
-        :param ~csv.writer csv_writer: Open CSV writer to write to
-        :param str pop_label:
-        :param float t_stop:
-        :param int pop_size:
-        :param int first_id:
-        :param str description:
+        :param csv_writer: Open CSV writer to write to
+        :param pop_label:
+        :param t_stop:
+        :param pop_size:
+        :param first_id:
+        :param description:
         :param annotations: annotations to put on the neo block
-        :type annotations: None or dict(str, ...)
         """
         csv_writer.writerow([self._POPULATION, pop_label])
         csv_writer.writerow([self._DESCRIPTION, f'"{description}"'])
@@ -598,9 +570,8 @@ class NeoCsv(object):
         """
         Reads block metadata and uses it to create an empty block.
 
-        :param ~csv.reader csv_reader: Open CSV writer to read from
+        :param csv_reader: Open CSV writer to read from
         :return: empty block
-        :rtype: ~neo.core.Block
         """
         metadata = self.__read_metadata(csv_reader)
         return self._insert_empty_block(
@@ -619,9 +590,8 @@ class NeoCsv(object):
         A metadata block is zero or more lines of two columns followed by an
         empty line. the first column will be the keys the second the data
 
-        :param ~csv.reader csv_reader: Open CSV writer to read from
+        :param csv_reader: Open CSV writer to read from
         :return: a dict of the keys to unformatted values
-        :rtype: dict(str, str)
         """
         metadata: Dict[str, str] = {}
         row = next(csv_reader)
@@ -635,9 +605,8 @@ class NeoCsv(object):
         """
         Reads a whole CSV file and creates a block with data.
 
-        :param str csv_file: Path of file to read
+        :param csv_file: Path of file to read
         :return: a block with all the data in the CSV file.
-        :rtype: ~neo.core.Block
         """
         with open(csv_file, newline='',  encoding="utf-8") as csvfile:
             csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"')

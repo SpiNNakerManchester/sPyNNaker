@@ -78,7 +78,7 @@ def check_directory_exists_and_create_if_not(filename: str) -> None:
     """
     Create a parent directory for a file if it doesn't exist.
 
-    :param str filename: The file whose parent directory is to be created
+    :param filename: The file whose parent directory is to be created
     """
     directory = os.path.dirname(filename)
     if directory != "" and not os.path.exists(directory):
@@ -92,11 +92,8 @@ def convert_param_to_numpy(
     Convert parameters into numpy arrays.
 
     :param param: the param to convert
-    :type param: ~pyNN.random.RandomDistribution or int or float or list(int)
-        or list(float) or ~numpy.ndarray
-    :param int no_atoms: the number of atoms available for conversion of param
+    :param no_atoms: the number of atoms available for conversion of param
     :return: the converted param as an array of floats
-    :rtype: ~numpy.ndarray(float)
     """
     # Deal with random distributions by generating values
     if isinstance(param, RandomDistribution):
@@ -126,10 +123,8 @@ def convert_to(value: float, data_type: DataType) -> uint32:
     Convert a value to a given data type.
 
     :param value: The value to convert
-    :param ~data_specification.enums.DataType data_type:
-        The data type to convert to
+    :param data_type: The data type to convert to
     :return: The converted data as a numpy data type
-    :rtype: numpy.uint32
     """
     return numpy.round(data_type.encode_as_int(value)).astype(
         data_type.struct_encoding)
@@ -143,16 +138,13 @@ def read_in_data_from_file(
 
         <time>\t<atom ID>\t<data value>
 
-    :param str file_path: absolute path to a file containing the data
-    :param int min_atom: min neuron ID to which neurons to read in
-    :param int max_atom: max neuron ID to which neurons to read in
+    :param file_path: absolute path to a file containing the data
+    :param min_atom: min neuron ID to which neurons to read in
+    :param max_atom: max neuron ID to which neurons to read in
     :param extra:
     :param min_time: min time slot to read neurons values of.
-    :type min_time: float or int
     :param max_time: max time slot to read neurons values of.
-    :type max_time: float or int
     :return: a numpy array of (time stamp, atom ID, data value)
-    :rtype: ~numpy.ndarray(tuple(float, int, float))
     """
     times: List[float] = []
     atom_ids: List[int] = []
@@ -191,20 +183,15 @@ def read_spikes_from_file(
 
         <time>\t<neuron ID>
 
-    :param str file_path: absolute path to a file containing spike values
+    :param file_path: absolute path to a file containing spike values
     :param min_atom: min neuron ID to which neurons to read in
-    :type min_atom: int or float
     :param max_atom: max neuron ID to which neurons to read in
-    :type max_atom: int or float
     :param min_time: min time slot to read neurons values of.
-    :type min_time: float or int
     :param max_time: max time slot to read neurons values of.
-    :type max_time: float or int
-    :param str split_value: the pattern to split by
+    :param split_value: the pattern to split by
     :return:
         a numpy array with up to max_atom elements each of which is a list of
         spike times.
-    :rtype: numpy.ndarray(int, int)
     """
     # For backward compatibility as previous version tested for None rather
     # than having default values
@@ -271,9 +258,9 @@ def get_probability_within_range(distribution: RandomDistribution,
     Get the probability that a value will fall within the given range for
     a given RandomDistribution.
 
-    :param ~spynnaker.pyNN.RandomDistribution distribution:
-    :param float lower:
-    :param float upper:
+    :param distribution:
+    :param lower:
+    :param upper:
     """
     stats = STATS_BY_NAME[distribution.name]
     return stats.cdf(distribution, upper) - stats.cdf(distribution, lower)
@@ -285,9 +272,9 @@ def get_maximum_probable_value(distribution: RandomDistribution, n_items: int,
     Get the likely maximum value of a RandomDistribution given a
     number of draws.
 
-    :param ~spynnaker.pyNN.RandomDistribution distribution:
-    :param int n_items:
-    :param float chance:
+    :param distribution:
+    :param n_items:
+    :param chance:
     """
     stats = STATS_BY_NAME[distribution.name]
     prob = 1.0 - (chance / float(n_items))
@@ -300,7 +287,7 @@ def get_minimum_probable_value(distribution: RandomDistribution, n_items: int,
     Get the likely minimum value of a RandomDistribution given a
     number of draws.
 
-    :param ~spynnaker.pyNN.RandomDistribution distribution:
+    :param distribution:
     """
     stats = STATS_BY_NAME[distribution.name]
     prob = chance / float(n_items)
@@ -311,7 +298,7 @@ def get_mean(distribution: RandomDistribution) -> float:
     """
     Get the mean of a RandomDistribution.
 
-    :param ~spynnaker.pyNN.RandomDistribution distribution:
+    :param distribution:
     """
     stats = STATS_BY_NAME[distribution.name]
     return stats.mean(distribution)
@@ -321,7 +308,7 @@ def get_standard_deviation(distribution: RandomDistribution) -> float:
     """
     Get the standard deviation of a RandomDistribution.
 
-    :param ~spynnaker.pyNN.RandomDistribution distribution:
+    :param distribution:
     """
     stats = STATS_BY_NAME[distribution.name]
     return stats.std(distribution)
@@ -331,7 +318,7 @@ def get_variance(distribution: RandomDistribution) -> float:
     """
     Get the variance of a RandomDistribution.
 
-    :param ~spynnaker.pyNN.RandomDistribution distribution:
+    :param distribution:
     """
     stats = STATS_BY_NAME[distribution.name]
     return stats.var(distribution)
@@ -343,7 +330,7 @@ def high(distribution: RandomDistribution) -> Optional[float]:
 
     Could return `None`.
 
-    :param ~spynnaker.pyNN.RandomDistribution distribution:
+    :param distribution:
     """
     stats = STATS_BY_NAME[distribution.name]
     return stats.high(distribution)
@@ -355,7 +342,7 @@ def low(distribution: RandomDistribution) -> Optional[float]:
 
     Could return `None`.
 
-    :param ~spynnaker.pyNN.RandomDistribution distribution:
+    :param distribution:
     """
     stats = STATS_BY_NAME[distribution.name]
     return stats.low(distribution)
@@ -381,13 +368,8 @@ def create_mars_kiss_seeds(rng: numpy.random.RandomState) -> Tuple[int, ...]:
     suitable for use as a mars 64 kiss seed.
 
     :param rng: the random number generator.
-    :type rng: ~numpy.random.RandomState
-    :param seed:
-        the seed to create a random number generator if not handed.
-    :type seed: int or None
     :return: a list of 4 integers which are used by the mars64 kiss random
         number generator for seeds.
-    :rtype: list(int)
     """
     kiss_seed = _validate_mars_kiss_64_seed([
         rng.randint(-BASE_RANDOM_FOR_MARS_64, CAP_RANDOM_FOR_MARS_64) +
@@ -399,9 +381,8 @@ def get_n_bits(n_values: int) -> int:
     """
     Determine how many bits are required for the given number of values.
 
-    :param int n_values: the number of values (starting at 0)
+    :param n_values: the number of values (starting at 0)
     :return: the number of bits required to express that many values
-    :rtype: int
     """
     if n_values == 0:
         return 0
@@ -414,8 +395,8 @@ def get_time_to_write_us(n_bytes: int, n_cores: int) -> int:
     """
     Determine how long a write of a given number of bytes will take in us.
 
-    :param int n_bytes: The number of bytes to transfer
-    :param int n_cores: How many cores will be writing at the same time
+    :param n_bytes: The number of bytes to transfer
+    :param n_cores: How many cores will be writing at the same time
     """
     bandwidth_per_core = WRITE_BANDWIDTH_BYTES_PER_SECOND / n_cores
     seconds = n_bytes / bandwidth_per_core
@@ -428,7 +409,7 @@ def get_neo_io(file_or_folder: str) -> BaseIO:
 
     In Neo 0.12 neo.get_io only works with existing files
 
-    :param str file_or_folder:
+    :param file_or_folder:
     """
     try:
         return neo.get_io(file_or_folder)
@@ -450,7 +431,7 @@ def report_non_spynnaker_pynn(msg: str) -> None:
     Report a case of non-spynnaker-compatible PyNN being used.  This will warn
     or error depending on the configuration setting.
 
-    :param str msg: The message to report
+    :param msg: The message to report
     """
     if get_config_bool("Simulation", "error_on_non_spynnaker_pynn"):
         raise ConfigurationException(msg)

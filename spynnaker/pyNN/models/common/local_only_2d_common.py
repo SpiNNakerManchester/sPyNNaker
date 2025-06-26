@@ -68,7 +68,7 @@ def get_delay_for_source(incoming: "Projection") -> Tuple[
     """ Get the vertex which will send data from a given source projection,
         along with the delay stage and locally-handled delay value
 
-    :param Projection incoming: The incoming projection to get the delay from
+    :param incoming: The incoming projection to get the delay from
     :return: The vertex, the local delay, the delay stage, the partition id
     """
     # pylint: disable=protected-access
@@ -126,7 +126,7 @@ def get_sources_for_target(app_vertex: "PopulationVertex") -> Dict[
     Get all the application vertex sources that will hit the given application
     vertex.
 
-    :param PopulationVertex app_vertex: The vertex being targeted
+    :param app_vertex: The vertex being targeted
     :return:
         A dict of source ApplicationVertex to list of source information
     """

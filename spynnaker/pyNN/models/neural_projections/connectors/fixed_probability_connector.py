@@ -70,15 +70,15 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             if the connector is used to connect a Population to itself, this
             flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
-        :param bool safe:
+        :param safe:
             If ``True``, check that weights and delays have valid values.
             If ``False``, this check is skipped.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
         :param rng:
             Seeded random number generator, or `None` to make one when needed
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::

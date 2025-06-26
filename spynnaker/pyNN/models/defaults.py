@@ -45,9 +45,9 @@ def get_map_from_init(
     Get an argument initialisation dictionary by examining an
     ``__init__`` method or function.
 
-    :param callable init_method: The method.
-    :param frozenset(str) skip: The arguments to be skipped, if any
-    :param frozenset(str) include: The arguments that must be present, if any
+    :param init_method: The method.
+    :param skip: The arguments to be skipped, if any
+    :param include: The arguments that must be present, if any
     :return: an initialisation dictionary
     """
     init_args = inspect.getfullargspec(init_method)
@@ -77,7 +77,7 @@ def default_parameters(parameters: Iterable[str]) -> Callable:
     ``__init__`` method of a class that is additionally decorated with
     :py:meth:`defaults`
 
-    :param iterable(str) parameters:
+    :param parameters:
         The names of the arguments that are parameters
     """
     def wrap(method: Callable) -> Callable:
@@ -117,7 +117,7 @@ def default_initial_values(state_variables: Iterable[str]) -> Callable:
     ``__init__`` method of a class that is additionally decorated with
     :py:meth:`defaults`
 
-    :param iterable(str) state_variables:
+    :param state_variables:
         The names of the arguments that are state variables
     """
     def wrap(method: Callable) -> Callable:

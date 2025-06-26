@@ -56,9 +56,9 @@ class SynapseDynamicsWeightChanger(
 
     def __init__(self, weight_change: float, projection: Projection):
         """
-        :param float weight_change:
+        :param weight_change:
             The positive or negative change in weight to apply on each spike
-        :param Projection projection:
+        :param projection:
             The projection that this synapse dynamics is being added to
         """
         super().__init__(delay=1, weight=weight_change)

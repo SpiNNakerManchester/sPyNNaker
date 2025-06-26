@@ -307,7 +307,6 @@ class SplitterPopulationVertexNeuronsSynapses(
             back to S1615 values
         :param weight_scales:
             The scale to apply to weights to encode them in the 16-bit synapses
-        :param synapse_vertices: A list to add the core to
         :param neuron_vertex:
             The neuron vertex the synapses will feed into
         :param atoms_per_core: The maximum atoms per core
@@ -351,8 +350,7 @@ class SplitterPopulationVertexNeuronsSynapses(
         :param synapse_references: References to the synapse regions
         :param shared_synapse_sdram:
         :param feedback_partition:
-        :param synapse_vertices: A list to add the core to
-        :param PopulationNeuronsMachineVertex neuron_vertex:
+`       :param neuron_vertex:
             The neuron vertex the synapses will feed into
         :return: The
         """
@@ -582,8 +580,6 @@ class SplitterPopulationVertexNeuronsSynapses(
         """
         Gets the resources of the neurons of a slice of atoms from a given
         application vertex.
-
-        :param vertex_slice: the slice
         """
         n_record = len(self.governed_app_vertex.neuron_recordables)
         variable_sdram = \
@@ -641,7 +637,6 @@ class SplitterPopulationVertexNeuronsSynapses(
         Get the resources of the synapses of a slice of atoms from a
         given application vertex.
 
-        :param vertex_slice: the slice
         :param shared_sdram:
             The SDRAM shared between cores, if this is to be included
         """
@@ -684,9 +679,6 @@ class SplitterPopulationVertexNeuronsSynapses(
     def __proj_dependent_synapse_sdram(self) -> MultiRegionSDRAM:
         """
         Get the SDRAM used by synapse cores dependent on the projections.
-
-        :param incoming_projections:
-            The projections to consider in the calculations
         """
         regions = PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
         sdram = MultiRegionSDRAM()

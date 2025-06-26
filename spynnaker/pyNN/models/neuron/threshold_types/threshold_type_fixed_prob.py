@@ -45,11 +45,7 @@ class ThresholdTypeFixedProb(AbstractThresholdType):
 
         """
         :param v_thresh: :math:`V_{thresh}`
-        :type v_thresh: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param p_thresh: :math:`P_{thresh}`
-        :type p_thresh: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param seed: Random number generator seed
         """
         super().__init__(

@@ -88,7 +88,6 @@ def _fill_in_initial_data(expanded_pop_vertices: List[
     Once expander has run, fill in the connection data.
 
     :param expanded_pop_vertices: List of machine vertices to read data from
-    :param transceiver: How to talk to the machine
     """
     progress = ProgressBar(
         len(expanded_pop_vertices), "Getting initial values")

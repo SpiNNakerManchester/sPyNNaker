@@ -84,8 +84,6 @@ class PopulationView(PopulationBase):
             selector: Selector, label: Optional[str] = None):
         """
         :param parent: the population or view to make the view from
-        :param vertex: The actual underlying vertex
-        :param recorder: The recorder of the Population
         :param selector: a slice or numpy mask array.
             The mask array should either be a Boolean array (ideally) of the
             same size as the parent,
@@ -99,9 +97,7 @@ class PopulationView(PopulationBase):
                 PopulationView(p, slice(2, 5, 2))
 
             will all create the same view.
-        :type selector: None or slice or int or list(bool) or list(int) or
-            ~numpy.ndarray(bool) or ~numpy.ndarray(int)
-        :param str label: A label for the view
+        :param label: A label for the view
         """
         self.__parent = parent
         sized = AbstractSized(parent.size)

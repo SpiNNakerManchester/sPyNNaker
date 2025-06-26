@@ -75,7 +75,7 @@ class SynapseInformation(object):
             Whether the synapse type came from synapse dynamics
         :param weights: The synaptic weights
         :param delays: The total synaptic delays
-        :param bool download_on_pause:
+        :param download_on_pause:
             Whether to download the synapse matrix when the simulation pauses
         :param partition_id:
             The partition id for the application edge when not standard; if

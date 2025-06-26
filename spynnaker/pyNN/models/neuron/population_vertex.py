@@ -141,8 +141,6 @@ _EXTRA_RECORDABLE_UNITS = {NeuronRecorder.SPIKES: "",
 def _all_gen(rd: RangeDictionary) -> bool:
     """
     Determine if all the values of a ranged dictionary can be generated.
-
-    :rtype: bool
     """
     for key in rd.keys():
         if is_singleton(rd[key]):
@@ -519,8 +517,6 @@ class PopulationVertex(
     def combined_binary_exists(self) -> bool:
         """
         Whether the combined binary file exists.
-
-        :rtype: bool
         """
         # If we are in virtual machine mode, we can work without binaries
         # so easier to assume they exist
@@ -537,8 +533,6 @@ class PopulationVertex(
     def split_binaries_exist(self) -> bool:
         """
         Whether the split binary files exist.
-
-        :rtype: bool
         """
         # If we are in virtual machine mode, we can work without binaries
         # so easier to assume they exist
@@ -559,8 +553,6 @@ class PopulationVertex(
         Whether the vertex should operate on a combined
         neuron-synapse core, or if a split synapse-core is more
         appropriate.
-
-        :rtype: bool
         """
         # If there are no binaries at all, complain!
         if not self.combined_binary_exists and not self.split_binaries_exist:
@@ -669,8 +661,6 @@ class PopulationVertex(
         """
         The estimated number of synapse cores required, when using a
         split synapse-neuron core model.
-
-        :rtype: int
         """
         return self.__update_n_synapse_cores()
 
@@ -838,8 +828,6 @@ class PopulationVertex(
         """
         The synapse dynamics used by the synapses e.g. plastic or static.
         Settable.
-
-        :rtype: AbstractSynapseDynamics
         """
         return self.__synapse_dynamics
 
@@ -853,8 +841,7 @@ class PopulationVertex(
             After setting, the dynamics might not be the type set as it can
             be combined with the existing dynamics in exciting ways.
 
-        :param AbstractSynapseDynamics synapse_dynamics:
-            The synapse dynamics to set
+        :param synapse_dynamics: The synapse dynamics to set
         """
         merged = self.__synapse_dynamics.merge(synapse_dynamics)
         assert isinstance(merged, (
@@ -866,8 +853,7 @@ class PopulationVertex(
         """
         Add a projection incoming to this vertex.
 
-        :param ~spynnaker.pyNN.models.projection.Projection projection:
-            The new projection to add
+        :param projection: The new projection to add
         """
         # Reset the ring buffer shifts as a projection has been added
         SpynnakerDataView.set_requires_mapping()
@@ -887,8 +873,6 @@ class PopulationVertex(
     def self_projection(self) -> Optional[Projection]:
         """
         Any projection from this vertex to itself.
-
-        :rtype: ~spynnaker.pyNN.models.projection.Projection or None
         """
         return self.__self_projection
 
@@ -908,8 +892,6 @@ class PopulationVertex(
     def size(self) -> int:
         """
         The number of neurons in the vertex.
-
-        :rtype: int
         """
         return self.__n_atoms
 
@@ -917,8 +899,6 @@ class PopulationVertex(
     def incoming_spike_buffer_size(self) -> int:
         """
         The size of the incoming spike buffer to be used on the cores.
-
-        :rtype: int
         """
         return self.__incoming_spike_buffer_size
 
@@ -926,8 +906,6 @@ class PopulationVertex(
     def parameters(self) -> RangeDictionary[float]:
         """
         The parameters of the neurons in the population.
-
-        :rtype: ~spinn_utilities.ranged.RangeDictionary
         """
         return self.__parameters
 
@@ -935,8 +913,6 @@ class PopulationVertex(
     def state_variables(self) -> RangeDictionary[float]:
         """
         The state variables of the neuron in the population.
-
-        :rtype: ~spinn_utilities.ranged.RangeDictionary
         """
         return self.__state_variables
 
@@ -944,8 +920,6 @@ class PopulationVertex(
     def initial_state_variables(self) -> RangeDictionary[float]:
         """
         The initial values of the state variables of the neurons.
-
-        :rtype: ~spinn_utilities.ranged.RangeDictionary
         """
         return self.__initial_state_variables
 
@@ -953,8 +927,6 @@ class PopulationVertex(
     def neuron_impl(self) -> AbstractNeuronImpl:
         """
         The neuron implementation.
-
-        :rtype: AbstractNeuronImpl
         """
         return self.__neuron_impl
 
@@ -962,8 +934,6 @@ class PopulationVertex(
     def n_profile_samples(self) -> int:
         """
         The maximum number of profile samples to report.
-
-        :rtype: int
         """
         return self.__n_profile_samples
 
@@ -971,8 +941,6 @@ class PopulationVertex(
     def neuron_recorder(self) -> NeuronRecorder:
         """
         The recorder for neurons.
-
-        :rtype: NeuronRecorder
         """
         return self.__neuron_recorder
 
@@ -980,8 +948,6 @@ class PopulationVertex(
     def synapse_recorder(self) -> NeuronRecorder:
         """
         The recorder for synapses.
-
-        :rtype: NeuronRecorder
         """
         return self.__synapse_recorder
 
@@ -989,16 +955,13 @@ class PopulationVertex(
     def drop_late_spikes(self) -> bool:
         """
         Whether spikes should be dropped if not processed in a timestep.
-
-        :rtype: bool
         """
         return self.__drop_late_spikes
 
     def get_sdram_usage_for_core_neuron_params(self, n_atoms: int) -> int:
         """
-        :param int n_atoms: The number of atoms per core
+        :param n_atoms: The number of atoms per core
         :return: The SDRAM required for the core neuron parameters
-        :rtype: int
         """
         return (
             self.CORE_PARAMS_BASE_SIZE +
@@ -1010,9 +973,8 @@ class PopulationVertex(
         """
         Calculate the SDRAM usage for just the neuron parameters region.
 
-        :param int n_atoms: The number of atoms per core
+        :param n_atoms: The number of atoms per core
         :return: The SDRAM required for the neuron region
-        :rtype: int
         """
         return sum(s.get_size_in_whole_words(n_atoms)
                    if s.repeat_type == StructRepeat.PER_NEURON
@@ -1023,9 +985,8 @@ class PopulationVertex(
         """
         Calculate the SDRAM usage for the neuron generation region.
 
-        :param int n_atoms: The number of atoms per core
+        :param n_atoms: The number of atoms per core
         :return: The SDRAM required for the neuron generator region
-        :rtype: int
         """
         return (self.__get_sdram_usage_for_neuron_struct_generation(n_atoms) +
                 self.__neuron_recorder.get_generator_sdram_usage_in_bytes(
@@ -1036,9 +997,8 @@ class PopulationVertex(
         """
         Calculate the SDRAM usage for the neuron struct generation region.
 
-        :param int n_atoms: The number of atoms per core
+        :param n_atoms: The number of atoms per core
         :return: The SDRAM required for the neuron generator region
-        :rtype: int
         """
         # Uses nothing if not generatable
         structs = self.__neuron_impl.structs
@@ -1061,9 +1021,8 @@ class PopulationVertex(
         """
         Calculate the SDRAM usage for the current source parameters region.
 
-        :param int n_atoms: The number of atoms to account for
+        :param n_atoms: The number of atoms to account for
         :return: The SDRAM required for the current source region
-        :rtype: int
         """
         # If non at all, just output size of 0 declaration
         if not self.__current_sources:
@@ -1299,14 +1258,14 @@ class PopulationVertex(
     @property
     def weight_scale(self) -> float:
         """
-        :rtype: float
+        Get the weight scaling required by the implementaion.
         """
         return self.__neuron_impl.get_global_weight_scale()
 
     @property
     def ring_buffer_sigma(self) -> float:
         """
-        :rtype: float
+        How many SD above the mean to go for upper bound of ring buffer size
         """
         return self.__ring_buffer_sigma
 
@@ -1317,7 +1276,9 @@ class PopulationVertex(
     @property
     def spikes_per_second(self) -> float:
         """
-        :rtype: float
+        Expected spike rate.
+
+        Comes from value passed into init otherwise cfg file
         """
         return self.__spikes_per_second
 
@@ -1330,8 +1291,7 @@ class PopulationVertex(
         """
         Set the synapse dynamics of this population.
 
-        :param AbstractSynapseDynamics synapse_dynamics:
-            The synapse dynamics to set
+        :param synapse_dynamics: The synapse dynamics to set
         """
         self.synapse_dynamics = synapse_dynamics
 
@@ -1351,8 +1311,6 @@ class PopulationVertex(
 
         If template is `None`, then a dictionary containing the template
         context will be returned.
-
-        :rtype: dict(str, any)
         """
         parameters = dict(self.get_parameter_values(
             self.__pynn_model.default_parameters.keys()))
@@ -1369,8 +1327,7 @@ class PopulationVertex(
         """
         Get the id of synapse using its target name.
 
-        :param str target: The synapse to get the id of
-        :rtype: int
+        :param target: The synapse to get the id of
         """
         return self.__neuron_impl.get_synapse_id_by_target(target)
 
@@ -1390,8 +1347,6 @@ class PopulationVertex(
     def current_sources(self) -> List[AbstractCurrentSource]:
         """
         Current sources needed to be available to machine vertex.
-
-        :rtype: list(AbstractCurrentSource)
         """
         return self.__current_sources
 
@@ -1399,8 +1354,6 @@ class PopulationVertex(
     def current_source_id_list(self) -> Dict[AbstractCurrentSource, Selector]:
         """
         Current source ID list needed to be available to machine vertex.
-
-        :rtype: dict(AbstractCurrentSource,any)
         """
         return self.__current_source_id_list
 
@@ -1428,8 +1381,6 @@ class PopulationVertex(
         """
         Get the shift of the ring buffers for transfer of values into the
         input buffers for this model.
-
-        :rtype: list(int)
         """
         n_synapse_types = self.__neuron_impl.get_n_synapse_types()
         max_weights = numpy.zeros(n_synapse_types)
@@ -1473,8 +1424,7 @@ class PopulationVertex(
         shifted left by ring_buffer_to_input_left_shift to produce an
         s1615 fixed point number.
 
-        :param int ring_buffer_to_input_left_shift:
-        :rtype: float
+        :param ring_buffer_to_input_left_shift:
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
@@ -1484,9 +1434,7 @@ class PopulationVertex(
         """
         Get the weight scaling to apply to weights in synapses.
 
-        :param list(int) ring_buffer_shifts:
-            The shifts to convert to weight scales
-        :rtype: list(int)
+        :param ring_buffer_shifts: The shifts to convert to weight scales
         """
         weight_scale = self.__neuron_impl.get_global_weight_scale()
         return numpy.array([
@@ -1520,8 +1468,6 @@ class PopulationVertex(
     def get_synapse_params_size(self) -> int:
         """
         Get the size of the synapse parameters, in bytes.
-
-        :rtype: int
         """
         # This will only hold ring buffer scaling for the neuron synapse
         # types
@@ -1531,8 +1477,6 @@ class PopulationVertex(
     def get_synapse_dynamics_size(self, n_atoms: int) -> int:
         """
         Get the size of the synapse dynamics region, in bytes.
-
-        :rtype: int
         """
         if isinstance(self.__synapse_dynamics, AbstractLocalOnly):
             return self.__synapse_dynamics.get_parameters_usage_in_bytes(
@@ -1545,9 +1489,7 @@ class PopulationVertex(
         """
         Get the size of the structural dynamics region, in bytes.
 
-        :param int n_atoms:
-            The number of atoms in the slice
-        :rtype: int
+        :param n_atoms: The number of atoms in the slice
         """
         if not _is_structural(self.__synapse_dynamics):
             return 0
@@ -1560,12 +1502,7 @@ class PopulationVertex(
         """
         Get the maximum SDRAM usage for the synapses on a vertex slice.
 
-        :param int n_post_atoms: The number of atoms projected to
-        :param incoming_projections:
-            The projections to consider in the calculations
-        :type incoming_projections:
-            list(~spynnaker.pyNN.models.projection.Projection)
-        :rtype: int
+        :param n_post_atoms: The number of atoms projected to
         """
         if isinstance(self.__synapse_dynamics, AbstractLocalOnly):
             return 0
@@ -1580,11 +1517,9 @@ class PopulationVertex(
         Add to the address the size of the matrices for the projection to
         the vertex slice.
 
-        :param int address: The address to start from
-        :param ~spynnaker.pyNN.models.projection.Projection:
-            The projection to add
-        :param int n_post_atoms: The number of atoms projected to
-        :rtype: int
+        :param address: The address to start from
+        :param projection: The projection to add
+        :param n_post_atoms: The number of atoms projected to
         """
         # pylint: disable=protected-access
         synapse_info = projection._synapse_information
@@ -1631,10 +1566,9 @@ class PopulationVertex(
         """
         Get maximum row length data.
 
-        :param SynapseInformation synapse_info: Information about synapses
-        :param int n_post_atoms: The number of atoms projected to
-        :param ProjectionApplicationEdge app_edge: The edge of the projection
-        :rtype: MaxRowInfo
+        :param synapse_info: Information about synapses
+        :param n_post_atoms: The number of atoms projected to
+        :param app_edge: The edge of the projection
         """
         key = (app_edge, synapse_info, n_post_atoms)
         if key in self.__max_row_info:
@@ -1647,8 +1581,6 @@ class PopulationVertex(
     def get_synapse_expander_size(self) -> int:
         """
         Get the size of the synapse expander region, in bytes.
-
-        :rtype: int
         """
         size = SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
         size += (self.__neuron_impl.get_n_synapse_types() *
@@ -1673,8 +1605,7 @@ class PopulationVertex(
         """
         The number of bytes required by the generator information.
 
-        :param SynapseInformation synapse_info: The synapse information to use
-        :rtype: int
+        :param synapse_info: The synapse information to use
         """
         if not synapse_info.may_generate_on_machine():
             return 0
@@ -1694,8 +1625,6 @@ class PopulationVertex(
     def synapse_executable_suffix(self) -> str:
         """
         The suffix of the executable name due to the type of synapses in use.
-
-        :rtype: str
         """
         return self.__synapse_dynamics.get_vertex_executable_suffix()
 
@@ -1703,8 +1632,6 @@ class PopulationVertex(
     def neuron_recordables(self) -> List[str]:
         """
         The names of variables that can be recorded by the neuron.
-
-        :rtype: list(str)
         """
         return self.__neuron_recorder.get_recordable_variables()
 
@@ -1712,8 +1639,6 @@ class PopulationVertex(
     def synapse_recordables(self) -> List[str]:
         """
         The names of variables that can be recorded by the synapses.
-
-        :rtype: list(str)
         """
         return self.__synapse_recorder.get_recordable_variables()
 
@@ -1723,10 +1648,9 @@ class PopulationVertex(
         """
         Get the amount of SDRAM used by common parts.
 
-        :param int n_record: The number of recording regions
-        :param int n_provenance: The number of provenance items
-        :param CommonRegions common_regions: Region IDs
-        :rtype: MultiRegionSDRAM
+        :param n_record: The number of recording regions
+        :param n_provenance: The number of provenance items
+        :param common_regions: Region IDs
         """
         sdram = MultiRegionSDRAM()
         sdram.add_cost(common_regions.system, SYSTEM_BYTES_REQUIREMENT)
@@ -1747,17 +1671,13 @@ class PopulationVertex(
         """
         Get the amount of SDRAM per timestep used by neuron parts.
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of neurons to get the size of
-        :rtype: int
+        :param vertex_slice: The slice of neurons to get the size of
         """
         return self.__neuron_recorder.get_variable_sdram_usage(vertex_slice)
 
     def get_max_neuron_variable_sdram(self, n_neurons: int) -> AbstractSDRAM:
         """
         Get the amount of SDRAM per timestep used by neuron parts.
-
-        :rtype: int
         """
         return self.__neuron_recorder.get_max_variable_sdram_usage(n_neurons)
 
@@ -1765,9 +1685,7 @@ class PopulationVertex(
         """
         Get the amount of SDRAM per timestep used by synapse parts.
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of neurons to get the size of
-        :rtype: int
+        :param vertex_slice: The slice of neurons to get the size of
         """
         if _is_structural(self.__synapse_dynamics):
             self.__synapse_recorder.set_max_rewires_per_ts(
@@ -1777,8 +1695,6 @@ class PopulationVertex(
     def get_max_synapse_variable_sdram(self, n_neurons: int) -> AbstractSDRAM:
         """
         Get the amount of SDRAM per timestep used by synapse parts.
-
-        :rtype: int
         """
         if _is_structural(self.__synapse_dynamics):
             self.__synapse_recorder.set_max_rewires_per_ts(
@@ -1791,8 +1707,7 @@ class PopulationVertex(
         """
         Get the amount of fixed SDRAM used by neuron parts.
 
-        :param NeuronRegions neuron_regions: Region IDs
-        :rtype: int
+        :param Region IDs
         """
         params_cost = self.get_sdram_usage_for_neuron_params(n_atoms)
         sdram = MultiRegionSDRAM()
@@ -1817,8 +1732,6 @@ class PopulationVertex(
     def incoming_projections(self) -> Iterable[Projection]:
         """
         The projections that target this population vertex.
-
-        :rtype: iterable(~spynnaker.pyNN.models.projection.Projection)
         """
         for proj_list in self.__incoming_projections.values():
             yield from proj_list
@@ -1829,8 +1742,6 @@ class PopulationVertex(
         """
         The projections that target this population vertex from
         the given source.
-
-        :rtype: iterable(~spynnaker.pyNN.models.projection.Projection)
         """
         return self.__incoming_projections[source_vertex]
 
@@ -1848,8 +1759,6 @@ class PopulationVertex(
     def pop_seed(self) -> Sequence[int]:
         """
         The seed to use for the population overall; a list of four integers.
-
-        :rtype: list(int)
         """
         return self.__pop_seed
 
@@ -1857,10 +1766,8 @@ class PopulationVertex(
         """
         The seed to use for a core.
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The machine vertex that the seed is for
+        :param vertex_slice: The machine vertex that the seed is for
         :return: A list of 4 integers
-        :rtype: list(int)
         """
         if vertex_slice not in self.__core_seeds:
             self.__core_seeds[vertex_slice] = create_mars_kiss_seeds(
@@ -1871,8 +1778,7 @@ class PopulationVertex(
         """
         Copies the state variables into the initial state variables.
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice to copy now
+        :param vertex_slice: The slice to copy now
         """
         for key in self.__state_variables.keys():
             value = self.__state_variables[key][vertex_slice.get_raster_ids()]
@@ -1887,8 +1793,6 @@ class PopulationVertex(
     def read_initial_values(self) -> bool:
         """
         Whether initial values need to be stored.
-
-        :rtype: bool
         """
         return self.__read_initial_values
 
@@ -1904,7 +1808,7 @@ class PopulationVertex(
 
     def get_n_atom_bits(self) -> int:
         """
-        :rtype: int
+        How many bits are required
         """
         return get_n_bits(min(self.n_atoms, self.get_max_atoms_per_core()))
 
@@ -1912,8 +1816,6 @@ class PopulationVertex(
         """
         Determine if the parameters of this vertex can be generated on the
         machine
-
-        :rtype: bool
         """
         # Check that all the structs can actually be generated
         for struct in self.__neuron_impl.structs:
@@ -1990,7 +1892,7 @@ class _Stats(object):
         """
         Adds the projection.
 
-        :param Projection projection:
+        :param projection:
         """
         # pylint: disable=protected-access
         s_dynamics = projection._synapse_information.synapse_dynamics
@@ -2082,16 +1984,14 @@ class _Stats(object):
         All arguments should be assumed real values except n_synapses_in
         which will be an integer.
 
-        :param float weight_mean: Mean of weight distribution (in either nA or
+        :param weight_mean: Mean of weight distribution (in either nA or
             microSiemens as required)
-        :param float weight_std_dev: SD of weight distribution
-        :param float spikes_per_second: Maximum expected Poisson rate in Hz
-        :param int machine_timestep: in us
-        :param int n_synapses_in: No of connected synapses
-        :param float sigma: How many SD above the mean to go for upper bound;
+        :param weight_std_dev: SD of weight distribution
+        :param spikes_per_second: Maximum expected Poisson rate in Hz
+        :param n_synapses_in: No of connected synapses
+        :param sigma: How many SD above the mean to go for upper bound;
             a good starting choice is 5.0. Given length of simulation we can
             set this for approximate number of saturation events.
-        :rtype: float
         """
         # E[ number of spikes ] in a timestep
         average_spikes_per_timestep = (
@@ -2144,8 +2044,7 @@ class _Stats(object):
         """
         Get the max weight.
 
-        :param int s_type: synapse_type
-        :rtype: float
+        :param s_type: synapse_type
         """
         if self.delay_running_totals[s_type].variance == 0.0:
             return max(self.total_weights[s_type], self.biggest_weight[s_type])

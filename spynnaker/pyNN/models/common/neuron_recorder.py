@@ -296,7 +296,6 @@ class NeuronRecorder(object):
         """
         Processes a placement for matrix data.
 
-        :param placements: the placements object
         :param vertex: the vertex to read from
         :param region: the recording region id
         :param expected_rows:

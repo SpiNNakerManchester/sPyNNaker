@@ -115,8 +115,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
         """
         Creates a delay extension machine vertex and adds to the tracker.
 
-        :param ~pacman.model.graphs.machine.MachineVertex source_vertex:
-            The source of the delay
+        :param source_app_vertex: The source of the delay
         :return: machine vertex
         """
         label = f"Delay extension for {source_app_vertex}"
@@ -153,7 +152,6 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
         """
         Get a delay extension machine vertex for a given vertex slice.
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice to get the data for
+        :param vertex_slice: The slice to get the data for
         """
         return self._machine_vertex_by_slice[vertex_slice]

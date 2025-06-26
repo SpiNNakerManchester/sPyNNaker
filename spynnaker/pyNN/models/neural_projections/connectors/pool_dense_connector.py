@@ -101,7 +101,7 @@ class PoolDenseConnector(AbstractConnector):
             is "inhibitory".
         :param safe: (ignored)
         :param verbose: (ignored)
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
@@ -305,14 +305,12 @@ class PoolDenseConnector(AbstractConnector):
             delay_stage: int, post_vertex_slice: Slice,
             weight_scales: NDArray[floating]) -> NDArray[uint32]:
         """
-        :param spec:
         :param app_edge:
-        :param pre_vertex_slice:
+        :param local_delay:
+        :param delay_stage:
         :param post_vertex_slice:
-        :param key:
-        :param mask:
-        :param n_colour_bits:
         :param weight_scales:
+        :return:
         """
 
         # Write numbers of things

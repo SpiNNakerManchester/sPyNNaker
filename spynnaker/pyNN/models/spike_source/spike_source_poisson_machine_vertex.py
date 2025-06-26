@@ -95,8 +95,7 @@ def get_params_bytes(n_atoms: int) -> int:
     """
     Gets the size of the Poisson parameters in bytes.
 
-    :param int n_atoms: How many atoms to account for
-    :rtype: int
+    :param n_atoms: How many atoms to account for
     """
     return (PARAMS_BASE_WORDS + n_atoms) * BYTES_PER_WORD
 
@@ -105,9 +104,8 @@ def get_rates_bytes(n_atoms: int, n_rates: int) -> int:
     """
     Gets the size of the Poisson rates in bytes.
 
-    :param int n_atoms: How many atoms to account for
-    :param int n_rates: How many rates to account for
-    :rtype: int
+    :param n_atoms: How many atoms to account for
+    :param n_rates: How many rates to account for
     """
     return ((n_atoms * PARAMS_WORDS_PER_NEURON) +
             (n_rates * PARAMS_WORDS_PER_RATE)) * BYTES_PER_WORD
@@ -117,9 +115,8 @@ def get_expander_rates_bytes(n_atoms: int, n_rates: int) -> int:
     """
     Gets the size of the Poisson rates in bytes.
 
-    :param int n_atoms: How many atoms to account for
-    :param int n_rates: How many rates to account for
-    :rtype: int
+    :param n_atoms: How many atoms to account for
+    :param n_rates: How many rates to account for
     """
     return ((n_atoms * EXPANDER_WORDS_PER_NEURON) +
             (n_rates * PARAMS_WORDS_PER_RATE) +
@@ -130,8 +127,7 @@ def get_sdram_edge_params_bytes(vertex_slice: Slice) -> int:
     """
     Gets the size of the Poisson SDRAM region in bytes.
 
-    :param ~pacman.model.graphs.common.Slice vertex_slice:
-    :rtype: int
+    :param vertex_slice:
     """
     return SDRAM_EDGE_PARAMS_BASE_BYTES + (
         vertex_slice.n_atoms * SDRAM_EDGE_PARAMS_BYTES_PER_WEIGHT)
@@ -446,8 +442,7 @@ class SpikeSourcePoissonMachineVertex(
         """
         Generate Rate data for Poisson spike sources.
 
-        :param ~data_specification.DataSpecification spec:
-            the data specification writer
+        :param spec: the data specification writer
         """
         spec.comment(
             f"\nWriting Rates for {self.vertex_slice.n_atoms} "
@@ -492,8 +487,7 @@ class SpikeSourcePoissonMachineVertex(
         """
         Generate Parameter data for Poisson spike sources.
 
-        :param ~data_specification.DataSpecification spec:
-            the data specification writer
+        :param spec: the data specification writer
         """
         spec.comment(
             f"\nWriting parameters for {self.vertex_slice.n_atoms} "
@@ -576,7 +570,7 @@ class SpikeSourcePoissonMachineVertex(
         """
         Reads the poisson rates of the machine if they could have changed.
 
-        :param Placement placement:
+        :param placement:
         """
         # It is only worth updating the rates when there is a control edge
         # that can change them
@@ -614,8 +608,7 @@ class SpikeSourcePoissonMachineVertex(
         """
         Read the connections from the machine.
 
-        :param SynapseInformation synapse_info:
-            The synapse information being read
+        :param synapse_info: The synapse information being read
         :return: The connections read back
         """
         size = self.vertex_slice.n_atoms * SDRAM_EDGE_PARAMS_BYTES_PER_WEIGHT

@@ -66,13 +66,10 @@ class PopulationSynapsesMachineVertexLead(
             synapse_references: SynapseRegionReferences,
             max_atoms_per_core: int, synaptic_matrices: SynapticMatrices):
         """
-        :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The SDRAM used by the vertex
-        :param str label: The label of the vertex
-        :param PopulationVertex app_vertex:
-            The associated application vertex
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the population that this implements
+        :param sdram: The SDRAM used by the vertex
+        :param label: The label of the vertex
+        :param app_vertex: The associated application vertex
+        :param vertex_slice: The slice of the population that this implements
         """
         super().__init__(
             sdram, label, app_vertex, vertex_slice)

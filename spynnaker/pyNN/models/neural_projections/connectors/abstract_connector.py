@@ -262,7 +262,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         Not all concrete connectors support omitting the delay range.
 
-        :param delays:
         :param n_post_atoms:
         :param synapse_info:
         :param min_delay:
@@ -277,7 +276,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the maximum number of connections to any neuron
         in the post vertex from neurons in the pre vertex.
 
-        :param SynapseInformation synapse_info:
+        :param synapse_info:
         """
         raise NotImplementedError
 
@@ -554,7 +553,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     def get_provenance_data(self, synapse_info: SynapseInformation) -> None:
         """
-        :param SynapseInformation synapse_info:
+        :param synapse_info:
         """
         # Convert to native Python integer; provenance system assumption
         ncd = self.__n_clipped_delays.item()

@@ -64,9 +64,7 @@ def _unique_edges(projections: Iterable[Projection]) -> Iterable[
     """
     Get the unique application edges of a collection of projections.
 
-    :param iterable(~spynnaker.pyNN.models.projection.Projection) projections:
-        The projections to examine.
-    :rtype: iterable(tuple(ProjectionApplicationEdge, str))
+    :param projections: The projections to examine.
     """
     seen_edges = set()
     for proj in projections:
@@ -87,10 +85,7 @@ def get_sdram_for_bit_field_region(
 
     :param incoming_projections:
         The projections that target the vertex in question
-    :type incoming_projections:
-        iterable(~spynnaker.pyNN.models.projection.Projection)
     :return: the estimated number of bytes used by the bit field region
-    :rtype: int
     """
     sdram = FILTER_HEADER_WORDS * BYTES_PER_WORD
     for in_edge, _part_id in _unique_edges(incoming_projections):
@@ -110,10 +105,7 @@ def get_sdram_for_keys(incoming_projections: Iterable[Projection]) -> int:
 
     :param incoming_projections:
         The projections that target the vertex in question
-    :type incoming_projections:
-        iterable(~spynnaker.pyNN.models.projection.Projection)
     :return: SDRAM needed
-    :rtype: int
     """
     # basic sdram
     sdram = 0
@@ -131,9 +123,6 @@ def get_bitfield_key_map_data(
 
     :param incoming_projections:
         The projections to generate bitfields for
-    :type incoming_projections:
-        iterable(~spynnaker.pyNN.models.projection.Projection)
-    :rtype: ~numpy.ndarray
     """
     # Gather the source vertices that target this core
     routing_infos = SpynnakerDataView.get_routing_infos()
@@ -167,11 +156,10 @@ def write_bitfield_init_data(
     """
     Writes the initialisation data needed for the bitfield generator.
 
-    :param ~data_specification.DataSpecificationGenerator spec:
-        data specification writer
-    :param int bit_field_region: the region ID for the bit-field filters
-    :param int n_bit_field_bytes: the size of the region
-    :param int bit_field_region_ref: The reference to the region
+    :param spec: data specification writer
+    :param bit_field_region: the region ID for the bit-field filters
+    :param n_bit_field_bytes: the size of the region
+    :param bit_field_region_ref: The reference to the region
     """
     # reserve the final destination for the bitfields
     spec.reserve_memory_region(

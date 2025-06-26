@@ -85,7 +85,7 @@ class Recorder(object):
         :param to_file: a file to automatically record to (optional).
             :py:meth:`write_data` will be automatically called when
             `sim.end()` is called.
-        :param int sampling_interval: a value in milliseconds, and an integer
+        :param sampling_interval: a value in milliseconds, and an integer
             multiple of the simulation timestep.
         :param indexes: The indexes of neurons to record from.
             This is non-standard PyNN and equivalent to creating a view with

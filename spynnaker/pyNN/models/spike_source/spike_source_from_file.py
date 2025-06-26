@@ -44,8 +44,6 @@ class SpikeSourceFromFile(SpikeSourceArray):
     def spike_times(self) -> NDArray[numpy.integer]:
         """
         The spike times read from the file.
-
-        :rtype: ndarray
         """
         # type guaranteed by init
         return cast(NDArray[numpy.integer], self._spike_times)

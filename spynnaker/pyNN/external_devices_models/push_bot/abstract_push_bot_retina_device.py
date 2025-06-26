@@ -33,7 +33,7 @@ class AbstractPushBotRetinaDevice(
                  resolution: Optional[PushBotRetinaResolution]):
         """
         :param protocol:
-        :param PushBotRetinaResolution:
+        :param resolution:
         """
         self._protocol = protocol
         self._resolution = resolution

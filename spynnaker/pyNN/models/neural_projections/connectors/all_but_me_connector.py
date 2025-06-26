@@ -78,7 +78,7 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
         :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::

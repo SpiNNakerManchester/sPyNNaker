@@ -62,32 +62,14 @@ class SynapseTypeSEMD(AbstractSynapseType):
             scaling_factor: ModelParameter):
         r"""
         :param tau_syn_E: :math:`\tau^{syn}_{e_1}`
-        :type tau_syn_E: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_syn_E2: :math:`\tau^{syn}_{e_2}`
-        :type tau_syn_E2: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_syn_I: :math:`\tau^{syn}_i`
-        :type tau_syn_I: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param isyn_exc: :math:`I^{syn}_{e_1}`
-        :type isyn_exc: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param isyn_exc2: :math:`I^{syn}_{e_2}`
-        :type isyn_exc2: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param isyn_inh: :math:`I^{syn}_i`
-        :type isyn_inh: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param multiplicator:
-        :type multiplicator: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param exc2_old:
-        :type exc2_old: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param scaling_factor:
-        :type scaling_factor: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([
@@ -155,8 +137,6 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def tau_syn_E(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         # pylint: disable=invalid-name
         return self.__tau_syn_E
@@ -165,8 +145,6 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def tau_syn_E2(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         # pylint: disable=invalid-name
         return self.__tau_syn_E2
@@ -175,8 +153,6 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def tau_syn_I(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         # pylint: disable=invalid-name
         return self.__tau_syn_I
@@ -185,8 +161,6 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def isyn_exc(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__isyn_exc
 
@@ -194,8 +168,6 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def isyn_inh(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__isyn_inh
 
@@ -203,8 +175,6 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def isyn_exc2(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__isyn_exc2
 
@@ -212,8 +182,6 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def multiplicator(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__multiplicator
 
@@ -221,8 +189,6 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def exc2_old(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__exc2_old
 
@@ -230,7 +196,5 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def scaling_factor(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__scaling_factor

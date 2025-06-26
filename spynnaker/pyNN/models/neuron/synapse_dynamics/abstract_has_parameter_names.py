@@ -28,7 +28,5 @@ class AbstractHasParameterNames(object, metaclass=AbstractBase):
     def get_parameter_names(self) -> Iterable[str]:
         """
         Get the parameter names available from the component.
-
-        :rtype: iterable(str)
         """
         raise NotImplementedError

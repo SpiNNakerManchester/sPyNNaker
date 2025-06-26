@@ -85,19 +85,16 @@ class PopulationMachineCommon(
             n_provenance_items: int, profile_tags: Mapping[int, str],
             binary_file_name: str):
         """
-        :param str label: The label of the vertex
-        :param PopulationVertex app_vertex:
-            The associated application vertex
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the population that this implements
-        :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The SDRAM used by the vertex
-        :param .CommonRegions regions: The regions to be assigned
-        :param int n_provenance_items:
+        :param label: The label of the vertex
+        :param app_vertex: The associated application vertex
+        :param vertex_slice: The slice of the population that this implements
+        :param sdram: The SDRAM used by the vertex
+        :param regions: The regions to be assigned
+        :param n_provenance_items:
             The number of additional provenance items to be read
-        :param dict(int,str) profile_tags:
+        :param profile_tags:
             A mapping of profile identifiers to names
-        :param str binary_file_name: The name of the binary file
+        :param binary_file_name: The name of the binary file
         """
         super().__init__(label, app_vertex, vertex_slice)
         self.__sdram = sdram
@@ -145,9 +142,9 @@ class PopulationMachineCommon(
         """
         Write the data specification for the common regions.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
+        :param spec:
             The data specification to write to
-        :param list(int) rec_regions:
+        :param rec_regions:
             A list of sizes of each recording region (including empty ones)
         """
         # Write the setup region

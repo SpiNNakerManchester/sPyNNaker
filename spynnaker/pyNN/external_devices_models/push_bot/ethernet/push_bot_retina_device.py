@@ -42,7 +42,7 @@ class PushBotEthernetRetinaDevice(
             retina_injector_label: str = "PushBotRetinaInjector"):
         """
         :param protocol:
-        :param PushBotRetinaResolution resolution:
+        :param resolution:
         :param pushbot_ip_address:
         :param pushbot_port:
         :param injector_port:

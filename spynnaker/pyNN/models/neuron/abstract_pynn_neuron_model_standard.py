@@ -51,18 +51,14 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             threshold_type: AbstractThresholdType,
             additional_input_type: Optional[AbstractAdditionalInput] = None):
         """
-        :param str model_name: Name of the model.
-        :param str binary: Name of the implementation executable.
-        :param NeuronModel neuron_model:
-            The model of the neuron body
-        :param AbstractInputType input_type: The model of synaptic input types
-        :param AbstractSynapseType synapse_type:
-            The model of the synapses' dynamics
-        :param AbstractThresholdType threshold_type:
-            The model of the firing threshold
+        :param model_name: Name of the model.
+        :param binary: Name of the implementation executable.
+        :param neuron_model: The model of the neuron body
+        :param input_type: The model of synaptic input types
+        :param synapse_type: The model of the synapses' dynamics
+        :param threshold_type: The model of the firing threshold
         :param additional_input_type:
             The model (if any) of additional environmental inputs
-        :type additional_input_type: AbstractAdditionalInput or None
         """
         super().__init__(NeuronImplStandard(
             model_name, binary, neuron_model, input_type, synapse_type,
@@ -83,7 +79,7 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             n_synapse_cores: Optional[int] = None,
             allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
         """
-        :param int n_steps_per_timestep:
+        :param n_steps_per_timestep:
         """
         cast(NeuronImplStandard,
              self._model).n_steps_per_timestep = n_steps_per_timestep

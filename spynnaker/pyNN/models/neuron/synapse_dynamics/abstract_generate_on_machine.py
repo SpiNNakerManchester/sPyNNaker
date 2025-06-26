@@ -47,8 +47,6 @@ class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
         Determines if this instance should be generated on the machine.
 
         Default implementation returns True
-
-        :rtype: bool
         """
         return True
 
@@ -57,8 +55,6 @@ class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
     def gen_matrix_id(self) -> int:
         """
         The ID of the on-machine matrix generator.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -71,8 +67,6 @@ class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
             ) -> NDArray[uint32]:
         """
         Any parameters required by the matrix generator.
-
-        :rtype: ~numpy.ndarray(uint32)
         """
         raise NotImplementedError
 
@@ -81,7 +75,5 @@ class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
     def gen_matrix_params_size_in_bytes(self) -> int:
         """
         The size of the parameters of the matrix generator in bytes.
-
-        :rtype: int
         """
         raise NotImplementedError

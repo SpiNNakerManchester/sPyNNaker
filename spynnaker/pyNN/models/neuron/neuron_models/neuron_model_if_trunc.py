@@ -52,7 +52,6 @@ class NeuronModelIFTrunc(NeuronModel):
             tau_refrac: ModelParameter):
         r"""
         :param v_init: :math:`V_{init}`
-        :param v_rest: :math:`V_{rest}`
         :param tau_m: :math:`\tau_{m}`
         :param cm: :math:`C_m`
         :param i_offset: :math:`I_{offset}`

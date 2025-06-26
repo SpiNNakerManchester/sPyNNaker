@@ -91,8 +91,6 @@ class PopulationMachineNeurons(
 
         .. note::
             This is likely to be available via the MachineVertex.
-
-        :rtype: PopulationVertex
         """
         raise NotImplementedError
 
@@ -242,8 +240,6 @@ class PopulationMachineNeurons(
         Re-Write the data specification of the neuron data.
 
         :param spec: The data specification to write to
-        :param ring_buffer_shifts:
-            The shifts to apply to convert ring buffer values to S1615 values
         """
         # Write the current source parameters
         self._write_current_source_parameters(spec)

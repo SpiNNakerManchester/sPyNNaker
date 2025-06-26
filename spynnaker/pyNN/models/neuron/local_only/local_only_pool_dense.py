@@ -70,7 +70,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     def __init__(self, delay: WEIGHTS_DELAYS_IN = None):
         """
-        :param float delay:
+        :param delay:
             The delay used in the connection; by default 1 time step
         """
         # Store the sources to avoid recalculation

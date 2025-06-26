@@ -52,15 +52,14 @@ class DistanceDependentFormation(AbstractFormation):
             sigma_form_lateral: float = 1.0):
         """
         :param grid: (x, y) dimensions of the grid of distance
-        :type grid: tuple(int,int) or list(int) or ~numpy.ndarray(int)
-        :param float p_form_forward:
+        :param p_form_forward:
             The peak probability of formation on feed-forward connections
-        :param float sigma_form_forward:
+        :param sigma_form_forward:
             The spread of probability with distance of formation on
             feed-forward connections
-        :param float p_form_lateral:
+        :param p_form_lateral:
             The peak probability of formation on lateral connections
-        :param float sigma_form_lateral:
+        :param sigma_form_lateral:
             The spread of probability with distance of formation on
             lateral connections
         """
@@ -93,10 +92,9 @@ class DistanceDependentFormation(AbstractFormation):
         """
         Generate the exponentially decaying probability LUTs.
 
-        :param float probability: peak probability
-        :param float sigma: spread
+        :param probability: peak probability
+        :param sigma: spread
         :return: distance-dependent probabilities
-        :rtype: ~numpy.ndarray(float)
         """
         euclidian_distances = numpy.ones(self.__grid ** 2) * numpy.nan
         for row in range(euclidian_distances.shape[0]):
@@ -135,14 +133,12 @@ class DistanceDependentFormation(AbstractFormation):
         Compute the distance between points x0 and x1 place on the grid
         using periodic boundary conditions.
 
-        :param ~numpy.ndarray(int) x0: first point in space
-        :param ~numpy.ndarray(int) x1: second point in space
-        :param ~numpy.ndarray(int) grid: shape of grid
-        :param str metric:
+        :param x0: first point in space
+        :param x1: second point in space
+        :param metric:
             distance metric, i.e. ``euclidian`` or ``manhattan`` or
             ``equidistant``
         :return: the distance
-        :rtype: float
         """
         delta = numpy.abs(numpy.asarray(x0) - numpy.asarray(x1))
         if (delta[0] > self.__grid[0] * .5) and self.__grid[0] > 0:

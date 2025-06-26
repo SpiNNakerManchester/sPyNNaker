@@ -69,8 +69,6 @@ class PopulationMachineSynapses(
 
         .. note::
             This is likely to be available via the MachineVertex.
-
-        :rtype: PopulationVertex
         """
         raise NotImplementedError
 
@@ -87,8 +85,6 @@ class PopulationMachineSynapses(
     def _synaptic_matrices(self) -> SynapticMatrices:
         """
         The object holding synaptic matrices.
-
-        :rtype: SynapticMatrices
         """
         raise NotImplementedError
 
@@ -97,8 +93,6 @@ class PopulationMachineSynapses(
     def _synapse_regions(self) -> SynapseRegions:
         """
         The identifiers of synaptic regions.
-
-        :rtype: .SynapseRegions
         """
         raise NotImplementedError
 
@@ -107,8 +101,6 @@ class PopulationMachineSynapses(
     def _max_atoms_per_core(self) -> int:
         """
         The maximum number of atoms on any core targeted by these synapses.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -123,8 +115,6 @@ class PopulationMachineSynapses(
     def _synapse_references(self) -> SynapseRegionReferences:
         """
         The references to synapse regions.  Override to provide these.
-
-        :rtype: .SynapseRegionReferences
         """
         return SynapseRegionReferences()
 
@@ -152,13 +142,12 @@ class PopulationMachineSynapses(
         """
         Write the data specification for the synapse data.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The data specification to write to
-        :param list(int) ring_buffer_shifts:
+        :param spec: The data specification to write to
+        :param ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
-        :param list(int) weight_scales:
+        :param weight_scales:
             The scaling to apply to weights to store them in the synapses
-        :param int structural_sz: The size of the structural data
+        :param structural_sz: The size of the structural data
         """
         # Write the synapse parameters
         self._write_synapse_parameters(spec, ring_buffer_shifts)
@@ -209,9 +198,8 @@ class PopulationMachineSynapses(
         """
         Write the synapse parameters data region.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The data specification to write to
-        :param list(int) ring_buffer_shifts:
+        :param spec: The data specification to write to
+        :param ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
         """
         # Reserve space

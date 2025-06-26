@@ -29,13 +29,9 @@ def do_synfire_npop(nNeurons: int, n_pops: int, neurons_per_core: int,
     Runs the script Does the run based on the parameters
 
     :param nNeurons: Number of Neurons in chain
-    :type  nNeurons: int
     :param n_pops: Number of populations
-    :type  n_pops: int
     :param neurons_per_core: Number of neurons per core
-    :type  neurons_per_core: int
     :param runtime: time to run the script for
-    :type  runtime: int
     """
     p.setup(timestep=1.0)
     RootTestCase.assert_not_spin_three()

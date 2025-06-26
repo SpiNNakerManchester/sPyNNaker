@@ -35,8 +35,7 @@ class AbstractStaticSynapseDynamics(
         """
         Get the number of 32-bit words for `n_connections` in a single row.
 
-        :param int n_connections:
-        :rtype: int
+        :param n_connections:
         """
         raise NotImplementedError
 
@@ -59,15 +58,14 @@ class AbstractStaticSynapseDynamics(
         Lengths are returned as an array made up of an integer for each row,
         for the fixed-fixed region.
 
-        :param ~numpy.ndarray connections: The connections to get data for
-        :param ~numpy.ndarray connection_row_indices:
+        :param connections: The connections to get data for
+        :param connection_row_indices:
             The row into which each connection should go
-        :param int n_rows: The number of rows to write
-        :param int n_synapse_types: The number of synapse types
-        :param int max_n_synapses: The maximum number of synapses to generate
-        :param int max_atoms_per_core: The maximum number of atoms on a core
+        :param n_rows: The number of rows to write
+        :param n_synapse_types: The number of synapse types
+        :param max_n_synapses: The maximum number of synapses to generate
+        :param max_atoms_per_core: The maximum number of atoms on a core
         :return: (ff_data, ff_size)
-        :rtype: tuple(list(~numpy.ndarray), ~numpy.ndarray)
         """
         raise NotImplementedError
 
@@ -78,8 +76,7 @@ class AbstractStaticSynapseDynamics(
         Get the number of bytes to be read per row for the static data
         given the size that was written to each row.
 
-        :param ~numpy.ndarray ff_size:
-        :rtype: ~numpy.ndarray
+        :param ff_size:
         """
         raise NotImplementedError
 
@@ -89,8 +86,7 @@ class AbstractStaticSynapseDynamics(
         """
         Get the number of synapses in the rows with sizes `ff_size`.
 
-        :param ~numpy.ndarray ff_size:
-        :rtype: ~numpy.ndarray
+        :param ff_size:
         """
         raise NotImplementedError
 
@@ -102,10 +98,9 @@ class AbstractStaticSynapseDynamics(
         """
         Read the connections from the words of data in `ff_data`.
 
-        :param int n_synapse_types:
-        :param ~numpy.ndarray ff_size:
-        :param list(~numpy.ndarray) ff_data:
-        :param int max_atoms_per_core:
-        :rtype: ~numpy.ndarray
+        :param n_synapse_types:
+        :param ff_size:
+        :param ff_data:
+        :param max_atoms_per_core:
         """
         raise NotImplementedError

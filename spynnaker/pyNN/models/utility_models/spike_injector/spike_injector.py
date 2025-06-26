@@ -42,12 +42,10 @@ class SpikeInjector(AbstractPyNNModel):
             splitter: Optional[AbstractSplitterCommon] = None) \
             -> SpikeInjectorVertex:
         """
-        :param int port:
-        :param int virtual_key:
-        :param bool reserve_reverse_ip_tag:
+        :param port:
+        :param virtual_key:
+        :param reserve_reverse_ip_tag:
         :param splitter:
-        :type splitter:
-            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
         """
         max_atoms_per_core = self.get_model_max_atoms_per_dimension_per_core()
         return SpikeInjectorVertex(

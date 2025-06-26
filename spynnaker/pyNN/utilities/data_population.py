@@ -204,7 +204,7 @@ class DataPopulation(object):
 
     def __getitem__(self, index_or_slice: Selector) -> DataPopulation:
         """
-        :param selector: a slice or numpy mask array.
+        :param index_or_slice: a slice or numpy mask array.
             The mask array should either be a Boolean array (ideally) of the
             same size as the parent,
             or an integer array containing cell indices,
@@ -217,8 +217,6 @@ class DataPopulation(object):
                 PopulationView(p, slice(2, 5, 2))
 
             will all create the same view.
-        :type selector: None or slice or int or list(bool) or list(int) or
-            ~numpy.ndarray(bool) or ~numpy.ndarray(int)
         :param index_or_slice:
         :return:
         """

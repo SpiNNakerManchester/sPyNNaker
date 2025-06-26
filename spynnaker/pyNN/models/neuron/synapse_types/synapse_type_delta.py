@@ -38,11 +38,7 @@ class SynapseTypeDelta(AbstractSynapseType):
     def __init__(self, isyn_exc: ModelParameter, isyn_inh: ModelParameter):
         """
         :param isyn_exc: :math:`I^{syn}_e`
-        :type isyn_exc: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param isyn_inh: :math:`I^{syn}_i`
-        :type isyn_inh: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([
@@ -82,8 +78,6 @@ class SynapseTypeDelta(AbstractSynapseType):
     def isyn_exc(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__isyn_exc
 
@@ -91,7 +85,5 @@ class SynapseTypeDelta(AbstractSynapseType):
     def isyn_inh(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__isyn_inh

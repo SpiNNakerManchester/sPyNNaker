@@ -110,11 +110,9 @@ class DelayExtensionMachineVertex(
     def __init__(self, sdram: AbstractSDRAM, label: str, vertex_slice: Slice,
                  app_vertex: Optional[ApplicationVertex] = None):
         """
-        :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The SDRAM required by the vertex
-        :param str label: The name of the vertex
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the vertex
+        :param sdram: The SDRAM required by the vertex
+        :param label: The name of the vertex
+        :param vertex_slice: The slice of the vertex
         :param app_vertex:
             The application vertex that caused this machine vertex to be
             created. If `None`, there is no such application vertex.
@@ -318,8 +316,8 @@ class DelayExtensionMachineVertex(
     def _write_setup_info(
             self, spec: DataSpecificationGenerator, binary_name: str) -> None:
         """
-        :param ~data_specification.DataSpecificationGenerator spec:
-        :param str binary_name: the binary name
+        :param spec:
+        :param binary_name: the binary name
         """
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(self._DelayExtensionRegions.SYSTEM)
@@ -332,11 +330,11 @@ class DelayExtensionMachineVertex(
         """
         Generate Delay Parameter data.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param spec:
+        :param vertex_slice:
         :param key:
-        :param int incoming_key:
-        :param int incoming_mask:
+        :param incoming_key:
+        :param incoming_mask:
         """
         # Write spec with commands to construct required delay region:
         spec.comment(

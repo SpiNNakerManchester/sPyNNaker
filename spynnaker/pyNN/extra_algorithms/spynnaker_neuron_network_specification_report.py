@@ -51,8 +51,6 @@ def spynnaker_neuron_graph_network_specification_report() -> None:
     """
     Produces a report describing the graph created from the neural
     populations and projections.
-
-    :param report_folder: the report folder to put figure into
     """
     # create holders for data
     dot_diagram, exe_not_found_exn = _get_diagram(_GRAPH_TITLE)

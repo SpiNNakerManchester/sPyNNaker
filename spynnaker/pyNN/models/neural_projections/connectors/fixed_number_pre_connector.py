@@ -87,9 +87,6 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
             .. note::
                 Not supported by sPyNNaker.
         """
-        # :param ~pyNN.space.Space space:
-        # a Space object, needed if you wish to specify distance-dependent
-        # weights or delays - not implemented
         super().__init__(safe, callback, verbose)
         # We absolutely require an integer at this point!
         self.__n_pre = self._roundsize(n, "FixedNumberPreConnector")

@@ -160,8 +160,6 @@ class PopulationMachineLocalOnlyCombinedVertex(
             The shifts to apply to convert ring buffer values to S1615 values
         :param weight_scales:
             The scaling to apply to weights to store them in the synapses
-        :param all_syn_block_sz: The maximum size of the synapses in bytes
-        :param structural_sz: The size of the structural data
         :param neuron_data:
             The handler of neuron data
         :param max_atoms_per_core:
