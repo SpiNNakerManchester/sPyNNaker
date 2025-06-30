@@ -1258,7 +1258,7 @@ class PopulationVertex(
     @property
     def weight_scale(self) -> float:
         """
-        Get the weight scaling required by the implementaion.
+        Get the weight scaling required by the implementation.
         """
         return self.__neuron_impl.get_global_weight_scale()
 
