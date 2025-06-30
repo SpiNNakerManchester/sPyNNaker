@@ -46,10 +46,10 @@ class WeightDependenceAdditiveTriplet(
             self, w_min: float = 0.0, w_max: float = 1.0,
             A3_plus: float = 0.01, A3_minus: float = 0.01):
         """
-        :param float w_min: :math:`w^{min}`
-        :param float w_max: :math:`w^{max}`
-        :param float A3_plus: :math:`A_3^+`
-        :param float A3_minus: :math:`A_3^-`
+        :param w_min: :math:`w^{min}`
+        :param w_max: :math:`w^{max}`
+        :param A3_plus: :math:`A_3^+`
+        :param A3_minus: :math:`A_3^-`
         """
         super().__init__()
         self.__w_min = w_min
@@ -61,8 +61,6 @@ class WeightDependenceAdditiveTriplet(
     def w_min(self) -> float:
         """
         :math:`w^{min}`
-
-        :rtype: float
         """
         return self.__w_min
 
@@ -70,8 +68,6 @@ class WeightDependenceAdditiveTriplet(
     def w_max(self) -> float:
         """
         :math:`w^{max}`
-
-        :rtype: float
         """
         return self.__w_max
 
@@ -79,8 +75,6 @@ class WeightDependenceAdditiveTriplet(
     def A3_plus(self) -> float:
         """
         :math:`A_3^+`
-
-        :rtype: float
         """
         # pylint: disable=invalid-name
         return self.__a3_plus
@@ -89,8 +83,6 @@ class WeightDependenceAdditiveTriplet(
     def A3_minus(self) -> float:
         """
         :math:`A_3^-`
-
-        :rtype: float
         """
         # pylint: disable=invalid-name
         return self.__a3_minus
@@ -111,8 +103,6 @@ class WeightDependenceAdditiveTriplet(
     def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
-
-        :rtype: str
         """
         return "additive"
 
@@ -159,8 +149,6 @@ class WeightDependenceAdditiveTriplet(
         """
         The maximum weight that will ever be set in a synapse as a result
         of this rule.
-
-        :rtype: float
         """
         return self.__w_max
 

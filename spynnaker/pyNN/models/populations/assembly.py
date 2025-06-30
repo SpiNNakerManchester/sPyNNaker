@@ -21,7 +21,5 @@ class Assembly(pynn_common.Assembly):
     where all the neurons are of the same type.
 
     :param populations: the populations or views to form the assembly out of
-    :type populations: ~spynnaker.pyNN.models.populations.Population or
-        ~spynnaker.pyNN.models.populations.PopulationView
     :param kwargs: may contain `label` (a string describing the assembly)
     """

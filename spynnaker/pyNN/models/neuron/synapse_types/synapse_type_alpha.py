@@ -57,23 +57,11 @@ class SynapseTypeAlpha(AbstractSynapseType):
             tau_syn_I: ModelParameter):
         r"""
         :param exc_response: :math:`response^\mathrm{linear}_e`
-        :type exc_response: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param exc_exp_response: :math:`response^\mathrm{exponential}_e`
-        :type exc_exp_response: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_syn_E: :math:`\tau^{syn}_e`
-        :type tau_syn_E: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param inh_response: :math:`response^\mathrm{linear}_i`
-        :type inh_response: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param inh_exp_response: :math:`response^\mathrm{exponential}_i`
-        :type inh_exp_response: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_syn_I: :math:`\tau^{syn}_i`
-        :type tau_syn_I: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([
@@ -136,8 +124,6 @@ class SynapseTypeAlpha(AbstractSynapseType):
     def exc_response(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__exc_response
 
@@ -145,8 +131,6 @@ class SynapseTypeAlpha(AbstractSynapseType):
     def exc_response(self, exc_response: ModelParameter) -> None:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         self.__exc_response = exc_response
 
@@ -154,8 +138,6 @@ class SynapseTypeAlpha(AbstractSynapseType):
     def tau_syn_E(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         # pylint: disable=invalid-name
         return self.__tau_syn_E
@@ -164,8 +146,6 @@ class SynapseTypeAlpha(AbstractSynapseType):
     def inh_response(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         return self.__inh_response
 
@@ -173,8 +153,6 @@ class SynapseTypeAlpha(AbstractSynapseType):
     def tau_syn_I(self) -> ModelParameter:
         """
         Value as passed into the init.
-
-        :rtype: ModelParameter
         """
         # pylint: disable=invalid-name
         return self.__tau_syn_I

@@ -31,7 +31,6 @@ class AbstractSynapseType(
         Get the number of synapse types supported.
 
         :return: The number of synapse types supported
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -41,7 +40,6 @@ class AbstractSynapseType(
         Get the ID of a synapse given the name.
 
         :return: The ID of the synapse
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -51,6 +49,5 @@ class AbstractSynapseType(
         Get the target names of the synapse type.
 
         :return: an array of strings (usually a list or tuple)
-        :rtype: iterable(str)
         """
         raise NotImplementedError

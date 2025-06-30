@@ -28,7 +28,6 @@ class AbstractSupportsOneToOneSDRAMInput(metaclass=AbstractBase):
         Determine if the source vertex of the given projection is to be
         handled by the target splitter.
 
-        :param Projection projection: The projection to check the source of
-        :rtype: bool
+        :param  projection: The projection to check the source of
         """
         raise NotImplementedError

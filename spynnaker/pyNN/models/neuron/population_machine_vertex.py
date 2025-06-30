@@ -174,23 +174,22 @@ class PopulationMachineVertex(
             max_atoms_per_core: int, synaptic_matrices: SynapticMatrices,
             neuron_data: NeuronData):
         """
-        :param ~pacman.model.resources.AbstractSDRAM sdram:
+        :param sdram:
             The SDRAM used by the vertex
-        :param str label: The label of the vertex
-        :param PopulationVertex app_vertex:
+        :param label: The label of the vertex
+        :param app_vertex:
             The associated application vertex
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param vertex_slice:
             The slice of the population that this implements
-        :param int slice_index:
+        :param slice_index:
             The index of the slice in the ordered list of slices
-        :param list(int) ring_buffer_shifts:
+        :param ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
-        :param list(int) weight_scales:
+        :param weight_scales:
             The scaling to apply to weights to store them in the synapses
-        :param int structural_sz: The size of the structural data
-        :param int n_neuron_bits: The number of bits to use for neuron IDs
-        :param SynapticMatrices synaptic_matrices: The synaptic matrices
-        :param NeuronData neuron_data: The handler of neuron data
+        :param structural_sz: The size of the structural data
+        :param synaptic_matrices: The synaptic matrices
+        :param neuron_data: The handler of neuron data
         """
         super().__init__(
             label, app_vertex, vertex_slice, sdram,
@@ -353,11 +352,11 @@ class PopulationMachineVertex(
         """
         Extract and yield spike processing provenance.
 
-        :param str label: The label of the node
-        :param int x: x coordinate of the chip where this core
-        :param int y: y coordinate of the core where this core
-        :param int p: virtual id of the core
-        :param list(int) provenance_data: A list of data items to interpret
+        :param label: The label of the node
+        :param x: x coordinate of the chip where this core
+        :param y: y coordinate of the core where this core
+        :param p: virtual id of the core
+        :param provenance_data: A list of data items to interpret
         """
         prov = SpikeProcessingProvenance(*provenance_data)
 

@@ -43,7 +43,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
 
     def __init__(self, devices: Sequence[AbstractMulticastControllableDevice]):
         """
-        :param list(AbstractMulticastControllableDevice) device:
+        :param devices:
         """
         super().__init__(
             [Struct([

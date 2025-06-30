@@ -57,12 +57,10 @@ class SpikeSourcePoisson(AbstractPyNNModel):
             neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
             n_colour_bits: Optional[int] = None) -> SpikeSourcePoissonVertex:
         """
-        :param float seed:
-        :param float max_rate:
+        :param seed:
+        :param max_rate:
         :param splitter:
-        :type splitter:
-            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
-        :param int n_colour_bits:
+        :param n_colour_bits:
         """
         if neurons_per_core is None:
             neurons_per_core = \

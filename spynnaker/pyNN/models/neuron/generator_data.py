@@ -93,8 +93,6 @@ class GeneratorData(object):
     def size(self) -> int:
         """
         The size of the generated data, in bytes.
-
-        :rtype: int
         """
         return sum(len(i) for i in self.__data) * BYTES_PER_WORD
 
@@ -102,7 +100,5 @@ class GeneratorData(object):
     def gen_data(self) -> Sequence[NDArray[uint32]]:
         """
         The data to be written for this connection.
-
-        :rtype: list(~numpy.ndarray(~numpy.uint32))
         """
         return self.__data

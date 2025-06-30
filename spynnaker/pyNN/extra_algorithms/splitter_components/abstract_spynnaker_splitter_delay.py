@@ -32,7 +32,6 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
         returns the max amount of delay this post vertex can support.
 
         :return: max delay supported in ticks
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -44,7 +43,5 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
         If this method returns False and the users ask for a delay larger than
         that allowed by :py:meth:`max_support_delay`, an exception will be
         raised saying a different splitter is required.
-
-        :rtype: bool
         """
         return True

@@ -60,19 +60,19 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
             with_replacement: bool = False, rng: Optional[NumpyRNG] = None,
             safe: bool = True, verbose: bool = False, callback: None = None):
         """
-        :param int n:
+        :param n:
             number of random pre-synaptic neurons connected to output
-        :param bool allow_self_connections:
+        :param allow_self_connections:
             if the connector is used to connect a Population to itself,
             this flag determines whether a neuron is allowed to connect to
             itself, or only to other neurons in the Population.
-        :param bool safe:
+        :param safe:
             Whether to check that weights and delays have valid values.
             If ``False``, this check is skipped.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
-        :param bool with_replacement:
+        :param with_replacement:
             this flag determines how the random selection of pre-synaptic
             neurons is performed; if true, then every pre-synaptic neuron
             can be chosen on each occasion, and so multiple connections
@@ -81,16 +81,12 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
             can't be connected again.
         :param rng:
             Seeded random number generator, or `None` to make one when needed
-        :type rng: ~pyNN.random.NumpyRNG or None
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
                 Not supported by sPyNNaker.
         """
-        # :param ~pyNN.space.Space space:
-        # a Space object, needed if you wish to specify distance-dependent
-        # weights or delays - not implemented
         super().__init__(safe, callback, verbose)
         # We absolutely require an integer at this point!
         self.__n_pre = self._roundsize(n, "FixedNumberPreConnector")
@@ -161,10 +157,6 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
 
     def _get_pre_neurons(self, synapse_info: SynapseInformation) -> List[
             NDArray[integer]]:
-        """
-        :param SynapseInformation synapse_info:
-        :rtype: list(~numpy.ndarray)
-        """
         # If we haven't set the array up yet, do it now
         if not self.__pre_neurons_set:
             self.__pre_neurons = self.__build_pre_neurons(synapse_info)
@@ -268,8 +260,6 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
     def allow_self_connections(self) -> bool:
         """
         Do we include connections from a neuron/id to itself?
-
-        :rtype: bool
         """
         return self.__allow_self_connections
 

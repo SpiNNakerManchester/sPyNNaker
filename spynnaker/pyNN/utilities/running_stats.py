@@ -33,7 +33,6 @@ class RunningStats(object):
         Adds an item to the running statistics.
 
         :param x: The item to add
-        :type x: int or float
         """
         old_n_items = self.__n_items
         self.__n_items += 1
@@ -49,9 +48,9 @@ class RunningStats(object):
         """
         Add a bunch of items (via their statistics).
 
-        :param float mean: The mean of the items to add.
-        :param float variance: The variance of the items to add.
-        :param int n_items: The number of items represented.
+        :param mean: The mean of the items to add.
+        :param variance: The variance of the items to add.
+        :param n_items: The number of items represented.
         """
         if n_items > 0:
             new_n_items = self.__n_items + n_items
@@ -72,8 +71,6 @@ class RunningStats(object):
     def n_items(self) -> int:
         """
         The number of items seen.
-
-        :rtype: int
         """
         return self.__n_items
 
@@ -81,8 +78,6 @@ class RunningStats(object):
     def mean(self) -> float:
         """
         The mean of the items seen.
-
-        :rtype: float
         """
         return self.__mean
 
@@ -90,8 +85,6 @@ class RunningStats(object):
     def variance(self) -> float:
         """
         The variance of the items seen.
-
-        :rtype: float
         """
         if self.__n_items <= 1:
             return 0.0
@@ -101,7 +94,5 @@ class RunningStats(object):
     def standard_deviation(self) -> float:
         """
         The population standard deviation of the items seen.
-
-        :rtype: float
         """
         return math.sqrt(self.variance)

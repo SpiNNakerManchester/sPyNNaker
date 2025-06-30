@@ -35,12 +35,8 @@ class HasSynapses(object, metaclass=AbstractBase):
         """
         Get the connections from the machine for this vertex.
 
-        :param ~pacman.model.placements.Placement placement:
-            Where the connection data is on the machine
-        :param ProjectionApplicationEdge app_edge:
-            The edge for which the data is being read
-        :param SynapseInformation synapse_info:
-            The specific projection within the edge
-        :rtype: list(~numpy.ndarray)
+        :param placement: Where the connection data is on the machine
+        :param app_edge: The edge for which the data is being read
+        :param synapse_info: The specific projection within the edge
         """
         raise NotImplementedError

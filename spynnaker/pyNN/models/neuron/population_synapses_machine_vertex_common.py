@@ -160,13 +160,10 @@ class PopulationSynapsesMachineVertexCommon(
             self, sdram: AbstractSDRAM, label: str,
             app_vertex: PopulationVertex, vertex_slice: Slice):
         """
-        :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The SDRAM used by the vertex
-        :param str label: The label of the vertex
-        :param PopulationVertex app_vertex:
-            The associated application vertex
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the population that this implements
+        :param sdram: The SDRAM used by the vertex
+        :param label: The label of the vertex
+        :param app_vertex: The associated application vertex
+        :param vertex_slice: The slice of the population that this implements
         """
         super().__init__(
             label, app_vertex, vertex_slice, sdram, self.COMMON_REGIONS,
@@ -192,9 +189,6 @@ class PopulationSynapsesMachineVertexCommon(
         """
         Set the neuron vertex and partition ID for the case with a
         self-connection.
-
-        :param ~pacman.model.graphs.machine.MachineEdge neuron_to_synapse_edge:
-            The edge that we will receive spikes from
         """
         self.__neuron_vertex = neuron_vertex
         self.__partition_id = partition_id
@@ -210,8 +204,7 @@ class PopulationSynapsesMachineVertexCommon(
         """
         Write information about SDRAM Edge.
 
-        :param DataSpecificationGenerator spec:
-            The generator of the specification to write
+        :param spec: The generator of the specification to write
         """
         assert self.__sdram_partition is not None
         send_size = self.__sdram_partition.get_sdram_size_of_region_for(self)
@@ -231,8 +224,7 @@ class PopulationSynapsesMachineVertexCommon(
         """
         Write key configuration region.
 
-        :param DataSpecificationGenerator spec:
-            The generator of the specification to write
+        :param spec: The generator of the specification to write
         """
         spec.reserve_memory_region(
             region=self.REGIONS.KEY_REGION, size=KEY_CONFIG_SIZE,
@@ -282,11 +274,11 @@ class PopulationSynapsesMachineVertexCommon(
         """
         Extract and yield synapse provenance.
 
-        :param str label: The label of the node
-        :param int x: x coordinate of the chip where this core
-        :param int y: y coordinate of the core where this core
-        :param int p: virtual id of the core
-        :param list(int) provenance_data: A list of data items to interpret
+        :param label: The label of the node
+        :param x: x coordinate of the chip where this core
+        :param y: y coordinate of the core where this core
+        :param p: virtual id of the core
+        :param provenance_data: A list of data items to interpret
         """
         raise NotImplementedError
 
@@ -296,11 +288,11 @@ class PopulationSynapsesMachineVertexCommon(
         """
         Extract and yield spike processing provenance.
 
-        :param str label: The label of the node
-        :param int x: x coordinate of the chip where this core
-        :param int y: y coordinate of the core where this core
-        :param int p: virtual id of the core
-        :param list(int) provenance_data: A list of data items to interpret
+        :param label: The label of the node
+        :param x: x coordinate of the chip where this core
+        :param y: y coordinate of the core where this core
+        :param p: virtual id of the core
+        :param provenance_data: A list of data items to interpret
         """
         prov = SpikeProcessingFastProvenance(*provenance_data)
 

@@ -29,13 +29,9 @@ class SpYNNakerConnectionHolderGenerator(object):
             ConnectionHolder]:
         """
         :param application_graph: application graph
-        :type application_graph:
-            ~pacman.model.graphs.application.ApplicationGraph
         :return:
             the set of connection holders for after data specification
             generation
-        :rtype: dict(tuple(ProjectionApplicationEdge, SynapseInformation),
-            ConnectionHolder)
         """
         progress = ProgressBar(
             application_graph.n_outgoing_edge_partitions,
@@ -61,10 +57,6 @@ class SpYNNakerConnectionHolderGenerator(object):
             edge: ProjectionApplicationEdge, data_holders: Dict[
                 Tuple[ProjectionApplicationEdge, SynapseInformation],
                 ConnectionHolder]) -> None:
-        """
-        :param ProjectionApplicationEdge edge:
-        :param dict data_holders:
-        """
         # build connection holders
         connection_holder = ConnectionHolder(
             None, True, edge.pre_vertex.n_atoms, edge.post_vertex.n_atoms)

@@ -150,24 +150,19 @@ class PopulationMachineLocalOnlyCombinedVertex(
             weight_scales: NDArray[floating], neuron_data: NeuronData,
             max_atoms_per_core: int):
         """
-        :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The SDRAM used by the vertex
-        :param str label: The label of the vertex
-        :param PopulationVertex app_vertex:
-            The associated application vertex
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the population that this implements
-        :param int slice_index:
+        :param sdram: The SDRAM used by the vertex
+        :param label: The label of the vertex
+        :param app_vertex: The associated application vertex
+        :param vertex_slice: The slice of the population that this implements
+        :param slice_index:
             The index of the slice in the ordered list of slices
-        :param list(int) ring_buffer_shifts:
+        :param ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
-        :param list(int) weight_scales:
+        :param weight_scales:
             The scaling to apply to weights to store them in the synapses
-        :param int all_syn_block_sz: The maximum size of the synapses in bytes
-        :param int structural_sz: The size of the structural data
-        :param NeuronData neuron_data:
+        :param neuron_data:
             The handler of neuron data
-        :param int max_atoms_per_core:
+        :param max_atoms_per_core:
             The maximum number of atoms per core
         """
         super().__init__(
@@ -235,9 +230,8 @@ class PopulationMachineLocalOnlyCombinedVertex(
         Get the local binary filename for this vertex.  Static because at
         the time this is needed, the local app_vertex is not set.
 
-        :param PopulationVertex app_vertex:
+        :param app_vertex:
             The associated application vertex
-        :rtype: str
         """
         # Split binary name into title and extension
         name, ext = os.path.splitext(app_vertex.neuron_impl.binary_name)
@@ -345,13 +339,12 @@ class PopulationMachineLocalOnlyCombinedVertex(
         """
         Extract and yield local-only provenance.
 
-        :param str label: The label of the node
-        :param int x: x coordinate of the chip where this core
-        :param int y: y coordinate of the core where this core
-        :param int p: virtual id of the core
-        :param list(int) provenance_data: A list of data items to interpret
+        :param label: The label of the node
+        :param x: x coordinate of the chip where this core
+        :param y: y coordinate of the core where this core
+        :param p: virtual id of the core
+        :param provenance_data: A list of data items to interpret
         :return: a list of provenance data items
-        :rtype: iterator of ProvenanceDataItem
         """
         prov = LocalOnlyProvenance(*provenance_data)
 

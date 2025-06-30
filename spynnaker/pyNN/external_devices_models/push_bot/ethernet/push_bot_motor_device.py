@@ -37,8 +37,8 @@ class PushBotEthernetMotorDevice(
                  protocol: MunichIoSpiNNakerLinkProtocol,
                  timesteps_between_send: Optional[int] = None):
         """
-        :param PushBotMotor motor: indicates which motor to control
-        :param MunichIoSpiNNakerLinkProtocol protocol:
+        :param motor: indicates which motor to control
+        :param protocol:
             The protocol used to control the device
         :param timesteps_between_send:
             The number of timesteps between sending commands to the device,

@@ -128,8 +128,6 @@ def is_iterable(value: Values) -> TypeGuard[
         Union[Sequence[float], NDArray[numpy.floating]]]:
     """
     Check that the Value is iterable.
-
-    :type value: float, iter(float) or RandomDistribution
     """
     return hasattr(value, "__iter__")
 
@@ -179,22 +177,20 @@ class SpikeSourcePoissonVertex(
             splitter: Optional[AbstractSplitterCommon] = None,
             n_colour_bits: Optional[int] = None):
         """
-        :param int n_neurons:
-        :param str label:
-        :param float seed:
-        :param int max_atoms_per_core:
-        :param ~spynnaker.pyNN.models.spike_source.SpikeSourcePoisson model:
-        :param float rate:
-        :param int start:
-        :param int duration:
-        :param iterable(float) rates:
-        :param iterable(int) starts:
-        :param iterable(int) durations:
-        :param float max_rate:
+        :param n_neurons:
+        :param label:
+        :param seed:
+        :param max_atoms_per_core:
+        :param model:
+        :param rate:
+        :param start:
+        :param duration:
+        :param rates:
+        :param starts:
+        :param durations:
+        :param max_rate:
         :param splitter:
-        :type splitter:
-            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
-        :param int n_colour_bits:
+        :param n_colour_bits:
         """
         super().__init__(label, max_atoms_per_core, splitter)
 
@@ -325,8 +321,6 @@ class SpikeSourcePoissonVertex(
     def rates(self) -> RangedList[NDArray[numpy.floating]]:
         """
         Get the rates.
-
-        :rtype: ~spinn_utilities.ranged.RangedList
         """
         # UGH! Mypy has been defeated!
         return cast(Any, self.__data["rates"])
@@ -335,7 +329,7 @@ class SpikeSourcePoissonVertex(
         """
         Add an outgoing projection from this vertex.
 
-        :param Projection projection: The projection to add
+        :param projection: The projection to add
         """
         self.__outgoing_projections.append(projection)
 
@@ -343,8 +337,6 @@ class SpikeSourcePoissonVertex(
     def outgoing_projections(self) -> Sequence[Projection]:
         """
         The projections outgoing from this vertex.
-
-        :rtype: list(Projection)
         """
         return self.__outgoing_projections
 
@@ -352,8 +344,6 @@ class SpikeSourcePoissonVertex(
     def n_profile_samples(self) -> int:
         """
         The n_profile_samples read from the config
-
-        :rtype: int
         """
         return self.__n_profile_samples
 
@@ -361,8 +351,6 @@ class SpikeSourcePoissonVertex(
     def time_to_spike(self) -> RangedList:
         """
         The "time_to_spike range list.
-
-        :rtype: RangedList
         """
         return self.__data["time_to_spike"]
 
@@ -503,7 +491,6 @@ class SpikeSourcePoissonVertex(
         Compute the maximum spike rate.
 
         :return: The maximum number of spikes per simulation timestep.
-        :rtype: float
         """
         ts_per_second = SpynnakerDataView.get_simulation_time_step_per_s()
         if float(self.__max_rate) / ts_per_second < SLOW_RATE_PER_TICK_CUTOFF:
@@ -518,8 +505,7 @@ class SpikeSourcePoissonVertex(
 
     def get_recording_sdram_usage(self, vertex_slice: Slice) -> AbstractSDRAM:
         """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :rtype: ~pacman.model.resources.AbstractSDRAM
+        :param vertex_slice:
         """
         variable_sdram = self.__spike_recorder.get_sdram_usage_in_bytes(
             vertex_slice.n_atoms, self.max_spikes_per_ts())
@@ -529,9 +515,6 @@ class SpikeSourcePoissonVertex(
 
     @overrides(LegacyPartitionerAPI.get_sdram_used_by_atoms)
     def get_sdram_used_by_atoms(self, vertex_slice: Slice) -> AbstractSDRAM:
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        """
         poisson_params_sz = get_params_bytes(vertex_slice.n_atoms)
         poisson_rates_sz = get_rates_bytes(
             vertex_slice.n_atoms, vertex_slice.n_atoms * self.__max_n_rates)
@@ -574,8 +557,6 @@ class SpikeSourcePoissonVertex(
     def max_rate(self) -> float:
         """
         The highest rate or 0 if no rate set.
-
-        :rtype: float
         """
         return float(self.__max_rate)
 
@@ -583,8 +564,6 @@ class SpikeSourcePoissonVertex(
     def max_n_rates(self) -> int:
         """
         the long length of any rates list.
-
-        :rtype: int
         """
         return self.__max_n_rates
 
@@ -592,8 +571,6 @@ class SpikeSourcePoissonVertex(
     def seed(self) -> Optional[int]:
         """
         The seed set if any.
-
-        :rtype: int or None
         """
         return self.__seed
 
@@ -611,8 +588,7 @@ class SpikeSourcePoissonVertex(
         random number generator or seed to a random number generator are
         suitable for use as a mars 64 kiss seed.
 
-        :param Slice vertex_slice:
-        :type: tuple(int)
+        :param vertex_slice:
         """
         if vertex_slice not in self.__kiss_seed:
             self.__kiss_seed[vertex_slice] = create_mars_kiss_seeds(self.__rng)
@@ -623,9 +599,8 @@ class SpikeSourcePoissonVertex(
         """
         Updates a KISS seed from the machine.
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            the vertex slice to update seed of
-        :param list(int) seed: the seed
+        :param vertex_slice: the vertex slice to update seed of
+        :param seed: the seed
         """
         self.__kiss_seed[vertex_slice] = tuple(seed)
 
@@ -652,8 +627,6 @@ class SpikeSourcePoissonVertex(
 
         If template is `None`, then a dictionary containing the template
         context will be returned.
-
-        :rtype: dict(str, ...)
         """
         parameters = self.get_parameter_values(self.__model.default_parameters)
 
@@ -668,7 +641,7 @@ class SpikeSourcePoissonVertex(
         """
         Sets the poisson generator.
 
-        :param ApplicationEdge edge:
+        :param edge:
         :raises ValueError: if already set
         """
         if self.__incoming_control_edge is not None:
@@ -680,8 +653,6 @@ class SpikeSourcePoissonVertex(
     def incoming_control_edge(self) -> Optional[ApplicationEdge]:
         """
         The live poisson control edge/ generator is set
-
-        :rtype: ApplicationEdg or None
         """
         return self.__incoming_control_edge
 
@@ -690,8 +661,6 @@ class SpikeSourcePoissonVertex(
             Union[NDArray[numpy.floating], NDArray[numpy.integer]]]:
         """
         A dictionary holding all the data as ranges
-
-        :rtype: RangeDictionary
         """
         return self.__data
 
@@ -703,8 +672,7 @@ class SpikeSourcePoissonVertex(
             self, synapse_info: SynapseInformation) -> List[ConnectionsArray]:
         """ Read Poisson connections from the machine
 
-        :param SynapseInformation synapse_info:
-            The synapse information of the data being read
+        :param synapse_info: The synapse information of the data being read
         :return: The set of connections from all machine vertices
         """
         connections = list()

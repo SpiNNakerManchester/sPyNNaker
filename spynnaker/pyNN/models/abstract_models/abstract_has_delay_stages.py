@@ -33,7 +33,5 @@ class AbstractHasDelayStages(object, metaclass=AbstractBase):
         """
         The maximum number of delay stages required by any connection
         out of this delay extension vertex.
-
-        :rtype: int
         """
         raise NotImplementedError

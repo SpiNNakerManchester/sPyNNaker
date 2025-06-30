@@ -95,8 +95,6 @@ class SynapseDynamicsNeuromodulation(
     def tau_c(self) -> float:
         """
         The tau c value passed into the init.
-
-        :rtype: float
         """
         return self.__tau_c
 
@@ -104,8 +102,6 @@ class SynapseDynamicsNeuromodulation(
     def tau_d(self) -> float:
         """
         The tau d value passed into the init.
-
-        :rtype: float
         """
         return self.__tau_d
 
@@ -113,8 +109,6 @@ class SynapseDynamicsNeuromodulation(
     def w_min(self) -> float:
         """
         The w min value passed into the init.
-
-        :rtype: float
         """
         return self.__w_min
 
@@ -122,8 +116,6 @@ class SynapseDynamicsNeuromodulation(
     def w_max(self) -> float:
         """
         The w max value passed into the init.
-
-        :rtype: float
         """
         return self.__w_max
 
@@ -147,8 +139,7 @@ class SynapseDynamicsNeuromodulation(
         """
         Checks that tau c, tau d, w max and w min are all the same.
 
-        :param SynapseDynamicsNeuromodulation other:
-        :rtype: bool
+        :param other:
         """
         return (self.__tau_c == other.tau_c and self.__tau_d == other.tau_d and
                 self.__w_min == other.w_min and self.__w_max == other.w_max)

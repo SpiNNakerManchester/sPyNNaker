@@ -38,14 +38,14 @@ class AbstractPushBotOutputDevice(Enum):
     @property
     def protocol_property(self) -> property:
         """
-        :rtype: property
+        The protocol property of the output device
         """
         return self._protocol_property
 
     @property
     def min_value(self) -> int:
         """
-        :rtype: int
+        The minimum value of the output device
         """
         return self._min_value
 
@@ -59,13 +59,13 @@ class AbstractPushBotOutputDevice(Enum):
     @property
     def time_between_send(self) -> int:
         """
-        :rtype: int
+        Time between sends
         """
         return self._time_between_send
 
     @property
     def send_type(self) -> SendType:
         """
-        :rtype: SendType
+        The time between sends
         """
         return self._send_type

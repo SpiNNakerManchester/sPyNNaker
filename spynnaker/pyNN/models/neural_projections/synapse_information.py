@@ -63,32 +63,23 @@ class SynapseInformation(object):
                  download_on_pause: bool = False,
                  partition_id: Optional[str] = None):
         """
-        :param AbstractConnector connector:
-            The connector connected to the synapse
+        :param connector: The connector connected to the synapse
         :param pre_population: The population sending spikes to the synapse
-        :type pre_population: ~spynnaker.pyNN.models.populations.Population or
-            ~spynnaker.pyNN.models.populations.PopulationView
         :param post_population: The population hosting the synapse
-        :type post_population: ~spynnaker.pyNN.models.populations.Population
-            or ~spynnaker.pyNN.models.populations.PopulationView
-        :param bool prepop_is_view: Whether the ``pre_population`` is a view
-        :param bool postpop_is_view: Whether the ``post_population`` is a view
-        :param AbstractSynapseDynamics synapse_dynamics:
-            The dynamic behaviour of the synapse
-        :param int synapse_type: The type of the synapse
-        :param str receptor_type: Description of the receptor (e.g. excitatory)
-        :param bool synapse_type_from_dynamics:
+        :param prepop_is_view: Whether the ``pre_population`` is a view
+        :param postpop_is_view: Whether the ``post_population`` is a view
+        :param synapse_dynamics: The dynamic behaviour of the synapse
+        :param synapse_type: The type of the synapse
+        :param receptor_type: Description of the receptor (e.g. excitatory)
+        :param synapse_type_from_dynamics:
             Whether the synapse type came from synapse dynamics
         :param weights: The synaptic weights
-        :type weights: float or list(float) or ~numpy.ndarray(float) or None
         :param delays: The total synaptic delays
-        :type delays: float or list(float) or ~numpy.ndarray(float) or None
-        :param bool download_on_pause:
+        :param download_on_pause:
             Whether to download the synapse matrix when the simulation pauses
         :param partition_id:
             The partition id for the application edge when not standard; if
             None, the standard SPIKE_PARTITION_ID is used
-        :type partition_id: str or None
         """
         self.__connector = connector
         self.__pre_population = pre_population
@@ -112,8 +103,6 @@ class SynapseInformation(object):
     def connector(self) -> AbstractConnector:
         """
         The connector connected to the synapse.
-
-        :rtype: AbstractConnector
         """
         return self.__connector
 
@@ -121,9 +110,6 @@ class SynapseInformation(object):
     def pre_population(self) -> Union[Population, PopulationView]:
         """
         The population sending spikes to the synapse.
-
-        :rtype: ~spynnaker.pyNN.models.populations.Population or
-            ~spynnaker.pyNN.models.populations.PopulationView
         """
         return self.__pre_population
 
@@ -131,9 +117,6 @@ class SynapseInformation(object):
     def post_population(self) -> Union[Population, PopulationView]:
         """
         The population hosting the synapse.
-
-        :rtype: ~spynnaker.pyNN.models.populations.Population or
-            ~spynnaker.pyNN.models.populations.PopulationView
         """
         return self.__post_population
 
@@ -141,8 +124,6 @@ class SynapseInformation(object):
     def pre_vertex(self) -> ApplicationVertex:
         """
         The vertex sending spikes to the synapse.
-
-        :rtype: ApplicationVertex
         """
         # pylint: disable=protected-access
         return self.__pre_population._vertex
@@ -151,8 +132,6 @@ class SynapseInformation(object):
     def post_vertex(self) -> ApplicationVertex:
         """
         The vertex hosting the synapse.
-
-        :rtype: ApplicationVertex
         """
         # pylint: disable=protected-access
         return self.__post_population._vertex
@@ -161,8 +140,6 @@ class SynapseInformation(object):
     def n_pre_neurons(self) -> int:
         """
         The number of neurons in the pre-population.
-
-        :rtype: int
         """
         return self.__pre_population.size
 
@@ -170,8 +147,6 @@ class SynapseInformation(object):
     def n_post_neurons(self) -> int:
         """
         The number of neurons in the post-population.
-
-        :rtype: int
         """
         return self.__post_population.size
 
@@ -179,8 +154,6 @@ class SynapseInformation(object):
     def prepop_is_view(self) -> bool:
         """
         Whether the :py:meth:`pre_population` is a view.
-
-        :rtype: bool
         """
         return self.__prepop_is_view
 
@@ -188,8 +161,6 @@ class SynapseInformation(object):
     def postpop_is_view(self) -> bool:
         """
         Whether the :py:meth:`post_population` is a view.
-
-        :rtype: bool
         """
         return self.__postpop_is_view
 
@@ -197,8 +168,6 @@ class SynapseInformation(object):
     def synapse_dynamics(self) -> AbstractSynapseDynamics:
         """
         The dynamic behaviour of the synapse.
-
-        :rtype: AbstractSynapseDynamics
         """
         return self.__synapse_dynamics
 
@@ -207,8 +176,6 @@ class SynapseInformation(object):
         """
         The type of the synapse. An index into the set of synapse types
         supported by a neuron.
-
-        :rtype: int
         """
         return self.__synapse_type
 
@@ -216,8 +183,6 @@ class SynapseInformation(object):
     def receptor_type(self) -> str:
         """
         A string representing the receptor type.
-
-        :rtype: str
         """
         return self.__receptor_type
 
@@ -225,8 +190,6 @@ class SynapseInformation(object):
     def weights(self) -> WEIGHTS:
         """
         The synaptic weights (if any).
-
-        :rtype: float or ~numpy.ndarray(float64) or str or RandomDistribution
         """
         return self.__weights
 
@@ -234,8 +197,6 @@ class SynapseInformation(object):
     def delays(self) -> DELAYS:
         """
         The total synaptic delays (if any).
-
-        :rtype: float or ~numpy.ndarray(float64) or str or RandomDistribution
         """
         return self.__delays
 
@@ -249,7 +210,6 @@ class SynapseInformation(object):
 
         :return: True if the synaptic matrix may be generated on machine (or
             may have already been so done)
-        :rtype: bool
         """
         # If we are using a virtual machine, we can't generate on the machine
         if get_config_bool("Machine", "virtual_board"):
@@ -266,8 +226,6 @@ class SynapseInformation(object):
     def pre_run_connection_holders(self) -> Sequence[ConnectionHolder]:
         """
         The list of connection holders to be filled in before run.
-
-        :rtype: list(ConnectionHolder)
         """
         return self.__pre_run_connection_holders
 
@@ -276,7 +234,7 @@ class SynapseInformation(object):
         """
         Add a connection holder that will be filled in before run.
 
-        :param ConnectionHolder pre_run_connection_holder:
+        :param pre_run_connection_holder:
             The connection holder to be added
         """
         self.__pre_run_connection_holders.append(pre_run_connection_holder)
@@ -294,8 +252,6 @@ class SynapseInformation(object):
     def synapse_type_from_dynamics(self) -> bool:
         """
         Whether the synapse type comes from the synapse dynamics.
-
-        :rtype: bool
         """
         return self.__synapse_type_from_dynamics
 
@@ -303,8 +259,6 @@ class SynapseInformation(object):
     def download_on_pause(self) -> bool:
         """
         Whether to download the synapse matrix when the simulation pauses.
-
-        :rtype: bool
         """
         return self.__download_on_pause
 
@@ -313,7 +267,7 @@ class SynapseInformation(object):
         """
         Set whether to download the synapse matrix when the simulation pauses.
 
-        :param bool download_on_pause:
+        :param download_on_pause:
             Whether to download the synapse matrix when the simulation pauses
         """
         self.__download_on_pause = download_on_pause
@@ -322,7 +276,5 @@ class SynapseInformation(object):
     def partition_id(self) -> str:
         """
         The partition id for the application edge
-
-        :rtype: str
         """
         return self.__partition_id

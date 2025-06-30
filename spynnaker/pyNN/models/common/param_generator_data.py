@@ -35,9 +35,8 @@ _GENERATOR_TYPES = {
 
 def get_generator_type(data_type: DataType) -> int:
     """
-    :param ~data_specification.enums.DataType data_type:
+    :param data_type:
     :return: The generator parameter type code for the given data type.
-    :rtype: int
     :raises TypeError: If an unsupported data type is given
     """
     if data_type in _GENERATOR_TYPES:
@@ -47,11 +46,10 @@ def get_generator_type(data_type: DataType) -> int:
 
 def type_has_generator(data_type: DataType) -> bool:
     """
-    :param ~data_specification.enums.DataType data_type:
+    :param data_type:
     :return:
         Whether there is a generator parameter type code for the given data
         type.
-    :rtype: bool
     """
     return data_type in _GENERATOR_TYPES
 
@@ -77,7 +75,6 @@ def param_generator_id(value: _ParamType) -> int:
     """
     :param value: The value to examine the type of.
     :return: The ID of the on-chip generator that handles the value.
-    :rtype: int
     :raises TypeError: If an value of an unsupported data type is given
     """
     # Scalars are fine on the machine
@@ -97,7 +94,6 @@ def is_param_generatable(value: Any) -> bool:
     """
     :param value: The value to examine the type of.
     :return: Whether the value is of a type that can be generated on chip.
-    :rtype: bool
     """
     if isinstance(value, str):
         return False
@@ -112,8 +108,6 @@ def param_generator_params(values: _ParamType) -> NDArray[uint32]:
     Get the parameter generator parameters as a numpy array.
 
     :param values:
-    :type values: float or ~pyNN.random.RandomDistribution
-    :rtype: ~numpy.ndarray
     """
     if numpy.isscalar(values):
         return numpy.array(
@@ -144,8 +138,6 @@ def param_generator_params_size_in_bytes(values: _ParamType) -> int:
     Get the size of the parameter generator parameters in bytes.
 
     :param values:
-    :type values: int or ~pyNN.random.RandomDistribution
-    :rtype: int
     :raises TypeError: If `values` is of an unsupported data type
     """
     if numpy.isscalar(values):

@@ -34,7 +34,7 @@ class MultiSpikeRecorder(object):
     @property
     def record(self) -> bool:
         """
-        :rtype: bool
+        If this recorder is recording or not
         """
         return self.__record
 
@@ -45,9 +45,8 @@ class MultiSpikeRecorder(object):
     def get_sdram_usage_in_bytes(
             self, n_neurons: int, spikes_per_timestep: float) -> AbstractSDRAM:
         """
-        :param int n_neurons:
-        :param float spikes_per_timestep:
-        :rtype: ~pacman.model.resources.AbstractSDRAM
+        :param n_neurons:
+        :param spikes_per_timestep:
         """
         if not self.__record:
             return ConstantSDRAM(0)

@@ -64,23 +64,22 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
                  safe: bool = True, verbose: bool = False,
                  callback: None = None):
         """
-        :param int n:
+        :param n:
             This is the total number of synapses in the connection.
-        :param bool allow_self_connections:
+        :param allow_self_connections:
             Allow a neuron to connect to itself or not.
-        :param bool with_replacement:
+        :param with_replacement:
             When selecting, allow a neuron to be re-selected or not.
-        :param bool safe:
+        :param safe:
             Whether to check that weights and delays have valid values.
             If ``False``, this check is skipped.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
         :param rng:
             Seeded random number generator, or ``None`` to make one when
             needed.
-        :type rng: ~pyNN.random.NumpyRNG or None
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
@@ -117,10 +116,9 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         """
         Get the required RNGs.
 
-        :param int num_synapses:
+        :param num_synapses:
             The number of synapses to make random numbers for in this call
-        :param list(float) prob_connect: The probability of connection
-        :rtype: ~numpy.ndarray
+        :param prob_connect: The probability of connection
         """
         # Below is how numpy does multinomial internally...
         size = len(prob_connect)
@@ -153,9 +151,6 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
     def _update_synapses_per_post_vertex(
             self, post_slices: Sequence[Slice], n_pre_atoms: int,
             rng: NumpyRNG) -> None:
-        """
-        :param list(~pacman.model.graphs.common.Slice) post_slices:
-        """
         if (self.__synapses_per_edge is None or
                 len(self.__post_slices) != len(post_slices)):
             n_post_atoms = sum(
@@ -184,10 +179,6 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             self.__post_slices = post_slices
 
     def _get_n_connections(self, post_slice_index: int) -> int:
-        """
-        :param int post_slice_index:
-        :rtype: int
-        """
         if not self.__synapses_per_edge:
             return 0
         return self.__synapses_per_edge[post_slice_index]

@@ -64,12 +64,12 @@ class PushBotSpiNNakerLinkRetinaDevice(
             label: Optional[str] = None,
             n_machine_vertices: int = 1):
         """
-        :param int spinnaker_link_id:
-        :param MunichIoSpiNNakerLinkProtocol protocol:
-        :param PushBotRetinaResolution resolution:
+        :param spinnaker_link_id:
+        :param protocol:
+        :param resolution:
         :param board_address:
         :param label:
-        :param int n_machine_vertices:
+        :param n_machine_vertices:
         """
         super().__init__(protocol, resolution)
         ApplicationSpiNNakerLinkVertex.__init__(
@@ -86,9 +86,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
         """
         Support method to obtain the key after the key allocator has run
 
-        :param routing_info:
         :return: the key
-        :rtype: int
         """
         routing_info = SpynnakerDataView.get_routing_infos()
         key = routing_info.get_key_from(

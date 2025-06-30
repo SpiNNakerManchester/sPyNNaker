@@ -45,8 +45,7 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         """
         Get the ID of a synapse given the name.
 
-        :param str target: The name of the synapse
-        :rtype: int
+        :param target: The name of the synapse
         """
         raise NotImplementedError
 
@@ -56,7 +55,7 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         """
         Set the synapse dynamics of this vertex.
 
-        :param AbstractSynapseDynamics synapse_dynamics:
+        :param synapse_dynamics:
         """
         raise NotImplementedError
 
@@ -67,11 +66,10 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         """
         Get the connections from the machine post-run.
 
-        :param ProjectionApplicationEdge app_edge:
+        :param app_edge:
             The edge for which the data is being read
-        :param SynapseInformation synapse_info:
+        :param synapse_info:
             The specific projection within the edge
-        :rtype: ~numpy.ndarray
         """
         raise NotImplementedError
 
@@ -91,7 +89,7 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         Any Vertex that implements this API should override
         `ApplicationVertex.splitter` method to also call this function.
 
-        :param AbstractSpynnakerSplitterDelay splitter: the splitter
+        :param splitter: the splitter
         :raises PacmanConfigurationException: if the splitter is not an
             instance of AbstractSpynnakerSplitterDelay
         """

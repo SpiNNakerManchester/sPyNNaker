@@ -115,29 +115,26 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
             weight: float = StaticSynapse.default_parameters['weight'],
             delay: Optional[float] = None):
         """
-        :param AbstractPartnerSelection partner_selection:
-            The partner selection rule
-        :param AbstractFormation formation: The formation rule
-        :param AbstractElimination elimination: The elimination rule
-        :param float f_rew: How many rewiring attempts will be done per second.
-        :param float initial_weight:
+        :param partner_selection: The partner selection rule
+        :param formation: The formation rule
+        :param elimination: The elimination rule
+        :param f_rew: How many rewiring attempts will be done per second.
+        :param initial_weight:
             Weight assigned to a newly formed connection
         :param initial_delay:
             Delay assigned to a newly formed connection; a single value means
             a fixed delay value, or a tuple of two values means the delay will
             be chosen at random from a uniform distribution between the given
             values
-        :type initial_delay: float or (float, float)
-        :param int s_max: Maximum fan-in per target layer neuron
-        :param bool with_replacement:
+        :param s_max: Maximum fan-in per target layer neuron
+        :param with_replacement:
             If set to True (default), a new synapse can be formed in a
             location where a connection already exists; if False, then it must
             form where no connection already exists
-        :param int seed: seed the random number generators
-        :param float weight: The weight of connections formed by the connector
+        :param seed: seed the random number generators
+        :param weight: The weight of connections formed by the connector
         :param delay: The delay of connections formed by the connector
             Use ``None`` to get the simulator default minimum delay.
-        :type delay: float or None
         """
         super().__init__(weight=weight, delay=delay, pad_to_length=s_max)
 

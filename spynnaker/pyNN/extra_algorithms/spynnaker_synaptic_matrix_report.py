@@ -56,9 +56,6 @@ class SpYNNakerSynapticMatrixReport(object):
 
         :param connection_holder: where the synaptic matrices are stored
             (possibly after retrieval from the machine)
-        :type connection_holder:
-            dict(tuple(ProjectionApplicationEdge, SynapseInformation),
-            ConnectionHolder)
         """
         # generate folder for synaptic reports
         top_level_folder = os.path.join(

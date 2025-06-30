@@ -30,13 +30,12 @@ class EthernetControlConnection(LiveEventConnection):
             live_packet_gather_label: str, local_host: Optional[str] = None,
             local_port: Optional[int] = None):
         """
-        :param AbstractEthernetTranslator translator:
-            The translator of multicast to control commands
-        :param str label: The label of the vertex to attach the translator to
-        :param str live_packet_gather_label: The label of the LPG vertex that
+        :param translator: The translator of multicast to control commands
+        :param label: The label of the vertex to attach the translator to
+        :param live_packet_gather_label: The label of the LPG vertex that
             this control connection will listen to.
-        :param str local_host: The optional host to listen on
-        :param int local_port: The optional port to listen on
+        :param local_host: The optional host to listen on
+        :param local_port: The optional port to listen on
         """
         super().__init__(
             live_packet_gather_label, receive_labels=[label],
@@ -51,9 +50,8 @@ class EthernetControlConnection(LiveEventConnection):
         """
         Add another translator that routes via the LPG.
 
-        :param str label: The label of the vertex to attach the translator to
-        :param AbstractEthernetTranslator translator:
-            The translator of multicast to control commands
+        :param label: The label of the vertex to attach the translator to
+        :param translator: The translator of multicast to control commands
         """
         super().add_receive_label(label)
         self.__translators[label] = translator

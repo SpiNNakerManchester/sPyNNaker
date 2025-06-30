@@ -54,9 +54,8 @@ def _n_bits(field: ctypes._CField) -> int:
     """
     Get the number of bits in a field (ctypes doesn't do this).
 
-    :param _ctypes.CField field: a ctype field from a structure
+    :param field: a ctype field from a structure
     :return: the number of bits
-    :rtype: int
     """
     # ctypes stores the number of bits in a bitfield in the top 16 bits;
     # if it isn't a bitfield, this is 0
@@ -74,10 +73,9 @@ def _make_array(ctype: Type[_T], n_items: int) -> ctypes.Array[_T]:
     Make an array of ctype items; done separately as the syntax is a
     little odd!
 
-    :param _ctypes.PyCSimpleType ctype: A ctype
-    :param int n_items: The number of items in the array
+    :param ctype: A ctype
+    :param n_items: The number of items in the array
     :return: a ctype array
-    :rtype: _ctypes.PyCArrayType
     """
     array_type = ctype * n_items  # type: ignore
     return array_type()  # type: ignore
@@ -159,8 +157,7 @@ def _to_numpy(array: ctypes.Array) -> NDArray[uint32]:
         No data copying is done; it is pure type conversion.  Editing
         the returned array will result in changes to the original.
 
-    :param _ctypes.PyCArrayType array: The array to convert
-    :rtype: numpy.ndarray
+    :param array: The array to convert
     """
     # Nothing to do if the array is 0 sized
     if len(array) == 0:
@@ -193,12 +190,12 @@ class _MasterPopEntry(object):
     def __init__(self, routing_key: int, mask: int, core_mask: int,
                  core_shift: int, n_neurons: int, n_colour_bits: int):
         """
-        :param int routing_key: The key to match for this entry
-        :param int mask: The mask to match for this entry
-        :param int core_mask:
+        :param routing_key: The key to match for this entry
+        :param mask: The mask to match for this entry
+        :param core_mask:
             The part of the routing_key where the core id is held
-        :param int core_shift: Where in the routing_key the core_id is held
-        :param int n_neurons:
+        :param core_shift: Where in the routing_key the core_id is held
+        :param n_neurons:
             The number of neurons on each core, except the last
         """
         self.__routing_key = routing_key
@@ -213,10 +210,9 @@ class _MasterPopEntry(object):
         """
         Add a synaptic matrix pointer to the entry.
 
-        :param int address: The address of the synaptic matrix
-        :param int row_length: The length of each row in the matrix
+        :param address: The address of the synaptic matrix
+        :param row_length: The length of each row in the matrix
         :return: The index of the pointer within the entry
-        :rtype: int
         """
         index = len(self.__addresses_and_row_lengths)
         if index > _MAX_ADDRESS_COUNT:
@@ -233,7 +229,6 @@ class _MasterPopEntry(object):
         between multiple entries when necessary.
 
         :return: The index of the marker within the entry
-        :rtype: int
         """
         index = len(self.__addresses_and_row_lengths)
         self.__addresses_and_row_lengths.append((0, 0, False))
@@ -243,8 +238,6 @@ class _MasterPopEntry(object):
     def routing_key(self) -> int:
         """
         The key combo of this entry.
-
-        :rtype: int
         """
         return self.__routing_key
 
@@ -252,8 +245,6 @@ class _MasterPopEntry(object):
     def mask(self) -> int:
         """
         The mask of the key for this entry.
-
-        :rtype: int
         """
         return self.__mask
 
@@ -261,8 +252,6 @@ class _MasterPopEntry(object):
     def core_mask(self) -> int:
         """
         The mask of the key once shifted to get the source core ID.
-
-        :rtype: int
         """
         return self.__core_mask
 
@@ -270,8 +259,6 @@ class _MasterPopEntry(object):
     def core_shift(self) -> int:
         """
         The shift of the key to get the source core ID.
-
-        :rtype: int
         """
         return self.__core_shift
 
@@ -279,8 +266,6 @@ class _MasterPopEntry(object):
     def n_neurons(self) -> int:
         """
         The number of neurons per source core.
-
-        :rtype: int
         """
         return self.__n_neurons
 
@@ -289,8 +274,6 @@ class _MasterPopEntry(object):
         """
         The memory address that this master pop entry points at
         (in the synaptic matrix).
-
-        :rtype: list(tuple(int,int,bool))
         """
         return self.__addresses_and_row_lengths
 
@@ -301,13 +284,12 @@ class _MasterPopEntry(object):
         """
         Write entries to the master population table.
 
-        :param _MasterPopEntryCType entry: The entry to write to
-        :param _AddressListEntryCType_Array address_list:
+        :param entry: The entry to write to
+        :param address_list:
             The address_list to write to
-        :param int start:
+        :param start:
             The index of the entry of the address list to start at
         :return: The number of entries written to the address list
-        :rtype: int
         """
         entry.key = self.__routing_key
         entry.mask = self.__mask
@@ -358,10 +340,7 @@ class MasterPopTableAsBinarySearch(object):
         :param incoming_projections:
             The projections arriving at the vertex that are to be handled by
             this table
-        :type incoming_projections:
-            list(~spynnaker.pyNN.models.projection.Projection)
         :return: the size the master pop table will take in SDRAM (in bytes)
-        :rtype: int
         """
         # Count the pre-machine-vertices
         n_entries = 0
@@ -394,9 +373,8 @@ class MasterPopTableAsBinarySearch(object):
         """
         Get the next allowed row length.
 
-        :param int row_length: the row length being considered
+        :param row_length: the row length being considered
         :return: the row length available
-        :rtype: int
         :raises SynapseRowTooBigException: If the row won't fit
         """
         if row_length > POP_TABLE_MAX_ROW_LENGTH:
@@ -411,9 +389,8 @@ class MasterPopTableAsBinarySearch(object):
         """
         Get the next allowed address.
 
-        :param int next_address: The next address that would be used
+        :param next_address: The next address that would be used
         :return: The next address that can be used following next_address
-        :rtype: int
         :raises SynapticConfigurationException:
             if the address is out of range
         """
@@ -438,19 +415,18 @@ class MasterPopTableAsBinarySearch(object):
         """
         Add an entry for an application-edge to the population table.
 
-        :param int block_start_addr: where the synaptic matrix block starts
-        :param int row_length: how long in words each row is
-        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
+        :param block_start_addr: where the synaptic matrix block starts
+        :param row_length: how long in words each row is
+        :param key_and_mask:
             the key and mask for this master pop entry
-        :param int core_mask:
+        :param core_mask:
             Mask for the part of the key that identifies the core
-        :param int core_shift: The shift of the mask to get to the core_mask
-        :param int n_neurons:
+        :param core_shift: The shift of the mask to get to the core_mask
+        :param n_neurons:
             The number of neurons in each machine vertex (bar the last)
-        :param int n_colour_bits:
+        :param n_colour_bits:
             The number of bits to use for colour
         :return: The index of the entry, to be used to retrieve it
-        :rtype: int
         :raises SynapticConfigurationException:
             If a bad address is used.
         """
@@ -477,18 +453,16 @@ class MasterPopTableAsBinarySearch(object):
         """
         Add an entry in the binary search to deal with the synaptic matrix.
 
-        :param int block_start_addr: where the synaptic matrix block starts
-        :param int row_length: how long in words each row is
-        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
-            the key and mask for this master pop entry
-        :param int core_mask:
+        :param block_start_addr: where the synaptic matrix block starts
+        :param row_length: how long in words each row is
+        :param key_and_mask: the key and mask for this master pop entry
+        :param core_mask:
             Mask for the part of the key that identifies the core
-        :param int core_shift: The shift of the mask to get to the core_mask
-        :param int n_neurons:
+        :param core_shift: The shift of the mask to get to the core_mask
+        :param n_neurons:
             The number of neurons in each machine vertex (bar the last)
-        :param int n_colour_bits: The number of bits to use for colour
+        :param n_colour_bits: The number of bits to use for colour
         :return: The index of the entry, to be used to retrieve it
-        :rtype: int
         :raises SynapticConfigurationException:
             If a bad address is used.
         """
@@ -517,20 +491,19 @@ class MasterPopTableAsBinarySearch(object):
         point to anywhere.  Used to keep indices in synchronisation between
         e.g. normal and delay entries and between entries on different cores.
 
-        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
+        :param key_and_mask:
             a key_and_mask object used as part of describing
             an edge that will require being received to be stored in the
             master pop table; the whole edge will become multiple calls to
             this function
-        :param int core_mask:
+        :param core_mask:
             Mask for the part of the key that identifies the core
-        :param int core_shift: The shift of the mask to get to the core_mask
-        :param int n_neurons:
+        :param core_shift: The shift of the mask to get to the core_mask
+        :param n_neurons:
             The number of neurons in each machine vertex (bar the last)
-        :param int n_colour_bits:
+        :param n_colour_bits:
             The number of bits to use for colour
         :return: The index of the added entry
-        :rtype: int
         """
         # If there are too many neurons per core, fail
         if n_neurons > _MAX_N_NEURONS:
@@ -554,20 +527,19 @@ class MasterPopTableAsBinarySearch(object):
         to keep indices in synchronisation between e.g. normal and delay
         entries and between entries on different cores.
 
-        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
+        :param key_and_mask:
             a key_and_mask object used as part of describing
             an edge that will require being received to be stored in the
             master pop table; the whole edge will become multiple calls to
             this function
-        :param int core_mask:
+        :param core_mask:
             Mask for the part of the key that identifies the core
-        :param int core_shift: The shift of the mask to get to the core_mask
-        :param int n_neurons:
+        :param core_shift: The shift of the mask to get to the core_mask
+        :param n_neurons:
             The number of neurons in each machine vertex (bar the last)
-        :param int n_colour_bits:
+        :param n_colour_bits:
             The number of bits used for colour
         :return: The index of the added entry
-        :rtype: int
         """
         entry = self.__add_entry(
             key_and_mask, core_mask, core_shift, n_neurons, n_colour_bits)
@@ -606,8 +578,6 @@ class MasterPopTableAsBinarySearch(object):
     def get_pop_table_data(self) -> NDArray[uint32]:
         """
         Get the master pop table data as a numpy array.
-
-        :rtype: ~numpy.ndarray
         """
         # sort entries by key
         entries = sorted(
@@ -632,8 +602,6 @@ class MasterPopTableAsBinarySearch(object):
         """
         The maximum number of neurons per core supported when a core-mask
         is > 0.
-
-        :rtype: int
         """
         return _MAX_N_NEURONS
 
@@ -642,8 +610,6 @@ class MasterPopTableAsBinarySearch(object):
         """
         The maximum core mask supported when n_neurons is > 0; this is the
         maximum number of cores that can be supported in a joined mask.
-
-        :rtype: int
         """
         return _MAX_CORE_MASK
 
@@ -651,7 +617,5 @@ class MasterPopTableAsBinarySearch(object):
     def max_index(self) -> int:
         """
         The maximum index of a synaptic connection.
-
-        :rtype: int
         """
         return _MAX_ADDRESS_COUNT

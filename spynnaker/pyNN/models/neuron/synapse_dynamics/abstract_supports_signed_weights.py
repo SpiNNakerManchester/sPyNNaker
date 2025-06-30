@@ -30,8 +30,6 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         Get the synapse type that positive weights will arrive at.
 
         :param incoming_projection: The projection targeted
-        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -42,8 +40,6 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         Get the synapse type that negative weights will arrive at.
 
         :param incoming_projection: The projection targeted
-        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -57,8 +53,6 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
             This must be a value >= 0.
 
         :param incoming_projection: The projection targeted
-        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
-        :rtype: float
         """
         raise NotImplementedError
 
@@ -72,8 +66,6 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
             This must be a value <= 0.
 
         :param incoming_projection: The projection targeted
-        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -87,8 +79,6 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
             This must be a value >= 0.
 
         :param incoming_projection: The projection targeted
-        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
-        :rtype: float
         """
         raise NotImplementedError
 
@@ -102,8 +92,6 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
             This must be a value <= 0.
 
         :param incoming_projection: The projection targeted
-        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
-        :rtype: float
         """
         raise NotImplementedError
 
@@ -117,8 +105,6 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
             This must be a value >= 0.
 
         :param incoming_projection: The projection targeted
-        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
-        :rtype: float
         """
         raise NotImplementedError
 
@@ -132,7 +118,5 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
             This must be a value <= 0.
 
         :param incoming_projection: The projection targeted
-        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
-        :rtype: float
         """
         raise NotImplementedError

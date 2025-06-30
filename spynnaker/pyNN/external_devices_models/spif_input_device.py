@@ -69,26 +69,23 @@ class SPIFInputDevice(
                  chip_coords: Optional[Tuple[int, int]] = None):
         """
 
-        :param int pipe: Which pipe on SPIF the retina is connected to
-        :param int n_neurons: The number of neurons in the device
+        :param pipe: Which pipe on SPIF the retina is connected to
+        :param n_neurons: The number of neurons in the device
         :param n_neurons_per_partition: The number of neurons per partition
         :param base_key:
             The key that is common over the whole vertex,
             or None to use the pipe number as the key
-        :type base_key: int or None
         :param board_address:
             The IP address of the board to which the FPGA is connected, or None
             to use the default board or chip_coords.  Note chip_coords will be
             used first if both are specified, with board_address then being
             used if the coordinates don't connect to an FPGA.
-        :type board_address: str or None
         :param chip_coords:
             The coordinates of the chip to which the FPGA is connected, or
             None to use the default board or board_address.   Note chip_coords
             will be used first if board_address is also specified, with
             board_address then being used if the coordinates don't connect to
             an FPGA.
-        :type chip_coords: tuple(int, int) or None
         """
         # Do some checks
         if n_neurons_per_partition < self.INPUT_MASK:
@@ -153,18 +150,14 @@ class SPIFInputDevice(
     def __is_power_of_2(self, v: int) -> bool:
         """ Determine if a value is a power of 2
 
-        :param int v: The value to test
-        :rtype: bool
+        :param v: The value to test
         """
         return (v & (v - 1) == 0) and (v != 0)
 
     def __incoming_fpgas(
             self, board_address: Optional[str],
             chip_coords: Optional[Tuple[int, int]]) -> List[FPGAConnection]:
-        """ Get the incoming FPGA connections
-
-        :rtype: list(FPGAConnection)
-        """
+        """ Get the incoming FPGA connections  """
         # We use every other odd link
         return [FPGAConnection(SPIF_FPGA_ID, i, board_address, chip_coords)
                 for i in SPIF_INPUT_FPGA_LINKS]
@@ -172,10 +165,7 @@ class SPIFInputDevice(
     def __outgoing_fpga(
             self, board_address: Optional[str],
             chip_coords: Optional[Tuple[int, int]]) -> FPGAConnection:
-        """ Get the outgoing FPGA connection (for commands)
-
-        :rtype: FGPA_Connection
-        """
+        """ Get the outgoing FPGA connection (for commands) """
         return FPGAConnection(
             SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address, chip_coords)
 

@@ -64,10 +64,9 @@ class SynapseDynamicsStatic(
             pad_to_length: Optional[int] = None):
 
         """
-        :param float weight:
+        :param weight:
         :param delay: Use ``None`` to get the simulator default minimum delay.
-        :type delay: float or None
-        :param int pad_to_length:
+        :param pad_to_length:
         """
         super(AbstractStaticSynapseDynamics, self).__init__(
             delay=delay, weight=weight)
@@ -148,11 +147,6 @@ class SynapseDynamicsStatic(
 
     def _pad_row(self, rows: List[NDArray],
                  no_bytes_per_connection: int) -> List[NDArray]:
-        """
-        :param list(~numpy.ndarray) rows:
-        :param int no_bytes_per_connection:
-        :rtype: list(~numpy.ndarray)
-        """
         assert self.__pad_to_length is not None
         return [
             numpy.concatenate([

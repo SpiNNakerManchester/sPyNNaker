@@ -69,13 +69,11 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
             local_host: Optional[str] = None,
             local_port: Optional[int] = None):
         """
-        :param str retina_injector_label:
-        :param PushBotWIFIConnection pushbot_wifi_connection:
-        :param PushBotRetinaResolution resolution:
+        :param retina_injector_label:
+        :param pushbot_wifi_connection:
+        :param resolution:
         :param local_host:
-        :type local_host: str or None
         :param local_port:
-        :type local_port: int or None
         """
         super().__init__(
             send_labels=[retina_injector_label], local_host=local_host,
@@ -123,7 +121,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         Receive retina packets from the PushBot and converts them into
         neuron spikes within the spike injector system.
 
-        :param bytearray data: Data to be processed
+        :param data: Data to be processed
         """
         with self.__lock:
             if not self.__ready:

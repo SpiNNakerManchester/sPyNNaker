@@ -49,8 +49,6 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
         """
         A partition ID to give to an outgoing edge partition that will
         control this device.
-
-        :rtype: str
         """
         raise NotImplementedError
 
@@ -59,8 +57,6 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
     def device_control_key(self) -> int:
         """
         The key that must be sent to the device to control it.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -70,8 +66,6 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
         """
         Whether the control of the device accepts an arbitrary valued
         payload, the value of which will change the devices behaviour.
-
-        :rtype: bool
         """
         raise NotImplementedError
 
@@ -80,8 +74,6 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
     def device_control_min_value(self) -> float:
         """
         The minimum value to send to the device.
-
-        :rtype: float
         """
         raise NotImplementedError
 
@@ -90,8 +82,6 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
     def device_control_max_value(self) -> Decimal:
         """
         The maximum value to send to the device.
-
-        :rtype: float
         """
         raise NotImplementedError
 
@@ -101,8 +91,6 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
         """
         The number of timesteps between sending commands to the device.
         This defines the "sampling interval" for the device.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -111,8 +99,6 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
     def device_control_send_type(self) -> SendType:
         """
         The type of data to be sent.
-
-        :rtype: SendType
         """
         raise NotImplementedError
 
@@ -120,8 +106,6 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
     def device_control_scaling_factor(self) -> int:  # pragma: no cover
         """
         The scaling factor used to send the payload to this device.
-
-        :rtype: int
         """
         return 1
 

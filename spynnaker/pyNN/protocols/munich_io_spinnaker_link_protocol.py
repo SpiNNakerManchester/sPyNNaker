@@ -49,8 +49,7 @@ def get_munich_i(key: int) -> int:
     """
     Get the instruction field from the key.
 
-    :param int key:
-    :rtype: int
+    :param key:
     """
     return key & _I_MASK
 
@@ -73,8 +72,7 @@ def get_retina_i(key: int) -> int:
     """
     Get the key with the UART mask.
 
-    :param int key:
-    :rtype: int
+    :param key:
     """
     return key & RETINA_WITHOUT_UART_MASK
 
@@ -83,8 +81,7 @@ def get_push_bot_laser_led_speaker_frequency_i(key: int) -> int:
     """
     Get the instruction field from the key with the I mask.
 
-    :param int key:
-    :rtype: int
+    :param key:
     """
     return get_munich_i(key)
 
@@ -92,9 +89,6 @@ def get_push_bot_laser_led_speaker_frequency_i(key: int) -> int:
 def get_push_bot_motor_i(key: int) -> int:
     """
     Gets the key without the universal asynchronous receiver/transmitter mask.
-
-    :param int payload:
-    :rtype: int
     """
 
     return key & PUSH_BOT_MOTOR_WITHOUT_UART_MASK
@@ -118,8 +112,7 @@ def GET_RETINA_KEY_VALUE(payload: int) -> int:
     """
     Gets the payload with the retina key mask and offset.
 
-    :param int payload:
-    :rtype: int
+    :param payload:
     """
     return (payload & _PAYLOAD_RETINA_KEY_MASK) >> _PAYLOAD_RETINA_KEY_OFFSET
 
@@ -129,8 +122,7 @@ def GET_RETINA_PAYLOAD_VALUE(payload: int) -> int:
     """
     Gets the payload with the retina payload mask and offset.
 
-    :param int payload:
-    :rtype: int
+    :param payload:
     """
     return (
         (payload & _PAYLOAD_RETINA_PAYLOAD_MASK) >>
@@ -287,8 +279,6 @@ class RetinaKey(Enum):
     def ident(self) -> int:
         """
         Gets the identification passed into the init.
-
-        :rtype: int
         """
         return self.__ident
 
@@ -296,8 +286,6 @@ class RetinaKey(Enum):
     def n_neurons(self) -> int:
         """
         Gets the number or neurons passed into the init.
-
-        :rtype: int
         """
         return 2 * (self.__pixels ** 2)
 
@@ -305,8 +293,6 @@ class RetinaKey(Enum):
     def pixels(self) -> int:
         """
         Get the pixels passed into the init.
-
-        :rtype: int
         """
         return self.__pixels
 
@@ -314,8 +300,6 @@ class RetinaKey(Enum):
     def bits_per_coordinate(self) -> int:
         """
         Gets the bits per coordinate passed into the init.
-
-        :rtype: int
         """
         return self.__bits_per_coordinate
 
@@ -339,8 +323,6 @@ class RetinaPayload(Enum):
     def ident(self) -> int:
         """
         Gets the indent passed into the init.
-
-        :rtype: int
         """
         return self.__ident
 
@@ -348,8 +330,6 @@ class RetinaPayload(Enum):
     def n_payload_bytes(self) -> int:
         """
         Gets the n_payload_bytes passed into the init.
-
-        :rtype: int
         """
         return self.__n_payload_bytes
 
@@ -387,11 +367,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def __init__(self, mode: MUNICH_MODES, instance_key: Optional[int] = None,
                  uart_id: int = 0):
         """
-        :param ~spynnaker.pyNN.protocols.MUNICH_MODES mode:
-            The mode of operation of the protocol
+        :param mode: The mode of operation of the protocol
         :param instance_key: The optional instance key to use
-        :type instance_key: int or None
-        :param int uart_id: The ID of the UART when needed
+        :param uart_id: The ID of the UART when needed
         """
         self.__mode = mode
 
@@ -410,23 +388,21 @@ class MunichIoSpiNNakerLinkProtocol(object):
     @property
     def mode(self) -> MUNICH_MODES:
         """
-        :rtype: ~spynnaker.pyNN.protocols.MUNICH_MODES
+        spynnaker.pyNN.protocols.MUNICH_MODES
         """
         return self.__mode
 
     @property
     def uart_id(self) -> int:
         """
-        :rtype: int
+        The ID of the UART when needed
         """
         return self.__uart_id
 
     @property
     def instance_key(self) -> int:
         """
-        The key of this instance of the protocol.
-
-        :rtype: int
+        The instance key to use
         """
         return self.__instance_key
 
@@ -450,11 +426,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to configure master key.
 
-        :param int new_key:
+        :param new_key:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(CONFIGURE_MASTER_KEY), payload=new_key, time=time)
@@ -465,8 +439,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         MunichIoSpiNNakerLinkProtocol.__sent_mode_command = True
         return MultiCastCommand(
@@ -476,8 +448,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def set_retina_key_key(self) -> int:
         """
         Get key to set retina key.
-
-        :rtype: int
         """
         return self._get_key(
             ACTIVE_RETINA_EVENT_STREAMING_SET_KEY, RETINA_UART_SHIFT)
@@ -487,11 +457,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set retina key.
 
-        :param int new_key:
+        :param new_key:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self.set_retina_key_key, payload=new_key, time=time)
@@ -500,8 +468,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def disable_retina_key(self) -> int:
         """
         Get key to disable the retina.
-
-        :rtype: int
         """
         return self._get_key(DISABLE_RETINA_EVENT_STREAMING, RETINA_UART_SHIFT)
 
@@ -511,8 +477,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(self.disable_retina_key, time=time)
 
@@ -523,8 +487,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(MASTER_SLAVE_KEY, RETINA_UART_SHIFT),
@@ -537,8 +499,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(MASTER_SLAVE_KEY, RETINA_UART_SHIFT),
@@ -551,8 +511,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(MASTER_SLAVE_KEY, RETINA_UART_SHIFT),
@@ -566,8 +524,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(MASTER_SLAVE_KEY, RETINA_UART_SHIFT),
@@ -579,12 +535,10 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to bias level.
 
-        :param int bias_id:
-        :param int bias_value:
+        :param bias_id:
+        :param bias_value:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(BIAS_KEY, RETINA_UART_SHIFT),
@@ -596,8 +550,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(RESET_RETINA_KEY, RETINA_UART_SHIFT), time=time)
@@ -608,11 +560,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to turn off sensor reporting.
 
-        :param int sensor_id:
+        :param sensor_id:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(SENSOR_REPORTING_OFF_KEY),
@@ -623,11 +573,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to sensor once.
 
-        :param int sensor_id:
+        :param sensor_id:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(POLL_SENSORS_ONCE_KEY),
@@ -639,11 +587,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to sensor continuously.
 
-        :param int sensor_id:
+        :param sensor_id:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(POLL_SENSORS_CONTINUOUSLY_KEY),
@@ -655,11 +601,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def enable_disable_motor_key(self) -> int:
         """
         Get key to disable motor.
-
-        :param time: The time within the simulation at which to send the
-            command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return self._get_key(ENABLE_DISABLE_MOTOR_KEY, RETINA_UART_SHIFT)
 
@@ -670,8 +611,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self.enable_disable_motor_key, payload=1, time=time)
@@ -683,8 +622,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self.enable_disable_motor_key, payload=0, time=time)
@@ -695,11 +632,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set motor total period.
 
-        :param int time_in_ms:
+        :param time_in_ms:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(MOTOR_RUN_FOR_PERIOD_KEY, RETINA_UART_SHIFT),
@@ -711,11 +646,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set generic motor 0 raw output permanently.
 
-        :param int pwm_signal:
+        :param pwm_signal:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(MOTOR_0_RAW_PERM_KEY, RETINA_UART_SHIFT),
@@ -727,11 +660,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set generic motor 1 raw output permanently.
 
-        :param int pwm_signal:
+        :param pwm_signal:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(MOTOR_1_RAW_PERM_KEY, RETINA_UART_SHIFT),
@@ -743,11 +674,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set generic motor 0 raw output leak to 0.
 
-        :param int pwm_signal:
+        :param pwm_signal:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(MOTOR_0_RAW_LEAK_KEY, RETINA_UART_SHIFT),
@@ -759,11 +688,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set generic motor 1 raw output leak to 0.
 
-        :param int pwm_signal:
+        :param pwm_signal:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(MOTOR_1_RAW_LEAK_KEY, RETINA_UART_SHIFT),
@@ -775,11 +702,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set a output timer duration.
 
-        :param int timer_period:
+        :param timer_period:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(MOTOR_TIMER_A_TOTAL_PERIOD_KEY, RETINA_UART_SHIFT),
@@ -791,11 +716,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set b output timer duration.
 
-        :param int timer_period:
+        :param timer_period:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(MOTOR_TIMER_B_TOTAL_PERIOD_KEY, RETINA_UART_SHIFT),
@@ -807,11 +730,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set c output timer duration.
 
-        :param int timer_period:
+        :param timer_period:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(MOTOR_TIMER_C_TOTAL_PERIOD_KEY, RETINA_UART_SHIFT),
@@ -823,11 +744,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set a channel 0 output timer.
 
-        :param int timer_period:
+        :param timer_period:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(
@@ -840,11 +759,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set a channel 1 output timer.
 
-        :param int timer_period:
+        :param timer_period:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(
@@ -857,11 +774,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set b channel 0 output timer.
 
-        :param int timer_period:
+        :param timer_period:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(
@@ -874,11 +789,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set b channel 1 output timer.
 
-        :param int timer_period:
+        :param timer_period:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(
@@ -891,11 +804,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set c channel 0 output timer.
 
-        :param int timer_period:
+        :param timer_period:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(
@@ -908,11 +819,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set c channel 1 output timer.
 
-        :param int timer_period:
+        :param timer_period:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(
@@ -926,8 +835,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(QUERY_STATES_LINES_KEY), time=time)
@@ -938,11 +845,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set output pattern for payload.
 
-        :param int payload:
+        :param payload:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(SET_OUTPUT_PATTERN_KEY), payload=payload, time=time)
@@ -953,11 +858,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to add payload logic to current output.
 
-        :param int payload:
+        :param payload:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(ADD_PAYLOAD_TO_CURRENT_OUTPUT_KEY),
@@ -969,11 +872,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to remove payload logic to current output.
 
-        :param int payload:
+        :param payload:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(REMOVE_PAYLOAD_TO_CURRENT_OUTPUT_KEY),
@@ -985,11 +886,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set the payload pins to high impedance.
 
-        :param int payload:
+        :param payload:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         """
         return MultiCastCommand(
             self._get_key(SET_PAYLOAD_TO_HIGH_IMPEDANCE_KEY),
@@ -1005,8 +904,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_laser_config_total_period_key(self) -> int:
         """
         Gets the key to set the laser total period.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_LASER_CONFIG_TOTAL_PERIOD, RETINA_UART_SHIFT)
@@ -1017,11 +914,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set the laser total period.
 
-        :param int total period:
+        :param total_period:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1033,8 +928,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_laser_config_active_time_key(self) -> int:
         """
         Gets the key to set the laser active time.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_LASER_CONFIG_ACTIVE_TIME, RETINA_UART_SHIFT)
@@ -1045,11 +938,8 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set the laser active time.
 
-        :param int frequency:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1061,8 +951,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_laser_set_frequency_key(self) -> int:
         """
         Gets the key to set the frequency.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_LASER_FREQUENCY,
@@ -1074,11 +962,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set the frequency
 
-        :param int frequency:
+        :param frequency:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1090,8 +976,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_speaker_config_total_period_key(self) -> int:
         """
         Gets the key to set the speaker total period.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_SPEAKER_CONFIG_TOTAL_PERIOD, RETINA_UART_SHIFT)
@@ -1102,11 +986,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set the speaker total period.
 
-        :param int total_period:
+        :param total_period:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1118,8 +1000,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_speaker_config_active_time_key(self) -> int:
         """
         Gets the key to set the speaker active time.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_SPEAKER_CONFIG_ACTIVE_TIME, RETINA_UART_SHIFT)
@@ -1130,11 +1010,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set the speaker active time.
 
-        :param int active_time:
+        :param active_time:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1146,8 +1024,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_speaker_set_tone_key(self) -> int:
         """
         Gets the key to set the tone.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_SPEAKER_TONE_BEEP,
@@ -1159,11 +1035,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set the tone.
 
-        :param int frequency:
+        :param frequency:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1175,8 +1049,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_speaker_set_melody_key(self) -> int:
         """
         Gets the key to set the melody.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_SPEAKER_TONE_MELODY,
@@ -1188,11 +1060,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set the melody.
 
-        :param int melody:
+        :param melody:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1204,8 +1074,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_led_total_period_key(self) -> int:
         """
         Gets the key to set the total led period.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_LED_CONFIG_TOTAL_PERIOD, RETINA_UART_SHIFT)
@@ -1216,11 +1084,8 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set the total led period.
 
-        :param int active_time:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1232,8 +1097,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_led_back_active_time_key(self) -> int:
         """
         Gets the key to set the back led active time.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_LED_BACK_CONFIG_ACTIVE_TIME, RETINA_UART_SHIFT)
@@ -1244,11 +1107,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set the back led active time.
 
-        :param int active_time:
+        :param active_time:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1260,8 +1121,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_led_front_active_time_key(self) -> int:
         """
         Gets the key to set the front led active time.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_LED_FRONT_CONFIG_ACTIVE_TIME, RETINA_UART_SHIFT)
@@ -1272,11 +1131,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set the front led active time.
 
-        :param int active_time:
+        :param active_time:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1288,8 +1145,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_led_set_frequency_key(self) -> int:
         """
         Gets the key to set the led frequency.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_LED_FREQUENCY,
@@ -1301,11 +1156,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set the led frequency
 
-        :param int frequency:
+        :param frequency:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1317,8 +1170,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_motor_0_permanent_key(self) -> int:
         """
         Gets the key for the change motor 0 permanently.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_MOTOR_0_PERMANENT_VELOCITY, PUSH_BOT_MOTOR_UART_SHIFT)
@@ -1329,11 +1180,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to change motor 0 permanently.
 
-        :param int velocity:
+        :param velocity:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1345,8 +1194,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_motor_1_permanent_key(self) -> int:
         """
         Gets the key for the change motor 1 permanently.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_MOTOR_1_PERMANENT_VELOCITY, PUSH_BOT_MOTOR_UART_SHIFT)
@@ -1357,11 +1204,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to change motor 1 permanently.
 
-        :param int velocity:
+        :param velocity:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1373,8 +1218,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_motor_0_leaking_towards_zero_key(self) -> int:
         """
         Gets the key for the change motor 0 towards zero.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_MOTOR_0_LEAKY_VELOCITY, PUSH_BOT_MOTOR_UART_SHIFT)
@@ -1385,11 +1228,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to change motor 0 towards zero.
 
-        :param int velocity:
+        :param velocity:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1401,8 +1242,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def push_bot_motor_1_leaking_towards_zero_key(self) -> int:
         """
         Gets the key for the change motor 1 towards zero.
-
-        :rtype: int
         """
         return self._get_key(
             PUSH_BOT_MOTOR_1_LEAKY_VELOCITY, PUSH_BOT_MOTOR_UART_SHIFT)
@@ -1413,11 +1252,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to change motor 1 towards zero.
 
-        :param int velocity:
+        :param velocity:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :type time: int or None
-        :rtype: MultiCastCommand
         :raises ConfigurationException: If the mode is not PUSH_BOT
         """
         self._check_for_pushbot_mode()
@@ -1429,8 +1266,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get the transmission key to this sensor id.
 
-        :param int sensor_id:
-        :rtype: int
+        :param sensor_id:
         """
         return ((sensor_id << _SENSOR_OUTGOING_OFFSET_TO_D) |
                 (self.__uart_id << _SENSOR_OUTGOING_OFFSET_TO_I))
@@ -1439,8 +1275,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def set_retina_transmission_key(self) -> int:
         """
         Get the key to set the retina_transmission.
-
-        :rtype: int
         """
         return self._get_key(
             ACTIVE_RETINA_EVENT_STREAMING_KEYS_CONFIGURATION,
@@ -1456,11 +1290,8 @@ class MunichIoSpiNNakerLinkProtocol(object):
         :param retina_key: the new key for the retina
         :param retina_payload:
             the new payload for the set retina key command packet
-        :type retina_payload: RetinaPayload or None
         :param time: when to transmit this packet
-        :type time: int or float or None
         :return: the command to send
-        :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
         """
         retina_key_id = retina_key.ident if retina_key is not None else 0
 

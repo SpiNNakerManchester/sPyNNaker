@@ -35,14 +35,14 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
                  local_port: Optional[int] = NOTIFY_PORT,
                  live_packet_gather_label: str = "LiveSpikeReceiver"):
         """
-        :param iterable(str) receive_labels:
+        :param receive_labels:
             Labels of population from which live spikes will be received.
-        :param iterable(str) send_labels:
+        :param send_labels:
             Labels of population to which live spikes will be sent
-        :param str local_host:
+        :param local_host:
             Optional specification of the local hostname or IP address of the
             interface to listen on
-        :param int local_port:
+        :param local_port:
             Optional specification of the local port to listen on. Must match
             the port that the toolchain will send the notification on (19999
             by default)
@@ -56,10 +56,10 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
         """
         Send a spike from a single neuron.
 
-        :param str label:
+        :param label:
             The label of the population from which the spike will originate
-        :param int neuron_id: The ID of the neuron sending a spike
-        :param bool send_full_keys: Determines whether to send full 32-bit
+        :param neuron_id: The ID of the neuron sending a spike
+        :param send_full_keys: Determines whether to send full 32-bit
             keys, getting the key for each neuron from the database, or
             whether to send 16-bit neuron IDs directly
         """
@@ -71,10 +71,10 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
         """
         Send a number of spikes.
 
-        :param str label:
+        :param label:
             The label of the population from which the spikes will originate
-        :param list(int) neuron_ids: array-like of neuron IDs sending spikes
-        :param bool send_full_keys: Determines whether to send full 32-bit
+        :param neuron_ids: array-like of neuron IDs sending spikes
+        :param send_full_keys: Determines whether to send full 32-bit
             keys, getting the key for each neuron from the database, or
             whether to send 16-bit neuron IDs directly
         """

@@ -40,8 +40,7 @@ class AbstractSDRAMSynapseDynamics(
         """
         Determines if this synapse dynamics is the same as another.
 
-        :param AbstractSynapseDynamics synapse_dynamics:
-        :rtype: bool
+        :param synapse_dynamics:
         """
         raise NotImplementedError
 
@@ -51,9 +50,8 @@ class AbstractSDRAMSynapseDynamics(
         """
         Get the SDRAM usage of the synapse dynamics parameters in bytes.
 
-        :param int n_neurons:
-        :param int n_synapse_types:
-        :rtype: int
+        :param n_neurons:
+        :param n_synapse_types:
         """
         raise NotImplementedError
 
@@ -65,11 +63,10 @@ class AbstractSDRAMSynapseDynamics(
         """
         Write the synapse parameters to the spec.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The specification to write to
-        :param int region: region ID to write to
-        :param float global_weight_scale: The weight scale applied globally
-        :param list(float) synapse_weight_scales:
+        :param spec: The specification to write to
+        :param region: region ID to write to
+        :param global_weight_scale: The weight scale applied globally
+        :param synapse_weight_scales:
             The total weight scale applied to each synapse including the global
             weight scale
         """
@@ -81,8 +78,7 @@ class AbstractSDRAMSynapseDynamics(
         Get the maximum number of synapses that can be held in the given
         number of words.
 
-        :param int n_words: The number of words the synapses must fit in
-        :rtype: int
+        :param n_words: The number of words the synapses must fit in
         """
         raise NotImplementedError
 
@@ -101,15 +97,14 @@ class AbstractSDRAMSynapseDynamics(
         Converts per-connection data generated from connections into
         row-based data to be returned from get_synaptic_data.
 
-        :param ~numpy.ndarray connection_row_indices:
+        :param connection_row_indices:
             The index of the row that each item should go into
-        :param int n_rows:
+        :param n_rows:
             The number of rows
-        :param ~numpy.ndarray data:
+        :param data:
             The non-row-based data
-        :param int max_n_synapses:
+        :param max_n_synapses:
             The maximum number of synapses to generate in each row
-        :rtype: list(~numpy.ndarray)
         """
         return [
             data[connection_row_indices == i][:max_n_synapses].reshape(-1)
@@ -121,9 +116,8 @@ class AbstractSDRAMSynapseDynamics(
         Get the number of items in each row as 4-byte values, given the
         item size.
 
-        :param ~numpy.ndarray rows:
-        :param int item_size:
-        :rtype: ~numpy.ndarray
+        :param rows:
+        :param item_size:
         """
         return numpy.array([
             int(math.ceil(float(row.size) / float(item_size)))
@@ -133,8 +127,7 @@ class AbstractSDRAMSynapseDynamics(
         """
         Convert the row data to words.
 
-        :param ~numpy.ndarray rows:
-        :rtype: ~numpy.ndarray
+        :param rows:
         """
         words = [numpy.pad(
             row, (0, (4 - (row.size % 4)) & 0x3), mode="constant",

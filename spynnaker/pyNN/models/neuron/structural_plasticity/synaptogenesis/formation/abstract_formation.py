@@ -30,8 +30,6 @@ class AbstractFormation(AbstractHasParameterNames, metaclass=AbstractBase):
     def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
-
-        :rtype: str
         """
         raise NotImplementedError
 
@@ -39,8 +37,6 @@ class AbstractFormation(AbstractHasParameterNames, metaclass=AbstractBase):
     def get_parameters_sdram_usage_in_bytes(self) -> int:
         """
         Get the amount of SDRAM used by the parameters of this rule.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -49,6 +45,6 @@ class AbstractFormation(AbstractHasParameterNames, metaclass=AbstractBase):
         """
         Write the parameters of the rule to the spec.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
+        :param spec:
         """
         raise NotImplementedError

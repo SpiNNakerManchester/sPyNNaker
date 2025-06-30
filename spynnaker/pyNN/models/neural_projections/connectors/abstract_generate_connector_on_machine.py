@@ -84,8 +84,7 @@ class AbstractGenerateConnectorOnMachine(
         Default implementation returns True if the weights and delays can
         be generated on the machine
 
-        :param SynapseInformation synapse_info: The synapse information
-        :rtype: bool
+        :param synapse_info: The synapse information
         """
         if (not is_param_generatable(synapse_info.weights) or
                 not is_param_generatable(synapse_info.delays)):
@@ -101,8 +100,6 @@ class AbstractGenerateConnectorOnMachine(
         Get the id of the weight generator on the machine.
 
         :param weights:
-        :type weights: ~pyNN.random.RandomDistribution or int or float
-        :rtype: int
         """
         return param_generator_id(weights)
 
@@ -111,8 +108,6 @@ class AbstractGenerateConnectorOnMachine(
         Get the parameters of the weight generator on the machine.
 
         :param weights:
-        :type weights: ~pyNN.random.RandomDistribution or int or float
-        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         return param_generator_params(weights)
 
@@ -121,8 +116,6 @@ class AbstractGenerateConnectorOnMachine(
         The size of the weight parameters in bytes.
 
         :param weights:
-        :type weights: ~pyNN.random.RandomDistribution or int or float
-        :rtype: int
         """
         return param_generator_params_size_in_bytes(weights)
 
@@ -131,8 +124,6 @@ class AbstractGenerateConnectorOnMachine(
         Get the id of the delay generator on the machine.
 
         :param delays:
-        :type delays: ~pyNN.random.RandomDistribution or int or float
-        :rtype: int
         """
         return param_generator_id(delays)
 
@@ -141,8 +132,6 @@ class AbstractGenerateConnectorOnMachine(
         Get the parameters of the delay generator on the machine.
 
         :param delays:
-        :type delays: ~pyNN.random.RandomDistribution or int or float
-        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         return param_generator_params(delays)
 
@@ -151,8 +140,6 @@ class AbstractGenerateConnectorOnMachine(
         The size of the delay parameters in bytes.
 
         :param delays:
-        :type delays: ~pyNN.random.RandomDistribution  or int or float
-        :rtype: int
         """
         return param_generator_params_size_in_bytes(delays)
 
@@ -161,8 +148,6 @@ class AbstractGenerateConnectorOnMachine(
     def gen_connector_id(self) -> int:
         """
         The ID of the connection generator on the machine.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -171,8 +156,7 @@ class AbstractGenerateConnectorOnMachine(
         """
         Get the parameters of the on machine generation.
 
-        :param SynapseInformation synapse_info: The synaptic information
-        :rtype: ~numpy.ndarray(uint32)
+        :param synapse_info: The synaptic information
         """
         _ = synapse_info
         return numpy.zeros(0, dtype="uint32")
@@ -181,7 +165,5 @@ class AbstractGenerateConnectorOnMachine(
     def gen_connector_params_size_in_bytes(self) -> int:
         """
         The size of the connector parameters, in bytes.
-
-        :rtype: int
         """
         return 0

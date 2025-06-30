@@ -58,13 +58,13 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
             dual_fsm: bool = True,
             A_plus: float = 0.01, A_minus: float = 0.01):
         """
-        :param int accumulator_depression:
-        :param int accumulator_potentiation:
-        :param float mean_pre_window:
-        :param float mean_post_window:
-        :param bool dual_fsm:
-        :param float A_plus: :math:`A^+`
-        :param float A_minus: :math:`A^-`
+        :param accumulator_depression:
+        :param accumulator_potentiation:
+        :param mean_pre_window:
+        :param mean_post_window:
+        :param dual_fsm:
+        :param A_plus: :math:`A^+`
+        :param A_minus: :math:`A^-`
         """
         super().__init__(SynapseStructureWeightAccumulator())
         self.__accumulator_depression_plus_one = accumulator_depression + 1
@@ -80,8 +80,6 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def A_plus(self) -> float:
         r"""
         :math:`A^+`
-
-        :rtype: float
         """
         return self.__a_plus
 
@@ -93,8 +91,6 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def A_minus(self) -> float:
         r"""
         :math:`A^-`
-
-        :rtype: float
         """
         return self.__a_minus
 
@@ -122,8 +118,6 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
-
-        :rtype: str
         """
         if self.__dual_fsm:
             return "recurrent_dual_fsm"
@@ -133,8 +127,6 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def pre_trace_n_bytes(self) -> int:
         """
         The number of bytes used by the pre-trace of the rule per neuron.
-
-        :rtype: int
         """
         # When using the separate FSMs, pre-trace contains window length,
         # otherwise it's in the synapse
@@ -151,8 +143,6 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def n_weight_terms(self) -> int:
         """
         The number of weight terms expected by this timing rule.
-
-        :rtype: int
         """
         return 1
 
@@ -178,10 +168,6 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @staticmethod
     def _write_exp_dist_lut(spec: DataSpecificationBase, mean: float) -> None:
-        """
-        :param .DataSpecificationGenerator spec:
-        :param float mean:
-        """
         indices = numpy.arange(STDP_FIXED_POINT_ONE)
         inv_cdf = numpy.log(1.0 - indices/float(STDP_FIXED_POINT_ONE)) * -mean
         spec.write_array(

@@ -32,24 +32,21 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 def get_x_from_robot_retina(key: int) -> int:
     """
-    :param int key:
-    :rtype: int
+    :param key:
     """
     return (key >> 7) & 0x7f
 
 
 def get_y_from_robot_retina(key: int) -> int:
     """
-    :param int key:
-    :rtype: int
+    :param key:
     """
     return key & 0x7f
 
 
 def get_spike_value_from_robot_retina(key: int) -> int:
     """
-    :param int key:
-    :rtype: int
+    :param key:
     """
     return (key >> 14) & 0x1
 
@@ -94,14 +91,13 @@ class MunichRetinaDevice(
             polarity: _T_POLARITY = None,
             board_address: Optional[str] = None):
         """
-        :param int retina_key:
-        :param int spinnaker_link_id:
+        :param retina_key:
+        :param spinnaker_link_id:
             The SpiNNaker link to which the retina is connected
-        :param str position: ``LEFT`` or ``RIGHT``
+        :param position: ``LEFT`` or ``RIGHT``
         :param label:
-        :param str polarity: ``UP``, ``DOWN`` or ``MERGED``
+        :param polarity: ``UP``, ``DOWN`` or ``MERGED``
         :param board_address:
-        :type board_address: str or None
         """
         if polarity is None:
             polarity = MunichRetinaDevice.MERGED_POLARITY

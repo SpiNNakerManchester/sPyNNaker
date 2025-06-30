@@ -93,18 +93,18 @@ class SynapticMatrixApp(object):
             delay_app_key_info: Optional[AppKeyInfo],
             weight_scales: WeightScales):
         """
-        :param SynapseInformation synapse_info:
+        :param synapse_info:
             The projection synapse information
-        :param ProjectionApplicationEdge app_edge:
+        :param app_edge:
             The projection application edge
-        :param int n_synapse_types: The number of synapse types accepted
-        :param int synaptic_matrix_region:
+        :param n_synapse_types: The number of synapse types accepted
+        :param synaptic_matrix_region:
             The region where synaptic matrices are stored
-        :param int all_syn_block_sz:
+        :param all_syn_block_sz:
             The space available for all synaptic matrices on the core
-        :param AppKeyInfo app_key_info:
+        :param app_key_info:
             Application-level routing key information for undelayed vertices
-        :param AppKeyInfo delay_app_key_info:
+        :param delay_app_key_info:
             Application-level routing key information for delayed vertices
         :param weight_scales:
             Weight scale for each synapse edge
@@ -144,8 +144,6 @@ class SynapticMatrixApp(object):
     def gen_size(self) -> int:
         """
         Size of a block.
-
-        :rtype: int
         """
         max_row_length = max(
             self.__max_row_info.undelayed_max_bytes,
@@ -159,11 +157,9 @@ class SynapticMatrixApp(object):
         """
         Allocate the master pop table entries for the blocks.
 
-        :param int block_addr: Where the allocation can start from
-        :param MasterPopTableAsBinarySearch pop_table:
-            The master population table
+        :param block_addr: Where the allocation can start from
+        :param pop_table: The master population table
         :return: Where the next allocation can start from
-        :rtype: int
         """
         block_addr = self.__reserve_app_matrix(block_addr, pop_table)
         block_addr = self.__reserve_delay_app_matrix(block_addr, pop_table)
@@ -175,12 +171,11 @@ class SynapticMatrixApp(object):
         """
         Reserve space for the matrix in the master pop table.
 
-        :param int block_addr:
+        :param block_addr:
             The address in the synaptic matrix region to start writing at
-        :param MasterPopTableAsBinarySearch pop_table:
+        :param pop_table:
             The master population table
         :return: The updated block address
-        :rtype: int
         """
         # If there is no routing info, don't write anything
         if self.__app_key_info is None:
@@ -212,12 +207,11 @@ class SynapticMatrixApp(object):
         """
         Reserve space in the master pop table for a delayed matrix.
 
-        :param int block_addr:
+        :param block_addr:
             The address in the synaptic matrix region to start writing at
-        :param MasterPopTableAsBinarySearch pop_table:
+        :param pop_table:
             The master population table
         :return: The updated block address
-        :rtype: int
         """
         # If there is no routing info, don't write anything
         if self.__delay_app_key_info is None:
@@ -250,11 +244,9 @@ class SynapticMatrixApp(object):
         """
         Get the next address after a block, checking it is in range.
 
-        :param int block_addr: The address of the start of the block
-        :param int size: The size of the block in bytes
-        :param int max_addr: The maximum allowed address
+        :param block_addr: The address of the start of the block
+        :param size: The size of the block in bytes
         :return: The updated address
-        :rtype: int
         :raises ValueError: If the updated address is out of range
         """
         next_addr = block_addr + size
@@ -271,12 +263,11 @@ class SynapticMatrixApp(object):
         """
         Append a synaptic matrix from be written from host.
 
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param post_vertex_slice:
             The slice of the post-vertex the matrix is for
-        :param list data_to_write: List to append the data to write to
-        :param int block_addr: The amount of data written so far
+        :param data_to_write: List to append the data to write to
+        :param block_addr: The amount of data written so far
         :return: The amount of data written after this data has been written
-        :rtype: int
         """
         row_data, delay_row_data = self.__get_row_data(post_vertex_slice)
         self.__update_connection_holders(
@@ -312,7 +303,6 @@ class SynapticMatrixApp(object):
         Generate the row data for a synaptic matrix from the description.
 
         :return: The data and the delayed data
-        :rtype: tuple(~numpy.ndarray or None, ~numpy.ndarray or None)
         """
         # Get the actual connections
         post_slices =\
@@ -351,10 +341,8 @@ class SynapticMatrixApp(object):
         """
         Fill in connections in the connection holders as they are created.
 
-        :param ~numpy.ndarray data: The row data created
-        :param ~numpy.ndarray delayed_data: The delayed row data created
-        :param ~pacman.model.graphs.machine.MachineVertex m_vertex:
-            The machine edge the connections are for
+        :param data: The row data created
+        :param delayed_data: The delayed row data created
         """
         post_splitter = self.__app_edge.post_vertex.splitter
         post_vertex_max_delay_ticks = post_splitter.max_support_delay()
@@ -371,7 +359,6 @@ class SynapticMatrixApp(object):
         Prepare to write a matrix using an on-chip generator.
 
         :return: The data to generate with
-        :rtype: GeneratorData
         """
         max_pre_atoms_per_core = min(
             self.__app_edge.pre_vertex.n_atoms,
@@ -385,7 +372,7 @@ class SynapticMatrixApp(object):
         """
         Read any pre-run connection holders after data has been generated.
 
-        :param ~pacman.model.placements.Placement placement:
+        :param placement:
             Where the matrix is on the machine
         """
         if self.__synapse_info.pre_run_connection_holders:
@@ -399,11 +386,10 @@ class SynapticMatrixApp(object):
         """
         Read connections from an address on the machine.
 
-        :param ~pacman.model.placements.Placement placement:
+        :param placement:
             Where the matrix is on the machine
         :return: A list of arrays of connections, each with dtype
             :py:const:`~.NUMPY_CONNECTORS_DTYPE`
-        :rtype: list(~numpy.ndarray)
         """
         connections = list()
 
@@ -454,11 +440,10 @@ class SynapticMatrixApp(object):
         """
         Get a block of data for undelayed synapses.
 
-        :param Placement placement: Where the matrix is on the machine
-        :param int synapses_address:
+        :param placement: Where the matrix is on the machine
+        :param synapses_address:
             The base address of the synaptic matrix region
         :return: The raw data from the synaptic matrix
-        :rtype: bytes
         """
         assert self.__syn_mat_offset is not None
         address = self.__syn_mat_offset + synapses_address
@@ -470,12 +455,11 @@ class SynapticMatrixApp(object):
         """
         Get a block of data for delayed synapses.
 
-        :param ~pacman.model.placements.Placement placement:
+        :param placement:
             Where the matrix is on the machine
-        :param int synapses_address:
+        :param synapses_address:
             The base address of the synaptic matrix region
         :return: The raw data from the delayed synaptic matrix
-        :rtype: bytes
         """
         assert self.__delay_syn_mat_offset is not None
         address = self.__delay_syn_mat_offset + synapses_address
@@ -485,10 +469,6 @@ class SynapticMatrixApp(object):
     def get_index(self) -> int:
         """
         Get the index in the master population table of the matrix.
-
-        :param ~pacman.model.graphs.machine.MachineVertex m_vertex:
-            The source machine vertex
-        :rtype: int
         """
         if self.__index is None:
             raise RuntimeError("master pop table space not yet reserved")
@@ -501,9 +481,9 @@ class SynapticMatrixApp(object):
         Get the data regions that should be downloaded when the simulation
         pauses.
 
-        :param ~pacman.model.placements.Placement placement:
+        :param placement:
             The placement of the vertex
-        :param int start_index:
+        :param start_index:
             The index to use for the first region to download
 
         :return: A list of tuples of (index, address, size) to download

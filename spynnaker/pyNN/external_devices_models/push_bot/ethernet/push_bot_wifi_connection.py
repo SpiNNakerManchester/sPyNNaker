@@ -37,8 +37,8 @@ def get_pushbot_wifi_connection(
     """
     Get an existing connection to a PushBot, or make a new one.
 
-    :param str remote_host: The IP address of the PushBot
-    :param int remote_port: The port number of the PushBot (default 56000)
+    :param remote_host: The IP address of the PushBot
+    :param remote_port: The port number of the PushBot (default 56000)
     """
     key = (remote_host, remote_port)
     if key not in _existing_connections:
@@ -62,8 +62,8 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     def __init__(self, remote_host: str, remote_port: int = 56000):
         """
-        :param str remote_host: The IP address of the PushBot
-        :param int remote_port: The port number of the PushBot (default 56000)
+        :param remote_host: The IP address of the PushBot
+        :param remote_port: The port number of the PushBot (default 56000)
         :raise ~spinnman.exceptions.SpinnmanIOException:
             If there is an error setting up the communication channel
         """
@@ -106,8 +106,6 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         The local IP address to which the connection is bound,
         as a dotted string, e.g. `0.0.0.0`.
-
-        :rtype: str
         """
         return self.__local_ip_address
 
@@ -115,8 +113,6 @@ class PushBotWIFIConnection(Connection, Listenable):
     def local_port(self) -> int:
         """
         The local port to which the connection is bound.
-
-        :rtype: int
         """
         return self.__local_port
 
@@ -125,8 +121,6 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         The remote IP address to which the connection is connected,
         as a dotted string, or `None` if not connected remotely.
-
-        :rtype: str or None
         """
         return self.__remote_ip_address
 
@@ -144,9 +138,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         Receive data from the connection
 
         :param timeout: The timeout, or `None` to wait forever
-        :type timeout: float or None
         :return: The data received
-        :rtype: bytes
         :raise SpinnmanTimeoutException:
             If a timeout occurs before any data is received
         :raise ~spinnman.exceptions.SpinnmanIOException:
@@ -158,7 +150,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         Send data down this connection
 
-        :param bytearray data: The data to be sent
+        :param data: The data to be sent
         :raise ~spinnman.exceptions.SpinnmanIOException:
             If there is an error sending the data
         """

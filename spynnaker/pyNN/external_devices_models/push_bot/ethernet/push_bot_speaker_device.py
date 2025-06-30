@@ -42,14 +42,13 @@ class PushBotEthernetSpeakerDevice(
             start_melody: Optional[int] = None,
             timesteps_between_send: Optional[int] = None):
         """
-        :param PushBotSpeaker speaker: The speaker to control
-        :param MunichIoSpiNNakerLinkProtocol protocol:
-            The protocol instance to get commands from
-        :param int start_active_time: The "active time" to set at the start
-        :param int start_total_period: The "total period" to set at the start
+        :param speaker: The speaker to control
+        :param protocol: The protocol instance to get commands from
+        :param start_active_time: The "active time" to set at the start
+        :param start_total_period: The "total period" to set at the start
         :param start_frequency: The "frequency" to set at the start
-        :param int start_melody: The "melody" to set at the start
-        :param int timesteps_between_send:
+        :param start_melody: The "melody" to set at the start
+        :param timesteps_between_send:
             The number of timesteps between sending commands to the device,
             or `None` to use the default
         """

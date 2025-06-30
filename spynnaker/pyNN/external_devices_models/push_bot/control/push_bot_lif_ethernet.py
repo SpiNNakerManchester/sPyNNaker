@@ -30,23 +30,21 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
     Leaky integrate and fire neuron with an exponentially decaying
     current input.
 
-    :param MunichIoSpiNNakerLinkProtocol protocol:
-        How to talk to the bot.
-    :param iterable(AbstractMulticastControllableDevice) devices:
-        The devices on the bot that we are interested in.
-    :param str pushbot_ip_address: Where is the pushbot?
-    :param int pushbot_port: (defaulted)
-    :param float tau_m: LIF neuron parameter (defaulted)
-    :param float cm: LIF neuron parameter (defaulted)
-    :param float v_rest: LIF neuron parameter (defaulted)
-    :param float v_reset: LIF neuron parameter (defaulted)
-    :param float tau_syn_E: LIF neuron parameter (defaulted)
-    :param float tau_syn_I: LIF neuron parameter (defaulted)
-    :param float tau_refrac: LIF neuron parameter (defaulted)
-    :param float i_offset: LIF neuron parameter (defaulted)
-    :param float v: LIF neuron parameter (defaulted)
-    :param float isyn_exc: LIF neuron parameter (defaulted)
-    :param float isyn_inh: LIF neuron parameter (defaulted)
+    :param protocol: How to talk to the bot.
+    :param devices: The devices on the bot that we are interested in.
+    :param pushbot_ip_address: Where is the pushbot?
+    :param pushbot_port: (defaulted)
+    :param tau_m: LIF neuron parameter (defaulted)
+    :param cm: LIF neuron parameter (defaulted)
+    :param v_rest: LIF neuron parameter (defaulted)
+    :param v_reset: LIF neuron parameter (defaulted)
+    :param tau_syn_E: LIF neuron parameter (defaulted)
+    :param tau_syn_I: LIF neuron parameter (defaulted)
+    :param tau_refrac: LIF neuron parameter (defaulted)
+    :param i_offset: LIF neuron parameter (defaulted)
+    :param v: LIF neuron parameter (defaulted)
+    :param isyn_exc: LIF neuron parameter (defaulted)
+    :param isyn_inh: LIF neuron parameter (defaulted)
     """
     __slots__ = ()
 

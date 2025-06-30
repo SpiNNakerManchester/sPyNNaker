@@ -36,15 +36,13 @@ class PushBotSpiNNakerLinkMotorDevice(
             spinnaker_link_id: int,  n_neurons: int = 1,
             label: Optional[str] = None,  board_address: Optional[str] = None):
         """
-        :param PushBotMotor motor: the motor to control
-        :param MunichIoSpiNNakerLinkProtocol protocol:
-            The protocol used to control the device
-        :param int spinnaker_link_id: The SpiNNakerLink connected to
-        :param int n_neurons: The number of neurons in the device
+        :param motor: the motor to control
+        :param protocol: The protocol used to control the device
+        :param spinnaker_link_id: The SpiNNakerLink connected to
+        :param n_neurons: The number of neurons in the device
         :param label: The label of the device
         :param board_address:
             The IP address of the board that the device is connected to
-        :type board_address: str or None
         """
         super().__init__(motor, protocol)
         ApplicationSpiNNakerLinkVertex.__init__(

@@ -47,14 +47,8 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
                  v_thresh: ModelParameter):
         r"""
         :param du_th: :math:`du_{thresh}`
-        :type du_th: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_th: :math:`\tau_{thresh}`
-        :type tau_th: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param v_thresh: :math:`V_{thresh}`
-        :type v_thresh: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([

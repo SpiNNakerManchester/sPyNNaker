@@ -56,12 +56,10 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
             label: str = "DelayExtension"):
         """
         :param partition: The partition that this delay is supporting
-        :type partition:
-            ~pacman.model.graphs.application.ApplicationEdgePartition
-        :param int delay_per_stage: the delay per stage
-        :param int n_delay_stages: the (initial) number of delay stages needed
-        :param int n_colour_bits: the number of bits for event colouring
-        :param str label: the vertex label
+        :param delay_per_stage: the delay per stage
+        :param n_delay_stages: the (initial) number of delay stages needed
+        :param n_colour_bits: the number of bits for event colouring
+        :param label: the vertex label
         """
         super().__init__(
             label, POP_TABLE_MAX_ROW_LENGTH, splitter=None)
@@ -81,8 +79,6 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
     def n_atoms(self) -> int:
         """
         The number of atoms in this vertex.
-
-        :rtype: int
         """
         return self.__partition.pre_vertex.n_atoms
 
@@ -110,8 +106,7 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
         """
         Get the max ticks the combination of delay and post vertex can handle.
 
-        :param int delay_ticks_at_post_vertex:
-        :rtype: int
+        :param delay_ticks_at_post_vertex:
         """
         return DelayExtensionVertex.MAX_SLOTS * delay_ticks_at_post_vertex
 
@@ -125,8 +120,8 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
         """
         Sets the delays per stages. Verifies delay per stage is unchanged.
 
-        :param int n_delay_stages:
-        :param int delay_per_stage:
+        :param n_delay_stages:
+        :param delay_per_stage:
         """
         if delay_per_stage != self.__delay_per_stage:
             raise DelayExtensionException(
@@ -149,8 +144,6 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
     def source_vertex(self) -> ApplicationVertex:
         """
         The pre vertex of the delayed partition.
-
-        :rtype:  ApplicationVertex
         """
         return self.__partition.pre_vertex
 
@@ -171,7 +164,7 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
         """
         Add an outgoing edge to the delay extension.
 
-        :param DelayedApplicationEdge edge: The edge to add
+        :param edge: The edge to add
         """
         self.__outgoing_edges.append(edge)
 

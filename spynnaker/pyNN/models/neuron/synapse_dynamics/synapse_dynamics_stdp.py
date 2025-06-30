@@ -102,16 +102,14 @@ class SynapseDynamicsSTDP(
             delay: _In_Types = None, pad_to_length: Optional[int] = None,
             backprop_delay: bool = True):
         """
-        :param AbstractTimingDependence timing_dependence:
-        :param AbstractWeightDependence weight_dependence:
-        :param None voltage_dependence: not supported
-        :param float dendritic_delay_fraction: must be 1.0!
-        :param float weight:
+        :param timing_dependence:
+        :param weight_dependence:
+        :param voltage_dependence: not supported
+        :param dendritic_delay_fraction: must be 1.0!
+        :param weight:
         :param delay: Use ``None`` to get the simulator default minimum delay.
-        :type delay: float or None
         :param pad_to_length:
-        :type pad_to_length: int or None
-        :param bool backprop_delay:
+        :param backprop_delay:
         """
         if timing_dependence is None or weight_dependence is None:
             raise NotImplementedError(
@@ -223,7 +221,7 @@ class SynapseDynamicsSTDP(
     @property
     def timing_dependence(self) -> AbstractTimingDependence:
         """
-        :rtype: AbstractTimingDependence
+        timing dependence to use for the STDP rule
         """
         return self.__timing_dependence
 
@@ -231,8 +229,6 @@ class SynapseDynamicsSTDP(
     def dendritic_delay_fraction(self) -> float:
         """
         Settable.
-
-        :rtype: float
         """
         return self.__dendritic_delay_fraction
 
@@ -244,8 +240,6 @@ class SynapseDynamicsSTDP(
     def backprop_delay(self) -> bool:
         """
         Settable.
-
-        :rtype: bool
         """
         return self.__backprop_delay
 
@@ -256,7 +250,7 @@ class SynapseDynamicsSTDP(
     @property
     def neuromodulation(self) -> Optional[SynapseDynamicsNeuromodulation]:
         """
-        :rtype: SynapseDynamicsNeuromodulation
+        Synapses that target a neuromodulation receptor.
         """
         return self.__neuromodulation
 
@@ -274,7 +268,7 @@ class SynapseDynamicsSTDP(
 
     def get_vertex_executable_suffix(self) -> str:
         """
-        :rtype: str
+        an executable suffix based on timing, weights and neuromodulation
         """
         # Get the suffix values for timing and weight dependence
         timing_suffix = self.__timing_dependence.vertex_executable_suffix
@@ -292,9 +286,8 @@ class SynapseDynamicsSTDP(
     def get_parameters_sdram_usage_in_bytes(
             self, n_neurons: int, n_synapse_types: int) -> int:
         """
-        :param int n_neurons:
-        :param int n_synapse_types:
-        :rtype: int
+        :param n_neurons:
+        :param n_synapse_types:
         """
         # 32-bits for back-prop delay
         size = BYTES_PER_WORD
@@ -334,9 +327,6 @@ class SynapseDynamicsSTDP(
 
     @property
     def _n_header_bytes(self) -> int:
-        """
-        :rtype: int
-        """
         # The header contains a single timestamp and pre-trace
         n_bytes = (
             TIME_STAMP_BYTES + self.__timing_dependence.pre_trace_n_bytes)
@@ -347,11 +337,6 @@ class SynapseDynamicsSTDP(
 
     def __get_n_connections(
             self, n_connections: int, check_length_padded: bool = True) -> int:
-        """
-        :param int n_connections:
-        :param bool check_length_padded:
-        :rtype: int
-        """
         synapse_structure = self.__timing_dependence.synaptic_structure
         if self.__pad_to_length is not None and check_length_padded:
             n_connections = max(n_connections, self.__pad_to_length)
@@ -376,8 +361,7 @@ class SynapseDynamicsSTDP(
                get_n_words_for_plastic_connections)
     def get_n_words_for_plastic_connections(self, n_connections: int) -> int:
         """
-        :param int n_connections:
-        :rtype: int
+        :param n_connections:
         """
         return self.__get_n_connections(n_connections)
 
@@ -451,11 +435,6 @@ class SynapseDynamicsSTDP(
 
     def _pad_row(self, rows: List[NDArray],
                  no_bytes_per_connection: int) -> List[NDArray]:
-        """
-        :param list(~numpy.ndarray) rows:
-        :param int no_bytes_per_connection:
-        :rtype: list(~numpy.ndarray)
-        """
         pad_len = self.__pad_to_length or 1
         # Row elements are (individual) bytes
         return [

@@ -88,23 +88,18 @@ class Population(PopulationBase):
             additional_parameters: Optional[_ParamDict] = None,
             **additional_kwargs: _ParamDict):
         """
-        :param int size: The number of neurons in the population
+        :param size: The number of neurons in the population
         :param cellclass: The implementation of the individual neurons.
-        :type cellclass: type or AbstractPyNNModel
         :param cellparams: Parameters to pass to ``cellclass`` if it
             is a class to instantiate. Must be ``None`` if ``cellclass`` is an
             instantiated object.
-        :type cellparams: dict(str,object) or None
-        :param ~pyNN.space.BaseStructure structure:
-        :param dict(str,float) initial_values:
-            Initial values of state variables
-        :param str label: A label for the population
+        :param structure:
+        :param initial_values: Initial values of state variables
+        :param label: A label for the population
         :param additional_parameters:
             Additional parameters to pass to the vertex creation function.
-        :type additional_parameters: dict(str, ...)
         :param additional_kwargs:
             A nicer way of allowing additional things
-        :type additional_kwargs: dict(str, ...)
         """
         # Deal with the kwargs!
         additional: _ParamDict = dict()
@@ -171,8 +166,6 @@ class Population(PopulationBase):
     def annotations(self) -> Dict[str, Any]:
         """
         The annotations given by the end user.
-
-        :rtype: dict(str, ...)
         """
         return self.__annotations
 
@@ -184,7 +177,6 @@ class Population(PopulationBase):
         :return:
             The cell type this property has been set to, or the vertex if it
             was directly instantiated.
-        :rtype: AbstractPyNNModel
         """
         return self.__celltype
 
@@ -192,8 +184,7 @@ class Population(PopulationBase):
         """
         Determine whether `variable` can be recorded from this population.
 
-        :param str variable: The variable to answer the question about
-        :rtype: bool
+        :param variable: The variable to answer the question about
         """
         return variable in self.__vertex.get_recordable_variables()
 
@@ -208,10 +199,8 @@ class Population(PopulationBase):
         Randomly sample `n` cells from the Population, and return a
         PopulationView object.
 
-        :param int n: The number of cells to put in the view.
+        :param n: The number of cells to put in the view.
         :param rng: The random number generator to use
-        :type rng: ~pyNN.random.NumpyRNG
-        :rtype: ~spynnaker.pyNN.models.populations.PopulationView
         """
         if not rng:
             rng = NumpyRNG()
@@ -253,10 +242,8 @@ class Population(PopulationBase):
         If ``template`` is ``None``, then a dictionary containing the template
         context will be returned.
 
-        :param str template: Template filename
+        :param template: Template filename
         :param engine: Template substitution engine
-        :type engine: str or ~pyNN.descriptions.TemplateEngine or None
-        :rtype: str or dict
         """
         context: Dict[str, Any] = {
             "label": self.label,
@@ -307,19 +294,16 @@ class Population(PopulationBase):
         :param variables: either a single variable name or a list of variable
             names. Variables must have been previously recorded, otherwise an
             Exception will be raised.
-        :type variables: str or list(str)
-        :param bool gather: Whether to collect data from all MPI nodes or
+        :param gather: Whether to collect data from all MPI nodes or
             just the current node.
 
             .. note::
                 This is irrelevant on sPyNNaker, which always behaves as if
                 this parameter is True.
 
-        :param bool clear:
+        :param clear:
             Whether recorded data will be deleted from the ``Assembly``.
         :param annotations: annotations to put on the neo block
-        :type annotations: dict(str, ...)
-        :rtype: ~neo.core.Block
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the variable or variables have not been previously set to
@@ -336,13 +320,11 @@ class Population(PopulationBase):
         SsPyNNaker specific method for getting data as a numpy array,
         instead of the Neo-based object
 
-        :param str variable: a single variable name.
-        :type variable: str or list(str)
-        :param bool as_matrix: If set True the data is returned as a 2d matrix
+        :param variable: a single variable name.
+        :param as_matrix: If set True the data is returned as a 2d matrix
         :param view_indexes: The indexes for which data should be returned.
             If ``None``, all data (view_index = data_indexes)
         :return: array of the data
-        :rtype: ~numpy.ndarray
         """
         warn_once(
             logger, "spinnaker_get_data is non-standard PyNN and therefore "
@@ -355,8 +337,6 @@ class Population(PopulationBase):
     def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
         """
         Return the number of spikes for each neuron.
-
-        :rtype: ~numpy.ndarray
         """
         self._check_params(gather)
         with NeoBufferDatabase() as db:
@@ -366,9 +346,8 @@ class Population(PopulationBase):
         """
         Get the units of a variable.
 
-        :param str variable: The name of the variable
+        :param variable: The name of the variable
         :return: The units of the variable
-        :rtype: str
         """
         return self.__vertex.get_units(variable)
 
@@ -430,8 +409,6 @@ class Population(PopulationBase):
             These values will be the same as the values set with the last call
             to initialize rather than the actual initial values if this call
             has been made.
-
-        :rtype: ParameterHolder
         """
         SpynnakerDataView.check_user_can_act()
         return self.__vertex.get_initial_state_values(
@@ -469,8 +446,6 @@ class Population(PopulationBase):
     def current_values(self) -> ParameterHolder:
         """
         Get the current values of the state variables.
-
-        :rtype: ParameterHolder
         """
         SpynnakerDataView.check_user_can_act()
         warn_once(
@@ -500,9 +475,6 @@ class Population(PopulationBase):
     @property
     @overrides(PopulationBase.all_cells)
     def all_cells(self) -> List[IDMixin]:
-        """
-        :rtype: list(IDMixin)
-        """
         return [IDMixin(self, _id) for _id in range(self.__size)]
 
     @property
@@ -514,8 +486,6 @@ class Population(PopulationBase):
     def first_id(self) -> int:
         """
         The ID of the first member of the population.
-
-        :rtype: int
         """
         return self.__first_id
 
@@ -523,8 +493,6 @@ class Population(PopulationBase):
     def last_id(self) -> int:
         """
         The ID of the last member of the population.
-
-        :rtype: int
         """
         return self.__last_id
 
@@ -535,9 +503,6 @@ class Population(PopulationBase):
 
     @property
     def _recorder(self) -> Recorder:
-        """
-        :rtype: Recorder
-        """
         return self.__recorder
 
     @property
@@ -549,8 +514,6 @@ class Population(PopulationBase):
     def conductance_based(self) -> bool:
         """
         Whether the population uses conductance inputs
-
-        :rtype: bool
         """
         return self.__vertex.conductance_based
 
@@ -561,13 +524,11 @@ class Population(PopulationBase):
 
         :param parameter_names: Name of parameter. This is either a single
             string or a list of strings
-        :type parameter_names: str or iterable(str)
-        :param bool gather: pointless on sPyNNaker
-        :param bool simplify: ignored
+        :param gather: pointless on sPyNNaker
+        :param simplify: ignored
         :return: A single list of values (or possibly a single value) if
             paramter_names is a string, or a dict of these if parameter names
             is a list.
-        :rtype: ParameterHolder
         """
         self._check_params(gather)
         if simplify is not True:
@@ -595,8 +556,6 @@ class Population(PopulationBase):
         https://neuralensemble.org/docs/PyNN/reference/populations.html
 
         :param id:
-        :type id: int or iterable(int)
-        :rtype: int or iterable(int)
         """
         # pylint: disable=redefined-builtin
         if not numpy.iterable(id):
@@ -623,8 +582,6 @@ class Population(PopulationBase):
         Population, return their ID(s)
 
         :param index:
-        :type index: int or iterable(int)
-        :rtype: int or iterable(int)
         """
         if not numpy.iterable(index):
             index = cast(int, index)
@@ -646,8 +603,6 @@ class Population(PopulationBase):
         https://neuralensemble.org/docs/PyNN/reference/populations.html
 
         :param cell_id:
-        :type cell_id: int or iterable(int)
-        :rtype: int or iterable(int)
         """
         raise NotImplementedError(
             "sPyNNaker does not currently do id_to_local_index")
@@ -673,8 +628,6 @@ class Population(PopulationBase):
     def label(self) -> str:
         """
         The label of the population.
-
-        :rtype: str
         """
         return self.__vertex.label or ""  # Should never be empty
 
@@ -688,8 +641,6 @@ class Population(PopulationBase):
     def structure(self) -> Optional[BaseStructure]:
         """
         The structure for the population.
-
-        :rtype: ~pyNN.space.BaseStructure or None
         """
         return self.__structure
 
@@ -699,9 +650,9 @@ class Population(PopulationBase):
         """
         Add a placement constraint.
 
-        :param int x: The x-coordinate of the placement constraint
-        :param int y: The y-coordinate of the placement constraint
-        :param int p: The processor ID of the placement constraint (optional)
+        :param x: The x-coordinate of the placement constraint
+        :param y: The y-coordinate of the placement constraint
+        :param p: The processor ID of the placement constraint (optional)
         :raises SimulatorRunningException: If `sim.run` is currently running
         :raises SimulatorNotSetupException: If called before `sim.setup`
         :raises SimulatorShutdownException: If called after `sim.end`
@@ -735,8 +686,6 @@ class Population(PopulationBase):
     def size(self) -> int:
         """
         The number of neurons in the population.
-
-        :rtype: int
         """
         return self.__vertex.n_atoms
 
@@ -746,12 +695,9 @@ class Population(PopulationBase):
             cell_params: Optional[_ParamDict]) -> _CellType:
         """
         :param cell_class: The implementation of the individual neurons.
-        :type cell_class: type or AbstractPyNNModel or ApplicationVertex
         :param cell_params: Parameters to pass to ``cell_class`` if it
             is a class to instantiate. Must be ``None`` if ``cell_class`` is an
             instantiated object.
-        :type cell_params: dict(str,object) or None
-        :rtype: ApplicationVertex or AbstractPyNNModel
         """
         if inspect.isclass(cell_class):
             if cell_params is None:
@@ -814,13 +760,10 @@ class Population(PopulationBase):
             additional_parameters: _ParamDict) -> None:
         """
         :param model: The implementation of the individual neurons.
-        :type model: ApplicationVertex or AbstractPyNNModel
-        :param int size:
+        :param size:
         :param label:
-        :type label: str or None
         :param additional_parameters:
             Additional parameters to pass to the vertex creation function.
-        :type additional_parameters: dict(str, ...)
         """
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):
@@ -847,12 +790,9 @@ class Population(PopulationBase):
         Create ``n`` cells all of the same type.
 
         :param cellclass: see :py:meth:`~.Population.__init__`
-        :type cellclass: type or AbstractPyNNModel
         :param cellparams: see :py:meth:`~.Population.__init__`
-        :type cellparams: dict(str, object) or None
-        :param int n: see :py:meth:`~.Population.__init__` (``size`` parameter)
+        :param n: see :py:meth:`~.Population.__init__` (``size`` parameter)
         :return: A New Population
-        :rtype: ~spynnaker.pyNN.models.populations.Population
         """
         return Population(size=n, cellclass=cellclass, cellparams=cellparams)
 
@@ -912,7 +852,6 @@ class _VertexHolder(AbstractPyNNModel):
     def vertex(self) -> PopulationApplicationVertex:
         """
         The vertex passed into the init.
-        :return:
         """
         return self.__vertex
 

@@ -98,7 +98,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
 
     def __init__(self, model: AbstractNeuronImpl):
         """
-        :param AbstractNeuronImpl model: The model implementation
+        :param model: The model implementation
         """
         self.__model = model
 
@@ -121,14 +121,13 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             n_synapse_cores: Optional[int] = None,
             allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
         """
-        :param float spikes_per_second:
-        :param float ring_buffer_sigma:
-        :param int incoming_spike_buffer_size:
-        :param bool drop_late_spikes:
+        :param spikes_per_second:
+        :param ring_buffer_sigma:
+        :param incoming_spike_buffer_size:
+        :param drop_late_spikes:
         :param splitter:
-        :type splitter: SplitterPopulationVertex or None
-        :param int seed:
-        :param int n_colour_bits:
+        :param seed:
+        :param n_colour_bits:
         """
         if neurons_per_core is None:
             neurons_per_core = \

@@ -49,14 +49,11 @@ class SpynnakerExternalDevicePluginManager(object):
         """
         :param database_notify_host:
             Host to talk to tell that the database (and application) is ready.
-        :type database_notify_host: str or None
         :param database_notify_port_num:
             Port to talk to tell that the database (and application) is ready.
-        :type database_notify_port_num: int or None
         :param database_ack_port_num:
             Port on which to listen for an acknowledgement that the
             simulation should start.
-        :type database_ack_port_num: int or None
         """
         # build the database socket address used by the notification interface
         database_socket = SocketAddress(
@@ -88,56 +85,52 @@ class SpynnakerExternalDevicePluginManager(object):
         Output the spikes from a given population from SpiNNaker as they
         occur in the simulation.
 
-        :param ~spynnaker.pyNN.models.populations.Population population:
-            The population to activate the live output for
-        :param str database_notify_host:
+        :param population: The population to activate the live output for
+        :param database_notify_host:
             The hostname for the device which is listening to the database
             notification.
-        :param int database_ack_port_num:
+        :param database_ack_port_num:
             The port number to which a external device will acknowledge that
             they have finished reading the database and are ready for it to
             start execution
-        :param int database_notify_port_num:
+        :param database_notify_port_num:
             The port number to which a external device will receive the
             database is ready command
         :param key_prefix: the prefix to be applied to the key
-        :type key_prefix: int or None
-        :param ~spinnman.messages.eieio.EIEIOPrefix prefix_type:
+        :param prefix_type:
             if the prefix type is 32 bit or 16 bit
-        :param ~spinnman.messages.eieio.EIEIOType message_type:
+        :param message_type:
             If the message is a EIEIO command message, or an EIEIO data
             message with 16 bit or 32 bit keys.
-        :param bool payload_as_time_stamps:
-        :param int right_shift:
-        :param bool use_payload_prefix:
-        :param bool notify:
+        :param payload_as_time_stamps:
+        :param right_shift:
+        :param use_payload_prefix:
+        :param notify:
         :param payload_prefix:
-        :type payload_prefix: int or None
-        :param int payload_right_shift:
-        :param int number_of_packets_sent_per_time_step:
-        :param int port:
+        :param payload_right_shift:
+        :param number_of_packets_sent_per_time_step:
+        :param port:
             The UDP port to which the live spikes will be sent. If not
             specified, the port will be taken from the "live_spike_port"
             parameter in the "Recording" section of the sPyNNaker
             configuration file.
-        :param str host:
+        :param host:
             The host name or IP address to which the live spikes will be
             sent. If not specified, the host will be taken from the
             "live_spike_host" parameter in the "Recording" section of the
             sPyNNaker configuration file.
-        :param int tag:
+        :param tag:
             The IP tag to be used for the spikes. If not specified, one will
             be automatically assigned
-        :param bool strip_sdp:
+        :param strip_sdp:
             Determines if the SDP headers will be stripped from the
             transmitted packet.
-        :param bool use_prefix:
+        :param use_prefix:
             Determines if the spike packet will contain a common prefix for
             the spikes
-        :param str label: The label of the gatherer vertex
-        :param list(str) partition_ids:
+        :param partition_ids:
             The names of the partitions to create edges for
-        :param bool translate_keys:
+        :param translate_keys:
             Whether the incoming keys from the cores should be translated
             to global keys rather than core-based keys
         """
@@ -190,15 +183,12 @@ class SpynnakerExternalDevicePluginManager(object):
         .. note::
             All spikes will be sent to the device.
 
-        :param ~spynnaker.pyNN.models.populations.Population population:
+        :param population:
             The pyNN population object from which spikes will be sent.
         :param device:
             The pyNN population or external device to which the spikes will be
             sent.
-        :type device:
-            ~spynnaker.pyNN.models.populations.Population or
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param str partition_id:
+        :param partition_id:
             The partition ID to activate live output to.
         """
         # pylint: disable=protected-access
@@ -220,14 +210,8 @@ class SpynnakerExternalDevicePluginManager(object):
         packet gatherer if needed.
 
         :param vertex_to_record_from:
-        :type vertex_to_record_from:
-            ~pacman.model.graphs.application.ApplicationVertex or
-            ~pacman.model.graphs.machine.MachineVertex
         :param params:
-        :type params:
-             ~spinn_front_end_common.utilities.utility_objs.LivePacketGatherParameters
-        :param list(str) partition_ids:
-        :param bool translate_keys:
+        :param partition_ids:
         """
         # add to the tracker
         SpynnakerDataView.add_live_packet_gatherer_parameters(
@@ -246,22 +230,20 @@ class SpynnakerExternalDevicePluginManager(object):
         Add a live rate controller to a Poisson population.
 
         :param poisson_population: The population to control
-        :type poisson_population:
-            ~spynnaker.pyNN.models.populations.Population
-        :param str control_label_extension:
+        :param control_label_extension:
             An extension to add to the label of the Poisson source. Must match
             up with the equivalent in the SpynnakerPoissonControlConnection
-        :param int receive_port:
+        :param receive_port:
             The port that the SpiNNaker board should listen on
-        :param str database_notify_host: the hostname for the device which is
+        :param database_notify_host: the hostname for the device which is
             listening to the database notification.
-        :param int database_ack_port_num: the port number to which a external
+        :param database_ack_port_num: the port number to which a external
             device will acknowledge that they have finished reading the
             database and are ready for it to start execution
-        :param int database_notify_port_num: The port number to which an
+        :param database_notify_port_num: The port number to which an
             external device will receive the database is ready command
-        :param bool notify: adds to the notification protocol if set.
-        :param bool reserve_reverse_ip_tag: True if a reverse IP tag is to be
+        :param notify: adds to the notification protocol if set.
+        :param reserve_reverse_ip_tag: True if a reverse IP tag is to be
             used, False if SDP is to be used (default)
         """
         # pylint: disable=protected-access
@@ -289,13 +271,11 @@ class SpynnakerExternalDevicePluginManager(object):
         Add an edge between two vertices (often a vertex and a external
         device) on a given partition.
 
-        :param ~pacman.model.graphs.application.ApplicationVertex vertex:
+        :param vertex:
             the pre-population vertex to connect the edge from
         :param device_vertex:
             the post-population vertex to connect the edge to
-        :type device_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param str partition_id: the partition identifier for making nets
+        :param partition_id: the partition identifier for making nets
         """
         edge = ApplicationEdge(vertex, device_vertex)
         SpynnakerDataView.add_edge(edge, partition_id)
@@ -308,6 +288,6 @@ class SpynnakerExternalDevicePluginManager(object):
 
         Semantic sugar for SpynnakerDataView.add_vertex(vertex)
 
-        :param ApplicationVertex vertex:
+        :param vertex:
         """
         SpynnakerDataView.add_vertex(vertex)

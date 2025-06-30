@@ -35,8 +35,6 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
     def send_over_sdram(self) -> bool:
         """
         Whether this vertex is to be sent using SDRAM.
-
-        :rtype: bool
         """
         # If there is only one outgoing projection, and it is one-to-one
         # connected to the target, and the target knows what to do, leave

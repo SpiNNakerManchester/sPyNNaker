@@ -49,16 +49,15 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             An explicit Boolean matrix that specifies the connections
             between the pre- and post-populations
             (see PyNN documentation). Must be 2D in practice.
-        :type array: ~numpy.ndarray(2, ~numpy.uint8)
-        :param bool safe:
+        :param safe:
             Whether to check that weights and delays have valid values.
             If False, this check is skipped.
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
                 Not supported by sPyNNaker.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
         """

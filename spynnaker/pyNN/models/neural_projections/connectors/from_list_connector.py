@@ -98,18 +98,16 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             ``p1``, ``p2``, etc. are the synaptic parameters (e.g.,
             weight, delay, plasticity parameters).
             All tuples/rows must have the same number of items.
-        :type conn_list: ~numpy.ndarray or list(tuple(int,int,...))
-        :param bool safe:
+        :param safe:
             if ``True``, check that weights and delays have valid values.
             If ``False``, this check is skipped.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
         :param column_names: the names of the parameters ``p1``, ``p2``, etc.
             If not provided, it is assumed the parameters are ``weight, delay``
             (for backwards compatibility).
-        :type column_names: None or tuple(str) or list(str)
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
@@ -179,9 +177,6 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             Tuple[NDArray[integer], NDArray[integer],
                   Optional[NDArray[floating]],
                   Optional[NDArray[floating]]]:
-        """
-        :param list(~pacman.model.graphs.common.Slice) post_slices:
-        """
         input_filter = numpy.logical_and(
             self.__targets < n_post_atoms, self.__sources < n_pre_atoms)
         targets = self.__targets[input_filter]
@@ -375,8 +370,6 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def conn_list(self) -> NDArray:
         """
         The connection list.
-
-        :rtype: ~numpy.ndarray
         """
         return self.__conn_list
 
@@ -475,8 +468,6 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         The names of the columns in the array after the first two.
         Of particular interest is whether ``weight`` and ``delay`` columns
         are present.
-
-        :rtype: list(str)
         """
         return self.__column_names
 
@@ -490,15 +481,12 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         ``delay`` columns.
 
         :return: The extra parameters
-        :rtype: ~numpy.ndarray
         """
         return self.__extra_params.data if self.__extra_params else None
 
     def get_extra_parameter_names(self) -> Optional[Sequence[str]]:
         """
         Get the names of the extra parameters.
-
-        :rtype: list(str)
         """
         return self.__extra_params.names if self.__extra_params else None
 
@@ -557,9 +545,6 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     def _apply_parameters_to_synapse_type(
             self, synapse_type: AbstractSynapseDynamics) -> None:
-        """
-        :param AbstractStaticSynapseDynamics synapse_type:
-        """
         if self.__extra_params:
             for i, name in enumerate(self.__extra_params.names):
                 synapse_type.set_value(name, self.__extra_params.data[:, i])

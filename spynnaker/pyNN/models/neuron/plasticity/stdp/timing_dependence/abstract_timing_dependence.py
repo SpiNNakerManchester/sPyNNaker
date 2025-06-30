@@ -41,8 +41,7 @@ class AbstractTimingDependence(
         """
         Determine if this timing dependence is the same as another.
 
-        :param AbstractTimingDependence timing_dependence:
-        :rtype: bool
+        :param timing_dependence:
         """
         raise NotImplementedError
 
@@ -51,8 +50,6 @@ class AbstractTimingDependence(
     def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
-
-        :rtype: str
         """
         raise NotImplementedError
 
@@ -61,8 +58,6 @@ class AbstractTimingDependence(
     def pre_trace_n_bytes(self) -> int:
         """
         The number of bytes used by the pre-trace of the rule per neuron.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -70,8 +65,6 @@ class AbstractTimingDependence(
     def get_parameters_sdram_usage_in_bytes(self) -> int:
         """
         Get the amount of SDRAM used by the parameters of this rule.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -80,8 +73,6 @@ class AbstractTimingDependence(
     def n_weight_terms(self) -> int:
         """
         The number of weight terms expected by this timing rule.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -92,10 +83,9 @@ class AbstractTimingDependence(
         """
         Write the parameters of the rule to the spec.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The specification to write to
-        :param float global_weight_scale: The weight scale applied globally
-        :param list(float) synapse_weight_scales:
+        :param spec: The specification to write to
+        :param global_weight_scale: The weight scale applied globally
+        :param synapse_weight_scales:
             The total weight scale applied to each synapse including the global
             weight scale
         """
@@ -105,8 +95,6 @@ class AbstractTimingDependence(
     def synaptic_structure(self) -> AbstractSynapseStructure:
         """
         The synaptic structure of the plastic part of the rows.
-
-        :rtype: AbstractSynapseStructure
         """
         return self.__synapse_structure
 
@@ -115,8 +103,6 @@ class AbstractTimingDependence(
     def A_plus(self) -> float:
         r"""
         :math:`A^+`
-
-        :rtype: float
         """
         # pylint: disable=invalid-name
         raise NotImplementedError
@@ -126,8 +112,6 @@ class AbstractTimingDependence(
     def A_minus(self) -> float:
         r"""
         :math:`A^-`
-
-        :rtype: float
         """
         # pylint: disable=invalid-name
         raise NotImplementedError

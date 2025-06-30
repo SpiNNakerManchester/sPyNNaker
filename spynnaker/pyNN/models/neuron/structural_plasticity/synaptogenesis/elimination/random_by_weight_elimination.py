@@ -33,14 +33,14 @@ class RandomByWeightElimination(AbstractElimination):
             self, threshold: float, prob_elim_depressed: float = 0.0245,
             prob_elim_potentiated: float = 1.36e-4):
         """
-        :param float threshold:
+        :param threshold:
             Below this weight is considered depression, above or equal to this
             weight is considered potentiation (or the static weight of the
             connection on static weight connections)
-        :param float prob_elim_depressed:
+        :param prob_elim_depressed:
             The probability of elimination if the weight has been depressed
             (ignored on static weight connections)
-        :param float prob_elim_potentiated:
+        :param prob_elim_potentiated:
             The probability of elimination of the weight has been potentiated
             or has not changed (and also used on static weight connections)
         """

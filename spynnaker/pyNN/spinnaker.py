@@ -77,22 +77,18 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :param time_scale_factor:
             multiplicative factor to the machine time step
             (does not affect the neuron models accuracy)
-        :type time_scale_factor: int or None
         :param min_delay:
         :param n_chips_required:
             Deprecated! Use n_boards_required instead.
             Must be `None` if n_boards_required specified.
-        :type n_chips_required: int or None
         :param n_boards_required:
             if you need to be allocated a machine (for spalloc) before
             building your graph, then fill this in with a general idea of
             the number of boards you need so that the spalloc system can
             allocate you a machine big enough for your needs.
-        :type n_boards_required: int or None
         :param timestep:
             the time step of the simulations in microseconds;
             if `None` the cfg value is used
-        :type timestep: float or None
         """
         # change min delay auto to be the min delay supported by simulator
         if min_delay == "auto":
@@ -139,8 +135,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         Clears the projections and Run the model created.
 
         :param run_time: the time (in milliseconds) to run the simulation for
-        :type run_time: float or int or None
-        :param float sync_time:
+        :param sync_time:
             If not 0, this specifies that the simulation should pause after
             this duration.  The continue_simulation() method must then be
             called for the simulation to continue.
@@ -191,7 +186,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         Used to bypass the dual level object.
 
         :return: the SpiNNaker object
-        :rtype: ~spynnaker.pyNN.SpiNNaker
         """
         return self
 
@@ -204,7 +198,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             Meaningless on SpiNNaker, so we pretend we're the head node.
 
         :return: Constant: 0
-        :rtype: int
         """
         return 0
 
@@ -225,7 +218,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             Meaningless on SpiNNaker, so we pretend there's one MPI process
 
         :return: Constant: 1
-        :rtype: int
         """
         return 1
 
@@ -243,7 +235,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         The simulation time step in milliseconds.
 
         :return: the machine time step
-        :rtype: float
         """
         return self.__writer.get_simulation_time_step_ms()
 
@@ -263,7 +254,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         The current simulation time in milliseconds.
 
         :return: the current runtime already executed
-        :rtype: float
         """
         return self.__writer.get_current_run_time_ms()
 
@@ -273,7 +263,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         The number of the current recording segment being generated.
 
         :return: the segment counter
-        :rtype: int
         """
         return self.__writer.get_reset_number()
 
@@ -294,7 +283,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         blocks are correctly labelled.
 
         :return: the name of the simulator.
-        :rtype: str
         """
         return _version.NAME
 
@@ -304,7 +292,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         The recorders, used by the PyNN state object.
 
         :return: the internal recorders object
-        :rtype: list(~spynnaker.pyNN.models.recorder.Recorder)
         """
         return self.__recorders
 
@@ -323,11 +310,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             time_scale_factor: Optional[int]) -> None:
         """
         :param timestep: machine_time_Step in milliseconds
-        :type timestep: float or None
         :param min_delay:
-        :type min_delay: int or float or None
         :param time_scale_factor:
-        :type time_scale_factor: int or None
         """
 
         # Get the standard values
@@ -374,7 +358,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         .. deprecated:: 7.0
             Use :py:meth:`SpynnakerDataView.register_binary_search_path`.
 
-        :param str search_path: absolute search path for binaries
+        :param search_path: absolute search path for binaries
         """
         SpynnakerDataView.register_binary_search_path(search_path)
 

@@ -24,9 +24,8 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 def get_y_from_fpga_retina(key: int, mode: int) -> Optional[int]:
     """
-    :param int key:
-    :param int mode:
-    :rtype: int or None
+    :param key:
+    :param mode:
     """
     if mode == 128:
         return key & 0x7f
@@ -41,9 +40,8 @@ def get_y_from_fpga_retina(key: int, mode: int) -> Optional[int]:
 
 def get_x_from_fpga_retina(key: int, mode: int) -> Optional[int]:
     """
-    :param int key:
-    :param int mode:
-    :rtype: int or None
+    :param key:
+    :param mode:
     """
     if mode == 128:
         return (key >> 7) & 0x7f
@@ -58,9 +56,8 @@ def get_x_from_fpga_retina(key: int, mode: int) -> Optional[int]:
 
 def get_spike_value_from_fpga_retina(key: int, mode: int) -> Optional[int]:
     """
-    :param int key:
-    :param int mode:
-    :rtype: int or None
+    :param key:
+    :param mode:
     """
     if mode == 128:
         return (key >> 14) & 0x1
@@ -96,13 +93,13 @@ class ExternalFPGARetinaDevice(
             polarity: str, label: Optional[str] = None,
             board_address: Optional[str] = None):
         """
-        :param str mode: The retina "mode"
-        :param int retina_key: The value of the top 16-bits of the key
-        :param int spinnaker_link_id:
+        :param mode: The retina "mode"
+        :param retina_key: The value of the top 16-bits of the key
+        :param spinnaker_link_id:
             The SpiNNaker link to which the retina is connected
-        :param str polarity: The "polarity" of the retina data
-        :param str label:
-        :param str board_address:
+        :param polarity: The "polarity" of the retina data
+        :param label:
+        :param board_address:
         """
         fixed_n_neurons = self.get_n_neurons(mode, polarity)
         super().__init__(
@@ -136,9 +133,7 @@ class ExternalFPGARetinaDevice(
     @staticmethod
     def get_n_neurons(mode: str, polarity: str) -> int:
         """
-        :param str mode: ``128`` or ``64`` or ``32`` or ``16``
-        :param str parity: ``UP`` or ``DOWN`` or ``MERGED``
-        :rtype: int
+        :param mode: ``128`` or ``64`` or ``32`` or ``16``
         """
         if mode == ExternalFPGARetinaDevice.MODE_128:
             if (polarity == ExternalFPGARetinaDevice.UP_POLARITY or

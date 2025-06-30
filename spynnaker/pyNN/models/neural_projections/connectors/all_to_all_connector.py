@@ -46,17 +46,17 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     def __init__(self, allow_self_connections: bool = True, safe: bool = True,
                  verbose: bool = False, callback: None = None):
         """
-        :param bool allow_self_connections:
+        :param allow_self_connections:
             if the connector is used to connect a Population to itself, this
             flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
-        :param bool safe:
+        :param safe:
             If ``True``, check that weights and delays have valid values.
             If ``False``, this check is skipped.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
@@ -148,7 +148,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     @property
     def allow_self_connections(self) -> bool:
         """
-        :rtype: bool
+        if the connector is used to connect a Population to itself
         """
         return self.__allow_self_connections
 

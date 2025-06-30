@@ -31,8 +31,8 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
         """
         Set the values of :math:`A^+` and :math:`A^-`.
 
-        :param float a_plus: :math:`A^+`
-        :param float a_minus: :math:`A^-`
+        :param a_plus: :math:`A^+`
+        :param a_minus: :math:`A^-`
         """
         self.__a_plus = a_plus
         self.__a_minus = a_minus
@@ -41,8 +41,6 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
     def A_plus(self) -> float:
         """
         Settable model parameter: :math:`A^+`
-
-        :rtype: float
         """
         # pylint: disable=invalid-name
         return self.__a_plus
@@ -56,8 +54,6 @@ class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
     def A_minus(self) -> float:
         """
         Settable model parameter: :math:`A^-`
-
-        :rtype: float
         """
         # pylint: disable=invalid-name
         return self.__a_minus

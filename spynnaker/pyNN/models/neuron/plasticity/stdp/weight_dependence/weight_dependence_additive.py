@@ -43,8 +43,8 @@ class WeightDependenceAdditive(
     # noinspection PyPep8Naming
     def __init__(self, w_min: float = 0.0, w_max: float = 1.0):
         """
-        :param float w_min: :math:`w^{min}`
-        :param float w_max: :math:`w^{max}`
+        :param w_min: :math:`w^{min}`
+        :param w_max: :math:`w^{max}`
         """
         super().__init__()
         self.__w_min = w_min
@@ -54,8 +54,6 @@ class WeightDependenceAdditive(
     def w_min(self) -> float:
         """
         :math:`w^{min}`
-
-        :rtype: float
         """
         return self.__w_min
 
@@ -63,8 +61,6 @@ class WeightDependenceAdditive(
     def w_max(self) -> float:
         """
         :math:`w^{max}`
-
-        :rtype: float
         """
         return self.__w_max
 
@@ -82,8 +78,6 @@ class WeightDependenceAdditive(
     def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
-
-        :rtype: str
         """
         return "additive"
 
@@ -126,8 +120,6 @@ class WeightDependenceAdditive(
         """
         The maximum weight that will ever be set in a synapse as a result
         of this rule.
-
-        :rtype: float
         """
         return self.__w_max
 

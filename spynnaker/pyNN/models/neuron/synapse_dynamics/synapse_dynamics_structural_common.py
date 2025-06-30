@@ -105,7 +105,7 @@ class SynapseDynamicsStructuralCommon(
 
     def get_parameter_names(self) -> Iterable[str]:
         """
-        :rtype: list(str)
+        Get the names of the parameters of the model.
         """
         yield from [
             'initial_weight', 'initial_delay', 'f_rew', 'p_rew', 's_max',
@@ -118,8 +118,6 @@ class SynapseDynamicsStructuralCommon(
     def p_rew(self) -> float:
         """
         The period of rewiring.
-
-        :rtype: float
         """
         return 1. / self.f_rew
 
@@ -170,11 +168,6 @@ class SynapseDynamicsStructuralCommon(
     def __get_structural_projections(
             self, incoming_projections: Iterable[Projection]
             ) -> List[Projection]:
-        """
-        :param list(Projection) incoming_projections:
-            Projections to filter to structural only
-        :rtype: list(Projection)
-        """
         structural_projections = list()
         seen_app_edges = set()
         for proj in incoming_projections:
@@ -196,13 +189,10 @@ class SynapseDynamicsStructuralCommon(
         """
         Write the non-sub-population synapse parameters to the spec.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            the data spec
-        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
-            The application vertex being generated
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the target vertex to generate for
-        :param int n_pre_pops: the number of pre-populations
+        :param spec: the data spec
+        :param app_vertex: The application vertex being generated
+        :param vertex_slice: The slice of the target vertex to generate for
+        :param n_pre_pops: the number of pre-populations
         """
         time_step_us = SpynnakerDataView.get_simulation_time_step_us()
         spec.comment("Writing common rewiring data")
@@ -249,18 +239,12 @@ class SynapseDynamicsStructuralCommon(
             synaptic_matrices: SynapticMatrices) -> Tuple[
                 _PopIndexType, _SubpopIndexType, _SubpopIndexType]:
         """
-        :param ~data_specification.DataSpecificationGenerator spec:
-        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
+        :param spec:
+        :param app_vertex:
             the vertex for which data specs are being prepared
         :param structural_projections: Projections that are structural
-        :param machine_edges_by_app:
-            map of application edge to associated machine edges
-        :type machine_edges_by_app:
-            dict(~pacman.model.graphs.application.ApplicationEdge,
-            list(~pacman.model.graphs.machine.MachineEdge))
-        :param dict(int,float) weight_scales:
-        :param SynapticMatrices synaptic_matrices:
-        :rtype: dict(tuple(PopulationVertex,SynapseInformation),int)
+        :param weight_scales:
+        :param synaptic_matrices:
         """
         spec.comment("Writing pre-population info")
         pop_index: _PopIndexType = dict()
@@ -332,14 +316,10 @@ class SynapseDynamicsStructuralCommon(
         """
         Post to pre table is basically the transpose of the synaptic matrix.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
+        :param spec:
         :param pop_index:
-        :type pop_index:
-            dict(tuple(PopulationVertex,SynapseInformation), int)
-        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
-            the vertex for which data specs are being prepared
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The target slice
+        :param app_vertex: the vertex for which data specs are being prepared
+        :param vertex_slice: The target slice
         """
         # Get connections for this post slice
         slice_conns = self.connections[app_vertex, vertex_slice.lo_atom]
@@ -426,7 +406,7 @@ class SynapseDynamicsStructuralCommon(
 
     def get_vertex_executable_suffix(self) -> str:
         """
-        :rtype: str
+        executable suffix based on details
         """
         name = "_structural"
         name += self.partner_selection.vertex_executable_suffix
@@ -437,8 +417,7 @@ class SynapseDynamicsStructuralCommon(
     def is_same_as(
             self, synapse_dynamics: AbstractSynapseDynamicsStructural) -> bool:
         """
-        :param SynapseDynamicsStructuralCommon synapse_dynamics:
-        :rtype: bool
+        :param synapse_dynamics:
         """
         # Note noqa:E721  because exact type comparison is required here
         return (
@@ -459,8 +438,6 @@ class SynapseDynamicsStructuralCommon(
     def connections(self) -> ConnectionsInfo:
         """
         Initial connectivity as defined via connector.
-
-        :rtype: dict
         """
         raise NotImplementedError
 
@@ -476,11 +453,7 @@ class SynapseDynamicsStructuralCommon(
         but the same for the same app_vertex.
         It should be different every time called with `None`.
 
-        :param app_vertex:
-        :type app_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex or None
         :return: list of random seed (4 words), generated randomly
-        :rtype: list(int)
         """
         raise NotImplementedError
 
@@ -489,7 +462,7 @@ class SynapseDynamicsStructuralCommon(
         """
         Check that delays can be done without delay extensions.
 
-        :param float max_delay_ms: The maximum delay supported, in milliseconds
+        :param max_delay_ms: The maximum delay supported, in milliseconds
         :raises ValueError: if the delay is out of range
         """
         if isinstance(self.initial_delay, tuple):

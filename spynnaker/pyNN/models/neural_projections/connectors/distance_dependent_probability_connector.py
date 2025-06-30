@@ -65,39 +65,33 @@ class DistanceDependentProbabilityConnector(
             rng: Optional[NumpyRNG] = None,
             safe: bool = True, verbose: bool = False, callback: None = None):
         """
-        :param str d_expression:
+        :param d_expression:
             the right-hand side of a valid python expression for
             probability, involving ``d``,
             (e.g. ``"exp(-abs(d))"``, or ``"d < 3"``),
             that can be parsed by ``eval()``, that computes the distance
             dependent distribution.
-        :param bool allow_self_connections:
+        :param allow_self_connections:
             if the connector is used to connect a Population to itself, this
             flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
-        :param bool safe:
+        :param safe:
             if ``True``, check that weights and delays have valid values.
             If ``False``, this check is skipped.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
         :param n_connections:
             The number of efferent synaptic connections per neuron.
-        :type n_connections: int or None
         :param rng:
             Seeded random number generator, or ``None`` to make one when
             needed.
-        :type rng: ~pyNN.random.NumpyRNG or None
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
                 Not supported by sPyNNaker.
         """
-        # :param ~pyNN.space.Space space:
-        #    a Space object, needed if you wish to specify distance-dependent
-        #    weights or delays.
-
         super().__init__(safe, callback, verbose)
         self.__d_expression = d_expression
         self.__allow_self_connections = allow_self_connections
@@ -115,9 +109,6 @@ class DistanceDependentProbabilityConnector(
         self._set_probabilities(synapse_info)
 
     def _set_probabilities(self, synapse_info: SynapseInformation) -> None:
-        """
-        :param SynapseInformation synapse_info:
-        """
         # Set the probabilities up-front for now
         # TODO: Work out how this can be done statistically
         expand_distances = self._expand_distances(self.__d_expression)
@@ -242,7 +233,7 @@ class DistanceDependentProbabilityConnector(
     @property
     def allow_self_connections(self) -> bool:
         """
-        :rtype: bool
+        if the connector is used to connect a Population to itself
         """
         return self.__allow_self_connections
 
@@ -254,8 +245,6 @@ class DistanceDependentProbabilityConnector(
     def d_expression(self) -> str:
         """
         The distance expression.
-
-        :rtype: str
         """
         return self.__d_expression
 

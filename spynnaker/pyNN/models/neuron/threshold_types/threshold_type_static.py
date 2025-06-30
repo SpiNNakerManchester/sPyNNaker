@@ -34,8 +34,6 @@ class ThresholdTypeStatic(AbstractThresholdType):
     def __init__(self, v_thresh: ModelParameter):
         """
         :param v_thresh: :math:`V_{thresh}`
-        :type v_thresh: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([(DataType.S1615, V_THRESH)])],

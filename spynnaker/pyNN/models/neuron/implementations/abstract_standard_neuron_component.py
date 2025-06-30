@@ -42,8 +42,8 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
 
     def __init__(self, structs: List[Struct], units: Dict[str, str]):
         """
-        :param list(Struct) structs: The structures of the component
-        :param dict units: The units to use for each parameter
+        :param structs: The structures of the component
+        :param units: The units to use for each parameter
         """
         self.__structs = structs
         self.__units = units
@@ -57,8 +57,6 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         e.g. for non-repeating structure `g`, followed by repeating structures
         `s1` and `s2` with 3 neurons the layout will be:
         ``[g, s1, s1, s1, s2, s2, s2]``.
-
-        :rtype: list(~spynnaker.pyNN.utilities.struct.Struct)
         """
         return self.__structs
 
@@ -67,8 +65,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         """
         Add the initial values of the parameters to the parameter holder.
 
-        :param ~spinn_utilities.ranged.RangeDictionary parameters:
-            A holder of the parameters
+        :param parameters: A holder of the parameters
         """
         raise NotImplementedError
 
@@ -79,8 +76,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         Add the initial values of the state variables to the state
         variables holder.
 
-        :param ~spinn_utilities.ranged.RangeDictionary state_variables:
-            A holder of the state variables
+        :param state_variables: A holder of the state variables
         """
         raise NotImplementedError
 
@@ -88,8 +84,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         """
         Determine if this component has a variable by the given name.
 
-        :param str variable: The name of the variable
-        :rtype: bool
+        :param variable: The name of the variable
         """
         return variable in self.__units
 
@@ -97,7 +92,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         """
         Get the units of the given variable.
 
-        :param str variable: The name of the variable
+        :param variable: The name of the variable
         """
         return self.__units[variable]
 

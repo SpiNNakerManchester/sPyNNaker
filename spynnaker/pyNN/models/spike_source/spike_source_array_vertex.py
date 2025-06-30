@@ -215,7 +215,7 @@ class SpikeSourceArrayVertex(
 
         Logs a warning for the first one found
 
-        :param list(int) spike_times:
+        :param spike_times:
         """
         current_time = SpynnakerDataView.get_current_run_time_ms()
         for spike_time in spike_times:
@@ -233,7 +233,7 @@ class SpikeSourceArrayVertex(
 
         Logs a warning for the first one found
 
-        :param iterable(int) spike_times:
+        :param spike_times:
         """
         current_time = SpynnakerDataView.get_current_run_time_ms()
         for neuron_id in range(0, self.n_atoms):

@@ -85,9 +85,8 @@ def get_maximum_delay_supported_in_ms(
     Get the maximum delay supported by the synapse representation
     before extensions are required.
 
-    :param int post_vertex_max_delay_ticks: post vertex max delay
+    :param post_vertex_max_delay_ticks: post vertex max delay
     :return: Maximum delay, in milliseconds.
-    :rtype: float
     """
     return (post_vertex_max_delay_ticks *
             SpynnakerDataView.get_simulation_time_step_ms())
@@ -101,15 +100,14 @@ def get_max_row_info(
     undelayed rows in bytes (including header), words (without header)
     and number of synapses.
 
-    :param SynapseInformation synapse_info:
+    :param synapse_info:
         The synapse information to get the row data for
-    :param int n_post_atoms:
+    :param n_post_atoms:
         The number of post atoms to get the maximum for
-    :param int n_delay_stages:
+    :param n_delay_stages:
         The number of delay stages on the edge
-    :param ProjectionApplicationEdge in_edge:
+    :param in_edge:
         The incoming edge on which the synapse information is held
-    :rtype: MaxRowInfo
     :raises SynapseRowTooBigException:
         If the synapse information can't be represented
     """
@@ -186,10 +184,10 @@ def _get_allowed_row_length(
     Get the allowed row length in words in the population table for a
     desired row length in words.
 
-    :param int n_words: The number of words in the row
-    :param AbstractSynapseDynamics dynamics: The synapse dynamics used
-    :param ProjectionApplicationEdge in_edge: The incoming edge
-    :param int n_synapses: The number of synapses for the number of words
+    :param n_words: The number of words in the row
+    :param dynamics: The synapse dynamics used
+    :param in_edge: The incoming edge
+    :param n_synapses: The number of synapses for the number of words
     :raises SynapseRowTooBigException:
         If the given row is too big; the exception will detail the maximum
         number of synapses that are supported.
@@ -226,24 +224,24 @@ def get_synapses(
     an array of words for delayed synapses. This is used to prepare
     information for *deployment to SpiNNaker*.
 
-    :param ~numpy.ndarray connections:
+    :param connections:
         The connections to get the synapses from
-    :param SynapseInformation synapse_info:
+    :param synapse_info:
         The synapse information to convert to synapses
-    :param int n_delay_stages:
+    :param n_delay_stages:
         The number of delay stages in total to be represented
-    :param int n_synapse_types:
+    :param n_synapse_types:
         The number of synapse types in total to be represented
     :param weight_scales: The scaling of the weights for each synapse type
-    :param ~pacman.model.graphs.application.ApplicationEdge app_edge:
+    :param app_edge:
         The incoming machine edge that the synapses are on
-    :param MaxRowInfo max_row_info:
+    :param max_row_info:
         The maximum row information for the synapses
-    :param bool gen_undelayed:
+    :param gen_undelayed:
         Whether to generate undelayed data
-    :param bool gen_delayed:
+    :param gen_delayed:
         Whether to generate delayed data
-    :param int max_atoms_per_core:
+    :param max_atoms_per_core:
         The maximum number of atoms on a core
     :return:
         (``row_data``, ``delayed_row_data``) where:
@@ -252,8 +250,6 @@ def get_synapses(
             row per source, each row the same length
         * ``delayed_row_data`` is the delayed connectivity data arranged
             into a row per source per delay stage, each row the same length
-    :rtype:
-        tuple(~numpy.ndarray, ~numpy.ndarray)
     """
     # Get delays in timesteps
     max_delay = app_edge.post_vertex.splitter.max_support_delay()
@@ -327,20 +323,19 @@ def _get_row_data(
         synapse_dynamics: AbstractSynapseDynamics, max_row_n_synapses: int,
         max_row_n_words: int, max_atoms_per_core: int) -> _RowData:
     """
-    :param ~numpy.ndarray connections:
+    :param connections:
         The connections to convert; the dtype is
         AbstractConnector.NUMPY_SYNAPSES_DTYPE
-    :param ~numpy.ndarray row_indices:
+    :param row_indices:
         The row into which each connection should go; same length as
         connections
-    :param int n_rows: The total number of rows
-    :param int n_synapse_types: The number of synapse types allowed
-    :param AbstractSynapseDynamics synapse_dynamics:
+    :param n_rows: The total number of rows
+    :param n_synapse_types: The number of synapse types allowed
+    :param synapse_dynamics:
         The synapse dynamics of the synapses
-    :param int max_row_n_synapses: The maximum number of synapses in a row
-    :param int max_row_n_words: The maximum number of words in a row
-    :param int max_atoms_per_core: The maximum number of atoms per core
-    :rtype: ~numpy.ndarray
+    :param max_row_n_synapses: The maximum number of synapses in a row
+    :param max_row_n_words: The maximum number of words in a row
+    :param max_atoms_per_core: The maximum number of atoms per core
     """
     fp_data: Union[NDArray[uint32], List[NDArray[uint32]]]
     pp_data: Union[NDArray[uint32], List[NDArray[uint32]]]
@@ -396,28 +391,27 @@ def convert_to_connections(
     Read the synapses for a given projection synapse information
     object out of the given data and convert to connection data
 
-    :param SynapseInformation synapse_info:
+    :param synapse_info:
         The synapse information of the synapses
-    :param int n_pre_atoms: The number of atoms in the pre-vertex
-    :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+    :param n_pre_atoms: The number of atoms in the pre-vertex
+    :param post_vertex_slice:
         The slice of the target neurons of the synapses in the data
-    :param int max_row_length:
+    :param max_row_length:
         The length of each row in the data
-    :param int n_synapse_types:
+    :param n_synapse_types:
         The number of synapse types in total
     :param weight_scales:
         The weight scaling of each synapse type
-    :param bytearray data:
+    :param data:
         The raw data containing the synapses
-    :param bool delayed:
+    :param delayed:
         True if the data should be considered delayed
-    :param int post_vertex_max_delay_ticks:
+    :param post_vertex_max_delay_ticks:
         The maximum delayed ticks supported from post vertex
-    :param int max_atoms_per_core:
+    :param max_atoms_per_core:
         The maximum number of atoms on a core
     :return: The connections read from the data; the dtype is
         :py:const:`~.NUMPY_CONNECTORS_DTYPE`
-    :rtype: ~numpy.ndarray
     """
     # If there is no data, return nothing
     if data is None or len(data) == 0:
@@ -467,28 +461,27 @@ def read_all_synapses(
     Read the synapses for a given projection synapse information
     object out of the given delayed and undelayed data.
 
-    :param bytearray data:
+    :param data:
         The raw data containing the undelayed synapses
-    :param bytearray delayed_data:
+    :param delayed_data:
         The raw data containing the delayed synapses
-    :param SynapseInformation synapse_info:
+    :param synapse_info:
         The synapse info that generated the synapses
-    :param int n_synapse_types:
+    :param n_synapse_types:
         The total number of synapse types available
     :param weight_scales:
         A weight scale for each synapse type
-    :param int n_pre_atoms: The number of atoms in the pre-vertex
-    :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+    :param n_pre_atoms: The number of atoms in the pre-vertex
+    :param post_vertex_slice:
         The slice of the post-vertex to read the synapses for
-    :param int post_vertex_max_delay_ticks:
+    :param post_vertex_max_delay_ticks:
             max delayed ticks supported from post vertex
-    :param MaxRowInfo max_row_info:
+    :param max_row_info:
         The maximum information for each of the rows
-    :param int max_atoms_per_core:
+    :param max_atoms_per_core:
         The maximum number of atoms on a core
     :return: The connections read from the data; the dtype is
         :py:const:`~.NUMPY_CONNECTORS_DTYPE`
-    :rtype: ~numpy.ndarray
     """
     connections: List[ConnectionsArray] = []
     max_row_length = max_row_info.undelayed_max_words
@@ -513,12 +506,11 @@ def _parse_static_data(
     """
     Parse static synaptic data.
 
-    :param ~numpy.ndarray row_data: The raw row data
-    :param AbstractStaticSynapseDynamics dynamics:
+    :param row_data: The raw row data
+    :param dynamics:
         The synapse dynamics that can decode the rows
     :return: A tuple of the recorded length of each row and the row data
         organised into rows
-    :rtype: tuple(~numpy.ndarray, list(~numpy.ndarray))
     """
     n_rows = row_data.shape[0]
     ff_size = row_data[:, 1]
@@ -538,19 +530,18 @@ def _read_static_data(
     """
     Read static data from row data.
 
-    :param AbstractStaticSynapseDynamics dynamics:
+    :param dynamics:
         The synapse dynamics that generated the data
-    :param int n_pre_atoms: The number of atoms on the pre-vertex
-    :param int n_synapse_types:
+    :param n_pre_atoms: The number of atoms on the pre-vertex
+    :param n_synapse_types:
         The number of synapse types available
-    :param ~numpy.ndarray row_data:
+    :param row_data:
         The raw row data to read
-    :param bool delayed: True if data should be considered delayed
-    :param int post_vertex_max_delay_ticks: post vertex delay maximum
-    :param int max_atoms_per_core: The maximum number of atoms on a core
+    :param delayed: True if data should be considered delayed
+    :param post_vertex_max_delay_ticks: post vertex delay maximum
+    :param max_atoms_per_core: The maximum number of atoms on a core
     :return: the connections read with dtype
         :py:const:`~.NUMPY_CONNECTORS_DTYPE`
-    :rtype: list(~numpy.ndarray)
     """
     if row_data is None or not row_data.size:
         return numpy.zeros(0, dtype=NUMPY_CONNECTORS_DTYPE)
@@ -572,15 +563,13 @@ def _parse_plastic_data(
     """
     Parse plastic synapses from raw row data.
 
-    :param ~numpy.ndarray row_data: The raw data to parse
-    :param AbstractPlasticSynapseDynamics dynamics:
+    :param row_data: The raw data to parse
+    :param dynamics:
         The dynamics that generated the data
     :return: A tuple of the recorded length of the plastic-plastic data in
         each row; the plastic-plastic data organised into rows; the
         recorded length of the static-plastic data in each row; and the
         static-plastic data organised into rows
-    :rtype: tuple(~numpy.ndarray, list(~numpy.ndarray), ~numpy.ndarray,
-        list(~numpy.ndarray))
     """
     n_rows = row_data.shape[0]
     pp_size = row_data[:, 0]
@@ -605,19 +594,18 @@ def _read_plastic_data(
     """
     Read plastic data from raw data.
 
-    :param AbstractStaticSynapseDynamics dynamics:
+    :param dynamics:
         The synapse dynamics that generated the data
-    :param int n_pre_atoms: The number of atoms in the pre-vertex
-    :param int n_synapse_types:
+    :param n_pre_atoms: The number of atoms in the pre-vertex
+    :param n_synapse_types:
         The number of synapse types available
-    :param ~numpy.ndarray row_data:
+    :param row_data:
         The raw row data to read
-    :param bool delayed: True if data should be considered delayed
-    :param int post_vertex_max_delay_ticks: post vertex delay maximum
-    :param int max_atoms_per_core: The maximum number of atoms on a core
+    :param delayed: True if data should be considered delayed
+    :param post_vertex_max_delay_ticks: post vertex delay maximum
+    :param max_atoms_per_core: The maximum number of atoms on a core
     :return: the connections read with dtype
         :py:const:`~.NUMPY_CONNECTORS_DTYPE`
-    :rtype: list(~numpy.ndarray)
     """
     if row_data is None or not row_data.size:
         return numpy.zeros(0, dtype=NUMPY_CONNECTORS_DTYPE)
@@ -641,10 +629,9 @@ def _rescale_connections(
     """
     Scale the connection data into machine values.
 
-    :param ~numpy.ndarray connections: The connections to be rescaled
+    :param connections: The connections to be rescaled
     :param weight_scales: The weight scale of each synapse type
-    :param SynapseInformation synapse_info:
-        The synapse information of the connections
+    :param synapse_info: The synapse information of the connections
     """
     # Return the delays values to milliseconds
     connections["delay"] /= SpynnakerDataView.get_simulation_time_step_per_ms()
@@ -661,14 +648,13 @@ def _convert_delayed_data(
     Take the delayed_connections and convert the source ids and delay
     values back to global values.
 
-    :param ~numpy.ndarray n_synapses: The number of synapses in each row
-    :param int n_pre_atoms: number of atoms in the pre-vertex
-    :param ~numpy.ndarray delayed_connections:
+    :param n_synapses: The number of synapses in each row
+    :param n_pre_atoms: number of atoms in the pre-vertex
+    :param delayed_connections:
         The connections to convert of dtype
         :py:const:`~.NUMPY_CONNECTORS_DTYPE`
-    :param int post_vertex_max_delay_ticks: post vertex delay maximum
+    :param post_vertex_max_delay_ticks: post vertex delay maximum
     :return: The converted connection with the same dtype
-    :rtype: ~numpy.ndarray
     """
     # Work out the delay stage of each row; rows are the all the rows
     # from the first delay stage, then all from the second stage and so on

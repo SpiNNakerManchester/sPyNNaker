@@ -21,9 +21,9 @@ def compare_spiketrain(spiketrain1: SpikeTrain, spiketrain2: SpikeTrain, *,
     """
     Checks two spike trains have the exact same data.
 
-    :param ~neo.core.SpikeTrain spiketrain1: first spike train
-    :param ~neo.core.SpikeTrain spiketrain2: second spike train
-    :param bool same_length: Flag to indicate if the same length of data is
+    :param spiketrain1: first spike train
+    :param spiketrain2: second spike train
+    :param same_length: Flag to indicate if the same length of data is
         held, i.e., all spikes up to the same time. If False allows one trains
         to have additional spikes after the first ends. This is used to
         compare data extracted part way with data extracted at the end.
@@ -51,15 +51,15 @@ def compare_spiketrains(
     """
     Check two Lists of spike trains have the exact same data.
 
-    :param list(~neo.core.SpikeTrain) spiketrains1:
+    :param spiketrains1:
         First list of spike trains to compare
-    :param list(~neo.core.SpikeTrain) spiketrains2:
+    :param spiketrains2:
         Second list of spike trains to compare
-    :param bool same_data: Flag to indicate if the same type of data is held,
+    :param same_data: Flag to indicate if the same type of data is held,
         i.e., same spikes, v, gsyn_exc and gsyn_inh.
         If False allows one or both lists to be Empty.
         Even if False none empty lists must be the same length
-    :param bool same_length: Flag to indicate if the same length of data is
+    :param same_length: Flag to indicate if the same length of data is
         held, i.e., all spikes up to the same time. If False allows one trains
         to have additional spikes after the first ends. This is used to compare
         data extracted part way with data extracted at the end.
@@ -80,11 +80,11 @@ def compare_analogsignal(as1: AnalogSignal, as2: AnalogSignal, *,
     """
     Compares two analog signal objects to see if they are the same.
 
-    :param ~neo.core.AnalogSignal as1:
+    :param as1:
         first analog signal holding list of individual analog signal objects
-    :param ~neo.core.AnalogSignal as2:
+    :param as2:
         second analog signal holding list of individual analog signal objects
-    :param bool same_length: Flag to indicate if the same length of data is
+    :param same_length: Flag to indicate if the same length of data is
         held, i.e., all spikes up to the same time. If False allows one trains
         to have additional data after the first ends. This is used to compare
         data extracted part way with data extracted at the end.
@@ -140,12 +140,12 @@ def compare_segments(
         seg1: Segment, seg2: Segment, *, same_data: bool = True,
         same_length: bool = True) -> None:
     """
-    :param ~neo.core.Segment seg1: First Segment to check
-    :param ~neo.core.Segment seg2: Second Segment to check
-    :param bool same_data: Flag to indicate if the same type of data is held,
+    :param seg1: First Segment to check
+    :param seg2: Second Segment to check
+    :param same_data: Flag to indicate if the same type of data is held,
         i.e., same spikes, v, gsyn_exc and gsyn_inh.
         If False only data in both blocks is compared
-    :param bool same_length: Flag to indicate if the same length of data is
+    :param same_length: Flag to indicate if the same length of data is
         held, i.e., all spikes up to the same time. If False allows one trains
         to have additional data after the first ends. This is used to compare
         data extracted part way with data extracted at the end.
@@ -179,14 +179,14 @@ def compare_blocks(
     """
     Compares two neo Blocks to see if they hold the same data.
 
-    :param ~neo.core.Block neo1: First block to check
-    :param ~neo.core.Block neo2: Second block to check
-    :param bool same_runs: Flag to signal if blocks are the same length.
+    :param neo1: First block to check
+    :param neo2: Second block to check
+    :param same_runs: Flag to signal if blocks are the same length.
         If False extra segments in the larger block are ignored
-    :param bool same_data: Flag to indicate if the same type of data is held,
+    :param same_data: Flag to indicate if the same type of data is held,
         i.e., same spikes, v, gsyn_exc and gsyn_inh.
         If False only data in both blocks is compared
-    :param bool same_length: Flag to indicate if the same length of data is
+    :param same_length: Flag to indicate if the same length of data is
         held, i.e., all spikes up to the same time. If False allows one trains
         to have additional data after the first ends. This is used to compare
         data extracted part way with data extracted at the end.

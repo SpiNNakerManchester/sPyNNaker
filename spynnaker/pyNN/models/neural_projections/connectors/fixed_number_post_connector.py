@@ -63,19 +63,19 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             with_replacement: bool = False, rng: Optional[NumpyRNG] = None,
             safe: bool = True, verbose: bool = False, callback: None = None):
         """
-        :param int n:
+        :param n:
             number of random post-synaptic neurons connected to pre-neurons.
-        :param bool allow_self_connections:
+        :param allow_self_connections:
             if the connector is used to connect a Population to itself, this
             flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
-        :param bool safe:
+        :param safe:
             Whether to check that weights and delays have valid values;
             if ``False``, this check is skipped.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
-        :param bool with_replacement:
+        :param with_replacement:
             this flag determines how the random selection of post-synaptic
             neurons is performed; if ``True``, then every post-synaptic neuron
             can be chosen on each occasion, and so multiple connections
@@ -85,8 +85,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         :param rng:
             Seeded random number generator, or ``None`` to make one when
             needed.
-        :type rng: ~pyNN.random.NumpyRNG or None
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
@@ -160,10 +159,6 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
 
     def _get_post_neurons(
             self, synapse_info: SynapseInformation) -> List[NDArray[integer]]:
-        """
-        :param SynapseInformation synapse_info:
-        :rtype: list(~numpy.ndarray)
-        """
         # If we haven't set the array up yet, do it now
         if not self.__post_neurons_set:
             self.__post_neurons = self.__build_post_neurons(synapse_info)
@@ -192,12 +187,6 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     def _post_neurons_in_slice(
             self, post_vertex_slice: Slice, n: int,
             synapse_info: SynapseInformation) -> NDArray[integer]:
-        """
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param int n:
-        :param SynapseInformation synapse_info:
-        :rtype: ~numpy.ndarray
-        """
         post_neurons = self._get_post_neurons(synapse_info)
 
         # Get the nth array and get the bits we need for
@@ -214,11 +203,6 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         """
         Count the number of post neurons in the slice.
         Faster than ``len(_post_neurons_in_slice(...))``.
-
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param int n:
-        :param SynapseInformation synapse_info:
-        :rtype: int
         """
         post_neurons = self._get_post_neurons(synapse_info)
 
@@ -311,8 +295,6 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     def allow_self_connections(self) -> bool:
         """
         Do we include connections from a neuron/id to itself?
-
-        :rtype: bool
         """
         return self.__allow_self_connections
 

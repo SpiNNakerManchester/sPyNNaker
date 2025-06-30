@@ -124,8 +124,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         Merge with the given synapse_dynamics and return the result, or
         error if merge is not possible.
 
-        :param AbstractSynapseDynamics synapse_dynamics:
-        :rtype: AbstractSynapseDynamics
+        :param synapse_dynamics:
         """
         raise NotImplementedError
 
@@ -133,8 +132,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     def get_vertex_executable_suffix(self) -> str:
         """
         Get the executable suffix for a vertex for this dynamics.
-
-        :rtype: str
         """
         raise NotImplementedError
 
@@ -143,8 +140,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     def changes_during_run(self) -> bool:
         """
         Whether the synapses change during a run.
-
-        :rtype: bool
         """
         raise NotImplementedError
 
@@ -152,8 +147,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     def weight(self) -> WEIGHTS:
         """
         The weight of connections.
-
-        :rtype: float
         """
         return self.__weight
 
@@ -207,8 +200,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     def delay(self) -> DELAYS:
         """
         The delay of connections.
-
-        :rtype: float
         """
         return self.__delay
 
@@ -218,8 +209,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         Whether the synapse dynamics can run on a core combined with
         the neuron, or if a separate core is needed.
-
-        :rtype: bool
         """
         raise NotImplementedError
 
@@ -229,8 +218,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         Whether the synapse dynamics can run on a core split from
         the neuron, or if only a combined core is possible.
-
-        :rtype: bool
         """
         raise NotImplementedError
 
@@ -238,8 +225,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         Get a property.
 
-        :param str key: the name of the property
-        :rtype: Any or float or int or list(float) or list(int)
+        :param key: the name of the property
         """
         if hasattr(self, key):
             return getattr(self, key)
@@ -250,9 +236,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         Set a property.
 
-        :param str key: the name of the parameter to change
+        :param key: the name of the parameter to change
         :param value: the new value of the parameter to assign
-        :type value: Any or float or int or list(float) or list(int)
         """
         if hasattr(self, key):
             setattr(self, key, value)
@@ -278,8 +263,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         from the graph, but requires fixes in the synaptic manager to
         happen first before this can be utilised fully.
 
-        :param AbstractConnector connector: connector
-        :param SynapseInformation synapse_info: synapse info
+        :param connector: connector
+        :param synapse_info: synapse info
         """
         return connector.get_delay_minimum(synapse_info)
 
@@ -289,9 +274,9 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         Get the variance in delay for the synapses.
 
-        :param AbstractConnector connector:
-        :param ~numpy.ndarray delays:
-        :param SynapseInformation synapse_info:
+        :param connector:
+        :param delays:
+        :param synapse_info:
         """
         return connector.get_delay_variance(delays, synapse_info)
 
@@ -301,8 +286,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         Get the mean weight for the synapses.
 
-        :param AbstractConnector connector:
-        :param SynapseInformation synapse_info:
+        :param connector:
+        :param synapse_info:
         """
         return connector.get_weight_mean(synapse_info.weights, synapse_info)
 
@@ -312,8 +297,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         Get the maximum weight for the synapses.
 
-        :param AbstractConnector connector:
-        :param SynapseInformation synapse_info:
+        :param connector:
+        :param synapse_info:
         """
         return connector.get_weight_maximum(synapse_info)
 
@@ -323,9 +308,9 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         Get the variance in weight for the synapses.
 
-        :param AbstractConnector connector:
-        :param ~numpy.ndarray weights:
-        :param SynapseInformation synapse_info:
+        :param connector:
+        :param weights:
+        :param synapse_info:
         """
         return connector.get_weight_variance(weights, synapse_info)
 
@@ -334,8 +319,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         Get the index of the synapse type based on the name, or `None`
         if the name is not found.
 
-        :param str target: The name of the synapse
-        :rtype: int or None
+        :param target: The name of the synapse
         """
         _ = target
         return None
@@ -349,17 +333,10 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         Get the machine vertices that are connected to each other with
         this connector.
 
-        :param SynapseInformation s_info:
-            The synapse information of the connection
+        :param s_info: The synapse information of the connection
         :param source_vertex: The source of the spikes
-        :type source_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
         :param target_vertex: The target of the spikes
-        :type target_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
         :return: A list of tuples of (target machine vertex, list of sources)
-        :rtype: list(tuple(~pacman.model.graphs.machine.MachineVertex,
-            list(~pacman.model.graphs.AbstractVertex)))
         """
         # By default, just ask the connector
         return s_info.connector.get_connected_vertices(
@@ -370,8 +347,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         The absolute maximum number of atoms per core supported by this
         synapse dynamics object.
-
-        :rtype: int
         """
         # By default, we can only support the maximum row length per core
         return POP_TABLE_MAX_ROW_LENGTH
@@ -387,9 +362,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         on multi-dimensional vertices.
 
         :param application_edge: The edge of the connection
-        :type application_edge:
-            ~pacman.model.graphs.application.ApplicationEdge
-        :param SynapseInformation synapse_info: The synaptic information
+        :param synapse_info: The synaptic information
         """
         # By default, just ask the connector
         synapse_info.connector.validate_connection(

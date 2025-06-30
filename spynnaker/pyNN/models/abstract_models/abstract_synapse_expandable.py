@@ -44,8 +44,6 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
         .. note::
             The typical implementation for this method will be to ask the
             app_vertex's synapse_manager
-
-        :rtype: bool
         """
         raise NotImplementedError
 
@@ -54,8 +52,6 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
     def connection_generator_region(self) -> int:
         """
         The region ID containing the parameters of synaptic expansion.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -64,8 +60,7 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
         """
         Fill in the connection holders.
 
-        :param ~pacman.model.placements.Placement placement:
-            Where the data is on the machine
+        :param placement: Where the data is on the machine
         """
         raise NotImplementedError
 
@@ -75,8 +70,6 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
         """
         The maximum amount of synaptic data to be generated.
         This is used to calculate the timeout of the execution.
-
-        :rtype: int
         """
         raise NotImplementedError
 
@@ -86,7 +79,5 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
         """
         The amount of bit field data to be generated.
         This is used to calculate the timeout of the execution.
-
-        :rtype: int
         """
         raise NotImplementedError

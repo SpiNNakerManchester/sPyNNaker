@@ -81,8 +81,7 @@ def spynnaker_vertex_selector(app_vertex: ApplicationVertex) -> None:
     Will delegate to the non-sPyNNaker selector if no heuristic is known for
     the application vertex.
 
-    :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
-        application vertex to give a splitter object to
+    :param app_vertex: application vertex to give a splitter object to
     """
     if not app_vertex.has_splitter:
         if isinstance(app_vertex, PopulationVertex):

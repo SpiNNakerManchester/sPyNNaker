@@ -118,40 +118,33 @@ class SynapseDynamicsStructuralSTDP(
             delay: _In_Types = None,
             backprop_delay: bool = True):
         """
-        :param AbstractPartnerSelection partner_selection:
-            The partner selection rule
-        :param AbstractFormation formation: The formation rule
-        :param AbstractElimination elimination: The elimination rule
-        :param AbstractTimingDependence timing_dependence:
-            The STDP timing dependence rule
-        :param AbstractWeightDependence weight_dependence:
-            The STDP weight dependence rule
-        :param None voltage_dependence:
-            The STDP voltage dependence (unsupported)
-        :param float dendritic_delay_fraction:
+        :param partner_selection: The partner selection rule
+        :param formation: The formation rule
+        :param elimination: The elimination rule
+        :param timing_dependence: The STDP timing dependence rule
+        :param weight_dependence: The STDP weight dependence rule
+        :param voltage_dependence: The STDP voltage dependence (unsupported)
+        :param dendritic_delay_fraction:
             The STDP dendritic delay fraction
-        :param float f_rew:
+        :param f_rew:
             How many rewiring attempts will be done per second.
-        :param float initial_weight:
+        :param initial_weight:
             Weight assigned to a newly formed connection
         :param initial_delay:
             Delay assigned to a newly formed connection; a single value means
             a fixed delay value, or a tuple of two values means the delay will
             be chosen at random from a uniform distribution between the given
             values
-        :type initial_delay: float or tuple(float, float)
-        :param int s_max: Maximum fan-in per target layer neuron
-        :param bool with_replacement:
+        :param s_max: Maximum fan-in per target layer neuron
+        :param with_replacement:
             If set to True (default), a new synapse can be formed in a
             location where a connection already exists; if False, then it must
             form where no connection already exists
         :param seed: seed for the random number generators
-        :type seed: int or None
-        :param float weight: The weight of connections formed by the connector
+        :param weight: The weight of connections formed by the connector
         :param delay: The delay of connections formed by the connector
             Use ``None`` to get the simulator default minimum delay.
-        :type delay: float or None
-        :param bool backprop_delay: Whether back-propagated delays are used
+        :param backprop_delay: Whether back-propagated delays are used
         """
         super().__init__(
             timing_dependence, weight_dependence, voltage_dependence,

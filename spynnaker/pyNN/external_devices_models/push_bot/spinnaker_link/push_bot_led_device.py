@@ -41,25 +41,19 @@ class PushBotSpiNNakerLinkLEDDevice(
             start_total_period: Optional[int] = None,
             start_frequency: Optional[int] = None):
         """
-        :param PushBotLED led: The LED device to control
-        :param MunichIoSpiNNakerLinkProtocol protocol:
-            The protocol instance to get commands from
-        :param int spinnaker_link_id: The SpiNNakerLink connected to
-        :param int n_neurons: The number of neurons in the device
+        :param led: The LED device to control
+        :param protocol: The protocol instance to get commands from
+        :param spinnaker_link_id: The SpiNNakerLink connected to
+        :param n_neurons: The number of neurons in the device
         :param label: The label of the device
         :param board_address:
             The IP address of the board that the device is connected to
-        :type board_address: str or None
         :param start_active_time_front:
             The "active time" to set for the front LED at the start
-        :type start_active_time_front: int or None
         :param start_active_time_back:
             The "active time" to set for the back LED at the start
-        :type start_active_time_back: int or None
         :param start_total_period: The "total period" to set at the start
-        :type start_total_period: int or None
         :param start_frequency: The "frequency" to set at the start
-        :type start_frequency: int or None
         """
         super().__init__(
             led, protocol, start_active_time_front, start_active_time_back,

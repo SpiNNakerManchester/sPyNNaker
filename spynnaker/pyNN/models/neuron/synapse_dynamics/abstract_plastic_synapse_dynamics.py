@@ -37,8 +37,7 @@ class AbstractPlasticSynapseDynamics(
         """
         Get the number of 32-bit words for `n_connections` in a single row.
 
-        :param int n_connections:
-        :rtype: int
+        :param n_connections:
         """
         raise NotImplementedError
 
@@ -65,17 +64,14 @@ class AbstractPlasticSynapseDynamics(
         Lengths are returned as an array made up of an integer for each row,
         for each of the fixed-plastic and plastic-plastic regions.
 
-        :param ~numpy.ndarray connections: The connections to get data for
-        :param ~numpy.ndarray connection_row_indices:
+        :param connections: The connections to get data for
+        :param connection_row_indices:
             The row into which each connection should go
-        :param int n_rows: The total number of rows
-        :param int n_synapse_types: The number of synapse types
-        :param int max_n_synapses: The maximum number of synapses to generate
-        :param int max_atoms_per_core: The maximum number of atoms on a core
+        :param n_rows: The total number of rows
+        :param n_synapse_types: The number of synapse types
+        :param max_n_synapses: The maximum number of synapses to generate
+        :param max_atoms_per_core: The maximum number of atoms on a core
         :return: (fp_data (2D), pp_data (2D), fp_size (1D), pp_size (1D))
-        :rtype:
-            tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,
-            ~numpy.ndarray)
         """
         raise NotImplementedError
 
@@ -84,8 +80,6 @@ class AbstractPlasticSynapseDynamics(
             self, pp_size: NDArray[uint32]) -> NDArray[integer]:
         """
         Get the number of plastic plastic words to be read from each row.
-
-        :param ~numpy.ndarray pp_size:
         """
         raise NotImplementedError
 
@@ -94,8 +88,6 @@ class AbstractPlasticSynapseDynamics(
             self, fp_size: NDArray[uint32]) -> NDArray[integer]:
         """
         Get the number of fixed plastic words to be read from each row.
-
-        :param ~numpy.ndarray fp_size:
         """
         raise NotImplementedError
 
@@ -107,8 +99,8 @@ class AbstractPlasticSynapseDynamics(
         Get the number of synapses in each of the rows with plastic sizes
         `pp_size` and `fp_size`.
 
-        :param ~numpy.ndarray pp_size:
-        :param ~numpy.ndarray fp_size:
+        :param pp_size:
+        :param fp_size:
         """
         raise NotImplementedError
 
@@ -122,14 +114,13 @@ class AbstractPlasticSynapseDynamics(
         Read the connections indicated in the connection indices from the
         data in `pp_data` and `fp_data`.
 
-        :param int n_synapse_types:
-        :param ~numpy.ndarray pp_size: 1D
-        :param ~numpy.ndarray pp_data: 2D
-        :param ~numpy.ndarray fp_size: 1D
-        :param ~numpy.ndarray fp_data: 2D
-        :param int max_atoms_per_core:
+        :param n_synapse_types:
+        :param pp_size: 1D
+        :param pp_data: 2D
+        :param fp_size: 1D
+        :param fp_data: 2D
+        :param max_atoms_per_core:
         :return:
             array with columns ``source``, ``target``, ``weight``, ``delay``
-        :rtype: ~numpy.ndarray
         """
         raise NotImplementedError

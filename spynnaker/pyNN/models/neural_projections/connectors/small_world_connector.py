@@ -56,10 +56,10 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             rng: Optional[NumpyRNG] = None,
             safe: bool = True, callback: None = None, verbose: bool = False):
         """
-        :param float degree:
+        :param degree:
             the region length where nodes will be connected locally
-        :param float rewiring: the probability of rewiring each edge
-        :param bool allow_self_connections:
+        :param rewiring: the probability of rewiring each edge
+        :param allow_self_connections:
             if the connector is used to connect a Population to itself, this
             flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
@@ -67,20 +67,18 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         :param n_connections:
             if specified, the number of efferent synaptic connections per
             neuron
-        :type n_connections: int or None
         :param rng:
             Seeded random number generator, or ``None`` to make one when
             needed.
-        :type rng: ~pyNN.random.NumpyRNG or None
-        :param bool safe:
+        :param safe:
             If ``True``, check that weights and delays have valid values.
             If ``False``, this check is skipped.
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
                 Not supported by sPyNNaker.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
         """
@@ -106,9 +104,6 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         self._set_n_connections(synapse_info)
 
     def _set_n_connections(self, synapse_info: SynapseInformation) -> None:
-        """
-        :param SynapseInformation synapse_info:
-        """
         if self.space is None:
             raise ConfigurationException("a metric space is required")
         # Get the probabilities up-front for now

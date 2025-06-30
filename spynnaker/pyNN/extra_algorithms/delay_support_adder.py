@@ -64,9 +64,6 @@ class _DelaySupportAdder(object):
         """
         Adds the delay extensions to the application graph, now that all the
         splitter objects have been set.
-
-        :rtype: tuple(list(DelayExtensionVertex),
-            list(Tuple(DelayedApplicationEdge, str)))
         """
         progress = ProgressBar(1 + SpynnakerDataView.get_n_partitions(),
                                "Adding delay extensions as required")
@@ -95,9 +92,6 @@ class _DelaySupportAdder(object):
         """
         Look at a particular edge to see if it needs a delay vertex+edge
         inserted, and add it in if it does.
-
-        :param ProjectionApplicationEdge edge:
-        :param ApplicationEdgePartition partition:
         """
         # figure the max delay and if we need a delay extension
         n_stages, steps_per_stage, need_delay_ext = self._check_delay_values(
@@ -120,10 +114,10 @@ class _DelaySupportAdder(object):
         Creates the edge between delay extension and post vertex. Stores
         for future loading to the application graph when safe to do so.
 
-        :param DelayExtensionVertex delay_app_vertex: delay extension vertex
-        :param ProjectionApplicationEdge app_edge:
+        :param delay_app_vertex: delay extension vertex
+        :param app_edge:
             the undelayed application edge this is associated with.
-        :param str partition_id: the partition id of the edge
+        :param partition_id: the partition id of the edge
         """
         # check for post edge
         delayed_edge = self._delay_post_edge_map.get(
@@ -151,13 +145,12 @@ class _DelaySupportAdder(object):
         source vertex to this delay extension. Adds to the graph, as safe to
         do so.
 
-        :param ApplicationEdgePartition app_outgoing_edge_partition:
+        :param app_outgoing_edge_partition:
             the original outgoing edge partition.
-        :param ApplicationEdge app_edge: the undelayed application edge.
-        :param int delay_per_stage: delay for each delay stage
-        :param int n_delay_stages: the number of delay stages needed
+        :param app_edge: the undelayed application edge.
+        :param delay_per_stage: delay for each delay stage
+        :param n_delay_stages: the number of delay stages needed
         :return: the DelayExtensionAppVertex
-        :rtype: DelayExtensionVertex
         """
         # get delay extension vertex if it already exists.
         delay_app_vertex = self._app_to_delay_map.get(
@@ -192,7 +185,7 @@ class _DelaySupportAdder(object):
         Checks the delay required from the user defined max, the max delay
         supported by the post vertex splitter and the delay Extensions.
 
-        :param ApplicationEdge app_edge: the undelayed application edge
+        :param app_edge: the undelayed application edge
         :return: tuple(n_delay_stages, delay_steps_per_stage, extension_needed)
         """
         # get max delay required
