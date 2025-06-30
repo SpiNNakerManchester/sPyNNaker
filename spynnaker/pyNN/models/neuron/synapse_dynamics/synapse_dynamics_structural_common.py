@@ -104,6 +104,9 @@ class SynapseDynamicsStructuralCommon(
     __slots__ = ()
 
     def get_parameter_names(self) -> Iterable[str]:
+        """
+        Get the names of the parameters of the model.
+        """
         yield from [
             'initial_weight', 'initial_delay', 'f_rew', 'p_rew', 's_max',
             'with_replacement']
