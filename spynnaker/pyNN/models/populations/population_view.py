@@ -562,7 +562,7 @@ class PopulationView(PopulationBase):
         if isinstance(io, str):
             extension = os.path.splitext(io)[1][1:]
             if extension == "csv":
-                self.__recorder.csv_neo_block(
+                self.__recorder.write_data(
                     io, variables, view_indexes=self.__indexes,
                     annotations=annotations)
                 return
