@@ -230,7 +230,7 @@ class Recorder(object):
         return self.__append_current_segment(
             block, variables, view_indexes, clear, annotations)
 
-    def csv_neo_block(
+    def write_data(
             self, csv_file: str, variables: Optional[Names],
             view_indexes: Optional[Sequence[int]] = None,
             annotations: Optional[Dict[str, Any]] = None) -> None:
@@ -242,7 +242,6 @@ class Recorder(object):
         :param view_indexes: the indexes to be included in the view
         :param annotations:
             annotations to put on the Neo block
-        :return: The Neo block
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly

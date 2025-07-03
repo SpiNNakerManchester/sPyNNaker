@@ -122,12 +122,13 @@ def run_forever(sync_time: float = 0.0) -> None:
     """
     Supports running forever in PyNN 0.8/0.9 format.
 
+    Returns only when the application has started running on the SpiNNaker
+        platform
+
     :param sync_time:
         The time in milliseconds after which to pause before the host must
         continue the simulation.
-    :return:
-        Only when the application has started running on the SpiNNaker
-        platform; no value is returned.
+
     """
     SpynnakerDataView.check_user_can_act()
     assert __simulator is not None, "no simulator set up"
