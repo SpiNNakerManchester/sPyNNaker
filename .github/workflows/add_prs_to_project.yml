@@ -21,4 +21,4 @@ on:
       - review_requested
 jobs:
   call-add-prs-to-project:
-    uses: SpiNNakerManchester/SupportScripts/workflows/add_prs_to_project.yml@main
+    uses: SpiNNakerManchester/SupportScripts/.github/workflows/add_prs_to_project.yml@main
