@@ -23,3 +23,5 @@ on:
 jobs:
   call-add-prs-to-project:
     uses: SpiNNakerManchester/SupportScripts/.github/workflows/add_prs_to_project.yml@main
+    with:
+      personal_access_token: ${{ secrets.SPINNAKER_PAT }}
