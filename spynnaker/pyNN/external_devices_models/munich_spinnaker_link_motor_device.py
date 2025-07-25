@@ -31,6 +31,13 @@ class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
 
     def __init__(self, spinnaker_link_id: int,
                  board_address: Optional[str] = None):
+        """
+        :param spinnaker_link_id:
+            The index of the spinnaker link to which the device is connected
+        :param board_address:
+            The optional IP address of the board to which the device is
+            connected e.g. in a multi-board system
+        """
         super().__init__(
             n_atoms=6, spinnaker_link_id=spinnaker_link_id,
             label="External Munich Motor", board_address=board_address)
