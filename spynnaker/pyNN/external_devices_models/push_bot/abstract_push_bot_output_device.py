@@ -28,6 +28,14 @@ class AbstractPushBotOutputDevice(Enum):
             self, value: int, protocol_property: property, min_value: int,
             max_value: Decimal, time_between_send: int,
             send_type: SendType = SendType.SEND_TYPE_INT):
+        """
+        :param value: Enum ID
+        :param protocol_property: The protocol property of the output device
+        :param min_value: smallest alue allowed
+        :param max_value: largest value allowed
+        :param time_between_send: Time between sends
+        :param send_type: The type of data to be sent.
+        """
         self._value_ = value
         self._protocol_property = protocol_property
         self._min_value = min_value
@@ -66,6 +74,6 @@ class AbstractPushBotOutputDevice(Enum):
     @property
     def send_type(self) -> SendType:
         """
-        The time between sends
+        The type of data to be sent.
         """
         return self._send_type

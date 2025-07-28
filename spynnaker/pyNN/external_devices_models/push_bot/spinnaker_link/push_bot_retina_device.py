@@ -32,6 +32,10 @@ class DelayedPayloadMultiCastCommand(MultiCastCommand):
     """
 
     def __init__(self, key: int, vertex: 'PushBotSpiNNakerLinkRetinaDevice'):
+        """
+        :param key:  The key of the command
+        :param vertex: Vertex to get the payload from
+        """
         super().__init__(key)
         self._vertex = vertex
 
