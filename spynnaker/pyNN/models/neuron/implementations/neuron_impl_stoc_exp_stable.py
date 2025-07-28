@@ -53,7 +53,15 @@ class NeuronImplStocExpStable(AbstractNeuronImpl):
                  tau: ModelParameter, tau_refrac: ModelParameter,
                  bias: ModelParameter, refract_init: ModelParameter,
                  seed: Optional[int]):
-
+        """
+        :param v_init:  :math:`V_{init}`
+        :param v_reset: :math:`V_{thresh}`
+        :param tau:
+        :param tau_refrac:
+        :param bias:
+        :param refract_init:
+        :param seed: Seed for the random distribution
+        """
         self._v_init = v_init
         self._v_reset = v_reset
         self._tau = tau

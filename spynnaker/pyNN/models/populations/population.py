@@ -846,6 +846,9 @@ class _VertexHolder(AbstractPyNNModel):
     default_population_parameters = {}
 
     def __init__(self, vertex: PopulationApplicationVertex):
+        """
+        :param vertex: Vertex to hold and return
+        """
         self.__vertex = vertex
 
     @property

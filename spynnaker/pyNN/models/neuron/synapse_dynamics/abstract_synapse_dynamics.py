@@ -55,6 +55,10 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
     def __init__(self, delay: WEIGHTS_DELAYS_IN,
                  weight: WEIGHTS_DELAYS_IN):
+        """
+        :param delay: The delay or a way of generating the delays
+        :param weight: The weights or way to generate the weights
+        """
         self.__check_in_type(delay, "delay")
         self.__delay = self._round_delay(delay)
         self.__check_out_delay(self.__delay, "delay")

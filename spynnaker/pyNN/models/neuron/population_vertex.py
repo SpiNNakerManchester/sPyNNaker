@@ -1871,6 +1871,11 @@ class _Stats(object):
     def __init__(
             self, neuron_impl: AbstractNeuronImpl,
             default_spikes_per_second: float, ring_buffer_sigma: float):
+        """
+        :param neuron_impl:
+        :param default_spikes_per_second:
+        :param ring_buffer_sigma:
+        """
         self.w_scale = neuron_impl.get_global_weight_scale()
         self.w_scale_sq = self.w_scale ** 2
         n_synapse_types = neuron_impl.get_n_synapse_types()

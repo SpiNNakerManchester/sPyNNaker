@@ -177,19 +177,24 @@ class SpikeSourcePoissonVertex(
             splitter: Optional[AbstractSplitterCommon] = None,
             n_colour_bits: Optional[int] = None):
         """
-        :param n_neurons:
-        :param label:
-        :param seed:
-        :param max_atoms_per_core:
-        :param model:
-        :param rate:
-        :param start:
-        :param duration:
-        :param rates:
-        :param starts:
-        :param durations:
-        :param max_rate:
-        :param splitter:
+        :param n_neurons: The number of neurons in this vertex.
+        :param label: The optional name of the vertex.
+        :param max_atoms_per_core: The max number of atoms that can be
+            placed on a core for each dimension, used in partitioning.
+            If the vertex is n-dimensional, with n > 1, the value must be a
+            tuple with a value for each dimension.  If it is single-dimensional
+            the value can be a 1-tuple or an int.
+        :param model: The model to get the parameters from
+        :param rate: The spike rate of all neuron
+        :param start: The start time of spikes on all neurons
+        :param duration: The duration of spikes on all neurons
+        :param rates: The spike rate of each neuron
+        :param starts: The start time of spikes on each neuron
+        :param durations: The duration of spikes on each neuron
+        :param max_rate: The maximum number of spikes
+            for any neuron at any timestamp
+        :param splitter: The splitter object needed for this vertex.
+            Leave as `None` to delegate the choice of splitter to the selector.
         :param n_colour_bits:
         """
         super().__init__(label, max_atoms_per_core, splitter)

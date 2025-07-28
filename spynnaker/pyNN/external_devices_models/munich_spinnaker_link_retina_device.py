@@ -95,7 +95,7 @@ class MunichRetinaDevice(
         :param spinnaker_link_id:
             The SpiNNaker link to which the retina is connected
         :param position: ``LEFT`` or ``RIGHT``
-        :param label:
+        :param label: The optional name of the vertex.
         :param polarity: ``UP``, ``DOWN`` or ``MERGED``
         :param board_address:
         """

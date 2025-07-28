@@ -76,6 +76,13 @@ class SynapseDynamicsNeuromodulation(
             self, weight: _Weight = StaticSynapse.default_parameters['weight'],
             tau_c: float = 1000.0, tau_d: float = 200.0,
             w_min: float = 0.0, w_max: float = 1.0):
+        """
+        :param weight: The weights or way to generate the weights
+        :param tau_c:
+        :param tau_d:
+        :param w_min:
+        :param w_max:
+        """
         super().__init__(delay=1, weight=weight)
         self.__tau_c = tau_c
         self.__tau_d = tau_d

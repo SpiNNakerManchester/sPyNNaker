@@ -71,7 +71,7 @@ class MunichMotorDevice(
         :param delay_time:
         :param delta_threshold:
         :param continue_if_not_different:
-        :param label:
+        :param label: The optional name of the vertex.
         """
         m_vertex = MachineMunichMotorDevice(
             speed, sample_time, update_time, delay_time, delta_threshold,

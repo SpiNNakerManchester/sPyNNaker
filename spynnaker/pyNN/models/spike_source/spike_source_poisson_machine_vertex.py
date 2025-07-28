@@ -237,6 +237,18 @@ class SpikeSourcePoissonMachineVertex(
             self, sdram: AbstractSDRAM, is_recording: bool,
             label: Optional[str], app_vertex: SpikeSourcePoissonVertex,
             vertex_slice: Slice):
+        """
+        :param sdram: SDRAM usage of this vertex
+        :param is_recording: F;lag tio say spikes are to be recorded
+        :param label: The optional name of the vertex
+        :param app_vertex:
+            The application vertex that caused this machine vertex to be
+            created. If `None`, there is no such application vertex.
+        :param vertex_slice:
+            The slice of the application vertex that this machine vertex
+            implements.
+        """
+
         super().__init__(
             label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__is_recording = is_recording

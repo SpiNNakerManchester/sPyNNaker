@@ -98,7 +98,7 @@ class ExternalFPGARetinaDevice(
         :param spinnaker_link_id:
             The SpiNNaker link to which the retina is connected
         :param polarity: The "polarity" of the retina data
-        :param label:
+        :param label: The optional name of the vertex.
         :param board_address:
         """
         fixed_n_neurons = self.get_n_neurons(mode, polarity)

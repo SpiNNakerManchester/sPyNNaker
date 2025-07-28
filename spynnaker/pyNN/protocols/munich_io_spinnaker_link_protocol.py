@@ -262,7 +262,7 @@ _PAYLOAD_MASTER_SLAVE_SET_MASTER_CLOCK_ACTIVE = 4
 
 class RetinaKey(Enum):
     """
-    The identification, pixels and buts per coordinate for each retina action.
+    The identification, pixels and bits per coordinate for each retina action.
     """
     FIXED_KEY = (0, 128, 7)
     NATIVE_128_X_128 = (1, 128, 7)
@@ -271,6 +271,11 @@ class RetinaKey(Enum):
     DOWNSAMPLE_16_X_16 = (4, 16, 4)
 
     def __init__(self, ident: int, pixels: int, bits_per_coordinate: int):
+        """
+        :param ident: The ID of the enum
+        :param pixels: number of pixels per retina dimension
+        :param bits_per_coordinate:  number of bits per retina dimension
+        """
         self.__ident = ident << _PAYLOAD_RETINA_KEY_OFFSET
         self.__pixels = pixels
         self.__bits_per_coordinate = bits_per_coordinate
@@ -316,6 +321,10 @@ class RetinaPayload(Enum):
     ABSOLUTE_4_BYTE_TIMESTAMPS = (4, 4)
 
     def __init__(self, ident: int, n_payload_bytes: int):
+        """
+        :param ident: ID for the enum
+        :param n_payload_bytes: number of payload bytes for retina actions.
+        """
         self.__ident = ident << _PAYLOAD_RETINA_PAYLOAD_OFFSET
         self.__n_payload_bytes = n_payload_bytes
 

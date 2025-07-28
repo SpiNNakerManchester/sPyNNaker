@@ -49,7 +49,13 @@ class NeuronImplStocSigma(AbstractNeuronImpl):
     def __init__(self, tau_refrac: ModelParameter, alpha: ModelParameter,
                  bias: ModelParameter, refract_init: ModelParameter,
                  seed: Optional[int]):
-
+        """
+        :param tau_refrac:
+        :param alpha:
+        :param bias:
+        :param refract_init:
+        :param seed: Seed for the random distribution
+        """
         self._tau_refrac = tau_refrac
         self._alpha = alpha
         self._bias = bias

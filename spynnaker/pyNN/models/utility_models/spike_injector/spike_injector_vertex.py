@@ -56,6 +56,9 @@ class SpikeInjectorVertex(
             splitter: Optional[AbstractSplitterCommon],
             max_atoms_per_core: Optional[
                 Union[int, Tuple[int, ...]]] = sys.maxsize):
+        """
+        :param label: The optional name of the vertex.
+        """
         super().__init__(
             n_keys=n_neurons, label=label, receive_port=port,
             virtual_key=virtual_key,

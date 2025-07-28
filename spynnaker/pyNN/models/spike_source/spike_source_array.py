@@ -28,6 +28,9 @@ class SpikeSourceArray(AbstractPyNNModel):
         "splitter": None, "n_colour_bits": None, "neurons_per_core": None}
 
     def __init__(self, spike_times: Optional[Spikes] = None):
+        """
+        :param spike_times: Timesteps on which to spike
+        """
         if spike_times is None:
             spike_times = []
         self.__spike_times = spike_times
