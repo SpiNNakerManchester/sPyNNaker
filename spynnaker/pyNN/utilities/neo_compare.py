@@ -140,6 +140,8 @@ def compare_segments(
         seg1: Segment, seg2: Segment, *, same_data: bool = True,
         same_length: bool = True) -> None:
     """
+    COmpare two segments objects to see if they are the same.
+
     :param seg1: First Segment to check
     :param seg2: Second Segment to check
     :param same_data: Flag to indicate if the same type of data is held,

@@ -692,6 +692,8 @@ class NeuronRecorder(object):
                       sampling_interval: Optional[float] = None,
                       indexes: Optional[Collection[int]] = None) -> None:
         """
+        Turns on the requested recording
+
         :param variable: PyNN variable name
         :param new_state:
         :param sampling_interval:
@@ -1054,6 +1056,8 @@ class NeuronRecorder(object):
 
     def set_max_rewires_per_ts(self, max_rewires_per_ts: int) -> None:
         """
+        Sets the the maximum rewires per timestep
+
         :param max_rewires_per_ts: the maximum rewires per timestep
         """
         self.__events_per_ts[self.MAX_REWIRES] = max_rewires_per_ts

@@ -553,6 +553,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     def get_provenance_data(self, synapse_info: SynapseInformation) -> None:
         """
+        Adds the synapse information to provenace database.
+
         :param synapse_info:
         """
         # Convert to native Python integer; provenance system assumption

@@ -47,6 +47,8 @@ class SpynnakerExternalDevicePluginManager(object):
             database_notify_port_num: Optional[int],
             database_ack_port_num: Optional[int]) -> None:
         """
+        Creates a new SocketAddress and saves in into the data view
+
         :param database_notify_host:
             Host to talk to tell that the database (and application) is ready.
         :param database_notify_port_num:
