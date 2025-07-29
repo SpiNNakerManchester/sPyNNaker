@@ -31,6 +31,7 @@ def is_direct_poisson_source(
     """
     Determine if a given Poisson source can be created by this splitter.
 
+    :param post_vertex: The receiving vertex
     :param pre_vertex: The vertex sending into the Projection
     :param connector: The connector in use in the Projection
     :param dynamics:

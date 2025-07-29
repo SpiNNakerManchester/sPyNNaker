@@ -187,9 +187,10 @@ class PoolDenseConnector(AbstractConnector):
             pool_shape: Union[int, Tuple[int, ...], None] = None,
             pool_stride: Union[int, Tuple[int, ...], None] = None) -> NDArray:
         """
-        The shape considering the stride
-
         :param pre_shape: tuple(int)
+        :param pool_shape:
+        :param pool_stride:
+        :return: The shape considering the stride
         """
         real_pool_shape = cls.__to_nd_shape_or_none(
             pool_shape, len(pre_shape), "pool_shape")

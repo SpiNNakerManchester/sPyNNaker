@@ -113,6 +113,7 @@ class PopulationApplicationVertex(
         if the selector is used.
 
         :param name: The name of the parameter to set
+        :param value: The new value
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
@@ -150,6 +151,7 @@ class PopulationApplicationVertex(
         or a subset if the selector is used.
 
         :param name: The name of the variable to set
+        :param value: The new value
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
@@ -182,6 +184,7 @@ class PopulationApplicationVertex(
         or a subset if the selector is used.
 
         :param name: The name of the variable to set
+        :param value: The new value
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`

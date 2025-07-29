@@ -801,6 +801,7 @@ class NeuronRecorder(object):
         Return the SDRAM used per record.
 
         :param variable: PyNN variable name
+        :param n_atoms: number of atoms recording
         :return: usage
         """
         n_neurons = self._max_recording_per_slice(variable, n_atoms) or 0

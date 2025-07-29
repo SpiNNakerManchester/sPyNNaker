@@ -344,6 +344,7 @@ class Struct(object):
         :param values: The values to update with the read data
         :param data_offset:
             Index of the byte at the start of the valid data.
+        :param vertex_slice: Slice to read data for or None for all
         """
         n_items = 1
         ids: NDArray[integer] = numpy.zeros([0], dtype=uint32)

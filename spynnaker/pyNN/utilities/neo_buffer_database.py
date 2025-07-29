@@ -1265,6 +1265,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param variables:
             One or more variable names or `None` for all available
         :param view_indexes: List of neurons IDs to include or `None` for all
+        :param allow_missing: Flag to say if data for missing variable
+            should raise an exception
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly

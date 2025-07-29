@@ -116,6 +116,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
         Creates a delay extension machine vertex and adds to the tracker.
 
         :param source_app_vertex: The source of the delay
+        :param vertex_slice: The neurons this Machine Vertex should cover.
         :return: machine vertex
         """
         label = f"Delay extension for {source_app_vertex}"

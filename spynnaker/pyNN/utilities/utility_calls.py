@@ -287,7 +287,9 @@ def get_minimum_probable_value(distribution: RandomDistribution, n_items: int,
     Get the likely minimum value of a RandomDistribution given a
     number of draws.
 
-    :param distribution:
+    :param distribution: Random type to check
+    :param n_items: Number of items to spread chance over
+    :param chance: Possibility of a
     """
     stats = STATS_BY_NAME[distribution.name]
     prob = chance / float(n_items)
@@ -445,6 +447,7 @@ def check_rng(rng: AbstractRNG, where: str) -> None:
     sPyNNaker.  If not None, warn or error depending on a config value.
 
     :param rng: The rng parameter value.
+    :param where: Caller location for error message
     """
     if rng is not None and rng.seed is not None:
         report_non_spynnaker_pynn(

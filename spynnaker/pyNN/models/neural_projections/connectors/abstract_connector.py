@@ -195,6 +195,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the variance of the delays.
 
         :param delays:
+        :param synapse_info: Info to get distances from (if needed)
         """
         if isinstance(delays, RandomDistribution):
             return utility_calls.get_variance(delays)
@@ -286,6 +287,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the mean of the weights.
 
         :param weights:
+        :param synapse_info: Info to get distances from (if needed)
         """
         if isinstance(weights, RandomDistribution):
             return abs(utility_calls.get_mean(weights))
@@ -340,6 +342,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the variance of the weights.
 
         :param weights:
+        :param synapse_info: Info to get distances from (if needed)
         """
         if isinstance(weights, RandomDistribution):
             return utility_calls.get_variance(weights)

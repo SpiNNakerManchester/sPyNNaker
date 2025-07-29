@@ -597,6 +597,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
         Get command to sensor continuously.
 
         :param sensor_id:
+        :param time_in_ms: time to sensor
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
         """
@@ -947,6 +948,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set the laser active time.
 
+        :param active_time: The time for the lazer
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
         :raises ConfigurationException: If the mode is not PUSH_BOT
@@ -1093,6 +1095,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         Get command to set the total led period.
 
+        :param total_period: total period for the LED
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
         :raises ConfigurationException: If the mode is not PUSH_BOT

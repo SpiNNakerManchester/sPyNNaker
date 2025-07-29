@@ -133,8 +133,13 @@ class ExternalFPGARetinaDevice(
     @staticmethod
     def get_n_neurons(mode: str, polarity: str) -> int:
         """
+        Calculate the number of neurons based on mode and polarity
+
         :param mode: ``128`` or ``64`` or ``32`` or ``16``
+        :param polarity: ``UP`` or ``DOWN``
+        :returns: The number of neurons in the retina
         """
+        # Uses mode and polarity to determine the number of neurons needed
         if mode == ExternalFPGARetinaDevice.MODE_128:
             if (polarity == ExternalFPGARetinaDevice.UP_POLARITY or
                     polarity == ExternalFPGARetinaDevice.DOWN_POLARITY):
