@@ -1476,7 +1476,7 @@ class PopulationVertex(
 
     def get_synapse_dynamics_size(self, n_atoms: int) -> int:
         """
-        Get the size of the synapse dynamics region, in bytes.
+        :returns: The size of the synapse dynamics region, in bytes.
         """
         if isinstance(self.__synapse_dynamics, AbstractLocalOnly):
             return self.__synapse_dynamics.get_parameters_usage_in_bytes(
@@ -1487,9 +1487,8 @@ class PopulationVertex(
 
     def get_structural_dynamics_size(self, n_atoms: int) -> int:
         """
-        Get the size of the structural dynamics region, in bytes.
-
         :param n_atoms: The number of atoms in the slice
+        :returns: The size of the structural dynamics region, in bytes.
         """
         if not _is_structural(self.__synapse_dynamics):
             return 0
@@ -1500,9 +1499,8 @@ class PopulationVertex(
 
     def get_synapses_size(self, n_post_atoms: int) -> int:
         """
-        Get the maximum SDRAM usage for the synapses on a vertex slice.
-
         :param n_post_atoms: The number of atoms projected to
+        :returns: The maximum SDRAM usage for the synapses on a vertex slice.
         """
         if isinstance(self.__synapse_dynamics, AbstractLocalOnly):
             return 0
@@ -1564,11 +1562,10 @@ class PopulationVertex(
             self, synapse_info: SynapseInformation, n_post_atoms: int,
             app_edge: ProjectionApplicationEdge) -> MaxRowInfo:
         """
-        Get maximum row length data.
-
         :param synapse_info: Information about synapses
         :param n_post_atoms: The number of atoms projected to
         :param app_edge: The edge of the projection
+        :returns: The maximum row length data.
         """
         key = (app_edge, synapse_info, n_post_atoms)
         if key in self.__max_row_info:
@@ -1580,7 +1577,7 @@ class PopulationVertex(
 
     def get_synapse_expander_size(self) -> int:
         """
-        Get the size of the synapse expander region, in bytes.
+        :returns: The size of the synapse expander region, in bytes.
         """
         size = SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
         size += (self.__neuron_impl.get_n_synapse_types() *
@@ -1646,11 +1643,10 @@ class PopulationVertex(
             self, n_record: int, n_provenance: int,
             common_regions: CommonRegions) -> MultiRegionSDRAM:
         """
-        Get the amount of SDRAM used by common parts.
-
         :param n_record: The number of recording regions
         :param n_provenance: The number of provenance items
         :param common_regions: Region IDs
+        :returns: The amount of SDRAM used by common parts.
         """
         sdram = MultiRegionSDRAM()
         sdram.add_cost(common_regions.system, SYSTEM_BYTES_REQUIREMENT)
@@ -1669,23 +1665,21 @@ class PopulationVertex(
 
     def get_neuron_variable_sdram(self, vertex_slice: Slice) -> AbstractSDRAM:
         """
-        Get the amount of SDRAM per timestep used by neuron parts.
-
         :param vertex_slice: The slice of neurons to get the size of
+        :returns: The amount of SDRAM per timestep used by neuron parts.
         """
         return self.__neuron_recorder.get_variable_sdram_usage(vertex_slice)
 
     def get_max_neuron_variable_sdram(self, n_neurons: int) -> AbstractSDRAM:
         """
-        Get the amount of SDRAM per timestep used by neuron parts.
+        :returns: The amount of SDRAM per timestep used by neuron parts.
         """
         return self.__neuron_recorder.get_max_variable_sdram_usage(n_neurons)
 
     def get_synapse_variable_sdram(self, vertex_slice: Slice) -> AbstractSDRAM:
         """
-        Get the amount of SDRAM per timestep used by synapse parts.
-
         :param vertex_slice: The slice of neurons to get the size of
+        :returns: The amount of SDRAM per timestep used by synapse parts.
         """
         if _is_structural(self.__synapse_dynamics):
             self.__synapse_recorder.set_max_rewires_per_ts(
@@ -1694,7 +1688,7 @@ class PopulationVertex(
 
     def get_max_synapse_variable_sdram(self, n_neurons: int) -> AbstractSDRAM:
         """
-        Get the amount of SDRAM per timestep used by synapse parts.
+        :returns: The amount of SDRAM per timestep used by synapse parts.
         """
         if _is_structural(self.__synapse_dynamics):
             self.__synapse_recorder.set_max_rewires_per_ts(
@@ -1705,9 +1699,9 @@ class PopulationVertex(
             self, n_atoms: int,
             neuron_regions: NeuronRegions) -> MultiRegionSDRAM:
         """
-        Get the amount of fixed SDRAM used by neuron parts.
-
-        :param Region IDs
+        :param n_atoms: The number of atoms
+        :param neuron_regions: Region IDs
+        :returns: The amount of SDRAM for these atoms and regions.
         """
         params_cost = self.get_sdram_usage_for_neuron_params(n_atoms)
         sdram = MultiRegionSDRAM()
@@ -1740,8 +1734,8 @@ class PopulationVertex(
             self, source_vertex: PopulationApplicationVertex
             ) -> Iterable[Projection]:
         """
-        The projections that target this population vertex from
-        the given source.
+        :returns: The projections that target this population vertex from
+           the given source.
         """
         return self.__incoming_projections[source_vertex]
 
@@ -1808,14 +1802,14 @@ class PopulationVertex(
 
     def get_n_atom_bits(self) -> int:
         """
-        How many bits are required
+        :returns: How many bits are required for one core's worth of atoms
         """
         return get_n_bits(min(self.n_atoms, self.get_max_atoms_per_core()))
 
     def can_generate_on_machine(self) -> bool:
         """
-        Determine if the parameters of this vertex can be generated on the
-        machine
+        :returns: True if the parameters of this vertex can be generated
+            on the machine
         """
         # Check that all the structs can actually be generated
         for struct in self.__neuron_impl.structs:
@@ -2047,9 +2041,8 @@ class _Stats(object):
 
     def get_max_weight(self, s_type: int) -> float:
         """
-        Get the max weight.
-
         :param s_type: synapse_type
+        :returns: The max weight.
         """
         if self.delay_running_totals[s_type].variance == 0.0:
             return max(self.total_weights[s_type], self.biggest_weight[s_type])

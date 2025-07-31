@@ -293,6 +293,7 @@ class PoolDenseConnector(AbstractConnector):
         """
         :param pre_shape:
         :param n_post_atoms:
+        :returns: Size in bytes needed for the weights
         """
         n_weights = self.__get_n_weights(pre_shape, n_post_atoms)
         n_weights = n_weights + 1 if n_weights % 2 != 0 else n_weights

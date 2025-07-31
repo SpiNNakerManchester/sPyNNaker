@@ -130,7 +130,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
 
     def get_sdram_used_by_atoms(self) -> AbstractSDRAM:
         """
-        Gets the amount of SDRAM used by the delay extension.
+        :returns: The amount of SDRAM used by the delay extension.
         """
         return ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
@@ -151,8 +151,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
     def get_machine_vertex(
             self, vertex_slice: Slice) -> DelayExtensionMachineVertex:
         """
-        Get a delay extension machine vertex for a given vertex slice.
-
         :param vertex_slice: The slice to get the data for
+        :returns: A delay extension machine vertex for the vertex slice.
         """
         return self._machine_vertex_by_slice[vertex_slice]

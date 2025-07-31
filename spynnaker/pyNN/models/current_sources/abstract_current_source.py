@@ -128,6 +128,6 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
     @abstractmethod
     def get_sdram_usage_in_bytes(self) -> int:
         """
-        The SDRAM usage in bytes of the current source.
+        :returns: The SDRAM usage in bytes of the current source.
         """
         raise NotImplementedError

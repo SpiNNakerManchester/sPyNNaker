@@ -33,13 +33,13 @@ class AbstractMaxSpikes(object, metaclass=AbstractBase):
     @abstractmethod
     def max_spikes_per_ts(self) -> float:
         """
-        Get maximum expected number of spikes per timestep.
+        :returns: The maximum expected number of spikes per timestep.
         """
         raise NotImplementedError
 
     @abstractmethod
     def max_spikes_per_second(self) -> float:
         """
-        Get maximum expected number of spikes per second.
+        :returns: The maximum expected number of spikes per second.
         """
         raise NotImplementedError

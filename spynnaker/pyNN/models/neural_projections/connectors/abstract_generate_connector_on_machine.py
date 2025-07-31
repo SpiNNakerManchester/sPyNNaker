@@ -85,6 +85,7 @@ class AbstractGenerateConnectorOnMachine(
         be generated on the machine
 
         :param synapse_info: The synapse information
+        :returns: True if this instance can generate on the machine.
         """
         if (not is_param_generatable(synapse_info.weights) or
                 not is_param_generatable(synapse_info.delays)):
@@ -97,49 +98,43 @@ class AbstractGenerateConnectorOnMachine(
 
     def gen_weights_id(self, weights: WEIGHTS) -> int:
         """
-        Get the id of the weight generator on the machine.
-
         :param weights:
+        :returns: The id of the weight generator on the machine.
         """
         return param_generator_id(weights)
 
     def gen_weights_params(self, weights: WEIGHTS) -> NDArray[uint32]:
         """
-        Get the parameters of the weight generator on the machine.
-
         :param weights:
+        :returns: The parameters of the weight generator on the machine.
         """
         return param_generator_params(weights)
 
     def gen_weight_params_size_in_bytes(self, weights:  WEIGHTS) -> int:
         """
-        The size of the weight parameters in bytes.
-
         :param weights:
+        :returns: The size of the weight parameters in bytes.
         """
         return param_generator_params_size_in_bytes(weights)
 
     def gen_delays_id(self, delays: DELAYS) -> int:
         """
-        Get the id of the delay generator on the machine.
-
         :param delays:
+        :returns: The id of the delay generator on the machine.
         """
         return param_generator_id(delays)
 
     def gen_delay_params(self, delays: DELAYS) -> NDArray[uint32]:
         """
-        Get the parameters of the delay generator on the machine.
-
         :param delays:
+        :returns: The parameters of the delay generator on the machine.
         """
         return param_generator_params(delays)
 
     def gen_delay_params_size_in_bytes(self, delays: DELAYS) -> int:
         """
-        The size of the delay parameters in bytes.
-
         :param delays:
+        :returns: The size of the delay parameters in bytes.
         """
         return param_generator_params_size_in_bytes(delays)
 
@@ -154,9 +149,8 @@ class AbstractGenerateConnectorOnMachine(
     def gen_connector_params(
             self, synapse_info: SynapseInformation) -> NDArray[uint32]:
         """
-        Get the parameters of the on machine generation.
-
         :param synapse_info: The synaptic information
+        :returns: The parameters of the on machine generation.
         """
         _ = synapse_info
         return numpy.zeros(0, dtype="uint32")

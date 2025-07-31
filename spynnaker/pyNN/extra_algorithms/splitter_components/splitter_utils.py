@@ -29,8 +29,6 @@ def is_direct_poisson_source(
         connector: AbstractConnector, dynamics: AbstractSynapseDynamics,
         delay: DELAYS) -> bool:
     """
-    Determine if a given Poisson source can be created by this splitter.
-
     :param post_vertex: The receiving vertex
     :param pre_vertex: The vertex sending into the Projection
     :param connector: The connector in use in the Projection
@@ -38,6 +36,7 @@ def is_direct_poisson_source(
         The synapse dynamics in use in the Projection
     :param delay:
         The delay in use in the Projection
+    :returns: True if a given Poisson source can be created by this splitter.
     """
     return (isinstance(pre_vertex, SpikeSourcePoissonVertex) and
             isinstance(pre_vertex.splitter, SplitterPoissonDelegate) and

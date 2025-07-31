@@ -43,9 +43,8 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
     @abstractmethod
     def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         """
-        Get the ID of a synapse given the name.
-
         :param target: The name of the synapse
+        :returns: The ID of the synapse with this name
         """
         raise NotImplementedError
 
@@ -64,12 +63,11 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
             self, app_edge: ProjectionApplicationEdge,
             synapse_info: SynapseInformation) -> ConnectionsArray:
         """
-        Get the connections from the machine post-run.
-
         :param app_edge:
             The edge for which the data is being read
         :param synapse_info:
             The specific projection within the edge
+        :returns: The connections from the machine post-run.
         """
         raise NotImplementedError
 

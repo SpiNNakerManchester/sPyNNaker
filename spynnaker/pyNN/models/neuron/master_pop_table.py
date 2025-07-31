@@ -577,7 +577,7 @@ class MasterPopTableAsBinarySearch(object):
 
     def get_pop_table_data(self) -> NDArray[uint32]:
         """
-        Get the master pop table data as a numpy array.
+        :returns: The master pop table data as a numpy array.
         """
         # sort entries by key
         entries = sorted(

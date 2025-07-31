@@ -74,5 +74,8 @@ def cfg_paths_skipped() -> Set[str]:
     Set of cfg path that would not be found based on other cfg settings
 
     Assuming mode = Debug
+
+    :returns:
+       List of cfg Option names that point to paths unlikely to be used.
     """
     return fec_cfg_paths_skipped()

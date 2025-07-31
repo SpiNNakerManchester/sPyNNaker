@@ -18,7 +18,10 @@ from pacman.model.placements import Placement
 
 def make_missing_string(missing: Iterable[Placement]) -> str:
     """
+    Unused likely to be removed.
+
     :param missing:
+    :return: A String with the X, Y and P of each placement
     """
     return "; ".join(
         f"({placement.x}, {placement.y}, {placement.p})"

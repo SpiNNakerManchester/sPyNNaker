@@ -486,7 +486,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     def get_extra_parameter_names(self) -> Optional[Sequence[str]]:
         """
-        Get the names of the extra parameters.
+        :returns: The names of the extra parameters or None if there are None
         """
         return self.__extra_params.names if self.__extra_params else None
 

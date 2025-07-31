@@ -194,9 +194,8 @@ class NeuronRecorder(object):
 
     def get_region(self, variable: str) -> int:
         """
-        Get the region of a variable.
-
         :param variable: The variable to get the region of
+        :returns: The region of a variable.
         """
         return self.__region_ids[variable]
 
@@ -241,6 +240,8 @@ class NeuronRecorder(object):
         """
         :param variable:
         :param vertex_slice:
+        :returns: The indexes of the neurons recording
+            or None if the variable is ununown
         """
         if variable not in self.__sampling_rates:
             return None
@@ -348,10 +349,9 @@ class NeuronRecorder(object):
             self, application_vertex: ApplicationVertex,
             variable: str) -> Iterable[int]:
         """
-        Get the indices being recorded for a given variable.
-
         :param application_vertex: The vertex being recorded
         :param variable: The name of the variable to get the indices of
+        :returns: The indices being recorded for a given variable.
         """
         if variable not in self.__sampling_rates:
             return []
@@ -365,6 +365,7 @@ class NeuronRecorder(object):
         Get the sampling interval of a variable.
 
         :param variable: The variable to get the sampling interval of
+        :returns: Sampling interval in microseconds
         """
         if (variable in self.__per_timestep_variables or
                 variable in self.__events_per_core_variables):
@@ -374,7 +375,9 @@ class NeuronRecorder(object):
 
     def get_buffer_data_type(self, variable: str) -> BufferDataType:
         """
-        :param variable:
+        :param variable: Name of variable to get type for
+        :returns: Type of data for this variable.
+           Defaults to MATRIX even if the variable in unknown
         """
         if variable == self.SPIKES:
             return BufferDataType.NEURON_SPIKES
@@ -389,6 +392,7 @@ class NeuronRecorder(object):
     def get_data_type(self, variable: str) -> Optional[DataType]:
         """
         :param variable:
+        :returns: Type of the Data for this variable or None if unknown
         """
         if variable in self.__per_timestep_variables:
             return self.__per_timestep_datatypes[variable]
@@ -398,7 +402,7 @@ class NeuronRecorder(object):
 
     def get_recordable_variables(self) -> List[str]:
         """
-        Names of variables being recorded
+        :returns: Names of variables that can be recorded
         """
         return [
             *self.__sampling_rates.keys(),
@@ -407,13 +411,15 @@ class NeuronRecorder(object):
 
     def get_event_recordable_variables(self) -> List[str]:
         """
-        Names of event variables being recorded
+        :returns: Names of event variables being recorded
         """
         return list(self.__events_per_core_variables)
 
     def is_recording(self, variable: str) -> bool:
         """
         :param variable:
+        :returns: True if the variable is being recorded,
+           False if the variable is not being recorded or not recordable
         """
         try:
             return self.__sampling_rates[variable] > 0
@@ -425,9 +431,9 @@ class NeuronRecorder(object):
 
     def is_recordable(self, variable: str) -> bool:
         """
-        Identify if the given variable can be recorded.
-
         :param variable: The variable to check for
+        :returns: True if the given variable can be recorded,
+           regardless if it is actually recording or not.
         """
         return (variable in self.__sampling_rates or
                 variable in self.__per_timestep_variables or
@@ -482,6 +488,8 @@ class NeuronRecorder(object):
     def recorded_ids_by_slice(self, vertex_slice: Slice) -> List[int]:
         """
         :param vertex_slice:
+        :returns: list of the IDs of the variables actualy recording.
+           Editing this list will not change recording settings.
         """
         # This needs to produce a new list every time; callers modify it
         variables = [
@@ -725,6 +733,7 @@ class NeuronRecorder(object):
         recorded or not, with those that are not having a size of 0.
 
         :param vertex_slice:
+        :returns: List of size of each region including ones not recoding
         """
         return [
             self.get_buffered_sdram(variable, vertex_slice)
@@ -756,10 +765,9 @@ class NeuronRecorder(object):
     def _get_buffered_sdram_per_record(
             self, variable: str, n_neurons: int) -> int:
         """
-        Return the SDRAM used per record.
-
         :param variable: PyNN variable name
-        :return: usage
+        :return: The SDRAM used per record.
+
         """
         if variable in self.__per_timestep_variables:
             if variable not in self.__per_timestep_recording:
@@ -899,9 +907,8 @@ class NeuronRecorder(object):
 
     def get_metadata_sdram_usage_in_bytes(self, n_atoms: int) -> int:
         """
-        Get the SDRAM usage of the metadata for recording.
-
         :param n_atoms: The number of atoms to record
+        :returns: The SDRAM usage of the metadata for recording.
         """
         # This calculates the size of the metadata only; thus no reference to
         # per-timestep variables which have no metadata
@@ -920,9 +927,9 @@ class NeuronRecorder(object):
 
     def get_generator_sdram_usage_in_bytes(self, n_atoms: int) -> int:
         """
-        Get the SDRAM usage of the generator data for recording metadata.
-
         :param n_atoms: The number of atoms to be recorded
+        :returns:
+           The SDRAM usage of the generator data for recording metadata.
         """
         n_indices = self.__ceil_n_indices(n_atoms)
         n_bytes_for_indices = n_indices * self._N_BYTES_PER_INDEX
@@ -941,6 +948,7 @@ class NeuronRecorder(object):
     def get_variable_sdram_usage(self, vertex_slice: Slice) -> AbstractSDRAM:
         """
         :param vertex_slice:
+        :returns: SDRAM cost including fix cost for saving the recordings
         """
         fixed_sdram = 0.0
         per_timestep_sdram = 0.0
@@ -971,6 +979,7 @@ class NeuronRecorder(object):
     def get_max_variable_sdram_usage(self, n_atoms: int) -> AbstractSDRAM:
         """
         :param n_atoms:
+        :returns: SDRAM cost EXCLUDING fix cost for saving the recordings
         """
         fixed_sdram = 0.0
         per_timestep_sdram = 0.0
@@ -1081,11 +1090,10 @@ class NeuronRecorder(object):
     def get_generator_data(
             self, vertex_slice: Optional[Slice] = None) -> NDArray[uint32]:
         """
-        Get the recorded data as a generatable data set.
-
         :param vertex_slice:
             The slice to generate the data for, or `None` to generate for
             all neurons (assuming all the same, otherwise error)
+        :returns: The recorded data as a generatable data set.
         """
         n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)
         data = [n_vars, len(self.__bitfield_variables)]

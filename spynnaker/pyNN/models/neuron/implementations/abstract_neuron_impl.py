@@ -92,6 +92,8 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         Get the units of the given variable that can be recorded.
 
         :param variable: The name of the variable
+        :returns: The unit or this variable. For example 'mV' or 'uS'.
+           Will be an empty string for things like spikes and probability
         """
         raise NotImplementedError
 

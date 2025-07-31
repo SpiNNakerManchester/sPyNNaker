@@ -29,5 +29,6 @@ class AbstractSupportsOneToOneSDRAMInput(metaclass=AbstractBase):
         handled by the target splitter.
 
         :param  projection: The projection to check the source of
+        :returns: True if the target can handle this projection
         """
         raise NotImplementedError

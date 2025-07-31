@@ -142,9 +142,8 @@ def get_sources_for_target(app_vertex: "PopulationVertex") -> Dict[
 def get_first_and_last_slice(pre_vertex: ApplicationVertex) -> \
         Union[Tuple[Slice, Slice], Tuple[MDSlice, MDSlice]]:
     """
-    Get the first and last slice of an application vertex.
-
     :param pre_vertex: The source vertex
+    :returns: The first and last slice of an application vertex.
     """
     if isinstance(pre_vertex, ApplicationVirtualVertex):
         if len(pre_vertex.atoms_shape) == 1:

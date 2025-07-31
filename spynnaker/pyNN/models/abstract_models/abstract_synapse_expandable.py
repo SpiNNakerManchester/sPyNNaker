@@ -38,12 +38,13 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
     @abstractmethod
     def gen_on_machine(self) -> bool:
         """
-        True if the synapses of a the slice of this vertex should be
-        generated on the machine.
+        True if the synapses of this vertex should be generated on the machine.
 
         .. note::
             The typical implementation for this method will be to ask the
             app_vertex's synapse_manager
+
+        :returns: True if this vertex can generate its data on machine
         """
         raise NotImplementedError
 

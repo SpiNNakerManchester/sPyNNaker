@@ -1,3 +1,4 @@
+
 # Copyright (c) 2014 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -120,6 +121,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             The number of synapses to make random numbers for in this call
         :param prob_connect: The probability of connection
         :param rng: The random number generator
+        :returns: The multinomial distribution
         """
         # Below is how numpy does multinomial internally...
         size = len(prob_connect)

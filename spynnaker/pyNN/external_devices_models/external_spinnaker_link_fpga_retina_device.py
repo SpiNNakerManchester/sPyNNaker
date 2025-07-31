@@ -26,6 +26,7 @@ def get_y_from_fpga_retina(key: int, mode: int) -> Optional[int]:
     """
     :param key:
     :param mode:
+    :returns: y value if mode is expected otherwise None.
     """
     if mode == 128:
         return key & 0x7f
@@ -42,6 +43,7 @@ def get_x_from_fpga_retina(key: int, mode: int) -> Optional[int]:
     """
     :param key:
     :param mode:
+    :returns: x value if mode is expected otherwise None.
     """
     if mode == 128:
         return (key >> 7) & 0x7f
@@ -58,6 +60,7 @@ def get_spike_value_from_fpga_retina(key: int, mode: int) -> Optional[int]:
     """
     :param key:
     :param mode:
+    :returns: Spike value if mode is expected otherwise None.
     """
     if mode == 128:
         return (key >> 14) & 0x1

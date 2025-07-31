@@ -28,11 +28,11 @@ class HasShapeKeyFields(object, metaclass=AbstractBase):
     def get_shape_key_fields(
             self, vertex_slice: Slice) -> List[Tuple[int, int, int, int]]:
         """
-        Get the fields to be used for each dimension in the shape of the
-        given source vertex slice, as a list of start, size, mask, shift
-        values in the order of the fields.
-
         :param vertex_slice:
             The slice of the source vertex
+        :returns:
+           Get the fields to be used for each dimension in the shape of the
+           given source vertex slice, as a list of start, size, mask, shift
+           values in the order of the fields.
         """
         raise NotImplementedError

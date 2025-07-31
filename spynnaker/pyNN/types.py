@@ -53,5 +53,7 @@ WeightScales: TypeAlias = Union[NDArray[numpy.floating], Sequence[float]]
 def is_scalar(value: WEIGHTS_DELAYS) -> TypeGuard[Union[int, float]]:
     """
     Are the weights or delays a simple integer or float?
+
+    :returns: True if the type of `value` is a scalar type.
     """
     return numpy.isscalar(value)

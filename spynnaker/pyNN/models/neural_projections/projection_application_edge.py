@@ -43,7 +43,7 @@ class _Dynamics:
     @classmethod
     def structural(cls) -> Type[AbstractSynapseDynamicsStructural]:
         """
-        Delayed import of AbstractSynapseDynamicsStructural
+        :returns: Delayed import of AbstractSynapseDynamicsStructural
         """
         if cls._Structural is None:
             # Avoid import loop by postponing this import
@@ -56,7 +56,7 @@ class _Dynamics:
     @classmethod
     def stdp(cls) -> Type[SynapseDynamicsSTDP]:
         """
-        Delayed import of SynapseDynamicsSTDP
+        :returns: Delayed import of SynapseDynamicsSTDP
         """
         if cls._STDP is None:
             # Avoid import loop by postponing this import
@@ -69,7 +69,7 @@ class _Dynamics:
     @classmethod
     def neuromodulation(cls) -> Type[SynapseDynamicsNeuromodulation]:
         """
-        Delayed import of SynapseDynamicsNeuromodulation
+        :returns: Delayed import of SynapseDynamicsNeuromodulation
         """
         if cls._Neuromodulation is None:
             # Avoid import loop by postponing this import
@@ -85,9 +85,8 @@ def are_dynamics_structural(
             AbstractSynapseDynamicsStructural]:
     # pylint: disable=isinstance-second-argument-not-valid-type
     """
-    Checks if synapse_dynamics is a AbstractSynapseDynamicsStructural
-
     :param synapse_dynamics:
+    :returns: True if synapse_dynamics is a AbstractSynapseDynamicsStructural
     """
     return isinstance(synapse_dynamics, _Dynamics.structural())
 
@@ -96,9 +95,8 @@ def are_dynamics_stdp(synapse_dynamics: AbstractSynapseDynamics) -> TypeGuard[
         SynapseDynamicsSTDP]:
     # pylint: disable=isinstance-second-argument-not-valid-type
     """
-    Checks if synapse_dynamics is a SynapseDynamicsSTD
-
     :param synapse_dynamics:
+    :returns: True if synapse_dynamics is a SynapseDynamicsSTD
     """
     return isinstance(synapse_dynamics, _Dynamics.stdp())
 
@@ -107,9 +105,8 @@ def are_dynamics_neuromodulation(
         synapse_dynamics: AbstractSynapseDynamics) -> TypeGuard[
             SynapseDynamicsNeuromodulation]:
     """
-    Checks if synapse_dynamics is a SynapseDynamicsNeuromodulation
-
     :param synapse_dynamics:
+    :returns: True if synapse_dynamics is a SynapseDynamicsNeuromodulation
     """
     # pylint: disable=isinstance-second-argument-not-valid-type
     return isinstance(synapse_dynamics, _Dynamics.neuromodulation())

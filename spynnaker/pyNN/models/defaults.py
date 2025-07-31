@@ -79,6 +79,7 @@ def default_parameters(parameters: Iterable[str]) -> Callable:
 
     :param parameters:
         The names of the arguments that are parameters
+    :returns: A check method to be called when first used
     """
     def wrap(method: Callable) -> Callable:
         # pylint: disable=protected-access
@@ -119,13 +120,14 @@ def default_initial_values(state_variables: Iterable[str]) -> Callable:
 
     :param state_variables:
         The names of the arguments that are state variables
+    :returns: A check method to be called when first used
     """
     def wrap(method: Callable) -> Callable:
         """
         Wraps the init method with a check method
 
         :param method: init method to wrap
-        :return:
+        :returns: A check method to be called when first used
         """
         # pylint: disable=protected-access
         # Find the real method in case we use multiple of these decorators
@@ -159,6 +161,8 @@ def default_initial_values(state_variables: Iterable[str]) -> Callable:
 
 def defaults(cls: type) -> type:
     """
+    Deprecated! Extend AbstractProvidesDefaults instead
+
     Get the default parameters and state variables from the arguments to
     the ``__init__`` method.  This uses the decorators
     :py:func:`default_parameters` and :py:func:`default_initial_values` to
@@ -167,6 +171,8 @@ def defaults(cls: type) -> type:
     arguments.
     If neither are specified, it is assumed that all default arguments are
     parameters.
+
+    :returns: input unchanged
     """
     logger.warning("@defaults is deprecated! "
                    "Extend AbstractProvidesDefaults instead")
@@ -276,6 +282,8 @@ class AbstractProvidesDefaults(object):
         If no @default_parameters decorator is used
         this will be all the init parameters with a default value
         less any defined in @default_initial_values
+
+        :returns: Mapping of parameter names to default values
         """
         if cls.__cashed_defaults is None:
             cls.__fill_in_defaults()
@@ -297,6 +305,10 @@ class AbstractProvidesDefaults(object):
         less any defined in @default_parameters
 
         If neither decorator is used this will be an empty Mapping
+
+        :returns:
+            The default initial values for the state variables of the model.
+
         """
         if cls.__cashed_initials is None:
             cls.__fill_in_defaults()
