@@ -110,6 +110,7 @@ jobs:
         install-check-tools: false
         ubuntu-packages: graphviz
         cfg-file: spynnaker
+        python-version: "3.13"
 
     - name: Download Fec binaries
       uses: actions/download-artifact@v4
