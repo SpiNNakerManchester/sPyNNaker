@@ -47,6 +47,8 @@ class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
         Determines if this instance should be generated on the machine.
 
         Default implementation returns True
+
+        :returns: True if the instance should be generated on the machine.
         """
         return True
 
@@ -66,7 +68,7 @@ class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
             max_pre_atoms_per_core: int, max_post_atoms_per_core: int
             ) -> NDArray[uint32]:
         """
-        Any parameters required by the matrix generator.
+        :returns: Any parameters required by the matrix generator.
         """
         raise NotImplementedError
 

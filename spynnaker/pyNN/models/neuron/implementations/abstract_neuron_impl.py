@@ -52,37 +52,36 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
     @abstractmethod
     def get_global_weight_scale(self) -> float:
         """
-        Get the weight scaling required by this model.
+        :returns: The weight scaling required by this model.
         """
         raise NotImplementedError
 
     @abstractmethod
     def get_n_synapse_types(self) -> int:
         """
-        Get the number of synapse types supported by the model.
+        :returns: The number of synapse types supported by the model.
         """
         raise NotImplementedError
 
     @abstractmethod
     def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         """
-        Get the ID of a synapse given the name.
-
         :param target: The name of the synapse
+        :returns: The ID of a synapse given the name.
         """
         raise NotImplementedError
 
     @abstractmethod
     def get_synapse_targets(self) -> Sequence[str]:
         """
-        Get the target names of the synapse type.
+        :returns: The target names of the synapse type.
         """
         raise NotImplementedError
 
     @abstractmethod
     def get_recordable_variables(self) -> Sequence[str]:
         """
-        Get the names of the variables that can be recorded in this model.
+        :returns: The names of the variables that can be recorded in this model.
         """
         raise NotImplementedError
 
@@ -112,16 +111,16 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         Determine if the given variable can be recorded.
 
         :param variable: The name of the variable
+        :returns: True if the variable is recorded, False otherwise
         """
         raise NotImplementedError
 
     @abstractmethod
     def get_recordable_variable_index(self, variable: str) -> int:
         """
-        Get the index of the variable in the list of variables that can be
-        recorded.
-
         :param variable: The name of the variable
+        :returns: The index of the variable in the list of variables that can
+            be recorded.
         """
         raise NotImplementedError
 
@@ -147,9 +146,8 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
     @abstractmethod
     def get_units(self, variable: str) -> str:
         """
-        Get the units of the given variable.
-
         :param variable: The name of the variable
+        :returns: The units of the given variable.
         """
         raise NotImplementedError
 

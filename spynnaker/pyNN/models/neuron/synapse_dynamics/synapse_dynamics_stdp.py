@@ -268,7 +268,8 @@ class SynapseDynamicsSTDP(
 
     def get_vertex_executable_suffix(self) -> str:
         """
-        an executable suffix based on timing, weights and neuromodulation
+        :returns:
+           An executable suffix based on timing, weights and neuromodulation
         """
         # Get the suffix values for timing and weight dependence
         timing_suffix = self.__timing_dependence.vertex_executable_suffix
@@ -288,6 +289,7 @@ class SynapseDynamicsSTDP(
         """
         :param n_neurons:
         :param n_synapse_types:
+        :returns: SDRAM size in bytes of paramterter data
         """
         # 32-bits for back-prop delay
         size = BYTES_PER_WORD

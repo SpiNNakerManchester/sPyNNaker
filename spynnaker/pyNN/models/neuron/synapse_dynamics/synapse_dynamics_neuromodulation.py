@@ -147,6 +147,7 @@ class SynapseDynamicsNeuromodulation(
         Checks that tau c, tau d, w max and w min are all the same.
 
         :param other:
+        :returns: True if all checked values are the same
         """
         return (self.__tau_c == other.tau_c and self.__tau_d == other.tau_d and
                 self.__w_min == other.w_min and self.__w_max == other.w_max)

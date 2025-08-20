@@ -129,13 +129,14 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         error if merge is not possible.
 
         :param synapse_dynamics:
+        :returns: A merge of this and the given synapse_dynamics
         """
         raise NotImplementedError
 
     @abstractmethod
     def get_vertex_executable_suffix(self) -> str:
         """
-        Get the executable suffix for a vertex for this dynamics.
+        :returns: The executable suffix for a vertex for this dynamics.
         """
         raise NotImplementedError
 
@@ -230,6 +231,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         Get a property.
 
         :param key: the name of the property
+        :returns: Value for this key
         """
         if hasattr(self, key):
             return getattr(self, key)
@@ -254,7 +256,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             self, connector: AbstractConnector,
             synapse_info: SynapseInformation) -> float:
         """
-        Get the maximum delay for the synapses.
+        :returns: The maximum delay for the synapses.
         """
         return connector.get_delay_maximum(synapse_info)
 
@@ -263,12 +265,14 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             synapse_info: SynapseInformation) -> Optional[float]:
         """
         Get the minimum delay for the synapses.
+
         This will support the filtering of the undelayed edge
         from the graph, but requires fixes in the synaptic manager to
         happen first before this can be utilised fully.
 
         :param connector: connector
         :param synapse_info: synapse info
+        :returns: The minimum delay
         """
         return connector.get_delay_minimum(synapse_info)
 
@@ -276,11 +280,10 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             self, connector: AbstractConnector, delays: DELAYS,
             synapse_info: SynapseInformation) -> float:
         """
-        Get the variance in delay for the synapses.
-
         :param connector:
         :param delays:
         :param synapse_info:
+        :returns: The variance in delay for the synapses.
         """
         return connector.get_delay_variance(delays, synapse_info)
 
@@ -288,10 +291,9 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             self, connector: AbstractConnector,
             synapse_info: SynapseInformation) -> float:
         """
-        Get the mean weight for the synapses.
-
         :param connector:
         :param synapse_info:
+        :returns: The mean weight for the synapses.
         """
         return connector.get_weight_mean(synapse_info.weights, synapse_info)
 
@@ -299,10 +301,9 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             self, connector: AbstractConnector,
             synapse_info: SynapseInformation) -> float:
         """
-        Get the maximum weight for the synapses.
-
         :param connector:
         :param synapse_info:
+        :returns: The maximum weight for the synapses.
         """
         return connector.get_weight_maximum(synapse_info)
 
@@ -310,20 +311,18 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
            self, connector: AbstractConnector, weights: WEIGHTS,
             synapse_info: SynapseInformation) -> float:
         """
-        Get the variance in weight for the synapses.
-
         :param connector:
         :param weights:
         :param synapse_info:
+        :returns: The variance in weight for the synapses.
         """
         return connector.get_weight_variance(weights, synapse_info)
 
     def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         """
-        Get the index of the synapse type based on the name, or `None`
-        if the name is not found.
-
         :param target: The name of the synapse
+        :returns: The index of the synapse type based on the name,
+            or `None` if the name is not found.
         """
         _ = target
         return None

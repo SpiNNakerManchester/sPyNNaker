@@ -382,6 +382,8 @@ class SpikeSourceArrayVertex(
 
         If template is `None`, then a dictionary containing the template
         context will be returned.
+
+        :returns: A human-readable description of the cell
         """
         return {
             "name": self.__model_name,

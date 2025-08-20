@@ -1303,14 +1303,7 @@ class PopulationVertex(
 
     def describe(self) -> Dict[str, Union[str, Dict[str, Any]]]:
         """
-        Get a human-readable description of the cell or synapse type.
-
-        The output may be customised by specifying a different template
-        together with an associated template engine
-        (see :py:mod:`pyNN.descriptions`).
-
-        If template is `None`, then a dictionary containing the template
-        context will be returned.
+        :returns: A human-readable description of vertex and its parameters
         """
         parameters = dict(self.get_parameter_values(
             self.__pynn_model.default_parameters.keys()))
@@ -1325,9 +1318,8 @@ class PopulationVertex(
 
     def get_synapse_id_by_target(self, target: str) -> Optional[int]:
         """
-        Get the id of synapse using its target name.
-
         :param target: The synapse to get the id of
+        :returns: The id of synapse using its target name.
         """
         return self.__neuron_impl.get_synapse_id_by_target(target)
 
@@ -1379,8 +1371,8 @@ class PopulationVertex(
 
     def get_ring_buffer_shifts(self) -> List[int]:
         """
-        Get the shift of the ring buffers for transfer of values into the
-        input buffers for this model.
+        :returns: The shift of the ring buffers for transfer of values into
+            the input buffers for this model.
         """
         n_synapse_types = self.__neuron_impl.get_n_synapse_types()
         max_weights = numpy.zeros(n_synapse_types)
@@ -1432,9 +1424,8 @@ class PopulationVertex(
             self, ring_buffer_shifts: Iterable[int]
             ) -> NDArray[numpy.floating]:
         """
-        Get the weight scaling to apply to weights in synapses.
-
         :param ring_buffer_shifts: The shifts to convert to weight scales
+        :returns: The weight scaling to apply to weights in synapses.
         """
         weight_scale = self.__neuron_impl.get_global_weight_scale()
         return numpy.array([
@@ -1467,7 +1458,7 @@ class PopulationVertex(
 
     def get_synapse_params_size(self) -> int:
         """
-        Get the size of the synapse parameters, in bytes.
+        :returns: The size of the synapse parameters, in bytes.
         """
         # This will only hold ring buffer scaling for the neuron synapse
         # types

@@ -468,7 +468,7 @@ class SynapticMatrixApp(object):
 
     def get_index(self) -> int:
         """
-        Get the index in the master population table of the matrix.
+        :returns: The index in the master population table of the matrix.
         """
         if self.__index is None:
             raise RuntimeError("master pop table space not yet reserved")

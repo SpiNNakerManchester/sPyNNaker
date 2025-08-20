@@ -86,26 +86,24 @@ def _flatten(alist: Iterable[Union[T, Iterable[T]]]) -> Iterable[T]:
 
 def get_n_rates(vertex_slice: Slice, rate_data: Sequence[Sized]) -> int:
     """
-    How many rates there are to be stored in total.
+    :returns: How many rates there are to be stored in total.
     """
     return sum(len(rate_data[i]) for i in vertex_slice.get_raster_ids())
 
 
 def get_params_bytes(n_atoms: int) -> int:
     """
-    Gets the size of the Poisson parameters in bytes.
-
     :param n_atoms: How many atoms to account for
+    :returns: The size of the Poisson parameters in bytes.
     """
     return (PARAMS_BASE_WORDS + n_atoms) * BYTES_PER_WORD
 
 
 def get_rates_bytes(n_atoms: int, n_rates: int) -> int:
     """
-    Gets the size of the Poisson rates in bytes.
-
     :param n_atoms: How many atoms to account for
     :param n_rates: How many rates to account for
+    :returns: The size of the Poisson rates in bytes.
     """
     return ((n_atoms * PARAMS_WORDS_PER_NEURON) +
             (n_rates * PARAMS_WORDS_PER_RATE)) * BYTES_PER_WORD
@@ -113,10 +111,9 @@ def get_rates_bytes(n_atoms: int, n_rates: int) -> int:
 
 def get_expander_rates_bytes(n_atoms: int, n_rates: int) -> int:
     """
-    Gets the size of the Poisson rates in bytes.
-
     :param n_atoms: How many atoms to account for
     :param n_rates: How many rates to account for
+    :returns: The size of the Poisson rates in bytes.
     """
     return ((n_atoms * EXPANDER_WORDS_PER_NEURON) +
             (n_rates * PARAMS_WORDS_PER_RATE) +
@@ -125,9 +122,8 @@ def get_expander_rates_bytes(n_atoms: int, n_rates: int) -> int:
 
 def get_sdram_edge_params_bytes(vertex_slice: Slice) -> int:
     """
-    Gets the size of the Poisson SDRAM region in bytes.
-
     :param vertex_slice:
+    :returns: The size of the Poisson SDRAM region in bytes.
     """
     return SDRAM_EDGE_PARAMS_BASE_BYTES + (
         vertex_slice.n_atoms * SDRAM_EDGE_PARAMS_BYTES_PER_WEIGHT)

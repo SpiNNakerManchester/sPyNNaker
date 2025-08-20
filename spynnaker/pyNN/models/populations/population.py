@@ -156,8 +156,7 @@ class Population(PopulationBase):
 
     def all(self) -> Iterator[PopulationView]:
         """
-        Iterator over cell IDs on all MPI nodes.
-
+        :returns: Iterator over cell IDs on all MPI nodes.
         """
         for _id in range(self.__size):
             yield IDMixin(self, _id)
@@ -185,6 +184,7 @@ class Population(PopulationBase):
         Determine whether `variable` can be recorded from this population.
 
         :param variable: The variable to answer the question about
+        :returns: True if the variable can be recorded, False otherwise.
         """
         return variable in self.__vertex.get_recordable_variables()
 
@@ -201,6 +201,7 @@ class Population(PopulationBase):
 
         :param n: The number of cells to put in the view.
         :param rng: The random number generator to use
+        :returns: A PopulationView over n random cells.
         """
         if not rng:
             rng = NumpyRNG()
@@ -244,6 +245,7 @@ class Population(PopulationBase):
 
         :param template: Template filename
         :param engine: Template substitution engine
+        :returns: Human-readable description as a string or dict
         """
         context: Dict[str, Any] = {
             "label": self.label,
@@ -281,34 +283,11 @@ class Population(PopulationBase):
                     io=self.__recorder.write_to_files_indicators[variable],
                     variables=[variable])
 
-    @overrides(PopulationBase.get_data, extend_doc=False)
+    @overrides(PopulationBase.get_data)
     def get_data(
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
             annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
-
-        """
-        Return a Neo Block containing the data (spikes, state variables)
-        recorded from the Assembly.
-
-        :param variables: either a single variable name or a list of variable
-            names. Variables must have been previously recorded, otherwise an
-            Exception will be raised.
-        :param gather: Whether to collect data from all MPI nodes or
-            just the current node.
-
-            .. note::
-                This is irrelevant on sPyNNaker, which always behaves as if
-                this parameter is True.
-
-        :param clear:
-            Whether recorded data will be deleted from the ``Assembly``.
-        :param annotations: annotations to put on the neo block
-        :raises \
-            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
-            If the variable or variables have not been previously set to
-            record.
-        """
         self._check_params(gather, annotations)
         return self.__recorder.extract_neo_block(
             variables, None, clear, annotations)
@@ -333,11 +312,8 @@ class Population(PopulationBase):
             return db.spinnaker_get_data(self.__recorder.recording_label,
                                          variable, as_matrix, view_indexes)
 
-    @overrides(PopulationBase.get_spike_counts, extend_doc=False)
+    @overrides(PopulationBase.get_spike_counts)
     def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
-        """
-        Return the number of spikes for each neuron.
-        """
         self._check_params(gather)
         with NeoBufferDatabase() as db:
             return db.get_spike_counts(self.__recorder.recording_label)
@@ -524,8 +500,8 @@ class Population(PopulationBase):
 
         :param parameter_names: Name of parameter. This is either a single
             string or a list of strings
-        :param gather: pointless on sPyNNaker
-        :param simplify: ignored
+        :param gather: Ignored. Purely for PyNN compatibility
+        :param simplify: Ignored. Purely for PyNN compatibility
         :return: A single list of values (or possibly a single value) if
             paramter_names is a string, or a dict of these if parameter names
             is a list.
@@ -556,6 +532,7 @@ class Population(PopulationBase):
         https://neuralensemble.org/docs/PyNN/reference/populations.html
 
         :param id:
+        :returns: Index of cell(s) in the Population
         """
         # pylint: disable=redefined-builtin
         if not numpy.iterable(id):
@@ -582,6 +559,7 @@ class Population(PopulationBase):
         Population, return their ID(s)
 
         :param index:
+        :returns: The ID(s) of the cell(s) in the Population
         """
         if not numpy.iterable(index):
             index = cast(int, index)

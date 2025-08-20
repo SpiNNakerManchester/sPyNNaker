@@ -33,6 +33,7 @@ class AbstractWeightDependence(
         Determine if this weight dependence is the same as another.
 
         :param weight_dependence:
+        :returns: True if the weight dependence is the same as another.
         """
         raise NotImplementedError
 
@@ -48,10 +49,9 @@ class AbstractWeightDependence(
     def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types: int, n_weight_terms: int) -> int:
         """
-        Get the amount of SDRAM used by the parameters of this rule.
-
         :param n_synapse_types:
         :param n_weight_terms:
+        :returns: the amount of SDRAM used by the parameters of this rule.
         """
         raise NotImplementedError
 

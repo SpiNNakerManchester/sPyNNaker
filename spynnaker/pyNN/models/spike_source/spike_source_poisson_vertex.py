@@ -594,6 +594,8 @@ class SpikeSourcePoissonVertex(
         suitable for use as a mars 64 kiss seed.
 
         :param vertex_slice:
+        :return: a list of 4 integers which are used by the mars64 kiss random
+            number generator for seeds.
         """
         if vertex_slice not in self.__kiss_seed:
             self.__kiss_seed[vertex_slice] = create_mars_kiss_seeds(self.__rng)
@@ -632,6 +634,8 @@ class SpikeSourcePoissonVertex(
 
         If template is `None`, then a dictionary containing the template
         context will be returned.
+
+        :returns:  human-readable description of the vetrex
         """
         parameters = self.get_parameter_values(self.__model.default_parameters)
 

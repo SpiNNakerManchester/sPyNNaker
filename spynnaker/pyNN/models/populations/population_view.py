@@ -250,7 +250,7 @@ class PopulationView(PopulationBase):
 
     def all(self) -> Iterator[IDMixin]:
         """
-        Iterator over cell IDs (on all MPI nodes).
+        :returns: An iterator over cell IDs (on all MPI nodes).
         """
         for idx in self.__indexes:
             yield IDMixin(self.__population, idx)
@@ -258,6 +258,9 @@ class PopulationView(PopulationBase):
     def can_record(self, variable: str) -> bool:
         """
         Determine whether variable can be recorded from this population.
+
+        :returns: True if this variable can be recorded,
+            False othwerwise including if the variable is invalid.
         """
         return variable in self.__vertex.get_recordable_variables()
 
@@ -292,6 +295,7 @@ class PopulationView(PopulationBase):
 
         :param template: Template filename
         :param engine: Template substitution engine
+        :returns: A human-readable description of the population view.
         """
         context = {"label": self.label,
                    "parent": self.parent.label,
@@ -315,8 +319,7 @@ class PopulationView(PopulationBase):
     def get(self, parameter_names: Names,
             gather: bool = False, simplify: bool = True) -> ParameterHolder:
         """
-        Get the values of the given parameters for every local cell in the
-        population, or, if ``gather=True``, for all cells in the population.
+        Get the values of the given parameters for all cells in the population.
 
         Values will be expressed in the standard PyNN units (i.e. millivolts,
         nanoamps, milliseconds, microsiemens, nanofarads, event per second).
@@ -325,8 +328,9 @@ class PopulationView(PopulationBase):
             SpiNNaker always gathers.
 
         :param parameter_names:
-        :param gather:
-        :param simplify:
+        :param gather: Ignored. Purely for PyNN compatibility
+        :param simplify: Ignored.  Purely for PyNN compatibility
+        :returns: The values of the given parameters for all cell
         """
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
@@ -349,11 +353,7 @@ class PopulationView(PopulationBase):
         :param variables: Either a single variable name or a list of variable
             names. Variables must have been previously recorded, otherwise an
             Exception will be raised.
-        :param gather: For parallel simulators, if gather is True, all
-            data will be gathered to all nodes and the Neo Block will contain
-            data from all nodes.
-            Otherwise, the Neo Block will contain only data from the cells
-            simulated on the local node.
+        :param gather: Ignored. Purely for PyNN compatibility
 
             .. note::
                 SpiNNaker always gathers.
@@ -428,6 +428,7 @@ class PopulationView(PopulationBase):
         assert pv.id_to_index(pv[3]) == 3
 
         :param id:
+        :returns: Index in this View
         """
         if isinstance(id, int):
             return self.__indexes.index(id)
@@ -439,6 +440,7 @@ class PopulationView(PopulationBase):
         population at the root of the tree.
 
         :param indices:
+        :returns: Indices in the parent
         """
         return [self.__indexes[index] for index in indices]
 
@@ -514,6 +516,7 @@ class PopulationView(PopulationBase):
 
         :param n: The number of cells to select
         :param rng: Random number generator
+        :returns: A PopulationView over n random cells.
         """
         if not rng:
             rng = NumpyRNG()
@@ -619,7 +622,7 @@ class IDMixin(PopulationView):
 
     def get_parameters(self) -> ParameterHolder:
         """
-        Return a dict of all cell parameters.
+        :returns: A dict of all cell parameters.
         """
         return self._vertex.get_parameter_values(
             self._vertex.get_parameters(), self.id)
@@ -648,6 +651,7 @@ class IDMixin(PopulationView):
         Get the initial value of a state variable of the cell.
 
         :param variable: The name of the variable
+        :returns: The initial value for this variable
         """
         return self._vertex.get_initial_state_values(variable, self.id)
 
@@ -674,7 +678,7 @@ class IDMixin(PopulationView):
 
     def as_view(self) -> PopulationView:
         """
-        Return a PopulationView containing just this cell.
+        :returns: A PopulationView containing just this cell.
         """
         return self
 

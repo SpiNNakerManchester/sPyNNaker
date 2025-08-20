@@ -112,9 +112,13 @@ class SynapseDynamicsWeightChangable(
         return self.__weight_min
 
     def get_synapse_info_index(self, synapse_info: SynapseInformation) -> int:
-        """ Get the row offset for the given synapse information.  Each synapse
-            information has a unique row offset which then allows for multiple
-            connections to be identified and kept separate.
+        """
+        Get the row offset for the given synapse information.
+
+        Each synapse information has a unique row offset which then allows
+        for multiple connections to be identified and kept separate.
+
+        :returns: The row offset for the given synapse information.
         """
         if synapse_info not in self.__synapse_info_to_index:
             self.__synapse_info_to_index[synapse_info] = self.__next_index

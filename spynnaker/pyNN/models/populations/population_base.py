@@ -94,10 +94,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             Either a single variable name or a list of variable names.
             Variables must have been previously recorded, otherwise an
             Exception will be raised.
-        :param gather: For parallel simulators, if this is True, all data
-            will be gathered to all nodes and the Neo Block will contain data
-            from all nodes. Otherwise, the Neo Block will contain only data
-            from the cells simulated on the local node.
+        :param gather: Ignored. Purely for PyNN compatibility
 
             .. note::
                 SpiNNaker always gathers.
@@ -105,6 +102,11 @@ class PopulationBase(object, metaclass=AbstractBase):
         :param clear:
             If this is True, recorded data will be deleted from the Population.
         :param annotations: annotations to put on the neo block
+        :returns: Data in neo format
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the variable or variables have not been previously set to
+            record.
         """
         raise NotImplementedError
 
@@ -115,14 +117,11 @@ class PopulationBase(object, metaclass=AbstractBase):
 
         The dict keys are neuron IDs, not indices.
 
-        :param gather:
-            For parallel simulators, if this is True, all data will be gathered
-            to all nodes and the Neo Block will contain data from all nodes.
-            Otherwise, the Neo Block will contain only data from the cells
-            simulated on the local node.
+        :param gather: Ignored. Purely for PyNN compatibility
 
             .. note::
                 SpiNNaker always gathers.
+        :returns: A dict containing the number of spikes for each neuron.
         """
         raise NotImplementedError
 
@@ -139,6 +138,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         Indicates whether the cell with the given ID exists on the
         local MPI node.
+
+        :returns: True
         """
         # pylint: disable=redefined-builtin
         _ = id
@@ -162,16 +163,11 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     def mean_spike_count(self, gather: bool = True) -> float:
         """
-        Returns the mean number of spikes per neuron.
-
-        :param gather:
-            For parallel simulators, if this is True, all data will be gathered
-            to all nodes and the Neo Block will contain data from all nodes.
-            Otherwise, the Neo Block will contain only data from the cells
-            simulated on the local node.
+        :param gather: Ignored. Purely for PyNN compatibility
 
             .. note::
                 SpiNNaker always gathers.
+        :returns: The mean number of spikes per neuron.
         """
         if not gather:
             warn_once(
@@ -226,11 +222,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             either a single variable name or a list of variable names.
             Variables must have been previously recorded, otherwise an
             Exception will be raised.
-        :param gather: For parallel simulators, if this is True, all data
-            will be gathered to all nodes and the Neo Block will contain data
-            from all nodes. Otherwise, the Neo Block will contain only data
-            from the cells simulated on the local node. This is pointless on
-            sPyNNaker.
+        :param gather: Ignored. Purely for PyNN compatibility
 
             .. note::
                 SpiNNaker always gathers.
