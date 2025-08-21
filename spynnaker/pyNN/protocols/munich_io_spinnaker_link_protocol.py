@@ -268,6 +268,7 @@ class RetinaKey(Enum):
     DOWNSAMPLE_16_X_16 = (4, 16, 4)
 
     def __init__(self, ident: int, pixels: int, bits_per_coordinate: int):
+        # pylint: disable=wrong-spelling-in-docstring
         """
         :param ident: The ID of the enum
         :param pixels: number of pixels per retina dimension
@@ -436,7 +437,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
         :param new_key:
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
-        :returns: Tommand to configure master key.
+        :returns: Command to configure master key.
         """
         return MultiCastCommand(
             self._get_key(CONFIGURE_MASTER_KEY), payload=new_key, time=time)
