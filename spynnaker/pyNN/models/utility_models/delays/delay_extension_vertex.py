@@ -105,7 +105,8 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
     def get_max_delay_ticks_supported(delay_ticks_at_post_vertex: int) -> int:
         """
         :param delay_ticks_at_post_vertex:
-        :returns: The max ticks the combination of delay and post vertex can handle.
+        :returns:
+           The max ticks the combination of delay and post vertex can handle.
         """
         return DelayExtensionVertex.MAX_SLOTS * delay_ticks_at_post_vertex
 

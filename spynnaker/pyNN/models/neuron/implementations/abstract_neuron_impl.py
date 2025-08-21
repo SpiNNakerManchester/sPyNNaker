@@ -81,7 +81,8 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
     @abstractmethod
     def get_recordable_variables(self) -> Sequence[str]:
         """
-        :returns: The names of the variables that can be recorded in this model.
+        :returns:
+           The names of the variables that can be recorded in this model.
         """
         raise NotImplementedError
 

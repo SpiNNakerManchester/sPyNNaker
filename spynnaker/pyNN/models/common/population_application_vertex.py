@@ -167,8 +167,8 @@ class PopulationApplicationVertex(
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids
-        :returns: The current values of a state variable for the whole Population
-            or a subset if the selector is used.
+        :returns: The current values of a state variable for
+            the whole Population or a subset if the selector is used.
         :raise KeyError: if the variable is not something that can be read
         """
         raise KeyError(

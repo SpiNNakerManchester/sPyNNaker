@@ -86,7 +86,8 @@ def get_push_bot_laser_led_speaker_frequency_i(key: int) -> int:
 
 def get_push_bot_motor_i(key: int) -> int:
     """
-    :returns: The key without the universal asynchronous receiver/transmitter mask.
+    :returns:
+       The key without the universal asynchronous receiver/transmitter mask.
     """
 
     return key & PUSH_BOT_MOTOR_WITHOUT_UART_MASK
