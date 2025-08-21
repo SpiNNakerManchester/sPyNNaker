@@ -149,7 +149,7 @@ class ProjectionApplicationEdge(
     def add_synapse_information(
             self, synapse_information: SynapseInformation) -> None:
         """
-        Adds sysnapse information on this edge
+        Adds synapse information on this edge
 
         :param synapse_information:
         """

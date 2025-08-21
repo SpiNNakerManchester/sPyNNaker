@@ -260,7 +260,7 @@ class PopulationView(PopulationBase):
         Determine whether variable can be recorded from this population.
 
         :returns: True if this variable can be recorded,
-            False othwerwise including if the variable is invalid.
+            False otherwise including if the variable is invalid.
         """
         return variable in self.__vertex.get_recordable_variables()
 

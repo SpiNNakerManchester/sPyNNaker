@@ -639,7 +639,7 @@ class SpikeSourcePoissonVertex(
         If template is `None`, then a dictionary containing the template
         context will be returned.
 
-        :returns:  human-readable description of the vetrex
+        :returns:  human-readable description of the vertex
         """
         parameters = self.get_parameter_values(self.__model.default_parameters)
 

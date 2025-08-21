@@ -235,7 +235,7 @@ class SpikeSourcePoissonMachineVertex(
             vertex_slice: Slice):
         """
         :param sdram: SDRAM usage of this vertex
-        :param is_recording: F;lag tio say spikes are to be recorded
+        :param is_recording: Flag to say spikes are to be recorded
         :param label: The optional name of the vertex
         :param app_vertex:
             The application vertex that caused this machine vertex to be

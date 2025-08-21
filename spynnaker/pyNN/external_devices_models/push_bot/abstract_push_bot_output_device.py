@@ -31,7 +31,7 @@ class AbstractPushBotOutputDevice(Enum):
         """
         :param value: Enum ID
         :param protocol_property: The protocol property of the output device
-        :param min_value: smallest alue allowed
+        :param min_value: smallest value allowed
         :param max_value: largest value allowed
         :param time_between_send: Time between sends
         :param send_type: The type of data to be sent.

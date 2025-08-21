@@ -241,7 +241,7 @@ class NeuronRecorder(object):
         :param variable:
         :param vertex_slice:
         :returns: The indexes of the neurons recording
-            or None if the variable is ununown
+            or None if the variable is unknown
         """
         if variable not in self.__sampling_rates:
             return None
@@ -488,7 +488,7 @@ class NeuronRecorder(object):
     def recorded_ids_by_slice(self, vertex_slice: Slice) -> List[int]:
         """
         :param vertex_slice:
-        :returns: list of the IDs of the variables actualy recording.
+        :returns: list of the IDs of the variables actually recording.
            Editing this list will not change recording settings.
         """
         # This needs to produce a new list every time; callers modify it

@@ -289,7 +289,7 @@ class SynapseDynamicsSTDP(
         """
         :param n_neurons:
         :param n_synapse_types:
-        :returns: SDRAM size in bytes of paramterter data
+        :returns: SDRAM size in bytes of parameter data
         """
         # 32-bits for back-prop delay
         size = BYTES_PER_WORD

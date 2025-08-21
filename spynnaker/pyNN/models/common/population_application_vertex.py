@@ -326,7 +326,7 @@ class PopulationApplicationVertex(
         For instance data such as spikes this will be `None`.
 
         :param name: The name of the variable to get the type of
-        :returns: The datatype used by the C code
+        :returns: The data type used by the C code
         :raise KeyError: If the variable isn't recordable
         """
         if name not in self.get_recordable_variables():

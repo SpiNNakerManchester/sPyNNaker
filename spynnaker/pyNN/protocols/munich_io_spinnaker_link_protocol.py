@@ -279,6 +279,7 @@ class RetinaKey(Enum):
 
     @property
     def ident(self) -> int:
+        # pylint: disable=wrong-spelling-in-docstring
         """
         :returns: The identification passed into the init.
         """
@@ -318,6 +319,7 @@ class RetinaPayload(Enum):
     ABSOLUTE_4_BYTE_TIMESTAMPS = (4, 4)
 
     def __init__(self, ident: int, n_payload_bytes: int):
+        # pylint: disable=wrong-spelling-in-docstring
         """
         :param ident: ID for the enum
         :param n_payload_bytes: number of payload bytes for retina actions.
@@ -910,7 +912,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             self, active_time: int,
             time: Optional[int] = None) -> MultiCastCommand:
         """
-        :param active_time: The time for the lazer
+        :param active_time: The time for the laser
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
         :returns: Command to set the laser active time.

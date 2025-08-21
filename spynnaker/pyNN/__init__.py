@@ -591,7 +591,7 @@ def get_max_delay() -> int:
     Most likely value is timestep * 144
 
     :raises NotImplementedError: As there is no system wide max_delay
-    :returns: In SpyNNaker this meathod never returns
+    :returns: In SpyNNaker this method never returns
     """
     raise NotImplementedError(
         "sPyNNaker does not have a system wide max_delay")
