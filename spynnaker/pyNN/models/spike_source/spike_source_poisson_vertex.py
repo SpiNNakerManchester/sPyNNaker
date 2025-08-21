@@ -128,6 +128,9 @@ def is_iterable(value: Values) -> TypeGuard[
         Union[Sequence[float], NDArray[numpy.floating]]]:
     """
     Check that the Value is iterable.
+
+    :param value: The value to check.
+    :returns: True if Value is iterable, False otherwise.
     """
     return hasattr(value, "__iter__")
 
@@ -510,7 +513,8 @@ class SpikeSourcePoissonVertex(
 
     def get_recording_sdram_usage(self, vertex_slice: Slice) -> AbstractSDRAM:
         """
-        :param vertex_slice:
+        :param vertex_slice: Slice to get cost for
+        :returns: SDRAm cost for recording
         """
         variable_sdram = self.__spike_recorder.get_sdram_usage_in_bytes(
             vertex_slice.n_atoms, self.max_spikes_per_ts())

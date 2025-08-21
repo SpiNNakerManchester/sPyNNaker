@@ -32,6 +32,7 @@ def convert_analog_signal(
     :param signal_array: Extended Quantities object
     :param time_unit:
         Data time unit for time index
+    :returns: Data in Spynnaker (7) format
     """
     ids = signal_array.annotations["channel_names"]
     xs = range(len(ids))
@@ -53,6 +54,7 @@ def convert_data(data: Block, name: str, run: int = 0) -> NDArray:
     :param name: Name of the data to be extracted.
         Same values as used in getData()
     :param run: Zero based index of the run to extract data for
+    :returns: Data for the named data type in Spynnaker (7) format
     """
     if len(data.segments) <= run:
         raise ValueError(
@@ -78,6 +80,7 @@ def convert_data_list(data: Block, name: str,
         Same values as used in getData()
     :param runs: List of Zero based index of the run to extract data for.
         Or `None` to extract all runs
+    :returns: List of numpy arrays for the named data in Spynnaker (7) format
     """
     if runs is None:
         runs = range(len(data.segments))
@@ -95,6 +98,7 @@ def convert_v_list(
     :param data: The data to convert; it must have V data in it
     :param runs: List of Zero based index of the run to extract data for.
         Or `None` to extract all runs
+    :returns: Voltage in sPyNNaker (7) format
     """
     return convert_data_list(data, "v", runs=runs)
 
@@ -109,6 +113,7 @@ def convert_gsyn_exc_list(
         The data to convert; it must have Gsyn_exc data in it
     :param runs: List of Zero based index of the run to extract data for.
         Or `None` to extract all runs
+    :returns: Gsyn in sPyNNaker (7) format
     """
     return convert_data_list(data, "gsyn_exc", runs=runs)
 
@@ -123,6 +128,7 @@ def convert_gsyn_inh_list(
         The data to convert; it must have Gsyn_inh data in it
     :param runs: List of Zero based index of the run to extract data for.
         Or `None` to extract all runs
+    :returns: Gsyn in sPyNNaker (7) format
     """
     return convert_data_list(data, "gsyn_inh", runs=runs)
 
@@ -135,7 +141,8 @@ def convert_gsyn(gsyn_exc: Block, gsyn_inh: Block) -> NDArray:
         It is acceptable for both neo parameters to be the same object
 
     :param gsyn_exc: neo with gsyn_exc data
-    :param gsyn_inh: neo with gsyn_exc data
+    :param gsyn_inh: neo with gsyn_inh data
+    :returns: Gsyn in sPyNNaker (7) format
     """
     exc = gsyn_exc.segments[0].filter(name='gsyn_exc')[0]
     inh = gsyn_inh.segments[0].filter(name='gsyn_inh')[0]
@@ -167,6 +174,7 @@ def convert_spiketrains(spiketrains: List[SpikeTrain]) -> NDArray:
     Converts a list of spiketrains into spynnaker7 format.
 
     :param spiketrains: List of SpikeTrains
+    :returns: Spikes in sPyNNaker (7) format
     """
     if len(spiketrains) == 0:
         return np.empty(shape=(0, 2))
@@ -184,6 +192,7 @@ def convert_spikes(neo: Block, run: int = 0) -> NDArray:
 
     :param neo: neo Object including Spike Data
     :param run: Zero based index of the run to extract data for
+    :returns: Spikes in sPyNNaker (7) format
     """
     if len(neo.segments) <= run:
         raise ValueError(
