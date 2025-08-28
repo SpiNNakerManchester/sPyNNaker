@@ -282,28 +282,28 @@ class RetinaKey(Enum):
     def ident(self) -> int:
         # pylint: disable=wrong-spelling-in-docstring
         """
-        :returns: The identification passed into the init.
+        The identification passed into the init.
         """
         return self.__ident
 
     @property
     def n_neurons(self) -> int:
         """
-        :returns: The number or neurons passed into the init.
+        The number of neurons passed into the init.
         """
         return 2 * (self.__pixels ** 2)
 
     @property
     def pixels(self) -> int:
         """
-        :returns: The pixels passed into the init.
+        The pixels passed into the init.
         """
         return self.__pixels
 
     @property
     def bits_per_coordinate(self) -> int:
         """
-        :returns: The bits per coordinate passed into the init.
+        The bits per coordinate passed into the init.
         """
         return self.__bits_per_coordinate
 
@@ -331,14 +331,14 @@ class RetinaPayload(Enum):
     @property
     def ident(self) -> int:
         """
-        :returns: The indent passed into the init.
+        The indent passed into the init.
         """
         return self.__ident
 
     @property
     def n_payload_bytes(self) -> int:
         """
-        :returns: The n_payload_bytes passed into the init.
+        The n_payload_bytes passed into the init.
         """
         return self.__n_payload_bytes
 

@@ -171,11 +171,7 @@ class Population(PopulationBase):
     @property
     def celltype(self) -> AbstractPyNNModel:
         """
-        Implements the PyNN expected `celltype` property.
-
-        :return:
-            The cell type this property has been set to, or the vertex if it
-            was directly instantiated.
+        The Model uses for this population.
         """
         return self.__celltype
 

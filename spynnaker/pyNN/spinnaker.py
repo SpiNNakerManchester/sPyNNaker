@@ -187,9 +187,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     @property
     def state(self) -> 'SpiNNaker':
         """
-        Used to bypass the dual level object.
-
-        :return: the SpiNNaker object
+        In SpyNNaker the state and SpiNNaker object are the same
         """
         return self
 
@@ -199,9 +197,11 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         The MPI rank of the simulator.
 
         .. note::
-            Meaningless on SpiNNaker, so we pretend we're the head node.
+            Meaningless on SpiNNaker,
+            so we pretend we're the head node with a value of 0
 
-        :return: Constant: 0
+            While there is a setter (for PyNN compatibility)
+            any set call is ignored
         """
         return 0
 
@@ -218,10 +218,11 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         The number of MPI worker processes.
 
-        .. note::
-            Meaningless on SpiNNaker, so we pretend there's one MPI process
+        Settable.
 
-        :return: Constant: 1
+        .. note::
+            While there is a setter (for PyNN compatibility)
+            any set call is ignored
         """
         return 1
 
@@ -238,7 +239,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         The simulation time step in milliseconds.
 
-        :return: the machine time step
+       .. note::
+            While there is a setter (for PyNN compatibility)
+            any set call is ignored
         """
         return self.__writer.get_simulation_time_step_ms()
 
@@ -256,8 +259,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     def t(self) -> float:
         """
         The current simulation time in milliseconds.
-
-        :return: the current runtime already executed
         """
         return self.__writer.get_current_run_time_ms()
 
@@ -266,7 +267,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         The number of the current recording segment being generated.
 
-        :return: the segment counter
+        .. note::
+            While there is a setter (for PyNN compatibility)
+            any set call is ignored
         """
         return self.__writer.get_reset_number()
 
@@ -285,8 +288,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         The name of the simulator. Used to ensure PyNN recording neo
         blocks are correctly labelled.
-
-        :return: the name of the simulator.
         """
         return _version.NAME
 
@@ -294,8 +295,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     def recorders(self) -> Collection[Recorder]:
         """
         The recorders, used by the PyNN state object.
-
-        :return: the internal recorders object
         """
         return self.__recorders
 

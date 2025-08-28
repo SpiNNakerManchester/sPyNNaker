@@ -202,8 +202,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         """
         The position array for structured populations.
 
-
-        :return: a 3xN array
+        This will be a 3xN array
         """
         raise NotImplementedError
 
