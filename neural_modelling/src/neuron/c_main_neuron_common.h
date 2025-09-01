@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef _C_MAIN_NEURON_COMMON_H_
+#define _C_MAIN_NEURON_COMMON_H_
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <debug.h>
@@ -116,3 +119,5 @@ static inline bool initialise_neuron_regions(
 
     return true;
 }
+
+#endif // _C_MAIN_NEURON_COMMON_H_
