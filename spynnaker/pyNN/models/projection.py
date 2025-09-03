@@ -341,9 +341,9 @@ class Projection(object):
         fixed_values: List[Tuple[str, int]] = list()
         for attribute in attribute_names:
             data_items.append(attribute)
-            if attribute not in {"source", "target", "weight", "delay"}:
-                value = self._synapse_information.synapse_dynamics.get_value(
-                    attribute)
+            synapse_dynamics = self._synapse_information.synapse_dynamics
+            if attribute not in synapse_dynamics.get_synapse_parameter_names():
+                value = synapse_dynamics.get_value(attribute)
                 fixed_values.append((attribute, value))
 
         # Return the connection data

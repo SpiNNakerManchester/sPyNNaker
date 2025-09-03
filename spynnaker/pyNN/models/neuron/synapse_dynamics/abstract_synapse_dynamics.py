@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 import logging
-from typing import Any, cast, Optional, Sequence, Tuple, TYPE_CHECKING
+from typing import Any, cast, Optional, Sequence, Tuple, Set, TYPE_CHECKING
 
 import numpy
 
@@ -220,6 +220,13 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         the neuron, or if only a combined core is possible.
         """
         raise NotImplementedError
+
+    def get_synapse_parameter_names(self) -> Set[str]:
+        """
+        Get the names of the parameters that can be extracted from synapses
+        read from the machine.
+        """
+        return {"source", "target", "weight", "delay"}
 
     def get_value(self, key: str) -> Any:
         """
