@@ -35,6 +35,16 @@ class IFFacetsConductancePopulation(AbstractProvidesDefaults):
             tau_syn_I: ModelParameter = 30.0, v_thresh: ModelParameter = -55.0,
             v_rest: ModelParameter = -65.0, e_rev_I: ModelParameter = -80,
             v_reset: ModelParameter = -80.0, v: ModelParameter = -65.0):
+        """
+        :param g_leak:
+        :param tau_syn_E:
+        :param tau_syn_I:
+        :param v_thresh:
+        :param v_rest:
+        :param e_rev_I:
+        :param v_reset:
+        :param v:
+        """
         # pylint: disable=unused-argument, invalid-name
         raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")

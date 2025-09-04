@@ -27,20 +27,6 @@ from spynnaker.pyNN.models.neuron.additional_inputs import (
 class IFCurrDeltaCa2Adaptive(AbstractPyNNNeuronModelStandard):
     """
     Leaky integrate and fire neuron with an instantaneous current input.
-
-    :param tau_m: :math:`\\tau_m`
-    :param cm: :math:`C_m`
-    :param v_rest: :math:`V_{rest}`
-    :param v_reset: :math:`V_{reset}`
-    :param v_thresh: :math:`V_{thresh}`
-    :param tau_refrac: :math:`\\tau_{refrac}`
-    :param tau_ca2: :math:`\\tau_{\\mathrm{Ca}^{+2}}`
-    :param i_ca2: :math:`I_{\\mathrm{Ca}^{+2}}`
-    :param i_alpha: :math:`\\tau_\\alpha`
-    :param i_offset: :math:`I_{offset}`
-    :param v: :math:`V_{init}`
-    :param isyn_exc: :math:`I^{syn}_e`
-    :param isyn_inh: :math:`I^{syn}_i`
     """
 
     # noinspection PyPep8Naming
@@ -53,6 +39,21 @@ class IFCurrDeltaCa2Adaptive(AbstractPyNNNeuronModelStandard):
             i_alpha: ModelParameter = 0.1, i_offset: ModelParameter = 0.0,
             v: ModelParameter = -65.0, isyn_exc: ModelParameter = 0.0,
             isyn_inh: ModelParameter = 0.0):
+        """
+        :param tau_m: :math:`\\tau_m`
+        :param cm: :math:`C_m`
+        :param v_rest: :math:`V_{rest}`
+        :param v_reset: :math:`V_{reset}`
+        :param v_thresh: :math:`V_{thresh}`
+        :param tau_refrac: :math:`\\tau_{refrac}`
+        :param tau_ca2: :math:`\\tau_{\\mathrm{Ca}^{+2}}`
+        :param i_ca2: :math:`I_{\\mathrm{Ca}^{+2}}`
+        :param i_alpha: :math:`\\tau_\\alpha`
+        :param i_offset: :math:`I_{offset}`
+        :param v: :math:`V_{init}`
+        :param isyn_exc: :math:`I^{syn}_e`
+        :param isyn_inh: :math:`I^{syn}_i`
+        """
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeDelta(isyn_exc, isyn_inh)

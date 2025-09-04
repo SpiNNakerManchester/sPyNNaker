@@ -151,7 +151,7 @@ def _heat_plot(axes: Axes, values: NDArray, label: str = '',
 
 
 def heat_plot_numpy(axes: Axes, data: NDArray, label: str = '',
-                    **options: Any) -> Any:
+                    **options: Any) -> None:
     """
     Plots neurons, times and values into a heat map.
 

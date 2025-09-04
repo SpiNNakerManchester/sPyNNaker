@@ -59,6 +59,29 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
             tau_syn_I: float = 5.0, tau_refrac: float = 0.1,
             i_offset: float = 0.0, v: float = 0.0, isyn_exc: float = 0.0,
             isyn_inh: float = 0.0):
+        """
+        :param protocol:
+           The instance of the PushBot protocol to get keys from
+        :param devices:
+            The AbstractMulticastControllableDevice instances to be controlled
+            by the population
+        :param pushbot_ip_address: The IP address of the PushBot
+        :param pushbot_port:
+        :param tau_m: (defaulted LIF neuron parameter)
+        :param cm: (defaulted LIF neuron parameter)
+        :param v_rest: (defaulted LIF neuron parameter)
+        :param v_reset: (defaulted LIF neuron parameter)
+        :param tau_syn_E: (defaulted LIF neuron parameter)
+        :param tau_syn_I: (defaulted LIF neuron parameter)
+        :param tau_refrac: (defaulted LIF neuron parameter)
+        :param i_offset: (defaulted LIF neuron parameter)
+        :param v: (defaulted LIF neuron state variable initial value)
+        :param isyn_exc:
+            (defaulted LIF neuron state variable initial value)
+        :param isyn_inh:
+            (defaulted LIF neuron state variable initial value)
+
+        """
         translator = PushBotTranslator(
             protocol,
             get_pushbot_wifi_connection(pushbot_ip_address, pushbot_port))

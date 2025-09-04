@@ -26,20 +26,6 @@ _IZK_THRESHOLD = 30.0
 class IzkCondExpBase(AbstractPyNNNeuronModelStandard):
     """
     Izhikevich neuron model with conductance inputs.
-
-    :param a: :math:`a`
-    :param b: :math:`b`
-    :param c: :math:`c`
-    :param d: :math:`d`
-    :param i_offset: :math:`I_{offset}`
-    :param u: :math:`u_{init} = \\delta V_{init}`
-    :param v: :math:`v_{init} = V_{init}`
-    :param tau_syn_E: :math:`\\tau^{syn}_e`
-    :param tau_syn_I: :math:`\\tau^{syn}_i`
-    :param e_rev_E: :math:`E^{rev}_e`
-    :param e_rev_I: :math:`E^{rev}_i`
-    :param isyn_exc: :math:`I^{syn}_e`
-    :param isyn_inh: :math:`I^{syn}_i`
     """
 
     # noinspection PyPep8Naming
@@ -52,6 +38,21 @@ class IzkCondExpBase(AbstractPyNNNeuronModelStandard):
             tau_syn_I: ModelParameter = 5.0, e_rev_E: ModelParameter = 0.0,
             e_rev_I: ModelParameter = -70.0, isyn_exc: ModelParameter = 0.0,
             isyn_inh: ModelParameter = 0.0):
+        """
+        :param a: :math:`a`
+        :param b: :math:`b`
+        :param c: :math:`c`
+        :param d: :math:`d`
+        :param i_offset: :math:`I_{offset}`
+        :param u: :math:`u_{init} = \\delta V_{init}`
+        :param v: :math:`v_{init} = V_{init}`
+        :param tau_syn_E: :math:`\\tau^{syn}_e`
+        :param tau_syn_I: :math:`\\tau^{syn}_i`
+        :param e_rev_E: :math:`E^{rev}_e`
+        :param e_rev_I: :math:`E^{rev}_i`
+        :param isyn_exc: :math:`I^{syn}_e`
+        :param isyn_inh: :math:`I^{syn}_i`
+        """
         neuron_model = NeuronModelIzh(a, b, c, d, v, u, i_offset)
         synapse_type = SynapseTypeExponential(
             tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)

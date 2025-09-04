@@ -45,6 +45,13 @@ class PushBotRetinaViewer():
 
     def __init__(self, retina_resolution: PushBotRetinaResolution,
                  label: str, sim: None = None):
+        # pylint: disable=wrong-spelling-in-docstring
+        """
+        :param retina_resolution: Size of the retina to use
+        :param label:
+            Label for connection over which live spikes will be received.
+        :param sim: Deprecated! Do not use.
+        """
         if sim is not None:
             _logger.warning("PushBotRetinaViewer: sim=None is deprecated")
         pyplot.ion()

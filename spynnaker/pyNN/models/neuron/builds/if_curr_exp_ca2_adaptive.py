@@ -32,22 +32,6 @@ class IFCurrExpCa2Adaptive(AbstractPyNNNeuronModelStandard):
     *Journal of Computational Neuroscience*, 10(1), 25-45.
     `doi:10.1023/A:1008916026143
     <https://doi.org/10.1023/A:1008916026143>`_
-
-    :param tau_m: :math:`\\tau_m`
-    :param cm: :math:`C_m`
-    :param v_rest: :math:`V_{rest}`
-    :param v_reset: :math:`V_{reset}`
-    :param v_thresh: :math:`V_{thresh}`
-    :param tau_syn_E: :math:`\\tau^{syn}_e`
-    :param tau_syn_I: :math:`\\tau^{syn}_i`
-    :param tau_refrac: :math:`\\tau_{refrac}`
-    :param i_offset: :math:`I_{offset}`
-    :param tau_ca2: :math:`\\tau_{\\mathrm{Ca}^{+2}}`
-    :param i_ca2: :math:`I_{\\mathrm{Ca}^{+2}}`
-    :param i_alpha: :math:`\\tau_\\alpha`
-    :param v: :math:`V_{init}`
-    :param isyn_exc: :math:`I^{syn}_e`
-    :param isyn_inh: :math:`I^{syn}_i`
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh", "i_ca2"})
@@ -60,6 +44,23 @@ class IFCurrExpCa2Adaptive(AbstractPyNNNeuronModelStandard):
             i_ca2: ModelParameter = 0.0, i_alpha: ModelParameter = 0.1,
             v: ModelParameter = -65.0, isyn_exc: ModelParameter = 0.0,
             isyn_inh: ModelParameter = 0.0):
+        """
+            :param tau_m: :math:`\\tau_m`
+        :param cm: :math:`C_m`
+        :param v_rest: :math:`V_{rest}`
+        :param v_reset: :math:`V_{reset}`
+        :param v_thresh: :math:`V_{thresh}`
+        :param tau_syn_E: :math:`\\tau^{syn}_e`
+        :param tau_syn_I: :math:`\\tau^{syn}_i`
+        :param tau_refrac: :math:`\\tau_{refrac}`
+        :param i_offset: :math:`I_{offset}`
+        :param tau_ca2: :math:`\\tau_{\\mathrm{Ca}^{+2}}`
+        :param i_ca2: :math:`I_{\\mathrm{Ca}^{+2}}`
+        :param i_alpha: :math:`\\tau_\\alpha`
+        :param v: :math:`V_{init}`
+        :param isyn_exc: :math:`I^{syn}_e`
+        :param isyn_inh: :math:`I^{syn}_i`
+        """
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(

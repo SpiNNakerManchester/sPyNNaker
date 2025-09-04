@@ -241,7 +241,7 @@ class Projection(object):
 
         :param attribute_names: list of attributes to gather
         :param format: ``"list"`` or ``"array"``
-        :param gather: gather over all nodes
+        :param gather: Ignored. Purely for PyNN compatibility
         :param with_address:
             True if the source and target are to be included
         :param multiple_synapses:
@@ -278,7 +278,7 @@ class Projection(object):
         :param attribute_names:
         :param file: filename or open handle (which will be closed)
         :param format:
-        :param gather: Ignored
+        :param gather: Ignored. Purely for PyNN compatibility
         :param with_address:
         """
         if not gather:

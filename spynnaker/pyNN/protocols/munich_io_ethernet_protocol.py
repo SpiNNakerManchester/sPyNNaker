@@ -41,37 +41,36 @@ class MunichIoEthernetProtocol(object):
     @staticmethod
     def enable_retina() -> bytes:
         """
-        Command to enable the retina.
+        :returns: Command to enable the retina.
         """
         return b"E+\n"
 
     @staticmethod
     def disable_retina() -> bytes:
         """
-        Command to disable the retina.
+        :returns: Command to disable the retina.
         """
         return b"E-\n"
 
     @staticmethod
     def set_retina_transmission(event_format: int) -> bytes:
         """
-        Command to set the retina transmission.
-
         :param event_format:
+        :returns: Command to set the retina transmission.
         """
         return f"!E{event_format}\n".encode("ascii")
 
     @staticmethod
     def disable_motor() -> bytes:
         """
-        Command to disable the motor.
+        :returns: Command to disable the motor.
         """
         return b"!M-\n"
 
     @staticmethod
     def enable_motor() -> bytes:
         """
-        Command to enable the motor.
+        :returns: Command to enable the motor.
         """
         return b"!M+\n"
 
@@ -83,6 +82,7 @@ class MunichIoEthernetProtocol(object):
         The value will be restricted to be between -100 and 100.
 
         :param velocity:
+        :returns: Command to set the motor 0 permanent velocity
         """
         return f"!MV0={_clamp(-100, velocity, 100)}\n".encode("ascii")
 
@@ -94,6 +94,7 @@ class MunichIoEthernetProtocol(object):
         The value will be restricted to be between -100 and 100.
 
         :param velocity:
+        :returns: Command to set the motor 1 permanent velocity.
         """
         return f"!MV1={_clamp(-100, velocity, 100)}\n".encode("ascii")
 
@@ -105,6 +106,7 @@ class MunichIoEthernetProtocol(object):
         The value will be restricted to be between -100 and 100.
 
         :param velocity:
+        :returns:
         """
         return f"!MVD0={_clamp(-100, velocity, 100)}\n".encode("ascii")
 
@@ -116,42 +118,39 @@ class MunichIoEthernetProtocol(object):
         The value will be restricted to be between -100 and 100.
 
         :param velocity:
+        :returns: Command to set the motor 1 leaky velocity.
         """
         return f"!MVD1={_clamp(-100, velocity, 100)}\n".encode("ascii")
 
     @staticmethod
     def led_total_period(total_period: int) -> bytes:
         """
-        Command to set the led total time
-
         :param total_period:
+        :returns:Command to set the led total time
         """
         return f"!PC={total_period}\n".encode("ascii")
 
     @staticmethod
     def led_front_active_time(active_time: int) -> bytes:
         """
-        Command to set the led front time
-
         :param active_time:
+        :returns: Command to set the led front time
         """
         return f"!PC1={active_time}\n".encode("ascii")
 
     @staticmethod
     def led_back_active_time(active_time: int) -> bytes:
         """
-        Command to set the led back time
-
         :param active_time:
+        :returns: Command to set the led back time
         """
         return f"!PC0={active_time}\n".encode("ascii")
 
     @staticmethod
     def led_frequency(frequency: Union[int, float]) -> bytes:
         """
-        Command to set the led times based on frequency
-
         :param frequency:
+        :returns: Command to set the led times based on frequency
         """
         active_time = _active_time_for_frequency(frequency)
         at2 = active_time // 2
@@ -160,9 +159,8 @@ class MunichIoEthernetProtocol(object):
     @staticmethod
     def speaker_frequency(frequency: Union[int, float]) -> bytes:
         """
-        Command to set the speaker times based on frequency.
-
         :param frequency:
+        :returns: Command to set the speaker times based on frequency.
         """
         active_time = _active_time_for_frequency(frequency)
         return f"!PB={active_time}\n!PB0={active_time // 2}\n".encode("ascii")
@@ -170,27 +168,24 @@ class MunichIoEthernetProtocol(object):
     @staticmethod
     def speaker_total_period(total_period: int) -> bytes:
         """
-        Command to set the speaker total time.
-
         :param total_period:
+        :returns: Command to set the speaker total time.
         """
         return f"!PB={total_period}\n".encode("ascii")
 
     @staticmethod
     def speaker_active_time(active_time: int) -> bytes:
         """
-        Command to set the speaker active time.
-
         :param active_time:
+        :returns: Command to set the speaker active time.
         """
         return f"!PB0={active_time}\n".encode("ascii")
 
     @staticmethod
     def laser_frequency(frequency: Union[int, float]) -> bytes:
         """
-        Command to set the laser periods based on the frequency.
-
         :param frequency:
+        :returns: Command to set the laser periods based on the frequency.
         """
         active_time = _active_time_for_frequency(frequency)
         return f"!PA={active_time}\n!PA0={active_time // 2}\n".encode("ascii")
@@ -198,17 +193,15 @@ class MunichIoEthernetProtocol(object):
     @staticmethod
     def laser_total_period(total_period: int) -> bytes:
         """
-        Command to set the laser total period
-
         :param total_period:
+        :returns: Command to set the laser total period
         """
         return f"!PA={total_period}\n".encode("ascii")
 
     @staticmethod
     def laser_active_time(active_time: int) -> bytes:
         """
-        Command to set the laser active time
-
         :param active_time:
+        :returns: Command to set the laser active time
         """
         return f"!PA0={active_time}\n".encode("ascii")

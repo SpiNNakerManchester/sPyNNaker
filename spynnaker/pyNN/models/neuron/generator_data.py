@@ -47,6 +47,15 @@ class GeneratorData(object):
             app_edge: ProjectionApplicationEdge,
             synapse_information: SynapseInformation, max_row_info: MaxRowInfo,
             max_pre_atoms_per_core: int, max_post_atoms_per_core: int):
+        """
+        :param synaptic_matrix_offset:
+        :param delayed_synaptic_matrix_offset:
+        :param app_edge:
+        :param synapse_information:
+        :param max_row_info:
+        :param max_pre_atoms_per_core:
+        :param max_post_atoms_per_core:
+        """
         # Offsets are used in words in the generator, but only
         # if the values are valid
         if synaptic_matrix_offset is not None:

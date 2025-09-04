@@ -98,7 +98,8 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     @classmethod
     def get_model_max_atoms_per_dimension_per_core(cls) -> Tuple[int, ...]:
         """
-        Get the maximum number of atoms per dimension per core for this model.
+        :returns:
+            The maximum number of atoms per dimension per core for this model.
         """
         # If there is a stored value, use it
         max_stored = AbstractPyNNModel._max_atoms_per_core.get(cls)
@@ -120,24 +121,26 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
             cls) -> int:
         """
         The absolute maximum number of atoms per core.
+
         This is an integer regardless of the number of dimensions
         in any vertex.
+
+        :returns: The absolute maximum number of atoms per core.
         """
         return sys.maxsize
 
     @classmethod
     def get_parameter_names(cls) -> Sequence[str]:
         """
-        Get the names of the parameters of the model.
+        :returns: The names of the parameters of the model.
         """
         return cls.default_parameters.keys()  # pylint: disable=no-member
 
     @classmethod
     def has_parameter(cls, name: str) -> bool:
         """
-        Determine if the model has a parameter with the given name.
-
         :param name: The name of the parameter to check for
+        :returns: True if the model has a parameter with the given name
         """
         return name in cls.default_parameters
 
@@ -187,6 +190,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
 
         :param template: Template filename
         :param engine: Template substitution engine
+        :returns: A human-readable description
         """
         context = {
             "name": self.name

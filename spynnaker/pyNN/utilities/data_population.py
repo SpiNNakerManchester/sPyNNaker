@@ -55,6 +55,14 @@ class DataPopulation(object):
 
     def __init__(self, database_file: str, label: str,
                  indexes: ViewIndices = None):
+        """
+        :param database_file:
+            The name of a file that contains an SQLite
+            database holding the data.
+        :param label: Label of the Population
+        :param indexes: The indexes for which data should be returned.
+            If ``None``, all data (view_index = data_indexes)
+        """
         self.__label = label
         self.__database_file = database_file
         # getting size right away also check the inputs or fails fast

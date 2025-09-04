@@ -39,9 +39,8 @@ class AbstractTimingDependence(
     def is_same_as(
             self, timing_dependence: 'AbstractTimingDependence') -> bool:
         """
-        Determine if this timing dependence is the same as another.
-
         :param timing_dependence:
+        :returns: True if the timing dependence is the same as another.
         """
         raise NotImplementedError
 
@@ -64,7 +63,7 @@ class AbstractTimingDependence(
     @abstractmethod
     def get_parameters_sdram_usage_in_bytes(self) -> int:
         """
-        Get the amount of SDRAM used by the parameters of this rule.
+        :returns: The amount of SDRAM used by the parameters of this rule.
         """
         raise NotImplementedError
 

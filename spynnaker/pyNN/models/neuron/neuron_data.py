@@ -82,6 +82,9 @@ class NeuronData(object):
         "__gen_on_machine")
 
     def __init__(self, app_vertex: PopulationVertex):
+        """
+        :param app_vertex: Vertex to get data from.
+        """
         self.__app_vertex = app_vertex
         self.__neuron_data: Optional[NDArray[uint32]] = None
         self.__neuron_recording_data: Optional[NDArray[uint32]] = None
@@ -337,6 +340,10 @@ class _MergedDict(MutableMapping[str, RangedList[float]]):
 
     def __init__(self, params: RangeDictionary[float],
                  state_vars: RangeDictionary[float]):
+        """
+        :param params: The parameter values
+        :param state_vars: The State values
+        """
         self.__params = params
         self.__state_vars = state_vars
 

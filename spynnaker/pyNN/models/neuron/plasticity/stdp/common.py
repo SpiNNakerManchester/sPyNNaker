@@ -24,6 +24,7 @@ STDP_FIXED_POINT_ONE = (1 << 11)
 def float_to_fixed(value: float) -> int:
     """
     :param value:
+    :returns: value in fixed point format
     """
     return int(round(float(value) * STDP_FIXED_POINT_ONE))
 
@@ -34,6 +35,7 @@ def get_exp_lut_array(time_step: float, time_constant: float,
     :param time_step:
     :param time_constant:
     :param shift:
+    :returns: Data as a lookup table
     """
     # Compute the actual exponential decay parameter
     # NB: lambda is a reserved word in Python

@@ -20,6 +20,8 @@ from numpy.typing import NDArray
 def synfire_spike_checker(spikes: Union[NDArray, List[NDArray]],
                           n_neurons: int) -> None:
     """
+    Checks the spikes and prints an error file if needed.
+
     :param spikes: The spike data to check.
     :param n_neurons: The number of neurons.
     :raises Exception: If there is a problem with the data

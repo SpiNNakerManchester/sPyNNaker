@@ -27,9 +27,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
     def get_positive_synapse_index(
             self, incoming_projection: Projection) -> int:
         """
-        Get the synapse type that positive weights will arrive at.
-
         :param incoming_projection: The projection targeted
+        :returns: The synapse type that positive weights will arrive as.
         """
         raise NotImplementedError
 
@@ -37,9 +36,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
     def get_negative_synapse_index(
             self, incoming_projection: Projection) -> int:
         """
-        Get the synapse type that negative weights will arrive at.
-
         :param incoming_projection: The projection targeted
+        :returns: The synapse type that negative weights will arrive as.
         """
         raise NotImplementedError
 
@@ -53,6 +51,7 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
             This must be a value >= 0.
 
         :param incoming_projection: The projection targeted
+        :returns: The maximum likely positive weight.
         """
         raise NotImplementedError
 
@@ -66,6 +65,7 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
             This must be a value <= 0.
 
         :param incoming_projection: The projection targeted
+        :returns: The minimum likely negative weight
         """
         raise NotImplementedError
 
@@ -79,6 +79,7 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
             This must be a value >= 0.
 
         :param incoming_projection: The projection targeted
+        :returns: The mean of the positive weights.
         """
         raise NotImplementedError
 
@@ -92,6 +93,7 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
             This must be a value <= 0.
 
         :param incoming_projection: The projection targeted
+        :returns: The mean of the negative weights.
         """
         raise NotImplementedError
 
@@ -105,6 +107,7 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
             This must be a value >= 0.
 
         :param incoming_projection: The projection targeted
+        :returns: The variance of the positive weights.
         """
         raise NotImplementedError
 
@@ -118,5 +121,6 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
             This must be a value <= 0.
 
         :param incoming_projection: The projection targeted
+        :returns: The variance of the negative weights.
         """
         raise NotImplementedError

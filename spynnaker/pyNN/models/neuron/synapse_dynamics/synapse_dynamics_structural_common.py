@@ -105,7 +105,7 @@ class SynapseDynamicsStructuralCommon(
 
     def get_parameter_names(self) -> Iterable[str]:
         """
-        Get the names of the parameters of the model.
+        :returns: The names of the parameters of the model.
         """
         yield from [
             'initial_weight', 'initial_delay', 'f_rew', 'p_rew', 's_max',
@@ -406,7 +406,7 @@ class SynapseDynamicsStructuralCommon(
 
     def get_vertex_executable_suffix(self) -> str:
         """
-        executable suffix based on details
+        :returns: executable suffix based on details
         """
         name = "_structural"
         name += self.partner_selection.vertex_executable_suffix
@@ -418,6 +418,7 @@ class SynapseDynamicsStructuralCommon(
             self, synapse_dynamics: AbstractSynapseDynamicsStructural) -> bool:
         """
         :param synapse_dynamics:
+        :returns: True if the two have the same data and types
         """
         # Note noqa:E721  because exact type comparison is required here
         return (

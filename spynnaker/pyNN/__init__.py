@@ -239,8 +239,6 @@ def distance(src_cell: IDMixin, tgt_cell: IDMixin,
              periodic_boundaries: Optional[Tuple[
                  Optional[Tuple[int, int]]]] = None) -> float:
     """
-    Return the Euclidean distance between two cells.
-
     :param src_cell: Measure from this cell
     :param tgt_cell: To this cell
     :param mask:
@@ -254,6 +252,7 @@ def distance(src_cell: IDMixin, tgt_cell: IDMixin,
         (the post-synaptic position is multiplied by this quantity).
     :param offset:
     :param periodic_boundaries:
+    :returns: The Euclidean distance between two cells.
     """
     return _pynn_distance(
         src_cell, tgt_cell, mask, scale_factor, offset, periodic_boundaries)
@@ -348,7 +347,7 @@ def setup(timestep: Optional[Union[float, Literal["auto"]]] = None,
 
 def name() -> str:
     """
-    Returns the name of the simulator.
+    :returns: The name of the simulator.
     """
     return SpynnakerDataView.get_sim_name()
 
@@ -437,8 +436,8 @@ def end(_: Any = True) -> None:
 
 def list_standard_models() -> List[str]:
     """
-    Return a list of all the StandardCellType classes available for this
-    simulator.
+    :returns: A list of all the StandardCellType classes available for this
+        simulator.
     """
     return [
         key
@@ -547,6 +546,7 @@ def create(
     :param cellclass: population class
     :param cellparams: population parameters.
     :param n: number of neurons
+    :returns: A new Population
     """
     SpynnakerDataView.check_user_can_act()
     return __pynn["create"](cellclass, cellparams, n)
@@ -591,6 +591,7 @@ def get_max_delay() -> int:
     Most likely value is timestep * 144
 
     :raises NotImplementedError: As there is no system wide max_delay
+    :returns: In SpyNNaker this method never returns
     """
     raise NotImplementedError(
         "sPyNNaker does not have a system wide max_delay")

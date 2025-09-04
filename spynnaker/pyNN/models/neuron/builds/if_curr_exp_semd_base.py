@@ -28,23 +28,6 @@ class IFCurrExpSEMDBase(AbstractPyNNNeuronModelStandard):
     current input, where the excitatory input depends upon the inhibitory
     input (see https://www.cit-ec.de/en/nbs/spiking-insect-vision)
 
-    :param tau_m: :math:`\\tau_m`
-    :param cm: :math:`C_m`
-    :param v_rest: :math:`V_{rest}`
-    :param v_reset: :math:`V_{reset}`
-    :param v_thresh: :math:`V_{thresh}`
-    :param tau_syn_E: :math:`\\tau^{syn}_{e_1}`
-    :param tau_syn_E2: :math:`\\tau^{syn}_{e_2}`
-    :param tau_syn_I: :math:`\\tau^{syn}_i`
-    :param tau_refrac: :math:`\\tau_{refrac}`
-    :param i_offset: :math:`I_{offset}`
-    :param v: :math:`V_{init}`
-    :param isyn_exc: :math:`I^{syn}_{e_1}`
-    :param isyn_exc2: :math:`I^{syn}_{e_2}`
-    :param isyn_inh: :math:`I^{syn}_i`
-    :param multiplicator:
-    :param exc2_old:
-    :param scaling_factor:
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_exc2", "isyn_inh",
@@ -60,6 +43,25 @@ class IFCurrExpSEMDBase(AbstractPyNNNeuronModelStandard):
             multiplicator: ModelParameter = 0.0,
             exc2_old: ModelParameter = 0.0,
             scaling_factor: ModelParameter = 1.0):
+        """
+        :param tau_m: :math:`\\tau_m`
+        :param cm: :math:`C_m`
+        :param v_rest: :math:`V_{rest}`
+        :param v_reset: :math:`V_{reset}`
+        :param v_thresh: :math:`V_{thresh}`
+        :param tau_syn_E: :math:`\\tau^{syn}_{e_1}`
+        :param tau_syn_E2: :math:`\\tau^{syn}_{e_2}`
+        :param tau_syn_I: :math:`\\tau^{syn}_i`
+        :param tau_refrac: :math:`\\tau_{refrac}`
+        :param i_offset: :math:`I_{offset}`
+        :param v: :math:`V_{init}`
+        :param isyn_exc: :math:`I^{syn}_{e_1}`
+        :param isyn_exc2: :math:`I^{syn}_{e_2}`
+        :param isyn_inh: :math:`I^{syn}_i`
+        :param multiplicator:
+        :param exc2_old:
+        :param scaling_factor:
+        """
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeSEMD(

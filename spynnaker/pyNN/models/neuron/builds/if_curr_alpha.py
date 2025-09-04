@@ -25,21 +25,6 @@ from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 class IFCurrAlpha(AbstractPyNNNeuronModelStandard):
     """
     Leaky integrate and fire neuron with an alpha-shaped current-based input.
-
-    :param tau_m: :math:`\\tau_m`
-    :param cm: :math:`C_m`
-    :param v_rest: :math:`V_{rest}`
-    :param v_reset: :math:`V_{reset}`
-    :param v_thresh: :math:`V_{thresh}`
-    :param tau_syn_E: :math:`\\tau^{syn}_e`
-    :param tau_syn_I: :math:`\\tau^{syn}_i`
-    :param tau_refrac: :math:`\\tau_{refrac}`
-    :param i_offset: :math:`I_{offset}`
-    :param v: :math:`V_{init}`
-    :param exc_response: :math:`response^\\mathrm{linear}_e`
-    :param exc_exp_response: :math:`response^\\mathrm{exponential}_e`
-    :param inh_response: :math:`response^\\mathrm{linear}_i`
-    :param inh_exp_response: :math:`response^\\mathrm{exponential}_i`
     """
 
     @default_initial_values({
@@ -55,6 +40,22 @@ class IFCurrAlpha(AbstractPyNNNeuronModelStandard):
             exc_exp_response: ModelParameter = 0.0,
             inh_response: ModelParameter = 0.0,
             inh_exp_response: ModelParameter = 0.0):
+        """
+        :param tau_m: :math:`\\tau_m`
+        :param cm: :math:`C_m`
+        :param v_rest: :math:`V_{rest}`
+        :param v_reset: :math:`V_{reset}`
+        :param v_thresh:
+        :param tau_syn_E: :math:`\\tau^{syn}_e`
+        :param tau_syn_I: :math:`\\tau^{syn}_i`
+        :param tau_refrac: :math:`\\tau_{refrac}`
+        :param i_offset: :math:`I_{offset}`
+        :param v: :math:`V_{init}`
+        :param exc_response: :math:`response^\\mathrm{linear}_e`
+        :param exc_exp_response: :math:`response^\\mathrm{exponential}_e`
+        :param inh_response: :math:`response^\\mathrm{linear}_i`
+        :param inh_exp_response: :math:`response^\\mathrm{exponential}_i`
+        """
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
 

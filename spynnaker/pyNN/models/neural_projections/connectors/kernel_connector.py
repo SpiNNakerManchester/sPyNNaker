@@ -70,6 +70,7 @@ def shape2word(
 
     :param short1: first 2 byte value
     :param short2: second 2 bytes value
+    :returns: Combination of the two values with the first shifted 16 places
     """
     return uint32(((uint32(short2) & 0xFFFF) << 16)
                   | (uint32(short1) & 0xFFFF))

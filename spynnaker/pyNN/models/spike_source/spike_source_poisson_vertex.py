@@ -128,6 +128,9 @@ def is_iterable(value: Values) -> TypeGuard[
         Union[Sequence[float], NDArray[numpy.floating]]]:
     """
     Check that the Value is iterable.
+
+    :param value: The value to check.
+    :returns: True if Value is iterable, False otherwise.
     """
     return hasattr(value, "__iter__")
 
@@ -177,19 +180,24 @@ class SpikeSourcePoissonVertex(
             splitter: Optional[AbstractSplitterCommon] = None,
             n_colour_bits: Optional[int] = None):
         """
-        :param n_neurons:
-        :param label:
-        :param seed:
-        :param max_atoms_per_core:
-        :param model:
-        :param rate:
-        :param start:
-        :param duration:
-        :param rates:
-        :param starts:
-        :param durations:
-        :param max_rate:
-        :param splitter:
+        :param n_neurons: The number of neurons in this vertex.
+        :param label: The optional name of the vertex.
+        :param max_atoms_per_core: The max number of atoms that can be
+            placed on a core for each dimension, used in partitioning.
+            If the vertex is n-dimensional, with n > 1, the value must be a
+            tuple with a value for each dimension.  If it is single-dimensional
+            the value can be a 1-tuple or an int.
+        :param model: The model to get the parameters from
+        :param rate: The spike rate of all neuron
+        :param start: The start time of spikes on all neurons
+        :param duration: The duration of spikes on all neurons
+        :param rates: The spike rate of each neuron
+        :param starts: The start time of spikes on each neuron
+        :param durations: The duration of spikes on each neuron
+        :param max_rate: The maximum number of spikes
+            for any neuron at any timestamp
+        :param splitter: The splitter object needed for this vertex.
+            Leave as `None` to delegate the choice of splitter to the selector.
         :param n_colour_bits:
         """
         super().__init__(label, max_atoms_per_core, splitter)
@@ -505,7 +513,8 @@ class SpikeSourcePoissonVertex(
 
     def get_recording_sdram_usage(self, vertex_slice: Slice) -> AbstractSDRAM:
         """
-        :param vertex_slice:
+        :param vertex_slice: Slice to get cost for
+        :returns: SDRAm cost for recording
         """
         variable_sdram = self.__spike_recorder.get_sdram_usage_in_bytes(
             vertex_slice.n_atoms, self.max_spikes_per_ts())
@@ -589,6 +598,8 @@ class SpikeSourcePoissonVertex(
         suitable for use as a mars 64 kiss seed.
 
         :param vertex_slice:
+        :return: a list of 4 integers which are used by the mars64 kiss random
+            number generator for seeds.
         """
         if vertex_slice not in self.__kiss_seed:
             self.__kiss_seed[vertex_slice] = create_mars_kiss_seeds(self.__rng)
@@ -627,6 +638,8 @@ class SpikeSourcePoissonVertex(
 
         If template is `None`, then a dictionary containing the template
         context will be returned.
+
+        :returns:  human-readable description of the vertex
         """
         parameters = self.get_parameter_values(self.__model.default_parameters)
 

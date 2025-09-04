@@ -35,9 +35,9 @@ class AbstractPlasticSynapseDynamics(
     @abstractmethod
     def get_n_words_for_plastic_connections(self, n_connections: int) -> int:
         """
-        Get the number of 32-bit words for `n_connections` in a single row.
-
         :param n_connections:
+        :returns:
+           The number of 32-bit words for `n_connections` in a single row.
         """
         raise NotImplementedError
 
@@ -79,7 +79,7 @@ class AbstractPlasticSynapseDynamics(
     def get_n_plastic_plastic_words_per_row(
             self, pp_size: NDArray[uint32]) -> NDArray[integer]:
         """
-        Get the number of plastic plastic words to be read from each row.
+        :returns: The number of plastic words to be read from each row.
         """
         raise NotImplementedError
 
@@ -87,7 +87,7 @@ class AbstractPlasticSynapseDynamics(
     def get_n_fixed_plastic_words_per_row(
             self, fp_size: NDArray[uint32]) -> NDArray[integer]:
         """
-        Get the number of fixed plastic words to be read from each row.
+        :returns: The number of fixed plastic words to be read from each row.
         """
         raise NotImplementedError
 
@@ -101,6 +101,7 @@ class AbstractPlasticSynapseDynamics(
 
         :param pp_size:
         :param fp_size:
+        :returns: The number of synapses in each of the rows
         """
         raise NotImplementedError
 

@@ -127,7 +127,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def segement_db(cls, segment_number: int,
                     read_only: Optional[bool] = None) -> NeoBufferDatabase:
         """
-        Retrieves a NeoBufferDatabase for this segment.
+        :returns: A NeoBufferDatabase for this segment.
         """
         database_file = segment_cache[segment_number]
         return NeoBufferDatabase(database_file, read_only)
@@ -318,6 +318,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 This is actually the label of the Application Vertex.
                 Typically the Population label, corrected for `None` or
                 duplicate values
+
+        :returns: True if there is Metadata with this label
         """
         for _ in self.cursor().execute(
                 """
@@ -1265,6 +1267,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param variables:
             One or more variable names or `None` for all available
         :param view_indexes: List of neurons IDs to include or `None` for all
+        :param allow_missing: Flag to say if data for missing variable
+            should raise an exception
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
@@ -1300,6 +1304,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 duplicate values
 
         :param annotations: annotations to put on the neo block
+        :returns: True if metadata was available and therefore written
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
@@ -1479,7 +1484,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         IDs are comma separated, except when a series of IDs is sequential then
         the start:end is used.
 
-        :param indexes:
+        :param indexes: Collection (ideally sorted of int Values)
+        :returns: string representation to be used in the database
         """
         if indexes is None or len(indexes) == 0:
             return ""
@@ -1513,7 +1519,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         Converts a string into a list of integers.
         Assumes the string was created by :py:meth:`array_to_string`
 
-        :param string:
+        :param string: in format used by array_to_string
+        :returns: List of integers
         """
         if not string:
             return []

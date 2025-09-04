@@ -39,5 +39,23 @@ class HHCondExp(AbstractProvidesDefaults):
             v_offset: ModelParameter = -63, v: ModelParameter = -65.0,
             gsyn_exc: ModelParameter = 0.0, gsyn_inh: ModelParameter = 0.0):
         # pylint: disable=unused-argument,invalid-name
+        """
+        :param gbar_K:
+        :param cm:
+        :param e_rev_Na:
+        :param tau_syn_E:
+        :param tau_syn_I:
+        :param i_offset:
+        :param g_leak:
+        :param e_rev_E:
+        :param gbar_Na:
+        :param e_rev_leak:
+        :param e_rev_I:
+        :param e_rev_K:
+        :param v_offset:
+        :param v:
+        :param gsyn_exc:
+        :param gsyn_inh:
+        """
         raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")

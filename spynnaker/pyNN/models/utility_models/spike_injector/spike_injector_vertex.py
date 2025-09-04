@@ -56,6 +56,9 @@ class SpikeInjectorVertex(
             splitter: Optional[AbstractSplitterCommon],
             max_atoms_per_core: Optional[
                 Union[int, Tuple[int, ...]]] = sys.maxsize):
+        """
+        :param label: The optional name of the vertex.
+        """
         super().__init__(
             n_keys=n_neurons, label=label, receive_port=port,
             virtual_key=virtual_key,
@@ -152,14 +155,7 @@ class SpikeInjectorVertex(
 
     def describe(self) -> Dict[str, Union[str, Collection[str]]]:
         """
-        Returns a human-readable description of the cell or synapse type.
-
-        The output may be customised by specifying a different template
-        together with an associated template engine
-        (see :py:mod:`pyNN.descriptions`).
-
-        If template is `None`, then a dictionary containing the template
-        context will be returned.
+        :returns: A human-readable description of the cell or synapse type.
         """
         context = {
             "name": "SpikeInjector",
