@@ -713,7 +713,7 @@ def get_machine() -> Machine:
     :return: the machine object
     """
     SpynnakerDataView.check_user_can_act()
-    return SpynnakerDataView.get_machine()
+    return __simulator.get_machine()
 
 
 # Check copy in case being run from pyNN.spiNNaker
