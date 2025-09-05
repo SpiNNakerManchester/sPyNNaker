@@ -713,6 +713,7 @@ def get_machine() -> Machine:
     :return: the machine object
     """
     SpynnakerDataView.check_user_can_act()
+    assert __simulator is not None
     return __simulator.get_machine()
 
 
