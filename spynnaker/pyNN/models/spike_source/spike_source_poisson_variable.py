@@ -42,6 +42,12 @@ class SpikeSourcePoissonVariable(AbstractPyNNModel):
             starts: Union[Sequence[int], NDArray[numpy.integer]],
             durations: Union[
                 Sequence[int], NDArray[numpy.integer], None] = None):
+        """
+=
+        :param rates: The spike rate of each neuron
+        :param starts:  The start time of spikes on each neuron
+        :param durations: The duration of spikes on each neuron
+        """
         self._rates = rates
         self._starts = starts
         self._durations = durations

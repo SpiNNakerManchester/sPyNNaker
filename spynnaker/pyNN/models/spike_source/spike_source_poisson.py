@@ -40,6 +40,11 @@ class SpikeSourcePoisson(AbstractPyNNModel):
     def __init__(self, rate: Union[float, Sequence[float]] = 0.0,
                  start: Union[int, Sequence[int]] = 0,
                  duration: Union[int, Sequence[int], None] = None):
+        """
+        :param rate:
+        :param start:
+        :param duration:
+        """
         self.__start = start
         self.__duration = duration
         self.__rate = rate
@@ -57,10 +62,11 @@ class SpikeSourcePoisson(AbstractPyNNModel):
             neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
             n_colour_bits: Optional[int] = None) -> SpikeSourcePoissonVertex:
         """
+        :param label: The name for the vertex.
         :param seed:
         :param max_rate:
-        :param splitter:
-        :param n_colour_bits:
+        :param splitter: The splitter object needed for this vertex.
+            Leave as `None` to delegate the choice of splitter to the selector.
         """
         if neurons_per_core is None:
             neurons_per_core = \

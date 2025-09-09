@@ -146,7 +146,7 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
             max_atoms_per_core: int, synaptic_matrices: SynapticMatrices,
             neuron_data: NeuronData) -> PopulationMachineCommon:
         """
-        Create the machine vertex for a slice.
+        :returns: A new Machine vertex for this slice.
         """
         # If using local-only create a local-only vertex
         s_dynamics = self.governed_app_vertex.synapse_dynamics
@@ -167,7 +167,7 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
             self, n_atoms: int, all_syn_block_sz: int,
             structural_sz: int) -> AbstractSDRAM:
         """
-        Gets the resources of a slice of atoms.
+        :returns: The SDRAM resources of a slice of atoms.
         """
         variable_sdram = self.__get_variable_sdram(n_atoms)
         constant_sdram = self.__get_constant_sdram(

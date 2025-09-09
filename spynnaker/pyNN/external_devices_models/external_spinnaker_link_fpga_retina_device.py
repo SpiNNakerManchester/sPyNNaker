@@ -26,6 +26,7 @@ def get_y_from_fpga_retina(key: int, mode: int) -> Optional[int]:
     """
     :param key:
     :param mode:
+    :returns: y value if mode is expected otherwise None.
     """
     if mode == 128:
         return key & 0x7f
@@ -42,6 +43,7 @@ def get_x_from_fpga_retina(key: int, mode: int) -> Optional[int]:
     """
     :param key:
     :param mode:
+    :returns: x value if mode is expected otherwise None.
     """
     if mode == 128:
         return (key >> 7) & 0x7f
@@ -58,6 +60,7 @@ def get_spike_value_from_fpga_retina(key: int, mode: int) -> Optional[int]:
     """
     :param key:
     :param mode:
+    :returns: Spike value if mode is expected otherwise None.
     """
     if mode == 128:
         return (key >> 14) & 0x1
@@ -98,7 +101,7 @@ class ExternalFPGARetinaDevice(
         :param spinnaker_link_id:
             The SpiNNaker link to which the retina is connected
         :param polarity: The "polarity" of the retina data
-        :param label:
+        :param label: The optional name of the vertex.
         :param board_address:
         """
         fixed_n_neurons = self.get_n_neurons(mode, polarity)
@@ -133,8 +136,13 @@ class ExternalFPGARetinaDevice(
     @staticmethod
     def get_n_neurons(mode: str, polarity: str) -> int:
         """
+        Calculate the number of neurons based on mode and polarity
+
         :param mode: ``128`` or ``64`` or ``32`` or ``16``
+        :param polarity: ``UP`` or ``DOWN``
+        :returns: The number of neurons in the retina
         """
+        # Uses mode and polarity to determine the number of neurons needed
         if mode == ExternalFPGARetinaDevice.MODE_128:
             if (polarity == ExternalFPGARetinaDevice.UP_POLARITY or
                     polarity == ExternalFPGARetinaDevice.DOWN_POLARITY):

@@ -31,5 +31,14 @@ class StocExpStable(AbstractPyNNNeuronModel):
             tau: ModelParameter = 0.1, tau_refrac: ModelParameter = 1,
             bias: ModelParameter = 0, refract_init: ModelParameter = 0,
             seed: Optional[int] = None):
+        """
+        :param v_init: :math:`V_{init}`
+        :param v_reset: :math:`V_{reset}`
+        :param tau: :math:`\\tau_m`
+        :param tau_refrac: :math:`\\tau_{refrac}`
+        :param bias:
+        :param refract_init:
+        :param seed:
+        """
         super().__init__(NeuronImplStocExpStable(
             v_init, v_reset, tau, tau_refrac, bias, refract_init, seed))

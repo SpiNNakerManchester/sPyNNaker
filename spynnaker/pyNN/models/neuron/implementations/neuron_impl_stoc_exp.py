@@ -48,7 +48,12 @@ class NeuronImplStocExp(AbstractNeuronImpl):
 
     def __init__(self, tau: ModelParameter, bias: ModelParameter,
                  refract_init: ModelParameter, seed: Optional[int]):
-
+        """
+        :param tau: :math:`\\tau_m`
+        :param bias:
+        :param refract_init:
+        :param seed: Seed for the random distribution
+        """
         self._tau = tau
         self._bias = bias
         self._refract_init = refract_init

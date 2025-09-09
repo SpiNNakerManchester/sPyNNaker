@@ -68,7 +68,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     @classmethod
     def get_model_n_synapse_cores(cls) -> Optional[int]:
         """
-        Get the number of synapse cores for the model.
+        :returns: The number of synapse cores for the model.
         """
         return cls._n_synapse_cores.get(cls, None)
 
@@ -86,6 +86,8 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     def get_model_allow_delay_extensions(cls) -> bool:
         """
         Get whether to allow delay extensions for the model.
+
+        :returns: True unless the model does not allow delay extensions
         """
         return cls._allow_delay_extensions.get(cls, True)
 

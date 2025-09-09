@@ -85,14 +85,14 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         Determine if this component has a variable by the given name.
 
         :param variable: The name of the variable
+        :returns: True if the variable exists, False otherwise
         """
         return variable in self.__units
 
     def get_units(self, variable: str) -> str:
         """
-        Get the units of the given variable.
-
         :param variable: The name of the variable
+        :returns: The units of the given variable.
         """
         return self.__units[variable]
 

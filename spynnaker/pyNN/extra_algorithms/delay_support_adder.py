@@ -64,6 +64,9 @@ class _DelaySupportAdder(object):
         """
         Adds the delay extensions to the application graph, now that all the
         splitter objects have been set.
+
+        :returns: Two independent lists, a list of the delay vertices and
+           a list of delay edges and their partition id
         """
         progress = ProgressBar(1 + SpynnakerDataView.get_n_partitions(),
                                "Adding delay extensions as required")

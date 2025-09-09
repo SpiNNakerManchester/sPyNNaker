@@ -25,13 +25,14 @@ class AbstractSynapseStructure(object, metaclass=AbstractBase):
     @abstractmethod
     def get_n_half_words_per_connection(self) -> int:
         """
-        Get the number of bytes for each connection.
+        :returns: The number of bytes for each connection.
         """
         raise NotImplementedError
 
     @abstractmethod
     def get_weight_half_word(self) -> int:
         """
-        The index of the half-word where the weight should be written.
+        :returns:
+           The index of the half-word where the weight should be written.
         """
         raise NotImplementedError

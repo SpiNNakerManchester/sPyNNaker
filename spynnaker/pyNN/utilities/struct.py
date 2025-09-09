@@ -106,10 +106,9 @@ class Struct(object):
 
     def get_size_in_whole_words(self, array_size: int = 1) -> int:
         """
-        Get the size of the structure in whole words in an array of given
-        size (default 1 item).
-
         :param array_size: The number of elements in an array of structures
+        :returns: The size of the structure in whole words in an array
+            of given size (default 1 item).
         """
         datatype = self.numpy_dtype
         size_in_bytes = array_size * datatype.itemsize
@@ -118,12 +117,11 @@ class Struct(object):
     def get_data(self, values: ValueMap,
                  vertex_slice: Optional[Slice] = None) -> NDArray[uint32]:
         """
-        Get a numpy array of uint32 of data for the given values.
-
         :param values: The values to fill in the data with
         :param vertex_slice:
             The vertex slice to get the data for, or `None` if the structure is
             global.
+        :returns: The numpy array of uint32 of data for the given values
         """
         n_items = 1
         if vertex_slice is None:
@@ -201,13 +199,12 @@ class Struct(object):
             self, values: ValueMap,
             vertex_slice: Optional[Slice] = None) -> NDArray[uint32]:
         """
-        Get a numpy array of uint32 of data to generate the given values.
-
         :param values: The values to fill in the data with
         :param vertex_slice:
             The vertex slice or `None` for a structure with repeat_type global,
             or where a single value repeats for every neuron.  If this is not
             the case and vertex_slice is `None`, an error will be raised!
+        :returns: A numpy array of uint32 of data to generate the given values.
         """
         # Define n_repeats, which is either the total number of neurons
         # or a flag to indicate that the data repeats for each neuron
@@ -344,6 +341,7 @@ class Struct(object):
         :param values: The values to update with the read data
         :param data_offset:
             Index of the byte at the start of the valid data.
+        :param vertex_slice: Slice to read data for or None for all
         """
         n_items = 1
         ids: NDArray[integer] = numpy.zeros([0], dtype=uint32)

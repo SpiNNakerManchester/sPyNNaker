@@ -47,6 +47,7 @@ class MultiSpikeRecorder(object):
         """
         :param n_neurons:
         :param spikes_per_timestep:
+        :returns: SDRAm cost for saving the recordings
         """
         if not self.__record:
             return ConstantSDRAM(0)

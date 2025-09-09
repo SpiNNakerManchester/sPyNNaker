@@ -182,6 +182,8 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def show_connection_set(
             self, n_pre_neurons: int, n_post_neurons: int) -> None:
         """
+        Calls csa.show
+
         :param n_pre_neurons:
         :param n_post_neurons:
         """

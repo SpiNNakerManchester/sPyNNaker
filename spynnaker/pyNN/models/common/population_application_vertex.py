@@ -94,13 +94,12 @@ class PopulationApplicationVertex(
     def get_parameter_values(
             self, names: Names, selector: Selector = None) -> ParameterHolder:
         """
-        Get the values of a parameter or parameters for the whole
-        Population or a subset if the selector is used.
-
         :param names: The name or names of the parameter to get
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+        :returns: The values of a parameter or parameters for the whole
+            Population or a subset if the selector is used.
         :raise KeyError: if the parameter is not something that can be read
         """
         raise KeyError(
@@ -113,6 +112,7 @@ class PopulationApplicationVertex(
         if the selector is used.
 
         :param name: The name of the parameter to set
+        :param value: The new value
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
@@ -123,20 +123,20 @@ class PopulationApplicationVertex(
 
     def get_parameters(self) -> List[str]:
         """
-        Get the names of all the parameters that can be obtained
+        :returns: The names of all the parameters that can be obtained
         """
         return []
 
     def get_initial_state_values(
             self, names: Names, selector: Selector = None) -> ParameterHolder:
         """
-        Get the initial values of a state variable for the whole Population
-        or a subset if the selector is used.
-
         :param names: The name or names of the variable to get
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+        :returns: The initial values of a state variable
+            for the whole Population
+            or a subset if the selector is used.
         :raise KeyError: if the variable is not something that can be read
         """
         raise KeyError(
@@ -150,6 +150,7 @@ class PopulationApplicationVertex(
         or a subset if the selector is used.
 
         :param name: The name of the variable to set
+        :param value: The new value
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
@@ -162,13 +163,12 @@ class PopulationApplicationVertex(
     def get_current_state_values(
             self, names: Names, selector: Selector = None) -> ParameterHolder:
         """
-        Get the current values of a state variable for the whole Population
-        or a subset if the selector is used.
-
         :param names: The name or names of the variable to get
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
-            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids
+        :returns: The current values of a state variable for
+            the whole Population or a subset if the selector is used.
         :raise KeyError: if the variable is not something that can be read
         """
         raise KeyError(
@@ -182,6 +182,7 @@ class PopulationApplicationVertex(
         or a subset if the selector is used.
 
         :param name: The name of the variable to set
+        :param value: The new value
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
@@ -193,7 +194,7 @@ class PopulationApplicationVertex(
 
     def get_state_variables(self) -> List[str]:
         """
-        Get a list of supported state variables.
+        :returns: A list of supported state variables.
         """
         return []
 
@@ -202,6 +203,8 @@ class PopulationApplicationVertex(
         Get the units of the given parameter or state variable.
 
         :param name: the name of the parameter to get the units of
+        :returns: The unit or this variable. For example 'mV' or 'uS'.
+           Will be an empty string for things like spikes and probability
         :raise KeyError:
             if the name isn't recognised or the units cannot be identified
         """
@@ -224,9 +227,13 @@ class PopulationApplicationVertex(
 
     def get_recordable_variables(self) -> List[str]:
         """
-        Get a list of the names and types of things that can be recorded.
+        Get a list of the names of things that can be recorded.
 
         This methods list the variable recorded via the Population.
+
+        Includes both neuron and synapse recordable things
+
+        :returns: List of variable names
         """
         return []
 
@@ -269,7 +276,7 @@ class PopulationApplicationVertex(
 
     def get_recording_variables(self) -> List[str]:
         """
-        Get a list of variables that are currently being recorded.
+        :returns: A list of variables that are currently being recorded.
         """
         if not self.get_recordable_variables():
             return []
@@ -286,6 +293,7 @@ class PopulationApplicationVertex(
 
         :param name: The name of the variable recorded
         :raises KeyError: if the variable isn't being recorded
+        :returns: Data type in the Buffer Database
         """
         if name not in self.get_recordable_variables():
             raise KeyError(f"{name} is not being recorded")
@@ -300,6 +308,8 @@ class PopulationApplicationVertex(
         The values is in ms and unless selective recording is used will be
         `SpynnakerDataView.get_simulation_time_step_us()`
 
+        :param name: The name of the variable
+        :returns: Sampling rate in milliseconds for this variable
         :raises KeyError: If the variable isn't being recorded
         """
         if name not in self.get_recordable_variables():
@@ -316,6 +326,7 @@ class PopulationApplicationVertex(
         For instance data such as spikes this will be `None`.
 
         :param name: The name of the variable to get the type of
+        :returns: The data type used by the C code
         :raise KeyError: If the variable isn't recordable
         """
         if name not in self.get_recordable_variables():
@@ -326,9 +337,8 @@ class PopulationApplicationVertex(
 
     def get_recording_region(self, name: str) -> int:
         """
-        Gets the recording region for the named variable.
-
         :param name: The name of the variable to get the region of
+        :returns: The recording region for the named variable.
         :raises KeyError: If the variable isn't being recorded
         """
         if name not in self.get_recordable_variables():

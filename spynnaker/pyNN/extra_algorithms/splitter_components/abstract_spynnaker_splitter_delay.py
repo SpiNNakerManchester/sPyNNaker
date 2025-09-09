@@ -43,5 +43,7 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
         If this method returns False and the users ask for a delay larger than
         that allowed by :py:meth:`max_support_delay`, an exception will be
         raised saying a different splitter is required.
+
+        :returns: True if extra delays can be supported using delay vertices
         """
         return True

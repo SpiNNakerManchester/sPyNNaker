@@ -33,6 +33,7 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 def get_x_from_robot_retina(key: int) -> int:
     """
     :param key:
+    :returns: x coordinate from key
     """
     return (key >> 7) & 0x7f
 
@@ -40,6 +41,7 @@ def get_x_from_robot_retina(key: int) -> int:
 def get_y_from_robot_retina(key: int) -> int:
     """
     :param key:
+    :returns: y coordinate from key
     """
     return key & 0x7f
 
@@ -47,6 +49,7 @@ def get_y_from_robot_retina(key: int) -> int:
 def get_spike_value_from_robot_retina(key: int) -> int:
     """
     :param key:
+    :returns: spike from key
     """
     return (key >> 14) & 0x1
 
@@ -95,7 +98,7 @@ class MunichRetinaDevice(
         :param spinnaker_link_id:
             The SpiNNaker link to which the retina is connected
         :param position: ``LEFT`` or ``RIGHT``
-        :param label:
+        :param label: The optional name of the vertex.
         :param polarity: ``UP``, ``DOWN`` or ``MERGED``
         :param board_address:
         """

@@ -26,42 +26,42 @@ class AbstractRandomStats(object, metaclass=AbstractBase):
     @abstractmethod
     def cdf(self, dist: RandomDistribution, v: float) -> float:
         """
-        Return the cumulative distribution function value for the value `v`.
+        :returns: The cumulative distribution function value for the value `v`.
         """
         raise NotImplementedError
 
     @abstractmethod
     def ppf(self, dist: RandomDistribution, p: float) -> float:
         """
-        Return the percent point function value for the probability `p`.
+        :returns: The percent point function value for the probability `p`.
         """
         raise NotImplementedError
 
     @abstractmethod
     def mean(self, dist: RandomDistribution) -> float:
         """
-        Return the mean of the distribution.
+        :returns: The mean of the distribution.
         """
         raise NotImplementedError
 
     @abstractmethod
     def std(self, dist: RandomDistribution) -> float:
         """
-        Return the standard deviation of the distribution.
+        :returns: The standard deviation of the distribution.
         """
         raise NotImplementedError
 
     @abstractmethod
     def var(self, dist: RandomDistribution) -> float:
         """
-        Return the variance of the distribution.
+        :returns: The variance of the distribution.
         """
         raise NotImplementedError
 
     @abstractmethod
     def high(self, distribution: RandomDistribution) -> Optional[float]:
         """
-        Return the high cut-off value of the distribution, or `None` if the
+        :returns: The high cut-off value of the distribution, or `None` if the
         distribution is unbounded.
         """
         raise NotImplementedError
@@ -69,7 +69,7 @@ class AbstractRandomStats(object, metaclass=AbstractBase):
     @abstractmethod
     def low(self, distribution: RandomDistribution) -> Optional[float]:
         """
-        Return the low cut-off value of the distribution, or `None` if the
+        :returns: The low cut-off value of the distribution, or `None` if the
         distribution is unbounded.
         """
         raise NotImplementedError

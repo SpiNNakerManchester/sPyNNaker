@@ -172,9 +172,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def get_delay_maximum(
             self, synapse_info: SynapseInformation) -> float:
         """
-        Get the maximum delay specified by the user in ms,.
-
         :param synapse_info: the synapse info
+        :returns: The maximum delay specified by the user in ms,.
         """
         raise NotImplementedError
 
@@ -182,19 +181,18 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def get_delay_minimum(
             self, synapse_info: SynapseInformation) -> Optional[float]:
         """
-        Get the minimum delay specified by the user in ms, or `None` if
-        unbounded.
-
         :param synapse_info:
+        :returns: The minimum delay specified by the user in ms,
+           or `None` if unbounded.
         """
         raise NotImplementedError
 
     def get_delay_variance(self, delays: DELAYS,
                            synapse_info: SynapseInformation) -> float:
         """
-        Get the variance of the delays.
-
         :param delays:
+        :param synapse_info: Info to get distances from (if needed)
+        :returns: The variance of the delays.
         """
         if isinstance(delays, RandomDistribution):
             return utility_calls.get_variance(delays)
@@ -210,14 +208,14 @@ class AbstractConnector(object, metaclass=AbstractBase):
             n_connections: int, min_delay: float, max_delay: float,
             synapse_info: SynapseInformation) -> int:
         """
-        Get the expected number of delays that will fall within min_delay and
-        max_delay given given a float, RandomDistribution or list of delays.
-
         :param delays:
         :param n_total_connections:
         :param n_connections:
         :param min_delay:
         :param max_delay:
+        :returns: The expected number of delays
+           that will fall within min_delay andmax_delay
+           given a float, RandomDistribution or list of delays.
         """
         if isinstance(delays, RandomDistribution):
             prob_in_range = utility_calls.get_probability_within_range(
@@ -266,6 +264,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param synapse_info:
         :param min_delay:
         :param max_delay:
+        :returns: maximum number of connections
         """
         raise NotImplementedError
 
@@ -273,19 +272,18 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def get_n_connections_to_post_vertex_maximum(
             self, synapse_info: SynapseInformation) -> int:
         """
-        Get the maximum number of connections to any neuron
-        in the post vertex from neurons in the pre vertex.
-
         :param synapse_info:
+        :returns: The maximum number of connections to any neuron
+        in the post vertex from neurons in the pre vertex.
         """
         raise NotImplementedError
 
     def get_weight_mean(self, weights: WEIGHTS,
                         synapse_info: SynapseInformation) -> float:
         """
-        Get the mean of the weights.
-
         :param weights:
+        :param synapse_info: Info to get distances from (if needed)
+        :returns: The mean of the weights.
         """
         if isinstance(weights, RandomDistribution):
             return abs(utility_calls.get_mean(weights))
@@ -328,18 +326,17 @@ class AbstractConnector(object, metaclass=AbstractBase):
     @abstractmethod
     def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
         """
-        Get the maximum of the weights for this connection.
-
         :param synapse_info:
+        :returns: The maximum of the weights for this connection.
         """
         raise NotImplementedError
 
     def get_weight_variance(self, weights: WEIGHTS,
                             synapse_info: SynapseInformation) -> float:
         """
-        Get the variance of the weights.
-
         :param weights:
+        :param synapse_info: Info to get distances from (if needed)
+        :returns: The variance of the weights.
         """
         if isinstance(weights, RandomDistribution):
             return utility_calls.get_variance(weights)
@@ -399,10 +396,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
             self, values: WEIGHTS_DELAYS,
             synapse_info: SynapseInformation) -> SpynnakerException:
         """
-        Returns a SpynnakerException about there being no space defined
-
         :param values:
         :param synapse_info:
+        :returns: A SpynnakerException about there being no space defined
         """
         return SpynnakerException(
             f"Str Weights or delays {values} are distance-dependent "
@@ -413,10 +409,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def weight_type_exception(
             self, weights: WEIGHTS) -> SpynnakerException:
         """
-        Returns an Exception explaining incorrect weight or delay type
-
         :param weights:
-        :raises: SpynnakerException
+        :returns: An Exception explaining incorrect weight or delay type
         """
         if weights is None:
             return SpynnakerException(
@@ -438,10 +432,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     def delay_type_exception(self, delays: DELAYS) -> SpynnakerException:
         """
-        Returns an Exception explaining incorrect delay type
-
         :param delays:
-        :raises: SpynnakerException
+        :returns: An Exception explaining incorrect delay type
         """
         if isinstance(delays, str):
             return SpynnakerException(
@@ -553,6 +545,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     def get_provenance_data(self, synapse_info: SynapseInformation) -> None:
         """
+        Adds the synapse information to provenance database.
+
         :param synapse_info:
         """
         # Convert to native Python integer; provenance system assumption

@@ -29,4 +29,10 @@ class StocExp(AbstractPyNNNeuronModel):
     def __init__(self, tau: ModelParameter = 10, bias: ModelParameter = 0,
                  refract_init: ModelParameter = 0,
                  seed: Optional[int] = None):
+        """
+        :param tau: :math:`\\tau_m`
+        :param bias:
+        :param refract_init:
+        :param seed: Seed for the random distribution
+        """
         super().__init__(NeuronImplStocExp(tau, bias, refract_init, seed))

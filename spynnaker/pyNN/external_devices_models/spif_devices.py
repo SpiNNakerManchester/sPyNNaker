@@ -125,6 +125,7 @@ class SPIFRegister(IntEnum):
         :param index:
             The index of the register to send to when there are multiple
             registers starting from a base
+        :returns: Command created but not yet run
         """
         return MultiCastCommand(
             _RC_KEY + self.value + index, payload, time=None, repeat=_REPEATS,
@@ -141,6 +142,7 @@ class SPIFRegister(IntEnum):
         :param index:
             The index of the register to use when using a multi-indexed
             register (default is 0 which works for all registers)
+        :returns: Command created but not yet run
         """
         return _DelayedMultiCastCommand(
             _RC_KEY + self.value + index, get_payload, repeat=_REPEATS,
@@ -154,6 +156,7 @@ def set_mapper_key(pipe: int, key: int) -> MultiCastCommand:
 
     :param pipe: The SPIF pipe to set the key of (0-1)
     :param key: The output key to set
+    :returns: Command created but not yet run
     """
     return SPIFRegister.MP_KEY_BASE.cmd(key, pipe)
 
@@ -167,6 +170,7 @@ def set_field_mask(pipe: int, index: int, mask: int) -> MultiCastCommand:
     :param pipe: The SPIF pipe to set the mask of (0-1)
     :param index: The index of the field to set (0-3)
     :param mask: The mask to set
+    :returns: Command created but not yet run
     """
     return SPIFRegister.MP_FLD_MASK_BASE.cmd(mask, (pipe * N_FIELDS) + index)
 
@@ -181,6 +185,7 @@ def set_field_shift(pipe: int, index: int, shift: int) -> MultiCastCommand:
     :param index: The index of the field to set (0-3)
     :param shift:
         The shift value to set (0-31); positive = right, negative = left
+    :returns: Command created but not yet run
     """
     return SPIFRegister.MP_FLD_SHIFT_BASE.cmd(
         shift, (pipe * N_FIELDS) + index)
@@ -194,6 +199,7 @@ def set_field_limit(pipe: int, index: int, limit: int) -> MultiCastCommand:
     :param pipe: The SPIF pipe to set the limit of (0-1)
     :param index: The index of the field to set (0-3)
     :param limit: The maximum value of the field
+    :returns: Command created but not yet run
     """
     return SPIFRegister.MP_FLD_LIMIT_BASE.cmd(
         limit, (pipe * N_FIELDS) + index)
@@ -208,6 +214,7 @@ def set_filter_value(pipe: int, index: int, value: int) -> MultiCastCommand:
     :param pipe: The SPIF pipe to set the filter of (0-1)
     :param index: The index of the filter to set (0-7)
     :param value: The filter value to set
+    :returns: Command created but not yet run
     """
     return SPIFRegister.FL_VALUE_BASE.cmd(
         value, (pipe * N_FILTERS) + index)
@@ -222,6 +229,7 @@ def set_filter_mask(pipe: int, index: int, mask: int) -> MultiCastCommand:
     :param pipe: The SPIF pipe to set the filter of (0-1)
     :param index: The index of the filter to set (0-7)
     :param mask: The filter mask to set
+    :returns: Command created but not yet run
     """
     return SPIFRegister.FL_MASK_BASE.cmd(
         mask, (pipe * N_FILTERS) + index)
@@ -237,6 +245,7 @@ def set_input_key(pipe: int, index: int, key: int) -> MultiCastCommand:
     :param pipe: The SPIF pipe to set the input of (0-1)
     :param index: The index of the input to set (0-7)
     :param key: The key to set
+    :returns: Command created but not yet run
     """
     return SPIFRegister.IR_KEY_BASE.cmd(key, (pipe * N_INPUTS) + index)
 
@@ -251,6 +260,8 @@ def set_input_mask(pipe: int, index: int, mask: int) -> MultiCastCommand:
     :param pipe: The SPIF pipe to set the input of (0-1)
     :param index: The index of the input to set (0-7)
     :param mask: The mask to set
+    :returns: Command created but not yet run
+
     """
     return SPIFRegister.IR_MASK_BASE.cmd(mask, (pipe * N_INPUTS) + index)
 
@@ -268,6 +279,7 @@ def set_input_route(pipe: int, index: int, route: int) -> MultiCastCommand:
     :param pipe: The SPIF pipe to set the input of (0-1)
     :param index: The index of the input to set (0-7)
     :param route: The route to set
+    :returns: Command created but not yet run
     """
     return SPIFRegister.IR_ROUTE_BASE.cmd(route, (pipe * N_INPUTS) + index)
 
@@ -280,6 +292,7 @@ def set_distiller_key(index: int, key: int) -> MultiCastCommand:
 
     :param index: The index of the channel to set (0-5)
     :param key: The key to set
+    :returns: Command created but not yet run
     """
     return SPIFRegister.DIST_KEY_BASE.cmd(key, index)
 
@@ -292,6 +305,7 @@ def set_distiller_mask(index: int, mask: int) -> MultiCastCommand:
 
     :param index: The index of the channel to set (0-5)
     :param mask: The mask to set
+    :returns: Command created but not yet run
     """
     return SPIFRegister.DIST_MASK_BASE.cmd(mask, index)
 
@@ -306,6 +320,7 @@ def set_distiller_mask_delayed(
     :param index: The index of the channel to set (0-5)
     :param mask_func:
         The function to call to set the mask - takes index as argument
+    :returns: Command created but not yet run
     """
     return SPIFRegister.DIST_MASK_BASE.delayed_command(mask_func, index)
 
@@ -317,6 +332,7 @@ def set_distiller_shift(index: int, shift: int) -> MultiCastCommand:
 
     :param index: The index of the channel to set (0-5)
     :param shift: The shift to set
+    :returns: Command created but not yet run
     """
     return SPIFRegister.DIST_SHIFT_BASE.cmd(shift, index)
 
@@ -405,6 +421,7 @@ class SpiNNFPGARegister(IntEnum):
         :param index:
             The index of the register to send to when there are multiple
             registers starting from a base
+        :returns: Command created but not yet run
         """
         return MultiCastCommand(
             _LC_KEY + self.value + index, payload, time=None, repeat=_REPEATS,
@@ -422,6 +439,7 @@ class SpiNNFPGARegister(IntEnum):
         :param index:
             The index of the register to send to when there are multiple
             registers starting from a base
+        :returns: Command created but not yet run
         """
         return _DelayedMultiCastCommand(
             _LC_KEY + self.value + index, get_payload, repeat=_REPEATS,
@@ -434,6 +452,7 @@ def set_xp_key(index: int, key: int) -> MultiCastCommand:
 
     :param index: The index of the channel to set (0-5)
     :param key: The key to set
+    :returns: Command created but not yet run
     """
     return SpiNNFPGARegister.XP_KEY_BASE.cmd(key, index)
 
@@ -446,6 +465,7 @@ def set_xp_key_delayed(
 
     :param index: The index of the channel to set (0-5)
     :param key_func: The function to call to get the key
+    :returns: Command created but not yet run
     """
     return SpiNNFPGARegister.XP_KEY_BASE.delayed_command(key_func, index)
 
@@ -457,6 +477,7 @@ def set_xp_mask(index: int, mask: int) -> MultiCastCommand:
 
     :param index: The index of the channel to set (0-5)
     :param mask: The mask to set
+    :returns: Command created but not yet run
     """
     return SpiNNFPGARegister.XP_MASK_BASE.cmd(mask, index)
 
@@ -470,5 +491,6 @@ def set_xp_mask_delayed(
 
     :param index: The index of the channel to set (0-5)
     :param mask_func: The function to call to get the mask
+    :returns: Command created but not yet run
     """
     return SpiNNFPGARegister.XP_MASK_BASE.delayed_command(mask_func, index)

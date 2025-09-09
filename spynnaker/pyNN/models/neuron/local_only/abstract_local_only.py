@@ -49,10 +49,9 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
             self, n_atoms: int,
             incoming_projections: Iterable[Projection]) -> int:
         """
-        Get the size of the parameters in bytes.
-
         :param n_atoms: The number of atoms in the vertex
         :param incoming_projections: The projections to get the size of
+        :returns: The size of the parameters in bytes
         """
         raise NotImplementedError
 

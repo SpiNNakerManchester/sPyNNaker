@@ -36,7 +36,7 @@ class AbstractFormation(AbstractHasParameterNames, metaclass=AbstractBase):
     @abstractmethod
     def get_parameters_sdram_usage_in_bytes(self) -> int:
         """
-        Get the amount of SDRAM used by the parameters of this rule.
+        :returns: The amount of SDRAM used by the parameters of this rule.
         """
         raise NotImplementedError
 

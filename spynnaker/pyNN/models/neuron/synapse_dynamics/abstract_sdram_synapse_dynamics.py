@@ -41,6 +41,7 @@ class AbstractSDRAMSynapseDynamics(
         Determines if this synapse dynamics is the same as another.
 
         :param synapse_dynamics:
+        :returns: True if this synapse dynamics is the same as another.
         """
         raise NotImplementedError
 
@@ -48,10 +49,9 @@ class AbstractSDRAMSynapseDynamics(
     def get_parameters_sdram_usage_in_bytes(
             self, n_neurons: int, n_synapse_types: int) -> int:
         """
-        Get the SDRAM usage of the synapse dynamics parameters in bytes.
-
         :param n_neurons:
         :param n_synapse_types:
+        :returns: The SDRAM usage of the synapse dynamics parameters in bytes.
         """
         raise NotImplementedError
 
@@ -79,6 +79,7 @@ class AbstractSDRAMSynapseDynamics(
         number of words.
 
         :param n_words: The number of words the synapses must fit in
+        :returns: The maximum number of synapses
         """
         raise NotImplementedError
 
@@ -105,6 +106,7 @@ class AbstractSDRAMSynapseDynamics(
             The non-row-based data
         :param max_n_synapses:
             The maximum number of synapses to generate in each row
+        :returns: Row based data
         """
         return [
             data[connection_row_indices == i][:max_n_synapses].reshape(-1)
@@ -118,6 +120,7 @@ class AbstractSDRAMSynapseDynamics(
 
         :param rows:
         :param item_size:
+        :returns: The number of items in each row
         """
         return numpy.array([
             int(math.ceil(float(row.size) / float(item_size)))
@@ -128,6 +131,7 @@ class AbstractSDRAMSynapseDynamics(
         Convert the row data to words.
 
         :param rows:
+        :returns: data as words
         """
         words = [numpy.pad(
             row, (0, (4 - (row.size % 4)) & 0x3), mode="constant",

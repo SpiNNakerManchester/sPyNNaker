@@ -229,6 +229,8 @@ def get_probable_maximum_selected(
     Get the likely maximum number of items that will be selected from a
     set of `n_trials` from a total set of `n_total_trials`
     with a probability of selection of `selection_prob`.
+
+    :returns: The likely maximum number of items
     """
     prob = 1.0 - (chance / float(n_total_trials))
     val = binom.ppf(prob, n_trials, selection_prob)
@@ -247,6 +249,8 @@ def get_probable_minimum_selected(
     Get the likely minimum number of items that will be selected from a
     set of `n_trials` from a total set of `n_total_trials`
     with a probability of selection of `selection_prob`.
+
+    :returns: The likely minimum number of items
     """
     prob = (chance / float(n_total_trials))
     return binom.ppf(prob, n_trials, selection_prob)
@@ -255,12 +259,11 @@ def get_probable_minimum_selected(
 def get_probability_within_range(distribution: RandomDistribution,
                                  lower: float, upper: float) -> float:
     """
-    Get the probability that a value will fall within the given range for
-    a given RandomDistribution.
-
     :param distribution:
     :param lower:
     :param upper:
+    :returns: The probability that a value will fall within the given range
+        for a given RandomDistribution.
     """
     stats = STATS_BY_NAME[distribution.name]
     return stats.cdf(distribution, upper) - stats.cdf(distribution, lower)
@@ -269,12 +272,11 @@ def get_probability_within_range(distribution: RandomDistribution,
 def get_maximum_probable_value(distribution: RandomDistribution, n_items: int,
                                chance: float = (1.0 / 100.0)) -> float:
     """
-    Get the likely maximum value of a RandomDistribution given a
-    number of draws.
-
     :param distribution:
     :param n_items:
     :param chance:
+    :returns: The likely maximum value of a RandomDistribution given a
+        number of draws.
     """
     stats = STATS_BY_NAME[distribution.name]
     prob = 1.0 - (chance / float(n_items))
@@ -284,10 +286,11 @@ def get_maximum_probable_value(distribution: RandomDistribution, n_items: int,
 def get_minimum_probable_value(distribution: RandomDistribution, n_items: int,
                                chance: float = (1.0 / 100.0)) -> float:
     """
-    Get the likely minimum value of a RandomDistribution given a
-    number of draws.
-
-    :param distribution:
+    :param distribution: Random type to check
+    :param n_items: Number of items to spread chance over
+    :param chance: Possibility of a value
+    :returns: The likely minimum value of a RandomDistribution given a
+        number of draws.
     """
     stats = STATS_BY_NAME[distribution.name]
     prob = chance / float(n_items)
@@ -296,9 +299,8 @@ def get_minimum_probable_value(distribution: RandomDistribution, n_items: int,
 
 def get_mean(distribution: RandomDistribution) -> float:
     """
-    Get the mean of a RandomDistribution.
-
     :param distribution:
+    :returns: The mean of a RandomDistribution.
     """
     stats = STATS_BY_NAME[distribution.name]
     return stats.mean(distribution)
@@ -306,9 +308,8 @@ def get_mean(distribution: RandomDistribution) -> float:
 
 def get_standard_deviation(distribution: RandomDistribution) -> float:
     """
-    Get the standard deviation of a RandomDistribution.
-
     :param distribution:
+    :returns: The standard deviation of a RandomDistribution.
     """
     stats = STATS_BY_NAME[distribution.name]
     return stats.std(distribution)
@@ -316,9 +317,8 @@ def get_standard_deviation(distribution: RandomDistribution) -> float:
 
 def get_variance(distribution: RandomDistribution) -> float:
     """
-    Get the variance of a RandomDistribution.
-
     :param distribution:
+    :returns: The variance of a RandomDistribution.
     """
     stats = STATS_BY_NAME[distribution.name]
     return stats.var(distribution)
@@ -331,6 +331,7 @@ def high(distribution: RandomDistribution) -> Optional[float]:
     Could return `None`.
 
     :param distribution:
+    :returns: The maximum boundary value
     """
     stats = STATS_BY_NAME[distribution.name]
     return stats.high(distribution)
@@ -338,11 +339,12 @@ def high(distribution: RandomDistribution) -> Optional[float]:
 
 def low(distribution: RandomDistribution) -> Optional[float]:
     """
-    Gets the high or minimum boundary value for this distribution.
+    Gets the low or minimum boundary value for this distribution.
 
     Could return `None`.
 
     :param distribution:
+    :returns: The minimum boundary value
     """
     stats = STATS_BY_NAME[distribution.name]
     return stats.low(distribution)
@@ -395,8 +397,11 @@ def get_time_to_write_us(n_bytes: int, n_cores: int) -> int:
     """
     Determine how long a write of a given number of bytes will take in us.
 
+    No known use so may be removed.
+
     :param n_bytes: The number of bytes to transfer
     :param n_cores: How many cores will be writing at the same time
+    :returns: how long a write of a given number of bytes will take in us.
     """
     bandwidth_per_core = WRITE_BANDWIDTH_BYTES_PER_SECOND / n_cores
     seconds = n_bytes / bandwidth_per_core
@@ -410,6 +415,7 @@ def get_neo_io(file_or_folder: str) -> BaseIO:
     In Neo 0.12 neo.get_io only works with existing files
 
     :param file_or_folder:
+    :returns: Neo IO instance, guessing the type based on the filename suffix.
     """
     try:
         return neo.get_io(file_or_folder)
@@ -445,6 +451,7 @@ def check_rng(rng: AbstractRNG, where: str) -> None:
     sPyNNaker.  If not None, warn or error depending on a config value.
 
     :param rng: The rng parameter value.
+    :param where: Caller location for error message
     """
     if rng is not None and rng.seed is not None:
         report_non_spynnaker_pynn(

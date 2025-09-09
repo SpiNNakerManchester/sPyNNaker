@@ -108,6 +108,7 @@ def get_max_row_info(
         The number of delay stages on the edge
     :param in_edge:
         The incoming edge on which the synapse information is held
+    :returns: Information about the maximums for rows in a synaptic matrix.
     :raises SynapseRowTooBigException:
         If the synapse information can't be represented
     """

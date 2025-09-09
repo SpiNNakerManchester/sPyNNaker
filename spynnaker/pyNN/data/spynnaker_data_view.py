@@ -109,6 +109,7 @@ class SpynnakerDataView(FecDataView):
         Typically `simulation_time_step_per_ms` but may be a positive multiple
         of it.
 
+        :returns: the minimum delay in milliseconds.
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the min_delay is currently unavailable
         """
@@ -120,6 +121,10 @@ class SpynnakerDataView(FecDataView):
     def has_min_delay(cls) -> bool:
         """
         Report if there is a minimum supported delay available.
+
+        If there is no delay time step could be used.
+
+        :returns: True if get_min_delay method will work
         """
         if cls.__spy_data._min_delay is not None:
             return True
@@ -133,13 +138,15 @@ class SpynnakerDataView(FecDataView):
         The iteration will be empty if no projections added.
 
         Note: This method is backed by a set so does not guarantee order
+
+        :returns: Unordered iterator of projections.
         """
         return iter(cls.__spy_data._projections)
 
     @classmethod
     def get_n_projections(cls) -> int:
         """
-        The number of projections previously added.
+        :returns: The number of projections previously added.
         """
         return len(cls.__spy_data._projections)
 
@@ -174,13 +181,15 @@ class SpynnakerDataView(FecDataView):
         The iteration will be empty if no populations added.
 
         Note: This method is backed by a set so does not guarantee order
+
+        :returns: Unordered iterator of Populations
         """
         return iter(cls.__spy_data._populations)
 
     @classmethod
     def get_n_populations(cls) -> int:
         """
-        The number of populations previously added.
+        :returns: The number of populations previously added.
         """
         return len(cls.__spy_data._populations)
 
@@ -221,6 +230,6 @@ class SpynnakerDataView(FecDataView):
     @classmethod
     def get_sim_name(cls) -> str:
         """
-        Gets the name to be returned by `pyNN.spiNNaker.name`.
+        :returns: The name to be returned by `pyNN.spiNNaker.name`.
         """
         return _version.NAME

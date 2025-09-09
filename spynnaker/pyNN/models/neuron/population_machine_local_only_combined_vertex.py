@@ -344,7 +344,6 @@ class PopulationMachineLocalOnlyCombinedVertex(
         :param y: y coordinate of the core where this core
         :param p: virtual id of the core
         :param provenance_data: A list of data items to interpret
-        :return: a list of provenance data items
         """
         prov = LocalOnlyProvenance(*provenance_data)
 
