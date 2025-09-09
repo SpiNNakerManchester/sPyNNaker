@@ -29,5 +29,12 @@ class StocSigma(AbstractPyNNNeuronModel):
                  alpha: ModelParameter = 1.0, bias: ModelParameter = 0,
                  refract_init: ModelParameter = 0,
                  seed: Optional[int] = None):
+        """
+        :param tau_refrac:
+        :param alpha:
+        :param bias:
+        :param refract_init:
+        :param seed: Seed for the random distribution
+        """
         super().__init__(NeuronImplStocSigma(tau_refrac, alpha, bias,
                                              refract_init, seed))

@@ -105,9 +105,8 @@ def is_param_generatable(value: Any) -> bool:
 
 def param_generator_params(values: _ParamType) -> NDArray[uint32]:
     """
-    Get the parameter generator parameters as a numpy array.
-
     :param values:
+    :returns: The parameter generator parameters as a numpy array.
     """
     if numpy.isscalar(values):
         return numpy.array(
@@ -135,9 +134,8 @@ MAX_PARAMS_BYTES = 4 * BYTES_PER_WORD
 
 def param_generator_params_size_in_bytes(values: _ParamType) -> int:
     """
-    Get the size of the parameter generator parameters in bytes.
-
     :param values:
+    :returns: The size of the parameter generator parameters in bytes.
     :raises TypeError: If `values` is of an unsupported data type
     """
     if numpy.isscalar(values):

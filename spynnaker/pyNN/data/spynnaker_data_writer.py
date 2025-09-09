@@ -62,6 +62,8 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
             time_scale_factor: Optional[float],
             min_delay: Optional[Union[int, float]]) -> None:
         """
+        Setup the timings and delays for the simulation
+
         :param simulation_time_step_us:
             An explicitly specified time step for the simulation in
             microseconds.
@@ -73,7 +75,6 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
             new value or `None` to say use simulation_time_step_ms
         """
         try:
-
             # If there isn't a time scale factor given, try to work it out
             # on the basis that we can do 0.1ms steps in real time
             if time_scale_factor is None:

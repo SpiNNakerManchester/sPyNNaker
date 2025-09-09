@@ -271,7 +271,7 @@ class ConvolutionConnector(AbstractConnector):
 
     def get_post_shape(self, shape: Tuple[int, ...]) -> Tuple[int, ...]:
         """
-        Get the shape of the post image given the pre-image shape.
+        :returns: The shape of the post image given the pre-image shape.
         """
         _shape = numpy.array(shape)
         if self.__pool_shape is not None:
@@ -435,12 +435,11 @@ class ConvolutionConnector(AbstractConnector):
             self, app_edge: ProjectionApplicationEdge, local_delay: int,
             delay_stage: int, weight_index: int) -> NDArray[uint32]:
         """
-        Gets the local only data
-
         :param app_edge:
         :param local_delay:
         :param delay_stage:
         :param weight_index:
+        :returns: The local only data
         """
         # Get info about things
         kernel_shape = self.__kernel_weights.shape
@@ -469,10 +468,9 @@ class ConvolutionConnector(AbstractConnector):
             self, app_edge: ProjectionApplicationEdge,
             weight_scales: NDArray[floating]) -> NDArray[int16]:
         """
-        Encode weights with weight scaling.
-
         :param app_edge:
         :param weight_scales:
+        :returns: Encoded weights with weight scaling.
         """
         encoded_kernel_weights = self.__kernel_weights.flatten()
         neg_weights = encoded_kernel_weights < 0

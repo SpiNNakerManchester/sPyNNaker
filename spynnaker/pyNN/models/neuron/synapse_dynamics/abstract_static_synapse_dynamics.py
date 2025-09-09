@@ -33,9 +33,9 @@ class AbstractStaticSynapseDynamics(
     @abstractmethod
     def get_n_words_for_static_connections(self, n_connections: int) -> int:
         """
-        Get the number of 32-bit words for `n_connections` in a single row.
-
         :param n_connections:
+        :returns:
+           The number of 32-bit words for `n_connections` in a single row.
         """
         raise NotImplementedError
 
@@ -73,10 +73,9 @@ class AbstractStaticSynapseDynamics(
     def get_n_static_words_per_row(
             self, ff_size: NDArray[integer]) -> NDArray[integer]:
         """
-        Get the number of bytes to be read per row for the static data
-        given the size that was written to each row.
-
         :param ff_size:
+        :returns: The number of bytes to be read per row for the static data
+           given the size that was written to each row.
         """
         raise NotImplementedError
 
@@ -84,9 +83,8 @@ class AbstractStaticSynapseDynamics(
     def get_n_synapses_in_rows(
             self, ff_size: NDArray[integer]) -> NDArray[integer]:
         """
-        Get the number of synapses in the rows with sizes `ff_size`.
-
         :param ff_size:
+        :returns: The number of synapses in the rows with sizes `ff_size`.
         """
         raise NotImplementedError
 
@@ -102,5 +100,7 @@ class AbstractStaticSynapseDynamics(
         :param ff_size:
         :param ff_data:
         :param max_atoms_per_core:
+        :return: the connections read with dtype
+            :py:const:`~.NUMPY_CONNECTORS_DTYPE`
         """
         raise NotImplementedError

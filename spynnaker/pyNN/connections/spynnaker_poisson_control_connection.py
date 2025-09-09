@@ -74,6 +74,8 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
 
     def add_poisson_label(self, label: str) -> None:
         """
+        Adds a send label.
+
         :param label: The label of the Poisson source population.
         """
         control = self.__convert_to_control_label(label)

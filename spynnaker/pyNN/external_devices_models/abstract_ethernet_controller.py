@@ -31,7 +31,7 @@ class AbstractEthernetController(object, metaclass=AbstractBase):
     @abstractmethod
     def get_message_translator(self) -> AbstractEthernetTranslator:
         """
-        Get the translator of messages.
+        :returns: The translator of messages.
         """
         raise NotImplementedError
 
@@ -39,13 +39,14 @@ class AbstractEthernetController(object, metaclass=AbstractBase):
     def get_external_devices(self) -> Iterable[
             AbstractMulticastControllableDevice]:
         """
-        Get the external devices that are to be controlled by the controller.
+        :returns:
+           The external devices that are to be controlled by the controller.
         """
         raise NotImplementedError
 
     @abstractmethod
     def get_outgoing_partition_ids(self) -> List[str]:
         """
-        Get the partition IDs of messages coming out of the controller.
+        :returns: The partition IDs of messages coming out of the controller.
         """
         raise NotImplementedError

@@ -552,12 +552,11 @@ class SynapticMatrices(object):
     def get_index(self, app_edge: ProjectionApplicationEdge,
                   synapse_info: SynapseInformation) -> int:
         """
-        Get the index of an incoming projection in the population table.
-
         :param app_edge:
             The application edge of the projection
         :param synapse_info:
             The synapse information of the projection
+        :returns: The index of an incoming projection in the population table.
         """
         matrix = self.__matrices[app_edge, synapse_info]
         return matrix.get_index()

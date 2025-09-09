@@ -116,6 +116,16 @@ class SpikeSourceArrayVertex(
             model: SpikeSourceArray,
             splitter: Optional[AbstractSplitterCommon],
             n_colour_bits: Optional[int]):
+        """
+
+        :param n_neurons: The number of neurons in the population
+        :param spike_times: Timesteps on which to spike
+        :param label:
+        :param max_atoms_per_core:
+        :param model:
+        :param splitter:
+        :param n_colour_bits:
+        """
         self.__model_name = "SpikeSourceArray"
         self.__model = model
         self.__structure: Optional[BaseStructure] = None
@@ -372,6 +382,8 @@ class SpikeSourceArrayVertex(
 
         If template is `None`, then a dictionary containing the template
         context will be returned.
+
+        :returns: A human-readable description of the cell
         """
         return {
             "name": self.__model_name,

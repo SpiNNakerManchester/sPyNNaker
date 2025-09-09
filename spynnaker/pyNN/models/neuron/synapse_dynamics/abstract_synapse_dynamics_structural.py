@@ -185,6 +185,6 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     @abstractmethod
     def get_max_rewires_per_ts(self) -> int:
         """
-        Get the max number of rewires per timestep.
+        :returns: The max number of rewires per timestep.
         """
         raise NotImplementedError

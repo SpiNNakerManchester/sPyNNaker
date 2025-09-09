@@ -32,11 +32,13 @@ class ArbitraryFPGADevice(ApplicationFPGAVertex, PopulationApplicationVertex):
             chip_coords: Optional[XY] = None, label: Optional[str] = None):
         """
         :param n_neurons: Number of neurons
-        :param fpga_link_id:
-        :param fpga_id:
-        :param board_address:
-        :param chip_coords:
-        :param label:
+        :param fpga_link_id: The ID of the link of the FPGA (0-15)
+        :param fpga_id: The ID of the FPGA on the board (0, 1 or 2)
+        :param board_address: The IP address of the board with the FPGA,
+            or None for the default board or if using chip_coords
+        :param chip_coords: The coordinates of the chip connected to the FPGA,
+            or None for the default board or if using board_address
+        :param label: The optional name of the vertex.
         """
         conn = FPGAConnection(
             fpga_id, fpga_link_id, board_address, chip_coords)

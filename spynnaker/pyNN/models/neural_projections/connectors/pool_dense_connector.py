@@ -187,9 +187,10 @@ class PoolDenseConnector(AbstractConnector):
             pool_shape: Union[int, Tuple[int, ...], None] = None,
             pool_stride: Union[int, Tuple[int, ...], None] = None) -> NDArray:
         """
-        The shape considering the stride
-
         :param pre_shape: tuple(int)
+        :param pool_shape:
+        :param pool_stride:
+        :return: The shape considering the stride
         """
         real_pool_shape = cls.__to_nd_shape_or_none(
             pool_shape, len(pre_shape), "pool_shape")
@@ -292,6 +293,7 @@ class PoolDenseConnector(AbstractConnector):
         """
         :param pre_shape:
         :param n_post_atoms:
+        :returns: Size in bytes needed for the weights
         """
         n_weights = self.__get_n_weights(pre_shape, n_post_atoms)
         n_weights = n_weights + 1 if n_weights % 2 != 0 else n_weights

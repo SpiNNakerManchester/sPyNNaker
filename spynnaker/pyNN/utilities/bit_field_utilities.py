@@ -45,8 +45,9 @@ BIT_IN_A_WORD = 32.0
 
 
 def is_sdram_poisson_source(app_edge: ApplicationEdge) -> bool:
-    """ Determine if a given app edge is a poisson source being sent over SDRAM
-        as it can likely be discounted if so
+    """
+    :returns: True if a given app edge is a poisson source being sent over
+        SDRAM as it can likely be discounted if so
     """
     # Avoid circular import
     # pylint: disable=import-outside-toplevel
@@ -119,10 +120,9 @@ def get_sdram_for_keys(incoming_projections: Iterable[Projection]) -> int:
 def get_bitfield_key_map_data(
         incoming_projections: Iterable[Projection]) -> NDArray[uint32]:
     """
-    Get data for the key map region.
-
     :param incoming_projections:
         The projections to generate bitfields for
+    :returns: Data for the key map region.
     """
     # Gather the source vertices that target this core
     routing_infos = SpynnakerDataView.get_routing_infos()

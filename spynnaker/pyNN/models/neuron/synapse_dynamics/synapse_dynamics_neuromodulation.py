@@ -76,6 +76,13 @@ class SynapseDynamicsNeuromodulation(
             self, weight: _Weight = StaticSynapse.default_parameters['weight'],
             tau_c: float = 1000.0, tau_d: float = 200.0,
             w_min: float = 0.0, w_max: float = 1.0):
+        """
+        :param weight: The weights or way to generate the weights
+        :param tau_c:
+        :param tau_d:
+        :param w_min:
+        :param w_max:
+        """
         super().__init__(delay=1, weight=weight)
         self.__tau_c = tau_c
         self.__tau_d = tau_d
@@ -140,6 +147,7 @@ class SynapseDynamicsNeuromodulation(
         Checks that tau c, tau d, w max and w min are all the same.
 
         :param other:
+        :returns: True if all checked values are the same
         """
         return (self.__tau_c == other.tau_c and self.__tau_d == other.tau_d and
                 self.__w_min == other.w_min and self.__w_max == other.w_max)

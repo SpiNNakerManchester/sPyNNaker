@@ -165,21 +165,21 @@ class ParameterHolder(object):
 
     def keys(self) -> Iterable[str]:
         """
-        The names of the data
+        :returns: The names of the data
         """
         data = self._get_data_items()
         return data.keys()
 
     def values(self) -> Iterable[List[float]]:
         """
-        The names and values of the data
+        :returns: The values of the data
         """
         data = self._get_data_items()
         return data.values()
 
     def items(self) -> Iterable[Tuple[str, List[float]]]:
         """
-        The names and values of the data
+        :returns: Iterable of the names and matching values of the data
         """
         data = self._get_data_items()
         return data.items()

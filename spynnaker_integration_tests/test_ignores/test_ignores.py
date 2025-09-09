@@ -32,7 +32,7 @@ def _receive_chip_info(
 
     # Hack to test ignores
     if (chip_info.x == 8 and chip_info.y == 4):
-        # hack the config to include an actual ip address used
+        # hack the config to include an actual IP address used
         set_config("Machine", "down_cores",
                    f"3,0,-4:99,99,2:2,2,-19:3,3,4,127.0.0.1:"
                    f"2,2,-10,{chip_info.ethernet_ip_address}:"

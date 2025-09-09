@@ -37,5 +37,21 @@ class IFCondAlpha(AbstractProvidesDefaults):
             i_offset: ModelParameter = 0, v: ModelParameter = -65.0,
             gsyn_exc: ModelParameter = 0.0, gsyn_inh: ModelParameter = 0.0):
         # pylint: disable=unused-argument, invalid-name
+        """
+        :param tau_m:
+        :param cm:
+        :param e_rev_E:
+        :param e_rev_I:
+        :param v_rest:
+        :param v_reset:
+        :param v_thresh:
+        :param tau_syn_E:
+        :param tau_syn_I:
+        :param tau_refrac:
+        :param i_offset:
+        :param v:
+        :param gsyn_exc:
+        :param gsyn_inh:
+        """
         raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")

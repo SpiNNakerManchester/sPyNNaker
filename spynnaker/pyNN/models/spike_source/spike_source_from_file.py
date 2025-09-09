@@ -35,6 +35,15 @@ class SpikeSourceFromFile(SpikeSourceArray):
             min_atom: float = 0.0, max_atom: float = _inf,
             min_time: float = 0.0, max_time: float = _inf,
             split_value: str = "\t"):
+        """
+        :param spike_time_file:
+            absolute path to a file containing spike values
+        :param min_atom: min neuron ID to which neurons to read in
+        :param max_atom: max neuron ID to which neurons to read in
+        :param min_time: min time slot to read neurons values of.
+        :param max_time: max time slot to read neurons values of.
+        :param split_value: the pattern to split by
+        """
         spike_times = utility_calls.read_spikes_from_file(
             spike_time_file, min_atom, max_atom, min_time, max_time,
             split_value)

@@ -25,6 +25,9 @@ class RandomStatsScipyImpl(AbstractRandomStats):
     """
 
     def __init__(self, distribution_type: str):
+        """
+        :param distribution_type: Name of the distribution type.
+        """
         self._scipy_stats = getattr(scipy.stats, distribution_type)
 
     @overrides(AbstractRandomStats.cdf)

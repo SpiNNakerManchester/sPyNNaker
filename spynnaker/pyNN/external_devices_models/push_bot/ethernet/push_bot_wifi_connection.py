@@ -39,6 +39,7 @@ def get_pushbot_wifi_connection(
 
     :param remote_host: The IP address of the PushBot
     :param remote_port: The port number of the PushBot (default 56000)
+    :returns: Connection to the Pushbot
     """
     key = (remote_host, remote_port)
     if key not in _existing_connections:
@@ -89,7 +90,9 @@ class PushBotWIFIConnection(Connection, Listenable):
     def is_connected(self) -> bool:
         """
         See
-        :py:meth:`~spinnman.connections.Connection.is_connected`.
+        :py:meth:`~spinnman.connections.Connection.is_connected
+
+        :returns: True if ping works
         """
         # check if machine is active and on the network
         for _ in range(5):  # Try up to five times...

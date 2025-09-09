@@ -26,19 +26,6 @@ class IFCurrExpBase(AbstractPyNNNeuronModelStandard):
     """
     Leaky integrate and fire neuron with an exponentially decaying
     current input.
-
-    :param tau_m: :math:`\\tau_m`
-    :param cm: :math:`C_m`
-    :param v_rest: :math:`V_{rest}`
-    :param v_reset: :math:`V_{reset}`
-    :param v_thresh: :math:`V_{thresh}`
-    :param tau_syn_E: :math:`\\tau^{syn}_e`
-    :param tau_syn_I: :math:`\\tau^{syn}_i`
-    :param tau_refrac: :math:`\\tau_{refrac}`
-    :param i_offset: :math:`I_{offset}`
-    :param v: :math:`V_{init}`
-    :param isyn_exc: :math:`I^{syn}_e`
-    :param isyn_inh: :math:`I^{syn}_i`
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
@@ -49,6 +36,20 @@ class IFCurrExpBase(AbstractPyNNNeuronModelStandard):
             tau_syn_I: ModelParameter = 5.0, tau_refrac: ModelParameter = 0.1,
             i_offset: ModelParameter = 0.0, v:  ModelParameter = -65.0,
             isyn_exc: ModelParameter = 0.0, isyn_inh: ModelParameter = 0.0):
+        """
+        :param tau_m: :math:`\\tau_m`
+        :param cm: :math:`C_m`
+        :param v_rest: :math:`V_{rest}`
+        :param v_reset: :math:`V_{reset}`
+        :param v_thresh: :math:`V_{thresh}`
+        :param tau_syn_E: :math:`\\tau^{syn}_e`
+        :param tau_syn_I: :math:`\\tau^{syn}_i`
+        :param tau_refrac: :math:`\\tau_{refrac}`
+        :param i_offset: :math:`I_{offset}`
+        :param v: :math:`V_{init}`
+        :param isyn_exc: :math:`I^{syn}_e`
+        :param isyn_inh: :math:`I^{syn}_i`
+        """
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(

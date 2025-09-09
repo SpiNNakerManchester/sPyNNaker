@@ -30,35 +30,36 @@ class AbstractEthernetSensor(object, metaclass=AbstractBase):
     @abstractmethod
     def get_n_neurons(self) -> int:
         """
-        Get the number of neurons that will be sent out by the device.
+        :returns: The number of neurons that will be sent out by the device.
         """
         raise NotImplementedError
 
     @abstractmethod
     def get_injector_parameters(self) -> Dict[str, Any]:
         """
-        Get the parameters of the Spike Injector to use with this device.
+        :returns:
+           The parameters of the Spike Injector to use with this device.
         """
         raise NotImplementedError
 
     @abstractmethod
     def get_injector_label(self) -> str:
         """
-        Get the label to give to the Spike Injector.
+        :returns: the label to give to the Spike Injector.
         """
         raise NotImplementedError
 
     @abstractmethod
     def get_translator(self) -> AbstractEthernetTranslator:
         """
-        Get a translator of multicast commands to Ethernet commands.
+        :returns: A translator of multicast commands to Ethernet commands.
         """
         raise NotImplementedError
 
     @abstractmethod
     def get_database_connection(self) -> SpynnakerLiveSpikesConnection:
         """
-        Get a Database Connection instance that this device uses to inject
-        packets.
+        :returns: A Database Connection instance that this device uses to
+             inject packets.
         """
         raise NotImplementedError

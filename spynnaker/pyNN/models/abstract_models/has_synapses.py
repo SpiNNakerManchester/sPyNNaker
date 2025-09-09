@@ -33,10 +33,9 @@ class HasSynapses(object, metaclass=AbstractBase):
             self, placement: Placement, app_edge: ProjectionApplicationEdge,
             synapse_info: SynapseInformation) -> Sequence[NDArray]:
         """
-        Get the connections from the machine for this vertex.
-
         :param placement: Where the connection data is on the machine
         :param app_edge: The edge for which the data is being read
         :param synapse_info: The specific projection within the edge
+        :returns: The connections from the machine for this vertex.
         """
         raise NotImplementedError
