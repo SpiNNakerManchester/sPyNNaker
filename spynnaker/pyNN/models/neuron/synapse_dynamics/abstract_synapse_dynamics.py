@@ -228,8 +228,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
     def get_synapse_parameter_names(self) -> Set[str]:
         """
-        :return: the names of the parameters that can be extracted from synapses
-        read from the machine.
+        :return: the names of the parameters that can be extracted from
+         synapses read from the machine.
         """
         return {"source", "target", "weight", "delay"}
 
