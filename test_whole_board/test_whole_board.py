@@ -22,8 +22,10 @@ from time import sleep
 from shutil import rmtree
 
 import pyNN.spiNNaker as sim
-from spinnman.spalloc import SpallocClient, SpallocState
 
+from spinn_utilities.config_holder import set_config
+from spinnman.spalloc import SpallocClient, SpallocState
+from spynnaker.pyNN.config_setup import unittest_setup
 
 class WholeBoardTest(object):
 
@@ -194,17 +196,19 @@ class WholeBoardTest(object):
 
 BOARDS = [(x, y, b) for x in range(20) for y in range(20) for b in range(3)]
 SPALLOC_URL = "https://spinnaker.cs.man.ac.uk/spalloc"
-SPALLOC_USERNAME = "jenkins"
+SPALLOC_USERNAME = None#"jenkins"
 SPALLOC_PASSWORD = os.getenv("SPALLOC_PASSWORD")
 SPALLOC_MACHINE = "SpiNNaker1M"
 
 
 @pytest.mark.parametrize("x,y,b", BOARDS)
 def test_run(x, y, b):
+    unittest_setup()
+    set_config("Machine", "spalloc_triad", f"{x},{y},{b}")
+    #set_config("Machine", "spalloc_machine", SPALLOC_MACHINE)
     test_dir = os.path.dirname(__file__)
     client = SpallocClient(SPALLOC_URL, SPALLOC_USERNAME, SPALLOC_PASSWORD)
-    job = client.create_job_board(
-        triad=(x, y, b), machine_name=SPALLOC_MACHINE)
+    job = client.create_job()
     with job:
         job.wait_until_ready(n_retries=2)
         state = job.get_state()
