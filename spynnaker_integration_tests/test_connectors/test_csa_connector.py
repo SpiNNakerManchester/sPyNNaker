@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from typing import Optional, Tuple, Union
+from unittest import SkipTest
 import numpy
 import csa  # type: ignore[import]
 from pyNN.space import BaseStructure
@@ -36,7 +37,12 @@ class CSAConnectorTest(BaseTestCase):
             post_size, p.IF_curr_exp(), structure=post_shape)
         post.set_max_atoms_per_core(neurons_per_core_post)
 
-        conn = p.CSAConnector(cset)
+        try:
+            conn = p.CSAConnector(cset)
+        except ImportError:
+            p.end()
+            raise SkipTest(
+                "Unable to import CSA likely due to python version")
         proj = p.Projection(
             pre, post, conn, p.StaticSynapse(weight=1.0, delay=1.0))
         p.run(0)
