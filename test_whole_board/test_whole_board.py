@@ -18,12 +18,14 @@ import os
 import traceback
 import sys
 import logging
-from time import sleep
 from shutil import rmtree
 
+from spinnman.exceptions import SpallocBoardUnavailableException
 import pyNN.spiNNaker as sim
-from spinnman.spalloc import SpallocClient, SpallocState
 
+from spinn_utilities.config_holder import set_config
+from spinnman.spalloc import SpallocClient, SpallocState
+from spynnaker.pyNN.config_setup import unittest_setup
 
 class WholeBoardTest(object):
 
@@ -194,37 +196,25 @@ class WholeBoardTest(object):
 
 BOARDS = [(x, y, b) for x in range(20) for y in range(20) for b in range(3)]
 SPALLOC_URL = "https://spinnaker.cs.man.ac.uk/spalloc"
-SPALLOC_USERNAME = "jenkins"
-SPALLOC_PASSWORD = os.getenv("SPALLOC_PASSWORD")
-SPALLOC_MACHINE = "SpiNNaker1M"
 
 
 @pytest.mark.parametrize("x,y,b", BOARDS)
 def test_run(x, y, b):
+    #set_config("Machine", "spalloc_machine", SPALLOC_MACHINE)
     test_dir = os.path.dirname(__file__)
-    client = SpallocClient(SPALLOC_URL, SPALLOC_USERNAME, SPALLOC_PASSWORD)
-    job = client.create_job_board(
-        triad=(x, y, b), machine_name=SPALLOC_MACHINE)
-    with job:
-        job.wait_until_ready(n_retries=2)
-        state = job.get_state()
-        # If queued or destroyed skip test
-        if state == SpallocState.QUEUED:
-            job.destroy("Queued")
-            pytest.skip(f"Some boards starting at {x}, {y}, {b} is in use")
-        elif state == SpallocState.DESTROYED:
-            pytest.skip(f"Boards {x}, {y}, {b} could not be allocated")
-        # Actually wait for ready now (as might be powering on)
-        job.wait_until_ready()
-        tmpdir = tempfile.mkdtemp(prefix=f"{x}_{y}_{b}", dir=test_dir)
-        os.chdir(tmpdir)
-        with open("spynnaker.cfg", "w", encoding="utf-8") as f:
-            f.write("[Machine]\n")
-            f.write("spalloc_server = None\n")
-            f.write(f"machine_name = {job.get_root_host()}\n")
-            f.write("version = 5\n")
-        test = WholeBoardTest()
+    tmpdir = tempfile.mkdtemp(prefix=f"{x}_{y}_{b}", dir=test_dir)
+    os.chdir(tmpdir)
+    with open("spynnaker.cfg", "w", encoding="utf-8") as f:
+        f.write("[Machine]\n")
+        f.write(f"spalloc_server = {SPALLOC_URL}\n")
+        f.write(f"spalloc_triad = {x},{y},{b}\n")
+        f.write("version = 5\n")
+    test = WholeBoardTest()
+    try:
         test.do_run()
+    except SpallocBoardUnavailableException as ex:
+        pytest.skip(str(ex))
+    finally:
         # If no errors we will get here and we can remove the tree;
         # then only error folders will be left
         rmtree(tmpdir)
