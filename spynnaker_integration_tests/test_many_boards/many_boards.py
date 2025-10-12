@@ -60,7 +60,7 @@ class ManyBoards(BaseTestCase):
         for i, chip in enumerate(machine.ethernet_connected_chips):
             if i >= self.n_boards:
                 break
-            version = SpynnakerDataView.get_machine_version()
+            version = sim.get_machine_version()
             offset = version.expected_xys[i % 48]
             x = chip.x + offset[0]
             y = chip.y + offset[1]

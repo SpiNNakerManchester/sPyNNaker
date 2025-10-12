@@ -55,7 +55,7 @@ class MachineTest(BaseTestCase):
         sim.run(3)
         self.assertFalse(MachineDataModel._user_accessed_machine, "run 3")
         # Normal detected get machine
-        machine = SpynnakerDataView.get_machine()
+        machine = sim.get_machine()
         self.assertEqual(id(machine), id(machine1), "run 3")
         self.assertTrue(MachineDataModel._user_accessed_machine, "run 3 get")
 
@@ -125,7 +125,7 @@ class MachineTest(BaseTestCase):
 
         sim.run(8)
         # Normal detected get machine
-        machine = SpynnakerDataView.get_machine()
+        machine = sim.get_machine()
         self.assertEqual(id(machine), id(machine4), "run 8")
 
         sim.end()
