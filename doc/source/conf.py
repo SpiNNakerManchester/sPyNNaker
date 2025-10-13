@@ -55,7 +55,7 @@ extensions = [
 ]
 
 # Which version of other SpiNNaker docs do we refer to?
-spinnaker_doc_version = "latest"
+spinnaker_doc_version = "7.4.0"
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.12', None),
