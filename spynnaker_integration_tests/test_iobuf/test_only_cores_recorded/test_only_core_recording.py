@@ -14,7 +14,6 @@
 
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
-from spynnaker.pyNN.data import SpynnakerDataView
 
 
 class TestOnlyCoresRecording(BaseTestCase):
@@ -23,7 +22,7 @@ class TestOnlyCoresRecording(BaseTestCase):
         sim.setup(timestep=1.0, n_boards_required=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 
-        machine = SpynnakerDataView.get_machine()
+        machine = sim.get_machine()
         input1 = sim.Population(
             1, sim.SpikeSourceArray(spike_times=[0]), label="input1")
         input2 = sim.Population(
