@@ -27,6 +27,7 @@ from .abstract_generate_connector_on_host import (
 try:
     import csa  # type: ignore[import]
     _csa_import_error: Optional[ImportError] = None
+    raise ImportError("pop")
 except ImportError as __ex:
     # Importing csa causes problems with readthedocs so allowing it to fail
     _csa_import_error = __ex
