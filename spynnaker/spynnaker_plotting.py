@@ -17,7 +17,7 @@ Plotting tools to be used together with
 https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/utility/plotting.py
 """
 
-from typing import Any, Dict, Final, List, Union
+from typing import Any, Dict, Final, List, TypeAlias, Union
 from types import ModuleType
 
 from neo import SpikeTrain, Block, Segment, AnalogSignal
@@ -25,7 +25,6 @@ from neo.core.spiketrainlist import SpikeTrainList  # type: ignore[import]
 import numpy as np
 from numpy.typing import NDArray
 import quantities
-from typing_extensions import TypeAlias
 
 plt: ModuleType
 try:
