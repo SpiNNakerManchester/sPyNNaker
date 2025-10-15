@@ -27,15 +27,15 @@ from pyNN.random import RandomDistribution
 
 #: The type of weights and delays provided by Synapse / SynapseInformation
 # Combined types (where value could be either)
-WEIGHTS_DELAYS: Final['TypeAlias'] = Optional[Union[
+WeightsDelays: Final['TypeAlias'] = Optional[Union[
     float, str, RandomDistribution, NDArray[numpy.float64]]]
-WEIGHTS: Final['TypeAlias'] = Optional[Union[
+Weights: Final['TypeAlias'] = Optional[Union[
     float, str, RandomDistribution, NDArray[numpy.float64]]]
-DELAYS: Final['TypeAlias'] = \
+Delays: Final['TypeAlias'] = \
     Union[float, str, RandomDistribution, NDArray[numpy.float64]]
 # These are the Types we know are coming in.
 # Most things that can be considered floats (including int)  will work
-WEIGHTS_DELAYS_IN: Final['TypeAlias'] = Optional[Union[
+WeightsDelysIn: Final['TypeAlias'] = Optional[Union[
     float, str, RandomDistribution, Iterable[float], NDArray[numpy.float64]]]
 
 IoDest: TypeAlias = Union[
@@ -50,7 +50,7 @@ Selector: TypeAlias = Union[
 WeightScales: TypeAlias = Union[NDArray[numpy.floating], Sequence[float]]
 
 
-def is_scalar(value: WEIGHTS) -> TypeGuard[Union[int, float]]:
+def is_scalar(value: Weights) -> TypeGuard[Union[int, float]]:
     """
     Are the weights or delays a simple integer or float?
 

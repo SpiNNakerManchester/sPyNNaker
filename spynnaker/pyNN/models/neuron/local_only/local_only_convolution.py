@@ -35,7 +35,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     ConvolutionConnector, AbstractConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
-from spynnaker.pyNN.types import WEIGHTS_DELAYS_IN
+from spynnaker.pyNN.types import WeightsDelysIn
 from spynnaker.pyNN.models.common.local_only_2d_common import (
     get_div_const, get_rinfo_for_spike_source, get_sources_for_target,
     BITS_PER_SHORT, N_COLOUR_BITS_BITS, KEY_INFO_SIZE,
@@ -68,7 +68,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         "__cached_sources",
     )
 
-    def __init__(self, delay: WEIGHTS_DELAYS_IN = None):
+    def __init__(self, delay: WeightsDelysIn = None):
 
         """
         :param delay:

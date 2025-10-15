@@ -36,7 +36,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.types import (
-    DELAYS, WEIGHTS_DELAYS, WEIGHTS)
+    Delays, WeightsDelays, WEIGHTS)
 
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
@@ -251,7 +251,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return (r, c)
 
     def __get_kernel_vals(self, values: Optional[Union[
-            _KERNAL, WEIGHTS_DELAYS]]) -> Optional[ConvolutionKernel]:
+            _KERNAL, WeightsDelays]]) -> Optional[ConvolutionKernel]:
         """
         Convert kernel values given into the correct format.
         """
@@ -279,7 +279,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     def __compute_statistics(
             self, weights: Optional[WEIGHTS],
-            delays: Optional[DELAYS], post_vertex_slice: Slice,
+            delays: Optional[Delays], post_vertex_slice: Slice,
             n_pre_neurons: int) -> Tuple[
                 int, NDArray[uint32], NDArray[uint32], NDArray[floating],
                 NDArray[floating]]:
@@ -382,7 +382,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             synapse_info.delays, n_conns, synapse_info)
 
     @overrides(AbstractConnector.get_delay_variance)
-    def get_delay_variance(self, delays: DELAYS,
+    def get_delay_variance(self, delays: Delays,
                            synapse_info: SynapseInformation) -> float:
         if self._krn_delays is not None:
             return float(numpy.var(self._krn_delays))

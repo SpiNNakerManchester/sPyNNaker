@@ -32,7 +32,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     STDP_FIXED_POINT_ONE, get_exp_lut_array)
-from spynnaker.pyNN.types import WEIGHTS_DELAYS_IN as _Weight
+from spynnaker.pyNN.types import WeightsDelysIn as _Weight
 
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (

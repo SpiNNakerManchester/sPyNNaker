@@ -63,7 +63,7 @@ if TYPE_CHECKING:
             AbstractElimination)
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray)
-    from spynnaker.pyNN.types import DELAYS
+    from spynnaker.pyNN.types import Delays
     from .synapse_dynamics_structural_common import ConnectionsInfo
 
 
@@ -312,7 +312,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
 
     @overrides(SynapseDynamicsStatic.get_delay_variance)
     def get_delay_variance(
-            self, connector: AbstractConnector, delays: DELAYS,
+            self, connector: AbstractConnector, delays: Delays,
             synapse_info: SynapseInformation) -> float:
         return 0.0
 
