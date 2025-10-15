@@ -29,7 +29,7 @@ from pacman.model.graphs.machine import MachineVertex
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.types import (
-    Delays, WeightsDelysIn, WEIGHTS)
+    Delays, WeightsDelysIn, Weights)
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
@@ -86,7 +86,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             "Expected types are int, float, str, RandomDistribution "
             "and collections of type int or float")
 
-    def __check_out_weight(self, weight: WEIGHTS, name: str) -> None:
+    def __check_out_weight(self, weight: Weights, name: str) -> None:
         if weight is None:
             return
         if isinstance(weight, (int, float, str, RandomDistribution)):
@@ -149,7 +149,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @property
-    def weight(self) -> WEIGHTS:
+    def weight(self) -> Weights:
         """
         The weight of connections.
         """
@@ -183,7 +183,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             return new_delay
         raise TypeError(f"{type(delay)=}")
 
-    def _convert_weight(self, weight: WeightsDelysIn) -> WEIGHTS:
+    def _convert_weight(self, weight: WeightsDelysIn) -> Weights:
         """
         Convert the weights if numerical to (list of) float .
 
@@ -315,7 +315,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         return connector.get_weight_maximum(synapse_info)
 
     def get_weight_variance(
-           self, connector: AbstractConnector, weights: WEIGHTS,
+           self, connector: AbstractConnector, weights: Weights,
             synapse_info: SynapseInformation) -> float:
         """
         :param connector:

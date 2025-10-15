@@ -33,7 +33,7 @@ from pacman.model.graphs.common import Slice
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.types import Delays, WeightsDelays, WEIGHTS
+from spynnaker.pyNN.types import Delays, WeightsDelays, Weights
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
@@ -291,7 +291,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             self.__targets.astype(int64, copy=False))))
 
     @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(self, weights: WEIGHTS,
+    def get_weight_mean(self, weights: Weights,
                         synapse_info: SynapseInformation) -> float:
         if self.__weights is None:
             if _is_sequential(synapse_info.weights):
@@ -312,7 +312,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             return float(numpy.amax(numpy.abs(self.__weights)))
 
     @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(self, weights: WEIGHTS,
+    def get_weight_variance(self, weights: Weights,
                             synapse_info: SynapseInformation) -> float:
         if self.__weights is None:
             if _is_sequential(synapse_info.weights):

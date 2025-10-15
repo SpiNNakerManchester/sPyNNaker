@@ -36,7 +36,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.types import (
-    Delays, WeightsDelays, WEIGHTS)
+    Delays, WeightsDelays, Weights)
 
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
@@ -278,7 +278,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             f"{self._kernel_h} and width: {self._kernel_w}).")
 
     def __compute_statistics(
-            self, weights: Optional[WEIGHTS],
+            self, weights: Optional[Weights],
             delays: Optional[Delays], post_vertex_slice: Slice,
             n_pre_neurons: int) -> Tuple[
                 int, NDArray[uint32], NDArray[uint32], NDArray[floating],
@@ -412,7 +412,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             synapse_info.weights, n_conns, synapse_info)
 
     @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(self, weights: WEIGHTS,
+    def get_weight_mean(self, weights: Weights,
                         synapse_info: SynapseInformation) -> float:
         # Use the kernel weights if user has supplied them
         if self._krn_weights is not None:
@@ -420,7 +420,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return super().get_weight_mean(weights, synapse_info)
 
     @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(self, weights: WEIGHTS,
+    def get_weight_variance(self, weights: Weights,
                             synapse_info: SynapseInformation) -> float:
         # Use the kernel weights if user has supplied them
         if self._krn_weights is not None:

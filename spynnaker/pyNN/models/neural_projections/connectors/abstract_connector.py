@@ -40,7 +40,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.types import (
-    Delays, is_scalar, WeightsDelays, WEIGHTS)
+    Delays, is_scalar, WeightsDelays, Weights)
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 
@@ -278,7 +278,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def get_weight_mean(self, weights: WEIGHTS,
+    def get_weight_mean(self, weights: Weights,
                         synapse_info: SynapseInformation) -> float:
         """
         :param weights:
@@ -295,7 +295,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         raise self.weight_type_exception(synapse_info)
 
     def _get_weight_maximum(
-            self, weights: WEIGHTS, n_connections: int,
+            self, weights: Weights, n_connections: int,
             synapse_info: SynapseInformation) -> float:
         """
         Get the maximum of the weights.
@@ -331,7 +331,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def get_weight_variance(self, weights: WEIGHTS,
+    def get_weight_variance(self, weights: Weights,
                             synapse_info: SynapseInformation) -> float:
         """
         :param weights:
@@ -407,7 +407,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             f"{synapse_info.post_population}")
 
     def weight_type_exception(
-            self, weights: WEIGHTS) -> SpynnakerException:
+            self, weights: Weights) -> SpynnakerException:
         """
         :param weights:
         :returns: An Exception explaining incorrect weight or delay type

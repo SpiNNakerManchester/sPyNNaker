@@ -31,7 +31,7 @@ from spinn_front_end_common.utilities.constants import (
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
-from spynnaker.pyNN.types import WEIGHTS
+from spynnaker.pyNN.types import Weights
 from spynnaker.pyNN.types import WeightsDelysIn as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
@@ -276,7 +276,7 @@ class SynapseDynamicsWeightChangable(
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_variance)
     def get_weight_variance(
-           self, connector: AbstractConnector, weights: WEIGHTS,
+           self, connector: AbstractConnector, weights: Weights,
             synapse_info: SynapseInformation) -> float:
         # Because the weights could all be changed to the maximum, the variance
         # has to be given as no variance
