@@ -78,7 +78,7 @@ class MunichRetinaDevice(
     UP_POLARITY = "UP"
     DOWN_POLARITY = "DOWN"
     MERGED_POLARITY: Literal["MERGED"] = "MERGED"
-    _T_POLARITY: TypeAlias = \
+    _Polarity: TypeAlias = \
         Union[Literal["UP"], Literal["DOWN"], Literal["MERGED"], None]
 
     #: Select the left retina
@@ -86,12 +86,12 @@ class MunichRetinaDevice(
     #: Select the right retina
     RIGHT_RETINA = "RIGHT"
     _RETINAS = frozenset((LEFT_RETINA, RIGHT_RETINA))
-    _T_RETINAS: TypeAlias = Union[Literal["LEFT"], Literal["RIGHT"]]
+    _Retinas: TypeAlias = Union[Literal["LEFT"], Literal["RIGHT"]]
 
     def __init__(
             self, retina_key: int, spinnaker_link_id: int,
-            position: _T_RETINAS, label: str = "MunichRetinaDevice",
-            polarity: _T_POLARITY = None,
+            position: _Retinas, label: str = "MunichRetinaDevice",
+            polarity: _Polarity = None,
             board_address: Optional[str] = None):
         """
         :param retina_key:
