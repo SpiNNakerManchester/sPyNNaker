@@ -29,7 +29,7 @@ from pacman.model.graphs.machine import MachineVertex
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.types import (
-    DELAYS, WEIGHTS_DELAYS_IN, WEIGHTS)
+    Delays, WeightsDelysIn, Weights)
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
@@ -53,8 +53,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
     __slots__ = ("__delay", "__weight")
 
-    def __init__(self, delay: WEIGHTS_DELAYS_IN,
-                 weight: WEIGHTS_DELAYS_IN):
+    def __init__(self, delay: WeightsDelysIn,
+                 weight: WeightsDelysIn):
         """
         :param delay: The delay or a way of generating the delays
         :param weight: The weights or way to generate the weights
@@ -66,7 +66,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         self.__weight = self._convert_weight(weight)
         self.__check_out_weight(self.__weight, "weight")
 
-    def __check_in_type(self, value: WEIGHTS_DELAYS_IN, name: str) -> None:
+    def __check_in_type(self, value: WeightsDelysIn, name: str) -> None:
         if value is None:
             return
         if isinstance(value, (int, float, str, RandomDistribution)):
@@ -86,7 +86,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             "Expected types are int, float, str, RandomDistribution "
             "and collections of type int or float")
 
-    def __check_out_weight(self, weight: WEIGHTS, name: str) -> None:
+    def __check_out_weight(self, weight: Weights, name: str) -> None:
         if weight is None:
             return
         if isinstance(weight, (int, float, str, RandomDistribution)):
@@ -103,7 +103,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             "Expected types are float, str, RandomDistribution "
             "and list of type float")
 
-    def __check_out_delay(self, delay: DELAYS, name: str) -> None:
+    def __check_out_delay(self, delay: Delays, name: str) -> None:
         if isinstance(delay, (float, (str, RandomDistribution))):
             return
         if isinstance(delay, numpy.ndarray):
@@ -149,13 +149,13 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @property
-    def weight(self) -> WEIGHTS:
+    def weight(self) -> Weights:
         """
         The weight of connections.
         """
         return self.__weight
 
-    def _round_delay(self, delay: WEIGHTS_DELAYS_IN) -> DELAYS:
+    def _round_delay(self, delay: WeightsDelysIn) -> Delays:
         """
         Round the delays to multiples of full timesteps.
 
@@ -183,7 +183,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             return new_delay
         raise TypeError(f"{type(delay)=}")
 
-    def _convert_weight(self, weight: WEIGHTS_DELAYS_IN) -> WEIGHTS:
+    def _convert_weight(self, weight: WeightsDelysIn) -> Weights:
         """
         Convert the weights if numerical to (list of) float .
 
@@ -202,7 +202,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         return new_weight
 
     @property
-    def delay(self) -> DELAYS:
+    def delay(self) -> Delays:
         """
         The delay of connections.
         """
@@ -284,7 +284,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         return connector.get_delay_minimum(synapse_info)
 
     def get_delay_variance(
-            self, connector: AbstractConnector, delays: DELAYS,
+            self, connector: AbstractConnector, delays: Delays,
             synapse_info: SynapseInformation) -> float:
         """
         :param connector:
@@ -315,7 +315,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         return connector.get_weight_maximum(synapse_info)
 
     def get_weight_variance(
-           self, connector: AbstractConnector, weights: WEIGHTS,
+           self, connector: AbstractConnector, weights: Weights,
             synapse_info: SynapseInformation) -> float:
         """
         :param connector:

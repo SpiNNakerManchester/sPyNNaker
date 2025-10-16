@@ -33,7 +33,7 @@ from pacman.model.graphs.common import Slice
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.types import DELAYS, WEIGHTS_DELAYS, WEIGHTS
+from spynnaker.pyNN.types import Delays, WeightsDelays, Weights
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
@@ -52,7 +52,7 @@ _TARGET = 1
 _FIRST_PARAM = 2
 
 
-def _is_sequential(value: WEIGHTS_DELAYS
+def _is_sequential(value: WeightsDelays
                    ) -> TypeGuard[NDArray[numpy.float64]]:
     return isinstance(value, numpy.ndarray)
 
@@ -151,7 +151,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             return numpy.min(self.__delays)
 
     @overrides(AbstractConnector.get_delay_variance)
-    def get_delay_variance(self, delays: DELAYS,
+    def get_delay_variance(self, delays: Delays,
                            synapse_info: SynapseInformation) -> float:
         if self.__delays is None:
             if _is_sequential(synapse_info.delays):
@@ -291,7 +291,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             self.__targets.astype(int64, copy=False))))
 
     @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(self, weights: WEIGHTS,
+    def get_weight_mean(self, weights: Weights,
                         synapse_info: SynapseInformation) -> float:
         if self.__weights is None:
             if _is_sequential(synapse_info.weights):
@@ -312,7 +312,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             return float(numpy.amax(numpy.abs(self.__weights)))
 
     @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(self, weights: WEIGHTS,
+    def get_weight_variance(self, weights: Weights,
                             synapse_info: SynapseInformation) -> float:
         if self.__weights is None:
             if _is_sequential(synapse_info.weights):

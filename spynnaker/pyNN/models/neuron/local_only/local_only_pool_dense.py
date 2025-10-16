@@ -34,7 +34,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     PoolDenseConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
-from spynnaker.pyNN.types import WEIGHTS_DELAYS_IN
+from spynnaker.pyNN.types import WeightsDelysIn
 from spynnaker.pyNN.models.common.local_only_2d_common import (
     get_sources_for_target, get_rinfo_for_spike_source, BITS_PER_SHORT,
     get_div_const, N_COLOUR_BITS_BITS, KEY_INFO_SIZE, get_first_and_last_slice,
@@ -68,7 +68,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     __slots__ = [
         "__cached_sources"]
 
-    def __init__(self, delay: WEIGHTS_DELAYS_IN = None):
+    def __init__(self, delay: WeightsDelysIn = None):
         """
         :param delay:
             The delay used in the connection; by default 1 time step

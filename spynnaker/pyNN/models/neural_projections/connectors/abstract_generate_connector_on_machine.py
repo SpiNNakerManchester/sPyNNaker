@@ -31,7 +31,7 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.common.param_generator_data import (
     param_generator_params, param_generator_params_size_in_bytes,
     param_generator_id, is_param_generatable)
-from spynnaker.pyNN.types import (DELAYS, WEIGHTS)
+from spynnaker.pyNN.types import (Delays, Weights)
 from spynnaker.pyNN.utilities.utility_calls import check_rng
 
 from .abstract_generate_connector_on_host import (
@@ -96,42 +96,42 @@ class AbstractGenerateConnectorOnMachine(
             check_rng(synapse_info.delays.rng, "RandomDistribution in delay")
         return True
 
-    def gen_weights_id(self, weights: WEIGHTS) -> int:
+    def gen_weights_id(self, weights: Weights) -> int:
         """
         :param weights:
         :returns: The id of the weight generator on the machine.
         """
         return param_generator_id(weights)
 
-    def gen_weights_params(self, weights: WEIGHTS) -> NDArray[uint32]:
+    def gen_weights_params(self, weights: Weights) -> NDArray[uint32]:
         """
         :param weights:
         :returns: The parameters of the weight generator on the machine.
         """
         return param_generator_params(weights)
 
-    def gen_weight_params_size_in_bytes(self, weights:  WEIGHTS) -> int:
+    def gen_weight_params_size_in_bytes(self, weights: Weights) -> int:
         """
         :param weights:
         :returns: The size of the weight parameters in bytes.
         """
         return param_generator_params_size_in_bytes(weights)
 
-    def gen_delays_id(self, delays: DELAYS) -> int:
+    def gen_delays_id(self, delays: Delays) -> int:
         """
         :param delays:
         :returns: The id of the delay generator on the machine.
         """
         return param_generator_id(delays)
 
-    def gen_delay_params(self, delays: DELAYS) -> NDArray[uint32]:
+    def gen_delay_params(self, delays: Delays) -> NDArray[uint32]:
         """
         :param delays:
         :returns: The parameters of the delay generator on the machine.
         """
         return param_generator_params(delays)
 
-    def gen_delay_params_size_in_bytes(self, delays: DELAYS) -> int:
+    def gen_delay_params_size_in_bytes(self, delays: Delays) -> int:
         """
         :param delays:
         :returns: The size of the delay parameters in bytes.

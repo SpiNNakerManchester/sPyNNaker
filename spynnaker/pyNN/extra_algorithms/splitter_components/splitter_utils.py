@@ -21,13 +21,13 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics, SynapseDynamicsStatic)
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from spynnaker.pyNN.types import DELAYS
+from spynnaker.pyNN.types import Delays
 
 
 def is_direct_poisson_source(
         post_vertex: ApplicationVertex, pre_vertex: ApplicationVertex,
         connector: AbstractConnector, dynamics: AbstractSynapseDynamics,
-        delay: DELAYS) -> bool:
+        delay: Delays) -> bool:
     """
     :param post_vertex: The receiving vertex
     :param pre_vertex: The vertex sending into the Projection

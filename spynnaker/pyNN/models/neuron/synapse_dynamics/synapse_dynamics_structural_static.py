@@ -25,7 +25,7 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.types import WEIGHTS
+from spynnaker.pyNN.types import Weights
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 
 from .abstract_synapse_dynamics_structural import (
@@ -63,7 +63,7 @@ if TYPE_CHECKING:
             AbstractElimination)
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray)
-    from spynnaker.pyNN.types import DELAYS
+    from spynnaker.pyNN.types import Delays
     from .synapse_dynamics_structural_common import ConnectionsInfo
 
 
@@ -283,7 +283,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
 
     @overrides(SynapseDynamicsStatic.get_weight_variance)
     def get_weight_variance(
-           self, connector: AbstractConnector, weights: WEIGHTS,
+           self, connector: AbstractConnector, weights: Weights,
            synapse_info: SynapseInformation) -> float:
         return 0.0
 
@@ -312,7 +312,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
 
     @overrides(SynapseDynamicsStatic.get_delay_variance)
     def get_delay_variance(
-            self, connector: AbstractConnector, delays: DELAYS,
+            self, connector: AbstractConnector, delays: Delays,
             synapse_info: SynapseInformation) -> float:
         return 0.0
 

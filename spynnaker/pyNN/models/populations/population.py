@@ -55,7 +55,6 @@ if TYPE_CHECKING:
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
     from spynnaker.pyNN.models.common.types import Names, Values
     from spynnaker.pyNN.models.common.parameter_holder import ParameterHolder
-    __Values: TypeAlias = Values  # Stupid PyDev!
 
 logger = FormatAdapter(logging.getLogger(__file__))
 _CellType: TypeAlias = Union[AbstractPyNNModel, PopulationApplicationVertex]
