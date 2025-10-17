@@ -2,7 +2,6 @@
 [![Python Build Status](https://github.com/SpiNNakerManchester/sPyNNaker/workflows/Python%20Actions/badge.svg?branch=master)](https://github.com/SpiNNakerManchester/sPyNNaker/actions?query=workflow%3A%22Python+Actions%22+branch%3Amaster)
 [![C Build Status](https://github.com/SpiNNakerManchester/sPyNNaker/workflows/C%20Actions/badge.svg?branch=master)](https://github.com/SpiNNakerManchester/sPyNNaker/actions?query=workflow%3A%22C+Actions%22+branch%3Amaster)
 [![Documentation Status](https://readthedocs.org/projects/spynnaker/badge/?version=7.4.1)](https://spynnaker.readthedocs.io/en/7.4.1)
-[![Coverage Status](https://coveralls.io/repos/github/SpiNNakerManchester/sPyNNaker/badge.svg?branch=master)](https://coveralls.io/github/SpiNNakerManchester/sPyNNaker?branch=master)
 
 sPyNNaker - PyNN Simulations on SpiNNaker Hardware
 ==================================================
