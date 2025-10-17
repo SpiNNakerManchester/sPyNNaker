@@ -1,6 +1,6 @@
 [![PyPi version](https://img.shields.io/pypi/v/sPyNNaker.svg?style=flat)](https://pypi.org/project/sPyNNaker/)
-[![Python Build Status](https://github.com/SpiNNakerManchester/sPyNNaker/workflows/Python%20Actions/badge.svg?branch=master)](https://github.com/SpiNNakerManchester/sPyNNaker/actions?query=workflow%3A%22Python+Actions%22+branch%3Amaster)
-[![C Build Status](https://github.com/SpiNNakerManchester/sPyNNaker/workflows/C%20Actions/badge.svg?branch=master)](https://github.com/SpiNNakerManchester/sPyNNaker/actions?query=workflow%3A%22C+Actions%22+branch%3Amaster)
+[![Python Actions](https://github.com/SpiNNakerManchester/sPyNNaker/actions/workflows/python_actions.yml/badge.svg)](https://github.com/SpiNNakerManchester/sPyNNaker/actions/workflows/python_actions.yml)
+[![C Actions](https://github.com/SpiNNakerManchester/sPyNNaker/actions/workflows/c_actions.yml/badge.svg)](https://github.com/SpiNNakerManchester/sPyNNaker/actions/workflows/c_actions.yml)
 [![Documentation Status](https://readthedocs.org/projects/spynnaker/badge/?version=latest)](https://spynnaker.readthedocs.io/en/latest)
 
 sPyNNaker - PyNN Simulations on SpiNNaker Hardware
