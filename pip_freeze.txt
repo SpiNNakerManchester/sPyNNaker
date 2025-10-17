@@ -1,0 +1,82 @@
+# Copyright (c) 2025 The University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+This release was tested against:
+
+Python 13 on Github actions
+appdirs==1.4.4
+astroid==4.0.1
+attrs==25.4.0
+certifi==2025.10.5
+charset-normalizer==3.4.4
+contourpy==1.3.3
+coverage==7.11.0
+coveralls==3.3.1
+csa==0.1.12
+cycler==0.12.1
+Deprecated==1.2.18
+dill==0.4.0
+docopt==0.6.2
+docstring_parser==0.17.0
+ebrains-drive==0.6.0
+flake8==7.3.0
+fonttools==4.60.1
+graphviz==0.21
+idna==3.11
+iniconfig==2.1.0
+isort==7.0.0
+jsonschema==4.25.1
+jsonschema-specifications==2025.9.1
+kiwisolver==1.4.9
+lazyarray==0.6.0
+matplotlib==3.10.7
+mccabe==0.7.0
+mock==5.2.0
+morphio==3.4.0
+mypy==1.18.2
+mypy_extensions==1.1.0
+neo==0.14.3
+numpy==2.3.4
+packaging==25.0
+pathspec==0.12.1
+pillow==12.0.0
+platformdirs==4.5.0
+pluggy==1.6.0
+pycodestyle==2.14.0
+pyenchant==3.3.0
+pyflakes==3.4.0
+Pygments==2.19.2
+pylint==4.0.1
+PyNN==0.12.4
+pyparsing==3.2.5
+pytest==8.4.2
+pytest-cov==7.0.0
+python-dateutil==2.9.0.post0
+PyYAML==6.0.3
+quantities==0.16.2
+referencing==0.37.0
+requests==2.32.5
+rpds-py==0.27.1
+scipy==1.16.2
+setuptools==80.9.0
+six==1.17.0
+testfixtures==9.2.0
+tomlkit==0.13.3
+tqdm==4.67.1
+types-requests==2.32.4.20250913
+typing_extensions==4.15.0
+urllib3==2.5.0
+websocket-client==1.9.0
+wheel==0.45.1
+wrapt==1.17.3
