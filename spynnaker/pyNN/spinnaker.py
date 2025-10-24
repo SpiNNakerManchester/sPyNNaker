@@ -108,9 +108,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         SpynnakerDataView.register_binary_search_path(
             os.path.dirname(model_binaries.__file__))
 
-        super().__init__(SpynnakerDataWriter)
+        super().__init__(
+            n_boards_required, n_chips_required, SpynnakerDataWriter)
 
-        self.__writer.set_n_required(n_boards_required, n_chips_required)
         # set up machine targeted data
         self._set_up_timings(timestep, min_delay, time_scale_factor)
 
