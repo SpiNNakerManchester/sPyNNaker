@@ -24,20 +24,7 @@ from spinn_front_end_common.interface.config_setup import (
 
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 
-CONFIG_FILE_NAME = "spynnaker.cfg"
-
-
-def setup_configs() -> None:
-    """
-    Sets up the configurations including the users configuration file.
-
-    Clears out any previous read configurations but does not load the new
-    configurations so a warning is generated if a configuration is used before
-    setup is called.
-    """
-    clear_cfg_files(False)
-    add_spynnaker_cfg()
-    load_config(CONFIG_FILE_NAME)
+SPYNNAKER_CFG = "spynnaker.cfg"
 
 
 def unittest_setup() -> None:
@@ -64,7 +51,7 @@ def add_spynnaker_cfg() -> None:
     Add the local configuration and all dependent configuration files.
     """
     add_spinnaker_cfg()  # This add its dependencies too
-    add_default_cfg(os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))
+    add_default_cfg(os.path.join(os.path.dirname(__file__), SPYNNAKER_CFG))
 
 
 def cfg_paths_skipped() -> Set[str]:

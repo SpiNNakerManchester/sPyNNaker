@@ -15,7 +15,7 @@
 import logging
 import math
 import os
-from typing import Any, Collection, Optional, Union, cast
+from typing import Any, Collection, Optional, Type, Union, cast
 
 from lazyarray import __version__ as lazyarray_version
 
@@ -41,7 +41,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
-from spynnaker.pyNN.config_setup import setup_configs
+from spynnaker.pyNN.config_setup import add_spynnaker_cfg, SPYNNAKER_CFG
 from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -100,15 +100,12 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # main pynn interface inheritance
         pynn_control.BaseState.__init__(self)
 
-        # SpiNNaker setup
-        setup_configs()
-
         # add model binaries
         # called before super.init as that logs the paths
         SpynnakerDataView.register_binary_search_path(
             os.path.dirname(model_binaries.__file__))
 
-        super().__init__(SpynnakerDataWriter)
+        super().__init__()
 
         self.__writer.set_n_required(n_boards_required, n_chips_required)
         # set up machine targeted data
@@ -124,6 +121,20 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # Clears all previously added ceiling on the number of neurons per
         # core, the number of synapse cores and allowing of delay extensions
         AbstractPyNNNeuronModel.reset_all()
+
+    @overrides(AbstractSpinnakerBase.add_default_cfg)
+    def add_default_cfg(self) -> None:
+        add_spynnaker_cfg()
+
+    @property
+    @overrides(AbstractSpinnakerBase.user_cfg_file)
+    def user_cfg_file(self) -> str:
+        return SPYNNAKER_CFG
+
+    @property
+    @overrides(AbstractSpinnakerBase.data_writer_cls)
+    def data_writer_cls(self) -> Type[SpynnakerDataWriter]:
+        return SpynnakerDataWriter
 
     @property
     def __writer(self) -> SpynnakerDataWriter:
