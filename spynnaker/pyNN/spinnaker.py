@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import logging
-import math
 import os
 from typing import Any, Collection, Optional, Union, cast
 
@@ -35,8 +34,6 @@ from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.interface.provenance import (
     FecTimer, GlobalProvenance, TimerCategory, TimerWork)
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker import _version
@@ -108,11 +105,11 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         SpynnakerDataView.register_binary_search_path(
             os.path.dirname(model_binaries.__file__))
 
-        super().__init__(SpynnakerDataWriter)
+        super().__init__(timestep, time_scale_factor, SpynnakerDataWriter)
 
         self.__writer.set_n_required(n_boards_required, n_chips_required)
         # set up machine targeted data
-        self.__writer.set_up_timings(timestep, time_scale_factor)
+
         self.__writer.set_min_delay(min_delay)
 
         with GlobalProvenance() as db:
