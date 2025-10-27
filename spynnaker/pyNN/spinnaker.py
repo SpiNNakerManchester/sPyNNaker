@@ -106,8 +106,11 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             os.path.dirname(model_binaries.__file__))
 
         super().__init__(
-            n_boards_required, n_chips_required, timestep, time_scale_factor,
-            SpynnakerDataWriter)
+            n_boards_required = n_boards_required,
+            n_chips_required = n_chips_required,
+            timestep = timestep,
+            time_scale_factor = time_scale_factor,
+            data_writer_cls = SpynnakerDataWriter)
 
         # set up machine targeted data
 
