@@ -13,9 +13,7 @@
 # limitations under the License.
 
 import logging
-import math
-from typing import Optional, Union
-from spinn_utilities.config_holder import get_config_int
+from typing import Optional
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.data.fec_data_writer import FecDataWriter
