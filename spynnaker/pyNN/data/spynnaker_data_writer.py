@@ -45,7 +45,7 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
     @overrides(FecDataWriter._mock)
     def _mock(self) -> None:
         FecDataWriter._mock(self)
-        self._set_min_delay(1)
+        self.set_min_delay(1)
 
     @overrides(FecDataWriter._hard_reset)
     def _hard_reset(self) -> None:
@@ -100,7 +100,7 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
             self.__spy_data._min_delay = None
             raise
 
-    def _set_min_delay(self, min_delay: Optional[Union[int, float]]) -> None:
+    def set_min_delay(self, min_delay: Optional[float]) -> None:
         """
         Sets a min delay or accepts `None` to use simulation_time_step_ms.
 

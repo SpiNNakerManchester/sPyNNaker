@@ -112,7 +112,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
         self.__writer.set_n_required(n_boards_required, n_chips_required)
         # set up machine targeted data
-        self._set_up_timings(timestep, min_delay, time_scale_factor)
+        self.__writer.set_up_timings(timestep, time_scale_factor)
+        self.__writer.set_min_delay(min_delay)
 
         with GlobalProvenance() as db:
             db.insert_version("sPyNNaker_version", _version.__version__)
@@ -306,41 +307,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :param new_value: the new value for the recorder
         """
         self.__recorders = set(new_value)
-
-    def _set_up_timings(
-            self, timestep: Optional[float], min_delay: Union[
-                int, float, None],
-            time_scale_factor: Optional[int]) -> None:
-        """
-        :param timestep: machine_time_Step in milliseconds
-        :param min_delay:
-        :param time_scale_factor:
-        """
-
-        # Get the standard values
-        if timestep is None:
-            self.__writer.set_up_timings_and_delay(
-                timestep, time_scale_factor, min_delay)
-        else:
-            self.__writer.set_up_timings_and_delay(
-                math.ceil(timestep * MICRO_TO_MILLISECOND_CONVERSION),
-                time_scale_factor, min_delay)
-
-        # Check the combination of machine time step and time scale factor
-        if (self.__writer.get_simulation_time_step_ms() *
-                self.__writer.get_time_scale_factor() < 0.1):
-            logger.warning(
-                "****************************************************")
-            logger.warning(
-                "*** The combination of simulation time step and  ***")
-            logger.warning(
-                "*** the machine time scale factor results in a   ***")
-            logger.warning(
-                "*** wall clock timer tick that is currently not  ***")
-            logger.warning(
-                "*** reliably supported by the SpiNNaker machine. ***")
-            logger.warning(
-                "****************************************************")
 
     def stop(self) -> None:
         """
