@@ -15,8 +15,7 @@
 import os
 from typing import Set
 
-from spinn_utilities.config_holder import (
-    clear_cfg_files, load_config)
+from spinn_utilities.config_holder import clear_cfg_files
 from spinn_front_end_common.interface.config_setup import (
     add_default_cfg, add_spinnaker_cfg)
 from spinn_front_end_common.interface.config_setup import (
