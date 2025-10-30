@@ -124,19 +124,19 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # core, the number of synapse cores and allowing of delay extensions
         AbstractPyNNNeuronModel.reset_all()
 
-    @overrides(AbstractSpinnakerBase.add_cfg_defaults_and_template)
-    def add_cfg_defaults_and_template(self) -> None:
+    @overrides(AbstractSpinnakerBase._add_cfg_defaults_and_template)
+    def _add_cfg_defaults_and_template(self) -> None:
         add_spynnaker_cfg()
         add_spinnaker_template()
 
     @property
-    @overrides(AbstractSpinnakerBase.user_cfg_file)
-    def user_cfg_file(self) -> str:
+    @overrides(AbstractSpinnakerBase._user_cfg_file)
+    def _user_cfg_file(self) -> str:
         return SPYNNAKER_CFG
 
     @property
-    @overrides(AbstractSpinnakerBase.data_writer_cls)
-    def data_writer_cls(self) -> Type[SpynnakerDataWriter]:
+    @overrides(AbstractSpinnakerBase._data_writer_cls)
+    def _data_writer_cls(self) -> Type[SpynnakerDataWriter]:
         return SpynnakerDataWriter
 
     @property
