@@ -33,6 +33,8 @@ from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
+from spinn_front_end_common.interface.config_setup import (
+    add_spinnaker_template)
 from spinn_front_end_common.interface.provenance import (
     FecTimer, GlobalProvenance, TimerCategory, TimerWork)
 from spinn_front_end_common.utilities.constants import (
@@ -122,9 +124,10 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # core, the number of synapse cores and allowing of delay extensions
         AbstractPyNNNeuronModel.reset_all()
 
-    @overrides(AbstractSpinnakerBase.add_default_cfg)
-    def add_default_cfg(self) -> None:
+    @overrides(AbstractSpinnakerBase.add_cfg_defaults_and_template)
+    def add_cfg_defaults_and_template(self) -> None:
         add_spynnaker_cfg()
+        add_spinnaker_template()
 
     @property
     @overrides(AbstractSpinnakerBase.user_cfg_file)
