@@ -208,6 +208,8 @@ def test_run(x, y, b):
         f.write("[Machine]\n")
         f.write(f"spalloc_server = {SPALLOC_URL}\n")
         f.write(f"spalloc_triad = {x},{y},{b}\n")
+        f.write("machine_name = None\n")
+        f.write("virtual_board = False\n")
         f.write("version = 5\n")
     test = WholeBoardTest()
     try:
