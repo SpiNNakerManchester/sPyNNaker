@@ -21,11 +21,11 @@ import logging
 from shutil import rmtree
 
 from spinnman.exceptions import SpallocBoardUnavailableException
+
+from spynnaker.pyNN.data import SpynnakerDataView
+
 import pyNN.spiNNaker as sim
 
-from spinn_utilities.config_holder import set_config
-from spinnman.spalloc import SpallocClient, SpallocState
-from spynnaker.pyNN.config_setup import unittest_setup
 
 class WholeBoardTest(object):
 
@@ -208,11 +208,14 @@ def test_run(x, y, b):
         f.write("[Machine]\n")
         f.write(f"spalloc_server = {SPALLOC_URL}\n")
         f.write(f"spalloc_triad = {x},{y},{b}\n")
+        f.write("machine_name = None\n")
+        f.write("virtual_board = False\n")
         f.write("version = 5\n")
     test = WholeBoardTest()
     try:
         test.do_run()
     except SpallocBoardUnavailableException as ex:
+        os.remove(SpynnakerDataView.get_error_file())
         pytest.skip(str(ex))
     finally:
         # If no errors we will get here and we can remove the tree;
