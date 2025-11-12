@@ -241,7 +241,7 @@ class PopulationSynapsesMachineVertexCommon(
         else:
             assert self.__partition_id is not None
             routing_info = SpynnakerDataView.get_routing_infos()
-            r_info = routing_info.get_info_from(
+            r_info = routing_info.get_machine_info(
                 self.__neuron_vertex, self.__partition_id)
             spec.write_value(r_info.key)
             spec.write_value(r_info.mask)

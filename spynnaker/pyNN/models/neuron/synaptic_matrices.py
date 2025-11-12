@@ -478,7 +478,7 @@ class SynapticMatrices(object):
             The synapse information of the projection
         """
         routing_info = SpynnakerDataView.get_routing_infos()
-        r_info = routing_info.get_info_from(
+        r_info = routing_info.get_application_info(
             app_edge.pre_vertex, s_info.partition_id)
         assert isinstance(r_info, AppVertexRoutingInfo)
         return self.__get_app_key_and_mask(
@@ -500,7 +500,7 @@ class SynapticMatrices(object):
         if delay_edge is None:
             return None
         routing_info = SpynnakerDataView.get_routing_infos()
-        r_info = routing_info.get_info_from(
+        r_info = routing_info.get_application_info(
             delay_edge.pre_vertex, s_info.partition_id)
         assert isinstance(r_info, AppVertexRoutingInfo)
 

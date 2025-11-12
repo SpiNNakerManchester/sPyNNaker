@@ -93,8 +93,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
         :return: the key
         """
         routing_info = SpynnakerDataView.get_routing_infos()
-        key = routing_info.get_key_from(
-            self, SPIKE_PARTITION_ID)
+        key = routing_info.get_application_key(self, SPIKE_PARTITION_ID)
         return key
 
     @property

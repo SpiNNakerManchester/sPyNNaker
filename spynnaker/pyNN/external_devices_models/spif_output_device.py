@@ -169,7 +169,7 @@ class SPIFOutputDevice(
         :param index: The index of key to get
         """
         r_infos = SpynnakerDataView.get_routing_infos()
-        return r_infos.get_key_from(
+        return r_infos.get_application_key(
             self.__incoming_partitions[index].pre_vertex,
             self.__incoming_partitions[index].identifier)
 
@@ -180,7 +180,7 @@ class SPIFOutputDevice(
         :param index: The index of the mask to get
         """
         r_infos = SpynnakerDataView.get_routing_infos()
-        return r_infos.get_info_from(
+        return r_infos.get_application_info(
             self.__incoming_partitions[index].pre_vertex,
             self.__incoming_partitions[index].identifier).mask
 
@@ -188,7 +188,7 @@ class SPIFOutputDevice(
         """ Get the payload for the command to set the distiller mask
         """
         r_infos = SpynnakerDataView.get_routing_infos()
-        return ~r_infos.get_info_from(
+        return ~r_infos.get_application_info(
             self.__incoming_partitions[index].pre_vertex,
             self.__incoming_partitions[index].identifier).mask & 0xFFFFFFFF
 
@@ -248,7 +248,7 @@ class SPIFOutputDevice(
                         m_vertex, part.identifier, routing_infos)
                 else:
                     r_info = \
-                        routing_infos.get_info_from(
+                        routing_infos.get_machine_info(
                             m_vertex, part.identifier)
                     vertex_slice = m_vertex.vertex_slice
                     keys = get_keys(r_info.key, vertex_slice)

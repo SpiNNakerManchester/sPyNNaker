@@ -291,7 +291,7 @@ class SynapseDynamicsStructuralCommon(
             spec.write_value(app_edge.pre_vertex.n_atoms)
             # Machine edge information
             for sub, m_vertex in enumerate(out_verts):
-                r_info = routing_info.get_info_from(
+                r_info = routing_info.get_machine_info(
                     m_vertex, synapse_info.partition_id)
                 vertex_slice = m_vertex.vertex_slice
                 spec.write_value(r_info.key)

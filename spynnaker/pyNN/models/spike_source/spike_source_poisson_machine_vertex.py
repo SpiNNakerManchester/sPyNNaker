@@ -510,7 +510,7 @@ class SpikeSourcePoissonMachineVertex(
 
         # Write Key info for this core:
         routing_info = SpynnakerDataView.get_routing_infos()
-        key = routing_info.get_single_key_from(self)
+        key = routing_info.get_single_machine_key(self)
         keys: Union[Sequence[int], numpy.ndarray]
         if key is None:
             spec.write_value(0)
@@ -523,7 +523,7 @@ class SpikeSourcePoissonMachineVertex(
         incoming_mask = 0
         if self._pop_vertex.incoming_control_edge is not None:
             routing_info = SpynnakerDataView.get_routing_infos()
-            r_info = routing_info.get_info_from(
+            r_info = routing_info.get_application_info(
                 self._pop_vertex.incoming_control_edge.pre_vertex,
                 LIVE_POISSON_CONTROL_PARTITION_ID)
             incoming_mask = ~r_info.mask & 0xFFFFFFFF

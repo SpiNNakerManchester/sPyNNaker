@@ -394,7 +394,7 @@ class PopulationApplicationVertex(
     def get_atom_key_map(
             self, pre_vertex: MachineVertex, partition_id: str,
             routing_info: RoutingInfo) -> Iterable[Tuple[int, int]]:
-        base_key = routing_info.get_key_from(
+        base_key = routing_info.get_machine_key(
             pre_vertex, partition_id)
         vertex_slice = pre_vertex.vertex_slice
         keys = get_keys(base_key, vertex_slice, self.n_colour_bits)

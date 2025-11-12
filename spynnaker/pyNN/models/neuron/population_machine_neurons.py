@@ -23,7 +23,7 @@ from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.abstract_sized import Selector
 
-from pacman.model.graphs import AbstractVertex
+from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.placements import Placement
 from pacman.utilities.utility_calls import get_keys
@@ -220,19 +220,19 @@ class PopulationMachineNeurons(
     def __find_default_key(self) -> Optional[int]:
         routing_info = SpynnakerDataView.get_routing_infos()
         if not self._pop_vertex.extra_partitions:
-            return routing_info.get_single_key_from(
-                cast(AbstractVertex, self))
+            return routing_info.get_single_machine_key(
+                cast(MachineVertex, self))
         partition_ids = set(
-            routing_info.get_partitions_from(
-                cast(AbstractVertex, self)))
+            routing_info.get_machine_partitions(
+                cast(MachineVertex, self)))
         partition_ids = partition_ids - set(self._pop_vertex.extra_partitions)
         if len(partition_ids) > 1:
             raise ValueError(
                 "Multiple outgoing partitions found, cannot determine key")
         if len(partition_ids) == 0:
             return None
-        return routing_info.get_key_from(
-            cast(AbstractVertex, self), next(iter(partition_ids)))
+        return routing_info.get_machine_key(
+            cast(MachineVertex, self), next(iter(partition_ids)))
 
     def _rewrite_neuron_data_spec(
             self, spec: DataSpecificationReloader) -> None:
