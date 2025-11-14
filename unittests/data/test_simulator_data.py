@@ -43,7 +43,7 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             SpynnakerDataView.get_min_delay()
         self.assertFalse(SpynnakerDataView.has_min_delay())
-        writer.set_up_timings(100, 10)
+        writer.set_up_timings(0.1, 10)
         self.assertTrue(SpynnakerDataView.has_min_delay())
         self.assertEqual(100,  SpynnakerDataView.get_simulation_time_step_us())
         self.assertEqual(0.1, SpynnakerDataView.get_min_delay())
@@ -53,25 +53,27 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             SpynnakerDataView.get_min_delay()
 
-        writer.set_up_timings_and_delay(500, 1, 0.5)
+        writer.set_up_timings(0.500, 1)
+        writer.set_min_delay(0.5)
         self.assertEqual(0.5, SpynnakerDataView.get_min_delay())
 
-        writer.set_up_timings_and_delay(1000, 1, None)
+        writer.set_up_timings(1, 1)
+        writer.set_min_delay(None)
         self.assertEqual(1, SpynnakerDataView.get_min_delay())
 
         with self.assertRaises(ConfigurationException):
-            writer.set_up_timings_and_delay(1000, 1, 0)
+            writer.set_min_delay(0)
 
         with self.assertRaises(ConfigurationException):
-            writer.set_up_timings_and_delay(1000, 1, 1.5)
+            writer.set_min_delay(1.5)
 
-        writer.set_up_timings_and_delay(1000, 1, 2)
+        writer.set_min_delay(2)
         with self.assertRaises(ConfigurationException):
-            writer.set_up_timings_and_delay(2000, 1, 1)
+            writer.set_up_timings(2, 1)
+            writer.set_min_delay(1)
 
         with self.assertRaises(TypeError):
-            writer.set_up_timings_and_delay(
-                1000, 1, "baocn")  # type: ignore[arg-type]
+            writer.set_min_delay("bacon")  # type: ignore[arg-type]
 
     def test_mock(self) -> None:
         # check there is a value not what it is
@@ -80,7 +82,7 @@ class TestSimulatorData(unittest.TestCase):
 
     def test_populations_and_projections(self) -> None:
         writer = SpynnakerDataWriter.setup()
-        writer.set_up_timings_and_delay(1000, 1, 1)
+        writer.set_up_timings(1, 1)
         self.assertListEqual(
             [], list(SpynnakerDataView.iterate_populations()))
         self.assertEqual(0, SpynnakerDataView.get_n_populations())

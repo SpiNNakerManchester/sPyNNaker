@@ -13,9 +13,8 @@
 # limitations under the License.
 
 import logging
-import math
 import os
-from typing import Any, Collection, Optional, Union, cast
+from typing import Any, Collection, Optional, Type, Union, cast
 
 from lazyarray import __version__ as lazyarray_version
 
@@ -33,15 +32,15 @@ from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
+from spinn_front_end_common.interface.config_setup import (
+    add_spinnaker_template)
 from spinn_front_end_common.interface.provenance import (
     FecTimer, GlobalProvenance, TimerCategory, TimerWork)
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
-from spynnaker.pyNN.config_setup import setup_configs
+from spynnaker.pyNN.config_setup import add_spynnaker_cfg, SPYNNAKER_CFG
 from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -100,19 +99,19 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # main pynn interface inheritance
         pynn_control.BaseState.__init__(self)
 
-        # SpiNNaker setup
-        setup_configs()
-
         # add model binaries
         # called before super.init as that logs the paths
         SpynnakerDataView.register_binary_search_path(
             os.path.dirname(model_binaries.__file__))
 
-        super().__init__(SpynnakerDataWriter)
+        super().__init__(
+            n_boards_required=n_boards_required,
+            n_chips_required=n_chips_required,
+            timestep=timestep, time_scale_factor=time_scale_factor)
 
-        self.__writer.set_n_required(n_boards_required, n_chips_required)
         # set up machine targeted data
-        self._set_up_timings(timestep, min_delay, time_scale_factor)
+
+        self.__writer.set_min_delay(min_delay)
 
         with GlobalProvenance() as db:
             db.insert_version("sPyNNaker_version", _version.__version__)
@@ -124,6 +123,21 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # Clears all previously added ceiling on the number of neurons per
         # core, the number of synapse cores and allowing of delay extensions
         AbstractPyNNNeuronModel.reset_all()
+
+    @overrides(AbstractSpinnakerBase._add_cfg_defaults_and_template)
+    def _add_cfg_defaults_and_template(self) -> None:
+        add_spynnaker_cfg()
+        add_spinnaker_template()
+
+    @property
+    @overrides(AbstractSpinnakerBase._user_cfg_file)
+    def _user_cfg_file(self) -> str:
+        return SPYNNAKER_CFG
+
+    @property
+    @overrides(AbstractSpinnakerBase._data_writer_cls)
+    def _data_writer_cls(self) -> Type[SpynnakerDataWriter]:
+        return SpynnakerDataWriter
 
     @property
     def __writer(self) -> SpynnakerDataWriter:
@@ -306,41 +320,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :param new_value: the new value for the recorder
         """
         self.__recorders = set(new_value)
-
-    def _set_up_timings(
-            self, timestep: Optional[float], min_delay: Union[
-                int, float, None],
-            time_scale_factor: Optional[int]) -> None:
-        """
-        :param timestep: machine_time_Step in milliseconds
-        :param min_delay:
-        :param time_scale_factor:
-        """
-
-        # Get the standard values
-        if timestep is None:
-            self.__writer.set_up_timings_and_delay(
-                timestep, time_scale_factor, min_delay)
-        else:
-            self.__writer.set_up_timings_and_delay(
-                math.ceil(timestep * MICRO_TO_MILLISECOND_CONVERSION),
-                time_scale_factor, min_delay)
-
-        # Check the combination of machine time step and time scale factor
-        if (self.__writer.get_simulation_time_step_ms() *
-                self.__writer.get_time_scale_factor() < 0.1):
-            logger.warning(
-                "****************************************************")
-            logger.warning(
-                "*** The combination of simulation time step and  ***")
-            logger.warning(
-                "*** the machine time scale factor results in a   ***")
-            logger.warning(
-                "*** wall clock timer tick that is currently not  ***")
-            logger.warning(
-                "*** reliably supported by the SpiNNaker machine. ***")
-            logger.warning(
-                "****************************************************")
 
     def stop(self) -> None:
         """
