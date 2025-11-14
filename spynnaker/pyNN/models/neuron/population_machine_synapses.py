@@ -24,10 +24,6 @@ from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.placements import Placement
 
-from spinn_front_end_common.utilities.helpful_functions import (
-    locate_memory_region_for_placement)
-from spinn_front_end_common.abstract_models import (
-    AbstractSupportsBitFieldRoutingCompression)
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.interface.buffer_management.buffer_models import (
     AbstractReceiveRegionsToHost)
@@ -51,7 +47,6 @@ if TYPE_CHECKING:
 
 class PopulationMachineSynapses(
         PopulationMachineSynapsesProvenance,
-        AbstractSupportsBitFieldRoutingCompression,
         AbstractSynapseExpandable,
         HasSynapses, AbstractReceiveRegionsToHost, allow_derivation=True):
     """
@@ -117,23 +112,6 @@ class PopulationMachineSynapses(
         The references to synapse regions.  Override to provide these.
         """
         return SynapseRegionReferences()
-
-    @overrides(AbstractSupportsBitFieldRoutingCompression.
-               bit_field_base_address)
-    def bit_field_base_address(self, placement: Placement) -> int:
-        return locate_memory_region_for_placement(
-            placement=placement, region=self._synapse_regions.bitfield_filter)
-
-    @overrides(AbstractSupportsBitFieldRoutingCompression.
-               regeneratable_sdram_blocks_and_sizes)
-    def regeneratable_sdram_blocks_and_sizes(
-            self, placement: Placement) -> List[Tuple[int, int]]:
-        synaptic_matrix_base_address = locate_memory_region_for_placement(
-            placement=placement, region=self._synapse_regions.synaptic_matrix)
-        return [(
-            self._synaptic_matrices.host_generated_block_addr +
-            synaptic_matrix_base_address,
-            self._synaptic_matrices.on_chip_generated_matrix_size)]
 
     def _write_synapse_data_spec(
             self, spec: DataSpecificationBase,
