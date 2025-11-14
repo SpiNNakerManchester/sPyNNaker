@@ -151,6 +151,7 @@ SOURCES = neuron/c_main_local_only.c \
           neuron/neuron.c \
           neuron/local_only.c \
           $(LOCAL_ONLY_IMPL) $(OTHER_SOURCES_CONVERTED)
+DATABASE_ID = 2
 
 include $(SPINN_DIRS)/make/local.mk
 

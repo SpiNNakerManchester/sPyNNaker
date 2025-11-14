@@ -142,6 +142,8 @@ SOURCES = neuron/c_main_neurons.c \
           neuron/plasticity/synapse_dynamics_remote.c \
           $(OTHER_SOURCES_CONVERTED)
 
+DATABASE_ID = 2
+
 include $(SPINN_DIRS)/make/local.mk
 
 FEC_OPT = $(OTIME)

@@ -171,6 +171,8 @@ SOURCES = neuron/c_main_synapses.c \
           $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS) \
           $(PARTNER_SELECTION) $(FORMATION) $(ELIMINATION) $(OTHER_SOURCES_CONVERTED)
 
+DATABASE_ID = 2
+
 include $(SPINN_DIRS)/make/local.mk
 
 FEC_OPT = $(OTIME)
