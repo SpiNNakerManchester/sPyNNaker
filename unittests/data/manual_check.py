@@ -48,6 +48,7 @@ try:
     raise NotImplementedError("OOPS")
 except DataNotYetAvialable:
     pass
-writer.set_up_timings_and_delay(1000, 1, 1)
+writer.set_up_timings(1, 1)
+writer.set_min_delay(1)
 print(SpynnakerDataView.get_simulation_time_step_us())
 print(SpynnakerDataView.get_min_delay())
