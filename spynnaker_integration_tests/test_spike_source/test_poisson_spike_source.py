@@ -208,7 +208,6 @@ class TestPoissonSpikeSource(BaseTestCase):
 
         n_neurons = 100
         timestep = 1.0
-        runtime = 2000
         sim.setup(timestep=timestep)
         sim.set_number_of_neurons_per_core(sim.SpikeSourcePoisson, 75)
         pop_label = "pop_to_control"
@@ -227,7 +226,10 @@ class TestPoissonSpikeSource(BaseTestCase):
         sim.external_devices.add_database_socket_address(
             conn.local_ip_address, conn.local_port, None)
         sim.external_devices.add_poisson_live_rate_control(pop)
-        sim.run(runtime)
+        sim.run(500)
+        self.assertEqual(self._saved_run_time_ms, 500)
+        sim.run(1500)
+        self.assertEqual(self._saved_run_time_ms, 1500)
         neo = pop.get_data("spikes")
         spikes = neo.segments[0].spiketrains
         sim.end()
@@ -244,7 +246,6 @@ class TestPoissonSpikeSource(BaseTestCase):
         self.assertEqual(self._saved_label_stop, pop_label)
         self.assertEqual(self._saved_machine_timestep_ms, timestep)
         self.assertEqual(self._saved_vertex_size, n_neurons)
-        self.assertEqual(self._saved_run_time_ms, runtime)
 
     def test_poisson_live_rates(self) -> None:
         self.runsafe(self.poisson_live_rates)
