@@ -38,7 +38,7 @@ SOURCE_DIRS += $(SRC_DIR)
 MODIFIED_DIR := $(NEURAL_MODELLING_DIRS)/modified_src/
 BUILD_DIR := $(NEURAL_MODELLING_DIRS)/builds/$(APP)/
 APP_OUTPUT_DIR :=  $(abspath $(dir $(MAKEFILE_PATH))../../spynnaker/pyNN/model_binaries)/
-DATABASE_ID = S
+DATABASE_KEY = S
 
 include $(SPINN_DIRS)/make/local.mk
 
