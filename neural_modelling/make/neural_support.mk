@@ -1,7 +1,3 @@
-# THIS FILE WAS USED IN AN OLDER MAKE STYLE
-# Make now has to convert c files before building
-# SEE https://spinnakermanchester.github.io/latest/Makefiles.html
-
 # Copyright (c) 2017 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,4 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$(error inclusion of sPyNNaker/neural_modelling/src/paths.mk)
+# If FEC_INSTALL_DIR is not defined, this is an error!
+ifndef FEC_INSTALL_DIR
+    $(error FEC_INSTALL_DIR is not set.  Please define FEC_INSTALL_DIR (possibly by running "source setup" in the spinnaker package folder))
+endif
+
+MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+NEURAL_MODELLING_DIRS := $(abspath $(dir $(MAKEFILE_PATH))/../)/
+
+# Add the neural modelling src directory to the source directories
+SRC_DIR := $(NEURAL_MODELLING_DIRS)/src/
+SOURCE_DIRS += $(SRC_DIR)
+
+include $(FEC_INSTALL_DIR)/make/fec.mk
