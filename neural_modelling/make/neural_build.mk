@@ -47,7 +47,9 @@ POPULATION_TABLE_IMPL := binary_search
 
 # Define the directories
 NEURON_DIR := $(abspath $(NEURAL_MODELLING_DIRS)/src)
-SOURCE_DIRS += $(NEURON_DIR):$(NEURAL_MODELLING_DIRS)/modified_src/
+NEURON_MODIFIED_DIR := $(abspath $(NEURAL_MODELLING_DIRS)/modified_src)/
+
+SOURCE_DIRS += $(NEURON_DIR):$(NEURON_MODIFIED_DIR)
 
 include $(CURRENT_DIR)/funcs.mk
 
@@ -63,7 +65,7 @@ else
 
         # Check required inputs and point them to modified sources
 		ifndef ADDITIONAL_INPUT_H
-		    ADDITIONAL_INPUT_H = $(MODIFIED_DIR)neuron/additional_inputs/additional_input_none_impl.h
+		    ADDITIONAL_INPUT_H = $(NEURON_MODIFIED_DIR)neuron/additional_inputs/additional_input_none_impl.h
 		else
 		    ADDITIONAL_INPUT_H := $(call replace_source_dirs,$(ADDITIONAL_INPUT_H))
 		endif
@@ -93,7 +95,7 @@ else
 		endif
 
 		ifndef CURRENT_SOURCE_H
-		    CURRENT_SOURCE_H = $(MODIFIED_DIR)neuron/current_sources/current_source_impl.h
+		    CURRENT_SOURCE_H = $(NEURON_MODIFIED_DIR)neuron/current_sources/current_source_impl.h
 		else
 		    CURRENT_SOURCE_H := $(call replace_source_dirs,$(CURRENT_SOURCE_H))
 		endif
@@ -150,7 +152,7 @@ endif
 SYNGEN_ENABLED = 1
 ifndef SYNAPTOGENESIS_DYNAMICS
     SYNAPTOGENESIS_DYNAMICS := neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
-    SYNAPTOGENESIS_DYNAMICS_C := $(MODIFIED_DIR)$(SYNAPTOGENESIS_DYNAMICS)
+    SYNAPTOGENESIS_DYNAMICS_C := $(NEURON_MODIFIED_DIR)$(SYNAPTOGENESIS_DYNAMICS)
     SYNGEN_ENABLED = 0
 else
     SYNAPTOGENESIS_DYNAMICS_C := $(call replace_source_dirs,$(SYNAPTOGENESIS_DYNAMICS))
@@ -207,22 +209,22 @@ FEC_OPT = $(OTIME)
 # Synapse build rules
 SYNAPSE_TYPE_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED)
 
-$(BUILD_DIR)neuron/c_main.o: $(MODIFIED_DIR)neuron/c_main.c
+$(BUILD_DIR)neuron/c_main.o: $(NEURON_MODIFIED_DIR)neuron/c_main.c
 	#c_main.c
 	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-$(BUILD_DIR)neuron/synapses.o: $(MODIFIED_DIR)neuron/synapses.c
+$(BUILD_DIR)neuron/synapses.o: $(NEURON_MODIFIED_DIR)neuron/synapses.c
 	#synapses.c
 	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-$(BUILD_DIR)neuron/spike_processing.o: $(MODIFIED_DIR)neuron/spike_processing.c
+$(BUILD_DIR)neuron/spike_processing.o: $(NEURON_MODIFIED_DIR)neuron/spike_processing.c
 	#spike_processing.c
 	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-$(BUILD_DIR)neuron/population_table/population_table_binary_search_impl.o: $(MODIFIED_DIR)neuron/population_table/population_table_binary_search_impl.c
+$(BUILD_DIR)neuron/population_table/population_table_binary_search_impl.o: $(NEURON_MODIFIED_DIR)neuron/population_table/population_table_binary_search_impl.c
 	#population_table/population_table_binary_search_impl.c
 	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
@@ -247,7 +249,7 @@ ifeq ($(STDP_ENABLED), 1)
 	-@mkdir -p $(dir $@)
 	$(STDP_COMPILE) $(SYNGEN_INCLUDES) -o $@ $<
 
-    $(BUILD_DIR)neuron/plasticity/common/post_events.o: $(MODIFIED_DIR)neuron/plasticity/common/post_events.c
+    $(BUILD_DIR)neuron/plasticity/common/post_events.o: $(NEURON_MODIFIED_DIR)neuron/plasticity/common/post_events.c
 	# plasticity/common/post_events.c
 	-@mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
@@ -296,9 +298,9 @@ $(ELIMINATION_O): $(ELIMINATION_C) $(SYNAPSE_TYPE_H) $(MAKEFILE_LIST)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(SYNAPSE_TYPE_H) -o $@ $<
 
-$(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_INCLUDE_FILES) $(MAKEFILE_LIST)
+$(BUILD_DIR)neuron/neuron.o: $(NEURON_MODIFIED_DIR)neuron/neuron.c $(NEURON_INCLUDE_FILES) $(MAKEFILE_LIST)
 	# neuron.o
 	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
 
-.PRECIOUS: $(MODIFIED_DIR)%.c $(MODIFIED_DIR)%.h $(LOG_DICT_FILE) $(EXTRA_PRECIOUS)
+.PRECIOUS: $(NEURON_MODIFIED_DIR)%.c $(NEURON_MODIFIED_DIR)%.h $(LOG_DICT_FILE) $(EXTRA_PRECIOUS)

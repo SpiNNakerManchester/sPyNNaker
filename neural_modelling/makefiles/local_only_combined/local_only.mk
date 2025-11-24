@@ -19,6 +19,5 @@ SPYNNAKER_DIR := $(abspath $(dir $(MAKEFILE_PATH))/../../../)/
 
 BUILD_DIR := $(SPYNNAKER_DIR)neural_modelling/builds/$(APP)/
 APP_OUTPUT_DIR := $(SPYNNAKER_DIR)spynnaker/pyNN/model_binaries/
-MODIFIED_DIR := $(SPYNNAKER_DIR)neural_modelling/modified_src/
 
 include $(SPYNNAKER_DIR)neural_modelling/make/local_only_build.mk
