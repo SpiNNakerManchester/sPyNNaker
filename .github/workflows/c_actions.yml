@@ -33,9 +33,11 @@ jobs:
 
     - name: Set environment variables
       run: |
-        echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
-        echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
-        echo "C_LOGS_DICT=$PWD/logs.sqlite3" >> $GITHUB_ENV
+        echo "SPINN_INSTALL_DIR=$PWD/spinnaker_tools_install" >> $GITHUB_ENV
+        echo "SPINN_COMMON_INSTALL_DIR=$PWD/spinn_common_install" >> $GITHUB_ENV
+        echo "FEC_INSTALL_DIR=$PWD/fec_install" >> $GITHUB_ENV
+        echo "SPYNNAKER_INSTALL_DIR=$PWD/spynnaker_install" >> $GITHUB_ENV
+        echo "C_LOGS_DICT=$PWD/spynnaker/model_binaries/logs.sqlite3" >> $GITHUB_ENV
 
     - name: Lint C code using Vera++
       uses: SpiNNakerManchester/SupportScripts/actions/vera@main
@@ -43,18 +45,15 @@ jobs:
         base-dir: neural_modelling/src
 
     - name: Build C dependencies
-      run: |
-        make -C $SPINN_DIRS
-        make -C spinn_common install
-
-    - name: Build FEC C code
-      run: make
-      working-directory: SpiNNFrontEndCommon/c_common
       env:
         CFLAGS: -fdiagnostics-color=always
+      run: |
+       make -C spinnaker_tools install
+       make -C spinn_common install
+       make -C SpiNNFrontEndCommon/c_common
 
     - name: Build PYNN C code
-      run: make
+      run: make install
       working-directory: neural_modelling
       env:
         CFLAGS: -fdiagnostics-color=always
@@ -83,13 +82,6 @@ jobs:
         path: spynnaker/pyNN/model_binaries/*.aplx
         retention-days: 5
 
-    - name: Upload log.sqlite3s
-      uses: actions/upload-artifact@v4
-      with:
-        name: logs.sqlite3
-        path: logs.sqlite3
-        retention-days: 5
-
   test:
     needs: build
     runs-on: ${{ matrix.runner }}
@@ -103,7 +95,7 @@ jobs:
     - name: Prepare
       uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
       with:
-        install-dependencies: > 
+        install-dependencies: >
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
           SpiNNFrontEndCommon TestBase
         install-module: true
@@ -132,7 +124,7 @@ jobs:
 
     - name: Append cfg
       # Doing this in the prepare action ended with a different path
-      run: | 
+      run: |
         echo '[Mapping]' >> ~/.spynnaker.cfg
         echo "external_binaries=$PWD/external_binaries" >> ~/.spynnaker.cfg
         cat ~/.spynnaker.cfg

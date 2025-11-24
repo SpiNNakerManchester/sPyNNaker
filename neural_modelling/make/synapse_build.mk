@@ -20,6 +20,7 @@ ifndef FEC_INSTALL_DIR
 endif
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+CURRENT_DIR := $(abspath $(dir $(MAKEFILE_PATH)))
 NEURAL_MODELLING_DIRS := $(abspath $(dir $(MAKEFILE_PATH))/../)/
 
 # Set logging levels
@@ -39,31 +40,11 @@ endif
 #POPULATION_TABLE_IMPL := fixed
 POPULATION_TABLE_IMPL := binary_search
 
-# Add source directory
-
 # Define the directories
 NEURON_DIR := $(abspath $(NEURAL_MODELLING_DIRS)/src)
-SOURCE_DIRS += $(NEURON_DIR)
+SOURCE_DIRS += $(NEURON_DIR):$(NEURAL_MODELLING_DIRS)/modified_src/
 
-# Define a rule to find the source directory of the given file.
-# This attempts to find each of SOURCE_DIRS within the given file name; the
-# first one that matches is then returned.  If none match, an empty string
-# will be returned.
-define get_source_dir#(file)
-$(firstword $(strip $(foreach d, $(sort $(SOURCE_DIRS)), $(findstring $(d), $(1)))))
-endef
-
-# Define rule to strip any SOURCE_DIRS from source_file to allow use via local.mk.
-# If no match is found, the value is returned untouched
-# (though this will probably fail later).
-define strip_source_dirs#(source_file)
-$(or $(patsubst $(call get_source_dir, $(1))/%,%,$(1)), $(1))
-endef
-
-# Define a rule to replace any SOURCE_DIRS from header_file with the modified_src folder.
-define replace_source_dirs#(header_file)
-$(patsubst $(call get_source_dir, $(1))/%, $(MODIFIED_DIR)%, $(1))
-endef
+include $(CURRENT_DIR)/funcs.mk
 
 ifndef SYNAPSE_DYNAMICS
     $(error SYNAPSE_DYNAMICS is not set.  Please select a synapse dynamics implementation)

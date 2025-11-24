@@ -22,6 +22,6 @@ NEURAL_MODELLING_DIRS := $(abspath $(dir $(MAKEFILE_PATH))/../)/
 
 # Add the neural modelling src directory to the source directories
 SRC_DIR := $(NEURAL_MODELLING_DIRS)/src/
-SOURCE_DIRS += $(SRC_DIR)
+SOURCE_DIRS += $(SRC_DIR):$(NEURAL_MODELLING_DIRS)/modified_src/
 
 include $(FEC_INSTALL_DIR)/make/fec.mk

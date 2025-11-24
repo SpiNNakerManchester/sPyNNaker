@@ -49,9 +49,12 @@ install:
 ifndef SPYNNAKER_INSTALL_DIR
 	$(error SPYNNAKER_INSTALL_DIR is not set.  Please define SPYNNAKER_INSTALL_DIR to the location where sPyNNaker is to be installed)
 endif
+	$(MKDIR) $(SPYNNAKER_INSTALL_DIR)/src
 	$(MKDIR) $(SPYNNAKER_INSTALL_DIR)/modified_src
 	$(MKDIR) $(SPYNNAKER_INSTALL_DIR)/make
 
+	for d in $$(find $(NEURAL_MODELLING_DIRS)/src -type d -printf '%P\n' ); do install -d --mode 755 "$(NEURAL_MODELLING_DIRS)/src/$$d" "$(SPYNNAKER_INSTALL_DIR)/src/$$d"; done
+	for f in $$(find $(NEURAL_MODELLING_DIRS)/src -type f -printf '%P\n' ); do install --mode 644 "$(NEURAL_MODELLING_DIRS)/src/$$f" "$(SPYNNAKER_INSTALL_DIR)/src/$$f"; done
 	for d in $$(find $(NEURAL_MODELLING_DIRS)/modified_src -type d -printf '%P\n' ); do install -d --mode 755 "$(NEURAL_MODELLING_DIRS)/modified_src/$$d" "$(SPYNNAKER_INSTALL_DIR)/modified_src/$$d"; done
 	for f in $$(find $(NEURAL_MODELLING_DIRS)/modified_src -type f -printf '%P\n' ); do install --mode 644 "$(NEURAL_MODELLING_DIRS)/modified_src/$$f" "$(SPYNNAKER_INSTALL_DIR)/modified_src/$$f"; done
 	$(INSTALL) $(NEURAL_MODELLING_DIRS)/make/* $(SPYNNAKER_INSTALL_DIR)/make
