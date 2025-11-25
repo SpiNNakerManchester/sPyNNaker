@@ -37,7 +37,7 @@ jobs:
         echo "SPINN_COMMON_INSTALL_DIR=$PWD/spinn_common_install" >> $GITHUB_ENV
         echo "FEC_INSTALL_DIR=$PWD/fec_install" >> $GITHUB_ENV
         echo "SPYNNAKER_INSTALL_DIR=$PWD/spynnaker_install" >> $GITHUB_ENV
-        echo "C_LOGS_DICT=$PWD/spynnaker/pyNN/model_binaries/spynnaker_logs.sqlite3" >> $GITHUB_ENV
+        echo "C_LOGS_DICT=$PWD/spynnaker/pyNN/model_binaries/logs.sqlite3" >> $GITHUB_ENV
 
     - name: Lint C code using Vera++
       uses: SpiNNakerManchester/SupportScripts/actions/vera@main
@@ -81,7 +81,7 @@ jobs:
         name: pynn_binaries
         path: |
           spynnaker/pyNN/model_binaries/*.aplx
-          spynnaker/pyNN/model_binaries/spynnaker_logs.sqlite3
+          spynnaker/pyNN/model_binaries/logs.sqlite3
         retention-days: 5
 
   test:
