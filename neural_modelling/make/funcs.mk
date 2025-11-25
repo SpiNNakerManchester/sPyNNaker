@@ -36,5 +36,5 @@ endef
 
 # Define a rule to replace any SOURCE_DIRS from header_file with the modified_src folder.
 define replace_source_dirs#(header_file)
-$(foreach d, $(SOURCE_DIRS), $(patsubst $(call word_by_colon,$(d),1)%, $(call word_by_colon,$(d),2)%, $(1)))
+$(foreach d, $(SOURCE_DIRS), $(patsubst $(call word_by_colon,$(d),1)%, $(call word_by_colon,$(d),2)%, $(filter $(call word_by_colon,$(d),1)%,$(1))))
 endef
