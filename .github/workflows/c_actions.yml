@@ -65,6 +65,8 @@ jobs:
       run: make clean; make SPYNNAKER_DEBUG=DEBUG
       working-directory: neural_modelling
       env:
+        SPINN_DIRS: ${{ github.workspace }}/spinn_dirs
+        C_LOGS_DICT: ${{ github.workspace }}/spynnaker/pyNN/model_binaries/logs.sqlite3
         CFLAGS: -fdiagnostics-color=always
 
     - name: Build documentation using doxygen
