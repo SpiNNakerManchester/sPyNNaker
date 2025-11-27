@@ -18,13 +18,20 @@
 # This attempts to find each of SOURCE_DIRS within the given file name; the
 # first one that matches is then returned.  If none match, an empty string
 # will be returned.
-word_by_colon = $(abspath $(word $2, $(subst :, ,$1)))/
+
+# Get one of the paths from the colon separated pair in SOURCE_DIRS
+# $1 = colon separated pair
+# $2 = 1 for original source dir, 2 for modified source dir
+get_path = $(abspath $(word $2, $(subst :, ,$1)))/
+
+# Get the source directory for a given file
 define get_source_dir#(file)
-$(firstword $(strip $(foreach d, $(SOURCE_DIRS), $(findstring $(call word_by_colon,$(d),1), $(1)))))
+$(firstword $(strip $(foreach d, $(SOURCE_DIRS), $(findstring $(call get_path,$(d),1), $(1)))))
 endef
 
+# Get the modified source directory for a given source directory
 define get_mod_dir#(src_dir)
-$(call word_by_colon,$(firstword $(strip $(foreach d, $(SOURCE_DIRS), $(findstring $(1):, $(d))))), 2)
+$(call get_path,$(firstword $(strip $(foreach d, $(SOURCE_DIRS), $(findstring $(1):, $(d))))), 2)
 endef
 
 # Define rule to strip any SOURCE_DIRS from source_file to allow use via local.mk.
@@ -36,5 +43,5 @@ endef
 
 # Define a rule to replace any SOURCE_DIRS from header_file with the modified_src folder.
 define replace_source_dirs#(header_file)
-$(foreach d, $(SOURCE_DIRS), $(patsubst $(call word_by_colon,$(d),1)%, $(call word_by_colon,$(d),2)%, $(filter $(call word_by_colon,$(d),1)%,$(1))))
+$(foreach d, $(SOURCE_DIRS), $(patsubst $(call get_path,$(d),1)%, $(call get_path,$(d),2)%, $(filter $(call get_path,$(d),1)%,$(1))))
 endef
