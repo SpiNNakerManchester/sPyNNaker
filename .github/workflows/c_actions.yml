@@ -31,9 +31,6 @@ jobs:
         install-check-tools: false
         ubuntu-packages: doxygen gcc-arm-none-eabi
 
-    - name: Set environment variables
-      run: |
-
     - name: Lint C code using Vera++
       uses: SpiNNakerManchester/SupportScripts/actions/vera@main
       with:
