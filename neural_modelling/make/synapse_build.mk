@@ -15,9 +15,7 @@
 # limitations under the License.
 
 # If FEC_INSTALL_DIR is not defined, this is an error!
-ifndef FEC_INSTALL_DIR
-    $(error FEC_INSTALL_DIR is not set.  Please define FEC_INSTALL_DIR (possibly by running "source setup" in the spinnaker package folder))
-endif
+FEC_INSTALL_DIR := $(strip $(if $(FEC_INSTALL_DIR), $(FEC_INSTALL_DIR), $(if $(SPINN_DIRS), $(SPINN_DIRS)/fec_install, $(error FEC_INSTALL_DIR or SPINN_DIRS is not set.  Please define FEC_INSTALL_DIR or SPINN_DIRS))))
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(abspath $(dir $(MAKEFILE_PATH)))

@@ -47,9 +47,7 @@ clean: $(DIRS)
 # This installs the source and makefiles into a central location so that
 # other projects can make use if it
 install:
-ifndef SPYNNAKER_INSTALL_DIR
-	$(error SPYNNAKER_INSTALL_DIR is not set.  Please define SPYNNAKER_INSTALL_DIR to the location where sPyNNaker is to be installed)
-endif
+	$(eval SPYNNAKER_INSTALL_DIR := $(strip $(if $(SPYNNAKER_INSTALL_DIR), $(SPYNNAKER_INSTALL_DIR), $(if $(SPINN_DIRS), $(SPINN_DIRS)/spynnaker_install, $(error SPYNNAKER_INSTALL_DIR or SPINN_DIRS is not set.  Please define SPYNNAKER_INSTALL_DIR or SPINN_DIRS)))))
 	$(RM) -r $(SPYNNAKER_INSTALL_DIR)/*
 	$(MKDIR) $(SPYNNAKER_INSTALL_DIR)/src
 	$(MKDIR) $(SPYNNAKER_INSTALL_DIR)/modified_src
