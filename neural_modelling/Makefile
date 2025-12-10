@@ -14,7 +14,7 @@
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 NEURAL_MODELLING_DIRS := $(abspath $(dir $(MAKEFILE_PATH)))
-APP_OUTPUT_DIR := $(abspath $(NEURAL_MODELLING_DIRS)/../spynnaker/pyNN/model_binaries)
+APP_OUTPUT_DIR := $(NEURAL_MODELLING_DIRS)/../spynnaker/pyNN/model_binaries/
 
 BUILDS = synapse_expander \
          spike_source/poisson \
@@ -43,8 +43,8 @@ all: $(DIRS)
 	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
 
 clean: $(DIRS)
-	$(RM) $(APP_OUTPUT_DIR)/logs.sqlite3
-	$(RM) $(APP_OUTPUT_DIR)/*.aplx
+	$(RM) $(APP_OUTPUT_DIR)logs.sqlite3
+	$(RM) $(APP_OUTPUT_DIR)*.aplx
 	for d in $(DIRS); do $(MAKE) -C $$d clean || exit $$?; done
 
 # This installs the source and makefiles into a central location so that
