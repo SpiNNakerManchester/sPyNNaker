@@ -54,6 +54,10 @@ jobs:
       run: make clean; make SPYNNAKER_DEBUG=DEBUG
       working-directory: neural_modelling
       env:
+        SPINN_INSTALL_DIR: ${{ github.workspace }}/spinnaker_tools_install
+        SPINN_COMMON_INSTALL_DIR: ${{ github.workspace }}/spinn_common_install
+        FEC_INSTALL_DIR: ${{ github.workspace }}/fec_install
+        SPYNNAKER_INSTALL_DIR: ${{ github.workspace }}/spynnaker_install
         C_LOGS_DICT: ${{ github.workspace }}/spynnaker/pyNN/model_binaries/logs.sqlite3
         CFLAGS: -fdiagnostics-color=always
 
