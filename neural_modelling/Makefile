@@ -52,6 +52,7 @@ INSTALL_ERROR += This environment variable must also exist for all higher level 
 # other projects can make use if it
 install: $(DIRS)
 	$(eval SPYNNAKER_INSTALL_DIR := $(strip $(if $(SPYNNAKER_INSTALL_DIR), $(SPYNNAKER_INSTALL_DIR), $(error $(INSTALL_ERROR)))))
+	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
 	$(MKDIR) $(SPYNNAKER_INSTALL_DIR)/src
 	$(MKDIR) $(SPYNNAKER_INSTALL_DIR)/modified_src
 	$(MKDIR) $(SPYNNAKER_INSTALL_DIR)/make
