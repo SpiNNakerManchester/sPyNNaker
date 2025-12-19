@@ -50,7 +50,7 @@ INSTALL_ERROR += This environment variable must also exist for all higher level 
 
 # This installs the source and makefiles into a central location so that
 # other projects can make use if it
-install:
+install: $(DIRS)
 	$(eval SPYNNAKER_INSTALL_DIR := $(strip $(if $(SPYNNAKER_INSTALL_DIR), $(SPYNNAKER_INSTALL_DIR), $(error $(INSTALL_ERROR)))))
 	$(MKDIR) $(SPYNNAKER_INSTALL_DIR)/src
 	$(MKDIR) $(SPYNNAKER_INSTALL_DIR)/modified_src
