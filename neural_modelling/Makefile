@@ -13,7 +13,8 @@
 # limitations under the License.
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-NEURAL_MODELLING_DIRS := $(abspath $(dir $(MAKEFILE_PATH))/../neural_modelling)
+NEURAL_MODELLING_DIRS := $(abspath $(dir $(MAKEFILE_PATH)))
+APP_OUTPUT_DIR := $(NEURAL_MODELLING_DIRS)/../spynnaker/pyNN/model_binaries/
 
 BUILDS = synapse_expander \
          spike_source/poisson \
@@ -42,6 +43,8 @@ all: $(DIRS)
 	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
 
 clean: $(DIRS)
+	$(RM) $(APP_OUTPUT_DIR)logs.sqlite3
+	$(RM) $(APP_OUTPUT_DIR)*.aplx
 	for d in $(DIRS); do $(MAKE) -C $$d clean || exit $$?; done
 
 INSTALL_ERROR := neural_modelling install is only required if you are building in a temporary location.
