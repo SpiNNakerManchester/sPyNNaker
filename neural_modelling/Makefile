@@ -45,6 +45,8 @@ all: $(DIRS)
 clean: $(DIRS)
 	$(RM) $(APP_OUTPUT_DIR)logs.sqlite3
 	$(RM) $(APP_OUTPUT_DIR)*.aplx
+	$(RM) -r $(NEURAL_MODELLING_DIRS)/modified_src
+
 	for d in $(DIRS); do $(MAKE) -C $$d clean || exit $$?; done
 
 INSTALL_ERROR := neural_modelling install is only required if you are building in a temporary location.
