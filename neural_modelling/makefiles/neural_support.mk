@@ -23,3 +23,6 @@ APP_OUTPUT_DIR := $(SPYNNAKER_DIR)spynnaker/pyNN/model_binaries/
 DATABASE_KEY = S
 
 include $(SPYNNAKER_DIR)neural_modelling/make/neural_support.mk
+
+clean:
+	$(RM) -r $(BUILD_DIR)
