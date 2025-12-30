@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-CUR_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/)
+CUR_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 FEC_INSTALL_DIR := $(strip $(if $(FEC_INSTALL_DIR), $(FEC_INSTALL_DIR), $(abspath $(CUR_DIR)/../../../SpiNNFrontEndCommon/c_common/front_end_common_lib)))
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
