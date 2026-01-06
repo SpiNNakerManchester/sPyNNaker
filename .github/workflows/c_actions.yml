@@ -67,7 +67,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: fec_binaries
-        path: SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
+        path: |
+          path: SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
+          path: SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/logs*.sqlite3
         retention-days: 5
 
     - name: Upload PyNN binaries
@@ -76,7 +78,7 @@ jobs:
         name: pynn_binaries
         path: |
           spynnaker/pyNN/model_binaries/*.aplx
-          spynnaker/pyNN/model_binaries/logs.sqlite3
+          spynnaker/pyNN/model_binaries/logs*.sqlite3
         retention-days: 5
 
   test:
