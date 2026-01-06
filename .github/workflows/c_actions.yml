@@ -49,6 +49,15 @@ jobs:
        make -C SpiNNFrontEndCommon/c_common install
        make -C neural_modelling
 
+    - name: Upload Fec binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: fec_binaries
+        path: |
+          path: SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
+          path: SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/logs.sqlite3
+        retention-days: 5
+
     - name: Build C code in DEBUG mode
       run: make clean; make SPYNNAKER_DEBUG=DEBUG
       working-directory: neural_modelling
@@ -62,15 +71,6 @@ jobs:
     - name: Build documentation using doxygen
       run: make doxysetup doxygen
       working-directory: neural_modelling
-
-    - name: Upload Fec binaries
-      uses: actions/upload-artifact@v4
-      with:
-        name: fec_binaries
-        path: |
-          path: SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
-          path: SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/logs*.sqlite3
-        retention-days: 5
 
     - name: Upload PyNN binaries
       uses: actions/upload-artifact@v4
