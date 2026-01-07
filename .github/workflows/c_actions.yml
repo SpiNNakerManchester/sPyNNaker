@@ -70,7 +70,7 @@ jobs:
         name: fec_binaries
         path: |
           SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
-          SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/logs.sqlite3
+          SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/logs*..sqlite3
         retention-days: 5
 
     - name: Upload PyNN binaries
