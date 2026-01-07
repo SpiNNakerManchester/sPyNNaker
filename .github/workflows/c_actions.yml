@@ -40,11 +40,13 @@ jobs:
       env:
         SPINN_INSTALL_DIR: ${{ github.workspace }}/spinnaker_tools_install
         SPINN_COMMON_INSTALL_DIR: ${{ github.workspace }}/spinn_common_install
+        FEC_INSTALL_DIR: ${{ github.workspace }}/fec_install
         SPYNNAKER_INSTALL_DIR: ${{ github.workspace }}/spynnaker_install
         CFLAGS: -fdiagnostics-color=always
       run: |
        make -C spinnaker_tools install
        make -C spinn_common install
+       make -C SpiNNFrontEndCommon/c_common/front_end_common_lib install 
        make -C SpiNNFrontEndCommon/c_common
        make -C neural_modelling
 
