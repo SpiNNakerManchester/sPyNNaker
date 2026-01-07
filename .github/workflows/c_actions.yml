@@ -36,7 +36,7 @@ jobs:
       with:
         base-dir: neural_modelling/src
 
-    - name: Build and install C code
+    - name: Build C code
       env:
         SPINN_INSTALL_DIR: ${{ github.workspace }}/spinnaker_tools_install
         SPINN_COMMON_INSTALL_DIR: ${{ github.workspace }}/spinn_common_install
@@ -46,7 +46,7 @@ jobs:
       run: |
        make -C spinnaker_tools install
        make -C spinn_common install
-       make -C SpiNNFrontEndCommon/c_common install
+       make -C SpiNNFrontEndCommon/c_common
        make -C neural_modelling
 
     - name: Upload Fec binaries
