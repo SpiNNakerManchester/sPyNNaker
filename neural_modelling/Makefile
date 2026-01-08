@@ -43,7 +43,7 @@ all: $(DIRS)
 	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
 
 clean: $(DIRS)
-	$(RM) $(APP_OUTPUT_DIR)logs.sqlite3
+	$(RM) $(APP_OUTPUT_DIR)logs*.sqlite3
 	$(RM) $(APP_OUTPUT_DIR)*.aplx
 	$(RM) -r $(NEURAL_MODELLING_DIRS)/modified_src
 

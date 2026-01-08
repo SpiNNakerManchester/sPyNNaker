@@ -1,2 +1,2 @@
 *.aplx
-logs.sqlite3
+logs*.sqlite3
