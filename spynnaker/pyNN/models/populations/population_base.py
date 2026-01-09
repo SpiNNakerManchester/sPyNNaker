@@ -245,7 +245,7 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @abstractmethod
     def record(self, variables: Names, to_file: IoDest = None,
-               sampling_interval: Optional[int] = None) -> None:
+               sampling_interval: Optional[float] = None) -> None:
         """
         Record the specified variable or variables for all cells in the
         Population or view.

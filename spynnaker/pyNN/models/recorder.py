@@ -73,7 +73,7 @@ class Recorder(object):
 
     def record(
             self, variables: Names, to_file: IoDest,
-            sampling_interval: Optional[int],
+            sampling_interval: Optional[float],
             indexes: Optional[Collection[int]]) -> None:
         """
         Turns on (or off) recording.
