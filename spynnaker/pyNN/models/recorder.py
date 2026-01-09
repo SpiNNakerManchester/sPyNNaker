@@ -129,7 +129,7 @@ class Recorder(object):
                         variable, sampling_interval, to_file, indexes)
 
     def __turn_on_all_record(
-            self, sampling_interval: Optional[int], to_file: IoDest,
+            self, sampling_interval: Optional[float], to_file: IoDest,
             indexes: Optional[Collection[int]]) -> None:
         """
         :param sampling_interval: the interval to record them
@@ -149,7 +149,7 @@ class Recorder(object):
                 variable, sampling_interval, to_file, indexes)
 
     def turn_on_record(
-            self, variable: str, sampling_interval: Optional[int] = None,
+            self, variable: str, sampling_interval: Optional[float] = None,
             to_file: IoDest = None,
             indexes: Optional[Collection[int]] = None) -> None:
         """
