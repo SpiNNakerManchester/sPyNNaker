@@ -435,7 +435,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             with NeoBufferDatabase() as db:
                 db.write_t_stop()
 
-    @overrides(AbstractSpinnakerBase._execute_buffer_extractor)
+    @overrides(AbstractSpinnakerBase._reset_graph_elements)
     def _reset_graph_elements(self) -> None:
          for vertex in self._data_writer.get_vertices_by_type(
                  PopulationVertex):
