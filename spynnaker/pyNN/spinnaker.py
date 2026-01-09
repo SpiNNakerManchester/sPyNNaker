@@ -428,8 +428,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             raise ConfigurationException(
                 f"Unexpected cfg setting delay_support_adder: {name}")
 
-    @overrides(AbstractSpinnakerBase._reset_graph_elements)
-    def _reset_graph_elements(self) -> None:
+    @overrides(AbstractSpinnakerBase.reset)
+    def reset(self) -> None:
+        super.reset()
         for vertex in self._data_writer.get_vertices_by_type(
                 PopulationVertex):
             vertex.reset_to_first_timestep()
@@ -440,4 +441,3 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         if not get_config_bool("Machine", "virtual_board"):
             with NeoBufferDatabase() as db:
                 db.write_t_stop()
-
