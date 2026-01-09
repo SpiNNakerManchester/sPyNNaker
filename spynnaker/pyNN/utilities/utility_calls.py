@@ -408,6 +408,7 @@ def get_time_to_write_us(n_bytes: int, n_cores: int) -> int:
     seconds = n_bytes / bandwidth_per_core
     return int(math.ceil(seconds * MICRO_TO_SECOND_CONVERSION))
 
+
 def check_io(to_file: IoDest) -> None:
     """
     Checks an io parameter
@@ -427,6 +428,7 @@ def check_io(to_file: IoDest) -> None:
     if extension == "csv":
         return
     get_neo_io(to_file)
+
 
 def get_neo_io(file_or_folder: str) -> BaseIO:
     """
