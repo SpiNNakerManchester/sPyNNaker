@@ -42,7 +42,8 @@ from spynnaker import _version
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import add_spynnaker_cfg, SPYNNAKER_CFG
 from spynnaker.pyNN.models.recorder import Recorder
-from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
+from spynnaker.pyNN.models.neuron import (
+    AbstractPyNNNeuronModel, PopulationVertex)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.extra_algorithms import (
@@ -433,3 +434,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         if not get_config_bool("Machine", "virtual_board"):
             with NeoBufferDatabase() as db:
                 db.write_t_stop()
+
+    @overrides(AbstractSpinnakerBase._execute_buffer_extractor)
+    def _reset_graph_elements(self) -> None:
+         for vertex in self._data_writer.get_vertices_by_type(
+                 PopulationVertex):
+            vertex.reset_to_first_timestep()
