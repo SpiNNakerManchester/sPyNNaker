@@ -40,6 +40,7 @@ from spinn_front_end_common.utilities.constants import (
     MICRO_TO_SECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
+from spynnaker.pyNN.types import IoDest
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
     RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
@@ -408,6 +409,26 @@ def get_time_to_write_us(n_bytes: int, n_cores: int) -> int:
     return int(math.ceil(seconds * MICRO_TO_SECOND_CONVERSION))
 
 
+def check_io(to_file: IoDest) -> None:
+    """
+    Checks an io parameter
+
+    :param to_file: io parameter to check
+    :raises ValueError: If neo can not generate an io Class
+    """
+    if to_file is None:
+        return
+    if not isinstance(to_file, str):
+        if isinstance(to_file, BaseIO):
+            return
+        raise ValueError(f"Unexpected type for {to_file=}")
+
+    # Special case handled by Population.write_data
+    extension = os.path.splitext(to_file)[1][1:]
+    if extension == "csv":
+        return
+    get_neo_io(to_file)
+
 def get_neo_io(file_or_folder: str) -> BaseIO:
     """
     Hack for https://github.com/NeuralEnsemble/python-neo/issues/1287
@@ -416,6 +437,7 @@ def get_neo_io(file_or_folder: str) -> BaseIO:
 
     :param file_or_folder:
     :returns: Neo IO instance, guessing the type based on the filename suffix.
+    :raises ValueError: If neo can not generate an io Class
     """
     try:
         return neo.get_io(file_or_folder)

@@ -531,6 +531,9 @@ class NeuronRecorder(object):
             raise ConfigurationException(
                 f"sampling_interval {sampling_interval} higher than "
                 f"max allowed which is {step * self._MAX_RATE}")
+        if rate <= 0:
+            raise ConfigurationException(
+                f"sampling_interval {sampling_interval} is negative")
         return rate
 
     def _check_indexes(self, indexes: Optional[Collection[int]]) -> None:

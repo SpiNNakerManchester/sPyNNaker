@@ -257,6 +257,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             `write_data()` will be automatically called when `end()` is called.
         :param sampling_interval: a value in milliseconds, and an integer
             multiple of the simulation timestep.
+        :raises ValueError: If neo can not generate an io Class
         """
         raise NotImplementedError
 
