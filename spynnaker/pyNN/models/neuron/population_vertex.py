@@ -1348,7 +1348,7 @@ class PopulationVertex(
 
     def reset_to_first_timestep(self) -> None:
         """
-        Sets the reequired elements of the vertex
+        Sets the reguired elements of the vertex
         """
         # Reset state variables
         self.__state_variables.copy_into(self.__initial_state_variables)
