@@ -430,7 +430,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @overrides(AbstractSpinnakerBase.reset)
     def reset(self) -> None:
-        super.reset()
+        super().reset()
         for vertex in self._data_writer.get_vertices_by_type(
                 PopulationVertex):
             vertex.reset_to_first_timestep()
