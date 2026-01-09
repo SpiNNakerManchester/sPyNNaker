@@ -408,7 +408,6 @@ def get_time_to_write_us(n_bytes: int, n_cores: int) -> int:
     seconds = n_bytes / bandwidth_per_core
     return int(math.ceil(seconds * MICRO_TO_SECOND_CONVERSION))
 
-
 def check_io(to_file: IoDest) -> None:
     """
     Checks an io parameter

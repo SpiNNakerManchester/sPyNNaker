@@ -51,6 +51,7 @@ def test_round() -> None:
         structure=None, initial_values={})
     assert pop_1.size == 5
 
+
 def test_bad_record() -> None:
     sim.setup()
     pop_1 = sim.Population(1, sim.IF_curr_exp(), label="pop_1")
