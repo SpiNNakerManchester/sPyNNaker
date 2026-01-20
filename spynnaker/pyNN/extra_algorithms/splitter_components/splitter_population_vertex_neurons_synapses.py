@@ -543,7 +543,8 @@ class SplitterPopulationVertexNeuronsSynapses(
         for start in range(0, n_sources, sources_per_vertex):
             end = min(start + sources_per_vertex, n_sources)
             source_range = sources[start:end]
-            for s_vertex in self.__incoming_vertices[self.__next_synapse_index]:
+            for s_vertex in self.__incoming_vertices[
+                    self.__next_synapse_index]:
                 targets_filtered = targets[s_vertex]
                 filtered = [s for s in source_range
                             if (s in targets_filtered or
