@@ -539,21 +539,20 @@ class SplitterPopulationVertexNeuronsSynapses(
         sources_per_vertex = max(1, int(2 ** math.ceil(math.log2(
             n_sources / n_synapse_cores))))
 
-        # Start on a different index each time to "even things out"
-        index = self.__next_synapse_index
-        self.__next_synapse_index = (
-            (self.__next_synapse_index + 1) % n_synapse_cores)
         result: List[Tuple[MachineVertex, List[MachineVertex]]] = list()
         for start in range(0, n_sources, sources_per_vertex):
             end = min(start + sources_per_vertex, n_sources)
             source_range = sources[start:end]
-            for s_vertex in self.__incoming_vertices[index]:
+            for s_vertex in self.__incoming_vertices[self.__next_synapse_index]:
                 targets_filtered = targets[s_vertex]
                 filtered = [s for s in source_range
                             if (s in targets_filtered or
                                 s.app_vertex in targets_filtered)]
                 result.append((s_vertex, filtered))
-            index = (index + 1) % n_synapse_cores
+
+            # Start on a different index each time to "even things out"
+            self.__next_synapse_index = (
+                (self.__next_synapse_index + 1) % n_synapse_cores)
 
         return result
 
