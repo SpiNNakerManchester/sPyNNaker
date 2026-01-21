@@ -245,7 +245,7 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @abstractmethod
     def record(self, variables: Names, to_file: IoDest = None,
-               sampling_interval: Optional[int] = None) -> None:
+               sampling_interval: Optional[float] = None) -> None:
         """
         Record the specified variable or variables for all cells in the
         Population or view.
@@ -257,6 +257,7 @@ class PopulationBase(object, metaclass=AbstractBase):
             `write_data()` will be automatically called when `end()` is called.
         :param sampling_interval: a value in milliseconds, and an integer
             multiple of the simulation timestep.
+        :raises ValueError: If neo can not generate an io Class
         """
         raise NotImplementedError
 
