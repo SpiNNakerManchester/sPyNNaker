@@ -185,7 +185,7 @@ class Population(PopulationBase):
 
     @overrides(PopulationBase.record)
     def record(self, variables: Names, to_file: IoDest = None,
-               sampling_interval: Optional[int] = None) -> None:
+               sampling_interval: Optional[float] = None) -> None:
         self.__recorder.record(
             variables, to_file, sampling_interval, indexes=None)
 
