@@ -1,2 +1,2 @@
 *.aplx
-*.dict
+logs*.sqlite3
