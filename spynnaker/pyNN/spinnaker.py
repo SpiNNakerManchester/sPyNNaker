@@ -26,8 +26,7 @@ from typing_extensions import Literal, Never
 
 
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.config_holder import (
-    get_config_bool, get_config_str_or_none, has_config_option)
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -36,7 +35,6 @@ from spinn_front_end_common.interface.config_setup import (
     add_spinnaker_template)
 from spinn_front_end_common.interface.provenance import (
     FecTimer, GlobalProvenance, TimerCategory, TimerWork)
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
