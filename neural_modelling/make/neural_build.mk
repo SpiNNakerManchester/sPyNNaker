@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# If FEC_INSTALL_DIR is not defined, this is an error!
-FEC_INSTALL_DIR := $(strip $(if $(FEC_INSTALL_DIR), $(FEC_INSTALL_DIR), $(if $(SPINN_DIRS), $(SPINN_DIRS)/fec_install, $(error FEC_INSTALL_DIR or SPINN_DIRS is not set.  Please define FEC_INSTALL_DIR or SPINN_DIRS))))
+CUR_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+FEC_INSTALL_DIR := $(strip $(if $(FEC_INSTALL_DIR), $(FEC_INSTALL_DIR), $(abspath $(CUR_DIR)/../../../SpiNNFrontEndCommon/c_common/front_end_common_lib)))
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(abspath $(dir $(MAKEFILE_PATH)))
@@ -302,3 +302,6 @@ $(BUILD_DIR)neuron/neuron.o: $(NEURON_MODIFIED_DIR)neuron/neuron.c $(NEURON_INCL
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
 
 .PRECIOUS: $(NEURON_MODIFIED_DIR)%.c $(NEURON_MODIFIED_DIR)%.h $(LOG_DICT_FILE) $(EXTRA_PRECIOUS)
+
+clean:
+	$(RM) -r $(BUILD_DIR)
