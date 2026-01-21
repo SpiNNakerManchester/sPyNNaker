@@ -36,28 +36,17 @@ jobs:
       with:
         base-dir: neural_modelling/src
 
-    - name: Build C code
+    - name: Build C and install code
       env:
         SPINN_INSTALL_DIR: ${{ github.workspace }}/spinnaker_tools_install
         SPINN_COMMON_INSTALL_DIR: ${{ github.workspace }}/spinn_common_install
         FEC_INSTALL_DIR: ${{ github.workspace }}/fec_install
         SPYNNAKER_INSTALL_DIR: ${{ github.workspace }}/spynnaker_install
-        C_LOGS_DICT: ${{ github.workspace }}/spynnaker/pyNN/model_binaries/logs.sqlite3
         CFLAGS: -fdiagnostics-color=always
       run: |
        make -C spinnaker_tools install
        make -C spinn_common install
-       make -C SpiNNFrontEndCommon/c_common
-       make -C neural_modelling
-
-    - name: Build C code global install
-      env:
-        SPINN_DIRS: ${{ github.workspace }}/spinn_dirs
-        C_LOGS_DICT: ${{ github.workspace }}/spynnaker/pyNN/model_binaries/logs.sqlite3
-        CFLAGS: -fdiagnostics-color=always
-      run: |
-       make -C spinnaker_tools install
-       make -C spinn_common install
+       make -C SpiNNFrontEndCommon/c_common/front_end_common_lib install 
        make -C SpiNNFrontEndCommon/c_common
        make -C neural_modelling
 
@@ -65,8 +54,10 @@ jobs:
       run: make clean; make SPYNNAKER_DEBUG=DEBUG
       working-directory: neural_modelling
       env:
-        SPINN_DIRS: ${{ github.workspace }}/spinn_dirs
-        C_LOGS_DICT: ${{ github.workspace }}/spynnaker/pyNN/model_binaries/logs.sqlite3
+        SPINN_INSTALL_DIR: ${{ github.workspace }}/spinnaker_tools_install
+        SPINN_COMMON_INSTALL_DIR: ${{ github.workspace }}/spinn_common_install
+        FEC_INSTALL_DIR: ${{ github.workspace }}/fec_install
+        SPYNNAKER_INSTALL_DIR: ${{ github.workspace }}/spynnaker_install
         CFLAGS: -fdiagnostics-color=always
 
     - name: Build documentation using doxygen
@@ -77,7 +68,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: fec_binaries
-        path: SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
+        path: |
+          SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
+          SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/logs*.sqlite3
         retention-days: 5
 
     - name: Upload PyNN binaries
@@ -86,7 +79,7 @@ jobs:
         name: pynn_binaries
         path: |
           spynnaker/pyNN/model_binaries/*.aplx
-          spynnaker/pyNN/model_binaries/logs.sqlite3
+          spynnaker/pyNN/model_binaries/logs*.sqlite3
         retention-days: 5
 
   test:

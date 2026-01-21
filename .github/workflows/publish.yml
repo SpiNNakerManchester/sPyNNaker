@@ -36,10 +36,6 @@ jobs:
         with:
           repository: SpiNNakerManchester/SupportScripts
           path: support
-      - name: Set dynamic environment variables
-        run: |
-          echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
-          echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
 
       - name: Checkout SpiNNaker Dependencies
         uses: SpiNNakerManchester/SupportScripts/actions/install-spinn-deps@main
