@@ -84,7 +84,7 @@ from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import (
-    POSSION_SIGMA_SUMMATION_LIMIT, MAX_RING_BUFFER_BITS)
+    POISSON_SIGMA_SUMMATION_LIMIT, MAX_RING_BUFFER_BITS)
 from spynnaker.pyNN.utilities.utility_calls import (
     create_mars_kiss_seeds, check_rng)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
@@ -1987,7 +1987,7 @@ class _Stats(object):
         # Upper end of range for Poisson summation required below
         # upper_bound needs to be an integer
         upper_bound = int(round(average_spikes_per_timestep +
-                                POSSION_SIGMA_SUMMATION_LIMIT *
+                                POISSON_SIGMA_SUMMATION_LIMIT *
                                 math.sqrt(average_spikes_per_timestep)))
 
         # pylint:disable=wrong-spelling-in-comment
