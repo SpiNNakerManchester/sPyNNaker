@@ -31,38 +31,33 @@ jobs:
         install-check-tools: false
         ubuntu-packages: doxygen gcc-arm-none-eabi
 
-    - name: Set environment variables
-      run: |
-        echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
-        echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
-        echo "C_LOGS_DICT=$PWD/logs.sqlite3" >> $GITHUB_ENV
-
     - name: Lint C code using Vera++
       uses: SpiNNakerManchester/SupportScripts/actions/vera@main
       with:
         base-dir: neural_modelling/src
 
-    - name: Build C dependencies
+    - name: Build C and install code
+      env:
+        SPINN_INSTALL_DIR: ${{ github.workspace }}/spinnaker_tools_install
+        SPINN_COMMON_INSTALL_DIR: ${{ github.workspace }}/spinn_common_install
+        FEC_INSTALL_DIR: ${{ github.workspace }}/fec_install
+        SPYNNAKER_INSTALL_DIR: ${{ github.workspace }}/spynnaker_install
+        CFLAGS: -fdiagnostics-color=always
       run: |
-        make -C $SPINN_DIRS
-        make -C spinn_common install
-
-    - name: Build FEC C code
-      run: make
-      working-directory: SpiNNFrontEndCommon/c_common
-      env:
-        CFLAGS: -fdiagnostics-color=always
-
-    - name: Build PYNN C code
-      run: make
-      working-directory: neural_modelling
-      env:
-        CFLAGS: -fdiagnostics-color=always
+       make -C spinnaker_tools install
+       make -C spinn_common install
+       make -C SpiNNFrontEndCommon/c_common/front_end_common_lib install 
+       make -C SpiNNFrontEndCommon/c_common
+       make -C neural_modelling
 
     - name: Build C code in DEBUG mode
       run: make clean; make SPYNNAKER_DEBUG=DEBUG
       working-directory: neural_modelling
       env:
+        SPINN_INSTALL_DIR: ${{ github.workspace }}/spinnaker_tools_install
+        SPINN_COMMON_INSTALL_DIR: ${{ github.workspace }}/spinn_common_install
+        FEC_INSTALL_DIR: ${{ github.workspace }}/fec_install
+        SPYNNAKER_INSTALL_DIR: ${{ github.workspace }}/spynnaker_install
         CFLAGS: -fdiagnostics-color=always
 
     - name: Build documentation using doxygen
@@ -73,21 +68,18 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: fec_binaries
-        path: SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
+        path: |
+          SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
+          SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/logs*.sqlite3
         retention-days: 5
 
     - name: Upload PyNN binaries
       uses: actions/upload-artifact@v4
       with:
         name: pynn_binaries
-        path: spynnaker/pyNN/model_binaries/*.aplx
-        retention-days: 5
-
-    - name: Upload log.sqlite3s
-      uses: actions/upload-artifact@v4
-      with:
-        name: logs.sqlite3
-        path: logs.sqlite3
+        path: |
+          spynnaker/pyNN/model_binaries/*.aplx
+          spynnaker/pyNN/model_binaries/logs*.sqlite3
         retention-days: 5
 
   test:
@@ -103,7 +95,7 @@ jobs:
     - name: Prepare
       uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
       with:
-        install-dependencies: > 
+        install-dependencies: >
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
           SpiNNFrontEndCommon TestBase
         install-module: true
@@ -124,15 +116,9 @@ jobs:
         name: pynn_binaries
         path: external_binaries
 
-    - name: Download logs.sqlite3
-      uses: actions/download-artifact@v4
-      with:
-        name: logs.sqlite3
-        path: external_binaries
-
     - name: Append cfg
       # Doing this in the prepare action ended with a different path
-      run: | 
+      run: |
         echo '[Mapping]' >> ~/.spynnaker.cfg
         echo "external_binaries=$PWD/external_binaries" >> ~/.spynnaker.cfg
         cat ~/.spynnaker.cfg
