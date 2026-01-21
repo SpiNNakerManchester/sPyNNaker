@@ -19,5 +19,7 @@ SPYNNAKER_DIR := $(abspath $(dir $(MAKEFILE_PATH))/../../../)/
 
 BUILD_DIR := $(SPYNNAKER_DIR)neural_modelling/builds/$(APP)/
 APP_OUTPUT_DIR := $(SPYNNAKER_DIR)spynnaker/pyNN/model_binaries/
+# key for the database in this APP_OUTPUT_DIR
+DATABASE_KEY = S
 
 include $(SPYNNAKER_DIR)neural_modelling/make/neuron_only_build.mk

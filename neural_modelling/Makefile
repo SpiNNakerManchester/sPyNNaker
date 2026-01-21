@@ -13,7 +13,8 @@
 # limitations under the License.
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-NEURAL_MODELLING_DIRS := $(abspath $(dir $(MAKEFILE_PATH))/../neural_modelling)
+NEURAL_MODELLING_DIRS := $(abspath $(dir $(MAKEFILE_PATH)))
+APP_OUTPUT_DIR := $(NEURAL_MODELLING_DIRS)/../spynnaker/pyNN/model_binaries/
 
 BUILDS = synapse_expander \
          spike_source/poisson \
@@ -42,13 +43,21 @@ all: $(DIRS)
 	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
 
 clean: $(DIRS)
+	$(RM) $(APP_OUTPUT_DIR)logs*.sqlite3
+	$(RM) $(APP_OUTPUT_DIR)*.aplx
+	$(RM) -r $(NEURAL_MODELLING_DIRS)/modified_src
+
 	for d in $(DIRS); do $(MAKE) -C $$d clean || exit $$?; done
+
+INSTALL_ERROR := neural_modelling install is only required if you are building in a temporary location.
+INSTALL_ERROR += In which case you must set the environment variable SPYNNAKER_INSTALL_DIR to where the install should go.
+INSTALL_ERROR += This environment variable must also exist for all higher level makes.
 
 # This installs the source and makefiles into a central location so that
 # other projects can make use if it
-install:
-	$(eval SPYNNAKER_INSTALL_DIR := $(strip $(if $(SPYNNAKER_INSTALL_DIR), $(SPYNNAKER_INSTALL_DIR), $(if $(SPINN_DIRS), $(SPINN_DIRS)/spynnaker_install, $(error SPYNNAKER_INSTALL_DIR or SPINN_DIRS is not set.  Please define SPYNNAKER_INSTALL_DIR or SPINN_DIRS)))))
-	$(RM) -r $(SPYNNAKER_INSTALL_DIR)/*
+install: $(DIRS)
+	$(eval SPYNNAKER_INSTALL_DIR := $(strip $(if $(SPYNNAKER_INSTALL_DIR), $(SPYNNAKER_INSTALL_DIR), $(error $(INSTALL_ERROR)))))
+	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
 	$(MKDIR) $(SPYNNAKER_INSTALL_DIR)/src
 	$(MKDIR) $(SPYNNAKER_INSTALL_DIR)/modified_src
 	$(MKDIR) $(SPYNNAKER_INSTALL_DIR)/make
