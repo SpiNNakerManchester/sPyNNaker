@@ -27,7 +27,7 @@ from typing_extensions import Literal, Never
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import (
-    get_config_bool, get_config_str_or_none)
+    get_config_bool, get_config_str_or_none, has_config_option)
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -412,20 +412,15 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     def _execute_delay_support_adder(self) -> None:
         """
         Runs, times and logs the DelaySupportAdder if required.
+                # Check for option removed Jan 2026
         """
-        name = get_config_str_or_none("Mapping", "delay_support_adder")
-        if name is None:
-            return
         with FecTimer("DelaySupportAdder", TimerWork.OTHER):
-            if name == "DelaySupportAdder":
-                d_vertices, d_edges = delay_support_adder()
-                for vertex in d_vertices:
-                    self.__writer.add_vertex(vertex)
-                for edge, partition_id in d_edges:
-                    self.__writer.add_edge(edge, partition_id)
-                return
-            raise ConfigurationException(
-                f"Unexpected cfg setting delay_support_adder: {name}")
+            d_vertices, d_edges = delay_support_adder()
+            for vertex in d_vertices:
+                self.__writer.add_vertex(vertex)
+            for edge, partition_id in d_edges:
+                self.__writer.add_edge(edge, partition_id)
+            return
 
     @overrides(AbstractSpinnakerBase._execute_buffer_extractor)
     def _execute_buffer_extractor(self) -> None:
