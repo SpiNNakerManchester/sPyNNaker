@@ -42,8 +42,6 @@ from pacman.model.graphs.common import Slice
 from pacman.model.resources import AbstractSDRAM, MultiRegionSDRAM
 from pacman.utilities.utility_calls import get_n_bits
 
-from spinn_front_end_common.abstract_models import (
-    AbstractCanReset)
 from spinn_front_end_common.interface.buffer_management\
     .recording_utilities import (
        get_recording_header_size, get_recording_data_constant_size)
@@ -86,7 +84,7 @@ from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import (
-    POSSION_SIGMA_SUMMATION_LIMIT, MAX_RING_BUFFER_BITS)
+    POISSON_SIGMA_SUMMATION_LIMIT, MAX_RING_BUFFER_BITS)
 from spynnaker.pyNN.utilities.utility_calls import (
     create_mars_kiss_seeds, check_rng)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
@@ -173,7 +171,7 @@ def _is_structural(dynamics: AbstractSynapseDynamics
 
 class PopulationVertex(
         PopulationApplicationVertex, AbstractAcceptsIncomingSynapses,
-        AbstractCanReset, SupportsStructure):
+        SupportsStructure):
     """
     Underlying vertex model for Neural Populations.
     """
@@ -1348,8 +1346,10 @@ class PopulationVertex(
     def __repr__(self) -> str:
         return self.__str__()
 
-    @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self) -> None:
+        """
+        Sets the required elements of the vertex
+        """
         # Reset state variables
         self.__state_variables.copy_into(self.__initial_state_variables)
 
@@ -1987,7 +1987,7 @@ class _Stats(object):
         # Upper end of range for Poisson summation required below
         # upper_bound needs to be an integer
         upper_bound = int(round(average_spikes_per_timestep +
-                                POSSION_SIGMA_SUMMATION_LIMIT *
+                                POISSON_SIGMA_SUMMATION_LIMIT *
                                 math.sqrt(average_spikes_per_timestep)))
 
         # pylint:disable=wrong-spelling-in-comment

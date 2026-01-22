@@ -42,7 +42,8 @@ from spynnaker import _version
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import add_spynnaker_cfg, SPYNNAKER_CFG
 from spynnaker.pyNN.models.recorder import Recorder
-from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
+from spynnaker.pyNN.models.neuron import (
+    AbstractPyNNNeuronModel, PopulationVertex)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.extra_algorithms import (
@@ -426,6 +427,13 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 return
             raise ConfigurationException(
                 f"Unexpected cfg setting delay_support_adder: {name}")
+
+    @overrides(AbstractSpinnakerBase.reset)
+    def reset(self) -> None:
+        super().reset()
+        for vertex in self._data_writer.get_vertices_by_type(
+                PopulationVertex):
+            vertex.reset_to_first_timestep()
 
     @overrides(AbstractSpinnakerBase._execute_buffer_extractor)
     def _execute_buffer_extractor(self) -> None:

@@ -24,6 +24,7 @@ from spinn_utilities.logger_utils import warn_once
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.utilities.utility_calls import check_io
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.types import IoDest
 
@@ -73,7 +74,7 @@ class Recorder(object):
 
     def record(
             self, variables: Names, to_file: IoDest,
-            sampling_interval: Optional[int],
+            sampling_interval: Optional[float],
             indexes: Optional[Collection[int]]) -> None:
         """
         Turns on (or off) recording.
@@ -90,7 +91,9 @@ class Recorder(object):
         :param indexes: The indexes of neurons to record from.
             This is non-standard PyNN and equivalent to creating a view with
             these indexes and asking the View to record.
+        :raises ValueError: If neo can not generate an io Class
         """
+        check_io(to_file)
         if variables is None:  # reset the list of things to record
             if sampling_interval is not None:
                 raise ConfigurationException(
@@ -126,7 +129,7 @@ class Recorder(object):
                         variable, sampling_interval, to_file, indexes)
 
     def __turn_on_all_record(
-            self, sampling_interval: Optional[int], to_file: IoDest,
+            self, sampling_interval: Optional[float], to_file: IoDest,
             indexes: Optional[Collection[int]]) -> None:
         """
         :param sampling_interval: the interval to record them
@@ -146,7 +149,7 @@ class Recorder(object):
                 variable, sampling_interval, to_file, indexes)
 
     def turn_on_record(
-            self, variable: str, sampling_interval: Optional[int] = None,
+            self, variable: str, sampling_interval: Optional[float] = None,
             to_file: IoDest = None,
             indexes: Optional[Collection[int]] = None) -> None:
         """
