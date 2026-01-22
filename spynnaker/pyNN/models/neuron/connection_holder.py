@@ -67,7 +67,7 @@ class ConnectionHolder(object):
     )
 
     def __init__(
-            self, data_items_to_return: Optional[Sequence[str]], as_list: bool,
+            self, data_items_to_return: Optional[List[str]], as_list: bool,
             n_pre_atoms: int, n_post_atoms: int,
             connections: Optional[List[ConnectionsArray]] = None,
             fixed_values: Optional[List[Tuple[str, int]]] = None,

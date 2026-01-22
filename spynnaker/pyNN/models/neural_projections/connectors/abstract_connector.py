@@ -475,7 +475,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
                         synapse_info.post_population.positions[targets[i]],
                         expand_distances)
                     # evaluate expression at this distance
-                    eval_values[i] = _expr_context.eval(values, d=dist)
+                    eval_values[i:i+1] = _expr_context.eval(values, d=dist)
                 return eval_values
 
             d = self.__space.distances(

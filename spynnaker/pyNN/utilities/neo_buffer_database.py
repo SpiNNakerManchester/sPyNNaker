@@ -926,10 +926,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             dtype="<i4").reshape([-1, self.__REWIRING_N_WORDS])
 
         record_time = (raw_data[:, 0] * sampling_interval_ms)
-        rewires_raw = raw_data[:, 1:]
+        rewires_raw = raw_data[:, 1]
         rew_length = len(rewires_raw)
         # rewires is 0 (elimination) or 1 (formation) in the first bit
-        rewires = (rewires_raw[i][0] & self.__FIRST_BIT
+        rewires = (rewires_raw[i] & self.__FIRST_BIT
                    for i in range(rew_length))
         # the post-neuron ID is stored in the next 8 bytes
         post_ids = (((int(rewires_raw[i]) >> self.__POST_ID_SHIFT) %
