@@ -398,11 +398,11 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @overrides(AbstractSpinnakerBase._execute_graph_provenance)
     def _execute_graph_provenance(self) -> None:
-        with FecTimer("Graph provenance" , TimerWork.OTHER) as timer:
+        with FecTimer("Graph provenance", TimerWork.OTHER) as timer:
             if timer.skip_if_cfg_false("Reports",
                                        "read_graph_provenance_data"):
                 return
-            for partition in self._iterate_partitions():
+            for partition in self._data_writer._iterate_partitions():
                 for edge in partition.edges:
                     if isinstance(edge, ProjectionApplicationEdge):
                         edge.get_local_provenance_data()
