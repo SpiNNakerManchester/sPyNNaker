@@ -195,6 +195,9 @@ class ProjectionApplicationEdge(ApplicationEdge):
                     self.__delay_edge.pre_vertex).n_delay_stages
 
     def get_local_provenance_data(self) -> None:
+        """
+        Calls get_provenance_data on the connectors
+        """
         for synapse_info in self.synapse_information:
             synapse_info.connector.get_provenance_data(synapse_info)
 
