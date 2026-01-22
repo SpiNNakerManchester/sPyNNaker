@@ -17,8 +17,6 @@ from typing import List, Optional, Type, cast, TYPE_CHECKING
 from typing_extensions import TypeGuard
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
-from spinn_front_end_common.interface.provenance import (
-    AbstractProvidesLocalProvenanceData)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.common.population_application_vertex import (
@@ -112,8 +110,7 @@ def are_dynamics_neuromodulation(
     return isinstance(synapse_dynamics, _Dynamics.neuromodulation())
 
 
-class ProjectionApplicationEdge(
-        ApplicationEdge, AbstractProvidesLocalProvenanceData):
+class ProjectionApplicationEdge(ApplicationEdge):
     """
     An edge which terminates on an :py:class:`PopulationVertex`.
     """
@@ -197,7 +194,6 @@ class ProjectionApplicationEdge(
         return cast(DelayExtensionVertex,
                     self.__delay_edge.pre_vertex).n_delay_stages
 
-    @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self) -> None:
         for synapse_info in self.synapse_information:
             synapse_info.connector.get_provenance_data(synapse_info)
