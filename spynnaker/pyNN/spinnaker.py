@@ -402,7 +402,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             if timer.skip_if_cfg_false("Reports",
                                        "read_graph_provenance_data"):
                 return
-            for partition in self._data_writer._iterate_partitions():
+            for partition in self._data_writer.iterate_partitions():
                 for edge in partition.edges:
                     if isinstance(edge, ProjectionApplicationEdge):
                         edge.get_local_provenance_data()
