@@ -197,6 +197,8 @@ class ProjectionApplicationEdge(ApplicationEdge):
     def get_local_provenance_data(self) -> None:
         """
         Calls get_provenance_data on the connectors
+
+        This calls get_provenance_data on the connector used.
         """
         for synapse_info in self.synapse_information:
             synapse_info.connector.get_provenance_data(synapse_info)
