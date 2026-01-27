@@ -52,6 +52,7 @@ from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_selector)
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 
@@ -392,6 +393,17 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     def _do_provenance_reports(self) -> None:
         AbstractSpinnakerBase._do_provenance_reports(self)
         self._report_redundant_packet_count()
+
+    @overrides(AbstractSpinnakerBase._execute_graph_provenance)
+    def _execute_graph_provenance(self) -> None:
+        with FecTimer("Graph provenance", TimerWork.OTHER) as timer:
+            if timer.skip_if_cfg_false("Reports",
+                                       "read_graph_provenance_data"):
+                return
+            for partition in self._data_writer.iterate_partitions():
+                for edge in partition.edges:
+                    if isinstance(edge, ProjectionApplicationEdge):
+                        edge.get_local_provenance_data()
 
     def _report_redundant_packet_count(self) -> None:
         with FecTimer("Redundant packet count report",
