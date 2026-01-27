@@ -880,13 +880,6 @@ class PopulationVertex(
         return super().atoms_shape
 
     @property
-    def size(self) -> int:
-        """
-        The number of neurons in the vertex.
-        """
-        return self.__n_atoms
-
-    @property
     def incoming_spike_buffer_size(self) -> int:
         """
         The size of the incoming spike buffer to be used on the cores.
