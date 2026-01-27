@@ -30,6 +30,8 @@ from .abstract_pynn_neuron_model_standard import (
     AbstractPyNNNeuronModelStandard)
 from .population_machine_local_only_combined_vertex import (
     PopulationMachineLocalOnlyCombinedVertex, LocalOnlyProvenance)
+from .population_machine_vertex_synapse_filter import (
+    PopulationMachineVertexSynapseFilter)
 
 __all__ = ["AbstractPyNNNeuronModel",
            "AbstractPyNNNeuronModelStandard", "ConnectionHolder",
@@ -39,4 +41,5 @@ __all__ = ["AbstractPyNNNeuronModel",
            "PopulationSynapsesMachineVertexShared", "PopulationVertex",
            "SynapseProvenance",
            "SpikeProcessingProvenance", "SpikeProcessingFastProvenance",
-           "PopulationMachineLocalOnlyCombinedVertex", "LocalOnlyProvenance"]
+           "PopulationMachineLocalOnlyCombinedVertex", "LocalOnlyProvenance",
+           "PopulationMachineVertexSynapseFilter"]

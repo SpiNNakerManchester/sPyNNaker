@@ -233,10 +233,10 @@ static inline bool get_next_spike(uint32_t time, spike_t *spike) {
     // Detect a looped back spike
     if ((*spike & key_config.mask) == key_config.key) {
         // Process event if not self-connected (if it is, this happens later)
-    	if (!key_config.self_connected) {
+        if (!key_config.self_connected) {
             synapse_dynamics_process_post_synaptic_event(
                     time, (*spike & key_config.spike_id_mask) >> key_config.colour_shift);
-    	}
+        }
         return key_config.self_connected;
     }
     return true;
@@ -250,7 +250,7 @@ static inline bool get_next_spike(uint32_t time, spike_t *spike) {
 //! \param[out] result The result of the lookup
 //! \return True if a DMA was started
 static inline bool start_first_dma(uint32_t time, spike_t *spike,
-		pop_table_lookup_result_t *result) {
+        pop_table_lookup_result_t *result) {
 
     do {
         if (population_table_get_first_address(*spike, result)) {
@@ -268,7 +268,7 @@ static inline bool start_first_dma(uint32_t time, spike_t *spike,
 //! \param[out] result The details of the transfer to do
 //! \return True if there is a DMA to do
 static inline bool get_next_dma(uint32_t time, spike_t *spike,
-		pop_table_lookup_result_t *result) {
+        pop_table_lookup_result_t *result) {
     if (population_table_is_next() && population_table_get_next_address(spike, result)) {
         return true;
     }
@@ -326,7 +326,7 @@ static inline void process_current_row(uint32_t time, bool dma_in_progress) {
     dma_buffer *buffer = &dma_buffers[next_buffer_to_process];
 
     if (!synapses_process_synaptic_row(time, buffer->colour, buffer->colour_mask,
-    		buffer->row, &write_back)) {
+            buffer->row, &write_back)) {
         handle_row_error(buffer);
     }
     synaptogenesis_spike_received(time, buffer->originating_spike);
@@ -448,7 +448,7 @@ static inline void do_rewiring(uint32_t time, uint32_t n_rewires) {
             dma_buffers[next_buffer].sdram_writeback_address = result.row_address;
             dma_buffers[next_buffer].n_bytes_transferred = result.n_bytes_to_transfer;
             do_fast_dma_read(result.row_address, dma_buffers[next_buffer].row,
-            		result.n_bytes_to_transfer);
+                    result.n_bytes_to_transfer);
             next_buffer = (next_buffer + 1) & DMA_BUFFER_MOD_MASK;
             dma_in_progress = true;
         }
@@ -475,7 +475,7 @@ static inline void do_rewiring(uint32_t time, uint32_t n_rewires) {
             dma_buffers[next_buffer].sdram_writeback_address = result.row_address;
             dma_buffers[next_buffer].n_bytes_transferred = result.n_bytes_to_transfer;
             do_fast_dma_read(result.row_address, dma_buffers[next_buffer].row,
-            		result.n_bytes_to_transfer);
+                    result.n_bytes_to_transfer);
             next_buffer = (next_buffer + 1) & DMA_BUFFER_MOD_MASK;
         }
 
@@ -586,13 +586,11 @@ void multicast_packet_received_callback(uint key, UNUSED uint unused) {
 //! \param[in] key: The key of the packet. The spike.
 //! \param payload: the payload of the packet. The count.
 void multicast_packet_pl_received_callback(uint key, uint payload) {
-    log_debug("Received spike %x with payload %d", key, payload);
+    log_debug("Received input %x with spike %d", key, payload);
     p_per_ts_struct.packets_this_time_step++;
 
-    // cycle through the packet insertion
-    for (uint count = payload; count > 0; count--) {
-        in_spikes_add_spike(key);
-    }
+    // In this case we add the payload as the key, as it came from a filter
+    in_spikes_add_spike(payload);
     check_times();
 }
 
@@ -605,8 +603,8 @@ bool spike_processing_fast_initialise(
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
         dma_buffers[i].row = spin1_malloc(row_max_n_words * sizeof(uint32_t));
         if (dma_buffers[i].row == NULL) {
-			log_error("Could not initialise DMA buffers of %u words",
-					row_max_n_words);
+            log_error("Could not initialise DMA buffers of %u words",
+                    row_max_n_words);
             return false;
         }
         log_debug("DMA buffer %u allocated at 0x%08x",

@@ -22,7 +22,7 @@
 #include <filter_info.h>
 #include <circular_buffer.h>
 #include <wfi.h>
-#include <population_table/population_table.h>
+#include "population_table/population_table.h"
 
 enum {
 
@@ -68,6 +68,8 @@ typedef struct {
     uint32_t n_spikes_invalid_app_id;
     //! The number of times the spike input queue was full (these are lost)
     uint32_t n_times_queue_overflowed;
+    //! The number of times the filter stopped a packet from being sent
+    uint32_t n_times_filter_stopped_packet;
 } filter_provenance_t;
 
 typedef struct {
@@ -95,6 +97,12 @@ typedef struct {
     bit_field_t data;
 } bit_field_filter_info_t;
 
+static uint32_t time = UINT32_MAX;
+
+static uint32_t n_timesteps;
+
+static uint32_t run_forever;
+
 static filter_config_t *config;
 
 static circular_buffer input_queue;
@@ -109,14 +117,14 @@ static volatile bool running = false;
 
 static inline bool check_app_id(uint32_t spike, uint32_t *app_id) {
     *app_id = (spike & config->app_id_mask) >> config->app_id_shift;
-    return (app_id <= config->app_id_max) && (app_id >= config->app_id_min);
+    return (*app_id <= config->app_id_max) && (*app_id >= config->app_id_min);
 }
 
 //! \brief Get the source core index from a spike
 //! \param[in] filter: The filter info for the spike
 //! \param[in] spike: The spike received
 //! \return the source core index in the list of source cores
-static inline uint32_t get_core_index(bit_field_filter_info_t filter,
+static inline uint32_t get_filter_core_index(bit_field_filter_info_t filter,
         spike_t spike) {
     return (spike >> filter.core_shift) & filter.core_mask;
 }
@@ -125,18 +133,18 @@ static inline uint32_t get_core_index(bit_field_filter_info_t filter,
 //! \param[in] filter: The filter info for the spike
 //! \param[in] spike: The spike received
 //! \return the base neuron number of this core
-static inline uint32_t get_core_sum(bit_field_filter_info_t filter,
+static inline uint32_t get_filter_core_sum(bit_field_filter_info_t filter,
         spike_t spike) {
-    return get_core_index(filter, spike) * filter.n_neurons;
+    return get_filter_core_index(filter, spike) * filter.n_neurons;
 }
 
 //! \brief Get the neuron id of the neuron on the source core
 //! \param[in] filter: the filter info for the spike
 //! \param[in] spike: the spike received
 //! \return the source neuron id local to the core
-static inline uint32_t get_local_neuron_id(bit_field_filter_info_t filter,
-        spike_t spike) {
-    return spike & filter.mask;
+static inline uint32_t get_filter_local_neuron_id(
+        bit_field_filter_info_t filter, spike_t spike) {
+    return (spike & filter.mask) >> filter.n_colour_bits;
 }
 
 static inline bool accepted(uint32_t app_id, uint32_t spike) {
@@ -149,12 +157,17 @@ static inline bool accepted(uint32_t app_id, uint32_t spike) {
     if (filters[pos].all_ones) {
         return true;
     }
-    uint32_t neuron_id = get_core_sum(filters[pos], spike)
-            + get_local_neuron_id(filters[pos], spike);
-    return bit_field_get(bit_field, neuron_id);
+    uint32_t neuron_id = get_filter_core_sum(filters[pos], spike)
+            + get_filter_local_neuron_id(filters[pos], spike);
+    if (bit_field_test(bit_field, neuron_id)) {
+        return true;
+    } else {
+        prov.n_times_filter_stopped_packet += 1;
+        return false;
+    }
 }
 
-static inline uint32_t get_key() {
+static inline uint32_t get_key(void) {
     uint32_t target = next_target;
     next_target = (next_target + 1);
     if (next_target >= config->n_targets) {
@@ -164,15 +177,15 @@ static inline uint32_t get_key() {
 }
 
 static inline void process_spike(void) {
-    uint32_t spike;
-    circular_buffer_pop(input_queue, &spike);
+    uint32_t spike = 0;
+    circular_buffer_get_next(input_queue, &spike);
 
-    // Check against the bitfield
+    // Check against the bit-field
     uint32_t app_id;
     if (!check_app_id(spike, &app_id)) {
         // Not in range, drop
         prov.n_spikes_invalid_app_id += 1;
-        continue;
+        return;
     }
 
     // If accepted, forward to the targets
@@ -183,7 +196,8 @@ static inline void process_spike(void) {
     }
 }
 
-void start_callback(void) {
+void start_callback(UNUSED uint unused0, UNUSED uint unused1) {
+    log_info("Running");
     running = true;
     while (running) {
         // Get the next packet
@@ -200,27 +214,43 @@ void start_callback(void) {
             process_spike();
         }
     }
+    log_info("Exiting Run loop");
 }
 
-void exit_callback(void) {
-    running = false;
+void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
+    time++;
+    log_debug("Time is %u", time);
+    if (time == 0) {
+        spin1_schedule_callback(start_callback, 0, 0, 1);
+    }
+    if (simulation_is_finished()) {
+        simulation_handle_pause_resume(NULL);
+        running = false;
+        simulation_ready_to_read();
+    }
 }
 
-void store_provenance_data(void *prov_region_addr) {
+void store_provenance_data(uint32_t *prov_region_addr) {
     // Copy across the provenance data
     spin1_memcpy(prov_region_addr, &prov, sizeof(filter_provenance_t));
 }
 
 void receive_spike_callback(uint key, uint payload) {
     // Try to put the spike in the input queue
-    prov.n_spikes_received += 1;
-    if (!circular_buffer_push(input_queue, key)) {
-        // Queue overflowed
-        prov.n_times_queue_overflowed += 1;
+    if (payload == 0) {
+        // No payload = 0, which means 1 spike
+        payload = 1;
+    }
+    prov.n_spikes_received += payload;
+    for (uint32_t i = 0; i < payload; i++) {
+        if (!circular_buffer_add(input_queue, key)) {
+            // Queue overflowed
+            prov.n_times_queue_overflowed += 1;
+        }
     }
 }
 
-bool initialise() {
+static bool initialise(void) {
     data_specification_metadata_t *ds = data_specification_get_data_address();
     if (!data_specification_read_header(ds)) {
         log_error("Failed to read data specification header");
@@ -228,17 +258,17 @@ bool initialise() {
     }
 
     // set up the simulation interface
-    uint32_t n_steps;
-    bool run_forever;
-    uint32_t step;
-    if (!simulation_steps_initialise(
+    uint32_t timer_period;
+    if (!simulation_initialise(
             data_specification_get_region(FILTER_REGION_SYSTEM, ds),
-            APPLICATION_NAME_HASH, &n_steps, &run_forever, &step, 0, -2)) {
+            APPLICATION_NAME_HASH, &timer_period, &n_timesteps, &run_forever,
+            &time, 0, -2)) {
         return false;
     }
     simulation_set_provenance_function(
             store_provenance_data,
             data_specification_get_region(FILTER_REGION_PROVENANCE, ds));
+    spin1_set_timer_tick(timer_period);
 
     // Read in the filter configuration
     filter_config_t *sdram_config = data_specification_get_region(
@@ -305,7 +335,7 @@ bool initialise() {
         uint32_t size = get_bit_field_size(
                 filters_sdram[i].n_atoms) * sizeof(uint32_t);
         filters[pos].data = spin1_malloc(size);
-        if (filters[pos] == NULL) {
+        if (filters[pos].data == NULL) {
             log_error("Failed to allocate bit field of %u atoms for app id %u",
                     filters_sdram[i].n_atoms, app_id);
             return false;
@@ -319,13 +349,12 @@ bool initialise() {
 //! \brief The entry point for this model.
 void c_main(void) {
     // initialise the model
-    if (!initialize()) {
+    if (!initialise()) {
         rt_error(RTE_SWERR);
     }
 
-    simulation_set_exit_function(exit_callback);
-    simulation_set_start_function(start_callback);
-    simulation_set_uses_timer(false);
     spin1_callback_on(MC_PACKET_RECEIVED, receive_spike_callback, -1);
+    spin1_callback_on(MCPL_PACKET_RECEIVED, receive_spike_callback, -1);
+    spin1_callback_on(TIMER_TICK, timer_callback, 0);
     simulation_run();
 }

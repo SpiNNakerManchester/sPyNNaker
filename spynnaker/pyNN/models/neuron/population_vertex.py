@@ -661,11 +661,11 @@ class PopulationVertex(
         version = SpynnakerDataView().get_machine_version()
         n_monitors = SpynnakerDataView().get_all_monitor_cores()
 
-        # The maximum number of cores minus 1 for the neuron core, and minus
-        # the number of monitors
+        # The maximum number of cores minus 1 for each of the neuron core,
+        # and the synapse filter core, and minus the number of monitors
         max_n_cores: int = (
             version.max_cores_per_chip -
-            (version.n_scamp_cores + n_monitors + 1))
+            (version.n_scamp_cores + n_monitors + 1 + 1))
 
         # So how many synapses can be processed accounting for timescale?
         synapses_per_core_per_sim_second: float = (
