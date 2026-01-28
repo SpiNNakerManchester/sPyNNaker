@@ -69,8 +69,12 @@ class FilterProvenance(ctypes.LittleEndianStructure):
         ("n_spikes_invalid_app_id", ctypes.c_uint32),
         # The number of times the spike queue overloaded.
         ("n_times_queue_overflowed", ctypes.c_uint32),
-        # The number of times the bitfield filter blocked a spike.
+        # The number of times the bit field filter blocked a spike.
         ("n_times_bitfield_blocked", ctypes.c_uint32),
+        # The number of packets discarded at the end of time steps.
+        ("n_packets_discarded", ctypes.c_uint32),
+        # The maximum number of packets discarded at the end of time steps.
+        ("max_packets_discarded", ctypes.c_uint32),
     ]
 
     N_ITEMS = len(_fields_)
@@ -194,6 +198,14 @@ class PopulationMachineVertexSynapseFilter(
                 x, y, p, "Number_of_times_bitfield_blocked_spikes",
                 filter_prov.n_times_bitfield_blocked)
 
+            db.insert_core(
+                x, y, p, "Number_of_packets_discarded_end_of_timestep",
+                filter_prov.n_packets_discarded)
+
+            db.insert_core(
+                x, y, p, "Max_number_of_packets_discarded_end_of_timestep",
+                filter_prov.max_packets_discarded)
+
             if filter_prov.n_spikes_invalid_app_id > 0:
                 db.insert_report(
                     f"{filter_prov.n_spikes_invalid_app_id} spikes were "
@@ -204,6 +216,13 @@ class PopulationMachineVertexSynapseFilter(
                     "The spike queue overflowed "
                     f"{filter_prov.n_times_queue_overflowed} times on {label}."
                     "  Consider increasing the spike queue size.")
+
+            if filter_prov.n_packets_discarded > 0:
+                db.insert_report(
+                    "At the end of time steps, "
+                    f"{filter_prov.n_packets_discarded} packets were discarded "
+                    f"on {label} (a maximum of "
+                    f"{filter_prov.max_packets_discarded} in one time step). ")
 
     def __lowest_set(self, value: int) -> int:
         """ Return the lowest set bit in value. """

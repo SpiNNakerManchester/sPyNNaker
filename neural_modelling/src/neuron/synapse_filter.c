@@ -70,6 +70,10 @@ typedef struct {
     uint32_t n_times_queue_overflowed;
     //! The number of times the filter stopped a packet from being sent
     uint32_t n_times_filter_stopped_packet;
+    //! The number of packets discarded at the end of time step
+    uint32_t n_packets_discarded_end_of_timestep;
+    //! The maximum number of packets discarded at the end of any time step
+    uint32_t max_packets_discarded_end_of_timestep;
 } filter_provenance_t;
 
 typedef struct {
@@ -176,9 +180,8 @@ static inline uint32_t get_key(void) {
     return config->send_keys[target];
 }
 
-static inline void process_spike(void) {
-    uint32_t spike = 0;
-    circular_buffer_get_next(input_queue, &spike);
+static inline void process_spike(uint32_t spike) {
+
 
     // Check against the bit-field
     uint32_t app_id;
@@ -196,32 +199,33 @@ static inline void process_spike(void) {
     }
 }
 
-void start_callback(UNUSED uint unused0, UNUSED uint unused1) {
-    log_info("Running");
-    running = true;
-    while (running) {
-        // Get the next packet
-        uint32_t cspr = spin1_irq_disable();
-        while (running && circular_buffer_size(input_queue) == 0) {
-            spin1_mode_restore(cspr);
-            wait_for_interrupt();
-            cspr = spin1_irq_disable();
-        }
-        spin1_mode_restore(cspr);
+void user_callback(UNUSED uint unused0, UNUSED uint unused1) {
 
-        // If we are still running, process the spike
-        if (running) {
-            process_spike();
-        }
+    // While there are still spikes, process them
+    uint32_t spike = 0;
+    uint32_t cspr = spin1_int_disable();
+    while (running && circular_buffer_get_next(input_queue, &spike)) {
+        spin1_mode_restore(cspr);
+        process_spike(spike);
+        cspr = spin1_int_disable();
     }
-    log_info("Exiting Run loop");
+    running = false;
+    spin1_mode_restore(cspr);
 }
 
 void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
     time++;
     log_debug("Time is %u", time);
-    if (time == 0) {
-        spin1_schedule_callback(start_callback, 0, 0, 1);
+    uint32_t cspr = spin1_int_disable();
+    // Clear the input queue
+    uint32_t n_dropped = circular_buffer_size(input_queue);
+    circular_buffer_clear(input_queue);
+    spin1_mode_restore(cspr);
+
+    // Update provenance
+    prov.n_packets_discarded_end_of_timestep += n_dropped;
+    if (n_dropped > prov.max_packets_discarded_end_of_timestep) {
+        prov.max_packets_discarded_end_of_timestep = n_dropped;
     }
     if (simulation_is_finished()) {
         simulation_handle_pause_resume(NULL);
@@ -246,6 +250,12 @@ void receive_spike_callback(uint key, uint payload) {
         if (!circular_buffer_add(input_queue, key)) {
             // Queue overflowed
             prov.n_times_queue_overflowed += 1;
+        } else {
+            if (!running) {
+                // Wake up the user callback if not running
+                running = true;
+                spin1_trigger_user_event(0, 0);
+            }
         }
     }
 }
@@ -356,5 +366,6 @@ void c_main(void) {
     spin1_callback_on(MC_PACKET_RECEIVED, receive_spike_callback, -1);
     spin1_callback_on(MCPL_PACKET_RECEIVED, receive_spike_callback, -1);
     spin1_callback_on(TIMER_TICK, timer_callback, 0);
+    spin1_callback_on(USER_EVENT, user_callback, 1);
     simulation_run();
 }
