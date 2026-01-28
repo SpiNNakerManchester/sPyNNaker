@@ -214,8 +214,9 @@ def test_write_data_spec() -> None:
         assert len(connections_4) == len(from_list_list)
         list_weights = [values[2] for values in from_list_list]
         list_delays = [values[3] for values in from_list_list]
-        assert all(list_weights == connections_4["weight"])
-        assert all(list_delays == connections_4["delay"])
+        for i in range(10):
+            assert list_weights[i] == connections_4["weight"][i]
+            assert list_delays[i] == connections_4["delay"][i]
     finally:
         shutil.rmtree(report_folder, ignore_errors=True)
 

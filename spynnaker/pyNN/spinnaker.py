@@ -26,8 +26,7 @@ from typing_extensions import Literal, Never
 
 
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.config_holder import (
-    get_config_bool, get_config_str_or_none)
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -36,7 +35,6 @@ from spinn_front_end_common.interface.config_setup import (
     add_spinnaker_template)
 from spinn_front_end_common.interface.provenance import (
     FecTimer, GlobalProvenance, TimerCategory, TimerWork)
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
@@ -54,6 +52,7 @@ from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_selector)
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 
@@ -395,6 +394,17 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         AbstractSpinnakerBase._do_provenance_reports(self)
         self._report_redundant_packet_count()
 
+    @overrides(AbstractSpinnakerBase._execute_graph_provenance)
+    def _execute_graph_provenance(self) -> None:
+        with FecTimer("Graph provenance", TimerWork.OTHER) as timer:
+            if timer.skip_if_cfg_false("Reports",
+                                       "read_graph_provenance_data"):
+                return
+            for partition in self._data_writer.iterate_partitions():
+                for edge in partition.edges:
+                    if isinstance(edge, ProjectionApplicationEdge):
+                        edge.get_local_provenance_data()
+
     def _report_redundant_packet_count(self) -> None:
         with FecTimer("Redundant packet count report",
                       TimerWork.REPORT) as timer:
@@ -413,20 +423,15 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     def _execute_delay_support_adder(self) -> None:
         """
         Runs, times and logs the DelaySupportAdder if required.
+                # Check for option removed Jan 2026
         """
-        name = get_config_str_or_none("Mapping", "delay_support_adder")
-        if name is None:
-            return
         with FecTimer("DelaySupportAdder", TimerWork.OTHER):
-            if name == "DelaySupportAdder":
-                d_vertices, d_edges = delay_support_adder()
-                for vertex in d_vertices:
-                    self.__writer.add_vertex(vertex)
-                for edge, partition_id in d_edges:
-                    self.__writer.add_edge(edge, partition_id)
-                return
-            raise ConfigurationException(
-                f"Unexpected cfg setting delay_support_adder: {name}")
+            d_vertices, d_edges = delay_support_adder()
+            for vertex in d_vertices:
+                self.__writer.add_vertex(vertex)
+            for edge, partition_id in d_edges:
+                self.__writer.add_edge(edge, partition_id)
+            return
 
     @overrides(AbstractSpinnakerBase.reset)
     def reset(self) -> None:
