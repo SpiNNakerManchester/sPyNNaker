@@ -169,7 +169,8 @@ class SplitterPopulationVertexNeuronsSynapses(
 
         # We add the SDRAM edge SDRAM to the neuron resources so it is
         # accounted for within the placement
-        n_synapse_cores = self.governed_app_vertex.n_synapse_cores_required
+        n_synapse_cores = max(
+            1, self.governed_app_vertex.n_synapse_cores_required - 1)
         n_incoming = n_synapse_cores + len(self.__poisson_sources)
         edge_sdram = PopulationNeuronsMachineVertex.get_n_bytes_for_transfer(
             atoms_per_core, n_synapse_types)
