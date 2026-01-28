@@ -23,6 +23,7 @@
 #include <circular_buffer.h>
 #include <wfi.h>
 #include "population_table/population_table.h"
+#include "send_spike.h"
 
 enum {
 
@@ -195,7 +196,7 @@ static inline void process_spike(uint32_t spike) {
     if (accepted(app_id, spike)) {
         prov.n_spikes_forwarded += 1;
         uint32_t key = get_key();
-        spin1_send_mc_packet(key, spike, WITH_PAYLOAD);
+        send_spike_mc_payload(key, spike);
     }
 }
 
