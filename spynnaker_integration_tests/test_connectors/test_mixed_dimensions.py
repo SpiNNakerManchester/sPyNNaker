@@ -19,12 +19,14 @@ from spinnaker_testbase import BaseTestCase
 
 class SmallWorldConnectorFixedTest(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
 
         sim.setup(timestep=1.0)
-        n_atoms = 6 * 6
+        width = 4
+        height = 6
+        n_atoms = width * height
         # Parameters
-        runtime = n_atoms + 100
+        runtime = n_atoms + 50
 
         # SpikeInjector
         spike_times = list()
@@ -35,9 +37,9 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
             label='inputSpikes')
 
         # Network population
-        grid_structure = sim.Grid2D(dx=2, dy=3, x0=0.0, y0=0.0)
+        grid_structure = sim.Grid2D(aspect_ratio=width/height)
         small_world = sim.Population(
-            6 * 6, sim.IF_curr_exp(), structure=grid_structure,
+            n_atoms, sim.IF_curr_exp(), structure=grid_structure,
             label="small_world")
         small_world.set_max_atoms_per_core((2, 2))
         small_world.record(['spikes'])
