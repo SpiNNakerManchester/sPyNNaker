@@ -73,5 +73,5 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
                 self.assertEqual(after_spikes[0][i].magnitude + n,
                                  after_spikes[n][i].magnitude)
 
-    def test_mixed(self):
+    def test_mixed(self) -> None:
         self.runsafe(self.do_run)
