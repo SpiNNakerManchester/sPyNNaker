@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import importlib
 import logging
 import os
 from typing import Any, Collection, Optional, Type, Union, cast
@@ -26,7 +27,7 @@ from typing_extensions import Literal, Never
 
 
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.config_holder import get_config_bool, get_config_str_list
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -123,6 +124,24 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # Clears all previously added ceiling on the number of neurons per
         # core, the number of synapse cores and allowing of delay extensions
         AbstractPyNNNeuronModel.reset_all()
+        self._add_test_cfg_settings()
+
+    def _add_test_cfg_settings(self) -> None:
+        """
+        Ideally this function will find nothing to do.
+
+        This is designed for switching scripts like PyNNExamples
+        to split mode without the need to change the scripts.
+
+        Better to call set_model_n_synapse_cores in the script
+        """
+        n_synapse_cores = get_config_str_list("Simulation", "n_synapse_cores")
+        for n_synapse_cores in n_synapse_cores:
+            path, name, n = n_synapse_cores.split(":")
+            model_class = getattr(importlib.import_module(path), name)
+            model = model_class()
+            model.set_model_n_synapse_cores(int(n))
+            logger.warning(f"{model=} {n_synapse_cores=} set from cfg")
 
     @overrides(AbstractSpinnakerBase._add_cfg_defaults_and_template)
     def _add_cfg_defaults_and_template(self) -> None:
