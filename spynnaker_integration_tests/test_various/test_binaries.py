@@ -12,11 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 
-from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.populations import Population
 
@@ -75,23 +73,10 @@ class TestBinaries(BaseTestCase):
         populations.append(self.add_neuron_population(
             sim.extra_models.IFCurrDeltaCa2Adaptive(), 15, input_pop))
 
-        #IF_curr_exp_ca2_adaptive_stdp_mad_pair_additive.aplx
-
-        #IF_curr_exp_stdp_mad_recurrent_pre_stochastic_multiplicative.aplx
-        #IZK_cond_exp_dual.aplx
-        #IZK_cond_exp_dual_neuron.aplx
-        #IZK_cond_exp_dual_stdp_mad_pair_additive.aplx
-        #external_device_lif_control_neuron.aplx
-        #synapses_stdp_izhikevich_neuromodulation_pair_additive_structural_last_neuron_distance_weight.aplx
-        #synapses_stdp_izhikevich_neuromodulation_pair_multiplicative.aplx
-        #synapses_stdp_izhikevich_neuromodulation_vogels_2011_additive.aplx
-        #synapses_stdp_mad_nearest_pair_additive.aplx
-        #synapses_stdp_mad_nearest_pair_additive_structural_random_distance_weight.aplx
-        #synapses_stdp_mad_nearest_pair_multiplicative.aplx
-        #synapses_stdp_mad_pair_multiplicative.aplx
-        #synapses_stdp_mad_pfister_triplet_additive.aplx
-        #synapses_stdp_mad_recurrent_dual_fsm_multiplicative.aplx
-        #synapses_stdp_mad_vogels_2011_additive.aplx
+        # IF_curr_exp_ca2_adaptive_stdp_mad_pair_additive.aplx
+        # currently does not spike
+        populations.append(self.add_population_stdp_mad_pair_additive(
+            sim.extra_models.IFCurrExpCa2Adaptive(), input_pop))
 
         sim.run(N_NEURONS + INTERVAL * 3)
 
@@ -99,8 +84,11 @@ class TestBinaries(BaseTestCase):
             self.check_population(population)
         sim.end()
 
-        self.check_binaries_used(["IF_curr_delta_ca2_adaptive.aplx",
-                                  "IF_curr_delta_ca2_adaptive_neuron.aplx"])
+        self.check_binaries_used([
+            "IF_curr_delta_ca2_adaptive.aplx",
+            "IF_curr_delta_ca2_adaptive_neuron.aplx",
+            "IF_curr_exp_ca2_adaptive_stdp_mad_pair_additive.aplx",
+        ])
 
 
     def test_binaries(self) -> None:
