@@ -20,7 +20,7 @@ import unittest
 
 class TestSTDPNearestPairAdditive(BaseTestCase):
 
-    def potentiation_and_depression(self) -> None:
+    def potentiation_and_depression(self, n_synapse_cores: int) -> None:
         p.setup(1)
         runtime = 100
         initial_run = 1000  # to negate any initial conditions
@@ -54,7 +54,8 @@ class TestSTDPNearestPairAdditive(BaseTestCase):
                                  {'spike_times': extra_spikes}, label="extra")
 
         # Post-plastic-synapse population
-        post_pop = p.Population(1, p.IF_curr_exp(),  label="post")
+        post_pop = p.Population(1, p.IF_curr_exp(),  label="post",
+                                n_synapse_cores=n_synapse_cores)
 
         # Create projections
         p.Projection(
@@ -136,8 +137,20 @@ class TestSTDPNearestPairAdditive(BaseTestCase):
         self.assertTrue(numpy.allclose(
                         weights[0], new_weight_exact, atol=0.001))
 
+    def do_synapse(self):
+        self.potentiation_and_depression(1)
+
     def test_potentiation_and_depression(self) -> None:
-        self.runsafe(self.potentiation_and_depression)
+        self.runsafe(self.do_synapse)
+        self.check_binary_used("synapses_stdp_mad_nearest_pair_additive.aplx")
+
+    def do_combined(self):
+        self.potentiation_and_depression(0)
+
+    def test_combined(self) -> None:
+        self.runsafe(self.do_combined)
+        self.check_binary_used(
+            "IF_curr_exp_stdp_mad_nearest_pair_additive.aplx")
 
 
 if __name__ == '__main__':
