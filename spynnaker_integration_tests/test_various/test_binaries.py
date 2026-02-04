@@ -68,22 +68,14 @@ class TestBinaries(BaseTestCase):
         populations = []
 
         # IF_curr_delta_ca2_adaptive.aplx
-        #populations.append(self.add_population(
-        #    sim.extra_models.IFCurrDeltaCa2Adaptive(), 15, input_pop))
+        populations.append(self.add_population(
+            sim.extra_models.IFCurrDeltaCa2Adaptive(), 15, input_pop))
 
         # IF_curr_delta_ca2_adaptive_neuron.aplx
-        #populations.append(self.add_neuron_population(
-        #    sim.extra_models.IFCurrDeltaCa2Adaptive(), 15, input_pop))
+        populations.append(self.add_neuron_population(
+            sim.extra_models.IFCurrDeltaCa2Adaptive(), 15, input_pop))
 
         #IF_curr_exp_ca2_adaptive_stdp_mad_pair_additive.aplx
-
-        #IF_curr_exp_dual_neuron.aplx
-        #populations.append(self.add_neuron_population(
-        #     sim.extra_models.IF_curr_dual_exp(), 5, input_pop))
-
-        #IF_curr_exp_sEMD_neuron.aplx
-        populations.append(self.add_population(
-            sim.extra_models.IF_curr_exp_sEMD(), 15, input_pop))
 
         #IF_curr_exp_stdp_mad_recurrent_pre_stochastic_multiplicative.aplx
         #IZK_cond_exp_dual.aplx
@@ -107,12 +99,8 @@ class TestBinaries(BaseTestCase):
             self.check_population(population)
         sim.end()
 
-        targets = SpynnakerDataView.get_executable_targets()
-        binaries = set()
-        for target in targets.binaries:
-            _, file = os.path.split(target)
-            binaries.add(file)
-        print(binaries)
+        self.check_binaries_used(["IF_curr_delta_ca2_adaptive.aplx",
+                                  "IF_curr_delta_ca2_adaptive_neuron.aplx"])
 
 
     def test_binaries(self) -> None:
