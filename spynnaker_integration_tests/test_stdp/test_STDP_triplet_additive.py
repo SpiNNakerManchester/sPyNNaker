@@ -18,7 +18,7 @@ from spinnaker_testbase import BaseTestCase
 import numpy
 
 
-def triplet_additive() -> None:
+def triplet_additive(n_synapse_cores: int) -> None:
     # -------------------------------------------------------------------
     # This test uses a single data point from the Pfister/Gerstner example
     # which is described and evaluated in more detail in
@@ -52,7 +52,8 @@ def triplet_additive() -> None:
     for t in delta_t:
         # Neuron populations
         pre_pop = sim.Population(1, model(**cell_params))
-        post_pop = sim.Population(1, model(**cell_params))
+        post_pop = sim.Population(1, model(**cell_params),
+                                  n_synapse_cores=n_synapse_cores)
 
         # Stimulating populations
         pre_times = [start_time - 1 + (s * int(1000.0 / float(freq)))
@@ -119,8 +120,20 @@ def triplet_additive() -> None:
 
 class TestSTDPPairAdditive(BaseTestCase):
 
-    def test_triplet_additive(self) -> None:
-        self.runsafe(triplet_additive)
+    def do_synapses(self) -> None:
+        triplet_additive(1)
+
+    def test_synapses(self) -> None:
+        self.runsafe(self.do_synapses)
+        self.check_binary_used("synapses_stdp_mad_pfister_triplet_additive.aplx")
+
+    def do_combined(self) -> None:
+        triplet_additive(0)
+
+    def test_combined(self) -> None:
+        self.runsafe(self.do_combined)
+        self.check_binary_used(
+            "IF_curr_exp_stdp_mad_pfister_triplet_additive.aplx")
 
 
 if __name__ == '__main__':
