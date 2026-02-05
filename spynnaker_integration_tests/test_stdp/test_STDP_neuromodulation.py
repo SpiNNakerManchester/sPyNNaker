@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import math
+from typing import cast, List
 import unittest
 
+import numpy
 import pyNN.spiNNaker as sim
 
 from spinnaker_testbase import BaseTestCase
@@ -147,9 +149,10 @@ class TestSTDPNeuromodulation(BaseTestCase):
         weight_exact = (
             ((el * DA_concentration) * const)*((decay_d * decay_e) - 1))
         print(f"Weight calculated: {weight_exact}")
-        print(f"Weight from SpiNNaker: {weights[0][2]}")
-        #self.assertTrue(numpy.allclose(
-        #                weights[0][2], weight_exact, atol=0.02))
+        weights0 = cast(List[float], weights[0])
+        print(f"Weight from SpiNNaker: {weights0[2]}")
+        self.assertTrue(numpy.allclose(
+                        weights0[2], weight_exact, atol=0.02))
 
         self.check_binary_used(
             "synapses_stdp_izhikevich_neuromodulation_pair_additive.aplx")
