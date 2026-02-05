@@ -19,15 +19,15 @@ import pyNN.spiNNaker as sim
 
 from spinnaker_testbase import BaseTestCase
 
+from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     AbstractWeightDependence)
 
 
 class TestSTDPNeuromodulation(BaseTestCase):
 
-    def neuromodulation(
-            self, weight_dependence: AbstractWeightDependence) -> None:
-
+    def neuromodulation(self, weight_dependence: AbstractWeightDependence
+                        ) -> ConnectionHolder:
         """
         Simple test for neuromodulated STDP.
         Two pre-synaptic spikes are added, at times 1500 and 2400ms.

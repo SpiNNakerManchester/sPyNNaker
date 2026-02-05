@@ -68,7 +68,7 @@ class TestSTDPRandomRun(BaseTestCase):
     def _do_if_curr_exp_ca2_additive(self) -> None:
         self.run_model(sim.extra_models.IFCurrExpCa2Adaptive())
 
-    def test_check_if_curr_exp(self) -> None:
+    def test_check_if_curr_exp_ca2_additive(self) -> None:
         self.runsafe(self._do_if_curr_exp_ca2_additive)
         self.check_binary_used(
             "IF_curr_exp_ca2_adaptive_stdp_mad_pair_additive.aplx")
