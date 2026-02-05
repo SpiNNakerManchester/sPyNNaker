@@ -120,6 +120,7 @@ def live_neuron_voltage() -> None:
     translator_2 = Translator(devices_2)
     model_2 = p.external_devices.ExternalDeviceLifControl(
         devices_2, create_edges, translator_2)
+    model_2.set_model_n_synapse_cores(1)
     conn = p.external_devices.SpynnakerLiveSpikesConnection(
         receive_labels=["stim"], local_port=None)
     conn.add_receive_callback("stim", spike_receiver)
@@ -160,6 +161,8 @@ class TestLiveNeuronVoltage(BaseTestCase):
 
     def test_live_neuron_voltage(self) -> None:
         self.runsafe(live_neuron_voltage)
+        self.check_binaries_used(["external_device_lif_control.aplx",
+                                  "external_device_lif_control_neuron.aplx"])
 
 
 if __name__ == '__main__':

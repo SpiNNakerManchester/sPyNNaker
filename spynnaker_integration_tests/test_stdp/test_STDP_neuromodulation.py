@@ -12,17 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.spiNNaker as sim
-from spinnaker_testbase import BaseTestCase
-import numpy
-import unittest
 import math
+from typing import cast, List
+import unittest
+
+import numpy
+import pyNN.spiNNaker as sim
+
+from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    AbstractWeightDependence)
 
 
 class TestSTDPNeuromodulation(BaseTestCase):
 
-    def neuromodulation(self) -> None:
-
+    def neuromodulation(self, weight_dependence: AbstractWeightDependence
+                        ) -> ConnectionHolder:
         """
         Simple test for neuromodulated STDP.
         Two pre-synaptic spikes are added, at times 1500 and 2400ms.
@@ -97,8 +104,7 @@ class TestSTDPNeuromodulation(BaseTestCase):
             timing_dependence=sim.SpikePairRule(
                 tau_plus=10, tau_minus=12,
                 A_plus=1, A_minus=1),
-            weight_dependence=sim.AdditiveWeightDependence(
-                w_min=0, w_max=20),
+            weight_dependence=weight_dependence,
             weight=rewarded_syn_weight)
 
         # Create a plastic connection between pre and post neurons
@@ -127,6 +133,13 @@ class TestSTDPNeuromodulation(BaseTestCase):
 
         print(spikes)
 
+        return weights
+
+    def do_additive(self) -> None:
+        weight_dependence = sim.AdditiveWeightDependence(w_min=0, w_max=20)
+        weights = self.neuromodulation(weight_dependence)
+
+        DA_concentration = 0.1
         pot = 1 * math.exp(-((1504 - 1500)/10))
         decay = math.exp(-((1601 - 1504)/1000))
         el = pot * decay
@@ -135,15 +148,30 @@ class TestSTDPNeuromodulation(BaseTestCase):
         decay_e = math.exp(-((2400 - 1601)/1000))
         weight_exact = (
             ((el * DA_concentration) * const)*((decay_d * decay_e) - 1))
-
         print(f"Weight calculated: {weight_exact}")
-        print(f"Weight from SpiNNaker: {weights[0][2]}")
-
+        weights0 = cast(List[float], weights[0])
+        print(f"Weight from SpiNNaker: {weights0[2]}")
         self.assertTrue(numpy.allclose(
-                        weights[0][2], weight_exact, atol=0.02))
+                        weights0[2], weight_exact, atol=0.02))
 
-    def test_neuromodulation(self) -> None:
-        self.runsafe(self.neuromodulation)
+        self.check_binary_used(
+            "synapses_stdp_izhikevich_neuromodulation_pair_additive.aplx")
+
+    def test_additive(self) -> None:
+        self.runsafe(self.do_additive)
+
+    def do_multiplicative(self) -> None:
+        weight_dependence = sim.MultiplicativeWeightDependence(
+            w_min=0, w_max=20)
+        self.neuromodulation(weight_dependence)
+
+        # TODO Weights expected
+        self.check_binary_used(
+            "synapses_stdp_izhikevich_neuromodulation_"
+            "pair_multiplicative.aplx")
+
+    def test_multiplicative(self) -> None:
+        self.runsafe(self.do_multiplicative)
 
 
 if __name__ == '__main__':
