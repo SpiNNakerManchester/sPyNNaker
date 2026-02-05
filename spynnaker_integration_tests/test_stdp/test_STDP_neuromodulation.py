@@ -12,16 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.spiNNaker as sim
-from spinnaker_testbase import BaseTestCase
-import numpy
-import unittest
 import math
+import unittest
+
+import pyNN.spiNNaker as sim
+
+from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    AbstractWeightDependence)
 
 
 class TestSTDPNeuromodulation(BaseTestCase):
 
-    def neuromodulation(self, weight_dependence) -> None:
+    def neuromodulation(
+            self, weight_dependence: AbstractWeightDependence) -> None:
 
         """
         Simple test for neuromodulated STDP.
@@ -128,7 +133,7 @@ class TestSTDPNeuromodulation(BaseTestCase):
 
         return weights
 
-    def do_additive(self):
+    def do_additive(self) -> None:
         weight_dependence=sim.AdditiveWeightDependence(w_min=0, w_max=20)
         weights = self.neuromodulation(weight_dependence)
 

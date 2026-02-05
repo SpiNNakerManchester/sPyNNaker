@@ -137,4 +137,4 @@ class TestSTDPPairAdditive(BaseTestCase):
 
 
 if __name__ == '__main__':
-    triplet_additive()
+    triplet_additive(0)

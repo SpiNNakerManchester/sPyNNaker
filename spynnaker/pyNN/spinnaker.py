@@ -136,12 +136,13 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         Better to call set_model_n_synapse_cores in the script
         """
         n_synapse_cores = get_config_str_list("Simulation", "n_synapse_cores")
-        for n_synapse_cores in n_synapse_cores:
-            path, name, n = n_synapse_cores.split(":")
+        for n_synapse_core in n_synapse_cores:
+            path, name, n = n_synapse_core.split(":")
             model_class = getattr(importlib.import_module(path), name)
             model = model_class()
             model.set_model_n_synapse_cores(int(n))
-            logger.warning(f"{model=} {n_synapse_cores=} set from cfg")
+            logger.warning(f"model:{name} n_synapse_core set to {n} "
+                           f"based on cfg")
 
     @overrides(AbstractSpinnakerBase._add_cfg_defaults_and_template)
     def _add_cfg_defaults_and_template(self) -> None:

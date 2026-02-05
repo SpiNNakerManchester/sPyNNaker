@@ -76,7 +76,7 @@ class TestSTDPRandomRun(BaseTestCase):
     def _do_izk_cond_exp_dual(self) -> None:
         self.run_model(sim.extra_models.Izhikevich_cond_dual())
 
-    def test_check_if_curr_exp(self) -> None:
+    def test_check_izk_cond_exp_dual(self) -> None:
         self.runsafe(self._do_izk_cond_exp_dual)
         self.check_binary_used(
             "IZK_cond_exp_dual_stdp_mad_pair_additive.aplx")

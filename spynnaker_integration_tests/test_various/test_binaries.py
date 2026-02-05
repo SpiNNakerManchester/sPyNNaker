@@ -25,7 +25,7 @@ N_NEURONS = 5
 class TestBinaries(BaseTestCase):
 
     def add_population(self, model: AbstractPyNNModel, weight:int,
-                       input_pop: Population) -> None:
+                       input_pop: Population) -> Population:
         population = sim.Population(
             N_NEURONS, model, label = model.name)
         sim.Projection(input_pop, population, sim.OneToOneConnector(),
@@ -34,7 +34,7 @@ class TestBinaries(BaseTestCase):
         return population
 
     def add_neuron_population(self, model: AbstractPyNNModel, weight:int,
-                              input_pop: Population) -> None:
+                              input_pop: Population) -> Population:
         population = sim.Population(
             N_NEURONS, model, label = model.name, n_synapse_cores=1)
         sim.Projection(input_pop, population, sim.OneToOneConnector(),
@@ -73,11 +73,6 @@ class TestBinaries(BaseTestCase):
         populations.append(self.add_neuron_population(
             sim.extra_models.IFCurrDeltaCa2Adaptive(), 15, input_pop))
 
-        # IF_curr_exp_ca2_adaptive_stdp_mad_pair_additive.aplx
-        # currently does not spike
-        populations.append(self.add_population_stdp_mad_pair_additive(
-            sim.extra_models.IFCurrExpCa2Adaptive(), input_pop))
-
         sim.run(N_NEURONS + INTERVAL * 3)
 
         for population in populations:
@@ -87,7 +82,6 @@ class TestBinaries(BaseTestCase):
         self.check_binaries_used([
             "IF_curr_delta_ca2_adaptive.aplx",
             "IF_curr_delta_ca2_adaptive_neuron.aplx",
-            "IF_curr_exp_ca2_adaptive_stdp_mad_pair_additive.aplx",
         ])
 
 

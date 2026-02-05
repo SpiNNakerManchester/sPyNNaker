@@ -137,7 +137,7 @@ class TestSTDPNearestPairAdditive(BaseTestCase):
         self.assertTrue(numpy.allclose(
                         weights[0], new_weight_exact, atol=0.001))
 
-    def do_synapse(self):
+    def do_synapse(self) -> None:
         self.potentiation_and_depression(1)
 
     def test_potentiation_and_depression(self) -> None:
@@ -145,7 +145,7 @@ class TestSTDPNearestPairAdditive(BaseTestCase):
         self.check_binary_used(
             "synapses_stdp_mad_nearest_pair_multiplicative.aplx")
 
-    def do_combined(self):
+    def do_combined(self) -> None:
         self.potentiation_and_depression(0)
 
     def test_combined(self) -> None:

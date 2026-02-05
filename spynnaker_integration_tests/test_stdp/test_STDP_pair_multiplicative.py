@@ -171,7 +171,7 @@ def potentiation_and_depression(n_synapse_cores: int) -> None:
 
 class TestSTDPPairAdditive(BaseTestCase):
 
-    def do_synapse(self):
+    def do_synapse(self) -> None:
         potentiation_and_depression(1)
 
     def test_potentiation_and_depression(self) -> None:
@@ -179,7 +179,7 @@ class TestSTDPPairAdditive(BaseTestCase):
         self.check_binary_used(
             "synapses_stdp_mad_pair_multiplicative.aplx")
 
-    def do_combined(self):
+    def do_combined(self) -> None:
         potentiation_and_depression(0)
 
     def test_combined(self) -> None:
