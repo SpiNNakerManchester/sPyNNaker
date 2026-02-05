@@ -125,7 +125,8 @@ class TestSTDPPairAdditive(BaseTestCase):
 
     def test_synapses(self) -> None:
         self.runsafe(self.do_synapses)
-        self.check_binary_used("synapses_stdp_mad_pfister_triplet_additive.aplx")
+        self.check_binary_used(
+            "synapses_stdp_mad_pfister_triplet_additive.aplx")
 
     def do_combined(self) -> None:
         triplet_additive(0)

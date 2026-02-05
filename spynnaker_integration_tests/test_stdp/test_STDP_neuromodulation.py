@@ -136,7 +136,7 @@ class TestSTDPNeuromodulation(BaseTestCase):
         return weights
 
     def do_additive(self) -> None:
-        weight_dependence=sim.AdditiveWeightDependence(w_min=0, w_max=20)
+        weight_dependence = sim.AdditiveWeightDependence(w_min=0, w_max=20)
         weights = self.neuromodulation(weight_dependence)
 
         DA_concentration = 0.1
@@ -161,14 +161,14 @@ class TestSTDPNeuromodulation(BaseTestCase):
         self.runsafe(self.do_additive)
 
     def do_multiplicative(self) -> None:
-        weight_dependence=sim.MultiplicativeWeightDependence(
+        weight_dependence = sim.MultiplicativeWeightDependence(
             w_min=0, w_max=20)
         self.neuromodulation(weight_dependence)
 
         # TODO Weights expected
-
         self.check_binary_used(
-            "synapses_stdp_izhikevich_neuromodulation_pair_multiplicative.aplx")
+            "synapses_stdp_izhikevich_neuromodulation_"
+            "pair_multiplicative.aplx")
 
     def test_multiplicative(self) -> None:
         self.runsafe(self.do_multiplicative)

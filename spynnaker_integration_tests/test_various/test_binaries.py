@@ -24,25 +24,25 @@ N_NEURONS = 5
 
 class TestBinaries(BaseTestCase):
 
-    def add_population(self, model: AbstractPyNNModel, weight:int,
+    def add_population(self, model: AbstractPyNNModel, weight: int,
                        input_pop: Population) -> Population:
         population = sim.Population(
-            N_NEURONS, model, label = model.name)
+            N_NEURONS, model, label=model.name)
         sim.Projection(input_pop, population, sim.OneToOneConnector(),
                        synapse_type=sim.StaticSynapse(weight=weight, delay=1))
         population.record("spikes")
         return population
 
-    def add_neuron_population(self, model: AbstractPyNNModel, weight:int,
+    def add_neuron_population(self, model: AbstractPyNNModel, weight: int,
                               input_pop: Population) -> Population:
         population = sim.Population(
-            N_NEURONS, model, label = model.name, n_synapse_cores=1)
+            N_NEURONS, model, label=model.name, n_synapse_cores=1)
         sim.Projection(input_pop, population, sim.OneToOneConnector(),
                        synapse_type=sim.StaticSynapse(weight=weight, delay=1))
         population.record("spikes")
         return population
 
-    def check_population(self, population: Population)-> None:
+    def check_population(self, population: Population) -> None:
         neo = population.get_data(variables="spikes")
         spikes_trains = neo.segments[0].spiketrains
         print(population.label, spikes_trains)
@@ -84,7 +84,5 @@ class TestBinaries(BaseTestCase):
             "IF_curr_delta_ca2_adaptive_neuron.aplx",
         ])
 
-
     def test_binaries(self) -> None:
         self.runsafe(self.check_binaries)
-
