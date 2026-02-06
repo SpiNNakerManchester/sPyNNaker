@@ -63,13 +63,13 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
             raise SpynnakerException(
                 "Global set is not supported after a Population has been "
                 "created. Either move it above the creation of all "
-                "Populations or provide {param} during the creation of each "
+                f"Populations or provide {param} during the creation of each "
                 "Population it applies to.")
         if AbstractPyNNModel._model_created:
             raise SpynnakerException(
                 "Global set is not supported after a Model has been "
                 "created. Either move it above the creation of all "
-                "Models or provide {param} during the creation of each "
+                f"Models or provide {param} during the creation of each "
                 "Population it applies to.")
 
     @classmethod
