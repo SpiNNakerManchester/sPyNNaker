@@ -43,7 +43,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     _model_created = False
 
     # Using new as most supers do not call the init
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args: Any, **kwargs: Any) -> "AbstractPyNNModel":
         AbstractPyNNModel._model_created = True
         return super(AbstractPyNNModel, cls).__new__(cls)
 
