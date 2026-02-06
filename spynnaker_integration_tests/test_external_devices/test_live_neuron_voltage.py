@@ -161,5 +161,6 @@ class TestLiveNeuronVoltage(BaseTestCase):
     def test_live_neuron_voltage(self) -> None:
         self.runsafe(live_neuron_voltage)
 
+
 if __name__ == '__main__':
     live_neuron_voltage()
