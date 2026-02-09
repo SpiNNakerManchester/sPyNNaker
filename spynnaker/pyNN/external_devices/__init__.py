@@ -21,7 +21,7 @@ PushBot (https://spinnakermanchester.github.io/docs/push_bot/).
     accuracy to gain performance.
 """
 import os
-from typing import Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 from spinn_utilities.socket_address import SocketAddress
 from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.abstract_models import (
@@ -206,7 +206,8 @@ def EthernetControlPopulation(
         n_neurons: int, model: _CellTypeArg, label: Optional[str] = None,
         local_host: Optional[str] = None, local_port: Optional[int] = None,
         database_notify_port_num: Optional[int] = None,
-        database_ack_port_num: Optional[int] = None) -> Population:
+        database_ack_port_num: Optional[int] = None,
+        **additional_kwargs: Dict[str, Any]) -> Population:
     # pylint: disable=invalid-name
     """
     Create a PyNN population that can be included in a network to
@@ -226,6 +227,8 @@ def EthernetControlPopulation(
     :param database_notify_port_num:
         The optional port to which notifications from the database
         notification protocol are to be sent
+    :param additional_kwargs:
+        A nicer way of allowing additional things to the Population
     :return:
         A pyNN Population which can be used as the target of a Projection.
 
@@ -235,7 +238,8 @@ def EthernetControlPopulation(
     :raises TypeError: If an invalid model class is used.
     """
     # pylint: disable=global-statement
-    population = Population(n_neurons, model, label=label)
+    population = Population(n_neurons, model, label=label,
+                            **additional_kwargs)
     vertex, aec, vertex_label = __vtx(population)
     translator = aec.get_message_translator()
     live_packet_gather_label = "EthernetControlReceiver"
@@ -273,7 +277,8 @@ def EthernetControlPopulation(
 def EthernetSensorPopulation(
         device: AbstractEthernetSensor, local_host: Optional[str] = None,
         database_notify_port_num: Optional[int] = None,
-        database_ack_port_num: Optional[int] = None) -> Population:
+        database_ack_port_num: Optional[int] = None,
+        **additional_kwargs: Dict[str, Any]) -> Population:
     # pylint: disable=invalid-name
     """
     Create a pyNN population which can be included in a network to
@@ -289,6 +294,8 @@ def EthernetSensorPopulation(
     :param database_notify_port_num:
         The optional port to which notifications from the database
         notification protocol are to be sent
+    :param additional_kwargs:
+        A nicer way of allowing additional things to the Population
     :return:
         A pyNN Population which can be used as the source of a Projection.
 
@@ -304,7 +311,8 @@ def EthernetSensorPopulation(
     population = Population(
         device.get_n_neurons(), SpikeInjector(notify=False),
         label=device.get_injector_label(),
-        additional_parameters=injector_params)
+        additional_parameters=injector_params,
+        **additional_kwargs)
     if isinstance(device, AbstractSendMeMulticastCommandsVertex):
         cmd_conn = EthernetCommandConnection(
             device.get_translator(), [device], local_host,
