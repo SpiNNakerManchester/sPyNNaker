@@ -40,6 +40,14 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     _max_atoms_per_core: Dict[type, Optional[Tuple[int, ...]]] = defaultdict(
         lambda: None)
 
+    _model_created = False
+
+    # Using new as most super classes do not call the init
+    def __new__(cls, *args: Any, **kwargs: Any) -> "AbstractPyNNModel":
+        _ = (args, kwargs)
+        AbstractPyNNModel._model_created = True
+        return super(AbstractPyNNModel, cls).__new__(cls)
+
     @classmethod
     def verify_may_set(cls, param: str) -> None:
         """ If a Population has been created, this method will raise an
@@ -51,13 +59,18 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
             in the Population constructor instead.
         """
         SpynnakerDataView.check_user_can_act()
-        if SpynnakerDataView.get_n_populations() == 0:
-            return
-        raise SpynnakerException(
-            "Global set is not supported after a Population has been "
-            "created. Either move it above the creation of all Populations "
-            f"or provide {param} during the creation of each Population it "
-            "applies to.")
+        if SpynnakerDataView.get_n_populations() > 0:
+            raise SpynnakerException(
+                "Global set is not supported after a Population has been "
+                "created. Either move it above the creation of all "
+                f"Populations or provide {param} during the creation of each "
+                "Population it applies to.")
+        if AbstractPyNNModel._model_created:
+            raise SpynnakerException(
+                "Global set is not supported after a Model has been "
+                "created. Either move it above the creation of all "
+                f"Models or provide {param} during the creation of each "
+                "Population it applies to.")
 
     @classmethod
     def set_model_max_atoms_per_dimension_per_core(
@@ -115,6 +128,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         Reset the maximum values for all classes.
         """
         AbstractPyNNModel._max_atoms_per_core.clear()
+        AbstractPyNNModel._model_created = False
 
     @classproperty
     def absolute_max_atoms_per_core(  # pylint: disable=no-self-argument
