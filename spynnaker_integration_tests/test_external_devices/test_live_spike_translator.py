@@ -88,6 +88,8 @@ class TestLiveGatherTranslator(BaseTestCase):
 
     def test_live_spike_receive_translated(self) -> None:
         self.runsafe(self.live_spike_receive_translated)
+        self.check_binary_used("live_packet_gather.aplx")
+
 
 
 if __name__ == '__main__':
