@@ -131,7 +131,7 @@ def live_neuron_voltage() -> None:
         len(devices_1), model_1)
     ext_pop.record(["v"])
     ext_pop_2 = p.external_devices.EthernetControlPopulation(
-        len(devices_2), model_2)
+        len(devices_2), model_2, n_synapse_cores=1)
     ext_pop_2.record(["v"])
     p.Projection(
         stim, ext_pop, p.OneToOneConnector(), p.StaticSynapse(1.0, 1.0))

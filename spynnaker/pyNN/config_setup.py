@@ -22,6 +22,7 @@ from spinn_front_end_common.interface.config_setup import (
     fec_cfg_paths_skipped)
 
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 
 SPYNNAKER_CFG = "spynnaker.cfg"
 
@@ -43,6 +44,7 @@ def unittest_setup() -> None:
     clear_cfg_files(True)
     add_spynnaker_cfg()
     SpynnakerDataWriter.mock()
+    AbstractPyNNNeuronModel.reset_all()
 
 
 def add_spynnaker_cfg() -> None:
