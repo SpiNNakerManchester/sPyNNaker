@@ -160,6 +160,8 @@ class TestLiveNeuronVoltage(BaseTestCase):
 
     def test_live_neuron_voltage(self) -> None:
         self.runsafe(live_neuron_voltage)
+        self.check_binaries_used(["external_device_lif_control.aplx",
+                                  "external_device_lif_control_neuron.aplx"])
 
 
 if __name__ == '__main__':
