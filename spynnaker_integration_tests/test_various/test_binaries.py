@@ -80,6 +80,9 @@ class TestBinaries(BaseTestCase):
         # remove models tested elsewhere!
         populations = []
 
+        populations.append(self.add_population(
+            sim.IF_curr_alpha(), 5, input_pop))
+
         # IF_curr_delta_ca2_adaptive.aplx
         populations.append(self.add_population(
             sim.extra_models.IFCurrDeltaCa2Adaptive(), 15, input_pop))
@@ -95,6 +98,7 @@ class TestBinaries(BaseTestCase):
         sim.end()
 
         self.check_binaries_used([
+            "IF_curr_alpha.aplx",
             "IF_curr_delta_ca2_adaptive.aplx",
             "IF_curr_delta_ca2_adaptive_neuron.aplx",
         ])
