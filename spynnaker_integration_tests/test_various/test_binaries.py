@@ -92,6 +92,12 @@ class TestBinaries(BaseTestCase):
         populations.append(self.add_neuron_population(
             sim.extra_models.IFCurrDeltaCa2Adaptive(), 15, input_pop))
 
+        populations.append(self.add_population(
+            sim.extra_models.Izhikevich_cond_dual(), 5, input_pop))
+
+        populations.append(self.add_neuron_population(
+            sim.extra_models.Izhikevich_cond_dual(), 5, input_pop))
+
         sim.run(N_NEURONS + INTERVAL * 3)
 
         for population in populations:
@@ -101,7 +107,9 @@ class TestBinaries(BaseTestCase):
         self.check_binaries_used([
             "IF_curr_delta_ca2_adaptive.aplx",
             "IF_curr_delta_ca2_adaptive_neuron.aplx",
-            "IZK_cond_exp.aplx"
+            "IZK_cond_exp.aplx",
+            "IZK_cond_exp_dual.aplx",
+            "IZK_cond_exp_dual_neuron.aplx"
         ])
 
     def test_binaries(self) -> None:
