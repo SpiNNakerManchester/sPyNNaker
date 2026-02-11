@@ -59,8 +59,8 @@ class TestBinaries(BaseTestCase):
         spikes_trains = neo.segments[0].spiketrains
         print(population.label, spikes_trains)
         self.assertEqual(len(spikes_trains), N_NEURONS)
-        for spike_trains in spikes_trains:
-            self.assertGreaterEqual(len(spikes_trains), 1)
+        for spike_train in spikes_trains:
+            self.assertGreaterEqual(len(spike_train), 1, population.label)
 
     def check_binaries(self) -> None:
         """
@@ -80,8 +80,9 @@ class TestBinaries(BaseTestCase):
         # remove models tested elsewhere!
         populations = []
 
+        # IZK_cond_exp.aplx
         populations.append(self.add_population(
-            sim.IF_curr_alpha(), 5, input_pop))
+            sim.extra_models.Izhikevich_cond(), 5, input_pop))
 
         # IF_curr_delta_ca2_adaptive.aplx
         populations.append(self.add_population(
@@ -98,9 +99,9 @@ class TestBinaries(BaseTestCase):
         sim.end()
 
         self.check_binaries_used([
-            "IF_curr_alpha.aplx",
             "IF_curr_delta_ca2_adaptive.aplx",
             "IF_curr_delta_ca2_adaptive_neuron.aplx",
+            "IZK_cond_exp.aplx"
         ])
 
     def test_binaries(self) -> None:
