@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.spiNNaker as sim
-from spinnaker_testbase import BaseTestCase
 import numpy
+import pyNN.spiNNaker as sim
+
+from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 
 class TestSTDPRandomRun(BaseTestCase):
@@ -22,11 +24,14 @@ class TestSTDPRandomRun(BaseTestCase):
     # same thing being loaded twice, both with data generated off and on the
     # machine
 
-    def do_run(self) -> None:
+    def run_model(self, model: AbstractPyNNModel) -> None:
+        """
+        Runs the test with the requested model
+        """
         sim.setup(1.0)
         pop = sim.Population(1, sim.IF_curr_exp(i_offset=5.0), label="pop")
         pop.record("spikes")
-        pop_2 = sim.Population(1, sim.IF_curr_exp(), label="pop_2")
+        pop_2 = sim.Population(1, model, label="pop_2")
         proj = sim.Projection(
             pop, pop_2, sim.AllToAllConnector(),
             sim.STDPMechanism(
@@ -53,7 +58,28 @@ class TestSTDPRandomRun(BaseTestCase):
 
         assert numpy.array_equal(weights_1_1, weights_2_1)
         assert numpy.array_equal(weights_1_2, weights_2_2)
+        assert len(spikes_1[0]) > 0
         assert numpy.array_equal(spikes_1, spikes_2)
 
-    def test_do_run(self) -> None:
-        self.runsafe(self.do_run)
+    def _do_if_curr_exp(self) -> None:
+        self.run_model(sim.IF_curr_exp())
+
+    def test_check_if_curr_exp(self) -> None:
+        self.runsafe(self._do_if_curr_exp)
+        self.check_binary_used("IF_curr_exp_stdp_mad_pair_additive.aplx")
+
+    def _do_if_curr_exp_ca2_additive(self) -> None:
+        self.run_model(sim.extra_models.IFCurrExpCa2Adaptive())
+
+    def test_check_if_curr_exp_ca2_additive(self) -> None:
+        self.runsafe(self._do_if_curr_exp_ca2_additive)
+        self.check_binary_used(
+            "IF_curr_exp_ca2_adaptive_stdp_mad_pair_additive.aplx")
+
+    def _do_izk_cond_exp_dual(self) -> None:
+        self.run_model(sim.extra_models.Izhikevich_cond_dual())
+
+    def test_check_izk_cond_exp_dual(self) -> None:
+        self.runsafe(self._do_izk_cond_exp_dual)
+        self.check_binary_used(
+            "IZK_cond_exp_dual_stdp_mad_pair_additive.aplx")
