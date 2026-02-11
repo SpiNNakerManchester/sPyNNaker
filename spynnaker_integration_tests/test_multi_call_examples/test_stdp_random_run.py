@@ -83,3 +83,11 @@ class TestSTDPRandomRun(BaseTestCase):
         self.runsafe(self._do_izk_cond_exp_dual)
         self.check_binary_used(
             "IZK_cond_exp_dual_stdp_mad_pair_additive.aplx")
+
+    def _do_if_curr_alpha(self) -> None:
+        self.run_model(sim.IF_curr_alpha())
+
+    def test_check_izk_cond_exp_dual(self) -> None:
+        self.runsafe(self._do_if_curr_alpha)
+        self.check_binary_used(
+            "IF_curr_alpha_stdp_mad_pair_additive.aplx")
