@@ -75,7 +75,7 @@ class TestSTDPRandomRun(BaseTestCase):
     def _do_synapse(self) -> None:
         self.run_model(sim.IF_curr_exp(), 1)
 
-    def test_check_if_curr_exp(self) -> None:
+    def test_check_synapse(self) -> None:
         self.runsafe(self._do_synapse)
         self.check_binary_used("synapses_stdp_mad_pair_additive.aplx")
 
@@ -98,7 +98,7 @@ class TestSTDPRandomRun(BaseTestCase):
     def _do_if_curr_alpha(self) -> None:
         self.run_model(sim.IF_curr_alpha())
 
-    def test_check_izk_cond_exp_dual(self) -> None:
+    def test_check_if_curr_alpha(self) -> None:
         self.runsafe(self._do_if_curr_alpha)
         self.check_binary_used(
             "IF_curr_alpha_stdp_mad_pair_additive.aplx")
