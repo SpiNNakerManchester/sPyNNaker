@@ -23,7 +23,8 @@ BUILDS = synapse_expander \
          neuron_only \
          synapse_only \
          neuron \
-         local_only_combined
+         local_only_combined \
+         synapse_filter
 
 DIRS = $(BUILDS:%=makefiles/%)
 

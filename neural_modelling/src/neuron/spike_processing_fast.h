@@ -32,6 +32,8 @@ struct sdram_config {
     uint32_t size_in_bytes;
     //! The time of the transfer in us
     uint32_t time_for_transfer_overhead;
+    //! The address of the cirular buffer for spike reception
+    circular_buffer input_buffer;
 };
 
 //! The key and mask being used to send spikes from neurons processed on this

@@ -44,6 +44,15 @@ enum {
 } filter_regions_e;
 
 typedef struct {
+    //! The core running this target
+    uint32_t core_id;
+
+    //! The address of the circular buffer to write to
+    //! (initialised by the target)
+    circular_buffer target;
+} target_core_t;
+
+typedef struct {
     // The mask to extract the application id from the incoming key
     uint32_t app_id_mask;
     // The shift to extract the application id from the incoming key
@@ -56,8 +65,8 @@ typedef struct {
     uint32_t input_queue_size;
     // The number of different targets to send to, round robin
     uint32_t n_targets;
-    // The keys for each of the targets
-    uint32_t send_keys[];
+    // The details of the target
+    target_core_t targets[];
 } filter_config_t;
 
 typedef struct {
@@ -67,6 +76,9 @@ typedef struct {
     uint32_t n_spikes_forwarded;
     //! The number of spikes dropped due to invalid application ID (should be 0)
     uint32_t n_spikes_invalid_app_id;
+    //! The number of spikes dropped because the target queue was full
+    //! (should be 0)
+    uint32_t n_spikes_dropped_target_queue_full;
     //! The number of times the spike input queue was full (these are lost)
     uint32_t n_times_queue_overflowed;
     //! The number of times the filter stopped a packet from being sent
@@ -172,17 +184,19 @@ static inline bool accepted(uint32_t app_id, uint32_t spike) {
     }
 }
 
-static inline uint32_t get_key(void) {
+static inline void push_key(uint32_t key) {
     uint32_t target = next_target;
     next_target = (next_target + 1);
     if (next_target >= config->n_targets) {
         next_target = 0;
     }
-    return config->send_keys[target];
+    circular_buffer target_queue = config->targets[target].target;
+    if (!circular_buffer_add(target_queue, key)) {
+        prov.n_spikes_dropped_target_queue_full += 1;
+    }
 }
 
 static inline void process_spike(uint32_t spike) {
-
 
     // Check against the bit-field
     uint32_t app_id;
@@ -195,17 +209,15 @@ static inline void process_spike(uint32_t spike) {
     // If accepted, forward to the targets
     if (accepted(app_id, spike)) {
         prov.n_spikes_forwarded += 1;
-        uint32_t key = get_key();
-        send_spike_mc_payload(key, spike);
+        push_key(spike);
     }
 }
 
 void user_callback(UNUSED uint unused0, UNUSED uint unused1) {
-
     // While there are still spikes, process them
     uint32_t spike = 0;
     uint32_t cspr = spin1_int_disable();
-    while (running && circular_buffer_get_next(input_queue, &spike)) {
+    while (circular_buffer_get_next(input_queue, &spike)) {
         spin1_mode_restore(cspr);
         process_spike(spike);
         cspr = spin1_int_disable();
@@ -216,6 +228,7 @@ void user_callback(UNUSED uint unused0, UNUSED uint unused1) {
 
 void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
     time++;
+
     log_debug("Time is %u", time);
     uint32_t cspr = spin1_int_disable();
     // Clear the input queue
@@ -237,27 +250,31 @@ void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
 
 void store_provenance_data(uint32_t *prov_region_addr) {
     // Copy across the provenance data
+    prov.n_times_queue_overflowed = circular_buffer_get_n_buffer_overflows(
+            input_queue);
     spin1_memcpy(prov_region_addr, &prov, sizeof(filter_provenance_t));
 }
 
-void receive_spike_callback(uint key, uint payload) {
-    // Try to put the spike in the input queue
-    if (payload == 0) {
-        // No payload = 0, which means 1 spike
-        payload = 1;
+static inline void add_spike(uint32_t key) {
+    if (circular_buffer_add(input_queue, key)) {
+        if (!running) {
+            // Wake up the user callback if not running
+            running = true;
+            spin1_trigger_user_event(0, 0);
+        }
     }
+}
+
+void receive_spike_callback(uint key, UNUSED uint payload) {
+    prov.n_spikes_received += 1;
+    add_spike(key);
+}
+
+void receive_spike_payload_callback(uint key, uint payload) {
+    // Try to put the spike in the input queue
     prov.n_spikes_received += payload;
     for (uint32_t i = 0; i < payload; i++) {
-        if (!circular_buffer_add(input_queue, key)) {
-            // Queue overflowed
-            prov.n_times_queue_overflowed += 1;
-        } else {
-            if (!running) {
-                // Wake up the user callback if not running
-                running = true;
-                spin1_trigger_user_event(0, 0);
-            }
-        }
+        add_spike(key);
     }
 }
 
@@ -285,7 +302,7 @@ static bool initialise(void) {
     filter_config_t *sdram_config = data_specification_get_region(
             FILTER_REGION_CONFIG, ds);
     uint32_t config_size = sizeof(filter_config_t)
-            + sizeof(uint32_t) * sdram_config->n_targets;
+            + sizeof(target_core_t) * sdram_config->n_targets;
     config = spin1_malloc(config_size);
     if (config == NULL) {
         log_error("Failed to allocate %u bytes for filter configuration",
@@ -293,8 +310,14 @@ static bool initialise(void) {
         return false;
     }
     spin1_memcpy(config, sdram_config, config_size);
+    log_info("Targeting %u cores", config->n_targets);
+    for (uint32_t i = 0; i < config->n_targets; i++) {
+        log_info("Target %u: core %u, address 0x%08x", i, config->targets[i].core_id,
+                config->targets[i].target);
+    }
 
     // Set up the input queue
+    log_info("Input queue size: %u", config->input_queue_size);
     input_queue = circular_buffer_initialize(config->input_queue_size);
     if (input_queue == NULL) {
         log_error("Failed to create input queue of size %u",
@@ -365,7 +388,7 @@ void c_main(void) {
     }
 
     spin1_callback_on(MC_PACKET_RECEIVED, receive_spike_callback, -1);
-    spin1_callback_on(MCPL_PACKET_RECEIVED, receive_spike_callback, -1);
+    spin1_callback_on(MCPL_PACKET_RECEIVED, receive_spike_payload_callback, -1);
     spin1_callback_on(TIMER_TICK, timer_callback, 0);
     spin1_callback_on(USER_EVENT, user_callback, 1);
     simulation_run();

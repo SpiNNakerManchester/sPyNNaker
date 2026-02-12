@@ -21,7 +21,8 @@ from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.config_holder import get_config_int
 from pacman.model.resources import AbstractSDRAM
 from pacman.model.graphs.machine import (
-    SDRAMMachineEdge, SourceSegmentedSDRAMMachinePartition)
+    SDRAMMachineEdge, SourceSegmentedSDRAMMachinePartition,
+    DestinationSegmentedSysRAMMachinePartition)
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
@@ -39,8 +40,8 @@ if TYPE_CHECKING:
         PopulationNeuronsMachineVertex)
 
 # Size of SDRAM params = 1 word for address + 1 word for size
-#  + 1 word for time to send
-SDRAM_PARAMS_SIZE = 3 * BYTES_PER_WORD
+#  + 1 word for time to send + 1 word for circular buffer
+SDRAM_PARAMS_SIZE = 4 * BYTES_PER_WORD
 
 # Size of the Key config params = 1 work for key + 1 word for mask
 #  + 1 word for spike mask + 1 word for colour shift
@@ -112,7 +113,8 @@ class PopulationSynapsesMachineVertexCommon(
     __slots__ = (
         "__sdram_partition",
         "__neuron_vertex",
-        "__partition_id")
+        "__partition_id",
+        "__filter_partition")
 
     class REGIONS(IntEnum):
         """
@@ -173,6 +175,8 @@ class PopulationSynapsesMachineVertexCommon(
             SourceSegmentedSDRAMMachinePartition] = None
         self.__neuron_vertex: Optional[PopulationNeuronsMachineVertex] = None
         self.__partition_id: Optional[str] = None
+        self.__filter_partition: Optional[
+            DestinationSegmentedSysRAMMachinePartition] = None
 
     @overrides(SendsSynapticInputsOverSDRAM.set_sdram_partition)
     def set_sdram_partition(
@@ -182,6 +186,14 @@ class PopulationSynapsesMachineVertexCommon(
             raise SynapticConfigurationException(
                 "Trying to set SDRAM partition more than once")
         self.__sdram_partition = sdram_partition
+
+    def set_filter_partition(
+            self, filter_partition:
+                DestinationSegmentedSysRAMMachinePartition) -> None:
+        if self.__filter_partition is not None:
+            raise SynapticConfigurationException(
+                "Trying to set filter partition more than once")
+        self.__filter_partition = filter_partition
 
     def set_neuron_vertex_and_partition_id(
             self, neuron_vertex: PopulationNeuronsMachineVertex,
@@ -219,6 +231,8 @@ class PopulationSynapsesMachineVertexCommon(
         spec.write_value(send_size)
         spec.write_value(get_config_int(
             "Simulation", "transfer_overhead_clocks"))
+        spec.write_value(
+            self.__filter_partition.get_sysram_base_address_for(self))
 
     def _write_key_spec(self, spec: DataSpecificationGenerator) -> None:
         """

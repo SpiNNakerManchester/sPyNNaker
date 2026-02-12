@@ -19,8 +19,11 @@ from typing import Sequence, List
 from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.overrides import overrides
 from spinnman.model.enums import ExecutableType
+from pacman.model.graphs import AbstractSupportsSysRAMEdges
 from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.machine import (
+    MachineVertex, SysRAMMachineEdge,
+    DestinationSegmentedSysRAMMachinePartition)
 from pacman.model.placements import Placement
 from pacman.model.resources import AbstractSDRAM, MultiRegionSDRAM
 from spinn_front_end_common.abstract_models import (
@@ -33,6 +36,7 @@ from spinn_front_end_common.interface.simulation.simulation_utilities import (
 from spinn_front_end_common.utilities.constants import (
     SIMULATION_N_BYTES, BYTES_PER_WORD)
 
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     is_sdram_poisson_source)
@@ -43,6 +47,8 @@ from .population_synapses_machine_vertex_common import (
 
 FILTER_PARTITION_PREFIX = "SynapseFilter_"
 N_BYTES_CONFIG = 6 * BYTES_PER_WORD
+N_BYTES_PER_SYNAPSE_CORE = BYTES_PER_WORD * 2
+CIRCULAR_BUFFER_BASE_SIZE = BYTES_PER_WORD * 4
 
 
 class REGIONS(IntEnum):
@@ -67,6 +73,8 @@ class FilterProvenance(ctypes.LittleEndianStructure):
         ("n_spikes_forwarded", ctypes.c_uint32),
         # The number spikes dropped because of invalid application vertex IDs.
         ("n_spikes_invalid_app_id", ctypes.c_uint32),
+        # The number of spikes dropped because the target spike queue was full
+        ("n_spikes_target_queue_full", ctypes.c_uint32),
         # The number of times the spike queue overloaded.
         ("n_times_queue_overflowed", ctypes.c_uint32),
         # The number of times the bit field filter blocked a spike.
@@ -84,9 +92,11 @@ class PopulationMachineVertexSynapseFilter(
         MachineVertex,
         AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary,
-        ProvidesProvenanceDataFromMachineImpl):
+        ProvidesProvenanceDataFromMachineImpl,
+        AbstractSupportsSysRAMEdges):
 
-    __slots__ = ("__synapse_references", "__synapse_cores")
+    __slots__ = ("__synapse_references", "__synapse_cores",
+                 "__filter_partition")
 
     def __init__(
             self, label: str, app_vertex: PopulationVertex,
@@ -102,6 +112,21 @@ class PopulationMachineVertexSynapseFilter(
         super().__init__(label, app_vertex, vertex_slice)
         self.__synapse_references = synapse_references
         self.__synapse_cores = synapse_cores
+        self.__filter_partition: DestinationSegmentedSysRAMMachinePartition = \
+            None
+
+    def set_filter_partition(
+            self,
+            filter_partition:
+                DestinationSegmentedSysRAMMachinePartition) -> None:
+        """ Set the partition that this filter sends using
+
+        :param filter_partition: The partition that this filter sends using
+        """
+        if self.__filter_partition is not None:
+            raise SynapticConfigurationException(
+                "Trying to set filter partition more than once")
+        self.__filter_partition = filter_partition
 
     @property
     @overrides(MachineVertex.sdram_required)
@@ -110,7 +135,8 @@ class PopulationMachineVertexSynapseFilter(
         sdram.add_cost(REGIONS.SYSTEM, SIMULATION_N_BYTES)
         sdram.add_cost(
             REGIONS.CONFIG,
-            N_BYTES_CONFIG + (len(self.__synapse_cores) * BYTES_PER_WORD))
+            N_BYTES_CONFIG +
+            (len(self.__synapse_cores) * N_BYTES_PER_SYNAPSE_CORE))
         sdram.add_cost(
             REGIONS.PROVENANCE,
             self.get_provenance_data_size(FilterProvenance.N_ITEMS))
@@ -119,8 +145,6 @@ class PopulationMachineVertexSynapseFilter(
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id: str) -> int:
-        if partition_id.startswith(FILTER_PARTITION_PREFIX):
-            return 1
         return 0
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
@@ -191,6 +215,10 @@ class PopulationMachineVertexSynapseFilter(
                 filter_prov.n_spikes_invalid_app_id)
 
             db.insert_core(
+                x, y, p, "Number_of_times_target_spike_queue_full",
+                filter_prov.n_spikes_target_queue_full)
+
+            db.insert_core(
                 x, y, p, "Number_of_times_spike_queue_overflowed",
                 filter_prov.n_times_queue_overflowed)
 
@@ -210,6 +238,12 @@ class PopulationMachineVertexSynapseFilter(
                 db.insert_report(
                     f"{filter_prov.n_spikes_invalid_app_id} spikes were "
                     f"dropped on {label}.  This should not happen!")
+
+            if filter_prov.n_spikes_target_queue_full > 0:
+                db.insert_report(
+                    f"{filter_prov.n_spikes_target_queue_full} spikes were "
+                    f"dropped on {label} because the target spike queue was "
+                    "full.  Consider increasing the spike queue size.")
 
             if filter_prov.n_times_queue_overflowed > 0:
                 db.insert_report(
@@ -231,7 +265,8 @@ class PopulationMachineVertexSynapseFilter(
     def _write_config_region(self, spec):
         spec.reserve_memory_region(
             region=REGIONS.CONFIG,
-            size=N_BYTES_CONFIG + (len(self.__synapse_cores) * BYTES_PER_WORD),
+            size=N_BYTES_CONFIG + (
+                len(self.__synapse_cores) * N_BYTES_PER_SYNAPSE_CORE),
             label='Synapse Filter Config')
         spec.switch_write_focus(REGIONS.CONFIG)
 
@@ -272,6 +307,16 @@ class PopulationMachineVertexSynapseFilter(
         spec.write_value(get_config_int(
             "Simulation", "incoming_spike_buffer_size"))
         spec.write_value(len(self.__synapse_cores))
-        for i, synapse_core in enumerate(self.__synapse_cores):
-            spec.write_value(routing_info.get_first_key_from_pre_vertex(
-                self, FILTER_PARTITION_PREFIX + self.label + "_" + str(i)))
+        for synapse_core in self.__synapse_cores:
+            p = SpynnakerDataView.get_placement_of_vertex(synapse_core).p
+            address = self.__filter_partition.get_sysram_base_address_for(
+                synapse_core)
+            spec.write_value(p)
+            spec.write_value(address)
+
+    @overrides(AbstractSupportsSysRAMEdges.sysram_requirement)
+    def sysram_requirement(
+            self, sysram_machine_edge: SysRAMMachineEdge) -> int:
+        buffer_size = get_config_int(
+            "Simulation", "incoming_spike_buffer_size")
+        return CIRCULAR_BUFFER_BASE_SIZE + (buffer_size * BYTES_PER_WORD)

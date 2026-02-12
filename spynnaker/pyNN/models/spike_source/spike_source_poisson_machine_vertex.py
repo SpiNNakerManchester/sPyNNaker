@@ -151,7 +151,7 @@ PARAMS_BASE_WORDS = 15
 # uint32_t n_rates; uint32_t index
 PARAMS_WORDS_PER_NEURON = 2
 
-# unsigned long accum rate, start, duration
+# unsigned uint64_t rate, start, duration
 PARAMS_WORDS_PER_RATE = 6
 
 # uint32_t count; one per neuron in worst case (= every neuron different)

@@ -572,28 +572,6 @@ static inline void check_times(void) {
     }
 }
 
-//! \brief Called when a multicast packet is received
-//! \param[in] key: The key of the packet. The spike.
-//! \param payload: the payload of the packet. The count.
-void multicast_packet_received_callback(uint key, UNUSED uint unused) {
-    log_debug("Received spike %x", key);
-    p_per_ts_struct.packets_this_time_step++;
-    in_spikes_add_spike(key);
-    check_times();
-}
-
-//! \brief Called when a multicast packet is received
-//! \param[in] key: The key of the packet. The spike.
-//! \param payload: the payload of the packet. The count.
-void multicast_packet_pl_received_callback(uint key, uint payload) {
-    log_debug("Received input %x with spike %d", key, payload);
-    p_per_ts_struct.packets_this_time_step++;
-
-    // In this case we add the payload as the key, as it came from a filter
-    in_spikes_add_spike(payload);
-    check_times();
-}
-
 bool spike_processing_fast_initialise(
         uint32_t row_max_n_words, uint32_t spike_buffer_size,
         bool discard_late_packets, uint32_t pkts_per_ts_rec_region,
@@ -614,7 +592,8 @@ bool spike_processing_fast_initialise(
     next_buffer_to_process = 0;
 
     // Allocate incoming spike buffer
-    if (!in_spikes_initialize_spike_buffer(spike_buffer_size)) {
+    if (!in_spikes_preallocate_spike_buffer(sdram_inputs_param.input_buffer,
+            spike_buffer_size)) {
         return false;
     }
 
@@ -625,11 +604,7 @@ bool spike_processing_fast_initialise(
     key_config = key_config_param;
     ring_buffers = ring_buffers_param;
 
-    // Configure for multicast reception
-    spin1_callback_on(MC_PACKET_RECEIVED, multicast_packet_received_callback,
-            multicast_priority);
-    spin1_callback_on(MCPL_PACKET_RECEIVED, multicast_packet_pl_received_callback,
-            multicast_priority);
+    // TODO: We could get a signal for a new spike here...
 
     // Wipe the inputs using word writes
     for (uint32_t i = 0; i < (sdram_inputs.size_in_bytes >> 2); i++) {

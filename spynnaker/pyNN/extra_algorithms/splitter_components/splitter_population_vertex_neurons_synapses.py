@@ -28,7 +28,8 @@ from pacman.model.graphs import AbstractEdgePartition, AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import (
     MachineEdge, SourceSegmentedSDRAMMachinePartition, SDRAMMachineEdge,
-    MulticastEdgePartition, MachineVertex)
+    MulticastEdgePartition, MachineVertex,
+    SysRAMMachineEdge, DestinationSegmentedSysRAMMachinePartition)
 from pacman.model.graphs.common import Slice
 from pacman.utilities.utility_objs import ChipCounter
 
@@ -94,8 +95,6 @@ class SplitterPopulationVertexNeuronsSynapses(
         "__synapse_vertices",
         # All the synapse filter cores
         "__filter_vertices",
-        # The synapse filter cores by partition id
-        "__filter_vertices_by_partition",
         # Any application Poisson sources that are handled here
         "__poisson_sources",
         # The next synapse core to use for an incoming machine edge
@@ -106,6 +105,8 @@ class SplitterPopulationVertexNeuronsSynapses(
         "__multicast_partitions",
         # The internal SDRAM partitions
         "__sdram_partitions",
+        # The system RAM partitions
+        "__sysram_partitions",
         # The same chip groups
         "__same_chip_groups",
         # The application vertex sources that are neuromodulators
@@ -120,9 +121,9 @@ class SplitterPopulationVertexNeuronsSynapses(
             PopulationSynapsesMachineVertexCommon] = []
         self.__filter_vertices: List[
             PopulationMachineVertexSynapseFilter] = []
-        self.__filter_vertices_by_partition: Dict[
-            str, PopulationMachineVertexSynapseFilter] = dict()
         self.__multicast_partitions: List[MulticastEdgePartition] = []
+        self.__sysram_partitions: List[
+            DestinationSegmentedSysRAMMachinePartition] = []
         self.__sdram_partitions: List[
             SourceSegmentedSDRAMMachinePartition] = []
         self.__same_chip_groups: List[Tuple[
@@ -169,8 +170,7 @@ class SplitterPopulationVertexNeuronsSynapses(
 
         # We add the SDRAM edge SDRAM to the neuron resources so it is
         # accounted for within the placement
-        n_synapse_cores = max(
-            1, self.governed_app_vertex.n_synapse_cores_required - 1)
+        n_synapse_cores = self.governed_app_vertex.n_synapse_cores_required
         n_incoming = n_synapse_cores + len(self.__poisson_sources)
         edge_sdram = PopulationNeuronsMachineVertex.get_n_bytes_for_transfer(
             atoms_per_core, n_synapse_types)
@@ -248,16 +248,17 @@ class SplitterPopulationVertexNeuronsSynapses(
             self.governed_app_vertex.remember_machine_vertex(filter_vertex)
             self.__filter_vertices.append(filter_vertex)
             sdram += filter_vertex.sdram_required
-            for s_idx, syn_vertex in enumerate(syn_vertices):
-                part_id = (
-                    FILTER_PARTITION_PREFIX + filter_vertex.label + "_" +
-                    str(s_idx))
-                filter_partition = MulticastEdgePartition(
-                    filter_vertex, part_id)
-                self.__filter_vertices_by_partition[part_id] = filter_vertex
-                filter_edge = MachineEdge(filter_vertex, syn_vertex)
+            filter_part_id = FILTER_PARTITION_PREFIX + filter_vertex.label
+            filter_partition = DestinationSegmentedSysRAMMachinePartition(
+                filter_part_id, filter_vertex)
+            self.__sysram_partitions.append(filter_partition)
+            filter_vertex.set_filter_partition(filter_partition)
+            for syn_vertex in syn_vertices:
+                filter_edge = SysRAMMachineEdge(
+                    filter_vertex, syn_vertex,
+                    f"{label}_Filter->{syn_vertex.label}")
                 filter_partition.add_edge(filter_edge)
-                self.__multicast_partitions.append(filter_partition)
+                syn_vertex.set_filter_partition(filter_partition)
 
             # Add the cores (neuron, synapse, filter) to the same chip
             n_cores = n_incoming + 1 + 1
@@ -519,8 +520,6 @@ class SplitterPopulationVertexNeuronsSynapses(
             PopulationNeuronsMachineVertex]:
         if partition_id == SPIKE_PARTITION_ID:
             return self.__neuron_vertices
-        elif partition_id.startswith(FILTER_PARTITION_PREFIX):
-            return [self.__filter_vertices_by_partition[partition_id]]
         return []
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
@@ -583,7 +582,6 @@ class SplitterPopulationVertexNeuronsSynapses(
         self.__neuron_vertices = []
         self.__synapse_vertices = []
         self.__filter_vertices = []
-        self.__filter_vertices_by_partition = dict()
         self.__multicast_partitions = []
         self.__sdram_partitions = []
         self.__same_chip_groups = []
@@ -727,3 +725,8 @@ class SplitterPopulationVertexNeuronsSynapses(
     def get_internal_sdram_partitions(
             self) -> List[SourceSegmentedSDRAMMachinePartition]:
         return self.__sdram_partitions
+
+    @overrides(AbstractSplitterCommon.get_internal_sysram_partitions)
+    def get_internal_sysram_partitions(
+            self)->List[DestinationSegmentedSysRAMMachinePartition]:
+        return self.__sysram_partitions

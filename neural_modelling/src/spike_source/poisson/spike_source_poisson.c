@@ -44,7 +44,8 @@
 
 // ----------------------------------------------------------------------
 
-#define END_OF_TIME 0xFFFFFFFF
+#define END_OF_TIME_LONG 0xFFFFFFFFFFFFFFFFL
+#define END_OF_TIME_SHORT 0xFFFFFFFF
 
 //! data structure for Poisson sources
 typedef struct spike_source_t {
@@ -151,9 +152,14 @@ struct poisson_extension_provenance {
 
 __attribute__((aligned(4)))
 typedef struct source_details {
-    unsigned long accum rate;
-    unsigned long accum start;
-    unsigned long accum duration;
+    // The rate - really an unsigned 32.32 accum
+    uint64_t rate;
+
+    // The start time - really an unsigned 32.32 accum
+    uint64_t start;
+
+    // The duration - really an unsigned 32.32 accum
+    uint64_t duration;
 } source_details;
 
 //! The keys to send spikes with
@@ -365,19 +371,24 @@ static inline uint32_t faster_spike_source_get_num_spikes(
 //! \param[in] id: the ID of the source to be updated
 //! \param[in] rate:
 //!     the rate in Hz, to be multiplied to get per-tick values
-void set_spike_source_rate(uint32_t sub_id, UREAL rate) {
+void set_spike_source_rate(uint32_t sub_id, uint64_t rate) {
 
-    UREAL rate_per_tick = ukbits(
-            (__U64(bitsuk(rate)) * __U64(bitsulr(ssp_params.seconds_per_tick))) >> 32);
-    log_debug("Setting rate of %u to %KHz (%K per tick)",
-            sub_id, rate, rate_per_tick);
+    // We want a 16.16 number from a 32.32 x 0.32 numbers.  We don't care
+    // so much about the bottom 16 bits of rate, so first shift each right by
+    // 16 to get a 32.16 x 0.32, then multiply to get a 48.32, then right shift
+    // 32 again and lose the top 32 bits to get a 16.16.
+    UREAL rate_per_tick = ukbits((uint32_t)
+            (((rate >> 16) * __U64(bitsulr(ssp_params.seconds_per_tick)))
+             >> 32));
+    log_debug("Setting rate of %u to %u.%uHz (%K per tick)",
+            sub_id, (uint32_t) (rate >> 32), (uint32_t) rate, rate_per_tick);
     spike_source_t *spike_source = &source[sub_id];
 
-    if (rate_per_tick >= ssp_params.slow_rate_per_tick_cutoff) {
+    if (ukbits(rate_per_tick) >= ukbits(ssp_params.slow_rate_per_tick_cutoff)) {
         spike_source->is_fast_source = 1;
         spike_source->mean_isi_ticks = 0;
         spike_source->time_to_spike_ticks = 0;
-        if (rate_per_tick >= ssp_params.fast_rate_per_tick_cutoff) {
+        if (ukbits(rate_per_tick) >= ukbits(ssp_params.fast_rate_per_tick_cutoff)) {
             spike_source->sqrt_lambda = SQRTU(rate_per_tick);
             spike_source->exp_minus_lambda = UFRACT_CONST(0);
             log_debug("    fast, sqrt_lambda=%K", spike_source->sqrt_lambda);
@@ -387,9 +398,12 @@ void set_spike_source_rate(uint32_t sub_id, UREAL rate) {
             log_debug("    fast, exp_minus_lambda=%K", (UREAL) spike_source->exp_minus_lambda);
         }
     } else {
-        if (rate > 0.0K) {
+        if (rate > 0L) {
+            // Divide 16.16 by 32.32 and get a 32.0 number.  Note that in this
+            // case we expect a "slow" rate, so we can just shift the 32.32
+            // into a 16.16 by dropping the bottom 16 bits.
             spike_source->mean_isi_ticks =
-                (uint32_t) ((bitsuk(ts_per_second)) / bitsuk(rate));
+                (uint32_t) ((bitsuk(ts_per_second)) / ((uint32_t) (rate >> 16)));
             log_debug("    slow, isi ticks = %u", spike_source->mean_isi_ticks);
         } else {
             spike_source->mean_isi_ticks = 0;
@@ -417,8 +431,13 @@ static void store_provenance_data(address_t provenance_region) {
     log_debug("finished other provenance data");
 }
 
-static inline uint32_t ms_to_ticks(unsigned long accum ms) {
-    return (uint32_t) ((ms * ssp_params.ticks_per_ms) + 0.5k);
+static inline uint32_t ms_to_ticks(uint64_t ms) {
+
+    // Multiply together a 32.32 x 0.32 and return a 32.0 number, so
+    // we shift both right by 16 to get 32.16 x 0.16 = 32.32, then shift
+    // right by 32 to drop the fractional bits.
+    return (uint32_t) (((ms >> 16)
+            * __U64(bitsulr(ssp_params.ticks_per_ms) >> 16)) >> 32);
 }
 
 static inline void set_spike_source_details(uint32_t id, bool rate_changed) {
@@ -426,15 +445,17 @@ static inline void set_spike_source_details(uint32_t id, bool rate_changed) {
     log_debug("Source %u is at index %u", id, index);
     source_details details = source_data[id]->details[index];
     if (rate_changed) {
-        log_debug("Setting rate of %u to %k at %u", id, (s1615) details.rate, time);
+        log_debug("Setting rate of %u to %u.%u at %u", id,
+                (uint32_t) (details.rate >> 32), (uint32_t) details.rate, time);
         set_spike_source_rate(id, details.rate);
     }
+
     spike_source_t *p = &(source[id]);
     p->start_ticks = ms_to_ticks(details.start);
     log_debug("Start of %u is %u", id, p->start_ticks);
-    if (details.duration == END_OF_TIME) {
+    if (details.duration == 0) {
         log_debug("Duration of %u is forever", id);
-        p->end_ticks = END_OF_TIME;
+        p->end_ticks = END_OF_TIME_SHORT;
     } else {
         uint32_t duration_ticks = ms_to_ticks(details.duration);
         p->end_ticks = p->start_ticks + duration_ticks;
@@ -442,9 +463,9 @@ static inline void set_spike_source_details(uint32_t id, bool rate_changed) {
     }
     if ((index + 1) >= source_data[id]->n_rates) {
         log_debug("Next of %u never happens", id);
-        p->next_ticks = END_OF_TIME;
+        p->next_ticks = END_OF_TIME_SHORT;
     } else {
-        accum next_start = source_data[id]->details[index + 1].start;
+        uint64_t next_start = source_data[id]->details[index + 1].start;
         p->next_ticks = ms_to_ticks(next_start);
         log_debug("Next of %u at %u", id, p->next_ticks);
     }
@@ -518,7 +539,8 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
 
     log_info("\tspike sources = %u, starting at %u",
             ssp_params.n_spike_sources, ssp_params.first_source_id);
-    log_info("seconds_per_tick = %K", (UREAL) ssp_params.seconds_per_tick);
+    log_info("seconds_per_tick = %K = %u = %K", (UREAL) ssp_params.seconds_per_tick,
+            ssp_params.seconds_per_tick, (UREAL) (ulrbits(bitsulr(ssp_params.seconds_per_tick) >> 16)) << 16);
     log_info("ticks_per_ms = %K\n", ssp_params.ticks_per_ms);
     log_info("ts_per_second = %K", ts_per_second);
     log_info("slow_rate_per_tick_cutoff = %K",
@@ -599,9 +621,9 @@ static bool read_rates(source_info *sdram_sources, bool rate_changed, uint32_t n
 
 static bool expand_rates(source_expand_region *items, source_info *sdram_sources) {
 
-	if (!items->rate_changed) {
-		return false;
-	}
+    if (!items->rate_changed) {
+        return false;
+    }
 
     // We need a pointer here as each item is dynamically sized.  This pointer
     // will be updated each time with the start of the next item to be read
@@ -777,10 +799,10 @@ static bool initialize(void) {
 
     // Allocate buffer to allow rate change (2 ints) per source
     rate_change_buffer = circular_buffer_initialize(
-    		(ssp_params.n_spike_sources * 2) + 1);
+            (ssp_params.n_spike_sources * 2) + 1);
     if (rate_change_buffer == NULL) {
-    	log_error("Could not allocate rate change buffer!");
-    	return false;
+        log_error("Could not allocate rate change buffer!");
+        return false;
     }
 
     log_info("Initialise: completed successfully");
@@ -798,12 +820,12 @@ static void resume_callback(void) {
     // If we are resetting, re-read the seed
     bool rates_changed = false;
     if (time == UINT32_MAX) {
-    	if (!read_global_parameters(data_specification_get_region(
-    			POISSON_PARAMS, ds_regions))) {
-    		log_error("failed to reread the Poisson params");
-    		rt_error(RTE_SWERR);
-    	}
-    	rates_changed = true;
+        if (!read_global_parameters(data_specification_get_region(
+                POISSON_PARAMS, ds_regions))) {
+            log_error("failed to reread the Poisson params");
+            rt_error(RTE_SWERR);
+        }
+        rates_changed = true;
     }
 
     void *rates_region = data_specification_get_region(RATES, ds_regions);
@@ -853,14 +875,14 @@ static inline void record_spikes(uint32_t time) {
 }
 
 static inline void add_sdram_spikes(uint32_t s_id, uint32_t num_spikes) {
-	uint32_t accumulation = input_this_timestep[sdram_inputs->offset + s_id] +
-			(sdram_inputs->weights[s_id] * num_spikes);
-	uint32_t sat_test = accumulation & 0xFFFF0000;
-	if (sat_test) {
-		accumulation = 0xFFFF;
-		n_saturations++;
-	}
-	input_this_timestep[sdram_inputs->offset + s_id] = (uint16_t) accumulation;
+    uint32_t accumulation = input_this_timestep[sdram_inputs->offset + s_id] +
+            (sdram_inputs->weights[s_id] * num_spikes);
+    uint32_t sat_test = accumulation & 0xFFFF0000;
+    if (sat_test) {
+        accumulation = 0xFFFF;
+        n_saturations++;
+    }
+    input_this_timestep[sdram_inputs->offset + s_id] = (uint16_t) accumulation;
 }
 
 //! \brief Handle a fast spike source
@@ -901,9 +923,11 @@ static void process_fast_source(index_t s_id, spike_source_t *source) {
             if (ssp_params.has_key) {
                 // Send spikes
                 const uint32_t spike_key = keys[s_id] | colour;
-                send_spike_mc_payload(spike_key, num_spikes);
+                for (uint32_t n = 0; n < num_spikes; n++) {
+                    send_spike_mc(spike_key);
+                }
             } else if (sdram_inputs->address != 0) {
-            	add_sdram_spikes(s_id, num_spikes);
+                add_sdram_spikes(s_id, num_spikes);
             }
         }
     }
@@ -988,11 +1012,13 @@ static void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
 
     // Do any rate changes
     while (circular_buffer_size(rate_change_buffer) >= 2) {
-    	uint32_t id = 0;
-    	UREAL rate = 0.0k;
-    	circular_buffer_get_next(rate_change_buffer, &id);
-    	circular_buffer_get_next(rate_change_buffer, (uint32_t *) &rate);
-        set_spike_source_rate(id, rate);
+        uint32_t id = 0;
+        uint32_t rate = 0;
+        circular_buffer_get_next(rate_change_buffer, &id);
+        circular_buffer_get_next(rate_change_buffer, &rate);
+        // The rate is a U24.8 value in Hz, but the set function wants
+        // a U32.32 value, so we need to shift left by 24 bits
+        set_spike_source_rate(id, (uint64_t) rate << 24);
     }
 
     // Reset the inputs this timestep if using them

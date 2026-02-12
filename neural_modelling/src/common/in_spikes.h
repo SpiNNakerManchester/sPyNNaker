@@ -53,6 +53,18 @@ static inline bool in_spikes_initialize_spike_buffer(uint32_t size) {
     return buffer != 0;
 }
 
+//! \brief re-uses preallocated memory for the spike buffer
+//! \param[in] buffer_space: The memory to use for the buffer;
+//!     this should be a pointer to a block of memory large enough to hold the
+//!     buffer (which will be sizeof(_circular_buffer) + size * sizeof(uint32_t)
+//! \param[in] size: The number of spikes we expect to handle in the buffer;
+//!     this will be a power of 2.
+static inline bool in_spikes_preallocate_spike_buffer(
+        circular_buffer buffer_space, uint32_t size) {
+    buffer = buffer_space;
+    return circular_buffer_prealloc(buffer, size);
+}
+
 //! \brief Adds a spike to the input spike buffer.
 //! \param[in] spike: The spike to add
 //! \return True if the spike was added

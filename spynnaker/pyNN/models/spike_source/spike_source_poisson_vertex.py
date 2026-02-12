@@ -77,7 +77,7 @@ OVERFLOW_TIMESTEPS_FOR_SDRAM = 5
 _MAX_OFFSET_DENOMINATOR = 10
 
 # Indicates a duration that never ends
-DURATION_FOREVER = 0xFFFFFFFF
+DURATION_FOREVER = 0
 
 
 def _is_list_of_lists(value: Any) -> TypeGuard[
