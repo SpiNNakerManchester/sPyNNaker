@@ -131,5 +131,6 @@ class TestStructuralWithSTDP(BaseTestCase):
             "synapses_stdp_mad_pair_additive_structural_last_neuron_distance_weight.aplx",  # noqa: E501
             "synapses_stdp_mad_pair_additive_structural_random_distance_weight.aplx"])  # noqa: E501
 
+
 if __name__ == "__main__":
     structural_with_stdp()

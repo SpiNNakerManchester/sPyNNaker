@@ -89,7 +89,7 @@ class TestStructuralShared(BaseTestCase):
         self.runsafe(structural_shared)
         self.check_binaries_used(
             ["synapses_stdp_mad_pair_additive_structural_last_neuron_distance_weight.aplx",  # noqa: E501
-            "synapses_structural_last_neuron_distance_weight.aplx"])
+             "synapses_structural_last_neuron_distance_weight.aplx"])
 
 
 if __name__ == "__main__":

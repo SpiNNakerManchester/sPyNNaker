@@ -91,6 +91,5 @@ class TestLiveGatherTranslator(BaseTestCase):
         self.check_binary_used("live_packet_gather.aplx")
 
 
-
 if __name__ == '__main__':
     unittest.main()

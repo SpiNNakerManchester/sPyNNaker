@@ -96,4 +96,4 @@ class TestStructuralWithoutSTDP(BaseTestCase):
         self.runsafe(split_structural_without_stdp)
         self.check_binaries_used(
             ["synapses_structural_last_neuron_distance_weight.aplx",
-            "synapses_structural_random_distance_weight.aplx"])
+             "synapses_structural_random_distance_weight.aplx"])

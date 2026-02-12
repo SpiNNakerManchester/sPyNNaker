@@ -130,4 +130,4 @@ class TestStructuralWithSTDP(BaseTestCase):
 
         self.check_binaries_used(
             ["synapses_stdp_mad_pair_additive_structural_last_neuron_distance_weight.aplx",  # noqa: E501
-            "synapses_stdp_mad_pair_additive_structural_random_distance_weight.aplx"])   # noqa: E501
+             "synapses_stdp_mad_pair_additive_structural_random_distance_weight.aplx"])   # noqa: E501
