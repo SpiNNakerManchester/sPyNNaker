@@ -91,3 +91,19 @@ class TestSTDPRandomRun(BaseTestCase):
         self.runsafe(self._do_if_curr_alpha)
         self.check_binary_used(
             "IF_curr_alpha_stdp_mad_pair_additive.aplx")
+
+    def _do_izk_cond_exp(self) -> None:
+        self.run_model(sim.extra_models.Izhikevich_cond())
+
+    def test_check_izk_cond_exp(self) -> None:
+        self.runsafe(self._do_izk_cond_exp)
+        self.check_binary_used(
+            "IZK_cond_exp_stdp_mad_pair_additive.aplx")
+
+    def _do_izk_curr_exp(self) -> None:
+        self.run_model(sim.Izhikevich())
+
+    def test_check_izk_curr_exp(self) -> None:
+        self.runsafe(self._do_izk_curr_exp)
+        self.check_binary_used(
+            "IZK_curr_exp_stdp_mad_pair_additive.aplx")
