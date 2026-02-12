@@ -213,25 +213,25 @@ static inline void process_spike(uint32_t spike) {
     }
 }
 
-void user_callback(UNUSED uint unused0, UNUSED uint unused1) {
-    // While there are still spikes, process them
-    uint32_t spike = 0;
+//! \brief Prepare the start of a time step
+//! \return Whether we should proceed or not
+static inline bool prepare_timestep(void) {
     uint32_t cspr = spin1_int_disable();
-    while (circular_buffer_get_next(input_queue, &spike)) {
-        spin1_mode_restore(cspr);
-        process_spike(spike);
-        cspr = spin1_int_disable();
+
+    // Start timer2 to tell us when to stop
+    uint32_t timer = tc[T1_COUNT];
+    if (timer < 100) {
+        return false;
     }
-    running = false;
-    spin1_mode_restore(cspr);
-}
+    uint32_t time_until_stop = timer - 100;
+    tc[T2_CONTROL] = 0;
+    tc[T2_LOAD] = time_until_stop;
+    tc[T2_CONTROL] = 0xe3;
 
-void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
-    time++;
+    log_debug("Start of time step %d, timer = %d, loading with %d",
+            time, timer, time_until_stop);
 
-    log_debug("Time is %u", time);
-    uint32_t cspr = spin1_int_disable();
-    // Clear the input queue
+    // Clear the buffer if needed
     uint32_t n_dropped = circular_buffer_size(input_queue);
     circular_buffer_clear(input_queue);
     spin1_mode_restore(cspr);
@@ -241,11 +241,50 @@ void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
     if (n_dropped > prov.max_packets_discarded_end_of_timestep) {
         prov.max_packets_discarded_end_of_timestep = n_dropped;
     }
+
+    return true;
+}
+
+//! \brief Determine if this is the end of the time step
+//! \return True if end of time step
+static inline bool is_end_of_time_step(void) {
+    return tc[T2_COUNT] == 0;
+}
+
+//! \brief Clear end of time step so it can be detected again
+static inline void clear_end_of_time_step(void) {
+    tc[T2_INT_CLR] = 1;
+}
+
+static inline void run_timestep(void) {
+    while (true) {
+        uint32_t spike = 0;
+        while (!is_end_of_time_step() &&
+                !circular_buffer_get_next(input_queue, &spike)) {
+            // Do nothing (could WFI, but T2 doesn't interrupt)!
+        }
+        if (is_end_of_time_step()) {
+            clear_end_of_time_step();
+            break;
+        }
+        process_spike(spike);
+    }
+}
+
+void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
+    time++;
+
     if (simulation_is_finished()) {
         simulation_handle_pause_resume(NULL);
         running = false;
         simulation_ready_to_read();
     }
+
+    if (!prepare_timestep()) {
+        return;
+    }
+
+    run_timestep();
 }
 
 void store_provenance_data(uint32_t *prov_region_addr) {
@@ -390,6 +429,5 @@ void c_main(void) {
     spin1_callback_on(MC_PACKET_RECEIVED, receive_spike_callback, -1);
     spin1_callback_on(MCPL_PACKET_RECEIVED, receive_spike_payload_callback, -1);
     spin1_callback_on(TIMER_TICK, timer_callback, 0);
-    spin1_callback_on(USER_EVENT, user_callback, 1);
     simulation_run();
 }
