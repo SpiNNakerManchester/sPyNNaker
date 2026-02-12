@@ -127,3 +127,7 @@ class TestStructuralWithSTDP(BaseTestCase):
 
     def test_split_structural_with_stdp(self) -> None:
         self.runsafe(split_structural_with_stdp)
+
+        self.check_binaries_used(
+            ["synapses_stdp_mad_pair_additive_structural_last_neuron_distance_weight.aplx",  # noqa: E501
+            "synapses_stdp_mad_pair_additive_structural_random_distance_weight.aplx"])   # noqa: E501
