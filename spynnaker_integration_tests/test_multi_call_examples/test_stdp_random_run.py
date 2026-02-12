@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+
 import numpy
 import pyNN.spiNNaker as sim
 
@@ -24,14 +26,16 @@ class TestSTDPRandomRun(BaseTestCase):
     # same thing being loaded twice, both with data generated off and on the
     # machine
 
-    def run_model(self, model: AbstractPyNNModel) -> None:
+    def run_model(self, model: AbstractPyNNModel,
+                  n_synapse_cores: Optional[int] = None) -> None:
         """
         Runs the test with the requested model
         """
         sim.setup(1.0)
         pop = sim.Population(1, sim.IF_curr_exp(i_offset=5.0), label="pop")
         pop.record("spikes")
-        pop_2 = sim.Population(1, model, label="pop_2")
+        pop_2 = sim.Population(
+            1, model, label="pop_2", n_synapse_cores=n_synapse_cores)
         proj = sim.Projection(
             pop, pop_2, sim.AllToAllConnector(),
             sim.STDPMechanism(
@@ -67,6 +71,13 @@ class TestSTDPRandomRun(BaseTestCase):
     def test_check_if_curr_exp(self) -> None:
         self.runsafe(self._do_if_curr_exp)
         self.check_binary_used("IF_curr_exp_stdp_mad_pair_additive.aplx")
+
+    def _do_synapse(self) -> None:
+        self.run_model(sim.IF_curr_exp(), 1)
+
+    def test_check_if_curr_exp(self) -> None:
+        self.runsafe(self._do_synapse)
+        self.check_binary_used("synapses_stdp_mad_pair_additive.aplx")
 
     def _do_if_curr_exp_ca2_additive(self) -> None:
         self.run_model(sim.extra_models.IFCurrExpCa2Adaptive())
