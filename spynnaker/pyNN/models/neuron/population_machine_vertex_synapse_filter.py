@@ -14,7 +14,7 @@
 
 import ctypes
 from enum import IntEnum
-from typing import Sequence, List
+from typing import Sequence, List, Optional
 
 from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.overrides import overrides
@@ -112,8 +112,8 @@ class PopulationMachineVertexSynapseFilter(
         super().__init__(label, app_vertex, vertex_slice)
         self.__synapse_references = synapse_references
         self.__synapse_cores = synapse_cores
-        self.__filter_partition: DestinationSegmentedSysRAMMachinePartition = \
-            None
+        self.__filter_partition: Optional[
+            DestinationSegmentedSysRAMMachinePartition] = None
 
     def set_filter_partition(
             self,
@@ -171,6 +171,8 @@ class PopulationMachineVertexSynapseFilter(
         self._write_config_region(spec)
 
         # Write references to the bit field and master population table regions
+        assert self.__synapse_references.bitfield_filter is not None
+        assert self.__synapse_references.pop_table is not None
         spec.reference_memory_region(
             REGIONS.BIT_FIELD, self.__synapse_references.bitfield_filter,
             "Bit Field Region")
@@ -262,7 +264,7 @@ class PopulationMachineVertexSynapseFilter(
         """ Return the lowest set bit in value. """
         return (value & -value).bit_length() - 1
 
-    def _write_config_region(self, spec):
+    def _write_config_region(self, spec: DataSpecificationGenerator) -> None:
         spec.reserve_memory_region(
             region=REGIONS.CONFIG,
             size=N_BYTES_CONFIG + (
@@ -271,10 +273,10 @@ class PopulationMachineVertexSynapseFilter(
         spec.switch_write_focus(REGIONS.CONFIG)
 
         # Find a common application mask, and minimum and maximum values
-        app_mask = None
-        app_shift = None
-        app_min = None
-        app_max = None
+        app_mask: Optional[int] = None
+        app_shift: Optional[int] = None
+        app_min: Optional[int] = None
+        app_max:Optional[int] = None
         routing_info = SpynnakerDataView.get_routing_infos()
         for proj in self._app_vertex.incoming_projections:
             app_edge = proj._projection_edge
@@ -300,6 +302,11 @@ class PopulationMachineVertexSynapseFilter(
                     app_min = app_value
                 if app_value > app_max:
                     app_max = app_value
+
+        assert app_mask is not None
+        assert app_shift is not None
+        assert app_min is not None
+        assert app_max is not None
         spec.write_value(app_mask)
         spec.write_value(app_shift)
         spec.write_value(app_min)
@@ -307,6 +314,7 @@ class PopulationMachineVertexSynapseFilter(
         spec.write_value(get_config_int(
             "Simulation", "incoming_spike_buffer_size"))
         spec.write_value(len(self.__synapse_cores))
+        assert self.__filter_partition is not None
         for synapse_core in self.__synapse_cores:
             p = SpynnakerDataView.get_placement_of_vertex(synapse_core).p
             address = self.__filter_partition.get_sysram_base_address_for(

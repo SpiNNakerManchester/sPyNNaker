@@ -219,6 +219,7 @@ class PopulationSynapsesMachineVertexCommon(
         :param spec: The generator of the specification to write
         """
         assert self.__sdram_partition is not None
+        assert self.__filter_partition is not None
         send_size = self.__sdram_partition.get_sdram_size_of_region_for(self)
         base_addr = self.__sdram_partition.get_sdram_base_address_for(self)
 
