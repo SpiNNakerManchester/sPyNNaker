@@ -540,7 +540,8 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
     log_info("\tspike sources = %u, starting at %u",
             ssp_params.n_spike_sources, ssp_params.first_source_id);
     log_info("seconds_per_tick = %K = %u = %K", (UREAL) ssp_params.seconds_per_tick,
-            ssp_params.seconds_per_tick, (UREAL) (ulrbits(bitsulr(ssp_params.seconds_per_tick) >> 16)) << 16);
+            ssp_params.seconds_per_tick,
+            (UREAL) (ulrbits(bitsulr(ssp_params.seconds_per_tick) >> 16)) << 16);
     log_info("ticks_per_ms = %K\n", ssp_params.ticks_per_ms);
     log_info("ts_per_second = %K", ts_per_second);
     log_info("slow_rate_per_tick_cutoff = %K",
