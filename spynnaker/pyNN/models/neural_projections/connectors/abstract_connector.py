@@ -15,13 +15,14 @@ from __future__ import annotations
 import logging
 import math
 import re
-from typing import Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING
+from typing import Any, Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING
 from typing_extensions import Never
 
 import numpy
 from numpy import float64, uint32, uint16, uint8
 from numpy.typing import NDArray
 
+from pyNN import descriptions
 from pyNN.random import NumpyRNG, RandomDistribution
 from pyNN.space import Space
 
@@ -679,3 +680,52 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 "Using a projection where the source or target is a "
                 "PopulationView on a multi-dimensional Population is not "
                 "supported")
+
+    def get_parameters(self) -> Dict[str, Any]:
+        """
+        A list of parameters that would recreate this connector.
+
+        May not be exactly the same as the ones used to construct this.
+
+        Will also not include any information or changes added by later calls.
+
+        :return: A map of the init parameters to the values passed in.
+        """
+        # The default is error
+        # This to avoid missing parameters in user Connnectors
+        raise NotImplementedError(
+            f"{type(self)} does not implement "
+            f"Standard pyNN get_parameters method")
+
+    def _get_parameters(self) -> Dict[str, Any]:
+        """
+        :return: A map of the init parameters to the values passed in.
+        """
+        return {
+            "safe": self.safe,
+            "verbose": self.verbose,
+            "callback": None
+        }
+
+    def clone(self) -> "AbstractConnector":
+        """
+        Create a clone of the Connector at init point
+        """
+        theType = type(self)
+        params = self.get_parameters()
+        return theType(**params)
+
+    def describe(self, template: Optional[str] = None,
+                 engine: str = 'default') -> str:
+        """
+        Returns a human-readable description of the connection method.
+
+        The output may be customized by specifying a different template
+        togther with an associated template engine (see pyNN.descriptions).
+
+        If template is None,
+        then a dictionary containing the template context will be returned.
+        """
+        context = {"Type": self.__class__.__name__}
+        context.update(self.get_parameters())
+        return descriptions.render(engine, template, context)

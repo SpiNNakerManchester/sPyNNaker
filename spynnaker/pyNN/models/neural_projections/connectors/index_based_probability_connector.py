@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 import math
-from typing import Optional, Sequence, TYPE_CHECKING
+from typing import Any, Dict, Optional, Sequence, TYPE_CHECKING
 
 import numpy
 from numpy import (
@@ -96,6 +96,14 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         self.__index_expression = index_expression
         self.__allow_self_connections = allow_self_connections
         self.__probs: Optional[NDArray] = None
+
+    @overrides(AbstractConnector.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        parameters = self._get_parameters()
+        parameters["index_expression"] = self.index_expression
+        parameters["allow_self_connections"] = self.__allow_self_connections
+        parameters["rng"] = self.__rng
+        return parameters
 
     def _update_probs_from_index_expression(
             self, synapse_info: SynapseInformation) -> NDArray:
