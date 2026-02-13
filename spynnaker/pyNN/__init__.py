@@ -74,7 +74,6 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     PoolDenseConnector)
 # synapse structures
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractStaticSynapseDynamics,
     SynapseDynamicsStatic as StaticSynapse)
 
 # plastic stuff
@@ -149,6 +148,8 @@ from spynnaker.pyNN.setup_pynn import setup_pynn
 
 # big stuff
 from spynnaker.pyNN.spinnaker import SpiNNaker
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamics)
 
 from spynnaker._version import __version__  # NOQA
 from spynnaker._version import __version_name__  # NOQA
@@ -356,7 +357,7 @@ def Projection(
         presynaptic_population: Population,
         postsynaptic_population: Population,
         connector: AbstractConnector,
-        synapse_type: Optional[AbstractStaticSynapseDynamics] = None,
+        synapse_type: Optional[AbstractSynapseDynamics] = None,
         source: None = None, receptor_type: str = "excitatory",
         space: Optional[Space] = None, label: Optional[str] = None,
         download_synapses: bool = False,
