@@ -194,6 +194,7 @@ class NetworkFakeRetinaInput(BaseTestCase):
 
     def test_run(self) -> None:
         self.runsafe(self.check_run)
+        self.check_binary_used("IF_curr_exp_conv.aplx")
 
 
 if __name__ == '__main__':

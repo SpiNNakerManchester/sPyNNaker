@@ -166,9 +166,7 @@ class TestSTDPNeuromodulation(BaseTestCase):
         self.neuromodulation(weight_dependence)
 
         # TODO Weights expected
-        self.check_binary_used(
-            "synapses_stdp_izhikevich_neuromodulation_"
-            "pair_multiplicative.aplx")
+        self.check_binary_used("synapses_stdp_izhikevich_neuromodulation_pair_multiplicative.aplx")  # noqa: E501
 
     def test_multiplicative(self) -> None:
         self.runsafe(self.do_multiplicative)
