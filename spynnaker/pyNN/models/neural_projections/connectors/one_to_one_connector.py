@@ -56,7 +56,6 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     """
     __slots__ = ()
 
-
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
     def get_parameters(self) -> Dict[str, Any]:
         return self._get_parameters()
