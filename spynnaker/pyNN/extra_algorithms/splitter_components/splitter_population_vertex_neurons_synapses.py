@@ -79,6 +79,7 @@ from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
 
 logger = FormatAdapter(logging.getLogger(__name__))
+N_FILTER_CORES = 3
 
 
 class SplitterPopulationVertexNeuronsSynapses(
@@ -199,7 +200,7 @@ class SplitterPopulationVertexNeuronsSynapses(
         neuron_data = NeuronData(self.governed_app_vertex)
 
         # TODO: Make this automatic too!
-        n_filter_cores = 2
+        n_filter_cores = N_FILTER_CORES
         for index in range(n_filter_cores):
             self.__incoming_vertices.append([])
 
@@ -582,7 +583,7 @@ class SplitterPopulationVertexNeuronsSynapses(
         sources = source_vertex.splitter.get_out_going_vertices(partition_id)
         n_sources = len(sources)
         # TODO: Make this automatic too!
-        n_filter_cores = 2
+        n_filter_cores = N_FILTER_CORES
         sources_per_vertex = max(1, int(2 ** math.ceil(math.log2(
             n_sources / n_filter_cores))))
 
