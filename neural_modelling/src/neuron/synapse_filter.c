@@ -249,7 +249,7 @@ static inline bool prepare_timestep(void) {
     // Clear the buffer if needed
 //    uint32_t n_dropped = circular_buffer_size(input_queue);
 //    circular_buffer_clear(input_queue);
-//    spin1_mode_restore(cspr);
+    spin1_mode_restore(cspr);
 //
 //    // Update provenance
 //    prov.n_packets_discarded_end_of_timestep += n_dropped;
