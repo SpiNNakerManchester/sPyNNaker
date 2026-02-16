@@ -119,6 +119,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         self.__split_conn_list: Dict[int, NDArray[integer]] = {}
         self.__split_post_slices: Optional[List[Slice]] = None
 
+        self.__conn_list: NDArray
         # These are set by __setup_using_conn_list
         self.__sources: NDArray[uint32]
         self.__targets: NDArray[uint32]
