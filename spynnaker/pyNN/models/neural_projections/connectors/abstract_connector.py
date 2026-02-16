@@ -713,7 +713,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         This method should just check the connector is unused,
         mark it as used and return it.
 
-        If the conenctor is used will attempt to make a clone,
+        If the conenector is used will attempt to make a clone,
         log warning that this is not recommended and may be incorrect,
         and returns the clone.
 
@@ -723,10 +723,10 @@ class AbstractConnector(object, metaclass=AbstractBase):
             logger.warning(
                 "Reusing Connectors in sPyNNaker is not recommended")
             clone = self.clone()
-        else:
-            clone = self
-        clone.__used = True
-        return clone
+            # call get_unused to mark used
+            return clone.get_unused()
+        self.__used = True
+        return self
 
     def describe(self, template: Optional[str] = None,
                  engine: str = 'default') -> str:
