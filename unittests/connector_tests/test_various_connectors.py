@@ -80,8 +80,8 @@ class TestConnectors(unittest.TestCase):
         params = connector.get_parameters()
         connector2 = OneToOneConnector(**params)
         assert connector2.get_parameters() == params
-        assert connector2.safe == False
-        assert connector2.verbose == True
+        assert connector2.safe is False
+        assert connector2.verbose is True
         # Callback is not interesting
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -89,7 +89,7 @@ class TestConnectors(unittest.TestCase):
 
     def testAllButMeConnector(self) -> None:
         weights = numpy.ones((2, 2))
-        connector = AllButMeConnector(n_neurons_per_group = 2, weights=weights)
+        connector = AllButMeConnector(n_neurons_per_group=2, weights=weights)
         params = connector.get_parameters()
         connector2 = AllButMeConnector(**params)
         assert connector2.get_parameters() == params
@@ -100,9 +100,9 @@ class TestConnectors(unittest.TestCase):
     def testAllToAllConnector(self) -> None:
         connector = AllToAllConnector(allow_self_connections=False)
         params = connector.get_parameters()
-        connector2 =  AllToAllConnector(**params)
+        connector2 = AllToAllConnector(**params)
         assert connector2.get_parameters() == params
-        assert connector2.allow_self_connections == False
+        assert connector2.allow_self_connections is False
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
         self.compare_connectors(connector, connector3)
@@ -120,12 +120,12 @@ class TestConnectors(unittest.TestCase):
     def testFixedNumberPostConnector(self) -> None:
         rng = NumpyRNG(seed=42)
         connector = FixedNumberPostConnector(
-            5, allow_self_connections = False, with_replacement = True,
-            rng = rng)
+            5, allow_self_connections=False, with_replacement=True,
+            rng=rng)
         params = connector.get_parameters()
-        connector2 =  FixedNumberPostConnector(**params)
+        connector2 = FixedNumberPostConnector(**params)
         assert connector2.get_parameters() == params
-        assert connector2.allow_self_connections == False
+        assert connector2.allow_self_connections is False
         connector2.allow_self_connections = False
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -134,12 +134,12 @@ class TestConnectors(unittest.TestCase):
     def testFixedNumberPreConnector(self) -> None:
         rng = NumpyRNG(seed=14)
         connector = FixedNumberPreConnector(
-            7, allow_self_connections = False, with_replacement = True,
-            rng = rng)
+            7, allow_self_connections=False, with_replacement=True,
+            rng=rng)
         params = connector.get_parameters()
         connector2 = FixedNumberPreConnector(**params)
         assert connector2.get_parameters() == params
-        assert connector2.allow_self_connections == False
+        assert connector2.allow_self_connections is False
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
         self.compare_connectors(connector, connector3)
@@ -147,7 +147,7 @@ class TestConnectors(unittest.TestCase):
     def testFixedProbabilityConnectorr(self) -> None:
         rng = NumpyRNG(seed=14)
         connector = FixedProbabilityConnector(
-            0.5, allow_self_connections = False,  rng = rng)
+            0.5, allow_self_connections=False, rng=rng)
         params = connector.get_parameters()
         connector2 = FixedProbabilityConnector(**params)
         assert connector2.get_parameters() == params
@@ -188,8 +188,8 @@ class TestConnectors(unittest.TestCase):
     def testMultapseConnector(self) -> None:
         rng = NumpyRNG(seed=37)
         connector = MultapseConnector(
-            4, allow_self_connections = False, with_replacement = False,
-            rng = rng)
+            4, allow_self_connections=False, with_replacement=False,
+            rng=rng)
         params = connector.get_parameters()
         connector2 = MultapseConnector(**params)
         assert connector2.get_parameters() == params
@@ -198,7 +198,8 @@ class TestConnectors(unittest.TestCase):
         self.compare_connectors(connector, connector3)
 
     def testOneToOneOffsetConnector(self) -> None:
-        connector = OneToOneOffsetConnector(offset=5, wrap=True, n_neurons_per_group=4)
+        connector = OneToOneOffsetConnector(
+            offset=5, wrap=True, n_neurons_per_group=4)
         params = connector.get_parameters()
         connector2 = OneToOneOffsetConnector(**params)
         assert connector2.get_parameters() == params
@@ -212,7 +213,7 @@ class TestConnectors(unittest.TestCase):
             k_shape)) - (numpy.prod(k_shape) / 2)).reshape(k_shape) * 0.1
         connector = ConvolutionConnector(kernel)
         params = connector.get_parameters()
-        connector2 =  ConvolutionConnector(**params)
+        connector2 = ConvolutionConnector(**params)
         self.compare_parameters(params, connector2.get_parameters())
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -251,7 +252,7 @@ class TestConnectors(unittest.TestCase):
         rng = NumpyRNG(seed=14)
         connector = DistanceDependentProbabilityConnector(
             d_expression="gigo", allow_self_connections=False,
-            n_connections=None, rng = rng)
+            n_connections=None, rng=rng)
         params = connector.get_parameters()
         connector2 = DistanceDependentProbabilityConnector(**params)
         assert connector2.get_parameters() == params
