@@ -18,4 +18,4 @@ build-backend = "setuptools.build_meta"
 
 [[tool.mypy.overrides]]
 module = ["matplotlib", "matplotlib.*", "quantities", "neo", "neo.*", "scipy", "scipy.*", "lazyarray"]
-ignore_missing_imports = true
+follow_untyped_imports = true
