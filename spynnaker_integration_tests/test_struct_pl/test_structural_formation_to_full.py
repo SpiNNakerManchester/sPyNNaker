@@ -138,6 +138,8 @@ class TestStructuralFormationToFull(BaseTestCase):
 
     def test_structural_formation_to_full(self) -> None:
         self.runsafe(self.do_run)
+        self.check_binary_used(
+            "synapses_structural_last_neuron_distance_weight.aplx")
 
     def test_structural_formation_to_full_with_reset(self) -> None:
         self.runsafe(self.do_run_with_reset)
