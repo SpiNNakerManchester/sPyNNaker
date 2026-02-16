@@ -87,6 +87,8 @@ class FilterProvenance(ctypes.LittleEndianStructure):
 
     N_ITEMS = len(_fields_)
 
+INPUT_BUFFER_LOCK = "InputBufferLock"
+
 
 class PopulationMachineVertexSynapseFilter(
         MachineVertex,
@@ -316,10 +318,12 @@ class PopulationMachineVertexSynapseFilter(
         spec.write_value(len(self.__synapse_cores))
         assert self.__filter_partition is not None
         for synapse_core in self.__synapse_cores:
-            p = SpynnakerDataView.get_placement_of_vertex(synapse_core).p
+            pl = SpynnakerDataView.get_placement_of_vertex(synapse_core)
+            lock_id = SpynnakerDataView.get_lock_id_for(
+                synapse_core, pl, INPUT_BUFFER_LOCK)
             address = self.__filter_partition.get_sysram_base_address_for(
                 synapse_core)
-            spec.write_value(p)
+            spec.write_value(pl.p << 16 | lock_id)
             spec.write_value(address)
 
     @overrides(AbstractSupportsSysRAMEdges.sysram_requirement)

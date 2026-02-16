@@ -45,7 +45,10 @@ enum {
 
 typedef struct {
     //! The core running this target
-    uint32_t core_id;
+    uint32_t core_id: 16;
+
+    //! The id of the lock to use to protect write access to the circular buffer
+    uint32_t lock_id: 16;
 
     //! The address of the circular buffer to write to
     //! (initialised by the target)
@@ -132,6 +135,16 @@ static uint32_t next_target = 0;
 
 static volatile bool running = false;
 
+static inline void lock_get(uint32_t lock_id) {
+    while (sc[SC_TAS0 + lock_id] != 0x80000000) {
+        // Do Nothing - the register will return 0 when the lock is acquired
+    }
+}
+
+static inline void lock_clr(uint32_t lock_id) {
+    UNUSED uint val = sc[SC_TAC0 + lock_id];
+}
+
 static inline bool check_app_id(uint32_t spike, uint32_t *app_id) {
     *app_id = (spike & config->app_id_mask) >> config->app_id_shift;
     return (*app_id <= config->app_id_max) && (*app_id >= config->app_id_min);
@@ -191,9 +204,11 @@ static inline void push_key(uint32_t key) {
         next_target = 0;
     }
     circular_buffer target_queue = config->targets[target].target;
+    lock_get(config->targets[target].lock_id);
     if (!circular_buffer_add(target_queue, key)) {
         prov.n_spikes_dropped_target_queue_full += 1;
     }
+    lock_clr(config->targets[target].lock_id);
 }
 
 static inline void process_spike(uint32_t spike) {
