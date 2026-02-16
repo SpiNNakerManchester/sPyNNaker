@@ -247,15 +247,15 @@ static inline bool prepare_timestep(void) {
             time, timer, time_until_stop);
 
     // Clear the buffer if needed
-    uint32_t n_dropped = circular_buffer_size(input_queue);
-    circular_buffer_clear(input_queue);
-    spin1_mode_restore(cspr);
-
-    // Update provenance
-    prov.n_packets_discarded_end_of_timestep += n_dropped;
-    if (n_dropped > prov.max_packets_discarded_end_of_timestep) {
-        prov.max_packets_discarded_end_of_timestep = n_dropped;
-    }
+//    uint32_t n_dropped = circular_buffer_size(input_queue);
+//    circular_buffer_clear(input_queue);
+//    spin1_mode_restore(cspr);
+//
+//    // Update provenance
+//    prov.n_packets_discarded_end_of_timestep += n_dropped;
+//    if (n_dropped > prov.max_packets_discarded_end_of_timestep) {
+//        prov.max_packets_discarded_end_of_timestep = n_dropped;
+//    }
 
     return true;
 }
