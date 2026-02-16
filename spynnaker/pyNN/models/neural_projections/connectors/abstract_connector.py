@@ -692,7 +692,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :return: A map of the init parameters to the values passed in.
         """
         # The default is error
-        # This to avoid missing parameters in user Connnectors
+        # This to avoid missing parameters in user Connectors
         raise NotImplementedError(
             f"{type(self)} does not implement "
             f"Standard pyNN get_parameters method")
@@ -721,7 +721,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Returns a human-readable description of the connection method.
 
         The output may be customized by specifying a different template
-        togther with an associated template engine (see pyNN.descriptions).
+        together with an associated template engine (see pyNN.descriptions).
 
         If template is None,
         then a dictionary containing the template context will be returned.
