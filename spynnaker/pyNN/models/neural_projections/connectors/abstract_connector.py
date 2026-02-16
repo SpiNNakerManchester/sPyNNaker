@@ -710,9 +710,15 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def clone(self) -> "AbstractConnector":
         """
         Create a clone of the Connector at init point
+
+        This is a best effort attempt and its use is not recommended
+
+        :return: A clone of the Connector. Ignoring any SynapseInformation
         """
         theType = type(self)
         params = self.get_parameters()
+        logger.warning(f"Cloning type{self} is not recommended "
+                       f"and may lead to incorrect results.")
         return theType(**params)
 
     def describe(self, template: Optional[str] = None,
@@ -725,6 +731,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         If template is None,
         then a dictionary containing the template context will be returned.
+
+        :return: A human-readable description of the connector.
         """
         context = {"Type": self.__class__.__name__}
         context.update(self.get_parameters())
