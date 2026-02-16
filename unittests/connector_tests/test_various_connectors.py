@@ -126,7 +126,6 @@ class TestConnectors(unittest.TestCase):
         connector2 = FixedNumberPostConnector(**params)
         assert connector2.get_parameters() == params
         assert connector2.allow_self_connections is False
-        connector2.allow_self_connections = False
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
         self.compare_connectors(connector, connector3)

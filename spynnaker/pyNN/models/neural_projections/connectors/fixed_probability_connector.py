@@ -227,13 +227,6 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         """
         return self._p_connect
 
-    @p_connect.setter
-    def p_connect(self, new_value: float) -> None:
-        if not 0.0 <= new_value <= 1.0:
-            raise ConfigurationException(
-                "The probability must be between 0 and 1 (inclusive)")
-        self._p_connect = new_value
-
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
             self, application_edge: ProjectionApplicationEdge,

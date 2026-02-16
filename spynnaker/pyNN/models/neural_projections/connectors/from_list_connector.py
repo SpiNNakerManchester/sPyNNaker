@@ -474,10 +474,6 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         """
         return self.__column_names
 
-    @column_names.setter
-    def column_names(self, column_names: Optional[Sequence[str]]) -> None:
-        self.__column_names = column_names
-
     def get_extra_parameters(self) -> Optional[NDArray]:
         """
         Getter for the extra parameters. Excludes ``weight`` and

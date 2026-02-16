@@ -245,17 +245,9 @@ class DistanceDependentProbabilityConnector(
         """
         return self.__allow_self_connections
 
-    @allow_self_connections.setter
-    def allow_self_connections(self, new_value: bool) -> None:
-        self.__allow_self_connections = new_value
-
     @property
     def d_expression(self) -> str:
         """
         The distance expression.
         """
         return self.__d_expression
-
-    @d_expression.setter
-    def d_expression(self, new_value: str) -> None:
-        self.__d_expression = new_value

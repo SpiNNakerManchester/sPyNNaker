@@ -223,10 +223,6 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         """
         return self.__allow_self_connections
 
-    @allow_self_connections.setter
-    def allow_self_connections(self, new_value: bool) -> None:
-        self.__allow_self_connections = new_value
-
     @property
     def index_expression(self) -> str:
         """
@@ -235,9 +231,3 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         be parsed by `eval()`, that computes a probability distribution.
         """
         return self.__index_expression
-
-    @index_expression.setter
-    def index_expression(self, new_value: str) -> None:
-        if self.__probs is None:
-            raise ValueError("connectivity matrix already fixed")
-        self.__index_expression = new_value

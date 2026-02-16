@@ -307,10 +307,6 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         """
         return self.__allow_self_connections
 
-    @allow_self_connections.setter
-    def allow_self_connections(self, new_value: bool) -> None:
-        self.__allow_self_connections = new_value
-
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self) -> int:

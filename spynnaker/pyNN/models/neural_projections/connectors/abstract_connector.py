@@ -576,10 +576,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         return self.__safe
 
-    @safe.setter
-    def safe(self, new_value: bool) -> None:
-        self.__safe = new_value
-
     @property
     def space(self) -> Optional[Space]:
         """
@@ -587,25 +583,12 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         return self.__space
 
-    @space.setter
-    def space(self, new_value: Space) -> None:
-        """
-        Set the space object (allowed after instantiation).
-
-        :param new_value:
-        """
-        self.__space = new_value
-
     @property
     def verbose(self) -> bool:
         """
         verbose value supplied by user
         """
         return self.__verbose
-
-    @verbose.setter
-    def verbose(self, new_value: bool) -> None:
-        self.__verbose = new_value
 
     def get_connected_vertices(
             self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
