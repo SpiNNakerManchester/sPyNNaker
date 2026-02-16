@@ -130,6 +130,8 @@ _EXTRA_RECORDABLE_UNITS = {NeuronRecorder.SPIKES: "",
                            NeuronRecorder.PACKETS: "",
                            NeuronRecorder.REWIRING: ""}
 
+_FILTER_CORE_SPIKES_PER_SECOND = 80000
+
 
 def _all_gen(rd: RangeDictionary) -> bool:
     """
@@ -209,7 +211,9 @@ class PopulationVertex(
         "__n_colour_bits",
         "__extra_partitions",
         "__n_synapse_cores",
+        "__n_filter_cores",
         "__n_synapse_cores_param",
+        "__n_filter_cores_param",
         "__allow_delay_extensions",
         "__max_delay_ms",
         "__max_delay_slots_available")
@@ -235,6 +239,7 @@ class PopulationVertex(
             self, *, n_neurons: int, label: str,
             max_atoms_per_core: Union[int, Tuple[int, ...]],
             n_synapse_cores: Optional[int],
+            n_filter_cores: Optional[int],
             allow_delay_extensions: bool,
             spikes_per_second: Optional[float],
             ring_buffer_sigma: Optional[float],
@@ -253,6 +258,9 @@ class PopulationVertex(
         :param n_synapse_cores:
             The number of synapse cores to use: 0 for combined core,
             or None for automatic determination
+        :param n_filter_cores:
+            The number of synapse filter cores to use: 0 for none, or None for
+            automatic determination
         :param allow_delay_extensions:
             Whether delay extensions should be allowed or not
         :param spikes_per_second: Expected spike rate
@@ -384,6 +392,8 @@ class PopulationVertex(
 
         self.__n_synapse_cores = n_synapse_cores
         self.__n_synapse_cores_param = n_synapse_cores
+        self.__n_filter_cores = n_filter_cores
+        self.__n_filter_cores_param = n_filter_cores
         self.__allow_delay_extensions = allow_delay_extensions
         self.__max_delay_ms: Optional[float] = None
         self.__max_delay_slots_available: Optional[int] = None
@@ -653,11 +663,25 @@ class PopulationVertex(
         The estimated number of synapse cores required, when using a
         split synapse-neuron core model.
         """
-        return self.__update_n_synapse_cores()
-
-    def __update_n_synapse_cores(self) -> int:
         if self.__n_synapse_cores is not None:
             return self.__n_synapse_cores
+        self.__update_n_synapse_cores()
+        assert self.__n_synapse_cores is not None
+        return self.__n_synapse_cores
+
+    @property
+    def n_filter_cores_required(self) -> int:
+        """
+        The estimated number of synapse filter cores required, when using a
+        split synapse-neuron core model.
+        """
+        if self.__n_filter_cores is not None:
+            return self.__n_filter_cores
+        self.__update_n_synapse_cores()
+        assert self.__n_filter_cores is not None
+        return self.__n_filter_cores
+
+    def __update_n_synapse_cores(self) -> None:
         version = SpynnakerDataView().get_machine_version()
         n_monitors = SpynnakerDataView().get_all_monitor_cores()
 
@@ -675,12 +699,16 @@ class PopulationVertex(
         # Add up the number of incoming synapse processes expected
         synapses_per_second: int = 0
         poisson_synapses_per_second: int = 0
+        incoming_spikes_per_second: int = 0
+        poisson_spikes_per_second: int = 0
         for pre_vertex, projs in self.__incoming_projections.items():
             spikes_per_second = self.__spikes_per_second
             if isinstance(pre_vertex, AbstractMaxSpikes):
                 rate = pre_vertex.max_spikes_per_second()
                 if rate > 0:
                     spikes_per_second = rate
+
+            pre_spikes_per_second = spikes_per_second * pre_vertex.n_atoms
 
             pre_synapses_per_second: int = 0
             for proj in projs:
@@ -702,8 +730,10 @@ class PopulationVertex(
 
             if self._is_direct_poisson(pre_vertex, projs):
                 poisson_synapses_per_second += pre_synapses_per_second
+                poisson_spikes_per_second += pre_spikes_per_second
             else:
                 synapses_per_second += pre_synapses_per_second
+                incoming_spikes_per_second += pre_spikes_per_second
 
         # How many cores are needed to process the non-direct-poisson synapses?
         n_synapse_cores = math.ceil(
@@ -712,21 +742,28 @@ class PopulationVertex(
         # The number of Poisson cores that will be needed
         n_poisson_cores = len(self.incoming_poisson_projections)
 
+        n_filter_cores = math.ceil(
+            incoming_spikes_per_second / _FILTER_CORE_SPIKES_PER_SECOND)
+
         # If we can definitely do the Poisson vertices directly,
         # lets recommend this
-        if n_synapse_cores + n_poisson_cores < max_n_cores:
+        if n_synapse_cores + n_poisson_cores + n_filter_cores < max_n_cores:
             self.__n_synapse_cores = n_synapse_cores
-            return n_synapse_cores
+            self.__n_filter_cores = n_filter_cores
+            return
 
         # Otherwise, we should consider how many more cores we need for the
         # Poisson input spikes
         n_synapse_cores = math.ceil(
             (synapses_per_second + poisson_synapses_per_second) /
             synapses_per_core_per_sim_second)
+        n_filter_cores = math.ceil(
+            (incoming_spikes_per_second + poisson_spikes_per_second) /
+            _FILTER_CORE_SPIKES_PER_SECOND)
 
         # If the number of cores needed is more than the maximum, use the
         # maximum
-        if n_synapse_cores > max_n_cores:
+        if n_synapse_cores + n_filter_cores > max_n_cores:
             logger.warning(
                 f"Ideally this execution would need {n_synapse_cores} synapse "
                 f"cores, but only {max_n_cores} cores are available. This may "
@@ -734,10 +771,10 @@ class PopulationVertex(
                 "solutions include increasing the time_scale_factor, or "
                 "reducing the number of synapses incoming into each "
                 "population")
-            n_synapse_cores = max_n_cores
+            n_synapse_cores = max_n_cores - 1
+            n_filter_cores = 1
         self.__n_synapse_cores = n_synapse_cores
-        assert self.__n_synapse_cores is not None
-        return self.__n_synapse_cores
+        self.__n_filter_cores = n_filter_cores
 
     @property
     def max_delay_steps(self) -> int:
@@ -852,6 +889,7 @@ class PopulationVertex(
         self.__max_delay_ms = None
         self.__max_delay_slots_available = None
         self.__n_synapse_cores = self.__n_synapse_cores_param
+        self.__n_filter_cores = self.__n_filter_cores_param
         # pylint: disable=protected-access
         pre_vertex = projection._projection_edge.pre_vertex
         self.__incoming_projections[pre_vertex].append(projection)

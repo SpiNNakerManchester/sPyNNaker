@@ -46,6 +46,10 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     # or None to determine based on time-step
     _n_synapse_cores: Dict[type, Optional[int]] = {}
 
+    # The number of filter cores for PyNN models that use PopulationVertex
+    # or None to determine based on time-step
+    _n_filter_cores: Dict[type, Optional[int]] = {}
+
     # Whether to allow delay extensions when using PyNN models that use
     # PopulationVertex
     _allow_delay_extensions: Dict[type, bool] = {}
@@ -71,6 +75,24 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         :returns: The number of synapse cores for the model.
         """
         return cls._n_synapse_cores.get(cls, None)
+
+    @classmethod
+    def set_model_n_filter_cores(cls, n_filter_cores: Optional[int]) -> None:
+        """
+        Set the number of filter cores for a model.
+
+        :param n_filter_cores:
+            The number of filter cores when synapse cores are used
+        """
+        cls.verify_may_set(param="n_filter_cores")
+        cls._n_filter_cores[cls] = n_filter_cores
+
+    @classmethod
+    def get_model_n_filter_cores(cls) -> Optional[int]:
+        """
+        :returns: The number of filter cores for the model.
+        """
+        return cls._n_filter_cores.get(cls, None)
 
     @classmethod
     def set_model_allow_delay_extensions(cls, allow: bool) -> None:
@@ -121,6 +143,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             n_colour_bits: Optional[int] = None,
             neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
             n_synapse_cores: Optional[int] = None,
+            n_filter_cores: Optional[int] = None,
             allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
         """
         :param spikes_per_second:
@@ -136,12 +159,15 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
                 self.get_model_max_atoms_per_dimension_per_core()
         if n_synapse_cores is None:
             n_synapse_cores = self.get_model_n_synapse_cores()
+        if n_filter_cores is None:
+            n_filter_cores = self.get_model_n_filter_cores()
         if allow_delay_extensions is None:
             allow_delay_extensions = self.get_model_allow_delay_extensions()
         return PopulationVertex(
             n_neurons=n_neurons, label=label,
             max_atoms_per_core=neurons_per_core,
             n_synapse_cores=n_synapse_cores,
+            n_filter_cores=n_filter_cores,
             allow_delay_extensions=allow_delay_extensions,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,

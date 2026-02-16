@@ -198,7 +198,8 @@ __all__ = [
     # Stuff that we define
     'end', 'setup', 'run', 'run_until', 'run_for', 'num_processes', 'rank',
     'reset', 'set_number_of_neurons_per_core',
-    'set_number_of_synapse_cores', 'set_allow_delay_extensions',
+    'set_number_of_synapse_cores', 'set_number_of_filter_cores',
+    'set_allow_delay_extensions',
     'Projection',
     'get_current_time', 'create', 'connect', 'get_time_step', 'get_min_delay',
     'get_max_delay', 'initialize', 'list_standard_models', 'name',
@@ -497,6 +498,22 @@ def set_number_of_synapse_cores(
     if SpynnakerDataView.get_n_populations() > 0:
         warn_once(logger,
                   "set_number_of_synapse_cores "
+                  "only affects Populations not yet made.")
+
+
+def set_number_of_filter_cores(
+        neuron_type: Type, n_filter_cores: Optional[int]) -> None:
+    """
+    Sets the number of filter cores for a model.
+
+    :param neuron_type: The model implementation
+    :param n_filter_cores:
+        The number of filter cores when synapse cores are used
+    """
+    neuron_type.set_model_n_filter_cores(n_filter_cores)
+    if SpynnakerDataView.get_n_populations() > 0:
+        warn_once(logger,
+                  "set_number_of_filter_cores "
                   "only affects Populations not yet made.")
 
 

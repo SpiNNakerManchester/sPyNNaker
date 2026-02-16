@@ -79,7 +79,6 @@ from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
 
 logger = FormatAdapter(logging.getLogger(__name__))
-N_FILTER_CORES = 3
 
 
 class SplitterPopulationVertexNeuronsSynapses(
@@ -172,6 +171,7 @@ class SplitterPopulationVertexNeuronsSynapses(
         # We add the SDRAM edge SDRAM to the neuron resources so it is
         # accounted for within the placement
         n_synapse_cores = self.governed_app_vertex.n_synapse_cores_required
+        n_filter_cores = self.governed_app_vertex.n_filter_cores_required
         n_incoming = n_synapse_cores + len(self.__poisson_sources)
         edge_sdram = PopulationNeuronsMachineVertex.get_n_bytes_for_transfer(
             atoms_per_core, n_synapse_types)
@@ -199,8 +199,6 @@ class SplitterPopulationVertexNeuronsSynapses(
             weight_scales, all_syn_block_sz)
         neuron_data = NeuronData(self.governed_app_vertex)
 
-        # TODO: Make this automatic too!
-        n_filter_cores = N_FILTER_CORES
         for index in range(n_filter_cores):
             self.__incoming_vertices.append([])
 
@@ -583,7 +581,7 @@ class SplitterPopulationVertexNeuronsSynapses(
         sources = source_vertex.splitter.get_out_going_vertices(partition_id)
         n_sources = len(sources)
         # TODO: Make this automatic too!
-        n_filter_cores = N_FILTER_CORES
+        n_filter_cores = self.governed_app_vertex.n_filter_cores_required
         sources_per_vertex = max(1, int(2 ** math.ceil(math.log2(
             n_sources / n_filter_cores))))
 
