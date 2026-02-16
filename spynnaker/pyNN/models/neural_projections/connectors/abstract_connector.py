@@ -77,7 +77,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         "__safe",
         "__space",
         "__verbose",
-        "__param_seeds")
+        "__param_seeds",
+        "__used")
 
     def __init__(self, safe: bool = True, callback: None = None,
                  verbose: bool = False):
@@ -103,6 +104,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         self.__n_clipped_delays = numpy.int64(0)
         self.__min_delay = 0.0
         self.__param_seeds: Dict[Tuple[int, int], int] = dict()
+        self.__used = False
 
     def set_space(self, space: Space) -> None:
         """
@@ -717,9 +719,31 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         theType = type(self)
         params = self.get_parameters()
-        logger.warning(f"Cloning type{self} is not recommended "
-                       f"and may lead to incorrect results.")
+        logger.warning(
+            f"Cloning type{self} which may lead to incorrect results.")
         return theType(**params)
+
+    def get_unused(self) -> "AbstractConnector":
+        """
+        Checks the Connector is unused and clones if needed
+
+        This method should just check the connector is unused,
+        mark it as used and return it.
+
+        If the conenctor is used will attempt to make a clone,
+        log warning that this is not recommended and may be incorrect,
+        and returns the clone.
+
+        :return: Ideally this Connector
+        """
+        if self.__used:
+            logger.warning(
+                "Reusing Connectors in sPyNNaker is not recommended")
+            clone = self.clone()
+        else:
+            clone = self
+        clone.__used = True
+        return clone
 
     def describe(self, template: Optional[str] = None,
                  engine: str = 'default') -> str:
