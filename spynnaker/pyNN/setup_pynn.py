@@ -63,10 +63,11 @@ def install_spynnaker_into(module: ModuleType) -> None:
     shutil.copyfile(spynnaker_init, pynn_init)
 
     py_typed = os.path.join(spynnaker_dir, "py.typed")
-    pynn_typed = os.path.join(spinnaker_dir, "py_typed")
+    pynn_typed = os.path.join(spinnaker_dir, "py.typed")
     shutil.copyfile(py_typed, pynn_typed)
 
     print(f"Updated {pynn_init} to be the same as spynnaker.pyNN")
+    print(f"Added {pynn_typed}")
 
 
 def setup_pynn() -> None:
