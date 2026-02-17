@@ -708,7 +708,8 @@ class PopulationVertex(
                 if rate > 0:
                     spikes_per_second = rate
 
-            pre_spikes_per_second = spikes_per_second * pre_vertex.n_atoms
+            pre_spikes_per_second = int(math.ceil(
+                spikes_per_second * pre_vertex.n_atoms))
 
             pre_synapses_per_second: int = 0
             for proj in projs:
@@ -736,14 +737,14 @@ class PopulationVertex(
                 incoming_spikes_per_second += pre_spikes_per_second
 
         # How many cores are needed to process the non-direct-poisson synapses?
-        n_synapse_cores = math.ceil(
-            synapses_per_second / synapses_per_core_per_sim_second)
+        n_synapse_cores: int = int(math.ceil(
+            synapses_per_second / synapses_per_core_per_sim_second))
 
         # The number of Poisson cores that will be needed
-        n_poisson_cores = len(self.incoming_poisson_projections)
+        n_poisson_cores: int = len(self.incoming_poisson_projections)
 
-        n_filter_cores = math.ceil(
-            incoming_spikes_per_second / _FILTER_CORE_SPIKES_PER_SECOND)
+        n_filter_cores: int = int(math.ceil(
+            incoming_spikes_per_second / _FILTER_CORE_SPIKES_PER_SECOND))
 
         # If we can definitely do the Poisson vertices directly,
         # lets recommend this
@@ -754,12 +755,12 @@ class PopulationVertex(
 
         # Otherwise, we should consider how many more cores we need for the
         # Poisson input spikes
-        n_synapse_cores = math.ceil(
+        n_synapse_cores = int(math.ceil(
             (synapses_per_second + poisson_synapses_per_second) /
-            synapses_per_core_per_sim_second)
-        n_filter_cores = math.ceil(
+            synapses_per_core_per_sim_second))
+        n_filter_cores = int(math.ceil(
             (incoming_spikes_per_second + poisson_spikes_per_second) /
-            _FILTER_CORE_SPIKES_PER_SECOND)
+            _FILTER_CORE_SPIKES_PER_SECOND))
 
         # If the number of cores needed is more than the maximum, use the
         # maximum

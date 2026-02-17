@@ -47,7 +47,7 @@ from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
     SDRAM_PARAMS_SIZE as NEURONS_SDRAM_PARAMS_SIZE, NeuronMainProvenance)
 from spynnaker.pyNN.models.neuron\
     .population_machine_vertex_synapse_filter import (
-    PopulationMachineVertexSynapseFilter, FILTER_PARTITION_PREFIX)
+        PopulationMachineVertexSynapseFilter, FILTER_PARTITION_PREFIX)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
@@ -255,7 +255,7 @@ class SplitterPopulationVertexNeuronsSynapses(
                 sdram += filter_vertex.sdram_required
 
             # Add filter partition and edges
-            filter_part_id = FILTER_PARTITION_PREFIX + filter_vertex.label
+            filter_part_id = f"{FILTER_PARTITION_PREFIX}{filter_vertex.label}"
             filter_partition = MimoSysRAMMachinePartition(
                 OrderedSet(filter_vertices), filter_part_id)
             self.__sysram_partitions.append(filter_partition)
@@ -531,7 +531,7 @@ class SplitterPopulationVertexNeuronsSynapses(
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(self, partition_id: str) -> Sequence[
-            PopulationSynapsesMachineVertexCommon]:
+            MachineVertex]:
         if partition_id == SPIKE_PARTITION_ID:
             return self.__filter_vertices
         return []
@@ -760,5 +760,6 @@ class SplitterPopulationVertexNeuronsSynapses(
         return self.__sdram_partitions
 
     @overrides(AbstractSplitterCommon.get_internal_sysram_partitions)
-    def get_internal_sysram_partitions(self)->List[MimoSysRAMMachinePartition]:
+    def get_internal_sysram_partitions(self) -> List[
+            MimoSysRAMMachinePartition]:
         return self.__sysram_partitions

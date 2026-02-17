@@ -77,6 +77,7 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             n_steps_per_timestep: int = 1,
             neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
             n_synapse_cores: Optional[int] = None,
+            n_filter_cores: Optional[int] = None,
             allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
         """
         :param n_steps_per_timestep:
@@ -92,4 +93,5 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             drop_late_spikes=drop_late_spikes,
             splitter=splitter, seed=seed, n_colour_bits=n_colour_bits,
             neurons_per_core=neurons_per_core, n_synapse_cores=n_synapse_cores,
+            n_filter_cores=n_filter_cores,
             allow_delay_extensions=allow_delay_extensions)

@@ -22,7 +22,7 @@ from spinn_utilities.config_holder import get_config_int
 from pacman.model.resources import AbstractSDRAM
 from pacman.model.graphs.machine import (
     SDRAMMachineEdge, SourceSegmentedSDRAMMachinePartition,
-    DestinationSegmentedSysRAMMachinePartition)
+    MimoSysRAMMachinePartition)
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
@@ -175,8 +175,7 @@ class PopulationSynapsesMachineVertexCommon(
             SourceSegmentedSDRAMMachinePartition] = None
         self.__neuron_vertex: Optional[PopulationNeuronsMachineVertex] = None
         self.__partition_id: Optional[str] = None
-        self.__filter_partition: Optional[
-            DestinationSegmentedSysRAMMachinePartition] = None
+        self.__filter_partition: Optional[MimoSysRAMMachinePartition] = None
 
     @overrides(SendsSynapticInputsOverSDRAM.set_sdram_partition)
     def set_sdram_partition(
@@ -188,8 +187,7 @@ class PopulationSynapsesMachineVertexCommon(
         self.__sdram_partition = sdram_partition
 
     def set_filter_partition(
-            self, filter_partition:
-                DestinationSegmentedSysRAMMachinePartition) -> None:
+            self, filter_partition: MimoSysRAMMachinePartition) -> None:
         if self.__filter_partition is not None:
             raise SynapticConfigurationException(
                 "Trying to set filter partition more than once")

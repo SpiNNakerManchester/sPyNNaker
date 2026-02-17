@@ -115,6 +115,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             n_steps_per_timestep: int = 1,
             neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
             n_synapse_cores: Optional[int] = None,
+            n_filter_cores: Optional[int] = None,
             allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
         if n_neurons != len(self._devices):
             raise ConfigurationException(
@@ -133,7 +134,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         return ExternalDeviceLifControlVertex(
             devices=self._devices, create_edges=self._create_edges,
             max_atoms_per_core=neurons_per_core,
-            n_synapse_cores=n_synapse_cores,
+            n_synapse_cores=n_synapse_cores, n_filter_cores=n_filter_cores,
             allow_delay_extensions=allow_delay_extensions,
             neuron_impl=model, pynn_model=self, translator=self._translator,
             spikes_per_second=spikes_per_second, label=label,

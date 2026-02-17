@@ -14,7 +14,7 @@
 
 import ctypes
 from enum import IntEnum
-from typing import Sequence, List, Optional
+from typing import Sequence, List, Optional, cast
 
 from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.overrides import overrides
@@ -22,8 +22,7 @@ from spinnman.model.enums import ExecutableType
 from pacman.model.graphs import AbstractSupportsSysRAMEdges
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import (
-    MachineVertex, SysRAMMachineEdge,
-    DestinationSegmentedSysRAMMachinePartition)
+    MachineVertex, SysRAMMachineEdge, MimoSysRAMMachinePartition)
 from pacman.model.placements import Placement
 from pacman.model.resources import AbstractSDRAM, MultiRegionSDRAM
 from spinn_front_end_common.abstract_models import (
@@ -49,6 +48,7 @@ FILTER_PARTITION_PREFIX = "SynapseFilter_"
 N_BYTES_CONFIG = 6 * BYTES_PER_WORD
 N_BYTES_PER_SYNAPSE_CORE = BYTES_PER_WORD * 2
 CIRCULAR_BUFFER_BASE_SIZE = BYTES_PER_WORD * 4
+INPUT_BUFFER_LOCK = "InputBufferLock"
 
 
 class REGIONS(IntEnum):
@@ -87,8 +87,6 @@ class FilterProvenance(ctypes.LittleEndianStructure):
 
     N_ITEMS = len(_fields_)
 
-INPUT_BUFFER_LOCK = "InputBufferLock"
-
 
 class PopulationMachineVertexSynapseFilter(
         MachineVertex,
@@ -99,6 +97,10 @@ class PopulationMachineVertexSynapseFilter(
 
     __slots__ = ("__synapse_references", "__synapse_cores",
                  "__filter_partition")
+
+    @property
+    def _pop_vertex(self) -> PopulationVertex:
+        return cast('PopulationVertex', self._app_vertex)
 
     def __init__(
             self, label: str, app_vertex: PopulationVertex,
@@ -114,13 +116,10 @@ class PopulationMachineVertexSynapseFilter(
         super().__init__(label, app_vertex, vertex_slice)
         self.__synapse_references = synapse_references
         self.__synapse_cores = synapse_cores
-        self.__filter_partition: Optional[
-            DestinationSegmentedSysRAMMachinePartition] = None
+        self.__filter_partition: Optional[MimoSysRAMMachinePartition] = None
 
     def set_filter_partition(
-            self,
-            filter_partition:
-                DestinationSegmentedSysRAMMachinePartition) -> None:
+            self, filter_partition: MimoSysRAMMachinePartition) -> None:
         """ Set the partition that this filter sends using
 
         :param filter_partition: The partition that this filter sends using
@@ -154,7 +153,7 @@ class PopulationMachineVertexSynapseFilter(
         return "synapse_filter.aplx"
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
-    def get_binary_start_type(self)->ExecutableType:
+    def get_binary_start_type(self) -> ExecutableType:
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
@@ -258,8 +257,8 @@ class PopulationMachineVertexSynapseFilter(
             if filter_prov.n_packets_discarded > 0:
                 db.insert_report(
                     "At the end of time steps, "
-                    f"{filter_prov.n_packets_discarded} packets were discarded "
-                    f"on {label} (a maximum of "
+                    f"{filter_prov.n_packets_discarded} packets were "
+                    f"discarded on {label} (a maximum of "
                     f"{filter_prov.max_packets_discarded} in one time step). ")
 
     def __lowest_set(self, value: int) -> int:
@@ -278,9 +277,9 @@ class PopulationMachineVertexSynapseFilter(
         app_mask: Optional[int] = None
         app_shift: Optional[int] = None
         app_min: Optional[int] = None
-        app_max:Optional[int] = None
+        app_max: Optional[int] = None
         routing_info = SpynnakerDataView.get_routing_infos()
-        for proj in self._app_vertex.incoming_projections:
+        for proj in self._pop_vertex.incoming_projections:
             app_edge = proj._projection_edge
             s_info = proj._synapse_information
             if is_sdram_poisson_source(app_edge):
@@ -295,8 +294,10 @@ class PopulationMachineVertexSynapseFilter(
                     "Cannot configure synapse filter when application "
                     "masks differ")
 
+            assert app_mask is not None
+            assert app_shift is not None
             app_value = (r_info.key & app_mask) >> app_shift
-            if app_min is None:
+            if app_min is None or app_max is None:
                 app_min = app_value
                 app_max = app_value
             else:
@@ -305,14 +306,18 @@ class PopulationMachineVertexSynapseFilter(
                 if app_value > app_max:
                     app_max = app_value
 
-        assert app_mask is not None
-        assert app_shift is not None
-        assert app_min is not None
-        assert app_max is not None
-        spec.write_value(app_mask)
-        spec.write_value(app_shift)
-        spec.write_value(app_min)
-        spec.write_value(app_max)
+        if (app_mask is None or app_shift is None or app_min is None or
+                app_max is None):
+            # We have no projections, so it doesn't matter!
+            spec.write_value(0)
+            spec.write_value(0)
+            spec.write_value(0)
+            spec.write_value(0)
+        else:
+            spec.write_value(app_mask)
+            spec.write_value(app_shift)
+            spec.write_value(app_min)
+            spec.write_value(app_max)
         spec.write_value(get_config_int(
             "Simulation", "incoming_spike_buffer_size"))
         spec.write_value(len(self.__synapse_cores))
