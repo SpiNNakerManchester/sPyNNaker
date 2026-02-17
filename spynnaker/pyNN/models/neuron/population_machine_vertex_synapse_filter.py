@@ -94,6 +94,9 @@ class PopulationMachineVertexSynapseFilter(
         AbstractHasAssociatedBinary,
         ProvidesProvenanceDataFromMachineImpl,
         AbstractSupportsSysRAMEdges):
+    """ A machine vertex that filters incoming spikes for a population before
+        sending them to synapse processing vertices.
+    """
 
     __slots__ = ("__synapse_references", "__synapse_cores",
                  "__filter_partition")
@@ -280,6 +283,7 @@ class PopulationMachineVertexSynapseFilter(
         app_max: Optional[int] = None
         routing_info = SpynnakerDataView.get_routing_infos()
         for proj in self._pop_vertex.incoming_projections:
+            # pylint: disable=protected-access
             app_edge = proj._projection_edge
             s_info = proj._synapse_information
             if is_sdram_poisson_source(app_edge):

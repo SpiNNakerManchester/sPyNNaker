@@ -188,6 +188,8 @@ class PopulationSynapsesMachineVertexCommon(
 
     def set_filter_partition(
             self, filter_partition: MimoSysRAMMachinePartition) -> None:
+        """ Set the partition that will be incoming from the filter cores.
+        """
         if self.__filter_partition is not None:
             raise SynapticConfigurationException(
                 "Trying to set filter partition more than once")
