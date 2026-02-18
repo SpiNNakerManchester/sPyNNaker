@@ -713,7 +713,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         This method should just check the connector is unused,
         mark it as used and return it.
 
-        If the conenector is used will attempt to make a clone,
+        If the Connector is used will attempt to make a clone,
         log warning that this is not recommended and may be incorrect,
         and returns the clone.
 
