@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import inspect
+import tempfile
 from typing import Any, Dict, List, Tuple
 import unittest
 
@@ -24,7 +25,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector, AllButMeConnector, AllToAllConnector, ArrayConnector,
     ConvolutionConnector, CSAConnector, DistanceDependentProbabilityConnector,
     FixedNumberPostConnector, FixedNumberPreConnector,
-    FixedProbabilityConnector, FromListConnector,
+    FixedProbabilityConnector, FromFileConnector, FromListConnector,
     IndexBasedProbabilityConnector, KernelConnector, MultapseConnector,
     OneToOneConnector, OneToOneOffsetConnector, PoolDenseConnector,
     SmallWorldConnector)
@@ -278,6 +279,23 @@ class TestConnectors(unittest.TestCase):
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
         self.compare_connectors(connector, connector3)
+
+    def testFromFileConnector(self) -> None:
+        as_list = [(0, 0), (13, 0), (2, 13), (5, 1), (0, 1)]
+        _, name = tempfile.mkstemp(".temp")
+        numpy.savetxt(name, as_list)
+
+        connector = FromFileConnector(name)
+        params = connector.get_parameters()
+        # FromFileConnector return FromListConnector Params
+        connector2 = FromListConnector(**params)
+        self.compare_parameters(params, connector2.get_parameters())
+        self.compare_values(
+            "conn_list", connector.conn_list, connector2.conn_list)
+        # FromFileConnector clone returns a FromListConnector
+        connector3 = connector.clone()
+        self.compare_values(
+            "conn_list", connector.conn_list, connector3.conn_list)
 
     def testIndexBasedProbabilityConnector(self) -> None:
         rng = NumpyRNG(seed=14)
