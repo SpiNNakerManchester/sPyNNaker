@@ -108,7 +108,8 @@ class Population(PopulationBase):
         :param label: A label for the population
         :param max_rate: Typed semantic sugar for an additional_parameter
         :param n_colour_bits: Typed semantic sugar for an additional_parameter
-        :param n_synapse_cores: Typed semantic sugar for an additional_parameter
+        :param n_synapse_cores:
+            Typed semantic sugar for an additional_parameter
         :param neurons_per_core:
             Typed semantic sugar for an additional_parameter
         :param port: Typed semantic sugar for an additional_parameter
