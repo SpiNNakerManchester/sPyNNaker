@@ -86,7 +86,6 @@ class Population(PopulationBase):
             structure: Optional[BaseStructure] = None,
             initial_values: Optional[Dict[str, float]] = None,
             label: Optional[str] = None,
-            *,
             max_rate: Optional[float] = None,
             n_colour_bits: Optional[int] = None,
             neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
@@ -108,7 +107,8 @@ class Population(PopulationBase):
         :param label: A label for the population
         :param max_rate: Typed semantic sugar for an additional_parameter
         :param n_colour_bits: Typed semantic sugar for an additional_parameter
-        :param neurons_per_core: Typed semantic sugar for an additional_parameter
+        :param neurons_per_core:
+            Typed semantic sugar for an additional_parameter
         :param port: Typed semantic sugar for an additional_parameter
         :param reserve_reverse_ip_tag:
             Typed semantic sugar for an additional_parameter
@@ -117,7 +117,7 @@ class Population(PopulationBase):
         :param virtual_key: Typed semantic sugar for an additional_parameter
         :param additional_parameters:
             Additional parameters to pass to the vertex creation function.
-            See the Moodel's create_vertex for more details.
+            See the Model's create_vertex method for more details.
             These will be ignored if the Model does not accept this parameter.
             These will raise an Exception if a Vertex is passed in
             There may be additional parameters not listed in this init.
