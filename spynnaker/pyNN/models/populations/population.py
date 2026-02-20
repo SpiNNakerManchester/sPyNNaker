@@ -35,6 +35,8 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
 
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -84,6 +86,15 @@ class Population(PopulationBase):
             structure: Optional[BaseStructure] = None,
             initial_values: Optional[Dict[str, float]] = None,
             label: Optional[str] = None,
+            *,
+            max_rate: Optional[float] = None,
+            n_colour_bits: Optional[int] = None,
+            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
+            port: Optional[int] = None,
+            reserve_reverse_ip_tag: Optional[bool] = None,
+            seed: Optional[int] = None,
+            splitter: Optional[AbstractSplitterCommon] = None,
+            virtual_key: Optional[int] = None,
             additional_parameters: Optional[_ParamDict] = None,
             **additional_kwargs: _ParamDict):
         """
@@ -95,10 +106,26 @@ class Population(PopulationBase):
         :param structure:
         :param initial_values: Initial values of state variables
         :param label: A label for the population
+        :param max_rate: Typed semantic sugar for an additional_parameter
+        :param n_colour_bits: Typed semantic sugar for an additional_parameter
+        :param neurons_per_core: Typed semantic sugar for an additional_parameter
+        :param port: Typed semantic sugar for an additional_parameter
+        :param reserve_reverse_ip_tag:
+            Typed semantic sugar for an additional_parameter
+        :param seed: Typed semantic sugar for an additional_parameter
+        :param splitter: Typed semantic sugar for an additional_parameter
+        :param virtual_key: Typed semantic sugar for an additional_parameter
         :param additional_parameters:
             Additional parameters to pass to the vertex creation function.
+            See the Moodel's create_vertex for more details.
+            These will be ignored if the Model does not accept this parameter.
+            These will raise an Exception if a Vertex is passed in
+            There may be additional parameters not listed in this init.
+            Values passed in as key=value take precedent over any
+            in an additional_parameter= dict
         :param additional_kwargs:
-            A nicer way of allowing additional things
+            A nicer way of passing in any other additional_parameters
+            not specifically declared here.
         """
         # Deal with the kwargs!
         additional: _ParamDict = dict()
@@ -106,6 +133,22 @@ class Population(PopulationBase):
             additional.update(additional_parameters)
         if additional_kwargs:
             additional.update(additional_kwargs)
+        if max_rate is not None:
+            additional['max_rate'] = max_rate
+        if n_colour_bits is not None:
+            additional['n_colour_bits'] = n_colour_bits
+        if neurons_per_core is not None:
+            additional['neurons_per_core'] = neurons_per_core
+        if port is not None:
+            additional['port'] = port
+        if reserve_reverse_ip_tag is not None:
+            additional['reserve_reverse_ip_tag'] = reserve_reverse_ip_tag
+        if seed is not None:
+            additional['seed'] = seed
+        if splitter is not None:
+            additional['splitter'] = splitter
+        if virtual_key is not None:
+            additional['virtual_key'] = virtual_key
 
         # build our initial objects
         self.__celltype: AbstractPyNNModel
