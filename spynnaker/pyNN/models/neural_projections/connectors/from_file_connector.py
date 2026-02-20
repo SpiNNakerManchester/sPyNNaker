@@ -97,8 +97,8 @@ class FromFileConnector(FromListConnector):
     def clone(self) -> FromListConnector:
         params = self.get_parameters()
         logger.warning(
-            f"Cloning FromFileConnector as a FromListConnector "
-            f"which may lead to incorrect results.")
+            "Cloning FromFileConnector as a FromListConnector "
+            "which may lead to incorrect results.")
         return FromListConnector(**params)
 
     @overrides(FromListConnector.get_parameters)
