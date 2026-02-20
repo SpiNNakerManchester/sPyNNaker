@@ -86,8 +86,9 @@ class Population(PopulationBase):
             structure: Optional[BaseStructure] = None,
             initial_values: Optional[Dict[str, float]] = None,
             label: Optional[str] = None,
-            max_rate: Optional[float] = None,
+            *, max_rate: Optional[float] = None,
             n_colour_bits: Optional[int] = None,
+            n_synapse_cores: Optional[int] = None,
             neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
             port: Optional[int] = None,
             reserve_reverse_ip_tag: Optional[bool] = None,
@@ -107,6 +108,7 @@ class Population(PopulationBase):
         :param label: A label for the population
         :param max_rate: Typed semantic sugar for an additional_parameter
         :param n_colour_bits: Typed semantic sugar for an additional_parameter
+        :param n_synapse_cores: Typed semantic sugar for an additional_parameter
         :param neurons_per_core:
             Typed semantic sugar for an additional_parameter
         :param port: Typed semantic sugar for an additional_parameter
@@ -137,6 +139,8 @@ class Population(PopulationBase):
             additional['max_rate'] = max_rate
         if n_colour_bits is not None:
             additional['n_colour_bits'] = n_colour_bits
+        if n_synapse_cores is not None:
+            additional['n_synapse_cores'] = n_synapse_cores
         if neurons_per_core is not None:
             additional['neurons_per_core'] = neurons_per_core
         if port is not None:
