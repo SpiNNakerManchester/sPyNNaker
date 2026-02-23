@@ -123,7 +123,7 @@ class Population(PopulationBase):
             the number of neurons that can be placed on a single core.
         :param port:
             Model.create_vertex parameter.
-            Likely: The live input portthe vertex receives spikes on
+            Likely: The live input port the vertex receives spikes on
         :param reserve_reverse_ip_tag:
             Model.create_vertex parameter.
             Likely: Extra flag for input without a reserved port
