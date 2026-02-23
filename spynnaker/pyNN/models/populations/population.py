@@ -106,29 +106,47 @@ class Population(PopulationBase):
         :param structure:
         :param initial_values: Initial values of state variables
         :param label: A label for the population
-        :param max_rate: Typed semantic sugar for an additional_parameter
-        :param n_colour_bits: Typed semantic sugar for an additional_parameter
+        :param max_rate:
+            Model.create_vertex parameter.
+            Likely:
+            The maximum number of spikes for any neuron at any timestamp
+        :param n_colour_bits:
+            Model.create_vertex parameter.
+            Likely: The number of bits to use for colour
         :param n_synapse_cores:
-            Typed semantic sugar for an additional_parameter
+            Model.create_vertex parameter.
+            Likely: The number of synapse cores; 0 to force combined cores,
+            or None to allow the system to choose
         :param neurons_per_core:
-            Typed semantic sugar for an additional_parameter
-        :param port: Typed semantic sugar for an additional_parameter
+            Model.create_vertex parameter.
+            Likely: A ceiling on
+            the number of neurons that can be placed on a single core.
+        :param port:
+            Model.create_vertex parameter.
+            Likely: The live input portthe vertex receives spikes on
         :param reserve_reverse_ip_tag:
-            Typed semantic sugar for an additional_parameter
-        :param seed: Typed semantic sugar for an additional_parameter
-        :param splitter: Typed semantic sugar for an additional_parameter
-        :param virtual_key: Typed semantic sugar for an additional_parameter
+            Model.create_vertex parameter.
+            Likely: Extra flag for input without a reserved port
+        :param seed:
+            Model.create_vertex parameter.
+            Likely: The Population seed,
+            used to ensure the same random generation on each run.
+        :param splitter:
+            Model.create_vertex parameter.
+            Likely: splitter from application vertices to machine vertices
+        :param virtual_key:
+            Model.create_vertex parameter.
+            Likely:
+            The virtual_key of the population to identify the population.
         :param additional_parameters:
-            Additional parameters to pass to the vertex creation function.
-            See the Model's create_vertex method for more details.
-            These will be ignored if the Model does not accept this parameter.
-            These will raise an Exception if a Vertex is passed in
-            There may be additional parameters not listed in this init.
-            Values passed in as key=value take precedent over any
-            in an additional_parameter= dict
+            Alternative way of entering Model.create_vertex parameter.
+            Ignored if also provided as a named parameter.
         :param additional_kwargs:
-            A nicer way of passing in any other additional_parameters
-            not specifically declared here.
+            Additional Model.create_vertex parameters.
+            See the Model's create_vertex method for more details.
+            create_vertex parameters will be ignored if
+            the Model does not accept this parameter,
+            or raise an Exception if a Vertex is passed in
         """
         # Deal with the kwargs!
         additional: _ParamDict = dict()
