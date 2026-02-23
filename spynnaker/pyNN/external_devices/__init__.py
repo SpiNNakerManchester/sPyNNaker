@@ -228,9 +228,12 @@ def EthernetControlPopulation(
     :param database_notify_port_num:
         The optional port to which notifications from the database
         notification protocol are to be sent
-    :param n_synapse_cores: Typed semantic sugar for an additional_kwargs
+    :param n_synapse_cores:
+        Model.create_vertex parameter.
+        Likely: The number of synapse cores; 0 to force combined cores,
+        or None to allow the system to choose
     :param additional_kwargs:
-            Additional parameters to pass to the vertex creation function.
+            Additional parameters to pass to the Model.create_vertex function.
             See the Model's create_vertex method for more details.
             These will be ignored if the Model does not accept this parameter.
             These will raise an Exception if a Vertex is passed in
