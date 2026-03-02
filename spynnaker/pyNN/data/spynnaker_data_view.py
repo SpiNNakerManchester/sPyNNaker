@@ -73,7 +73,7 @@ class _SpynnakerDataModel(object):
         # Using a dict to verify if later could be stored here only
         self._populations: Set[Population] = set()
         self._projections: Set[Projection] = set()
-        self._pynn_report = None
+        self._pynn_report: Optional[str] = None
 
     def _hard_reset(self) -> None:
         """
@@ -239,8 +239,8 @@ class SpynnakerDataView(FecDataView):
         return _version.NAME
 
     @classmethod
-    def write_pynn_report(cls, text: str, *args: List[Any],
-                          **kwargs: Dict[str, Any]) -> None:
+    def write_pynn_report(cls, text: str, *args: Any,
+                          **kwargs: Any) -> None:
         """
         Writes text to the PyNN report file, or does nothing if the report is
         disabled.
