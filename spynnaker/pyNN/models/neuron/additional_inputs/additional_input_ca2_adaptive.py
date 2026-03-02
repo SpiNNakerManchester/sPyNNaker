@@ -22,6 +22,7 @@ from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
 
 from .abstract_additional_input import AbstractAdditionalInput
+from typing import Dict
 
 I_ALPHA = "i_alpha"
 I_CA2 = "i_ca2"
@@ -55,6 +56,13 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         self.__tau_ca2 = tau_ca2
         self.__i_ca2 = i_ca2
         self.__i_alpha = i_alpha
+
+    @overrides(AbstractAdditionalInput.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return {
+            TAU_CA2: self.__tau_ca2,
+            I_ALPHA: self.__i_alpha,
+            TIME_STEP: SpynnakerDataView.get_simulation_time_step_ms()}
 
     @overrides(AbstractAdditionalInput.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

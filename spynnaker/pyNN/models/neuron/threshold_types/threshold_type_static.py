@@ -21,6 +21,7 @@ from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.utilities.struct import Struct
 
 from .abstract_threshold_type import AbstractThresholdType
+from typing import Dict
 
 V_THRESH = "v_thresh"
 
@@ -39,6 +40,10 @@ class ThresholdTypeStatic(AbstractThresholdType):
             [Struct([(DataType.S1615, V_THRESH)])],
             {V_THRESH: "mV"})
         self.__v_thresh = v_thresh
+
+    @overrides(AbstractThresholdType.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return {V_THRESH: self.__v_thresh}
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

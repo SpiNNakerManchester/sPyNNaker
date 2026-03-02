@@ -19,6 +19,7 @@ from spynnaker.pyNN.models.neuron.implementations import (
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
 from .neuron_model import NeuronModel
+from typing import Dict
 
 A = 'a'
 B = 'b'
@@ -72,6 +73,13 @@ class NeuronModelIzh(NeuronModel):
         self.__i_offset = i_offset
         self.__v_init = v_init
         self.__u_init = u_init
+
+    @overrides(AbstractStandardNeuronComponent.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return {
+            A: self.__a, B: self.__b, C: self.__c, D: self.__d,
+            I_OFFSET: self.__i_offset, "v_init": self.__v_init,
+            "u_init": self.__u_init}
 
     @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

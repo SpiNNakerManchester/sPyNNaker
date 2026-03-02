@@ -252,3 +252,7 @@ class SynapseDynamicsStatic(
         # From Synapse-Centric Mapping of Cortical Models to the SpiNNaker
         # Neuromorphic Architecture
         return 13000000
+
+    def __str__(self) -> str:
+        return (
+            f"SynapseDynamicsStatic(weight={self.weight}, delay={self.delay})")

@@ -140,6 +140,10 @@ class Population(PopulationBase):
             for variable, value in initial_values.items():
                 self.__vertex.set_initial_state_values(variable, value)
 
+        SpynnakerDataView.write_pynn_report(
+            "{} = Population({}, {}, structure={}, initial_values={})",
+            label, size, model, structure, initial_values, label)
+
     def __iter__(self) -> Iterator[PopulationView]:
         """
         Iterate over local cells.
@@ -188,6 +192,9 @@ class Population(PopulationBase):
                sampling_interval: Optional[float] = None) -> None:
         self.__recorder.record(
             variables, to_file, sampling_interval, indexes=None)
+        SpynnakerDataView.write_pynn_report(
+            "{}.record(variables={}, to_file={}, sampling_interval={})",
+            self.label, variables, to_file, sampling_interval)
 
     def sample(self, n: int, rng: Optional[NumpyRNG] = None) -> PopulationView:
         """
@@ -370,6 +377,8 @@ class Population(PopulationBase):
                 " consider calling the non-PyNN function set_state instead.")
         for variable, value in kwargs.items():
             self.__vertex.set_initial_state_values(variable, value)
+        SpynnakerDataView.write_pynn_report(
+            "{}.initialize({})", self.label, kwargs)
 
     @property
     def initial_values(self) -> ParameterHolder:
@@ -590,6 +599,8 @@ class Population(PopulationBase):
         """
         # Pass this into the vertex
         self.__vertex.inject(current_source, [n for n in range(self.__size)])
+        SpynnakerDataView.write_pynn_report(
+            "{}.inject({})", self.label, current_source)
 
     def __len__(self) -> int:
         """

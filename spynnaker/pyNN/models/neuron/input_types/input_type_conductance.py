@@ -21,6 +21,7 @@ from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.utilities.struct import Struct
 
 from .abstract_input_type import AbstractInputType
+from typing import Dict
 
 E_REV_E = "e_rev_E"
 E_REV_I = "e_rev_I"
@@ -48,6 +49,10 @@ class InputTypeConductance(AbstractInputType):
         # pylint: disable=invalid-name
         self.__e_rev_E = e_rev_E
         self.__e_rev_I = e_rev_I
+
+    @overrides(AbstractInputType.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return {E_REV_E: self.__e_rev_E, E_REV_I: self.__e_rev_I}
 
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

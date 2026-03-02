@@ -21,6 +21,8 @@ from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
 
 from .abstract_input_type import AbstractInputType
+from typing import Dict
+from spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component import ModelParameter
 
 TIME_STEP = "time_step"
 
@@ -36,6 +38,10 @@ class InputTypeDelta(AbstractInputType):
             # scale_factor, calculated from timestep
             [Struct([(DataType.S1615, TIME_STEP)])],
             dict())
+
+    @overrides(AbstractInputType.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return dict()
 
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

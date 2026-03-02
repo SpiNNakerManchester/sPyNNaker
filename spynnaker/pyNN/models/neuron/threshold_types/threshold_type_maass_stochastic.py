@@ -22,6 +22,7 @@ from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
 
 from .abstract_threshold_type import AbstractThresholdType
+from typing import Dict
 
 DU_TH = "du_th"
 TAU_TH = "tau_th"
@@ -60,6 +61,13 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         self.__du_th = du_th
         self.__tau_th = tau_th
         self.__v_thresh = v_thresh
+
+    @overrides(AbstractThresholdType.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return {
+            DU_TH: self.__du_th,
+            TAU_TH: self.__tau_th,
+            V_THRESH: self.__v_thresh}
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

@@ -109,3 +109,10 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
             return value
         # TODO: Is this correct? Without this, things will only handle floats
         return SpynnakerRangedList(None, value)
+
+    @abstractmethod
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        """
+        The parameters of the component and their values
+        """
+        raise NotImplementedError

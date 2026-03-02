@@ -93,3 +93,6 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             splitter=splitter, seed=seed, n_colour_bits=n_colour_bits,
             neurons_per_core=neurons_per_core, n_synapse_cores=n_synapse_cores,
             allow_delay_extensions=allow_delay_extensions)
+
+    def __str__(self) -> str:
+        return f"{self._model}"

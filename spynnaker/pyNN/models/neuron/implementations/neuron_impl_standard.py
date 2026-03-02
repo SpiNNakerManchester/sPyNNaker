@@ -197,3 +197,10 @@ class NeuronImplStandard(AbstractNeuronImpl):
         # ... or fail
         raise AttributeError(
             f"'{self.__class__.__name__}' object has no attribute {key}")
+
+    def __str__(self) -> str:
+        param_values: str = "";
+        for component in self.__components:
+            for param, value in component.get_param_values().items():
+                param_values += f"{param}={value}, "
+        return f"{self.__class__.__name__}({param_values[:-2]})"

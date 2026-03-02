@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
@@ -63,6 +63,14 @@ class SynapseTypeExponential(AbstractSynapseType):
         self.__tau_syn_I = tau_syn_I
         self.__isyn_exc = isyn_exc
         self.__isyn_inh = isyn_inh
+
+    @overrides(AbstractSynapseType.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return {
+            TAU_SYN_E: self.__tau_syn_E,
+            TAU_SYN_I: self.__tau_syn_I,
+            ISYN_EXC: self.__isyn_exc,
+            ISYN_INH: self.__isyn_inh}
 
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

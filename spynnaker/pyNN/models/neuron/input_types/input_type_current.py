@@ -16,6 +16,9 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
 from spynnaker.pyNN.utilities.struct import Struct
 from .abstract_input_type import AbstractInputType
+from typing import Dict
+from spynnaker.pyNN.models.neuron.implementations\
+    .abstract_standard_neuron_component import ModelParameter
 
 
 class InputTypeCurrent(AbstractInputType):
@@ -26,6 +29,10 @@ class InputTypeCurrent(AbstractInputType):
 
     def __init__(self) -> None:
         super().__init__([Struct([])], dict())
+
+    @overrides(AbstractInputType.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return dict()
 
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:
