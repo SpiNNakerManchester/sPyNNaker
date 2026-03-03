@@ -13,8 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-from typing import (
-    Iterator, Optional, Set, Tuple, TYPE_CHECKING, List, Any, Dict)
+from typing import Iterator, Optional, Set, Tuple, TYPE_CHECKING, Any
 
 from spinn_utilities.log import FormatAdapter
 

@@ -213,6 +213,7 @@ class Projection(object):
             "source={}, receptor_type={}, space={}, label={})",
             pre_synaptic_population.label, post_synaptic_population.label,
             connector, synapse_type, source, receptor_type, space, label)
+
     @staticmethod
     def __check_population(param: _Pop) -> bool:
         """

@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Dict
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
 from spynnaker.pyNN.utilities.struct import Struct
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from .abstract_input_type import AbstractInputType
-from typing import Dict
-from spynnaker.pyNN.models.neuron.implementations\
-    .abstract_standard_neuron_component import ModelParameter
 
 
 class InputTypeCurrent(AbstractInputType):

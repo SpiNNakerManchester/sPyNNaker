@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Dict
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
 
@@ -22,7 +24,6 @@ from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
 
 from .abstract_additional_input import AbstractAdditionalInput
-from typing import Dict
 
 I_ALPHA = "i_alpha"
 I_CA2 = "i_ca2"

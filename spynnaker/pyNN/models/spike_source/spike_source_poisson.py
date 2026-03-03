@@ -76,7 +76,6 @@ class SpikeSourcePoisson(AbstractPyNNModel):
             rate=self.__rate, start=self.__start, duration=self.__duration,
             max_rate=max_rate, splitter=splitter, n_colour_bits=n_colour_bits)
 
-
     def __str__(self) -> str:
-        return (f"SpikeSourcePoisson(rate={self.__rate}, start={self.__start}, "
-                f"duration={self.__duration})")
+        return (f"SpikeSourcePoisson(rate={self.__rate}, start={self.__start},"
+                f" duration={self.__duration})")

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Dict
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
 
@@ -21,7 +23,6 @@ from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.utilities.struct import Struct
 
 from .abstract_input_type import AbstractInputType
-from typing import Dict
 
 E_REV_E = "e_rev_E"
 E_REV_I = "e_rev_I"
