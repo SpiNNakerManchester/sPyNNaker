@@ -68,7 +68,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         self.__check_out_delay(self.__delay, "delay")
         self.__check_out_weight(self.__weight, "weight")
 
-        if not numpy.allclose(cast(float, delay), self.__delay):
+        if delay is not None and not numpy.allclose(
+                cast(float, delay), self.__delay):
             logger.warning("Rounding up delay in f{} from {} to {}",
                            self, delay, self.__delay)
 
