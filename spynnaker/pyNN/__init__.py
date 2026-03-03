@@ -55,7 +55,7 @@ from spinn_front_end_common.utilities.exceptions import (
 import spynnaker.pyNN as _sim  # pylint: disable=import-self
 
 from spynnaker.pyNN.exceptions import SpynnakerException
-
+from spynnaker.pyNN.models.common.types import Names
 from spynnaker.pyNN.random_distribution import RandomDistribution
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
@@ -464,7 +464,7 @@ def set_allow_delay_extensions(
 
 def connect(pre: Population, post: Population, weight: float = 0.0,
             delay: Optional[float] = None, receptor_type: str = "excitatory",
-            p: int = 1, rng: Optional[NumpyRNG] = None) -> Projection:
+            p: int = 1, rng: Optional[NumpyRNG] = None) -> None:
     """
     Builds a projection.
 
@@ -487,8 +487,8 @@ def connect(pre: Population, post: Population, weight: float = 0.0,
     if rng is not None:
         warn_once(
             logger, "The rng argument to connect is ignored in sPyNNaker.")
-    return Projection(pre, post, connector, receptor_type=receptor_type,
-                      synapse_type=synapse)
+    Projection(pre, post, connector, receptor_type=receptor_type,
+               synapse_type=synapse)
 
 
 def create(
@@ -527,7 +527,7 @@ def get_current_time() -> float:
     return __simulator.t
 
 
-def get_min_delay() -> int:
+def get_min_delay() -> float:
     """
     The minimum allowed synaptic delay; delays will be clamped to be at
     least this.
@@ -539,7 +539,7 @@ def get_min_delay() -> int:
     return __simulator.dt
 
 
-def get_max_delay() -> int:
+def get_max_delay() -> float:
     """
     Part of the PyNN API but does not make sense for sPyNNaker as
     different Projection, Vertex splitter combination could have different
@@ -601,7 +601,7 @@ def rank() -> int:
     return 0
 
 
-def record(variables: Union[str, Sequence[str]], source: Population,
+def record(variables: Names, source: Population,
            filename: str, sampling_interval: Optional[float] = None,
            annotations: Optional[Dict[str, Any]] = None) -> Block:
     """
@@ -636,8 +636,6 @@ def reset(annotations: Optional[Dict[str, Any]] = None) -> None:
     if annotations is None:
         annotations = {}
     assert __simulator is not None
-    for recorder in __simulator.recorders:
-        recorder.store_to_cache(annotations)
     __simulator.reset()
 
 
