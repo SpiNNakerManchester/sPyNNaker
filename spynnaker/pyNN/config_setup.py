@@ -15,11 +15,12 @@
 import os
 from typing import Set
 
-from spinn_utilities.config_holder import clear_cfg_files
+from spinn_utilities.config_holder import clear_cfg_files, set_config
 from spinn_front_end_common.interface.config_setup import (
     add_default_cfg, add_spinnaker_cfg)
 from spinn_front_end_common.interface.config_setup import (
     fec_cfg_paths_skipped)
+from spinn_front_end_common.interface.config_handler import ConfigHandler
 
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
@@ -45,6 +46,7 @@ def unittest_setup() -> None:
     add_spynnaker_cfg()
     SpynnakerDataWriter.mock()
     AbstractPyNNNeuronModel.reset_all()
+    set_config("Reports", "write_pynn_report", "False")
 
 
 def add_spynnaker_cfg() -> None:
