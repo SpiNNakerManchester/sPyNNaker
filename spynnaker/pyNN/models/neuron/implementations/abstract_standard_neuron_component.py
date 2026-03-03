@@ -114,5 +114,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
     def get_param_values(self) -> Dict[str, ModelParameter]:
         """
         The parameters of the component and their values
+
+        :returns: A dictionary mapping parameter names to their values
         """
         raise NotImplementedError
