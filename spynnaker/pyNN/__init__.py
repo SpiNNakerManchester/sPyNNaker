@@ -203,27 +203,6 @@ __all__ = [
     'get_max_delay', 'initialize', 'list_standard_models', 'name',
     'record', "get_machine"]
 
-
-class __PynnOperations(TypedDict, total=False):
-    run: Callable[[float, Any], float]
-    run_until: Callable[[float, Any], float]
-    get_current_time: Callable[[], float]
-    get_time_step: Callable[[], float]
-    get_max_delay: Callable[[], int]
-    get_min_delay: Callable[[], int]
-    num_processes: Callable[[], int]
-    rank: Callable[[], int]
-    reset: Callable[[Dict[str, Any]], None]
-    create: Callable[
-        [Union[Type, AbstractPyNNModel], Optional[Dict[str, Any]], int],
-        Population]
-    connect: Callable[
-        [Population, Population, float, Optional[float], Optional[str], int,
-         Optional[NumpyRNG]], None]
-    record: Callable[
-        [Union[str, Sequence[str]], PopulationBase, str, Optional[float],
-         Optional[Dict[str, Any]]], Block]
-
 # Cache of the simulator created by setup
 __simulator: Optional[SpiNNaker] = None
 
@@ -500,7 +479,7 @@ def connect(pre: Population, post: Population, weight: float = 0.0,
     """
     SpynnakerDataView.check_user_can_act()
     if isinstance(pre, IDMixin):
-            pre = pre.as_view()
+        pre = pre.as_view()
     if isinstance(post, IDMixin):
         post = post.as_view()
     connector = FixedProbabilityConnector(p_connect=p)
@@ -696,6 +675,7 @@ def _run_until(time_point: float, callbacks: Optional[List[Callable]] = None):
     else:
         __simulator.run_until(time_point)
     return __simulator.t
+
 
 def run(simtime: float, callbacks: Optional[List[Callable]] = None) -> float:
     """
