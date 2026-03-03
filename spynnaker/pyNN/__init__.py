@@ -484,8 +484,8 @@ def set_allow_delay_extensions(
 
 
 def connect(pre: Population, post: Population, weight: float = 0.0,
-            delay: Optional[float] = None, receptor_type: Optional[str] = None,
-            p: int = 1, rng: Optional[NumpyRNG] = None) -> None:
+            delay: Optional[float] = None, receptor_type: str = "excitatory",
+            p: int = 1, rng: Optional[NumpyRNG] = None) -> Projection:
     """
     Builds a projection.
 
@@ -496,6 +496,7 @@ def connect(pre: Population, post: Population, weight: float = 0.0,
     :param receptor_type: excitatory / inhibitory
     :param p: probability
     :param rng: random number generator (ignored)
+    :returns: a new Projection
     """
     SpynnakerDataView.check_user_can_act()
     if isinstance(pre, IDMixin):
@@ -524,7 +525,7 @@ def create(
     :returns: A new Population
     """
     SpynnakerDataView.check_user_can_act()
-    return Population(cellclass, cellparams, n)
+    return Population(n, cellclass, cellparams)
 
 
 def NativeRNG(seed_value: Union[int, List[int], NDArray]) -> None:
@@ -543,6 +544,7 @@ def get_current_time() -> float:
     :return: returns the current time
     """
     SpynnakerDataView.check_user_can_act()
+    assert __simulator is not None
     return __simulator.t
 
 
@@ -554,6 +556,7 @@ def get_min_delay() -> int:
     :return: returns the min delay of the simulation
     """
     SpynnakerDataView.check_user_can_act()
+    assert __simulator is not None
     return __simulator.dt
 
 
@@ -579,6 +582,7 @@ def get_time_step() -> float:
     :return: get the time step of the simulation (in ms)
     """
     SpynnakerDataView.check_user_can_act()
+    assert __simulator is not None
     return __simulator.dt
 
 
@@ -618,7 +622,7 @@ def rank() -> int:
     return 0
 
 
-def record(variables: Union[str, Sequence[str]], source: PopulationBase,
+def record(variables: Union[str, Sequence[str]], source: Population,
            filename: str, sampling_interval: Optional[float] = None,
            annotations: Optional[Dict[str, Any]] = None) -> Block:
     """
@@ -652,6 +656,7 @@ def reset(annotations: Optional[Dict[str, Any]] = None) -> None:
     """
     if annotations is None:
         annotations = {}
+    assert __simulator is not None
     for recorder in __simulator.recorders:
         recorder.store_to_cache(annotations)
     __simulator.reset()
@@ -666,6 +671,7 @@ def _run_until(time_point: float, callbacks: Optional[List[Callable]] = None):
         accept the current time as an argument, and return the next time it
         wishes to be called.
     """
+    assert __simulator is not None
     now = __simulator.t
     # allow for floating point error
     if time_point - now < -__simulator.dt / 2.0:
@@ -701,6 +707,7 @@ def run(simtime: float, callbacks: Optional[List[Callable]] = None) -> float:
     :return: the actual simulation time that the simulation stopped at
     """
     SpynnakerDataView.check_user_can_act()
+    assert __simulator is not None
     return _run_until(__simulator.t + simtime, callbacks)
 
 
