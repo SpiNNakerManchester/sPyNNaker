@@ -164,6 +164,16 @@ class Population(PopulationBase):
         for _id in range(self.__size):
             yield IDMixin(self, _id)
 
+    def annotate(self, **annotations: Any) -> None:
+        """
+        Add annotations to this population. These are user-defined key-value
+        pairs that will be stored with the population and can be retrieved
+        later with the `annotations` property.
+
+        :param annotations: The annotations to add to the population.
+        """
+        self.__annotations.update(annotations)
+
     @property
     def annotations(self) -> Dict[str, Any]:
         """
