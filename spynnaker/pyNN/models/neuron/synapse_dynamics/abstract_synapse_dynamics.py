@@ -62,14 +62,15 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         self.__check_in_type(delay, "delay")
         self.__check_in_type(weight, "weight")
 
-        self.__delay = self._round_delay(delay)
+        self.__delay, delay_rounded = self._round_delay(delay)
         self.__weight = self._convert_weight(weight)
 
         self.__check_out_delay(self.__delay, "delay")
         self.__check_out_weight(self.__weight, "weight")
 
-        if delay is not None and not numpy.allclose(
-                cast(float, delay), self.__delay):
+        # This check is done here to ensure the class has all values
+        # initialized before a warning is displayed.
+        if delay_rounded:
             logger.warning("Rounding up delay in f{} from {} to {}",
                            self, delay, self.__delay)
 
@@ -162,17 +163,17 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return self.__weight
 
-    def _round_delay(self, delay: WeightsDelysIn) -> Delays:
+    def _round_delay(self, delay: WeightsDelysIn) -> Tuple[Delays, bool]:
         """
         Round the delays to multiples of full timesteps.
 
         (otherwise SDRAM estimation calculations can go wrong)
 
         :param delay:
-        :return: Rounded delay
+        :return: Rounded delay, and whether to display a warning
         """
         if isinstance(delay, (RandomDistribution, str)):
-            return delay
+            return delay, False
         if delay is None:
             delay = SpynnakerDataView.get_min_delay()
         # Note the cast is just to say trust use the delay will work
@@ -181,10 +182,11 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
                 numpy.rint(numpy.array(cast(float, delay)) *
                            SpynnakerDataView.get_simulation_time_step_per_ms())
                 * SpynnakerDataView.get_simulation_time_step_ms())
+        delay_rounded = not numpy.allclose(cast(float, delay), new_delay)
         if isinstance(new_delay, numpy.float64):
-            return float(new_delay)
+            return float(new_delay), delay_rounded
         if isinstance(new_delay, numpy.ndarray):
-            return new_delay
+            return new_delay, delay_rounded
         raise TypeError(f"{type(delay)=}")
 
     def _convert_weight(self, weight: WeightsDelysIn) -> Weights:
