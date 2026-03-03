@@ -39,7 +39,7 @@ class _MyNeuronModel(NeuronModel):
         self._bar = bar
 
     @overrides(AbstractStandardNeuronComponent.get_param_values)
-    def get_param_values(self)->Dict[str, ModelParameter]:
+    def get_param_values(self) -> Dict[str, ModelParameter]:
         return {"foo": self._foo, "bar": self._bar}
 
     @overrides(AbstractStandardNeuronComponent.add_parameters)
