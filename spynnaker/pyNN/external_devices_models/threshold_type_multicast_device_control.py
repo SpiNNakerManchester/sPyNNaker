@@ -61,7 +61,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
         self.__devices = devices
 
     @overrides(AbstractThresholdType.get_param_values)
-    def get_param_values(self)->Dict[str, ModelParameter]:
+    def get_param_values(self) -> Dict[str, ModelParameter]:
         return {
             _KEY: [d.device_control_key for d in self.__devices],
             _SCALE: [d.device_control_scaling_factor for d in self.__devices],
