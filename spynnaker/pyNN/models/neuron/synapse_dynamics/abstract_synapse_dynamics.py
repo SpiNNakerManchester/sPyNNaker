@@ -60,11 +60,17 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param weight: The weights or way to generate the weights
         """
         self.__check_in_type(delay, "delay")
-        self.__delay = self._round_delay(delay)
-        self.__check_out_delay(self.__delay, "delay")
         self.__check_in_type(weight, "weight")
+
+        self.__delay = self._round_delay(delay)
         self.__weight = self._convert_weight(weight)
+
+        self.__check_out_delay(self.__delay, "delay")
         self.__check_out_weight(self.__weight, "weight")
+
+        if not numpy.allclose(cast(float, delay), self.__delay):
+            logger.warning("Rounding up delay in f{} from {} to {}",
+                           self, delay, self.__delay)
 
     def __check_in_type(self, value: WeightsDelysIn, name: str) -> None:
         if value is None:
@@ -174,9 +180,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
                 numpy.rint(numpy.array(cast(float, delay)) *
                            SpynnakerDataView.get_simulation_time_step_per_ms())
                 * SpynnakerDataView.get_simulation_time_step_ms())
-        if not numpy.allclose(cast(float, delay), new_delay):
-            logger.warning("Rounding up delay in f{} from {} to {}",
-                           self, delay, new_delay)
         if isinstance(new_delay, numpy.float64):
             return float(new_delay)
         if isinstance(new_delay, numpy.ndarray):
