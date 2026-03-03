@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Dict
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
 
@@ -21,7 +23,6 @@ from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.utilities.struct import Struct
 
 from .abstract_threshold_type import AbstractThresholdType
-from typing import Dict
 
 V_THRESH = "v_thresh"
 

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Dict
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
 from spinn_front_end_common.interface.ds import DataType
@@ -19,7 +20,6 @@ from spynnaker.pyNN.models.neuron.implementations import (
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
 from .neuron_model import NeuronModel
-from typing import Dict
 
 A = 'a'
 B = 'b'

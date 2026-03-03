@@ -186,4 +186,5 @@ class NeuronImplStocExpStable(AbstractNeuronImpl):
             f"{self.model_name}(v_init={self._v_init}, "
             f"v_reset={self._v_reset}, tau={self._tau}, "
             f"tau_refrac={self._tau_refrac}, bias={self._bias}, "
-            f"refract_init={self._refract_init}, seed={self._random.seed})")
+            f"refract_init={self._refract_init}, "
+            f"seed={self._random.rng.seed})")

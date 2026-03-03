@@ -167,4 +167,5 @@ class NeuronImplStocExp(AbstractNeuronImpl):
     def __str__(self) -> str:
         return (
             f"NeuronImplStocExp(tau={self._tau}, bias={self._bias}, "
-            f"refract_init={self._refract_init}, seed={self._random.seed})")
+            f"refract_init={self._refract_init}, "
+            f"seed={self._random.rng.seed})")

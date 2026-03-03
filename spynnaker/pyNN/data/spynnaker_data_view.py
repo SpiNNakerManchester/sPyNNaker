@@ -16,11 +16,11 @@ import logging
 from typing import Iterator, Optional, Set, Tuple, TYPE_CHECKING, Any
 
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.config_holder import get_config_bool, get_report_path
 
 from spinn_front_end_common.data import FecDataView
 
 from spynnaker import _version
-from spinn_utilities.config_holder import get_config_bool, get_report_path
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection

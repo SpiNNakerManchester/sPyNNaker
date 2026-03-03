@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Sequence
+from typing import Sequence, Dict
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
@@ -23,6 +23,7 @@ from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.external_devices_models import (
     AbstractMulticastControllableDevice)
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 
 _DEVICE = "device"
 _KEY = "key"
@@ -58,6 +59,21 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
              _TS_INTER_SEND: "time steps", _TS_NEXT_SEND: "time steps",
              _TYPE: ""})
         self.__devices = devices
+
+    @overrides(AbstractThresholdType.get_param_values)
+    def get_param_values(self)->Dict[str, ModelParameter]:
+        return {
+            _KEY: [d.device_control_key for d in self.__devices],
+            _SCALE: [d.device_control_scaling_factor for d in self.__devices],
+            _MIN: [d.device_control_min_value for d in self.__devices],
+            _MAX: [d.device_control_max_value for d in self.__devices],
+            _TS_INTER_SEND: [
+                d.device_control_timesteps_between_sending
+                for d in self.__devices],
+            _TS_NEXT_SEND: [
+                d.device_control_first_send_timestep for d in self.__devices],
+            _TYPE: [d.device_control_send_type.value
+                    for d in self.__devices]}
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:
