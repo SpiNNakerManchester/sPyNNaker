@@ -20,7 +20,6 @@ from spinn_front_end_common.interface.config_setup import (
     add_default_cfg, add_spinnaker_cfg)
 from spinn_front_end_common.interface.config_setup import (
     fec_cfg_paths_skipped)
-from spinn_front_end_common.interface.config_handler import ConfigHandler
 
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
