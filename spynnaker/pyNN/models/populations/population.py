@@ -68,7 +68,6 @@ class Population(PopulationBase):
     """
     # pylint: disable=redefined-builtin
     __slots__ = (
-        "__annotations",
         "__celltype",
         "__first_id",
         "__last_id",
@@ -100,6 +99,8 @@ class Population(PopulationBase):
         :param additional_kwargs:
             A nicer way of allowing additional things
         """
+        super().__init__()
+
         # Deal with the kwargs!
         additional: _ParamDict = dict()
         if additional_parameters is not None:
@@ -129,7 +130,6 @@ class Population(PopulationBase):
         if realsize is None:
             realsize = self.__vertex.n_atoms
         self.__size = realsize
-        self.__annotations: Dict[str, Any] = dict()
 
         # things for pynn demands
         self.__first_id, self.__last_id = SpynnakerDataView.add_population(
@@ -139,6 +139,10 @@ class Population(PopulationBase):
         if initial_values:
             for variable, value in initial_values.items():
                 self.__vertex.set_initial_state_values(variable, value)
+
+        SpynnakerDataView.write_pynn_report(
+            "{} = Population({}, {}, structure={}, initial_values={})",
+            label, size, model, structure, initial_values)
 
     def __iter__(self) -> Iterator[PopulationView]:
         """
@@ -161,13 +165,6 @@ class Population(PopulationBase):
             yield IDMixin(self, _id)
 
     @property
-    def annotations(self) -> Dict[str, Any]:
-        """
-        The annotations given by the end user.
-        """
-        return self.__annotations
-
-    @property
     def celltype(self) -> AbstractPyNNModel:
         """
         The Model uses for this population.
@@ -188,6 +185,9 @@ class Population(PopulationBase):
                sampling_interval: Optional[float] = None) -> None:
         self.__recorder.record(
             variables, to_file, sampling_interval, indexes=None)
+        SpynnakerDataView.write_pynn_report(
+            "{}.record(variables={}, to_file={}, sampling_interval={})",
+            self.label, variables, to_file, sampling_interval)
 
     def sample(self, n: int, rng: Optional[NumpyRNG] = None) -> PopulationView:
         """
@@ -370,6 +370,8 @@ class Population(PopulationBase):
                 " consider calling the non-PyNN function set_state instead.")
         for variable, value in kwargs.items():
             self.__vertex.set_initial_state_values(variable, value)
+        SpynnakerDataView.write_pynn_report(
+            "{}.initialize({})", self.label, kwargs)
 
     @property
     def initial_values(self) -> ParameterHolder:
@@ -590,6 +592,8 @@ class Population(PopulationBase):
         """
         # Pass this into the vertex
         self.__vertex.inject(current_source, [n for n in range(self.__size)])
+        SpynnakerDataView.write_pynn_report(
+            "{}.inject({})", self.label, current_source)
 
     def __len__(self) -> int:
         """

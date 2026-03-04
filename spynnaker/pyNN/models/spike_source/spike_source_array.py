@@ -55,3 +55,6 @@ class SpikeSourceArray(AbstractPyNNModel):
     @property
     def _spike_times(self) -> Spikes:
         return self.__spike_times
+
+    def __str__(self) -> str:
+        return f"SpikeSourceArray(spike_times={self.__spike_times})"

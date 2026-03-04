@@ -13,9 +13,10 @@
 # limitations under the License.
 from __future__ import annotations
 import logging
-from typing import Iterator, Optional, Set, Tuple, TYPE_CHECKING
+from typing import Iterator, Optional, Set, Tuple, TYPE_CHECKING, Any
 
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.config_holder import get_config_bool, get_report_path
 
 from spinn_front_end_common.data import FecDataView
 
@@ -51,7 +52,8 @@ class _SpynnakerDataModel(object):
         "_id_counter",
         "_min_delay",
         "_populations",
-        "_projections")
+        "_projections",
+        "_pynn_report")
 
     def __new__(cls) -> '_SpynnakerDataModel':
         if cls.__singleton is not None:
@@ -70,6 +72,7 @@ class _SpynnakerDataModel(object):
         # Using a dict to verify if later could be stored here only
         self._populations: Set[Population] = set()
         self._projections: Set[Projection] = set()
+        self._pynn_report: Optional[str] = None
 
     def _hard_reset(self) -> None:
         """
@@ -233,3 +236,24 @@ class SpynnakerDataView(FecDataView):
         :returns: The name to be returned by `pyNN.spiNNaker.name`.
         """
         return _version.NAME
+
+    @classmethod
+    def write_pynn_report(cls, text: str, *args: Any,
+                          **kwargs: Any) -> None:
+        """
+        Writes text to the PyNN report file, or does nothing if the report is
+        disabled.
+
+        :param text: The text to write to the report file.
+        :param args: Any additional arguments to format into the text using
+            `str.format`.
+        :param kwargs: Any additional keyword arguments to format into the text
+            using `str.format`.
+        """
+        if not get_config_bool("Reports", "write_pynn_report"):
+            return
+        if cls.__spy_data._pynn_report is None:
+            cls.__spy_data._pynn_report = get_report_path("path_pynn_report")
+        with open(cls.__spy_data._pynn_report, "a", encoding="utf-8") as f:
+            f.write(text.format(*args, **kwargs))
+            f.write("\n")

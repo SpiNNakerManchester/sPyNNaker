@@ -192,7 +192,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         Clear the current recordings and reset the simulation.
         """
-        self.recorders = set()
+        self.__recorders = set()
         self.reset()
 
         # Stop any currently running SpiNNaker application

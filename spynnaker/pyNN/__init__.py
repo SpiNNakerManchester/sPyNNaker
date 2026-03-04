@@ -25,21 +25,18 @@ import filecmp
 import logging
 import os
 from typing import (
-    Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type,
-    TypedDict, Union, cast)
+    Any, Callable, Dict, Iterable, List, Optional, Tuple, Type, Union, cast)
 
 import numpy as __numpy
 from typing_extensions import Literal
 from numpy.typing import NDArray
 
-from pyNN import common as pynn_common
 from pyNN.common import control as _pynn_control
 from pyNN.recording import get_io
 from pyNN.random import NumpyRNG
 from pyNN.space import (
     Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure)
 from pyNN.space import distance as _pynn_distance
-from neo import Block
 
 from spinn_utilities.exceptions import SimulatorNotSetupException
 from spinn_utilities.log import FormatAdapter
@@ -56,7 +53,7 @@ from spinn_front_end_common.utilities.exceptions import (
 import spynnaker.pyNN as _sim  # pylint: disable=import-self
 
 from spynnaker.pyNN.exceptions import SpynnakerException
-
+from spynnaker.pyNN.models.common.types import Names
 from spynnaker.pyNN.random_distribution import RandomDistribution
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
@@ -205,30 +202,6 @@ __all__ = [
     'get_max_delay', 'initialize', 'list_standard_models', 'name',
     'record', "get_machine"]
 
-
-class __PynnOperations(TypedDict, total=False):
-    run: Callable[[float, Any], float]
-    run_until: Callable[[float, Any], float]
-    get_current_time: Callable[[], float]
-    get_time_step: Callable[[], float]
-    get_max_delay: Callable[[], int]
-    get_min_delay: Callable[[], int]
-    num_processes: Callable[[], int]
-    rank: Callable[[], int]
-    reset: Callable[[Dict[str, Any]], None]
-    create: Callable[
-        [Union[Type, AbstractPyNNModel], Optional[Dict[str, Any]], int],
-        Population]
-    connect: Callable[
-        [Population, Population, float, Optional[float], Optional[str], int,
-         Optional[NumpyRNG]], None]
-    record: Callable[
-        [Union[str, Sequence[str]], PopulationBase, str, Optional[float],
-         Optional[Dict[str, Any]]], Block]
-
-
-# Dynamically-extracted operations from PyNN
-__pynn: __PynnOperations = {}
 # Cache of the simulator created by setup
 __simulator: Optional[SpiNNaker] = None
 
@@ -312,9 +285,6 @@ def setup(timestep: Optional[Union[float, Literal["auto"]]] = None,
         logger.warning(
             "max_delay is not supported by sPyNNaker so will be ignored")
 
-    # setup PyNN common stuff
-    pynn_common.setup(timestep, min_delay, **extra_params)
-
     # create stuff simulator
     if SpynnakerDataView.is_setup():
         logger.warning("Calling setup a second time causes the previous "
@@ -340,8 +310,6 @@ def setup(timestep: Optional[Union[float, Literal["auto"]]] = None,
         logger.warning("Extra params {} have been applied to the setup "
                        "command which we do not consider", extra_params)
 
-    # get overloaded functions from PyNN in relation of our simulator object
-    _create_overloaded_functions(__simulator)
     SpynnakerDataView.add_database_socket_addresses(database_socket_addresses)
     return rank()
 
@@ -383,32 +351,6 @@ def Projection(
         synapse_type=synapse_type, source=source, receptor_type=receptor_type,
         space=space, label=label, download_synapses=download_synapses,
         partition_id=partition_id)
-
-
-def _create_overloaded_functions(spinnaker_simulator: SpiNNaker) -> None:
-    """
-    Creates functions that the main PyNN interface supports
-    (given from PyNN)
-
-    :param spinnaker_simulator: the simulator object we use underneath
-    """
-    # overload the failed ones with now valid ones, now that we're in setup
-    # phase.
-    __pynn["run"], __pynn["run_until"] = pynn_common.build_run(
-        spinnaker_simulator)
-
-    __pynn["get_current_time"], __pynn["get_time_step"], \
-        __pynn["get_min_delay"], __pynn["get_max_delay"], \
-        __pynn["num_processes"], __pynn["rank"] = \
-        pynn_common.build_state_queries(spinnaker_simulator)
-
-    __pynn["reset"] = pynn_common.build_reset(spinnaker_simulator)
-    __pynn["create"] = pynn_common.build_create(Population)
-
-    __pynn["connect"] = pynn_common.build_connect(
-        Projection, FixedProbabilityConnector, StaticSynapse)
-
-    __pynn["record"] = pynn_common.build_record(spinnaker_simulator)
 
 
 def end(_: Any = True) -> None:
@@ -520,7 +462,7 @@ def set_allow_delay_extensions(
 
 
 def connect(pre: Population, post: Population, weight: float = 0.0,
-            delay: Optional[float] = None, receptor_type: Optional[str] = None,
+            delay: Optional[float] = None, receptor_type: str = "excitatory",
             p: int = 1, rng: Optional[NumpyRNG] = None) -> None:
     """
     Builds a projection.
@@ -531,10 +473,20 @@ def connect(pre: Population, post: Population, weight: float = 0.0,
     :param delay: the delay of the connections
     :param receptor_type: excitatory / inhibitory
     :param p: probability
-    :param rng: random number generator
+    :param rng: random number generator (ignored)
     """
     SpynnakerDataView.check_user_can_act()
-    __pynn["connect"](pre, post, weight, delay, receptor_type, p, rng)
+    if isinstance(pre, IDMixin):
+        pre = pre.as_view()
+    if isinstance(post, IDMixin):
+        post = post.as_view()
+    connector = FixedProbabilityConnector(p_connect=p)
+    synapse = StaticSynapse(weight=weight, delay=delay)
+    if rng is not None:
+        warn_once(
+            logger, "The rng argument to connect is ignored in sPyNNaker.")
+    Projection(pre, post, connector, receptor_type=receptor_type,
+               synapse_type=synapse)
 
 
 def create(
@@ -550,7 +502,7 @@ def create(
     :returns: A new Population
     """
     SpynnakerDataView.check_user_can_act()
-    return __pynn["create"](cellclass, cellparams, n)
+    return Population(n, cellclass, cellparams)
 
 
 def NativeRNG(seed_value: Union[int, List[int], NDArray]) -> None:
@@ -569,10 +521,11 @@ def get_current_time() -> float:
     :return: returns the current time
     """
     SpynnakerDataView.check_user_can_act()
-    return __pynn["get_current_time"]()
+    assert __simulator is not None
+    return __simulator.t
 
 
-def get_min_delay() -> int:
+def get_min_delay() -> float:
     """
     The minimum allowed synaptic delay; delays will be clamped to be at
     least this.
@@ -580,10 +533,11 @@ def get_min_delay() -> int:
     :return: returns the min delay of the simulation
     """
     SpynnakerDataView.check_user_can_act()
-    return __pynn["get_min_delay"]()
+    assert __simulator is not None
+    return __simulator.dt
 
 
-def get_max_delay() -> int:
+def get_max_delay() -> float:
     """
     Part of the PyNN API but does not make sense for sPyNNaker as
     different Projection, Vertex splitter combination could have different
@@ -605,7 +559,8 @@ def get_time_step() -> float:
     :return: get the time step of the simulation (in ms)
     """
     SpynnakerDataView.check_user_can_act()
-    return float(__pynn["get_time_step"]())
+    assert __simulator is not None
+    return __simulator.dt
 
 
 def initialize(cells: PopulationBase, **initial_values: Any) -> None:
@@ -616,7 +571,8 @@ def initialize(cells: PopulationBase, **initial_values: Any) -> None:
     :param initial_values: the parameters and their values to change
     """
     SpynnakerDataView.check_user_can_act()
-    pynn_common.initialize(cells, **initial_values)
+    assert isinstance(cells, (Population, Assembly)), type(cells)
+    cells.initialize(**initial_values)
 
 
 def num_processes() -> int:
@@ -628,8 +584,7 @@ def num_processes() -> int:
 
     :return: the number of MPI processes
     """
-    SpynnakerDataView.check_user_can_act()
-    return __pynn["num_processes"]()
+    return 1
 
 
 def rank() -> int:
@@ -641,13 +596,12 @@ def rank() -> int:
 
     :return: MPI rank
     """
-    SpynnakerDataView.check_user_can_act()
-    return __pynn["rank"]()
+    return 0
 
 
-def record(variables: Union[str, Sequence[str]], source: PopulationBase,
+def record(variables: Names, source: PopulationBase,
            filename: str, sampling_interval: Optional[float] = None,
-           annotations: Optional[Dict[str, Any]] = None) -> Block:
+           annotations: Optional[Dict[str, Any]] = None) -> None:
     """
     Sets variables to be recorded.
 
@@ -659,11 +613,15 @@ def record(variables: Union[str, Sequence[str]], source: PopulationBase,
     :param sampling_interval:
         how often to sample the recording, not ignored so far
     :param annotations: the annotations to data writers
-    :return: neo object
     """
     SpynnakerDataView.check_user_can_act()
-    return __pynn["record"](variables, source, filename, sampling_interval,
-                            annotations)
+    if not isinstance(source, (Population, Assembly)):
+        if isinstance(source, (IDMixin)):
+            source = source.as_view()
+    source.record(variables, to_file=filename,
+                  sampling_interval=sampling_interval)
+    if annotations:
+        source.annotate(**annotations)
 
 
 def reset(annotations: Optional[Dict[str, Any]] = None) -> None:
@@ -674,11 +632,49 @@ def reset(annotations: Optional[Dict[str, Any]] = None) -> None:
     """
     if annotations is None:
         annotations = {}
-    SpynnakerDataView.check_user_can_act()
-    __pynn["reset"](annotations)
+    assert __simulator is not None
+    __simulator.reset()
 
 
-def run(simtime: float, callbacks: Optional[Callable] = None) -> float:
+def _run_until(time_point: float,
+               callbacks: Optional[List[Callable]] = None) -> float:
+    """
+    Advance the simulation until a given time.
+
+    :param time_point: the time to run until (in ms)
+    :param callbacks: an optional list of callback functions, each of which
+        accepts the current time as an argument, and returns the next time it
+        wishes to be called.
+    :returns: the actual simulation time that the simulation stopped at
+    """
+    assert __simulator is not None
+    now = __simulator.t
+    # allow for floating point error
+    if time_point - now < -__simulator.dt / 2.0:
+        raise ValueError(
+            f"Time {time_point} is in the past (current time {now})")
+    if callbacks:
+        callback_events = [(callback(__simulator.t), callback)
+                           for callback in callbacks]
+        while __simulator.t + 1e-9 < time_point:
+            callback_events.sort(key=lambda cbe: cbe[0], reverse=True)
+            nxt, callback = callback_events.pop()
+            # collapse multiple events that happen within the same timestep
+            active_callbacks = [callback]
+            while (len(callback_events) > 0 and
+                   abs(nxt - callback_events[-1][0]) < __simulator.dt):
+                active_callbacks.append(callback_events.pop()[1])
+
+            nxt = min(nxt, time_point)
+            __simulator.run_until(nxt)
+            callback_events.extend((callback(__simulator.t), callback)
+                                   for callback in active_callbacks)
+    else:
+        __simulator.run_until(time_point)
+    return __simulator.t
+
+
+def run(simtime: float, callbacks: Optional[List[Callable]] = None) -> float:
     """
     The run() function advances the simulation for a given number of
     milliseconds.
@@ -688,7 +684,8 @@ def run(simtime: float, callbacks: Optional[Callable] = None) -> float:
     :return: the actual simulation time that the simulation stopped at
     """
     SpynnakerDataView.check_user_can_act()
-    return __pynn["run"](simtime, callbacks)
+    assert __simulator is not None
+    return _run_until(__simulator.t + simtime, callbacks)
 
 
 # left here because needs to be done, and no better place to put it
@@ -704,7 +701,7 @@ def run_until(tstop: float) -> float:
     :return: the actual simulation time that the simulation stopped at
     """
     SpynnakerDataView.check_user_can_act()
-    return __pynn["run_until"](tstop, None)
+    return _run_until(tstop, None)
 
 
 def get_machine() -> Machine:

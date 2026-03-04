@@ -276,7 +276,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         return block
 
     def __repr__(self) -> str:
-        return f"MultapseConnector({self.__num_synapses})"
+        return f"FixedTotalNumberConnector({self.__num_synapses})"
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)

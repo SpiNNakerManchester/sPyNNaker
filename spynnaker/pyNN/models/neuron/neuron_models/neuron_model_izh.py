@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Dict
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
 from spinn_front_end_common.interface.ds import DataType
@@ -72,6 +73,13 @@ class NeuronModelIzh(NeuronModel):
         self.__i_offset = i_offset
         self.__v_init = v_init
         self.__u_init = u_init
+
+    @overrides(AbstractStandardNeuronComponent.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return {
+            A: self.__a, B: self.__b, C: self.__c, D: self.__d,
+            I_OFFSET: self.__i_offset, "v_init": self.__v_init,
+            "u_init": self.__u_init}
 
     @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

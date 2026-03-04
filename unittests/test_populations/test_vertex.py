@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import pytest
+from typing import Dict
 import pyNN.spiNNaker as sim
 
 from spinn_utilities.overrides import overrides
@@ -25,7 +26,7 @@ from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
 
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent)
+    AbstractStandardNeuronComponent, ModelParameter)
 
 from unittests.mocks import (
     MockInputType, MockSynapseType, MockThresholdType)
@@ -36,6 +37,10 @@ class _MyNeuronModel(NeuronModel):
         super().__init__([], {})
         self._foo = foo
         self._bar = bar
+
+    @overrides(AbstractStandardNeuronComponent.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return {"foo": self._foo, "bar": self._bar}
 
     @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:
