@@ -68,7 +68,6 @@ class PopulationView(PopulationBase):
         Selector to Id is actually handled by :py:class:`~.AbstractSized`.
     """
     __slots__ = (
-        "__annotations",
         "__indexes",
         "__label",
         "__mask",
@@ -77,7 +76,9 @@ class PopulationView(PopulationBase):
         "__vertex",
         "__recorder")
 
-    __realslots__ = frozenset("_PopulationView" + item for item in __slots__)
+    __realslots__ = frozenset(
+        ["_PopulationView" + item for item in __slots__] +
+        ["_PopulationBase__annotations"])
 
     def __init__(
             self, parent: Union[Population, 'PopulationView'],
@@ -114,7 +115,6 @@ class PopulationView(PopulationBase):
         if label is None:
             label = f"{parent.label}:{selector}"
         self.__label = label
-        self.__annotations: Dict[str, Any] = dict()
 
         # Get these two objects to make access easier
         # pylint: disable=protected-access
@@ -302,7 +302,7 @@ class PopulationView(PopulationBase):
                    "parent": self.parent.label,
                    "mask": self.mask,
                    "size": self.size}
-        context.update(self.__annotations)
+        context.update(self.annotations)
         return descriptions.render(engine, template, context)
 
     def find_units(self, variable: str) -> str:
