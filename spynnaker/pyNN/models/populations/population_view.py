@@ -99,6 +99,7 @@ class PopulationView(PopulationBase):
             will all create the same view.
         :param label: A label for the view
         """
+        super().__init__()
         self.__parent = parent
         sized = AbstractSized(parent.size)
         ids = sized.selector_to_ids(selector, warn=True)

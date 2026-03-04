@@ -99,6 +99,8 @@ class Population(PopulationBase):
         :param additional_kwargs:
             A nicer way of allowing additional things
         """
+        super().__init__()
+
         # Deal with the kwargs!
         additional: _ParamDict = dict()
         if additional_parameters is not None:

@@ -50,7 +50,7 @@ class PopulationBase(object, metaclass=AbstractBase):
     __slots__ = (
         "__annotations",)
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.__annotations: Dict[str, Any] = dict()
 
     def annotate(self, **annotations: Any) -> None:
