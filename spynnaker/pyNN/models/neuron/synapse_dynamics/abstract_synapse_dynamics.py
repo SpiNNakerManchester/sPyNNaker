@@ -71,7 +71,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         # This check is done here to ensure the class has all values
         # initialized before a warning is displayed.
         if delay_rounded:
-            logger.warning("Rounding up delay in f{} from {} to {}",
+            logger.warning("Rounding up delay in {} from {} to {}",
                            self, delay, self.__delay)
 
     def __check_in_type(self, value: WeightsDelysIn, name: str) -> None:

@@ -475,7 +475,6 @@ def connect(pre: Population, post: Population, weight: float = 0.0,
     :param receptor_type: excitatory / inhibitory
     :param p: probability
     :param rng: random number generator (ignored)
-    :returns: a new Projection
     """
     SpynnakerDataView.check_user_can_act()
     if isinstance(pre, IDMixin):
@@ -601,9 +600,9 @@ def rank() -> int:
     return 0
 
 
-def record(variables: Names, source: Population,
+def record(variables: Names, source: PopulationBase,
            filename: str, sampling_interval: Optional[float] = None,
-           annotations: Optional[Dict[str, Any]] = None) -> Block:
+           annotations: Optional[Dict[str, Any]] = None) -> None:
     """
     Sets variables to be recorded.
 
@@ -615,7 +614,6 @@ def record(variables: Names, source: Population,
     :param sampling_interval:
         how often to sample the recording, not ignored so far
     :param annotations: the annotations to data writers
-    :return: neo object
     """
     SpynnakerDataView.check_user_can_act()
     if not isinstance(source, (Population, Assembly)):

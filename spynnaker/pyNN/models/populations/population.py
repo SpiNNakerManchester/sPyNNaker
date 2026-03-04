@@ -68,7 +68,6 @@ class Population(PopulationBase):
     """
     # pylint: disable=redefined-builtin
     __slots__ = (
-        "__annotations",
         "__celltype",
         "__first_id",
         "__last_id",
@@ -129,7 +128,6 @@ class Population(PopulationBase):
         if realsize is None:
             realsize = self.__vertex.n_atoms
         self.__size = realsize
-        self.__annotations: Dict[str, Any] = dict()
 
         # things for pynn demands
         self.__first_id, self.__last_id = SpynnakerDataView.add_population(
@@ -142,7 +140,7 @@ class Population(PopulationBase):
 
         SpynnakerDataView.write_pynn_report(
             "{} = Population({}, {}, structure={}, initial_values={})",
-            label, size, model, structure, initial_values, label)
+            label, size, model, structure, initial_values)
 
     def __iter__(self) -> Iterator[PopulationView]:
         """
@@ -163,23 +161,6 @@ class Population(PopulationBase):
         """
         for _id in range(self.__size):
             yield IDMixin(self, _id)
-
-    def annotate(self, **annotations: Any) -> None:
-        """
-        Add annotations to this population. These are user-defined key-value
-        pairs that will be stored with the population and can be retrieved
-        later with the `annotations` property.
-
-        :param annotations: The annotations to add to the population.
-        """
-        self.__annotations.update(annotations)
-
-    @property
-    def annotations(self) -> Dict[str, Any]:
-        """
-        The annotations given by the end user.
-        """
-        return self.__annotations
 
     @property
     def celltype(self) -> AbstractPyNNModel:

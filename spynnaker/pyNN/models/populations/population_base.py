@@ -47,7 +47,28 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     Mainly pass through and not implemented.
     """
-    __slots__ = ()
+    __slots__ = (
+        "__annotations",)
+
+    def __init__(self):
+        self.__annotations: Dict[str, Any] = dict()
+
+    def annotate(self, **annotations: Any) -> None:
+        """
+        Add annotations to this population. These are user-defined key-value
+        pairs that will be stored with the population and can be retrieved
+        later with the `annotations` property.
+
+        :param annotations: The annotations to add to the population.
+        """
+        self.__annotations.update(annotations)
+
+    @property
+    def annotations(self) -> Dict[str, Any]:
+        """
+        The annotations given by the end user.
+        """
+        return self.__annotations
 
     @property
     def local_cells(self) -> Sequence[IDMixin]:
