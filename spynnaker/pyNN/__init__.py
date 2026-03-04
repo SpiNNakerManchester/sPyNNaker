@@ -644,8 +644,8 @@ def _run_until(time_point: float,
     Advance the simulation until a given time.
 
     :param time_point: the time to run until (in ms)
-    :param callbacks: an optional list of callables, each of which should
-        accept the current time as an argument, and return the next time it
+    :param callbacks: an optional list of callback functions, each of which
+        accepts the current time as an argument, and returns the next time it
         wishes to be called.
     :returns: the actual simulation time that the simulation stopped at
     """
