@@ -25,8 +25,7 @@ import filecmp
 import logging
 import os
 from typing import (
-    Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type,
-    TypedDict, Union, cast)
+    Any, Callable, Dict, Iterable, List, Optional, Tuple, Type, Union, cast)
 
 import numpy as __numpy
 from typing_extensions import Literal
@@ -639,7 +638,8 @@ def reset(annotations: Optional[Dict[str, Any]] = None) -> None:
     __simulator.reset()
 
 
-def _run_until(time_point: float, callbacks: Optional[List[Callable]] = None):
+def _run_until(time_point: float,
+               callbacks: Optional[List[Callable]] = None) -> float:
     """
     Advance the simulation until a given time.
 
@@ -647,6 +647,7 @@ def _run_until(time_point: float, callbacks: Optional[List[Callable]] = None):
     :param callbacks: an optional list of callables, each of which should
         accept the current time as an argument, and return the next time it
         wishes to be called.
+    :returns: the actual simulation time that the simulation stopped at
     """
     assert __simulator is not None
     now = __simulator.t
