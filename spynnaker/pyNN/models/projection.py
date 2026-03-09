@@ -98,6 +98,7 @@ class Projection(object):
             raise NotImplementedError(
                 f"sPyNNaker {__version__} does not yet support "
                 "multi-compartmental cells.")
+        connector.make_used()
 
         pre_is_view = self.__check_population(pre_synaptic_population)
         post_is_view = self.__check_population(post_synaptic_population)
