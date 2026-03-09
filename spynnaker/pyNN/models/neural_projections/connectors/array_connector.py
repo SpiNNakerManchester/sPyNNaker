@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import Sequence, Optional, TYPE_CHECKING
+from typing import Any, Dict, Optional, Sequence, TYPE_CHECKING
 
 import numpy
 from numpy import uint8
@@ -75,6 +75,12 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
         self.__n_total_connections = n_total_connections
         self.__array_dims = dims
+
+    @overrides(AbstractConnector.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        parameters = self._get_parameters()
+        parameters["array"] = self.__array
+        return parameters
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:

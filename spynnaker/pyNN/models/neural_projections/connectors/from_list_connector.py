@@ -16,7 +16,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import logging
 from typing import (
-    Dict, List, Optional, Sequence, Tuple, Union, cast, TYPE_CHECKING)
+    Any, Dict, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING)
 
 import numpy
 from numpy import floating, integer, int64, uint32
@@ -81,7 +81,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         "__split_conn_list",
         "__split_post_slices")
 
-    def __init__(self, conn_list: Union[None, NDArray, List[Tuple[int, ...]]],
+    def __init__(self, conn_list: Union[NDArray, List[Tuple[int, ...]]],
                  column_names: Optional[Sequence[str]] = None, *,
                  safe: bool = True, verbose: bool = False,
                  callback: None = None):
@@ -119,16 +119,26 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         self.__split_conn_list: Dict[int, NDArray[integer]] = {}
         self.__split_post_slices: Optional[List[Slice]] = None
 
-        # These are set by the conn_list setter
         self.__conn_list: NDArray
+        # These are set by __setup_using_conn_list
         self.__sources: NDArray[uint32]
         self.__targets: NDArray[uint32]
         self.__delays: Optional[NDArray[floating]]
         self.__weights: Optional[NDArray[floating]]
         self.__extra_params: Optional[_ExtraParams]
 
-        # Call the conn_list setter, as this sets the internal values
-        self.conn_list = cast(NDArray, conn_list)  # Bug: python/mypy#3004
+        if conn_list is None or len(conn_list) == 0:
+            self.__conn_list = numpy.zeros((0, 2), dtype=uint32)
+        else:
+            self.__conn_list = numpy.array(conn_list)
+        self.__setup_using_conn_list()
+
+    @overrides(AbstractConnector.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        parameters = self._get_parameters()
+        parameters["conn_list"] = self.conn_list
+        parameters["column_names"] = self.column_names
+        return parameters
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
@@ -373,14 +383,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         """
         return self.__conn_list
 
-    @conn_list.setter
-    def conn_list(self, conn_list: Union[
-            None, NDArray, List[Tuple[int, ...]]]) -> None:
-        if conn_list is None or len(conn_list) == 0:
-            self.__conn_list = numpy.zeros((0, 2), dtype=uint32)
-        else:
-            self.__conn_list = numpy.array(conn_list)
-
+    def __setup_using_conn_list(self) -> None:
         # If the shape of the conn_list is 2D, numpy has been able to create
         # a 2D array which means every entry has the same number of values.
         # If this was not possible, raise an exception!
@@ -470,10 +473,6 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         are present.
         """
         return self.__column_names
-
-    @column_names.setter
-    def column_names(self, column_names: Optional[Sequence[str]]) -> None:
-        self.__column_names = column_names
 
     def get_extra_parameters(self) -> Optional[NDArray]:
         """

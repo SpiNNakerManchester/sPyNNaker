@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Sequence, Optional, TYPE_CHECKING
+from typing import Any, Dict, Sequence, Optional, TYPE_CHECKING
 
 import numpy
 from numpy import uint32
@@ -91,6 +91,13 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
         self.__n_neurons_per_group = n_neurons_per_group
         self.__weights = weights
         self.__check_weights(weights, n_neurons_per_group)
+
+    @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        parameters = self._get_parameters()
+        parameters["n_neurons_per_group"] = self.__n_neurons_per_group
+        parameters["weights"] = self.__weights
+        return parameters
 
     def __check_weights(self, weights: Optional[NDArray[numpy.float64]],
                         n_neurons_per_group: Optional[int]) -> None:

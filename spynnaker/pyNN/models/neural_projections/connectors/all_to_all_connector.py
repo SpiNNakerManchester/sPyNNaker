@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Sequence, Optional, TYPE_CHECKING
+from typing import Any, Dict, Optional, Sequence, TYPE_CHECKING
 
 import numpy
 from numpy import uint32
@@ -64,6 +64,12 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
         """
         super().__init__(safe, callback, verbose)
         self.__allow_self_connections = allow_self_connections
+
+    @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        parameters = self._get_parameters()
+        parameters["allow_self_connections"] = self.allow_self_connections
+        return parameters
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
@@ -151,10 +157,6 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
         if the connector is used to connect a Population to itself
         """
         return self.__allow_self_connections
-
-    @allow_self_connections.setter
-    def allow_self_connections(self, new_value: bool) -> None:
-        self.__allow_self_connections = new_value
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)

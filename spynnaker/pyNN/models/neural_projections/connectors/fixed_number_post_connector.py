@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 import math
-from typing import List, Optional, Sequence, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Sequence, TYPE_CHECKING
 
 import numpy
 from numpy import integer, uint32
@@ -98,6 +98,15 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         self.__post_neurons: List[NDArray[integer]] = []
         self.__post_neurons_set = False
         self.__rng = rng
+
+    @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        parameters = self._get_parameters()
+        parameters["n"] = self.__n_post
+        parameters["allow_self_connections"] = self.allow_self_connections
+        parameters["with_replacement"] = self.__with_replacement
+        parameters["rng"] = self.__rng
+        return parameters
 
     def set_projection_information(
             self, synapse_info: SynapseInformation) -> None:
@@ -297,10 +306,6 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         Do we include connections from a neuron/id to itself?
         """
         return self.__allow_self_connections
-
-    @allow_self_connections.setter
-    def allow_self_connections(self, new_value: bool) -> None:
-        self.__allow_self_connections = new_value
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)

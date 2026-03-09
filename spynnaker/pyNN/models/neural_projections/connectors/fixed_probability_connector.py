@@ -14,7 +14,7 @@
 from __future__ import annotations
 import logging
 import math
-from typing import Optional, Sequence, TYPE_CHECKING
+from typing import Any, Dict, Optional, Sequence, TYPE_CHECKING
 
 import numpy
 from numpy.typing import NDArray
@@ -99,6 +99,14 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
         self.__rng = rng
+
+    @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        parameters = self._get_parameters()
+        parameters["p_connect"] = self.p_connect
+        parameters["allow_self_connections"] = self.__allow_self_connections
+        parameters["rng"] = self.__rng
+        return parameters
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
@@ -218,13 +226,6 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         A value between zero and one. (inclusive)
         """
         return self._p_connect
-
-    @p_connect.setter
-    def p_connect(self, new_value: float) -> None:
-        if not 0.0 <= new_value <= 1.0:
-            raise ConfigurationException(
-                "The probability must be between 0 and 1 (inclusive)")
-        self._p_connect = new_value
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(

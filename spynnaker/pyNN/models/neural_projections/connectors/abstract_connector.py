@@ -15,13 +15,14 @@ from __future__ import annotations
 import logging
 import math
 import re
-from typing import Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING
+from typing import Any, Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING
 from typing_extensions import Never
 
 import numpy
 from numpy import float64, uint32, uint16, uint8
 from numpy.typing import NDArray
 
+from pyNN import descriptions
 from pyNN.random import NumpyRNG, RandomDistribution
 from pyNN.space import Space
 
@@ -76,7 +77,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         "__safe",
         "__space",
         "__verbose",
-        "__param_seeds")
+        "__param_seeds",
+        "__used")
 
     def __init__(self, safe: bool = True, callback: None = None,
                  verbose: bool = False):
@@ -102,6 +104,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         self.__n_clipped_delays = numpy.int64(0)
         self.__min_delay = 0.0
         self.__param_seeds: Dict[Tuple[int, int], int] = dict()
+        self.__used = False
 
     def set_space(self, space: Space) -> None:
         """
@@ -573,10 +576,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         return self.__safe
 
-    @safe.setter
-    def safe(self, new_value: bool) -> None:
-        self.__safe = new_value
-
     @property
     def space(self) -> Optional[Space]:
         """
@@ -584,25 +583,12 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         return self.__space
 
-    @space.setter
-    def space(self, new_value: Space) -> None:
-        """
-        Set the space object (allowed after instantiation).
-
-        :param new_value:
-        """
-        self.__space = new_value
-
     @property
     def verbose(self) -> bool:
         """
         verbose value supplied by user
         """
         return self.__verbose
-
-    @verbose.setter
-    def verbose(self, new_value: bool) -> None:
-        self.__verbose = new_value
 
     def get_connected_vertices(
             self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
@@ -679,3 +665,82 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 "Using a projection where the source or target is a "
                 "PopulationView on a multi-dimensional Population is not "
                 "supported")
+
+    def get_parameters(self) -> Dict[str, Any]:
+        """
+        A list of parameters that would recreate this connector.
+
+        May not be exactly the same as the ones used to construct this.
+
+        Will also not include any information or changes added by later calls.
+
+        :return: A map of the init parameters to the values passed in.
+        """
+        # The default is error
+        # This to avoid missing parameters in user Connectors
+        raise NotImplementedError(
+            f"{type(self)} does not implement "
+            f"Standard pyNN get_parameters method")
+
+    def _get_parameters(self) -> Dict[str, Any]:
+        """
+        :return: A map of the init parameters to the values passed in.
+        """
+        return {
+            "safe": self.safe,
+            "verbose": self.verbose,
+            "callback": None
+        }
+
+    def clone(self) -> "AbstractConnector":
+        """
+        Create a clone of the Connector at init point
+
+        This is a best effort attempt and its use is not recommended
+
+        :return: A clone of the Connector. Ignoring any SynapseInformation
+        """
+        theType = type(self)
+        params = self.get_parameters()
+        logger.warning(
+            f"Cloning type{self} which may lead to incorrect results.")
+        return theType(**params)
+
+    def get_unused(self) -> "AbstractConnector":
+        """
+        Checks the Connector is unused and clones if needed
+
+        This method should just check the connector is unused,
+        mark it as used and return it.
+
+        If the Connector is used will attempt to make a clone,
+        log warning that this is not recommended and may be incorrect,
+        and returns the clone.
+
+        :return: Ideally this Connector
+        """
+        if self.__used:
+            logger.warning(
+                "Reusing Connectors in sPyNNaker is not recommended")
+            clone = self.clone()
+            # call get_unused to mark used
+            return clone.get_unused()
+        self.__used = True
+        return self
+
+    def describe(self, template: Optional[str] = None,
+                 engine: str = 'default') -> str:
+        """
+        Returns a human-readable description of the connection method.
+
+        The output may be customized by specifying a different template
+        together with an associated template engine (see pyNN.descriptions).
+
+        If template is None,
+        then a dictionary containing the template context will be returned.
+
+        :return: A human-readable description of the connector.
+        """
+        context = {"Type": self.__class__.__name__}
+        context.update(self.get_parameters())
+        return descriptions.render(engine, template, context)

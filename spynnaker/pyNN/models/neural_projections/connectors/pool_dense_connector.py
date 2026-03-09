@@ -17,7 +17,7 @@
 from __future__ import annotations
 from collections.abc import Iterable, Sized
 from typing import (
-    Optional, Tuple, Union, cast, TYPE_CHECKING)
+    Any, Dict, Optional, Tuple, Union, cast, TYPE_CHECKING)
 
 import numpy
 from numpy import integer, floating, float64, uint16, uint32
@@ -113,6 +113,16 @@ class PoolDenseConnector(AbstractConnector):
         self.__pool_stride = pool_shape if pool_stride is None else pool_stride
         self.__positive_receptor_type = positive_receptor_type
         self.__negative_receptor_type = negative_receptor_type
+
+    @overrides(AbstractConnector.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        parameters = self._get_parameters()
+        parameters["weights"] = self.weights
+        parameters["pool_shape"] = self.__pool_shape
+        parameters["pool_stride"] = self.__pool_stride
+        parameters["positive_receptor_type"] = self.__positive_receptor_type
+        parameters["negative_receptor_type"] = self.__negative_receptor_type
+        return parameters
 
     @property
     def positive_receptor_type(self) -> str:
