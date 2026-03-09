@@ -146,7 +146,7 @@ def test_write_data_spec() -> None:
         writer.add_edge(edge, part_id)
     splitter_partitioner()
     allocator = ZonedRoutingInfoAllocator()
-    writer.set_routing_infos(allocator.allocate([]))
+    writer.set_routing_infos(allocator.allocate())
 
     post_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_vertex.vertex_slice
@@ -466,7 +466,7 @@ def test_pop_based_master_pop_table_standard(
         writer.add_edge(edge, part_id)
     splitter_partitioner()
     allocator = ZonedRoutingInfoAllocator()
-    writer.set_routing_infos(allocator.allocate([]))
+    writer.set_routing_infos(allocator.allocate())
 
     post_mac_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_mac_vertex.vertex_slice
