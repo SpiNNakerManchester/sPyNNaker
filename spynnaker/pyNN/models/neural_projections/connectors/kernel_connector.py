@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import (Dict, List, Final, Optional, Sequence, Tuple, Union,
+from typing import (Any, Dict, List, Final, Optional, Sequence, Tuple, Union,
                     TYPE_CHECKING)
 
 import numpy
@@ -207,6 +207,26 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         # Create storage for later
         self._post_as_pre: Dict[
             Slice, Tuple[NDArray[integer], NDArray[integer]]] = {}
+
+    @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        parameters = self._get_parameters()
+        parameters["shape_pre"] = [self._pre_h, self._pre_w]
+        parameters["shape_post"] = [self._post_h, self._post_w]
+        parameters["shape_kernel"] = (self._kernel_h, self._kernel_w)
+        parameters["weight_kernel"] = self._krn_weights
+        parameters["delay_kernel"] = self._krn_delays
+        parameters["shape_common"] = self._shape_common
+        parameters["pre_sample_steps_in_post"] = (
+            self._pre_step_h, self._pre_step_w)
+        parameters["pre_start_coords_in_post"] = (
+            self._pre_start_h, self._pre_start_w)
+        parameters["post_sample_steps_in_pre"] = (
+            self._post_step_h, self._post_step_w)
+        parameters["post_start_coords_in_pre"] = (
+            self._post_start_h, self._post_start_w)
+        parameters["space"] = None
+        return parameters
 
     def __to_post_coords(
             self, post_vertex_slice: Slice) -> Tuple[
