@@ -523,12 +523,8 @@ class PopulationVertex(
         # so easier to assume they exist
         if get_config_bool("Machine", "virtual_board"):
             return True
-        try:
-            SpynnakerDataView().get_executable_path(
-                self.combined_binary_file_name)
-            return True
-        except KeyError:
-            return False
+        return SpynnakerDataView().check_executable_path(
+            self.combined_binary_file_name)
 
     @property
     def split_binaries_exist(self) -> bool:
@@ -539,14 +535,11 @@ class PopulationVertex(
         # so easier to assume they exist
         if get_config_bool("Machine", "virtual_board"):
             return True
-        try:
-            SpynnakerDataView().get_executable_path(
-                self.neuron_core_binary_file_name)
-            SpynnakerDataView().get_executable_path(
-                self.synapse_core_binary_file_name)
-            return True
-        except KeyError:
+        if not SpynnakerDataView().check_executable_path(
+                self.neuron_core_binary_file_name):
             return False
+        return SpynnakerDataView().check_executable_path(
+            self.synapse_core_binary_file_name)
 
     @property
     def use_combined_core(self) -> bool:

@@ -62,6 +62,7 @@ class TestSetTOffset(BaseTestCase):
 
     def test_one_core(self) -> None:
         self.runsafe(self.one_core)
+        self.check_binary_used("IZK_curr_exp.aplx")
 
 
 if __name__ == '__main__':

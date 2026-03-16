@@ -212,6 +212,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         if not isinstance(synapse_info.synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
             return
+        self.__connections = dict()
         collector = self.__connections.setdefault(
             (app_edge.post_vertex, post_vertex_slice.lo_atom), [])
         collector.append((connections, app_edge, synapse_info))

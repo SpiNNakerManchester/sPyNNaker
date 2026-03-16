@@ -16,10 +16,14 @@ import numpy as np
 import pyNN.spiNNaker as pynn
 from pyNN.space import Grid2D
 
+from spinnaker_testbase.base_test_case import BaseTestCase
+
 
 def test_2d_1d() -> None:
 
     pynn.setup()
+
+    pynn.set_number_of_neurons_per_core(pynn.SpikeSourceArray, (3, 3))
 
     neuron_type = pynn.IF_curr_exp(
         tau_m=5.0,
@@ -31,8 +35,6 @@ def test_2d_1d() -> None:
         i_offset=0.0,
         v=0.0,
     )
-
-    pynn.set_number_of_neurons_per_core(pynn.SpikeSourceArray, (3, 3))
 
     kernel = np.array(((2.0,),))
 
@@ -89,3 +91,10 @@ def test_2d_1d() -> None:
     print(merge_neurons.get_data("spikes").segments[0].spiketrains)
 
     pynn.end()
+
+
+class Test2D1D(BaseTestCase):
+
+    def test_2d_1d(self) -> None:
+        test_2d_1d()
+        self.check_binary_used("IF_curr_exp_conv.aplx")
