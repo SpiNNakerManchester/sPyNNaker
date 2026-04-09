@@ -325,12 +325,12 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         End running of the simulation. Notifying each Population of the end.
         """
+        super().stop()
+
         # pylint: disable=protected-access
-        FecTimer.start_category(TimerCategory.SHUTTING_DOWN)
         for population in self.__writer.iterate_populations():
             population._end()
 
-        super().stop()
 
     @staticmethod
     def register_binary_search_path(search_path: str) -> None:
