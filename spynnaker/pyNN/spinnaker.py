@@ -359,13 +359,17 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         with FecTimer("Synapse expander", TimerWork.SYNAPSE) as timer:
             if timer.skip_if_virtual_board():
                 return
+            FecTimer.start_category(TimerCategory.DATA_SPEC_SYNAPSE)
             synapse_expander()
+            FecTimer.end_category(TimerCategory.DATA_SPEC_SYNAPSE)
 
     def _execute_neuron_expander(self) -> None:
         with FecTimer("Neuron expander", TimerWork.SYNAPSE) as timer:
             if timer.skip_if_virtual_board():
                 return
+            FecTimer.start_category(TimerCategory.DATA_SPEC_SYNAPSE)
             neuron_expander()
+            FecTimer.end_category(TimerCategory.DATA_SPEC_SYNAPSE)
 
     def _execute_finish_connection_holders(self) -> None:
         with FecTimer("Finish connection holders", TimerWork.OTHER):
