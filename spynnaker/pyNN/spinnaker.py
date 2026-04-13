@@ -331,7 +331,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         for population in self.__writer.iterate_populations():
             population._end()
 
-
     @staticmethod
     def register_binary_search_path(search_path: str) -> None:
         """
