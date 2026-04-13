@@ -40,7 +40,7 @@ class TestPowerMonitoring(BaseTestCase):
     def assert_report(self) -> None:
         path = get_report_path("path_energy_report")
         if not os.path.exists(path):
-            raise AssertionError(f"Unable to find report")
+            raise AssertionError("Unable to find report")
 
     def do_run(self) -> None:
         synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
