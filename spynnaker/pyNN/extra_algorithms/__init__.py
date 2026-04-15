@@ -17,7 +17,6 @@ from .spynnaker_connection_holder_generations import (
     SpYNNakerConnectionHolderGenerator)
 from .spynnaker_neuron_network_specification_report import (
     spynnaker_neuron_graph_network_specification_report)
-from .spynnaker_synaptic_matrix_report import SpYNNakerSynapticMatrixReport
 from .synapse_expander import synapse_expander
 from .delay_support_adder import delay_support_adder
 from .neuron_expander import neuron_expander
@@ -28,5 +27,4 @@ __all__ = [
     "redundant_packet_count_report",
     "SpYNNakerConnectionHolderGenerator",
     "spynnaker_neuron_graph_network_specification_report",
-    "SpYNNakerSynapticMatrixReport",
     "synapse_expander", "neuron_expander"]
