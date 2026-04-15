@@ -115,7 +115,7 @@ def get_rinfo_for_spike_source(
     if n_cores == 1 or isinstance(pre_vertex, ApplicationVirtualVertex):
         return r_info, 0, 0
 
-    mask_shift = r_info.n_bits_atoms
+    mask_shift = r_info.machine_shift
     core_mask = (2 ** get_n_bits(n_cores)) - 1
     return r_info, core_mask, mask_shift
 
