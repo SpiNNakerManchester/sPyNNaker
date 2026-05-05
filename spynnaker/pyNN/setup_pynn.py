@@ -29,7 +29,7 @@ import spynnaker.pyNN as sim
 
 
 # The version of PyNN that we really want
-_TARGET_PYNN_VERSION = "0.9"
+_TARGET_PYNN_VERSION = "0.12"
 
 
 def version_satisfies(module: ModuleType, requirement: str) -> bool:
@@ -58,8 +58,16 @@ def install_spynnaker_into(module: ModuleType) -> None:
 
     pynn_init = os.path.join(spinnaker_dir, "__init__.py")
     spynnaker_init = os.path.abspath(sim.__file__)
+    pynn_dir = os.path.dirname(spynnaker_init)
+    spynnaker_dir = os.path.dirname(pynn_dir)
     shutil.copyfile(spynnaker_init, pynn_init)
+
+    py_typed = os.path.join(spynnaker_dir, "py.typed")
+    pynn_typed = os.path.join(spinnaker_dir, "py.typed")
+    shutil.copyfile(py_typed, pynn_typed)
+
     print(f"Updated {pynn_init} to be the same as spynnaker.pyNN")
+    print(f"Added {pynn_typed}")
 
 
 def setup_pynn() -> None:
