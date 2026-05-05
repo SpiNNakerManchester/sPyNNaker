@@ -454,7 +454,7 @@ class SynapticMatrices(object):
             n_atoms = 0
         else:
             # Find the part that is just for the core
-            mask_size = r_info.n_bits_atoms
+            mask_size = r_info.machine_shift
             core_mask = (2 ** allocator_bits_needed(
                 len(r_info.vertex.splitter.get_out_going_vertices(
                     partition_id)))) - 1
