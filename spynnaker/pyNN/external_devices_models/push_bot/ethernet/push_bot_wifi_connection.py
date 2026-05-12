@@ -29,7 +29,7 @@ T = TypeVar("T")
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # A set of connections that have already been made
-_existing_connections = dict()
+_existing_connections: dict[tuple[str, int], "PushBotWIFIConnection"] = dict()
 
 
 def get_pushbot_wifi_connection(
