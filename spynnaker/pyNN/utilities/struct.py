@@ -332,7 +332,8 @@ class Struct(object):
                    for data_type, _name in self.__fields)
 
     def read_data(
-            self, data: bytearray | bytes, values: RangeDictionary, data_offset: int = 0,
+            self, data: bytearray | bytes, values: RangeDictionary,
+            data_offset: int = 0,
             vertex_slice: Optional[Slice] = None) -> None:
         """
         Read a byte string of data and write to values.
