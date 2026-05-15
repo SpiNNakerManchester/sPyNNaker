@@ -71,7 +71,7 @@ class _MockTransceiverinOut(MockableTransceiver):
     @overrides(MockableTransceiver.write_memory)
     def write_memory(
             self, x: int, y: int, base_address: int,
-            data: Union[BinaryIO, bytes, int, str], *,
+            data: BinaryIO | bytearray | bytes | int | str, *,
             n_bytes: Optional[int] = None, offset: int = 0, cpu: int = 0,
             get_sum: bool = False) -> Tuple[int, int]:
         if data is None:

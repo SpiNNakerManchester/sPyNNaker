@@ -405,7 +405,7 @@ class SynapticMatrixApp(object):
         splitter = self.__app_edge.post_vertex.splitter
         vertex_slice = placement.vertex.vertex_slice
         if self.__syn_mat_offset is not None:
-            block: bytes | memoryview
+            block: bytearray | bytes | memoryview
             if self.__download_index is not None:
                 assert buffers is not None
                 block, _ = buffers.get_download(
