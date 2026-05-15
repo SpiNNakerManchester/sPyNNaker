@@ -207,6 +207,7 @@ def EthernetControlPopulation(
         local_host: Optional[str] = None, local_port: Optional[int] = None,
         database_notify_port_num: Optional[int] = None,
         database_ack_port_num: Optional[int] = None,
+        n_synapse_cores: Optional[int] = None,
         **additional_kwargs: Dict[str, Any]) -> Population:
     # pylint: disable=invalid-name
     """
@@ -227,8 +228,16 @@ def EthernetControlPopulation(
     :param database_notify_port_num:
         The optional port to which notifications from the database
         notification protocol are to be sent
+    :param n_synapse_cores:
+        Model.create_vertex parameter.
+        Likely: The number of synapse cores; 0 to force combined cores,
+        or None to allow the system to choose
     :param additional_kwargs:
-        A nicer way of allowing additional things to the Population
+            Additional parameters to pass to the Model.create_vertex function.
+            See the Model's create_vertex method for more details.
+            These will be ignored if the Model does not accept this parameter.
+            These will raise an Exception if a Vertex is passed in
+            There may be additional parameters not listed in this init.
     :return:
         A pyNN Population which can be used as the target of a Projection.
 
@@ -237,9 +246,14 @@ def EthernetControlPopulation(
             Projection, but it might not send spikes.
     :raises TypeError: If an invalid model class is used.
     """
+    additional: Dict[str, Any] = dict()
+    if additional_kwargs:
+        additional.update(additional_kwargs)
+    if n_synapse_cores is not None:
+        additional['n_synapse_cores'] = n_synapse_cores
     # pylint: disable=global-statement
     population = Population(n_neurons, model, label=label,
-                            **additional_kwargs)
+                            additional_parameters=additional)
     vertex, aec, vertex_label = __vtx(population)
     translator = aec.get_message_translator()
     live_packet_gather_label = "EthernetControlReceiver"
@@ -306,13 +320,13 @@ def EthernetSensorPopulation(
     if not isinstance(device, AbstractEthernetSensor):
         raise TypeError(
             "Device must be an instance of AbstractEthernetSensor")
-    injector_params = dict(device.get_injector_parameters())
-
+    additional_parameters = dict(device.get_injector_parameters())
+    if additional_kwargs:
+        additional_parameters.update(additional_kwargs)
     population = Population(
         device.get_n_neurons(), SpikeInjector(notify=False),
         label=device.get_injector_label(),
-        additional_parameters=injector_params,
-        **additional_kwargs)
+        additional_parameters=additional_parameters)
     if isinstance(device, AbstractSendMeMulticastCommandsVertex):
         cmd_conn = EthernetCommandConnection(
             device.get_translator(), [device], local_host,
