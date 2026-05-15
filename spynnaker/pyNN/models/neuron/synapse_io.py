@@ -386,7 +386,7 @@ def convert_to_connections(
         synapse_info: SynapseInformation, post_vertex_slice: Slice,
         n_pre_atoms: int, max_row_length: int, n_synapse_types: int,
         weight_scales: WeightScales,
-        data: Union[bytes, memoryview, NDArray, None],
+        data: bytearray | bytes | memoryview | NDArray | None,
         delayed: bool, post_vertex_max_delay_ticks: int,
         max_atoms_per_core: int) -> ConnectionsArray:
     """

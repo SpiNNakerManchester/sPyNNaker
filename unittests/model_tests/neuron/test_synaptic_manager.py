@@ -13,7 +13,7 @@
 # limitations under the License.
 import shutil
 import struct
-from typing import Any, BinaryIO, List, Optional, Sequence, Tuple, Union
+from typing import Any, BinaryIO, List, Optional, Sequence, Tuple
 import unittest
 from tempfile import mkdtemp
 import numpy
