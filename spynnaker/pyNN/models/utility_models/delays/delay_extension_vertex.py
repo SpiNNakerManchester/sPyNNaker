@@ -24,8 +24,9 @@ from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterDelayVertexSlice)
+if TYPE_CHECKING:
+    from spynnaker.pyNN.extra_algorithms.splitter_components import (
+        SplitterDelayVertexSlice)
 
 _DELAY_PARAM_HEADER_WORDS = 9
 
@@ -88,7 +89,7 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
 
     @property
     def _delay_splitter(self) -> SplitterDelayVertexSlice:
-        return cast(SplitterDelayVertexSlice, self._splitter)
+        return cast("SplitterDelayVertexSlice", self._splitter)
 
     @property
     def drop_late_spikes(self) -> bool:
