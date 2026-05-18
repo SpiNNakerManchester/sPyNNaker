@@ -24,9 +24,8 @@ from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
-if TYPE_CHECKING:
-    from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterDelayVertexSlice)
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    SplitterDelayVertexSlice)
 
 _DELAY_PARAM_HEADER_WORDS = 9
 
