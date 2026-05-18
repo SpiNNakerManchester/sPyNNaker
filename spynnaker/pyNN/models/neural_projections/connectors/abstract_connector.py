@@ -76,7 +76,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         "__safe",
         "__space",
         "__verbose",
-        "__param_seeds")
+        "__param_seeds",
+        "__used")
 
     def __init__(self, safe: bool = True, callback: None = None,
                  verbose: bool = False):
@@ -102,6 +103,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         self.__n_clipped_delays = numpy.int64(0)
         self.__min_delay = 0.0
         self.__param_seeds: Dict[Tuple[int, int], int] = dict()
+        self.__used = False
 
     def set_space(self, space: Space) -> None:
         """
@@ -679,3 +681,13 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 "Using a projection where the source or target is a "
                 "PopulationView on a multi-dimensional Population is not "
                 "supported")
+
+    def make_used(self) -> None:
+        """
+        Safety check making this connector as used.
+
+        :raises SpynnakerException: If the connection is already used
+        """
+        if self.__used:
+            raise SpynnakerException("Connector is already used")
+        self.__used = True
