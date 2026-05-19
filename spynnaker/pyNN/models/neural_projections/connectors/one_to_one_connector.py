@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 import math
-from typing import Optional, Sequence, Tuple, TYPE_CHECKING
+from typing import Any, Dict, Optional, Sequence, Tuple, TYPE_CHECKING
 
 import numpy
 from numpy import integer, floating, uint32
@@ -55,6 +55,10 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     the postsynaptic population, for all *i*.
     """
     __slots__ = ()
+
+    @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        return self._get_parameters()
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:

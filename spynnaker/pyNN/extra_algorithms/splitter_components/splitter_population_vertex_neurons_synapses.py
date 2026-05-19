@@ -102,6 +102,8 @@ class SplitterPopulationVertexNeuronsSynapses(
         "__sdram_partitions",
         # The same chip groups
         "__same_chip_groups",
+        # The index used in get_source_specific_in_coming_vertices
+        "__synapse_index_used",
         # The application vertex sources that are neuromodulators
         "__neuromodulators")
 
@@ -117,6 +119,9 @@ class SplitterPopulationVertexNeuronsSynapses(
             SourceSegmentedSDRAMMachinePartition] = []
         self.__same_chip_groups: List[Tuple[
             List[MachineVertex], AbstractSDRAM]] = []
+        self.__synapse_index_used: Dict[Tuple[ApplicationVertex, str], int]
+        self.__synapse_index_used = dict()
+
         self.__neuromodulators: Set[ApplicationVertex] = set()
         self.__incoming_vertices: List[List[MachineVertex]] = []
         self.__poisson_sources: Set[SpikeSourcePoissonVertex] = set()
@@ -539,10 +544,16 @@ class SplitterPopulationVertexNeuronsSynapses(
         sources_per_vertex = max(1, int(2 ** math.ceil(math.log2(
             n_sources / n_synapse_cores))))
 
-        # Start on a different index each time to "even things out"
-        index = self.__next_synapse_index
-        self.__next_synapse_index = (
-            (self.__next_synapse_index + 1) % n_synapse_cores)
+        key = (source_vertex, partition_id)
+        if key in self.__synapse_index_used:
+            index = self.__synapse_index_used[key]
+        else:
+            # Start on a different index each time to "even things out"
+            index = self.__next_synapse_index
+            self.__next_synapse_index = (
+                (self.__next_synapse_index + 1) % n_synapse_cores)
+            self.__synapse_index_used[key] = index
+
         result: List[Tuple[MachineVertex, List[MachineVertex]]] = list()
         for start in range(0, n_sources, sources_per_vertex):
             end = min(start + sources_per_vertex, n_sources)

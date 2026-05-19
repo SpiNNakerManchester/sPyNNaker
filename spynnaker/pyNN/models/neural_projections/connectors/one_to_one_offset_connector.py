@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Sequence, Optional, TYPE_CHECKING
+from typing import Any, Dict, Sequence, Optional, TYPE_CHECKING
 
 import numpy
 from numpy import int32, uint32
@@ -84,6 +84,14 @@ class OneToOneOffsetConnector(
         self.__n_neurons_per_group = n_neurons_per_group
         self.__offset = offset
         self.__wrap = wrap
+
+    @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        parameters = self._get_parameters()
+        parameters["n_neurons_per_group"] = self.__n_neurons_per_group
+        parameters["offset"] = self.__offset
+        parameters["wrap"] = self.__wrap
+        return parameters
 
     def __n_connections(self, synapse_info: SynapseInformation) -> int:
         if self.__wrap:
