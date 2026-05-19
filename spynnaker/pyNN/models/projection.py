@@ -121,6 +121,8 @@ class Projection(object):
         else:
             synapse_dynamics = synapse_type
 
+        connector = connector.get_unused()
+
         # set the space function as required
         if space is None:
             space = PyNNSpace()

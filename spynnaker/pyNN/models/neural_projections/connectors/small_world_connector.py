@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 import math
-from typing import Optional, Sequence, TYPE_CHECKING
+from typing import Any, Dict, Optional, Sequence, TYPE_CHECKING
 
 import numpy
 from numpy.typing import NDArray
@@ -96,6 +96,15 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             raise NotImplementedError(
                 "n_connections is not implemented for"
                 " SmallWorldConnector on this platform")
+
+    @overrides(AbstractConnector.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        parameters = self._get_parameters()
+        parameters["rewiring"] = self.__rewiring
+        parameters["degree"] = self.__degree
+        parameters["n_connections"] = None
+        parameters["rng"] = self.__rng
+        return parameters
 
     @overrides(AbstractConnector.set_projection_information)
     def set_projection_information(
