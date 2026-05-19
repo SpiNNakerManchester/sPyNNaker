@@ -12,15 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
-from typing import Union
+from typing import Any, Dict, Union
 
 import numpy
 from numpy.typing import NDArray
 
 from pyNN.recording.files import BaseFile, StandardTextFile
 
+from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
+
 from .from_list_connector import FromListConnector
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class FromFileConnector(FromListConnector):
@@ -86,6 +92,20 @@ class FromFileConnector(FromListConnector):
         super().__init__(
             conn_list, safe=safe, verbose=verbose,
             column_names=column_names, callback=callback)
+
+    @overrides(FromListConnector.clone)
+    def clone(self) -> FromListConnector:
+        params = self.get_parameters()
+        logger.warning(
+            "Cloning FromFileConnector as a FromListConnector "
+            "which may lead to incorrect results.")
+        return FromListConnector(**params)
+
+    @overrides(FromListConnector.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        logger.warning("FromFileConnectors parameters are actually the ones "
+                       "for the underlying FromListConnector")
+        return super().get_parameters()
 
     def _read_conn_list(
             self, the_file: BaseFile, distributed: bool) -> NDArray:

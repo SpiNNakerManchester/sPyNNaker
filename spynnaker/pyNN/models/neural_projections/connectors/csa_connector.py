@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Optional, Tuple, TYPE_CHECKING, Sequence
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Sequence
 
 import numpy
 from numpy.typing import NDArray
@@ -80,6 +80,12 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         # Storage for full connection sets
         self.__full_connection_set: Optional[List[CSet]] = None
         self.__full_cset: Optional[List[CSet]] = None
+
+    @overrides(AbstractConnector.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        parameters = self._get_parameters()
+        parameters["cset"] = self.__cset
+        return parameters
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
