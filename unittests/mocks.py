@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Mapping, Optional, Sequence, Tuple, Union
+from typing import List, Mapping, Optional, Sequence, Tuple, Union, Dict
 from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
@@ -30,7 +30,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
 from spynnaker.pyNN.models.neuron import PopulationVertex, \
     AbstractPyNNNeuronModel
 from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractNeuronImpl, AbstractStandardNeuronComponent)
+    AbstractNeuronImpl, AbstractStandardNeuronComponent, ModelParameter)
 from spynnaker.pyNN.models.neuron.input_types import AbstractInputType
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
@@ -267,6 +267,10 @@ class MockNeuronComponent(AbstractStandardNeuronComponent):
     def add_state_variables(
             self, state_variables: RangeDictionary[float]) -> None:
         pass
+
+    @overrides(AbstractStandardNeuronComponent.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return dict()
 
 
 class MockInputType(MockNeuronComponent, AbstractInputType):

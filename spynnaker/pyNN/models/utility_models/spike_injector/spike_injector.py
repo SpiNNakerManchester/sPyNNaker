@@ -51,3 +51,6 @@ class SpikeInjector(AbstractPyNNModel):
         return SpikeInjectorVertex(
             n_neurons, label, port, virtual_key,
             reserve_reverse_ip_tag, splitter, max_atoms_per_core)
+
+    def __str__(self) -> str:
+        return "SpikeInjector()"

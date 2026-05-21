@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Dict
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
 
@@ -55,6 +57,13 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         self.__tau_ca2 = tau_ca2
         self.__i_ca2 = i_ca2
         self.__i_alpha = i_alpha
+
+    @overrides(AbstractAdditionalInput.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return {
+            TAU_CA2: self.__tau_ca2,
+            I_ALPHA: self.__i_alpha,
+            TIME_STEP: SpynnakerDataView.get_simulation_time_step_ms()}
 
     @overrides(AbstractAdditionalInput.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

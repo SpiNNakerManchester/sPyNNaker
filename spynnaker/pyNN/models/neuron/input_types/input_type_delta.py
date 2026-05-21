@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Dict
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
 
@@ -19,6 +21,7 @@ from spinn_front_end_common.interface.ds import DataType
 
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 
 from .abstract_input_type import AbstractInputType
 
@@ -36,6 +39,10 @@ class InputTypeDelta(AbstractInputType):
             # scale_factor, calculated from timestep
             [Struct([(DataType.S1615, TIME_STEP)])],
             dict())
+
+    @overrides(AbstractInputType.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return dict()
 
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

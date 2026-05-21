@@ -166,3 +166,9 @@ class NeuronImplStocSigma(AbstractNeuronImpl):
     @overrides(AbstractNeuronImpl.is_conductance_based)
     def is_conductance_based(self) -> bool:
         return False
+
+    def __str__(self) -> str:
+        return (f"NeuronImplStocSigma(tau_refrac={self._tau_refrac}, "
+                f"alpha={self._alpha}, bias={self._bias}, "
+                f"refract_init={self._refract_init}, "
+                f"seed={self._random.rng.seed})")
