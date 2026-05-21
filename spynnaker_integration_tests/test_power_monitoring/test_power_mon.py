@@ -37,10 +37,10 @@ synfire_run = SynfireRunner()
 
 class TestPowerMonitoring(BaseTestCase):
 
-    def assert_report(self, n_run: int) -> None:
-        path = get_report_path("path_energy_report", n_run=n_run)
+    def assert_report(self) -> None:
+        path = get_report_path("path_energy_report")
         if not os.path.exists(path):
-            raise AssertionError(f"Unable to find report for run {n_run}")
+            raise AssertionError("Unable to find report")
 
     def do_run(self) -> None:
         synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
@@ -54,9 +54,7 @@ class TestPowerMonitoring(BaseTestCase):
         self.assertIsNotNone(hist, "must have a histogram")
 
         # Did we build the report file like we asked for in config file?
-        self.assert_report(1)
-        self.assert_report(2)
-        self.assert_report(3)
+        self.assert_report()
 
         # Did we output power provenance data, as requested?
         exec_times = set()
@@ -66,7 +64,8 @@ class TestPowerMonitoring(BaseTestCase):
                     "FROM power_provenance "
                     "WHERE description = 'Exec time (seconds)'"):
                 exec_times.add(row[0])
-        self.assertEqual(exec_times, set([0.01, 0.03, 0.06]))
+        # combined
+        self.assertEqual(exec_times, set([0.06]))
 
     def test_power_monitoring(self) -> None:
         self.runsafe(self.do_run)

@@ -325,12 +325,11 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         End running of the simulation. Notifying each Population of the end.
         """
+        super().stop()
+
         # pylint: disable=protected-access
-        FecTimer.start_category(TimerCategory.SHUTTING_DOWN)
         for population in self.__writer.iterate_populations():
             population._end()
-
-        super().stop()
 
     @staticmethod
     def register_binary_search_path(search_path: str) -> None:
@@ -359,13 +358,17 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         with FecTimer("Synapse expander", TimerWork.SYNAPSE) as timer:
             if timer.skip_if_virtual_board():
                 return
+            FecTimer.start_category(TimerCategory.DATA_SPEC_SYNAPSE)
             synapse_expander()
+            FecTimer.end_category(TimerCategory.DATA_SPEC_SYNAPSE)
 
     def _execute_neuron_expander(self) -> None:
         with FecTimer("Neuron expander", TimerWork.SYNAPSE) as timer:
             if timer.skip_if_virtual_board():
                 return
+            FecTimer.start_category(TimerCategory.DATA_SPEC_SYNAPSE)
             neuron_expander()
+            FecTimer.end_category(TimerCategory.DATA_SPEC_SYNAPSE)
 
     def _execute_finish_connection_holders(self) -> None:
         with FecTimer("Finish connection holders", TimerWork.OTHER):
