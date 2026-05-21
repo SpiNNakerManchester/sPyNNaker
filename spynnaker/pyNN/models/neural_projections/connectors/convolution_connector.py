@@ -17,7 +17,7 @@
 from __future__ import annotations
 from collections.abc import (Iterable, Sequence)
 from typing import (
-    List, Optional, Sequence as TSequence, Tuple, Union,
+    Any, Dict, List, Optional, Sequence as TSequence, Tuple, Union,
     cast, overload, TYPE_CHECKING)
 
 import numpy
@@ -169,9 +169,33 @@ class ConvolutionConnector(AbstractConnector):
             self.__pool_stride = self.__pool_shape
         if self.__pool_shape is not None:
             self.__kernel_weights /= numpy.prod(self.__pool_shape)
-
         self.__positive_receptor_type = positive_receptor_type
         self.__negative_receptor_type = negative_receptor_type
+
+    @overrides(AbstractConnector.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        parameters = self._get_parameters()
+        if self.__pool_shape is None:
+            parameters["kernel_weights"] = self.__kernel_weights
+        else:
+            parameters["kernel_weights"] = (
+                self.__kernel_weights * numpy.prod(self.__pool_shape))
+        # Now included in weights
+        parameters["kernel_shape"] = None
+        parameters["strides"] = tuple(self.__strides)
+        parameters["padding"] = tuple(self.__padding_shape)
+        if self.__pool_shape is None:
+            parameters["pool_shape"] = None
+        else:
+            parameters["pool_shape"] = tuple(self.__pool_shape)
+        if self.__pool_stride is None:
+            parameters["pool_stride"] = None
+        else:
+            parameters["pool_stride"] = tuple(self.__pool_stride)
+        parameters["positive_receptor_type"] = self.__positive_receptor_type
+        parameters["negative_receptor_type"] = self.__negative_receptor_type
+        parameters["filter_edges"] = self.__filter_edges
+        return parameters
 
     @property
     def positive_receptor_type(self) -> str:

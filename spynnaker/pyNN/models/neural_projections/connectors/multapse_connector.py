@@ -15,7 +15,7 @@
 
 from __future__ import annotations
 import math
-from typing import Optional, Sequence, TYPE_CHECKING
+from typing import Any, Dict, Optional, Sequence, TYPE_CHECKING
 
 from numpy import uint32, integer
 from numpy.typing import NDArray
@@ -94,6 +94,15 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         self.__post_slices: Sequence[Slice] = ()
         self.__synapses_per_edge: Optional[NDArray[integer]] = None
         self.__rng = rng
+
+    @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        parameters = self._get_parameters()
+        parameters["n"] = self.__num_synapses
+        parameters["allow_self_connections"] = self.__allow_self_connections
+        parameters["with_replacement"] = self.__with_replacement
+        parameters["rng"] = self.__rng
+        return parameters
 
     def set_projection_information(
             self, synapse_info: SynapseInformation) -> None:
