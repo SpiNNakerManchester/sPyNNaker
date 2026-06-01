@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Dict, List
+
 import unittest
 from spynnaker.pyNN.exceptions import ConfigurationException
 import pyNN.spiNNaker as p
@@ -22,13 +24,13 @@ from spinnaker_testbase import BaseTestCase
 
 class TestMultiBoardSpikeOutput(BaseTestCase):
 
-    counts = None
+    counts: Dict[str, int] = dict()
 
     @staticmethod
-    def spike_receiver(label, time, neuron_ids):
+    def spike_receiver(label: str, time: int, neuron_ids: List[int]) -> None:
         TestMultiBoardSpikeOutput.counts[label] += len(neuron_ids)
 
-    def multi_board_spike_output(self):
+    def multi_board_spike_output(self) -> None:
         TestMultiBoardSpikeOutput.counts = dict()
         try:
             p.setup(1.0, n_chips_required=((48 * 2) + 1))
@@ -71,7 +73,7 @@ class TestMultiBoardSpikeOutput(BaseTestCase):
             self.assertGreaterEqual(count, 500)
             self.assertLessEqual(count, 1000)
 
-    def test_multi_board_spike_output(self):
+    def test_multi_board_spike_output(self) -> None:
         self.runsafe(self.multi_board_spike_output)
 
 

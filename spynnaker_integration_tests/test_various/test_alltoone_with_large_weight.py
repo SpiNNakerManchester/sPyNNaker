@@ -20,7 +20,7 @@ import pyNN.spiNNaker as sim
 
 class AllToOneWithLargeWeightCase(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         sources = 700
         destinations = 1
         weights = 50.0
@@ -41,5 +41,5 @@ class AllToOneWithLargeWeightCase(BaseTestCase):
         weight_sum = sum(weight[2] for weight in weight_list)
         self.assertEqual(weight_sum, sources * weights)
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)

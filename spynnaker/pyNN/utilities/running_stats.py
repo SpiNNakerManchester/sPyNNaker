@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import math
+from typing import Union
 
 
 class RunningStats(object):
@@ -20,19 +21,18 @@ class RunningStats(object):
     Keeps running statistics.
     From: https://www.johndcook.com/blog/skewness_kurtosis/
     """
-    __slots__ = ["__mean", "__mean_2", "__n_items"]
+    __slots__ = ("__mean", "__mean_2", "__n_items")
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.__mean = 0.0
         self.__mean_2 = 0.0
         self.__n_items = 0
 
-    def add_item(self, x):
+    def add_item(self, x: Union[int, float]) -> None:
         """
         Adds an item to the running statistics.
 
         :param x: The item to add
-        :type x: int or float
         """
         old_n_items = self.__n_items
         self.__n_items += 1
@@ -44,13 +44,13 @@ class RunningStats(object):
         self.__mean += delta_n
         self.__mean_2 += term_1
 
-    def add_items(self, mean, variance, n_items):
+    def add_items(self, mean: float, variance: float, n_items: int) -> None:
         """
         Add a bunch of items (via their statistics).
 
-        :param float mean: The mean of the items to add.
-        :param float variance: The variance of the items to add.
-        :param int n_items: The number of items represented.
+        :param mean: The mean of the items to add.
+        :param variance: The variance of the items to add.
+        :param n_items: The number of items represented.
         """
         if n_items > 0:
             new_n_items = self.__n_items + n_items
@@ -68,39 +68,31 @@ class RunningStats(object):
             self.__mean_2 = new_mean_2
 
     @property
-    def n_items(self):
+    def n_items(self) -> int:
         """
         The number of items seen.
-
-        :rtype: int
         """
         return self.__n_items
 
     @property
-    def mean(self):
+    def mean(self) -> float:
         """
         The mean of the items seen.
-
-        :rtype: float
         """
         return self.__mean
 
     @property
-    def variance(self):
+    def variance(self) -> float:
         """
         The variance of the items seen.
-
-        :rtype: float
         """
         if self.__n_items <= 1:
             return 0.0
         return self.__mean_2 / (self.__n_items - 1.0)
 
     @property
-    def standard_deviation(self):
+    def standard_deviation(self) -> float:
         """
         The population standard deviation of the items seen.
-
-        :rtype: float
         """
         return math.sqrt(self.variance)

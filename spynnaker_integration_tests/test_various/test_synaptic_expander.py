@@ -12,16 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.spiNNaker as p
-from spinnman.exceptions import SpiNNManCoresNotInStateException
-import functools
-from spinnaker_testbase import BaseTestCase
-import numpy
 from collections import defaultdict
+import functools
 import math
+from typing import Dict, List
+
+import numpy
+import pyNN.spiNNaker as p
+
+from spinnman.exceptions import SpiNNManCoresNotInStateException
+from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 
-def run_script():
+def run_script() -> None:
     p.setup(1.0)
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 3)
 
@@ -48,18 +52,15 @@ def run_script():
     connectors = [
         (p.OneToOneConnector, functools.partial(check_one_to_one, 10)),
         (p.AllToAllConnector,
-         functools.partial(check_all_to_all, 10, True)),
-        (functools.partial(p.AllToAllConnector,
-                           allow_self_connections=False),
-         functools.partial(check_all_to_all, 10, False)),
+         functools.partial(check_all_to_all, 10)),
         (functools.partial(p.FixedProbabilityConnector, 0.5),
-         functools.partial(check_fixed_prob, 10, 0.5, 3)),
+         functools.partial(check_fixed_prob, 10, 0.5)),
         (functools.partial(p.FixedTotalNumberConnector, 50,
                            with_replacement=True),
-         functools.partial(check_fixed_total, 10, 50)),
+         functools.partial(check_fixed_total, 50)),
         (functools.partial(p.FixedTotalNumberConnector, 20,
                            with_replacement=False),
-         functools.partial(check_fixed_total, 10, 20))
+         functools.partial(check_fixed_total, 20))
     ]
 
     projs = list()
@@ -99,7 +100,7 @@ def run_script():
     p.end()
 
 
-def check_params(param, result):
+def check_params(param: float, result: ConnectionHolder) -> None:
     if not isinstance(param, p.RandomDistribution):
         assert all(param == value for value in result)
     else:
@@ -115,38 +116,33 @@ def check_params(param, result):
             assert param.parameters["high"] >= maximum
 
 
-def check_one_to_one(n, conns):
+def check_one_to_one(n: int, conns: List[List[int]]) -> None:
     assert len(conns) == n
     assert all(pre == post for pre, post in conns)
 
 
-def conns_by_pre(conns):
+def conns_by_pre(conns: List[List[int]]) -> Dict[int, List[int]]:
     cbp = defaultdict(list)
     for pre, post in conns:
         cbp[pre].append(post)
     return cbp
 
 
-def conns_by_post(conns):
+def conns_by_post(conns: List[List[int]]) -> Dict[int, List[int]]:
     cbp = defaultdict(list)
     for pre, post in conns:
         cbp[post].append(pre)
     return cbp
 
 
-def check_all_to_all(n, allow_self, conns):
+def check_all_to_all(n: int, conns: List[List[int]]) -> None:
     cbp = conns_by_pre(conns)
     assert len(cbp) == n
     for pre in cbp:
-        if allow_self:
-            assert numpy.array_equal(sorted(cbp[pre]), range(n))
-        else:
-            assert (numpy.array_equal(
-                sorted(cbp[pre]),
-                [i for i in range(n) if i != pre]))
+        assert numpy.array_equal(sorted(cbp[pre]), range(n))
 
 
-def check_fixed_prob(n, prob, n_per_core, conns):
+def check_fixed_prob(n: int, prob: float, conns: List[List[int]]) -> None:
     cbpre = conns_by_pre(conns)
     cbpost = conns_by_post(conns)
     expected = n * prob
@@ -159,20 +155,20 @@ def check_fixed_prob(n, prob, n_per_core, conns):
     assert avgpost <= (expected + error)
 
 
-def check_fixed_total(n, total, conns):
+def check_fixed_total(total: int, conns: List[List[int]]) -> None:
     assert len(conns) == total
 
 
-def run_bad_normal_clipping():
+def run_bad_normal_clipping() -> None:
     p.setup(timestep=1.0)
 
     pop_1 = p.Population(4, p.IF_curr_exp(), label="pop_1")
-    input = p.Population(4, p.SpikeSourceArray(spike_times=[0]), label="input")
+    source = p.Population(4, p.SpikeSourceArray(spike_times=[0]), label="src")
 
     delays = p.RandomDistribution(
         "normal_clipped", mu=20, sigma=1, low=1, high=6)
 
-    p.Projection(input, pop_1, p.AllToAllConnector(),
+    p.Projection(source, pop_1, p.AllToAllConnector(),
                  synapse_type=p.StaticSynapse(weight=5, delay=delays))
 
     p.run(10)
@@ -182,10 +178,10 @@ def run_bad_normal_clipping():
 
 class TestSynapticExpander(BaseTestCase):
 
-    def test_script(self):
+    def test_script(self) -> None:
         self.runsafe(run_script)
 
-    def test_bad_normal_clipping(self):
+    def test_bad_normal_clipping(self) -> None:
         with self.assertRaises(SpiNNManCoresNotInStateException):
             run_bad_normal_clipping()
 

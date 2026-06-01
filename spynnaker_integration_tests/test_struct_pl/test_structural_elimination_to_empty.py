@@ -15,7 +15,7 @@ from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as p
 
 
-def structural_eliminate_to_empty():
+def structural_eliminate_to_empty() -> None:
     p.setup(1.0)
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 5)
     stim = p.Population(9, p.SpikeSourceArray(range(10)), label="stim")
@@ -33,7 +33,8 @@ def structural_eliminate_to_empty():
             formation=p.DistanceDependentFormation([3, 3], 0.0),
             elimination=p.RandomByWeightElimination(4.0, 1.0, 1.0),
             f_rew=1000, initial_weight=4.0, initial_delay=3.0,
-            s_max=9, seed=0, weight=0.0, delay=1.0))
+            s_max=9, seed=0, weight=0.0, delay=1.0),
+        download_synapses=True)
 
     pop.record("rewiring")
 
@@ -63,7 +64,7 @@ def structural_eliminate_to_empty():
 
 class TestStructuralEliminateToEmpty(BaseTestCase):
 
-    def test_structural_eliminate_to_empty(self):
+    def test_structural_eliminate_to_empty(self) -> None:
         self.runsafe(structural_eliminate_to_empty)
 
 

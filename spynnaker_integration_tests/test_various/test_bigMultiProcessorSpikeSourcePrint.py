@@ -14,13 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import spynnaker.plot_utils as plot_utils
+from neo import Block
 import pyNN.spiNNaker as p
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(nNeurons, neurons_per_core):
+def do_run(nNeurons: int, neurons_per_core: int) -> Block:
     cell_params_lif = {'cm': 0.25,  # nF
                        'i_offset': 0.0,
                        'tau_m': 10.0,
@@ -60,13 +60,13 @@ def do_run(nNeurons, neurons_per_core):
 
 class BigMultiProcessorSpikeSourcePrint(BaseTestCase):
 
-    def seventy(self):
+    def seventy(self) -> None:
         nNeurons = 600  # number of neurons in each population
         neo = do_run(nNeurons, 70)
         spike_count = neo_convertor.count_spikes(neo)
         self.assertEqual(spike_count, 7200)
 
-    def test_seventy(self):
+    def test_seventy(self) -> None:
         self.runsafe(self.seventy)
 
 
@@ -74,10 +74,8 @@ if __name__ == '__main__':
     nNeurons = 600  # number of neurons in each population
     neo = do_run(nNeurons, 60)
     spikes = neo_convertor.convert_spikes(neo)
-    plot_utils.plot_spikes(spikes)
     print(spikes)
 
     neo = do_run(nNeurons, 70)
     spikes = neo_convertor.convert_spikes(neo)
-    plot_utils.plot_spikes(spikes)
     print(spikes)

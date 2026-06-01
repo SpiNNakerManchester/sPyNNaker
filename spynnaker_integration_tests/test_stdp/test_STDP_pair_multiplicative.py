@@ -19,7 +19,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spinnaker_testbase import BaseTestCase
 
 
-def post_spike_same_time():
+def post_spike_same_time() -> None:
     """ Check that the offsets between send times of different spike source
         arrays don't change the outcome of STDP
     """
@@ -60,14 +60,13 @@ def post_spike_same_time():
 
     # Get the spikes
     post_spikes = numpy.array(
-        # pylint: disable=no-member
         post_1.get_data('spikes').segments[0].spiketrains[0].magnitude)
 
     p.end()
 
     new_weight_exact = calculate_spike_pair_multiplicative_stdp_weight(
-        pre_spikes, post_spikes, initial_weight, plastic_delay, min_weight,
-        max_weight, a_plus, a_minus, tau_plus, tau_minus)
+        numpy.array(pre_spikes), post_spikes, initial_weight, plastic_delay,
+        min_weight, max_weight, a_plus, a_minus, tau_plus, tau_minus)
 
     print(weights_1)
     print(weights_2)
@@ -79,7 +78,7 @@ def post_spike_same_time():
     assert numpy.allclose(weights_1, new_weight_exact, rtol=0.001)
 
 
-def potentiation_and_depression():
+def potentiation_and_depression() -> None:
     p.setup(1)
     runtime = 100
     initial_run = 1000  # to negate any initial conditions
@@ -149,15 +148,14 @@ def potentiation_and_depression():
 
     # Get the spikes
     post_spikes = numpy.array(
-        # pylint: disable=no-member
         post_pop.get_data('spikes').segments[0].spiketrains[0].magnitude)
 
     # End the simulation as all information gathered
     p.end()
 
     new_weight_exact = calculate_spike_pair_multiplicative_stdp_weight(
-        pre_spikes, post_spikes, initial_weight, plastic_delay, min_weight,
-        max_weight, a_plus, a_minus, tau_plus, tau_minus)
+        numpy.array(pre_spikes), post_spikes, initial_weight, plastic_delay,
+        min_weight, max_weight, a_plus, a_minus, tau_plus, tau_minus)
 
     print("Pre neuron spikes at: {}".format(pre_spikes))
     print("Post-neuron spikes at: {}".format(post_spikes))
@@ -172,10 +170,10 @@ def potentiation_and_depression():
 
 class TestSTDPPairAdditive(BaseTestCase):
 
-    def test_potentiation_and_depression(self):
+    def test_potentiation_and_depression(self) -> None:
         self.runsafe(potentiation_and_depression)
 
-    def test_post_spike_same_time(self):
+    def test_post_spike_same_time(self) -> None:
         self.runsafe(post_spike_same_time)
 
 

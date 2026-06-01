@@ -11,14 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 from enum import Enum
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from typing import Mapping, Optional, Sequence, Union, TYPE_CHECKING
+from typing_extensions import TypeAlias
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_front_end_common.interface.ds import DataType
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.populations import Population, PopulationBase
+    from spynnaker.pyNN.models.neuron.population_vertex import (
+        PopulationVertex)
+
+#: General type of parameters to current sources.
+#: Individual parameters will only be one of these!
+CurrentParameter: TypeAlias = Union[int, float, Sequence[int], Sequence[float]]
 
 
-# Hashes of the current sources currently supported
 class CurrentSourceIDs(Enum):
+    """
+    Hashes of the current sources currently supported
+    """
     NO_SOURCE = 0
     DC_SOURCE = 1
     AC_SOURCE = 2
@@ -33,95 +45,89 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
     out the actual offset value on the SpiNNaker machine itself based on
     the parameters during the run.
     """
-    __slots__ = [
+    __slots__ = (
         "__app_vertex",
-        "__population"]
+        "__population")
 
-    def __init__(self):
-        self.__app_vertex = None
-        self.__population = None
+    def __init__(self) -> None:
+        self.__app_vertex: Optional[PopulationVertex] = None
+        self.__population: Optional[Population] = None
 
-    def inject_into(self, cells):
+    def inject_into(self, cells: PopulationBase) -> None:
         """
         Inject this source into the specified population cells.
 
-        :param PopulationBase cells: The cells to inject the source into
+        :param cells: The cells to inject the source into
         """
         # Call the population method to pass the source in
         cells.inject(self)
 
-    def set_app_vertex(self, vertex):
+    def set_app_vertex(self, vertex: PopulationVertex) -> None:
         """
         Set the application vertex associated with the current source.
 
-        :param AbstractPopulationVertex vertex: The population vertex
+        :param vertex: The population vertex
         """
         self.__app_vertex = vertex
 
     @property
-    def app_vertex(self):
+    def app_vertex(self) -> Optional[PopulationVertex]:
         """
         The application vertex associated with the current source.
-
-        :rtype: AbstractPopulationVertex
         """
         return self.__app_vertex
 
-    def set_population(self, population):
+    def set_population(self, population: Population) -> None:
         """
         Set the population associated with the current source.
 
-        :param ~spynnaker.pyNN.models.populations.Population population:
+        :param population:
         """
         self.__population = population
 
     @property
-    def population(self):
+    def population(self) -> Optional[Population]:
         """
         The population associated with the current source.
-
-        :rtype: ~spynnaker.pyNN.models.populations.Population
         """
         return self.__population
 
     @abstractmethod
-    def set_parameters(self, **parameters):
+    def set_parameters(self, **parameters: CurrentParameter) -> None:
         """
         Set the current source parameters.
 
         :param parameters: the parameters to set
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def get_parameters(self):
+    @property
+    @abstractmethod
+    def parameters(self) -> Mapping[str, CurrentParameter]:
         """
         The parameters of the current source.
-
-        :rtype: dict(str, Any)
         """
-        # TODO: Wrong naming for a property!
+        raise NotImplementedError
 
-    @abstractproperty
-    def get_parameter_types(self):
+    @property
+    @abstractmethod
+    def parameter_types(self) -> Mapping[str, DataType]:
         """
         The parameter types for the current source.
-
-        :rtype: dict(str, Any)
         """
-        # TODO: Wrong naming for a property!
+        raise NotImplementedError
 
-    @abstractproperty
-    def current_source_id(self):
+    @property
+    @abstractmethod
+    def current_source_id(self) -> int:
         """
         The ID of the current source.
-
-        :rtype: int
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_sdram_usage_in_bytes(self):
+    def get_sdram_usage_in_bytes(self) -> int:
         """
-        The SDRAM usage in bytes of the current source.
-
-        :rtype: int
+        :returns: The SDRAM usage in bytes of the current source.
         """
+        raise NotImplementedError

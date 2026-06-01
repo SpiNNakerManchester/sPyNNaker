@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Tuple
 import numpy
+from numpy.typing import NDArray
 import pyNN.spiNNaker as sim
 from pyNN.space import Grid2D
 import matplotlib.pyplot as plt
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(plot):
+def do_run(plot: bool) -> Tuple[NDArray, NDArray]:
     in_shape = (11, 11)
     n_input = int(numpy.prod(in_shape))
     print("n_input ", n_input)
@@ -33,8 +35,8 @@ def do_run(plot):
     run_time = 4.
 
     sim.setup(timestep=1.)
-    sim.set_number_of_neurons_per_core(sim.SpikeSourceArray, (5, 5))
-    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, (3, 3))
+    sim.set_number_of_neurons_per_core(sim.SpikeSourceArray, (11, 1))
+    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, (7, 1))
 
     spike_idx = ((in_shape[1] // 2) * in_shape[0]) + (in_shape[1] // 2)
     spike_times = [[1.0] if i == spike_idx else []
@@ -99,12 +101,12 @@ def do_run(plot):
 
 class SingleSpikeKernelResponse(BaseTestCase):
 
-    def check_run(self):
+    def check_run(self) -> None:
         (ratios, kernel_ratios) = do_run(plot=False)
         is_close = numpy.isclose(ratios, kernel_ratios, rtol=0.01)
         assert (all(is_close))
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.check_run)
 
 

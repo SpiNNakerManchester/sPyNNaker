@@ -17,7 +17,7 @@ from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 
 
-class AbstractAdditionalInput(
+class AbstractAdditionalInput(  # pylint: disable=abstract-method
         AbstractStandardNeuronComponent, metaclass=AbstractBase):
     """
     Represents a possible additional independent input for a model.

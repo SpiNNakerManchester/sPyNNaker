@@ -18,7 +18,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestSampling(BaseTestCase):
 
-    def test_thrtytwo(self):
+    def test_thrtytwo(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 
@@ -34,7 +34,6 @@ class TestSampling(BaseTestCase):
         sim.run(simtime)
 
         neo = pop_1.get_data(variables=["spikes", "v"])
-        # pylint: disable=no-member
         spikes = neo.segments[0].spiketrains
         # Include all the spiketrains as there is no outside index
         self.assertEqual(40, len(spikes))

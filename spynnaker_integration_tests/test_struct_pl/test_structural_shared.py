@@ -16,7 +16,7 @@ import pyNN.spiNNaker as p
 import numpy
 
 
-def structural_shared():
+def structural_shared() -> None:
     p.setup(1.0)
     pre_spikes = numpy.array(range(0, 10, 2))
     A_plus = 0.01
@@ -50,9 +50,11 @@ def structural_shared():
             f_rew=1000, initial_weight=2.0, initial_delay=5.0,
             s_max=1, seed=0, weight=0.0, delay=1.0)
     proj = p.Projection(
-        stim, pop, p.FromListConnector([]), struct_pl_static)
+        stim, pop, p.FromListConnector([]), struct_pl_static,
+        download_synapses=True)
     proj_2 = p.Projection(
-        stim, pop_2, p.FromListConnector([]), struct_pl_static)
+        stim, pop_2, p.FromListConnector([]), struct_pl_static,
+        download_synapses=True)
     proj_3 = p.Projection(
         stim, pop_3, p.FromListConnector([(0, 0)]), struct_pl_stdp)
     proj_4 = p.Projection(
@@ -83,8 +85,11 @@ def structural_shared():
 
 class TestStructuralShared(BaseTestCase):
 
-    def test_structural_shared(self):
+    def test_structural_shared(self) -> None:
         self.runsafe(structural_shared)
+        self.check_binaries_used(
+            ["synapses_stdp_mad_pair_additive_structural_last_neuron_distance_weight.aplx",  # noqa: E501
+             "synapses_structural_last_neuron_distance_weight.aplx"])
 
 
 if __name__ == "__main__":

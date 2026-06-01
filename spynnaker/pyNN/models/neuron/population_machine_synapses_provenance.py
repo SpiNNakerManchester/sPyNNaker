@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ctypes
-from spinn_utilities.abstract_base import abstractproperty
+from typing import Sequence
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 
@@ -37,7 +37,7 @@ class SynapseProvenance(ctypes.LittleEndianStructure):
         ("n_filtered_by_bitfield", ctypes.c_uint32),
         # The number of synapses skipped due to late spikes
         ("n_skipped_synapses", ctypes.c_uint32),
-        # The number of spikes detecte as late
+        # The number of spikes detected as late
         ("n_late_spikes", ctypes.c_uint32),
         # The maximum lateness of a spike
         ("max_late_spike", ctypes.c_uint32)
@@ -52,7 +52,7 @@ class PopulationMachineSynapsesProvenance(object):
     """
 
     # This MUST stay empty to allow mixing with other things with slots
-    __slots__ = []
+    __slots__ = ()
 
     TOTAL_PRE_SYNAPTIC_EVENT_NAME = "Total_pre_synaptic_events"
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
@@ -67,27 +67,17 @@ class PopulationMachineSynapsesProvenance(object):
     LATE_SPIKES = "Late spikes"
     MAX_LATE_SPIKE = "Max late spike"
 
-    @abstractproperty
-    def _app_vertex(self):
-        """
-        The application vertex of the machine vertex.
-
-        .. note::
-            This is likely to be available via the
-            :py:class:`~pacman.model.graphs.machine.MachineVertex`.
-
-        :rtype: AbstractPopulationVertex
-        """
-
-    def _parse_synapse_provenance(self, label,  x, y, p, provenance_data):
+    def _parse_synapse_provenance(
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]) -> None:
         """
         Extract and yield synapse provenance.
 
-        :param str label: The label of the node
-        :param int x: x coordinate of the chip where this core
-        :param int y: y coordinate of the core where this core
-        :param int p: virtual id of the core
-        :param list(int) provenance_data: A list of data items to interpret
+        :param label: The label of the node
+        :param x: x coordinate of the chip where this core
+        :param y: y coordinate of the core where this core
+        :param p: virtual id of the core
+        :param provenance_data: A list of data items to interpret
         """
         synapse_prov = SynapseProvenance(*provenance_data)
 

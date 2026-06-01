@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy
 import pytest
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
@@ -25,7 +24,7 @@ class TestIDMixin(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_cells(self):
+    def test_cells(self) -> None:
         sim.setup(timestep=1.0)
         pop_1 = sim.Population(N_NEURONS, sim.IF_curr_exp(), label=LABEL)
         cells = pop_1.all_cells
@@ -35,7 +34,7 @@ class TestIDMixin(BaseTestCase):
         assert not cells[1].__eq__("Not the same object")
         sim.end()
 
-    def test_get_set(self):
+    def test_get_set(self) -> None:
         sim.setup(timestep=1.0)
         pop_1 = sim.Population(N_NEURONS, sim.IF_curr_exp(), label=LABEL)
         cells = pop_1.all_cells
@@ -53,7 +52,7 @@ class TestIDMixin(BaseTestCase):
         assert 13 == params["i_offset"]
         sim.end()
 
-    def test_bad(self):
+    def test_bad(self) -> None:
         sim.setup(timestep=1.0)
         pop_1 = sim.Population(4, sim.IF_curr_exp(), label=LABEL)
         cell = pop_1.all_cells[2]
@@ -63,7 +62,7 @@ class TestIDMixin(BaseTestCase):
             cell.variable_that_is_not_there = "pop"
         sim.end()
 
-    def test_is_local(self):
+    def test_is_local(self) -> None:
         sim.setup(timestep=1.0)
         pop_1 = sim.Population(N_NEURONS, sim.IF_curr_exp(), label=LABEL)
         cells = pop_1.all_cells
@@ -71,7 +70,7 @@ class TestIDMixin(BaseTestCase):
         sim.end()
 
     """
-    def test_positions(self):
+    def test_positions(self) -> None:
         grid_structure = sim.Grid2D(dx=1.0, dy=1.0, x0=0.0, y0=0.0)
         positions = grid_structure.generate_positions(4)
         pos_T = positions.T
@@ -81,7 +80,7 @@ class TestIDMixin(BaseTestCase):
         assert "q" == pop_1.position[1]
     """
 
-    def test_init_by_in(self):
+    def test_init_by_in(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label=LABEL)
         assert [-65.0, -65.0, -65.0, -65.0] == pop.initial_values["v"]
@@ -93,7 +92,7 @@ class TestIDMixin(BaseTestCase):
         assert [-65.0, -60.0, -59.0, -65.0] == pop.initial_values["v"]
         sim.end()
 
-    def test_initial_values(self):
+    def test_initial_values(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label=LABEL)
         cells = pop.all_cells
@@ -102,13 +101,13 @@ class TestIDMixin(BaseTestCase):
         assert [-65.0, -60.0, -65.0, -65.0] == pop.initial_values["v"]
         sim.end()
 
-    def test_asview(self):
+    def test_asview(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label=LABEL)
         cell = pop[2]
         cell.as_view()
 
-    def test_ssa_spike_times(self):
+    def test_ssa_spike_times(self) -> None:
         n_atoms = 10
         set_id = 1
         set_value = [5]
@@ -119,7 +118,7 @@ class TestIDMixin(BaseTestCase):
         result_should_be = []
         for atom in range(n_atoms):
             if atom == set_id:
-                result_should_be.append(numpy.array(set_value))
+                result_should_be.append(set_value)
             else:
                 result_should_be.append([])
         self.assertEqual(result, result_should_be)

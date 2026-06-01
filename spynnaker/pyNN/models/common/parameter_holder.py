@@ -11,8 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import (
+    Any, Callable, cast, Dict, Iterable, Iterator, List, Optional, overload,
+    Tuple, Union)
 from pyNN.random import RandomDistribution
 from spinn_utilities.helpful_functions import is_singleton
+from spinn_utilities.ranged.abstract_sized import Selector
 
 
 class ParameterHolder(object):
@@ -25,6 +29,8 @@ class ParameterHolder(object):
         # A list of items of data that are to be present in each element
         "__data_items_to_return",
 
+        "__single_key",
+
         # Function call to get the values
         "__get_call",
 
@@ -32,27 +38,32 @@ class ParameterHolder(object):
         "__data_items",
 
         # A selector to use if requested
-        "__selector"
-    )
+        "__selector")
 
-    def __init__(self, data_items_to_return, get_call, selector=None):
+    def __init__(
+            self, data_items_to_return: Union[str, Iterable[str]],
+            get_call: Callable[[str, Selector], Union[
+                List[float], RandomDistribution]],
+            selector: Selector = None):
         """
         :param data_items_to_return: A list of data fields to be returned
-        :type data_items_to_return: list(str) or tuple(str)
         :param get_call: A function to call to read a value
-        :type get_call: callable(str, selector=None)->list
         :param selector: a description of the subrange to accept,
             or `None` for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
-        :type selector: None or slice or int or list(bool) or list(int)
         """
-        # pylint: disable=too-many-arguments
-        self.__data_items_to_return = data_items_to_return
+        self.__data_items_to_return: Union[str, Tuple[str, ...]]
+        if isinstance(data_items_to_return, str):
+            self.__data_items_to_return = data_items_to_return
+            self.__single_key: Optional[str] = data_items_to_return
+        else:
+            self.__data_items_to_return = tuple(data_items_to_return)
+            self.__single_key = None
         self.__get_call = get_call
-        self.__data_items = None
+        self.__data_items: Optional[Dict[str, List[float]]] = None
         self.__selector = selector
 
-    def _safe_read_values(self, parameter):
+    def _safe_read_values(self, parameter: str) -> Union[List[float], float]:
         values = self.__get_call(parameter, self.__selector)
 
         # The values must be a single item, a list or a random distribution;
@@ -68,7 +79,7 @@ class ParameterHolder(object):
             return values[0]
         return values
 
-    def _get_data_items(self):
+    def _get_data_items(self) -> Dict[str, List[float]]:
         """
         Merges the parameters and values in to the final data items
         """
@@ -78,61 +89,97 @@ class ParameterHolder(object):
 
         # If there is just one item to return, return the values stored
         if is_singleton(self.__data_items_to_return):
-            self.__data_items = self._safe_read_values(
-                self.__data_items_to_return)
+            key = cast(str, self.__data_items_to_return)
+            self.__data_items = {
+                key: cast(List[float], self._safe_read_values(key))}
             return self.__data_items
 
         # If there are multiple items to return, form a list
         self.__data_items = {
-            param: self._safe_read_values(param)
+            param: cast(List[float], self._safe_read_values(param))
             for param in self.__data_items_to_return}
 
         return self.__data_items
 
-    def __getitem__(self, s):
+    @overload
+    def __getitem__(self, s: int) -> float:
+        ...
+
+    @overload
+    def __getitem__(self, s: str) -> List[float]:
+        ...
+
+    def __getitem__(self, s: Union[int, str]) -> Union[float, List[float]]:
         data = self._get_data_items()
+        if self.__single_key is not None:
+            if not isinstance(s, int):
+                raise KeyError("As there is only one array held "
+                               "only int parameter are valid")
+            return data[self.__single_key][s]
+        if not isinstance(s, str):
+            raise KeyError("As multiple arrays held "
+                           "only str parameter are valid")
         return data[s]
 
-    def __len__(self):
+    def __len__(self) -> int:
         data = self._get_data_items()
+        if self.__single_key is not None:
+            return len(data[self.__single_key])
         return len(data)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator:
         data = self._get_data_items()
+        if self.__single_key is not None:
+            return iter(data[self.__single_key])
         return iter(data)
 
-    def __str__(self):
+    def __str__(self) -> str:
         data = self._get_data_items()
-        return data.__str__()
+        if self.__single_key is not None:
+            return str(data[self.__single_key])
+        return str(data)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         data = self._get_data_items()
-        return data.__repr__()
+        if self.__single_key is not None:
+            return repr(data[self.__single_key])
+        return repr(data)
 
-    def __contains__(self, item):
+    def __contains__(self, item: Union[str, int]) -> bool:
         data = self._get_data_items()
+        if self.__single_key is not None:
+            return item in data[self.__single_key]
         return item in data
 
-    def __getattr__(self, name):
+    def __eq__(self, other: Any) -> bool:
         data = self._get_data_items()
-        return getattr(data, name)
-
-    def __eq__(self, other):
-        data = self._get_data_items()
+        if self.__single_key is not None:
+            return data[self.__single_key] == other
         return data == other
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         data = self._get_data_items()
+        if self.__single_key is not None:
+            return hash(data[self.__single_key])
         return hash(data)
 
-    def keys(self):
+    def keys(self) -> Iterable[str]:
+        """
+        :returns: The names of the data
+        """
         data = self._get_data_items()
         return data.keys()
 
-    def values(self):
+    def values(self) -> Iterable[List[float]]:
+        """
+        :returns: The values of the data
+        """
         data = self._get_data_items()
-        return data.items()
+        return data.values()
 
-    def items(self):
+    def items(self) -> Iterable[Tuple[str, List[float]]]:
+        """
+        :returns: Iterable of the names and matching values of the data
+        """
         data = self._get_data_items()
         return data.items()

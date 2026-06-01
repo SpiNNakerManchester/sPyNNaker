@@ -14,12 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Tuple
+from neo import Block
 import pyNN.spiNNaker as p
-from spynnaker.pyNN.utilities import neo_convertor
+
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.utilities import neo_convertor
 
 
-def do_run(nNeurons):
+def do_run(nNeurons: int) -> Tuple[Block, Block, Block]:
 
     p.setup(timestep=1.0, min_delay=1.0)
 
@@ -51,7 +54,7 @@ def do_run(nNeurons):
 
 
 class OnePopLifExample(BaseTestCase):
-    def do_run(self):
+    def do_run(self) -> None:
         nNeurons = 5  # number of neurons in each population
         (v, gsyn, spikes) = do_run(nNeurons)
         self.assertEqual(5, len(spikes))
@@ -66,5 +69,5 @@ class OnePopLifExample(BaseTestCase):
         self.assertEqual(spikes[4][0], 4)
         self.assertEqual(spikes[4][1], 72)
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)

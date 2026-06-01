@@ -11,19 +11,33 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import logging
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
+from typing import (
+    Any, Callable, Dict, final, Optional, Sequence, Tuple, TYPE_CHECKING,
+    Union)
+
+from pyNN.space import BaseStructure
+import neo
+from numpy import floating
+from numpy.typing import NDArray
+from typing_extensions import Never
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 
+from pacman.model.graphs.application import ApplicationVertex
+
+from spynnaker.pyNN.models.recorder import Recorder
+from spynnaker.pyNN.types import IoDest
+
+if TYPE_CHECKING:
+    from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
+    from spynnaker.pyNN.models.common.types import Names
+    from .population_view import IDMixin
+
 logger = FormatAdapter(logging.getLogger(__name__))
-
-
-def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
-    # pragma: no cover
-    raise NotImplementedError("sPyNNaker does not currently do this")
 
 
 class PopulationBase(object, metaclass=AbstractBase):
@@ -33,30 +47,29 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     Mainly pass through and not implemented.
     """
-    __slots__ = []
+    __slots__ = ()
 
     @property
-    def local_cells(self):
+    def local_cells(self) -> Sequence[IDMixin]:
         """
         An array containing the cell IDs of those neurons in the
         Population that exist on the local MPI node.
-
-        :rtype: list(int)
         """
         logger.warning("local calls do not really make sense on sPyNNaker so "
                        "local_cells just returns all_cells")
         return self.all_cells
 
-    @abstractproperty
-    def all_cells(self):
+    @property
+    @abstractmethod
+    def all_cells(self) -> Sequence[IDMixin]:
         """
         An array containing the cell IDs of all neurons in the
         Population (all MPI nodes).
-
-        :rtype: list(int)
         """
+        raise NotImplementedError
 
-    def __add__(self, other):
+    @final
+    def __add__(self, other: PopulationBase) -> Never:  # pylint: disable=W0613
         """
         A Population / PopulationView can be added to another
         Population, PopulationView or Assembly, returning an Assembly.
@@ -64,15 +77,15 @@ class PopulationBase(object, metaclass=AbstractBase):
         .. warning::
             Currently unimplemented.
 
-        :param PopulationBase other:
-        :rtype: Assembly
+        :param other:
         """
-        # TODO: support assemblies
-        _we_dont_do_this_now(other)  # pragma: no cover
+        raise NotImplementedError("sPyNNaker does not support Assemblies")
 
     @abstractmethod
-    def get_data(self, variables='all', gather=True, clear=False,
-                 annotations=None):
+    def get_data(
+            self, variables: Names = 'all',
+            gather: bool = True, clear: bool = False, *,
+            annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
         """
         Return a Neo Block containing the data(spikes, state variables)
         recorded from the Population.
@@ -81,88 +94,80 @@ class PopulationBase(object, metaclass=AbstractBase):
             Either a single variable name or a list of variable names.
             Variables must have been previously recorded, otherwise an
             Exception will be raised.
-        :type variables: str or list(str)
-        :param bool gather: For parallel simulators, if this is True, all data
-            will be gathered to all nodes and the Neo Block will contain data
-            from all nodes. Otherwise, the Neo Block will contain only data
-            from the cells simulated on the local node.
+        :param gather: Ignored. Purely for PyNN compatibility
 
             .. note::
                 SpiNNaker always gathers.
 
-        :param bool clear:
+        :param clear:
             If this is True, recorded data will be deleted from the Population.
         :param annotations: annotations to put on the neo block
-        :type annotations: None or dict(str, ...)
-        :rtype: ~neo.core.Block
+        :returns: Data in neo format
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the variable or variables have not been previously set to
+            record.
         """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_spike_counts(self, gather=True):
+    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
         """
         Returns a dict containing the number of spikes for each neuron.
 
         The dict keys are neuron IDs, not indices.
 
-        :param bool gather:
-            For parallel simulators, if this is True, all data will be gathered
-            to all nodes and the Neo Block will contain data from all nodes.
-            Otherwise, the Neo Block will contain only data from the cells
-            simulated on the local node.
+        :param gather: Ignored. Purely for PyNN compatibility
 
             .. note::
                 SpiNNaker always gathers.
-
-        :rtype: dict(int, int)
+        :returns: A dict containing the number of spikes for each neuron.
         """
+        raise NotImplementedError
 
-    @abstractmethod
-    def inject(self, current_source):
+    def inject(self, current_source: NeuronCurrentSource) -> None:
         """
         Connect a current source to all cells in the Population.
 
         :param current_source:
-        :type current_source:
-            ~pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource
         """
+        raise NotImplementedError
 
-    def is_local(self,
-                 id):  # pylint: disable=unused-argument, redefined-builtin
+    @final
+    def is_local(self, id: int) -> bool:  # @ReservedAssignment
         """
         Indicates whether the cell with the given ID exists on the
         local MPI node.
 
-        :rtype: bool
+        :returns: True
         """
+        # pylint: disable=redefined-builtin
+        _ = id
         logger.warning("local calls do not really make sense on sPyNNaker so "
                        "is_local always returns True")
         return True
 
     @property
-    def local_size(self):
+    @final
+    def local_size(self) -> int:
         """
         The number of cells in the population on the local MPI node.
-
-        :rtype: int
         """
         logger.warning("local calls do not really make sense on sPyNNaker so "
                        "is_local always returns size")
         return len(self)
 
-    def mean_spike_count(self, gather=True):
-        """
-        Returns the mean number of spikes per neuron.
+    @abstractmethod
+    def __len__(self) -> int:
+        raise NotImplementedError
 
-        :param bool gather:
-            For parallel simulators, if this is True, all data will be gathered
-            to all nodes and the Neo Block will contain data from all nodes.
-            Otherwise, the Neo Block will contain only data from the cells
-            simulated on the local node.
+    def mean_spike_count(self, gather: bool = True) -> float:
+        """
+        :param gather: Ignored. Purely for PyNN compatibility
 
             .. note::
                 SpiNNaker always gathers.
-
-        :rtype: float
+        :returns: The mean number of spikes per neuron.
         """
         if not gather:
             warn_once(
@@ -171,74 +176,64 @@ class PopulationBase(object, metaclass=AbstractBase):
         counts = self.get_spike_counts()
         return sum(counts.values()) / len(counts)
 
-    def nearest(self, position):
+    @final
+    def nearest(
+            self, position: Any) -> Never:
         """
         Return the neuron closest to the specified position.
 
         .. warning::
             Currently unimplemented.
         """
-        # TODO: support neuron positions and spaces
-        _we_dont_do_this_now(position)  # pragma: no cover
+        _ = position
+        raise NotImplementedError("sPyNNaker does not currently do nearest")
 
     @property
-    def position_generator(self):
+    @abstractmethod
+    def position_generator(self) -> Callable[[int], NDArray[floating]]:
         """
-        .. note::
-            NO PyNN description of this method.
-
-        .. warning::
-            Currently unimplemented.
+        Returns a function to get the position for single id
         """
-        # TODO: support neuron positions and spaces
-        _we_dont_do_this_now()  # pragma: no cover
+        raise NotImplementedError
 
     @property
-    def positions(self):
+    @abstractmethod
+    def positions(self) -> NDArray[floating]:
         """
-        .. note::
-            NO PyNN description of this method.
+        The position array for structured populations.
 
-        .. warning::
-            Currently unimplemented.
-
-        :rtype: ~numpy.ndarray(tuple(float, float, float))
+        This will be a 3xN array
         """
-        # TODO: support neuron positions and spaces
-        _we_dont_do_this_now()  # pragma: no cover
+        raise NotImplementedError
 
     @abstractmethod
-    def write_data(self, io, variables='all', gather=True, clear=False,
-                   annotations=None):
+    def write_data(self, io: Union[str, neo.baseio.BaseIO],
+                   variables: Names = 'all',
+                   gather: bool = True, clear: bool = False,
+                   annotations: Optional[Dict[str, Any]] = None) -> None:
         """
         Write recorded data to file, using one of the file formats
         supported by Neo.
 
         :param io:
             a Neo IO instance, or a string for where to put a Neo instance
-        :type io: ~neo.io or ~neo.rawio or str
         :param variables:
             either a single variable name or a list of variable names.
             Variables must have been previously recorded, otherwise an
             Exception will be raised.
-        :type variables: str or list(str)
-        :param bool gather: For parallel simulators, if this is True, all data
-            will be gathered to all nodes and the Neo Block will contain data
-            from all nodes. Otherwise, the Neo Block will contain only data
-            from the cells simulated on the local node. This is pointless on
-            sPyNNaker.
+        :param gather: Ignored. Purely for PyNN compatibility
 
             .. note::
                 SpiNNaker always gathers.
 
-        :param bool clear:
+        :param clear:
             clears the storage data if set to true after reading it back
         :param annotations: annotations to put on the Neo block
-        :type annotations: None or dict(str, ...)
         """
-        # pylint: disable=too-many-arguments
+        raise NotImplementedError
 
-    def receptor_types(self):
+    @final
+    def receptor_types(self) -> Never:
         """
         .. note::
             NO PyNN description of this method.
@@ -246,10 +241,11 @@ class PopulationBase(object, metaclass=AbstractBase):
         .. warning::
             Currently unimplemented.
         """
-        _we_dont_do_this_now()  # pragma: no cover
+        raise NotImplementedError()
 
     @abstractmethod
-    def record(self, variables, to_file=None, sampling_interval=None):
+    def record(self, variables: Names, to_file: IoDest = None,
+               sampling_interval: Optional[float] = None) -> None:
         """
         Record the specified variable or variables for all cells in the
         Population or view.
@@ -257,55 +253,60 @@ class PopulationBase(object, metaclass=AbstractBase):
         :param variables: either a single variable name or a list of variable
             names. For a given `celltype` class, `celltype.recordable` contains
             a list of variables that can be recorded for that `celltype`.
-        :type variables: str or list(str)
         :param to_file: a file to automatically record to (optional).
             `write_data()` will be automatically called when `end()` is called.
-        :type to_file: ~neo.io or ~neo.rawio or str
-        :param int sampling_interval: a value in milliseconds, and an integer
+        :param sampling_interval: a value in milliseconds, and an integer
             multiple of the simulation timestep.
+        :raises ValueError: If neo can not generate an io Class
         """
+        raise NotImplementedError
 
-    def save_positions(self, file):  # pylint: disable=redefined-builtin
+    @final
+    def save_positions(self, file: Any) -> Never:  # pylint: disable=W0622
         """
         Save positions to file. The output format is index x y z
 
         .. warning::
             Currently unimplemented.
         """
-        # TODO:
-        _we_dont_do_this_now(file)  # pragma: no cover
+        _ = file
+        raise NotImplementedError
 
     @property
-    def structure(self):
+    @abstractmethod
+    def structure(self) -> Optional[BaseStructure]:
         """
         The spatial structure of the parent Population.
-
-        .. warning::
-            Currently unimplemented.
-
-        :rtype: ~pyNN.space.BaseStructure
         """
-        # TODO: support neuron positions and spaces
-        _we_dont_do_this_now()  # pragma: no cover
+        raise NotImplementedError
 
-    @abstractproperty
-    def _vertex(self):
+    @property
+    @abstractmethod
+    def _vertex(self) -> ApplicationVertex:
         """
         The underlying application vertex.
-
-        :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
+        raise NotImplementedError
 
-    @abstractproperty
-    def _recorder(self):
+    @property
+    @abstractmethod
+    def _view_range(self) -> Tuple[int, int]:
+        """
+        The range of neuron IDs supported.
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def _recorder(self) -> Recorder:
         """
         The recorder of the population.
-
-        :rtype: ~Recorder
         """
+        raise NotImplementedError
 
     @staticmethod
-    def _check_params(gather, annotations=None):
+    def _check_params(gather: bool,
+                      annotations: Optional[Dict[str, Any]] = None) -> None:
         if not gather:
             logger.warning(
                 "sPyNNaker only supports gather=True. We will run "

@@ -13,11 +13,12 @@
 # limitations under the License.
 
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.defaults import defaults, default_initial_values
+from spynnaker.pyNN.models.defaults import (
+    AbstractProvidesDefaults, default_initial_values)
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 
 
-@defaults
-class HHCondExp(object):
+class HHCondExp(AbstractProvidesDefaults):
     """
     Single-compartment Hodgkin-Huxley model with exponentially decaying
     current input.
@@ -29,10 +30,32 @@ class HHCondExp(object):
     # noinspection PyPep8Naming
     @default_initial_values({"v", "gsyn_exc", "gsyn_inh"})
     def __init__(
-            self, gbar_K=6.0, cm=0.2, e_rev_Na=50.0, tau_syn_E=0.2,
-            tau_syn_I=2.0, i_offset=0.0, g_leak=0.01, e_rev_E=0.0,
-            gbar_Na=20.0, e_rev_leak=-65.0, e_rev_I=-80, e_rev_K=-90.0,
-            v_offset=-63, v=-65.0, gsyn_exc=0.0, gsyn_inh=0.0):
-        # pylint: disable=unused-argument
+            self, gbar_K: ModelParameter = 6.0, cm: ModelParameter = 0.2,
+            e_rev_Na: ModelParameter = 50.0, tau_syn_E: ModelParameter = 0.2,
+            tau_syn_I: ModelParameter = 2.0, i_offset: ModelParameter = 0.0,
+            g_leak: ModelParameter = 0.01, e_rev_E: ModelParameter = 0.0,
+            gbar_Na: ModelParameter = 20.0, e_rev_leak: ModelParameter = -65.0,
+            e_rev_I: ModelParameter = -80, e_rev_K: ModelParameter = -90.0,
+            v_offset: ModelParameter = -63, v: ModelParameter = -65.0,
+            gsyn_exc: ModelParameter = 0.0, gsyn_inh: ModelParameter = 0.0):
+        # pylint: disable=unused-argument,invalid-name
+        """
+        :param gbar_K:
+        :param cm:
+        :param e_rev_Na:
+        :param tau_syn_E:
+        :param tau_syn_I:
+        :param i_offset:
+        :param g_leak:
+        :param e_rev_E:
+        :param gbar_Na:
+        :param e_rev_leak:
+        :param e_rev_I:
+        :param e_rev_K:
+        :param v_offset:
+        :param v:
+        :param gsyn_exc:
+        :param gsyn_inh:
+        """
         raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")

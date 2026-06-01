@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List, Optional
 from scipy.stats import expon
+from spinn_utilities.overrides import overrides
+from pyNN.random import RandomDistribution
 from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
@@ -22,26 +25,33 @@ class RandomStatsExponentialClippedImpl(AbstractRandomStats):
     distributions.
     """
 
-    def _get_params(self, dist):
+    def _get_params(self, dist: RandomDistribution) -> List[float]:
         return [dist.parameters['beta']]
 
-    def cdf(self, dist, v):
+    @overrides(AbstractRandomStats.cdf)
+    def cdf(self, dist: RandomDistribution, v: float) -> float:
         return expon.cdf(v, *self._get_params(dist))
 
-    def ppf(self, dist, p):
+    @overrides(AbstractRandomStats.ppf)
+    def ppf(self, dist: RandomDistribution, p: float) -> float:
         return expon.ppf(p, *self._get_params(dist))
 
-    def mean(self, dist):
+    @overrides(AbstractRandomStats.mean)
+    def mean(self, dist: RandomDistribution) -> float:
         return expon.mean(*self._get_params(dist))
 
-    def std(self, dist):
+    @overrides(AbstractRandomStats.std)
+    def std(self, dist: RandomDistribution) -> float:
         return expon.std(*self._get_params(dist))
 
-    def var(self, dist):
+    @overrides(AbstractRandomStats.var)
+    def var(self, dist: RandomDistribution) -> float:
         return expon.var(*self._get_params(dist))
 
-    def high(self, distribution):
+    @overrides(AbstractRandomStats.high)
+    def high(self, distribution: RandomDistribution) -> Optional[float]:
         return distribution.parameters['high']
 
-    def low(self, distribution):
+    @overrides(AbstractRandomStats.low)
+    def low(self, distribution: RandomDistribution) -> Optional[float]:
         return distribution.parameters['low']

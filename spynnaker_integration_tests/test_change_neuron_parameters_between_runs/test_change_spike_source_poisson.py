@@ -18,7 +18,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestChangeSpikeSourcePoisson(BaseTestCase):
 
-    def with_reset(self):
+    def with_reset(self) -> None:
         p.setup(1.0)
 
         inp = p.Population(
@@ -33,10 +33,10 @@ class TestChangeSpikeSourcePoisson(BaseTestCase):
         p.end()
         assert len(spikes1) > len(spikes2) * 5
 
-    def test_with_reset(self):
+    def test_with_reset(self) -> None:
         self.runsafe(self.with_reset)
 
-    def no_reset(self):
+    def no_reset(self) -> None:
         p.setup(1.0)
 
         inp = p.Population(
@@ -50,5 +50,5 @@ class TestChangeSpikeSourcePoisson(BaseTestCase):
         assert len(spikes1) > (len(spikes2)-len(spikes1)) * 5
         p.end()
 
-    def test_no_reset(self):
+    def test_no_reset(self) -> None:
         self.runsafe(self.no_reset)

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from neo.io import PickleIO
+from neo.io import PickleIO  # type: ignore[import]
 import pyNN.spiNNaker as sim
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities import neo_compare
@@ -23,9 +23,8 @@ pickle_path = "data.pickle"
 
 
 class TestRecordingOnOff(BaseTestCase):
-    # pylint: disable=no-member
 
-    def record_all(self):
+    def record_all(self) -> None:
         sim.setup(timestep=1)
         simtime = 100
         input = sim.Population(1, sim.SpikeSourceArray(spike_times=[0, 30]),
@@ -73,10 +72,10 @@ class TestRecordingOnOff(BaseTestCase):
         assert len(gsyn_neo.segments[0].filter(name="gsyn_exc")) > 0
         sim.end()
 
-    def test_record_all(self):
+    def test_record_all(self) -> None:
         self.runsafe(self.record_all)
 
-    def record_v(self):
+    def record_v(self) -> None:
         sim.setup(timestep=1)
         simtime = 100
         input = sim.Population(1, sim.SpikeSourceArray(spike_times=[0, 30]),
@@ -113,5 +112,5 @@ class TestRecordingOnOff(BaseTestCase):
             pop.write_data(pickle_path, "gsyn_exc")
         sim.end()
 
-    def test_record_v(self):
+    def test_record_v(self) -> None:
         self.runsafe(self.record_v)

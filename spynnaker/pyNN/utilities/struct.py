@@ -12,15 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy
 from enum import Enum
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+
+import numpy
+from numpy import integer, uint8, uint32
+from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
+from typing_extensions import TypeAlias
+
 from spinn_utilities.helpful_functions import is_singleton
+from spinn_utilities.ranged.abstract_list import AbstractList
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
+
+from pacman.model.graphs.common import Slice
+
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.utilities.utility_calls import convert_to
 from spynnaker.pyNN.models.common.param_generator_data import (
     get_generator_type, param_generator_id, param_generator_params,
     type_has_generator)
+
+#: The type of values used populate structure instances
+ValueMap: TypeAlias = Mapping[str, Union[int, float, AbstractList[float]]]
+
 
 REPEAT_PER_NEURON_FLAG = 0xFFFFFFFF
 
@@ -40,84 +57,71 @@ class Struct(object):
     """
     Represents a C code structure.
     """
-
-    __slots__ = [
+    __slots__ = (
         "__fields",
         "__repeat_type",
-        "__default_values"
-    ]
+        "__default_values")
 
-    def __init__(self, fields, repeat_type=StructRepeat.PER_NEURON,
-                 default_values=None):
+    def __init__(
+            self, fields: Sequence[Tuple[DataType, str]],
+            repeat_type: StructRepeat = StructRepeat.PER_NEURON,
+            default_values: Optional[Dict[str, Union[int, float]]] = None):
         """
         :param fields:
             The types and names of the fields, ordered as they appear in the
             structure.
-        :type fields: list(~data_specification.enums.DataType, str)
-        :param StructRepeat repeat_type: How the structure repeats
+        :param repeat_type: How the structure repeats
         :param default_values:
             Dict of field name -> value to use when values doesn't contain the
             field
-        :type default_values: dict(str, int or float) or None
         """
         self.__fields = fields
         self.__repeat_type = repeat_type
         self.__default_values = default_values or dict()
 
     @property
-    def fields(self):
+    def fields(self) -> Sequence[Tuple[DataType, str]]:
         """
         The types and names of the fields, ordered as they appear in the
         structure.
-
-        :rtype: list(~data_specification.enums.DataType, str)
         """
         return self.__fields
 
     @property
-    def repeat_type(self):
+    def repeat_type(self) -> StructRepeat:
         """
         How the structure repeats.
-
-        :rtype: StructRepeat
         """
         return self.__repeat_type
 
     @property
-    def numpy_dtype(self):
+    def numpy_dtype(self) -> numpy.dtype:
         """
         The numpy data type of the structure.
-
-        :rtype: ~numpy.dtype
         """
         return numpy.dtype(
             [(name, numpy.dtype(data_type.struct_encoding))
              for data_type, name in self.__fields],
             align=True)
 
-    def get_size_in_whole_words(self, array_size=1):
+    def get_size_in_whole_words(self, array_size: int = 1) -> int:
         """
-        Get the size of the structure in whole words in an array of given
-        size (default 1 item).
-
-        :param int array_size: The number of elements in an array of structures
-        :rtype: int
+        :param array_size: The number of elements in an array of structures
+        :returns: The size of the structure in whole words in an array
+            of given size (default 1 item).
         """
         datatype = self.numpy_dtype
         size_in_bytes = array_size * datatype.itemsize
         return (size_in_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
 
-    def get_data(self, values, vertex_slice=None):
+    def get_data(self, values: ValueMap,
+                 vertex_slice: Optional[Slice] = None) -> NDArray[uint32]:
         """
-        Get a numpy array of uint32 of data for the given values.
-
         :param values: The values to fill in the data with
-        :type values: dict(str, int or float or AbstractList)
         :param vertex_slice:
             The vertex slice to get the data for, or `None` if the structure is
             global.
-        :type vertex_slice: Slice or None
-        :rtype: ~numpy.ndarray(dtype="uint32")
+        :returns: The numpy array of uint32 of data for the given values
         """
         n_items = 1
         if vertex_slice is None:
@@ -133,23 +137,25 @@ class Struct(object):
         data = numpy.zeros(n_items, dtype=self.numpy_dtype)
 
         if not self.__fields:
-            return data.view("uint32")
+            return data.view(uint32)
 
         # Go through and get the values and put them in the array
         for data_type, name in self.__fields:
             if name in values:
                 all_vals = values[name]
-
                 if is_singleton(all_vals):
                     # If there is just one value for everything, use it
                     # everywhere
                     data[name] = convert_to(all_vals, data_type)
-                elif self.__repeat_type == StructRepeat.GLOBAL:
+                    continue
+                assert isinstance(all_vals, AbstractList)
+                if self.__repeat_type == StructRepeat.GLOBAL:
                     # If there is a ranged list for global struct,
                     # we might need to read a single value
                     data[name] = convert_to(
                         all_vals.get_single_value_all(), data_type)
                 else:
+                    assert vertex_slice is not None
                     self.__get_data_for_slice(
                         data, all_vals, name, data_type, vertex_slice)
             else:
@@ -163,12 +169,13 @@ class Struct(object):
         overflow = (n_items * self.numpy_dtype.itemsize) % BYTES_PER_WORD
         if overflow != 0:
             data = numpy.pad(
-                data.view("uint8"), (0, BYTES_PER_WORD - overflow), "constant")
+                data.view(uint8), (0, BYTES_PER_WORD - overflow), "constant")
 
-        return data.view("uint32")
+        return data.view(uint32)
 
     def __get_data_for_slice(
-            self, data, all_vals, name, data_type, vertex_slice):
+            self, data: NDArray, all_vals: AbstractList[float], name: str,
+            data_type: DataType, vertex_slice: Slice) -> None:
         """
         Get the data for a single value from a vertex slice.
         """
@@ -180,26 +187,24 @@ class Struct(object):
             n_values = stop - start
             if isinstance(value, RandomDistribution):
                 r_vals = value.next(n_values)
-                data_value = [
+                data[name][data_pos:data_pos + n_values] = [
                     convert_to(v, data_type) for v in r_vals]
             else:
-                data_value = convert_to(value, data_type)
+                data[name][data_pos:data_pos + n_values] = convert_to(
+                    value, data_type)
 
-            data[name][data_pos:data_pos + n_values] = data_value
             data_pos += n_values
 
-    def get_generator_data(self, values, vertex_slice=None):
+    def get_generator_data(
+            self, values: ValueMap,
+            vertex_slice: Optional[Slice] = None) -> NDArray[uint32]:
         """
-        Get a numpy array of uint32 of data to generate the given values.
-
-        :param ~dict-like values:
-            The values to fill in the data with
+        :param values: The values to fill in the data with
         :param vertex_slice:
             The vertex slice or `None` for a structure with repeat_type global,
             or where a single value repeats for every neuron.  If this is not
             the case and vertex_slice is `None`, an error will be raised!
-        :type vertex_slice: Slice or None
-        :rtype: ~numpy.ndarray(dtype="uint32")
+        :returns: A numpy array of uint32 of data to generate the given values.
         """
         # Define n_repeats, which is either the total number of neurons
         # or a flag to indicate that the data repeats for each neuron
@@ -218,11 +223,10 @@ class Struct(object):
         # total size of data written (0 as filled in later),
         # and number of fields in struct
         data = [self.numpy_dtype.itemsize, n_repeats, 0, len(self.__fields)]
-        gen_data = list()
+        gen_data: List[NDArray[uint32]] = list()
 
         # Go through all values and add in generator data for each
         for data_type, name in self.__fields:
-
             # Store the writer type based on the data type
             data.append(get_generator_type(data_type))
 
@@ -241,13 +245,15 @@ class Struct(object):
         data[2] = len(data) * BYTES_PER_WORD
 
         # Add the generator parameters after the rest of the data
-        all_data = [numpy.array(data, dtype="uint32")]
+        all_data = [numpy.array(data, dtype=uint32)]
         all_data.extend(gen_data)
 
         # Make it one
         return numpy.concatenate(all_data)
 
-    def __gen_data_one_for_all(self, data, gen_data, values, name, n_repeats):
+    def __gen_data_one_for_all(
+            self, data: List[int], gen_data: List[NDArray[uint32]],
+            values: ValueMap, name: str, n_repeats: int) -> None:
         """
         Generate data with a single value for all neurons.
         """
@@ -260,6 +266,7 @@ class Struct(object):
 
         # Get the value to write, of which there can only be one
         # (or else there will be an error here ;)
+        value: Any
         if name in values:
             value = values[name]
             if not is_singleton(value):
@@ -274,7 +281,8 @@ class Struct(object):
         gen_data.append(param_generator_params(value))
 
     def __gen_data_for_slice(
-            self, data, gen_data, values, name, vertex_slice):
+            self, data: List[int], gen_data: List[NDArray[uint32]],
+            values: ValueMap, name: str, vertex_slice: Slice) -> None:
         """
         Generate data with different values for each neuron.
         """
@@ -290,7 +298,7 @@ class Struct(object):
                 data.append(param_generator_id(vals))
                 gen_data.append(param_generator_params(vals))
             else:
-
+                assert isinstance(vals, AbstractList)
                 # Store where to update with the number of items and
                 # set to 0 to start
                 n_items_index = len(data)
@@ -316,35 +324,28 @@ class Struct(object):
             gen_data.append(param_generator_params(value))
 
     @property
-    def is_generatable(self):
+    def is_generatable(self) -> bool:
         """
         Whether the data inside could be generated on machine.
-
-        :rtype: bool
         """
         return all(type_has_generator(data_type)
                    for data_type, _name in self.__fields)
 
     def read_data(
-            self, data, values, data_offset=0, vertex_slice=None):
+            self, data: bytearray | bytes, values: RangeDictionary,
+            data_offset: int = 0,
+            vertex_slice: Optional[Slice] = None) -> None:
         """
         Read a byte string of data and write to values.
 
         :param data: The data to be read
-        :type data: bytes or bytearray
-        :param ~spinn_utilities.ranged.RangeDictionary values:
-            The values to update with the read data
-        :param int data_offset:
+        :param values: The values to update with the read data
+        :param data_offset:
             Index of the byte at the start of the valid data.
-        :param int offset:
-            The first index into values to write to.
-        :param array_size:
-            The number of structure copies to read, or `None` if this is a
-            non-repeating structure.
-        :type array_size: int or None
+        :param vertex_slice: Slice to read data for or None for all
         """
         n_items = 1
-        ids = None
+        ids: NDArray[integer] = numpy.zeros([0], dtype=uint32)
         if vertex_slice is None:
             if self.__repeat_type != StructRepeat.GLOBAL:
                 raise ValueError(

@@ -18,7 +18,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestAddNewProjectionWithReset(BaseTestCase):
 
-    def projection_with_reset(self):
+    def projection_with_reset(self) -> None:
         p.setup(1.0)
 
         inp = p.Population(1, p.IF_curr_exp(), label="input")
@@ -43,5 +43,5 @@ class TestAddNewProjectionWithReset(BaseTestCase):
 
         assert weights_delays_out[0][2] == 4.0
 
-    def test_projection_with_reset(self):
+    def test_projection_with_reset(self) -> None:
         self.runsafe(self.projection_with_reset)

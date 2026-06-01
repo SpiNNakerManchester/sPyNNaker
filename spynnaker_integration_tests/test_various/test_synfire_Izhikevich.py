@@ -17,14 +17,15 @@
 """
 Synfirechain-like example
 """
-import spynnaker.plot_utils as plot_utils
-import spynnaker.spike_checker as spike_checker
+from typing import Tuple
+from numpy.typing import NDArray
 import pyNN.spiNNaker as p
-from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.utilities import neo_convertor
+import spynnaker.spike_checker as spike_checker
 
 
-def do_run(nNeurons):
+def do_run(nNeurons: int) -> Tuple[NDArray, NDArray, NDArray]:
     p.setup(timestep=1.0, min_delay=1.0)
     p.set_number_of_neurons_per_core(p.Izhikevich, 100)
 
@@ -82,13 +83,13 @@ def do_run(nNeurons):
 
 class SynfireIzhikevich(BaseTestCase):
 
-    def check_run(self):
+    def check_run(self) -> None:
         nNeurons = 200  # number of neurons in each population
         (v, gsyn, spikes) = do_run(nNeurons)
         spike_checker.synfire_spike_checker(spikes, nNeurons)
         self.assertEqual(215, len(spikes))
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.check_run)
 
 
@@ -96,6 +97,5 @@ if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population
     (v, gsyn, spikes) = do_run(nNeurons)
     print(len(spikes))
-    plot_utils.plot_spikes(spikes)
-    plot_utils.heat_plot(v, title="v")
-    plot_utils.heat_plot(gsyn, title="gsyn")
+    print(v)
+    print(gsyn)

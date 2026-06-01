@@ -13,15 +13,17 @@
 # limitations under the License.
 
 import random
-from spinnaker_testbase import BaseTestCase
+from typing import List
 import numpy
+from numpy.typing import NDArray
 import pyNN.spiNNaker as p
+from spinnaker_testbase import BaseTestCase
 
 
 class TestSpikeSourceArray(BaseTestCase):
     __name__ = "bOB"
 
-    def recording_1_element(self):
+    def recording_1_element(self) -> None:
         p.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 200  # number of neurons in each population
         p.set_number_of_neurons_per_core(p.IF_curr_exp, n_neurons / 2)
@@ -55,16 +57,16 @@ class TestSpikeSourceArray(BaseTestCase):
         p.run(5000)
 
         spike_array_spikes = populations[1].spinnaker_get_data("spikes")
-        boxed_array = numpy.zeros(shape=(0, 2))
+        boxed_array: NDArray = numpy.zeros(shape=(0, 2))
         boxed_array = numpy.append(boxed_array, [[0, 0]], axis=0)
         numpy.testing.assert_array_equal(spike_array_spikes, boxed_array)
 
         p.end()
 
-    def test_recording_1_element(self):
+    def test_recording_1_element(self) -> None:
         self.runsafe(self.recording_1_element)
 
-    def recording_numerous_elements(self, run_zero):
+    def recording_numerous_elements(self, run_zero: bool) -> None:
         p.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 20  # number of neurons in each population
         p.set_number_of_neurons_per_core(p.IF_curr_exp, n_neurons / 2)
@@ -84,8 +86,8 @@ class TestSpikeSourceArray(BaseTestCase):
         populations = list()
         projections = list()
 
-        boxed_array = numpy.zeros(shape=(0, 2))
-        spike_array = list()
+        boxed_array: NDArray = numpy.zeros(shape=(0, 2))
+        spike_array: List[List[int]] = list()
         for neuron_id in range(0, n_neurons):
             spike_array.append(list())
             for counter in range(0, 20):
@@ -116,19 +118,19 @@ class TestSpikeSourceArray(BaseTestCase):
         numpy.testing.assert_array_equal(spike_array_spikes, boxed_array)
         p.end()
 
-    def recording_numerous_elements_no_zero(self):
+    def recording_numerous_elements_no_zero(self) -> None:
         self.recording_numerous_elements(False)
 
-    def test_recording_numerous_elements_no_zero(self):
+    def test_recording_numerous_elements_no_zero(self) -> None:
         self.runsafe(self.recording_numerous_elements_no_zero)
 
-    def recording_numerous_elements_with_zero(self):
+    def recording_numerous_elements_with_zero(self) -> None:
         self.recording_numerous_elements(True)
 
-    def test_recording_numerous_element_with_zero(self):
+    def test_recording_numerous_element_with_zero(self) -> None:
         self.runsafe(self.recording_numerous_elements_with_zero)
 
-    def recording_with_empty_lists_first_empty(self):
+    def recording_with_empty_lists_first_empty(self) -> None:
         p.setup(timestep=1.0)
         p.set_number_of_neurons_per_core(p.SpikeSourceArray, 2)
         spike_times = [[], [1], [], [], [4], [3]]
@@ -146,10 +148,10 @@ class TestSpikeSourceArray(BaseTestCase):
 
         p.end()
 
-    def test_recording_with_empty_lists_first_empty(self):
+    def test_recording_with_empty_lists_first_empty(self) -> None:
         self.runsafe(self.recording_with_empty_lists_first_empty)
 
-    def recording_with_empty_lists_first_not_empty(self):
+    def recording_with_empty_lists_first_not_empty(self) -> None:
         p.setup(timestep=1.0)
         p.set_number_of_neurons_per_core(p.SpikeSourceArray, 2)
         spike_times = [[1], [], [], [], [4], [3]]
@@ -167,5 +169,5 @@ class TestSpikeSourceArray(BaseTestCase):
 
         p.end()
 
-    def test_recording_with_empty_lists_first_not_empty(self):
+    def test_recording_with_empty_lists_first_not_empty(self) -> None:
         self.runsafe(self.recording_with_empty_lists_first_not_empty)

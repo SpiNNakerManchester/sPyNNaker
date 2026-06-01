@@ -22,7 +22,7 @@ class TestPopulation(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_depricated(self):
+    def test_depricated(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp())
         assert [] == pop._vertex.get_recording_variables()
@@ -31,7 +31,7 @@ class TestPopulation(BaseTestCase):
         assert target == set(pop._vertex.get_recording_variables())
         sim.end()
 
-    def test_set_many(self):
+    def test_set_many(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(10, sim.IF_curr_exp())
         view = pop[2:5]
@@ -47,7 +47,7 @@ class TestPopulation(BaseTestCase):
         assert target1 == pop._vertex.neuron_recorder._indexes["spikes"]
         sim.end()
 
-    def test_same_rates(self):
+    def test_same_rates(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(10, sim.IF_curr_exp())
         view = pop[2:5]
@@ -63,7 +63,7 @@ class TestPopulation(BaseTestCase):
         assert target1 == pop._vertex.neuron_recorder._indexes["spikes"]
         sim.end()
 
-    def test_different_rates(self):
+    def test_different_rates(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(10, sim.IF_curr_exp())
         view = pop[2:5]
@@ -73,7 +73,7 @@ class TestPopulation(BaseTestCase):
             view2.record("v")
         sim.end()
 
-    def test_different_rates2(self):
+    def test_different_rates2(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(10, sim.IF_curr_exp())
         view = pop[2:5]
@@ -83,7 +83,7 @@ class TestPopulation(BaseTestCase):
         view2.record("v")
         sim.end()
 
-    def test_record_with_indexes(self):
+    def test_record_with_indexes(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(10, sim.IF_curr_exp())
         pop[2, 3, 4].record("v", to_file=None, sampling_interval=None)
@@ -97,7 +97,7 @@ class TestPopulation(BaseTestCase):
         assert target2 == pop._vertex.neuron_recorder._indexes["v"]
         sim.end()
 
-    def test_record_all_of_by_indexes(self):
+    def test_record_all_of_by_indexes(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(5, sim.IF_curr_exp())
         pop.record("v")
@@ -112,7 +112,7 @@ class TestPopulation(BaseTestCase):
         assert len(pop._vertex.get_recording_variables()) == 0
         sim.end()
 
-    def test_clash(self):
+    def test_clash(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(5, sim.IF_curr_exp())
         pop.record("v")

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import random
-import time
 from spinn_utilities.config_holder import get_config_bool
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
@@ -21,7 +20,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestBigConnection(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         sources = 300
         destinations = 300
         aslist = []
@@ -49,20 +48,7 @@ class TestBigConnection(BaseTestCase):
         self.assertEqual(sources * destinations, len(spikes))
         sim.end()
 
-    def do_big(self):
-        report_file = self.report_file()
-        t_before = time.time()
-
-        self.do_run()
-
-        t_after = time.time()
-        results = self.get_run_time_of_BufferExtractor()
-        self.report(results, report_file)
-        self.report(
-            "total run time was: {} seconds\n".format(t_after-t_before),
-            report_file)
-
-    def report_file(self):
+    def report_file(self) -> str:
         if get_config_bool("Java", "use_java"):
             style = "java_"
         else:

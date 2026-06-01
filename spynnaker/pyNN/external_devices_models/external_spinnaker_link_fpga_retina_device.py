@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from typing import Iterable, List, Optional
 from spinn_utilities.overrides import overrides
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
@@ -22,7 +22,12 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
-def get_y_from_fpga_retina(key, mode):
+def get_y_from_fpga_retina(key: int, mode: int) -> Optional[int]:
+    """
+    :param key:
+    :param mode:
+    :returns: y value if mode is expected otherwise None.
+    """
     if mode == 128:
         return key & 0x7f
     elif mode == 64:
@@ -34,7 +39,12 @@ def get_y_from_fpga_retina(key, mode):
     return None
 
 
-def get_x_from_fpga_retina(key, mode):
+def get_x_from_fpga_retina(key: int, mode: int) -> Optional[int]:
+    """
+    :param key:
+    :param mode:
+    :returns: x value if mode is expected otherwise None.
+    """
     if mode == 128:
         return (key >> 7) & 0x7f
     elif mode == 64:
@@ -46,7 +56,12 @@ def get_x_from_fpga_retina(key, mode):
     return None
 
 
-def get_spike_value_from_fpga_retina(key, mode):
+def get_spike_value_from_fpga_retina(key: int, mode: int) -> Optional[int]:
+    """
+    :param key:
+    :param mode:
+    :returns: Spike value if mode is expected otherwise None.
+    """
     if mode == 128:
         return (key >> 14) & 0x1
     elif mode == 64:
@@ -61,9 +76,12 @@ def get_spike_value_from_fpga_retina(key, mode):
 class ExternalFPGARetinaDevice(
         ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex,
         AbstractSendMeMulticastCommandsVertex):
-    __slots__ = [
+    """
+    A retina connected by FPGA
+    """
+    __slots__ = (
         "__fixed_key",
-        "__fixed_mask"]
+        "__fixed_mask")
 
     MODE_128 = "128"
     MODE_64 = "64"
@@ -74,18 +92,18 @@ class ExternalFPGARetinaDevice(
     MERGED_POLARITY = "MERGED"
 
     def __init__(
-            self, mode, retina_key, spinnaker_link_id, polarity,
-            label=None, board_address=None):
+            self, mode: str, retina_key: int, spinnaker_link_id: int,
+            polarity: str, label: Optional[str] = None,
+            board_address: Optional[str] = None):
         """
-        :param str mode: The retina "mode"
-        :param int retina_key: The value of the top 16-bits of the key
-        :param int spinnaker_link_id:
+        :param mode: The retina "mode"
+        :param retina_key: The value of the top 16-bits of the key
+        :param spinnaker_link_id:
             The SpiNNaker link to which the retina is connected
-        :param str polarity: The "polarity" of the retina data
-        :param str label:
-        :param str board_address:
+        :param polarity: The "polarity" of the retina data
+        :param label: The optional name of the vertex.
+        :param board_address:
         """
-        # pylint: disable=too-many-arguments
         fixed_n_neurons = self.get_n_neurons(mode, polarity)
         super().__init__(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
@@ -100,10 +118,10 @@ class ExternalFPGARetinaDevice(
         self.__fixed_mask = self._get_mask(mode)
 
     @overrides(ApplicationSpiNNakerLinkVertex.get_fixed_key_and_mask)
-    def get_fixed_key_and_mask(self, partition_id):
+    def get_fixed_key_and_mask(self, partition_id: str) -> BaseKeyAndMask:
         return BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)
 
-    def _get_mask(self, mode):
+    def _get_mask(self, mode: str) -> int:
         if mode == ExternalFPGARetinaDevice.MODE_128:
             return 0xFFFFC000
         elif mode == ExternalFPGARetinaDevice.MODE_64:
@@ -116,12 +134,15 @@ class ExternalFPGARetinaDevice(
             "the FPGA retina does not recognise this mode")
 
     @staticmethod
-    def get_n_neurons(mode, polarity):
+    def get_n_neurons(mode: str, polarity: str) -> int:
         """
-        :param str mode: ``128`` or ``64`` or ``32`` or ``16``
-        :param str parity: ``UP`` or ``DOWN`` or ``MERGED``
-        :rtype: int
+        Calculate the number of neurons based on mode and polarity
+
+        :param mode: ``128`` or ``64`` or ``32`` or ``16``
+        :param polarity: ``UP`` or ``DOWN``
+        :returns: The number of neurons in the retina
         """
+        # Uses mode and polarity to determine the number of neurons needed
         if mode == ExternalFPGARetinaDevice.MODE_128:
             if (polarity == ExternalFPGARetinaDevice.UP_POLARITY or
                     polarity == ExternalFPGARetinaDevice.DOWN_POLARITY):
@@ -147,17 +168,17 @@ class ExternalFPGARetinaDevice(
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
-    def start_resume_commands(self):
-        return [MultiCastCommand(
-            key=0x0000FFFF, payload=1, repeat=5, delay_between_repeats=100)]
+    def start_resume_commands(self) -> Iterable[MultiCastCommand]:
+        yield MultiCastCommand(
+            key=0x0000FFFF, payload=1, repeat=5, delay_between_repeats=100)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
-    def pause_stop_commands(self):
-        return [MultiCastCommand(
-            key=0x0000FFFE, payload=0, repeat=5, delay_between_repeats=100)]
+    def pause_stop_commands(self) -> Iterable[MultiCastCommand]:
+        yield MultiCastCommand(
+            key=0x0000FFFE, payload=0, repeat=5, delay_between_repeats=100)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
-    def timed_commands(self):
+    def timed_commands(self) -> List[MultiCastCommand]:
         return []

@@ -12,29 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+from spinn_utilities.typing.coords import XY
 from pacman.model.graphs.application import (
     ApplicationFPGAVertex, FPGAConnection)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
 class ArbitraryFPGADevice(ApplicationFPGAVertex, PopulationApplicationVertex):
-    __slots__ = []
+    """
+    A device connected to SpiNNaker via one of the on-board FPGAs.
+    """
+
+    __slots__ = ()
 
     def __init__(
-            self, n_neurons, fpga_link_id, fpga_id, board_address=None,
-            chip_coords=None, label=None):
+            self, n_neurons: int, fpga_link_id: int, fpga_id: int,
+            board_address: Optional[str] = None,
+            chip_coords: Optional[XY] = None, label: Optional[str] = None):
         """
-        :param int n_neurons: Number of neurons
-        :param int fpga_link_id:
-        :param int fpga_id:
-        :param board_address:
-        :type board_address: str or None
-        :param chip_coords:
-        :type chip_coords: tuple(int, int) or None
-        :param label:
-        :type label: str or None
+        :param n_neurons: Number of neurons
+        :param fpga_link_id: The ID of the link of the FPGA (0-15)
+        :param fpga_id: The ID of the FPGA on the board (0, 1 or 2)
+        :param board_address: The IP address of the board with the FPGA,
+            or None for the default board or if using chip_coords
+        :param chip_coords: The coordinates of the chip connected to the FPGA,
+            or None for the default board or if using board_address
+        :param label: The optional name of the vertex.
         """
-        # pylint: disable=too-many-arguments
         conn = FPGAConnection(
             fpga_id, fpga_link_id, board_address, chip_coords)
         super().__init__(n_neurons, [conn], conn, label)

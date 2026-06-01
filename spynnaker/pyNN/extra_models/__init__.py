@@ -18,7 +18,9 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceVogels2011 as Vogels2011Rule,
     TimingDependencePfisterSpikeTriplet as PfisterSpikeTriplet)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsNeuromodulation as Neuromodulation)
+    SynapseDynamicsNeuromodulation as Neuromodulation,
+    SynapseDynamicsWeightChangable as WeightChangeable,
+    SynapseDynamicsWeightChanger as WeightChanger)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditiveTriplet, WeightDependenceEpropReg)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
@@ -34,7 +36,10 @@ from spynnaker.pyNN.models.neuron.builds import (
     EPropAdaptive as EPropAdaptive,
     SinusoidReadout as SinusoidReadout,
     LeftRightReadout as LeftRightReadout,
-    IFCurrDeltaCa2Adaptive)
+    IFCurrDeltaCa2Adaptive, StocExp, StocExpStable, StocSigma, IFTruncDelta,
+    IFCurrDeltaFixedProb)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AllButMeConnector, OneToOneOffsetConnector)
 
 # Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
@@ -61,4 +66,17 @@ __all__ = [
     'WeightDependenceEpropReg',
 
     # Variable rate Poisson
-    'SpikeSourcePoissonVariable']
+    'SpikeSourcePoissonVariable',
+
+    # Stochastic
+    'StocExp', 'StocExpStable', 'StocSigma', 'IFCurrDeltaFixedProb',
+
+    # Special
+    'IFTruncDelta',
+
+    # Connectors
+    'AllButMeConnector', 'OneToOneOffsetConnector',
+
+    # Weight changeable synapse dynamics
+    'WeightChangeable', 'WeightChanger'
+    ]

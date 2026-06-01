@@ -11,12 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 import logging
+from typing import Iterator, Optional, Set, Tuple, TYPE_CHECKING
+
 from spinn_utilities.log import FormatAdapter
+
 from spinn_front_end_common.data import FecDataView
+
 from spynnaker import _version
-from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.projection import Projection
+    from spynnaker.pyNN.models.populations import Population
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access
@@ -37,47 +44,41 @@ class _SpynnakerDataModel(object):
     What data is held where and how can change without notice.
     """
 
-    __singleton = None
+    __singleton: Optional['_SpynnakerDataModel'] = None
 
-    __slots__ = [
+    __slots__ = (
         # Data values cached
         "_id_counter",
         "_min_delay",
-        "_neurons_per_core_set",
         "_populations",
-        "_projections",
-        "_segment_counter"
-    ]
+        "_projections")
 
-    def __new__(cls):
-        if cls.__singleton:
+    def __new__(cls) -> '_SpynnakerDataModel':
+        if cls.__singleton is not None:
             return cls.__singleton
-        # pylint: disable=protected-access
         obj = object.__new__(cls)
         cls.__singleton = obj
         obj._clear()
         return obj
 
-    def _clear(self):
+    def _clear(self) -> None:
         """
         Clears out all data.
         """
         self._id_counter = 0
-        self._min_delay = None
+        self._min_delay: Optional[float] = None
         # Using a dict to verify if later could be stored here only
-        self._neurons_per_core_set = set()
-        self._populations = []
-        self._projections = []
-        self._segment_counter = 0
+        self._populations: Set[Population] = set()
+        self._projections: Set[Projection] = set()
 
-    def _hard_reset(self):
+    def _hard_reset(self) -> None:
         """
         Puts all data back into the state expected at graph changed and
         `sim.reset`.
         """
         self._soft_reset()
 
-    def _soft_reset(self):
+    def _soft_reset(self) -> None:
         """
         Puts all data back into the state expected at `sim.reset` but not
         graph changed.
@@ -95,21 +96,20 @@ class SpynnakerDataView(FecDataView):
     Use this class wherever possible as it inherits all methods from all View
     classes.
     """
-    # pylint: disable=attribute-defined-outside-init
 
     __spy_data = _SpynnakerDataModel()
 
-    __slots__ = []
+    __slots__ = ()
 
     @classmethod
-    def get_min_delay(cls):
+    def get_min_delay(cls) -> float:
         """
         The minimum supported delay if available, in milliseconds.
 
         Typically `simulation_time_step_per_ms` but may be a positive multiple
         of it.
 
-        :rtype: float
+        :returns: the minimum delay in milliseconds.
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the min_delay is currently unavailable
         """
@@ -118,81 +118,83 @@ class SpynnakerDataView(FecDataView):
         return cls.get_simulation_time_step_ms()
 
     @classmethod
-    def has_min_delay(cls):
+    def has_min_delay(cls) -> bool:
         """
         Report if there is a minimum supported delay available.
 
-        :rtype: bool
+        If there is no delay time step could be used.
+
+        :returns: True if get_min_delay method will work
         """
         if cls.__spy_data._min_delay is not None:
             return True
         return cls.has_time_step()
 
     @classmethod
-    def iterate_projections(cls):
+    def iterate_projections(cls) -> Iterator[Projection]:
         """
         An iteration of the projections previously added.
 
         The iteration will be empty if no projections added.
 
-        :rtype: iterable(Projection)
+        Note: This method is backed by a set so does not guarantee order
+
+        :returns: Unordered iterator of projections.
         """
         return iter(cls.__spy_data._projections)
 
     @classmethod
-    def get_n_projections(cls):
+    def get_n_projections(cls) -> int:
         """
-        The number of projections previously added.
-
-        rtype: int
+        :returns: The number of projections previously added.
         """
         return len(cls.__spy_data._projections)
 
     @classmethod
-    def add_projection(cls, projection):
+    def add_projection(cls, projection: Projection) -> None:
         """
         Called by each projection to add itself to the list.
 
         Usage other than from `Projection.__init__` is not supported and likely
         to raise an exception
 
-        :param ~spynnaker.pyNN.models.projection.Projection projection:
-            Projection to add
+        :param projection: Projection to add
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If projections should not be added in the current state
         """
         # UGLY but needed to avoid circular import
-        from spynnaker.pyNN.models.projection import Projection
+        # pylint: disable=import-outside-toplevel
+        from spynnaker.pyNN.models.projection import Projection as Proj
         cls.check_user_can_act()
         if projection in cls.__spy_data._projections:
             raise NotImplementedError(
                 "This method should only be called from the Projection init")
-        if not isinstance(projection, Projection):
+        if not isinstance(projection, Proj):
             raise TypeError("The projection must be a Projection")
-        cls.__spy_data._projections.append(projection)
+        cls.__spy_data._projections.add(projection)
 
     @classmethod
-    def iterate_populations(cls):
+    def iterate_populations(cls) -> Iterator[Population]:
         """
         An iteration of the populations previously added.
 
         The iteration will be empty if no populations added.
 
-        :rtype: iterable(~spynnaker.pyNN.models.populations.Population)
+        Note: This method is backed by a set so does not guarantee order
+
+        :returns: Unordered iterator of Populations
         """
         return iter(cls.__spy_data._populations)
 
     @classmethod
-    def get_n_populations(cls):
+    def get_n_populations(cls) -> int:
         """
-        The number of populations previously added.
-
-        :rtype: int
+        :returns: The number of populations previously added.
         """
         return len(cls.__spy_data._populations)
 
     @classmethod
-    def add_population(cls, population):
+    def add_population(cls, population: Population) -> Tuple[int, int]:
         """
         Called by each population to add itself to the list.
 
@@ -201,10 +203,8 @@ class SpynnakerDataView(FecDataView):
 
         Increments the all population ID counter by the size of the population.
 
-        :param ~spynnaker.pyNN.models.populations.Population population:
-            Population to add
+        :param population: Population to add
         :return: The first and last global IDs for this Population
-        :rtype: tuple(int, int)
         :raises ~spinn_utilites.exceptions.SimulatorRunningException:
             If `sim.run` is currently running
         :raises ~spinn_utilites.exceptions.SimulatorNotSetupException:
@@ -213,51 +213,23 @@ class SpynnakerDataView(FecDataView):
             If called after `sim.end`
         """
         # UGLY but needed to avoid circular import
-        from spynnaker.pyNN.models.populations.population import Population
+        # pylint: disable=import-outside-toplevel
+        from spynnaker.pyNN.models.populations.population import (
+            Population as Pop)
         cls.check_user_can_act()
-        if not isinstance(population, Population):
+        if not isinstance(population, Pop):
             raise TypeError("The population must be a Population")
         if population in cls.__spy_data._populations:
             raise NotImplementedError(
                 "This method should only be called from the Population init")
         first_id = cls.__spy_data._id_counter
         cls.__spy_data._id_counter += population.size
-        cls.__spy_data._populations.append(population)
+        cls.__spy_data._populations.add(population)
         return first_id, cls.__spy_data._id_counter-1
 
     @classmethod
-    def set_number_of_neurons_per_dimension_per_core(
-            cls, neuron_type, max_permitted):
+    def get_sim_name(cls) -> str:
         """
-        Sets a ceiling on the number of neurons of a given type that can be
-        placed on a single core for each dimension.
-
-        :param AbstractPopulationVertex neuron_type: neuron type
-        :param max_permitted: the number to set to
-        :type max_permitted: int or tuple or None
+        :returns: The name to be returned by `pyNN.spiNNaker.name`.
         """
-        cls.check_valid_simulator()
-        if not issubclass(neuron_type, AbstractPyNNModel):
-            raise TypeError(f"{neuron_type} is not an AbstractPyNNModel")
-
-        neuron_type.set_model_max_atoms_per_dimension_per_core(max_permitted)
-        cls.__spy_data._neurons_per_core_set.add(neuron_type)
-
-    @classmethod
-    def get_segment_counter(cls):
-        """
-        The number of the current recording segment being generated.
-
-        :return: the segment counter
-        :rtype: int
-        """
-        return cls.__spy_data._segment_counter
-
-    @classmethod
-    def get_sim_name(cls):
-        """
-        Gets the name to be returned by `pyNN.spiNNaker.name`.
-
-        :rtype: str
-        """
-        return _version._NAME   # pylint: disable=protected-access
+        return _version.NAME

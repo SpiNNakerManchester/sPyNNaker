@@ -26,6 +26,7 @@
 #include "matrix_generators/matrix_generator_static.h"
 #include "matrix_generators/matrix_generator_stdp.h"
 #include "matrix_generators/matrix_generator_neuromodulation.h"
+#include "matrix_generators/matrix_generator_weight_changer.h"
 #include <delay_extension/delay_extension.h>
 
 //! The "hashes" for synaptic matrix generators
@@ -36,6 +37,8 @@ enum {
     PLASTIC_MATRIX_GENERATOR,
     //! Generate a synaptic matrix for Neuromodulation
     NEUROMODULATION_MATRIX_GENERATOR,
+	//! Generate a synaptic matrix for weight change
+	WEIGHT_CHANGER_MATRIX_GENERATOR,
     /**
      * \brief The number of known generators
      */
@@ -86,7 +89,11 @@ static const struct matrix_generator_info matrix_generators[] = {
     {NEUROMODULATION_MATRIX_GENERATOR,
             matrix_generator_neuromodulation_initialize,
             matrix_generator_neuromodulation_write_synapse,
-            matrix_generator_neuromodulation_free}
+            matrix_generator_neuromodulation_free},
+    {WEIGHT_CHANGER_MATRIX_GENERATOR,
+		matrix_generator_changer_initialize,
+		matrix_generator_changer_write_synapse,
+		matrix_generator_changer_free}
 };
 
 matrix_generator_t matrix_generator_init(uint32_t hash, void **in_region,

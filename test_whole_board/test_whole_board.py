@@ -12,16 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.spiNNaker as sim
-import spynnaker
-from spalloc_client.job import Job
-from spalloc_client.states import JobState
 import pytest
 import tempfile
 import os
 import traceback
 import sys
-import time
+import logging
+from shutil import rmtree
+
+from spinnman.exceptions import SpallocBoardUnavailableException
+
+from spynnaker.pyNN.data import SpynnakerDataView
+
+import pyNN.spiNNaker as sim
 
 
 class WholeBoardTest(object):
@@ -56,6 +59,10 @@ class WholeBoardTest(object):
           (4, 0), (5, 1), (6, 2), (7, 3)]
     dl = list(ur)
     dl.reverse()
+
+    def __init__(self):
+        self.to_allocate = None
+        self.targets = None
 
     def find_a_placement(self):
         for count in range(17, 0, -1):
@@ -155,7 +162,7 @@ class WholeBoardTest(object):
         # find number of cores on machine less one for monitors
         self.to_allocate = dict()
         for key, chip in machine:
-            self.to_allocate[key] = chip.n_user_processors - 1
+            self.to_allocate[key] = chip.n_placable_processors - 1
         # less 1 for the gather
         self.to_allocate[(0, 0)] -= 1
 
@@ -187,40 +194,43 @@ class WholeBoardTest(object):
         sim.end()
 
 
-boards = [(x, y, b) for x in range(20) for y in range(20) for b in range(3)]
+BOARDS = [(x, y, b) for x in range(20) for y in range(20) for b in range(3)]
+SPALLOC_URL = "https://spinnaker.cs.man.ac.uk/spalloc"
 
 
-@pytest.mark.parametrize("x,y,b", boards)
+@pytest.mark.parametrize("x,y,b", BOARDS)
 def test_run(x, y, b):
+    #set_config("Machine", "spalloc_machine", SPALLOC_MACHINE)
     test_dir = os.path.dirname(__file__)
-    job = Job(x, y, b, hostname="spinnaker.cs.man.ac.uk",
-              owner="Jenkins Machine Test")
-    # Sleep before checking for queued in case of multiple jobs running
-    time.sleep(2.0)
-    if job.state == JobState.queued:
-        job.destroy("Queued")
-        pytest.skip(f"Board {x}, {y}, {b} is in use")
-    elif job.state == JobState.destroyed:
-        pytest.skip(f"Board {x}, {y}, {b} could not be allocated")
-    with job:
-        with tempfile.TemporaryDirectory(
-                prefix=f"{x}_{y}_{b}", dir=test_dir) as tmpdir:
-            os.chdir(tmpdir)
-            with open("spynnaker.cfg", "w", encoding="utf-8") as f:
-                f.write("[Machine]\n")
-                f.write("spalloc_server = None\n")
-                f.write(f"machine_name = {job.hostname}\n")
-                f.write("version = 5\n")
-            test = WholeBoardTest()
-            test.do_run()
+    tmpdir = tempfile.mkdtemp(prefix=f"{x}_{y}_{b}", dir=test_dir)
+    os.chdir(tmpdir)
+    with open("spynnaker.cfg", "w", encoding="utf-8") as f:
+        f.write("[Machine]\n")
+        f.write(f"spalloc_server = {SPALLOC_URL}\n")
+        f.write(f"spalloc_triad = {x},{y},{b}\n")
+        f.write("machine_name = None\n")
+        f.write("virtual_board = False\n")
+        f.write("version = 5\n")
+    test = WholeBoardTest()
+    try:
+        test.do_run()
+    except SpallocBoardUnavailableException as ex:
+        os.remove(SpynnakerDataView.get_error_file())
+        pytest.skip(str(ex))
+    finally:
+        # If no errors we will get here and we can remove the tree;
+        # then only error folders will be left
+        rmtree(tmpdir)
 
 
 if __name__ == "__main__":
-    for x, y, b in boards:
+    logging.basicConfig(level=logging.DEBUG)
+    main_boards = [(0, 0, 0)]
+    for b_x, b_y, b_b in main_boards:
         print("", file=sys.stderr,)
-        print(f"*************** Testing {x}, {y}, {b} *******************",
+        print(f"************** Testing {b_x}, {b_y}, {b_b} ******************",
               file=sys.stderr)
         try:
-            test_run(x, y, b)
+            test_run(b_x, b_y, b_b)
         except Exception:
             traceback.print_exc()

@@ -31,7 +31,7 @@ class TestAllow(BaseTestCase):
         2. Synfire like spike pattern
     """
 
-    def allow(self):
+    def allow(self) -> None:
         try:
             synfire_run.do_run(
                 n_neurons, time_step=0.1,
@@ -46,5 +46,5 @@ class TestAllow(BaseTestCase):
             SpynnakerDataView.raise_skiptest(
                 "Overload caused timeout", parent=ex)
 
-    def test_allow(self):
+    def test_allow(self) -> None:
         self.runsafe(self.allow)

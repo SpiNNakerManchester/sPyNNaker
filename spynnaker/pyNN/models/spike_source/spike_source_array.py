@@ -12,36 +12,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional, Union, Tuple
 from spinn_utilities.overrides import overrides
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+from spynnaker.pyNN.models.common.types import Spikes
 from .spike_source_array_vertex import SpikeSourceArrayVertex
 
 
 class SpikeSourceArray(AbstractPyNNModel):
-
+    """
+    Model that creates a Spike Source Array Vertex
+    """
     default_population_parameters = {
-        "splitter": None, "n_colour_bits": None}
+        "splitter": None, "n_colour_bits": None, "neurons_per_core": None}
 
-    def __init__(self, spike_times=None):
+    def __init__(self, spike_times: Optional[Spikes] = None):
+        """
+        :param spike_times: Timesteps on which to spike
+        """
         if spike_times is None:
             spike_times = []
         self.__spike_times = spike_times
 
-    @overrides(AbstractPyNNModel.create_vertex,
-               additional_arguments=default_population_parameters.keys())
-    def create_vertex(self, n_neurons, label, splitter, n_colour_bits):
+    @overrides(AbstractPyNNModel.create_vertex)
+    def create_vertex(
+            self, n_neurons: int, label: str, *,
+            splitter: Optional[AbstractSplitterCommon] = None,
+            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
+            n_colour_bits: Optional[int] = None) -> SpikeSourceArrayVertex:
         """
         :param splitter:
-        :type splitter:
-            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
-        :param int n_colour_bits:
+        :param n_colour_bits:
         """
-        # pylint: disable=arguments-differ
-        max_atoms = self.get_model_max_atoms_per_dimension_per_core()
+        if neurons_per_core is None:
+            neurons_per_core = \
+                self.get_model_max_atoms_per_dimension_per_core()
         return SpikeSourceArrayVertex(
-            n_neurons, self.__spike_times, label, max_atoms, self, splitter,
-            n_colour_bits)
+            n_neurons, self.__spike_times, label, neurons_per_core, self,
+            splitter, n_colour_bits)
 
     @property
-    def _spike_times(self):
+    def _spike_times(self) -> Spikes:
         return self.__spike_times

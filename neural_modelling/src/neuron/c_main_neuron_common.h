@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef _C_MAIN_NEURON_COMMON_H_
+#define _C_MAIN_NEURON_COMMON_H_
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <debug.h>
@@ -98,7 +101,7 @@ static inline void store_neuron_provenance(struct neuron_provenance *prov) {
 //! \param[in] ds_regions: Pointer to region position data
 //! \param[in] regions: The indices of the regions to be read
 //! \param[out] n_rec_regions_used: The number of recording regions used
-//! \return a boolean indicating success (True) or failure (False)
+//! \return a Boolean indicating success (True) or failure (False)
 static inline bool initialise_neuron_regions(
         data_specification_metadata_t *ds_regions,
         struct neuron_regions regions, uint32_t *n_rec_regions_used) {
@@ -116,3 +119,5 @@ static inline bool initialise_neuron_regions(
 
     return true;
 }
+
+#endif // _C_MAIN_NEURON_COMMON_H_

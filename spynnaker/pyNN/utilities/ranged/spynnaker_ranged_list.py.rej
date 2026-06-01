@@ -1,0 +1,20 @@
+diff a/spynnaker/pyNN/utilities/ranged/spynnaker_ranged_list.py b/spynnaker/pyNN/utilities/ranged/spynnaker_ranged_list.py	(rejected hunks)
+@@ -24,14 +33,16 @@ class SpynnakerRangedList(RangedList):
+     """
+ 
+     @overrides(RangedList.listness_check)
+-    def listness_check(self, value):
++    def listness_check(self, value: _ValueType) -> bool:
+         if isinstance(value, RandomDistribution):
+             return True
+ 
+         return super().listness_check(value)
+ 
+     @overrides(RangedList.as_list)
+-    def as_list(self, value, size, ids=None):
++    def as_list(
++            self, value: _ListType, size: int,
++            ids: Optional[IdsType] = None) -> List[T]:
+         if isinstance(value, RandomDistribution):
+             return value.next(n=size)
+ 

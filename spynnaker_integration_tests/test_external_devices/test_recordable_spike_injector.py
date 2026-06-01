@@ -15,17 +15,20 @@
 from collections import defaultdict
 from random import randint
 import time
+from typing import Dict
 import unittest
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
 
 
 class TestRecordableSpikeInjector(BaseTestCase):
 
-    _n_spikes = defaultdict(lambda: 0)
+    _n_spikes: Dict[int, int] = defaultdict(lambda: 0)
     _n_neurons = 100
 
-    def _inject(self, label, connection):
+    def _inject(self, label: str,
+                connection: SpynnakerLiveSpikesConnection) -> None:
         time.sleep(0.1)
         for _ in range(5000):
             neuron_id = randint(0, self._n_neurons - 1)
@@ -33,8 +36,7 @@ class TestRecordableSpikeInjector(BaseTestCase):
             connection.send_spike(label, neuron_id)
             time.sleep(0.001)
 
-    def recordable_spike_injector(self):
-        # pylint: disable=no-member
+    def recordable_spike_injector(self) -> None:
         p.setup(1.0)
         pop = p.Population(
             self._n_neurons, p.external_devices.SpikeInjector(), label="input")
@@ -73,7 +75,7 @@ class TestRecordableSpikeInjector(BaseTestCase):
             else:
                 assert index in spike_trains
 
-    def test_recordable_spike_injector(self):
+    def test_recordable_spike_injector(self) -> None:
         self.runsafe(self.recordable_spike_injector)
 
 

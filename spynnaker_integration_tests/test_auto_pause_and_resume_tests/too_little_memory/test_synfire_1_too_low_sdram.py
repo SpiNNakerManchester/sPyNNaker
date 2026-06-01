@@ -31,7 +31,7 @@ class TestTooLow(BaseTestCase):
     tests the run fails due to too small ram
     """
 
-    def test_too_low(self):
+    def test_too_low(self) -> None:
         with pytest.raises(PacmanException):
             synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                                run_times=[runtime])

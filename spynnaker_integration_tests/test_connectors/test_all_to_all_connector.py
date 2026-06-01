@@ -12,19 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional, Tuple, Union
+
+from pyNN.space import BaseStructure
 import pyNN.spiNNaker as sim
+
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.projection import Projection
 
 
 class TestAllToAllConnector(BaseTestCase):
 
-    def check_weights(self, projection, sources, destinations):
+    def check_weights(self, projection: Projection, sources: int,
+                      destinations: int) -> None:
         weights = projection.get(["weight"], "list")
         s_d_set = set((s, d) for s, d, _ in weights)
         self.assertEqual(len(weights), sources * destinations)
         self.assertEqual(len(s_d_set), sources * destinations)
 
-    def check_other_connect(self, sources, destinations):
+    def check_other_connect(self, sources: int, destinations: int) -> None:
         sim.setup(1.0)
         pop1 = sim.Population(sources, sim.IF_curr_exp(), label="pop1")
         pop2 = sim.Population(destinations, sim.IF_curr_exp(), label="pop2")
@@ -35,31 +41,31 @@ class TestAllToAllConnector(BaseTestCase):
         self.check_weights(projection, sources, destinations)
         sim.end()
 
-    def same(self):
+    def same(self) -> None:
         self.check_other_connect(5, 5)
 
-    def test_same(self):
+    def test_same(self) -> None:
         self.runsafe(self.same)
 
-    def less_sources(self):
+    def less_sources(self) -> None:
         self.check_other_connect(5, 10)
 
-    def test_less_sources(self):
+    def test_less_sources(self) -> None:
         self.runsafe(self.less_sources)
 
-    def less_destinations(self):
+    def less_destinations(self) -> None:
         self.check_other_connect(10, 5)
 
-    def test_less_destinations(self):
+    def test_less_destinations(self) -> None:
         self.runsafe(self.less_destinations)
 
-    def many(self):
+    def many(self) -> None:
         self.check_other_connect(500, 500)
 
-    def test_many(self):
+    def test_many(self) -> None:
         self.runsafe(self.many)
 
-    def get_before_run(self):
+    def get_before_run(self) -> None:
         sim.setup(1.0)
         pop1 = sim.Population(3, sim.IF_curr_exp(), label="pop1")
         pop2 = sim.Population(3, sim.IF_curr_exp(), label="pop2")
@@ -73,10 +79,10 @@ class TestAllToAllConnector(BaseTestCase):
         self.assertEqual(9, length)
         sim.end()
 
-    def test_get_before_run(self):
+    def test_get_before_run(self) -> None:
         self.runsafe(self.get_before_run)
 
-    def using_static_synapse_singles(self):
+    def using_static_synapse_singles(self) -> None:
         sim.setup(timestep=1.0)
         input = sim.Population(2, sim.SpikeSourceArray([0]), label="input")
         pop = sim.Population(2, sim.IF_curr_exp(), label="pop")
@@ -91,10 +97,10 @@ class TestAllToAllConnector(BaseTestCase):
             for j in range(2):
                 self.assertAlmostEqual(weights[i][j], target[i][j], places=3)
 
-    def test_using_static_synapse_singles(self):
+    def test_using_static_synapse_singles(self) -> None:
         self.runsafe(self.using_static_synapse_singles)
 
-    def using_population_views(self):
+    def using_population_views(self) -> None:
         sim.setup(timestep=1.0)
         input = sim.Population(4, sim.SpikeSourceArray([0]), label="input")
         pop = sim.Population(4, sim.IF_curr_exp(), label="pop")
@@ -107,5 +113,71 @@ class TestAllToAllConnector(BaseTestCase):
                   [2, 3, 0.5, 2.]]
         self.assertCountEqual(weights, target)
 
-    def test_using_population_views(self):
+    def test_using_population_views(self) -> None:
         self.runsafe(self.using_population_views)
+
+    def do_all_to_all_nd_test(
+            self, neurons_per_core_pre: Union[int, Tuple[int, ...]],
+            pre_size: int, pre_shape: Optional[BaseStructure],
+            neurons_per_core_post: Union[int, Tuple[int, ...]],
+            post_size: int, post_shape: Optional[BaseStructure]) -> None:
+        sim.setup(1.0)
+        pre = sim.Population(
+            pre_size, sim.IF_curr_exp(), structure=pre_shape)
+        pre.set_max_atoms_per_core(neurons_per_core_pre)
+        post = sim.Population(
+            post_size, sim.IF_curr_exp(), structure=post_shape)
+        post.set_max_atoms_per_core(neurons_per_core_post)
+        proj = sim.Projection(
+            pre, post, sim.AllToAllConnector(),
+            sim.StaticSynapse(weight=1.0, delay=1.0))
+        sim.run(0)
+        conns = set((int(i), int(j)) for i, j in proj.get([], "list"))
+        sim.end()
+
+        for i in range(pre_size):
+            for j in range(post_size):
+                assert (i, j) in conns
+
+    def test_3d_to_1d(self) -> None:
+        self.do_all_to_all_nd_test(
+            (3, 2, 4), 9 * 4 * 8, sim.Grid3D(9 / 4, 9 / 8),
+            11, 100, None)
+
+    def test_2d(self) -> None:
+        self.do_all_to_all_nd_test((3, 5), 9 * 10, sim.Grid2D(9 / 10),
+                                   (2, 4), 6 * 8, sim.Grid2D(6 / 8))
+
+    def test_1d_to_2d(self) -> None:
+        self.do_all_to_all_nd_test(6, 90, None,
+                                   (3, 4), 9 * 8, sim.Grid2D(9 / 8))
+
+    def do_all_to_all_nd_self_test(
+            self, neurons_per_core: Tuple[int, ...], size: int,
+            shape: BaseStructure, self_connect: bool) -> None:
+        sim.setup(1.0)
+        pop = sim.Population(
+            size, sim.IF_curr_exp(), structure=shape)
+        pop.set_max_atoms_per_core(neurons_per_core)
+        proj = sim.Projection(
+            pop, pop, sim.AllToAllConnector(
+                allow_self_connections=self_connect),
+            sim.StaticSynapse(weight=1.0, delay=1.0))
+        sim.run(0)
+        conns = set((int(i), int(j)) for i, j in proj.get([], "list"))
+        sim.end()
+
+        for i in range(size):
+            for j in range(size):
+                if not self_connect and i == j:
+                    assert (i, j) not in conns
+                else:
+                    assert (i, j) in conns
+
+    def test_3d_no_self_connect(self) -> None:
+        self.do_all_to_all_nd_self_test(
+            (2, 3, 4), 6 * 6 * 8, sim.Grid3D(6 / 6, 6 / 8), self_connect=False)
+
+    def test_2d_self_connect(self) -> None:
+        self.do_all_to_all_nd_self_test(
+            (3, 5), 6 * 15, sim.Grid2D(6 / 15), self_connect=True)

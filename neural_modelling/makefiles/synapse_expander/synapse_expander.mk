@@ -13,7 +13,6 @@
 # limitations under the License.
 
 APP = synapse_expander
-BUILD_DIR = build/
 SOURCES = synapse_expander/rng.c \
           synapse_expander/common_kernel.c \
           synapse_expander/param_generator.c \

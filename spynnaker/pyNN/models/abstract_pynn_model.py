@@ -11,28 +11,70 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
 from collections import defaultdict
 import sys
+from typing import (
+    Any, cast, Dict, Optional, Sequence, Tuple, TYPE_CHECKING, Union)
 import numpy
 from pyNN import descriptions
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod, abstractproperty)
-from spynnaker.pyNN.models.defaults import get_dict_from_init
+    AbstractBase, abstractmethod)
+from spynnaker.pyNN.models.defaults import AbstractProvidesDefaults
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.data import SpynnakerDataView
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.common.population_application_vertex import (
+        PopulationApplicationVertex)
 
 
-class AbstractPyNNModel(object, metaclass=AbstractBase):
+class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     """
     A Model that can be passed in to a Population object in PyNN.
     """
 
-    __slots__ = []
-    _max_atoms_per_core = defaultdict(lambda: None)
+    __slots__ = ()
+
+    # The maximum number of atoms per core for PyNN models
+    _max_atoms_per_core: Dict[type, Optional[Tuple[int, ...]]] = defaultdict(
+        lambda: None)
+
+    _model_created = False
+
+    # Using new as most super classes do not call the init
+    def __new__(cls, *args: Any, **kwargs: Any) -> "AbstractPyNNModel":
+        _ = (args, kwargs)
+        AbstractPyNNModel._model_created = True
+        return super(AbstractPyNNModel, cls).__new__(cls)
 
     @classmethod
-    def set_model_max_atoms_per_dimension_per_core(cls, n_atoms=None):
+    def verify_may_set(cls, param: str) -> None:
+        """ If a Population has been created, this method will raise an
+            exception; used to avoid setting global limits after a Population
+            has been created.
+
+        :param param:
+            The parameter name that can be used to set the value being changed
+            in the Population constructor instead.
+        """
+        SpynnakerDataView.check_user_can_act()
+        if SpynnakerDataView.get_n_populations() > 0:
+            raise SpynnakerException(
+                "Global set is not supported after a Population has been "
+                "created. Either move it above the creation of all "
+                f"Populations or provide {param} during the creation of each "
+                "Population it applies to.")
+        if AbstractPyNNModel._model_created:
+            raise SpynnakerException(
+                "Global set is not supported after a Model has been "
+                "created. Either move it above the creation of all "
+                f"Models or provide {param} during the creation of each "
+                "Population it applies to.")
+
+    @classmethod
+    def set_model_max_atoms_per_dimension_per_core(
+            cls, n_atoms: Union[None, int, Tuple[int, ...]] = None) -> None:
         """
         Set the default maximum number of atoms per dimension per core for
         this model.  This can be overridden by the individual Population.
@@ -45,140 +87,124 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         set the maximum on each Population.
 
         :param n_atoms: The new maximum, or `None` for the largest possible
-        :type n_atoms: int or tuple or None
         """
+        cls.verify_may_set(param="neurons_per_core")
         abs_max = cls.absolute_max_atoms_per_core
-        if n_atoms is not None and numpy.prod(n_atoms) > abs_max:
-            raise SpynnakerException(
-                "The absolute maximum neurons per core for this model is"
-                f" {abs_max}")
-        AbstractPyNNModel._max_atoms_per_core[cls] = n_atoms
+        if n_atoms is None:
+            AbstractPyNNModel._max_atoms_per_core[cls] = None
+        elif numpy.isscalar(n_atoms):
+            if n_atoms > abs_max:
+                raise SpynnakerException(
+                    "The absolute maximum neurons per core for this"
+                    f" model is {abs_max}")
+            max_atoms_int: int = int(cast(int, n_atoms))
+            AbstractPyNNModel._max_atoms_per_core[cls] = (max_atoms_int, )
+        else:
+            if numpy.prod(n_atoms) > abs_max:
+                raise SpynnakerException(
+                    "The absolute maximum sum of neurons per core for this"
+                    f" model is {abs_max}")
+            max_atoms_tuple: Tuple[int, ...] = cast(
+                Tuple[int, ...],  n_atoms)
+            AbstractPyNNModel._max_atoms_per_core[cls] = max_atoms_tuple
 
     @classmethod
-    def get_model_max_atoms_per_dimension_per_core(cls):
+    def get_model_max_atoms_per_dimension_per_core(cls) -> Tuple[int, ...]:
         """
-        Get the maximum number of atoms per dimension per core for this model.
-
-        :rtype: int or tuple or None
+        :returns:
+            The maximum number of atoms per dimension per core for this model.
         """
         # If there is a stored value, use it
         max_stored = AbstractPyNNModel._max_atoms_per_core.get(cls)
         if max_stored is not None:
             return max_stored
 
-        # Otherwise return the absolute maximum
-        return cls.absolute_max_atoms_per_core
+        # Otherwise return the absolute maximum assuming 1D
+        return (cls.absolute_max_atoms_per_core, )
+
+    @classmethod
+    def reset_all(cls) -> None:
+        """
+        Reset the maximum values for all classes.
+        """
+        AbstractPyNNModel._max_atoms_per_core.clear()
+        AbstractPyNNModel._model_created = False
 
     @classproperty
-    def absolute_max_atoms_per_core(cls):  # pylint: disable=no-self-argument
+    def absolute_max_atoms_per_core(  # pylint: disable=no-self-argument
+            cls) -> int:
         """
         The absolute maximum number of atoms per core.
+
         This is an integer regardless of the number of dimensions
         in any vertex.
 
-        :rtype: int
+        :returns: The absolute maximum number of atoms per core.
         """
         return sys.maxsize
 
-    @staticmethod
-    def __get_init_params_and_svars(the_cls):
-        init = getattr(the_cls, "__init__")
-        while hasattr(init, "_method"):
-            init = getattr(init, "_method")
-        params = None
-        if hasattr(init, "_parameters"):
-            params = getattr(init, "_parameters")
-        svars = None
-        if hasattr(init, "_state_variables"):
-            svars = getattr(init, "_state_variables")
-        return init, params, svars
-
-    @classproperty
-    def default_parameters(cls):  # pylint: disable=no-self-argument
-        """
-        Get the default values for the parameters of the model.
-
-        :rtype: dict(str, Any)
-        """
-        init, params, svars = cls.__get_init_params_and_svars(cls)
-        return get_dict_from_init(init, skip=svars, include=params)
-
-    @classproperty
-    def default_initial_values(cls):  # pylint: disable=no-self-argument
-        """
-        Get the default initial values for the state variables of the model.
-
-        :rtype: dict(str, Any)
-        """
-        init, params, svars = cls.__get_init_params_and_svars(cls)
-        if params is None and svars is None:
-            return {}
-        return get_dict_from_init(init, skip=params, include=svars)
-
     @classmethod
-    def get_parameter_names(cls):
+    def get_parameter_names(cls) -> Sequence[str]:
         """
-        Get the names of the parameters of the model.
-
-        :rtype: list(str)
+        :returns: The names of the parameters of the model.
         """
         return cls.default_parameters.keys()  # pylint: disable=no-member
 
     @classmethod
-    def has_parameter(cls, name):
+    def has_parameter(cls, name: str) -> bool:
         """
-        Determine if the model has a parameter with the given name.
-
-        :param str name: The name of the parameter to check for
-        :rtype: bool
+        :param name: The name of the parameter to check for
+        :returns: True if the model has a parameter with the given name
         """
         return name in cls.default_parameters
 
-    @abstractproperty
-    def default_population_parameters(self):
-        """
-        The default values for the parameters at the population level.
-        These are parameters that can be passed in to the Population
-        constructor in addition to the standard PyNN options.
+    #: The default values for the parameters at the population level.
+    #: These are parameters that can be passed in to the Population
+    #: constructor in addition to the standard PyNN options.
+    default_population_parameters: Dict[str, Any] = {}
 
-        :rtype: dict(str, Any)
+    @classmethod
+    def _get_default_population_parameters(cls) -> Dict[str, Any]:
         """
+        Get the default population parameters.
+        Slightly contorted to allow for overriding class variables.
+        """
+        return dict(cls.default_population_parameters)
 
     @abstractmethod
-    def create_vertex(self, n_neurons, label):
+    def create_vertex(
+            self, n_neurons: int, label: str) -> PopulationApplicationVertex:
         """
         Create a vertex for a population of the model.
 
-        :param int n_neurons: The number of neurons in the population
-        :param str label: The label to give to the vertex
+        :param n_neurons: The number of neurons in the population
+        :param label: The label to give to the vertex
         :return: An application vertex for the population
-        :rtype: PopulationApplicationVertex
         """
+        raise NotImplementedError
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         The name of this model.
-
-        :rtype: str
         """
         return self.__class__.__name__
 
-    def describe(self, template='modeltype_default.txt', engine='default'):
+    def describe(self, template: Optional[str] = 'modeltype_default.txt',
+                 engine: str = 'default') -> str:
         """
         Returns a human-readable description of the population.
 
-        The output may be customized by specifying a different template
+        The output may be customised by specifying a different template
         together with an associated template engine (see
         :mod:`pyNN.descriptions`).
 
         If ``template`` is ``None``, then a dictionary containing the template
         context will be returned.
 
-        :param str template: Template filename
+        :param template: Template filename
         :param engine: Template substitution engine
-        :type engine: str or ~pyNN.descriptions.TemplateEngine or None
-        :rtype: str or dict
+        :returns: A human-readable description
         """
         context = {
             "name": self.name

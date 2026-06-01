@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy
-import spynnaker.plot_utils as plot_utils
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import SynfireRunner
 
 n_neurons = 200  # number of neurons in each population
-neurons_per_core = n_neurons / 2
+neurons_per_core = n_neurons // 2
 run_times = [5000, 5000]
 # parameters for population 1 first run
 input_class = p.SpikeSourcePoisson
@@ -36,7 +35,7 @@ synfire_run = SynfireRunner()
 
 class TestSynfirePoissonIfCurrExpParameter(BaseTestCase):
 
-    def synfire_poisson_if_curr_exp_parameter(self):
+    def synfire_poisson_if_curr_exp_parameter(self) -> None:
         synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                            run_times=run_times, input_class=input_class,
                            start_time=start_time, duration=duration, rate=rate,
@@ -48,7 +47,7 @@ class TestSynfirePoissonIfCurrExpParameter(BaseTestCase):
         hist = numpy.histogram(spikes[:, 1], bins=[0, 5000, 10000])
         self.assertLess(hist[0][0] * 10, hist[0][1])
 
-    def test_synfire_poisson_if_curr_exp_parameter(self):
+    def test_synfire_poisson_if_curr_exp_parameter(self) -> None:
         self.runsafe(self.synfire_poisson_if_curr_exp_parameter)
 
 
@@ -61,4 +60,4 @@ if __name__ == '__main__':
     spikes = synfire_run.get_output_pop_spikes_numpy()
     hist = numpy.histogram(spikes[:, 1], bins=[0, 5000, 10000])
     print(hist[0][0] * 10, hist[0][1])
-    plot_utils.plot_spikes(spikes)
+    print(spikes)

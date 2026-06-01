@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.models.neuron.builds import IFCurrExpBase
 from spynnaker.pyNN.models.populations.population import Population
 import pyNN.spiNNaker as sim
@@ -19,7 +21,7 @@ import pyNN.spiNNaker as sim
 # NO unittest_step as sim.setup call is needed before creating a Population
 
 
-def test_selector():
+def test_selector() -> None:
     sim.setup()
     model = IFCurrExpBase()
     pop_1 = Population(
@@ -41,10 +43,40 @@ def test_selector():
     assert [-50.0, -50.0, -50.0] == values["v_thresh"]
 
 
-def test_round():
+def test_round() -> None:
     sim.setup()
     model = IFCurrExpBase()
     pop_1 = Population(
         size=4.999999, label="Test", cellclass=model,
         structure=None, initial_values={})
     assert pop_1.size == 5
+
+
+def test_bad_record() -> None:
+    sim.setup()
+    pop_1 = sim.Population(1, sim.IF_curr_exp(), label="pop_1")
+    try:
+        pop_1.record("spikes", 2)
+        raise AssertionError("Should have raised an exception")
+    except ValueError:
+        pass
+    try:
+        pop_1.record("spikes", "test.bacon")
+        raise AssertionError("Should have raised an exception")
+    except ValueError:
+        pass
+    try:
+        pop_1.record("spikes", sampling_interval="bacon")
+        raise AssertionError("Should have raised an exception")
+    except TypeError:
+        pass
+    try:
+        pop_1.record("spikes", sampling_interval=-1)
+        raise AssertionError("Should have raised an exception")
+    except ConfigurationException:
+        pass
+    try:
+        pop_1.record("spikes", sampling_interval=0.01)
+        raise AssertionError("Should have raised an exception")
+    except ConfigurationException:
+        pass

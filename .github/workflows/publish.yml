@@ -24,6 +24,8 @@ env:
 
 jobs:
   build:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -34,13 +36,9 @@ jobs:
         with:
           repository: SpiNNakerManchester/SupportScripts
           path: support
-      - name: Set dynamic environment variables
-        run: |
-          echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
-          echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
 
       - name: Checkout SpiNNaker Dependencies
-        uses: ./support/actions/install-spinn-deps
+        uses: SpiNNakerManchester/SupportScripts/actions/install-spinn-deps@main
         with:
           repositories: >
             spinnaker_tools
@@ -51,7 +49,7 @@ jobs:
         working-directory: neural_modelling
 
       - name: Build C documentation
-        uses: mattnotmitt/doxygen-action@v1.9.5
+        uses: mattnotmitt/doxygen-action@v1.9.8
         with:
           working-directory: neural_modelling
 
@@ -61,7 +59,7 @@ jobs:
           cp -vaT $C_DOC_DIR $DEPLOY_DIR/c
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        uses: JamesIves/github-pages-deploy-action@v4.6.1
         with:
           branch: gh-pages
           folder: ${{ env.DEPLOY_DIR }}

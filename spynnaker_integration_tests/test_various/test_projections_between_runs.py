@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.spiNNaker as sim
+from typing import Tuple
+from neo import Block
 from spinnaker_testbase import BaseTestCase
+import pyNN.spiNNaker as sim
 # import neo_convertor
 
 
-def do_run():
+def do_run() -> Tuple[Block, Block]:
     sim.setup(timestep=1)
     pop_1 = sim.Population(1, sim.IF_curr_exp, {}, label="pop_1")
     inp = sim.Population(
@@ -46,10 +48,10 @@ def do_run():
 
 
 class TestProjectionBetweenRun(BaseTestCase):
-    def do_run(self):
+    def do_run(self) -> None:
         first_spikes, second_spikes = do_run()
         assert len(first_spikes) == 0
         assert len(second_spikes[0]) == 2
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)

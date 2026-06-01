@@ -17,7 +17,8 @@ from .threshold_type_static import ThresholdTypeStatic
 from .threshold_type_maass_stochastic import ThresholdTypeMaassStochastic
 from .threshold_type_adaptive import ThresholdTypeAdaptive
 from .threshold_type_none import ThresholdTypeNone
+from .threshold_type_fixed_prob import ThresholdTypeFixedProb
 
 __all__ = ["AbstractThresholdType", "ThresholdTypeStatic",
            "ThresholdTypeMaassStochastic", "ThresholdTypeAdaptive",
-           "ThresholdTypeNone"]
+           "ThresholdTypeNone", "ThresholdTypeFixedProb"]

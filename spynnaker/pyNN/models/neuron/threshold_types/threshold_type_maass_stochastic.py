@@ -13,10 +13,15 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged import RangeDictionary
+
 from spinn_front_end_common.interface.ds import DataType
-from .abstract_threshold_type import AbstractThresholdType
+
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
+
+from .abstract_threshold_type import AbstractThresholdType
 
 DU_TH = "du_th"
 TAU_TH = "tau_th"
@@ -33,22 +38,17 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
     `doi:10.1371/journal.pcbi.1003311
     <https://doi.org/10.1371/journal.pcbi.1003311>`_
     """
-    __slots__ = [
+    __slots__ = (
         "__du_th",
         "__tau_th",
-        "__v_thresh"]
+        "__v_thresh")
 
-    def __init__(self, du_th, tau_th, v_thresh):
+    def __init__(self, du_th: ModelParameter, tau_th: ModelParameter,
+                 v_thresh: ModelParameter):
         r"""
         :param du_th: :math:`du_{thresh}`
-        :type du_th: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_th: :math:`\tau_{thresh}`
-        :type tau_th: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param v_thresh: :math:`V_{thresh}`
-        :type v_thresh: float or iterable(float) or
-            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([
@@ -62,32 +62,33 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         self.__v_thresh = v_thresh
 
     @overrides(AbstractThresholdType.add_parameters)
-    def add_parameters(self, parameters):
-        parameters[DU_TH] = self.__du_th
-        parameters[TAU_TH] = self.__tau_th
-        parameters[V_THRESH] = self.__v_thresh
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
+        parameters[DU_TH] = self._convert(self.__du_th)
+        parameters[TAU_TH] = self._convert(self.__tau_th)
+        parameters[V_THRESH] = self._convert(self.__v_thresh)
         parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractThresholdType.add_state_variables)
-    def add_state_variables(self, state_variables):
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         pass
 
     @property
-    def v_thresh(self):
+    def v_thresh(self) -> ModelParameter:
         """
         :math:`V_{thresh}`
         """
         return self.__v_thresh
 
     @property
-    def du_th(self):
+    def du_th(self) -> ModelParameter:
         """
         :math:`du_{thresh}`
         """
         return self.__du_th
 
     @property
-    def tau_th(self):
+    def tau_th(self) -> ModelParameter:
         r"""
         :math:`\tau_{thresh}`
         """

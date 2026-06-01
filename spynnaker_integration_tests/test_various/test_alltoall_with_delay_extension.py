@@ -23,7 +23,7 @@ class AllToAllWithDelayExtensionCase(BaseTestCase):
     # Added to check that the delay expander runs; a previous fix
     # for a related issue inadvertently turned it off for this type of case
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(timestep=1.0)
 
         model = sim.IF_curr_exp
@@ -78,5 +78,5 @@ class AllToAllWithDelayExtensionCase(BaseTestCase):
         length = len(neo_post_spikes.segments[0].spiketrains[0])
         self.assertGreater(length, 0)
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)

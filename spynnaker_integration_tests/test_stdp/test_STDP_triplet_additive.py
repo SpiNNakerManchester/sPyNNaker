@@ -18,11 +18,11 @@ from spinnaker_testbase import BaseTestCase
 import numpy
 
 
-def triplet_additive():
+def triplet_additive() -> None:
     # -------------------------------------------------------------------
     # This test uses a single data point from the Pfister/Gerstner example
     # which is described and evaluated in more detail in
-    # PyNN8Examples/extra_models_examples/stdp_triplet.py
+    # PyNNExamples/examples/extra_models_examples/stdp_triplet.py
     # -------------------------------------------------------------------
 
     # -------------------------------------------------------------------
@@ -119,7 +119,7 @@ def triplet_additive():
 
 class TestSTDPPairAdditive(BaseTestCase):
 
-    def test_triplet_additive(self):
+    def test_triplet_additive(self) -> None:
         self.runsafe(triplet_additive)
 
 

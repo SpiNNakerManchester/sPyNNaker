@@ -12,10 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable
+
+from numpy import floating
+from numpy.typing import NDArray
+
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.interface.ds import DataType
+
+from spinn_front_end_common.interface.ds import (
+    DataSpecificationBase, DataType)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     AbstractTimingDependence)
@@ -29,121 +37,104 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     """
     A timing dependence STDP rule due to Vogels (2011).
     """
-    __slots__ = [
+    __slots__ = (
         "__alpha",
-        "__synapse_structure",
         "__tau",
         "__tau_data",
         "__a_plus",
-        "__a_minus"]
+        "__a_minus")
     __PARAM_NAMES = ('alpha', 'tau')
-    default_parameters = {'tau': 20.0}
 
-    def __init__(self, alpha, tau=default_parameters['tau'],
-                 A_plus=0.01, A_minus=0.01):
+    def __init__(self, alpha: float, tau: float = 20.0,
+                 A_plus: float = 0.01, A_minus: float = 0.01):
         r"""
-        :param float alpha: :math:`\alpha`
-        :param float tau: :math:`\tau`
-        :param float A_plus: :math:`A^+`
-        :param float A_minus: :math:`A^-`
+        :param alpha: :math:`\alpha`
+        :param tau: :math:`\tau`
+        :param A_plus: :math:`A^+`
+        :param A_minus: :math:`A^-`
         """
+        super().__init__(SynapseStructureWeightOnly())
         self.__alpha = alpha
         self.__tau = tau
         self.__a_plus = A_plus
         self.__a_minus = A_minus
 
-        self.__synapse_structure = SynapseStructureWeightOnly()
-
         self.__tau_data = get_exp_lut_array(
             SpynnakerDataView.get_simulation_time_step_ms(), self.__tau)
 
     @property
-    def alpha(self):
+    def alpha(self) -> float:
         r"""
         :math:`\alpha`
-
-        :rtype: float
         """
         return self.__alpha
 
     @property
-    def tau(self):
+    def tau(self) -> float:
         r"""
         :math:`\tau`
-
-        :rtype: float
         """
         return self.__tau
 
     @property
-    def A_plus(self):
+    def A_plus(self) -> float:
         r"""
         :math:`A^+`
-
-        :rtype: float
         """
         return self.__a_plus
 
     @A_plus.setter
-    def A_plus(self, new_value):
+    def A_plus(self, new_value: float) -> None:
         self.__a_plus = new_value
 
     @property
-    def A_minus(self):
+    def A_minus(self) -> float:
         r"""
         :math:`A^-`
-
-        :rtype: float
         """
         return self.__a_minus
 
     @A_minus.setter
-    def A_minus(self, new_value):
+    def A_minus(self, new_value: float) -> None:
         self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
-    def is_same_as(self, timing_dependence):
+    def is_same_as(self, timing_dependence: AbstractTimingDependence) -> bool:
         if not isinstance(timing_dependence, TimingDependenceVogels2011):
             return False
         return (self.__tau == timing_dependence.tau and
                 self.__alpha == timing_dependence.alpha)
 
     @property
-    def vertex_executable_suffix(self):
+    def vertex_executable_suffix(self) -> str:
         """
         The suffix to be appended to the vertex executable for this rule.
-
-        :rtype: str
         """
         return "vogels_2011"
 
     @property
-    def pre_trace_n_bytes(self):
+    def pre_trace_n_bytes(self) -> int:
         """
         The number of bytes used by the pre-trace of the rule per neuron.
-
-        :rtype: int
         """
         # Trace entries consist of a single 16-bit number
         return BYTES_PER_SHORT
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
-    def get_parameters_sdram_usage_in_bytes(self):
+    def get_parameters_sdram_usage_in_bytes(self) -> int:
         return BYTES_PER_WORD + BYTES_PER_WORD * len(self.__tau_data)
 
     @property
-    def n_weight_terms(self):
+    def n_weight_terms(self) -> int:
         """
         The number of weight terms expected by this timing rule.
-
-        :rtype: int
         """
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
-            self, spec, global_weight_scale, synapse_weight_scales):
-
+            self, spec: DataSpecificationBase, global_weight_scale: float,
+            synapse_weight_scales: NDArray[floating]) -> None:
         # Write alpha to spec
         fixed_point_alpha = float_to_fixed(self.__alpha)
         spec.write_value(data=fixed_point_alpha, data_type=DataType.INT32)
@@ -151,15 +142,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         # Write lookup table
         spec.write_array(self.__tau_data)
 
-    @property
-    def synaptic_structure(self):
-        """
-        The synaptic structure of the plastic part of the rows.
-
-        :rtype: AbstractSynapseStructure
-        """
-        return self.__synapse_structure
-
     @overrides(AbstractTimingDependence.get_parameter_names)
-    def get_parameter_names(self):
+    def get_parameter_names(self) -> Iterable[str]:
         return self.__PARAM_NAMES

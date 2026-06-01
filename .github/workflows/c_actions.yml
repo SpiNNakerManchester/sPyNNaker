@@ -22,65 +22,109 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Checkout SupportScripts
-      uses: actions/checkout@v4
+    - name: Prepare
+      uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
       with:
-        repository: SpiNNakerManchester/SupportScripts
-        path: support
-    - name: Set up Python 3.8
-      # Note: Python is needed for spinn_utilities.make_tools when building
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.8
-    - name: Install Ubuntu dependencies
-      uses: ./support/actions/apt-get-install
-      with:
-        packages: doxygen gcc-arm-none-eabi
-
-    - name: Checkout SpiNNaker C Dependencies
-      uses: ./support/actions/install-spinn-deps
-      with:
-        # Note: SpiNNUtils needed for spinn_utilities.make_tools
-        repositories: spinnaker_tools spinn_common SpiNNFrontEndCommon
-        install: false
-
-    - name: "Prepare: Install SpiNNUtils"
-      uses: ./support/actions/install-spinn-deps
-      with:
-        # Note: SpiNNUtils needed for spinn_utilities.make_tools
-        repositories: SpiNNUtils
-        install: true
-
-    - name: Set environment variables
-      run: |
-        echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
-        echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
+        checkout-dependencies: spinnaker_tools spinn_common SpiNNFrontEndCommon
+        install-dependencies: SpiNNUtils
+        install-module: false
+        install-check-tools: false
+        ubuntu-packages: doxygen gcc-arm-none-eabi
 
     - name: Lint C code using Vera++
-      uses: ./support/actions/vera
+      uses: SpiNNakerManchester/SupportScripts/actions/vera@main
       with:
         base-dir: neural_modelling/src
 
-    - name: Build C dependencies
-      run: |
-        make -C $SPINN_DIRS
-        make -C spinn_common install
-        make -C SpiNNFrontEndCommon/c_common install
-
-    - name: Build C code
-      run: make
-      working-directory: neural_modelling
+    - name: Build C and install code
       env:
+        SPINN_INSTALL_DIR: ${{ github.workspace }}/spinnaker_tools_install
+        SPINN_COMMON_INSTALL_DIR: ${{ github.workspace }}/spinn_common_install
+        FEC_INSTALL_DIR: ${{ github.workspace }}/fec_install
+        SPYNNAKER_INSTALL_DIR: ${{ github.workspace }}/spynnaker_install
         CFLAGS: -fdiagnostics-color=always
+      run: |
+       make -C spinnaker_tools install
+       make -C spinn_common install
+       make -C SpiNNFrontEndCommon/c_common/front_end_common_lib install 
+       make -C SpiNNFrontEndCommon/c_common
+       make -C neural_modelling
 
     - name: Build C code in DEBUG mode
       run: make clean; make SPYNNAKER_DEBUG=DEBUG
       working-directory: neural_modelling
       env:
+        SPINN_INSTALL_DIR: ${{ github.workspace }}/spinnaker_tools_install
+        SPINN_COMMON_INSTALL_DIR: ${{ github.workspace }}/spinn_common_install
+        FEC_INSTALL_DIR: ${{ github.workspace }}/fec_install
+        SPYNNAKER_INSTALL_DIR: ${{ github.workspace }}/spynnaker_install
         CFLAGS: -fdiagnostics-color=always
 
     - name: Build documentation using doxygen
       run: make doxysetup doxygen
       working-directory: neural_modelling
+
+    - name: Upload Fec binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: fec_binaries
+        path: |
+          SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/*.aplx
+          SpiNNFrontEndCommon/spinn_front_end_common/common_model_binaries/logs*.sqlite3
+        retention-days: 5
+
+    - name: Upload PyNN binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: pynn_binaries
+        path: |
+          spynnaker/pyNN/model_binaries/*.aplx
+          spynnaker/pyNN/model_binaries/logs*.sqlite3
+        retention-days: 5
+
+  test:
+    needs: build
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        #runner: [ubuntu-latest, windows-latest, macos-latest]
+        runner: [ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Prepare
+      uses: SpiNNakerManchester/SupportScripts/actions/prepare@main
+      with:
+        install-dependencies: >
+          SpiNNUtils SpiNNMachine SpiNNMan PACMAN spalloc
+          SpiNNFrontEndCommon TestBase
+        install-module: true
+        install-check-tools: false
+        ubuntu-packages: graphviz
+        cfg-file: spynnaker
+
+    - name: Download Fec binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: fec_binaries
+        # Need to go into spynnaker as FEC will have been moved by install
+        path: external_binaries
+
+    - name: Download PyNN Binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: pynn_binaries
+        path: external_binaries
+
+    - name: Append cfg
+      # Doing this in the prepare action ended with a different path
+      run: |
+        echo '[Mapping]' >> ~/.spynnaker.cfg
+        echo "external_binaries=$PWD/external_binaries" >> ~/.spynnaker.cfg
+        cat ~/.spynnaker.cfg
+
+    - name: Test with pytest and proxy
+      env:
+        SPALLOC_USER: ${{ secrets.SPALLOC_USER }}
+        SPALLOC_PASSWORD: ${{ secrets.SPALLOC_PASSWORD }}
+      run: pytest proxy_integration_tests

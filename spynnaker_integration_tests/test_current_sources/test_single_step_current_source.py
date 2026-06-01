@@ -19,7 +19,7 @@ from spynnaker.pyNN.utilities import neo_convertor
 
 class TestSingleStepCurrentSource(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(timestep=1.0)
 
         n_neurons = 10
@@ -59,5 +59,5 @@ class TestSingleStepCurrentSource(BaseTestCase):
 
         self.assertEqual(len(spike_count), 5)
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)

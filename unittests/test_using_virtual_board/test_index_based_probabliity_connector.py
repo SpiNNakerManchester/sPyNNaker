@@ -15,13 +15,16 @@
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 
+from spynnaker.pyNN.models.projection import Projection
+
 WEIGHT = 5
 DELAY = 2
 
 
 class TestIndexBasedProbabilityConnector(BaseTestCase):
 
-    def check_weights(self, projection, n, expression, allow_self_connections):
+    def check_weights(self, projection: Projection, n: int, expression: str,
+                      allow_self_connections: bool) -> None:
         weights = projection.get(["weight"], "list")
         pairs = [(s, d) for (s, d, _) in weights]
         must_count = 0
@@ -45,8 +48,7 @@ class TestIndexBasedProbabilityConnector(BaseTestCase):
         # Check not all the maybes connected
         self.assertGreaterEqual(len(weights), must_count)
 
-    def check_connect(self, n, expression, allow_self_connections):
-        n = 6
+    def check_connect(self, n: int, expression: str) -> None:
         sim.setup(1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 10)
         pop1 = sim.Population(
@@ -55,21 +57,30 @@ class TestIndexBasedProbabilityConnector(BaseTestCase):
         synapse_type = sim.StaticSynapse(weight=5, delay=2)
 
         projection = sim.Projection(
-            pop1, pop2, sim.IndexBasedProbabilityConnector(
-                expression, allow_self_connections=allow_self_connections),
+            pop1, pop2, sim.IndexBasedProbabilityConnector(expression),
             synapse_type=synapse_type)
         sim.run(0)
-        self.check_weights(projection, n, expression, allow_self_connections)
+        self.check_weights(projection, n, expression, True)
         sim.end()
 
-    def test_self(self):
-        self.check_connect(
-            n=6, expression="(i+j)%3*0.5", allow_self_connections=True)
+    def check_connect_no_self(self, n: int, expression: str) -> None:
+        sim.setup(1.0)
+        sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 10)
+        pop = sim.Population(n, sim.IF_curr_exp(), label="pop")
+        synapse_type = sim.StaticSynapse(weight=5, delay=2)
 
-    def test_other(self):
-        self.check_connect(
-            n=6, expression="(i+j)%3*0.5", allow_self_connections=False)
+        projection = sim.Projection(
+            pop, pop, sim.IndexBasedProbabilityConnector(
+                expression, allow_self_connections=False),
+            synapse_type=synapse_type)
+        sim.run(0)
+        self.check_weights(projection, n, expression, False)
+        sim.end()
 
-    def test_big(self):
+    def test_self(self) -> None:
         self.check_connect(
-            n=60, expression="(i+j)%3*0.5", allow_self_connections=True)
+            n=6, expression="(i+j)%3*0.5")
+
+    def test_other(self) -> None:
+        self.check_connect_no_self(
+            n=6, expression="(i+j)%3*0.5")

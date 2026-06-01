@@ -20,7 +20,7 @@ class TestResetAdd(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def testReset_add(self):
+    def testReset_add(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 1)
 

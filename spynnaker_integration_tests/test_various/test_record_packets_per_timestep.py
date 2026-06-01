@@ -18,7 +18,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestRecordPacketsPerTimestep(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(timestep=1.0)
 
         runtime = 500
@@ -50,7 +50,7 @@ class TestRecordPacketsPerTimestep(BaseTestCase):
 
         sim.end()
 
-    def do_multi_run(self):
+    def do_multi_run(self) -> None:
         sim.setup(timestep=1.0)
         runtime = 500
         n_neurons = 10
@@ -84,7 +84,7 @@ class TestRecordPacketsPerTimestep(BaseTestCase):
 
         sim.end()
 
-    def do_run_with_reset(self):
+    def do_run_with_reset(self) -> None:
         sim.setup(timestep=1.0)
         runtime = 500
         n_neurons = 10
@@ -124,11 +124,11 @@ class TestRecordPacketsPerTimestep(BaseTestCase):
 
         sim.end()
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)
 
-    def test_multi_run(self):
+    def test_multi_run(self) -> None:
         self.runsafe(self.do_multi_run)
 
-    def test_run_with_reset(self):
+    def test_run_with_reset(self) -> None:
         self.runsafe(self.do_run_with_reset)

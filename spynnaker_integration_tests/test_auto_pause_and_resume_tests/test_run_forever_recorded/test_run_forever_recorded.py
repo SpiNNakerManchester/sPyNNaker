@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import time
 from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as sim
 from spinn_front_end_common.utilities.database.database_connection import (
@@ -19,23 +19,18 @@ from spinn_front_end_common.utilities.database.database_connection import (
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager)
 
-run_count = 0
+
+def start_callback() -> None:
+    time.sleep(3.0)
+    print("Ending Simulation")
+    sim.external_devices.request_stop()
 
 
-def start_callback():
-    global run_count
-    run_count += 1
-    print("Starting run {}".format(run_count))
-    if run_count == 3:
-        print("Ending Simulation")
-        sim.external_devices.request_stop()
-
-
-def stop_callback():
+def stop_callback() -> None:
     print("Stopping")
 
 
-def run_forever_recorded():
+def run_forever_recorded() -> None:
     sim.setup(1.0)
     source_spikes = range(0, 5000, 100)
     stim = sim.Population(1, sim.SpikeSourceArray(source_spikes))
@@ -60,7 +55,7 @@ def run_forever_recorded():
 
 
 class MyTestCase(BaseTestCase):
-    def test_run_forever_recorded(self):
+    def test_run_forever_recorded(self) -> None:
         self.runsafe(run_forever_recorded)
 
 

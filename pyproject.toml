@@ -15,3 +15,7 @@
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[[tool.mypy.overrides]]
+module = ["csa", "docstring_parser", "matplotlib", "matplotlib.*", "pyNN.*", "quantities", "neo", "neo.*", "scipy", "scipy.*", "lazyarray", "testfixtures"]
+ignore_missing_imports = true

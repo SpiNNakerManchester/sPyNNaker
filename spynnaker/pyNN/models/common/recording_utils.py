@@ -12,11 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable
+from pacman.model.placements import Placement
 
-def make_missing_string(missing):
+
+def make_missing_string(missing: Iterable[Placement]) -> str:
     """
-    :param iterable(~pacman.model.placements.Placement) missing:
-    :rtype: str
+    Unused likely to be removed.
+
+    :param missing:
+    :return: A String with the X, Y and P of each placement
     """
     return "; ".join(
         f"({placement.x}, {placement.y}, {placement.p})"

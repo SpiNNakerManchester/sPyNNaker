@@ -12,23 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
+from typing import Any, Dict, Union
+
 import numpy
-from pyNN.recording.files import StandardTextFile
+from numpy.typing import NDArray
+
+from pyNN.recording.files import BaseFile, StandardTextFile
+
+from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
+
 from .from_list_connector import FromListConnector
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class FromFileConnector(FromListConnector):
     """
     Make connections according to a list read from a file.
     """
-    __slots__ = ["_file"]
+    __slots__ = ("_file", )
 
     def __init__(
-            self, file,  # @ReservedAssignment
-            distributed=False, safe=True, callback=None, verbose=False):
+            self, file: Union[str, BaseFile],  # @ReservedAssignment
+            distributed: bool = False, safe: bool = True,
+            callback: None = None, verbose: bool = False):
         """
-        :param str file:
+        :param file:
             Either an open file object or the filename of a file containing a
             list of connections, in the format required by
             :py:class:`FromListConnector`.
@@ -39,8 +51,7 @@ class FromFileConnector(FromListConnector):
 
             .. note::
                 The header requires `#` at the beginning of the line.
-        :type file: str or ~io.FileIO
-        :param bool distributed:
+        :param distributed:
             Basic pyNN says:
 
                 if this is ``True``, then each node will read connections from
@@ -50,15 +61,15 @@ class FromFileConnector(FromListConnector):
             .. note::
                 Always leave this as ``False`` with sPyNNaker, which is not
                 MPI-based.
-        :param bool safe:
+        :param safe:
             Whether to check that weights and delays have valid values.
             If ``False``, this check is skipped.
-        :param callable callback:
+        :param callback:
             if given, a callable that display a progress bar on the terminal.
 
             .. note::
                 Not supported by sPyNNaker.
-        :param bool verbose:
+        :param verbose:
             Whether to output extra information about the connectivity to a
             CSV file
         """
@@ -78,12 +89,26 @@ class FromFileConnector(FromListConnector):
             column_names = [column for column in column_names
                             if column not in ("i", "j")]
 
-        # pylint: disable=too-many-arguments
         super().__init__(
             conn_list, safe=safe, verbose=verbose,
             column_names=column_names, callback=callback)
 
-    def _read_conn_list(self, the_file, distributed):
+    @overrides(FromListConnector.clone)
+    def clone(self) -> FromListConnector:
+        params = self.get_parameters()
+        logger.warning(
+            "Cloning FromFileConnector as a FromListConnector "
+            "which may lead to incorrect results.")
+        return FromListConnector(**params)
+
+    @overrides(FromListConnector.get_parameters)
+    def get_parameters(self) -> Dict[str, Any]:
+        logger.warning("FromFileConnectors parameters are actually the ones "
+                       "for the underlying FromListConnector")
+        return super().get_parameters()
+
+    def _read_conn_list(
+            self, the_file: BaseFile, distributed: bool) -> NDArray:
         if not distributed:
             return the_file.read()
         filename = f"{os.path.basename(the_file.file)}."
@@ -99,14 +124,13 @@ class FromFileConnector(FromListConnector):
                     file_reader.close()
         return numpy.concatenate(conns)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"FromFileConnector({self._file})"
 
-    def get_reader(self, file):  # @ReservedAssignment
+    def get_reader(self, file: str) -> BaseFile:  # @ReservedAssignment
         """
         Get a file reader object using the PyNN methods.
 
         :return: A pynn StandardTextFile or similar
-        :rtype: ~pynn.recording.files.StandardTextFile
         """
         return StandardTextFile(file, mode="r")

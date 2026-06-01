@@ -13,12 +13,20 @@
 # limitations under the License.
 
 from threading import RLock
+from typing import Optional
+
 import numpy
+
 from spinnman.connections import ConnectionListener
+
+from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
+
 from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotRetinaResolution)
+
+from .push_bot_wifi_connection import PushBotWIFIConnection
 
 # Each value is a 16-bit 1yyyyyyy.pxxxxxxx
 _RETINA_PACKET_SIZE = BYTES_PER_SHORT
@@ -38,7 +46,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
     .. note::
         This assumes a packet format of 16-bits per retina event.
     """
-    __slots__ = [
+    __slots__ = (
         "__lock",
         "__p_shift",
         "__pixel_shift",
@@ -51,22 +59,22 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         "__x_mask",
         "__y_mask",
         "__next_data",
-        "__ready"]
+        "__ready")
 
     def __init__(
-            self, retina_injector_label, pushbot_wifi_connection,
-            resolution=PushBotRetinaResolution.NATIVE_128_X_128,
-            local_host=None, local_port=None):
+            self, retina_injector_label: str,
+            pushbot_wifi_connection: PushBotWIFIConnection,
+            resolution: PushBotRetinaResolution = (
+                    PushBotRetinaResolution.NATIVE_128_X_128),
+            local_host: Optional[str] = None,
+            local_port: Optional[int] = None):
         """
-        :param str retina_injector_label:
-        :param PushBotWIFIConnection pushbot_wifi_connection:
-        :param PushBotRetinaResolution resolution:
+        :param retina_injector_label:
+        :param pushbot_wifi_connection:
+        :param resolution:
         :param local_host:
-        :type local_host: str or None
         :param local_port:
-        :type local_port: int or None
         """
-        # pylint: disable=too-many-arguments
         super().__init__(
             send_labels=[retina_injector_label], local_host=local_host,
             local_port=local_port)
@@ -88,7 +96,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         self.__pushbot_listener.start()
         self.__lock = RLock()
 
-        self.__next_data = None
+        self.__next_data: Optional[bytearray] = None
         self.__ready = False
 
         self.add_start_resume_callback(
@@ -96,22 +104,24 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         self.add_pause_stop_callback(
             retina_injector_label, self.__push_bot_stop)
 
-    # pylint: disable=unused-argument
-    def __push_bot_start(self, label, connection):
+    def __push_bot_start(
+            self, label: str, connection: LiveEventConnection) -> None:
+        _ = (label, connection)
         with self.__lock:
             self.__ready = True
 
-    # pylint: disable=unused-argument
-    def __push_bot_stop(self, label, connection):
+    def __push_bot_stop(
+            self, label: str, connection: LiveEventConnection) -> None:
+        _ = (label, connection)
         with self.__lock:
             self.__ready = False
 
-    def _receive_retina_data(self, data):
+    def _receive_retina_data(self, data: bytearray) -> None:
         """
         Receive retina packets from the PushBot and converts them into
         neuron spikes within the spike injector system.
 
-        :param bytearray data: Data to be processed
+        :param data: Data to be processed
         """
         with self.__lock:
             if not self.__ready:
@@ -122,8 +132,9 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
                 self.__next_data = None
 
             # Go through the data and find pairs where the first of the pair
-            # has a 1 in the MSB
+            # has a 1 in the most significant bit
             data_all = b''
+            # pylint: disable=consider-using-enumerate
             for i in range(len(data)):
                 if data[i] > 128:
                     if i + 1 < len(data):
@@ -133,7 +144,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
                         self.__next_data = data[i:i+1]
 
             # Filter out the usable data
-            data_filtered = numpy.fromstring(data_all, dtype=numpy.uint16)
+            data_filtered = numpy.frombuffer(data_all, dtype=numpy.uint16)
             y_values = (data_filtered >> self.__orig_y_shift) & self.__y_mask
             x_values = (data_filtered >> self.__orig_x_shift) & self.__x_mask
             polarity = (data_filtered >> _P_SHIFT) & _P_MASK

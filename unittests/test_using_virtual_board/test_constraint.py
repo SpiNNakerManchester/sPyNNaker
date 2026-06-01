@@ -22,17 +22,22 @@ class TestConstraint(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_placement_constraint(self):
+    def test_placement_constraint(self) -> None:
         """
         test the get_placements call.
 
         """
         sim.setup(timestep=1.0)
-        set_config("Reports", "write_application_graph_placer_report", True)
+        width, height = SpynnakerDataView.get_machine_version().board_shape
+        # pick and XY in the middle of the board
+        x = (width + 1) // 3
+        y = (height + 1) // 3
+        set_config("Reports", "write_application_graph_placer_report",
+                   str(True))
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 50)
 
         pop_1 = sim.Population(200, sim.IF_curr_exp(), label="pop_1")
-        pop_1.add_placement_constraint(x=1, y=1)
+        pop_1.add_placement_constraint(x=x, y=y)
         input = sim.Population(1, sim.SpikeSourceArray(spike_times=[0]),
                                label="input")
         sim.Projection(input, pop_1, sim.AllToAllConnector(),
@@ -44,5 +49,5 @@ class TestConstraint(BaseTestCase):
         sim.end()
         self.assertGreater(len(placements), 0)
         for pl in placements:
-            self.assertEqual(1, pl.x)
-            self.assertEqual(1, pl.y)
+            self.assertEqual(x, pl.x)
+            self.assertEqual(y, pl.y)

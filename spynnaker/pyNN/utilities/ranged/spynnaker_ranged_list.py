@@ -12,9 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Callable, List, Optional, Sequence, Union
+from typing_extensions import TypeAlias
 from pyNN.random import RandomDistribution
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.ranged_list import RangedList
+from spinn_utilities.ranged.abstract_list import IdsType, T
+
+# The type of things we consider to be a list of values
+_ListType: TypeAlias = Union[Callable[[int], T], Sequence[T],
+                             RandomDistribution]
+# The type of value arguments in several places
+_ValueType: TypeAlias = Optional[Union[T, _ListType]]
 
 
 class SpynnakerRangedList(RangedList):
@@ -23,14 +32,14 @@ class SpynnakerRangedList(RangedList):
     :py:class:`~spinn_utilities.ranged.RangedList`.
     """
 
-    @overrides(RangedList.listness_check)
+    # @overrides(RangedList.listness_check)
     def listness_check(self, value):
         if isinstance(value, RandomDistribution):
             return True
 
         return super().listness_check(value)
 
-    @overrides(RangedList.as_list)
+    # @overrides(RangedList.as_list)
     def as_list(self, value, size, ids=None):
         if isinstance(value, RandomDistribution):
             return value.next(n=size)

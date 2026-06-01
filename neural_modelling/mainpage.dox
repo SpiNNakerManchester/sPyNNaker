@@ -59,8 +59,6 @@
 *
 * These enable the neuron simulation to work, or to work more efficiently.
 *
-* * Bitfield Expander, which builds inter-core message masks on the machine.
-*   See bit_field_expander.c
 * * Delay Extension, which handles messages that need to be delayed a long time
 *   before delivery. See delay_extension.c
 * * Robot Motor Control, which translates spiking rates of SpiNNaker messages

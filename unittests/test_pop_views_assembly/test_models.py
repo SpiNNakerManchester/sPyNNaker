@@ -20,7 +20,7 @@ class TestPopulation(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_model_fail_to_set_synpase_param(self):
+    def test_model_fail_to_set_synpase_param(self) -> None:
         n_neurons = 5
         value = 5
         label = "pop_1"
@@ -34,7 +34,7 @@ class TestPopulation(BaseTestCase):
             pop_1.get('tau_syn_I'), [value, value, value, value, value])
         sim.end()
 
-    def test_model_fail_to_set_neuron_param(self):
+    def test_model_fail_to_set_neuron_param(self) -> None:
         n_neurons = 5
         value = 5
         label = "pop_1"
@@ -48,7 +48,7 @@ class TestPopulation(BaseTestCase):
             pop_1.get('i_offset'), [value, value, value, value, value])
         sim.end()
 
-    def test_model_fail_to_set_neuron_param_array(self):
+    def test_model_fail_to_set_neuron_param_array(self) -> None:
         n_neurons = 5
         value = 5
         new_value = 6
@@ -65,7 +65,7 @@ class TestPopulation(BaseTestCase):
             pop_1.get('i_offset'), [value, value, value, value, value])
         sim.end()
 
-    def test_model_fail_to_set_neuron_param_array_wrong_size(self):
+    def test_model_fail_to_set_neuron_param_array_wrong_size(self) -> None:
         n_neurons = 5
         value = 5
         label = "pop_1"
@@ -75,10 +75,10 @@ class TestPopulation(BaseTestCase):
             sim.Population(n_neurons, model, label=label)
         sim.end()
 
-    def test_model_fail_to_set_neuron_param_function(self):
+    def test_model_fail_to_set_neuron_param_function(self) -> None:
         n_neurons = 5
 
-        def _silly_funct():
+        def _silly_funct() -> int:
             return 5
 
         value = _silly_funct()

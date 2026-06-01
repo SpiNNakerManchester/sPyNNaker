@@ -17,11 +17,13 @@
 """
 Synfirechain-like example with 6 chains
 """
+from typing import List
+from numpy.typing import NDArray
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(nNeurons):
+def do_run(nNeurons: int) -> List[NDArray]:
     p.setup(timestep=1.0, min_delay=1.0)
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
 
@@ -68,13 +70,13 @@ def do_run(nNeurons):
 
 class SynfireIfCurrx6(BaseTestCase):
 
-    def check_run(self):
+    def check_run(self) -> None:
         nNeurons = 200  # number of neurons in each population
         spikes = do_run(nNeurons)
         for x in range(0, 12, 2):
             self.assertEqual(999, len(spikes[x // 2]))
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.check_run)
 
 

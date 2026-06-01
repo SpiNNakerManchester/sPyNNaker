@@ -16,7 +16,7 @@ from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.common import NeuronRecorder
 
 
-def test_simple_record():
+def test_simple_record() -> None:
     unittest_setup()
     recordables = ["v", "gsyn_exc", "gsyn_inh"]
 
@@ -26,15 +26,15 @@ def test_simple_record():
         "gsyn_inh": DataType.S1615
     }
 
-    nr = NeuronRecorder(recordables, data_types, [], 100, [], [], [], [])
+    nr = NeuronRecorder(recordables, data_types, [], 100, [], {}, [], {})
     assert (frozenset(["v", "gsyn_exc", "gsyn_inh"]) ==
             frozenset(nr.get_recordable_variables()))
-    assert [] == nr.recording_variables
+    assert [] == list(nr.recording_variables)
     nr.set_recording("v", True)
-    assert ["v"] == nr.recording_variables
+    assert ["v"] == list(nr.recording_variables)
 
 
-def test_recording_variables():
+def test_recording_variables() -> None:
     unittest_setup()
     recordables = ["v", "gsyn_exc", "gsyn_inh"]
 
@@ -44,9 +44,9 @@ def test_recording_variables():
         "gsyn_inh": DataType.S1615
     }
 
-    nr = NeuronRecorder(recordables, data_types, [], 100, [], [], [], [])
-    assert [] == nr.recording_variables
+    nr = NeuronRecorder(recordables, data_types, [], 100, [], {}, [], {})
+    assert [] == list(nr.recording_variables)
     nr.set_recording("v", True)
     nr.set_recording("gsyn_inh", True)
-    assert ["v", "gsyn_inh"] == nr.recording_variables
-    assert [0, 2] == nr.recorded_region_ids
+    assert ["v", "gsyn_inh"] == list(nr.recording_variables)
+    assert [0, 2] == list(nr.recorded_region_ids)

@@ -85,6 +85,11 @@ typedef struct matrix_generator_stdp {
     uint32_t n_half_words_per_pp_synapse;
     //! The index of the half-word that will contain the weight
     uint32_t weight_half_word;
+    //! Whether to write the pre-neuron index in the first word of the header
+    //! space (used for externally changeable synapses)
+    uint32_t first_word_is_row_index;
+    //! The offset of the row index to use
+    uint32_t row_offset;
 } matrix_generator_stdp_data_t;
 
 /**
@@ -138,16 +143,22 @@ static row_fixed_t *get_stdp_fixed_row(row_plastic_t *plastic_row,
  */
 static void setup_stdp_rows(uint32_t *matrix, uint32_t n_rows,
         uint32_t n_half_words_per_pp_header, uint32_t n_half_words_per_pp_synapse,
-        uint32_t max_row_n_synapses, uint32_t max_row_n_words) {
+        uint32_t max_row_n_synapses, uint32_t max_row_n_words,
+		uint32_t first_header_word_is_row_index, uint32_t row_offset) {
 
     // Set all the header half-words to 0 and set all the sizes
     uint32_t plastic_words = plastic_half_words(n_half_words_per_pp_header,
             n_half_words_per_pp_synapse, max_row_n_synapses) >> 1;
     for (uint32_t i = 0; i < n_rows; i++) {
         row_plastic_t *row = get_row(matrix, max_row_n_words, i);
-        // Use word writing for efficiency
+        // Use word writing for efficiency (and to write the first word)
         uint32_t *data = (uint32_t *) &row->plastic_plastic_data[0];
-        for (uint32_t j = 0; j < plastic_words; j++) {
+		if (first_header_word_is_row_index) {
+			data[0] = i + row_offset;
+		} else {
+			data[0] = 0;
+		}
+        for (uint32_t j = 1; j < plastic_words; j++) {
             data[j] = 0;
         }
         row->plastic_plastic_size = plastic_words;
@@ -210,7 +221,8 @@ void *matrix_generator_stdp_initialize(void **region, void *synaptic_matrix) {
         setup_stdp_rows(obj->synaptic_matrix, obj->n_pre_neurons,
                 obj->n_half_words_per_pp_row_header,
                 obj->n_half_words_per_pp_synapse, obj->max_row_n_synapses,
-                obj->max_row_n_words);
+                obj->max_row_n_words, obj->first_word_is_row_index,
+				obj->row_offset);
     } else {
         obj->synaptic_matrix = NULL;
     }
@@ -221,7 +233,8 @@ void *matrix_generator_stdp_initialize(void **region, void *synaptic_matrix) {
                 obj->n_pre_neurons * (obj->max_stage - 1),
                 obj->n_half_words_per_pp_row_header,
                 obj->n_half_words_per_pp_synapse,
-                obj->max_delayed_row_n_synapses, obj->max_delayed_row_n_words);
+                obj->max_delayed_row_n_synapses, obj->max_delayed_row_n_words,
+				obj->first_word_is_row_index, obj->row_offset);
     } else {
         obj->delayed_synaptic_matrix = NULL;
     }

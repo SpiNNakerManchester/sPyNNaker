@@ -12,21 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import quantities
+from typing import List, Optional, Sequence
+
 import numpy as np
+from numpy.typing import NDArray
+from neo import AnalogSignal, Block, SpikeTrain
+import quantities
+from quantities import UnitTime
 
 # needed as dealing with quantities
-# pylint: disable=c-extension-no-member
 
 
-def convert_analog_signal(signal_array, time_unit=quantities.ms):
+def convert_analog_signal(
+        signal_array: AnalogSignal,
+        time_unit: UnitTime = quantities.ms) -> NDArray:
     """
     Converts part of a NEO object into told spynnaker7 format.
 
-    :param ~neo.core.AnalogSignal signal_array: Extended Quantities object
-    :param quantities.unitquantity.UnitTime time_unit:
+    :param signal_array: Extended Quantities object
+    :param time_unit:
         Data time unit for time index
-    :rtype: ~numpy.ndarray
+    :returns: Data in Spynnaker (7) format
     """
     ids = signal_array.annotations["channel_names"]
     xs = range(len(ids))
@@ -40,15 +46,15 @@ def convert_analog_signal(signal_array, time_unit=quantities.ms):
     return np.column_stack((neurons, all_times, values))
 
 
-def convert_data(data, name, run=0):
+def convert_data(data: Block, name: str, run: int = 0) -> NDArray:
     """
     Converts the data into a numpy array in the format ID, time, value.
 
-    :param ~neo.core.Block data: Data as returned by a getData() call
-    :param str name: Name of the data to be extracted.
+    :param data: Data as returned by a getData() call
+    :param name: Name of the data to be extracted.
         Same values as used in getData()
-    :param int run: Zero based index of the run to extract data for
-    :rtype: ~numpy.ndarray
+    :param run: Zero based index of the run to extract data for
+    :returns: Data for the named data type in Spynnaker (7) format
     """
     if len(data.segments) <= run:
         raise ValueError(
@@ -63,81 +69,80 @@ def convert_data(data, name, run=0):
         data.segments[run].filter(name=name)[0])
 
 
-def convert_data_list(data, name, runs=None):
+def convert_data_list(data: Block, name: str,
+                      runs: Optional[Sequence[int]] = None) -> List[NDArray]:
     """
     Converts the data into a list of numpy arrays in the format ID, time,
     value.
 
-    :param ~neo.core.Block data: Data as returned by a getData() call
-    :param str name: Name of the data to be extracted.
+    :param data: Data as returned by a getData() call
+    :param name: Name of the data to be extracted.
         Same values as used in getData()
     :param runs: List of Zero based index of the run to extract data for.
         Or `None` to extract all runs
-    :type runs: list(int) or None
-    :rtype: list(~numpy.ndarray)
+    :returns: List of numpy arrays for the named data in Spynnaker (7) format
     """
-    results = []
     if runs is None:
         runs = range(len(data.segments))
-    for run in runs:
-        results.append(convert_data(data, name, run=run))
-    return results
+    return [
+        convert_data(data, name, run=run)
+        for run in runs]
 
 
-def convert_v_list(data, runs=None):
+def convert_v_list(
+        data: Block, runs: Optional[Sequence[int]] = None) -> List[NDArray]:
     """
     Converts the voltage into a list numpy array one per segment (all
     runs) in the format ID, time, value.
 
-    :param ~neo.core.Block data: The data to convert; it must have V data in it
+    :param data: The data to convert; it must have V data in it
     :param runs: List of Zero based index of the run to extract data for.
         Or `None` to extract all runs
-    :type runs: list(int) or None
-    :rtype: list(~numpy.ndarray)
+    :returns: Voltage in sPyNNaker (7) format
     """
     return convert_data_list(data, "v", runs=runs)
 
 
-def convert_gsyn_exc_list(data, runs=None):
+def convert_gsyn_exc_list(
+        data: Block, runs: Optional[Sequence[int]] = None) -> List[NDArray]:
     """
     Converts the gsyn_exc into a list numpy array one per segment (all
     runs) in the format ID, time, value.
 
-    :param ~neo.core.Block data:
+    :param data:
         The data to convert; it must have Gsyn_exc data in it
     :param runs: List of Zero based index of the run to extract data for.
         Or `None` to extract all runs
-    :type runs: list(int) or None
-    :rtype: list(~numpy.ndarray)
+    :returns: Gsyn in sPyNNaker (7) format
     """
     return convert_data_list(data, "gsyn_exc", runs=runs)
 
 
-def convert_gsyn_inh_list(data, runs=None):
+def convert_gsyn_inh_list(
+        data: Block, runs: Optional[Sequence[int]] = None) -> List[NDArray]:
     """
     Converts the gsyn_inh into a list numpy array one per segment (all
     runs) in the format ID, time, value.
 
-    :param ~neo.core.Block data:
+    :param data:
         The data to convert; it must have Gsyn_inh data in it
     :param runs: List of Zero based index of the run to extract data for.
         Or `None` to extract all runs
-    :type runs: list(int) or None
-    :rtype: list(~numpy.ndarray)
+    :returns: Gsyn in sPyNNaker (7) format
     """
     return convert_data_list(data, "gsyn_inh", runs=runs)
 
 
-def convert_gsyn(gsyn_exc, gsyn_inh):
+def convert_gsyn(gsyn_exc: Block, gsyn_inh: Block) -> NDArray:
     """
     Converts two neo objects into the spynnaker7 format.
 
     .. note::
         It is acceptable for both neo parameters to be the same object
 
-    :param ~neo.core.Block gsyn_exc: neo with gsyn_exc data
-    :param ~neo.core.Block gsyn_inh: neo with gsyn_exc data
-    :rtype: ~numpy.ndarray
+    :param gsyn_exc: neo with gsyn_exc data
+    :param gsyn_inh: neo with gsyn_inh data
+    :returns: Gsyn in sPyNNaker (7) format
     """
     exc = gsyn_exc.segments[0].filter(name='gsyn_exc')[0]
     inh = gsyn_inh.segments[0].filter(name='gsyn_inh')[0]
@@ -159,18 +164,17 @@ def convert_gsyn(gsyn_exc, gsyn_inh):
         raise ValueError("times in gsyn_exc and gsyn_inh do not match")
     all_times = np.tile(times, len(ids))
     neurons = np.repeat(ids, len(times))
-    idlist = list(range(len(ids)))
-    exc_np = np.concatenate([exc[:, x] for x in idlist])
-    inh_np = np.concatenate([inh[:, x] for x in idlist])
+    exc_np = np.concatenate([exc[:, x] for x in range(len(ids))])
+    inh_np = np.concatenate([inh[:, x] for x in range(len(ids))])
     return np.column_stack((neurons, all_times, exc_np, inh_np))
 
 
-def convert_spiketrains(spiketrains):
+def convert_spiketrains(spiketrains: List[SpikeTrain]) -> NDArray:
     """
     Converts a list of spiketrains into spynnaker7 format.
 
-    :param list(~neo.core.SpikeTrain) spiketrains: List of SpikeTrains
-    :rtype: ~numpy.ndarray
+    :param spiketrains: List of SpikeTrains
+    :returns: Spikes in sPyNNaker (7) format
     """
     if len(spiketrains) == 0:
         return np.empty(shape=(0, 2))
@@ -182,13 +186,13 @@ def convert_spiketrains(spiketrains):
     return np.column_stack((neurons, spikes))
 
 
-def convert_spikes(neo, run=0):
+def convert_spikes(neo: Block, run: int = 0) -> NDArray:
     """
     Extracts the spikes for run one from a Neo Object.
 
-    :param ~neo.core.Block neo: neo Object including Spike Data
-    :param int run: Zero based index of the run to extract data for
-    :rtype: ~numpy.ndarray
+    :param neo: neo Object including Spike Data
+    :param run: Zero based index of the run to extract data for
+    :returns: Spikes in sPyNNaker (7) format
     """
     if len(neo.segments) <= run:
         raise ValueError(
@@ -197,24 +201,23 @@ def convert_spikes(neo, run=0):
     return convert_spiketrains(neo.segments[run].spiketrains)
 
 
-def count_spiketrains(spiketrains):
+def count_spiketrains(spiketrains: SpikeTrain) -> int:
     """
     Help function to count the number of spikes in a list of spiketrains.
 
-    :param list(~neo.core.SpikeTrain) spiketrains: List of SpikeTrains
+    :param spiketrains: List of SpikeTrains
     :return: Total number of spikes in all the spiketrains
-    :rtype: int
     """
     return sum(map(len, spiketrains))
 
 
-def count_spikes(neo):
+def count_spikes(neo: Block) -> int:
     """
     Help function to count the number of spikes in a list of spiketrains.
 
     Only counts run 0
 
-    :param ~neo.core.Block neo: Neo Object which has spikes in it
+    :param neo: Neo Object which has spikes in it
     :return: The number of spikes in the first segment
     """
     return count_spiketrains(neo.segments[0].spiketrains)

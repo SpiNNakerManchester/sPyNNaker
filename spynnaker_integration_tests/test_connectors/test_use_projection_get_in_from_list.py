@@ -18,7 +18,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestUseProjectionGetInFromList(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
 
@@ -60,5 +60,5 @@ class TestUseProjectionGetInFromList(BaseTestCase):
 
         self.assertCountEqual(weights_delays_pre, weights_delays_out)
 
-    def test_use_projection_get_in_from_list(self):
+    def test_use_projection_get_in_from_list(self) -> None:
         self.runsafe(self.do_run)

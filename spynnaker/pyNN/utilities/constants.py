@@ -15,7 +15,7 @@
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_KB)
 
-POSSION_SIGMA_SUMMATION_LIMIT = 3.0
+POISSON_SIGMA_SUMMATION_LIMIT = 3.0
 
 BLOCK_INDEX_HEADER_WORDS = 3
 BLOCK_INDEX_ROW_WORDS = 2
@@ -25,7 +25,7 @@ RECORD_STATE_BIT = 1 << 1
 RECORD_GSYN_BIT = 1 << 2
 RECORDING_ENTRY_BYTE_SIZE = BYTES_PER_WORD
 
-
+# pylint: disable=wrong-spelling-in-comment
 # From neuron common-typedefs.h
 SYNAPSE_INDEX_BITS = 8
 MAX_NEURON_SIZE = 1 << SYNAPSE_INDEX_BITS
@@ -80,3 +80,7 @@ SYNAPSE_SDRAM_PARTITION_ID = "SDRAM Synaptic Inputs"
 
 #: The conservative amount of write bandwidth available on a chip
 WRITE_BANDWIDTH_BYTES_PER_SECOND = 250 * 1024 * 1024
+
+#: The maximum number of bits for the ring buffer index that are likely to
+#: fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
+MAX_RING_BUFFER_BITS = 14

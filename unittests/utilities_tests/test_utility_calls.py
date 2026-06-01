@@ -22,16 +22,16 @@ from spynnaker.pyNN.utilities import utility_calls
 
 class TestUtilityCalls(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         unittest_setup()
 
-    def test_check_directory_exists(self):
+    def test_check_directory_exists(self) -> None:
         utility_calls.check_directory_exists_and_create_if_not(os.path.dirname(
             os.path.realpath(__file__)))
         self.assertTrue(os.path.exists(os.path.dirname(
             os.path.realpath(__file__))))
 
-    def test_check_directory_not_exists(self):
+    def test_check_directory_not_exists(self) -> None:
         test_dir = os.path.join(os.path.dirname(__file__),
                                 "test_utility_call")
         test_file = os.path.join(test_dir, "test")
@@ -46,7 +46,7 @@ class TestUtilityCalls(unittest.TestCase):
         print("Directory created successfully. Deleting...")
         os.rmdir(test_dir)
 
-    def test_convert_param_to_numpy_random_distribution(self):
+    def test_convert_param_to_numpy_random_distribution(self) -> None:
         random = RandomDistribution("uniform", [0, 1])
         single_value = utility_calls.convert_param_to_numpy(random, 1)
         multi_value = utility_calls.convert_param_to_numpy(random, 10)

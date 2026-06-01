@@ -21,18 +21,18 @@ from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
 import time
 
 
-def start_callback():
+def start_callback() -> None:
     print("Starting run for 3 seconds")
     time.sleep(3.0)
     print("Ending Simulation")
     sim.external_devices.request_stop()
 
 
-def stop_callback():
+def stop_callback() -> None:
     print("Stopping")
 
 
-def run_forever_not_recorded():
+def run_forever_not_recorded() -> None:
     sim.setup(1.0)
     stim = sim.Population(1, sim.SpikeSourcePoisson(rate=10.0))
     pop = sim.Population(255, sim.IF_curr_exp(tau_syn_E=1.0), label="pop")
@@ -48,7 +48,7 @@ def run_forever_not_recorded():
 
 
 class MyTestCase(BaseTestCase):
-    def test_run_forever_recorded(self):
+    def test_run_forever_recorded(self) -> None:
         self.runsafe(run_forever_not_recorded)
 
 

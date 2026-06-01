@@ -72,7 +72,7 @@ struct common_priorities {
 //! \param[in] regions: The identifiers of the various regions to be read
 //! \param[in] priorities: The interrupt priorities of the signals
 //! \param[out] ds_regions: Returns the data specification regions
-//! \return boolean indicating success (True) or failure (False)
+//! \return Boolean indicating success (True) or failure (False)
 static inline bool initialise_common_regions(
         uint32_t *timer_period, uint32_t *simulation_ticks,
         uint32_t *infinite_run, uint32_t *time, uint32_t *recording_flags,

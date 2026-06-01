@@ -15,25 +15,31 @@
 import logging
 import select
 import socket
+from typing import Callable, Optional, TypeVar
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
 from spinn_utilities.ping import Ping
 from spinnman.connections.abstract_classes import Listenable, Connection
 from spinnman.utilities.socket_utils import (
     get_tcp_socket, connect_socket, get_socket_address, resolve_host,
     receive_message, send_message)
 from spinn_front_end_common.utilities.constants import BYTES_PER_KB
+#: :meta private:
+T = TypeVar("T")
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # A set of connections that have already been made
-_existing_connections = dict()
+_existing_connections: dict[tuple[str, int], "PushBotWIFIConnection"] = dict()
 
 
-def get_pushbot_wifi_connection(remote_host, remote_port=56000):
+def get_pushbot_wifi_connection(
+        remote_host: str, remote_port: int = 56000) -> "PushBotWIFIConnection":
     """
     Get an existing connection to a PushBot, or make a new one.
 
-    :param str remote_host: The IP address of the PushBot
-    :param int remote_port: The port number of the PushBot (default 56000)
+    :param remote_host: The IP address of the PushBot
+    :param remote_port: The port number of the PushBot (default 56000)
+    :returns: Connection to the Pushbot
     """
     key = (remote_host, remote_port)
     if key not in _existing_connections:
@@ -46,19 +52,19 @@ class PushBotWIFIConnection(Connection, Listenable):
     """
     A connection to a PushBot via Wi-Fi.
     """
-    __slots__ = [
+    __slots__ = (
         "__local_ip_address",
         "__local_port",
         "__remote_ip_address",
         "__remote_port",
-        "__socket"]
+        "__socket")
 
     RECV_SIZE = 1 * BYTES_PER_KB
 
-    def __init__(self, remote_host, remote_port=56000):
+    def __init__(self, remote_host: str, remote_port: int = 56000):
         """
-        :param str remote_host: The IP address of the PushBot
-        :param int remote_port: The port number of the PushBot (default 56000)
+        :param remote_host: The IP address of the PushBot
+        :param remote_port: The port number of the PushBot (default 56000)
         :raise ~spinnman.exceptions.SpinnmanIOException:
             If there is an error setting up the communication channel
         """
@@ -81,10 +87,12 @@ class PushBotWIFIConnection(Connection, Listenable):
         self.__local_ip_address, self.__local_port = get_socket_address(
             self.__socket)
 
-    def is_connected(self):
+    def is_connected(self) -> bool:
         """
         See
-        :py:meth:`~spinnman.connections.Connection.is_connected`.
+        :py:meth:`~spinnman.connections.Connection.is_connected
+
+        :returns: True if ping works
         """
         # check if machine is active and on the network
         for _ in range(5):  # Try up to five times...
@@ -97,52 +105,43 @@ class PushBotWIFIConnection(Connection, Listenable):
         return False
 
     @property
-    def local_ip_address(self):
+    def local_ip_address(self) -> str:
         """
         The local IP address to which the connection is bound,
         as a dotted string, e.g. `0.0.0.0`.
-
-        :rtype: str
         """
         return self.__local_ip_address
 
     @property
-    def local_port(self):
+    def local_port(self) -> int:
         """
         The local port to which the connection is bound.
-
-        :rtype: int
         """
         return self.__local_port
 
     @property
-    def remote_ip_address(self):
+    def remote_ip_address(self) -> Optional[str]:
         """
         The remote IP address to which the connection is connected,
         as a dotted string, or `None` if not connected remotely.
-
-        :rtype: str or None
         """
         return self.__remote_ip_address
 
     @property
-    def remote_port(self):
+    def remote_port(self) -> int:
         """
         The remote port to which the connection is connected,
         or `None` if not connected remotely.
 
-        :rtype: int or None
         """
         return self.__remote_port
 
-    def receive(self, timeout=None):
+    def receive(self, timeout: Optional[float] = None) -> bytes:
         """
         Receive data from the connection
 
         :param timeout: The timeout, or `None` to wait forever
-        :type timeout: float or None
         :return: The data received
-        :rtype: bytes
         :raise SpinnmanTimeoutException:
             If a timeout occurs before any data is received
         :raise ~spinnman.exceptions.SpinnmanIOException:
@@ -150,17 +149,17 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         return receive_message(self.__socket, timeout, self.RECV_SIZE)
 
-    def send(self, data):
+    def send(self, data: bytes) -> None:
         """
         Send data down this connection
 
-        :param bytearray data: The data to be sent
+        :param data: The data to be sent
         :raise ~spinnman.exceptions.SpinnmanIOException:
             If there is an error sending the data
         """
         send_message(self.__socket, data)
 
-    def close(self):
+    def close(self) -> None:
         """
         See
         :py:meth:`spinnman.connections.Connection.close`.
@@ -171,8 +170,10 @@ class PushBotWIFIConnection(Connection, Listenable):
             pass
         self.__socket.close()
 
-    def is_ready_to_receive(self, timeout=0):
+    @overrides(Listenable.is_ready_to_receive)
+    def is_ready_to_receive(self, timeout: float = 0) -> bool:
         return bool(select.select([self.__socket], [], [], timeout)[0])
 
-    def get_receive_method(self):
+    @overrides(Listenable.get_receive_method)
+    def get_receive_method(self) -> Callable[[], bytes]:
         return self.receive

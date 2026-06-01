@@ -11,7 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
+from typing import Sequence, Tuple, TYPE_CHECKING
+from numpy.typing import NDArray
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from pacman.model.graphs.common import Slice
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 
 class AbstractGenerateConnectorOnHost(object, metaclass=AbstractBase):
@@ -20,19 +26,20 @@ class AbstractGenerateConnectorOnHost(object, metaclass=AbstractBase):
     """
 
     # Mix-in class, so don't add anything here!
-    __slots__ = []
+    __slots__: Tuple[str, ...] = ()
 
     @abstractmethod
     def create_synaptic_block(
-            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
+            self, post_slices: Sequence[Slice], post_vertex_slice: Slice,
+            synapse_type: int, synapse_info: SynapseInformation) -> NDArray:
         """
         Create a synaptic block from the data.
 
-        :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param AbstractSynapseType synapse_type:
-        :param SynapseInformation synapse_info:
+        :param post_slices:
+        :param post_vertex_slice:
+        :param synapse_type:
+        :param synapse_info:
         :returns:
             The synaptic matrix data to go to the machine, as a Numpy array
-        :rtype: ~numpy.ndarray
         """
+        raise NotImplementedError

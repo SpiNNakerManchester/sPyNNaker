@@ -13,31 +13,21 @@
 # limitations under the License.
 
 import os
-from spinn_utilities.config_holder import (
-    clear_cfg_files, set_cfg_files)
+from typing import Set
+
+from spinn_utilities.config_holder import clear_cfg_files
 from spinn_front_end_common.interface.config_setup import (
     add_default_cfg, add_spinnaker_cfg)
+from spinn_front_end_common.interface.config_setup import (
+    fec_cfg_paths_skipped)
+
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 
-CONFIG_FILE_NAME = "spynnaker.cfg"
-
-
-def setup_configs():
-    """
-    Sets up the configurations including the users configuration file.
-
-    Clears out any previous read configurations but does not load the new
-    configurations so a warning is generated if a configuration is used before
-    setup is called.
-    """
-    clear_cfg_files(False)
-    add_spinnaker_cfg()  # This add its dependencies too
-    set_cfg_files(
-        config_file=CONFIG_FILE_NAME,
-        default=os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))
+SPYNNAKER_CFG = "spynnaker.cfg"
 
 
-def unittest_setup():
+def unittest_setup() -> None:
     """
     Does all the steps that may be required before a unit-test.
 
@@ -54,8 +44,24 @@ def unittest_setup():
     clear_cfg_files(True)
     add_spynnaker_cfg()
     SpynnakerDataWriter.mock()
+    AbstractPyNNNeuronModel.reset_all()
 
 
-def add_spynnaker_cfg():
+def add_spynnaker_cfg() -> None:
+    """
+    Add the local configuration and all dependent configuration files.
+    """
     add_spinnaker_cfg()  # This add its dependencies too
-    add_default_cfg(os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))
+    add_default_cfg(os.path.join(os.path.dirname(__file__), SPYNNAKER_CFG))
+
+
+def cfg_paths_skipped() -> Set[str]:
+    """
+    Set of cfg path that would not be found based on other cfg settings
+
+    Assuming mode = Debug
+
+    :returns:
+       List of cfg Option names that point to paths unlikely to be used.
+    """
+    return fec_cfg_paths_skipped()

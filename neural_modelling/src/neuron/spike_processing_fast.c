@@ -433,7 +433,7 @@ static inline bool prepare_timestep(uint32_t time) {
 
 //! \brief Perform synaptic rewiring for this time step
 //! \param[in] time The current time step
-//! \param[in] n_rewires The number of rewirings to try
+//! \param[in] n_rewires The number of rewires to try
 static inline void do_rewiring(uint32_t time, uint32_t n_rewires) {
     uint32_t spike;
     pop_table_lookup_result_t result;
@@ -605,7 +605,8 @@ bool spike_processing_fast_initialise(
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
         dma_buffers[i].row = spin1_malloc(row_max_n_words * sizeof(uint32_t));
         if (dma_buffers[i].row == NULL) {
-            log_error("Could not initialise DMA buffers");
+			log_error("Could not initialise DMA buffers of %u words",
+					row_max_n_words);
             return false;
         }
         log_debug("DMA buffer %u allocated at 0x%08x",

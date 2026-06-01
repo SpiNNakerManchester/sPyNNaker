@@ -13,6 +13,7 @@
 # limitations under the License.
 import shutil
 import struct
+from typing import Any, BinaryIO, List, Optional, Sequence, Tuple
 import unittest
 from tempfile import mkdtemp
 import numpy
@@ -20,6 +21,7 @@ import pytest
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
+from spinn_machine.version.version_strings import VersionStrings
 from spinnman.transceiver.mockable_transceiver import MockableTransceiver
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
@@ -32,7 +34,7 @@ from spinn_front_end_common.interface.interface_functions import (
     load_application_data_specs)
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neuron.synaptic_matrices import (
-    SynapticMatrices, SynapseRegions)
+    SynapticMatrices, SynapseRegions, SynapseRegionReferences)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
     SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic,
@@ -50,55 +52,64 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexFixed)
+    SplitterPopulationVertexFixed)
 from spynnaker.pyNN.extra_algorithms import delay_support_adder
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.config_setup import unittest_setup
-from spynnaker.pyNN.utilities import constants
 import pyNN.spiNNaker as p
 
 
 class _MockTransceiverinOut(MockableTransceiver):
 
     @overrides(MockableTransceiver.malloc_sdram)
-    def malloc_sdram(self, x, y, size, app_id, tag=None):
+    def malloc_sdram(
+            self, x: int, y: int, size: int, app_id: int, tag: int = 0) -> int:
         self._data_to_read = bytearray(size)
         return 0
 
     @overrides(MockableTransceiver.write_memory)
-    def write_memory(self, x, y, base_address, data, *, n_bytes=None,
-                     offset=0, cpu=0, get_sum=False):
+    def write_memory(
+            self, x: int, y: int, base_address: int,
+            data: BinaryIO | bytearray | bytes | int | str, *,
+            n_bytes: Optional[int] = None, offset: int = 0, cpu: int = 0,
+            get_sum: bool = False) -> Tuple[int, int]:
         if data is None:
             return
         if isinstance(data, int):
             data = struct.Struct("<I").pack(data)
+        assert isinstance(data, (bytes, bytearray))
         self._data_to_read[base_address:base_address + len(data)] = data
+        return (-1, -1)
 
     @overrides(Transceiver.get_region_base_address)
-    def get_region_base_address(self, x, y, p):
+    def get_region_base_address(self, x: int, y: int, p: int) -> int:
         return 0
 
     @overrides(MockableTransceiver.read_memory)
-    def read_memory(self, x, y, base_address, length, cpu=0):
+    def read_memory(
+            self, x: int, y: int, base_address: int, length: int,
+            cpu: int = 0) -> bytearray:
         return self._data_to_read[base_address:base_address + length]
 
     @overrides(MockableTransceiver.read_word)
-    def read_word(self, x, y, base_address, cpu=0):
+    def read_word(
+            self, x: int, y: int, base_address: int, cpu: int = 0) -> int:
         datum, = struct.unpack("<I", self.read_memory(x, y, base_address, 4))
         return datum
 
 
-def say_false(self, weights, delays):
+def say_false(*args: Any, **kwargs: Any) -> bool:
     return False
 
 
-def test_write_data_spec():
+def test_write_data_spec() -> None:
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.ANY.text)
     writer = SpynnakerDataWriter.mock()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
-    AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
+    AbstractGenerateConnectorOnMachine.\
+        generate_on_machine = (say_false)   # type: ignore[method-assign]
 
     set_config("Machine", "enable_advanced_monitor_support", "False")
     set_config("Java", "use_java", "False")
@@ -107,11 +118,11 @@ def test_write_data_spec():
     pre_pop = p.Population(
         10, p.IF_curr_exp(), label="Pre",
         additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexFixed()})
+            "splitter": SplitterPopulationVertexFixed()})
     post_pop = p.Population(
         10, p.IF_curr_exp(), label="Post",
         additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexFixed()})
+            "splitter": SplitterPopulationVertexFixed()})
     proj_one_to_one_1 = p.Projection(
         pre_pop, post_pop, p.OneToOneConnector(),
         p.StaticSynapse(weight=1.5, delay=1.0))
@@ -119,7 +130,7 @@ def test_write_data_spec():
         pre_pop, post_pop, p.OneToOneConnector(),
         p.StaticSynapse(weight=2.5, delay=2.0))
     proj_all_to_all = p.Projection(
-        pre_pop, post_pop, p.AllToAllConnector(allow_self_connections=False),
+        pre_pop, post_pop, p.AllToAllConnector(),
         p.StaticSynapse(weight=4.5, delay=4.0))
 
     from_list_list = [(i, i, i, (i * 5) + 1) for i in range(10)]
@@ -131,12 +142,11 @@ def test_write_data_spec():
     d_vertices, d_edges = delay_support_adder()
     for vertex in d_vertices:
         writer.add_vertex(vertex)
-    for edge in d_edges:
-        writer.add_edge(
-            edge, constants.SPIKE_PARTITION_ID)
+    for edge, part_id in d_edges:
+        writer.add_edge(edge, part_id)
     splitter_partitioner()
     allocator = ZonedRoutingInfoAllocator()
-    writer.set_routing_infos(allocator.__call__([], flexible=False))
+    writer.set_routing_infos(allocator.allocate())
 
     post_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_vertex.vertex_slice
@@ -146,10 +156,6 @@ def test_write_data_spec():
         synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
         bitfield_filter=8,
         synaptic_matrix=1, pop_table=3, connection_builder=4)
-    references = SynapseRegions(
-        synapse_params=None, synapse_dynamics=None, structural_dynamics=None,
-        bitfield_filter=None, synaptic_matrix=None, pop_table=None,
-        connection_builder=None)
     synaptic_matrices = SynapticMatrices(
         post_pop._vertex, regions, max_atoms_per_core=10,
         weight_scales=[32, 32], all_syn_block_sz=10000)
@@ -158,7 +164,7 @@ def test_write_data_spec():
     with DsSqlliteDatabase() as ds_db:
         spec = DataSpecificationGenerator(0, 0, 3, post_vertex, ds_db)
         synaptic_matrices.write_synaptic_data(
-            spec, post_vertex_slice, references)
+            spec, post_vertex_slice, SynapseRegionReferences())
 
     writer.set_transceiver(_MockTransceiverinOut())
     load_application_data_specs()
@@ -194,7 +200,7 @@ def test_write_data_spec():
                 proj_all_to_all._synapse_information))
 
         # Check that all the connections have the right weight and delay
-        assert len(connections_3) == 90
+        assert len(connections_3) == 100
         assert all([conn["weight"] == 4.5 for conn in connections_3])
         assert all([conn["delay"] == 4.0 for conn in connections_3])
 
@@ -208,13 +214,14 @@ def test_write_data_spec():
         assert len(connections_4) == len(from_list_list)
         list_weights = [values[2] for values in from_list_list]
         list_delays = [values[3] for values in from_list_list]
-        assert all(list_weights == connections_4["weight"])
-        assert all(list_delays == connections_4["delay"])
+        for i in range(10):
+            assert list_weights[i] == connections_4["weight"][i]
+            assert list_delays[i] == connections_4["delay"][i]
     finally:
         shutil.rmtree(report_folder, ignore_errors=True)
 
 
-def test_set_synapse_dynamics():
+def test_set_synapse_dynamics() -> None:
     raise unittest.SkipTest("needs fixing")
     unittest_setup()
     post_app_model = IFCurrExpBase()
@@ -419,17 +426,19 @@ def test_set_synapse_dynamics():
         # (app keys work because all undelayed exist)
         (range(10), [4, 5, 6, 7], 1000, 100, 200),
         # Should work but number of cores doesn't work out
-        (range(2000), [], 10000, 5, None)
+        (range(100), [], 10000, 5, None)
     ])
 def test_pop_based_master_pop_table_standard(
-        undelayed_indices_connected, delayed_indices_connected,
-        n_pre_neurons, neurons_per_core, max_delay):
+        undelayed_indices_connected: Sequence[int],
+        delayed_indices_connected: Sequence[int],
+        n_pre_neurons: int, neurons_per_core: int,
+        max_delay: Optional[int]) -> None:
     unittest_setup()
-    set_config("Machine", "version", 5)
+    set_config("Machine", "versions", VersionStrings.FOUR_PLUS.text)
     writer = SpynnakerDataWriter.mock()
 
     # Build a from list connector with the delays we want
-    connections = []
+    connections: List[Tuple[int, int, int, Optional[int]]] = []
     connections.extend([(i * neurons_per_core + j, j, 0, 10)
                         for i in undelayed_indices_connected
                         for j in range(100)])
@@ -442,13 +451,10 @@ def test_pop_based_master_pop_table_standard(
     # a single vertex
     post_pop = p.Population(
         256, p.IF_curr_exp(), label="Post",
-        additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexFixed()})
-    p.IF_curr_exp.set_model_max_atoms_per_dimension_per_core(neurons_per_core)
+        splitter=SplitterPopulationVertexFixed())
     pre_pop = p.Population(
         n_pre_neurons, p.IF_curr_exp(), label="Pre",
-        additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexFixed()})
+        splitter=SplitterPopulationVertexFixed())
     p.Projection(
         pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 
@@ -456,39 +462,35 @@ def test_pop_based_master_pop_table_standard(
     d_vertices, d_edges = delay_support_adder()
     for vertex in d_vertices:
         writer.add_vertex(vertex)
-    for edge in d_edges:
-        writer.add_edge(
-            edge, constants.SPIKE_PARTITION_ID)
+    for edge, part_id in d_edges:
+        writer.add_edge(edge, part_id)
     splitter_partitioner()
     allocator = ZonedRoutingInfoAllocator()
-    writer.set_routing_infos(allocator.__call__([], flexible=False))
+    writer.set_routing_infos(allocator.allocate())
 
     post_mac_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_mac_vertex.vertex_slice
 
     # Generate the data
     with DsSqlliteDatabase() as db:
-        spec = DataSpecificationGenerator(1, 2, 3, post_mac_vertex, db)
+        spec = DataSpecificationGenerator(1, 0, 3, post_mac_vertex, db)
 
         regions = SynapseRegions(
             synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
             bitfield_filter=8,
             synaptic_matrix=1, pop_table=3, connection_builder=4)
-        references = SynapseRegions(
-            synapse_params=None, synapse_dynamics=None,
-            structural_dynamics=None, bitfield_filter=None,
-            synaptic_matrix=None, pop_table=None, connection_builder=None)
         synaptic_matrices = SynapticMatrices(
             post_pop._vertex, regions, max_atoms_per_core=neurons_per_core,
-            weight_scales=[32, 32], all_syn_block_sz=10000000)
+            weight_scales=numpy.array([32, 32]), all_syn_block_sz=10000000)
         synaptic_matrices.generate_data()
         synaptic_matrices.write_synaptic_data(
-            spec, post_vertex_slice, references)
+            spec, post_vertex_slice, SynapseRegionReferences())
 
         # Read the population table and check entries
-        info = list(db.get_region_pointers_and_content(1, 2, 3))
+        info = list(db.get_region_pointers_and_content(1, 0, 3))
     region, _, region_data = info[1]
     assert region == 3
+    assert region_data is not None
     mpop_data = numpy.frombuffer(region_data, dtype="uint8").view("uint32")
     n_entries = mpop_data[0]
     n_addresses = mpop_data[1]

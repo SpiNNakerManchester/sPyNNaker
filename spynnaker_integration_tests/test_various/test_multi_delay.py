@@ -21,7 +21,7 @@ class TestMultiDelay(BaseTestCase):
     tests the run is split buy auto pause resume
     """
 
-    def test_run(self):
+    def test_run(self) -> None:
         n_neurons = 70
         sim.setup(timestep=1.0)
 
@@ -52,5 +52,5 @@ class TestMultiDelay(BaseTestCase):
 
         self.assertEqual(30*5*n_neurons, len(spikes))
 
-    def more_runs(self):
+    def more_runs(self) -> None:
         self.runsafe(self.more_runs)

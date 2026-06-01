@@ -20,7 +20,7 @@ class SynfireIfCurrExp(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_run(self):
+    def test_run(self) -> None:
         p.setup()
         p.Population(10, p.SpikeSourceArray, {'spike_times': [100, 200]},
                      label='messed up')

@@ -14,18 +14,19 @@
 
 import os
 import numpy
-import unittest
 import pyNN.spiNNaker as p
-from spinnaker_testbase import BaseTestCase
-from spynnaker_integration_tests.scripts import SynfireRunner
+
+from spinn_utilities.config_holder import get_report_path
+
 from spinn_front_end_common.interface.provenance import ProvenanceReader
-from spinn_front_end_common.utilities.report_functions import EnergyReport
-from spynnaker.pyNN.data import SpynnakerDataView
-import sqlite3
+
+from spinnaker_testbase import BaseTestCase
+
+from spynnaker_integration_tests.scripts import SynfireRunner
 
 n_neurons = 200  # number of neurons in each population
-neurons_per_core = n_neurons / 2
-run_times = [5000]
+neurons_per_core = int(n_neurons / 2)
+run_times = [10, 20, 30]
 # parameters for population 1 first run
 input_class = p.SpikeSourcePoisson
 start_time = 0
@@ -35,13 +36,13 @@ synfire_run = SynfireRunner()
 
 
 class TestPowerMonitoring(BaseTestCase):
-    def query_provenance(self, query, *args):
-        prov_file = ProvenanceReader.get_last_run_database_path()
-        with sqlite3.connect(prov_file) as prov_db:
-            prov_db.row_factory = sqlite3.Row
-            return list(prov_db.execute(query, args))
 
-    def do_run(self):
+    def assert_report(self) -> None:
+        path = get_report_path("path_energy_report")
+        if not os.path.exists(path):
+            raise AssertionError("Unable to find report")
+
+    def do_run(self) -> None:
         synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                            run_times=run_times, input_class=input_class,
                            start_time=start_time, duration=duration, rate=rate,
@@ -51,20 +52,20 @@ class TestPowerMonitoring(BaseTestCase):
         # Check spikes increase in second half by at least a factor of ten
         hist = numpy.histogram(spikes[:, 1], bins=[0, 5000, 10000])
         self.assertIsNotNone(hist, "must have a histogram")
-        # Did we build the report file like we asked for in config file?
-        self.assertIn(EnergyReport._SUMMARY_FILENAME,
-                      os.listdir(SpynnakerDataView.get_run_dir_path()))
-        # Did we output power provenance data, as requested?
-        num_chips = None
-        for row in self.query_provenance(
-                "SELECT the_value "
-                "FROM power_provenance "
-                "WHERE description = 'Num_chips' LIMIT 1"):
-            num_chips = row["the_value"]
-        self.assertIsNotNone(num_chips, "power provenance was not written")
 
-    @unittest.skip(
-        "https://github.com/SpiNNakerManchester/"
-        "SpiNNFrontEndCommon/issues/866")
-    def test_power_monitoring(self):
+        # Did we build the report file like we asked for in config file?
+        self.assert_report()
+
+        # Did we output power provenance data, as requested?
+        exec_times = set()
+        with ProvenanceReader() as reader:
+            for row in reader.cursor().execute(
+                    "SELECT the_value "
+                    "FROM power_provenance "
+                    "WHERE description = 'Exec time (seconds)'"):
+                exec_times.add(row[0])
+        # combined
+        self.assertEqual(exec_times, set([0.06]))
+
+    def test_power_monitoring(self) -> None:
         self.runsafe(self.do_run)

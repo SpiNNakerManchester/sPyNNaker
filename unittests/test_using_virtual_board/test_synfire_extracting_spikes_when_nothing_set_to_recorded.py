@@ -21,7 +21,7 @@ class SynfireExtractingSpikesWhenNothingSetToRecorded(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_cause_error(self):
+    def test_cause_error(self) -> None:
         with self.assertRaises(ConfigurationException):
             sim.setup(timestep=1.0)
             sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)

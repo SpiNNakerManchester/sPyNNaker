@@ -17,5 +17,5 @@ from spynnaker_integration_tests.test_many_boards import ManyBoards
 
 class TestPythonSimple(ManyBoards):
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)

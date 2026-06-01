@@ -11,25 +11,41 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from __future__ import annotations
+from abc import abstractmethod
 from enum import Enum
+from typing import TYPE_CHECKING
+
 import numpy
-from spinn_utilities.abstract_base import abstractproperty, AbstractBase
+from numpy import uint32
+from numpy.typing import NDArray
+
+from pyNN.random import RandomDistribution
+
+from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
+
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.common.param_generator_data import (
     param_generator_params, param_generator_params_size_in_bytes,
     param_generator_id, is_param_generatable)
-from .abstract_generate_connector_on_host import (
-    AbstractGenerateConnectorOnHost)
-from pyNN.random import RandomDistribution
+from spynnaker.pyNN.types import (Delays, Weights)
 from spynnaker.pyNN.utilities.utility_calls import check_rng
 
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
-# Hashes of the connection generators supported by the synapse expander
+if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge, SynapseInformation)
+
+
 class ConnectorIDs(Enum):
+    """
+    Hashes of the connection generators supported by the synapse expander
+    """
     ONE_TO_ONE_CONNECTOR = 0
     ALL_TO_ALL_CONNECTOR = 1
     FIXED_PROBABILITY_CONNECTOR = 2
@@ -37,6 +53,8 @@ class ConnectorIDs(Enum):
     FIXED_NUMBER_PRE_CONNECTOR = 4
     FIXED_NUMBER_POST_CONNECTOR = 5
     KERNEL_CONNECTOR = 6
+    ALL_BUT_ME_CONNECTOR = 7
+    ONE_TO_ONE_OFFSET_CONNECTOR = 8
 
 
 class AbstractGenerateConnectorOnMachine(
@@ -45,125 +63,101 @@ class AbstractGenerateConnectorOnMachine(
     Indicates that the connectivity can be generated on the machine.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     @overrides(AbstractConnector.validate_connection)
-    def validate_connection(self, application_edge, synapse_info):
+    def validate_connection(
+            self, application_edge: ProjectionApplicationEdge,
+            synapse_info: SynapseInformation) -> None:
         # If we can't generate on machine, we must be able to generate on host
-        if not self.generate_on_machine(
-                synapse_info.weights, synapse_info.delays):
+        if not self.generate_on_machine(synapse_info):
             if not isinstance(self, AbstractGenerateConnectorOnHost):
                 raise SynapticConfigurationException(
                     "The parameters of this connection do not allow it to be"
                     " generated on the machine, but the connector cannot"
                     " be generated on host!")
 
-    def generate_on_machine(self, weights, delays):
+    def generate_on_machine(self, synapse_info: SynapseInformation) -> bool:
         """
         Determine if this instance can generate on the machine.
 
         Default implementation returns True if the weights and delays can
         be generated on the machine
 
-        :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.RandomDistribution
-            or int or float or list(int) or list(float)
-        :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.RandomDistribution
-            or int or float or list(int) or list(float)
-        :rtype: bool
+        :param synapse_info: The synapse information
+        :returns: True if this instance can generate on the machine.
         """
-        if (not is_param_generatable(weights) or
-                not is_param_generatable(delays)):
+        if (not is_param_generatable(synapse_info.weights) or
+                not is_param_generatable(synapse_info.delays)):
             return False
-        if isinstance(weights, RandomDistribution):
-            check_rng(weights.rng, "RandomDistribution in weight")
-        if isinstance(delays, RandomDistribution):
-            check_rng(delays.rng, "RandomDistribution in delay")
+        if isinstance(synapse_info.weights, RandomDistribution):
+            check_rng(synapse_info.weights.rng, "RandomDistribution in weight")
+        if isinstance(synapse_info.delays, RandomDistribution):
+            check_rng(synapse_info.delays.rng, "RandomDistribution in delay")
         return True
 
-    def gen_weights_id(self, weights):
+    def gen_weights_id(self, weights: Weights) -> int:
         """
-        Get the id of the weight generator on the machine.
-
         :param weights:
-        :type weights: ~pyNN.random.RandomDistribtuion or int or float
-        :rtype: int
+        :returns: The id of the weight generator on the machine.
         """
         return param_generator_id(weights)
 
-    def gen_weights_params(self, weights):
+    def gen_weights_params(self, weights: Weights) -> NDArray[uint32]:
         """
-        Get the parameters of the weight generator on the machine.
-
         :param weights:
-        :type weights: ~pyNN.random.RandomDistribution or int or float
-        :rtype: ~numpy.ndarray(~numpy.uint32)
+        :returns: The parameters of the weight generator on the machine.
         """
         return param_generator_params(weights)
 
-    def gen_weight_params_size_in_bytes(self, weights):
+    def gen_weight_params_size_in_bytes(self, weights: Weights) -> int:
         """
-        The size of the weight parameters in bytes.
-
         :param weights:
-        :type weights: ~pyNN.random.RandomDistribution or int or float
-        :rtype: int
+        :returns: The size of the weight parameters in bytes.
         """
         return param_generator_params_size_in_bytes(weights)
 
-    def gen_delays_id(self, delays):
+    def gen_delays_id(self, delays: Delays) -> int:
         """
-        Get the id of the delay generator on the machine.
-
         :param delays:
-        :type delays: ~pyNN.random.RandomDistribution or int or float
-        :rtype: int
+        :returns: The id of the delay generator on the machine.
         """
         return param_generator_id(delays)
 
-    def gen_delay_params(self, delays):
+    def gen_delay_params(self, delays: Delays) -> NDArray[uint32]:
         """
-        Get the parameters of the delay generator on the machine.
-
         :param delays:
-        :type delays: ~pyNN.random.RandomDistribution or int or float
-        :rtype: ~numpy.ndarray(~numpy.uint32)
+        :returns: The parameters of the delay generator on the machine.
         """
         return param_generator_params(delays)
 
-    def gen_delay_params_size_in_bytes(self, delays):
+    def gen_delay_params_size_in_bytes(self, delays: Delays) -> int:
         """
-        The size of the delay parameters in bytes.
-
         :param delays:
-        :type delays: ~pyNN.random.RandomDistribution  or int or float
-        :rtype: int
+        :returns: The size of the delay parameters in bytes.
         """
         return param_generator_params_size_in_bytes(delays)
 
-    @abstractproperty
-    def gen_connector_id(self):
+    @property
+    @abstractmethod
+    def gen_connector_id(self) -> int:
         """
         The ID of the connection generator on the machine.
-
-        :rtype: int
         """
+        raise NotImplementedError
 
-    def gen_connector_params(self):
+    def gen_connector_params(
+            self, synapse_info: SynapseInformation) -> NDArray[uint32]:
         """
-        Get the parameters of the on machine generation.
-
-        :rtype: ~numpy.ndarray(uint32)
+        :param synapse_info: The synaptic information
+        :returns: The parameters of the on machine generation.
         """
-        # pylint: disable=unused-argument
+        _ = synapse_info
         return numpy.zeros(0, dtype="uint32")
 
     @property
-    def gen_connector_params_size_in_bytes(self):
+    def gen_connector_params_size_in_bytes(self) -> int:
         """
         The size of the connector parameters, in bytes.
-
-        :rtype: int
         """
         return 0

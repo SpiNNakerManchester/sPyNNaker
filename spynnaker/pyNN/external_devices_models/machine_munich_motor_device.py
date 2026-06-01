@@ -12,22 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional, Sequence
+
 from spinn_utilities.overrides import overrides
+
 from spinnman.model.enums import ExecutableType
+
+from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
+from pacman.model.placements import Placement
 from pacman.model.resources import ConstantSDRAM
+
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary)
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification)
+from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
+
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.exceptions import SpynnakerException
 
 
 class MachineMunichMotorDevice(
@@ -38,13 +46,13 @@ class MachineMunichMotorDevice(
     An Omnibot motor control device. This has a real vertex and an
     external device vertex.
     """
-    __slots__ = [
+    __slots__ = (
         "__continue_if_not_different",
         "__delay_time",
         "__delta_threshold",
         "__sample_time",
         "__speed",
-        "__update_time"]
+        "__update_time")
 
     MOTOR_PARTITION_ID = "MOTOR"
 
@@ -66,18 +74,19 @@ class MachineMunichMotorDevice(
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
 
     def __init__(
-            self, speed, sample_time, update_time, delay_time,
-            delta_threshold, continue_if_not_different,
-            label=None, app_vertex=None):
+            self, speed: int, sample_time: int, update_time: int,
+            delay_time: int, delta_threshold: int,
+            continue_if_not_different: bool, label: Optional[str] = None,
+            app_vertex: Optional[ApplicationVertex] = None):
         """
-        :param int speed:
-        :param int sample_time:
-        :param int update_time:
-        :param int delay_time:
-        :param int delta_threshold:
-        :param bool continue_if_not_different:
-        :param str label:
-        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
+        :param speed:
+        :param sample_time:
+        :param update_time:
+        :param delay_time:
+        :param delta_threshold:
+        :param continue_if_not_different:
+        :param label:
+        :param app_vertex:
         """
         super().__init__(
             label=label, app_vertex=app_vertex,
@@ -91,33 +100,34 @@ class MachineMunichMotorDevice(
 
     @property
     @overrides(MachineVertex.sdram_required)
-    def sdram_required(self):
+    def sdram_required(self) -> ConstantSDRAM:
         return ConstantSDRAM(
                 SYSTEM_BYTES_REQUIREMENT + self._PARAMS_SIZE +
                 self.get_provenance_data_size(self._PROVENANCE_ELEMENTS))
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
-    def get_binary_file_name(self):
+    def get_binary_file_name(self) -> str:
         return "robot_motor_control.aplx"
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
-    def get_binary_start_type(self):
+    def get_binary_start_type(self) -> ExecutableType:
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
-    def _provenance_region_id(self):
+    def _provenance_region_id(self) -> int:
         return self._PROVENANCE_REGION
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
-    def _n_additional_data_items(self):
+    def _n_additional_data_items(self) -> int:
         return self._PROVENANCE_ELEMENTS
 
     @overrides(
         ProvidesProvenanceDataFromMachineImpl.parse_extra_provenance_items)
     def parse_extra_provenance_items(
-            self, label, x, y, p, provenance_data):
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]) -> None:
         n_buffer_overflows, = provenance_data
 
         with ProvenanceWriter() as db:
@@ -133,7 +143,8 @@ class MachineMunichMotorDevice(
                     "or decrease the number of neurons per core.")
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(self, spec, placement):
+    def generate_data_specification(self, spec: DataSpecificationGenerator,
+                                    placement: Placement) -> None:
         # reserve regions
         self.reserve_memory_regions(spec)
 
@@ -142,16 +153,15 @@ class MachineMunichMotorDevice(
 
         # handle simulation data
         spec.switch_write_focus(self._SYSTEM_REGION)
+        vertex = placement.vertex
+        assert isinstance(vertex, AbstractHasAssociatedBinary)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            placement.vertex.get_binary_file_name()))
+            vertex.get_binary_file_name()))
 
         # Get the key
         routing_info = SpynnakerDataView.get_routing_infos()
-        edge_key = routing_info.get_first_key_from_pre_vertex(
+        edge_key = routing_info.get_key_from(
             placement.vertex, self.MOTOR_PARTITION_ID)
-        if edge_key is None:
-            raise SpynnakerException(
-                "This motor should have one outgoing edge to the robot")
 
         # write params to memory
         spec.switch_write_focus(region=self._PARAMS_REGION)
@@ -166,7 +176,7 @@ class MachineMunichMotorDevice(
         # End-of-Spec:
         spec.end_specification()
 
-    def reserve_memory_regions(self, spec):
+    def reserve_memory_regions(self, spec: DataSpecificationGenerator) -> None:
         """
         Reserve SDRAM space for memory areas:
 
@@ -175,7 +185,6 @@ class MachineMunichMotorDevice(
         #. area for end commands
 
         :param spec: The data specification to write to
-        :type spec: ~data_specification.DataSpecificationGenerator
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
 
@@ -189,8 +198,7 @@ class MachineMunichMotorDevice(
         self.reserve_provenance_data_region(spec)
 
     @overrides(MachineVertex.get_n_keys_for_partition)
-    def get_n_keys_for_partition(self, partition_id):
+    def get_n_keys_for_partition(self, partition_id: str) -> int:
         if partition_id == self.MOTOR_PARTITION_ID:
             return self._MOTOR_N_KEYS
-        return super(MachineMunichMotorDevice, self).get_n_keys_for_partition(
-            partition_id)
+        return super().get_n_keys_for_partition(partition_id)

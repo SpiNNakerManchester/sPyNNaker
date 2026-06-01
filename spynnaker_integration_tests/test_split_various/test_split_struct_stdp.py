@@ -16,11 +16,9 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as p
 import numpy
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexNeuronsSynapses)
 
 
-def split_structural_with_stdp():
+def split_structural_with_stdp() -> None:
     p.setup(1.0)
     pre_spikes = numpy.array(range(0, 10, 2))
     pre_spikes_last_neuron = pre_spikes[pre_spikes > 0]
@@ -31,22 +29,14 @@ def split_structural_with_stdp():
     w_min = 0.0
     w_max = 5.0
     w_init_1 = 5.0
-    delay_1 = 2.0
+    delay_1 = 2
     w_init_2 = 4.0
-    delay_2 = 1.0
+    delay_2 = 1
     stim = p.Population(1, p.SpikeSourceArray(pre_spikes), label="stim")
-    pop = p.Population(
-        1, p.IF_curr_exp(), label="pop", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(1)})
-    pop_2 = p.Population(
-        1, p.IF_curr_exp(), label="pop_2", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(1)})
-    pop_3 = p.Population(
-        1, p.IF_curr_exp(), label="pop_3", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(1)})
-    pop_4 = p.Population(
-        1, p.IF_curr_exp(), label="pop_4", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(1)})
+    pop = p.Population(1, p.IF_curr_exp(), label="pop", n_synapse_cores=1)
+    pop_2 = p.Population(1, p.IF_curr_exp(), label="pop_2", n_synapse_cores=1)
+    pop_3 = p.Population(1, p.IF_curr_exp(), label="pop_3", n_synapse_cores=1)
+    pop_4 = p.Population(1, p.IF_curr_exp(), label="pop_4", n_synapse_cores=1)
     pop.record("spikes")
     pop_2.record("spikes")
     proj = p.Projection(
@@ -58,7 +48,8 @@ def split_structural_with_stdp():
                 tau_plus, tau_minus, A_plus, A_minus),
             weight_dependence=p.AdditiveWeightDependence(w_min, w_max),
             f_rew=1000, initial_weight=w_init_1, initial_delay=delay_1,
-            s_max=1, seed=0, weight=0.0, delay=1.0))
+            s_max=1, seed=0, weight=0.0, delay=1.0),
+        download_synapses=True)
     proj_2 = p.Projection(
         stim, pop_2, p.FromListConnector([]), p.StructuralMechanismSTDP(
             partner_selection=p.RandomSelection(),
@@ -68,7 +59,8 @@ def split_structural_with_stdp():
                 tau_plus, tau_minus, A_plus, A_minus),
             weight_dependence=p.AdditiveWeightDependence(w_min, w_max),
             f_rew=1000, initial_weight=w_init_2, initial_delay=delay_2,
-            s_max=1, seed=0, weight=0.0, delay=1.0))
+            s_max=1, seed=0, weight=0.0, delay=1.0),
+        download_synapses=True)
     proj_3 = p.Projection(
         stim, pop_3, p.FromListConnector([(0, 0)]),
         p.StructuralMechanismSTDP(
@@ -133,5 +125,9 @@ def split_structural_with_stdp():
 
 class TestStructuralWithSTDP(BaseTestCase):
 
-    def test_split_structural_with_stdp(self):
+    def test_split_structural_with_stdp(self) -> None:
         self.runsafe(split_structural_with_stdp)
+
+        self.check_binaries_used(
+            ["synapses_stdp_mad_pair_additive_structural_last_neuron_distance_weight.aplx",  # noqa: E501
+             "synapses_stdp_mad_pair_additive_structural_random_distance_weight.aplx"])   # noqa: E501

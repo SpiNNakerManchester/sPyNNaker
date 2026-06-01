@@ -24,18 +24,18 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
     accept spikes from a :py:class:`DelayExtensionMachineVertex`.
     """
 
-    __slots__ = []
+    __slots__ = ()
 
     @abstractmethod
-    def max_support_delay(self):
+    def max_support_delay(self) -> int:
         """
         returns the max amount of delay this post vertex can support.
 
         :return: max delay supported in ticks
-        :rtype: int
         """
+        raise NotImplementedError
 
-    def accepts_edges_from_delay_vertex(self):
+    def accepts_edges_from_delay_vertex(self) -> bool:
         """
         Confirms that the splitter's vertices can handle spikes coming from a
         :py:class:`DelayExtensionMachineVertex`.
@@ -44,6 +44,6 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
         that allowed by :py:meth:`max_support_delay`, an exception will be
         raised saying a different splitter is required.
 
-        :rtype: bool
+        :returns: True if extra delays can be supported using delay vertices
         """
         return True

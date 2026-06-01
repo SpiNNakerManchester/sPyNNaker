@@ -12,49 +12,54 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+from typing import Any, Dict, TYPE_CHECKING
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+if TYPE_CHECKING:
+    from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
+    from .abstract_ethernet_translator import AbstractEthernetTranslator
 
 
 class AbstractEthernetSensor(object, metaclass=AbstractBase):
-    __slots__ = []
+    """
+    An Ethernet-connected device that can send events (spikes) to SpiNNaker
+    via a Spike Injector.
+    """
+    __slots__ = ()
 
     @abstractmethod
-    def get_n_neurons(self):
+    def get_n_neurons(self) -> int:
         """
-        Get the number of neurons that will be sent out by the device.
-
-        :rtype: int
+        :returns: The number of neurons that will be sent out by the device.
         """
-
-    @abstractmethod
-    def get_injector_parameters(self):
-        """
-        Get the parameters of the Spike Injector to use with this device.
-
-        :rtype: dict(str,Any)
-        """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_injector_label(self):
+    def get_injector_parameters(self) -> Dict[str, Any]:
         """
-        Get the label to give to the Spike Injector.
-
-        :rtype: str
+        :returns:
+           The parameters of the Spike Injector to use with this device.
         """
-
-    @abstractmethod
-    def get_translator(self):
-        """
-        Get a translator of multicast commands to Ethernet commands.
-
-        :rtype: AbstractEthernetTranslator
-        """
+        raise NotImplementedError
 
     @abstractmethod
-    def get_database_connection(self):
+    def get_injector_label(self) -> str:
         """
-        Get a Database Connection instance that this device uses to inject
-        packets.
+        :returns: the label to give to the Spike Injector.
+        """
+        raise NotImplementedError
 
-        :rtype: SpynnakerLiveSpikesConnection
+    @abstractmethod
+    def get_translator(self) -> AbstractEthernetTranslator:
         """
+        :returns: A translator of multicast commands to Ethernet commands.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_database_connection(self) -> SpynnakerLiveSpikesConnection:
+        """
+        :returns: A Database Connection instance that this device uses to
+             inject packets.
+        """
+        raise NotImplementedError

@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
 from spinn_utilities.overrides import overrides
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from .spike_injector_vertex import SpikeInjectorVertex
 
@@ -25,24 +27,27 @@ _population_parameters = {
 
 
 class SpikeInjector(AbstractPyNNModel):
-    __slots__ = []
+    """
+    Model that creates a Spike Injector Vertex
+    """
+    __slots__ = ()
 
     default_population_parameters = _population_parameters
 
-    @overrides(AbstractPyNNModel.create_vertex,
-               additional_arguments=_population_parameters.keys())
+    @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
-            self, n_neurons, label, port, virtual_key,
-            reserve_reverse_ip_tag, splitter):
+            self, n_neurons: int, label: str, *,
+            port: Optional[int] = None, virtual_key: Optional[int] = None,
+            reserve_reverse_ip_tag: bool = False,
+            splitter: Optional[AbstractSplitterCommon] = None) \
+            -> SpikeInjectorVertex:
         """
-        :param int port:
-        :param int virtual_key:
-        :param bool reserve_reverse_ip_tag:
+        :param port:
+        :param virtual_key:
+        :param reserve_reverse_ip_tag:
         :param splitter:
-        :type splitter:
-            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
         """
-        # pylint: disable=arguments-differ
+        max_atoms_per_core = self.get_model_max_atoms_per_dimension_per_core()
         return SpikeInjectorVertex(
             n_neurons, label, port, virtual_key,
-            reserve_reverse_ip_tag, splitter)
+            reserve_reverse_ip_tag, splitter, max_atoms_per_core)

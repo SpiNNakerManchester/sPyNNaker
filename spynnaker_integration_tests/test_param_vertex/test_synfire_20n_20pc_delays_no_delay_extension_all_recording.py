@@ -38,7 +38,7 @@ gysn_file = "20_7_gsyn.csv"
 
 class Synfire20n20pcDelaysDelayExtensionsAllRecording(BaseTestCase):
 
-    def do_all_no_constraint(self):
+    def do_all_no_constraint(self) -> None:
         synfire_run = SynfireRunner()
         synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                            delay=delay, run_times=[runtime], record=True,
@@ -75,10 +75,10 @@ class Synfire20n20pcDelaysDelayExtensionsAllRecording(BaseTestCase):
         self.assertTrue(numpy.allclose(read_spikes, spikes),
                         "spikes neo method mismatch")
 
-    def test_all_no_constraint(self):
+    def test_all_no_constraint(self) -> None:
         self.runsafe(self.do_all_no_constraint)
 
-    def do_all_constraint(self):
+    def do_all_constraint(self) -> None:
         synfire_run = SynfireRunner()
         synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                            delay=delay, run_times=[runtime],
@@ -107,7 +107,7 @@ class Synfire20n20pcDelaysDelayExtensionsAllRecording(BaseTestCase):
         self.assertTrue(numpy.allclose(read_spikes, spikes),
                         "spikes neo method mismatch")
 
-    def test_all_constraint(self):
+    def test_all_constraint(self) -> None:
         self.runsafe(self.do_all_constraint)
 
 

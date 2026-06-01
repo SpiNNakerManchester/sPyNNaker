@@ -17,5 +17,5 @@ from spynnaker_integration_tests.test_big_connection import TestBigConnection
 
 class TestJavaAdvancedBigConnection(TestBigConnection):
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)

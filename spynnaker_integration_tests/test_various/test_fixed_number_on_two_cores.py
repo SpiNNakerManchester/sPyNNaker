@@ -20,7 +20,7 @@ import pyNN.spiNNaker as sim
 
 class FixNumberOnTwoCoresCase(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         n_neurons = 100
         weights = 0.5
         delays = 17.0
@@ -42,5 +42,5 @@ class FixNumberOnTwoCoresCase(BaseTestCase):
         length = len(weight_list)
         self.assertEqual(n_neurons*n_pre, length)
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)

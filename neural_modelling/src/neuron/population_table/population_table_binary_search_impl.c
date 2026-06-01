@@ -205,6 +205,7 @@ bool population_table_setup(address_t table_address, uint32_t *row_max_n_words,
         master_population_table_entry **master_pop_table,
         address_list_entry **address_list) {
     pop_table_config_t *config = (pop_table_config_t *) table_address;
+    *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
 
     *master_pop_table_length = config->table_length;
 
@@ -238,8 +239,6 @@ bool population_table_setup(address_t table_address, uint32_t *row_max_n_words,
     spin1_memcpy(*master_pop_table, config->data, n_master_pop_bytes);
     spin1_memcpy(*address_list, &config->data[*master_pop_table_length],
             n_address_list_bytes);
-
-    *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
     return true;
 }
 //! \}

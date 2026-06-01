@@ -19,7 +19,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestClearData(BaseTestCase):
 
-    def make_rewires(self):
+    def make_rewires(self) -> None:
         sim.setup(1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
         stim = sim.Population(9, sim.SpikeSourceArray(range(10)), label="stim")
@@ -49,7 +49,7 @@ class TestClearData(BaseTestCase):
 
         sim.end()
 
-    def do_simple(self):
+    def do_simple(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 
@@ -77,7 +77,7 @@ class TestClearData(BaseTestCase):
         self.assertEqual(10, v.size)
         sim.end()
 
-    def test_clear_previous_segment(self):
+    def test_clear_previous_segment(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 
@@ -110,8 +110,8 @@ class TestClearData(BaseTestCase):
             repr(spikes[0]))
         sim.end()
 
-    def test_rewires(self):
+    def test_rewires(self) -> None:
         self.runsafe(self.make_rewires)
 
-    def test_simple(self):
+    def test_simple(self) -> None:
         self.runsafe(self.do_simple)

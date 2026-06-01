@@ -31,7 +31,7 @@ struct spike_processing_provenance {
     uint32_t n_dmas_complete;
     //! The number of spikes received and processed
     uint32_t n_spikes_processed;
-    //! The number of rewirings performed.
+    //! The number of rewires performed.
     uint32_t n_rewires;
     //! The number of packets that were cleared at the end of timesteps
     uint32_t n_packets_dropped_from_lateness;
@@ -61,7 +61,7 @@ bool spike_processing_initialise(
 void spike_processing_store_provenance(struct spike_processing_provenance *prov);
 
 //! \brief Set the number of times spike_processing has to attempt rewiring.
-//! \param[in] number_of_rewires: The number of rewirings to perform
+//! \param[in] number_of_rewires: The number of rewires to perform
 //! \return currently always true
 bool spike_processing_do_rewiring(int number_of_rewires);
 

@@ -22,7 +22,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestIFCondExpSTDPPairAdditive(BaseTestCase):
 
-    def potentiation_and_depression(self):
+    def potentiation_and_depression(self) -> None:
         p.setup(1)
         runtime = 100
         initial_run = 1000  # to negate any initial conditions
@@ -37,7 +37,7 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
         max_weight = 0.5
         min_weight = 0
 
-        pre_spikes = [10, 50]
+        pre_spikes = numpy.array([10, 50])
         extra_spikes = [30]
 
         for i in range(len(pre_spikes)):
@@ -78,7 +78,8 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
         plastic_synapse = p.Projection(pre_pop, post_pop,
                                        p.OneToOneConnector(),
                                        synapse_type=syn_plas,
-                                       receptor_type='excitatory')
+                                       receptor_type='excitatory',
+                                       download_synapses=True)
 
         # Record the spikes
         post_pop.record("spikes")
@@ -92,7 +93,6 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
 
         # Get the spikes
         post_spikes = numpy.array(
-            # pylint: disable=no-member
             post_pop.get_data('spikes').segments[0].spiketrains[0].magnitude)
 
         # End the simulation as all information gathered
@@ -111,7 +111,7 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
 
         self.assertTrue(numpy.allclose(weights, new_weight_exact, rtol=0.001))
 
-    def test_potentiation_and_depression(self):
+    def test_potentiation_and_depression(self) -> None:
         self.runsafe(self.potentiation_and_depression)
 
 

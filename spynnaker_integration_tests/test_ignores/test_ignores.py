@@ -13,19 +13,26 @@
 # limitations under the License.
 
 from unittest import SkipTest
-from spinn_utilities.config_holder import set_config
-from spinnman.processes.get_machine_process import GetMachineProcess
-from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as sim
+from spinn_utilities.config_holder import set_config
+from spinn_utilities.overrides import overrides
+from spinnman.processes.get_machine_process import GetMachineProcess
+from spinnman.messages.scp.impl.get_chip_info_response import (
+    GetChipInfoResponse)
+from spinnaker_testbase import BaseTestCase
 
 
-def hacked_receive_chip_info(self, scp_read_chip_info_response):
+# HACK! Do not copy
+@overrides(GetMachineProcess._receive_chip_info)
+def _receive_chip_info(
+        self: GetMachineProcess,
+        scp_read_chip_info_response: GetChipInfoResponse) -> None:
     chip_info = scp_read_chip_info_response.chip_info
     self._chip_info[chip_info.x, chip_info.y] = chip_info
 
     # Hack to test ignores
     if (chip_info.x == 8 and chip_info.y == 4):
-        # hack the config to include an actual ip address used
+        # hack the config to include an actual IP address used
         set_config("Machine", "down_cores",
                    f"3,0,-4:99,99,2:2,2,-19:3,3,4,127.0.0.1:"
                    f"2,2,-10,{chip_info.ethernet_ip_address}:"
@@ -41,12 +48,12 @@ def hacked_receive_chip_info(self, scp_read_chip_info_response):
 
 class TestAllow(BaseTestCase):
 
-    def test_with_actual_ip_address(self):
+    def test_with_actual_ip_address(self) -> None:
         sim.setup(timestep=1.0, n_boards_required=6)
         self.assert_not_spin_three()
 
-        # Hack in to set the ignores with used ipaddress
-        GetMachineProcess._receive_chip_info = hacked_receive_chip_info
+        # Hack in to set the ignores with used IP address
+        GetMachineProcess._receive_chip_info = _receive_chip_info   # type: ignore[method-assign]  # noqa: E501
 
         machine = sim.get_machine()
         sim.end()
@@ -100,8 +107,8 @@ class TestAllow(BaseTestCase):
 
 
 if __name__ == '__main__':
-    # Hack in to set the ignores with used ipaddress
-    GetMachineProcess._receive_chip_info = hacked_receive_chip_info
+    # Hack in to set the ignores with used IP address
+    GetMachineProcess._receive_chip_info = _receive_chip_info   # type: ignore[method-assign]  # noqa: E501
 
     sim.setup(timestep=1.0, n_boards_required=6)
     machine = sim.get_machine()

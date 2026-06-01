@@ -11,28 +11,46 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from enum import Enum
-import os
 import ctypes
+from enum import IntEnum
+from typing import List, Optional, Sequence
+
+from numpy import floating
+from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
+
+from pacman.model.resources import AbstractSDRAM
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.common import Slice
+from pacman.model.placements import Placement
+
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
+from spinn_front_end_common.interface.ds import (
+    DataSpecificationGenerator, DataSpecificationReloader)
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.neuron_models import (
     NeuronModelLeftRightReadout)
+from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.utilities import constants
+
+from .population_vertex import PopulationVertex
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
-from .population_machine_synapses import (
-    SynapseRegions, PopulationMachineSynapses)
+from .population_machine_synapses import PopulationMachineSynapses
 from .population_machine_synapses_provenance import SynapseProvenance
+from .synaptic_matrices import SynapseRegions
 
 
 class SpikeProcessingProvenance(ctypes.LittleEndianStructure):
+    """
+    The provenance from spike processing.
+    """
     _fields_ = [
         # A count of the times that the synaptic input circular buffers
         # overflowed
@@ -41,7 +59,7 @@ class SpikeProcessingProvenance(ctypes.LittleEndianStructure):
         ("n_dmas_complete", ctypes.c_uint32),
         # The number of spikes successfully processed
         ("n_spikes_processed", ctypes.c_uint32),
-        # The number of rewirings performed.
+        # The number of rewires performed.
         ("n_rewires", ctypes.c_uint32),
         # The number of packets that were dropped due to being late
         ("n_late_packets", ctypes.c_uint32),
@@ -76,7 +94,7 @@ class PopulationMachineVertex(
     A machine vertex for PyNN Populations.
     """
 
-    __slots__ = [
+    __slots__ = (
         "__synaptic_matrices",
         "__neuron_data",
         "__key",
@@ -86,7 +104,7 @@ class PopulationMachineVertex(
         "__slice_index",
         "__max_atoms_per_core",
         "__regenerate_neuron_data",
-        "__regenerate_synapse_data"]
+        "__regenerate_synapse_data")
 
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
     DMA_COMPLETE = "DMA's that were completed"
@@ -97,7 +115,7 @@ class PopulationMachineVertex(
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
-    class REGIONS(Enum):
+    class REGIONS(IntEnum):
         """
         Regions for populations.
         """
@@ -121,31 +139,29 @@ class PopulationMachineVertex(
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
-        system=REGIONS.SYSTEM.value,
-        provenance=REGIONS.PROVENANCE_DATA.value,
-        profile=REGIONS.PROFILING.value,
-        recording=REGIONS.RECORDING.value)
+        REGIONS.SYSTEM,
+        REGIONS.PROVENANCE_DATA,
+        REGIONS.PROFILING,
+        REGIONS.RECORDING)
 
     # Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
-        core_params=REGIONS.CORE_PARAMS.value,
-        neuron_params=REGIONS.NEURON_PARAMS.value,
-        current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
-        neuron_recording=REGIONS.NEURON_RECORDING.value,
-        neuron_builder=REGIONS.NEURON_BUILDER.value,
-        initial_values=REGIONS.INITIAL_VALUES.value
-    )
+        REGIONS.CORE_PARAMS,
+        REGIONS.NEURON_PARAMS,
+        REGIONS.CURRENT_SOURCE_PARAMS,
+        REGIONS.NEURON_RECORDING,
+        REGIONS.NEURON_BUILDER,
+        REGIONS.INITIAL_VALUES)
 
     # Regions for this vertex used by synapse parts
     SYNAPSE_REGIONS = SynapseRegions(
-        synapse_params=REGIONS.SYNAPSE_PARAMS.value,
-        pop_table=REGIONS.POPULATION_TABLE.value,
-        synaptic_matrix=REGIONS.SYNAPTIC_MATRIX.value,
-        synapse_dynamics=REGIONS.SYNAPSE_DYNAMICS.value,
-        structural_dynamics=REGIONS.STRUCTURAL_DYNAMICS.value,
-        bitfield_filter=REGIONS.BIT_FIELD_FILTER.value,
-        connection_builder=REGIONS.CONNECTOR_BUILDER.value
-    )
+        REGIONS.SYNAPSE_PARAMS,
+        REGIONS.POPULATION_TABLE,
+        REGIONS.SYNAPTIC_MATRIX,
+        REGIONS.SYNAPSE_DYNAMICS,
+        REGIONS.STRUCTURAL_DYNAMICS,
+        REGIONS.BIT_FIELD_FILTER,
+        REGIONS.CONNECTOR_BUILDER)
 
     _PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -155,35 +171,37 @@ class PopulationMachineVertex(
         4: "PROCESS_PLASTIC_SYNAPSES"}
 
     def __init__(
-            self, sdram, label, app_vertex, vertex_slice, slice_index,
-            ring_buffer_shifts, weight_scales,
-            structural_sz, max_atoms_per_core, synaptic_matrices, neuron_data):
+            self, sdram: AbstractSDRAM, label: str,
+            app_vertex: PopulationVertex, vertex_slice: Slice,
+            slice_index: int, ring_buffer_shifts: Sequence[int],
+            weight_scales: NDArray[floating], structural_sz: int,
+            max_atoms_per_core: int, synaptic_matrices: SynapticMatrices,
+            neuron_data: NeuronData):
         """
-        :param ~pacman.model.resources.AbstractSDRAM sdram:
+        :param sdram:
             The SDRAM used by the vertex
-        :param str label: The label of the vertex
-        :param AbstractPopulationVertex app_vertex:
+        :param label: The label of the vertex
+        :param app_vertex:
             The associated application vertex
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param vertex_slice:
             The slice of the population that this implements
-        :param int slice_index:
+        :param slice_index:
             The index of the slice in the ordered list of slices
-        :param list(int) ring_buffer_shifts:
+        :param ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
-        :param list(int) weight_scales:
+        :param weight_scales:
             The scaling to apply to weights to store them in the synapses
-        :param int structural_sz: The size of the structural data
-        :param int n_neuron_bits: The number of bits to use for neuron IDs
-        :param SynapticMatrices synaptic_matrices: The synaptic matrices
-        :param NeuronData neuron_data: The handler of neuron data
+        :param structural_sz: The size of the structural data
+        :param synaptic_matrices: The synaptic matrices
+        :param neuron_data: The handler of neuron data
         """
-        super(PopulationMachineVertex, self).__init__(
+        super().__init__(
             label, app_vertex, vertex_slice, sdram,
             self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS +
             SpikeProcessingProvenance.N_ITEMS + MainProvenance.N_ITEMS,
-            self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
-        self.__key = None
+            self._PROFILE_TAG_LABELS, app_vertex.combined_binary_file_name)
+        self.__key: Optional[int] = None
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
@@ -195,63 +213,58 @@ class PopulationMachineVertex(
         self.__regenerate_synapse_data = False
 
     @property
+    def _vertex_slice(self) -> Slice:
+        return self.vertex_slice
+
+    @property
     @overrides(PopulationMachineNeurons._slice_index)
-    def _slice_index(self):
+    def _slice_index(self) -> int:
         return self.__slice_index
 
     @property
     @overrides(PopulationMachineNeurons._key)
-    def _key(self):
+    def _key(self) -> int:
+        assert self.__key is not None, "key not yet set"
         return self.__key
 
+    @property
+    @overrides(PopulationMachineNeurons._has_key)
+    def _has_key(self) -> bool:
+        return self.__key is not None
+
     @overrides(PopulationMachineNeurons._set_key)
-    def _set_key(self, key):
+    def _set_key(self, key: int) -> None:
         self.__key = key
 
     @property
     @overrides(PopulationMachineNeurons._neuron_regions)
-    def _neuron_regions(self):
+    def _neuron_regions(self) -> NeuronRegions:
         return self.NEURON_REGIONS
 
     @property
     @overrides(PopulationMachineNeurons._neuron_data)
-    def _neuron_data(self):
+    def _neuron_data(self) -> NeuronData:
         return self.__neuron_data
 
     @property
     @overrides(PopulationMachineSynapses._synapse_regions)
-    def _synapse_regions(self):
+    def _synapse_regions(self) -> SynapseRegions:
         return self.SYNAPSE_REGIONS
 
     @property
     @overrides(PopulationMachineSynapses._synaptic_matrices)
-    def _synaptic_matrices(self):
+    def _synaptic_matrices(self) -> SynapticMatrices:
         return self.__synaptic_matrices
 
     @property
     @overrides(PopulationMachineSynapses._max_atoms_per_core)
-    def _max_atoms_per_core(self):
+    def _max_atoms_per_core(self) -> int:
         return self.__max_atoms_per_core
-
-    @staticmethod
-    def __get_binary_file_name(app_vertex):
-        """
-        Get the local binary filename for this vertex.  Static because at
-        the time this is needed, the local `app_vertex` is not set.
-
-        :param AbstractPopulationVertex app_vertex:
-            The associated application vertex
-        :rtype: str
-        """
-        # Split binary name into title and extension
-        name, ext = os.path.splitext(app_vertex.neuron_impl.binary_name)
-
-        # Reunite title and extension and return
-        return name + app_vertex.synapse_executable_suffix + ext
 
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(
-            self, label, x, y, p, provenance_data):
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]) -> None:
         syn_offset = NeuronProvenance.N_ITEMS
         proc_offset = syn_offset + SynapseProvenance.N_ITEMS
         end_proc_offset = proc_offset + SpikeProcessingProvenance.N_ITEMS
@@ -286,30 +299,31 @@ class PopulationMachineVertex(
                     " the .spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
-    def get_recorded_region_ids(self):
-        ids = self._app_vertex.neuron_recorder.recorded_ids_by_slice(
+    def get_recorded_region_ids(self) -> List[int]:
+        ids = self._pop_vertex.neuron_recorder.recorded_ids_by_slice(
             self.vertex_slice)
-        ids.extend(self._app_vertex.synapse_recorder.recorded_ids_by_slice(
+        ids.extend(self._pop_vertex.synapse_recorder.recorded_ids_by_slice(
             self.vertex_slice))
         return ids
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(self, spec, placement):
-        rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
+    def generate_data_specification(self, spec: DataSpecificationGenerator,
+                                    placement: Placement) -> None:
+        rec_regions = self._pop_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
-        rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(
+        rec_regions.extend(self._pop_vertex.synapse_recorder.get_region_sizes(
             self.vertex_slice))
         self._write_common_data_spec(spec, rec_regions)
 
         # Set the poisson key for eprop left-right
         routing_info = SpynnakerDataView.get_routing_infos()
         # pylint: disable=protected-access
-        if isinstance(self._app_vertex._pynn_model._model.neuron_model,
+        if isinstance(self._pop_vertex._pynn_model._model.neuron_model,
                       NeuronModelLeftRightReadout):
             poisson_key = routing_info.get_first_key_from_pre_vertex(
                 placement.vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
             # pylint: disable=protected-access
-            self._app_vertex._pynn_model._model.neuron_model.set_poisson_key(
+            self._pop_vertex._pynn_model._model.neuron_model.set_poisson_key(
                 poisson_key)
 
         self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
@@ -323,7 +337,8 @@ class PopulationMachineVertex(
 
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
-    def regenerate_data_specification(self, spec, placement):
+    def regenerate_data_specification(self, spec: DataSpecificationReloader,
+                                      placement: Placement) -> None:
         if self.__regenerate_neuron_data:
             self._rewrite_neuron_data_spec(spec)
             self.__regenerate_neuron_data = False
@@ -338,24 +353,25 @@ class PopulationMachineVertex(
         spec.end_specification()
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
-    def reload_required(self):
+    def reload_required(self) -> bool:
         return self.__regenerate_neuron_data or self.__regenerate_synapse_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
-    def set_reload_required(self, new_value):
+    def set_reload_required(self, new_value: bool) -> None:
         # These are set elsewhere once data is generated
         pass
 
     def _parse_spike_processing_provenance(
-            self, label, x, y, p, provenance_data):
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]) -> None:
         """
         Extract and yield spike processing provenance.
 
-        :param str label: The label of the node
-        :param int x: x coordinate of the chip where this core
-        :param int y: y coordinate of the core where this core
-        :param int p: virtual id of the core
-        :param list(int) provenance_data: A list of data items to interpret
+        :param label: The label of the node
+        :param x: x coordinate of the chip where this core
+        :param y: y coordinate of the core where this core
+        :param p: virtual id of the core
+        :param provenance_data: A list of data items to interpret
         """
         prov = SpikeProcessingProvenance(*provenance_data)
 
@@ -386,7 +402,7 @@ class PopulationMachineVertex(
                 prov.n_late_packets)
 
             if prov.n_late_packets > 0:
-                if self._app_vertex.drop_late_spikes:
+                if self._pop_vertex.drop_late_spikes:
                     db.insert_report(
                         f"On {label}, {prov.n_late_packets} packets were "
                         f"dropped from the input buffer, because they "
@@ -407,24 +423,23 @@ class PopulationMachineVertex(
                 prov.max_size_input_buffer)
 
     @overrides(PopulationMachineNeurons.set_do_neuron_regeneration)
-    def set_do_neuron_regeneration(self):
+    def set_do_neuron_regeneration(self) -> None:
         self.__regenerate_neuron_data = True
         self.__neuron_data.reset_generation()
 
     @overrides(PopulationMachineSynapses.set_do_synapse_regeneration)
-    def set_do_synapse_regeneration(self):
+    def set_do_synapse_regeneration(self) -> None:
         self.__regenerate_synapse_data = True
 
-    @overrides(PopulationMachineCommon.get_n_keys_for_partition)
-    def get_n_keys_for_partition(self, partition_id):
-        n_colours = 2 ** self._app_vertex.n_colour_bits
+    @overrides(MachineVertex.get_n_keys_for_partition)
+    def get_n_keys_for_partition(self, partition_id: str) -> int:
+        n_colours = 2 ** self._pop_vertex.n_colour_bits
         if partition_id == constants.LIVE_POISSON_CONTROL_PARTITION_ID:
             n_keys = 0
-            # Seems like overkill, there should be a simpler way to do this
             partitions = (
                 SpynnakerDataView.
                 get_outgoing_edge_partitions_starting_at_vertex(
-                    self._app_vertex))
+                    self._pop_vertex))
             for partition in partitions:
                 if partition.identifier == (
                         constants.LIVE_POISSON_CONTROL_PARTITION_ID):
@@ -432,4 +447,4 @@ class PopulationMachineVertex(
                         n_keys += edge.post_vertex.n_atoms
             return n_keys * n_colours
         else:
-            return self._vertex_slice.n_atoms * n_colours
+            return self.vertex_slice.n_atoms * n_colours

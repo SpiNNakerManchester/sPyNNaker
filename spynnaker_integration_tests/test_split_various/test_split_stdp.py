@@ -18,11 +18,9 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spinnaker_testbase import BaseTestCase
 
 import numpy
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexNeuronsSynapses)
 
 
-def split_potentiation_and_depression():
+def split_potentiation_and_depression() -> None:
     p.setup(1.0)
     runtime = 100
     initial_run = 1000  # to negate any initial conditions
@@ -57,8 +55,7 @@ def split_potentiation_and_depression():
 
     # Post-plastic-synapse population
     post_pop = p.Population(
-        1, p.IF_curr_exp(),  label="post", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(1)})
+        1, p.IF_curr_exp(), label="post", n_synapse_cores=1)
 
     # Create projections
     p.Projection(
@@ -94,14 +91,13 @@ def split_potentiation_and_depression():
 
     # Get the spikes
     post_spikes = numpy.array(
-        # pylint: disable=no-member
         post_pop.get_data('spikes').segments[0].spiketrains[0].magnitude)
 
     # End the simulation as all information gathered
     p.end()
 
     new_weight_exact = calculate_spike_pair_additive_stdp_weight(
-        pre_spikes, post_spikes, initial_weight, plastic_delay,
+        numpy.array(pre_spikes), post_spikes, initial_weight, plastic_delay,
         a_plus, a_minus, tau_plus, tau_minus)
 
     print("Pre neuron spikes at: {}".format(pre_spikes))
@@ -117,5 +113,5 @@ def split_potentiation_and_depression():
 
 class TestSTDPPairAdditive(BaseTestCase):
 
-    def test_split_potentiation_and_depression(self):
+    def test_split_potentiation_and_depression(self) -> None:
         self.runsafe(split_potentiation_and_depression)

@@ -11,30 +11,49 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from enum import Enum, IntEnum
+
+from __future__ import annotations
+from enum import IntEnum
+from typing import Optional, Sequence, TYPE_CHECKING
+
+from spinn_utilities.overrides import overrides
 
 from spinnman.model.enums import ExecutableType
-from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
-from spinn_utilities.overrides import overrides
+
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
-from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
+from pacman.model.resources import AbstractSDRAM
+
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
+from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
+
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
+from .delay_extension_vertex import DelayExtensionVertex
+
+if TYPE_CHECKING:
+    from pacman.model.placements import Placement
+    from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 
 
 class DelayExtensionMachineVertex(
         MachineVertex, ProvidesProvenanceDataFromMachineImpl,
         AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification):
+    """
+    Vertex that implements a delay extension.
+    Not expected to be directly referenced in user code.
+    """
 
-    __slots__ = [
+    __slots__ = (
         "__sdram",
-        "__drop_late_spikes"]
+        "__drop_late_spikes")
 
-    class _DELAY_EXTENSION_REGIONS(IntEnum):
+    class _DelayExtensionRegions(IntEnum):
         """
         Region indices.
         """
@@ -43,7 +62,7 @@ class DelayExtensionMachineVertex(
         PROVENANCE_REGION = 2
         TDMA_REGION = 3
 
-    class EXTRA_PROVENANCE_DATA_ENTRIES(Enum):
+    class _ExtraProvenanceDataEntries(IntEnum):
         """
         Indices into raw provenance data about delay extension vertices.
         """
@@ -72,7 +91,7 @@ class DelayExtensionMachineVertex(
         #: The number of times the background queue overflowed
         N_BACKGROUND_OVERLOADS = 11
 
-    N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
+    N_EXTRA_PROVENANCE_DATA_ENTRIES = len(_ExtraProvenanceDataEntries)
 
     COUNT_SATURATION_NAME = "saturation_count"
     INVALID_NEURON_ID_COUNT_NAME = "invalid_neuron_count"
@@ -88,14 +107,13 @@ class DelayExtensionMachineVertex(
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
-    def __init__(self, sdram, label, vertex_slice, app_vertex=None):
+    def __init__(self, sdram: AbstractSDRAM, label: str, vertex_slice: Slice,
+                 app_vertex: Optional[ApplicationVertex] = None):
         """
-        :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The SDRAM required by the vertex
-        :param str label: The name of the vertex
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the vertex
-        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
+        :param sdram: The SDRAM required by the vertex
+        :param label: The name of the vertex
+        :param vertex_slice: The slice of the vertex
+        :param app_vertex:
             The application vertex that caused this machine vertex to be
             created. If `None`, there is no such application vertex.
         """
@@ -104,24 +122,32 @@ class DelayExtensionMachineVertex(
         self.__sdram = sdram
 
     @property
+    @overrides(MachineVertex.app_vertex)
+    def app_vertex(self) -> DelayExtensionVertex:
+        assert isinstance(self._app_vertex, DelayExtensionVertex)
+        return self._app_vertex
+
+    @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
-    def _provenance_region_id(self):
-        return self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION
+    def _provenance_region_id(self) -> int:
+        return self._DelayExtensionRegions.PROVENANCE_REGION
 
     @property
     @overrides(
         ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
-    def _n_additional_data_items(self):
+    def _n_additional_data_items(self) -> int:
         return self.N_EXTRA_PROVENANCE_DATA_ENTRIES
 
     @property
     @overrides(MachineVertex.sdram_required)
-    def sdram_required(self):
+    def sdram_required(self) -> AbstractSDRAM:
         return self.__sdram
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                parse_extra_provenance_items)
-    def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
+    def parse_extra_provenance_items(
+            self, label: str, x: int, y: int, p: int,
+            provenance_data: Sequence[int]) -> None:
         (n_received, n_processed, n_added, n_sent, n_overflows, n_delays,
          n_sat, n_bad_neuron, n_bad_keys, n_late_spikes, max_bg,
          n_bg_overloads) = provenance_data
@@ -193,7 +219,7 @@ class DelayExtensionMachineVertex(
             db.insert_core(x, y, p, self.N_LATE_SPIKES_NAME, n_late_spikes)
             if n_late_spikes == 0:
                 pass
-            elif self._app_vertex.drop_late_spikes:
+            elif self.app_vertex.drop_late_spikes:
                 db.insert_report(
                     f"On {label}, {n_late_spikes} packets were dropped from "
                     f"the input buffer, because they arrived too late to be "
@@ -226,21 +252,23 @@ class DelayExtensionMachineVertex(
                     ".spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(MachineVertex.get_n_keys_for_partition)
-    def get_n_keys_for_partition(self, partition_id):
+    def get_n_keys_for_partition(self, partition_id: str) -> int:
         n_keys = super().get_n_keys_for_partition(partition_id)
-        n_colours = 2 ** self.app_vertex.n_colour_bits
-        return n_keys * self.app_vertex.n_delay_stages * n_colours
+        v = self.app_vertex
+        n_colours = 2 ** v.n_colour_bits
+        return n_keys * v.n_delay_stages * n_colours
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
-    def get_binary_file_name(self):
+    def get_binary_file_name(self) -> str:
         return "delay_extension.aplx"
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
-    def get_binary_start_type(self):
+    def get_binary_start_type(self) -> ExecutableType:
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
-    def generate_data_specification(self, spec, placement):
+    def generate_data_specification(self, spec: DataSpecificationGenerator,
+                                    placement: Placement) -> None:
         vertex = placement.vertex
 
         # Reserve memory:
@@ -248,72 +276,72 @@ class DelayExtensionMachineVertex(
 
         # ###################################################################
         # Reserve SDRAM space for memory areas:
-        delay_params_sz = self._app_vertex.delay_params_size()
+        delay_params_sz = self.app_vertex.delay_params_size()
 
         spec.reserve_memory_region(
-            region=self._DELAY_EXTENSION_REGIONS.SYSTEM,
+            region=self._DelayExtensionRegions.SYSTEM,
             size=SIMULATION_N_BYTES, label='setup')
 
         spec.reserve_memory_region(
-            region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS,
+            region=self._DelayExtensionRegions.DELAY_PARAMS,
             size=delay_params_sz, label='delay_params')
 
         # reserve region for provenance
         self.reserve_provenance_data_region(spec)
 
+        assert isinstance(vertex, AbstractHasAssociatedBinary)
         self._write_setup_info(spec, vertex.get_binary_file_name())
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
         routing_infos = SpynnakerDataView.get_routing_infos()
-        key = routing_infos.get_first_key_from_pre_vertex(
-            vertex, SPIKE_PARTITION_ID)
+        key = routing_infos.get_single_key_from(vertex)
 
         srcs = self.app_vertex.source_vertex.splitter.get_out_going_vertices(
-            SPIKE_PARTITION_ID)
+            self.app_vertex.partition.identifier)
         for source_vertex in srcs:
             if source_vertex.vertex_slice == self.vertex_slice:
-                r_info = routing_infos.get_routing_info_from_pre_vertex(
-                    source_vertex, SPIKE_PARTITION_ID)
+                r_info = routing_infos.get_info_from(
+                    source_vertex, self.app_vertex.partition.identifier)
                 incoming_key = r_info.key
                 incoming_mask = r_info.mask
                 break
 
         self.write_delay_parameters(
-            spec, self._vertex_slice, key, incoming_key, incoming_mask)
+            spec, self.vertex_slice, key, incoming_key, incoming_mask)
 
         # End-of-Spec:
         spec.end_specification()
 
-    def _write_setup_info(self, spec, binary_name):
+    def _write_setup_info(
+            self, spec: DataSpecificationGenerator, binary_name: str) -> None:
         """
-        :param ~data_specification.DataSpecificationGenerator spec:
-        :param str binary_name: the binary name
+        :param spec:
+        :param binary_name: the binary name
         """
         # Write this to the system region (to be picked up by the simulation):
-        spec.switch_write_focus(self._DELAY_EXTENSION_REGIONS.SYSTEM)
+        spec.switch_write_focus(self._DelayExtensionRegions.SYSTEM)
         spec.write_array(simulation_utilities.get_simulation_header_array(
             binary_name))
 
     def write_delay_parameters(
-            self, spec, vertex_slice, key, incoming_key, incoming_mask):
+            self, spec: DataSpecificationGenerator, vertex_slice: Slice,
+            key: Optional[int], incoming_key: int, incoming_mask: int) -> None:
         """
         Generate Delay Parameter data.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param int key:
-        :param int incoming_key:
-        :param int incoming_mask:
+        :param spec:
+        :param vertex_slice:
+        :param key:
+        :param incoming_key:
+        :param incoming_mask:
         """
-        # pylint: disable=too-many-arguments
-
         # Write spec with commands to construct required delay region:
         spec.comment(
             f"Writing Delay Parameters for {vertex_slice.n_atoms} Neurons:\n")
 
         # Set the focus to the memory region 2 (delay parameters):
-        spec.switch_write_focus(self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS)
+        spec.switch_write_focus(self._DelayExtensionRegions.DELAY_PARAMS)
 
         # Write header info to the memory region:
         # Write Key info for this core and the incoming key and mask:
@@ -329,14 +357,15 @@ class DelayExtensionMachineVertex(
         # Write the number of neurons in the block:
         spec.write_value(data=vertex_slice.n_atoms)
 
+        app_vertex = self.app_vertex
         # Write the number of blocks of delays:
-        spec.write_value(data=self._app_vertex.n_delay_stages)
+        spec.write_value(data=app_vertex.n_delay_stages)
 
         # write the delay per delay stage
-        spec.write_value(data=self._app_vertex.delay_per_stage)
+        spec.write_value(data=app_vertex.delay_per_stage)
 
         # write whether to throw away spikes
-        spec.write_value(data=int(self._app_vertex.drop_late_spikes))
+        spec.write_value(data=int(app_vertex.drop_late_spikes))
 
         # Write the number of colour bits
-        spec.write_value(data=self.app_vertex.n_colour_bits)
+        spec.write_value(data=app_vertex.n_colour_bits)

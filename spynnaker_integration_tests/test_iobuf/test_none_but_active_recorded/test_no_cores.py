@@ -23,11 +23,11 @@ from spynnaker.pyNN.data import SpynnakerDataView
 
 class TestNoIobufDuringRun(BaseTestCase):
 
-    def check_for_iobufs(self, prov_path):
+    def check_for_iobufs(self, prov_path: str) -> bool:
         return any("iobuf" in filename and ".txt" in filename
                    for filename in os.listdir(prov_path))
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(timestep=1.0, min_delay=1.0)
         sim.Population(10, sim.IF_curr_exp(), label='pop_1')
         sim.run(500)
@@ -37,7 +37,7 @@ class TestNoIobufDuringRun(BaseTestCase):
         sim.end()
         self.assertFalse(self.check_for_iobufs(prov_path))
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)
 
 

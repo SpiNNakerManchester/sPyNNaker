@@ -21,12 +21,12 @@ from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 
 n_neurons = 200  # number of neurons in each population
 simtime = 500
-neurons_per_core = n_neurons / 2
+neurons_per_core = n_neurons // 2
 
 
 class TestCoresAndBinariesRecording(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 
@@ -53,7 +53,7 @@ class TestCoresAndBinariesRecording(BaseTestCase):
                 data.add(placement)
 
         false_data = list(range(0, 16))
-        for placement in SpynnakerDataView.iterate_placements_on_core(0, 0):
+        for placement in SpynnakerDataView.iterate_placements_on_core((0, 0)):
             if placement in data:
                 false_data.remove(placement.p)
 
@@ -67,5 +67,5 @@ class TestCoresAndBinariesRecording(BaseTestCase):
                 "iobuf_for_chip_0_0_processor_id_{}.txt".format(processor),
                 provenance_files)
 
-    def test_do_run(self):
+    def test_do_run(self) -> None:
         self.runsafe(self.do_run)

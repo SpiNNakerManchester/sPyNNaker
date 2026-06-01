@@ -12,25 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import pyNN.spiNNaker as sim
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexNeuronsSynapses)
 from spinnaker_testbase import BaseTestCase
 
 
-def run_sdram_split():
+def run_sdram_split() -> None:
     sim.setup(1.0)
 
-    spikeArray = {'spike_times': []}
     pre_pop = sim.Population(
-        21000, sim.SpikeSourceArray(**spikeArray), label="pre")
+        21000, sim.SpikeSourceArray(spike_times=[]), label="pre",
+        neurons_per_core=20000)
     post_pop = sim.Population(
-        600, sim.IF_cond_exp, label="post",
-        additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(
-                1, 64, False)})
-
-    pre_pop.set_max_atoms_per_core(20000)
-    post_pop.set_max_atoms_per_core(64)
+        600, sim.IF_cond_exp, label="post", neurons_per_core=64,
+        n_synapse_cores=1, allow_delay_extensions=False)
 
     sim.Projection(pre_pop, post_pop, sim.AllToAllConnector(), label="proj")
 
@@ -41,7 +34,7 @@ def run_sdram_split():
 
 class TestSplitSDRAM(BaseTestCase):
 
-    def test_run_simple_split(self):
+    def test_run_simple_split(self) -> None:
         self.runsafe(run_sdram_split)
 
 

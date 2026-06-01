@@ -12,30 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import pyNN.spiNNaker as sim
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexNeuronsSynapses)
 import numpy
 from spinnaker_testbase import BaseTestCase
 
 
-def run_delayed_split():
+def run_delayed_split() -> None:
     sim.setup(0.1, time_scale_factor=1)
     source = sim.Population(10, sim.SpikeSourceArray(spike_times=[0]))
     target_1 = sim.Population(
-        10, sim.IF_curr_exp(), label="target_1", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(1)})
+        10, sim.IF_curr_exp(), label="target_1", n_synapse_cores=1)
     target_1.record("spikes")
     target_2 = sim.Population(
-        10, sim.IF_curr_exp(), label="target_2", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(2)})
+        10, sim.IF_curr_exp(), label="target_2", n_synapse_cores=2)
     target_2.record("spikes")
     target_3 = sim.Population(
-        10, sim.IF_curr_exp(), label="target_3", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(3)})
+        10, sim.IF_curr_exp(), label="target_3", n_synapse_cores=3)
     target_3.record("spikes")
     target_4 = sim.Population(
-        10, sim.IF_curr_exp(), label="target_4", additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexNeuronsSynapses(3)})
+        10, sim.IF_curr_exp(), label="target_4", n_synapse_cores=3)
     target_4.record("spikes")
 
     # Try from list, which means host generated
@@ -98,7 +92,7 @@ def run_delayed_split():
 
 class TestSplitDelays(BaseTestCase):
 
-    def test_run_simple_split(self):
+    def test_run_simple_split(self) -> None:
         self.runsafe(run_delayed_split)
 
 

@@ -19,7 +19,7 @@ from spinnaker_testbase import BaseTestCase
 
 class ParamsUsingRandomDists(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         nNeurons = 2
         p.setup(timestep=1.0, min_delay=1.0)
 
@@ -61,5 +61,5 @@ class ParamsUsingRandomDists(BaseTestCase):
         self.assertEqual(nNeurons, len(pop_1.get("v_thresh")))
         p.end()
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)

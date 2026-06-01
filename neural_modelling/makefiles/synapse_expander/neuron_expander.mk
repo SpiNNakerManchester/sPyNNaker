@@ -13,7 +13,6 @@
 # limitations under the License.
 
 APP = neuron_expander
-BUILD_DIR = build/
 SOURCES = synapse_expander/rng.c \
           synapse_expander/param_generator.c \
           synapse_expander/neuron_expander.c

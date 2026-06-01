@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .abstract_population_vertex import AbstractPopulationVertex
 from .connection_holder import ConnectionHolder
 from .population_machine_vertex import (
     PopulationMachineVertex, SpikeProcessingProvenance)
@@ -25,17 +24,19 @@ from .population_synapses_machine_vertex_shared import (
 from .population_synapses_machine_vertex_common import (
     PopulationSynapsesMachineVertexCommon, SpikeProcessingFastProvenance)
 from .population_machine_synapses_provenance import SynapseProvenance
+from .population_vertex import PopulationVertex
 from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
 from .abstract_pynn_neuron_model_standard import (
     AbstractPyNNNeuronModelStandard)
 from .population_machine_local_only_combined_vertex import (
     PopulationMachineLocalOnlyCombinedVertex, LocalOnlyProvenance)
 
-__all__ = ["AbstractPopulationVertex", "AbstractPyNNNeuronModel",
+__all__ = ["AbstractPyNNNeuronModel",
            "AbstractPyNNNeuronModelStandard", "ConnectionHolder",
            "PopulationMachineVertex", "PopulationNeuronsMachineVertex",
            "NeuronProvenance", "PopulationSynapsesMachineVertexCommon",
            "PopulationSynapsesMachineVertexLead", "NeuronRegions",
-           "PopulationSynapsesMachineVertexShared", "SynapseProvenance",
+           "PopulationSynapsesMachineVertexShared", "PopulationVertex",
+           "SynapseProvenance",
            "SpikeProcessingProvenance", "SpikeProcessingFastProvenance",
            "PopulationMachineLocalOnlyCombinedVertex", "LocalOnlyProvenance"]

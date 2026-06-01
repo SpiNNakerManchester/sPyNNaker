@@ -11,9 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Any, Union, cast
+
 import numpy
-from spinn_front_end_common.interface.ds import DataType
+from numpy import uint32, int32
+from numpy.typing import NDArray
+from typing_extensions import TypeAlias
+
 from pyNN.random import RandomDistribution, available_distributions
+
+from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
@@ -26,11 +33,10 @@ _GENERATOR_TYPES = {
 }
 
 
-def get_generator_type(data_type):
+def get_generator_type(data_type: DataType) -> int:
     """
-    :param ~data_specification.enums.DataType data_type:
+    :param data_type:
     :return: The generator parameter type code for the given data type.
-    :rtype: int
     :raises TypeError: If an unsupported data type is given
     """
     if data_type in _GENERATOR_TYPES:
@@ -38,13 +44,12 @@ def get_generator_type(data_type):
     raise TypeError(f"Ungeneratable type {data_type}")
 
 
-def type_has_generator(data_type):
+def type_has_generator(data_type: DataType) -> bool:
     """
-    :param ~data_specification.enums.DataType data_type:
+    :param data_type:
     :return:
         Whether there is a generator parameter type code for the given data
         type.
-    :rtype: bool
     """
     return data_type in _GENERATOR_TYPES
 
@@ -63,12 +68,13 @@ PARAM_TYPE_BY_NAME = {
     "exponential_clipped": 6
 }
 
+_ParamType: TypeAlias = Union[int, float, RandomDistribution]
 
-def param_generator_id(value):
+
+def param_generator_id(value: _ParamType) -> int:
     """
     :param value: The value to examine the type of.
     :return: The ID of the on-chip generator that handles the value.
-    :rtype: int
     :raises TypeError: If an value of an unsupported data type is given
     """
     # Scalars are fine on the machine
@@ -84,11 +90,10 @@ def param_generator_id(value):
     raise TypeError(f"Ungeneratable parameter {value}")
 
 
-def is_param_generatable(value):
+def is_param_generatable(value: Any) -> bool:
     """
     :param value: The value to examine the type of.
     :return: Whether the value is of a type that can be generated on chip.
-    :rtype: bool
     """
     if isinstance(value, str):
         return False
@@ -98,18 +103,15 @@ def is_param_generatable(value):
             value.name in PARAM_TYPE_BY_NAME)
 
 
-def param_generator_params(values):
+def param_generator_params(values: _ParamType) -> NDArray[uint32]:
     """
-    Get the parameter generator parameters as a numpy array.
-
     :param values:
-    :type values: int or ~pyNN.random.RandomDistribution
-    :rtype: ~numpy.ndarray
+    :returns: The parameter generator parameters as a numpy array.
     """
     if numpy.isscalar(values):
         return numpy.array(
-            [DataType.S1615.encode_as_int(values)],
-            dtype=numpy.uint32)
+            [DataType.S1615.encode_as_int(cast(float, values))],
+            dtype=int32).view(uint32)
 
     if isinstance(values, RandomDistribution):
         parameters = (
@@ -121,7 +123,7 @@ def param_generator_params(values):
             for param in parameters if param is not None)
         params = [
             DataType.S1615.encode_as_int(param) for param in parameters]
-        return numpy.array(params, dtype=numpy.uint32)
+        return numpy.array(params, dtype=int32).view(uint32)
 
     raise ValueError(f"Unexpected value {values}")
 
@@ -130,13 +132,10 @@ def param_generator_params(values):
 MAX_PARAMS_BYTES = 4 * BYTES_PER_WORD
 
 
-def param_generator_params_size_in_bytes(values):
+def param_generator_params_size_in_bytes(values: _ParamType) -> int:
     """
-    Get the size of the parameter generator parameters in bytes.
-
     :param values:
-    :type values: int or ~pyNN.random.RandomDistribution
-    :rtype: int
+    :returns: The size of the parameter generator parameters in bytes.
     :raises TypeError: If `values` is of an unsupported data type
     """
     if numpy.isscalar(values):

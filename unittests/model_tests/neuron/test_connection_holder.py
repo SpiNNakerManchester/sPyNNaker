@@ -15,17 +15,19 @@
 import math
 import pytest
 import numpy
+from typing import Any, List, Optional, Tuple
+
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import ConnectionHolder
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSDRAMSynapseDynamics)
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    NUMPY_CONNECTORS_DTYPE)
 
 
 @pytest.fixture(
     scope="module",
     params=[None, [], ["weight"], ["source", "target", "weight", "delay"]],
     ids=["None", "Empty", "SingleItem", "MultiItem"])
-def data_items(request):
+def data_items(request: Any) -> Optional[List[str]]:
     return request.param
 
 
@@ -34,7 +36,7 @@ def data_items(request):
     params=[None, [], [("test", 100)],
             [("test", 100), ("test_2", 200), ("test_3", 300)]],
     ids=["None", "Empty", "SingleValue", "MultiValue"])
-def fixed_values(request):
+def fixed_values(request: Any) -> Optional[List[Tuple[str, int]]]:
     return request.param
 
 
@@ -42,11 +44,13 @@ def fixed_values(request):
     scope="module",
     params=[True, False],
     ids=["AsList", "AsMatrix"])
-def as_list(request):
+def as_list(request: Any) -> bool:
     return request.param
 
 
-def test_connection_holder(data_items, fixed_values, as_list):
+def test_connection_holder(
+        data_items: Optional[List[str]],
+        fixed_values: Optional[List[Tuple[str, int]]], as_list: bool) -> None:
     unittest_setup()
     all_values = None
     n_items = 0
@@ -69,7 +73,7 @@ def test_connection_holder(data_items, fixed_values, as_list):
         n_post_atoms=2, fixed_values=fixed_values)
     connections = numpy.array(
         [(0, 0, 1, 10), (0, 0, 2, 20), (0, 1, 3, 30)],
-        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+        NUMPY_CONNECTORS_DTYPE)
     connection_holder.add_connections(connections)
 
     if as_list:
@@ -84,24 +88,28 @@ def test_connection_holder(data_items, fixed_values, as_list):
             p = 0
             if test_data_items is not None:
                 p = len(test_data_items)
-                for j, item in enumerate(test_data_items):
+                for j, item_d in enumerate(test_data_items):
 
-                    item_index = connections.dtype.names.index(item)
+                    names = connections.dtype.names
+                    assert names is not None
+                    item_index = names.index(item_d)
 
+                    chi = connection_holder[i]
                     # Check that the value matches with the correct field value
                     if n_items == 1:
-                        assert connection_holder[i] == \
-                            connections[i][item_index]
+                        assert chi == connections[i][item_index]
                     else:
-                        assert connection_holder[i][j] == \
-                            connections[i][item_index]
+                        assert isinstance(chi, list)
+                        assert chi[j] == connections[i][item_index]
 
             if fixed_values is not None:
-                for j, item in enumerate(fixed_values):
+                for j, item_f in enumerate(fixed_values):
                     if n_items == 1:
-                        assert connection_holder[i] == item[1]
+                        assert connection_holder[i] == item_f[1]
                     else:
-                        assert connection_holder[i][p + j] == item[1]
+                        chi = connection_holder[i]
+                        assert isinstance(chi, list)
+                        assert chi[p + j] == item_f[1]
 
     else:
 
@@ -113,8 +121,12 @@ def test_connection_holder(data_items, fixed_values, as_list):
             # matrix
             if n_items == 1:
                 assert len(connection_holder) == 2
-                assert len(connection_holder[0]) == 2
-                assert len(connection_holder[1]) == 2
+                ch0 = connection_holder[0]
+                assert isinstance(ch0, numpy.ndarray)
+                assert len(ch0) == 2
+                ch1 = connection_holder[1]
+                assert isinstance(ch1, numpy.ndarray)
+                assert len(ch1) == 2
             else:
                 assert len(connection_holder) == n_items
                 for matrix in connection_holder:
@@ -127,10 +139,12 @@ def test_connection_holder(data_items, fixed_values, as_list):
             p = 0
             if test_data_items is not None:
                 p = len(test_data_items)
-                for j, item in enumerate(test_data_items):
+                for j, item_d in enumerate(test_data_items):
 
                     # Check that the value matches with the correct field value
-                    item_index = connections.dtype.names.index(item)
+                    names = connections.dtype.names
+                    assert names is not None
+                    item_index = names.index(item_d)
                     if n_items == 1:
                         matrix = connection_holder
                     else:
@@ -142,24 +156,24 @@ def test_connection_holder(data_items, fixed_values, as_list):
                     assert math.isnan(matrix[1, 1])
 
             if fixed_values is not None:
-                for j, item in enumerate(fixed_values):
+                for j, item_f in enumerate(fixed_values):
                     if n_items == 1:
                         matrix = connection_holder
                     else:
                         matrix = connection_holder[j + p]
-                    assert matrix[0, 0] == item[1]
-                    assert matrix[0, 1] == item[1]
+                    assert matrix[0, 0] == item_f[1]
+                    assert matrix[0, 1] == item_f[1]
                     assert math.isnan(matrix[1, 0])
                     assert math.isnan(matrix[1, 1])
 
 
-def test_connection_holder_matrix_multiple_items():
+def test_connection_holder_matrix_multiple_items() -> None:
     unittest_setup()
-    data_items = ["source", "target", "delay", "weight"]
+    data_items_to_return = ["source", "target", "delay", "weight"]
     connection_holder = ConnectionHolder(
-        data_items_to_return=data_items,
+        data_items_to_return=data_items_to_return,
         as_list=False, n_pre_atoms=2, n_post_atoms=2)
     connections = numpy.array(
         [(0, 0, 1, 10), (0, 0, 2, 20), (0, 1, 3, 30)],
-        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+        NUMPY_CONNECTORS_DTYPE)
     connection_holder.add_connections(connections)

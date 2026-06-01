@@ -21,7 +21,7 @@ from spinnaker_testbase import BaseTestCase
 
 class TestSynapsesExcitVsInhib(BaseTestCase):
 
-    def do_run(self):
+    def do_run(self) -> None:
         p.setup(timestep=1.0, min_delay=1.0)
 
         cell_params = {'i_offset': .1, 'tau_refrac': 3.0, 'v_rest': -65.0,
@@ -62,5 +62,5 @@ class TestSynapsesExcitVsInhib(BaseTestCase):
         self.assertLess(v2[42][2], v2[41][2])
         self.assertLess(v2[62][2], v2[61][2])
 
-    def test_run(self):
+    def test_run(self) -> None:
         self.runsafe(self.do_run)

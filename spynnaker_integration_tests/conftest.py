@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterator
+
 import pytest
+from _pytest.fixtures import SubRequest
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 import pyNN.spiNNaker as sim
 
 
 @pytest.fixture(autouse=True)
-def check_end_is_called(request):
+def check_end_is_called(request: SubRequest) -> Iterator[None]:
     """ Fixture for all tests, to make sure end is used!
     """
     yield

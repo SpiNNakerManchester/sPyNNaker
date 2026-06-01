@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable, List, Optional
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
 
@@ -26,50 +27,54 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
     A connection for receiving and sending live spikes from and to
     SpiNNaker.
     """
-    __slots__ = []
+    __slots__ = ()
 
-    def __init__(self, receive_labels=None, send_labels=None, local_host=None,
-                 local_port=NOTIFY_PORT,
-                 live_packet_gather_label="LiveSpikeReceiver"):
+    def __init__(self, receive_labels: Optional[Iterable[str]] = None,
+                 send_labels: Optional[Iterable[str]] = None,
+                 local_host: Optional[str] = None,
+                 local_port: Optional[int] = NOTIFY_PORT,
+                 live_packet_gather_label: str = "LiveSpikeReceiver"):
         """
-        :param iterable(str) receive_labels:
+        :param receive_labels:
             Labels of population from which live spikes will be received.
-        :param iterable(str) send_labels:
+        :param send_labels:
             Labels of population to which live spikes will be sent
-        :param str local_host:
+        :param local_host:
             Optional specification of the local hostname or IP address of the
             interface to listen on
-        :param int local_port:
+        :param local_port:
             Optional specification of the local port to listen on. Must match
             the port that the toolchain will send the notification on (19999
             by default)
         """
-        # pylint: disable=too-many-arguments
         super().__init__(
             live_packet_gather_label, receive_labels, send_labels,
             local_host, local_port)
 
-    def send_spike(self, label, neuron_id, send_full_keys=False):
+    def send_spike(self, label: str, neuron_id: int,
+                   send_full_keys: bool = False) -> None:
         """
         Send a spike from a single neuron.
 
-        :param str label:
+        :param label:
             The label of the population from which the spike will originate
-        :param int neuron_id: The ID of the neuron sending a spike
-        :param bool send_full_keys: Determines whether to send full 32-bit
+        :param neuron_id: The ID of the neuron sending a spike
+        :param send_full_keys: Determines whether to send full 32-bit
             keys, getting the key for each neuron from the database, or
             whether to send 16-bit neuron IDs directly
         """
         self.send_spikes(label, [neuron_id], send_full_keys)
 
-    def send_spikes(self, label, neuron_ids, send_full_keys=False):
+    def send_spikes(
+            self, label: str, neuron_ids: List[int],
+            send_full_keys: bool = False) -> None:
         """
         Send a number of spikes.
 
-        :param str label:
+        :param label:
             The label of the population from which the spikes will originate
-        :param list(int) neuron_ids: array-like of neuron IDs sending spikes
-        :param bool send_full_keys: Determines whether to send full 32-bit
+        :param neuron_ids: array-like of neuron IDs sending spikes
+        :param send_full_keys: Determines whether to send full 32-bit
             keys, getting the key for each neuron from the database, or
             whether to send 16-bit neuron IDs directly
         """
