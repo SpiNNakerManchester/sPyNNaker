@@ -15,6 +15,8 @@ import shutil
 import struct
 from typing import Any, BinaryIO, List, Optional, Sequence, Tuple
 import unittest
+
+from parameterized import parameterized
 from tempfile import mkdtemp
 import numpy
 import pytest
