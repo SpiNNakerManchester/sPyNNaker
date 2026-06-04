@@ -98,32 +98,18 @@ static bool fixed_post_write(uint32_t pre, uint32_t post, accum weight_scale,
 
 /**
  * \brief Generate connections with the fixed-post connection generator
- * \param[in] generator: The generator to use to generate connections
- * \param[in] pre_slice_start: The start of the slice of the pre-population
- *                             being generated
- * \param[in] pre_slice_count: The number of neurons in the slice of the
- *                             pre-population being generated
- * \param[in] pre_neuron_index: The index of the neuron in the pre-population
- *                              being generated
- * \param[in] post_slice_start: The start of the slice of the post-population
- *                              being generated
- * \param[in] post_slice_count: The number of neurons in the slice of the
- *                              post-population being generated
- * \param[in] max_row_length: The maximum number of connections to generate
- * \param[in,out] indices: An array into which the core-relative post-indices
- *                         should be placed.  This will be initialised to be
- *                         \p max_row_length in size
- * \return The number of connections generated
  */
 static bool connection_generator_fixed_post_generate(
         void *generator, uint32_t pre_lo, uint32_t pre_hi,
-        uint32_t post_lo, uint32_t post_hi, UNUSED uint32_t post_index,
+        uint32_t post_lo, uint32_t post_hi,
+        uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t post_slice_start, uint32_t post_slice_count,
         unsigned long accum weight_scale, accum timestep_per_delay,
         param_generator_t weight_generator, param_generator_t delay_generator,
         matrix_generator_t matrix_generator) {
 
     // Get the actual ranges to generate within
+    uint32_t pre_slice_end = pre_slice_start + pre_slice_count;
     uint32_t post_slice_end = post_slice_start + post_slice_count;
 
     struct fixed_post *obj = generator;

@@ -62,30 +62,24 @@ static void connection_generator_all_to_all_free(void *generator) {
 
 /**
  * \brief Generate connections with the all-to-all connection generator
- * \param[in] generator: The generator to use to generate connections
- * \param[in] pre_slice_start: The start of the slice of the pre-population
- *                             being generated
- * \param[in] pre_slice_count: The number of neurons in the slice of the
- *                             pre-population being generated
- * \param[in] post_slice_start: The start of the slice of the post-population
- *                              being generated
- * \param[in] post_slice_count: The number of neurons in the slice of the
- *                              post-population being generated
  */
 static bool connection_generator_all_to_all_generate(
         void *generator, uint32_t pre_lo, uint32_t pre_hi,
-        uint32_t post_lo, uint32_t post_hi, UNUSED uint32_t post_index,
+        uint32_t post_lo, uint32_t post_hi,
+        uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t post_slice_start, uint32_t post_slice_count,
         unsigned long accum weight_scale, accum timestep_per_delay,
         param_generator_t weight_generator, param_generator_t delay_generator,
         matrix_generator_t matrix_generator) {
 
     // Get the actual ranges to generate within
+    uint32_t pre_start = max(pre_slice_start, pre_lo);
+    uint32_t pre_end = min(pre_slice_start + pre_slice_count - 1, pre_hi);
     uint32_t post_start = max(post_slice_start, post_lo);
     uint32_t post_end = min(post_slice_start + post_slice_count - 1, post_hi);
 
     struct all_to_all *obj = generator;
-    for (uint32_t pre = pre_lo; pre <= pre_hi; pre++) {
+    for (uint32_t pre = pre_start; pre <= pre_end; pre++) {
         for (uint32_t post = post_start; post <= post_end; post++) {
             if (obj->allow_self_connections || pre != post) {
                 uint32_t local_post = post - post_slice_start;

@@ -85,26 +85,12 @@ void connection_generator_fixed_pre_free(void *generator) {
 
 /**
  * \brief Generate connections with the fixed-pre connection generator
- * \param[in] generator: The generator to use to generate connections
- * \param[in] pre_slice_start: The start of the slice of the pre-population
- *                             being generated
- * \param[in] pre_slice_count: The number of neurons in the slice of the
- *                             pre-population being generated
- * \param[in] pre_neuron_index: The index of the neuron in the pre-population
- *                              being generated
- * \param[in] post_slice_start: The start of the slice of the post-population
- *                              being generated
- * \param[in] post_slice_count: The number of neurons in the slice of the
- *                              post-population being generated
- * \param[in] max_row_length: The maximum number of connections to generate
- * \param[in,out] indices: An array into which the core-relative post-indices
- *                         should be placed.  This will be initialised to be
- *                         \p max_row_length in size
- * \return The number of connections generated
  */
 bool connection_generator_fixed_pre_generate(
-        void *generator, uint32_t pre_lo, uint32_t pre_hi,
-        uint32_t post_lo, uint32_t post_hi, UNUSED uint32_t post_index,
+        void *generator,
+        uint32_t pre_lo, uint32_t pre_hi,
+        uint32_t post_lo, uint32_t post_hi,
+        uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t post_slice_start, uint32_t post_slice_count,
         unsigned long accum weight_scale, accum timestep_per_delay,
         param_generator_t weight_generator, param_generator_t delay_generator,
@@ -137,7 +123,7 @@ bool connection_generator_fixed_pre_generate(
                     if (obj->params.allow_self_connections || pre != post) {
                         written = matrix_generator_write_synapse(
                                 matrix_generator, pre, local_post, weight, delay,
-								weight_scale);
+                                weight_scale);
                         n_retries++;
                     }
                 } while (!written && n_retries < 10);

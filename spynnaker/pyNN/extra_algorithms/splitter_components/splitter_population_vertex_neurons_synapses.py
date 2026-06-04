@@ -110,6 +110,8 @@ class SplitterPopulationVertexNeuronsSynapses(
         "__sysram_partitions",
         # The same chip groups
         "__same_chip_groups",
+        # The index used in get_source_specific_in_coming_vertices
+        "__synapse_index_used",
         # The application vertex sources that are neuromodulators
         "__neuromodulators")
 
@@ -128,6 +130,9 @@ class SplitterPopulationVertexNeuronsSynapses(
             SourceSegmentedSDRAMMachinePartition] = []
         self.__same_chip_groups: List[Tuple[
             List[MachineVertex], AbstractSDRAM]] = []
+        self.__synapse_index_used: Dict[Tuple[ApplicationVertex, str], int]
+        self.__synapse_index_used = dict()
+
         self.__neuromodulators: Set[ApplicationVertex] = set()
         self.__incoming_vertices: List[List[MachineVertex]] = []
         self.__poisson_sources: Set[SpikeSourcePoissonVertex] = set()

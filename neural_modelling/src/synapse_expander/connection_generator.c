@@ -45,8 +45,8 @@ enum {
     FIXED_PRE,             //!< Fixed pre-size connection generator
     FIXED_POST,            //!< Fixed post-size connection generator
     KERNEL,                //!< Convolution kernel connection generator
-	ALL_BUT_ME,            //!< AllButMe connection generator
-	ONE_TO_ONE_OFFSET,     //!< One-to-one offset connection generator
+    ALL_BUT_ME,            //!< AllButMe connection generator
+    ONE_TO_ONE_OFFSET,     //!< One-to-one offset connection generator
     N_CONNECTION_GENERATORS//!< The number of known generators
 };
 
@@ -102,13 +102,13 @@ static const connection_generator_info connection_generators[] = {
             connection_generator_kernel_generate,
             connection_generator_kernel_free},
     {ALL_BUT_ME,
-			connection_generator_all_but_me_initialise,
-			connection_generator_all_but_me_generate,
-			connection_generator_all_but_me_free},
-	{ONE_TO_ONE_OFFSET,
-			connection_generator_one_to_one_offset_initialise,
-			connection_generator_one_to_one_offset_generate,
-			connection_generator_one_to_one_offset_free}
+            connection_generator_all_but_me_initialise,
+            connection_generator_all_but_me_generate,
+            connection_generator_all_but_me_free},
+    {ONE_TO_ONE_OFFSET,
+            connection_generator_one_to_one_offset_initialise,
+            connection_generator_one_to_one_offset_generate,
+            connection_generator_one_to_one_offset_free}
 };
 
 connection_generator_t connection_generator_init(
@@ -140,15 +140,20 @@ connection_generator_t connection_generator_init(
 }
 
 bool connection_generator_generate(
-        connection_generator_t generator, uint32_t pre_lo, uint32_t pre_hi,
-        uint32_t post_lo, uint32_t post_hi, uint32_t post_index,
+        connection_generator_t generator,
+        uint32_t pre_lo, uint32_t pre_hi,
+        uint32_t post_lo, uint32_t post_hi,
+        uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t post_slice_start, uint32_t post_slice_count,
         unsigned long accum weight_scale, accum timestep_per_delay,
         param_generator_t weight_generator, param_generator_t delay_generator,
         matrix_generator_t matrix_generator) {
     return generator->type->generate(
-            generator->data, pre_lo, pre_hi, post_lo, post_hi, post_index,
-            post_slice_start, post_slice_count, weight_scale, timestep_per_delay,
+            generator->data,
+            pre_lo, pre_hi, post_lo, post_hi,
+            pre_slice_start, pre_slice_count,
+            post_slice_start, post_slice_count,
+            weight_scale, timestep_per_delay,
             weight_generator, delay_generator, matrix_generator);
 }
 
