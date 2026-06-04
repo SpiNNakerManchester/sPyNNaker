@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from parameterized import parameterized
 import pyNN.spiNNaker as sim
+from spinn_utilities.config_holder import set_config
+from spinn_machine.version import BIG_BOARD_TYPES
 from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.models.projection import Projection
@@ -48,8 +51,9 @@ class TestIndexBasedProbabilityConnector(BaseTestCase):
         # Check not all the maybes connected
         self.assertGreaterEqual(len(weights), must_count)
 
-    def check_connect(self, n: int, expression: str) -> None:
+    def check_connect(self, n: int, expression: str, ver_num: str) -> None:
         sim.setup(1.0)
+        set_config("Machine", "version", ver_num)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 10)
         pop1 = sim.Population(
             n, sim.SpikeSourceArray(spike_times=[0]), label="input")
@@ -63,8 +67,9 @@ class TestIndexBasedProbabilityConnector(BaseTestCase):
         self.check_weights(projection, n, expression, True)
         sim.end()
 
-    def check_connect_no_self(self, n: int, expression: str) -> None:
+    def check_connect_no_self(self, n: int, expression: str, ver_num:str) -> None:
         sim.setup(1.0)
+        set_config("Machine", "version", ver_num)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 10)
         pop = sim.Population(n, sim.IF_curr_exp(), label="pop")
         synapse_type = sim.StaticSynapse(weight=5, delay=2)
@@ -77,10 +82,12 @@ class TestIndexBasedProbabilityConnector(BaseTestCase):
         self.check_weights(projection, n, expression, False)
         sim.end()
 
-    def test_self(self) -> None:
+    @parameterized.expand(BIG_BOARD_TYPES)
+    def test_self(self, _:str, ver_num:str) -> None:
         self.check_connect(
-            n=6, expression="(i+j)%3*0.5")
+            n=6, expression="(i+j)%3*0.5", ver_num=ver_num)
 
-    def test_other(self) -> None:
+    @parameterized.expand(BIG_BOARD_TYPES)
+    def test_other(self, _:str, ver_num:str) -> None:
         self.check_connect_no_self(
-            n=6, expression="(i+j)%3*0.5")
+            n=6, expression="(i+j)%3*0.5", ver_num=ver_num)

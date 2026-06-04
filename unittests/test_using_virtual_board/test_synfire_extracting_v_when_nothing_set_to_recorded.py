@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from parameterized import parameterized
 import pyNN.spiNNaker as sim
+from spinn_utilities.config_holder import set_config
+from spinn_machine.version import BIG_BOARD_TYPES
 from spinnaker_testbase import BaseTestCase
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
@@ -21,9 +24,11 @@ class SynfireExtractingSpikesWhenNothingSetToRecorded(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_cause_error(self) -> None:
+    @parameterized.expand(BIG_BOARD_TYPES)
+    def test_cause_error(self, _:str, ver_num:str) -> None:
         with self.assertRaises(ConfigurationException):
             sim.setup(timestep=1.0)
+            set_config("Machine", "version", ver_num)
             sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 
             pop_1 = sim.Population(1, sim.IF_curr_exp(), label="pop_1")
