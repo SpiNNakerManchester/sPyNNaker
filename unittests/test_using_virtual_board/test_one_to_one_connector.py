@@ -51,7 +51,7 @@ class TestOneToOneConnector(BaseTestCase):
         sim.end()
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_same(self, _:str, ver_num:str) -> None:
+    def test_same(self, _: str, ver_num: str) -> None:
         self.check_other_connect(5, 5, ver_num)
 
     # Does not work on VM
@@ -63,11 +63,11 @@ class TestOneToOneConnector(BaseTestCase):
     #    self.check_other_connect(10, 5)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_many(self, _:str, ver_num:str) -> None:
+    def test_many(self, _: str, ver_num: str) -> None:
         self.check_other_connect(500, 500, ver_num)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_get_before_run(self, _:str, ver_num:str) -> None:
+    def test_get_before_run(self, _: str, ver_num: str) -> None:
         sim.setup(1.0)
         set_config("Machine", "version", ver_num)
         pop1 = sim.Population(3, sim.IF_curr_exp(), label="pop1")

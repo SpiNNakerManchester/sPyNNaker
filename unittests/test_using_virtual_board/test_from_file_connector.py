@@ -101,7 +101,7 @@ class TestFromFileConnector(BaseTestCase):
             pass
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_simple(self, _:str, ver_num:str) -> None:
+    def test_simple(self, _: str, ver_num: str) -> None:
         as_list: AsList4 = [
             (0, 0, 0.1, 10),
             (3, 0, 0.2, 11),
@@ -112,7 +112,7 @@ class TestFromFileConnector(BaseTestCase):
         self.check_other_connect(as_list, ver_num)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_list_too_big(self, _:str, ver_num:str) -> None:
+    def test_list_too_big(self, _: str, ver_num: str) -> None:
         as_list: AsList4 = [
             (0, 0, 0.1, 10),
             (13, 0, 0.2, 11),
@@ -123,7 +123,7 @@ class TestFromFileConnector(BaseTestCase):
         self.check_other_connect(as_list, ver_num)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_no_delays(self, _:str, ver_num:str) -> None:
+    def test_no_delays(self, _: str, ver_num: str) -> None:
         as_list = [
             (0, 0, 0.1),
             (3, 0, 0.2),
@@ -136,7 +136,7 @@ class TestFromFileConnector(BaseTestCase):
             d_index=None)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_no_weight(self, _:str, ver_num:str) -> None:
+    def test_no_weight(self, _: str, ver_num: str) -> None:
         as_list: List[Tuple[int, int, float]] = [
             (0, 0, 10),
             (3, 0, 11),
@@ -149,7 +149,7 @@ class TestFromFileConnector(BaseTestCase):
             d_index=2, w_index=None)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_invert(self, _:str, ver_num:str) -> None:
+    def test_invert(self, _: str, ver_num: str) -> None:
         as_list: List[Tuple[int, int, float, float]] = [
             (0, 0, 10, 0.1),
             (3, 0, 11, 0.2),
@@ -163,7 +163,7 @@ class TestFromFileConnector(BaseTestCase):
             w_index=3, d_index=2)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_big(self, _:str, ver_num:str) -> None:
+    def test_big(self, _: str, ver_num: str) -> None:
         sources = 200
         destinations = 300
         aslist: AsList4 = []

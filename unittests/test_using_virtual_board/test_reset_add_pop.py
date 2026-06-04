@@ -24,7 +24,7 @@ class TestResetAdd(BaseTestCase):
     # NO unittest_setup() as sim.setup is called
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def testReset_add(self, _:str, ver_num:str) -> None:
+    def testReset_add(self, _: str, ver_num: str) -> None:
         sim.setup(timestep=1.0)
         set_config("Machine", "version", ver_num)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 1)

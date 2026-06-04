@@ -25,7 +25,7 @@ class TestConstraint(BaseTestCase):
     # NO unittest_setup() as sim.setup is called
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_placement_constraint(self, _:str, ver_num:str) -> None:
+    def test_placement_constraint(self, _: str, ver_num: str) -> None:
         """
         test the get_placements call.
 

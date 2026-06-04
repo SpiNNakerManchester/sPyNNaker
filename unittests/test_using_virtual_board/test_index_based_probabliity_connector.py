@@ -83,11 +83,11 @@ class TestIndexBasedProbabilityConnector(BaseTestCase):
         sim.end()
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_self(self, _:str, ver_num:str) -> None:
+    def test_self(self, _: str, ver_num: str) -> None:
         self.check_connect(
             n=6, expression="(i+j)%3*0.5", ver_num=ver_num)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_other(self, _:str, ver_num:str) -> None:
+    def test_other(self, _: str, ver_num: str) -> None:
         self.check_connect_no_self(
             n=6, expression="(i+j)%3*0.5", ver_num=ver_num)

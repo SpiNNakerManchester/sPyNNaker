@@ -25,7 +25,7 @@ class SynfireExtractingSpikesWhenNothingSetToRecorded(BaseTestCase):
     # NO unittest_setup() as sim.setup is called
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_cause_error(self, _:str, ver_num:str) -> None:
+    def test_cause_error(self, _: str, ver_num: str) -> None:
         with self.assertRaises(ConfigurationException):
             sim.setup(timestep=1.0)
             set_config("Machine", "version", ver_num)

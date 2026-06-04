@@ -87,7 +87,7 @@ class TestFromListConnector(BaseTestCase):
         sim.end()
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_simple(self, _:str, ver_num:str) -> None:
+    def test_simple(self, _: str, ver_num: str) -> None:
         as_list: AsList4 = [
             (0, 0, 0.1, 10),
             (3, 0, 0.2, 11),
@@ -98,7 +98,7 @@ class TestFromListConnector(BaseTestCase):
         self.check_other_connect(as_list, ver_num)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_list_too_big(self, _:str, ver_num:str) -> None:
+    def test_list_too_big(self, _: str, ver_num: str) -> None:
         as_list: AsList4 = [
             (0, 0, 0.1, 10),
             (13, 0, 0.2, 11),
@@ -109,7 +109,7 @@ class TestFromListConnector(BaseTestCase):
         self.check_other_connect(as_list, ver_num)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_no_delays(self, _:str, ver_num:str) -> None:
+    def test_no_delays(self, _: str, ver_num: str) -> None:
         as_list: AsList3 = [
             (0, 0, 0.1),
             (3, 0, 0.2),
@@ -121,7 +121,7 @@ class TestFromListConnector(BaseTestCase):
             as_list, ver_num, column_names=["weight"], d_index=None)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_no_weight(self, _:str, ver_num:str) -> None:
+    def test_no_weight(self, _: str, ver_num: str) -> None:
         as_list: AsList3 = [
             (0, 0, 10),
             (3, 0, 11),
@@ -133,7 +133,7 @@ class TestFromListConnector(BaseTestCase):
             as_list, ver_num, column_names=["delay"], d_index=2, w_index=None)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_invert(self, _:str, ver_num:str) -> None:
+    def test_invert(self, _: str, ver_num: str) -> None:
         as_list: AsList4 = [
             (0, 0, 10, 0.1),
             (3, 0, 11, 0.2),
@@ -146,7 +146,7 @@ class TestFromListConnector(BaseTestCase):
             d_index=2)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_big(self, _:str, ver_num:str) -> None:
+    def test_big(self, _: str, ver_num: str) -> None:
         sources = 200
         destinations = 300
         aslist: AsList4 = []
@@ -159,7 +159,7 @@ class TestFromListConnector(BaseTestCase):
             sources=sources, destinations=destinations)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_get_before_run(self, _:str, ver_num:str) -> None:
+    def test_get_before_run(self, _: str, ver_num: str) -> None:
         sim.setup(1.0)
         set_config("Machine", "version", ver_num)
         pop1 = sim.Population(3, sim.IF_curr_exp(), label="pop1")
@@ -174,7 +174,7 @@ class TestFromListConnector(BaseTestCase):
         sim.end()
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_using_static_synapse_singles(self, _:str, ver_num:str) -> None:
+    def test_using_static_synapse_singles(self, _: str, ver_num: str) -> None:
         sim.setup(timestep=1.0)
         set_config("Machine", "version", ver_num)
         input = sim.Population(2, sim.SpikeSourceArray([0]), label="input")
@@ -191,7 +191,7 @@ class TestFromListConnector(BaseTestCase):
                 self.assertAlmostEqual(weights[i][j], target[i][j], places=3)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_using_half_static_synapse_singles(self, _:str, ver_num:str) -> None:
+    def test_using_half_static_synapse_singles(self, _: str, ver_num: str) -> None:
         sim.setup(timestep=1.0)
         set_config("Machine", "version", ver_num)
         input = sim.Population(2, sim.SpikeSourceArray([0]), label="input")
@@ -209,7 +209,7 @@ class TestFromListConnector(BaseTestCase):
                 self.assertAlmostEqual(weights[i][j], target[i][j], places=3)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_using_static_synapse_doubles(self, _:str, ver_num:str) -> None:
+    def test_using_static_synapse_doubles(self, _: str, ver_num: str) -> None:
         sim.setup(timestep=1.0)
         set_config("Machine", "version", ver_num)
         input = sim.Population(2, sim.SpikeSourceArray([0]), label="input")

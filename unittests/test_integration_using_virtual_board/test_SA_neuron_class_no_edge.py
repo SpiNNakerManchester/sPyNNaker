@@ -27,7 +27,7 @@ class SSANeuronClassNoEdgeTest(BaseTestCase):
     # NO unittest_setup() as sim.setup is called
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_run(self, _:str, ver_num:str) -> None:
+    def test_run(self, _: str, ver_num: str) -> None:
         sim.setup()
         set_config("Machine", "version", ver_num)
 

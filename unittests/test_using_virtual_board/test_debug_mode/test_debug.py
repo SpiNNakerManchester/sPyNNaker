@@ -54,7 +54,7 @@ class TestDebug(BaseTestCase):
                         f"Unable to find report for {option} {path}")
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_debug(self, _:str, ver_num:str) -> None:
+    def test_debug(self, _: str, ver_num: str) -> None:
         sim.setup(1.0)
         set_config("Machine", "version", ver_num)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
