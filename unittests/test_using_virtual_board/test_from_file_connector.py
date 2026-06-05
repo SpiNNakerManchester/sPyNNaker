@@ -73,7 +73,7 @@ class TestFromFileConnector(BaseTestCase):
             as_index += 1
 
     def check_other_connect(
-            self, aslist: AsList, ver_num:str,
+            self, aslist: AsList, ver_num: str,
             header: Optional[str] = None, w_index: Optional[int] = 2,
             d_index: Optional[int] = 3, sources: int = 6,
             destinations: int = 8) -> None:

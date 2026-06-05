@@ -67,7 +67,8 @@ class TestIndexBasedProbabilityConnector(BaseTestCase):
         self.check_weights(projection, n, expression, True)
         sim.end()
 
-    def check_connect_no_self(self, n: int, expression: str, ver_num:str) -> None:
+    def check_connect_no_self(
+            self, n: int, expression: str, ver_num: str) -> None:
         sim.setup(1.0)
         set_config("Machine", "version", ver_num)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 10)

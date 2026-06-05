@@ -191,7 +191,8 @@ class TestFromListConnector(BaseTestCase):
                 self.assertAlmostEqual(weights[i][j], target[i][j], places=3)
 
     @parameterized.expand(BIG_BOARD_TYPES)
-    def test_using_half_static_synapse_singles(self, _: str, ver_num: str) -> None:
+    def test_using_half_static_synapse_singles(
+            self, _: str, ver_num: str) -> None:
         sim.setup(timestep=1.0)
         set_config("Machine", "version", ver_num)
         input = sim.Population(2, sim.SpikeSourceArray([0]), label="input")

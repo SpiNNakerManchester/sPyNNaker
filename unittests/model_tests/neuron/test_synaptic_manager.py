@@ -411,7 +411,7 @@ def test_set_synapse_dynamics() -> None:
 
 @pytest.mark.parametrize(
     "undelayed_indices_connected,delayed_indices_connected,n_pre_neurons,"
-    "neurons_per_core,max_delay,version_number",[
+    "neurons_per_core,max_delay,version_number", [
         # Only undelayed, all edges exist
         (range(10), [], 1000, 100, None, FIVE),
         # Only delayed, all edges exist
