@@ -17,12 +17,20 @@
 """
 Synfirechain-like example
 """
+from parameterized import parameterized
 import pyNN.spiNNaker as p
+
+from spinn_utilities.config_holder import set_config
+
+from spinn_machine.version import BIG_BOARD_TYPES
+
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(nNeurons: int) -> None:
+def do_run(nNeurons: int, ver_num: str) -> None:
     p.setup(timestep=1.0, min_delay=1.0)
+    set_config("Machine", "version", ver_num)
+
     p.set_number_of_neurons_per_core(p.Izhikevich, 100)
 
     cell_params_izk = {
@@ -77,11 +85,7 @@ class SynfireIzhikevich(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_run(self) -> None:
+    @parameterized.expand(BIG_BOARD_TYPES)
+    def test_run(self, _: str, ver_num: str) -> None:
         nNeurons = 200  # number of neurons in each population
-        do_run(nNeurons)
-
-
-if __name__ == '__main__':
-    x = SynfireIzhikevich()
-    x.test_run()
+        do_run(nNeurons, ver_num)

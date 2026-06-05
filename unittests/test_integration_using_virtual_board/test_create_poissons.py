@@ -11,12 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from parameterized import parameterized
 import pyNN.spiNNaker as p
+
+from spinn_utilities.config_holder import set_config
+
+from spinn_machine.version import BIG_BOARD_TYPES
+
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run() -> None:
+def do_run(ver_num: str) -> None:
     p.setup(1.0)
+    set_config("Machine", "version", ver_num)
     n_neurons = 2
 
     pop_a = p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
@@ -109,9 +117,6 @@ class TestCreatePoissons(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_run(self) -> None:
-        do_run()
-
-
-if __name__ == '__main__':
-    do_run()
+    @parameterized.expand(BIG_BOARD_TYPES)
+    def test_run(self, _: str, ver_num: str) -> None:
+        do_run(ver_num)

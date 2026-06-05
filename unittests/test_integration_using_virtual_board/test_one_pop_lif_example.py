@@ -14,13 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+from parameterized import parameterized
 import pyNN.spiNNaker as p
+
+from spinn_utilities.config_holder import set_config
+
+from spinn_machine.version import BIG_BOARD_TYPES
+
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(nNeurons: int) -> None:
+def do_run(nNeurons: int, ver_num: str) -> None:
 
     p.setup(timestep=1.0, min_delay=1.0)
+    set_config("Machine", "version", ver_num)
 
     cell_params_lif_in = {'tau_m': 333.33, 'cm': 208.33, 'v': 0.0,
                           'v_rest': 0.1, 'v_reset': 0.0, 'v_thresh': 1.0,
@@ -46,11 +54,7 @@ class OnePopLifExample(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_run(self) -> None:
+    @parameterized.expand(BIG_BOARD_TYPES)
+    def test_run(self, _: str, ver_num: str) -> None:
         nNeurons = 255  # number of neurons in each population
-        do_run(nNeurons)
-
-
-if __name__ == '__main__':
-    nNeurons = 255  # number of neurons in each population
-    do_run(nNeurons)
+        do_run(nNeurons, ver_num)
