@@ -52,6 +52,7 @@ def do_run(ver_num: str) -> None:
     p.run(1000)
     p.end()
 
+
 class SpinnakerLink2DifferentBoardsNoBoardAddressTest(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
@@ -61,5 +62,6 @@ class SpinnakerLink2DifferentBoardsNoBoardAddressTest(BaseTestCase):
     def test_spinnaker_link_2_different_boards_no_board_address(
             self, _: str, ver_num: str) -> None:
         do_run(ver_num)
+
 
 

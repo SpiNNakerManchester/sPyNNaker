@@ -64,5 +64,3 @@ class SpinnakerLink2DifferentBoardsValidBoardAddressTest(BaseTestCase):
     def test_valid_board_address(
             self, _: str, ver_num: str) -> None:
         do_run(ver_num)
-
-
