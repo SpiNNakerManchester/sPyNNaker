@@ -54,5 +54,3 @@ class Sata2DifferentBoardsNoBoardAddressTest(BaseTestCase):
     def test_sata_2_different_boards_no_board_address(
             self, _: str, ver_num: str) -> None:
         do_run(ver_num)
-
-
