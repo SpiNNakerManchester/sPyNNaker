@@ -16,13 +16,18 @@
 retina example that just feeds data from a retina to live output via an
 intermediate population
 """
+from parameterized import parameterized
 import pyNN.spiNNaker as p
-from spinnaker_testbase import BaseTestCase
+from spinn_utilities.config_holder import set_config
+from spinn_machine.version import FPGA_BOARD_TYPES
 
 
-def do_run() -> None:
+@parameterized.expand(FPGA_BOARD_TYPES)
+def test_sata_2_different_boards_valid_board_address(
+        _: str, ver_num: str) -> None:
     # Setup
     p.setup(timestep=1.0, n_boards_required=3)
+    set_config("Machine", "version", ver_num)
 
     src_1 = p.Population(
         None,
@@ -46,15 +51,3 @@ def do_run() -> None:
 
     p.run(1000)
     p.end()
-
-
-class Sata2DifferentBoardsValidBoardAddress(BaseTestCase):
-
-    # NO unittest_setup() as sim.setup is called
-
-    def test_sata_2_different_boards_valid_board_address(self) -> None:
-        do_run()
-
-
-if __name__ == '__main__':
-    do_run()
