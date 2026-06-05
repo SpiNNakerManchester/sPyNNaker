@@ -20,11 +20,10 @@ from parameterized import parameterized
 import pyNN.spiNNaker as p
 from spinn_utilities.config_holder import set_config
 from spinn_machine.version import FPGA_BOARD_TYPES
+from spinnaker_testbase import BaseTestCase
 
 
-@parameterized.expand(FPGA_BOARD_TYPES)
-def test_spinnaker_link_2_different_boards_valid_board_address(
-        _: str, ver_num: str) -> None:
+def do_run(ver_num: str) -> None:
     # Setup
     p.setup(timestep=1.0, n_boards_required=3)
     set_config("Machine", "version", ver_num)
@@ -54,3 +53,16 @@ def test_spinnaker_link_2_different_boards_valid_board_address(
 
     p.run(1000)
     p.end()
+
+
+class SpinnakerLink2DifferentBoardsValidBoardAddressTest(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
+    # BaseTestCase to change dir and pickup cfg
+
+    @parameterized.expand(FPGA_BOARD_TYPES)
+    def test_valid_board_address(
+            self, _: str, ver_num: str) -> None:
+        do_run(ver_num)
+
+
