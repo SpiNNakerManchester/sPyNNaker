@@ -429,9 +429,9 @@ class SynapseDynamicsStructuralCommon(
             # pylint: disable=unidiomatic-typecheck
             (type(self.partner_selection) ==  # noqa: E721
              type(synapse_dynamics.partner_selection)) and
-            (type(self.formation) ==
+            (type(self.formation) is
              type(synapse_dynamics.formation)) and
-            (type(self.elimination) ==
+            (type(self.elimination) is
              type(synapse_dynamics.elimination)))
 
     @property
