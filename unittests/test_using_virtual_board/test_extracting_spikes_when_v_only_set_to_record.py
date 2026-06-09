@@ -18,7 +18,7 @@ from parameterized import parameterized
 import pyNN.spiNNaker as sim
 
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version import BIG_BOARD_TYPES
+from spinn_machine.version import MANY_BOARD_TYPES
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinnaker_testbase import BaseTestCase
 
@@ -27,7 +27,7 @@ class ExtractingSpikesWhenVOnlySetToRecord(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_cause_error(self, _: str, ver_num: str) -> None:
         with self.assertRaises(ConfigurationException):
             sim.setup(timestep=1.0)

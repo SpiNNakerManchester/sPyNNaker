@@ -19,7 +19,7 @@ from typing_extensions import TypeAlias
 import pyNN.spiNNaker as sim
 
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version import BIG_BOARD_TYPES
+from spinn_machine.version import MANY_BOARD_TYPES
 from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.models.projection import Projection
@@ -86,7 +86,7 @@ class TestFromListConnector(BaseTestCase):
             projection, aslist, w_index, d_index, sources, destinations)
         sim.end()
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_simple(self, _: str, ver_num: str) -> None:
         as_list: AsList4 = [
             (0, 0, 0.1, 10),
@@ -97,7 +97,7 @@ class TestFromListConnector(BaseTestCase):
         ]
         self.check_other_connect(as_list, ver_num)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_list_too_big(self, _: str, ver_num: str) -> None:
         as_list: AsList4 = [
             (0, 0, 0.1, 10),
@@ -108,7 +108,7 @@ class TestFromListConnector(BaseTestCase):
         ]
         self.check_other_connect(as_list, ver_num)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_no_delays(self, _: str, ver_num: str) -> None:
         as_list: AsList3 = [
             (0, 0, 0.1),
@@ -120,7 +120,7 @@ class TestFromListConnector(BaseTestCase):
         self.check_other_connect(
             as_list, ver_num, column_names=["weight"], d_index=None)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_no_weight(self, _: str, ver_num: str) -> None:
         as_list: AsList3 = [
             (0, 0, 10),
@@ -132,7 +132,7 @@ class TestFromListConnector(BaseTestCase):
         self.check_other_connect(
             as_list, ver_num, column_names=["delay"], d_index=2, w_index=None)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_invert(self, _: str, ver_num: str) -> None:
         as_list: AsList4 = [
             (0, 0, 10, 0.1),
@@ -145,7 +145,7 @@ class TestFromListConnector(BaseTestCase):
             as_list, ver_num, column_names=["delay", "weight"], w_index=3,
             d_index=2)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_big(self, _: str, ver_num: str) -> None:
         sources = 200
         destinations = 300
@@ -158,7 +158,7 @@ class TestFromListConnector(BaseTestCase):
             aslist, ver_num, column_names=None, w_index=2, d_index=3,
             sources=sources, destinations=destinations)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_get_before_run(self, _: str, ver_num: str) -> None:
         sim.setup(1.0)
         set_config("Machine", "version", ver_num)
@@ -173,7 +173,7 @@ class TestFromListConnector(BaseTestCase):
         self.assertEqual(1, len(weights))
         sim.end()
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_using_static_synapse_singles(self, _: str, ver_num: str) -> None:
         sim.setup(timestep=1.0)
         set_config("Machine", "version", ver_num)
@@ -190,7 +190,7 @@ class TestFromListConnector(BaseTestCase):
             for j in range(2):
                 self.assertAlmostEqual(weights[i][j], target[i][j], places=3)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_using_half_static_synapse_singles(
             self, _: str, ver_num: str) -> None:
         sim.setup(timestep=1.0)
@@ -209,7 +209,7 @@ class TestFromListConnector(BaseTestCase):
             for j in range(2):
                 self.assertAlmostEqual(weights[i][j], target[i][j], places=3)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_using_static_synapse_doubles(self, _: str, ver_num: str) -> None:
         sim.setup(timestep=1.0)
         set_config("Machine", "version", ver_num)

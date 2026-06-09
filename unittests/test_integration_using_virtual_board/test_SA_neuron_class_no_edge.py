@@ -17,7 +17,7 @@ import pyNN.spiNNaker as sim
 
 from spinn_utilities.config_holder import set_config
 
-from spinn_machine.version import BIG_BOARD_TYPES
+from spinn_machine.version import MANY_BOARD_TYPES
 
 from spinnaker_testbase import BaseTestCase
 
@@ -26,7 +26,7 @@ class SSANeuronClassNoEdgeTest(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_run(self, _: str, ver_num: str) -> None:
         sim.setup()
         set_config("Machine", "version", ver_num)

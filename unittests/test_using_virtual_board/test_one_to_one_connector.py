@@ -15,7 +15,7 @@
 from parameterized import parameterized
 import pyNN.spiNNaker as sim
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version import BIG_BOARD_TYPES
+from spinn_machine.version import MANY_BOARD_TYPES
 from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.models.projection import Projection
@@ -50,7 +50,7 @@ class TestOneToOneConnector(BaseTestCase):
         self.check_weights(projection, sources, destinations)
         sim.end()
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_same(self, _: str, ver_num: str) -> None:
         self.check_other_connect(5, 5, ver_num)
 
@@ -62,11 +62,11 @@ class TestOneToOneConnector(BaseTestCase):
     # def test_less_destinations(self) -> None:
     #    self.check_other_connect(10, 5)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_many(self, _: str, ver_num: str) -> None:
         self.check_other_connect(500, 500, ver_num)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_get_before_run(self, _: str, ver_num: str) -> None:
         sim.setup(1.0)
         set_config("Machine", "version", ver_num)

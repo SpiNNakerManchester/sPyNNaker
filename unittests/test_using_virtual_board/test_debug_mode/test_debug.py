@@ -20,7 +20,7 @@ from spinn_utilities.config_holder import (
     config_options, config_sections, get_report_path, get_timestamp_path,
     set_config)
 
-from spinn_machine.version import BIG_BOARD_TYPES
+from spinn_machine.version import MANY_BOARD_TYPES
 
 from spinnaker_testbase import BaseTestCase
 
@@ -53,7 +53,7 @@ class TestDebug(BaseTestCase):
                     raise AssertionError(
                         f"Unable to find report for {option} {path}")
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_debug(self, _: str, ver_num: str) -> None:
         sim.setup(1.0)
         set_config("Machine", "version", ver_num)

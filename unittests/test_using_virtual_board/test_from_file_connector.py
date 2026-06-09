@@ -24,7 +24,7 @@ import numpy
 import pyNN.spiNNaker as sim
 
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version import BIG_BOARD_TYPES
+from spinn_machine.version import MANY_BOARD_TYPES
 from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.models.projection import Projection
@@ -100,7 +100,7 @@ class TestFromFileConnector(BaseTestCase):
         except OSError:
             pass
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_simple(self, _: str, ver_num: str) -> None:
         as_list: AsList4 = [
             (0, 0, 0.1, 10),
@@ -111,7 +111,7 @@ class TestFromFileConnector(BaseTestCase):
         ]
         self.check_other_connect(as_list, ver_num)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_list_too_big(self, _: str, ver_num: str) -> None:
         as_list: AsList4 = [
             (0, 0, 0.1, 10),
@@ -122,7 +122,7 @@ class TestFromFileConnector(BaseTestCase):
         ]
         self.check_other_connect(as_list, ver_num)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_no_delays(self, _: str, ver_num: str) -> None:
         as_list = [
             (0, 0, 0.1),
@@ -135,7 +135,7 @@ class TestFromFileConnector(BaseTestCase):
             as_list, ver_num, header='columns = ["i", "j", "weight"]',
             d_index=None)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_no_weight(self, _: str, ver_num: str) -> None:
         as_list: List[Tuple[int, int, float]] = [
             (0, 0, 10),
@@ -148,7 +148,7 @@ class TestFromFileConnector(BaseTestCase):
             as_list, ver_num, header='columns = ["i", "j", "delay"]',
             d_index=2, w_index=None)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_invert(self, _: str, ver_num: str) -> None:
         as_list: List[Tuple[int, int, float, float]] = [
             (0, 0, 10, 0.1),
@@ -162,7 +162,7 @@ class TestFromFileConnector(BaseTestCase):
             header='columns = ["i", "j", "delay", "weight"]',
             w_index=3, d_index=2)
 
-    @parameterized.expand(BIG_BOARD_TYPES)
+    @parameterized.expand(MANY_BOARD_TYPES)
     def test_big(self, _: str, ver_num: str) -> None:
         sources = 200
         destinations = 300
