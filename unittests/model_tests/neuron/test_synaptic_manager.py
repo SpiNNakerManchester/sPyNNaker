@@ -23,7 +23,7 @@ import pytest
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version import ALL_BOARD_TYPES, FIVE, SPIN2_48CHIP
+from spinn_machine.version import MANY_BOARD_TYPES, FIVE, SPIN2_48CHIP
 from spinnman.transceiver.mockable_transceiver import MockableTransceiver
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
@@ -105,7 +105,7 @@ def say_false(*args: Any, **kwargs: Any) -> bool:
     return False
 
 
-@parameterized.expand(ALL_BOARD_TYPES)
+@parameterized.expand(MANY_BOARD_TYPES)
 def test_write_data_spec(_: str, ver_num: str) -> None:
     unittest_setup()
     set_config("Machine", "version", ver_num)
