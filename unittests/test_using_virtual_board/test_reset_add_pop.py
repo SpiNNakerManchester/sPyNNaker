@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from parameterized import parameterized
 import pyNN.spiNNaker as sim
+from spinn_utilities.config_holder import set_config
+from spinn_machine.version import MANY_BOARD_TYPES
 from spinnaker_testbase import BaseTestCase
 
 
@@ -20,8 +23,10 @@ class TestResetAdd(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def testReset_add(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def testReset_add(self, _: str, ver_num: str) -> None:
         sim.setup(timestep=1.0)
+        set_config("Machine", "version", ver_num)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 1)
 
         input = sim.Population(
