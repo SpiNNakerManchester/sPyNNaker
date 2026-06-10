@@ -23,7 +23,7 @@ import pytest
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version import MANY_BOARD_TYPES, FIVE, SPIN2_48CHIP
+from spinn_machine.version import MANY_BOARD_TYPES, Spin1Gen, Spin2Gen
 from spinnman.transceiver.mockable_transceiver import MockableTransceiver
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
@@ -413,41 +413,41 @@ def test_set_synapse_dynamics() -> None:
     "undelayed_indices_connected,delayed_indices_connected,n_pre_neurons,"
     "neurons_per_core,max_delay,version_number", [
         # Only undelayed, all edges exist
-        (range(10), [], 1000, 100, None, FIVE),
+        (range(10), [], 1000, 100, None, Spin1Gen.FIVE.value),
         # Only delayed, all edges exist
-        ([], range(10), 1000, 100, 200, FIVE),
+        ([], range(10), 1000, 100, 200, Spin1Gen.FIVE.value),
         # All undelayed and delayed edges exist
-        (range(10), range(10), 1000, 100, 200, FIVE),
+        (range(10), range(10), 1000, 100, 200, Spin1Gen.FIVE.value),
         # Only undelayed, some connections missing but app keys can still work
-        ([0, 1, 2, 3, 4], [], 1000, 100, None, FIVE),
+        ([0, 1, 2, 3, 4], [], 1000, 100, None, Spin1Gen.FIVE.value),
         # Only delayed, some connections missing but app keys can still work
-        ([], [5, 6, 7, 8, 9], 1000, 100, 200, FIVE),
+        ([], [5, 6, 7, 8, 9], 1000, 100, 200, Spin1Gen.FIVE.value),
         # Both delayed and undelayed, some undelayed edges don't exist
         # (app keys work because undelayed aren't filtered)
-        ([3, 4, 5, 6, 7], range(10), 1000, 100, 200, FIVE),
+        ([3, 4, 5, 6, 7], range(10), 1000, 100, 200, Spin1Gen.FIVE.value),
         # Both delayed and undelayed, some delayed edges don't exist
         # (app keys work because all undelayed exist)
-        (range(10), [4, 5, 6, 7], 1000, 100, 200, FIVE),
+        (range(10), [4, 5, 6, 7], 1000, 100, 200, Spin1Gen.FIVE.value),
         # Should work but number of cores doesn't work out
-        (range(100), [], 10000, 5, None, FIVE),
+        (range(100), [], 10000, 5, None, Spin1Gen.FIVE.value),
         # Only undelayed, all edges exist
-        (range(10), [], 1000, 100, None, SPIN2_48CHIP),
+        (range(10), [], 1000, 100, None, Spin2Gen.SPIN2_48CHIP.value),
         # Only delayed, all edges exist
-        ([], range(10), 1000, 100, 200, SPIN2_48CHIP),
+        ([], range(10), 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
         # All undelayed and delayed edges exist
-        (range(10), range(10), 1000, 100, 200, SPIN2_48CHIP),
+        (range(10), range(10), 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
         # Only undelayed, some connections missing but app keys can still work
-        ([0, 1, 2, 3, 4], [], 1000, 100, None, SPIN2_48CHIP),
+        ([0, 1, 2, 3, 4], [], 1000, 100, None, Spin2Gen.SPIN2_48CHIP.value),
         # Only delayed, some connections missing but app keys can still work
-        ([], [5, 6, 7, 8, 9], 1000, 100, 200, SPIN2_48CHIP),
+        ([], [5, 6, 7, 8, 9], 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
         # Both delayed and undelayed, some undelayed edges don't exist
         # (app keys work because undelayed aren't filtered)
-        ([3, 4, 5, 6, 7], range(10), 1000, 100, 200, SPIN2_48CHIP),
+        ([3, 4, 5, 6, 7], range(10), 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
         # Both delayed and undelayed, some delayed edges don't exist
         # (app keys work because all undelayed exist)
-        (range(10), [4, 5, 6, 7], 1000, 100, 200, SPIN2_48CHIP),
+        (range(10), [4, 5, 6, 7], 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
         # Should work but number of cores doesn't work out
-        (range(100), [], 10000, 5, None, SPIN2_48CHIP)
+        (range(100), [], 10000, 5, None, Spin2Gen.SPIN2_48CHIP.value)
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected: Sequence[int],
