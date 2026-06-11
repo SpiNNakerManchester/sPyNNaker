@@ -442,7 +442,8 @@ def test_set_synapse_dynamics() -> None:
         ([], [5, 6, 7, 8, 9], 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
         # Both delayed and undelayed, some undelayed edges don't exist
         # (app keys work because undelayed aren't filtered)
-        ([3, 4, 5, 6, 7], range(10), 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
+        ([3, 4, 5, 6, 7], range(10), 1000, 100, 200,
+         Spin2Gen.SPIN2_48CHIP.value),
         # Both delayed and undelayed, some delayed edges don't exist
         # (app keys work because all undelayed exist)
         (range(10), [4, 5, 6, 7], 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
