@@ -20,13 +20,17 @@ MODELS = IF_curr_exp \
          IZK_cond_exp_dual \
          IF_curr_delta \
          IF_curr_exp_ca2_adaptive \
-         IF_curr_delta_ca2_adaptive
+         IF_curr_delta_ca2_adaptive \
+         stoc_exp \
+         stoc_exp_stable \
+         stoc_sigma \
+         IF_curr_delta_fixed_prob \
+         IF_trunc_delta \
+         IF_curr_alpha \
+         IF_cond_exp_stoc
 
 ifneq ($(SPYNNAKER_DEBUG), DEBUG)
     MODELS += external_device_lif_control \
-              IF_curr_alpha \
-              IF_cond_exp_stoc \
-              IF_curr_exp_sEMD \
               IF_curr_exp_stdp_mad_pair_additive \
               IF_curr_exp_stdp_mad_pair_multiplicative \
               IF_cond_exp_stdp_mad_pair_additive \
@@ -44,6 +48,8 @@ ifneq ($(SPYNNAKER_DEBUG), DEBUG)
               IF_curr_delta_stdp_mad_nearest_pair_additive \
               IF_curr_exp_stdp_mad_recurrent_pre_stochastic_multiplicative \
               IF_curr_exp_stdp_mad_pfister_triplet_additive \
+              IF_curr_exp_weight_change \
+              IF_curr_exp_sEMD \
               eprop_adaptive \
               eprop_adaptive_stdp_mad_eprop_reg \
               sinusoid_readout \
