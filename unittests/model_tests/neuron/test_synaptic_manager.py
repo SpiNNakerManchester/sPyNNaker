@@ -13,15 +13,17 @@
 # limitations under the License.
 import shutil
 import struct
-from typing import Any, BinaryIO, List, Optional, Sequence, Tuple, Union
+from typing import Any, BinaryIO, List, Optional, Sequence, Tuple
 import unittest
+
+from parameterized import parameterized
 from tempfile import mkdtemp
 import numpy
 import pytest
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version.version_strings import VersionStrings
+from spinn_machine.version import MANY_BOARD_TYPES, Spin1Gen, Spin2Gen
 from spinnman.transceiver.mockable_transceiver import MockableTransceiver
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
@@ -71,7 +73,7 @@ class _MockTransceiverinOut(MockableTransceiver):
     @overrides(MockableTransceiver.write_memory)
     def write_memory(
             self, x: int, y: int, base_address: int,
-            data: Union[BinaryIO, bytes, int, str], *,
+            data: BinaryIO | bytearray | bytes | int | str, *,
             n_bytes: Optional[int] = None, offset: int = 0, cpu: int = 0,
             get_sum: bool = False) -> Tuple[int, int]:
         if data is None:
@@ -103,9 +105,10 @@ def say_false(*args: Any, **kwargs: Any) -> bool:
     return False
 
 
-def test_write_data_spec() -> None:
+@parameterized.expand(MANY_BOARD_TYPES)
+def test_write_data_spec(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.text)
+    set_config("Machine", "version", ver_num)
     writer = SpynnakerDataWriter.mock()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.\
@@ -408,33 +411,52 @@ def test_set_synapse_dynamics() -> None:
 
 @pytest.mark.parametrize(
     "undelayed_indices_connected,delayed_indices_connected,n_pre_neurons,"
-    "neurons_per_core,max_delay", [
+    "neurons_per_core,max_delay,version_number", [
         # Only undelayed, all edges exist
-        (range(10), [], 1000, 100, None),
+        (range(10), [], 1000, 100, None, Spin1Gen.FIVE.value),
         # Only delayed, all edges exist
-        ([], range(10), 1000, 100, 200),
+        ([], range(10), 1000, 100, 200, Spin1Gen.FIVE.value),
         # All undelayed and delayed edges exist
-        (range(10), range(10), 1000, 100, 200),
+        (range(10), range(10), 1000, 100, 200, Spin1Gen.FIVE.value),
         # Only undelayed, some connections missing but app keys can still work
-        ([0, 1, 2, 3, 4], [], 1000, 100, None),
+        ([0, 1, 2, 3, 4], [], 1000, 100, None, Spin1Gen.FIVE.value),
         # Only delayed, some connections missing but app keys can still work
-        ([], [5, 6, 7, 8, 9], 1000, 100, 200),
+        ([], [5, 6, 7, 8, 9], 1000, 100, 200, Spin1Gen.FIVE.value),
         # Both delayed and undelayed, some undelayed edges don't exist
         # (app keys work because undelayed aren't filtered)
-        ([3, 4, 5, 6, 7], range(10), 1000, 100, 200),
+        ([3, 4, 5, 6, 7], range(10), 1000, 100, 200, Spin1Gen.FIVE.value),
         # Both delayed and undelayed, some delayed edges don't exist
         # (app keys work because all undelayed exist)
-        (range(10), [4, 5, 6, 7], 1000, 100, 200),
+        (range(10), [4, 5, 6, 7], 1000, 100, 200, Spin1Gen.FIVE.value),
         # Should work but number of cores doesn't work out
-        (range(100), [], 10000, 5, None)
+        (range(100), [], 10000, 5, None, Spin1Gen.FIVE.value),
+        # Only undelayed, all edges exist
+        (range(10), [], 1000, 100, None, Spin2Gen.SPIN2_48CHIP.value),
+        # Only delayed, all edges exist
+        ([], range(10), 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
+        # All undelayed and delayed edges exist
+        (range(10), range(10), 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
+        # Only undelayed, some connections missing but app keys can still work
+        ([0, 1, 2, 3, 4], [], 1000, 100, None, Spin2Gen.SPIN2_48CHIP.value),
+        # Only delayed, some connections missing but app keys can still work
+        ([], [5, 6, 7, 8, 9], 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
+        # Both delayed and undelayed, some undelayed edges don't exist
+        # (app keys work because undelayed aren't filtered)
+        ([3, 4, 5, 6, 7], range(10), 1000, 100, 200,
+         Spin2Gen.SPIN2_48CHIP.value),
+        # Both delayed and undelayed, some delayed edges don't exist
+        # (app keys work because all undelayed exist)
+        (range(10), [4, 5, 6, 7], 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
+        # Should work but number of cores doesn't work out
+        (range(100), [], 10000, 5, None, Spin2Gen.SPIN2_48CHIP.value)
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected: Sequence[int],
         delayed_indices_connected: Sequence[int],
         n_pre_neurons: int, neurons_per_core: int,
-        max_delay: Optional[int]) -> None:
+        max_delay: Optional[int], version_number: int) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.FOUR_PLUS.text)
+    set_config("Machine", "version", str(version_number))
     writer = SpynnakerDataWriter.mock()
 
     # Build a from list connector with the delays we want

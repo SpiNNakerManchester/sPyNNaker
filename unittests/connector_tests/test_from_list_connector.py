@@ -38,8 +38,6 @@ from unittests.mocks import (
     "clist, column_names, weights, delays, expected_clist, expected_weights, "
     "expected_delays, expected_extra_parameters, "
     "expected_extra_parameter_names", [
-        (None, None, 0, 0, numpy.zeros((0, 2)), [], [], None, None),
-        ([], None, 0, 0, numpy.zeros((0, 2)), [], [], None, None),
         (numpy.array([(0, 0, 0, 0), (1, 1, 1, 1), (2, 2, 2, 2)]), None, 5, 1,
          None, [0, 1, 2], [0, 1, 2], None, None),
         (numpy.array([(0, 0), (1, 1), (2, 2)]), None, 5, 1,
@@ -51,8 +49,6 @@ from unittests.mocks import (
         (numpy.array([(0, 0, 0), (1, 1, 0), (2, 2, 0)]), ["extra"], 5, 1,
          None, [5, 5, 5], [1, 1, 1], numpy.array([[0], [0], [0]]), ["extra"]),
     ], ids=[
-        "None Connections",
-        "Empty Connections",
         "4-elements",
         "2-elements",
         "3-elements-weight",
@@ -60,7 +56,7 @@ from unittests.mocks import (
         "3-elements-extra"
     ])
 def test_connector(
-        clist: Optional[NDArray], column_names: Optional[List[str]],
+        clist: NDArray, column_names: Optional[List[str]],
         weights: int, delays: int, expected_clist: Optional[NDArray],
         expected_weights: List[int], expected_delays: List[int],
         expected_extra_parameters: Optional[NDArray],

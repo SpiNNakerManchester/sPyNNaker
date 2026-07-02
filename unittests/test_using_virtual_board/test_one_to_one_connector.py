@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from parameterized import parameterized
 import pyNN.spiNNaker as sim
+from spinn_utilities.config_holder import set_config
+from spinn_machine.version import MANY_BOARD_TYPES
 from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.models.projection import Projection
@@ -34,8 +37,10 @@ class TestOneToOneConnector(BaseTestCase):
             self.assertLess(destination, sources)
         self.assertEqual(len(weights), min(sources, destinations))
 
-    def check_other_connect(self, sources: int, destinations: int) -> None:
+    def check_other_connect(
+            self, sources: int, destinations: int, ver_num: str) -> None:
         sim.setup(1.0)
+        set_config("Machine", "version", ver_num)
         pop1 = sim.Population(sources, sim.IF_curr_exp(), label="pop1")
         pop2 = sim.Population(destinations, sim.IF_curr_exp(), label="pop2")
         synapse_type = sim.StaticSynapse(weight=5, delay=1)
@@ -45,8 +50,9 @@ class TestOneToOneConnector(BaseTestCase):
         self.check_weights(projection, sources, destinations)
         sim.end()
 
-    def test_same(self) -> None:
-        self.check_other_connect(5, 5)
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_same(self, _: str, ver_num: str) -> None:
+        self.check_other_connect(5, 5, ver_num)
 
     # Does not work on VM
     # def test_less_sources(self) -> None:
@@ -56,11 +62,14 @@ class TestOneToOneConnector(BaseTestCase):
     # def test_less_destinations(self) -> None:
     #    self.check_other_connect(10, 5)
 
-    def test_many(self) -> None:
-        self.check_other_connect(500, 500)
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_many(self, _: str, ver_num: str) -> None:
+        self.check_other_connect(500, 500, ver_num)
 
-    def test_get_before_run(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_get_before_run(self, _: str, ver_num: str) -> None:
         sim.setup(1.0)
+        set_config("Machine", "version", ver_num)
         pop1 = sim.Population(3, sim.IF_curr_exp(), label="pop1")
         pop2 = sim.Population(3, sim.IF_curr_exp(), label="pop2")
         synapse_type = sim.StaticSynapse(weight=5, delay=1)

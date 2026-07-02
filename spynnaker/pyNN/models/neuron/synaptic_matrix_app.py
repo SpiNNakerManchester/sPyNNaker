@@ -405,6 +405,7 @@ class SynapticMatrixApp(object):
         splitter = self.__app_edge.post_vertex.splitter
         vertex_slice = placement.vertex.vertex_slice
         if self.__syn_mat_offset is not None:
+            block: bytearray | bytes | memoryview
             if self.__download_index is not None:
                 assert buffers is not None
                 block, _ = buffers.get_download(
@@ -436,7 +437,7 @@ class SynapticMatrixApp(object):
         return connections
 
     def __get_block(
-            self, placement: Placement, synapses_address: int) -> bytes:
+            self, placement: Placement, synapses_address: int) -> bytearray:
         """
         Get a block of data for undelayed synapses.
 
@@ -451,7 +452,7 @@ class SynapticMatrixApp(object):
             placement.x, placement.y, address, self.__matrix_size)
 
     def __get_delayed_block(
-            self, placement: Placement, synapses_address: int) -> bytes:
+            self, placement: Placement, synapses_address: int) -> bytearray:
         """
         Get a block of data for delayed synapses.
 

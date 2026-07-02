@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from parameterized import parameterized
 import pyNN.spiNNaker as sim
+
+from spinn_utilities.config_holder import set_config
+from spinn_machine.version import MANY_BOARD_TYPES
 from spinnaker_testbase import BaseTestCase
 
 
@@ -20,8 +24,10 @@ class TestSimple(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_simple(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_simple(self_: str, _: str, ver_num: str) -> None:
         sim.setup(timestep=1.0, n_boards_required=1)
+        set_config("Machine", "version", ver_num)
         sim.get_machine()
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 

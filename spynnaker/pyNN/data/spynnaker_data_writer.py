@@ -42,6 +42,7 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
 
     @overrides(FecDataWriter._mock)
     def _mock(self) -> None:
+        self.__spy_data._clear()
         FecDataWriter._mock(self)
         self.set_min_delay(1)
 

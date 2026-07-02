@@ -44,7 +44,7 @@ class SynapseTypeDelta(AbstractSynapseType):
             [Struct([
                 (DataType.S1615, ISYN_EXC),  # isyn_exc
                 (DataType.S1615, ISYN_INH)])],  # isyn_inh
-            {ISYN_EXC: "", ISYN_EXC: ""})
+            {ISYN_EXC: "", ISYN_INH: ""})
         self.__isyn_exc = isyn_exc
         self.__isyn_inh = isyn_inh
 

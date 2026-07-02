@@ -12,7 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from parameterized import parameterized
 import pyNN.spiNNaker as sim
+
+from spinn_utilities.config_holder import set_config
+
+from spinn_machine.version import MANY_BOARD_TYPES
+
 from spinnaker_testbase import BaseTestCase
 
 
@@ -20,8 +26,10 @@ class SSANeuronClassNoEdgeTest(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_run(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_run(self, _: str, ver_num: str) -> None:
         sim.setup()
+        set_config("Machine", "version", ver_num)
 
         sim.Population(3, sim.SpikeSourceArray,
                        {"spike_times": [1.0, 2.0, 3.0]})
