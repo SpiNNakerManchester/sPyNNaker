@@ -145,7 +145,7 @@ class SynapseDynamicsWeightChanger(
                 NDArray[uint32]]:
 
         # Pre-scale the weights here to match the ring buffer format to make
-        # addition to the ring buffer easy
+        # addition to the weights easier
         scaled_weights = (
             numpy.abs(connections["weight"]) *
             numpy.array(ring_buffer_weight_scales)[
