@@ -202,6 +202,7 @@ class SynapseDynamicsWeightChanger(
             ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         data = numpy.concatenate(fp_data)
         weight = ((data >> 16) & 0xFFFF).astype(int16)
+        n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
         connections = numpy.zeros(data.size, dtype=NUMPY_CONNECTORS_DTYPE)
@@ -210,7 +211,8 @@ class SynapseDynamicsWeightChanger(
         connections["target"] = data & neuron_id_mask
         connections["weight"] = weight
         connections["delay"] = 1
-        synapse_type = data >> n_neuron_id_bits
+        synapse_type = (
+            (data >> n_neuron_id_bits) & ((1 << n_synapse_type_bits) - 1))
         connections["weight"] /= numpy.array(ring_buffer_weight_scales)[
             synapse_type]
         return connections
