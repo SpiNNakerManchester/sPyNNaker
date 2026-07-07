@@ -153,7 +153,7 @@ class SynapseDynamicsWeightChanger(
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
         fixed_plastic = (
-            ((scaled_weights.astype(uint32) & 0xFFFF) << 16) |
+            ((numpy.rint(scaled_weights).astype(uint32) & 0xFFFF) << 16) |
             (connections["synapse_type"].astype(uint32) << n_neuron_id_bits) |
             (connections["target"] & neuron_id_mask))
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
