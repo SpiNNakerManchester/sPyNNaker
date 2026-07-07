@@ -406,7 +406,7 @@ def convert_to_connections(
         The length of each row in the data
     :param n_synapse_types:
         The number of synapse types in total
-    :param weight_scales:
+    :param ring_buffer_weight_scales:
         The weight scaling of each synapse type
     :param data:
         The raw data containing the synapses
