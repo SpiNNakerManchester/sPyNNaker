@@ -28,11 +28,11 @@ from spynnaker.pyNN.exceptions import (
     SynapticConfigurationException, InvalidParameterType)
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE)
+from spynnaker.pyNN.types import WeightScales
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import AbstractGenerateOnMachine
 from .abstract_generate_on_machine import MatrixGeneratorID
 from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
-from spynnaker.pyNN.types import WeightScales
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
