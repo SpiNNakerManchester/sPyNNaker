@@ -513,10 +513,10 @@ class SynapseDynamicsSTDP(
         connections["weight"] = pp_half_words
         connections["delay"] = data_fixed >> (
             n_neuron_id_bits + n_synapse_type_bits)
-        connections["synapse_type"] = (data_fixed >> n_neuron_id_bits) & (
+        synapse_type = (data_fixed >> n_neuron_id_bits) & (
             (1 << n_synapse_type_bits) - 1)
         connections["weight"] /= numpy.array(ring_buffer_weight_scales)[
-            connections["synapse_type"]]
+            synapse_type]
         return connections
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)

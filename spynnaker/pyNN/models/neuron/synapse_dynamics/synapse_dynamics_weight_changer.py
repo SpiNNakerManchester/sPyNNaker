@@ -210,9 +210,9 @@ class SynapseDynamicsWeightChanger(
         connections["target"] = data & neuron_id_mask
         connections["weight"] = weight
         connections["delay"] = 1
-        connections["synapse_type"] = data >> n_neuron_id_bits
+        synapse_type = data >> n_neuron_id_bits
         connections["weight"] /= numpy.array(ring_buffer_weight_scales)[
-            connections["synapse_type"]]
+            synapse_type]
         return connections
 
     @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)

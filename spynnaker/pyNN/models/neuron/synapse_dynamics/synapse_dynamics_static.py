@@ -189,10 +189,10 @@ class SynapseDynamicsStatic(
         connections["weight"] = (data >> 16) & 0xFFFF
         connections["delay"] = (data & 0xFFFF) >> (
             n_neuron_id_bits + n_synapse_type_bits)
-        connections["synapse_type"] = (data >> n_neuron_id_bits) & (
+        synapse_type = (data >> n_neuron_id_bits) & (
             (1 << n_synapse_type_bits) - 1)
         connections["weight"] /= numpy.array(ring_buffer_weight_scales)[
-            connections["synapse_type"]]
+            synapse_type]
         return connections
 
     @overrides(AbstractStaticSynapseDynamics.get_parameter_names)
