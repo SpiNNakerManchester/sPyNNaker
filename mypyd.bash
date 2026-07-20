@@ -14,18 +14,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This bash assumes that other repositories are installed in paralled
 
-# requires the latest mypy
-# pip install --upgrade mypy
+# This bash assumes that other repositories are installed in parallel
 
-utils="../SpiNNUtils/spinn_utilities"
-machine="../SpiNNMachine/spinn_machine"
-man="../SpiNNMan/spinnman"
-pacman="../PACMAN/pacman"
-spalloc="../spalloc/spalloc_client"
-fec="../SpiNNFrontEndCommon/spinn_front_end_common"
-test_base="../TestBase/spinnaker_testbase"
+if [ "$#" -eq  "0" ]
+  then
+    echo "Provide any argument to run setup"
+    source ../SupportScripts/venv/mypy_runner/bin/activate
+else
+    python3 -m venv ../SupportScripts/venv/mypy_runner
+    source ../SupportScripts/venv/mypy_runner/bin/activate
+    pip3 install --upgrade ../SpiNNUtils
+    pip3 install --upgrade ../SpiNNMachine
+    pip3 install --upgrade ../SpiNNMan
+    pip3 install --upgrade ../spalloc
+    pip3 install --upgrade ../PACMAN
+    pip3 install --upgrade ../SpiNNFrontEndCommon
+    pip3 install --upgrade ../TestBase
+    pip3 install --upgrade ../sPyNNaker[test]
+    python3 -m pip install --upgrade mypy
+fi
 
-mypy --disallow-untyped-defs $utils $machine $man $pacman $spalloc $fec $test_base spynnaker unittests spynnaker_integration_tests proxy_integration_tests
+mypy --disallow-untyped-defs spynnaker unittests spynnaker_integration_tests proxy_integration_tests
 
