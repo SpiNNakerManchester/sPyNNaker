@@ -43,7 +43,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
 
     def test_double_no_spikes(self) -> None:
         with LogCapture() as lc:
-            v = SpikeSourceArrayVertex(
+            SpikeSourceArrayVertex(
                 n_neurons=5, spike_times=[[], [], [], [], []], label="test",
                 max_atoms_per_core=10, model=SpikeSourceArray(),
                 splitter=None, n_colour_bits=None)
