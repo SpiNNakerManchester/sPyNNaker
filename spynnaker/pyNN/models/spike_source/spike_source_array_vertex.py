@@ -199,6 +199,9 @@ class SpikeSourceArrayVertex(
         counter: Counter = Counter()
         for neuron_id in range(0, self.n_atoms):
             counter.update(spike_times[neuron_id])
+        if len(counter) == 0:
+            logger.warning("SpikeSourceArray all spike times lists are empty")
+            return
         top = counter.most_common(1)
         val, count = top[0]
         if count > TOO_MANY_SPIKES:

@@ -41,6 +41,18 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             [[], [1, 2, 3], [], [1, 2, 3], []],
             list(v.get_parameter_values("spike_times")))
 
+    def test_double_no_spikes(self) -> None:
+        with LogCapture() as lc:
+            v = SpikeSourceArrayVertex(
+                n_neurons=5, spike_times=[[], [], [], [], []], label="test",
+                max_atoms_per_core=10, model=SpikeSourceArray(),
+                splitter=None, n_colour_bits=None)
+        found = False
+        for record in lc.records:
+            if "lists are empty" in str(record.msg):
+                found = True
+        self.assertTrue(found)
+
     def test_singleton_list(self) -> None:
         v = SpikeSourceArrayVertex(
             n_neurons=5, spike_times=[1, 11, 22],
