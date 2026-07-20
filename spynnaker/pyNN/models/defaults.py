@@ -159,6 +159,7 @@ def default_initial_values(state_variables: Iterable[str]) -> Callable:
         return wrapper
     return wrap
 
+
 @no_type_check
 def defaults(cls: type) -> type:
     """
