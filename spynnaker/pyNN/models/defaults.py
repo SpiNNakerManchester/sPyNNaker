@@ -20,7 +20,8 @@ import inspect
 import logging
 from types import MappingProxyType
 from typing import (
-    Any, Callable, FrozenSet, Iterable, List, Mapping, Optional, Tuple)
+    Any, Callable, FrozenSet, Iterable, List, Mapping, no_type_check,
+    Optional, Tuple)
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.log import FormatAdapter
 
@@ -158,7 +159,7 @@ def default_initial_values(state_variables: Iterable[str]) -> Callable:
         return wrapper
     return wrap
 
-
+@no_type_check
 def defaults(cls: type) -> type:
     """
     Deprecated! Extend AbstractProvidesDefaults instead
