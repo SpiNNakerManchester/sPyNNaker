@@ -99,14 +99,14 @@ static inline update_state_t timing_apply_pre_spike(
 
     // Get time of event relative to last post-synaptic event
     uint32_t time_since_last_post = time - last_post_time;
-    int32_t decayed_o1 = maths_lut_exponential_decay(
+    int32_t decayed_trace = maths_lut_exponential_decay(
         time_since_last_post, tau_minus_lookup);
 
-    log_debug("\t\t\ttime_since_last_post=%u, decayed_o1=%d\n",
-            time_since_last_post, decayed_o1);
+    log_debug("\t\t\ttime_since_last_post=%u, decayed_trace=%d\n",
+            time_since_last_post, decayed_trace);
 
     // Apply depression to state (which is a weight_state)
-    return weight_one_term_apply_depression(previous_state, decayed_o1);
+    return weight_one_term_apply_depression(previous_state, decayed_trace);
 }
 
 //---------------------------------------
