@@ -34,7 +34,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
     abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
-from spynnaker.pyNN.types import Weights
+from spynnaker.pyNN.types import Weights, WeightScales
 from spynnaker.pyNN.types import WeightsDelysIn as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
@@ -372,12 +372,20 @@ class SynapseDynamicsSTDP(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
-            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
+            max_n_synapses: int, max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> Tuple[
                 List[NDArray[uint32]], List[NDArray[uint32]],
                 NDArray[uint32], NDArray[uint32]]:
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
+
+        # Pre-scale the weights here to match the ring buffer format to make
+        # addition to the ring buffer easy
+        scaled_weights = (
+            numpy.abs(connections["weight"]) *
+            numpy.array(ring_buffer_weight_scales)[
+                connections["synapse_type"]])
 
         # Get the fixed data
         fixed_plastic = (
@@ -409,7 +417,7 @@ class SynapseDynamicsSTDP(
         plastic_plastic = numpy.zeros(
             len(connections) * n_half_words, dtype=uint16)
         plastic_plastic[half_word::n_half_words] = \
-            numpy.rint(numpy.abs(connections["weight"])).astype(uint16)
+            numpy.rint(scaled_weights).astype(uint16)
 
         # Convert the plastic data into groups of bytes per connection and
         # then into rows
@@ -473,8 +481,8 @@ class SynapseDynamicsSTDP(
     def read_plastic_synaptic_data(
             self, n_synapse_types: int, pp_size: NDArray[uint32],
             pp_data: List[NDArray[uint32]], fp_size: NDArray[uint32],
-            fp_data: List[NDArray[uint32]],
-            max_atoms_per_core: int) -> ConnectionsArray:
+            fp_data: List[NDArray[uint32]], max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         n_rows = len(fp_size)
 
         n_synapse_type_bits = get_n_bits(n_synapse_types)
@@ -505,6 +513,10 @@ class SynapseDynamicsSTDP(
         connections["weight"] = pp_half_words
         connections["delay"] = data_fixed >> (
             n_neuron_id_bits + n_synapse_type_bits)
+        synapse_type = (data_fixed >> n_neuron_id_bits) & (
+            (1 << n_synapse_type_bits) - 1)
+        connections["weight"] /= numpy.array(ring_buffer_weight_scales)[
+            synapse_type]
         return connections
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)
