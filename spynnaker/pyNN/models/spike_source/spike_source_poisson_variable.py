@@ -70,3 +70,9 @@ class SpikeSourcePoissonVariable(AbstractPyNNModel):
         return SpikeSourcePoissonVertex(
             n_neurons, label, seed, max_atoms, self, rates=self._rates,
             starts=self._starts, durations=self._durations, splitter=splitter)
+
+    def __str__(self) -> str:
+        return f"SpikeSourcePoissonVariable(" \
+               f"rates={self._rates}, " \
+               f"starts={self._starts}, " \
+               f"durations={self._durations})"

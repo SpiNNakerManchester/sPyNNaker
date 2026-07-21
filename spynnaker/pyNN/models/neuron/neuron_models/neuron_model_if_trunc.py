@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
+from typing import Optional, Dict
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
 from spinn_front_end_common.interface.ds import DataType
@@ -79,6 +79,16 @@ class NeuronModelIFTrunc(NeuronModel):
         self.__i_offset = i_offset
         self.__v_reset = v_reset
         self.__tau_refrac = tau_refrac
+
+    @overrides(AbstractStandardNeuronComponent.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return {
+            "v_init": self.__v_init,
+            "tau_m": self.__tau_m,
+            "cm": self.__cm,
+            "i_offset": self.__i_offset,
+            "v_reset": self.__v_reset,
+            "tau_refrac": self.__tau_refrac}
 
     @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

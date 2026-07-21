@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
+from typing import Optional, Dict
 
 from pyNN.random import NumpyRNG
 
@@ -61,6 +61,10 @@ class ThresholdTypeFixedProb(AbstractThresholdType):
         self.__p_thresh = p_thresh
         self.__random = RandomDistribution(
             "uniform", low=0, high=0xFFFFFFFF, rng=NumpyRNG(seed))
+
+    @overrides(AbstractThresholdType.get_param_values)
+    def get_param_values(self) -> Dict[str, ModelParameter]:
+        return {V_THRESH: self.__v_thresh, P_THRESH: self.__p_thresh}
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:
