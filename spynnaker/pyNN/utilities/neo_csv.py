@@ -30,7 +30,7 @@ from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.data import SpynnakerDataView
 
 if TYPE_CHECKING:
-    from _csv import _writer as CSVWriter, _reader as CSVReader
+    from _csv import Writer as CSVWriter, Reader as CSVReader
     from spynnaker.pyNN.utilities.neo_buffer_database import Annotations
 
 logger = FormatAdapter(logging.getLogger(__name__))
