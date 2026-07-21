@@ -54,7 +54,7 @@ from spynnaker.pyNN.utilities.constants import SPIKES
 from spynnaker.pyNN.utilities.neo_csv import NeoCsv
 
 if TYPE_CHECKING:
-    from _csv import _writer as CSVWriter
+    from _csv import Writer as CSVWriter
     from spynnaker.pyNN.models.common.types import Names as ConcreteNames
     from spynnaker.pyNN.models.populations.population import Population
     from .data_population import DataPopulation
