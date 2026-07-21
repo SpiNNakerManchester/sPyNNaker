@@ -672,6 +672,7 @@ class Population(PopulationBase):
             is a class to instantiate. Must be ``None`` if ``cell_class`` is an
             instantiated object.
         """
+        model: AbstractPyNNModel | PopulationApplicationVertex
         if inspect.isclass(cell_class):
             if cell_params is None:
                 model = cell_class()
