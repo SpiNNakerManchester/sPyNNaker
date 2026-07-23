@@ -217,59 +217,11 @@ class SpikeSourceArrayVertex(
             return self.__structure.calculate_size(self.n_atoms)
         return super().atoms_shape
 
-    def _to_early_spikes_single_list(self, spike_times: _SingleList) -> None:
-        """
-        Checks if there is one or more spike_times before the current time.
-
-        Logs a warning for the first one found
-
-        :param spike_times:
-        """
-        current_time = SpynnakerDataView.get_current_run_time_ms()
-        for spike_time in spike_times:
-            if spike_time < current_time:
-                logger.warning(
-                    "SpikeSourceArray {} has spike_times that are lower than "
-                    "the current time {} For example {} - "
-                    "these will be ignored.",
-                    self, current_time, float(spike_time))
-                return
-
-    def _check_spikes_double_list(self, spike_times: _DoubleList) -> None:
-        """
-        Checks if there is one or more spike_times before the current time.
-
-        Logs a warning for the first one found
-
-        :param spike_times:
-        """
-        current_time = SpynnakerDataView.get_current_run_time_ms()
-        for neuron_id in range(0, self.n_atoms):
-            id_times = spike_times[neuron_id]
-            for id_time in id_times:
-                if id_time < current_time:
-                    logger.warning(
-                        "SpikeSourceArray {} has spike_times that are lower "
-                        "than the current time {} For example {} - "
-                        "these will be ignored.",
-                        self, current_time, float(id_time))
-                    return
-
     def __set_spike_buffer_times(self, spike_times: Spikes) -> None:
         """
         Set the spike source array's buffer spike times.
         """
         time_step = SpynnakerDataView.get_simulation_time_step_us()
-        # warn the user if they are asking for a spike time out of range
-        if _is_double_list(spike_times):
-            self._check_spikes_double_list(spike_times)
-        elif _is_single_list(spike_times):
-            self._to_early_spikes_single_list(spike_times)
-        elif _is_singleton(spike_times):
-            self._to_early_spikes_single_list([spike_times])
-        else:
-            # in case of empty list do not check
-            pass
         self.send_buffer_times = _send_buffer_times(spike_times, time_step)
         self._check_spike_density(spike_times)
 
