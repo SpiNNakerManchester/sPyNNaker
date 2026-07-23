@@ -26,6 +26,7 @@ from pyNN.space import Grid2D, Grid3D, BaseStructure
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import get_config_int
+from spinn_utilities.ranged import RangedList
 from spinn_utilities.ranged.abstract_sized import Selector
 
 from pacman.model.graphs.common import Slice
@@ -227,19 +228,44 @@ class SpikeSourceArrayVertex(
 
     def __read_parameter(self, name: str, selector: Selector) -> Sequence:
         _ = name
-        return self._spike_times.get_values(selector)
+        time_step = SpynnakerDataView.get_simulation_time_step_us()
+        numpy_times = self.send_buffer_times * time_step / 1000
+        double_list = _is_double_list(numpy_times)
+        if selector or double_list:
+            # Let RangeList do the heavy lifting using 2D spikes
+            spike_times = [times.tolist() for times in numpy_times]
+            range_list = RangedList(self.n_atoms, spike_times,
+                                    use_list_as_value=not double_list)
+            return range_list.get_values(selector)
+
+        # A single list is fine
+        return numpy_times.tolist()
 
     @overrides(PopulationApplicationVertex.get_parameter_values)
     def get_parameter_values(
             self, names: Names, selector: Selector = None) -> ParameterHolder:
         self._check_parameters(names, {"spike_times"})
-        return ParameterHolder(names, self.send_buffer_times, selector)
+        return ParameterHolder(names, self.__read_parameter, selector)
 
     @overrides(PopulationApplicationVertex.set_parameter_values)
     def set_parameter_values(
             self, name: str, value: Spikes, selector: Selector = None) -> None:
         self._check_parameters(name, {"spike_times"})
-        self.__set_spike_buffer_times(value)
+        if value is None:
+            value = []
+        if selector is None:
+            self.__set_spike_buffer_times(value)
+        else:
+            # get the existing spiketimes in micro seconds
+            time_step = SpynnakerDataView.get_simulation_time_step_us()
+            numpy_times = self.send_buffer_times * time_step / 1000
+            # Use range list to set based on selector
+            spike_times = RangedList(
+                self.n_atoms, numpy_times,
+                use_list_as_value=not _is_double_list(numpy_times))
+            spike_times.set_value_by_selector(
+                selector, value, use_list_as_value=not _is_double_list(value))
+            self.__set_spike_buffer_times(spike_times)
 
     @overrides(PopulationApplicationVertex.get_parameters)
     def get_parameters(self) -> List[str]:

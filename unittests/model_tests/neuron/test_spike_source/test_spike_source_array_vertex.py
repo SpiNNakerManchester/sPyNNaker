@@ -35,11 +35,50 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             if "no spike" in str(record.msg):
                 found = True
         self.assertTrue(found)
+
+        # None spike_times is converted to an empty list
+        self.assertSequenceEqual(
+            [],  list(v.get_parameter_values("spike_times")))
+
+        v.set_parameter_values("spike_times", [4, 5, 6])
+        self.assertSequenceEqual(
+            [4, 5, 6],  list(v.get_parameter_values("spike_times")))
+        self.assertSequenceEqual(
+            [4, 5, 6],
+            list(v.get_parameter_values("spike_times", selector=3)))
+        self.assertSequenceEqual(
+            [[4, 5, 6], [4, 5, 6]],
+            list(v.get_parameter_values("spike_times", selector=[2,4])))
+
+        v.set_parameter_values("spike_times", None)
+        self.assertSequenceEqual(
+            [],  list(v.get_parameter_values("spike_times")))
+
+        v.set_parameter_values("spike_times", 7)
+        # Single value converted to a list with 1 value
+        self.assertSequenceEqual(
+            [7],  list(v.get_parameter_values("spike_times")))
+        self.assertSequenceEqual(
+            [7],
+            list(v.get_parameter_values("spike_times", selector=3)))
+        self.assertSequenceEqual(
+            [[7], [7]],
+            list(v.get_parameter_values("spike_times", selector=[2,4])))
+
         v.set_parameter_values("spike_times", [])
+        self.assertSequenceEqual(
+            [],  list(v.get_parameter_values("spike_times")))
+
         v.set_parameter_values("spike_times", [1, 2, 3], [1, 3])
         self.assertSequenceEqual(
             [[], [1, 2, 3], [], [1, 2, 3], []],
             list(v.get_parameter_values("spike_times")))
+        self.assertSequenceEqual(
+            [[1, 2, 3], []],
+            list(v.get_parameter_values("spike_times", selector=[1,4])))
+        self.assertSequenceEqual(
+            [1, 2, 3],
+            list(v.get_parameter_values("spike_times", selector=3)))
 
     def test_double_no_spikes(self) -> None:
         with LogCapture() as lc:
