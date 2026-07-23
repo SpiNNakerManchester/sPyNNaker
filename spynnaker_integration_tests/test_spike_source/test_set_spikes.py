@@ -41,10 +41,18 @@ class TestSetSpikes(BaseTestCase):
 
         in_spikes = input_pop.spinnaker_get_data("spikes").tolist()
         out_spikes = pop_1.spinnaker_get_data("spikes").tolist()
+
+        input_pop.set(spike_times=[])
+
+        with self.assertRaises(NotImplementedError):
+            # requires mapping so hard reset required.
+            sim.run(100)
+
         sim.end()
 
         self.assertSequenceEqual([[0, 12], [0, 40], [2, 23]], in_spikes)
         self.assertSequenceEqual([[0, 19], [0, 45], [2, 30]], out_spikes)
+
 
     def test_run(self) -> None:
         self.runsafe(self.do_run)

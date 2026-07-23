@@ -251,6 +251,7 @@ class SpikeSourceArrayVertex(
     def set_parameter_values(
             self, name: str, value: Spikes, selector: Selector = None) -> None:
         self._check_parameters(name, {"spike_times"})
+        SpynnakerDataView.set_requires_mapping()
         if value is None:
             value = []
         if selector is None:
