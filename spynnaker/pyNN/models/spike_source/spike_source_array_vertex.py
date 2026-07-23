@@ -40,7 +40,6 @@ from spynnaker.pyNN.models.common import (
     ParameterHolder, PopulationApplicationVertex)
 from spynnaker.pyNN.models.common.types import (Names, Spikes)
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
-from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 
 from .spike_source_array_machine_vertex import SpikeSourceArrayMachineVertex
 
@@ -104,7 +103,6 @@ class SpikeSourceArrayVertex(
         "__model_name",
         "__model",
         "__structure",
-        "_spike_times",
         "__n_colour_bits")
 
     #: ID of the recording region used for recording transmitted spikes.
@@ -132,9 +130,6 @@ class SpikeSourceArrayVertex(
 
         if spike_times is None:
             spike_times = []
-        self._spike_times = SpynnakerRangedList(
-            n_neurons, spike_times,
-            use_list_as_value=not _is_double_list(spike_times))
 
         time_step = SpynnakerDataView.get_simulation_time_step_us()
 
@@ -286,15 +281,13 @@ class SpikeSourceArrayVertex(
     def get_parameter_values(
             self, names: Names, selector: Selector = None) -> ParameterHolder:
         self._check_parameters(names, {"spike_times"})
-        return ParameterHolder(names, self.__read_parameter, selector)
+        return ParameterHolder(names, self.send_buffer_times, selector)
 
     @overrides(PopulationApplicationVertex.set_parameter_values)
     def set_parameter_values(
             self, name: str, value: Spikes, selector: Selector = None) -> None:
         self._check_parameters(name, {"spike_times"})
         self.__set_spike_buffer_times(value)
-        self._spike_times.set_value_by_selector(
-            selector, value, use_list_as_value=not _is_double_list(value))
 
     @overrides(PopulationApplicationVertex.get_parameters)
     def get_parameters(self) -> List[str]:
