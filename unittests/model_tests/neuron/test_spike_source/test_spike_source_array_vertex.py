@@ -48,7 +48,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             list(v.get_parameter_values("spike_times", selector=3)))
         self.assertSequenceEqual(
             [[4, 5, 6], [4, 5, 6]],
-            list(v.get_parameter_values("spike_times", selector=[2,4])))
+            list(v.get_parameter_values("spike_times", selector=[2, 4])))
 
         v.set_parameter_values("spike_times", None)
         self.assertSequenceEqual(
@@ -63,7 +63,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             list(v.get_parameter_values("spike_times", selector=3)))
         self.assertSequenceEqual(
             [[7], [7]],
-            list(v.get_parameter_values("spike_times", selector=[2,4])))
+            list(v.get_parameter_values("spike_times", selector=[2, 4])))
 
         v.set_parameter_values("spike_times", [])
         self.assertSequenceEqual(
@@ -75,7 +75,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             list(v.get_parameter_values("spike_times")))
         self.assertSequenceEqual(
             [[1, 2, 3], []],
-            list(v.get_parameter_values("spike_times", selector=[1,4])))
+            list(v.get_parameter_values("spike_times", selector=[1, 4])))
         self.assertSequenceEqual(
             [1, 2, 3],
             list(v.get_parameter_values("spike_times", selector=3)))
