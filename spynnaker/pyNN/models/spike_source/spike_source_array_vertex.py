@@ -26,6 +26,7 @@ from pyNN.space import Grid2D, Grid3D, BaseStructure
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import get_config_int
+from spinn_utilities.ranged import RangedList
 from spinn_utilities.ranged.abstract_sized import Selector
 
 from pacman.model.graphs.common import Slice
@@ -40,7 +41,6 @@ from spynnaker.pyNN.models.common import (
     ParameterHolder, PopulationApplicationVertex)
 from spynnaker.pyNN.models.common.types import (Names, Spikes)
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
-from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 
 from .spike_source_array_machine_vertex import SpikeSourceArrayMachineVertex
 
@@ -104,7 +104,6 @@ class SpikeSourceArrayVertex(
         "__model_name",
         "__model",
         "__structure",
-        "_spike_times",
         "__n_colour_bits")
 
     #: ID of the recording region used for recording transmitted spikes.
@@ -132,9 +131,6 @@ class SpikeSourceArrayVertex(
 
         if spike_times is None:
             spike_times = []
-        self._spike_times = SpynnakerRangedList(
-            n_neurons, spike_times,
-            use_list_as_value=not _is_double_list(spike_times))
 
         time_step = SpynnakerDataView.get_simulation_time_step_us()
 
@@ -199,6 +195,9 @@ class SpikeSourceArrayVertex(
         counter: Counter = Counter()
         for neuron_id in range(0, self.n_atoms):
             counter.update(spike_times[neuron_id])
+        if len(counter) == 0:
+            logger.warning("SpikeSourceArray all spike times lists are empty")
+            return
         top = counter.most_common(1)
         val, count = top[0]
         if count > TOO_MANY_SPIKES:
@@ -219,65 +218,28 @@ class SpikeSourceArrayVertex(
             return self.__structure.calculate_size(self.n_atoms)
         return super().atoms_shape
 
-    def _to_early_spikes_single_list(self, spike_times: _SingleList) -> None:
-        """
-        Checks if there is one or more spike_times before the current time.
-
-        Logs a warning for the first one found
-
-        :param spike_times:
-        """
-        current_time = SpynnakerDataView.get_current_run_time_ms()
-        for spike_time in spike_times:
-            if spike_time < current_time:
-                logger.warning(
-                    "SpikeSourceArray {} has spike_times that are lower than "
-                    "the current time {} For example {} - "
-                    "these will be ignored.",
-                    self, current_time, float(spike_time))
-                return
-
-    def _check_spikes_double_list(self, spike_times: _DoubleList) -> None:
-        """
-        Checks if there is one or more spike_times before the current time.
-
-        Logs a warning for the first one found
-
-        :param spike_times:
-        """
-        current_time = SpynnakerDataView.get_current_run_time_ms()
-        for neuron_id in range(0, self.n_atoms):
-            id_times = spike_times[neuron_id]
-            for id_time in id_times:
-                if id_time < current_time:
-                    logger.warning(
-                        "SpikeSourceArray {} has spike_times that are lower "
-                        "than the current time {} For example {} - "
-                        "these will be ignored.",
-                        self, current_time, float(id_time))
-                    return
-
     def __set_spike_buffer_times(self, spike_times: Spikes) -> None:
         """
         Set the spike source array's buffer spike times.
         """
         time_step = SpynnakerDataView.get_simulation_time_step_us()
-        # warn the user if they are asking for a spike time out of range
-        if _is_double_list(spike_times):
-            self._check_spikes_double_list(spike_times)
-        elif _is_single_list(spike_times):
-            self._to_early_spikes_single_list(spike_times)
-        elif _is_singleton(spike_times):
-            self._to_early_spikes_single_list([spike_times])
-        else:
-            # in case of empty list do not check
-            pass
         self.send_buffer_times = _send_buffer_times(spike_times, time_step)
         self._check_spike_density(spike_times)
 
     def __read_parameter(self, name: str, selector: Selector) -> Sequence:
         _ = name
-        return self._spike_times.get_values(selector)
+        time_step = SpynnakerDataView.get_simulation_time_step_us()
+        numpy_times = self.send_buffer_times * time_step / 1000
+        double_list = _is_double_list(numpy_times)
+        if selector or double_list:
+            # Let RangeList do the heavy lifting using 2D spikes
+            spike_times = [times.tolist() for times in numpy_times]
+            range_list = RangedList(self.n_atoms, spike_times,
+                                    use_list_as_value=not double_list)
+            return range_list.get_values(selector)
+
+        # A single list is fine
+        return numpy_times.tolist()
 
     @overrides(PopulationApplicationVertex.get_parameter_values)
     def get_parameter_values(
@@ -289,9 +251,22 @@ class SpikeSourceArrayVertex(
     def set_parameter_values(
             self, name: str, value: Spikes, selector: Selector = None) -> None:
         self._check_parameters(name, {"spike_times"})
-        self.__set_spike_buffer_times(value)
-        self._spike_times.set_value_by_selector(
-            selector, value, use_list_as_value=not _is_double_list(value))
+        SpynnakerDataView.set_requires_mapping()
+        if value is None:
+            value = []
+        if selector is None:
+            self.__set_spike_buffer_times(value)
+        else:
+            # get the existing spiketimes in micro seconds
+            time_step = SpynnakerDataView.get_simulation_time_step_us()
+            numpy_times = self.send_buffer_times * time_step / 1000
+            # Use range list to set based on selector
+            spike_times = RangedList(
+                self.n_atoms, numpy_times,
+                use_list_as_value=not _is_double_list(numpy_times))
+            spike_times.set_value_by_selector(
+                selector, value, use_list_as_value=not _is_double_list(value))
+            self.__set_spike_buffer_times(spike_times)
 
     @overrides(PopulationApplicationVertex.get_parameters)
     def get_parameters(self) -> List[str]:
