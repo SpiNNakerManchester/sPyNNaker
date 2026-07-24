@@ -229,13 +229,17 @@ class SpikeSourceArrayVertex(
     def __read_parameter(self, name: str, selector: Selector) -> Sequence:
         _ = name
         time_step = SpynnakerDataView.get_simulation_time_step_us()
-        numpy_times = self.send_buffer_times * time_step / 1000
+        send_buffer_times = self.send_buffer_times
+        if send_buffer_times is None:
+            return []
+        numpy_times = send_buffer_times * time_step / 1000
         double_list = _is_double_list(numpy_times)
         if selector or double_list:
             # Let RangeList do the heavy lifting using 2D spikes
             spike_times = [times.tolist() for times in numpy_times]
-            range_list = RangedList(self.n_atoms, spike_times,
-                                    use_list_as_value=not double_list)
+            range_list: RangedList[float] = (
+                RangedList(self.n_atoms, spike_times,
+                use_list_as_value=not double_list))
             return range_list.get_values(selector)
 
         # A single list is fine
@@ -259,9 +263,13 @@ class SpikeSourceArrayVertex(
         else:
             # get the existing spiketimes in micro seconds
             time_step = SpynnakerDataView.get_simulation_time_step_us()
-            numpy_times = self.send_buffer_times * time_step / 1000
+            send_buffer_times = self.send_buffer_times
+            if send_buffer_times is None:
+                self.__set_spike_buffer_times([])
+                return
+            numpy_times = send_buffer_times * time_step / 1000
             # Use range list to set based on selector
-            spike_times = RangedList(
+            spike_times: RangedList[float] = RangedList(
                 self.n_atoms, numpy_times,
                 use_list_as_value=not _is_double_list(numpy_times))
             spike_times.set_value_by_selector(
