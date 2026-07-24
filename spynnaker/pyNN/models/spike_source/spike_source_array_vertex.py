@@ -223,7 +223,7 @@ class SpikeSourceArrayVertex(
         Set the spike source array's buffer spike times.
         """
         time_step = SpynnakerDataView.get_simulation_time_step_us()
-        self.send_buffer_times = _send_buffer_times(spike_times, time_step)
+        self.set_send_buffer_times(_send_buffer_times(spike_times, time_step))
         self._check_spike_density(spike_times)
 
     def __read_parameter(self, name: str, selector: Selector) -> Sequence:
