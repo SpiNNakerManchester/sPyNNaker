@@ -261,7 +261,7 @@ class SpikeSourceArrayVertex(
         if selector is None:
             self.__set_spike_buffer_times(value)
         else:
-            # get the existing spiketimes in micro seconds
+            # get the existing spike times in micro seconds
             time_step = SpynnakerDataView.get_simulation_time_step_us()
             send_buffer_times = self.send_buffer_times
             if send_buffer_times is None:
