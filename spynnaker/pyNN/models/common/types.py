@@ -28,4 +28,5 @@ Values: TypeAlias = Union[
     float, Sequence[float], NDArray[numpy.floating], RandomDistribution]
 
 #: Type of spikes in spike sources.
-Spikes: TypeAlias = Values | RangedList[float] | NDArray[numpy.integer]
+Spikes: TypeAlias = (Values | RangedList[float] | Sequence[Sequence[int]] |
+                     NDArray[numpy.integer])
