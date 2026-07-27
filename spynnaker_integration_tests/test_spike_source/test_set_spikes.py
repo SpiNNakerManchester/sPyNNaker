@@ -73,6 +73,5 @@ class TestSetSpikes(BaseTestCase):
 
         sim.end()
 
-
     def test_run(self) -> None:
         self.runsafe(self.do_run)

@@ -239,7 +239,7 @@ class SpikeSourceArrayVertex(
             spike_times = [times.tolist() for times in numpy_times]
             range_list: RangedList[float] = (
                 RangedList(self.n_atoms, spike_times,
-                use_list_as_value=not double_list))
+                           use_list_as_value=not double_list))
             return range_list.get_values(selector)
 
         # A single list is fine

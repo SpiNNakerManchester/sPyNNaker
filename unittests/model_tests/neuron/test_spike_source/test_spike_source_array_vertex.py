@@ -51,7 +51,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             list(v.get_parameter_values("spike_times", selector=[2, 4])))
 
         # None is not PyNN but lets check it works anyway
-        v.set_parameter_values("spike_times", None) # type: ignore[arg-type]
+        v.set_parameter_values("spike_times", None)  # type: ignore[arg-type]
         self.assertSequenceEqual(
             [],  list(v.get_parameter_values("spike_times")))
 
