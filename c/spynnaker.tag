@@ -4186,7 +4186,6 @@
     <name>synapse_dynamics_stdp_mad_impl.c</name>
     <path>src/neuron/plasticity/stdp/</path>
     <filename>synapse__dynamics__stdp__mad__impl_8c.html</filename>
-    <includes id="post__events_8h" name="post_events.h" local="yes" import="no" module="no" objc="no">post_events.h</includes>
     <includes id="synapse__dynamics__stdp__common_8h" name="synapse_dynamics_stdp_common.h" local="yes" import="no" module="no" objc="no">synapse_dynamics_stdp_common.h</includes>
     <class kind="struct">synapse_row_plastic_data_t</class>
     <member kind="function" static="yes">
