@@ -20,7 +20,7 @@
 # that takes a long time in sPyNNaker right now.
 
 name: Python Actions
-on: [push]
+on: [push, pull_request]
 
 jobs:
   call:
