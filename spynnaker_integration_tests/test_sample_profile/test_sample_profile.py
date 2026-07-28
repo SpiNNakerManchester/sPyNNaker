@@ -60,6 +60,5 @@ class TestSampleProfiling(BaseTestCase):
         # Did we build the report file like we asked for in config file?
         self.assert_report()
 
-
     def test_sample_profiling(self) -> None:
         self.runsafe(self.do_run)

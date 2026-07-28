@@ -77,6 +77,5 @@ class TestSampleProfilingWithEnerfy(BaseTestCase):
         self.assert_energy_report()
         self.assert_sample_profile_report()
 
-
     def test_sample_profile_and_energy(self) -> None:
         self.runsafe(self.do_run)
