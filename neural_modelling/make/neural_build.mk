@@ -46,7 +46,6 @@ POPULATION_TABLE_IMPL := binary_search
 # Define the directories
 NEURON_DIR := $(abspath $(NEURAL_MODELLING_DIRS)/src)
 NEURON_MODIFIED_DIR := $(abspath $(NEURAL_MODELLING_DIRS)/modified_src)/
-
 SOURCE_DIRS += $(NEURON_DIR):$(NEURON_MODIFIED_DIR)
 
 include $(CURRENT_DIR)/funcs.mk
@@ -116,21 +115,6 @@ else
     SYNAPSE_DYNAMICS_C := $(call replace_source_dirs,$(SYNAPSE_DYNAMICS))
     SYNAPSE_DYNAMICS := $(call strip_source_dirs,$(SYNAPSE_DYNAMICS))
     SYNAPSE_DYNAMICS_O := $(BUILD_DIR)$(SYNAPSE_DYNAMICS:%.c=%.o)
-
-    SYNAPSE_DYNAMICS_STATIC := neuron/plasticity/synapse_dynamics_static_impl.c
-    STDP_ENABLED = 0
-    ifneq ($(SYNAPSE_DYNAMICS), $(SYNAPSE_DYNAMICS_STATIC))
-        ifndef SYNAPSE_DYNAMICS_CUSTOM
-	        STDP_ENABLED = 1
-
-	        ifndef TIMING_DEPENDENCE_H
-	            $(error TIMING_DEPENDENCE_H is not set which is required when SYNAPSE_DYNAMICS ($(SYNAPSE_DYNAMICS_C)) != $(SYNAPSE_DYNAMICS_STATIC))
-	        endif
-	        ifndef WEIGHT_DEPENDENCE_H
-	            $(error WEIGHT_DEPENDENCE_H is not set which is required when SYNAPSE_DYNAMICS ($(SYNAPSE_DYNAMICS_C)) != $(SYNAPSE_DYNAMICS_STATIC))
-	        endif
-	    endif
-    endif
 endif
 
 ifdef WEIGHT_DEPENDENCE
@@ -138,6 +122,7 @@ ifdef WEIGHT_DEPENDENCE
     WEIGHT_DEPENDENCE_C := $(call replace_source_dirs,$(WEIGHT_DEPENDENCE))
     WEIGHT_DEPENDENCE := $(call strip_source_dirs,$(WEIGHT_DEPENDENCE))
     WEIGHT_DEPENDENCE_O := $(BUILD_DIR)$(WEIGHT_DEPENDENCE:%.c=%.o)
+    STDP_INCLUDES := $(STDP_INCLUDES) -include $(WEIGHT_DEPENDENCE_H) 
 endif
 
 ifdef TIMING_DEPENDENCE
@@ -145,13 +130,12 @@ ifdef TIMING_DEPENDENCE
     TIMING_DEPENDENCE_C := $(call replace_source_dirs,$(TIMING_DEPENDENCE))
     TIMING_DEPENDENCE := $(call strip_source_dirs,$(TIMING_DEPENDENCE))
     TIMING_DEPENDENCE_O := $(BUILD_DIR)$(TIMING_DEPENDENCE:%.c=%.o)
+    STDP_INCLUDES := $(STDP_INCLUDES) -include $(TIMING_DEPENDENCE_H) 
 endif
 
-SYNGEN_ENABLED = 1
 ifndef SYNAPTOGENESIS_DYNAMICS
     SYNAPTOGENESIS_DYNAMICS := neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
     SYNAPTOGENESIS_DYNAMICS_C := $(NEURON_MODIFIED_DIR)$(SYNAPTOGENESIS_DYNAMICS)
-    SYNGEN_ENABLED = 0
 else
     SYNAPTOGENESIS_DYNAMICS_C := $(call replace_source_dirs,$(SYNAPTOGENESIS_DYNAMICS))
     SYNAPTOGENESIS_DYNAMICS := $(call strip_source_dirs,$(SYNAPTOGENESIS_DYNAMICS))
@@ -172,6 +156,7 @@ ifdef PARTNER_SELECTION
     PARTNER_SELECTION_C := $(call replace_source_dirs,$(PARTNER_SELECTION))
     PARTNER_SELECTION := $(call strip_source_dirs,$(PARTNER_SELECTION))
     PARTNER_SELECTION_O := $(BUILD_DIR)$(PARTNER_SELECTION:%.c=%.o)
+    SYNGEN_INCLUDES:= $(SYNGEN_INCLUDES) -include $(PARTNER_SELECTION_H) 
 endif
 
 ifdef FORMATION
@@ -179,6 +164,7 @@ ifdef FORMATION
     FORMATION_C := $(call replace_source_dirs,$(FORMATION))
     FORMATION := $(call strip_source_dirs,$(FORMATION))
     FORMATION_O := $(BUILD_DIR)$(FORMATION:%.c=%.o)
+    SYNGEN_INCLUDES:= $(SYNGEN_INCLUDES) -include $(FORMATION_H) 
 endif
 
 ifdef ELIMINATION
@@ -186,6 +172,7 @@ ifdef ELIMINATION
     ELIMINATION_C := $(call replace_source_dirs,$(ELIMINATION))
     ELIMINATION := $(call strip_source_dirs,$(ELIMINATION))
     ELIMINATION_O := $(BUILD_DIR)$(ELIMINATION:%.c=%.o)
+    SYNGEN_INCLUDES:= $(SYNGEN_INCLUDES) -include $(ELIMINATION_H) 
 endif
 
 OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
@@ -205,7 +192,7 @@ include $(FEC_INSTALL_DIR)/make/fec.mk
 FEC_OPT = $(OTIME)
 
 # Synapse build rules
-SYNAPSE_TYPE_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED)
+SYNAPSE_TYPE_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS)
 
 $(BUILD_DIR)neuron/c_main.o: $(NEURON_MODIFIED_DIR)neuron/c_main.c
 	#c_main.c
@@ -227,49 +214,27 @@ $(BUILD_DIR)neuron/population_table/population_table_binary_search_impl.o: $(NEU
 	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-SYNGEN_INCLUDES:=
-ifeq ($(SYNGEN_ENABLED), 1)
-    SYNGEN_INCLUDES:= -include $(PARTNER_SELECTION_H) -include $(FORMATION_H) -include $(ELIMINATION_H)
-endif
+STDP_COMPILE = $(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) $(STDP_INCLUDES)
 
-#STDP Build rules If and only if STDP used
-ifeq ($(STDP_ENABLED), 1)
-    STDP_INCLUDES:= -include $(WEIGHT_DEPENDENCE_H) -include $(TIMING_DEPENDENCE_H)
-    STDP_COMPILE = $(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED) -DSYNGEN_ENABLED=$(SYNGEN_ENABLED) $(STDP_INCLUDES)
-
-    $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
+$(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
 	# SYNAPSE_DYNAMICS_O stdp
 	-@mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
 
-    $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
+$(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
 	# SYNAPTOGENESIS_DYNAMICS_O stdp
 	-@mkdir -p $(dir $@)
 	$(STDP_COMPILE) $(SYNGEN_INCLUDES) -o $@ $<
 
-    $(BUILD_DIR)neuron/plasticity/common/post_events.o: $(NEURON_MODIFIED_DIR)neuron/plasticity/common/post_events.c
+$(BUILD_DIR)neuron/plasticity/common/post_events.o: $(NEURON_MODIFIED_DIR)neuron/plasticity/common/post_events.c
 	# plasticity/common/post_events.c
 	-@mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
 
-else
-    $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
-	# $(SYNAPTOGENESIS_DYNAMICS) Synapese
-	-@mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) $(SYNGEN_INCLUDES) -o $@ $<
-
-    $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
-	# SYNAPSE_DYNAMICS_O Synapese
-	-@mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
-
-endif
-
 $(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE_C) $(SYNAPSE_TYPE_H) $(MAKEFILE_LIST)
 	# WEIGHT_DEPENDENCE_O
 	-@mkdir -p $(dir $@)
-	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
-	        -o $@ $<
+	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) -o $@ $<
 
 $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE_C) $(SYNAPSE_TYPE_H) \
                         $(WEIGHT_DEPENDENCE_H) $(MAKEFILE_LIST)
@@ -304,4 +269,4 @@ $(BUILD_DIR)neuron/neuron.o: $(NEURON_MODIFIED_DIR)neuron/neuron.c $(NEURON_INCL
 .PRECIOUS: $(NEURON_MODIFIED_DIR)%.c $(NEURON_MODIFIED_DIR)%.h $(LOG_DICT_FILE) $(EXTRA_PRECIOUS)
 
 clean:
-	$(RM) -r $(BUILD_DIR)
+	$(RM) -r $(BUILD_DIR) $(NEURON_MODIFIED_DIR)
