@@ -28,6 +28,7 @@ from spynnaker.pyNN.exceptions import (
     SynapticConfigurationException, InvalidParameterType)
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE)
+from spynnaker.pyNN.types import WeightScales
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import AbstractGenerateOnMachine
 from .abstract_generate_on_machine import MatrixGeneratorID
@@ -138,14 +139,21 @@ class SynapseDynamicsWeightChanger(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
-            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
+            max_n_synapses: int, max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> Tuple[
                 NDArray[uint32], NDArray[uint32], NDArray[uint32],
                 NDArray[uint32]]:
-        weights = numpy.rint(numpy.abs(connections["weight"]))
+
+        # Pre-scale the weights here to match the ring buffer format to make
+        # addition to the weights easier
+        scaled_weights = (
+            numpy.abs(connections["weight"]) *
+            numpy.array(ring_buffer_weight_scales)[
+                connections["synapse_type"]])
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
         fixed_plastic = (
-            ((weights.astype(uint32) & 0xFFFF) << 16) |
+            ((numpy.rint(scaled_weights).astype(uint32) & 0xFFFF) << 16) |
             (connections["synapse_type"].astype(uint32) << n_neuron_id_bits) |
             (connections["target"] & neuron_id_mask))
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
@@ -190,9 +198,11 @@ class SynapseDynamicsWeightChanger(
             self, n_synapse_types: int,
             pp_size: NDArray[uint32], pp_data: List[NDArray[uint32]],
             fp_size: NDArray[uint32], fp_data: List[NDArray[uint32]],
-            max_atoms_per_core: int) -> ConnectionsArray:
+            max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         data = numpy.concatenate(fp_data)
         weight = ((data >> 16) & 0xFFFF).astype(int16)
+        n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
         connections = numpy.zeros(data.size, dtype=NUMPY_CONNECTORS_DTYPE)
@@ -201,6 +211,10 @@ class SynapseDynamicsWeightChanger(
         connections["target"] = data & neuron_id_mask
         connections["weight"] = weight
         connections["delay"] = 1
+        synapse_type = (
+            (data >> n_neuron_id_bits) & ((1 << n_synapse_type_bits) - 1))
+        connections["weight"] /= numpy.array(ring_buffer_weight_scales)[
+            synapse_type]
         return connections
 
     @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)

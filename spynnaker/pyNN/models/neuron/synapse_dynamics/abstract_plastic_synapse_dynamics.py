@@ -20,6 +20,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     ConnectionsArray)
+from spynnaker.pyNN.types import WeightScales
 
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 
@@ -46,7 +47,8 @@ class AbstractPlasticSynapseDynamics(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
-            max_n_synapses: int, max_atoms_per_core: int) -> Union[
+            max_n_synapses: int, max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> Union[
                 Tuple[NDArray[uint32], NDArray[uint32],
                       NDArray[uint32], NDArray[uint32]],
                 Tuple[List[NDArray[uint32]], List[NDArray[uint32]],
@@ -71,6 +73,11 @@ class AbstractPlasticSynapseDynamics(
         :param n_synapse_types: The number of synapse types
         :param max_n_synapses: The maximum number of synapses to generate
         :param max_atoms_per_core: The maximum number of atoms on a core
+        :param ring_buffer_weight_scales:
+            The ring buffer scaling of the weights for each synapse type.  This
+            does not have to be used in the storage of synapses, but could
+            instead be used when converting stored weights to ring buffer
+            weights.
         :return: (fp_data (2D), pp_data (2D), fp_size (1D), pp_size (1D))
         """
         raise NotImplementedError
@@ -110,7 +117,8 @@ class AbstractPlasticSynapseDynamics(
             self, n_synapse_types: int,
             pp_size: NDArray[uint32], pp_data: List[NDArray[uint32]],
             fp_size: NDArray[uint32], fp_data: List[NDArray[uint32]],
-            max_atoms_per_core: int) -> ConnectionsArray:
+            max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         """
         Read the connections indicated in the connection indices from the
         data in `pp_data` and `fp_data`.
@@ -121,6 +129,7 @@ class AbstractPlasticSynapseDynamics(
         :param fp_size: 1D
         :param fp_data: 2D
         :param max_atoms_per_core:
+        :param ring_buffer_weight_scales:
         :return:
             array with columns ``source``, ``target``, ``weight``, ``delay``
         """

@@ -31,7 +31,7 @@ from spinn_front_end_common.utilities.constants import (
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
-from spynnaker.pyNN.types import Weights
+from spynnaker.pyNN.types import Weights, WeightScales
 from spynnaker.pyNN.types import WeightsDelysIn as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
@@ -204,7 +204,8 @@ class SynapseDynamicsWeightChangable(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
-            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
+            max_n_synapses: int, max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> Tuple[
                 List[NDArray[uint32]], List[NDArray[uint32]],
                 NDArray[uint32], NDArray[uint32]]:
         raise NotImplementedError(
@@ -236,7 +237,8 @@ class SynapseDynamicsWeightChangable(
             self, n_synapse_types: int, pp_size: NDArray[uint32],
             pp_data: List[NDArray[uint32]], fp_size: NDArray[uint32],
             fp_data: List[NDArray[uint32]],
-            max_atoms_per_core: int) -> ConnectionsArray:
+            max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         logger.warning(
             "Weights are only changed when a pre-spike arrives after a"
             " change-spike has been received, and so the weights might"
@@ -265,6 +267,10 @@ class SynapseDynamicsWeightChangable(
         connections["weight"] = pp_half_words
         connections["delay"] = data_fixed >> (
             n_neuron_id_bits + n_synapse_type_bits)
+        synapse_type = (data_fixed >> n_neuron_id_bits) & (
+            (1 << n_synapse_type_bits) - 1)
+        connections["weight"] /= numpy.array(ring_buffer_weight_scales)[
+            synapse_type]
         return connections
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)
