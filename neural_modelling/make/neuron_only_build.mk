@@ -84,14 +84,15 @@ else
 		    CURRENT_SOURCE_H := $(call replace_source_dirs,$(CURRENT_SOURCE_H))
 		endif
 
-		NEURON_INCLUDES := \
-	      -include $(NEURON_MODEL_H) \
-	      -include $(SYNAPSE_TYPE_H) \
-	      -include $(INPUT_TYPE_H) \
-	      -include $(THRESHOLD_TYPE_H) \
-	      -include $(ADDITIONAL_INPUT_H) \
-	      -include $(CURRENT_SOURCE_H) \
-	      -include $(NEURON_IMPL_H)
+		NEURON_INCLUDE_FILES := \
+	      $(NEURON_MODEL_H) \
+	      $(SYNAPSE_TYPE_H) \
+	      $(INPUT_TYPE_H) \
+	      $(THRESHOLD_TYPE_H) \
+	      $(ADDITIONAL_INPUT_H) \
+	      $(CURRENT_SOURCE_H) \
+	      $(NEURON_IMPL_H)
+		NEURON_INCLUDES := $(NEURON_INCLUDE_FILES:%=-include %)
     endif
 endif
 
@@ -121,4 +122,4 @@ $(BUILD_DIR)neuron/neuron.o: $(NEURON_MODIFIED_DIR)neuron/neuron.c $(NEURON_MODE
 .PRECIOUS: $(NEURON_MODIFIED_DIR)%.c $(NEURON_MODIFIED_DIR)%.h $(LOG_DICT_FILE) $(EXTRA_PRECIOUS)
 
 clean:
-	$(RM) -r $(BUILD_DIR)
+	$(RM) -r $(BUILD_DIR) $(NEURON_MODIFIED_DIR)

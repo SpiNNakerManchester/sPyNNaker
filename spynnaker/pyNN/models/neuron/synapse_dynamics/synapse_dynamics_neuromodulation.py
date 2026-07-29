@@ -32,7 +32,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     STDP_FIXED_POINT_ONE, get_exp_lut_array)
-from spynnaker.pyNN.types import WeightsDelysIn as _Weight
+from spynnaker.pyNN.types import WeightsDelysIn as _Weight, WeightScales
 
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (
@@ -215,7 +215,8 @@ class SynapseDynamicsNeuromodulation(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
-            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
+            max_n_synapses: int, max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> Tuple[
                 NDArray[uint32], NDArray[uint32], NDArray[uint32],
                 NDArray[uint32]]:
         weights = numpy.rint(
@@ -271,13 +272,14 @@ class SynapseDynamicsNeuromodulation(
             self, n_synapse_types: int,
             pp_size: NDArray[uint32], pp_data: List[NDArray[uint32]],
             fp_size: NDArray[uint32], fp_data: List[NDArray[uint32]],
-            max_atoms_per_core: int) -> ConnectionsArray:
+            max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         data = numpy.concatenate(fp_data)
         connections = numpy.zeros(data.size, dtype=NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, fp_size[i]) for i in range(len(fp_size))])
         connections["target"] = data & 0xFFFF
-        connections["weight"] = (data >> 16) & 0xFFFF
+        connections["weight"] = ((data >> 16) & 0xFFFF) / STDP_FIXED_POINT_ONE
         connections["delay"] = 1
         return connections
 
