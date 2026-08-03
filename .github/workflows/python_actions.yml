@@ -20,7 +20,7 @@
 # that takes a long time in sPyNNaker right now.
 
 name: Python Actions
-on: [push]
+on: [push, pull_request]
 
 jobs:
   call:
@@ -35,3 +35,4 @@ jobs:
       mypy-packages:
       mypy-full-packages: spynnaker unittests spynnaker_integration_tests proxy_integration_tests
       cfg-file: spynnaker
+      ruff-packages: spynnaker unittests spynnaker_integration_tests proxy_integration_tests
