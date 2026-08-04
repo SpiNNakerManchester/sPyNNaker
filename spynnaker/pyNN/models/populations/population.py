@@ -35,6 +35,8 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
 
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -84,6 +86,15 @@ class Population(PopulationBase):
             structure: Optional[BaseStructure] = None,
             initial_values: Optional[Dict[str, float]] = None,
             label: Optional[str] = None,
+            *, max_rate: Optional[float] = None,
+            n_colour_bits: Optional[int] = None,
+            n_synapse_cores: Optional[int] = None,
+            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
+            port: Optional[int] = None,
+            reserve_reverse_ip_tag: Optional[bool] = None,
+            seed: Optional[int] = None,
+            splitter: Optional[AbstractSplitterCommon] = None,
+            virtual_key: Optional[int] = None,
             additional_parameters: Optional[_ParamDict] = None,
             **additional_kwargs: _ParamDict):
         """
@@ -95,10 +106,47 @@ class Population(PopulationBase):
         :param structure:
         :param initial_values: Initial values of state variables
         :param label: A label for the population
+        :param max_rate:
+            Model.create_vertex parameter.
+            Likely:
+            The maximum number of spikes for any neuron at any timestamp
+        :param n_colour_bits:
+            Model.create_vertex parameter.
+            Likely: The number of bits to use for colour
+        :param n_synapse_cores:
+            Model.create_vertex parameter.
+            Likely: The number of synapse cores; 0 to force combined cores,
+            or None to allow the system to choose
+        :param neurons_per_core:
+            Model.create_vertex parameter.
+            Likely: A ceiling on
+            the number of neurons that can be placed on a single core.
+        :param port:
+            Model.create_vertex parameter.
+            Likely: The live input port the vertex receives spikes on
+        :param reserve_reverse_ip_tag:
+            Model.create_vertex parameter.
+            Likely: Extra flag for input without a reserved port
+        :param seed:
+            Model.create_vertex parameter.
+            Likely: The Population seed,
+            used to ensure the same random generation on each run.
+        :param splitter:
+            Model.create_vertex parameter.
+            Likely: splitter from application vertices to machine vertices
+        :param virtual_key:
+            Model.create_vertex parameter.
+            Likely:
+            The virtual_key of the population to identify the population.
         :param additional_parameters:
-            Additional parameters to pass to the vertex creation function.
+            Alternative way of entering Model.create_vertex parameter.
+            Ignored if also provided as a named parameter.
         :param additional_kwargs:
-            A nicer way of allowing additional things
+            Additional Model.create_vertex parameters.
+            See the Model's create_vertex method for more details.
+            create_vertex parameters will be ignored if
+            the Model does not accept this parameter,
+            or raise an Exception if a Vertex is passed in
         """
         # Deal with the kwargs!
         additional: _ParamDict = dict()
@@ -106,6 +154,24 @@ class Population(PopulationBase):
             additional.update(additional_parameters)
         if additional_kwargs:
             additional.update(additional_kwargs)
+        if max_rate is not None:
+            additional['max_rate'] = max_rate
+        if n_colour_bits is not None:
+            additional['n_colour_bits'] = n_colour_bits
+        if n_synapse_cores is not None:
+            additional['n_synapse_cores'] = n_synapse_cores
+        if neurons_per_core is not None:
+            additional['neurons_per_core'] = neurons_per_core
+        if port is not None:
+            additional['port'] = port
+        if reserve_reverse_ip_tag is not None:
+            additional['reserve_reverse_ip_tag'] = reserve_reverse_ip_tag
+        if seed is not None:
+            additional['seed'] = seed
+        if splitter is not None:
+            additional['splitter'] = splitter
+        if virtual_key is not None:
+            additional['virtual_key'] = virtual_key
 
         # build our initial objects
         self.__celltype: AbstractPyNNModel
