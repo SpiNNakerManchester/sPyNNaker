@@ -13,8 +13,11 @@
 # limitations under the License.
 
 import random
-from spinn_utilities.config_holder import get_config_bool
+
 import pyNN.spiNNaker as sim
+
+from spinn_utilities.config_holder import get_config_bool
+
 from spinnaker_testbase import BaseTestCase
 
 

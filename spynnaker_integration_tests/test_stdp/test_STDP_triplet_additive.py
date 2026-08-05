@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.spiNNaker as sim
-from spinnaker_testbase import BaseTestCase
-
 import numpy
+import pyNN.spiNNaker as sim
+
+from spinnaker_testbase import BaseTestCase
 
 
 def triplet_additive() -> None:

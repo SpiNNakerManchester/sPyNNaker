@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from .abstract_threshold_type import AbstractThresholdType
-from .threshold_type_static import ThresholdTypeStatic
-from .threshold_type_maass_stochastic import ThresholdTypeMaassStochastic
 from .threshold_type_fixed_prob import ThresholdTypeFixedProb
+from .threshold_type_maass_stochastic import ThresholdTypeMaassStochastic
+from .threshold_type_static import ThresholdTypeStatic
 
 __all__ = ["AbstractThresholdType", "ThresholdTypeStatic",
            "ThresholdTypeMaassStochastic", "ThresholdTypeFixedProb"]

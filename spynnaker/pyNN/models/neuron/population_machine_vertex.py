@@ -20,26 +20,33 @@ from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
 
-from pacman.model.resources import AbstractSDRAM
-from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
 from pacman.model.placements import Placement
+from pacman.model.resources import AbstractSDRAM
 
 from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
+    AbstractGeneratesDataSpecification,
+    AbstractRewritesDataSpecification,
+)
 from spinn_front_end_common.interface.ds import (
-    DataSpecificationGenerator, DataSpecificationReloader)
+    DataSpecificationGenerator,
+    DataSpecificationReloader,
+)
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 
-from .population_vertex import PopulationVertex
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
-    NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
+    NeuronProvenance,
+    NeuronRegions,
+    PopulationMachineNeurons,
+)
 from .population_machine_synapses import PopulationMachineSynapses
 from .population_machine_synapses_provenance import SynapseProvenance
+from .population_vertex import PopulationVertex
 from .synaptic_matrices import SynapseRegions
 
 

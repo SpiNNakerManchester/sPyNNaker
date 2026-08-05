@@ -20,16 +20,19 @@ from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
 
-from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationBase)
+from spinn_front_end_common.interface.ds import DataSpecificationBase, DataType
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+    BYTES_PER_SHORT,
+    BYTES_PER_WORD,
+)
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
-    SynapseStructureWeightAccumulator)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    STDP_FIXED_POINT_ONE)
+    STDP_FIXED_POINT_ONE,
+)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
+    SynapseStructureWeightAccumulator,
+)
 
 from .abstract_timing_dependence import AbstractTimingDependence
 

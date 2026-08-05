@@ -12,52 +12,79 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from collections.abc import Sequence as Seq
-from collections.abc import Sized
+
 import logging
 import math
+from collections.abc import Sequence as Seq
+from collections.abc import Sized
 from typing import (
-    Any, Collection, Dict, List, Optional, Sequence, Tuple, Union,
-    cast, TYPE_CHECKING)
-from typing_extensions import TypeGuard
+    TYPE_CHECKING,
+    Any,
+    Collection,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    cast,
+)
+
 import numpy
-from numpy.typing import NDArray
 import scipy.stats
-from pyNN.space import Grid2D, Grid3D, BaseStructure
+from numpy.typing import NDArray
+from pyNN.space import BaseStructure, Grid2D, Grid3D
+from typing_extensions import TypeGuard
+
+from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary, RangedList
-from spinn_utilities.config_holder import get_config_int
+
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
+from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
+
 from spinn_front_end_common.interface.buffer_management import (
-    recording_utilities)
-from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT)
+    recording_utilities,
+)
 from spinn_front_end_common.interface.profiling import profile_utils
+from spinn_front_end_common.utilities.constants import SYSTEM_BYTES_REQUIREMENT
+
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.common import MultiSpikeRecorder
-from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.common import (
-    ParameterHolder, PopulationApplicationVertex)
+    MultiSpikeRecorder,
+    ParameterHolder,
+    PopulationApplicationVertex,
+)
 from spynnaker.pyNN.models.common.types import Names
-from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    ConnectionsArray)
+    ConnectionsArray,
+)
+from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
+from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
+
 from .spike_source_poisson_machine_vertex import (
-    SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
-    get_sdram_edge_params_bytes, get_expander_rates_bytes, get_params_bytes)
+    SpikeSourcePoissonMachineVertex,
+    _flatten,
+    get_expander_rates_bytes,
+    get_params_bytes,
+    get_rates_bytes,
+    get_sdram_edge_params_bytes,
+)
+
 if TYPE_CHECKING:
     from spinn_utilities.ranged.abstract_sized import Selector
-    from .spike_source_poisson import SpikeSourcePoisson
-    from .spike_source_poisson_variable import SpikeSourcePoissonVariable
+
+    from spynnaker.pyNN.models.common.types import Values
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
     from spynnaker.pyNN.models.projection import Projection
-    from spynnaker.pyNN.models.common.types import Values
+
+    from .spike_source_poisson import SpikeSourcePoisson
+    from .spike_source_poisson_variable import SpikeSourcePoissonVariable
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

@@ -15,15 +15,16 @@
 from typing import Iterable
 
 import numpy
-from numpy import uint16, floating
+from numpy import floating, uint16
 from numpy.typing import ArrayLike, NDArray
 
 from spinn_utilities.overrides import overrides
 
-from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationBase)
+from spinn_front_end_common.interface.ds import DataSpecificationBase, DataType
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+    BYTES_PER_SHORT,
+    BYTES_PER_WORD,
+)
 
 from .abstract_formation import AbstractFormation
 

@@ -11,17 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
 from math import ceil, log2
 from typing import Dict, Optional
-import logging
-from spinn_utilities.overrides import overrides
+
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import Application2DSpiNNakerLinkVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.utilities.constants import BITS_IN_KEY
 from pacman.utilities.utility_calls import is_power_of_2
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 logger = FormatAdapter(logging.getLogger(__name__))

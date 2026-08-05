@@ -14,14 +14,20 @@
 
 import functools
 from typing import Dict, Iterable, Optional, Tuple
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.connections.live_event_connection \
     import (
-        LiveEventConnection, _Callback, _InitCallback, _RcvCallback,
-        _RcvTimeCallback)
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
+        LiveEventConnection,
+        _Callback,
+        _InitCallback,
+        _RcvCallback,
+        _RcvTimeCallback,
+    )
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 
 class SpynnakerPoissonControlConnection(LiveEventConnection):

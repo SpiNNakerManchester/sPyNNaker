@@ -13,9 +13,13 @@
 # limitations under the License.
 import pyNN.spiNNaker as sim
 import pytest
-from spynnaker.pyNN.exceptions import (
-    SynapticConfigurationException, DelayExtensionException)
+
 from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.exceptions import (
+    DelayExtensionException,
+    SynapticConfigurationException,
+)
 
 
 def mission_impossible() -> None:

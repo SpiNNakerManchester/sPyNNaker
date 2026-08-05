@@ -12,26 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, List, Union, Tuple
+from typing import List, Optional, Tuple, Union
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPopulationVertex)
-from spynnaker.pyNN.models.neuron import (
-    PopulationVertex, AbstractPyNNNeuronModelStandard)
+    SplitterPopulationVertex,
+)
 from spynnaker.pyNN.models.defaults import (
-    default_initial_values, default_parameters)
-from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
+    default_initial_values,
+    default_parameters,
+)
+from spynnaker.pyNN.models.neuron import (
+    AbstractPyNNNeuronModelStandard,
+    PopulationVertex,
+)
 from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
+from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.neuron_models import (
-    NeuronModelLeakyIntegrateAndFire)
+    NeuronModelLeakyIntegrateAndFire,
+)
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
+
 from .abstract_ethernet_translator import AbstractEthernetTranslator
 from .abstract_multicast_controllable_device import (
-    AbstractMulticastControllableDevice)
+    AbstractMulticastControllableDevice,
+)
 from .external_device_lif_control_vertex import ExternalDeviceLifControlVertex
 from .threshold_type_multicast_device_control import (
-    ThresholdTypeMulticastDeviceControl)
+    ThresholdTypeMulticastDeviceControl,
+)
 
 
 class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):

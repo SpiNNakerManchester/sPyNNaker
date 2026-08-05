@@ -13,13 +13,18 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Optional
+
 from pacman.model.graphs.application import ApplicationEdge
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.population_application_vertex import (
-        PopulationApplicationVertex)
+        PopulationApplicationVertex,
+    )
     from spynnaker.pyNN.models.utility_models.delays import (
-        DelayExtensionVertex)
+        DelayExtensionVertex,
+    )
 
 
 class DelayAfferentApplicationEdge(ApplicationEdge):

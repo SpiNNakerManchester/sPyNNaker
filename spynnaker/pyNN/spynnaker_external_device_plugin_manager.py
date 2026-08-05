@@ -14,25 +14,27 @@
 
 from typing import Iterable, Optional, Union
 
+from spinn_utilities.config_holder import get_config_int, get_config_str
 from spinn_utilities.socket_address import SocketAddress
-from spinn_utilities.config_holder import (get_config_int, get_config_str)
 
 from spinnman.messages.eieio import EIEIOPrefix, EIEIOType
 
-from pacman.model.graphs.application import (
-    ApplicationEdge, ApplicationVertex)
+from pacman.model.graphs.application import ApplicationEdge, ApplicationVertex
 
-from spinn_front_end_common.utility_models import (
-    ReverseIpTagMultiCastSource)
 from spinn_front_end_common.utilities.utility_objs import (
-    LivePacketGatherParameters)
+    LivePacketGatherParameters,
+)
+from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
-    SpikeSourcePoissonVertex)
+    SpikeSourcePoissonVertex,
+)
 from spynnaker.pyNN.utilities.constants import (
-    LIVE_POISSON_CONTROL_PARTITION_ID, SPIKE_PARTITION_ID)
+    LIVE_POISSON_CONTROL_PARTITION_ID,
+    SPIKE_PARTITION_ID,
+)
 
 
 class SpynnakerExternalDevicePluginManager(object):

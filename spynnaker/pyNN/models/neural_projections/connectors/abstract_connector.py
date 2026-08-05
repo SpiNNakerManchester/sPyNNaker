@@ -12,44 +12,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
 import math
 import re
-from typing import Any, Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING
-from typing_extensions import Never
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Tuple, Union
 
 import numpy
-from numpy import float64, uint32, uint16, uint8
+from numpy import float64, uint8, uint16, uint32
 from numpy.typing import NDArray
-
 from pyNN import descriptions
 from pyNN.random import NumpyRNG, RandomDistribution
 from pyNN.space import Space
+from typing_extensions import Never
 
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 from pacman.model.graphs import AbstractVertex
-from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
 
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.types import (
-    Delays, is_scalar, WeightsDelays, Weights)
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.types import Delays, Weights, WeightsDelays, is_scalar
+from spynnaker.pyNN.utilities import utility_calls
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
-    from spynnaker.pyNN.models.projection import Projection
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.populations import Population, PopulationView
+    from spynnaker.pyNN.models.projection import Projection
 
 # global objects
 logger = FormatAdapter(logging.getLogger(__name__))

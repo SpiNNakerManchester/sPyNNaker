@@ -14,21 +14,34 @@
 
 import inspect
 import tempfile
-from typing import Any, Dict, List, Tuple
 import unittest
+from typing import Any, Dict, List, Tuple
 
 import csa
 import numpy
 from pyNN.random import NumpyRNG
 
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector, AllButMeConnector, AllToAllConnector, ArrayConnector,
-    ConvolutionConnector, CSAConnector, DistanceDependentProbabilityConnector,
-    FixedNumberPostConnector, FixedNumberPreConnector,
-    FixedProbabilityConnector, FromFileConnector, FromListConnector,
-    IndexBasedProbabilityConnector, KernelConnector, MultapseConnector,
-    OneToOneConnector, OneToOneOffsetConnector, PoolDenseConnector,
-    SmallWorldConnector)
+    AbstractConnector,
+    AllButMeConnector,
+    AllToAllConnector,
+    ArrayConnector,
+    ConvolutionConnector,
+    CSAConnector,
+    DistanceDependentProbabilityConnector,
+    FixedNumberPostConnector,
+    FixedNumberPreConnector,
+    FixedProbabilityConnector,
+    FromFileConnector,
+    FromListConnector,
+    IndexBasedProbabilityConnector,
+    KernelConnector,
+    MultapseConnector,
+    OneToOneConnector,
+    OneToOneOffsetConnector,
+    PoolDenseConnector,
+    SmallWorldConnector,
+)
 
 
 class TestConnectors(unittest.TestCase):

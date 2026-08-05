@@ -12,15 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import time
+
 import pyNN.spiNNaker as sim
 
 from spinn_utilities.config_holder import get_config_bool
+
 from spinn_front_end_common.interface.provenance import GlobalProvenance
+
+from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import ConfigurationException
 from spynnaker.pyNN.models.populations import Population
+
 from spynnaker_integration_tests.scripts import check_data
-from spinnaker_testbase import BaseTestCase
 
 CHIPS_PER_BOARD_EXCLUDING_SAFETY = 43.19
 

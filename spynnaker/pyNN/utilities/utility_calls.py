@@ -15,39 +15,47 @@
 """
 Utility package containing simple helper functions.
 """
-from collections.abc import Sized
 import logging
-import os
 import math
+import os
+from collections.abc import Sized
 from math import isnan
-from typing import cast, List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, cast
 
 import neo
-from neo.io.baseio import BaseIO  # type: ignore[import]
 import numpy
-from numpy import uint32, float64, floating
+from neo.io.baseio import BaseIO  # type: ignore[import]
+from numpy import float64, floating, uint32
 from numpy.typing import NDArray
 from pyNN.random import AbstractRNG, RandomDistribution
 from scipy.stats import binom
 
-from spinn_utilities.log import FormatAdapter
-from spinn_utilities.safe_eval import SafeEval
 from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
+from spinn_utilities.safe_eval import SafeEval
 
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_SECOND_CONVERSION)
+    MICRO_TO_SECOND_CONVERSION,
+)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.types import IoDest
-from spynnaker.pyNN.utilities.random_stats import (
-    RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
-    RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
-    RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
-    RandomStatsVonmisesImpl, RandomStatsBinomialImpl,
-    RandomStatsExponentialClippedImpl)
 from spynnaker.pyNN.utilities.constants import WRITE_BANDWIDTH_BYTES_PER_SECOND
+from spynnaker.pyNN.utilities.random_stats import (
+    RandomStatsBinomialImpl,
+    RandomStatsExponentialClippedImpl,
+    RandomStatsExponentialImpl,
+    RandomStatsGammaImpl,
+    RandomStatsLogNormalImpl,
+    RandomStatsNormalClippedImpl,
+    RandomStatsNormalImpl,
+    RandomStatsPoissonImpl,
+    RandomStatsRandIntImpl,
+    RandomStatsUniformImpl,
+    RandomStatsVonmisesImpl,
+)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

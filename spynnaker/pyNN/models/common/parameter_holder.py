@@ -12,9 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import (
-    Any, Callable, cast, Dict, Iterable, Iterator, List, Optional, overload,
-    Tuple, Union)
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+    overload,
+)
+
 from pyNN.random import RandomDistribution
+
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged.abstract_sized import Selector
 

@@ -13,20 +13,29 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import List, Sequence, TYPE_CHECKING, Union, Optional
+
+from typing import TYPE_CHECKING, List, Optional, Sequence, Union
+
 from spinn_utilities.config_holder import get_config_bool
+
 from pacman.model.graphs.application import ApplicationVertex
+
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector, AbstractGenerateConnectorOnMachine)
+    AbstractConnector,
+    AbstractGenerateConnectorOnMachine,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine)
-from spynnaker.pyNN.types import (Delays, Weights)
+    AbstractGenerateOnMachine,
+)
+from spynnaker.pyNN.types import Delays, Weights
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.populations import Population, PopulationView
     from spynnaker.pyNN.models.neuron import ConnectionHolder
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-        AbstractSynapseDynamics)
+        AbstractSynapseDynamics,
+    )
+    from spynnaker.pyNN.models.populations import Population, PopulationView
 
 
 class SynapseInformation(object):

@@ -13,6 +13,7 @@
 # limitations under the License.
 import ctypes
 from typing import Sequence
+
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 

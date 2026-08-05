@@ -15,10 +15,12 @@
 # limitations under the License.
 
 from typing import Tuple
-from neo import Block
+
 import pyNN.spiNNaker as p
+from neo import Block
 
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.utilities import neo_convertor
 
 

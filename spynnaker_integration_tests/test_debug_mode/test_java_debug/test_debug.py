@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spynnaker_integration_tests.test_debug_mode.check_debug import (
-    CheckDebug)
+from spynnaker_integration_tests.test_debug_mode.check_debug import CheckDebug
 
 
 class TestDebug(CheckDebug):

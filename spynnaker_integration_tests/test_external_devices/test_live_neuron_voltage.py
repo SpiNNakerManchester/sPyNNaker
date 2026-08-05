@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections import defaultdict
 import decimal
+from collections import defaultdict
 from typing import Dict, List
 
 import numpy
@@ -24,9 +24,13 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utility_models import MultiCastCommand
 
-from spynnaker.pyNN.external_devices_models import (
-    AbstractEthernetTranslator, AbstractMulticastControllableDevice, SendType)
 from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.external_devices_models import (
+    AbstractEthernetTranslator,
+    AbstractMulticastControllableDevice,
+    SendType,
+)
 
 
 class Translator(AbstractEthernetTranslator):

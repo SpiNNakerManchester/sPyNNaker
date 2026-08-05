@@ -16,13 +16,19 @@ import logging
 import struct
 from threading import Thread
 from typing import Callable, Dict, Final, Iterable, List, Optional, Set, Tuple
+
 from typing_extensions import TypeAlias
+
 from spinn_utilities.log import FormatAdapter
+
 from spinnman.connections import ConnectionListener
 from spinnman.connections.udp_packet_connections import UDPConnection
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.database import DatabaseConnection
-from spinn_front_end_common.utilities.database import DatabaseReader
+from spinn_front_end_common.utilities.database import (
+    DatabaseConnection,
+    DatabaseReader,
+)
 
 Event: Final['TypeAlias'] = Callable[[str, List[int]], None]
 Init: Final['TypeAlias'] = Callable[[str, int, float, float], None]

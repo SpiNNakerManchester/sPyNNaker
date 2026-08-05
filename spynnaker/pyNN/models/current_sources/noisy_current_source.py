@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from typing import Dict, Mapping
+
 import numpy
 
 from spinn_utilities.overrides import overrides
@@ -25,7 +26,10 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities import utility_calls
 
 from .abstract_current_source import (
-    AbstractCurrentSource, CurrentSourceIDs, CurrentParameter)
+    AbstractCurrentSource,
+    CurrentParameter,
+    CurrentSourceIDs,
+)
 
 
 class NoisyCurrentSource(AbstractCurrentSource):

@@ -13,8 +13,10 @@
 # limitations under the License.
 
 from typing import Dict, Optional
-from spinn_front_end_common.utility_models import MultiCastCommand
+
 from spinn_front_end_common.utilities.connections import LiveEventConnection
+from spinn_front_end_common.utility_models import MultiCastCommand
+
 from spynnaker.pyNN.external_devices_models import AbstractEthernetTranslator
 
 

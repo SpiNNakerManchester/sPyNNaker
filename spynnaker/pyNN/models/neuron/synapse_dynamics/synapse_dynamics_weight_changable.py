@@ -12,42 +12,52 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, List, Optional, Tuple, Dict, TYPE_CHECKING, cast
+
 import logging
+from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Tuple, cast
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
 from numpy.typing import NDArray
-
 from pyNN.standardmodels.synapses import StaticSynapse
 
-from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+    BYTES_PER_SHORT,
+    BYTES_PER_WORD,
+)
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector)
+    AbstractConnector,
+    AbstractGenerateConnectorOnMachine,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    NUMPY_CONNECTORS_DTYPE,
+)
 from spynnaker.pyNN.types import Weights, WeightScales
 from spynnaker.pyNN.types import WeightsDelysIn as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE)
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
-from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+
 from .abstract_generate_on_machine import (
-    AbstractGenerateOnMachine, MatrixGeneratorID)
+    AbstractGenerateOnMachine,
+    MatrixGeneratorID,
+)
+from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
+        ConnectionsArray,
+    )
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -133,7 +143,8 @@ class SynapseDynamicsWeightChangable(
         # Note: hack required to avoid circular import
         # pylint: disable=import-outside-toplevel
         from .synapse_dynamics_weight_changer import (
-            SynapseDynamicsWeightChanger)
+            SynapseDynamicsWeightChanger,
+        )
         if isinstance(synapse_dynamics, SynapseDynamicsWeightChanger):
             return self
 

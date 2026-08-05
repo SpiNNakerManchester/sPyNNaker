@@ -17,10 +17,11 @@ from typing import Tuple
 
 import matplotlib.pyplot as plt
 import pyNN.spiNNaker as p
-from pyNN.utility.plotting import Figure, Panel
 from pyNN.random import NumpyRNG
+from pyNN.utility.plotting import Figure, Panel
 
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 

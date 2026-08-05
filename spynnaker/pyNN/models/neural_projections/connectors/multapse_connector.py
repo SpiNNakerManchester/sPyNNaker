@@ -14,13 +14,13 @@
 # limitations under the License.
 
 from __future__ import annotations
+
 import math
-from typing import Any, Dict, Optional, Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
 
-from numpy import uint32, integer
-from numpy.typing import NDArray
 import numpy.random
-
+from numpy import integer, uint32
+from numpy.typing import NDArray
 from pyNN.random import NumpyRNG
 
 from spinn_utilities.overrides import overrides
@@ -29,18 +29,23 @@ from pacman.model.graphs.common import Slice
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.utilities import utility_calls
 
 from .abstract_connector import AbstractConnector
-from .abstract_generate_connector_on_machine import (
-    AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
-    AbstractGenerateConnectorOnHost)
+    AbstractGenerateConnectorOnHost,
+)
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine,
+    ConnectorIDs,
+)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
 
 
 class MultapseConnector(AbstractGenerateConnectorOnMachine,

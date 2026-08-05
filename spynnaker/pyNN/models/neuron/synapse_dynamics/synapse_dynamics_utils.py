@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from typing import Tuple
+
 import numpy
 from numpy import integer, uint32
 from numpy.typing import NDArray

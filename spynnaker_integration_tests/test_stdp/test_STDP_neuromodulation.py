@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import math
-from typing import cast, List
 import unittest
+from typing import List, cast
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -23,7 +23,8 @@ from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
-    AbstractWeightDependence)
+    AbstractWeightDependence,
+)
 
 
 class TestSTDPNeuromodulation(BaseTestCase):

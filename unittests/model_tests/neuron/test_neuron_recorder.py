@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from spinn_front_end_common.interface.ds import DataType
+
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.common import NeuronRecorder
 

@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from .connection_holder_finisher import finish_connection_holders
-from .redundant_packet_count_report import redundant_packet_count_report
-from .spynnaker_connection_holder_generations import (
-    SpYNNakerConnectionHolderGenerator)
-from .spynnaker_neuron_network_specification_report import (
-    spynnaker_neuron_graph_network_specification_report)
-from .synapse_expander import synapse_expander
 from .delay_support_adder import delay_support_adder
 from .neuron_expander import neuron_expander
+from .redundant_packet_count_report import redundant_packet_count_report
+from .spynnaker_connection_holder_generations import (
+    SpYNNakerConnectionHolderGenerator,
+)
+from .spynnaker_neuron_network_specification_report import (
+    spynnaker_neuron_graph_network_specification_report,
+)
+from .synapse_expander import synapse_expander
 
 __all__ = [
     "delay_support_adder",

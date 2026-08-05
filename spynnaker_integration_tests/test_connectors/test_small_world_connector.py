@@ -16,12 +16,13 @@ from collections import defaultdict
 from typing import Dict, Set, Tuple
 
 import matplotlib.pyplot as plt
+import pyNN.spiNNaker as p
 from neo import Block
 from pyNN.random import NumpyRNG
-import pyNN.spiNNaker as p
 from pyNN.utility.plotting import Figure, Panel
 
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.utilities import neo_convertor

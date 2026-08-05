@@ -12,12 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from enum import IntEnum
-from collections.abc import Sized
+
 import struct
+from collections.abc import Sized
+from enum import IntEnum
 from typing import (
-    Iterable, List, Optional, Sequence, TypeVar, Union,
-    cast, TYPE_CHECKING)
+    TYPE_CHECKING,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    TypeVar,
+    Union,
+    cast,
+)
 
 import numpy
 from numpy import uint16, uint32
@@ -29,48 +37,73 @@ from spinnman.model.enums import ExecutableType
 from pacman.model.graphs import AbstractEdgePartition
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import (
-    MachineVertex, SourceSegmentedSDRAMMachinePartition, SDRAMMachineEdge)
+    MachineVertex,
+    SDRAMMachineEdge,
+    SourceSegmentedSDRAMMachinePartition,
+)
 from pacman.model.placements import Placement
 from pacman.model.resources import AbstractSDRAM
 from pacman.utilities.utility_calls import get_keys
 
 from spinn_front_end_common.abstract_models import (
+    AbstractGeneratesDataSpecification,
     AbstractHasAssociatedBinary,
-    AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
+    AbstractRewritesDataSpecification,
+)
 from spinn_front_end_common.interface.buffer_management import (
-    recording_utilities)
+    recording_utilities,
+)
 from spinn_front_end_common.interface.buffer_management.buffer_models import (
-    AbstractReceiveBuffersToHost)
+    AbstractReceiveBuffersToHost,
+)
 from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationBase, DataSpecificationGenerator,
-    DataSpecificationReloader)
+    DataSpecificationBase,
+    DataSpecificationGenerator,
+    DataSpecificationReloader,
+    DataType,
+)
 from spinn_front_end_common.interface.profiling import (
-    AbstractHasProfileData, ProfileData, profile_utils)
+    AbstractHasProfileData,
+    ProfileData,
+    profile_utils,
+)
 from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
+    ProvenanceWriter,
+    ProvidesProvenanceDataFromMachineImpl,
+)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities.constants import (
-    SIMULATION_N_BYTES, BYTES_PER_WORD, BYTES_PER_SHORT)
+    BYTES_PER_SHORT,
+    BYTES_PER_WORD,
+    SIMULATION_N_BYTES,
+)
 from spinn_front_end_common.utilities.helpful_functions import (
-    locate_memory_region_for_placement)
-from spinn_front_end_common.interface.provenance import ProvenanceWriter
+    locate_memory_region_for_placement,
+)
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
-    AbstractMaxSpikes, SendsSynapticInputsOverSDRAM,
-    ReceivesSynapticInputsOverSDRAM)
-from spynnaker.pyNN.utilities.constants import (
-    LIVE_POISSON_CONTROL_PARTITION_ID)
+    AbstractMaxSpikes,
+    ReceivesSynapticInputsOverSDRAM,
+    SendsSynapticInputsOverSDRAM,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE, ConnectionsArray)
+    NUMPY_CONNECTORS_DTYPE,
+    ConnectionsArray,
+)
+from spynnaker.pyNN.utilities.constants import (
+    LIVE_POISSON_CONTROL_PARTITION_ID,
+)
 
 if TYPE_CHECKING:
-    from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
     from spynnaker.pyNN.models.neural_projections.connectors import (
-        AbstractGenerateConnectorOnHost)
+        AbstractGenerateConnectorOnHost,
+    )
+
+    from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
 
 #: :meta private:
 T = TypeVar("T")

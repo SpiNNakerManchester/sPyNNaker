@@ -12,9 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
 from typing import (
-    Any, Collection, Dict, Mapping, Optional, Sequence, TYPE_CHECKING)
+    TYPE_CHECKING,
+    Any,
+    Collection,
+    Dict,
+    Mapping,
+    Optional,
+    Sequence,
+)
 
 import neo  # type: ignore[import]
 
@@ -24,14 +32,14 @@ from spinn_utilities.logger_utils import warn_once
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.utility_calls import check_io
-from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.types import IoDest
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+from spynnaker.pyNN.utilities.utility_calls import check_io
 
 if TYPE_CHECKING:
+    from spynnaker.pyNN.models.common import PopulationApplicationVertex
     from spynnaker.pyNN.models.common.types import Names
     from spynnaker.pyNN.models.populations import Population
-    from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

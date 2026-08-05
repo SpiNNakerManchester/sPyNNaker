@@ -12,39 +12,54 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import csv
-from datetime import datetime
 import logging
 import math
 import os
 import re
 import struct
+from datetime import datetime
 from typing import (
-    Any, Collection, Dict, Iterable, List, Optional, Sequence, Set, Tuple,
-    TYPE_CHECKING, Union)
+    TYPE_CHECKING,
+    Any,
+    Collection,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Union,
+)
 
+import neo  # type: ignore[import]
 import numpy
+import quantities
 from numpy import float64, floating, integer, uint8, uint32
 from numpy.typing import NDArray
-import quantities
-import neo  # type: ignore[import]
 
 from spinn_utilities.log import FormatAdapter
+
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 
-
-from pacman.model.graphs.common import Slice, MDSlice
+from pacman.model.graphs.common import MDSlice, Slice
 from pacman.utilities.utility_calls import get_keys
 
+from spinn_front_end_common.interface.buffer_management.storage_objects import (
+    BufferDatabase,
+)
 from spinn_front_end_common.interface.ds import DataType
-from spinn_front_end_common.utility_models import (
-    ReverseIPTagMulticastSourceMachineVertex)
-from spinn_front_end_common.interface.buffer_management.storage_objects \
-    import BufferDatabase
 from spinn_front_end_common.utilities.base_database import _SqliteTypes
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BITS_PER_WORD)
+    BITS_PER_WORD,
+    BYTES_PER_WORD,
+)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.utility_models import (
+    ReverseIPTagMulticastSourceMachineVertex,
+)
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
@@ -55,8 +70,10 @@ from spynnaker.pyNN.utilities.neo_csv import NeoCsv
 
 if TYPE_CHECKING:
     from _csv import Writer as CSVWriter
+
     from spynnaker.pyNN.models.common.types import Names as ConcreteNames
     from spynnaker.pyNN.models.populations.population import Population
+
     from .data_population import DataPopulation
     #: :meta private:
     Names = Optional[ConcreteNames]

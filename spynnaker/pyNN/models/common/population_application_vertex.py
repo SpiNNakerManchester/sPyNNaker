@@ -16,19 +16,20 @@ from typing import Collection, Container, Iterable, List, Optional, Tuple
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.abstract_sized import Selector
 
-from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
 from pacman.model.routing_info import RoutingInfo
 from pacman.utilities.utility_calls import get_keys
 
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import HasCustomAtomKeyMap
 from spinn_front_end_common.interface.ds import DataType
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
 from spynnaker.pyNN.models.common.parameter_holder import ParameterHolder
-from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
+from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
+
 from .types import Names, Values
 
 

@@ -14,15 +14,18 @@
 
 from typing import List
 
-from spynnaker.pyNN.models.defaults import default_initial_values
-from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
-    PushBotTranslator)
 from spynnaker.pyNN.external_devices_models import (
-    AbstractMulticastControllableDevice, ExternalDeviceLifControl)
+    AbstractMulticastControllableDevice,
+    ExternalDeviceLifControl,
+)
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
-    get_pushbot_wifi_connection)
+    PushBotTranslator,
+    get_pushbot_wifi_connection,
+)
+from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
-    MunichIoSpiNNakerLinkProtocol)
+    MunichIoSpiNNakerLinkProtocol,
+)
 
 
 class PushBotLifEthernet(ExternalDeviceLifControl):

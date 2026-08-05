@@ -12,19 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-from threading import Thread, RLock
+from threading import RLock, Thread
 from time import sleep
 from typing import Any, List
 
-from matplotlib import pyplot
 import numpy
+from matplotlib import pyplot
 
 from spinn_utilities.log import FormatAdapter
 
 import spynnaker.pyNN.external_devices as external_devices
-from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotRetinaResolution)
 from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
+from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
+    PushBotRetinaResolution,
+)
 
 _logger = FormatAdapter(logging.getLogger(__name__))
 MAX_VALUE = 33.0

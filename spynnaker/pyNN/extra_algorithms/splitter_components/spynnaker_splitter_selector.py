@@ -11,26 +11,38 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import cast, List
+from typing import List, cast
+
 from spinn_utilities.progress_bar import ProgressBar
+
 from pacman.model.graphs.application import (
-    ApplicationVertex, ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex)
+    ApplicationFPGAVertex,
+    ApplicationSpiNNakerLinkVertex,
+    ApplicationVertex,
+)
 from pacman.model.partitioner_splitters import (
-    SplitterExternalDevice, SplitterFixedLegacy)
-from spinn_front_end_common.interface.splitter_selectors import (
-    vertex_selector)
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractAcceptsIncomingSynapses)
+    SplitterExternalDevice,
+    SplitterFixedLegacy,
+)
+
+from spinn_front_end_common.interface.splitter_selectors import vertex_selector
+
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractAcceptsIncomingSynapses,
+)
 from spynnaker.pyNN.models.neuron import PopulationVertex
 from spynnaker.pyNN.models.spike_source import (
-    SpikeSourceArrayVertex, SpikeSourcePoissonVertex)
-from .splitter_population_vertex_fixed import (
-    SplitterPopulationVertexFixed)
-from .splitter_poisson_delegate import SplitterPoissonDelegate
-from .splitter_population_vertex_neurons_synapses import (
-    SplitterPopulationVertexNeuronsSynapses)
+    SpikeSourceArrayVertex,
+    SpikeSourcePoissonVertex,
+)
+
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
+from .splitter_poisson_delegate import SplitterPoissonDelegate
+from .splitter_population_vertex_fixed import SplitterPopulationVertexFixed
+from .splitter_population_vertex_neurons_synapses import (
+    SplitterPopulationVertexNeuronsSynapses,
+)
 
 PROGRESS_BAR_NAME = "Adding Splitter selectors where appropriate"
 

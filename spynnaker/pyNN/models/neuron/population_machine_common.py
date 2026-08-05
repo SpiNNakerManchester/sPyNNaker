@@ -12,32 +12,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Mapping, NamedTuple, Sequence, cast, TYPE_CHECKING
-from spinn_utilities.overrides import overrides
-from spinnman.model.enums import ExecutableType
-from pacman.model.graphs.machine import MachineVertex
-from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM
-from pacman.model.placements import Placement
 
-from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
-from spinn_front_end_common.interface.buffer_management.buffer_models import (
-    AbstractReceiveBuffersToHost)
-from spinn_front_end_common.utilities.helpful_functions import (
-    locate_memory_region_for_placement)
-from spinn_front_end_common.interface.profiling.profile_utils import (
-    get_profiling_data, reserve_profile_region, write_profile_region_data)
+from typing import TYPE_CHECKING, Mapping, NamedTuple, Sequence, cast
+
+from spinn_utilities.overrides import overrides
+
+from spinnman.model.enums import ExecutableType
+
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.placements import Placement
+from pacman.model.resources import AbstractSDRAM
+
 from spinn_front_end_common.abstract_models import AbstractHasAssociatedBinary
+from spinn_front_end_common.interface.buffer_management.buffer_models import (
+    AbstractReceiveBuffersToHost,
+)
 from spinn_front_end_common.interface.buffer_management\
     .recording_utilities import (
-        get_recording_header_size, get_recording_header_array)
-from spinn_front_end_common.interface.simulation.simulation_utilities import (
-    get_simulation_header_array)
+    get_recording_header_array,
+    get_recording_header_size,
+)
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.profiling import (
-    AbstractHasProfileData, ProfileData)
+    AbstractHasProfileData,
+    ProfileData,
+)
+from spinn_front_end_common.interface.profiling.profile_utils import (
+    get_profiling_data,
+    reserve_profile_region,
+    write_profile_region_data,
+)
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl,
+)
+from spinn_front_end_common.interface.simulation.simulation_utilities import (
+    get_simulation_header_array,
+)
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
+from spinn_front_end_common.utilities.helpful_functions import (
+    locate_memory_region_for_placement,
+)
+
 if TYPE_CHECKING:
     from .population_vertex import PopulationVertex
 

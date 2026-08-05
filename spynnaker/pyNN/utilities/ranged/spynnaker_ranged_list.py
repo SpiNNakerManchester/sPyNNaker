@@ -13,11 +13,13 @@
 # limitations under the License.
 
 from typing import Callable, List, Optional, Sequence, Union
-from typing_extensions import TypeAlias
+
 from pyNN.random import RandomDistribution
+from typing_extensions import TypeAlias
+
 from spinn_utilities.overrides import overrides
-from spinn_utilities.ranged.ranged_list import RangedList
 from spinn_utilities.ranged.abstract_list import IdsType, T
+from spinn_utilities.ranged.ranged_list import RangedList
 
 # The type of things we consider to be a list of values
 _ListType: TypeAlias = Union[Callable[[int], T], Sequence[T],

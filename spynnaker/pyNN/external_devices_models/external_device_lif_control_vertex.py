@@ -13,27 +13,49 @@
 # limitations under the License.
 
 from __future__ import annotations
+
 from typing import (
-    Iterable, List, Optional, Sequence, Tuple, TYPE_CHECKING, Union)
+    TYPE_CHECKING,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import (
-    ApplicationVertex, ApplicationVirtualVertex)
+    ApplicationVertex,
+    ApplicationVirtualVertex,
+)
 from pacman.model.routing_info import BaseKeyAndMask
+
 from spinn_front_end_common.abstract_models import (
-    AbstractVertexWithEdgeToDependentVertices, HasCustomAtomKeyMap)
+    AbstractVertexWithEdgeToDependentVertices,
+    HasCustomAtomKeyMap,
+)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.models.neuron import PopulationVertex
+
 from .abstract_ethernet_controller import AbstractEthernetController
 from .abstract_multicast_controllable_device import (
-    AbstractMulticastControllableDevice)
+    AbstractMulticastControllableDevice,
+)
+
 if TYPE_CHECKING:
     from pacman.model.graphs.machine.machine_vertex import MachineVertex
     from pacman.model.routing_info.routing_info import RoutingInfo
-    from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
-    from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
-    from .abstract_ethernet_translator import AbstractEthernetTranslator
+
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterPopulationVertex)
+        SplitterPopulationVertex,
+    )
+    from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
+    from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
+
+    from .abstract_ethernet_translator import AbstractEthernetTranslator
 
 
 class ExternalDeviceLifControlVertex(

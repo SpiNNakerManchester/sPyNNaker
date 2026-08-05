@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Union, Tuple
+from typing import Optional, Tuple, Union
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
+
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.common.types import Spikes
+
 from .spike_source_array_vertex import SpikeSourceArrayVertex
 
 

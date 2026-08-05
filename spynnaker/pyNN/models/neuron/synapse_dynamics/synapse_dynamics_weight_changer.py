@@ -12,38 +12,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING, cast
+
+from typing import TYPE_CHECKING, Iterable, List, Optional, Tuple, cast
 
 import numpy
-from numpy import floating, integer, uint8, uint32, int16
+from numpy import floating, int16, integer, uint8, uint32
 from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
+
 from pacman.utilities.utility_calls import get_n_bits
 
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.exceptions import (
-    SynapticConfigurationException, InvalidParameterType)
+    InvalidParameterType,
+    SynapticConfigurationException,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE)
+    NUMPY_CONNECTORS_DTYPE,
+)
 from spynnaker.pyNN.types import WeightScales
+
+from .abstract_generate_on_machine import (
+    AbstractGenerateOnMachine,
+    MatrixGeneratorID,
+)
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
-from .abstract_generate_on_machine import AbstractGenerateOnMachine
-from .abstract_generate_on_machine import MatrixGeneratorID
 from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
-    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
-    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neural_projections.connectors import (
-        AbstractConnector)
-    from spynnaker.pyNN.types import Weights
+        AbstractConnector,
+    )
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray,
+    )
+    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
     from spynnaker.pyNN.models.projection import Projection
+    from spynnaker.pyNN.types import Weights
+
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 

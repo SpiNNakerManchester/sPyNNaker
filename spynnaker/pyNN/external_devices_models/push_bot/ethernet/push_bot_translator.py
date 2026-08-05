@@ -16,16 +16,19 @@ import logging
 from time import sleep
 from typing import Optional
 
-from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.utility_models import MultiCastCommand
 
 from spynnaker.pyNN.external_devices_models import AbstractEthernetTranslator
 from spynnaker.pyNN.protocols import (
-    MunichIoEthernetProtocol, munich_io_spinnaker_link_protocol)
+    MunichIoEthernetProtocol,
+    munich_io_spinnaker_link_protocol,
+)
 from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
-    MunichIoSpiNNakerLinkProtocol)
+    MunichIoSpiNNakerLinkProtocol,
+)
 
 from .push_bot_wifi_connection import PushBotWIFIConnection
 

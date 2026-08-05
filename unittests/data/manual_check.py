@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from spinn_utilities.config_holder import clear_cfg_files
-from spinn_utilities.exceptions import (
-    DataNotYetAvialable, NotSetupException)
+from spinn_utilities.exceptions import DataNotYetAvialable, NotSetupException
+
 from spynnaker.pyNN.config_setup import add_spynnaker_cfg
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter

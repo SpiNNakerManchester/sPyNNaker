@@ -11,10 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from pacman.model.graphs import AbstractSupportsSDRAMEdges
-from pacman.model.graphs.machine import (
-    SourceSegmentedSDRAMMachinePartition)
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
+from pacman.model.graphs import AbstractSupportsSDRAMEdges
+from pacman.model.graphs.machine import SourceSegmentedSDRAMMachinePartition
 
 
 # pylint: disable=abstract-method

@@ -13,16 +13,41 @@
 # limitations under the License.
 
 from __future__ import annotations
+
 import math
-from typing import Any, Dict, Optional, Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
 
 import numpy
 from numpy import (
-    arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
-    hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
-    minimum, e, pi, floating)
+    arccos,
+    arcsin,
+    arctan,
+    arctan2,
+    ceil,
+    cos,
+    cosh,
+    e,
+    exp,
+    fabs,
+    floating,
+    floor,
+    fmod,
+    hypot,
+    ldexp,
+    log,
+    log10,
+    maximum,
+    minimum,
+    modf,
+    pi,
+    power,
+    sin,
+    sinh,
+    sqrt,
+    tan,
+    tanh,
+)
 from numpy.typing import NDArray
-
 from pyNN.random import NumpyRNG
 
 from spinn_utilities.overrides import overrides
@@ -31,11 +56,14 @@ from spinn_utilities.safe_eval import SafeEval
 from pacman.model.graphs.common import Slice
 
 from spynnaker.pyNN.utilities.utility_calls import (
-    get_probable_maximum_selected, get_probable_minimum_selected)
+    get_probable_maximum_selected,
+    get_probable_minimum_selected,
+)
 
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
-    AbstractGenerateConnectorOnHost)
+    AbstractGenerateConnectorOnHost,
+)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation

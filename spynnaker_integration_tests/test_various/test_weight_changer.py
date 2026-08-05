@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.spiNNaker as sim
 import numpy
+import pyNN.spiNNaker as sim
 
 
 def test_weight_changer_limits() -> None:

@@ -13,7 +13,15 @@
 # limitations under the License.
 
 from typing import (
-    Any, Callable, Iterator, List, Optional, Sequence, Tuple, Union)
+    Any,
+    Callable,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import numpy
 from numpy.lib.recfunctions import merge_arrays
@@ -21,7 +29,8 @@ from numpy.typing import NDArray
 from typing_extensions import TypeAlias, TypeGuard
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    ConnectionsArray)
+    ConnectionsArray,
+)
 
 _ItemType: TypeAlias = numpy.floating
 _Items: TypeAlias = Union[Tuple[NDArray[_ItemType], ...], NDArray[_ItemType],

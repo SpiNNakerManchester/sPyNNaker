@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import List, Tuple
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 from pacman.model.graphs.common import Slice
 
 

@@ -12,20 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from collections import Counter
+
 import logging
-from typing import (Any, Collection, Dict, List, Optional, Sequence, Tuple,
-                    Union, TYPE_CHECKING)
+from collections import Counter
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Collection,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import numpy
 from numpy.typing import ArrayLike, NDArray
+from pyNN.space import BaseStructure, Grid2D, Grid3D
 from typing_extensions import TypeAlias, TypeGuard
 
-from pyNN.space import Grid2D, Grid3D, BaseStructure
-
+from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
-from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.ranged.abstract_sized import Selector
 
 from pacman.model.graphs.common import Slice
@@ -37,8 +46,10 @@ from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.common import (
-    ParameterHolder, PopulationApplicationVertex)
-from spynnaker.pyNN.models.common.types import (Names, Spikes)
+    ParameterHolder,
+    PopulationApplicationVertex,
+)
+from spynnaker.pyNN.models.common.types import Names, Spikes
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 

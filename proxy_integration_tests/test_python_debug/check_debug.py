@@ -14,14 +14,20 @@
 
 import os
 from unittest.case import SkipTest
+
+import pyNN.spiNNaker as sim
 from requests.exceptions import ConnectionError
 
 from spinn_utilities.config_holder import (
-    config_options, config_sections, get_report_path, get_timestamp_path)
+    config_options,
+    config_sections,
+    get_report_path,
+    get_timestamp_path,
+)
 
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.config_setup import cfg_paths_skipped
-import pyNN.spiNNaker as sim
 
 
 class CheckDebug(BaseTestCase):

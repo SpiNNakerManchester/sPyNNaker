@@ -13,9 +13,13 @@
 # limitations under the License.
 
 import pyNN.spiNNaker as sim
+
+from spinn_front_end_common.utility_models import (
+    ReverseIPTagMulticastSourceMachineVertex,
+)
+
 from spinnaker_testbase import BaseTestCase
-from spinn_front_end_common.utility_models import \
-    ReverseIPTagMulticastSourceMachineVertex
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 

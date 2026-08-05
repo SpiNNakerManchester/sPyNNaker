@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
+import unittest
 from collections import defaultdict
 from random import randint
-import time
 from typing import Dict
-import unittest
+
 import pyNN.spiNNaker as p
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
 
 

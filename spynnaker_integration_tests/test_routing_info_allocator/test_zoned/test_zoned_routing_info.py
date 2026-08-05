@@ -18,6 +18,7 @@
 Synfirechain-like example
 """
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker_integration_tests.scripts import do_synfire_npop
 
 n_neurons = 10  # number of neurons in each population

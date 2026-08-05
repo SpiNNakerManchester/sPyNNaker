@@ -12,24 +12,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from collections import defaultdict
+
 import logging
 import math
 import os
+from collections import defaultdict
 from typing import (
-    Any, Collection, Dict, Iterable, List, Optional, Sequence, Tuple, Union,
-    cast, TYPE_CHECKING)
+    TYPE_CHECKING,
+    Any,
+    Collection,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    cast,
+)
 
 import numpy
 from numpy.typing import NDArray
+from pyNN.random import RandomDistribution
+from pyNN.space import BaseStructure, Grid2D, Grid3D
 from scipy import special  # @UnresolvedImport
 from typing_extensions import TypeGuard
 
-from pyNN.space import Grid2D, Grid3D, BaseStructure
-from pyNN.random import RandomDistribution
-
 from spinn_utilities.config_holder import (
-    get_config_int, get_config_float, get_config_bool)
+    get_config_bool,
+    get_config_float,
+    get_config_int,
+)
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -44,69 +57,98 @@ from pacman.utilities.utility_calls import get_n_bits
 
 from spinn_front_end_common.interface.buffer_management\
     .recording_utilities import (
-       get_recording_header_size, get_recording_data_constant_size)
+    get_recording_data_constant_size,
+    get_recording_header_size,
+)
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.interface.profiling.profile_utils import (
-    get_profile_region_size)
+    get_profile_region_size,
+)
 from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
+    ProvidesProvenanceDataFromMachineImpl,
+)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
+    BYTES_PER_WORD,
+    SYSTEM_BYTES_REQUIREMENT,
+)
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
-    SynapticConfigurationException, SpynnakerException)
-
+    SpynnakerException,
+    SynapticConfigurationException,
+)
 from spynnaker.pyNN.models.abstract_models import (
-    AbstractAcceptsIncomingSynapses, AbstractMaxSpikes, HasSynapses,
-    SupportsStructure)
+    AbstractAcceptsIncomingSynapses,
+    AbstractMaxSpikes,
+    HasSynapses,
+    SupportsStructure,
+)
 from spynnaker.pyNN.models.common import (
-    ParameterHolder, PopulationApplicationVertex, NeuronRecorder)
-from spynnaker.pyNN.models.common.types import Names, Values
-from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
+    NeuronRecorder,
+    ParameterHolder,
+    PopulationApplicationVertex,
+)
 from spynnaker.pyNN.models.common.param_generator_data import (
-    MAX_PARAMS_BYTES, is_param_generatable)
+    MAX_PARAMS_BYTES,
+    is_param_generatable,
+)
+from spynnaker.pyNN.models.common.types import Names, Values
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
+    AbstractGenerateConnectorOnMachine,
+)
+from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.models.neuron.population_machine_common import (
-    CommonRegions)
+    CommonRegions,
+)
 from spynnaker.pyNN.models.neuron.population_machine_neurons import (
-    NeuronRegions)
+    NeuronRegions,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractGenerateOnMachine,
-    AbstractSynapseDynamics, AbstractSynapseDynamicsStructural,
-    AbstractSDRAMSynapseDynamics, AbstractSupportsSignedWeights,
-    SynapseDynamicsStatic)
+    AbstractSDRAMSynapseDynamics,
+    AbstractSupportsSignedWeights,
+    AbstractSynapseDynamics,
+    AbstractSynapseDynamicsStructural,
+    SynapseDynamicsStatic,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE)
+    NUMPY_CONNECTORS_DTYPE,
+)
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-
 from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import (
-    POISSON_SIGMA_SUMMATION_LIMIT, MAX_RING_BUFFER_BITS)
-from spynnaker.pyNN.utilities.utility_calls import (
-    create_mars_kiss_seeds, check_rng)
+    MAX_RING_BUFFER_BITS,
+    POISSON_SIGMA_SUMMATION_LIMIT,
+)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.utilities.struct import StructRepeat
+from spynnaker.pyNN.utilities.utility_calls import (
+    check_rng,
+    create_mars_kiss_seeds,
+)
 
 from .generator_data import GeneratorData
 from .master_pop_table import MasterPopTableAsBinarySearch
 from .population_machine_neurons import PopulationMachineNeurons
-from .synaptic_matrices import SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
 from .synapse_io import get_max_row_info
+from .synaptic_matrices import SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterPopulationVertex)
+        SplitterPopulationVertex,
+    )
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
     from spynnaker.pyNN.models.neural_projections import (
-        SynapseInformation, ProjectionApplicationEdge)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
     from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
-    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
+        ConnectionsArray,
+    )
+    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
     from spynnaker.pyNN.models.projection import Projection
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -415,7 +457,8 @@ class PopulationVertex(
         # Circularity
         # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.extra_algorithms.splitter_components import (
-            SplitterPopulationVertex as ValidSplitter)
+            SplitterPopulationVertex as ValidSplitter,
+        )
         if not isinstance(splitter, ValidSplitter):
             raise PacmanConfigurationException(
                 f"The splitter object on {self._label} must be set to one "

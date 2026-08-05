@@ -14,6 +14,7 @@
 
 import logging
 import struct
+
 from spinn_utilities.log import FormatAdapter
 
 logger = FormatAdapter(logging.getLogger(__name__))

@@ -13,10 +13,13 @@
 # limitations under the License.
 
 import os
+
 import pyNN.spiNNaker as sim
 
 from pacman.model.placements import Placement
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.data import SpynnakerDataView
 
 

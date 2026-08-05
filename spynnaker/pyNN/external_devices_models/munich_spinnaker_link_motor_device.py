@@ -13,16 +13,24 @@
 # limitations under the License.
 
 from typing import Iterable, Optional
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import (
-    ApplicationSpiNNakerLinkVertex)
-from pacman.model.graphs.application import ApplicationVertex
+    ApplicationSpiNNakerLinkVertex,
+    ApplicationVertex,
+)
 from pacman.model.graphs.application.abstract import (
-    AbstractOneAppOneMachineVertex)
+    AbstractOneAppOneMachineVertex,
+)
+
 from spinn_front_end_common.abstract_models import (
-    AbstractVertexWithEdgeToDependentVertices)
-from spynnaker.pyNN.models.defaults import AbstractProvidesDefaults
+    AbstractVertexWithEdgeToDependentVertices,
+)
+
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.defaults import AbstractProvidesDefaults
+
 from .machine_munich_motor_device import MachineMunichMotorDevice
 
 

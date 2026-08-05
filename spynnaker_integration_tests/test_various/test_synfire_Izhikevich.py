@@ -18,11 +18,14 @@
 Synfirechain-like example
 """
 from typing import Tuple
-from numpy.typing import NDArray
+
 import pyNN.spiNNaker as p
+from numpy.typing import NDArray
+
 from spinnaker_testbase import BaseTestCase
-from spynnaker.pyNN.utilities import neo_convertor
+
 import spynnaker.spike_checker as spike_checker
+from spynnaker.pyNN.utilities import neo_convertor
 
 
 def do_run(nNeurons: int) -> Tuple[NDArray, NDArray, NDArray]:

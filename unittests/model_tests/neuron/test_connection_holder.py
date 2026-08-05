@@ -13,14 +13,16 @@
 # limitations under the License.
 
 import math
-import pytest
-import numpy
 from typing import Any, List, Optional, Tuple
+
+import numpy
+import pytest
 
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE)
+    NUMPY_CONNECTORS_DTYPE,
+)
 
 
 @pytest.fixture(

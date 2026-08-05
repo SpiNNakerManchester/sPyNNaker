@@ -14,10 +14,12 @@
 
 from typing import Optional
 
-from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
-from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.models.defaults import default_parameters
-from spynnaker.pyNN.models.neuron.implementations import NeuronImplStocExp
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
+from spynnaker.pyNN.models.neuron.implementations import (
+    ModelParameter,
+    NeuronImplStocExp,
+)
 
 
 class StocExp(AbstractPyNNNeuronModel):

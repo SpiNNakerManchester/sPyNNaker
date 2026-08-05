@@ -12,53 +12,66 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import math
-from typing import Any, Iterable, List, Optional, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Iterable, List, Optional, Tuple
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
 from numpy.typing import NDArray
-
 from pyNN.standardmodels.synapses import StaticSynapse
 
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+    BYTES_PER_SHORT,
+    BYTES_PER_WORD,
+)
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
-    SynapticConfigurationException, InvalidParameterType)
+    InvalidParameterType,
+    SynapticConfigurationException,
+)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector)
+    AbstractConnector,
+)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
     abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    NUMPY_CONNECTORS_DTYPE,
+)
 from spynnaker.pyNN.types import Weights, WeightScales
 from spynnaker.pyNN.types import WeightsDelysIn as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE)
 
+from .abstract_generate_on_machine import (
+    AbstractGenerateOnMachine,
+    MatrixGeneratorID,
+)
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
-    AbstractSynapseDynamicsStructural)
-from .abstract_generate_on_machine import (
-    AbstractGenerateOnMachine, MatrixGeneratorID)
+    AbstractSynapseDynamicsStructural,
+)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
 from .synapse_dynamics_weight_changer import SynapseDynamicsWeightChanger
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
-    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.\
-        abstract_timing_dependence import AbstractTimingDependence
+            abstract_timing_dependence import AbstractTimingDependence
     from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
-        abstract_weight_dependence import AbstractWeightDependence
+            abstract_weight_dependence import AbstractWeightDependence
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray,
+    )
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 # How large are the time-stamps stored with each event
@@ -177,7 +190,8 @@ class SynapseDynamicsSTDP(
         # NOTE: Import here as otherwise we get a circular dependency
         # pylint: disable=import-outside-toplevel
         from .synapse_dynamics_structural_stdp import (
-            SynapseDynamicsStructuralSTDP)
+            SynapseDynamicsStructuralSTDP,
+        )
         if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
             return SynapseDynamicsStructuralSTDP(
                 synapse_dynamics.partner_selection, synapse_dynamics.formation,

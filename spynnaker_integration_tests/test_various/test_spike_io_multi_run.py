@@ -12,14 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import random
-from threading import Condition
 import time
+from threading import Condition
 from typing import List, Tuple
 
-from neo import Block
 import pyNN.spiNNaker as Frontend
+from neo import Block
+
 from spinn_front_end_common.utilities.connections import LiveEventConnection
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.external_devices import SpynnakerLiveSpikesConnection
 from spynnaker.pyNN.utilities import neo_convertor
 

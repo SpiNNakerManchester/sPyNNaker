@@ -13,9 +13,13 @@
 # limitations under the License.
 
 from typing import Optional
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
+
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+
 from .spike_injector_vertex import SpikeInjectorVertex
 
 _population_parameters = {

@@ -12,12 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import time
-from spinnaker_testbase import BaseTestCase
+
 import pyNN.spiNNaker as sim
+
 from spinn_front_end_common.utilities.database.database_connection import (
-    DatabaseConnection)
+    DatabaseConnection,
+)
+
+from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
-    SpynnakerExternalDevicePluginManager)
+    SpynnakerExternalDevicePluginManager,
+)
 
 
 def start_callback() -> None:

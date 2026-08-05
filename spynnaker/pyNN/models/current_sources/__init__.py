@@ -13,10 +13,10 @@
 # limitations under the License.
 
 from .abstract_current_source import AbstractCurrentSource, CurrentSourceIDs
-from .dc_source import DCSource
 from .ac_source import ACSource
-from .step_current_source import StepCurrentSource
+from .dc_source import DCSource
 from .noisy_current_source import NoisyCurrentSource
+from .step_current_source import StepCurrentSource
 
 __all__ = ["AbstractCurrentSource", "CurrentSourceIDs", "DCSource", "ACSource",
            "StepCurrentSource", "NoisyCurrentSource"]

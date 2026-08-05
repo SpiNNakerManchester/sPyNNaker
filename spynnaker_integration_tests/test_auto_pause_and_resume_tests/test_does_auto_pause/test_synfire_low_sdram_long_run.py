@@ -16,8 +16,11 @@
 Synfirechain-like example
 """
 from testfixtures import LogCapture  # type: ignore[import]
-import spynnaker.spike_checker as spike_checker
+
 from spinnaker_testbase import BaseTestCase
+
+import spynnaker.spike_checker as spike_checker
+
 from spynnaker_integration_tests.scripts import SynfireRunner
 
 n_neurons = 200  # number of neurons in each population

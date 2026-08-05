@@ -11,14 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import pyNN.spiNNaker as sim
 from itertools import permutations
 from typing import List
 
-import pytest
 import numpy
+import pyNN.spiNNaker as sim
+import pytest
 
 from pacman.model.graphs.common.slice import Slice
+
 from spinnaker_testbase import BaseTestCase
 
 

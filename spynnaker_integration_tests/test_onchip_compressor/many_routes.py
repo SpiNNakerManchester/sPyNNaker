@@ -20,10 +20,11 @@ from spinn_machine import Machine
 
 from spinn_front_end_common.interface.provenance import GlobalProvenance
 
-from spynnaker.pyNN.exceptions import ConfigurationException
 from spynnaker.pyNN import SpynnakerDataView
+from spynnaker.pyNN.exceptions import ConfigurationException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPopulationVertexFixed)
+    SplitterPopulationVertexFixed,
+)
 
 
 def find_good_chip(machine: Machine, n_target: int) -> Tuple[int, int]:

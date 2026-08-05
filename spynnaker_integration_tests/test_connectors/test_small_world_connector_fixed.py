@@ -14,11 +14,14 @@
 
 from collections import defaultdict
 from typing import Dict, Set, Tuple
-from neo import Block
+
 import pyNN.spiNNaker as p
+from neo import Block
+
+from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.populations import Population
-from spinnaker_testbase import BaseTestCase
 
 
 def create_grid(

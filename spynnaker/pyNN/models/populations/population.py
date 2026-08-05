@@ -12,24 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import inspect
 import logging
 import os
 from typing import (
-    Any, Callable, cast, Dict, final, Iterable, Iterator, List, Optional,
-    overload, Sequence, Tuple, Type, TYPE_CHECKING, Union)
-
-import numpy
-from numpy import floating
-from numpy.typing import NDArray
-from typing_extensions import Never, TypeAlias
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+    cast,
+    final,
+    overload,
+)
 
 import neo
+import numpy
 from neo.io.baseio import BaseIO  # type: ignore[import]
-from pyNN.descriptions import TemplateEngine
+from numpy import floating
+from numpy.typing import NDArray
 from pyNN import descriptions
+from pyNN.descriptions import TemplateEngine
 from pyNN.random import NumpyRNG
 from pyNN.space import BaseStructure
+from typing_extensions import Never, TypeAlias
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
@@ -43,18 +57,18 @@ from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.recorder import Recorder
-from spynnaker.pyNN.types import IoDest
+from spynnaker.pyNN.types import IoDest, Selector
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
-from spynnaker.pyNN.types import Selector
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 
 from .population_base import PopulationBase
-from .population_view import PopulationView, IDMixin
+from .population_view import IDMixin, PopulationView
 
 if TYPE_CHECKING:
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
-    from spynnaker.pyNN.models.common.types import Names, Values
+
     from spynnaker.pyNN.models.common.parameter_holder import ParameterHolder
+    from spynnaker.pyNN.models.common.types import Names, Values
 
 logger = FormatAdapter(logging.getLogger(__file__))
 _CellType: TypeAlias = Union[AbstractPyNNModel, PopulationApplicationVertex]
