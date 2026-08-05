@@ -18,8 +18,9 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-from spynnaker.pyNN.models.neuron import PopulationVertex
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
+
+from .population_vertex import PopulationVertex
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
