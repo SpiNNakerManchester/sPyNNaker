@@ -54,13 +54,13 @@ from spynnaker.pyNN.models.neuron import (
 )
 from spynnaker.pyNN.models.neuron. \
     population_synapses_machine_vertex_common import (
-    KEY_CONFIG_SIZE,
-    PopulationSynapsesMachineVertexCommon,
-)
+        KEY_CONFIG_SIZE,
+        PopulationSynapsesMachineVertexCommon,
+    )
 from spynnaker.pyNN.models.neuron. \
     population_synapses_machine_vertex_common import (
-    SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE,
-)
+        SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE,
+    )
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch,
 )
