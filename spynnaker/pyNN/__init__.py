@@ -70,11 +70,11 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 # Self import to check files if copied into pyNN.spiNNaker
 import spynnaker.pyNN as _sim  # pylint: disable=import-self
-from spynnaker._version import (
-    __version__,  # NOQA
-    __version_month__,  # NOQA
-    __version_name__,  # NOQA
-    __version_year__,  # NOQA
+from spynnaker._version import (  # NOQA
+    __version__,
+    __version_month__,
+    __version_name__,
+    __version_year__,
 )
 from spynnaker.pyNN import external_devices, extra_models
 from spynnaker.pyNN.data import SpynnakerDataView

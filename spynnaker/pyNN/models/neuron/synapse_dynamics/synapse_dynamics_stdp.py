@@ -64,9 +64,9 @@ if TYPE_CHECKING:
         SynapseInformation,
     )
     from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.\
-            abstract_timing_dependence import AbstractTimingDependence
+        abstract_timing_dependence import AbstractTimingDependence
     from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
-            abstract_weight_dependence import AbstractWeightDependence
+        abstract_weight_dependence import AbstractWeightDependence
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray,
     )

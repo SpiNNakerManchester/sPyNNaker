@@ -47,9 +47,8 @@ from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from pacman.model.graphs.common import MDSlice, Slice
 from pacman.utilities.utility_calls import get_keys
 
-from spinn_front_end_common.interface.buffer_management.storage_objects import (
-    BufferDatabase,
-)
+from spinn_front_end_common.interface. \
+    buffer_management.storage_objects import BufferDatabase
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.base_database import _SqliteTypes
 from spinn_front_end_common.utilities.constants import (

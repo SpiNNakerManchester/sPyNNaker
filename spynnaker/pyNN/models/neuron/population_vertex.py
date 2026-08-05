@@ -57,9 +57,9 @@ from pacman.utilities.utility_calls import get_n_bits
 
 from spinn_front_end_common.interface.buffer_management\
     .recording_utilities import (
-    get_recording_data_constant_size,
-    get_recording_header_size,
-)
+        get_recording_data_constant_size,
+        get_recording_header_size,
+    )
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profile_region_size,

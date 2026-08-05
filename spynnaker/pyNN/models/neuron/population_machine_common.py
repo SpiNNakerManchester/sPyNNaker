@@ -30,9 +30,9 @@ from spinn_front_end_common.interface.buffer_management.buffer_models import (
 )
 from spinn_front_end_common.interface.buffer_management\
     .recording_utilities import (
-    get_recording_header_array,
-    get_recording_header_size,
-)
+        get_recording_header_array,
+        get_recording_header_size,
+    )
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.profiling import (
     AbstractHasProfileData,

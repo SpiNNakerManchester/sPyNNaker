@@ -32,11 +32,11 @@ if TYPE_CHECKING:
     )
     from spynnaker.pyNN.models.neuron import PopulationVertex
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-            .elimination import AbstractElimination
+        .elimination import AbstractElimination
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-            .formation import AbstractFormation
+        .formation import AbstractFormation
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-            .partner_selection import AbstractPartnerSelection
+        .partner_selection import AbstractPartnerSelection
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray,
     )

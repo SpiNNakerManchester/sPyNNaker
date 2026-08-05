@@ -68,15 +68,15 @@ if TYPE_CHECKING:
         AbstractConnector,
     )
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
-            elimination.abstract_elimination import AbstractElimination
+        elimination.abstract_elimination import AbstractElimination
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
-            formation.abstract_formation import AbstractFormation
+        formation.abstract_formation import AbstractFormation
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
-            partner_selection.abstract_partner_selection import (
-        AbstractPartnerSelection,
-    )
+        partner_selection.abstract_partner_selection import (
+            AbstractPartnerSelection,
+        )
     from spynnaker.pyNN.models.neuron.synapse_dynamics.\
-            abstract_synapse_dynamics_structural import InitialDelay
+        abstract_synapse_dynamics_structural import InitialDelay
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray,
     )

@@ -52,6 +52,15 @@ from spynnaker.pyNN.models.neuron import (
     SpikeProcessingFastProvenance,
     SynapseProvenance,
 )
+from spynnaker.pyNN.models.neuron. \
+    population_synapses_machine_vertex_common import (
+    KEY_CONFIG_SIZE,
+    PopulationSynapsesMachineVertexCommon,
+)
+from spynnaker.pyNN.models.neuron. \
+    population_synapses_machine_vertex_common import (
+    SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE,
+)
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch,
 )
@@ -61,13 +70,6 @@ from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
 )
 from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
     NeuronMainProvenance,
-)
-from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common import (
-    KEY_CONFIG_SIZE,
-    PopulationSynapsesMachineVertexCommon,
-)
-from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common import (
-    SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE,
 )
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural,
@@ -79,9 +81,8 @@ from spynnaker.pyNN.models.neuron.synaptic_matrices import (
 )
 from spynnaker.pyNN.models.projection import Projection
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex import (
-    SpikeSourcePoissonMachineVertex,
-)
+from spynnaker.pyNN.models.spike_source. \
+    spike_source_poisson_machine_vertex import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region,
