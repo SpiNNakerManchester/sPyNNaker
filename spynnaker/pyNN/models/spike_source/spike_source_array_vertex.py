@@ -35,6 +35,7 @@ from typing_extensions import TypeAlias, TypeGuard
 from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged import RangedList
 from spinn_utilities.ranged.abstract_sized import Selector
 
 from pacman.model.graphs.common import Slice
