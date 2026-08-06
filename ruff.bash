@@ -36,6 +36,7 @@ ruff check ../SpiNNUtils/spinn_utilities ../SpiNNUtils/unittests \
     ../spalloc/spalloc_client ../spalloc/tests \
      ../SpiNNFrontEndCommon/spinn_front_end_common ../SpiNNFrontEndCommon/unittests \
      ../SpiNNFrontEndCommon/fec_integration_tests \
+     ../TestBase/spinnaker_testbase ../TestBase/unittests \
      spynnaker unittests spynnaker_integration_tests proxy_integration_tests \
      --target-version py310 --config ../SupportScripts/actions/ruff/ruff.toml
 echo using ruff_up.toml
@@ -47,5 +48,6 @@ ruff check ../SpiNNUtils/spinn_utilities ../SpiNNUtils/unittests \
     ../spalloc/spalloc_client ../spalloc/tests \
      ../SpiNNFrontEndCommon/spinn_front_end_common ../SpiNNFrontEndCommon/unittests \
      ../SpiNNFrontEndCommon/fec_integration_tests \
+     ../TestBase/spinnaker_testbase ../TestBase/unittests \
      spynnaker unittests spynnaker_integration_tests proxy_integration_tests \
      --target-version py310 --config ../SupportScripts/actions/ruff/ruff_up.toml
