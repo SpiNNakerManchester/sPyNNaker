@@ -13,20 +13,22 @@
 # limitations under the License.
 
 import tempfile
-from typing import Optional, List
+from typing import List, Optional
 
 import numpy
-from numpy.typing import NDArray
-import pytest
 import pyNN.spiNNaker as sim
+import pytest
+from numpy.typing import NDArray
 
 from pacman.model.graphs.common.slice import Slice
 
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    FromFileConnector)
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    FromFileConnector,
+)
+
 from unittests.connector_tests.test_from_list_connector import MockAppVertex
-from unittests.mocks import MockSynapseDynamics, MockPopulation
+from unittests.mocks import MockPopulation, MockSynapseDynamics
 
 # NO unittest_setup() as sim.setup is called
 

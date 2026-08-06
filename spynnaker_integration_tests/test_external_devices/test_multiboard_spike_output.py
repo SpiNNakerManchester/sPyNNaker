@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import unittest
 from typing import Dict, List
 
-import unittest
-from spynnaker.pyNN.exceptions import ConfigurationException
 import pyNN.spiNNaker as p
-from spynnaker.pyNN.data import SpynnakerDataView
-import spynnaker.pyNN.external_devices as e
+
 from spinnaker_testbase import BaseTestCase
+
+import spynnaker.pyNN.external_devices as e
+from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.exceptions import ConfigurationException
 
 
 class TestMultiBoardSpikeOutput(BaseTestCase):

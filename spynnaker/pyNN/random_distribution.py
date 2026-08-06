@@ -15,7 +15,8 @@
 from typing import Optional
 
 import pyNN.random
-from pyNN.random import available_distributions, NumpyRNG
+from pyNN.random import NumpyRNG, available_distributions
+
 # This file is to work around a Sphinx bug
 
 if "exponential_clipped" not in available_distributions:

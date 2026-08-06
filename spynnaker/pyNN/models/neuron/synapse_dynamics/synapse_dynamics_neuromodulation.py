@@ -12,38 +12,50 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Iterable, List, Optional, Tuple
 
 import numpy
 from numpy import floating, integer, uint8, uint32
 from numpy.typing import NDArray
-
 from pyNN.standardmodels.synapses import StaticSynapse
 
 from spinn_utilities.overrides import overrides
 
-from spinn_front_end_common.interface.ds import DataType, DataSpecificationBase
+from spinn_front_end_common.interface.ds import DataSpecificationBase, DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
-    SynapticConfigurationException, InvalidParameterType)
-from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE)
+    InvalidParameterType,
+    SynapticConfigurationException,
+)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    STDP_FIXED_POINT_ONE, get_exp_lut_array)
-from spynnaker.pyNN.types import WeightsDelysIn as _Weight, WeightScales
+    STDP_FIXED_POINT_ONE,
+    get_exp_lut_array,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    NUMPY_CONNECTORS_DTYPE,
+)
+from spynnaker.pyNN.types import WeightScales
+from spynnaker.pyNN.types import WeightsDelysIn as _Weight
 
-from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (
-    AbstractGenerateOnMachine, MatrixGeneratorID)
+    AbstractGenerateOnMachine,
+    MatrixGeneratorID,
+)
+from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
-    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
+        ConnectionsArray,
+    )
+    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 # The targets of neuromodulation

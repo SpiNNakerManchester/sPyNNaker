@@ -16,12 +16,14 @@ from .push_bot_device import PushBotEthernetDevice
 from .push_bot_laser_device import PushBotEthernetLaserDevice
 from .push_bot_led_device import PushBotEthernetLEDDevice
 from .push_bot_motor_device import PushBotEthernetMotorDevice
+from .push_bot_retina_connection import PushBotRetinaConnection
 from .push_bot_retina_device import PushBotEthernetRetinaDevice
 from .push_bot_speaker_device import PushBotEthernetSpeakerDevice
-from .push_bot_retina_connection import PushBotRetinaConnection
 from .push_bot_translator import PushBotTranslator
 from .push_bot_wifi_connection import (
-    get_pushbot_wifi_connection, PushBotWIFIConnection)
+    PushBotWIFIConnection,
+    get_pushbot_wifi_connection,
+)
 
 __all__ = ["PushBotEthernetDevice", "PushBotEthernetLaserDevice",
            "PushBotEthernetLEDDevice", "PushBotEthernetMotorDevice",

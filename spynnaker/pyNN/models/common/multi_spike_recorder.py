@@ -14,10 +14,13 @@
 
 import math
 import struct
-from pacman.model.resources import (
-    AbstractSDRAM, ConstantSDRAM, VariableSDRAM)
+
+from pacman.model.resources import AbstractSDRAM, ConstantSDRAM, VariableSDRAM
+
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BITS_PER_WORD)
+    BITS_PER_WORD,
+    BYTES_PER_WORD,
+)
 
 _TWO_WORDS = struct.Struct("<II")
 

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from neo import AnalogSignal, SpikeTrain
+
 from spynnaker.pyNN.models.populations import Population
 
 

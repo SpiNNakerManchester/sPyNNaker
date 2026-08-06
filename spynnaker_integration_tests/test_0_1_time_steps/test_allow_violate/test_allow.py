@@ -12,11 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinnaker_testbase import BaseTestCase
-from spynnaker_integration_tests.scripts import SynfireRunner
-from spynnaker.pyNN.data import SpynnakerDataView
-import spynnaker.spike_checker as spike_checker
 from spinnman.exceptions import SpinnmanTimeoutException
+
+from spinnaker_testbase import BaseTestCase
+
+import spynnaker.spike_checker as spike_checker
+from spynnaker.pyNN.data import SpynnakerDataView
+
+from spynnaker_integration_tests.scripts import SynfireRunner
 
 n_neurons = 10  # number of neurons in each population
 runtime = 50

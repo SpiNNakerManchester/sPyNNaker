@@ -18,10 +18,13 @@ from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.external_devices_models import AbstractEthernetSensor
 from spynnaker.pyNN.external_devices_models.push_bot import (
-    AbstractPushBotRetinaDevice)
+    AbstractPushBotRetinaDevice,
+)
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotRetinaResolution)
+    PushBotRetinaResolution,
+)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+
 from .push_bot_retina_connection import PushBotRetinaConnection
 from .push_bot_translator import PushBotTranslator
 from .push_bot_wifi_connection import get_pushbot_wifi_connection

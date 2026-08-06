@@ -12,42 +12,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
 import os
 from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional,
-    overload, Sequence, Tuple, TYPE_CHECKING, Union)
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    overload,
+)
 
+import neo  # type: ignore[import]
 import numpy
 from numpy import bool_, integer
 from numpy.typing import NDArray
-
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
 from pyNN.space import BaseStructure
-import neo  # type: ignore[import]
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.abstract_sized import AbstractSized
 
-from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.types import Selector
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 
 from .population_base import PopulationBase
 
 if TYPE_CHECKING:
-    from .population import Population
-    from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
     from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-    from spynnaker.pyNN.models.common.population_application_vertex import (
-        PopulationApplicationVertex)
     from spynnaker.pyNN.models.common import ParameterHolder
+    from spynnaker.pyNN.models.common.population_application_vertex import (
+        PopulationApplicationVertex,
+    )
     from spynnaker.pyNN.models.common.types import Names, Values
+    from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
     from spynnaker.pyNN.models.recorder import Recorder
     from spynnaker.pyNN.types import IoDest
+
+    from .population import Population
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

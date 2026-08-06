@@ -17,12 +17,14 @@ from typing import Iterable, List, Optional
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex)
+    AbstractSendMeMulticastCommandsVertex,
+)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import MultiCastCommand
 
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotLaser)
+    PushBotLaser,
+)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 
 from .push_bot_device import PushBotEthernetDevice

@@ -12,13 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
 from typing import List
+
+from testfixtures import LogCapture  # type: ignore[import]
 
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.defaults import (
-    AbstractProvidesDefaults, default_parameters, default_initial_values)
-from testfixtures import LogCapture  # type: ignore[import]
-import re
+    AbstractProvidesDefaults,
+    default_initial_values,
+    default_parameters,
+)
+
 # pylint: disable=no-member
 
 

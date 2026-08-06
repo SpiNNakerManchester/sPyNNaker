@@ -11,14 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from math import ceil, log2, floor
-from collections import namedtuple, defaultdict
-from typing import Dict, List, Tuple, TYPE_CHECKING, Union
+from collections import defaultdict, namedtuple
+from math import ceil, floor, log2
+from typing import TYPE_CHECKING, Dict, List, Tuple, Union
 
 from pacman.model.graphs.application import (
-    ApplicationVertex, ApplicationVirtualVertex)
-from pacman.model.graphs.common.slice import Slice
+    ApplicationVertex,
+    ApplicationVirtualVertex,
+)
 from pacman.model.graphs.common.mdslice import MDSlice
+from pacman.model.graphs.common.slice import Slice
 from pacman.model.routing_info import AppVertexRoutingInfo
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD

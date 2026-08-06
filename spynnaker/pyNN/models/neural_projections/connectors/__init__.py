@@ -13,29 +13,32 @@
 # limitations under the License.
 
 from .abstract_connector import AbstractConnector
-from .abstract_generate_connector_on_machine import (
-    AbstractGenerateConnectorOnMachine)
 from .abstract_generate_connector_on_host import (
-    AbstractGenerateConnectorOnHost)
+    AbstractGenerateConnectorOnHost,
+)
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine,
+)
 from .all_but_me_connector import AllButMeConnector
 from .all_to_all_connector import AllToAllConnector
 from .array_connector import ArrayConnector
+from .convolution_connector import ConvolutionConnector
 from .csa_connector import CSAConnector
 from .distance_dependent_probability_connector import (
-    DistanceDependentProbabilityConnector)
+    DistanceDependentProbabilityConnector,
+)
 from .fixed_number_post_connector import FixedNumberPostConnector
 from .fixed_number_pre_connector import FixedNumberPreConnector
 from .fixed_probability_connector import FixedProbabilityConnector
 from .from_file_connector import FromFileConnector
 from .from_list_connector import FromListConnector
 from .index_based_probability_connector import IndexBasedProbabilityConnector
+from .kernel_connector import KernelConnector
 from .multapse_connector import MultapseConnector
 from .one_to_one_connector import OneToOneConnector
-from .small_world_connector import SmallWorldConnector
-from .kernel_connector import KernelConnector
-from .convolution_connector import ConvolutionConnector
-from .pool_dense_connector import PoolDenseConnector
 from .one_to_one_offset_connector import OneToOneOffsetConnector
+from .pool_dense_connector import PoolDenseConnector
+from .small_world_connector import SmallWorldConnector
 
 __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
            "AbstractGenerateConnectorOnHost", "AllButMeConnector",

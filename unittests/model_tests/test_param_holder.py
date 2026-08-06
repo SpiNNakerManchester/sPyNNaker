@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
 import unittest
+from typing import List
+
 from spinn_utilities.ranged.abstract_sized import Selector
+
 from spynnaker.pyNN.models.common import ParameterHolder
 
 

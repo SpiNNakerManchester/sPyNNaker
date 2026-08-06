@@ -13,12 +13,16 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import List, Iterable, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Iterable, List
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 if TYPE_CHECKING:
     from .abstract_ethernet_translator import AbstractEthernetTranslator
     from .abstract_multicast_controllable_device import (
-        AbstractMulticastControllableDevice)
+        AbstractMulticastControllableDevice,
+    )
 
 
 class AbstractEthernetController(object, metaclass=AbstractBase):

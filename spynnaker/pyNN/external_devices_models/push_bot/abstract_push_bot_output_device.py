@@ -14,9 +14,9 @@
 
 from decimal import Decimal
 from enum import Enum
+
 from spynnaker.pyNN.external_devices_models\
-    .abstract_multicast_controllable_device import (
-        SendType)
+    .abstract_multicast_controllable_device import SendType
 
 
 class AbstractPushBotOutputDevice(Enum):

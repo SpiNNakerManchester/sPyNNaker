@@ -32,9 +32,9 @@ by adding them together::
 """
 
 from .assembly import Assembly
-from .population_base import PopulationBase
 from .population import Population
-from .population_view import PopulationView, IDMixin
+from .population_base import PopulationBase
+from .population_view import IDMixin, PopulationView
 
 __all__ = ["Assembly", "IDMixin", "Population", "PopulationBase",
            "PopulationView"]

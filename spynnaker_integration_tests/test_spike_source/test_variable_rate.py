@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy
-from numpy.typing import NDArray
 import pyNN.spiNNaker as p
 import scipy
+from numpy.typing import NDArray
 
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
-    DURATION_FOREVER)
+    DURATION_FOREVER,
+)
 
 
 def array(value: NDArray) -> NDArray:

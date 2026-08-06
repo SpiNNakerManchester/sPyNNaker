@@ -12,21 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Sequence, Tuple, TYPE_CHECKING, cast
-from spinn_utilities.overrides import overrides
+
+from typing import TYPE_CHECKING, List, Sequence, Tuple, cast
+
 from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import (
-    ApplicationEdgePartition, ApplicationVertex)
+    ApplicationEdgePartition,
+    ApplicationVertex,
+)
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
 from spynnaker.pyNN.exceptions import DelayExtensionException
-from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
-from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractHasDelayStages,
+    ColouredApplicationVertex,
+)
 from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
+from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterDelayVertexSlice)
+        SplitterDelayVertexSlice,
+    )
 
 _DELAY_PARAM_HEADER_WORDS = 9
 

@@ -13,14 +13,16 @@
 # limitations under the License.
 from typing import List, Tuple
 
+import numpy
 import pyNN.spiNNaker as sim
 from neo.core import AnalogSignal
 from neo.core.spiketrainlist import SpikeTrainList
-import numpy
 
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPoissonDelegate)
+    SplitterPoissonDelegate,
+)
 from spynnaker.pyNN.models.neuron import PopulationVertex
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.models.projection import Projection

@@ -12,19 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import functools
 import logging
 from typing import (
-    Any, Callable, Dict, List, Optional, Sequence, Tuple, Union,
-    cast, TYPE_CHECKING)
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    cast,
+)
 
 import numpy
 from numpy import void
 from numpy.typing import NDArray
-from typing_extensions import Literal, Never, TypeAlias
-
 from pyNN.recording.files import BaseFile
 from pyNN.space import Space as PyNNSpace
+from typing_extensions import Literal, Never, TypeAlias
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
@@ -34,26 +43,33 @@ from pacman.model.graphs.application import ApplicationVertex
 
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
+from spynnaker._version import __version__
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
-    AbstractAcceptsIncomingSynapses)
+    AbstractAcceptsIncomingSynapses,
+)
 from spynnaker.pyNN.models.neural_projections import (
-    SynapseInformation, ProjectionApplicationEdge)
+    ProjectionApplicationEdge,
+    SynapseInformation,
+)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    FromListConnector)
-from spynnaker.pyNN.models.neuron import (
-    PopulationVertex, ConnectionHolder)
-from spynnaker.pyNN.models.populations import Population, PopulationView
+    FromListConnector,
+)
+from spynnaker.pyNN.models.neuron import ConnectionHolder, PopulationVertex
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsStatic, AbstractHasParameterNames)
+    AbstractHasParameterNames,
+    SynapseDynamicsStatic,
+)
+from spynnaker.pyNN.models.populations import Population, PopulationView
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from spynnaker._version import __version__
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections.connectors import (
-        AbstractConnector)
+        AbstractConnector,
+    )
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-        AbstractSynapseDynamics)
+        AbstractSynapseDynamics,
+    )
     _Pop: TypeAlias = Union[Population, PopulationView]
 
 logger = FormatAdapter(logging.getLogger(__name__))

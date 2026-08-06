@@ -17,7 +17,9 @@ from typing import Tuple
 
 import numpy
 import pyNN.spiNNaker as p
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 sources = 1000  # number of neurons in each population

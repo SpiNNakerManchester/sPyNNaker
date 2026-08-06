@@ -17,44 +17,54 @@ import os
 from typing import Any, Collection, Optional, Type, Union, cast
 
 from lazyarray import __version__ as lazyarray_version
-
 from neo import __version__ as neo_version
-from quantities import __version__ as quantities_version
-from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
+from pyNN.common import control as pynn_control
+from quantities import __version__ as quantities_version
 from typing_extensions import Literal, Never
 
-
-from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
-    AbstractSpinnakerBase)
+    AbstractSpinnakerBase,
+)
 from spinn_front_end_common.interface.config_setup import (
-    add_spinnaker_template)
+    add_spinnaker_template,
+)
 from spinn_front_end_common.interface.provenance import (
-    FecTimer, GlobalProvenance, TimerCategory, TimerWork)
+    FecTimer,
+    GlobalProvenance,
+    TimerCategory,
+    TimerWork,
+)
 
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
-from spynnaker.pyNN.config_setup import add_spynnaker_cfg, SPYNNAKER_CFG
-from spynnaker.pyNN.models.recorder import Recorder
-from spynnaker.pyNN.models.neuron import (
-    AbstractPyNNNeuronModel, PopulationVertex)
+from spynnaker.pyNN.config_setup import SPYNNAKER_CFG, add_spynnaker_cfg
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.extra_algorithms import (
-    delay_support_adder, neuron_expander, synapse_expander,
+    delay_support_adder,
+    neuron_expander,
     redundant_packet_count_report,
-    spynnaker_neuron_graph_network_specification_report)
+    spynnaker_neuron_graph_network_specification_report,
+    synapse_expander,
+)
 from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
-    finish_connection_holders)
+    finish_connection_holders,
+)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    spynnaker_splitter_selector)
+    spynnaker_splitter_selector,
+)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neuron import (
+    AbstractPyNNNeuronModel,
+    PopulationVertex,
+)
+from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
-
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

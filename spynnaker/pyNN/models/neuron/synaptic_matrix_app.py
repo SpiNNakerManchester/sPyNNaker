@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Optional, Tuple, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, List, Optional, Tuple
 
 import numpy
 from numpy import uint32
@@ -21,25 +22,31 @@ from numpy.typing import NDArray
 from pacman.model.graphs.common import Slice
 from pacman.model.placements import Placement
 
-from spinn_front_end_common.utilities.helpful_functions import (
-    locate_memory_region_for_placement)
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.interface.buffer_management import BufferManager
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.helpful_functions import (
+    locate_memory_region_for_placement,
+)
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnHost)
+    AbstractGenerateConnectorOnHost,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamicsStructural,
+)
 from spynnaker.pyNN.types import WeightScales
 
 from .generator_data import GeneratorData
-from .synapse_io import read_all_synapses, convert_to_connections, get_synapses
+from .synapse_io import convert_to_connections, get_synapses, read_all_synapses
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron.synaptic_matrices import AppKeyInfo
+
     from .master_pop_table import MasterPopTableAsBinarySearch
 
 

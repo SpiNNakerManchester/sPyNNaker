@@ -18,8 +18,9 @@
 Synfirechain-like example
 """
 import numpy
-from numpy.typing import NDArray
 import pyNN.spiNNaker as p
+from numpy.typing import NDArray
+
 from spinnaker_testbase.root_test_case import RootTestCase
 
 

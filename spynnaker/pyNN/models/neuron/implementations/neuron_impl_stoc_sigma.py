@@ -13,15 +13,21 @@
 # limitations under the License.
 
 from typing import Mapping, Optional, Sequence
+
 from pyNN.random import NumpyRNG
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
+
 from spinn_front_end_common.interface.ds import DataType
-from spynnaker.pyNN.utilities.struct import Struct
-from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractNeuronImpl, ModelParameter)
+
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractNeuronImpl,
+    ModelParameter,
+)
 from spynnaker.pyNN.random_distribution import RandomDistribution
+from spynnaker.pyNN.utilities.struct import Struct
 
 TAU_REFRAC = "tau_refrac"
 ALPHA = "alpha"

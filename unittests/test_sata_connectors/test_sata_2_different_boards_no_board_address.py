@@ -16,10 +16,13 @@
 retina example that just feeds data from a retina to live output via an
 intermediate population
 """
-from parameterized import parameterized
 import pyNN.spiNNaker as p
+from parameterized import parameterized
+
 from spinn_utilities.config_holder import set_config
+
 from spinn_machine.version import FPGA_BOARD_TYPES
+
 from spinnaker_testbase import BaseTestCase
 
 

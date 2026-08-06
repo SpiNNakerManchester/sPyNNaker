@@ -14,12 +14,14 @@
 
 from typing import List, Optional, Tuple, Union
 
+import pyNN.spiNNaker as sim
 from parameterized import parameterized
 from typing_extensions import TypeAlias
-import pyNN.spiNNaker as sim
 
 from spinn_utilities.config_holder import set_config
+
 from spinn_machine.version import MANY_BOARD_TYPES
+
 from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.models.projection import Projection

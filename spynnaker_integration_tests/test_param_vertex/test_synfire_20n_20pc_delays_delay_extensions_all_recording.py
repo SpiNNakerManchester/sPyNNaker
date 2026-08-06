@@ -20,9 +20,12 @@ Synfirechain-like example
 import matplotlib.pyplot as plt
 import numpy
 from pyNN.utility.plotting import Figure
+
+from spinnaker_testbase import BaseTestCase
+
 import spynnaker.spike_checker as spike_checker
 from spynnaker.spynnaker_plotting import SpynnakerPanel
-from spinnaker_testbase import BaseTestCase
+
 from spynnaker_integration_tests.scripts import SynfireRunner
 
 n_neurons = 20  # number of neurons in each population

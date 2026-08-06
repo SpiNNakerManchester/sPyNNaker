@@ -13,9 +13,12 @@
 # limitations under the License.
 
 from typing import List, Optional
-from scipy.stats import binom
+
 from pyNN.random import RandomDistribution
+from scipy.stats import binom
+
 from spinn_utilities.overrides import overrides
+
 from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 

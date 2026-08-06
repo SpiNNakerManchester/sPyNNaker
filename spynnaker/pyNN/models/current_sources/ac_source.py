@@ -25,7 +25,10 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 
 from .abstract_current_source import (
-    AbstractCurrentSource, CurrentSourceIDs, CurrentParameter)
+    AbstractCurrentSource,
+    CurrentParameter,
+    CurrentSourceIDs,
+)
 
 
 class ACSource(AbstractCurrentSource):

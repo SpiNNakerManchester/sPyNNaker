@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import pyNN.spiNNaker as sim
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker_integration_tests.scripts import check_data
 
 n_neurons = 2  # number of neurons in each population

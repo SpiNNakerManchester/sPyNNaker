@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Iterable
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 

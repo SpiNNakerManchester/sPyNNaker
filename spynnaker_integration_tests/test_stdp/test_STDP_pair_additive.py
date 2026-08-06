@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import numpy
 import pyNN.spiNNaker as p
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    calculate_spike_pair_additive_stdp_weight)
+
 from spinnaker_testbase import BaseTestCase
 
-import numpy
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    calculate_spike_pair_additive_stdp_weight,
+)
 
 
 def post_spike_same_time() -> None:

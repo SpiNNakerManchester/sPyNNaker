@@ -14,10 +14,11 @@
 
 from typing import Iterator
 
+import pyNN.spiNNaker as sim
 import pytest
 from _pytest.fixtures import SubRequest
+
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
-import pyNN.spiNNaker as sim
 
 
 @pytest.fixture(autouse=True)

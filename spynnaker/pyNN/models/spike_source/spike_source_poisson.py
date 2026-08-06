@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Sequence, Union, Tuple
-from spinn_utilities.overrides import overrides
+from typing import Optional, Sequence, Tuple, Union
+
 from spinn_utilities.classproperty import classproperty
+from spinn_utilities.overrides import overrides
+
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
+
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+
 from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
 
 _population_parameters = {

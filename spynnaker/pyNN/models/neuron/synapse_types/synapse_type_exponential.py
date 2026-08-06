@@ -19,9 +19,9 @@ from spinn_utilities.ranged import RangeDictionary
 
 from spinn_front_end_common.interface.ds import DataType
 
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.utilities.struct import Struct
-from spynnaker.pyNN.data import SpynnakerDataView
 
 from .abstract_synapse_type import AbstractSynapseType
 

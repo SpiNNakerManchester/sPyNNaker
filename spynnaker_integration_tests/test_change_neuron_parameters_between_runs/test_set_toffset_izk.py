@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from neo.core import Block
 import numpy
 import pyNN.spiNNaker as p
-from spynnaker.pyNN.utilities import neo_convertor
+from neo.core import Block
+
 from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.utilities import neo_convertor
 
 
 def do_run(n_neurons: int, n_cores: int, i_offset2: int,

@@ -12,23 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 import pyNN.spiNNaker as sim
+import pytest
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
 
 from spynnaker.pyNN.config_setup import unittest_setup
+from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron import (
-    PopulationVertex, AbstractPyNNNeuronModelStandard)
+    AbstractPyNNNeuronModelStandard,
+    PopulationVertex,
+)
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent,
+)
 from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
 
-from spynnaker.pyNN.models.defaults import default_initial_values
-from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent)
-
-from unittests.mocks import (
-    MockInputType, MockSynapseType, MockThresholdType)
+from unittests.mocks import MockInputType, MockSynapseType, MockThresholdType
 
 
 class _MyNeuronModel(NeuronModel):

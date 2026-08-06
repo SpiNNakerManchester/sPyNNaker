@@ -13,8 +13,11 @@
 # limitations under the License.
 from numpy import floating
 from numpy.typing import NDArray
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 from pacman.model.graphs import AbstractSupportsSDRAMEdges
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
 
 

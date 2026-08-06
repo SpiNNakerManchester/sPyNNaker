@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import math
-from typing import Any, Dict, List, Optional, Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence
 
 import numpy
 from numpy import integer, uint32
 from numpy.typing import NDArray
-
 from pyNN.random import NumpyRNG
 
 from spinn_utilities.overrides import overrides
@@ -31,14 +31,19 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities import utility_calls
 
 from .abstract_connector import AbstractConnector
-from .abstract_generate_connector_on_machine import (
-    AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
-    AbstractGenerateConnectorOnHost)
+    AbstractGenerateConnectorOnHost,
+)
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine,
+    ConnectorIDs,
+)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
 
 N_GEN_PARAMS = 8
 

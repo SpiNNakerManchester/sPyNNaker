@@ -13,11 +13,13 @@
 # limitations under the License.
 
 from typing import Tuple
-from neo.core import AnalogSignal
-from neo.core.spiketrainlist import SpikeTrainList
+
 import numpy
 import pyNN.spiNNaker as sim
+from neo.core import AnalogSignal
+from neo.core.spiketrainlist import SpikeTrainList
 from pyNN.space import Grid2D
+
 from spinnaker_testbase import BaseTestCase
 
 

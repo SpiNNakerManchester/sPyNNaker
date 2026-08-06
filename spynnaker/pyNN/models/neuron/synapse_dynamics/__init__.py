@@ -12,15 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .abstract_has_parameter_names import AbstractHasParameterNames
-from .abstract_synapse_dynamics import AbstractSynapseDynamics
-from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 from .abstract_generate_on_machine import AbstractGenerateOnMachine
-from .abstract_synapse_dynamics_structural import (
-    AbstractSynapseDynamicsStructural)
-from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
+from .abstract_has_parameter_names import AbstractHasParameterNames
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
+from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_supports_signed_weights import AbstractSupportsSignedWeights
+from .abstract_synapse_dynamics import AbstractSynapseDynamics
+from .abstract_synapse_dynamics_structural import (
+    AbstractSynapseDynamicsStructural,
+)
+from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_common import SynapseDynamicsStructuralCommon
@@ -28,11 +30,10 @@ from .synapse_dynamics_structural_static import SynapseDynamicsStructuralStatic
 from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
 from .synapse_dynamics_utils import (
     calculate_spike_pair_additive_stdp_weight,
-    calculate_spike_pair_multiplicative_stdp_weight)
-from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
+    calculate_spike_pair_multiplicative_stdp_weight,
+)
 from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
 from .synapse_dynamics_weight_changer import SynapseDynamicsWeightChanger
-
 
 __all__ = ("AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
            "AbstractStaticSynapseDynamics", "AbstractSynapseDynamics",

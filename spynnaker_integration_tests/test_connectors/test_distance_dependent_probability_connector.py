@@ -13,9 +13,11 @@
 # limitations under the License.
 
 from typing import Tuple
+
 import numpy
-from pyNN.space import BaseStructure
 import pyNN.spiNNaker as p
+from pyNN.space import BaseStructure
+
 from spinnaker_testbase import BaseTestCase
 
 

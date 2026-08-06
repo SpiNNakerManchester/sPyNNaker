@@ -19,7 +19,9 @@ from spinn_utilities.config_holder import get_report_path
 from spinn_utilities.log import FormatAdapter
 
 from spinn_front_end_common.interface.provenance import (
-    ProvenanceReader, ProvenanceWriter)
+    ProvenanceReader,
+    ProvenanceWriter,
+)
 
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 

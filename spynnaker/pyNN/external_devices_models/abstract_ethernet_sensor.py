@@ -13,10 +13,14 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import Any, Dict, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Any, Dict
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
+
     from .abstract_ethernet_translator import AbstractEthernetTranslator
 
 

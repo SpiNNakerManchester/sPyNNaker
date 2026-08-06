@@ -14,18 +14,26 @@
 
 
 import functools
-import numpy
-import pytest
 import random
 import sys
 from typing import Any, Callable
+
+import numpy
+import pytest
+
 from pacman.model.graphs.common import Slice
+
 from spynnaker.pyNN.config_setup import unittest_setup
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector, AbstractGenerateConnectorOnHost,
-    FixedNumberPreConnector, FixedNumberPostConnector,
-    FixedProbabilityConnector, IndexBasedProbabilityConnector)
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractConnector,
+    AbstractGenerateConnectorOnHost,
+    FixedNumberPostConnector,
+    FixedNumberPreConnector,
+    FixedProbabilityConnector,
+    IndexBasedProbabilityConnector,
+)
+
 from unittests.mocks import MockPopulation, MockSynapseDynamics
 
 

@@ -12,17 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
-from typing import Dict, Set, Tuple, Type, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, Set, Tuple, Type, TypeVar
 
 from spinn_utilities.config_holder import (
-    get_config_str_or_none, get_report_path)
+    get_config_str_or_none,
+    get_report_path,
+)
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
+
 from pacman.model.graphs.application import ApplicationVertex
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+
 if TYPE_CHECKING:
     import graphviz as gv  # type: ignore[import]
 

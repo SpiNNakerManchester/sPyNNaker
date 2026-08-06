@@ -20,9 +20,12 @@ from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.models.neuron.additional_inputs import (
-    AbstractAdditionalInput)
+    AbstractAdditionalInput,
+)
 from spynnaker.pyNN.models.neuron.input_types import (
-    AbstractInputType, InputTypeConductance)
+    AbstractInputType,
+    InputTypeConductance,
+)
 from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType

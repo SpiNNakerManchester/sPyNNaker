@@ -13,53 +13,73 @@
 # limitations under the License.
 import shutil
 import struct
-from typing import Any, BinaryIO, List, Optional, Sequence, Tuple
 import unittest
-
-from parameterized import parameterized
 from tempfile import mkdtemp
-import numpy
-import pytest
+from typing import Any, BinaryIO, List, Optional, Sequence, Tuple
 
-from spinn_utilities.overrides import overrides
+import numpy
+import pyNN.spiNNaker as p
+import pytest
+from parameterized import parameterized
+
 from spinn_utilities.config_holder import set_config
+from spinn_utilities.overrides import overrides
+
 from spinn_machine.version import MANY_BOARD_TYPES, Spin1Gen, Spin2Gen
-from spinnman.transceiver.mockable_transceiver import MockableTransceiver
+
 from spinnman.transceiver import Transceiver
+from spinnman.transceiver.mockable_transceiver import MockableTransceiver
+
 from pacman.model.placements import Placement
-from pacman.operations.routing_info_allocator_algorithms import (
-    ZonedRoutingInfoAllocator)
 from pacman.operations.partition_algorithms import splitter_partitioner
+from pacman.operations.routing_info_allocator_algorithms import (
+    ZonedRoutingInfoAllocator,
+)
+
 from spinn_front_end_common.interface.ds import (
-    DataSpecificationGenerator, DsSqlliteDatabase)
+    DataSpecificationGenerator,
+    DsSqlliteDatabase,
+)
 from spinn_front_end_common.interface.interface_functions import (
-    load_application_data_specs)
+    load_application_data_specs,
+)
+
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
-from spynnaker.pyNN.models.neuron.synaptic_matrices import (
-    SynapticMatrices, SynapseRegions, SynapseRegionReferences)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
-    SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic,
-    SynapseDynamicsNeuromodulation)
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.extra_algorithms import delay_support_adder
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    SplitterPopulationVertexFixed,
+)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractGenerateConnectorOnMachine,
+)
+from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    TimingDependenceSpikePair)
+    TimingDependenceSpikePair,
+)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
-    WeightDependenceAdditive, WeightDependenceMultiplicative)
+    WeightDependenceAdditive,
+    WeightDependenceMultiplicative,
+)
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .partner_selection import (LastNeuronSelection, RandomSelection)
+    .elimination import RandomByWeightElimination
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
     .formation import DistanceDependentFormation
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .elimination import RandomByWeightElimination
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPopulationVertexFixed)
-from spynnaker.pyNN.extra_algorithms import delay_support_adder
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
-from spynnaker.pyNN.config_setup import unittest_setup
-import pyNN.spiNNaker as p
+    .partner_selection import LastNeuronSelection, RandomSelection
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsNeuromodulation,
+    SynapseDynamicsStatic,
+    SynapseDynamicsSTDP,
+    SynapseDynamicsStructuralStatic,
+    SynapseDynamicsStructuralSTDP,
+)
+from spynnaker.pyNN.models.neuron.synaptic_matrices import (
+    SynapseRegionReferences,
+    SynapseRegions,
+    SynapticMatrices,
+)
 
 
 class _MockTransceiverinOut(MockableTransceiver):

@@ -17,37 +17,47 @@ from typing import Dict, Iterable, List, Sequence, Tuple, cast
 from numpy import floating
 from numpy.typing import NDArray
 
-from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
+from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM, MultiRegionSDRAM
+from pacman.model.graphs.machine import MachineVertex
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
+from pacman.model.resources import AbstractSDRAM, MultiRegionSDRAM
 from pacman.utilities.utility_objs import ChipCounter
 
 from spynnaker.pyNN.models.common.population_application_vertex import (
-    PopulationApplicationVertex)
+    PopulationApplicationVertex,
+)
 from spynnaker.pyNN.models.neuron import (
+    LocalOnlyProvenance,
+    PopulationMachineLocalOnlyCombinedVertex,
     PopulationMachineVertex,
-    PopulationMachineLocalOnlyCombinedVertex, LocalOnlyProvenance)
-from spynnaker.pyNN.models.neuron.population_machine_vertex import (
-    NeuronProvenance, SynapseProvenance, MainProvenance,
-    SpikeProcessingProvenance)
-from spynnaker.pyNN.models.neuron.master_pop_table import (
-    MasterPopTableAsBinarySearch)
-from spynnaker.pyNN.utilities.bit_field_utilities import (
-    get_sdram_for_bit_field_region)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural)
+)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
-from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+from spynnaker.pyNN.models.neuron.master_pop_table import (
+    MasterPopTableAsBinarySearch,
+)
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.population_machine_common import (
-    PopulationMachineCommon)
+    PopulationMachineCommon,
+)
+from spynnaker.pyNN.models.neuron.population_machine_vertex import (
+    MainProvenance,
+    NeuronProvenance,
+    SpikeProcessingProvenance,
+    SynapseProvenance,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamicsStructural,
+)
+from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.utilities.bit_field_utilities import (
+    get_sdram_for_bit_field_region,
+)
 
 from .splitter_population_vertex import SplitterPopulationVertex
 

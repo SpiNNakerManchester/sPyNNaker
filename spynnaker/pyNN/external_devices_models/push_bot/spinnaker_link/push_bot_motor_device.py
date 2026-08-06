@@ -15,10 +15,13 @@
 from typing import Optional
 
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
-from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotMotor)
+
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
-    PushBotEthernetMotorDevice)
+    PushBotEthernetMotorDevice,
+)
+from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
+    PushBotMotor,
+)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 

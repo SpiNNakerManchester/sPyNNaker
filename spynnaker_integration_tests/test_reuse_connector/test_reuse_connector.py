@@ -13,8 +13,11 @@
 # limitations under the License.
 
 from typing import Tuple
+
 import pyNN.spiNNaker as p
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from enum import Enum
+
 from spynnaker.pyNN.protocols import RetinaKey
 
 

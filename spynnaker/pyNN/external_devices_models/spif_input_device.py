@@ -17,7 +17,9 @@ from typing import Dict, Iterable, List, Optional, Tuple
 from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs.application import (
-    ApplicationFPGAVertex, FPGAConnection)
+    ApplicationFPGAVertex,
+    FPGAConnection,
+)
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.machine import MachineFPGAVertex, MachineVertex
 from pacman.model.routing_info import BaseKeyAndMask, RoutingInfo
@@ -25,17 +27,32 @@ from pacman.utilities.constants import BITS_IN_KEY
 from pacman.utilities.utility_calls import get_n_bits
 
 from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex)
+    AbstractSendMeMulticastCommandsVertex,
+)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import MultiCastCommand
 
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+
 from .spif_devices import (
-    SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SPIF_INPUT_FPGA_LINKS,
-    N_PIPES, N_FIELDS, N_FILTERS, SpiNNFPGARegister, SPIFRegister,
-    set_field_mask, set_field_shift, set_field_limit,
-    set_filter_mask, set_filter_value, set_mapper_key,
-    set_input_key, set_input_mask, set_input_route)
+    N_FIELDS,
+    N_FILTERS,
+    N_PIPES,
+    SPIF_FPGA_ID,
+    SPIF_INPUT_FPGA_LINKS,
+    SPIF_OUTPUT_FPGA_LINK,
+    SPIFRegister,
+    SpiNNFPGARegister,
+    set_field_limit,
+    set_field_mask,
+    set_field_shift,
+    set_filter_mask,
+    set_filter_value,
+    set_input_key,
+    set_input_mask,
+    set_input_route,
+    set_mapper_key,
+)
 
 
 class SPIFInputDevice(

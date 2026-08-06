@@ -14,9 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
 import pyNN.spiNNaker as p
+
 from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 
 class TestMultipleStdpMechsOnSameNeuron(BaseTestCase):
