@@ -18,6 +18,7 @@ from numpy.typing import NDArray
 from typing_extensions import TypeAlias
 
 from spinn_utilities.ranged import RangedList
+
 from spynnaker.pyNN.random_distribution import RandomDistribution
 
 #: Type of names of parameters and state variables.
