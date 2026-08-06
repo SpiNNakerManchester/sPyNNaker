@@ -14,12 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from parameterized import parameterized
 import pyNN.spiNNaker as sim
+from parameterized import parameterized
 
 from spinn_utilities.config_holder import set_config
+
 from spinn_machine.version import MANY_BOARD_TYPES
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spinnaker_testbase import BaseTestCase
 
 

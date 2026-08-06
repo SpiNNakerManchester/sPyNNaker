@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyNN.spiNNaker as sim
 import neo
+import pyNN.spiNNaker as sim
+
+from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.utilities import neo_compare
-from spinnaker_testbase import BaseTestCase
+
 from spynnaker_integration_tests.scripts import check_neuron_data
 
 n_neurons = 20  # number of neurons in each population

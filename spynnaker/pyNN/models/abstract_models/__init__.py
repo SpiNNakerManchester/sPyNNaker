@@ -15,17 +15,22 @@
 from .abstract_accepts_incoming_synapses import AbstractAcceptsIncomingSynapses
 from .abstract_has_delay_stages import AbstractHasDelayStages
 from .abstract_max_spikes import AbstractMaxSpikes
-from .abstract_synapse_expandable import (
-    AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
-from .coloured_application_vertex import ColouredApplicationVertex
-from .sends_synaptic_inputs_over_sdram import SendsSynapticInputsOverSDRAM
-from .receives_synaptic_inputs_over_sdram import (
-    ReceivesSynapticInputsOverSDRAM)
-from .has_synapses import HasSynapses
 from .abstract_neuron_expandable import (
-    AbstractNeuronExpandable, NEURON_EXPANDER_APLX)
-from .supports_structure import SupportsStructure
+    NEURON_EXPANDER_APLX,
+    AbstractNeuronExpandable,
+)
+from .abstract_synapse_expandable import (
+    SYNAPSE_EXPANDER_APLX,
+    AbstractSynapseExpandable,
+)
+from .coloured_application_vertex import ColouredApplicationVertex
 from .has_shape_key_fields import HasShapeKeyFields
+from .has_synapses import HasSynapses
+from .receives_synaptic_inputs_over_sdram import (
+    ReceivesSynapticInputsOverSDRAM,
+)
+from .sends_synaptic_inputs_over_sdram import SendsSynapticInputsOverSDRAM
+from .supports_structure import SupportsStructure
 
 __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractHasDelayStages",
            "AbstractMaxSpikes", "AbstractSynapseExpandable",

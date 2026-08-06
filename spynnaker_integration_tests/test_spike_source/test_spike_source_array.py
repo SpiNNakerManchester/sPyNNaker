@@ -14,9 +14,11 @@
 
 import random
 from typing import List
+
 import numpy
-from numpy.typing import NDArray
 import pyNN.spiNNaker as p
+from numpy.typing import NDArray
+
 from spinnaker_testbase import BaseTestCase
 
 

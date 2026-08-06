@@ -12,15 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from enum import Enum
-from typing import Mapping, Optional, Sequence, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Mapping, Optional, Sequence, Union
+
 from typing_extensions import TypeAlias
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 from spinn_front_end_common.interface.ds import DataType
+
 if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
     from spynnaker.pyNN.models.populations import Population, PopulationBase
-    from spynnaker.pyNN.models.neuron.population_vertex import (
-        PopulationVertex)
 
 #: General type of parameters to current sources.
 #: Individual parameters will only be one of these!

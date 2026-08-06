@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from typing import List, Mapping, Optional, Sequence, Tuple, Union
+
 from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
@@ -21,24 +22,29 @@ from spinn_utilities.ranged import RangeDictionary
 from spinn_front_end_common.interface.ds import DataType
 
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPopulationVertex)
+    SplitterPopulationVertex,
+)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
-from spynnaker.pyNN.models.neural_projections import (
-        SynapseInformation)
+from spynnaker.pyNN.models.neural_projections import SynapseInformation
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector)
-from spynnaker.pyNN.models.neuron import PopulationVertex, \
-    AbstractPyNNNeuronModel
+    AbstractConnector,
+)
+from spynnaker.pyNN.models.neuron import (
+    AbstractPyNNNeuronModel,
+    PopulationVertex,
+)
 from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractNeuronImpl, AbstractStandardNeuronComponent)
+    AbstractNeuronImpl,
+    AbstractStandardNeuronComponent,
+)
 from spynnaker.pyNN.models.neuron.input_types import AbstractInputType
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamics)
-from spynnaker.pyNN.models.neuron.threshold_types import (
-    AbstractThresholdType)
+    AbstractSynapseDynamics,
+)
+from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
+from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.utilities.struct import Struct
-from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
 
 
 class MockPopulation(Population):

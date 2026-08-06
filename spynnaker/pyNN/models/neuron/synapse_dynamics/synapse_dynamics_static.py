@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Iterable, List, Optional, Tuple
 
 import numpy
 from numpy import floating, integer, uint8, uint32
 from numpy.typing import NDArray
-
 from pyNN.standardmodels.synapses import StaticSynapse
 
 from spinn_utilities.overrides import overrides
@@ -27,23 +27,30 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE)
-from spynnaker.pyNN.types import WeightsDelysIn as _InTypes, WeightScales
+    NUMPY_CONNECTORS_DTYPE,
+)
+from spynnaker.pyNN.types import WeightScales
+from spynnaker.pyNN.types import WeightsDelysIn as _InTypes
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
-from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
-    AbstractGenerateOnMachine, MatrixGeneratorID)
-
+    AbstractGenerateOnMachine,
+    MatrixGeneratorID,
+)
+from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 
 if TYPE_CHECKING:
-    from .abstract_synapse_dynamics import AbstractSynapseDynamics
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
-    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
+        ConnectionsArray,
+    )
+    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+
+    from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 
 class SynapseDynamicsStatic(

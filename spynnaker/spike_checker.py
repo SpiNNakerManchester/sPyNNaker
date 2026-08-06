@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from typing import List, Union
+
 import numpy
 from numpy.typing import NDArray
 

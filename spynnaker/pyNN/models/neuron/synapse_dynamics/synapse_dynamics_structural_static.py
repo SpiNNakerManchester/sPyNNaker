@@ -12,11 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from typing import (
-    Any, Dict, Iterable, Optional, Tuple, TYPE_CHECKING, Sequence, Union)
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import numpy
-
 from pyNN.standardmodels.synapses import StaticSynapse
 
 from spinn_utilities.overrides import overrides
@@ -28,42 +36,52 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.types import Weights
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 
-from .abstract_synapse_dynamics_structural import (
-    AbstractSynapseDynamicsStructural)
-from .synapse_dynamics_structural_common import (
-    DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
-    DEFAULT_S_MAX, SynapseDynamicsStructuralCommon as
-    _Common)
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
+from .abstract_synapse_dynamics import AbstractSynapseDynamics
+from .abstract_synapse_dynamics_structural import (
+    AbstractSynapseDynamicsStructural,
+)
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
+from .synapse_dynamics_structural_common import (
+    DEFAULT_F_REW,
+    DEFAULT_INITIAL_DELAY,
+    DEFAULT_INITIAL_WEIGHT,
+    DEFAULT_S_MAX,
+)
+from .synapse_dynamics_structural_common import (
+    SynapseDynamicsStructuralCommon as _Common,
+)
 from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
-from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
 from .synapse_dynamics_weight_changer import SynapseDynamicsWeightChanger
 
 if TYPE_CHECKING:
     from pacman.model.graphs import AbstractVertex
     from pacman.model.graphs.machine import MachineVertex
+
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neural_projections.connectors import (
-        AbstractConnector)
-    from spynnaker.pyNN.models.neuron.synapse_dynamics.\
-        abstract_synapse_dynamics_structural import (
-            InitialDelay)
+        AbstractConnector,
+    )
+    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
+        elimination.abstract_elimination import AbstractElimination
+    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
+        formation.abstract_formation import AbstractFormation
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
         partner_selection.abstract_partner_selection import (
-            AbstractPartnerSelection)
-    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
-        formation.abstract_formation import (
-            AbstractFormation)
-    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
-        elimination.abstract_elimination import (
-            AbstractElimination)
+            AbstractPartnerSelection,
+        )
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.\
+        abstract_synapse_dynamics_structural import InitialDelay
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
+        ConnectionsArray,
+    )
     from spynnaker.pyNN.types import Delays
+
     from .synapse_dynamics_structural_common import ConnectionsInfo
 
 

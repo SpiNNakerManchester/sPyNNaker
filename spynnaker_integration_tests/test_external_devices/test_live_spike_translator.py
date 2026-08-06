@@ -12,19 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import unittest
 from typing import Callable, List, Tuple
+
 import pyNN.spiNNaker as p
 
 from spinnman.connections import ConnectionListener
+from spinnman.connections.udp_packet_connections import SCAMPConnection
 from spinnman.messages.eieio import read_eieio_data_message
 from spinnman.messages.eieio.data_messages import KeyPayloadDataElement
-from spinnman.connections.udp_packet_connections import SCAMPConnection
-from spinnman.utilities.utility_functions import reprogram_tag
-from spinn_front_end_common.utilities.database import (
-    DatabaseConnection, DatabaseReader)
 from spinnman.messages.eieio.eieio_prefix import EIEIOPrefix
+from spinnman.utilities.utility_functions import reprogram_tag
+
+from spinn_front_end_common.utilities.database import (
+    DatabaseConnection,
+    DatabaseReader,
+)
+
 from spinnaker_testbase.base_test_case import BaseTestCase
-import unittest
 
 
 class UDPSCAMPConnection(SCAMPConnection):

@@ -13,18 +13,27 @@
 # limitations under the License.
 import math
 from typing import Dict, List, Sequence, Tuple
+
 from spinn_utilities.progress_bar import ProgressBar
+
 from pacman.model.graphs.application import (
-    ApplicationEdge, ApplicationEdgePartition)
+    ApplicationEdge,
+    ApplicationEdgePartition,
+)
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    AbstractSpynnakerSplitterDelay, SplitterDelayVertexSlice)
+    AbstractSpynnakerSplitterDelay,
+    SplitterDelayVertexSlice,
+)
 from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, DelayedApplicationEdge,
-    DelayAfferentApplicationEdge)
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+    DelayAfferentApplicationEdge,
+    DelayedApplicationEdge,
+    ProjectionApplicationEdge,
+)
 from spynnaker.pyNN.models.neuron import PopulationVertex
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 
 
 def delay_support_adder() -> Tuple[

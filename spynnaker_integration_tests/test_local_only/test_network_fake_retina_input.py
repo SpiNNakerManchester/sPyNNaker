@@ -11,11 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List, Tuple, Union
 from random import randint
+from typing import List, Tuple, Union
 
-from neo.core.spiketrainlist import SpikeTrainList
 import pyNN.spiNNaker as p
+from neo.core.spiketrainlist import SpikeTrainList
 from pyNN.space import Grid2D
 from quantities import Quantity
 

@@ -15,9 +15,9 @@
 from typing import List, Optional, Sequence
 
 import numpy as np
-from numpy.typing import NDArray
-from neo import AnalogSignal, Block, SpikeTrain
 import quantities
+from neo import AnalogSignal, Block, SpikeTrain
+from numpy.typing import NDArray
 from quantities import UnitTime
 
 # needed as dealing with quantities

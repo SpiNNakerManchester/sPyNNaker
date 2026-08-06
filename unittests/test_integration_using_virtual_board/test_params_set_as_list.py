@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pyNN.spiNNaker as p
 from parameterized import parameterized
 from pyNN.random import RandomDistribution
-import pyNN.spiNNaker as p
 
 from spinn_utilities.config_holder import set_config
 

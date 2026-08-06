@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import pyNN.spiNNaker as p
-from spinnaker_testbase import BaseTestCase
 from testfixtures import LogCapture  # type: ignore[import]
+
+from spinnaker_testbase import BaseTestCase
 
 
 def a_run() -> None:

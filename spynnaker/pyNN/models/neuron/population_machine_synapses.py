@@ -12,37 +12,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Sequence, Tuple, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Sequence, Tuple
 
 from numpy import floating
 from numpy.typing import NDArray
 
-from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
+from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.placements import Placement
 
-from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.interface.buffer_management.buffer_models import (
-    AbstractReceiveRegionsToHost)
+    AbstractReceiveRegionsToHost,
+)
+from spinn_front_end_common.interface.ds import DataSpecificationBase
 
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural, AbstractSDRAMSynapseDynamics)
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import (
-    AbstractSynapseExpandable, HasSynapses)
+    AbstractSynapseExpandable,
+    HasSynapses,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSDRAMSynapseDynamics,
+    AbstractSynapseDynamicsStructural,
+)
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
-from .population_vertex import PopulationVertex
 from .population_machine_synapses_provenance import (
-    PopulationMachineSynapsesProvenance)
-from .synaptic_matrices import SynapseRegions, SynapseRegionReferences
+    PopulationMachineSynapsesProvenance,
+)
+from .population_vertex import PopulationVertex
+from .synaptic_matrices import SynapseRegionReferences, SynapseRegions
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
+    from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 
 
 class PopulationMachineSynapses(

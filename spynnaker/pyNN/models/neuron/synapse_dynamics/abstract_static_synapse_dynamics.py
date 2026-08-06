@@ -17,9 +17,12 @@ from numpy import integer, uint32
 from numpy.typing import NDArray
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    ConnectionsArray)
+    ConnectionsArray,
+)
 from spynnaker.pyNN.types import WeightScales
+
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 
 

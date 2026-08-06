@@ -16,7 +16,16 @@ import logging
 import math
 from types import MappingProxyType
 from typing import (
-    Collection, Dict, Iterable, List, Mapping, Optional, Sequence, Set, Tuple)
+    Collection,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+)
 
 import numpy
 from numpy import float64, uint8, uint16, uint32
@@ -25,16 +34,17 @@ from numpy.typing import NDArray
 from spinn_utilities.log import FormatAdapter
 
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM, VariableSDRAM
+from pacman.model.graphs.machine import MachineVertex
 from pacman.model.placements import Placement
+from pacman.model.resources import AbstractSDRAM, VariableSDRAM
 
-from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationBase)
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.interface.ds import DataSpecificationBase, DataType
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BITS_PER_WORD)
+    BITS_PER_WORD,
+    BYTES_PER_WORD,
+)
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType

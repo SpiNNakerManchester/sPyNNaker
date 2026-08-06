@@ -12,21 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Optional, Sequence, cast, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Optional, Sequence, cast
 
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
+    AbstractGenerateConnectorOnMachine,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine)
+    AbstractGenerateOnMachine,
+)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
 
 # Address to indicate that the synaptic region is unused

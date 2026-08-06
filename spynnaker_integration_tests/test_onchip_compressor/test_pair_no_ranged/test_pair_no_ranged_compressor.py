@@ -13,10 +13,13 @@
 # limitations under the License.
 
 from spinnaker_testbase import BaseTestCase
-from spynnaker_integration_tests.test_onchip_compressor.many_routes \
-    import do_run
-from spynnaker_integration_tests.test_onchip_compressor.one_route \
-    import do_one_run
+
+from spynnaker_integration_tests.test_onchip_compressor.many_routes import (
+    do_run,
+)
+from spynnaker_integration_tests.test_onchip_compressor.one_route import (
+    do_one_run,
+)
 
 
 class TestPairNoRangeCompressor(BaseTestCase):

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from enum import Enum
 from typing import TYPE_CHECKING
 
@@ -22,7 +23,9 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
 
 

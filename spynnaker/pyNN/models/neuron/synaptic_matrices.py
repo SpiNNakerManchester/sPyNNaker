@@ -12,43 +12,57 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import (
-    Dict, List, NamedTuple, Optional, Sequence, Tuple, TYPE_CHECKING, cast)
+    TYPE_CHECKING,
+    Dict,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Tuple,
+    cast,
+)
 
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
 
+from pacman.model.graphs.application import ApplicationVirtualVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.placements import Placement
-from pacman.model.routing_info import (
-    AppVertexRoutingInfo, BaseKeyAndMask)
+from pacman.model.routing_info import AppVertexRoutingInfo, BaseKeyAndMask
 from pacman.utilities.utility_calls import allocator_bits_needed
-from pacman.model.graphs.application import ApplicationVirtualVertex
-from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationBase)
 
+from spinn_front_end_common.interface.ds import DataSpecificationBase, DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.neuron.master_pop_table import (
-    MasterPopTableAsBinarySearch)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural)
-from spynnaker.pyNN.utilities.bit_field_utilities import (
-    get_sdram_for_bit_field_region, get_bitfield_key_map_data,
-    write_bitfield_init_data, is_sdram_poisson_source)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.neuron.master_pop_table import (
+    MasterPopTableAsBinarySearch,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamicsStructural,
+)
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.types import WeightScales
+from spynnaker.pyNN.utilities.bit_field_utilities import (
+    get_bitfield_key_map_data,
+    get_sdram_for_bit_field_region,
+    is_sdram_poisson_source,
+    write_bitfield_init_data,
+)
+
 from .synaptic_matrix_app import SynapticMatrixApp
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.population_vertex import (
-        PopulationVertex)
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
+    from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
 
 # 1 for synaptic matrix region
 # 1 for master pop region

@@ -12,22 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Sequence, cast, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Sequence, cast
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM
 from pacman.model.placements import Placement
+from pacman.model.resources import AbstractSDRAM
+
 from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification)
+    AbstractGeneratesDataSpecification,
+)
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
-from .population_synapses_machine_vertex_common import (
-    PopulationSynapsesMachineVertexCommon)
+
 from .population_machine_synapses_provenance import (
-    PopulationMachineSynapsesProvenance)
+    PopulationMachineSynapsesProvenance,
+)
+from .population_synapses_machine_vertex_common import (
+    PopulationSynapsesMachineVertexCommon,
+)
+
 if TYPE_CHECKING:
-    from .population_vertex import PopulationVertex
     from spynnaker.pyNN.models.neuron.synaptic_matrices import (
-        SynapseRegionReferences)
+        SynapseRegionReferences,
+    )
+
+    from .population_vertex import PopulationVertex
 
 
 class PopulationSynapsesMachineVertexShared(

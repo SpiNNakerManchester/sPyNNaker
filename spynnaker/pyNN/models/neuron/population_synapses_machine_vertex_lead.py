@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Sequence, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, List, Sequence
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -20,23 +21,32 @@ from numpy.typing import NDArray
 from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM
 from pacman.model.placements import Placement
+from pacman.model.resources import AbstractSDRAM
 
 from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
+    AbstractGeneratesDataSpecification,
+    AbstractRewritesDataSpecification,
+)
 from spinn_front_end_common.interface.ds import (
-    DataSpecificationGenerator, DataSpecificationReloader)
+    DataSpecificationGenerator,
+    DataSpecificationReloader,
+)
 
 from .population_machine_common import PopulationMachineCommon
 from .population_machine_synapses import PopulationMachineSynapses
 from .population_synapses_machine_vertex_common import (
-    PopulationSynapsesMachineVertexCommon)
+    PopulationSynapsesMachineVertexCommon,
+)
 
 if TYPE_CHECKING:
-    from .population_vertex import PopulationVertex
     from spynnaker.pyNN.models.neuron.synaptic_matrices import (
-        SynapseRegions, SynapseRegionReferences, SynapticMatrices)
+        SynapseRegionReferences,
+        SynapseRegions,
+        SynapticMatrices,
+    )
+
+    from .population_vertex import PopulationVertex
 
 
 class PopulationSynapsesMachineVertexLead(

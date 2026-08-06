@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 
 import numpy
 from numpy import integer, uint32
@@ -25,24 +26,33 @@ from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractConnector,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractStaticSynapseDynamics, AbstractSDRAMSynapseDynamics,
-    AbstractPlasticSynapseDynamics)
+    AbstractPlasticSynapseDynamics,
+    AbstractSDRAMSynapseDynamics,
+    AbstractStaticSynapseDynamics,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE, ConnectionsArray)
+    NUMPY_CONNECTORS_DTYPE,
+    ConnectionsArray,
+)
 from spynnaker.pyNN.types import WeightScales
 
 from .master_pop_table import MasterPopTableAsBinarySearch
 
 if TYPE_CHECKING:
     from typing_extensions import TypeAlias
+
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-        AbstractSynapseDynamics)
+        AbstractSynapseDynamics,
+    )
     _RowData: TypeAlias = numpy.ndarray  # 2D
 
 _N_HEADER_WORDS = 3

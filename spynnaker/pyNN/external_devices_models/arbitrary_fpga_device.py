@@ -13,9 +13,14 @@
 # limitations under the License.
 
 from typing import Optional
+
 from spinn_utilities.typing.coords import XY
+
 from pacman.model.graphs.application import (
-    ApplicationFPGAVertex, FPGAConnection)
+    ApplicationFPGAVertex,
+    FPGAConnection,
+)
+
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 

@@ -14,17 +14,18 @@
 
 from typing import List, Union
 
-from neo import AnalogSignal
 import numpy
-from numpy.typing import NDArray
 import pyNN.spiNNaker as sim
+from neo import AnalogSignal
+from numpy.typing import NDArray
 from quantities import Quantity
+
+from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN import FixedTotalNumberConnector, OneToOneConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.projection import Projection
 from spynnaker.pyNN.models.populations import Population
-from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.models.projection import Projection
 
 SOURCES = 5
 DESTINATIONS = 10

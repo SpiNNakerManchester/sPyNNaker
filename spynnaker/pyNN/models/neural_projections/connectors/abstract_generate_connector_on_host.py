@@ -12,10 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Sequence, Tuple, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Sequence, Tuple
+
 from numpy.typing import NDArray
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 from pacman.model.graphs.common import Slice
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
 

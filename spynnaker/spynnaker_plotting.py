@@ -17,20 +17,20 @@ Plotting tools to be used together with
 https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/utility/plotting.py
 """
 
-from typing import Any, Dict, List, TypeAlias, Union
 from types import ModuleType
+from typing import Any, Dict, List, TypeAlias, Union
 
-from neo import SpikeTrain, Block, Segment, AnalogSignal
-from neo.core.spiketrainlist import SpikeTrainList  # type: ignore[import]
 import numpy as np
-from numpy.typing import NDArray
 import quantities
+from neo import AnalogSignal, Block, Segment, SpikeTrain
+from neo.core.spiketrainlist import SpikeTrainList  # type: ignore[import]
+from numpy.typing import NDArray
 
 plt: ModuleType
 try:
-    from pyNN.utility.plotting import repeat
     import matplotlib.pyplot
     from matplotlib.axes import Axes
+    from pyNN.utility.plotting import repeat
     plt = matplotlib.pyplot
     _matplotlib_missing = False
 except ImportError:

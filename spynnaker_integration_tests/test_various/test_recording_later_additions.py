@@ -13,8 +13,11 @@
 # limitations under the License.
 
 import os
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 import pyNN.spiNNaker as sim
+
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spinnaker_testbase import BaseTestCase
 
 

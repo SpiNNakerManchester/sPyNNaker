@@ -12,15 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union, Tuple
+
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron import PopulationVertex
+
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
+
+from .population_vertex import PopulationVertex
+
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterPopulationVertex)
+        SplitterPopulationVertex,
+    )
+    from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
 
 # The maximum atoms per core is the master population table row length to
 # make it easier when all-to-all-connector is used

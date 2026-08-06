@@ -13,8 +13,11 @@
 # limitations under the License.
 from time import sleep
 from typing import List
+
 import pyNN.spiNNaker as sim
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
 from spynnaker.pyNN.utilities.neo_convertor import count_spikes
 

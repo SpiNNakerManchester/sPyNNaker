@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from __future__ import annotations
+
 import logging
-from typing import Any, cast, Optional, Sequence, Tuple, Set, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional, Sequence, Set, Tuple, cast
 
 import numpy
-
 from pyNN.random import RandomDistribution
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
@@ -28,20 +28,21 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.machine import MachineVertex
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.types import (
-    Delays, WeightsDelysIn, Weights)
-from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE as CONNECTOR_DTYPE)
-from spynnaker.pyNN.types import is_scalar
+    NUMPY_CONNECTORS_DTYPE as CONNECTOR_DTYPE,
+)
+from spynnaker.pyNN.types import Delays, Weights, WeightsDelysIn, is_scalar
+from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neural_projections.connectors import (
-        AbstractConnector)
-    from spynnaker.pyNN.models.neural_projections import SynapseInformation
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
+    from spynnaker.pyNN.models.neural_projections.connectors import (
+        AbstractConnector,
+    )
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy
-import spynnaker.spike_checker as spike_checker
 import pyNN.spiNNaker as p
+
 from spinnaker_testbase import BaseTestCase
+
+import spynnaker.spike_checker as spike_checker
+
 from spynnaker_integration_tests.scripts import SynfireRunner
 
 n_neurons = 200  # number of neurons in each population

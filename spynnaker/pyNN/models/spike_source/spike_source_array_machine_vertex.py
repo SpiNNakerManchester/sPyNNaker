@@ -14,12 +14,18 @@
 from __future__ import annotations
 
 import sys
-from typing import cast, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
+
 from spinn_utilities.overrides import overrides
+
 from pacman.utilities.utility_calls import get_keys
+
 from spinn_front_end_common.utility_models import (
-    ReverseIPTagMulticastSourceMachineVertex)
+    ReverseIPTagMulticastSourceMachineVertex,
+)
+
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+
 if TYPE_CHECKING:
     from .spike_source_array_vertex import SpikeSourceArrayVertex
 

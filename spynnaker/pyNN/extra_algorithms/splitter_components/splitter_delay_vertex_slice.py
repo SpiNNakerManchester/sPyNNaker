@@ -17,19 +17,25 @@ from typing import Dict, Iterable, Sequence, Tuple
 from spinn_utilities.overrides import overrides
 
 from pacman.exceptions import (
-    PacmanConfigurationException, PacmanInvalidParameterException)
+    PacmanConfigurationException,
+    PacmanInvalidParameterException,
+)
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, BYTES_PER_WORD)
+    BYTES_PER_WORD,
+    SYSTEM_BYTES_REQUIREMENT,
+)
 
 from spynnaker.pyNN.models.utility_models.delays import (
-    DelayExtensionVertex, DelayExtensionMachineVertex)
+    DelayExtensionMachineVertex,
+    DelayExtensionVertex,
+)
 
 
 class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):

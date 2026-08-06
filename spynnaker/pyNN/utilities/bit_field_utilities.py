@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import math
-from typing import Iterable, Optional, TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Iterable, Optional, Tuple
 
 import numpy
 from numpy import uint32
@@ -28,9 +29,10 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge)
+        ProjectionApplicationEdge,
+    )
+    from spynnaker.pyNN.models.projection import Projection
 
 #: number of elements
 #  key, n atoms, atoms_per_core, pointer to bitfield
@@ -52,7 +54,8 @@ def is_sdram_poisson_source(app_edge: ApplicationEdge) -> bool:
     # Avoid circular import
     # pylint: disable=import-outside-toplevel
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterPoissonDelegate)
+        SplitterPoissonDelegate,
+    )
     splitter: AbstractSplitterCommon = app_edge.pre_vertex.splitter
     if isinstance(splitter, SplitterPoissonDelegate):
         if splitter.send_over_sdram:

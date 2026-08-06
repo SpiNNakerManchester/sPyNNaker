@@ -12,15 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
 from typing import (
-    Any, Callable, Dict, final, Optional, Sequence, Tuple, TYPE_CHECKING,
-    Union)
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    final,
+)
 
-from pyNN.space import BaseStructure
 import neo
 from numpy import floating
 from numpy.typing import NDArray
+from pyNN.space import BaseStructure
 from typing_extensions import Never
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
@@ -34,7 +43,9 @@ from spynnaker.pyNN.types import IoDest
 
 if TYPE_CHECKING:
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
+
     from spynnaker.pyNN.models.common.types import Names
+
     from .population_view import IDMixin
 
 logger = FormatAdapter(logging.getLogger(__name__))

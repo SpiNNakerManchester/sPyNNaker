@@ -12,16 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections import defaultdict
 import functools
 import math
+from collections import defaultdict
 from typing import Dict, List
 
 import numpy
 import pyNN.spiNNaker as p
 
 from spinnman.exceptions import SpiNNManCoresNotInStateException
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 

@@ -13,9 +13,12 @@
 # limitations under the License.
 
 from typing import Tuple
-from neo import Block
-from spinnaker_testbase import BaseTestCase
+
 import pyNN.spiNNaker as sim
+from neo import Block
+
+from spinnaker_testbase import BaseTestCase
+
 # import neo_convertor
 
 

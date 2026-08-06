@@ -12,17 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Union, Tuple
+from typing import Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
-from neo import Block
 import numpy
+import pyNN.spiNNaker as p
+from neo import Block
 from pyNN.space import BaseStructure
 from pyNN.utility.plotting import Figure, Panel
-import pyNN.spiNNaker as p
+
+from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.utilities import neo_convertor
-from spinnaker_testbase import BaseTestCase
 
 
 def do_run(plot: bool) -> Tuple[Block, Block, Block, Block]:

@@ -18,8 +18,7 @@ from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
 
-from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationBase)
+from spinn_front_end_common.interface.ds import DataSpecificationBase, DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus

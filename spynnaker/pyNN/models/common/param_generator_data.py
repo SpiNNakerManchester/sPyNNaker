@@ -14,15 +14,13 @@
 from typing import Any, Union, cast
 
 import numpy
-from numpy import uint32, int32
+from numpy import int32, uint32
 from numpy.typing import NDArray
-from typing_extensions import TypeAlias
-
 from pyNN.random import RandomDistribution, available_distributions
+from typing_extensions import TypeAlias
 
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-
 
 #: The generator param type for each data type
 _GENERATOR_TYPES = {

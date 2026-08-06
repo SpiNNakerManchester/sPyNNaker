@@ -30,10 +30,13 @@ from pacman.model.graphs.common import Slice
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.utilities.utility_calls import convert_to
 from spynnaker.pyNN.models.common.param_generator_data import (
-    get_generator_type, param_generator_id, param_generator_params,
-    type_has_generator)
+    get_generator_type,
+    param_generator_id,
+    param_generator_params,
+    type_has_generator,
+)
+from spynnaker.pyNN.utilities.utility_calls import convert_to
 
 #: The type of values used populate structure instances
 ValueMap: TypeAlias = Mapping[str, Union[int, float, AbstractList[float]]]

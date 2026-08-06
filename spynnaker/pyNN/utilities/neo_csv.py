@@ -12,16 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from collections import defaultdict
-import csv
-from datetime import datetime
-import logging
-from typing import (
-    Any, Dict, Iterable, List, Optional, Tuple, Union, TYPE_CHECKING)
 
-from neo import AnalogSignal, Block, Event, Segment, SpikeTrain
+import csv
+import logging
+from collections import defaultdict
+from datetime import datetime
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
+
 import numpy
-from numpy import integer, float64
+from neo import AnalogSignal, Block, Event, Segment, SpikeTrain
+from numpy import float64, integer
 from numpy.typing import NDArray
 from quantities import Quantity, ms
 
@@ -30,7 +39,9 @@ from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.data import SpynnakerDataView
 
 if TYPE_CHECKING:
-    from _csv import Writer as CSVWriter, Reader as CSVReader
+    from _csv import Reader as CSVReader
+    from _csv import Writer as CSVWriter
+
     from spynnaker.pyNN.utilities.neo_buffer_database import Annotations
 
 logger = FormatAdapter(logging.getLogger(__name__))

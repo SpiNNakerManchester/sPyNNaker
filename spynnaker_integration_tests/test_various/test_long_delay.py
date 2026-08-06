@@ -16,6 +16,7 @@
 Synfirechain-like example
 """
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker_integration_tests.scripts.synfire_runner import SynfireRunner
 
 n_neurons = 200  # number of neurons in each population

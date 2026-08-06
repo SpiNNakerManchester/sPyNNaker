@@ -12,11 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Dict, Mapping, Tuple
+
 from spinn_utilities.progress_bar import ProgressBar
+
 from pacman.model.graphs.application import ApplicationGraph
-from spynnaker.pyNN.models.neuron import ConnectionHolder
+
 from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, SynapseInformation)
+    ProjectionApplicationEdge,
+    SynapseInformation,
+)
+from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 
 class SpYNNakerConnectionHolderGenerator(object):

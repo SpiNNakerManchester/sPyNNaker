@@ -24,7 +24,8 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
 
 from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotRetinaResolution)
+    PushBotRetinaResolution,
+)
 
 from .push_bot_wifi_connection import PushBotWIFIConnection
 

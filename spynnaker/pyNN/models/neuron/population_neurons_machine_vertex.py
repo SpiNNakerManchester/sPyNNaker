@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from enum import IntEnum
 import ctypes
+from enum import IntEnum
 from typing import List, Optional, Sequence
 
 from numpy import floating
@@ -20,28 +20,40 @@ from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
 
-from pacman.model.graphs.machine import (
-    MachineVertex, SDRAMMachineEdge, SourceSegmentedSDRAMMachinePartition)
 from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM
+from pacman.model.graphs.machine import (
+    MachineVertex,
+    SDRAMMachineEdge,
+    SourceSegmentedSDRAMMachinePartition,
+)
 from pacman.model.placements import Placement
+from pacman.model.resources import AbstractSDRAM
 
 from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
-from spinn_front_end_common.interface.provenance import ProvenanceWriter
+    AbstractGeneratesDataSpecification,
+    AbstractRewritesDataSpecification,
+)
 from spinn_front_end_common.interface.ds import (
-    DataSpecificationGenerator, DataSpecificationReloader)
+    DataSpecificationGenerator,
+    DataSpecificationReloader,
+)
+from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
-    ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
+    ReceivesSynapticInputsOverSDRAM,
+    SendsSynapticInputsOverSDRAM,
+)
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
-    NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
+    NeuronProvenance,
+    NeuronRegions,
+    PopulationMachineNeurons,
+)
 from .population_vertex import PopulationVertex
 
 # Size of SDRAM params = 1 word for address + 1 word for size

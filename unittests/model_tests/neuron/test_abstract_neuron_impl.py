@@ -12,20 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 import sys
+
+import pytest
 
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.config_setup import unittest_setup
+from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.common.population_application_vertex import (
-        PopulationApplicationVertex)
-from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
-    AbstractPyNNNeuronModel)
+    PopulationApplicationVertex,
+)
 from spynnaker.pyNN.models.defaults import default_initial_values
-from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
+    AbstractPyNNNeuronModel,
+)
 
 
 class _MyPyNNModelImpl(AbstractPyNNModel):

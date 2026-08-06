@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import pyNN.spiNNaker as p
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 

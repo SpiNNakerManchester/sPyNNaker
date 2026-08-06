@@ -23,10 +23,11 @@ module.
 import os
 import shutil
 from types import ModuleType
-from packaging.version import Version
-import pyNN
-import spynnaker.pyNN as sim
 
+import pyNN
+from packaging.version import Version
+
+import spynnaker.pyNN as sim
 
 # The version of PyNN that we really want
 _TARGET_PYNN_VERSION = "0.9"

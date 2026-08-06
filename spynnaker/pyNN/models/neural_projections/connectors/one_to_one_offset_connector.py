@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Any, Dict, Sequence, Optional, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
 
 import numpy
 from numpy import int32, uint32
@@ -25,15 +26,19 @@ from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from .abstract_connector import AbstractConnector
-from .abstract_generate_connector_on_machine import (
-    AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
-    AbstractGenerateConnectorOnHost)
+    AbstractGenerateConnectorOnHost,
+)
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine,
+    ConnectorIDs,
+)
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neural_projections import SynapseInformation
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
 
 
 class OneToOneOffsetConnector(

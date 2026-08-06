@@ -13,14 +13,18 @@
 # limitations under the License.
 
 from typing import Iterable, List, Optional
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex)
+    AbstractSendMeMulticastCommandsVertex,
+)
 from spinn_front_end_common.utility_models import MultiCastCommand
 
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotRetinaResolution)
+    PushBotRetinaResolution,
+)
+from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 
 
 class AbstractPushBotRetinaDevice(

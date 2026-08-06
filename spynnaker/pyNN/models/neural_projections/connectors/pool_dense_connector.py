@@ -15,14 +15,13 @@
 # limitations under the License.
 
 from __future__ import annotations
+
 from collections.abc import Iterable, Sized
-from typing import (
-    Any, Dict, Optional, Tuple, Union, cast, TYPE_CHECKING)
+from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Union, cast
 
 import numpy
-from numpy import integer, floating, float64, uint16, uint32
+from numpy import float64, floating, integer, uint16, uint32
 from numpy.typing import ArrayLike, NDArray
-
 from pyNN.random import RandomDistribution
 
 from spinn_utilities.overrides import overrides
@@ -30,7 +29,9 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+    BYTES_PER_SHORT,
+    BYTES_PER_WORD,
+)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -40,7 +41,9 @@ from .abstract_connector import AbstractConnector
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
 
 
 _DIMENSION_SIZE = BYTES_PER_WORD

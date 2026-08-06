@@ -13,11 +13,13 @@
 # limitations under the License.
 
 from typing import Tuple
-import numpy
-from numpy.typing import NDArray
-import pyNN.spiNNaker as sim
-from pyNN.space import Grid2D
+
 import matplotlib.pyplot as plt
+import numpy
+import pyNN.spiNNaker as sim
+from numpy.typing import NDArray
+from pyNN.space import Grid2D
+
 from spinnaker_testbase import BaseTestCase
 
 

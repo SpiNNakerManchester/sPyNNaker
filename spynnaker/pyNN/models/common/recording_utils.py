@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from typing import Iterable
+
 from pacman.model.placements import Placement
 
 

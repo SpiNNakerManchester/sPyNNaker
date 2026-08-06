@@ -13,15 +13,17 @@
 # limitations under the License.
 
 from typing import Iterable, List, Literal, Optional, Union
+
 from typing_extensions import TypeAlias
 
 from spinn_utilities.overrides import overrides
 
-from pacman.model.routing_info import BaseKeyAndMask
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
+from pacman.model.routing_info import BaseKeyAndMask
 
 from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex)
+    AbstractSendMeMulticastCommandsVertex,
+)
 from spinn_front_end_common.utility_models import MultiCastCommand
 
 from spynnaker.pyNN.exceptions import SpynnakerException

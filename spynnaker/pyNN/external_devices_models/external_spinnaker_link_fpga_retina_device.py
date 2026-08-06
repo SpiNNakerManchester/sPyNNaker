@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Iterable, List, Optional
+
 from spinn_utilities.overrides import overrides
-from pacman.model.routing_info import BaseKeyAndMask
+
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
+from pacman.model.routing_info import BaseKeyAndMask
+
 from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex)
+    AbstractSendMeMulticastCommandsVertex,
+)
 from spinn_front_end_common.utility_models import MultiCastCommand
+
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 

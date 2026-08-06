@@ -12,18 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from collections.abc import Iterable
-from typing import List, Optional, Union, cast, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional, Union, cast
 
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import ApplicationEdge
 
 if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron import PopulationVertex
     from spynnaker.pyNN.models.utility_models.delays import (
-        DelayExtensionVertex)
-    from spynnaker.pyNN.models.neural_projections import (
-        SynapseInformation, ProjectionApplicationEdge)
+        DelayExtensionVertex,
+    )
 
 
 class DelayedApplicationEdge(ApplicationEdge):

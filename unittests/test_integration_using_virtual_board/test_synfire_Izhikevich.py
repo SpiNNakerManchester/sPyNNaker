@@ -17,8 +17,8 @@
 """
 Synfirechain-like example
 """
-from parameterized import parameterized
 import pyNN.spiNNaker as p
+from parameterized import parameterized
 
 from spinn_utilities.config_holder import set_config
 
