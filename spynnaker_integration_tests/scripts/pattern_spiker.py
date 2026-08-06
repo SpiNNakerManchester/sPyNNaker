@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
 from types import ModuleType
 from typing import List, Optional
+
 import numpy
-import math
 from neo import AnalogSignal
 from neo.core.spiketrainlist import SpikeTrainList
 
-from spynnaker.pyNN.models.populations import (Population, PopulationView)
+from spynnaker.pyNN.models.populations import Population, PopulationView
 
 
 class PatternSpiker(object):

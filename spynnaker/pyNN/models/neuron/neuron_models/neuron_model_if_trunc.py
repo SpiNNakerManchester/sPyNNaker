@@ -13,13 +13,19 @@
 # limitations under the License.
 
 from typing import Optional
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
+
 from spinn_front_end_common.interface.ds import DataType
-from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent, ModelParameter)
-from spynnaker.pyNN.utilities.struct import Struct
+
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent,
+    ModelParameter,
+)
+from spynnaker.pyNN.utilities.struct import Struct
+
 from .neuron_model import NeuronModel
 
 V = "v"

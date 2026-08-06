@@ -18,7 +18,6 @@ from typing import Any, Dict, Union
 
 import numpy
 from numpy.typing import NDArray
-
 from pyNN.recording.files import BaseFile, StandardTextFile
 
 from spinn_utilities.log import FormatAdapter

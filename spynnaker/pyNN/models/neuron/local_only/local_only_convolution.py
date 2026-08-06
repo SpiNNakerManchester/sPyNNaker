@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from math import ceil
-from typing import (
-    Dict, Iterable, List, Tuple, cast, TYPE_CHECKING)
+from typing import TYPE_CHECKING, Dict, Iterable, List, Tuple, cast
 
 import numpy
 from numpy import floating, uint32
@@ -25,31 +25,46 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 
 from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationGenerator)
+    DataSpecificationGenerator,
+    DataType,
+)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_SHORT, BYTES_PER_WORD)
+    BYTES_PER_SHORT,
+    BYTES_PER_WORD,
+)
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    ConvolutionConnector, AbstractConnector)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSupportsSignedWeights)
-from spynnaker.pyNN.types import WeightsDelysIn
 from spynnaker.pyNN.models.common.local_only_2d_common import (
-    get_div_const, get_rinfo_for_spike_source, get_sources_for_target,
-    BITS_PER_SHORT, N_COLOUR_BITS_BITS, KEY_INFO_SIZE,
-    get_first_and_last_slice, Source)
+    BITS_PER_SHORT,
+    KEY_INFO_SIZE,
+    N_COLOUR_BITS_BITS,
+    Source,
+    get_div_const,
+    get_first_and_last_slice,
+    get_rinfo_for_spike_source,
+    get_sources_for_target,
+)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractConnector,
+    ConvolutionConnector,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSupportsSignedWeights,
+)
+from spynnaker.pyNN.types import WeightsDelysIn
+
 from .abstract_local_only import AbstractLocalOnly
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.population_vertex import (
-        PopulationVertex)
-    from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron import (
-        PopulationMachineLocalOnlyCombinedVertex)
+        PopulationMachineLocalOnlyCombinedVertex,
+    )
+    from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-        AbstractSynapseDynamics)
+        AbstractSynapseDynamics,
+    )
+    from spynnaker.pyNN.models.projection import Projection
 
 
 #: Size of convolution config main bytes

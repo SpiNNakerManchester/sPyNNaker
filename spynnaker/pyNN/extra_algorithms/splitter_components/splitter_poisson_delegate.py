@@ -12,17 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import List, Sequence, Tuple
+
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.machine import MachineVertex
-from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM
-from pacman.model.partitioner_splitters import AbstractSplitterCommon
+
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.partitioner_splitters import SplitterFixedLegacy
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.partitioner_splitters import (
+    AbstractSplitterCommon,
+    SplitterFixedLegacy,
+)
+from pacman.model.resources import AbstractSDRAM
 from pacman.utilities.utility_objs import ChipCounter
+
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
+
 from .abstract_supports_one_to_one_sdram_input import (
-    AbstractSupportsOneToOneSDRAMInput)
+    AbstractSupportsOneToOneSDRAMInput,
+)
 
 
 class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):

@@ -12,21 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from collections import defaultdict
+
 import sys
+from collections import defaultdict
 from typing import (
-    Any, cast, Dict, Optional, Sequence, Tuple, TYPE_CHECKING, Union)
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    cast,
+)
+
 import numpy
 from pyNN import descriptions
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.classproperty import classproperty
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractmethod)
-from spynnaker.pyNN.models.defaults import AbstractProvidesDefaults
-from spynnaker.pyNN.exceptions import SpynnakerException
+
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.models.defaults import AbstractProvidesDefaults
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.population_application_vertex import (
-        PopulationApplicationVertex)
+        PopulationApplicationVertex,
+    )
 
 
 class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):

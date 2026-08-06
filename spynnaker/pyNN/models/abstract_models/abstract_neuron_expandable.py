@@ -14,6 +14,7 @@
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.require_subclass import require_subclass
+
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.placements import Placement
 

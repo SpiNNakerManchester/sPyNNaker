@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import math
+
 import numpy
 from numpy import uint16, uint32
 from numpy.typing import NDArray

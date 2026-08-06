@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import ctypes
-from enum import IntEnum
 import os
+from enum import IntEnum
 from typing import List, Optional, Sequence, cast
 
 from numpy import floating
@@ -22,24 +23,31 @@ from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
 
-from pacman.model.placements import Placement
 from pacman.model.graphs.common import Slice
+from pacman.model.placements import Placement
 from pacman.model.resources import AbstractSDRAM
 
 from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+    AbstractGeneratesDataSpecification,
+    AbstractRewritesDataSpecification,
+)
 from spinn_front_end_common.interface.ds import (
-    DataSpecificationGenerator, DataSpecificationReloader)
+    DataSpecificationGenerator,
+    DataSpecificationReloader,
+)
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
-    NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
+    NeuronProvenance,
+    NeuronRegions,
+    PopulationMachineNeurons,
+)
 from .population_vertex import PopulationVertex
 
 

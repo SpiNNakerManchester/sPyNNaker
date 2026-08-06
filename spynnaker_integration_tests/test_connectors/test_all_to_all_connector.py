@@ -14,10 +14,11 @@
 
 from typing import Optional, Tuple, Union
 
-from pyNN.space import BaseStructure
 import pyNN.spiNNaker as sim
+from pyNN.space import BaseStructure
 
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.models.projection import Projection
 
 

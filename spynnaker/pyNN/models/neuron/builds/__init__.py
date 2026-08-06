@@ -24,23 +24,23 @@ from .eif_cond_alpha_isfa_ista import EIFConductanceAlphaPopulation
 from .hh_cond_exp import HHCondExp
 from .if_cond_alpha import IFCondAlpha
 from .if_cond_exp_base import IFCondExpBase
+from .if_cond_exp_stoc import IFCondExpStoc
 from .if_curr_alpha import IFCurrAlpha
+from .if_curr_delta import IFCurrDelta
+from .if_curr_delta_ca2_adaptive import IFCurrDeltaCa2Adaptive
+from .if_curr_delta_fixed_prob import IFCurrDeltaFixedProb
 from .if_curr_dual_exp_base import IFCurrDualExpBase
 from .if_curr_exp_base import IFCurrExpBase
-from .if_facets_hardware1 import IFFacetsConductancePopulation
-from .izk_cond_exp_base import IzkCondExpBase
-from .izk_cond_dual_exp_base import IzkCondDualExpBase
-from .izk_curr_exp_base import IzkCurrExpBase
-from .if_cond_exp_stoc import IFCondExpStoc
-from .if_curr_delta import IFCurrDelta
 from .if_curr_exp_ca2_adaptive import IFCurrExpCa2Adaptive
 from .if_curr_exp_semd_base import IFCurrExpSEMDBase
-from .if_curr_delta_ca2_adaptive import IFCurrDeltaCa2Adaptive
+from .if_facets_hardware1 import IFFacetsConductancePopulation
+from .if_trunc_delta import IFTruncDelta
+from .izk_cond_dual_exp_base import IzkCondDualExpBase
+from .izk_cond_exp_base import IzkCondExpBase
+from .izk_curr_exp_base import IzkCurrExpBase
 from .stoc_exp import StocExp
 from .stoc_exp_stable import StocExpStable
 from .stoc_sigma import StocSigma
-from .if_trunc_delta import IFTruncDelta
-from .if_curr_delta_fixed_prob import IFCurrDeltaFixedProb
 
 __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",

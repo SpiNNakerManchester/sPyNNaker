@@ -11,10 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from spinn_front_end_common.interface.ds import DataType
-from spynnaker.pyNN.models.common import NeuronRecorder
 import pyNN.spiNNaker as sim
+
+from spinn_front_end_common.interface.ds import DataType
+
 from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.models.common import NeuronRecorder
 
 
 class TestSetRecord(BaseTestCase):

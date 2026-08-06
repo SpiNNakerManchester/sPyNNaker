@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
 import math
-from typing import Any, Dict, Optional, Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
 
 import numpy
 from numpy.typing import NDArray
-
 from pyNN.random import NumpyRNG
 
-from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs.common import Slice
 
@@ -31,16 +31,25 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.utilities.utility_calls import (
-    get_probable_maximum_selected, get_probable_minimum_selected, check_rng)
+    check_rng,
+    get_probable_maximum_selected,
+    get_probable_minimum_selected,
+)
+
 from .abstract_connector import AbstractConnector
-from .abstract_generate_connector_on_machine import (
-    AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
-    AbstractGenerateConnectorOnHost)
+    AbstractGenerateConnectorOnHost,
+)
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine,
+    ConnectorIDs,
+)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

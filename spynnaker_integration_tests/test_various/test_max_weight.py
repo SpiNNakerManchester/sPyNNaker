@@ -18,7 +18,9 @@
 Synfirechain-like example
 """
 import math
+
 import pyNN.spiNNaker as p
+
 from spinnaker_testbase import BaseTestCase
 
 

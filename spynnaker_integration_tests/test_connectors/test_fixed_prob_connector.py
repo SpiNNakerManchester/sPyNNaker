@@ -13,9 +13,11 @@
 # limitations under the License.
 
 from typing import Optional, Tuple, Union
+
 import numpy
-from pyNN.space import BaseStructure
 import pyNN.spiNNaker as sim
+from pyNN.space import BaseStructure
+
 from spinnaker_testbase import BaseTestCase
 
 SOURCES = 5

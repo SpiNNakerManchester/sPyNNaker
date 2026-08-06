@@ -14,12 +14,15 @@
 import math
 import time
 from typing import List
-from neo import Block
-import pyNN.spiNNaker as sim
 
-from spinnaker_testbase import BaseTestCase
+import pyNN.spiNNaker as sim
+from neo import Block
+
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
+from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.connections import SpynnakerPoissonControlConnection
 
 

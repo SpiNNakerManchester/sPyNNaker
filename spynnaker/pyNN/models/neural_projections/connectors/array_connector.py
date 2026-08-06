@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import Any, Dict, Optional, Sequence, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
 
 import numpy
 from numpy import uint8
@@ -25,7 +26,8 @@ from pacman.model.graphs.common import Slice
 
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
-    AbstractGenerateConnectorOnHost)
+    AbstractGenerateConnectorOnHost,
+)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation

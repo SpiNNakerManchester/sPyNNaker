@@ -13,11 +13,16 @@
 # limitations under the License.
 
 import unittest
+
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.protocols import (
-    MunichIoSpiNNakerLinkProtocol, MUNICH_MODES, RetinaKey)
+    MUNICH_MODES,
+    MunichIoSpiNNakerLinkProtocol,
+    RetinaKey,
+)
 from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
-    _OFFSET_TO_IGNORED_KEY)
+    _OFFSET_TO_IGNORED_KEY,
+)
 
 
 class TestMunichIOSpinnakerLinkProtocol(unittest.TestCase):

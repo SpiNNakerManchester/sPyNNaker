@@ -25,15 +25,20 @@ from pacman.model.placements import Placement
 from pacman.model.resources import ConstantSDRAM
 
 from spinn_front_end_common.abstract_models import (
-    AbstractHasAssociatedBinary)
-from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification)
+    AbstractGeneratesDataSpecification,
+    AbstractHasAssociatedBinary,
+)
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
+    ProvenanceWriter,
+    ProvidesProvenanceDataFromMachineImpl,
+)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
+    BYTES_PER_WORD,
+    SIMULATION_N_BYTES,
+    SYSTEM_BYTES_REQUIREMENT,
+)
 
 from spynnaker.pyNN.data import SpynnakerDataView
 

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from typing import Final
+
 from numpy import dtype, float64, uint32, void
 from numpy.typing import NDArray
 from typing_extensions import TypeAlias

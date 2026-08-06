@@ -13,10 +13,13 @@
 # limitations under the License.
 
 from typing import Iterable, List, Optional
+
 from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex)
+    AbstractSendMeMulticastCommandsVertex,
+)
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
 from spinn_front_end_common.utilities.database import DatabaseConnection
+
 from spynnaker.pyNN.external_devices_models import AbstractEthernetTranslator
 
 

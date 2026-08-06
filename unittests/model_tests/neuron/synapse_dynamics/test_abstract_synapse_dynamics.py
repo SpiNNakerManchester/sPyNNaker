@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from numpy import float64, array, ndarray
-from pyNN.random import RandomDistribution
 import unittest
+
+from numpy import array, float64, ndarray
+from pyNN.random import RandomDistribution
+
 from spynnaker.pyNN.config_setup import unittest_setup
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsStatic)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 
 
 class TestAbstractSynapseDynamics(unittest.TestCase):

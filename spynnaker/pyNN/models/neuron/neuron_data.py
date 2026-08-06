@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Iterator, MutableMapping, Optional, Tuple, cast
-from typing_extensions import Never
 
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
+from typing_extensions import Never
 
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged import RangeDictionary, RangedList
@@ -27,14 +27,15 @@ from pacman.model.placements import Placement
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.helpful_functions import (
-    locate_memory_region_for_placement)
+    locate_memory_region_for_placement,
+)
 
-from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.neuron.population_vertex import (
-    PopulationVertex)
 from spynnaker.pyNN.models.neuron.population_machine_neurons import (
-    NeuronRegions)
+    NeuronRegions,
+)
+from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
+from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
 
 
 def _all_one_val_gen(rd: RangeDictionary[float]) -> bool:

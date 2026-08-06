@@ -13,9 +13,12 @@
 # limitations under the License.
 
 from typing import List
+
 import numpy
 import pyNN.spiNNaker as sim
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.utilities import neo_convertor
 
 

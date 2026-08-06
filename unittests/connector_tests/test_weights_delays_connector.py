@@ -17,11 +17,13 @@ from typing import Any
 import numpy
 import pytest
 
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    OneToOneConnector)
-from spynnaker.pyNN.models.neural_projections import SynapseInformation
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.models.neural_projections import SynapseInformation
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    OneToOneConnector,
+)
+
 from unittests.mocks import MockConnector, MockPopulation, MockSynapseDynamics
 
 

@@ -13,14 +13,16 @@
 # limitations under the License.
 
 from typing import Optional
-from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
+
 from spynnaker.pyNN.models.defaults import default_initial_values
-from spynnaker.pyNN.models.neuron.neuron_models import (
-    NeuronModelLeakyIntegrateAndFire)
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.models.neuron.input_types import InputTypeDelta
-from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeFixedProb
+from spynnaker.pyNN.models.neuron.neuron_models import (
+    NeuronModelLeakyIntegrateAndFire,
+)
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeDelta
+from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeFixedProb
 
 
 class IFCurrDeltaFixedProb(AbstractPyNNNeuronModelStandard):

@@ -12,23 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Iterable
 
 from numpy import floating
 from numpy.typing import NDArray
 
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamics)
+    AbstractSynapseDynamics,
+)
 from spynnaker.pyNN.types import WeightsDelysIn
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron import (
-        PopulationMachineLocalOnlyCombinedVertex)
+        PopulationMachineLocalOnlyCombinedVertex,
+    )
+    from spynnaker.pyNN.models.projection import Projection
 
 
 class AbstractLocalOnly(AbstractSynapseDynamics):

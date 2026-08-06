@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from abc import abstractmethod
 from enum import Enum
 from typing import TYPE_CHECKING
@@ -19,27 +20,33 @@ from typing import TYPE_CHECKING
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
-
 from pyNN.random import RandomDistribution
 
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.common.param_generator_data import (
-    param_generator_params, param_generator_params_size_in_bytes,
-    param_generator_id, is_param_generatable)
-from spynnaker.pyNN.types import (Delays, Weights)
+    is_param_generatable,
+    param_generator_id,
+    param_generator_params,
+    param_generator_params_size_in_bytes,
+)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractConnector,
+)
+from spynnaker.pyNN.types import Delays, Weights
 from spynnaker.pyNN.utilities.utility_calls import check_rng
 
 from .abstract_generate_connector_on_host import (
-    AbstractGenerateConnectorOnHost)
+    AbstractGenerateConnectorOnHost,
+)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
 
 
 class ConnectorIDs(Enum):

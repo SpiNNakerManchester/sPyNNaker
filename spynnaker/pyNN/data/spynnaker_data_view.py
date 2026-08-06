@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
-from typing import Iterator, Optional, Set, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterator, Optional, Set, Tuple
 
 from spinn_utilities.log import FormatAdapter
 
@@ -22,8 +23,8 @@ from spinn_front_end_common.data import FecDataView
 from spynnaker import _version
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.populations import Population
+    from spynnaker.pyNN.models.projection import Projection
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access
@@ -215,7 +216,8 @@ class SpynnakerDataView(FecDataView):
         # UGLY but needed to avoid circular import
         # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.models.populations.population import (
-            Population as Pop)
+            Population as Pop,
+        )
         cls.check_user_can_act()
         if not isinstance(population, Pop):
             raise TypeError("The population must be a Population")

@@ -15,9 +15,9 @@
 import sys
 from typing import Tuple
 
-from neo import Block
-import pyNN.spiNNaker as p
 import numpy
+import pyNN.spiNNaker as p
+from neo import Block
 
 from spinnaker_testbase import BaseTestCase
 

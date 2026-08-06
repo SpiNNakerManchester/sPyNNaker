@@ -13,8 +13,10 @@
 # limitations under the License.
 
 from typing import Optional, Tuple, Union
+
 import numpy
 import pyNN.spiNNaker as sim
+
 from spinnaker_testbase import BaseTestCase
 
 SOURCES = 5

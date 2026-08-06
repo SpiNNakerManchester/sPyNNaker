@@ -12,11 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from typing import (
-    Dict, Iterable, Optional, Sequence, Tuple, TYPE_CHECKING, Union)
+    TYPE_CHECKING,
+    Dict,
+    Iterable,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import numpy
-
 from pyNN.standardmodels.synapses import StaticSynapse
 
 from spinn_utilities.overrides import overrides
@@ -27,40 +34,53 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.types import WeightsDelysIn as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 
-from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
-    AbstractSynapseDynamicsStructural, InitialDelay)
+    AbstractSynapseDynamicsStructural,
+    InitialDelay,
+)
+from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_common import (
-    DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
-    DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
-from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
+    DEFAULT_F_REW,
+    DEFAULT_INITIAL_DELAY,
+    DEFAULT_INITIAL_WEIGHT,
+    DEFAULT_S_MAX,
+    SynapseDynamicsStructuralCommon,
+)
 from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
 from .synapse_dynamics_weight_changer import SynapseDynamicsWeightChanger
 
 if TYPE_CHECKING:
     from pacman.model.graphs import AbstractVertex
-    from pacman.model.graphs.machine import MachineVertex
     from pacman.model.graphs.common import Slice
-    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
-        partner_selection.abstract_partner_selection import \
-        AbstractPartnerSelection
-    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
-        formation.abstract_formation import AbstractFormation
-    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
-        elimination.abstract_elimination import AbstractElimination
+    from pacman.model.graphs.machine import MachineVertex
+
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
+    from spynnaker.pyNN.models.neural_projections.connectors import (
+        AbstractConnector,
+    )
     from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.\
         abstract_timing_dependence import AbstractTimingDependence
     from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
         abstract_weight_dependence import AbstractWeightDependence
-    from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
-    from spynnaker.pyNN.models.neural_projections.connectors import (
-        AbstractConnector)
+    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
+        elimination.abstract_elimination import AbstractElimination
+    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
+        formation.abstract_formation import AbstractFormation
+    from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.\
+        partner_selection.abstract_partner_selection import (
+            AbstractPartnerSelection,
+        )
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
+        ConnectionsArray,
+    )
     from spynnaker.pyNN.types import Delays
+
     from .synapse_dynamics_structural_common import ConnectionsInfo
 
 

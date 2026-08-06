@@ -13,9 +13,18 @@
 # limitations under the License.
 
 from __future__ import annotations
+
 import math
 from typing import (
-    cast, Dict, Iterable, List, Sequence, Tuple, Union, TYPE_CHECKING)
+    TYPE_CHECKING,
+    Dict,
+    Iterable,
+    List,
+    Sequence,
+    Tuple,
+    Union,
+    cast,
+)
 
 import numpy
 from numpy.typing import NDArray
@@ -27,29 +36,33 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 
-from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationBase)
+from spinn_front_end_common.interface.ds import DataSpecificationBase, DataType
 from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+    BYTES_PER_SHORT,
+    BYTES_PER_WORD,
+    MICRO_TO_MILLISECOND_CONVERSION,
+    MICRO_TO_SECOND_CONVERSION,
+)
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 from .abstract_synapse_dynamics_structural import (
-    AbstractSynapseDynamicsStructural)
+    AbstractSynapseDynamicsStructural,
+)
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neural_projections import (
-        SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron import PopulationVertex
-    from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
-    from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge)
+        ConnectionsArray,
+    )
+    from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+    from spynnaker.pyNN.models.projection import Projection
 
     _PopIndexType: TypeAlias = Dict[
         Tuple[PopulationApplicationVertex, SynapseInformation], int]

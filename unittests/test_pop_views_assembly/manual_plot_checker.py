@@ -13,11 +13,12 @@
 # limitations under the License.
 
 import os
+
 import matplotlib.pyplot as plt
 import pyNN.utility.plotting as plot
+
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.spynnaker_plotting import SpynnakerPanel
-
 
 my_dir = os.path.dirname(os.path.abspath(__file__))
 my_buffer = os.path.join(my_dir, "all_data.sqlite3")

@@ -15,23 +15,29 @@
 from typing import Iterable, List, Optional, Sequence
 
 import numpy
-from numpy.typing import NDArray
 import pytest
+from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common.slice import Slice
-from pacman.model.graphs.machine import SimpleMachineVertex, MachineVertex
+from pacman.model.graphs.machine import MachineVertex, SimpleMachineVertex
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.utilities.utility_objs import ChipCounter
 
 from spynnaker.pyNN.config_setup import unittest_setup
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    FromListConnector)
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    FromListConnector,
+)
+
 from unittests.mocks import (
-    MockConnector, MockPopulation, MockSynapseDynamics, MockVertex)
+    MockConnector,
+    MockPopulation,
+    MockSynapseDynamics,
+    MockVertex,
+)
 
 
 @pytest.mark.parametrize(

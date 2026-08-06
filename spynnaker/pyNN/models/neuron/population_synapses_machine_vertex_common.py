@@ -12,31 +12,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from enum import IntEnum
-import ctypes
-from typing import Optional, Sequence, TYPE_CHECKING
 
-from spinn_utilities.overrides import overrides
+import ctypes
+from enum import IntEnum
+from typing import TYPE_CHECKING, Optional, Sequence
+
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.config_holder import get_config_int
-from pacman.model.resources import AbstractSDRAM
-from pacman.model.graphs.machine import (
-    SDRAMMachineEdge, SourceSegmentedSDRAMMachinePartition)
+from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import (
+    SDRAMMachineEdge,
+    SourceSegmentedSDRAMMachinePartition,
+)
+from pacman.model.resources import AbstractSDRAM
+
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
-    ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
+    ReceivesSynapticInputsOverSDRAM,
+    SendsSynapticInputsOverSDRAM,
+)
+
 from .population_machine_common import CommonRegions, PopulationMachineCommon
-from .synaptic_matrices import SynapseRegions
 from .population_machine_synapses_provenance import SynapseProvenance
+from .synaptic_matrices import SynapseRegions
+
 if TYPE_CHECKING:
-    from .population_vertex import PopulationVertex
     from .population_neurons_machine_vertex import (
-        PopulationNeuronsMachineVertex)
+        PopulationNeuronsMachineVertex,
+    )
+    from .population_vertex import PopulationVertex
 
 # Size of SDRAM params = 1 word for address + 1 word for size
 #  + 1 word for time to send

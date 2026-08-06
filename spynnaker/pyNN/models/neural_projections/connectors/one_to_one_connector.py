@@ -12,29 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import math
-from typing import Any, Dict, Optional, Sequence, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Tuple
 
 import numpy
-from numpy import integer, floating, uint32
+from numpy import floating, integer, uint32
 from numpy.typing import NDArray
-
 from pyNN.random import RandomDistribution
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
 
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from .abstract_connector import AbstractConnector
-from .abstract_generate_connector_on_machine import (
-    AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
-    AbstractGenerateConnectorOnHost)
+    AbstractGenerateConnectorOnHost,
+)
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine,
+    ConnectorIDs,
+)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation

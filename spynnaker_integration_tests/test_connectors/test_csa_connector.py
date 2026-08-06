@@ -13,11 +13,13 @@
 # limitations under the License.
 
 from typing import Optional, Tuple, Union
-import numpy
+
 import csa  # type: ignore[import]
-from pyNN.space import BaseStructure
-from spinnaker_testbase.base_test_case import BaseTestCase
+import numpy
 import pyNN.spiNNaker as p
+from pyNN.space import BaseStructure
+
+from spinnaker_testbase.base_test_case import BaseTestCase
 
 
 class CSAConnectorTest(BaseTestCase):

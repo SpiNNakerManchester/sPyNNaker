@@ -14,6 +14,7 @@
 
 import os
 import unittest
+
 import spinn_utilities.package_loader as package_loader
 
 

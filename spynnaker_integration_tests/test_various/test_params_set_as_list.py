@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pyNN.random import RandomDistribution, NumpyRNG
-import pyNN.spiNNaker as p
-from spinnaker_testbase import BaseTestCase
 import numpy
+import pyNN.spiNNaker as p
+from pyNN.random import NumpyRNG, RandomDistribution
+
+from spinnaker_testbase import BaseTestCase
 
 
 class ParamsSetAsList(BaseTestCase):

@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from spynnaker.pyNN.models.defaults import default_initial_values
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from spynnaker.pyNN.models.neuron.neuron_models import NeuronModelIzh
 from spynnaker.pyNN.models.neuron.synapse_types import (
-    SynapseTypeDualExponential)
+    SynapseTypeDualExponential,
+)
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
-from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
-from spynnaker.pyNN.models.defaults import default_initial_values
 
 _IZK_THRESHOLD = 30.0
 

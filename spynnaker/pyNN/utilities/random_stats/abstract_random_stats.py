@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from typing import Optional
+
 from pyNN.random import RandomDistribution
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 

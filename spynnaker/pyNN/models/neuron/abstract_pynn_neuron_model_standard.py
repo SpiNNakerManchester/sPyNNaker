@@ -12,23 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, cast, TYPE_CHECKING, Union, Tuple
+
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union, cast
 
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
+
 from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
-    AbstractPyNNNeuronModel, _population_parameters as APNM_default_params)
+    AbstractPyNNNeuronModel,
+)
+from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
+    _population_parameters as APNM_default_params,
+)
+from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 
 if TYPE_CHECKING:
+    from spynnaker.pyNN.extra_algorithms.splitter_components import (
+        SplitterPopulationVertex,
+    )
     from spynnaker.pyNN.models.neuron.additional_inputs import (
-        AbstractAdditionalInput)
+        AbstractAdditionalInput,
+    )
     from spynnaker.pyNN.models.neuron.input_types import AbstractInputType
     from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
     from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
     from spynnaker.pyNN.models.neuron.threshold_types import (
-        AbstractThresholdType)
-    from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterPopulationVertex)
+        AbstractThresholdType,
+    )
+
     from .population_vertex import PopulationVertex
 
 _population_parameters: Dict[str, Any] = dict(APNM_default_params)

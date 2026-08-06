@@ -13,17 +13,23 @@
 # limitations under the License.
 
 from typing import List, Optional
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
+
 from spinn_front_end_common.utility_models import MultiCastCommand
+
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.external_devices_models.push_bot import (
-    AbstractPushBotRetinaDevice)
+    AbstractPushBotRetinaDevice,
+)
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotRetinaResolution)
+    PushBotRetinaResolution,
+)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 
 class DelayedPayloadMultiCastCommand(MultiCastCommand):

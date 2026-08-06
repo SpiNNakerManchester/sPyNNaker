@@ -13,21 +13,33 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import List, Optional, Type, cast, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, List, Optional, Type, cast
+
 from typing_extensions import TypeGuard
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import ApplicationEdge
+
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.common.population_application_vertex import (
-    PopulationApplicationVertex)
+    PopulationApplicationVertex,
+)
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-        AbstractSynapseDynamics, AbstractSynapseDynamicsStructural,
-        SynapseDynamicsSTDP, SynapseDynamicsNeuromodulation)
     from spynnaker.pyNN.models.neural_projections import (
-        SynapseInformation, DelayedApplicationEdge)
+        DelayedApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron import PopulationVertex
+    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+        AbstractSynapseDynamics,
+        AbstractSynapseDynamicsStructural,
+        SynapseDynamicsNeuromodulation,
+        SynapseDynamicsSTDP,
+    )
 
 
 class _Dynamics:
@@ -47,7 +59,8 @@ class _Dynamics:
             # Avoid import loop by postponing this import
             # pylint: disable=import-outside-toplevel
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-                AbstractSynapseDynamicsStructural as StructuralDynamics)
+                AbstractSynapseDynamicsStructural as StructuralDynamics,
+            )
             cls._Structural = StructuralDynamics
         return cls._Structural
 
@@ -60,7 +73,8 @@ class _Dynamics:
             # Avoid import loop by postponing this import
             # pylint: disable=import-outside-toplevel
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-                SynapseDynamicsSTDP as STDPDynamics)
+                SynapseDynamicsSTDP as STDPDynamics,
+            )
             cls._STDP = STDPDynamics
         return cls._STDP
 
@@ -73,7 +87,8 @@ class _Dynamics:
             # Avoid import loop by postponing this import
             # pylint: disable=import-outside-toplevel
             from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-                SynapseDynamicsNeuromodulation as Neuromodulation)
+                SynapseDynamicsNeuromodulation as Neuromodulation,
+            )
             cls._Neuromodulation = Neuromodulation
         return cls._Neuromodulation
 

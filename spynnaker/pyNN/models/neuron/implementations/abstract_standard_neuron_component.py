@@ -17,9 +17,8 @@ from typing import Dict, Iterable, List, Union
 import numpy
 from numpy import floating
 from numpy.typing import NDArray
-from typing_extensions import TypeAlias
-
 from pyNN.random import RandomDistribution
+from typing_extensions import TypeAlias
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ranged import RangeDictionary, RangedList

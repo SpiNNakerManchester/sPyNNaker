@@ -16,14 +16,23 @@ import logging
 import select
 import socket
 from typing import Callable, Optional, TypeVar
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ping import Ping
-from spinnman.connections.abstract_classes import Listenable, Connection
+
+from spinnman.connections.abstract_classes import Connection, Listenable
 from spinnman.utilities.socket_utils import (
-    get_tcp_socket, connect_socket, get_socket_address, resolve_host,
-    receive_message, send_message)
+    connect_socket,
+    get_socket_address,
+    get_tcp_socket,
+    receive_message,
+    resolve_host,
+    send_message,
+)
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_KB
+
 #: :meta private:
 T = TypeVar("T")
 

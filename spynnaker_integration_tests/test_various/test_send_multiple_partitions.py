@@ -15,9 +15,13 @@
 # limitations under the License.
 
 from time import sleep
+
 import pyNN.spiNNaker as sim
+
 from spinn_front_end_common.utilities.connections import LiveEventConnection
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.external_devices import SpynnakerLiveSpikesConnection
 
 

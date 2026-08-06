@@ -13,8 +13,11 @@
 # limitations under the License.
 
 import pyNN.spiNNaker as sim
+
 from spinn_utilities.data.reset_status import ResetStatus
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.data import SpynnakerDataView
 
 

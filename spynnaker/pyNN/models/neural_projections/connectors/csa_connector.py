@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Sequence
+
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy
 from numpy.typing import NDArray
@@ -23,7 +24,9 @@ from pacman.model.graphs.common import Slice
 
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
-    AbstractGenerateConnectorOnHost)
+    AbstractGenerateConnectorOnHost,
+)
+
 try:
     import csa  # type: ignore[import]
     _csa_import_error: Optional[ImportError] = None
@@ -32,6 +35,7 @@ except ImportError as __ex:
     _csa_import_error = __ex
 if TYPE_CHECKING:
     from csa.connset import CSet  # type: ignore[import]
+
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 

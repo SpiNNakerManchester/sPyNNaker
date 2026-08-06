@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from .eieio_spike_recorder import EIEIOSpikeRecorder
-from .neuron_recorder import NeuronRecorder
 from .multi_spike_recorder import MultiSpikeRecorder
+from .neuron_recorder import NeuronRecorder
 from .parameter_holder import ParameterHolder
 from .population_application_vertex import PopulationApplicationVertex
 

@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pyNN.random import NumpyRNG
 import pyNN.spiNNaker as p
+from pyNN.random import NumpyRNG
+
 from spinnaker_testbase import BaseTestCase
 
 

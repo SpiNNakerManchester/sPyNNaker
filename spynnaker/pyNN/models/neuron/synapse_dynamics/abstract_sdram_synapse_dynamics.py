@@ -23,8 +23,8 @@ from spinn_utilities.abstract_base import abstractmethod
 
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 
-from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from .abstract_has_parameter_names import AbstractHasParameterNames
+from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 
 class AbstractSDRAMSynapseDynamics(

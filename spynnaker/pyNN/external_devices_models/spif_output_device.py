@@ -14,32 +14,43 @@
 
 from typing import Dict, Iterable, List, Optional, Tuple
 
-from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
+from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs.application import (
-    ApplicationEdge, ApplicationEdgePartition, ApplicationFPGAVertex,
-    FPGAConnection)
+    ApplicationEdge,
+    ApplicationEdgePartition,
+    ApplicationFPGAVertex,
+    FPGAConnection,
+)
 from pacman.model.graphs.machine import MachineVertex
 from pacman.utilities.utility_calls import get_keys
 
 from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex, LiveOutputDevice,
-    HasCustomAtomKeyMap)
-from spinn_front_end_common.utility_models.command_sender import CommandSender
+    AbstractSendMeMulticastCommandsVertex,
+    HasCustomAtomKeyMap,
+    LiveOutputDevice,
+)
 from spinn_front_end_common.utility_models import MultiCastCommand
+from spinn_front_end_common.utility_models.command_sender import CommandSender
 
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.populations import Population
-from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
-    SpynnakerExternalDevicePluginManager)
+    SpynnakerExternalDevicePluginManager,
+)
 
 from .spif_devices import (
-    SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK,
-    set_distiller_key, set_distiller_mask,
-    set_distiller_mask_delayed, set_distiller_shift,
-    set_xp_key_delayed, set_xp_mask_delayed)
+    SPIF_FPGA_ID,
+    SPIF_OUTPUT_FPGA_LINK,
+    set_distiller_key,
+    set_distiller_mask,
+    set_distiller_mask_delayed,
+    set_distiller_shift,
+    set_xp_key_delayed,
+    set_xp_mask_delayed,
+)
 
 # The maximum number of partitions that can be supported.
 N_OUTGOING = 6

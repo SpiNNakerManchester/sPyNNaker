@@ -20,6 +20,7 @@ import numpy
 from numpy.typing import NDArray
 
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.utilities import neo_convertor
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.neo_csv import NeoCsv

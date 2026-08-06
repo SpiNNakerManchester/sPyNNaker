@@ -18,9 +18,10 @@ Synfirechain-like example
 from typing import Any, Dict, List, Literal, Optional, Tuple, Type
 
 import neo
+import pyNN.spiNNaker as p
 from numpy import floating
 from numpy.typing import NDArray
-import pyNN.spiNNaker as p
+
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.models.projection import Projection

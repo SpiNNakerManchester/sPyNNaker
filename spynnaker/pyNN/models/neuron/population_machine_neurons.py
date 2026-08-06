@@ -12,10 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from collections.abc import Container
+
 import ctypes
+from collections.abc import Container
 from typing import (
-    List, NamedTuple, Sequence, Set, Union, Optional, cast, TYPE_CHECKING)
+    TYPE_CHECKING,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Set,
+    Union,
+    cast,
+)
 
 import numpy
 
@@ -29,19 +38,21 @@ from pacman.model.placements import Placement
 from pacman.utilities.utility_calls import get_keys
 
 from spinn_front_end_common.interface.ds import (
-    DataSpecificationBase, DataSpecificationGenerator,
-    DataSpecificationReloader)
+    DataSpecificationBase,
+    DataSpecificationGenerator,
+    DataSpecificationReloader,
+)
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import AbstractNeuronExpandable
 from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
-from spynnaker.pyNN.utilities.utility_calls import convert_to
+from spynnaker.pyNN.utilities.utility_calls import convert_to, get_n_bits
+
 if TYPE_CHECKING:
+    from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
     from spynnaker.pyNN.models.neuron import PopulationVertex
     from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
-    from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
 
 
 class NeuronProvenance(ctypes.LittleEndianStructure):

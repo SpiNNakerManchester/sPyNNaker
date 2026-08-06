@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import unittest
 from typing import Type
 
-import unittest
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotLaser, PushBotMotor, PushBotSpeaker, PushBotLED)
+    PushBotLaser,
+    PushBotLED,
+    PushBotMotor,
+    PushBotSpeaker,
+)
 
 
 class Test(unittest.TestCase):

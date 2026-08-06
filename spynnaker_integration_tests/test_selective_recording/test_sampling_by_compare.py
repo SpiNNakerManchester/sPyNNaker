@@ -13,16 +13,17 @@
 # limitations under the License.
 
 import os
-from typing import List, Optional, Sequence, Tuple
 import sys
+from typing import List, Optional, Sequence, Tuple
 
-from neo.core.spiketrainlist import SpikeTrainList
-from neo import AnalogSignal
 import numpy
 import pyNN.spiNNaker as sim
+from neo import AnalogSignal
+from neo.core.spiketrainlist import SpikeTrainList
+
+from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.models.populations import PopulationView
-from spinnaker_testbase import BaseTestCase
 
 """
 This is the original way of testing selective recording.

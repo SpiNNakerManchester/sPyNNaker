@@ -13,9 +13,11 @@
 # limitations under the License.
 
 from typing import List
+
 import numpy
 import pyNN.spiNNaker as sim
 from pyNN.space import Grid2D
+
 from spinnaker_testbase import BaseTestCase
 
 

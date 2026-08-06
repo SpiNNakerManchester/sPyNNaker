@@ -13,9 +13,11 @@
 # limitations under the License.
 
 import unittest
+
+import pyNN.spiNNaker as p
+
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron.builds.if_cond_exp_base import IFCondExpBase
-import pyNN.spiNNaker as p
 
 
 class TestParameters(unittest.TestCase):

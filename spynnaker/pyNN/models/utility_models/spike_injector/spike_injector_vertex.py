@@ -14,21 +14,27 @@
 
 import logging
 import sys
-from typing import (Collection, Dict, List, Optional, Tuple, Union)
+from typing import Collection, Dict, List, Optional, Tuple, Union
+
 import numpy
 from numpy.typing import NDArray
-from pyNN.space import Grid2D, Grid3D, BaseStructure
+from pyNN.space import BaseStructure, Grid2D, Grid3D
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.common import Slice
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
-from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
-from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
-from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
-from spynnaker.pyNN.models.abstract_models import SupportsStructure
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
+from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
+
+from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.models.common import (
+    EIEIOSpikeRecorder,
+    PopulationApplicationVertex,
+)
+from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
