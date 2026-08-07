@@ -349,10 +349,10 @@ class SynfireRunner(object):
             use_spike_connections: Literal[True]
             ) -> Tuple[List[Population], List[Projection], int]:
         """ This actually builds the synfire chain. """
-        populations: List[Population] = list()
-        projections: List[Projection] = list()
+        populations: List[Population] = []
+        projections: List[Projection] = []
 
-        loop_connections = list()
+        loop_connections = []
         if use_wrap_around_connections:
             for i in range(0, n_neurons):
                 single_connection = \

@@ -211,7 +211,7 @@ class Projection(object):
         # user asks for it
         self.__virtual_connection_list: Optional[List[NDArray[void]]] = None
         if get_config_bool("Machine", "virtual_board"):
-            self.__virtual_connection_list = list()
+            self.__virtual_connection_list = []
             self.__synapse_information.add_pre_run_connection_holder(
                 ConnectionHolder(
                     None, False, pre_vertex.n_atoms, post_vertex.n_atoms,
@@ -340,7 +340,7 @@ class Projection(object):
         if isinstance(attribute_names, str):
             attribute_names = [attribute_names]
 
-        data_items: List[str] = list()
+        data_items: List[str] = []
         if format != "list":
             with_address = False
         if with_address:
@@ -356,7 +356,7 @@ class Projection(object):
                 attribute_names.remove("target")
 
         # Split out attributes in to standard versus synapse dynamics data
-        fixed_values: List[Tuple[str, int]] = list()
+        fixed_values: List[Tuple[str, int]] = []
         for attribute in attribute_names:
             data_items.append(attribute)
             synapse_dynamics = self._synapse_information.synapse_dynamics

@@ -145,7 +145,7 @@ class SplitterPopulationVertexNeuronsSynapses(
         self.__same_chip_groups: List[Tuple[
             List[MachineVertex], AbstractSDRAM]] = []
         self.__synapse_index_used: Dict[Tuple[ApplicationVertex, str], int]
-        self.__synapse_index_used = dict()
+        self.__synapse_index_used = {}
 
         self.__neuromodulators: Set[ApplicationVertex] = set()
         self.__incoming_vertices: List[List[MachineVertex]] = []
@@ -226,8 +226,8 @@ class SplitterPopulationVertexNeuronsSynapses(
                 vertex_slice, neuron_sdram, label, index, rb_shifts,
                 weight_scales, neuron_data, atoms_per_core)
             sdram: AbstractSDRAM = neuron_sdram
-            source_vertices: List[MachineVertex] = list()
-            source_sdram_vertices: List[SendsSynapticInputsOverSDRAM] = list()
+            source_vertices: List[MachineVertex] = []
+            source_sdram_vertices: List[SendsSynapticInputsOverSDRAM] = []
 
             # Add the first vertex
             synapse_references, syn_label, feedback_partition, lead_vtx = \
@@ -579,7 +579,7 @@ class SplitterPopulationVertexNeuronsSynapses(
                 (self.__next_synapse_index + 1) % n_synapse_cores)
             self.__synapse_index_used[key] = index
 
-        result: List[Tuple[MachineVertex, List[MachineVertex]]] = list()
+        result: List[Tuple[MachineVertex, List[MachineVertex]]] = []
         for start in range(0, n_sources, sources_per_vertex):
             end = min(start + sources_per_vertex, n_sources)
             source_range = sources[start:end]

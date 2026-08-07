@@ -27,7 +27,7 @@ class InputTypeCurrent(AbstractInputType):
     __slots__ = ()
 
     def __init__(self) -> None:
-        super().__init__([Struct([])], dict())
+        super().__init__([Struct([])], {})
 
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

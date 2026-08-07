@@ -33,13 +33,13 @@ def do_run(nNeurons: int) -> List[NDArray]:
                        'tau_refrac': 2.0, 'tau_syn_E': 0.5, 'tau_syn_I': 0.5,
                        'v_reset': -65.0, 'v_rest': -65.0, 'v_thresh': -64.4}
 
-    populations = list()
-    projections = list()
+    populations = []
+    projections = []
 
     weight_to_spike = 2
     delay = 1
 
-    connections = list()
+    connections = []
     for i in range(0, nNeurons):
         singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
         connections.append(singleConnection)

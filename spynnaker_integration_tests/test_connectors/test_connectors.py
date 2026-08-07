@@ -57,7 +57,7 @@ class ConnectorsTest(BaseTestCase):
         return counts
 
     def calc_spikes_received(self, v: AnalogSignal) -> List[List[int]]:
-        counts: List[List[int]] = list()
+        counts: List[List[int]] = []
         counts.append(self.spike_received_count(v[2]))
         counts.append(self.spike_received_count(v[22]))
         counts.append(self.spike_received_count(v[42]))

@@ -234,7 +234,7 @@ class SpikeSourcePoissonVertex(
         self.__model_name = "SpikeSourcePoisson"
         self.__model = model
         self.__seed = seed
-        self.__kiss_seed: Dict[Slice, Tuple[int, ...]] = dict()
+        self.__kiss_seed: Dict[Slice, Tuple[int, ...]] = {}
 
         self.__spike_recorder = MultiSpikeRecorder()
 
@@ -330,7 +330,7 @@ class SpikeSourcePoissonVertex(
         self.__max_n_rates = max(len(r) for r in rates_list)
 
         # Keep track of how many outgoing projections exist
-        self.__outgoing_projections: List[Projection] = list()
+        self.__outgoing_projections: List[Projection] = []
         self.__incoming_control_edge: Optional[ApplicationEdge] = None
 
         self.__structure: Optional[BaseStructure] = None
@@ -613,7 +613,7 @@ class SpikeSourcePoissonVertex(
     @seed.setter
     def seed(self, seed: int) -> None:
         self.__seed = seed
-        self.__kiss_seed = dict()
+        self.__kiss_seed = {}
         self.__rng = numpy.random.RandomState(seed)
 
     def kiss_seed(self, vertex_slice: Slice) -> Tuple[int, ...]:
@@ -715,7 +715,7 @@ class SpikeSourcePoissonVertex(
         :param synapse_info: The synapse information of the data being read
         :return: The set of connections from all machine vertices
         """
-        connections = list()
+        connections = []
         for m_vertex in self.machine_vertices:
             connections.append(m_vertex.read_connections(synapse_info))
         return connections

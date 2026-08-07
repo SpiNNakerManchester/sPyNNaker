@@ -42,13 +42,13 @@ def do_synfire_npop(nNeurons: int, n_pops: int, neurons_per_core: int,
                        'tau_refrac': 2.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
                        'v_reset': -70.0, 'v_rest': -65.0, 'v_thresh': -50.0}
 
-    populations = list()
-    projections = list()
+    populations = []
+    projections = []
 
     weight_to_spike = 2.0
     delay = 1
 
-    connections = list()
+    connections = []
     for i in range(0, nNeurons - 1):
         singleConnection = (i, i + 1, weight_to_spike, delay)
         connections.append(singleConnection)

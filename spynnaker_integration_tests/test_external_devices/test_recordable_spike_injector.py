@@ -53,7 +53,7 @@ class TestRecordableSpikeInjector(BaseTestCase):
         spikes = pop.get_data("spikes").segments[0].spiketrains
         p.end()
 
-        spike_trains = dict()
+        spike_trains = {}
         for spiketrain in spikes:
             i = spiketrain.annotations['source_index']
             if __name__ == "__main__":

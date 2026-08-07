@@ -207,7 +207,7 @@ class SynapticMatrices(object):
         # Map of (app_edge, synapse_info) to SynapticMatrixApp
         self.__matrices: Dict[
             Tuple[ProjectionApplicationEdge, SynapseInformation],
-            SynapticMatrixApp] = dict()
+            SynapticMatrixApp] = {}
 
         # Store locations of synaptic data and generated data
         self.__host_generated_block_addr = 0
@@ -280,9 +280,9 @@ class SynapticMatrices(object):
         poptable.initialise_table()
 
         # Set up other lists
-        self.__on_host_matrices = list()
-        self.__on_machine_matrices = list()
-        generated_data: List[NDArray[uint32]] = list()
+        self.__on_host_matrices = []
+        self.__on_machine_matrices = []
+        generated_data: List[NDArray[uint32]] = []
 
         # Keep on-machine generated blocks together at the end
         self.__generated_data_size = (
@@ -375,7 +375,7 @@ class SynapticMatrices(object):
 
         # Get the on-host data to be written
         block_addr = 0
-        data_to_write: List[NDArray[uint32]] = list()
+        data_to_write: List[NDArray[uint32]] = []
         for matrix in self.__on_host_matrices:
             block_addr = matrix.append_matrix(
                 post_vertex_slice, data_to_write, block_addr)
@@ -585,7 +585,7 @@ class SynapticMatrices(object):
         :return: The index, the start address and the size of the regions
         """
         start_index = 0
-        regions = list()
+        regions = []
         for matrix in self.__matrices.values():
             mat_regions = matrix.get_download_regions(placement, start_index)
             regions.extend(mat_regions)

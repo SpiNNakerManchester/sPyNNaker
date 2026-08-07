@@ -76,7 +76,7 @@ def _plan_expansion() -> Tuple[ExecutableTargets, List[Placement], float]:
     """
     synapse_bin = SpynnakerDataView.get_executable_path(SYNAPSE_EXPANDER_APLX)
     expander_cores = ExecutableTargets()
-    expanded_placements = list()
+    expanded_placements = []
     txrx = SpynnakerDataView.get_transceiver()
 
     max_data = 0

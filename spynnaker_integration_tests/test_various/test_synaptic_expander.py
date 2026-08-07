@@ -65,7 +65,7 @@ def run_script() -> None:
          functools.partial(check_fixed_total, 20))
     ]
 
-    projs = list()
+    projs = []
     for weight, delay in param_projections:
         for connector, check in connectors:
             conn = connector()

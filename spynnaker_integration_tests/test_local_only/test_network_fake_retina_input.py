@@ -68,7 +68,7 @@ def find_square_of_spikes(
         x: int, y: int, time: Quantity, spikes: SpikeTrainList, s_label: str,
         t_label: str
         ) -> Tuple[SpikeTrainList, List[Tuple[int, int, Quantity]]]:
-    found_spikes = list()
+    found_spikes = []
     last_target_time = None
     for x_t in range(x - 1, x + 2):
         if x_t < 0 or x_t >= WIDTH:

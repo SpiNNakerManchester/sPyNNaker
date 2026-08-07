@@ -217,8 +217,8 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
         pre_end = min(pre_start + group_size, pre_hi + 1)
         n_values = pre_end - pre_start
 
-        pres = list()
-        posts = list()
+        pres = []
+        posts = []
         for post in range(post_start, post_end):
             for value in range(n_values):
                 if value != post_value:

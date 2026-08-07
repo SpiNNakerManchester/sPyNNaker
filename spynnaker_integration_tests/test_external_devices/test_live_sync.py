@@ -26,7 +26,7 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.external_devices import SpynnakerLiveSpikesConnection
 
 sim_finished = False
-n_spikes = list()
+n_spikes = []
 n_spikes.append(0)
 
 

@@ -149,7 +149,7 @@ class SPIFInputDevice(
             self.__key_mask + (sub_mask << self.__index_shift))
 
         # A dictionary to get vertex index from FPGA and slice
-        self.__index_by_slice: Dict[Tuple[int, Slice], int] = dict()
+        self.__index_by_slice: Dict[Tuple[int, Slice], int] = {}
 
         self.__pipe = pipe
         if base_key is None:

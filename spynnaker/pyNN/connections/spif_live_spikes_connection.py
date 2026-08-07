@@ -124,17 +124,17 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         self.__spif_port = spif_port
         self.__spif_packet_size = events_per_packet * BYTES_PER_WORD
         self.__spif_packet_time_us = time_per_packet
-        self.__key_to_atom_id_and_label: Dict[int, Tuple[int, int]] = dict()
-        self.__live_event_callbacks: List[List[Tuple[Event, bool]]] = list()
-        self.__start_resume_callbacks: Dict[str, List[StartStop]] = dict()
-        self.__pause_stop_callbacks: Dict[str, List[StartStop]] = dict()
-        self.__init_callbacks: Dict[str, List[Init]] = dict()
+        self.__key_to_atom_id_and_label: Dict[int, Tuple[int, int]] = {}
+        self.__live_event_callbacks: List[List[Tuple[Event, bool]]] = []
+        self.__start_resume_callbacks: Dict[str, List[StartStop]] = {}
+        self.__pause_stop_callbacks: Dict[str, List[StartStop]] = {}
+        self.__init_callbacks: Dict[str, List[Init]] = {}
         if receive_labels is not None:
             for label in receive_labels:
-                self.__live_event_callbacks.append(list())
-                self.__start_resume_callbacks[label] = list()
-                self.__pause_stop_callbacks[label] = list()
-                self.__init_callbacks[label] = list()
+                self.__live_event_callbacks.append([])
+                self.__start_resume_callbacks[label] = []
+                self.__pause_stop_callbacks[label] = []
+                self.__init_callbacks[label] = []
         self.__receiver_listener: Optional[ConnectionListener[bytes]] = None
         self.__receiver_connection: Optional[UDPConnection] = None
         self.__error_keys: Set[int] = set()
@@ -147,11 +147,11 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         """
         if label not in self.__receive_labels:
             self.__receive_labels.append(label)
-            self.__live_event_callbacks.append(list())
+            self.__live_event_callbacks.append([])
         if label not in self.__start_resume_callbacks:
-            self.__start_resume_callbacks[label] = list()
-            self.__pause_stop_callbacks[label] = list()
-            self.__init_callbacks[label] = list()
+            self.__start_resume_callbacks[label] = []
+            self.__pause_stop_callbacks[label] = []
+            self.__init_callbacks[label] = []
 
     def add_init_callback(self, label: str, init_callback: Init) -> None:
         """
@@ -219,7 +219,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
     def __read_database_callback(self, db_reader: DatabaseReader) -> None:
         self.__handle_possible_rerun_state()
 
-        vertex_sizes: Dict[str, int] = dict()
+        vertex_sizes: Dict[str, int] = {}
         run_time_ms = db_reader.get_configuration_parameter_value(
             "runtime") or 0.0
         machine_timestep_ms = (
@@ -301,16 +301,16 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             logger.warning("problem handling received packet", exc_info=True)
 
     def __handle_packet(self, packet: bytes) -> None:
-        key_labels: Dict[int, List[int]] = dict()
-        atoms_labels: Dict[int, List[int]] = dict()
+        key_labels: Dict[int, List[int]] = {}
+        atoms_labels: Dict[int, List[int]] = {}
         n_events = len(packet) // BYTES_PER_WORD
         events = struct.unpack(f"<{n_events}I", packet)
         for key in events:
             if key in self.__key_to_atom_id_and_label:
                 atom_id, label_id = self.__key_to_atom_id_and_label[key]
                 if label_id not in key_labels:
-                    key_labels[label_id] = list()
-                    atoms_labels[label_id] = list()
+                    key_labels[label_id] = []
+                    atoms_labels[label_id] = []
                 key_labels[label_id].append(key)
                 atoms_labels[label_id].append(atom_id)
             else:

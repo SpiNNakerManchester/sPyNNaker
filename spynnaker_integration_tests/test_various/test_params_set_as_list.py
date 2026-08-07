@@ -27,14 +27,14 @@ class ParamsSetAsList(BaseTestCase):
 
         p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
 
-        cm = list()
-        i_off = list()
-        tau_m = list()
-        tau_re = list()
-        tau_syn_e = list()
-        tau_syn_i = list()
-        v_reset = list()
-        v_rest = list()
+        cm = []
+        i_off = []
+        tau_m = []
+        tau_re = []
+        tau_syn_e = []
+        tau_syn_i = []
+        v_reset = []
+        v_rest = []
 
         for atom in range(0, nNeurons):
             cm.append(0.25)

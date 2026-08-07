@@ -44,7 +44,7 @@ class SpYNNakerConnectionHolderGenerator(object):
 
         data_holders: Dict[
             Tuple[ProjectionApplicationEdge, SynapseInformation],
-            ConnectionHolder] = dict()
+            ConnectionHolder] = {}
         for partition in progress.over(
                 application_graph.outgoing_edge_partitions):
             for edge in partition.edges:

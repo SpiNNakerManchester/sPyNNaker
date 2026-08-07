@@ -64,7 +64,7 @@ class TestLiveGatherTranslator(BaseTestCase):
         self.listener.start()
 
     def live_spike_receive_translated(self) -> None:
-        self.stored_data: List[Tuple[int, int]] = list()
+        self.stored_data: List[Tuple[int, int]] = []
 
         db_conn = DatabaseConnection(local_port=None)
         db_conn.add_database_callback(self.database_callback)

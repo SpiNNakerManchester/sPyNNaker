@@ -104,8 +104,8 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
         last_pre_spike = pre_spikes_n[-1]
         considered_post_spikes = post_spikes[post_spikes < last_pre_spike]
         considered_post_spikes += plastic_delay
-        potentiation_times = list()
-        depression_times = list()
+        potentiation_times = []
+        depression_times = []
         for time in pre_spikes_n:
             post_times = considered_post_spikes[considered_post_spikes > time]
             if len(post_times) > 0:

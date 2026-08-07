@@ -125,7 +125,7 @@ class SmallWorldConnectorTest(BaseTestCase):
 
     def next_connected(self, previous: Dict[int, Set[int]],
                        single: Dict[int, Set[int]]) -> Dict[int, Set[int]]:
-        current: Dict[int, Set[int]] = dict()
+        current: Dict[int, Set[int]] = {}
         for i in range(25):
             current[i] = set(previous[i])
             for j in previous[i]:

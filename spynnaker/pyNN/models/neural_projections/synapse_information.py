@@ -106,7 +106,7 @@ class SynapseInformation(object):
         self.__partition_id = partition_id or SPIKE_PARTITION_ID
 
         # Make a list of holders to be updated
-        self.__pre_run_connection_holders: List[ConnectionHolder] = list()
+        self.__pre_run_connection_holders: List[ConnectionHolder] = []
 
     @property
     def connector(self) -> AbstractConnector:

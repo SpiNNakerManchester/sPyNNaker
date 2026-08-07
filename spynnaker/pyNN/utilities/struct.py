@@ -80,7 +80,7 @@ class Struct(object):
         """
         self.__fields = fields
         self.__repeat_type = repeat_type
-        self.__default_values = default_values or dict()
+        self.__default_values = default_values or {}
 
     @property
     def fields(self) -> Sequence[Tuple[DataType, str]]:
@@ -226,7 +226,7 @@ class Struct(object):
         # total size of data written (0 as filled in later),
         # and number of fields in struct
         data = [self.numpy_dtype.itemsize, n_repeats, 0, len(self.__fields)]
-        gen_data: List[NDArray[uint32]] = list()
+        gen_data: List[NDArray[uint32]] = []
 
         # Go through all values and add in generator data for each
         for data_type, name in self.__fields:

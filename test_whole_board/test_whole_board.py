@@ -144,7 +144,7 @@ class WholeBoardTest(object):
         for (x, y), processors in self.to_allocate.items():
             for _ in range(processors):
                 rest.append((x, y))
-        self.to_allocate = dict()
+        self.to_allocate = {}
         return rest
 
     def check_spikes(self):
@@ -160,14 +160,14 @@ class WholeBoardTest(object):
         sim.setup(timestep=1.0, n_boards_required=1)
         machine = sim.get_machine()
         # find number of cores on machine less one for monitors
-        self.to_allocate = dict()
+        self.to_allocate = {}
         for key, chip in machine:
             self.to_allocate[key] = chip.n_placable_processors - 1
         # less 1 for the gather
         self.to_allocate[(0, 0)] -= 1
 
         # keep track of the last vertex in each chain
-        self.targets = dict()
+        self.targets = {}
 
         # Make synfire chains using all possible links in each direction
         self.do_direction(self.up, "up")

@@ -126,7 +126,7 @@ class PopulationView(PopulationBase):
         if label is None:
             label = f"{parent.label}:{selector}"
         self.__label = label
-        self.__annotations: Dict[str, Any] = dict()
+        self.__annotations: Dict[str, Any] = {}
 
         # Get these two objects to make access easier
         # pylint: disable=protected-access

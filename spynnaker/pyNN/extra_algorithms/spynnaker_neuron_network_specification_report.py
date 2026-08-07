@@ -99,7 +99,7 @@ def _generate_vertices(
     """
     :return: the mapping from vertex to ID for the generated vertices
     """
-    vertex_ids: Dict[ApplicationVertex, str] = dict()
+    vertex_ids: Dict[ApplicationVertex, str] = {}
     for vertex_counter, vertex in progress.over(
             enumerate(SpynnakerDataView.iterate_vertices()), False):
         # Arbitrary labels used inside dot

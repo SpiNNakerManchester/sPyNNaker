@@ -61,12 +61,12 @@ class _DelaySupportAdder(object):
 
     def __init__(self) -> None:
         self._app_to_delay_map: Dict[
-            ApplicationEdgePartition, DelayExtensionVertex] = dict()
+            ApplicationEdgePartition, DelayExtensionVertex] = {}
         self._delay_post_edge_map: Dict[
             Tuple[DelayExtensionVertex, PopulationVertex, str],
-            DelayedApplicationEdge] = dict()
-        self._new_edges: List[Tuple[ApplicationEdge, str]] = list()
-        self._new_vertices: List[DelayExtensionVertex] = list()
+            DelayedApplicationEdge] = {}
+        self._new_edges: List[Tuple[ApplicationEdge, str]] = []
+        self._new_vertices: List[DelayExtensionVertex] = []
 
     def add_delays(self) -> Tuple[
             List[DelayExtensionVertex], List[Tuple[ApplicationEdge, str]]]:
