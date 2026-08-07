@@ -81,7 +81,7 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
         self.__drop_late_spikes = get_config_bool(
             "Simulation", "drop_late_spikes") or False
 
-        self.__outgoing_edges: List[DelayedApplicationEdge] = list()
+        self.__outgoing_edges: List[DelayedApplicationEdge] = []
 
         self.__n_colour_bits = n_colour_bits
 

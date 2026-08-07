@@ -57,7 +57,7 @@ def test_connection_holder(
     all_values = None
     n_items = 0
     if data_items is not None or fixed_values is not None:
-        all_values = list()
+        all_values = []
     elif as_list:
         n_items = 4
     if data_items is not None:

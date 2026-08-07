@@ -181,7 +181,7 @@ class SynapseDynamicsStructuralCommon(
     def __get_structural_projections(
             self, incoming_projections: Iterable[Projection]
             ) -> List[Projection]:
-        structural_projections = list()
+        structural_projections = []
         seen_app_edges = set()
         for proj in incoming_projections:
             # pylint: disable=protected-access
@@ -260,10 +260,10 @@ class SynapseDynamicsStructuralCommon(
         :param synaptic_matrices:
         """
         spec.comment("Writing pre-population info")
-        pop_index: _PopIndexType = dict()
+        pop_index: _PopIndexType = {}
         routing_info = SpynnakerDataView.get_routing_infos()
-        subpop_index: _SubpopIndexType = dict()
-        lo_atom_index: _SubpopIndexType = dict()
+        subpop_index: _SubpopIndexType = {}
+        lo_atom_index: _SubpopIndexType = {}
         index = 0
         for proj in structural_projections:
             spec.comment(f"Writing pre-population info for {proj.label}")

@@ -94,7 +94,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         # Store the sources to avoid recalculation
         self.__cached_sources: Dict[ApplicationVertex, Dict[
                 Tuple[ColouredApplicationVertex, str],
-                List[Source]]] = dict()
+                List[Source]]] = {}
 
     @property
     def _delay(self) -> float:
@@ -166,11 +166,11 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.switch_write_focus(region)
 
         # Get spec for each incoming source
-        connector_weight_index: Dict[AbstractConnector, int] = dict()
+        connector_weight_index: Dict[AbstractConnector, int] = {}
         next_weight_index: int = 0
-        source_data = list()
-        connector_data: List[NDArray[uint32]] = list()
-        weight_data = list()
+        source_data = []
+        connector_data: List[NDArray[uint32]] = []
+        weight_data = []
         for (pre_vertex, part_id), source_infos in sources.items():
 
             # Add connectors as needed

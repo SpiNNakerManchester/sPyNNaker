@@ -60,8 +60,8 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         self.__control_label_extension = control_label_extension
 
         control_labels: Optional[Iterable[str]] = None
-        self.__control_label_to_label: Dict[str, str] = dict()
-        self.__label_to_control_label: Dict[str, str] = dict()
+        self.__control_label_to_label: Dict[str, str] = {}
+        self.__label_to_control_label: Dict[str, str] = {}
         if poisson_labels is not None:
             control_labels = [
                 self.__convert_to_control_label(label)

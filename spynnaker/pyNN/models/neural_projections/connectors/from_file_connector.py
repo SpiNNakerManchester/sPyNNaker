@@ -113,7 +113,7 @@ class FromFileConnector(FromListConnector):
         filename = f"{os.path.basename(the_file.file)}."
 
         # This assumes it finds the files in the right order!
-        conns = list()
+        conns = []
         for found_file in os.listdir(os.path.dirname(the_file.file)):
             if found_file.startswith(filename):
                 file_reader = self.get_reader(found_file)

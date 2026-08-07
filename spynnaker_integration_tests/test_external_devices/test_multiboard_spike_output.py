@@ -26,14 +26,14 @@ from spynnaker.pyNN.exceptions import ConfigurationException
 
 class TestMultiBoardSpikeOutput(BaseTestCase):
 
-    counts: Dict[str, int] = dict()
+    counts: Dict[str, int] = {}
 
     @staticmethod
     def spike_receiver(label: str, time: int, neuron_ids: List[int]) -> None:
         TestMultiBoardSpikeOutput.counts[label] += len(neuron_ids)
 
     def multi_board_spike_output(self) -> None:
-        TestMultiBoardSpikeOutput.counts = dict()
+        TestMultiBoardSpikeOutput.counts = {}
         try:
             p.setup(1.0, n_chips_required=((48 * 2) + 1))
             machine = p.get_machine()
@@ -42,8 +42,8 @@ class TestMultiBoardSpikeOutput(BaseTestCase):
                 SpynnakerDataView.raise_skiptest(
                     "You Need at least 3 boards to run this test", oops)
 
-        labels = list()
-        pops = list()
+        labels = []
+        pops = []
         for chip in machine.ethernet_connected_chips:
             # print("Adding population on {}, {}".format(chip.x, chip.y))
             label = "{}, {}".format(chip.x, chip.y)

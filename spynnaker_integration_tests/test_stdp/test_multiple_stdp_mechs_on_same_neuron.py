@@ -34,13 +34,13 @@ class TestMultipleStdpMechsOnSameNeuron(BaseTestCase):
                            'tau_syn_I': 5.0, 'v_reset': -70.0, 'v_rest': -65.0,
                            'v_thresh': -50.0}
 
-        populations = list()
-        projections = list()
+        populations = []
+        projections = []
 
         weight_to_spike = 2.0
         delay = 1
 
-        connections = list()
+        connections = []
         for i in range(0, nNeurons):
             singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike,
                                 delay)

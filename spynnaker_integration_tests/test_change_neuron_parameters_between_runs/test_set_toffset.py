@@ -37,7 +37,7 @@ def do_run(n_neurons: int, n_cores: int, i_offset2: int,
                        'v_thresh': -50.0
                        }
 
-    populations = list()
+    populations = []
 
     populations.append(p.Population(n_neurons, p.IF_curr_exp, cell_params_lif,
                                     label='pop_1'))

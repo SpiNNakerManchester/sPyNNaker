@@ -55,7 +55,7 @@ class EthernetCommandConnection(DatabaseConnection):
             local_host=local_host, local_port=local_port)
 
         self.__command_containers: List[
-            AbstractSendMeMulticastCommandsVertex] = list()
+            AbstractSendMeMulticastCommandsVertex] = []
         if command_containers is not None:
             for command_container in command_containers:
                 self.add_command_container(command_container)

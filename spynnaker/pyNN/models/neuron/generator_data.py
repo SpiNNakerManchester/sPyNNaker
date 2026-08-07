@@ -85,7 +85,7 @@ class GeneratorData(object):
                                 synapse_information.synapse_dynamics)
 
         # Create the data needed
-        self.__data = list()
+        self.__data = []
         self.__data.append(numpy.array([
             pre_lo, pre_hi, post_lo, post_hi,
             synapse_information.synapse_type,

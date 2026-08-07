@@ -123,7 +123,7 @@ class ConnectionHolder(object):
             source, target, weight and delay
         """
         if self.__connections is None:
-            self.__connections = list()
+            self.__connections = []
         self.__connections.append(connections)
 
     @property

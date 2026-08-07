@@ -59,7 +59,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
     def __init__(self) -> None:
         super().__init__()
         self._machine_vertex_by_slice: Dict[
-            Slice, DelayExtensionMachineVertex] = dict()
+            Slice, DelayExtensionMachineVertex] = {}
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(
@@ -152,7 +152,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self) -> None:
-        self._machine_vertex_by_slice = dict()
+        self._machine_vertex_by_slice = {}
 
     def get_machine_vertex(
             self, vertex_slice: Slice) -> DelayExtensionMachineVertex:

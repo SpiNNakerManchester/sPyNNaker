@@ -41,8 +41,8 @@ class TestSpikeSourceArray(BaseTestCase):
                            'v_thresh': -50.0
                            }
 
-        populations = list()
-        projections = list()
+        populations = []
+        projections = []
 
         spike_array = {'spike_times': [[0]]}
         populations.append(p.Population(n_neurons, p.IF_curr_exp,
@@ -85,13 +85,13 @@ class TestSpikeSourceArray(BaseTestCase):
                            'v_thresh': -50.0
                            }
 
-        populations = list()
-        projections = list()
+        populations = []
+        projections = []
 
         boxed_array: NDArray = numpy.zeros(shape=(0, 2))
-        spike_array: List[List[int]] = list()
+        spike_array: List[List[int]] = []
         for neuron_id in range(0, n_neurons):
-            spike_array.append(list())
+            spike_array.append([])
             for counter in range(0, 20):
                 random_time = random.randint(0, 4999)
                 boxed_array = numpy.append(

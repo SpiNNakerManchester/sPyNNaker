@@ -106,7 +106,7 @@ class SPIFOutputDevice(
                 SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address,
                 chip_coords),
             label=label)
-        self.__incoming_partitions: List[ApplicationEdgePartition] = list()
+        self.__incoming_partitions: List[ApplicationEdgePartition] = []
         # Force creation of the database, to be used in the read side of things
         if create_database:
             set_config("Database", "create_database", "True")
@@ -116,7 +116,7 @@ class SPIFOutputDevice(
         self.__create_database = create_database
         self.__output_key_shift = output_key_shift
         self.__output_key_and_mask: \
-            Dict[PopulationApplicationVertex, Tuple[int, int]] = dict()
+            Dict[PopulationApplicationVertex, Tuple[int, int]] = {}
 
     def set_output_key_and_mask(
             self, population: Population, key: int, mask: int) -> None:
@@ -208,7 +208,7 @@ class SPIFOutputDevice(
     def start_resume_commands(self) -> Iterable[MultiCastCommand]:
         # The commands here are delayed, as at the time of providing them,
         # we don't know the key or mask of the incoming link...
-        commands: List[MultiCastCommand] = list()
+        commands: List[MultiCastCommand] = []
         for i, part in enumerate(self.__incoming_partitions):
             pop_vertex = part.pre_vertex
             assert isinstance(pop_vertex, PopulationApplicationVertex)
@@ -240,7 +240,7 @@ class SPIFOutputDevice(
     @overrides(LiveOutputDevice.get_device_output_keys)
     def get_device_output_keys(self) -> Dict[MachineVertex,
                                              List[Tuple[int, int]]]:
-        all_keys: Dict[MachineVertex, List[Tuple[int, int]]] = dict()
+        all_keys: Dict[MachineVertex, List[Tuple[int, int]]] = {}
         routing_infos = SpynnakerDataView.get_routing_infos()
         for i, part in enumerate(self.__incoming_partitions):
             pop_vertex = part.pre_vertex
@@ -253,7 +253,7 @@ class SPIFOutputDevice(
             shift = pop_vertex.n_colour_bits
             for m_vertex in part.pre_vertex.splitter.get_out_going_vertices(
                     part.identifier):
-                atom_keys: Iterable[Tuple[int, int]] = list()
+                atom_keys: Iterable[Tuple[int, int]] = []
                 if isinstance(m_vertex.app_vertex, HasCustomAtomKeyMap):
                     atom_keys = m_vertex.app_vertex.get_atom_key_map(
                         m_vertex, part.identifier, routing_infos)

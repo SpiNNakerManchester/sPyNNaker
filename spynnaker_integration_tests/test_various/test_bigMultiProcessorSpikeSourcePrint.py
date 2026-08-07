@@ -39,8 +39,8 @@ def do_run(nNeurons: int, neurons_per_core: int) -> Block:
 
     p.set_number_of_neurons_per_core(p.SpikeSourceArray, neurons_per_core)
 
-    populations = list()
-    projections = list()
+    populations = []
+    projections = []
 
     populations.append(p.Population(nNeurons, p.SpikeSourceArray, spike_list,
                                     label='input'))

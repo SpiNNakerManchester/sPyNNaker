@@ -95,7 +95,7 @@ class ICUBRetinaDevice(Application2DSpiNNakerLinkVertex):
             board_address, incoming=True, outgoing=True)
 
         # A dictionary to get vertex index from FPGA and slice
-        self.__index_by_slice: Dict[Slice, int] = dict()
+        self.__index_by_slice: Dict[Slice, int] = {}
         self.__base_key = base_key
 
     @overrides(Application2DSpiNNakerLinkVertex.get_incoming_slice)

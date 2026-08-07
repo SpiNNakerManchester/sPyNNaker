@@ -35,7 +35,7 @@ def do_run(n_neurons: int, n_cores: int, i_offset2: int,
                        'tau_syn_I': 2,
                        'i_offset': 0
                        }
-    populations = list()
+    populations = []
     populations.append(p.Population(n_neurons, p.Izhikevich, cell_params_izk,
                                     label='pop_1'))
     populations[0].record("spikes")

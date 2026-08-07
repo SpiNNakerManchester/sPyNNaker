@@ -38,8 +38,8 @@ def do_run() -> Tuple[ConnectionHolder, ConnectionHolder, ConnectionHolder,
                        'tau_syn_E': 5.0, 'tau_syn_I': 5.0, 'v_reset': -70.0,
                        'v_rest': -65.0, 'v_thresh': -50.0}
 
-    populations = list()
-    projections = list()
+    populations = []
+    projections = []
 
     populations.append(
         p.Population(sources, p.IF_curr_exp, cell_params_lif, label='pop_1'))

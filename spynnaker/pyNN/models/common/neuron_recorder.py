@@ -158,8 +158,8 @@ class NeuronRecorder(object):
         :param events_per_core_variables:
         :param events_per_core_datatypes:
         """
-        self.__sampling_rates: Dict[str, int] = dict()
-        self.__indexes: Dict[str, Optional[Sequence[int]]] = dict()
+        self.__sampling_rates: Dict[str, int] = {}
+        self.__indexes: Dict[str, Optional[Sequence[int]]] = {}
         self.__data_types = data_types
         self.__n_neurons = n_neurons
         self.__bitfield_variables = bitfield_variables
@@ -171,7 +171,7 @@ class NeuronRecorder(object):
         self.__events_per_core_variables = events_per_core_variables
         self.__events_per_core_datatypes = events_per_core_datatypes
         self.__events_per_core_recording: Set[str] = set()
-        self.__events_per_ts: Dict[str, int] = dict()
+        self.__events_per_ts: Dict[str, int] = {}
         self.__events_per_ts[self.MAX_REWIRES] = 0  # record('all')
 
         # Get info on variables like these
@@ -1044,7 +1044,7 @@ class NeuronRecorder(object):
             data.append(numpy.arange(n_indices, dtype=uint16).view(uint32))
         else:
             local_index = 0
-            local_indexes: List[int] = list()
+            local_indexes: List[int] = []
             # Add indices based on the raster ids
             index = 0
             for index in vertex_slice.get_raster_ids():
@@ -1063,7 +1063,7 @@ class NeuronRecorder(object):
 
     def _get_data(self, vertex_slice: Slice) -> NDArray[uint32]:
         # There is no data here for per-timestep variables by design
-        data: List[NDArray[uint32]] = list()
+        data: List[NDArray[uint32]] = []
         for variable in self.__sampling_rates:
             rate, n_recording = self._rate_and_count_per_slice(
                 variable, vertex_slice)

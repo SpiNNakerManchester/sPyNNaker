@@ -161,8 +161,8 @@ def do_run() -> Tuple[Block, Block]:
     # Synfire chain connection where each neuron is connected to next neuron
     # NOTE: there is no recurrent connection so that each chain stops once it
     # reaches the end
-    loop_forward = list()
-    loop_backward = list()
+    loop_forward = []
+    loop_backward = []
     for i in range(0, n_neurons - 1):
         loop_forward.append((i, (i + 1) % n_neurons, weight_to_spike, 3))
         loop_backward.append(((i + 1) % n_neurons, i, weight_to_spike, 3))

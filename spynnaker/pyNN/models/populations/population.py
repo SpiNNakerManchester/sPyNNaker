@@ -115,7 +115,7 @@ class Population(PopulationBase):
             A nicer way of allowing additional things
         """
         # Deal with the kwargs!
-        additional: _ParamDict = dict()
+        additional: _ParamDict = {}
         if additional_parameters is not None:
             additional.update(additional_parameters)
         if additional_kwargs:
@@ -143,7 +143,7 @@ class Population(PopulationBase):
         if realsize is None:
             realsize = self.__vertex.n_atoms
         self.__size = realsize
-        self.__annotations: Dict[str, Any] = dict()
+        self.__annotations: Dict[str, Any] = {}
 
         # things for pynn demands
         self.__first_id, self.__last_id = SpynnakerDataView.add_population(

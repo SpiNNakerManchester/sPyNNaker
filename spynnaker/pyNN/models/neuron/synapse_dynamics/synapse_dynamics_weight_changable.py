@@ -96,7 +96,7 @@ class SynapseDynamicsWeightChangable(
         super().__init__(delay=delay, weight=weight)
         self.__weight_max = weight_max
         self.__weight_min = weight_min
-        self.__synapse_info_to_index: Dict[SynapseInformation, int] = dict()
+        self.__synapse_info_to_index: Dict[SynapseInformation, int] = {}
         self.__next_index = 0
 
         if weight_min < 0.0:

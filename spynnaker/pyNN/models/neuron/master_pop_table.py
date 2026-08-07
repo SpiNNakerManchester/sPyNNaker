@@ -215,7 +215,7 @@ class _MasterPopEntry(object):
         self.__core_shift = core_shift
         self.__n_neurons = n_neurons
         self.__n_colour_bits = n_colour_bits
-        self.__addresses_and_row_lengths: List[Tuple[int, int, bool]] = list()
+        self.__addresses_and_row_lengths: List[Tuple[int, int, bool]] = []
 
     def append(self, address: int, row_length: int) -> int:
         """
@@ -416,7 +416,7 @@ class MasterPopTableAsBinarySearch(object):
         """
         Initialise the master pop data structure.
         """
-        self.__entries = dict()
+        self.__entries = {}
         self.__n_addresses = 0
 
     def add_application_entry(

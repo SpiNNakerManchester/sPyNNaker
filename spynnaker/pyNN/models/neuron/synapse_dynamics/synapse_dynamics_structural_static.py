@@ -165,10 +165,10 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         self.__s_max = s_max
         self.__with_replacement = with_replacement
         self.__seed = seed
-        self.__connections: ConnectionsInfo = dict()
+        self.__connections: ConnectionsInfo = {}
 
         self.__rng = numpy.random.RandomState(seed)
-        self.__seeds: Dict[Any, Tuple[int, ...]] = dict()
+        self.__seeds: Dict[Any, Tuple[int, ...]] = {}
 
     @overrides(AbstractStaticSynapseDynamics.merge)
     def merge(self, synapse_dynamics: AbstractSynapseDynamics
@@ -230,7 +230,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         if not isinstance(synapse_info.synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
             return
-        self.__connections = dict()
+        self.__connections = {}
         collector = self.__connections.setdefault(
             (app_edge.post_vertex, post_vertex_slice.lo_atom), [])
         collector.append((connections, app_edge, synapse_info))

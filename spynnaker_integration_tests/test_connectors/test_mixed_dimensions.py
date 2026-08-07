@@ -29,7 +29,7 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
         runtime = n_atoms + 50
 
         # SpikeInjector
-        spike_times = list()
+        spike_times = []
         for i in range(n_atoms):
             spike_times.append([i, i + 10, i + 20, i + 30])
         inj_pop = sim.Population(

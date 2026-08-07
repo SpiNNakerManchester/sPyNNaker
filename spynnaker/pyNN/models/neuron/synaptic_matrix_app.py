@@ -398,7 +398,7 @@ class SynapticMatrixApp(object):
         :return: A list of arrays of connections, each with dtype
             :py:const:`~.NUMPY_CONNECTORS_DTYPE`
         """
-        connections = list()
+        connections = []
 
         synapses_address: Optional[int] = None
         buffers: Optional[BufferManager] = None
@@ -500,7 +500,7 @@ class SynapticMatrixApp(object):
             return []
         synapses_address = locate_memory_region_for_placement(
             placement, self.__synaptic_matrix_region)
-        regions = list()
+        regions = []
         if self.__syn_mat_offset is not None:
             regions.append((start_index,
                             synapses_address + self.__syn_mat_offset,

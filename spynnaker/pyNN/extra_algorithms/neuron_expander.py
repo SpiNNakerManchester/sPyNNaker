@@ -69,7 +69,7 @@ def _plan_expansion() -> Tuple[
 
     expander_cores = ExecutableTargets()
     expanded_pop_vertices: List[
-        Tuple[AbstractNeuronExpandable, Placement]] = list()
+        Tuple[AbstractNeuronExpandable, Placement]] = []
     to_write: List[Tuple[int, int, int, UserRegister, int]] = []
     for placement in SpynnakerDataView.iterate_placemements():
         # Add all machine vertices of the population vertex to ones

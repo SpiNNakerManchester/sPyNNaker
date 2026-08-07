@@ -108,7 +108,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
     def start_resume_commands(
             self) -> List[MultiCastCommand]:
         # Update the commands with the additional one to set the key
-        new_commands: List[MultiCastCommand] = list()
+        new_commands: List[MultiCastCommand] = []
         for command in super().start_resume_commands:
             if command.key == self._protocol.set_retina_transmission_key:
                 # This has to be stored so that the payload can be updated

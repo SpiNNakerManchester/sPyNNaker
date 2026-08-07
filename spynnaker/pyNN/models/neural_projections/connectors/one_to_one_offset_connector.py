@@ -161,8 +161,8 @@ class OneToOneOffsetConnector(
         pre_start = pre_lo + (post_group * group_size)
         pre_end = min(pre_start + group_size, pre_hi)
 
-        pres = list()
-        posts = list()
+        pres = []
+        posts = []
         for post in range(post_start, post_end):
             pre = post - self.__offset
             if pre < pre_start:

@@ -104,7 +104,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         self.__n_clipped_delays = numpy.int64(0)
         self.__min_delay = 0.0
-        self.__param_seeds: Dict[Tuple[int, int], int] = dict()
+        self.__param_seeds: Dict[Tuple[int, int], int] = {}
         self.__used = False
 
     def set_space(self, space: Space) -> None:

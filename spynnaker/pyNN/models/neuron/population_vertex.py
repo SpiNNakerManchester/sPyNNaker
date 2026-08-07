@@ -387,7 +387,7 @@ class PopulationVertex(
         # Current sources for this vertex
         self.__current_sources: List[AbstractCurrentSource] = []
         self.__current_source_id_list: Dict[
-            AbstractCurrentSource, Selector] = dict()
+            AbstractCurrentSource, Selector] = {}
 
         # Set up for profiling
         self.__n_profile_samples = get_config_int(
@@ -400,7 +400,7 @@ class PopulationVertex(
             SpikeSourcePoissonVertex, List[Projection]] = defaultdict(list)
         self.__max_row_info: Dict[
             Tuple[ProjectionApplicationEdge, SynapseInformation, int],
-            MaxRowInfo] = dict()
+            MaxRowInfo] = {}
         self.__self_projection: Optional[Projection] = None
 
         # Keep track of the synapse dynamics for the vertex overall
@@ -413,12 +413,12 @@ class PopulationVertex(
         # An RNG for use in synaptic generation
         self.__rng = numpy.random.RandomState(seed)
         self.__pop_seed = create_mars_kiss_seeds(self.__rng)
-        self.__core_seeds: Dict[Slice, Sequence[int]] = dict()
+        self.__core_seeds: Dict[Slice, Sequence[int]] = {}
 
         # Store connections read from machine until asked to clear
         # Key is app_edge, synapse_info
         self.__connection_cache: Dict[Tuple[
-            ProjectionApplicationEdge, SynapseInformation], NDArray] = dict()
+            ProjectionApplicationEdge, SynapseInformation], NDArray] = {}
         self.__read_initial_values = False
         self.__have_read_initial_values = False
         self.__last_parameter_read_time: Optional[float] = None

@@ -42,7 +42,7 @@ class EthernetControlConnection(LiveEventConnection):
         super().__init__(
             live_packet_gather_label, receive_labels=[label],
             local_host=local_host, local_port=local_port)
-        self.__translators: Dict[str, AbstractEthernetTranslator] = dict()
+        self.__translators: Dict[str, AbstractEthernetTranslator] = {}
         self.__translators[label] = translator
         self.add_receive_no_time_callback(
             label, self._translate, translate_key=False)

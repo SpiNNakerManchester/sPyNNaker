@@ -45,13 +45,13 @@ def do_run(nNeurons: int, ver_num: str) -> None:
         'i_offset': 0
         }
 
-    populations = list()
-    projections = list()
+    populations = []
+    projections = []
 
     weight_to_spike = 40
     delay = 1
 
-    connections = list()
+    connections = []
     for i in range(0, nNeurons):
         singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
         connections.append(singleConnection)

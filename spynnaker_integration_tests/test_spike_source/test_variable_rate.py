@@ -35,7 +35,7 @@ def variable_rate_options() -> None:
     run_time = 20000
     seed = 0
 
-    pops = list()
+    pops = []
 
     pops.append(
         p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
@@ -135,7 +135,7 @@ def variable_rate_options() -> None:
 
     p.run(run_time)
 
-    all_spikes = list()
+    all_spikes = []
     for pop in pops:
         all_spikes.append(pop.get_data("spikes").segments[0].spiketrains)
     p.end()
@@ -161,7 +161,7 @@ def variable_rate_options() -> None:
             # Check the rates
             rates, starts, durations = (
                 array(values[0]), array(values[1]), array(values[2]))
-            ends = list()
+            ends = []
             for j, (start, duration) in enumerate(zip(starts, durations)):
                 if duration == DURATION_FOREVER and (j + 1) >= len(starts):
                     ends.append(run_time)
@@ -246,7 +246,7 @@ def variable_rate_100us() -> None:
     spikes = pop.get_data("spikes").segments[0].spiketrains
     p.end()
 
-    n_spikes = dict()
+    n_spikes = {}
     for i in range(len(spikes)):
         for rate, start, end in zip(rates, starts, ends):
             rate_spikes = spikes[i][(spikes[i] >= start) &
