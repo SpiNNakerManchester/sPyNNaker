@@ -17,5 +17,9 @@ from .threshold_type_fixed_prob import ThresholdTypeFixedProb
 from .threshold_type_maass_stochastic import ThresholdTypeMaassStochastic
 from .threshold_type_static import ThresholdTypeStatic
 
-__all__ = ["AbstractThresholdType", "ThresholdTypeStatic",
-           "ThresholdTypeMaassStochastic", "ThresholdTypeFixedProb"]
+__all__ = [
+           "AbstractThresholdType",
+           "ThresholdTypeFixedProb",
+           "ThresholdTypeMaassStochastic",
+           "ThresholdTypeStatic",
+]

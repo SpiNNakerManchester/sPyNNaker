@@ -18,5 +18,10 @@ from .neuron_recorder import NeuronRecorder
 from .parameter_holder import ParameterHolder
 from .population_application_vertex import PopulationApplicationVertex
 
-__all__ = ["EIEIOSpikeRecorder", "NeuronRecorder", "MultiSpikeRecorder",
-           "ParameterHolder", "PopulationApplicationVertex"]
+__all__ = [
+           "EIEIOSpikeRecorder",
+           "MultiSpikeRecorder",
+           "NeuronRecorder",
+           "ParameterHolder",
+           "PopulationApplicationVertex",
+]
