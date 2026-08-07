@@ -146,7 +146,7 @@ def _heat_plot(axes: Axes, values: NDArray, label: str = '',
     if label:
         plt.text(0.95, 0.95, label,
                  transform=axes.transAxes, ha='right', va='top',
-                 bbox={"facecolor": 'white', "alpha":1.0})
+                 bbox={"facecolor": 'white', "alpha": 1.0})
 
 
 def heat_plot_numpy(axes: Axes, data: NDArray, label: str = '',
