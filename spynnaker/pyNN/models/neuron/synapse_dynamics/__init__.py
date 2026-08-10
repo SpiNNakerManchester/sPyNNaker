@@ -36,18 +36,16 @@ from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
 from .synapse_dynamics_weight_changer import SynapseDynamicsWeightChanger
 
 __all__ = (  # noqa: RUF022
-            "AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
-           "AbstractStaticSynapseDynamics", "AbstractSynapseDynamics",
-           "AbstractSDRAMSynapseDynamics", "AbstractSynapseDynamicsStructural",
-           "calculate_spike_pair_additive_stdp_weight",
-           "calculate_spike_pair_multiplicative_stdp_weight",
-           "SynapseDynamicsStatic",
-           "SynapseDynamicsSTDP", "AbstractHasParameterNames",
-           # Structural plasticity
-           "SynapseDynamicsStructuralCommon",
-           "SynapseDynamicsStructuralStatic",
-           "SynapseDynamicsStructuralSTDP",
-           # Neuromodulation
-           "SynapseDynamicsNeuromodulation",
-           "AbstractSupportsSignedWeights",
-           "SynapseDynamicsWeightChanger", "SynapseDynamicsWeightChangable")
+    "AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
+    "AbstractStaticSynapseDynamics", "AbstractSynapseDynamics",
+    "AbstractSDRAMSynapseDynamics", "AbstractSynapseDynamicsStructural",
+    "calculate_spike_pair_additive_stdp_weight",
+    "calculate_spike_pair_multiplicative_stdp_weight",
+    "SynapseDynamicsStatic",
+    "SynapseDynamicsSTDP", "AbstractHasParameterNames",
+    # Structural plasticity
+    "SynapseDynamicsStructuralCommon", "SynapseDynamicsStructuralStatic",
+    "SynapseDynamicsStructuralSTDP",
+    # Neuromodulation
+    "SynapseDynamicsNeuromodulation", "AbstractSupportsSignedWeights",
+    "SynapseDynamicsWeightChanger", "SynapseDynamicsWeightChangable")
