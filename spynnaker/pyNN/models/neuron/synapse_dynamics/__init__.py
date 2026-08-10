@@ -35,6 +35,7 @@ from .synapse_dynamics_utils import (
 from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
 from .synapse_dynamics_weight_changer import SynapseDynamicsWeightChanger
 
+
 __all__ = ( # noqa: RUF022
             "AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
            "AbstractStaticSynapseDynamics", "AbstractSynapseDynamics",
