@@ -90,9 +90,9 @@ class TestSpikeSourceArray(BaseTestCase):
 
         boxed_array: NDArray = numpy.zeros(shape=(0, 2))
         spike_array: List[List[int]] = []
-        for neuron_id in range(0, n_neurons):
+        for neuron_id in range(n_neurons):
             spike_array.append([])
-            for counter in range(0, 20):
+            for counter in range(20):
                 random_time = random.randint(0, 4999)
                 boxed_array = numpy.append(
                     boxed_array, [[neuron_id, random_time]], axis=0)

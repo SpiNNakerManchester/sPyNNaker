@@ -354,12 +354,12 @@ class SynfireRunner(object):
 
         loop_connections = []
         if use_wrap_around_connections:
-            for i in range(0, n_neurons):
+            for i in range(n_neurons):
                 single_connection = \
                     (i, ((i + 1) % n_neurons), weight_to_spike, delay)
                 loop_connections.append(single_connection)
         else:
-            for i in range(0, n_neurons - 1):
+            for i in range(n_neurons - 1):
                 single_connection = (i, i + 1, weight_to_spike, delay)
                 loop_connections.append(single_connection)
 

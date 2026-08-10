@@ -36,7 +36,7 @@ class ParamsSetAsList(BaseTestCase):
         v_reset = []
         v_rest = []
 
-        for atom in range(0, nNeurons):
+        for atom in range(nNeurons):
             cm.append(0.25)
             i_off.append(0.0 + atom * 0.01)
             tau_m.append(10.0 + atom // 2 * 0.1)

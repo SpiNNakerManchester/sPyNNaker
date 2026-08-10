@@ -143,7 +143,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         multinomial = numpy.zeros(size, int)
         total = 1.0
         dn = num_synapses
-        for j in range(0, size - 1):
+        for j in range(size - 1):
             multinomial[j] = rng.next(
                 1, distribution="binomial",
                 parameters={'n': dn, 'p': prob_connect[j] / total})

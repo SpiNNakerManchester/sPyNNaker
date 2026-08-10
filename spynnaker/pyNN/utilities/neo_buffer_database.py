@@ -1017,7 +1017,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         n_neurons = len(indexes)
         column_length = n_machine_time_steps * n_neurons
         times = [i * sampling_interval_ms
-                 for i in range(0, n_machine_time_steps)]
+                 for i in range(n_machine_time_steps)]
         return numpy.column_stack((
                 numpy.repeat(indexes, n_machine_time_steps, 0),
                 numpy.tile(times, n_neurons),

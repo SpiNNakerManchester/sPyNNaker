@@ -49,7 +49,7 @@ def do_synfire_npop(nNeurons: int, n_pops: int, neurons_per_core: int,
     delay = 1
 
     connections = []
-    for i in range(0, nNeurons - 1):
+    for i in range(nNeurons - 1):
         singleConnection = (i, i + 1, weight_to_spike, delay)
         connections.append(singleConnection)
 
@@ -59,7 +59,7 @@ def do_synfire_npop(nNeurons: int, n_pops: int, neurons_per_core: int,
 
     spikeArray = {'spike_times': [[0]]}
 
-    for i in range(0, n_pops):
+    for i in range(n_pops):
         populations.append(p.Population(
             nNeurons, p.IF_curr_exp(**cell_params_lif),
             label='pop_{}'.format(i)))
@@ -67,7 +67,7 @@ def do_synfire_npop(nNeurons: int, n_pops: int, neurons_per_core: int,
     populations.append(p.Population(
         1, p.SpikeSourceArray(**spikeArray), label='inputSpikes_1'))
 
-    for i in range(0, n_pops):
+    for i in range(n_pops):
         projections.append(p.Projection(
             presynaptic_population=populations[i],
             postsynaptic_population=populations[i],
@@ -87,7 +87,7 @@ def do_synfire_npop(nNeurons: int, n_pops: int, neurons_per_core: int,
         connector=p.FromListConnector(injectionConnection),
         synapse_type=p.StaticSynapse()))
 
-    for pop_index in range(0, n_pops):
+    for pop_index in range(n_pops):
         populations[pop_index].record("spikes")
 
     p.run(runtime)
