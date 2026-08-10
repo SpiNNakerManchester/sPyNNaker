@@ -32,10 +32,18 @@ from .receives_synaptic_inputs_over_sdram import (
 from .sends_synaptic_inputs_over_sdram import SendsSynapticInputsOverSDRAM
 from .supports_structure import SupportsStructure
 
-__all__ = ["AbstractAcceptsIncomingSynapses", "AbstractHasDelayStages",
-           "AbstractMaxSpikes", "AbstractSynapseExpandable",
-           "ColouredApplicationVertex",
-           "SYNAPSE_EXPANDER_APLX",
-           "SendsSynapticInputsOverSDRAM", "ReceivesSynapticInputsOverSDRAM",
-           "HasSynapses", "AbstractNeuronExpandable", "NEURON_EXPANDER_APLX",
-           "SupportsStructure", "HasShapeKeyFields"]
+__all__ = [
+    "NEURON_EXPANDER_APLX",
+    "SYNAPSE_EXPANDER_APLX",
+    "AbstractAcceptsIncomingSynapses",
+    "AbstractHasDelayStages",
+    "AbstractMaxSpikes",
+    "AbstractNeuronExpandable",
+    "AbstractSynapseExpandable",
+    "ColouredApplicationVertex",
+    "HasShapeKeyFields",
+    "HasSynapses",
+    "ReceivesSynapticInputsOverSDRAM",
+    "SendsSynapticInputsOverSDRAM",
+    "SupportsStructure",
+]

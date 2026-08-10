@@ -35,10 +35,21 @@ from .threshold_type_multicast_device_control import (
     ThresholdTypeMulticastDeviceControl,
 )
 
-__all__ = ["AbstractEthernetController", "AbstractEthernetSensor",
-           "AbstractEthernetTranslator", "ArbitraryFPGADevice",
-           "AbstractMulticastControllableDevice", "ExternalDeviceLifControl",
-           "ExternalFPGARetinaDevice", "MachineMunichMotorDevice",
-           "MunichMotorDevice", "MunichRetinaDevice", "SendType",
-           "ThresholdTypeMulticastDeviceControl", "SPIFRetinaDevice",
-           "ICUBRetinaDevice", "SPIFOutputDevice", "SPIFInputDevice"]
+__all__ = [
+    "AbstractEthernetController",
+    "AbstractEthernetSensor",
+    "AbstractEthernetTranslator",
+    "AbstractMulticastControllableDevice",
+    "ArbitraryFPGADevice",
+    "ExternalDeviceLifControl",
+    "ExternalFPGARetinaDevice",
+    "ICUBRetinaDevice",
+    "MachineMunichMotorDevice",
+    "MunichMotorDevice",
+    "MunichRetinaDevice",
+    "SPIFInputDevice",
+    "SPIFOutputDevice",
+    "SPIFRetinaDevice",
+    "SendType",
+    "ThresholdTypeMulticastDeviceControl",
+]

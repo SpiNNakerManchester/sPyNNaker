@@ -17,5 +17,10 @@ from .pattern_spiker import PatternSpiker
 from .synfire_npop_run import do_synfire_npop
 from .synfire_runner import SynfireRunner
 
-__all__ = ["check_data", "check_neuron_data", "do_synfire_npop",
-           "PatternSpiker", "SynfireRunner"]
+__all__ = [
+           "PatternSpiker",
+           "SynfireRunner",
+           "check_data",
+           "check_neuron_data",
+           "do_synfire_npop",
+]

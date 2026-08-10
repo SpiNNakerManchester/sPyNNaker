@@ -40,12 +40,21 @@ from .population_synapses_machine_vertex_shared import (
 )
 from .population_vertex import PopulationVertex
 
-__all__ = ["AbstractPyNNNeuronModel",
-           "AbstractPyNNNeuronModelStandard", "ConnectionHolder",
-           "PopulationMachineVertex", "PopulationNeuronsMachineVertex",
-           "NeuronProvenance", "PopulationSynapsesMachineVertexCommon",
-           "PopulationSynapsesMachineVertexLead", "NeuronRegions",
-           "PopulationSynapsesMachineVertexShared", "PopulationVertex",
-           "SynapseProvenance",
-           "SpikeProcessingProvenance", "SpikeProcessingFastProvenance",
-           "PopulationMachineLocalOnlyCombinedVertex", "LocalOnlyProvenance"]
+__all__ = [
+    "AbstractPyNNNeuronModel",
+    "AbstractPyNNNeuronModelStandard",
+    "ConnectionHolder",
+    "LocalOnlyProvenance",
+    "NeuronProvenance",
+    "NeuronRegions",
+    "PopulationMachineLocalOnlyCombinedVertex",
+    "PopulationMachineVertex",
+    "PopulationNeuronsMachineVertex",
+    "PopulationSynapsesMachineVertexCommon",
+    "PopulationSynapsesMachineVertexLead",
+    "PopulationSynapsesMachineVertexShared",
+    "PopulationVertex",
+    "SpikeProcessingFastProvenance",
+    "SpikeProcessingProvenance",
+    "SynapseProvenance",
+]

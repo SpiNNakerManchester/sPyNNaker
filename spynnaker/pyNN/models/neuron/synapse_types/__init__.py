@@ -19,6 +19,11 @@ from .synapse_type_dual_exponential import SynapseTypeDualExponential
 from .synapse_type_exponential import SynapseTypeExponential
 from .synapse_type_semd import SynapseTypeSEMD
 
-__all__ = ["AbstractSynapseType", "SynapseTypeDualExponential",
-           "SynapseTypeExponential", "SynapseTypeDelta", "SynapseTypeAlpha",
-           "SynapseTypeSEMD"]
+__all__ = [
+           "AbstractSynapseType",
+           "SynapseTypeAlpha",
+           "SynapseTypeDelta",
+           "SynapseTypeDualExponential",
+           "SynapseTypeExponential",
+           "SynapseTypeSEMD",
+]
