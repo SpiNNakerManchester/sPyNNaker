@@ -121,9 +121,10 @@ class PopulationSynapsesMachineVertexCommon(
     MAX_SPIKE_OVERFLOW = "Max_spike_overflow_in_time_step"
 
     __slots__ = (
-        "__sdram_partition",
         "__neuron_vertex",
-        "__partition_id")
+        "__partition_id",
+        "__sdram_partition",
+    )
 
     class REGIONS(IntEnum):
         """

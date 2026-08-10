@@ -95,12 +95,13 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     __slots__ = (
         "__key",
-        "__ring_buffer_shifts",
-        "__weight_scales",
-        "__slice_index",
-        "__neuron_data",
         "__max_atoms_per_core",
-        "__regenerate_data")
+        "__neuron_data",
+        "__regenerate_data",
+        "__ring_buffer_shifts",
+        "__slice_index",
+        "__weight_scales",
+    )
 
     # log_n_neurons, log_n_synapse_types, log_max_delay, input_buffer_size,
     # clear_input_buffer

@@ -58,8 +58,9 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         "__n_pre",
         "__pre_neurons",
         "__pre_neurons_set",
+        "__rng",
         "__with_replacement",
-        "__rng")
+    )
 
     def __init__(
             self, n: int, *, allow_self_connections: bool = True,

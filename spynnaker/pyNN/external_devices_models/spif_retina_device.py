@@ -74,14 +74,15 @@ class SPIFRetinaDevice(
     __n_devices = 0
 
     __slots__ = (
-        "__spif_mask",
-        "__index_by_slice",
         "__base_key",
-        "__pipe",
+        "__index_by_slice",
+        "__input_x_mask",
+        "__input_x_shift",
         "__input_y_mask",
         "__input_y_shift",
-        "__input_x_mask",
-        "__input_x_shift")
+        "__pipe",
+        "__spif_mask",
+    )
 
     @classmethod
     def __issue_device_id(cls, base_key: Optional[int]) -> int:

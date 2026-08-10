@@ -84,16 +84,17 @@ class PopulationMachineCommon(
     """
 
     __slots__ = (
-        # Sdram used by the machine vertex
-        "__sdram",
-        # Regions to be used
-        "__regions",
+        # The name of the binary to run on the core
+        "__binary_file_name",
         # The total number of provenance items returned by this core
         "__n_provenance_items",
         # The profile tags to be decoded
         "__profile_tags",
-        # The name of the binary to run on the core
-        "__binary_file_name")
+        # Regions to be used
+        "__regions",
+        # Sdram used by the machine vertex
+        "__sdram",
+    )
 
     def __init__(
             self, label: str, app_vertex: PopulationVertex,

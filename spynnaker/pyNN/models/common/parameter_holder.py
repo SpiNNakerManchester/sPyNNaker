@@ -38,19 +38,20 @@ class ParameterHolder(object):
     """
 
     __slots__ = (
+        # The merged parameters formed just before the data is read
+        "__data_items",
+
         # A list of items of data that are to be present in each element
         "__data_items_to_return",
-
-        "__single_key",
 
         # Function call to get the values
         "__get_call",
 
-        # The merged parameters formed just before the data is read
-        "__data_items",
-
         # A selector to use if requested
-        "__selector")
+        "__selector",
+
+        "__single_key",
+     )
 
     def __init__(
             self, data_items_to_return: Union[str, Iterable[str]],

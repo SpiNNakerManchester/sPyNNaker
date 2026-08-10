@@ -39,7 +39,7 @@ class ThresholdTypeFixedProb(AbstractThresholdType):
     """
     A threshold that spikes with a fixed probability when over a static value.
     """
-    __slots__ = ("__v_thresh", "__p_thresh", "__random")
+    __slots__ = ("__p_thresh", "__random", "__v_thresh")
 
     def __init__(self, v_thresh: ModelParameter, p_thresh: ModelParameter,
                  seed: Optional[int]):

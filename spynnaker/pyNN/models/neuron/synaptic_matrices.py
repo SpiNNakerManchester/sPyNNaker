@@ -146,46 +146,47 @@ class SynapticMatrices(object):
     """
 
     __slots__ = (
-        # The number of synapse types received
-        "__n_synapse_types",
-        # The region identifiers
-        "__regions",
-        # The sub-matrices for each incoming edge
-        "__matrices",
-        # The address within the synaptic matrix region after the last matrix
-        # was written
-        "__host_generated_block_addr",
-        # The address within the synaptic matrix region after the last
-        # generated matrix will be written
-        "__on_chip_generated_block_addr",
+        # The size of all synaptic blocks added together
+        "__all_syn_block_sz",
+        # The application vertex
+        "__app_vertex",
+        # The bit field key map generated
+        "__bit_field_key_map",
+        # The size of the bit field data to be allocated
+        "__bit_field_size",
+        # Whether data generation has already happened
+        "__data_generated",
         # Determine if any of the matrices can be generated on the machine
         "__gen_on_machine",
-        # Number of bits to use for neuron IDs
-        "__max_atoms_per_core",
-        # The stored master population table data
-        "__master_pop_data",
         # The stored generated data
         "__generated_data",
         # The size needed for generated data
         "__generated_data_size",
+        # The address within the synaptic matrix region after the last matrix
+        # was written
+        "__host_generated_block_addr",
+        # The stored master population table data
+        "__master_pop_data",
+        # The sub-matrices for each incoming edge
+        "__matrices",
+        # Number of bits to use for neuron IDs
+        "__max_atoms_per_core",
+        # The maximum generated data, for calculating timeouts
+        "__max_gen_data",
+        # The number of synapse types received
+        "__n_synapse_types",
+        # The address within the synaptic matrix region after the last
+        # generated matrix will be written
+        "__on_chip_generated_block_addr",
         # The matrices that need to be generated on host
         "__on_host_matrices",
         # The matrices that have been generated on machine
         "__on_machine_matrices",
-        # The application vertex
-        "__app_vertex",
+        # The region identifiers
+        "__regions",
         # The weight scales
         "__weight_scales",
-        # The size of all synaptic blocks added together
-        "__all_syn_block_sz",
-        # Whether data generation has already happened
-        "__data_generated",
-        # The size of the bit field data to be allocated
-        "__bit_field_size",
-        # The bit field key map generated
-        "__bit_field_key_map",
-        # The maximum generated data, for calculating timeouts
-        "__max_gen_data")
+    )
 
     def __init__(
             self, app_vertex: PopulationVertex,

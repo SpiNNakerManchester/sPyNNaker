@@ -85,15 +85,16 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     Make connections according to a list.
     """
     __slots__ = (
-        "__conn_list",
         "__column_names",
-        "__sources",
-        "__targets",
-        "__weights",
+        "__conn_list",
         "__delays",
         "__extra_params",
+        "__sources",
         "__split_conn_list",
-        "__split_post_slices")
+        "__split_post_slices",
+        "__targets",
+        "__weights",
+    )
 
     def __init__(self, conn_list: Union[NDArray, List[Tuple[int, ...]]],
                  column_names: Optional[Sequence[str]] = None, *,

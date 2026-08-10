@@ -63,11 +63,12 @@ class PoolDenseConnector(AbstractConnector):
     """
 
     __slots__ = (
-        "__weights",
+        "__negative_receptor_type",
         "__pool_shape",
         "__pool_stride",
         "__positive_receptor_type",
-        "__negative_receptor_type")
+        "__weights",
+    )
 
     def __init__(self, weights: ArrayLike,
                  pool_shape: Union[int, Tuple[int], None] = None,

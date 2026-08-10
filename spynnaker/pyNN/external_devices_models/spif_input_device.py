@@ -68,17 +68,18 @@ class SPIFInputDevice(
     __n_devices = 0
 
     __slots__ = [
-        "__spif_mask",
-        "__index_by_slice",
         "__base_key",
-        "__pipe",
+        "__index_bits",
+        "__index_by_slice",
+        "__index_shift",
+        "__input_mask",
+        "__input_shift",
         "__key_mask",
         "__m_vertex_mask",
         "__neuron_bits",
-        "__index_bits",
-        "__index_shift",
-        "__input_mask",
-        "__input_shift"]
+        "__pipe",
+        "__spif_mask",
+    ]
 
     def __init__(self, pipe: int, n_neurons: int, n_neurons_per_partition: int,
                  base_key: Optional[int] = None,

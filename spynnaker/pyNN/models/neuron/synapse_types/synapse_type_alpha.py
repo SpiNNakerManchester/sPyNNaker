@@ -45,10 +45,11 @@ class SynapseTypeAlpha(AbstractSynapseType):
         "__exc_response",
         "__inh_exp_response",
         "__inh_response",
+        "__q_exc",
+        "__q_inh",
         "__tau_syn_E",
         "__tau_syn_I",
-        "__q_exc",
-        "__q_inh")
+    )
 
     def __init__(
             self, exc_response: ModelParameter,

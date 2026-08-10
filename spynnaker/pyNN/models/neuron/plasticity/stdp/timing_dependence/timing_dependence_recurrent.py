@@ -42,13 +42,14 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     A timing dependence STDP rule based on recurrences.
     """
     __slots__ = (
+        "__a_minus",
+        "__a_plus",
         "__accumulator_depression_plus_one",
         "__accumulator_potentiation_minus_one",
         "__dual_fsm",
         "__mean_post_window",
         "__mean_pre_window",
-        "__a_plus",
-        "__a_minus")
+    )
 
     __PARAM_NAMES = (
         'accumulator_depression', 'accumulator_potentiation',

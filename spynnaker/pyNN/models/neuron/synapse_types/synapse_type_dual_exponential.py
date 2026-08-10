@@ -39,12 +39,13 @@ class SynapseTypeDualExponential(AbstractSynapseType):
     A synapse with 2 excitatory values.
     """
     __slots__ = (
+        "__isyn_exc",
+        "__isyn_exc2",
+        "__isyn_inh",
         "__tau_syn_E",
         "__tau_syn_E2",
         "__tau_syn_I",
-        "__isyn_exc",
-        "__isyn_exc2",
-        "__isyn_inh")
+    )
 
     def __init__(
             self, tau_syn_E: ModelParameter, tau_syn_E2: ModelParameter,

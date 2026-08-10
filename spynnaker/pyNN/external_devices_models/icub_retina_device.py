@@ -39,8 +39,9 @@ class ICUBRetinaDevice(Application2DSpiNNakerLinkVertex):
     """
 
     __slots__ = (
+        "__base_key",
         "__index_by_slice",
-        "__base_key")
+    )
 
     def __init__(self, base_key: int = 0, width: int = DEFAULT_WIDTH,
                  height: int = DEFAULT_HEIGHT,

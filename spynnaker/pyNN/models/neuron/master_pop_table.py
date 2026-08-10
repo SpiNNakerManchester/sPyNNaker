@@ -185,18 +185,19 @@ class _MasterPopEntry(object):
     """
     __slots__ = (
         "__addresses_and_row_lengths",
-        # The mask to match this entry on
-        "__mask",
-        # The routing key to match this entry on
-        "__routing_key",
         # The part of the key where the core id is held after shifting (below)
         "__core_mask",
         # Where in the key that the core id is held
         "__core_shift",
+        # The mask to match this entry on
+        "__mask",
+        # The number of bits reserved for the colour
+        "__n_colour_bits",
         # The number of neurons on every core except the last
         "__n_neurons",
-        # The number of bits reserved for the colour
-        "__n_colour_bits")
+        # The routing key to match this entry on
+        "__routing_key",
+    )
 
     def __init__(self, routing_key: int, mask: int, core_mask: int,
                  core_shift: int, n_neurons: int, n_colour_bits: int):

@@ -46,19 +46,20 @@ class SynapseInformation(object):
     # Made by a Projection
     __slots__ = (
         "__connector",
-        "__pre_population",
+        "__delays",
+        "__download_on_pause",
+        "__partition_id",
         "__post_population",
-        "__prepop_is_view",
         "__postpop_is_view",
+        "__pre_population",
+        "__pre_run_connection_holders",
+        "__prepop_is_view",
+        "__receptor_type",
         "__synapse_dynamics",
         "__synapse_type",
-        "__receptor_type",
-        "__weights",
-        "__delays",
-        "__pre_run_connection_holders",
         "__synapse_type_from_dynamics",
-        "__download_on_pause",
-        "__partition_id")
+        "__weights",
+    )
 
     def __init__(self, connector: AbstractConnector,
                  pre_population: Union[Population, PopulationView],

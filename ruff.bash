@@ -38,7 +38,7 @@ ruff check ../SpiNNUtils/spinn_utilities ../SpiNNUtils/unittests \
      ../SpiNNFrontEndCommon/fec_integration_tests \
      ../TestBase/spinnaker_testbase ../TestBase/unittests \
      spynnaker unittests spynnaker_integration_tests proxy_integration_tests \
-     --target-version py310 --config ../SupportScripts/actions/ruff/ruff.toml
+     --target-version py310 --config ../SupportScripts/actions/ruff/ruff.toml --fix
 echo using ruff_up.toml
 ruff check ../SpiNNUtils/spinn_utilities ../SpiNNUtils/unittests \
     ../SpiNNMachine/spinn_machine ../SpiNNMachine/unittests \

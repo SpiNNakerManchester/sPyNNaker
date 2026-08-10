@@ -131,8 +131,9 @@ class ProjectionApplicationEdge(ApplicationEdge):
     """
     __slots__ = (
         "__delay_edge",
+        "__is_neuromodulation",
         "__synapse_information",
-        "__is_neuromodulation")
+    )
 
     def __init__(
             self, pre_vertex: PopulationApplicationVertex,

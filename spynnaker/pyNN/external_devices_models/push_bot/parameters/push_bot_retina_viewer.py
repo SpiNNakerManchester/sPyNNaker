@@ -39,10 +39,15 @@ class PushBotRetinaViewer():
     Viewer of retina from the PushBot.
     """
     __slots__ = (
-        "__image_data", "__image_lock",
-        "__without_polarity_mask", "__height",
-        "__fig", "__plot",
-        "__running", "__conn")
+        "__conn",
+        "__fig",
+        "__height",
+        "__image_data",
+        "__image_lock",
+        "__plot",
+        "__running",
+        "__without_polarity_mask",
+    )
 
     def __init__(self, retina_resolution: PushBotRetinaResolution,
                  label: str, sim: None = None):
