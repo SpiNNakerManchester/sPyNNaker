@@ -107,7 +107,8 @@ SpynnakerDataView.register_binary_search_path(
     os.path.dirname(model_binaries.__file__))
 spynnaker_external_devices = Plugins()
 
-__all__ = [
+
+__all__ = [  # noqa: RUF022
     "EIEIOType",
 
     # General Devices

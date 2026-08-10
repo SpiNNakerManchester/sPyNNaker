@@ -217,7 +217,7 @@ SPYNNAKER_AUTO_TIMESTEP = 1.0
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
-__all__ = [
+__all__ = [  # noqa: RUF022
     # PyNN imports
     'Cuboid', 'distance', 'Grid2D', 'Grid3D', 'Line', 'NumpyRNG',
     'RandomDistribution', 'RandomStructure', 'Space', 'Sphere',
