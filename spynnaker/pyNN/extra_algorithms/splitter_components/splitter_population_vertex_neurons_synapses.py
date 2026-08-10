@@ -133,7 +133,6 @@ class SplitterPopulationVertexNeuronsSynapses(
         "__synapse_vertices",
     )
 
-
     def __init__(self) -> None:
         super().__init__()
 
