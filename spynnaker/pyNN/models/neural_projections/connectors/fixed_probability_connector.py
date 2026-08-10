@@ -64,8 +64,9 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     __slots__ = (
         "__allow_self_connections",
+        "__rng",
         "_p_connect",
-        "__rng")
+    )
 
     def __init__(
             self, p_connect: float, allow_self_connections: bool = True,

@@ -35,10 +35,11 @@ class DCSource(AbstractCurrentSource):
     """
     __slots__ = (
         "__amplitude",
+        "__parameter_types",
+        "__parameters",
         "__start",
         "__stop",
-        "__parameters",
-        "__parameter_types")
+    )
 
     def __init__(self, amplitude: float = 0.0, start: float = 0.0,
                  stop: float = 0.0) -> None:

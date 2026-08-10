@@ -43,11 +43,12 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     A timing dependence STDP rule due to Vogels (2011).
     """
     __slots__ = (
+        "__a_minus",
+        "__a_plus",
         "__alpha",
         "__tau",
         "__tau_data",
-        "__a_plus",
-        "__a_minus")
+    )
     __PARAM_NAMES = ('alpha', 'tau')
 
     def __init__(self, alpha: float, tau: float = 20.0,

@@ -78,11 +78,12 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         "__receive_labels",
         "__receiver_connection",
         "__receiver_listener",
-        "__start_resume_callbacks",
         "__spif_host",
-        "__spif_port",
         "__spif_packet_size",
-        "__spif_packet_time_us")
+        "__spif_packet_time_us",
+        "__spif_port",
+        "__start_resume_callbacks",
+    )
 
     def __init__(self, receive_labels: Optional[Iterable[str]],
                  spif_host: str, spif_port: int = _DEFAULT_SPIF_PORT,

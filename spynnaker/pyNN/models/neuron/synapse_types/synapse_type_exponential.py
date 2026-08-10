@@ -37,10 +37,11 @@ class SynapseTypeExponential(AbstractSynapseType):
     A simple exponential synapse.
     """
     __slots__ = (
+        "__isyn_exc",
+        "__isyn_inh",
         "__tau_syn_E",
         "__tau_syn_I",
-        "__isyn_exc",
-        "__isyn_inh")
+    )
 
     def __init__(self, tau_syn_E: ModelParameter, tau_syn_I: ModelParameter,
                  isyn_exc: ModelParameter, isyn_inh: ModelParameter):

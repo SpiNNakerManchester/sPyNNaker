@@ -112,11 +112,12 @@ class SpikeSourceArrayVertex(
     Model for play back of spikes.
     """
     __slots__ = (
-        "__model_name",
         "__model",
+        "__model_name",
+        "__n_colour_bits",
         "__structure",
         "_spike_times",
-        "__n_colour_bits")
+    )
 
     #: ID of the recording region used for recording transmitted spikes.
     SPIKE_RECORDING_REGION_ID = 0

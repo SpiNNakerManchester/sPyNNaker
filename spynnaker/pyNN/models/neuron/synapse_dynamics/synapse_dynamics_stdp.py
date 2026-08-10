@@ -93,18 +93,19 @@ class SynapseDynamicsSTDP(
     """
 
     __slots__ = (
+        # Whether to use back-propagation delay or not
+        "__backprop_delay",
         # Fraction of delay that is dendritic (instead of axonal or synaptic)
         "__dendritic_delay_fraction",
-        # timing dependence to use for the STDP rule
-        "__timing_dependence",
-        # weight dependence to use for the STDP rule
-        "__weight_dependence",
         # The neuromodulation instance if enabled
         "__neuromodulation",
         # padding to add to a synaptic row for synaptic rewiring
         "__pad_to_length",
-        # Whether to use back-propagation delay or not
-        "__backprop_delay")
+        # timing dependence to use for the STDP rule
+        "__timing_dependence",
+        # weight dependence to use for the STDP rule
+        "__weight_dependence",
+    )
 
     def __init__(
             self, timing_dependence: AbstractTimingDependence,

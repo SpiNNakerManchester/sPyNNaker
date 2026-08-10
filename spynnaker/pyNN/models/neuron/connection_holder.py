@@ -47,18 +47,9 @@ class ConnectionHolder(object):
     """
 
     __slots__ = (
-        # A list of items of data that are to be present in each element
-        "__data_items_to_return",
-
         # True if the values should be returned as a list of tuples,
         # False if they should be returned as a tuple of matrices
         "__as_list",
-
-        # The number of atoms in the pre-vertex
-        "__n_pre_atoms",
-
-        # The number of atoms in the post-vertex
-        "__n_post_atoms",
 
         # A list of the connections that have been added
         "__connections",
@@ -66,10 +57,19 @@ class ConnectionHolder(object):
         # The merged connections formed just before the data is read
         "__data_items",
 
+        # A list of items of data that are to be present in each element
+        "__data_items_to_return",
+
         # Additional fixed values to be added to the data returned,
         # with the same values per synapse, as a list of tuples of
         # (field name, value)
         "__fixed_values",
+
+        # The number of atoms in the post-vertex
+        "__n_post_atoms",
+
+        # The number of atoms in the pre-vertex
+        "__n_pre_atoms",
 
         # A callback to call with the data when finished
         "__notify"

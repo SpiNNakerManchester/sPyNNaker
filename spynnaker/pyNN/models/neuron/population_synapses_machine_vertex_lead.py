@@ -60,13 +60,14 @@ class PopulationSynapsesMachineVertexLead(
     """
 
     __slots__ = (
-        "__synaptic_matrices",
+        "__max_atoms_per_core",
+        "__regenerate_data",
         "__ring_buffer_shifts",
-        "__weight_scales",
         "__structural_sz",
         "__synapse_references",
-        "__max_atoms_per_core",
-        "__regenerate_data")
+        "__synaptic_matrices",
+        "__weight_scales",
+    )
 
     def __init__(
             self, sdram: AbstractSDRAM, label: str,

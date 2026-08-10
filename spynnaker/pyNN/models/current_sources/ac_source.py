@@ -37,14 +37,15 @@ class ACSource(AbstractCurrentSource):
     "stop", given (y-)offset, amplitude, frequency and phase.
     """
     __slots__ = (
+        "__amplitude",
+        "__frequency",
+        "__offset",
+        "__parameter_types",
+        "__parameters",
+        "__phase",
         "__start",
         "__stop",
-        "__amplitude",
-        "__offset",
-        "__frequency",
-        "__phase",
-        "__parameters",
-        "__parameter_types")
+    )
 
     def __init__(self, start: float = 0.0, stop: float = 0.0,
                  amplitude: float = 0.0, offset: float = 0.0,

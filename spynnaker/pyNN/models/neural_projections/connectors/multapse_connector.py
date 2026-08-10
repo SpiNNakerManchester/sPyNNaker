@@ -61,9 +61,10 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         "__allow_self_connections",
         "__num_synapses",
         "__post_slices",
+        "__rng",
         "__synapses_per_edge",
         "__with_replacement",
-        "__rng")
+    )
 
     def __init__(self, n: int, allow_self_connections: bool = True,
                  with_replacement: bool = True, rng: Optional[NumpyRNG] = None,

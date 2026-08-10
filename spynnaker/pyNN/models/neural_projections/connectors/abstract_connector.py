@@ -75,11 +75,12 @@ class AbstractConnector(object, metaclass=AbstractBase):
     __slots__ = (
         "__min_delay",
         "__n_clipped_delays",
+        "__param_seeds",
         "__safe",
         "__space",
+        "__used",
         "__verbose",
-        "__param_seeds",
-        "__used")
+    )
 
     def __init__(self, safe: bool = True, callback: None = None,
                  verbose: bool = False):

@@ -74,8 +74,12 @@ class SPIFOutputDevice(
     packet, but this can be controlled with the output_key_shift parameter.
     """
 
-    __slots__ = ("__incoming_partitions", "__create_database",
-                 "__output_key_shift", "__output_key_and_mask")
+    __slots__ = (
+        "__create_database",
+        "__incoming_partitions",
+        "__output_key_and_mask",
+        "__output_key_shift",
+    )
 
     def __init__(self, board_address: Optional[str] = None,
                  chip_coords: Optional[Tuple[int, int]] = None,

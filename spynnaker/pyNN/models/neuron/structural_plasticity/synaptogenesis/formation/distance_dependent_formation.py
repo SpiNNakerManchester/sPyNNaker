@@ -39,13 +39,14 @@ class DistanceDependentFormation(AbstractFormation):
     """
 
     __slots__ = (
-        "__grid",
-        "__p_form_forward",
-        "__sigma_form_forward",
-        "__p_form_lateral",
-        "__sigma_form_lateral",
         "__ff_distance_probabilities",
-        "__lat_distance_probabilities")
+        "__grid",
+        "__lat_distance_probabilities",
+        "__p_form_forward",
+        "__p_form_lateral",
+        "__sigma_form_forward",
+        "__sigma_form_lateral",
+    )
 
     def __init__(
             self, grid: ArrayLike = (16, 16), p_form_forward: float = 0.16,

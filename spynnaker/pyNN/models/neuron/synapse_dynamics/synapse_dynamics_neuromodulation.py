@@ -78,11 +78,12 @@ class SynapseDynamicsNeuromodulation(
 
     __slots__ = (
         "__tau_c",
-        "__tau_d",
         "__tau_c_data",
+        "__tau_d",
         "__tau_d_data",
+        "__w_max",
         "__w_min",
-        "__w_max")
+    )
 
     def __init__(
             self, weight: _Weight = StaticSynapse.default_parameters['weight'],

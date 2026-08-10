@@ -71,18 +71,18 @@ class SynapseDynamicsWeightChangable(
     """
 
     __slots__ = (
+        # The next index to use for the next projection
+        "__next_index",
+
+        # The map of synapse information to index
+        "__synapse_info_to_index",
 
         # The maximum weight
         "__weight_max",
 
         # The minimum weight
         "__weight_min",
-
-        # The map of synapse information to index
-        "__synapse_info_to_index",
-
-        # The next index to use for the next projection
-        "__next_index")
+    )
 
     def __init__(
             self,

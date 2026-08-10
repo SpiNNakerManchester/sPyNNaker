@@ -111,26 +111,27 @@ class SplitterPopulationVertexNeuronsSynapses(
     """
 
     __slots__ = (
-        # All the neuron cores
-        "__neuron_vertices",
-        # All the synapse cores
-        "__synapse_vertices",
-        # Any application Poisson sources that are handled here
-        "__poisson_sources",
-        # The next synapse core to use for an incoming machine edge
-        "__next_synapse_index",
         # The incoming vertices cached
         "__incoming_vertices",
         # The internal multicast partitions
         "__multicast_partitions",
-        # The internal SDRAM partitions
-        "__sdram_partitions",
+        # The application vertex sources that are neuromodulators
+        "__neuromodulators",
+        # All the neuron cores
+        "__neuron_vertices",
+        # The next synapse core to use for an incoming machine edge
+        "__next_synapse_index",
+        # Any application Poisson sources that are handled here
+        "__poisson_sources",
         # The same chip groups
         "__same_chip_groups",
+        # The internal SDRAM partitions
+        "__sdram_partitions",
         # The index used in get_source_specific_in_coming_vertices
         "__synapse_index_used",
-        # The application vertex sources that are neuromodulators
-        "__neuromodulators")
+        # All the synapse cores
+        "__synapse_vertices",
+    )
 
     def __init__(self) -> None:
         super().__init__()

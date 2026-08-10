@@ -95,32 +95,33 @@ class SynapseDynamicsStructuralSTDP(
     Written by Petrut Bogdan.
     """
     __slots__ = (
+        # Holds initial connectivity as defined via connector
+        "__connections",
+        # The elimination rule
+        "__elimination",
         # Frequency of rewiring (Hz)
         "__f_rew",
-        # Initial weight assigned to a newly formed connection
-        "__initial_weight",
+        # The formation rule
+        "__formation",
         # Delay assigned to a newly formed connection
         "__initial_delay",
+        # Initial weight assigned to a newly formed connection
+        "__initial_weight",
+        # The partner selection rule
+        "__partner_selection",
+        # The RNG used with the seed that is passed in
+        "__rng",
         # Maximum fan-in per target layer neuron
         "__s_max",
         # The seed
         "__seed",
-        # Holds initial connectivity as defined via connector
-        "__connections",
+        # Shared RNG seed to be written on all cores
+        "__seeds",
         # The actual type of weights: static through the simulation or those
         # that can be change through STDP
         "__weight_dynamics",
-        # Shared RNG seed to be written on all cores
-        "__seeds",
-        # The RNG used with the seed that is passed in
-        "__rng",
-        # The partner selection rule
-        "__partner_selection",
-        # The formation rule
-        "__formation",
-        # The elimination rule
-        "__elimination",
-        "__with_replacement")
+        "__with_replacement",
+    )
 
     def __init__(
             self, partner_selection: AbstractPartnerSelection,

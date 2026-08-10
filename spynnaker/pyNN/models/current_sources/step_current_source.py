@@ -35,9 +35,10 @@ class StepCurrentSource(AbstractCurrentSource):
     """
     __slots__ = (
         "__amplitudes",
-        "__times",
+        "__parameter_types",
         "__parameters",
-        "__parameter_types")
+        "__times",
+    )
 
     def __init__(
             self, times: Sequence[int] = (), amplitudes: Sequence[float] = ()):

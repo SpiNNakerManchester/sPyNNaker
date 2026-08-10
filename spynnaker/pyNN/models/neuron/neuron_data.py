@@ -67,6 +67,12 @@ class NeuronData(object):
         # The application vertex
         "__app_vertex",
 
+        # Whether to generate things on the machine
+        "__gen_on_machine",
+
+        # Whether an attempt has been made to generate neuron data
+        "__generation_done",
+
         # The data to be written for all vertices, if applicable
         "__neuron_data",
 
@@ -75,12 +81,7 @@ class NeuronData(object):
 
         # The neuron recording data for all vertices, if applicable
         "__neuron_recording_data",
-
-        # Whether an attempt has been made to generate neuron data
-        "__generation_done",
-
-        # Whether to generate things on the machine
-        "__gen_on_machine")
+    )
 
     def __init__(self, app_vertex: PopulationVertex):
         """

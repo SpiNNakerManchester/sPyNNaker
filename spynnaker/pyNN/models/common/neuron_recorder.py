@@ -79,20 +79,21 @@ class NeuronRecorder(object):
     Methods related to recording of neuron data.
     """
     __slots__ = (
-        "__indexes",
-        "__n_neurons",
-        "__sampling_rates",
-        "__data_types",
         "__bitfield_variables",
-        "__per_timestep_variables",
-        "__per_timestep_datatypes",
-        "__per_timestep_recording",
-        "__events_per_core_variables",
+        "__data_types",
         "__events_per_core_datatypes",
         "__events_per_core_recording",
+        "__events_per_core_variables",
         "__events_per_ts",
+        "__indexes",
+        "__n_neurons",
+        "__offset_added",
+        "__per_timestep_datatypes",
+        "__per_timestep_recording",
+        "__per_timestep_variables",
         "__region_ids",
-        "__offset_added")
+        "__sampling_rates",
+    )
 
     _N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
     _N_BYTES_PER_RATE = BYTES_PER_WORD

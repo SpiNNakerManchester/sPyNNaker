@@ -50,15 +50,16 @@ class NeuronImplStandard(AbstractNeuronImpl):
     """
 
     __slots__ = (
-        "__model_name",
+        "__additional_input_type",
         "__binary",
-        "__neuron_model",
+        "__components",
         "__input_type",
+        "__model_name",
+        "__n_steps_per_timestep",
+        "__neuron_model",
         "__synapse_type",
         "__threshold_type",
-        "__additional_input_type",
-        "__components",
-        "__n_steps_per_timestep")
+    )
 
     _RECORDABLES = ["v", "gsyn_exc", "gsyn_inh"]
 

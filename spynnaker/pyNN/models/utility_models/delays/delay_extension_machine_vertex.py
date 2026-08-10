@@ -56,8 +56,9 @@ class DelayExtensionMachineVertex(
     """
 
     __slots__ = (
+        "__drop_late_spikes",
         "__sdram",
-        "__drop_late_spikes")
+    )
 
     class _DelayExtensionRegions(IntEnum):
         """

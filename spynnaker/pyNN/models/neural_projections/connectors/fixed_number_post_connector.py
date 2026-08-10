@@ -60,8 +60,9 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         "__n_post",
         "__post_neurons",
         "__post_neurons_set",
+        "__rng",
         "__with_replacement",
-        "__rng")
+    )
 
     def __init__(
             self, n: int, *, allow_self_connections: bool = True,

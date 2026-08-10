@@ -87,13 +87,14 @@ class PopulationNeuronsMachineVertex(
 
     __slots__ = (
         "__key",
-        "__sdram_partition",
-        "__ring_buffer_shifts",
-        "__weight_scales",
-        "__slice_index",
-        "__neuron_data",
         "__max_atoms_per_core",
-        "__regenerate_data")
+        "__neuron_data",
+        "__regenerate_data",
+        "__ring_buffer_shifts",
+        "__sdram_partition",
+        "__slice_index",
+        "__weight_scales",
+    )
 
     class REGIONS(IntEnum):
         """

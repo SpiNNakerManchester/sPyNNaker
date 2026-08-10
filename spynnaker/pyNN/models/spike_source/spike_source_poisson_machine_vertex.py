@@ -220,9 +220,10 @@ class SpikeSourcePoissonMachineVertex(
         "__buffered_sdram_per_timestep",
         "__is_recording",
         "__minimum_buffer_sdram",
+        "__rate_changed",
         "__sdram",
         "__sdram_partition",
-        "__rate_changed")
+    )
 
     class _PoissonSpikeSourceRegions(IntEnum):
         """

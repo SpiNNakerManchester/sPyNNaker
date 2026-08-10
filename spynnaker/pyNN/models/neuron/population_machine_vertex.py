@@ -98,16 +98,17 @@ class PopulationMachineVertex(
     """
 
     __slots__ = (
-        "__synaptic_matrices",
-        "__neuron_data",
         "__key",
-        "__ring_buffer_shifts",
-        "__weight_scales",
-        "__structural_sz",
-        "__slice_index",
         "__max_atoms_per_core",
+        "__neuron_data",
         "__regenerate_neuron_data",
-        "__regenerate_synapse_data")
+        "__regenerate_synapse_data",
+        "__ring_buffer_shifts",
+        "__slice_index",
+        "__structural_sz",
+        "__synaptic_matrices",
+        "__weight_scales",
+    )
 
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
     DMA_COMPLETE = "DMA's that were completed"

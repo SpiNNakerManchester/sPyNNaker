@@ -49,18 +49,19 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
     """
     __slots__ = (
         "__lock",
+        "__next_data",
+        "__orig_x_shift",
+        "__orig_y_shift",
         "__p_shift",
         "__pixel_shift",
         "__pushbot_listener",
+        "__ready",
         "__retina_injector_label",
-        "__x_shift",
-        "__y_shift",
-        "__orig_x_shift",
-        "__orig_y_shift",
         "__x_mask",
+        "__x_shift",
         "__y_mask",
-        "__next_data",
-        "__ready")
+        "__y_shift",
+    )
 
     def __init__(
             self, retina_injector_label: str,

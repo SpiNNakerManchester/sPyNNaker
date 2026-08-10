@@ -87,8 +87,9 @@ class PopulationView(PopulationBase):
         "__mask",
         "__parent",
         "__population",
+        "__recorder",
         "__vertex",
-        "__recorder")
+    )
 
     __realslots__ = frozenset("_PopulationView" + item for item in __slots__)
 

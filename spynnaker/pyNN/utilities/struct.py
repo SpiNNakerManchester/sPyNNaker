@@ -61,9 +61,10 @@ class Struct(object):
     Represents a C code structure.
     """
     __slots__ = (
+        "__default_values",
         "__fields",
         "__repeat_type",
-        "__default_values")
+    )
 
     def __init__(
             self, fields: Sequence[Tuple[DataType, str]],

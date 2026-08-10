@@ -41,8 +41,14 @@ class NeuronModelIzh(NeuronModel):
     Model of neuron due to Eugene M. Izhikevich et al.
     """
     __slots__ = (
-        "__a", "__b", "__c", "__d",
-        "__v_init", "__u_init", "__i_offset")
+        "__a",
+        "__b",
+        "__c",
+        "__d",
+        "__i_offset",
+        "__u_init",
+        "__v_init",
+    )
 
     def __init__(
             self, a: ModelParameter, b: ModelParameter, c: ModelParameter,

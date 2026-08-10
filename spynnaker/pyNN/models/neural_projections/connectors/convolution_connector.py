@@ -83,14 +83,14 @@ class ConvolutionConnector(AbstractConnector):
     """
 
     __slots__ = (
+        "__filter_edges",
         "__kernel_weights",
-        "__strides",
+        "__negative_receptor_type",
         "__padding_shape",
         "__pool_shape",
         "__pool_stride",
         "__positive_receptor_type",
-        "__negative_receptor_type",
-        "__filter_edges"
+        "__strides"
     )
 
     def __init__(self, kernel_weights: _Weights,

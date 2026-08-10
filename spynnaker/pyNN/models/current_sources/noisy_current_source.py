@@ -39,14 +39,15 @@ class NoisyCurrentSource(AbstractCurrentSource):
     updating every `dt` (`dt` should default to the machine time step).
     """
     __slots__ = (
-        "__mean",
-        "__stdev",
-        "__start",
-        "__stop",
         "__dt",
-        "__rng",
+        "__mean",
+        "__parameter_types",
         "__parameters",
-        "__parameter_types")
+        "__rng",
+        "__start",
+        "__stdev",
+        "__stop",
+    )
 
     def __init__(self, mean: float = 0.0, stdev: float = 0.0,
                  start: float = 0.0, stop: float = 0.0, dt: float = 1.0,

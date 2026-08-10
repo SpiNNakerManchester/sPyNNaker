@@ -57,40 +57,41 @@ class SynapticMatrixApp(object):
     """
 
     __slots__ = (
-        # The synaptic info that these matrices are for
-        "__synapse_info",
-        # The application edge that these matrices are for
-        "__app_edge",
-        # The number of synapse types incoming
-        "__n_synapse_types",
-        # The ID of the synaptic matrix region
-        "__synaptic_matrix_region",
-        # The maximum row length of delayed and undelayed matrices
-        "__max_row_info",
         # The maximum summed size of the synaptic matrices
         "__all_syn_block_sz",
+        # The application edge that these matrices are for
+        "__app_edge",
         # The application-level key information for the incoming edge
         "__app_key_info",
         # The application-level key information for the incoming delay edge
         "__delay_app_key_info",
-        # The weight scaling used by each synapse type
-        "__weight_scales",
-        # The expected size in bytes of a synaptic matrix
-        "__matrix_size",
         # The expected size in bytes of a delayed synaptic matrix
         "__delay_matrix_size",
-        # The offset of the undelayed synaptic matrix in the region
-        "__syn_mat_offset",
         # The offset of the delayed synaptic matrix in the region
         "__delay_syn_mat_offset",
-        # The index of the synaptic matrix within the master population table
-        "__index",
-        # The number of bits to use for neuron IDs
-        "__max_atoms_per_core",
+        # The download index for the delayed synaptic matrix
+        "__download_delay_index",
         # The download index for the undelayed synaptic matrix
         "__download_index",
-        # The download index for the delayed synaptic matrix
-        "__download_delay_index")
+        # The index of the synaptic matrix within the master population table
+        "__index",
+        # The expected size in bytes of a synaptic matrix
+        "__matrix_size",
+        # The number of bits to use for neuron IDs
+        "__max_atoms_per_core",
+        # The maximum row length of delayed and undelayed matrices
+        "__max_row_info",
+        # The number of synapse types incoming
+        "__n_synapse_types",
+        # The offset of the undelayed synaptic matrix in the region
+        "__syn_mat_offset",
+        # The synaptic info that these matrices are for
+        "__synapse_info",
+        # The ID of the synaptic matrix region
+        "__synaptic_matrix_region",
+        # The weight scaling used by each synapse type
+        "__weight_scales",
+    )
 
     def __init__(
             self, synapse_info: SynapseInformation,

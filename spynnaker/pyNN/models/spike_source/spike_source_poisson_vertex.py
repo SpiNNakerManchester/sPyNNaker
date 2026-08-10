@@ -170,24 +170,25 @@ class SpikeSourcePoissonVertex(
     """
 
     __slots__ = (
+        "__allowed_parameters",
+        "__data",
+        "__incoming_control_edge",
+        "__is_variable_rate",
+        "__kiss_seed",  # dict indexed by vertex slice
         "__last_rate_read_time",
+        "__max_n_rates",
+        "__max_rate",
         "__model",
         "__model_name",
         "__n_atoms",
+        "__n_colour_bits",
+        "__n_profile_samples",
+        "__outgoing_projections",
         "__rng",
         "__seed",
         "__spike_recorder",
-        "__kiss_seed",  # dict indexed by vertex slice
-        "__max_rate",
-        "__max_n_rates",
-        "__n_profile_samples",
-        "__data",
-        "__is_variable_rate",
-        "__outgoing_projections",
-        "__incoming_control_edge",
         "__structure",
-        "__allowed_parameters",
-        "__n_colour_bits")
+    )
 
     SPIKE_RECORDING_REGION_ID = 0
 

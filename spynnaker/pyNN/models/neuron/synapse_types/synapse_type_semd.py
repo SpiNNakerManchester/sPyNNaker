@@ -44,15 +44,16 @@ class SynapseTypeSEMD(AbstractSynapseType):
     inhibitory input (see https://www.cit-ec.de/en/nbs/spiking-insect-vision)
     """
     __slots__ = (
-        "__tau_syn_E",
-        "__tau_syn_E2",
-        "__tau_syn_I",
+        "__exc2_old",
         "__isyn_exc",
         "__isyn_exc2",
         "__isyn_inh",
         "__multiplicator",
-        "__exc2_old",
-        "__scaling_factor")
+        "__scaling_factor",
+        "__tau_syn_E",
+        "__tau_syn_E2",
+        "__tau_syn_I",
+    )
 
     def __init__(
             self, tau_syn_E: ModelParameter, tau_syn_E2: ModelParameter,
