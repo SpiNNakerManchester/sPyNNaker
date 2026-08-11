@@ -203,7 +203,7 @@ class DistanceDependentProbabilityConnector(
             n_post_atoms, max_prob)
 
         if min_delay is None or max_delay is None:
-            return int(math.ceil(n_connections))
+            return math.ceil(n_connections)
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,

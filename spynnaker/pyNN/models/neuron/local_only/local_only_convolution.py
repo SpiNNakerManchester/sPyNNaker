@@ -209,8 +209,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
             # Get cores per width / height
             pre_shape = list(pre_vertex.atoms_shape)
-            cores_per_width = int(ceil(pre_shape[0] / width_per_core))
-            cores_per_height = int(ceil(pre_shape[1] / height_per_core))
+            cores_per_width = ceil(pre_shape[0] / width_per_core)
+            cores_per_height = ceil(pre_shape[1] / height_per_core)
 
             # Add the key and mask...
             source_data.extend([r_info.key, r_info.mask])

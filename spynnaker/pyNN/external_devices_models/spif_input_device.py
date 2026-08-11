@@ -118,8 +118,7 @@ class SPIFInputDevice(
             raise ConfigurationException(
                 f"Pipe {pipe} is bigger than maximum allowed {N_PIPES}")
 
-        n_machine_vertices = int(
-            math.ceil(n_neurons / n_neurons_per_partition))
+        n_machine_vertices = math.ceil(n_neurons / n_neurons_per_partition)
 
         # Call the super
         super().__init__(

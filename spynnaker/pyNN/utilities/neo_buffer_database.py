@@ -566,7 +566,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         neurons_recording = len(neurons)
         if neurons_recording == 0:
             return
-        n_words = int(math.ceil(neurons_recording / BITS_PER_WORD))
+        n_words = math.ceil(neurons_recording / BITS_PER_WORD)
         n_bytes = n_words * BYTES_PER_WORD
         n_words_with_timestamp = n_words + 1
 
@@ -711,7 +711,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         raw_data = self._read_recording(region_id)
 
-        n_words = int(math.ceil(len(neurons) / BITS_PER_WORD))
+        n_words = math.ceil(len(neurons) / BITS_PER_WORD)
         n_bytes_per_block = n_words * BYTES_PER_WORD
         offset = 0
         while offset < len(raw_data):

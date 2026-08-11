@@ -813,7 +813,7 @@ class Population(PopulationBase):
         if size is None or isinstance(size, int):
             return size
         # Allow a float which has a near int value
-        temp = int(round(size))
+        temp = round(size)
         if abs(temp - size) < 0.001:
             logger.warning("Size of the population {} rounded "
                            "from {} to {}. Please use int values for size",

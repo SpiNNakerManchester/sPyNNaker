@@ -135,7 +135,7 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             d = distances
 
         self.__mask = (d < self.__degree).astype(numpy.float64)
-        self.__n_connections = int(math.ceil(numpy.sum(self.__mask)))
+        self.__n_connections = math.ceil(numpy.sum(self.__mask))
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:

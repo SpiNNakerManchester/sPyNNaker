@@ -215,7 +215,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
                 cum_size *= first_slice.shape[i]
 
                 # Cores
-                cores_per_dim = int(ceil(pre_shape[i] / first_slice.shape[i]))
+                cores_per_dim = ceil(pre_shape[i] / first_slice.shape[i])
                 dim_data.append(cores_per_dim)
                 dim_data.append(cum_cores_per_dim)
                 dim_data.append(get_div_const(cum_cores_per_dim))

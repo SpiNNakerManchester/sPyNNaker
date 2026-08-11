@@ -350,7 +350,7 @@ class SynapseDynamicsSTDP(
 
         # The actual number of bytes is in a word-aligned struct, so work out
         # the number of bytes as a number of words
-        return int(math.ceil(float(n_bytes) / BYTES_PER_WORD)) * BYTES_PER_WORD
+        return math.ceil(float(n_bytes) / BYTES_PER_WORD) * BYTES_PER_WORD
 
     def __get_n_connections(
             self, n_connections: int, check_length_padded: bool = True) -> int:
@@ -370,7 +370,7 @@ class SynapseDynamicsSTDP(
         # Neuromodulation synapses have the actual weight separately
         if self.__neuromodulation:
             pp_size_bytes += BYTES_PER_SHORT * n_connections
-        pp_size_words = int(math.ceil(float(pp_size_bytes) / BYTES_PER_WORD))
+        pp_size_words = math.ceil(float(pp_size_bytes) / BYTES_PER_WORD)
 
         return fp_size_words + pp_size_words
 

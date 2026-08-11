@@ -399,7 +399,7 @@ def get_n_bits(n_values: int) -> int:
         return 0
     if n_values == 1:
         return 1
-    return int(math.ceil(math.log2(n_values)))
+    return math.ceil(math.log2(n_values))
 
 
 def get_time_to_write_us(n_bytes: int, n_cores: int) -> int:
@@ -414,7 +414,7 @@ def get_time_to_write_us(n_bytes: int, n_cores: int) -> int:
     """
     bandwidth_per_core = WRITE_BANDWIDTH_BYTES_PER_SECOND / n_cores
     seconds = n_bytes / bandwidth_per_core
-    return int(math.ceil(seconds * MICRO_TO_SECOND_CONVERSION))
+    return math.ceil(seconds * MICRO_TO_SECOND_CONVERSION)
 
 
 def check_io(to_file: IoDest) -> None:
