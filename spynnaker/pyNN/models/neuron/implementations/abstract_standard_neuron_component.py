@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Iterable, List, Union
+from typing import Iterable, Union
 
 import numpy
 from numpy import floating
@@ -31,7 +31,7 @@ ModelParameter: TypeAlias = Union[
     float, Iterable[float], RandomDistribution, NDArray[floating]]
 
 
-class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
+class AbstractStandardNeuronComponent(metaclass=AbstractBase):
     """
     Represents a component of a standard neural model.
     """
@@ -39,7 +39,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         "__structs",
         "__units")
 
-    def __init__(self, structs: List[Struct], units: Dict[str, str]):
+    def __init__(self, structs: list[Struct], units: dict[str, str]):
         """
         :param structs: The structures of the component
         :param units: The units to use for each parameter
@@ -48,7 +48,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         self.__units = units
 
     @property
-    def structs(self) -> List[Struct]:
+    def structs(self) -> list[Struct]:
         """
         The structures of the component.  If there are multiple structures,
         the order is how they will appear in memory; where there are

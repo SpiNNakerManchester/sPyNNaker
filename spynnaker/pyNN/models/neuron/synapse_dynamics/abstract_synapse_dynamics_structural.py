@@ -48,7 +48,7 @@ if TYPE_CHECKING:
 InitialDelay: TypeAlias = float
 
 
-class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
+class AbstractSynapseDynamicsStructural(metaclass=AbstractBase):
     """
     Base class for synapse dynamics that structural plasticity understands.
     """

@@ -19,7 +19,6 @@ from enum import IntEnum
 from typing import (
     TYPE_CHECKING,
     Iterable,
-    List,
     Optional,
     Sequence,
     TypeVar,
@@ -331,7 +330,7 @@ class SpikeSourcePoissonMachineVertex(
         return 1
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
-    def get_recorded_region_ids(self) -> List[int]:
+    def get_recorded_region_ids(self) -> list[int]:
         if self.__is_recording:
             return [0]
         return []
@@ -498,7 +497,7 @@ class SpikeSourcePoissonMachineVertex(
 
         # List starts with n_items, so start with 0.  Use arrays to allow
         # numpy concatenation to work.
-        data_items: List[Union[Sequence[int], numpy.ndarray]] = []
+        data_items: list[Union[Sequence[int], numpy.ndarray]] = []
         data_items.append([int(self.__rate_changed)])
         data_items.append([0])
         n_items = 0
@@ -637,7 +636,7 @@ class SpikeSourcePoissonMachineVertex(
                 n_rates, = _ONE_WORD.unpack_from(byte_array, offset)
                 # Skip the count and index
                 offset += PARAMS_WORDS_PER_NEURON * BYTES_PER_WORD
-                rates: List[float] = []
+                rates: list[float] = []
                 for _ in range(n_rates):
                     rate_int = _ONE_WORD.unpack_from(byte_array, offset)[0]
                     rates.append(rate_int / DataType.S1615.scale)

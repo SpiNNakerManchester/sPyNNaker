@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Iterator, Optional, Set, Tuple
+from typing import TYPE_CHECKING, Iterator, Optional
 
 from spinn_utilities.log import FormatAdapter
 
@@ -30,7 +30,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access
 
 
-class _SpynnakerDataModel(object):
+class _SpynnakerDataModel:
     """
     Singleton data model.
 
@@ -69,8 +69,8 @@ class _SpynnakerDataModel(object):
         self._id_counter = 0
         self._min_delay: Optional[float] = None
         # Using a dict to verify if later could be stored here only
-        self._populations: Set[Population] = set()
-        self._projections: Set[Projection] = set()
+        self._populations: set[Population] = set()
+        self._projections: set[Projection] = set()
 
     def _hard_reset(self) -> None:
         """
@@ -195,7 +195,7 @@ class SpynnakerDataView(FecDataView):
         return len(cls.__spy_data._populations)
 
     @classmethod
-    def add_population(cls, population: Population) -> Tuple[int, int]:
+    def add_population(cls, population: Population) -> tuple[int, int]:
         """
         Called by each population to add itself to the list.
 

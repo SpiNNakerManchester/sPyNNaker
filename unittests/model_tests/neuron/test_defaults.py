@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import re
-from typing import List
 
 from testfixtures import LogCapture  # type: ignore[import]
 
@@ -132,8 +131,8 @@ def test_setting_state_variables() -> None:
         _AnotherClass(param_3=3)
 
 
-def _check_warnings(lc: LogCapture, expected: List[str],
-                    not_expected: List[str]) -> None:
+def _check_warnings(lc: LogCapture, expected: list[str],
+                    not_expected: list[str]) -> None:
     line_matcher = re.compile(
         "Formal PyNN specifies that (.*) should be set using initial_values"
         " not cell_params")

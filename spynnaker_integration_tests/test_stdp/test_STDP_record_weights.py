@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Tuple
 
 import pyNN.spiNNaker as sim
 from neo import AnalogSignal
@@ -46,8 +45,8 @@ synParameters = {
 
 # Network and simulation
 def record_weights_using_callback(
-        ) -> Tuple[List[List[int]], SpikeTrainList, AnalogSignal,
-                   List[ConnectionHolder]]:
+        ) -> tuple[list[list[int]], SpikeTrainList, AnalogSignal,
+                   list[ConnectionHolder]]:
 
     ######################################
     # Setup
@@ -128,7 +127,7 @@ def record_weights_using_callback(
 
 
 # https://neuralensemble.org/docs/PyNN/examples/simple_STDP.html
-class weight_recorder(object):
+class weight_recorder:
     """
     Recording of weights is not yet built in to PyNN, so therefore we need
     to construct a callback object, which reads the current weights from
@@ -138,21 +137,21 @@ class weight_recorder(object):
     def __init__(self, sampling_interval: float, projection: Projection):
         self.interval = sampling_interval
         self.projection = projection
-        self._weights: List[ConnectionHolder] = []
+        self._weights: list[ConnectionHolder] = []
 
     def __call__(self, t: float) -> float:
         self._weights.append(
             self.projection.get('weight', format='list', with_address=True))
         return t + self.interval
 
-    def get_weights(self) -> List[ConnectionHolder]:
+    def get_weights(self) -> list[ConnectionHolder]:
         return self._weights
 
 
 # Network and simulation
 def record_weights_using_multirun(
-        ) -> Tuple[List[List[int]], SpikeTrainList, AnalogSignal,
-                   List[ConnectionHolder]]:
+        ) -> tuple[list[list[int]], SpikeTrainList, AnalogSignal,
+                   list[ConnectionHolder]]:
 
     ######################################
     # Setup

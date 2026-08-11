@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import sys
-from typing import Tuple
 
 import numpy
 import pyNN.spiNNaker as p
@@ -23,7 +22,7 @@ from spinnaker_testbase import BaseTestCase
 
 
 def run_network(
-        timestep: float, steps_per_timestep: int) -> Tuple[Block, Block]:
+        timestep: float, steps_per_timestep: int) -> tuple[Block, Block]:
     p.setup(timestep, max_delay=1.0)
     pre = p.Population(1, p.SpikeSourceArray(range(0, 100, 10)))
     post = p.Population(1, p.IF_cond_exp(), additional_parameters={
@@ -38,7 +37,7 @@ def run_network(
     return v, spikes
 
 
-def do_test_multistep() -> Tuple[Block, Block, Block, Block]:
+def do_test_multistep() -> tuple[Block, Block, Block, Block]:
     v_005, spikes_005 = run_network(0.05, 1)
     v_005 = numpy.ravel(v_005.magnitude)[1::2][:-1]
     spikes_005 = numpy.round(spikes_005[0].times.magnitude + 0.025, 1)

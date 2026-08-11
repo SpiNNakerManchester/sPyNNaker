@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Tuple
 
 import pyNN.spiNNaker as p
 from neo import Block
@@ -24,7 +23,7 @@ from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.utilities import neo_convertor
 
 
-def do_run(nNeurons: int) -> Tuple[Block, Block, Block]:
+def do_run(nNeurons: int) -> tuple[Block, Block, Block]:
 
     p.setup(timestep=1.0, min_delay=1.0)
 

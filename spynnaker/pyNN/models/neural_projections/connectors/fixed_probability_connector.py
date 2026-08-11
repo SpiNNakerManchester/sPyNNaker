@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import logging
 import math
-from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Optional, Sequence
 
 import numpy
 from numpy.typing import NDArray
@@ -111,7 +111,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         self.__rng = rng
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["p_connect"] = self.p_connect
         parameters["allow_self_connections"] = self.__allow_self_connections

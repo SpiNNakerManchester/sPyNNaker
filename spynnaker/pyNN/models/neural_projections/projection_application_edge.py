@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional, Type, cast
+from typing import TYPE_CHECKING, Optional, cast
 
 from typing_extensions import TypeGuard
 
@@ -46,12 +46,12 @@ class _Dynamics:
     """
     Holds late-initialised class references.
     """
-    _Structural: Optional[Type[AbstractSynapseDynamicsStructural]] = None
-    _STDP: Optional[Type[SynapseDynamicsSTDP]] = None
-    _Neuromodulation: Optional[Type[SynapseDynamicsNeuromodulation]] = None
+    _Structural: Optional[type[AbstractSynapseDynamicsStructural]] = None
+    _STDP: Optional[type[SynapseDynamicsSTDP]] = None
+    _Neuromodulation: Optional[type[SynapseDynamicsNeuromodulation]] = None
 
     @classmethod
-    def structural(cls) -> Type[AbstractSynapseDynamicsStructural]:
+    def structural(cls) -> type[AbstractSynapseDynamicsStructural]:
         """
         :returns: Delayed import of AbstractSynapseDynamicsStructural
         """
@@ -65,7 +65,7 @@ class _Dynamics:
         return cls._Structural
 
     @classmethod
-    def stdp(cls) -> Type[SynapseDynamicsSTDP]:
+    def stdp(cls) -> type[SynapseDynamicsSTDP]:
         """
         :returns: Delayed import of SynapseDynamicsSTDP
         """
@@ -79,7 +79,7 @@ class _Dynamics:
         return cls._STDP
 
     @classmethod
-    def neuromodulation(cls) -> Type[SynapseDynamicsNeuromodulation]:
+    def neuromodulation(cls) -> type[SynapseDynamicsNeuromodulation]:
         """
         :returns: Delayed import of SynapseDynamicsNeuromodulation
         """
@@ -176,7 +176,7 @@ class ProjectionApplicationEdge(ApplicationEdge):
         self.__synapse_information.append(synapse_information)
 
     @property
-    def synapse_information(self) -> List[SynapseInformation]:
+    def synapse_information(self) -> list[SynapseInformation]:
         """
         The synapse information on this edge
         """

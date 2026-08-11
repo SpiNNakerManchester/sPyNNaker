@@ -21,7 +21,7 @@ PushBot (https://spinnakermanchester.github.io/docs/push_bot/).
     accuracy to gain performance.
 """
 import os
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Optional
 
 from spinn_utilities.socket_address import SocketAddress
 
@@ -216,7 +216,7 @@ def register_database_notification_request(
 __ethernet_control_connection: Optional[EthernetControlConnection] = None
 
 
-def __vtx(population: Population) -> Tuple[
+def __vtx(population: Population) -> tuple[
         PopulationVertex, AbstractEthernetController, str]:
     vertex = population._vertex  # pylint: disable=protected-access
     if isinstance(vertex, PopulationVertex):
@@ -239,7 +239,7 @@ def EthernetControlPopulation(
         local_host: Optional[str] = None, local_port: Optional[int] = None,
         database_notify_port_num: Optional[int] = None,
         database_ack_port_num: Optional[int] = None,
-        **additional_kwargs: Dict[str, Any]) -> Population:
+        **additional_kwargs: dict[str, Any]) -> Population:
     # pylint: disable=invalid-name
     """
     Create a PyNN population that can be included in a network to
@@ -310,7 +310,7 @@ def EthernetSensorPopulation(
         device: AbstractEthernetSensor, local_host: Optional[str] = None,
         database_notify_port_num: Optional[int] = None,
         database_ack_port_num: Optional[int] = None,
-        **additional_kwargs: Dict[str, Any]) -> Population:
+        **additional_kwargs: dict[str, Any]) -> Population:
     # pylint: disable=invalid-name
     """
     Create a pyNN population which can be included in a network to

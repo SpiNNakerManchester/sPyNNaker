@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-from typing import Tuple
 
 import numpy
 import pyNN.spiNNaker as p
@@ -28,7 +27,7 @@ weight_to_spike = 2.0
 delay = 1
 
 
-def do_run() -> Tuple[ConnectionHolder, ConnectionHolder, ConnectionHolder,
+def do_run() -> tuple[ConnectionHolder, ConnectionHolder, ConnectionHolder,
                       ConnectionHolder, ConnectionHolder, ConnectionHolder,
                       ConnectionHolder, ConnectionHolder]:
     p.setup(timestep=1.0, min_delay=1.0)

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Mapping, Optional, Sequence, Tuple, Union
+from typing import Mapping, Optional, Sequence, Union
 
 from numpy.typing import NDArray
 
@@ -167,17 +167,17 @@ class MockApvVertex(PopulationVertex):
 
     def __init__(
             self, *, n_neurons: int = 1, label: str = "test",
-            max_atoms_per_core: Union[int, Tuple[int, ...]] = 255,
+            max_atoms_per_core: Union[int, tuple[int, ...]] = 255,
             spikes_per_second: Optional[float] = None,
             ring_buffer_sigma: Optional[float] = None,
-            max_expected_summed_weight: Optional[List[float]] = None,
+            max_expected_summed_weight: Optional[list[float]] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             neuron_impl: Optional[AbstractNeuronImpl] = None,
             pynn_model: Optional[AbstractPyNNNeuronModel] = None,
             drop_late_spikes: bool = False,
             splitter: Optional[SplitterPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
-            extra_partitions: Optional[List[str]] = None):
+            extra_partitions: Optional[list[str]] = None):
         if neuron_impl is None:
             if pynn_model is not None:
                 neuron_impl = pynn_model._model

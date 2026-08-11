@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
 
 from neo import AnalogSignal, Block, Segment, SpikeTrain
 
@@ -47,7 +46,7 @@ def compare_spiketrain(spiketrain1: SpikeTrain, spiketrain2: SpikeTrain, *,
 
 
 def compare_spiketrains(
-        spiketrains1: List[SpikeTrain], spiketrains2: List[SpikeTrain], *,
+        spiketrains1: list[SpikeTrain], spiketrains2: list[SpikeTrain], *,
         same_data: bool = True, same_length: bool = True) -> None:
     """
     Check two Lists of spike trains have the exact same data.

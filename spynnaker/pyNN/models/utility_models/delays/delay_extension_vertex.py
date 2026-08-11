@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Sequence, Tuple, cast
+from typing import TYPE_CHECKING, Sequence, cast
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.overrides import overrides
@@ -82,7 +82,7 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
         self.__drop_late_spikes = get_config_bool(
             "Simulation", "drop_late_spikes") or False
 
-        self.__outgoing_edges: List[DelayedApplicationEdge] = []
+        self.__outgoing_edges: list[DelayedApplicationEdge] = []
 
         self.__n_colour_bits = n_colour_bits
 
@@ -95,7 +95,7 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
 
     @property
     @overrides(ColouredApplicationVertex.atoms_shape)
-    def atoms_shape(self) -> Tuple[int, ...]:
+    def atoms_shape(self) -> tuple[int, ...]:
         return self.__partition.pre_vertex.atoms_shape
 
     @property

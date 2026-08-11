@@ -14,7 +14,7 @@
 
 import logging
 import sys
-from typing import Collection, Dict, List, Optional, Tuple, Union
+from typing import Collection, Optional, Union
 
 import numpy
 from numpy.typing import NDArray
@@ -61,7 +61,7 @@ class SpikeInjectorVertex(
             reserve_reverse_ip_tag: bool,
             splitter: Optional[AbstractSplitterCommon],
             max_atoms_per_core: Optional[
-                Union[int, Tuple[int, ...]]] = sys.maxsize):
+                Union[int, tuple[int, ...]]] = sys.maxsize):
         """
         :param label: The optional name of the vertex.
         """
@@ -81,13 +81,13 @@ class SpikeInjectorVertex(
 
     @property
     @overrides(PopulationApplicationVertex.atoms_shape)
-    def atoms_shape(self) -> Tuple[int, ...]:
+    def atoms_shape(self) -> tuple[int, ...]:
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.n_atoms)
         return super().atoms_shape
 
     @overrides(PopulationApplicationVertex.get_recordable_variables)
-    def get_recordable_variables(self) -> List[str]:
+    def get_recordable_variables(self) -> list[str]:
         return ["spikes"]
 
     @overrides(PopulationApplicationVertex.set_recording)
@@ -106,7 +106,7 @@ class SpikeInjectorVertex(
         self.__spike_recorder.record = True
 
     @overrides(PopulationApplicationVertex.get_recording_variables)
-    def get_recording_variables(self) -> List[str]:
+    def get_recording_variables(self) -> list[str]:
         if self.__spike_recorder.record:
             return ["spikes"]
         return []
@@ -159,7 +159,7 @@ class SpikeInjectorVertex(
             raise KeyError(f"Cannot record {name}")
         return vertex_slice.get_raster_ids()
 
-    def describe(self) -> Dict[str, Union[str, Collection[str]]]:
+    def describe(self) -> dict[str, Union[str, Collection[str]]]:
         """
         :returns: A human-readable description of the cell or synapse type.
         """

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List, Optional
+from typing import Iterable, Optional
 
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
@@ -67,7 +67,7 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
         self.send_spikes(label, [neuron_id], send_full_keys)
 
     def send_spikes(
-            self, label: str, neuron_ids: List[int],
+            self, label: str, neuron_ids: list[int],
             send_full_keys: bool = False) -> None:
         """
         Send a number of spikes.

@@ -14,7 +14,6 @@
 
 import decimal
 from collections import defaultdict
-from typing import Dict, List
 
 import numpy
 import pyNN.spiNNaker as p
@@ -35,9 +34,9 @@ from spynnaker.pyNN.external_devices_models import (
 
 class Translator(AbstractEthernetTranslator):
 
-    def __init__(self, devices: List["Device"]):
+    def __init__(self, devices: list["Device"]):
         self.__keys = {device.device_control_key for device in devices}
-        self.voltages: Dict[int, List[float]] = defaultdict(list)
+        self.voltages: dict[int, list[float]] = defaultdict(list)
 
     @overrides(AbstractEthernetTranslator.translate_control_packet)
     def translate_control_packet(
@@ -101,7 +100,7 @@ class Device(AbstractMulticastControllableDevice):
         return True
 
 
-def spike_receiver(label: str, time: int, spikes: List[int]) -> None:
+def spike_receiver(label: str, time: int, spikes: list[int]) -> None:
     print(f"Received spikes {spikes} from {label} at time {time}")
 
 

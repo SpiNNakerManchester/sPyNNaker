@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Sequence, Tuple
+from typing import TYPE_CHECKING, Sequence
 
 from numpy.typing import NDArray
 
@@ -25,13 +25,13 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 
-class AbstractGenerateConnectorOnHost(object, metaclass=AbstractBase):
+class AbstractGenerateConnectorOnHost(metaclass=AbstractBase):
     """
     A connector that can be generated on host.
     """
 
     # Mix-in class, so don't add anything here!
-    __slots__: Tuple[str, ...] = ()
+    __slots__: tuple[str, ...] = ()
 
     @abstractmethod
     def create_synaptic_block(

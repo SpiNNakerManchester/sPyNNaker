@@ -14,7 +14,7 @@
 
 import math
 import unittest
-from typing import List, cast
+from typing import cast
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -150,7 +150,7 @@ class TestSTDPNeuromodulation(BaseTestCase):
         weight_exact = (
             ((el * DA_concentration) * const)*((decay_d * decay_e) - 1))
         print(f"Weight calculated: {weight_exact}")
-        weights0 = cast(List[float], weights[0])
+        weights0 = cast(list[float], weights[0])
         print(f"Weight from SpiNNaker: {weights0[2]}")
         self.assertTrue(numpy.allclose(
                         weights0[2], weight_exact, atol=0.02))

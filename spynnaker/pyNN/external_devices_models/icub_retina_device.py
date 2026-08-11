@@ -13,7 +13,7 @@
 # limitations under the License.
 import logging
 from math import ceil, log2
-from typing import Dict, Optional
+from typing import Optional
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -96,7 +96,7 @@ class ICUBRetinaDevice(Application2DSpiNNakerLinkVertex):
             board_address, incoming=True, outgoing=True)
 
         # A dictionary to get vertex index from FPGA and slice
-        self.__index_by_slice: Dict[Slice, int] = {}
+        self.__index_by_slice: dict[Slice, int] = {}
         self.__base_key = base_key
 
     @overrides(Application2DSpiNNakerLinkVertex.get_incoming_slice)

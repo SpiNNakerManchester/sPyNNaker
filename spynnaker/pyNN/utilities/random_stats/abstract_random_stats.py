@@ -19,7 +19,7 @@ from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-class AbstractRandomStats(object, metaclass=AbstractBase):
+class AbstractRandomStats(metaclass=AbstractBase):
     """
     Statistics about PyNN `~spynnaker.pyNN.RandomDistribution` objects.
     """

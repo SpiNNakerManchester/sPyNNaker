@@ -19,11 +19,8 @@ from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
-    List,
     Optional,
     Sequence,
-    Tuple,
     Union,
 )
 
@@ -96,7 +93,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         "__weights",
     )
 
-    def __init__(self, conn_list: Union[NDArray, List[Tuple[int, ...]]],
+    def __init__(self, conn_list: Union[NDArray, list[tuple[int, ...]]],
                  column_names: Optional[Sequence[str]] = None, *,
                  safe: bool = True, verbose: bool = False,
                  callback: None = None):
@@ -131,8 +128,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         super().__init__(safe, callback, verbose)
 
         self.__column_names = column_names
-        self.__split_conn_list: Dict[int, NDArray[integer]] = {}
-        self.__split_post_slices: Optional[List[Slice]] = None
+        self.__split_conn_list: dict[int, NDArray[integer]] = {}
+        self.__split_post_slices: Optional[list[Slice]] = None
 
         self.__conn_list: NDArray
         # These are set by __setup_using_conn_list
@@ -149,7 +146,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         self.__setup_using_conn_list()
 
     @overrides(AbstractConnector.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["conn_list"] = self.conn_list
         parameters["column_names"] = self.column_names
@@ -199,7 +196,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def _split_connections(
             self, n_pre_atoms: int, n_post_atoms: int,
             post_slices: Sequence[Slice]) -> \
-            Tuple[NDArray[integer], NDArray[integer],
+            tuple[NDArray[integer], NDArray[integer],
                   Optional[NDArray[floating]],
                   Optional[NDArray[floating]]]:
         input_filter = numpy.logical_and(
@@ -295,7 +292,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             max_targets, min_delay, max_delay, synapse_info)
 
     @staticmethod
-    def __numpy_group(conns: NDArray, column: int) -> List[NDArray]:
+    def __numpy_group(conns: NDArray, column: int) -> list[NDArray]:
         # Sort by the column to group by
         s = conns[conns[:, column].argsort()]
 
@@ -509,7 +506,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             self, s_info: SynapseInformation,
             source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
-                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
+                tuple[MachineVertex, Sequence[AbstractVertex]]]:
         # Divide the targets into bins based on post slices
         post_slices = [m.vertex_slice
                        for m in target_vertex.splitter.get_in_coming_vertices(

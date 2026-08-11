@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Optional, Sequence
 
 import numpy
 from numpy import integer, uint32
@@ -101,12 +101,12 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         self.__n_post = self._roundsize(n, "FixedNumberPostConnector")
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
-        self.__post_neurons: List[NDArray[integer]] = []
+        self.__post_neurons: list[NDArray[integer]] = []
         self.__post_neurons_set = False
         self.__rng = rng
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["n"] = self.__n_post
         parameters["allow_self_connections"] = self.allow_self_connections
@@ -144,9 +144,9 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             synapse_info.delays, n_connections, synapse_info)
 
     def __build_post_neurons(
-            self, synapse_info: SynapseInformation) -> List[NDArray[integer]]:
+            self, synapse_info: SynapseInformation) -> list[NDArray[integer]]:
         rng = self.__rng or NumpyRNG()
-        post_neurons: List[NDArray[integer]] = \
+        post_neurons: list[NDArray[integer]] = \
             [numpy.empty([0], dtype=uint32)] * synapse_info.n_pre_neurons
         # Loop over all the pre neurons
         for m in range(synapse_info.n_pre_neurons):
@@ -173,7 +173,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         return post_neurons
 
     def _get_post_neurons(
-            self, synapse_info: SynapseInformation) -> List[NDArray[integer]]:
+            self, synapse_info: SynapseInformation) -> list[NDArray[integer]]:
         # If we haven't set the array up yet, do it now
         if not self.__post_neurons_set:
             self.__post_neurons = self.__build_post_neurons(synapse_info)

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Dict, Set, Tuple
 
 import pyNN.spiNNaker as p
 from neo import Block
@@ -42,8 +41,8 @@ def create_grid(
                         structure=grid_structure, label=label)
 
 
-def do_run(m_size: Tuple[int, int],
-           n_atoms_side: int) -> Tuple[Block, ConnectionHolder]:
+def do_run(m_size: tuple[int, int],
+           n_atoms_side: int) -> tuple[Block, ConnectionHolder]:
 
     p.setup(timestep=1.0)
 
@@ -148,7 +147,7 @@ class SmallWorldConnectorFixedTest(BaseTestCase):
               21, 21, 21, 21, 21, 22]
 
     def directly_connected(
-            self, weights: ConnectionHolder) -> Dict[int, Set[int]]:
+            self, weights: ConnectionHolder) -> dict[int, set[int]]:
         singles = defaultdict(set)
         for (s, d, _) in weights:
             singles[s].add(d)

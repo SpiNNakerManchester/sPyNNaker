@@ -16,12 +16,9 @@ from __future__ import annotations
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
     Final,
-    List,
     Optional,
     Sequence,
-    Tuple,
     Union,
 )
 
@@ -62,9 +59,9 @@ if TYPE_CHECKING:
     )
 
 
-_TWOD: Final['TypeAlias'] = Union[List[int], Tuple[int, int]]
+_TWOD: Final['TypeAlias'] = Union[list[int], tuple[int, int]]
 _KERNAL: Final['TypeAlias'] = Union[
-    float, int, List[float], NDArray[numpy.floating], RandomDistribution]
+    float, int, list[float], NDArray[numpy.floating], RandomDistribution]
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 9
@@ -231,11 +228,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         self._shape_post = shape_post
 
         # Create storage for later
-        self._post_as_pre: Dict[
-            Slice, Tuple[NDArray[integer], NDArray[integer]]] = {}
+        self._post_as_pre: dict[
+            Slice, tuple[NDArray[integer], NDArray[integer]]] = {}
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["shape_pre"] = [self._pre_h, self._pre_w]
         parameters["shape_post"] = [self._post_h, self._post_w]
@@ -255,7 +252,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return parameters
 
     def __to_post_coords(
-            self, post_vertex_slice: Slice) -> Tuple[
+            self, post_vertex_slice: Slice) -> tuple[
                 NDArray[integer], NDArray[integer]]:
         """
         Get a list of possible post-slice coordinates.
@@ -268,7 +265,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return numpy.divmod(post, self._post_w)
 
     def __map_to_pre_coords(
-            self, post_r: NDArray[integer], post_c: NDArray[integer]) -> Tuple[
+            self, post_r: NDArray[integer], post_c: NDArray[integer]) -> tuple[
                 NDArray[integer], NDArray[integer]]:
         """
         Get a map from post to pre-population coordinates.
@@ -276,7 +273,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return (self._post_start_h + post_r * self._post_step_h,
                 self._post_start_w + post_c * self._post_step_w)
 
-    def __post_as_pre(self, post_vertex_slice: Slice) -> Tuple[
+    def __post_as_pre(self, post_vertex_slice: Slice) -> tuple[
             NDArray[integer], NDArray[integer]]:
         """
         Write post-population coordinates as pre-population coordinates.
@@ -288,7 +285,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
                 self.__map_to_pre_coords(post_r, post_c)
         return self._post_as_pre[post_vertex_slice]
 
-    def __pre_as_post(self, pre_r: int, pre_c: int) -> Tuple[int, int]:
+    def __pre_as_post(self, pre_r: int, pre_c: int) -> tuple[int, int]:
         """
         Write pre-population coordinates as post-population coordinates.
         """
@@ -326,7 +323,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     def __compute_statistics(
             self, weights: Optional[Weights],
             delays: Optional[Delays], post_vertex_slice: Slice,
-            n_pre_neurons: int) -> Tuple[
+            n_pre_neurons: int) -> tuple[
                 int, NDArray[uint32], NDArray[uint32], NDArray[floating],
                 NDArray[floating]]:
         """
@@ -342,12 +339,12 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         assert self._krn_delays is not None
 
         post_as_pre_r, post_as_pre_c = self.__post_as_pre(post_vertex_slice)
-        coords: Dict[int, List[int]] = {}
+        coords: dict[int, list[int]] = {}
         hh, hw = self._hlf_k_h, self._hlf_k_w
-        all_pre_ids: List[int] = []
-        all_post_ids: List[int] = []
-        all_delays: List[NDArray[floating]] = []
-        all_weights: List[NDArray[floating]] = []
+        all_pre_ids: list[int] = []
+        all_post_ids: list[int] = []
+        all_delays: list[NDArray[floating]] = []
+        all_weights: list[NDArray[floating]] = []
         count = 0
         post_lo = post_vertex_slice.lo_atom
 
@@ -547,7 +544,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     def get_connected_vertices(
             self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
-                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
+                tuple[MachineVertex, Sequence[AbstractVertex]]]:
         src_splitter = source_vertex.splitter
         return [
             (t_vert,

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional
+from typing import Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -106,9 +106,9 @@ class PushBotSpiNNakerLinkRetinaDevice(
     @property
     @overrides(AbstractPushBotRetinaDevice.start_resume_commands)
     def start_resume_commands(
-            self) -> List[MultiCastCommand]:
+            self) -> list[MultiCastCommand]:
         # Update the commands with the additional one to set the key
-        new_commands: List[MultiCastCommand] = []
+        new_commands: list[MultiCastCommand] = []
         for command in super().start_resume_commands:
             if command.key == self._protocol.set_retina_transmission_key:
                 # This has to be stored so that the payload can be updated

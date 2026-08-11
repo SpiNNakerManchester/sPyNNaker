@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Iterable, Sequence, Tuple
+from typing import Iterable, Sequence
 
 from spinn_utilities.overrides import overrides
 
@@ -58,7 +58,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
 
     def __init__(self) -> None:
         super().__init__()
-        self._machine_vertex_by_slice: Dict[
+        self._machine_vertex_by_slice: dict[
             Slice, DelayExtensionMachineVertex] = {}
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
@@ -74,7 +74,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
             self, source_vertex: ApplicationVertex,
-            partition_id: str) -> Sequence[Tuple[
+            partition_id: str) -> Sequence[tuple[
                 DelayExtensionMachineVertex, Sequence[MachineVertex]]]:
         # Only connect to the source that matches the slice
         return [

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Dict, Mapping, Tuple
+from typing import Mapping
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -24,13 +24,13 @@ from spynnaker.pyNN.models.neural_projections import (
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 
-class SpYNNakerConnectionHolderGenerator(object):
+class SpYNNakerConnectionHolderGenerator:
     """
     Sets up connection holders for reports to use.
     """
 
     def __call__(self, application_graph: ApplicationGraph) -> Mapping[
-            Tuple[ProjectionApplicationEdge, SynapseInformation],
+            tuple[ProjectionApplicationEdge, SynapseInformation],
             ConnectionHolder]:
         """
         :param application_graph: application graph
@@ -42,8 +42,8 @@ class SpYNNakerConnectionHolderGenerator(object):
             application_graph.n_outgoing_edge_partitions,
             "Generating connection holders for reporting connection data.")
 
-        data_holders: Dict[
-            Tuple[ProjectionApplicationEdge, SynapseInformation],
+        data_holders: dict[
+            tuple[ProjectionApplicationEdge, SynapseInformation],
             ConnectionHolder] = {}
         for partition in progress.over(
                 application_graph.outgoing_edge_partitions):
@@ -59,8 +59,8 @@ class SpYNNakerConnectionHolderGenerator(object):
 
     @staticmethod
     def _generate_holder_for_edge(
-            edge: ProjectionApplicationEdge, data_holders: Dict[
-                Tuple[ProjectionApplicationEdge, SynapseInformation],
+            edge: ProjectionApplicationEdge, data_holders: dict[
+                tuple[ProjectionApplicationEdge, SynapseInformation],
                 ConnectionHolder]) -> None:
         # build connection holders
         connection_holder = ConnectionHolder(

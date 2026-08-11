@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Callable, Optional, Type
+from typing import Any, Callable, Optional
 
 import pyNN.spiNNaker as sim
 import pytest
@@ -67,7 +67,7 @@ from unittests.mocks import (
 def test_get_allowed_row_length(
         dynamics_class: Callable[..., AbstractSynapseDynamics],
         timing: Any, weight: Any, size: int,
-        exception: Optional[Type[SynapseRowTooBigException]],
+        exception: Optional[type[SynapseRowTooBigException]],
         max_size: int) -> None:
     sim.setup()
     if timing is not None and weight is not None:

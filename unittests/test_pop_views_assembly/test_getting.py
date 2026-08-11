@@ -16,7 +16,6 @@ import csv
 import os
 import pickle
 import shutil
-from typing import List
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -36,7 +35,7 @@ from .make_test_data import N_NEURONS
 
 
 def trim_spikes(spikes: NDArray[numpy.floating],
-                indexes: List[int]) -> List[List[numpy.floating]]:
+                indexes: list[int]) -> list[list[numpy.floating]]:
     return [[n, t] for [n, t] in spikes if n in indexes]
 
 

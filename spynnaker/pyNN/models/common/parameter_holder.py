@@ -14,12 +14,9 @@
 from typing import (
     Any,
     Callable,
-    Dict,
     Iterable,
     Iterator,
-    List,
     Optional,
-    Tuple,
     Union,
     cast,
     overload,
@@ -31,7 +28,7 @@ from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged.abstract_sized import Selector
 
 
-class ParameterHolder(object):
+class ParameterHolder:
     """
     Holds a set of parameters and state variables to be returned in a
     PyNN-specific format.
@@ -56,7 +53,7 @@ class ParameterHolder(object):
     def __init__(
             self, data_items_to_return: Union[str, Iterable[str]],
             get_call: Callable[[str, Selector], Union[
-                List[float], RandomDistribution]],
+                list[float], RandomDistribution]],
             selector: Selector = None):
         """
         :param data_items_to_return: A list of data fields to be returned
@@ -65,7 +62,7 @@ class ParameterHolder(object):
             or `None` for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         """
-        self.__data_items_to_return: Union[str, Tuple[str, ...]]
+        self.__data_items_to_return: Union[str, tuple[str, ...]]
         if isinstance(data_items_to_return, str):
             self.__data_items_to_return = data_items_to_return
             self.__single_key: Optional[str] = data_items_to_return
@@ -73,10 +70,10 @@ class ParameterHolder(object):
             self.__data_items_to_return = tuple(data_items_to_return)
             self.__single_key = None
         self.__get_call = get_call
-        self.__data_items: Optional[Dict[str, List[float]]] = None
+        self.__data_items: Optional[dict[str, list[float]]] = None
         self.__selector = selector
 
-    def _safe_read_values(self, parameter: str) -> Union[List[float], float]:
+    def _safe_read_values(self, parameter: str) -> Union[list[float], float]:
         values = self.__get_call(parameter, self.__selector)
 
         # The values must be a single item, a list or a random distribution;
@@ -92,7 +89,7 @@ class ParameterHolder(object):
             return values[0]
         return values
 
-    def _get_data_items(self) -> Dict[str, List[float]]:
+    def _get_data_items(self) -> dict[str, list[float]]:
         """
         Merges the parameters and values in to the final data items
         """
@@ -104,12 +101,12 @@ class ParameterHolder(object):
         if is_singleton(self.__data_items_to_return):
             key = cast(str, self.__data_items_to_return)
             self.__data_items = {
-                key: cast(List[float], self._safe_read_values(key))}
+                key: cast(list[float], self._safe_read_values(key))}
             return self.__data_items
 
         # If there are multiple items to return, form a list
         self.__data_items = {
-            param: cast(List[float], self._safe_read_values(param))
+            param: cast(list[float], self._safe_read_values(param))
             for param in self.__data_items_to_return}
 
         return self.__data_items
@@ -119,10 +116,10 @@ class ParameterHolder(object):
         ...
 
     @overload
-    def __getitem__(self, s: str) -> List[float]:
+    def __getitem__(self, s: str) -> list[float]:
         ...
 
-    def __getitem__(self, s: Union[int, str]) -> Union[float, List[float]]:
+    def __getitem__(self, s: Union[int, str]) -> Union[float, list[float]]:
         data = self._get_data_items()
         if self.__single_key is not None:
             if not isinstance(s, int):
@@ -183,14 +180,14 @@ class ParameterHolder(object):
         data = self._get_data_items()
         return data.keys()
 
-    def values(self) -> Iterable[List[float]]:
+    def values(self) -> Iterable[list[float]]:
         """
         :returns: The values of the data
         """
         data = self._get_data_items()
         return data.values()
 
-    def items(self) -> Iterable[Tuple[str, List[float]]]:
+    def items(self) -> Iterable[tuple[str, list[float]]]:
         """
         :returns: Iterable of the names and matching values of the data
         """

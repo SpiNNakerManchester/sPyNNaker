@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 SYN_REGION_UNUSED = 0xFFFFFFFF
 
 
-class GeneratorData(object):
+class GeneratorData:
     """
     Data for each connection of the synapse generator.
     """

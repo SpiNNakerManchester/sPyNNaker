@@ -17,12 +17,8 @@ import ctypes
 import math
 from typing import (
     TYPE_CHECKING,
-    Dict,
     Iterable,
-    List,
     Sequence,
-    Tuple,
-    Type,
     TypeVar,
 )
 
@@ -79,7 +75,7 @@ def _n_bits(field: ctypes._CField) -> int:
     return _BITS_PER_BYTES * field.size
 
 
-def _make_array(ctype: Type[_T], n_items: int) -> ctypes.Array[_T]:
+def _make_array(ctype: type[_T], n_items: int) -> ctypes.Array[_T]:
     """
     Make an array of ctype items; done separately as the syntax is a
     little odd!
@@ -179,7 +175,7 @@ def _to_numpy(array: ctypes.Array) -> NDArray[uint32]:
     return numpy.ctypeslib.as_array(uint32_array, (n_words,))
 
 
-class _MasterPopEntry(object):
+class _MasterPopEntry:
     """
     Internal class that contains a master population table entry.
     """
@@ -216,7 +212,7 @@ class _MasterPopEntry(object):
         self.__core_shift = core_shift
         self.__n_neurons = n_neurons
         self.__n_colour_bits = n_colour_bits
-        self.__addresses_and_row_lengths: List[Tuple[int, int, bool]] = []
+        self.__addresses_and_row_lengths: list[tuple[int, int, bool]] = []
 
     def append(self, address: int, row_length: int) -> int:
         """
@@ -282,7 +278,7 @@ class _MasterPopEntry(object):
         return self.__n_neurons
 
     @property
-    def addresses_and_row_lengths(self) -> Sequence[Tuple[int, int, bool]]:
+    def addresses_and_row_lengths(self) -> Sequence[tuple[int, int, bool]]:
         """
         The memory address that this master pop entry points at
         (in the synaptic matrix).
@@ -331,7 +327,7 @@ class _MasterPopEntry(object):
         return n_entries
 
 
-class MasterPopTableAsBinarySearch(object):
+class MasterPopTableAsBinarySearch:
     """
     Master population table, implemented as binary search master.
     """
@@ -340,7 +336,7 @@ class MasterPopTableAsBinarySearch(object):
         "__n_addresses")
 
     def __init__(self) -> None:
-        self.__entries: Dict[int, _MasterPopEntry] = {}
+        self.__entries: dict[int, _MasterPopEntry] = {}
         self.__n_addresses = 0
 
     @staticmethod

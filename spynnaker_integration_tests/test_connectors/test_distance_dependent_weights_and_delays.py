@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import math
-from typing import Tuple
 
 import matplotlib.pyplot as plt
 import pyNN.spiNNaker as p
@@ -25,7 +24,7 @@ from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 
-def do_run(plot: bool) -> Tuple[ConnectionHolder, ConnectionHolder]:
+def do_run(plot: bool) -> tuple[ConnectionHolder, ConnectionHolder]:
 
     p.setup(timestep=1.0)
 

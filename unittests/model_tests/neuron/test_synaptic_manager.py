@@ -15,7 +15,7 @@ import shutil
 import struct
 import unittest
 from tempfile import mkdtemp
-from typing import Any, BinaryIO, List, Optional, Sequence, Tuple
+from typing import Any, BinaryIO, Optional, Sequence
 
 import numpy
 import pyNN.spiNNaker as p
@@ -95,7 +95,7 @@ class _MockTransceiverinOut(MockableTransceiver):
             self, x: int, y: int, base_address: int,
             data: BinaryIO | bytearray | bytes | int | str, *,
             n_bytes: Optional[int] = None, offset: int = 0, cpu: int = 0,
-            get_sum: bool = False) -> Tuple[int, int]:
+            get_sum: bool = False) -> tuple[int, int]:
         if data is None:
             return
         if isinstance(data, int):
@@ -480,7 +480,7 @@ def test_pop_based_master_pop_table_standard(
     writer = SpynnakerDataWriter.mock()
 
     # Build a from list connector with the delays we want
-    connections: List[Tuple[int, int, int, Optional[int]]] = []
+    connections: list[tuple[int, int, int, Optional[int]]] = []
     connections.extend([(i * neurons_per_core + j, j, 0, 10)
                         for i in undelayed_indices_connected
                         for j in range(100)])

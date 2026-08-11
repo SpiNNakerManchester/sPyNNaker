@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from math import ceil
-from typing import TYPE_CHECKING, Dict, Iterable, List, Tuple, cast
+from typing import TYPE_CHECKING, Iterable, cast
 
 import numpy
 from numpy import floating, uint32
@@ -86,8 +86,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             The delay used in the connection; by default 1 time step
         """
         # Store the sources to avoid recalculation
-        self.__cached_sources: Dict[ApplicationVertex, Dict[
-                Tuple[ColouredApplicationVertex, str], List[Source]]] = {}
+        self.__cached_sources: dict[ApplicationVertex, dict[
+                tuple[ColouredApplicationVertex, str], list[Source]]] = {}
 
         super().__init__(delay)
         if not isinstance(self.delay, (float, int)):
@@ -164,7 +164,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.reserve_memory_region(region, size, label="LocalOnlyPoolDense")
         spec.switch_write_focus(region)
 
-        connector_data: List[NDArray[uint32]] = []
+        connector_data: list[NDArray[uint32]] = []
         source_data = []
         n_connectors = 0
         for (pre_vertex, part_id), source_infos in sources.items():
@@ -239,8 +239,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.write_array(numpy.concatenate(connector_data))
 
     def __get_sources_for_target(
-            self, app_vertex: PopulationVertex) -> Dict[
-            Tuple[ColouredApplicationVertex, str], List[Source]]:
+            self, app_vertex: PopulationVertex) -> dict[
+            tuple[ColouredApplicationVertex, str], list[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.

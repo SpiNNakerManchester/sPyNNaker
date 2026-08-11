@@ -14,7 +14,7 @@
 
 import math
 from types import ModuleType
-from typing import List, Optional
+from typing import Optional
 
 import numpy
 from neo import AnalogSignal
@@ -23,7 +23,7 @@ from neo.core.spiketrainlist import SpikeTrainList
 from spynnaker.pyNN.models.populations import Population, PopulationView
 
 
-class PatternSpiker(object):
+class PatternSpiker:
     V_PATTERN = [-65.0, -64.024658203125, -63.09686279296875,
                  -62.214324951171875,
                  -61.37481689453125, -60.576263427734375, -59.816650390625,
@@ -39,9 +39,9 @@ class PatternSpiker(object):
     def create_population(
             self, sim: ModuleType, n_neurons: int, label: str,
             spike_rate: Optional[int] = None,
-            spike_rec_indexes: Optional[List[int]] = None,
+            spike_rec_indexes: Optional[list[int]] = None,
             v_rate: Optional[int] = None,
-            v_rec_indexes: Optional[List[int]] = None) -> Population:
+            v_rec_indexes: Optional[list[int]] = None) -> Population:
 
         v_start = self.V_PATTERN * math.ceil(n_neurons/self.V_COUNT)
         v_start = v_start[:n_neurons]
@@ -62,7 +62,7 @@ class PatternSpiker(object):
         return pop
 
     def check_v(self, v: AnalogSignal, label: str, v_rate: Optional[int],
-                v_rec_indexes: Optional[List[int]], is_view: bool,
+                v_rec_indexes: Optional[list[int]], is_view: bool,
                 missing: bool) -> None:
         if v_rate is None:
             v_rate = 1
@@ -99,7 +99,7 @@ class PatternSpiker(object):
     def check_spikes(
             self, spikes: SpikeTrainList, simtime: int, label: str,
             spike_rate: Optional[int],
-            spike_rec_indexes: Optional[List[int]]) -> None:
+            spike_rec_indexes: Optional[list[int]]) -> None:
         for neuron in range(len(spikes)):
             if spike_rec_indexes and neuron not in spike_rec_indexes:
                 continue
@@ -128,9 +128,9 @@ class PatternSpiker(object):
     def check(
             self, pop: Population, simtime: int,
             spike_rate: Optional[int] = None,
-            spike_rec_indexes: Optional[List[int]] = None,
+            spike_rec_indexes: Optional[list[int]] = None,
             v_rate: Optional[int] = None,
-            v_rec_indexes: Optional[List[int]] = None, is_view: bool = False,
+            v_rec_indexes: Optional[list[int]] = None, is_view: bool = False,
             missing: bool = False) -> None:
         if is_view:
             neo = pop.get_data("spikes")

@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from math import ceil
-from typing import TYPE_CHECKING, Dict, Iterable, List, Tuple, cast
+from typing import TYPE_CHECKING, Iterable, cast
 
 import numpy
 from numpy import floating, uint32
@@ -92,9 +92,9 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         super().__init__(delay)
 
         # Store the sources to avoid recalculation
-        self.__cached_sources: Dict[ApplicationVertex, Dict[
-                Tuple[ColouredApplicationVertex, str],
-                List[Source]]] = {}
+        self.__cached_sources: dict[ApplicationVertex, dict[
+                tuple[ColouredApplicationVertex, str],
+                list[Source]]] = {}
 
     @property
     def _delay(self) -> float:
@@ -166,10 +166,10 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.switch_write_focus(region)
 
         # Get spec for each incoming source
-        connector_weight_index: Dict[AbstractConnector, int] = {}
+        connector_weight_index: dict[AbstractConnector, int] = {}
         next_weight_index: int = 0
         source_data = []
-        connector_data: List[NDArray[uint32]] = []
+        connector_data: list[NDArray[uint32]] = []
         weight_data = []
         for (pre_vertex, part_id), source_infos in sources.items():
 
@@ -264,8 +264,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             numpy.concatenate(weight_data, dtype="int16").view("uint32"))
 
     def __get_sources_for_target(
-            self, app_vertex: PopulationVertex) -> Dict[
-                Tuple[ColouredApplicationVertex, str], List[Source]]:
+            self, app_vertex: PopulationVertex) -> dict[
+                tuple[ColouredApplicationVertex, str], list[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.

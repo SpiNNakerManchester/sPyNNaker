@@ -19,11 +19,8 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Dict,
-    List,
     Optional,
     Sequence,
-    Tuple,
     Union,
     cast,
 )
@@ -75,7 +72,7 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class Projection(object):
+class Projection:
     """
     A container for all the connections of a given type (same synapse type and
     plasticity mechanisms) between two populations, together with methods to
@@ -209,7 +206,7 @@ class Projection(object):
 
         # If there is a virtual board, we need to hold the data in case the
         # user asks for it
-        self.__virtual_connection_list: Optional[List[NDArray[void]]] = None
+        self.__virtual_connection_list: Optional[list[NDArray[void]]] = None
         if get_config_bool("Machine", "virtual_board"):
             self.__virtual_connection_list = []
             self.__synapse_information.add_pre_run_connection_holder(
@@ -322,7 +319,7 @@ class Projection(object):
             notify=functools.partial(self.__save_callback, file, metadata))
 
     def __get_data(
-            self, attribute_names: List[str],
+            self, attribute_names: list[str],
             format: str,  # @ReservedAssignment
             with_address: bool,
             notify: Optional[Callable[[ConnectionHolder], None]]
@@ -340,7 +337,7 @@ class Projection(object):
         if isinstance(attribute_names, str):
             attribute_names = [attribute_names]
 
-        data_items: List[str] = []
+        data_items: list[str] = []
         if format != "list":
             with_address = False
         if with_address:
@@ -356,7 +353,7 @@ class Projection(object):
                 attribute_names.remove("target")
 
         # Split out attributes in to standard versus synapse dynamics data
-        fixed_values: List[Tuple[str, int]] = []
+        fixed_values: list[tuple[str, int]] = []
         for attribute in attribute_names:
             data_items.append(attribute)
             synapse_dynamics = self._synapse_information.synapse_dynamics
@@ -371,7 +368,7 @@ class Projection(object):
     @staticmethod
     def __save_callback(
             save_file: Union[str, BaseFile],
-            metadata: Dict[str, Any], data: ConnectionHolder) -> None:
+            metadata: dict[str, Any], data: ConnectionHolder) -> None:
         """
         :param save_file:
         :param metadata:
@@ -460,8 +457,8 @@ class Projection(object):
         return None
 
     def _get_synaptic_data(
-            self, as_list: bool, data_to_get: List[str],
-            fixed_values: List[Tuple[str, int]],
+            self, as_list: bool, data_to_get: list[str],
+            fixed_values: list[tuple[str, int]],
             notify: Optional[Callable[[ConnectionHolder], None]]
             ) -> ConnectionHolder:
         post_vertex = self.__projection_edge.post_vertex

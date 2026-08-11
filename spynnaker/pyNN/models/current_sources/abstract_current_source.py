@@ -43,7 +43,7 @@ class CurrentSourceIDs(Enum):
     N_SOURCES = 4
 
 
-class AbstractCurrentSource(object, metaclass=AbstractBase):
+class AbstractCurrentSource(metaclass=AbstractBase):
     """
     A simplified version of the PyNN class, since in most cases we work
     out the actual offset value on the SpiNNaker machine itself based on

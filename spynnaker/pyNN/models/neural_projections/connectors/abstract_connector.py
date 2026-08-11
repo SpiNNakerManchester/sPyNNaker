@@ -16,7 +16,7 @@ from __future__ import annotations
 import logging
 import math
 import re
-from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Any, Optional, Sequence, Union
 
 import numpy
 from numpy import float64, uint8, uint16, uint32
@@ -62,7 +62,7 @@ _expr_context = SafeEval(
     numpy.maximum, numpy.minimum, e=numpy.e, pi=numpy.pi)
 
 
-class AbstractConnector(object, metaclass=AbstractBase):
+class AbstractConnector(metaclass=AbstractBase):
     """
     Abstract class that all PyNN Connectors extend.
     """
@@ -105,7 +105,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         self.__n_clipped_delays = numpy.int64(0)
         self.__min_delay = 0.0
-        self.__param_seeds: Dict[Tuple[int, int], int] = {}
+        self.__param_seeds: dict[tuple[int, int], int] = {}
         self.__used = False
 
     def set_space(self, space: Space) -> None:
@@ -595,7 +595,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def get_connected_vertices(
             self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
-                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
+                tuple[MachineVertex, Sequence[AbstractVertex]]]:
         """
         Get the machine vertices that are connected to each other with
         this connector
@@ -668,7 +668,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 "PopulationView on a multi-dimensional Population is not "
                 "supported")
 
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         """
         A list of parameters that would recreate this connector.
 
@@ -684,7 +684,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             f"{type(self)} does not implement "
             f"Standard pyNN get_parameters method")
 
-    def _get_parameters(self) -> Dict[str, Any]:
+    def _get_parameters(self) -> dict[str, Any]:
         """
         :return: A map of the init parameters to the values passed in.
         """

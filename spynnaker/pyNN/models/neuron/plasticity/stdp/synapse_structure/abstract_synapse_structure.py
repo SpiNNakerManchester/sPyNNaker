@@ -15,7 +15,7 @@
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-class AbstractSynapseStructure(object, metaclass=AbstractBase):
+class AbstractSynapseStructure(metaclass=AbstractBase):
     """
     Base for classes that describe synaptic structure for STDP.
     """

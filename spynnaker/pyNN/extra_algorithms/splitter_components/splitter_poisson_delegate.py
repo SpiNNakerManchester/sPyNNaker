@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List, Sequence, Tuple
+from typing import Sequence
 
 from spinn_utilities.overrides import overrides
 
@@ -77,7 +77,7 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
         super().create_machine_vertices(chip_counter)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
-    def get_in_coming_slices(self) -> List[Slice]:
+    def get_in_coming_slices(self) -> list[Slice]:
         if self.send_over_sdram:
             proj = self.governed_app_vertex.outgoing_projections[0]
             # pylint: disable=protected-access
@@ -86,7 +86,7 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
         return super().get_in_coming_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
-    def get_out_going_slices(self) -> List[Slice]:
+    def get_out_going_slices(self) -> list[Slice]:
         if self.send_over_sdram:
             proj = self.governed_app_vertex.outgoing_projections[0]
             # pylint: disable=protected-access
@@ -95,14 +95,14 @@ class SplitterPoissonDelegate(SplitterFixedLegacy[SpikeSourcePoissonVertex]):
         return super().get_out_going_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, partition_id: str) -> List[MachineVertex]:
+    def get_out_going_vertices(self, partition_id: str) -> list[MachineVertex]:
         if self.send_over_sdram:
             return []
         return super().get_out_going_vertices(partition_id)
 
     @overrides(AbstractSplitterCommon.get_same_chip_groups)
     def get_same_chip_groups(self) -> Sequence[
-            Tuple[Sequence[MachineVertex], AbstractSDRAM]]:
+            tuple[Sequence[MachineVertex], AbstractSDRAM]]:
         if self.send_over_sdram:
             return []
         return super().get_same_chip_groups()

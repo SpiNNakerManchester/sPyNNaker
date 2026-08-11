@@ -15,7 +15,7 @@
 from spinn_utilities.abstract_base import AbstractBase
 
 
-class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
+class AbstractHasAPlusAMinus(metaclass=AbstractBase):
     """
     An object that has :math:`A^+` and :math:`A^-` properties.
     """

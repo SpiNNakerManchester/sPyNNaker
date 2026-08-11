@@ -17,11 +17,9 @@ import ctypes
 from collections.abc import Container
 from typing import (
     TYPE_CHECKING,
-    List,
     NamedTuple,
     Optional,
     Sequence,
-    Set,
     Union,
     cast,
 )
@@ -282,7 +280,7 @@ class PopulationMachineNeurons(
 
         # Write whether the key is to be used, and then the key, or 0 if it
         # isn't to be used
-        keys: Union[numpy.ndarray, List[int]]
+        keys: Union[numpy.ndarray, list[int]]
         if not self._has_key:
             spec.write_value(data=0)
             keys = [0] * n_atoms
@@ -344,7 +342,7 @@ class PopulationMachineNeurons(
         if current_sources:
             # Array to keep track of the number of each type of current source
             # (there are four, but they are numbered 1 to 4, so five elements)
-            cs_index_array: List[int] = [0, 0, 0, 0, 0]
+            cs_index_array: list[int] = [0, 0, 0, 0, 0]
 
             # Data sent to the machine will be current sources per neuron
             # This array will have the first entry indicating the number of
@@ -412,11 +410,11 @@ class PopulationMachineNeurons(
                                 value, cs_data_types[key]).item()
                             spec.write_value(data=value_convert)
 
-    def __get_current_sources_sorted(self) -> List[AbstractCurrentSource]:
+    def __get_current_sources_sorted(self) -> list[AbstractCurrentSource]:
         app_current_sources = self._pop_vertex.current_sources
         current_source_id_list = self._pop_vertex.current_source_id_list
 
-        current_sources: Set[AbstractCurrentSource] = set()
+        current_sources: set[AbstractCurrentSource] = set()
         for app_current_source in app_current_sources:
             for n in self._vertex_slice.get_raster_ids():
                 if self.__in_selector(

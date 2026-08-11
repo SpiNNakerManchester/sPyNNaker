@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from collections import defaultdict
-from typing import Dict, Iterable, List, Sequence, Tuple, cast
+from typing import Iterable, Sequence, cast
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -101,11 +101,11 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
             app_vertex.remember_machine_vertex(machine_vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
-    def get_in_coming_slices(self) -> List[Slice]:
+    def get_in_coming_slices(self) -> list[Slice]:
         return self._get_fixed_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
-    def get_out_going_slices(self) -> List[Slice]:
+    def get_out_going_slices(self) -> list[Slice]:
         return self._get_fixed_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
@@ -121,8 +121,8 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
             self, source_vertex: ApplicationVertex,
-            partition_id: str) -> List[
-                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
+            partition_id: str) -> list[
+                tuple[MachineVertex, Sequence[AbstractVertex]]]:
         # Determine the real pre-vertex
         pre_vertex = source_vertex
         if isinstance(source_vertex, DelayExtensionVertex):
@@ -131,7 +131,7 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
             return []
 
         # Use the real pre-vertex to get the projections
-        targets: Dict[MachineVertex, OrderedSet[
+        targets: dict[MachineVertex, OrderedSet[
             AbstractVertex]] = defaultdict(OrderedSet)
         for proj in self.governed_app_vertex.get_incoming_projections_from(
                 pre_vertex):

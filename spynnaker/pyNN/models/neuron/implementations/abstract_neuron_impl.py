@@ -21,7 +21,7 @@ from spinn_front_end_common.interface.ds import DataType
 from spynnaker.pyNN.utilities.struct import Struct
 
 
-class AbstractNeuronImpl(object, metaclass=AbstractBase):
+class AbstractNeuronImpl(metaclass=AbstractBase):
     """
     An abstraction of a whole neuron model including all parts.
     """

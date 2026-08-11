@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Iterable, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Iterable, Optional
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
@@ -388,8 +388,8 @@ class SynapseDynamicsSTDP(
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
             max_n_synapses: int, max_atoms_per_core: int,
-            ring_buffer_weight_scales: WeightScales) -> Tuple[
-                List[NDArray[uint32]], List[NDArray[uint32]],
+            ring_buffer_weight_scales: WeightScales) -> tuple[
+                list[NDArray[uint32]], list[NDArray[uint32]],
                 NDArray[uint32], NDArray[uint32]]:
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
@@ -458,8 +458,8 @@ class SynapseDynamicsSTDP(
 
         return fp_data, pp_data, fp_size, pp_size
 
-    def _pad_row(self, rows: List[NDArray],
-                 no_bytes_per_connection: int) -> List[NDArray]:
+    def _pad_row(self, rows: list[NDArray],
+                 no_bytes_per_connection: int) -> list[NDArray]:
         pad_len = self.__pad_to_length or 1
         # Row elements are (individual) bytes
         return [
@@ -495,8 +495,8 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
             self, n_synapse_types: int, pp_size: NDArray[uint32],
-            pp_data: List[NDArray[uint32]], fp_size: NDArray[uint32],
-            fp_data: List[NDArray[uint32]], max_atoms_per_core: int,
+            pp_data: list[NDArray[uint32]], fp_size: NDArray[uint32],
+            fp_data: list[NDArray[uint32]], max_atoms_per_core: int,
             ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         n_rows = len(fp_size)
 

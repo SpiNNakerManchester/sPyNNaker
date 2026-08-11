@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Any, Optional, Sequence
 
 import numpy
 from numpy import floating, integer, uint32
@@ -60,7 +60,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     __slots__ = ()
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         return self._get_parameters()
 
     @overrides(AbstractConnector.get_delay_maximum)
@@ -183,7 +183,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     def get_connected_vertices(
             self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
-                Tuple[MachineVertex, Sequence[MachineVertex]]]:
+                tuple[MachineVertex, Sequence[MachineVertex]]]:
         src_vtxs = source_vertex.splitter.get_out_going_vertices(
             s_info.partition_id)
         tgt_vtxs = target_vertex.splitter.get_in_coming_vertices(

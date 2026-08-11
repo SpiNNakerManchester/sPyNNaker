@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import random
-from typing import List
 
 import numpy
 import pyNN.spiNNaker as p
@@ -89,7 +88,7 @@ class TestSpikeSourceArray(BaseTestCase):
         projections = []
 
         boxed_array: NDArray = numpy.zeros(shape=(0, 2))
-        spike_array: List[List[int]] = []
+        spike_array: list[list[int]] = []
         for neuron_id in range(n_neurons):
             spike_array.append([])
             for counter in range(20):

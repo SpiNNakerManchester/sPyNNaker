@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import math
-from typing import Dict, List, Sequence, Tuple
+from typing import Sequence
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -36,8 +36,8 @@ from spynnaker.pyNN.models.neuron import PopulationVertex
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 
 
-def delay_support_adder() -> Tuple[
-        Sequence[DelayExtensionVertex], Sequence[Tuple[ApplicationEdge, str]]]:
+def delay_support_adder() -> tuple[
+        Sequence[DelayExtensionVertex], Sequence[tuple[ApplicationEdge, str]]]:
     """
     Adds the delay extensions to the application graph, now that all the
     splitter objects have been set.
@@ -48,7 +48,7 @@ def delay_support_adder() -> Tuple[
     return adder.add_delays()
 
 
-class _DelaySupportAdder(object):
+class _DelaySupportAdder:
     """
     Adds delay extension vertices into the application graph as needed.
     """
@@ -60,16 +60,16 @@ class _DelaySupportAdder(object):
         "_new_vertices")
 
     def __init__(self) -> None:
-        self._app_to_delay_map: Dict[
+        self._app_to_delay_map: dict[
             ApplicationEdgePartition, DelayExtensionVertex] = {}
-        self._delay_post_edge_map: Dict[
-            Tuple[DelayExtensionVertex, PopulationVertex, str],
+        self._delay_post_edge_map: dict[
+            tuple[DelayExtensionVertex, PopulationVertex, str],
             DelayedApplicationEdge] = {}
-        self._new_edges: List[Tuple[ApplicationEdge, str]] = []
-        self._new_vertices: List[DelayExtensionVertex] = []
+        self._new_edges: list[tuple[ApplicationEdge, str]] = []
+        self._new_vertices: list[DelayExtensionVertex] = []
 
-    def add_delays(self) -> Tuple[
-            List[DelayExtensionVertex], List[Tuple[ApplicationEdge, str]]]:
+    def add_delays(self) -> tuple[
+            list[DelayExtensionVertex], list[tuple[ApplicationEdge, str]]]:
         """
         Adds the delay extensions to the application graph, now that all the
         splitter objects have been set.
@@ -192,7 +192,7 @@ class _DelaySupportAdder(object):
         return delay_app_vertex
 
     def _check_delay_values(self, app_edge: ProjectionApplicationEdge)\
-            -> Tuple[int, int, bool]:
+            -> tuple[int, int, bool]:
         """
         Checks the delay required from the user defined max, the max delay
         supported by the post vertex splitter and the delay Extensions.

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List, Sequence, Tuple, Union
+from typing import Sequence, Union
 
 import numpy
 from numpy.typing import NDArray
@@ -20,7 +20,7 @@ from typing_extensions import TypeAlias
 from spynnaker.pyNN.random_distribution import RandomDistribution
 
 #: Type of names of parameters and state variables.
-Names: TypeAlias = Union[str, List[str], Tuple[str, ...]]
+Names: TypeAlias = Union[str, list[str], tuple[str, ...]]
 
 #: Type of normal values of parameters and state variables.
 Values: TypeAlias = Union[

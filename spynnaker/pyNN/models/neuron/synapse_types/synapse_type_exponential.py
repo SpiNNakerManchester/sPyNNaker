@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Tuple
+from typing import Optional
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
@@ -91,7 +91,7 @@ class SynapseTypeExponential(AbstractSynapseType):
         return None
 
     @overrides(AbstractSynapseType.get_synapse_targets)
-    def get_synapse_targets(self) -> Tuple[str, ...]:
+    def get_synapse_targets(self) -> tuple[str, ...]:
         return "excitatory", "inhibitory"
 
     @property

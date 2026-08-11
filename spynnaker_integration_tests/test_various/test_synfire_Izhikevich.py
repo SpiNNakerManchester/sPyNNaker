@@ -17,7 +17,6 @@
 """
 Synfirechain-like example
 """
-from typing import Tuple
 
 import pyNN.spiNNaker as p
 from numpy.typing import NDArray
@@ -28,7 +27,7 @@ import spynnaker.spike_checker as spike_checker
 from spynnaker.pyNN.utilities import neo_convertor
 
 
-def do_run(nNeurons: int) -> Tuple[NDArray, NDArray, NDArray]:
+def do_run(nNeurons: int) -> tuple[NDArray, NDArray, NDArray]:
     p.setup(timestep=1.0, min_delay=1.0)
     p.set_number_of_neurons_per_core(p.Izhikevich, 100)
 

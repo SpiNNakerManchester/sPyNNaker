@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from .abstract_ethernet_translator import AbstractEthernetTranslator
 
 
-class AbstractEthernetSensor(object, metaclass=AbstractBase):
+class AbstractEthernetSensor(metaclass=AbstractBase):
     """
     An Ethernet-connected device that can send events (spikes) to SpiNNaker
     via a Spike Injector.
@@ -39,7 +39,7 @@ class AbstractEthernetSensor(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_injector_parameters(self) -> Dict[str, Any]:
+    def get_injector_parameters(self) -> dict[str, Any]:
         """
         :returns:
            The parameters of the Spike Injector to use with this device.

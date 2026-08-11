@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Mapping
+from typing import Mapping
 
 import numpy
 
@@ -76,7 +76,7 @@ class ACSource(AbstractCurrentSource):
             'frequency': DataType.S1615,
             'phase': DataType.S1615}
 
-        self.__parameters: Dict[str, CurrentParameter] = {
+        self.__parameters: dict[str, CurrentParameter] = {
             'start': self.__start,
             'stop': self.__stop,
             'amplitude': self.__amplitude,

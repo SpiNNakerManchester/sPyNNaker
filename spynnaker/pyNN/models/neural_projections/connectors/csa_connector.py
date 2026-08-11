@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Any, Optional, Sequence
 
 import numpy
 from numpy.typing import NDArray
@@ -82,11 +82,11 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         self.__cset = cset
 
         # Storage for full connection sets
-        self.__full_connection_set: Optional[List[CSet]] = None
-        self.__full_cset: Optional[List[CSet]] = None
+        self.__full_connection_set: Optional[list[CSet]] = None
+        self.__full_cset: Optional[list[CSet]] = None
 
     @overrides(AbstractConnector.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["cset"] = self.__cset
         return parameters
@@ -107,7 +107,7 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     def _get_n_connections(
             self, post_vertex_slice: Slice,
-            synapse_info: SynapseInformation) -> Tuple[int, CSet]:
+            synapse_info: SynapseInformation) -> tuple[int, CSet]:
         # do the work from self._cset in here
 
         # this is where the magic needs to happen somehow

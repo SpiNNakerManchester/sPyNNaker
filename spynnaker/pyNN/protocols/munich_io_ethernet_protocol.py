@@ -28,7 +28,7 @@ def _active_time_for_frequency(frequency: Union[int, float]) -> int:
     return 0
 
 
-class MunichIoEthernetProtocol(object):
+class MunichIoEthernetProtocol:
     """
     Implementation of the Munich robot IO protocol, communicating over
     Ethernet.

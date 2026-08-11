@@ -16,12 +16,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
-    Dict,
-    List,
     NamedTuple,
     Optional,
     Sequence,
-    Tuple,
     cast,
 )
 
@@ -113,7 +110,7 @@ class SynapseRegionReferences(NamedTuple):
 
 
 @dataclass(frozen=True)
-class AppKeyInfo(object):
+class AppKeyInfo:
     """
     An object which holds an application key and mask along with the other
     details.
@@ -140,7 +137,7 @@ class AppKeyInfo(object):
         return BaseKeyAndMask(self.app_key, self.app_mask)
 
 
-class SynapticMatrices(object):
+class SynapticMatrices:
     """
     Handler of synaptic matrices for a core of a population vertex.
     """
@@ -206,8 +203,8 @@ class SynapticMatrices(object):
         self.__all_syn_block_sz = all_syn_block_sz
 
         # Map of (app_edge, synapse_info) to SynapticMatrixApp
-        self.__matrices: Dict[
-            Tuple[ProjectionApplicationEdge, SynapseInformation],
+        self.__matrices: dict[
+            tuple[ProjectionApplicationEdge, SynapseInformation],
             SynapticMatrixApp] = {}
 
         # Store locations of synaptic data and generated data
@@ -218,8 +215,8 @@ class SynapticMatrices(object):
         self.__gen_on_machine = False
         self.__data_generated = False
         self.__max_gen_data = 0
-        self.__on_host_matrices: List[SynapticMatrixApp] = []
-        self.__on_machine_matrices: List[SynapticMatrixApp] = []
+        self.__on_host_matrices: list[SynapticMatrixApp] = []
+        self.__on_machine_matrices: list[SynapticMatrixApp] = []
         self.__generated_data: Optional[NDArray[uint32]] = None
         self.__generated_data_size = 0
         self.__master_pop_data: Optional[NDArray[uint32]] = None
@@ -283,7 +280,7 @@ class SynapticMatrices(object):
         # Set up other lists
         self.__on_host_matrices = []
         self.__on_machine_matrices = []
-        generated_data: List[NDArray[uint32]] = []
+        generated_data: list[NDArray[uint32]] = []
 
         # Keep on-machine generated blocks together at the end
         self.__generated_data_size = (
@@ -376,7 +373,7 @@ class SynapticMatrices(object):
 
         # Get the on-host data to be written
         block_addr = 0
-        data_to_write: List[NDArray[uint32]] = []
+        data_to_write: list[NDArray[uint32]] = []
         for matrix in self.__on_host_matrices:
             block_addr = matrix.append_matrix(
                 post_vertex_slice, data_to_write, block_addr)
@@ -577,7 +574,7 @@ class SynapticMatrices(object):
         return matrix.get_index()
 
     def get_download_regions(
-            self, placement: Placement) -> List[Tuple[int, int, int]]:
+            self, placement: Placement) -> list[tuple[int, int, int]]:
         """
         Get the regions that need to be downloaded.
 

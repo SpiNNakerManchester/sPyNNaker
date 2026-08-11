@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
 
 from spynnaker.pyNN.external_devices_models import (
     AbstractMulticastControllableDevice,
@@ -54,7 +53,7 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(
             self, protocol: MunichIoSpiNNakerLinkProtocol,
-            devices: List[AbstractMulticastControllableDevice],
+            devices: list[AbstractMulticastControllableDevice],
             pushbot_ip_address: str, pushbot_port: int = 56000,
             # default params for the neuron model type
             tau_m: float = 20.0, cm: float = 1.0, v_rest: float = 0.0,

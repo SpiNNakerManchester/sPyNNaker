@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, List, Optional, Union, cast
+from typing import TYPE_CHECKING, Optional, Union, cast
 
 from spinn_utilities.overrides import overrides
 
@@ -73,7 +73,7 @@ class DelayedApplicationEdge(ApplicationEdge):
         return cast('PopulationVertex', super().post_vertex)
 
     @property
-    def synapse_information(self) -> List[SynapseInformation]:
+    def synapse_information(self) -> list[SynapseInformation]:
         """
         The synapse information on this edge
         """

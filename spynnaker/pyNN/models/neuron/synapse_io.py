@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 import numpy
 from numpy import integer, uint32
@@ -61,7 +61,7 @@ _STD_DELAY_SLOTS = 16
 
 
 @dataclass(frozen=True)
-class MaxRowInfo(object):
+class MaxRowInfo:
     """
     Information about the maximums for rows in a synaptic matrix.
     """
@@ -230,7 +230,7 @@ def get_synapses(
         ring_buffer_weight_scales: WeightScales,
         app_edge: ProjectionApplicationEdge,
         max_row_info: MaxRowInfo, gen_undelayed: bool, gen_delayed: bool,
-        max_atoms_per_core: int) -> Tuple[_RowData, _RowData]:
+        max_atoms_per_core: int) -> tuple[_RowData, _RowData]:
     """
     Get the synapses as an array of words for non-delayed synapses and
     an array of words for delayed synapses. This is used to prepare
@@ -350,8 +350,8 @@ def _get_row_data(
     :param ring_buffer_weight_scales:
         The scaling of the weights for the ring buffers of each synapse type
     """
-    fp_data: Union[NDArray[uint32], List[NDArray[uint32]]]
-    pp_data: Union[NDArray[uint32], List[NDArray[uint32]]]
+    fp_data: Union[NDArray[uint32], list[NDArray[uint32]]]
+    pp_data: Union[NDArray[uint32], list[NDArray[uint32]]]
     if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics):
         # Get the static data
         ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
@@ -502,7 +502,7 @@ def read_all_synapses(
     :return: The connections read from the data; the dtype is
         :py:const:`~.NUMPY_CONNECTORS_DTYPE`
     """
-    connections: List[ConnectionsArray] = []
+    connections: list[ConnectionsArray] = []
     max_row_length = max_row_info.undelayed_max_words
     delayed_max_row_length = max_row_info.delayed_max_words
     connections.append(convert_to_connections(
@@ -520,8 +520,8 @@ def read_all_synapses(
 
 def _parse_static_data(
         row_data: _RowData,
-        dynamics: AbstractStaticSynapseDynamics) -> Tuple[
-            NDArray[numpy.integer], List[_RowData]]:
+        dynamics: AbstractStaticSynapseDynamics) -> tuple[
+            NDArray[numpy.integer], list[_RowData]]:
     """
     Parse static synaptic data.
 
@@ -580,8 +580,8 @@ def _read_static_data(
 
 def _parse_plastic_data(
         row_data: _RowData,
-        dynamics: AbstractPlasticSynapseDynamics) -> Tuple[
-            NDArray[uint32], List[_RowData], NDArray[uint32], List[_RowData]]:
+        dynamics: AbstractPlasticSynapseDynamics) -> tuple[
+            NDArray[uint32], list[_RowData], NDArray[uint32], list[_RowData]]:
     """
     Parse plastic synapses from raw row data.
 

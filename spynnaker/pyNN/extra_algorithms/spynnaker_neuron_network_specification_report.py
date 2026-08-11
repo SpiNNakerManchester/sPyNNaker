@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Dict, Set, Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 from spinn_utilities.config_holder import (
     get_config_str_or_none,
@@ -40,7 +40,7 @@ _GRAPH_TITLE = "The graph of the network in graphical form"
 _GRAPH_FORMAT = "png"
 
 
-def _get_diagram(label: str) -> Tuple[gv.Digraph, Type[gv.ExecutableNotFound]]:
+def _get_diagram(label: str) -> tuple[gv.Digraph, type[gv.ExecutableNotFound]]:
     # pylint: disable=import-error,import-outside-toplevel
     try:
         import graphviz
@@ -95,11 +95,11 @@ def spynnaker_neuron_graph_network_specification_report() -> None:
 
 def _generate_vertices(
         dot_diagram: gv.Digraph,
-        progress: ProgressBar) -> Dict[ApplicationVertex, str]:
+        progress: ProgressBar) -> dict[ApplicationVertex, str]:
     """
     :return: the mapping from vertex to ID for the generated vertices
     """
-    vertex_ids: Dict[ApplicationVertex, str] = {}
+    vertex_ids: dict[ApplicationVertex, str] = {}
     for vertex_counter, vertex in progress.over(
             enumerate(SpynnakerDataView.iterate_vertices()), False):
         # Arbitrary labels used inside dot
@@ -111,7 +111,7 @@ def _generate_vertices(
 
 
 def _generate_edges(
-        dot_diagram: gv.Digraph, vertex_ids: Dict[ApplicationVertex, str],
+        dot_diagram: gv.Digraph, vertex_ids: dict[ApplicationVertex, str],
         progress: ProgressBar) -> None:
     for partition in progress.over(
             SpynnakerDataView.iterate_partitions(), False):
@@ -119,7 +119,7 @@ def _generate_edges(
             source_vertex_id = vertex_ids[edge.pre_vertex]
             dest_vertex_id = vertex_ids[edge.post_vertex]
             if isinstance(edge, ProjectionApplicationEdge):
-                links: Set[str] = set()
+                links: set[str] = set()
                 for synapse_info in edge.synapse_information:
                     links.add(str(synapse_info.connector))
                 for synapse_str in links:

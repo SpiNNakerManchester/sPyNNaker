@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional, Tuple
+from typing import TYPE_CHECKING, Optional
 
 import numpy
 from numpy import uint32
@@ -50,7 +50,7 @@ if TYPE_CHECKING:
     from .master_pop_table import MasterPopTableAsBinarySearch
 
 
-class SynapticMatrixApp(object):
+class SynapticMatrixApp:
     """
     The synaptic matrix (and delay matrix if applicable) for an incoming
     application edge.
@@ -266,7 +266,7 @@ class SynapticMatrixApp(object):
 
     def append_matrix(
             self, post_vertex_slice: Slice,
-            data_to_write: List[NDArray[uint32]],
+            data_to_write: list[NDArray[uint32]],
             block_addr: int) -> int:
         """
         Append a synaptic matrix from be written from host.
@@ -293,7 +293,7 @@ class SynapticMatrixApp(object):
         return block_addr
 
     def __get_padding(
-            self, data_to_write: List[NDArray[uint32]],
+            self, data_to_write: list[NDArray[uint32]],
             expected_offset: int, block_addr: int) -> int:
         if expected_offset < block_addr:
             raise ValueError(
@@ -306,7 +306,7 @@ class SynapticMatrixApp(object):
         return block_addr
 
     def __get_row_data(
-            self, post_vertex_slice: Slice) -> Tuple[NDArray, NDArray]:
+            self, post_vertex_slice: Slice) -> tuple[NDArray, NDArray]:
         """
         Generate the row data for a synaptic matrix from the description.
 
@@ -390,7 +390,7 @@ class SynapticMatrixApp(object):
                 for holder in self.__synapse_info.pre_run_connection_holders:
                     holder.add_connections(conns)
 
-    def get_connections(self, placement: Placement) -> List[NDArray]:
+    def get_connections(self, placement: Placement) -> list[NDArray]:
         """
         Read connections from an address on the machine.
 
@@ -485,7 +485,7 @@ class SynapticMatrixApp(object):
 
     def get_download_regions(
             self, placement: Placement,
-            start_index: int) -> List[Tuple[int, int, int]]:
+            start_index: int) -> list[tuple[int, int, int]]:
         """
         Get the data regions that should be downloaded when the simulation
         pauses.

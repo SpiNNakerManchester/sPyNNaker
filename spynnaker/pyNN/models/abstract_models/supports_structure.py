@@ -16,7 +16,7 @@ from pyNN.space import BaseStructure
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-class SupportsStructure(object, metaclass=AbstractBase):
+class SupportsStructure(metaclass=AbstractBase):
     """
     Indicates an object that supports the setting of a PyNN structure.
     """

@@ -17,7 +17,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_front_end_common.utility_models import MultiCastCommand
 
 
-class AbstractEthernetTranslator(object, metaclass=AbstractBase):
+class AbstractEthernetTranslator(metaclass=AbstractBase):
     """
     A module that can translate packets received over Ethernet into
     control of an external device.

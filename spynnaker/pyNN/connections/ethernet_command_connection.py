@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List, Optional
+from typing import Iterable, Optional
 
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex,
@@ -54,7 +54,7 @@ class EthernetCommandConnection(DatabaseConnection):
             stop_pause_callback_function=self._stop_pause_callback,
             local_host=local_host, local_port=local_port)
 
-        self.__command_containers: List[
+        self.__command_containers: list[
             AbstractSendMeMulticastCommandsVertex] = []
         if command_containers is not None:
             for command_container in command_containers:

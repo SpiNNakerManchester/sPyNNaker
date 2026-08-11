@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Optional, Sequence
 
 import numpy
 from numpy import uint8
@@ -79,7 +79,7 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         self.__array_dims = dims
 
     @overrides(AbstractConnector.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["array"] = self.__array
         return parameters

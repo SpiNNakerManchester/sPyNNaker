@@ -21,12 +21,9 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Collection,
-    Dict,
     Iterable,
-    List,
     Optional,
     Sequence,
-    Tuple,
     Union,
     cast,
 )
@@ -276,18 +273,18 @@ class PopulationVertex(
 
     def __init__(
             self, *, n_neurons: int, label: str,
-            max_atoms_per_core: Union[int, Tuple[int, ...]],
+            max_atoms_per_core: Union[int, tuple[int, ...]],
             n_synapse_cores: Optional[int],
             allow_delay_extensions: bool,
             spikes_per_second: Optional[float],
             ring_buffer_sigma: Optional[float],
-            max_expected_summed_weight: Optional[List[float]],
+            max_expected_summed_weight: Optional[list[float]],
             incoming_spike_buffer_size: Optional[int],
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel, drop_late_spikes: bool,
             splitter: Optional[SplitterPopulationVertex],
             seed: Optional[int], n_colour_bits: Optional[int],
-            extra_partitions: Optional[List[str]] = None):
+            extra_partitions: Optional[list[str]] = None):
         """
         :param n_neurons: The number of neurons in the population
         :param label: The label on the population
@@ -386,8 +383,8 @@ class PopulationVertex(
             {NeuronRecorder.REWIRING: NeuronRecorder.REWIRING_TYPE})
 
         # Current sources for this vertex
-        self.__current_sources: List[AbstractCurrentSource] = []
-        self.__current_source_id_list: Dict[
+        self.__current_sources: list[AbstractCurrentSource] = []
+        self.__current_source_id_list: dict[
             AbstractCurrentSource, Selector] = {}
 
         # Set up for profiling
@@ -395,12 +392,12 @@ class PopulationVertex(
             "Reports", "n_profile_samples")
 
         # Set up for incoming
-        self.__incoming_projections: Dict[
-            PopulationApplicationVertex, List[Projection]] = defaultdict(list)
-        self.__incoming_poisson_projections: Dict[
-            SpikeSourcePoissonVertex, List[Projection]] = defaultdict(list)
-        self.__max_row_info: Dict[
-            Tuple[ProjectionApplicationEdge, SynapseInformation, int],
+        self.__incoming_projections: dict[
+            PopulationApplicationVertex, list[Projection]] = defaultdict(list)
+        self.__incoming_poisson_projections: dict[
+            SpikeSourcePoissonVertex, list[Projection]] = defaultdict(list)
+        self.__max_row_info: dict[
+            tuple[ProjectionApplicationEdge, SynapseInformation, int],
             MaxRowInfo] = {}
         self.__self_projection: Optional[Projection] = None
 
@@ -414,11 +411,11 @@ class PopulationVertex(
         # An RNG for use in synaptic generation
         self.__rng = numpy.random.RandomState(seed)
         self.__pop_seed = create_mars_kiss_seeds(self.__rng)
-        self.__core_seeds: Dict[Slice, Sequence[int]] = {}
+        self.__core_seeds: dict[Slice, Sequence[int]] = {}
 
         # Store connections read from machine until asked to clear
         # Key is app_edge, synapse_info
-        self.__connection_cache: Dict[Tuple[
+        self.__connection_cache: dict[tuple[
             ProjectionApplicationEdge, SynapseInformation], NDArray] = {}
         self.__read_initial_values = False
         self.__have_read_initial_values = False
@@ -432,7 +429,7 @@ class PopulationVertex(
         self.__max_delay_slots_available: Optional[int] = None
 
     @property
-    def extra_partitions(self) -> List[str]:
+    def extra_partitions(self) -> list[str]:
         """ The extra partitions that are to be sent by the vertex. """
         if self.__extra_partitions is None:
             return []
@@ -477,7 +474,7 @@ class PopulationVertex(
 
     @overrides(
         PopulationApplicationVertex.get_max_atoms_per_dimension_per_core)
-    def get_max_atoms_per_dimension_per_core(self) -> Tuple[int, ...]:
+    def get_max_atoms_per_dimension_per_core(self) -> tuple[int, ...]:
         max_atoms = self.get_max_atoms_per_core()
 
         # If single dimensional, we can use the max atoms calculation
@@ -505,7 +502,7 @@ class PopulationVertex(
     @overrides(PopulationApplicationVertex.
                set_max_atoms_per_dimension_per_core)
     def set_max_atoms_per_dimension_per_core(
-            self, new_value: Union[int, Tuple[int, ...]]) -> None:
+            self, new_value: Union[int, tuple[int, ...]]) -> None:
         max_atoms = self.__synapse_dynamics.absolute_max_atoms_per_core
         if numpy.prod(new_value) > max_atoms:
             raise SpynnakerException(
@@ -810,7 +807,7 @@ class PopulationVertex(
             SpynnakerDataView().get_simulation_time_step_ms())
         return delay_available_ms < max_delay_ms
 
-    def __update_max_delay(self) -> Tuple[float, int]:
+    def __update_max_delay(self) -> tuple[float, int]:
         if self.__max_delay_ms is not None:
             # Can't have one without the other
             assert self.__max_delay_slots_available is not None
@@ -835,7 +832,7 @@ class PopulationVertex(
         return self.__max_delay_ms, self.__max_delay_slots_available
 
     def _is_direct_poisson(self, pre_vertex: PopulationApplicationVertex,
-                           projs: List[Projection]) -> bool:
+                           projs: list[Projection]) -> bool:
         # The only way to avoid circular imports!
         # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.extra_algorithms.splitter_components\
@@ -911,7 +908,7 @@ class PopulationVertex(
 
     @property
     @overrides(PopulationApplicationVertex.atoms_shape)
-    def atoms_shape(self) -> Tuple[int, ...]:
+    def atoms_shape(self) -> tuple[int, ...]:
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.__n_atoms)
         return super().atoms_shape
@@ -1117,7 +1114,7 @@ class PopulationVertex(
         self.__parameters[name].set_value_by_selector(selector, value)
 
     @overrides(PopulationApplicationVertex.get_parameters)
-    def get_parameters(self) -> List[str]:
+    def get_parameters(self) -> list[str]:
         return list(self.__pynn_model.default_parameters.keys())
 
     def __read_initial_state_variable(
@@ -1178,7 +1175,7 @@ class PopulationVertex(
             selector, value)
 
     @overrides(PopulationApplicationVertex.get_state_variables)
-    def get_state_variables(self) -> List[str]:
+    def get_state_variables(self) -> list[str]:
         return list(self.__pynn_model.default_initial_values.keys())
 
     @overrides(PopulationApplicationVertex.get_units)
@@ -1198,7 +1195,7 @@ class PopulationVertex(
         return self.__neuron_impl.is_conductance_based
 
     @overrides(PopulationApplicationVertex.get_recordable_variables)
-    def get_recordable_variables(self) -> List[str]:
+    def get_recordable_variables(self) -> list[str]:
         return [
             *self.__neuron_recorder.get_recordable_variables(),
             *self.__synapse_recorder.get_recordable_variables()]
@@ -1236,7 +1233,7 @@ class PopulationVertex(
             raise KeyError(f"It is not possible to record {name}")
 
     @overrides(PopulationApplicationVertex.get_recording_variables)
-    def get_recording_variables(self) -> List[str]:
+    def get_recording_variables(self) -> list[str]:
         return [
             *self.__neuron_recorder.recording_variables,
             *self.__synapse_recorder.recording_variables]
@@ -1322,7 +1319,7 @@ class PopulationVertex(
         """
         self.__connection_cache.clear()
 
-    def describe(self) -> Dict[str, Union[str, Dict[str, Any]]]:
+    def describe(self) -> dict[str, Union[str, dict[str, Any]]]:
         """
         :returns: A human-readable description of vertex and its parameters
         """
@@ -1357,14 +1354,14 @@ class PopulationVertex(
             m_vertex.set_reload_required(True)
 
     @property
-    def current_sources(self) -> List[AbstractCurrentSource]:
+    def current_sources(self) -> list[AbstractCurrentSource]:
         """
         Current sources needed to be available to machine vertex.
         """
         return self.__current_sources
 
     @property
-    def current_source_id_list(self) -> Dict[AbstractCurrentSource, Selector]:
+    def current_source_id_list(self) -> dict[AbstractCurrentSource, Selector]:
         """
         Current source ID list needed to be available to machine vertex.
         """
@@ -1392,7 +1389,7 @@ class PopulationVertex(
             # generation
             self.__tell_neuron_vertices_to_regenerate()
 
-    def get_ring_buffer_shifts(self) -> List[int]:
+    def get_ring_buffer_shifts(self) -> list[int]:
         """
         :returns: The shift of the ring buffers for transfer of values into
             the input buffers for this model.
@@ -1464,7 +1461,7 @@ class PopulationVertex(
             return self.__connection_cache[app_edge, synapse_info]
 
         # Start with something in the list so that concatenate works
-        connections: List[ConnectionsArray] = [
+        connections: list[ConnectionsArray] = [
             numpy.zeros(0, dtype=NUMPY_CONNECTORS_DTYPE)]
         progress = ProgressBar(
             len(self.machine_vertices),
@@ -1640,14 +1637,14 @@ class PopulationVertex(
         return self.__synapse_dynamics.get_vertex_executable_suffix()
 
     @property
-    def neuron_recordables(self) -> List[str]:
+    def neuron_recordables(self) -> list[str]:
         """
         The names of variables that can be recorded by the neuron.
         """
         return self.__neuron_recorder.get_recordable_variables()
 
     @property
-    def synapse_recordables(self) -> List[str]:
+    def synapse_recordables(self) -> list[str]:
         """
         The names of variables that can be recorded by the synapses.
         """
@@ -1859,7 +1856,7 @@ class PopulationVertex(
         self.__allow_delay_extensions = allow_delay_extensions
 
 
-class _Stats(object):
+class _Stats:
     """
     Object to keep hold of and process statistics for ring buffer scaling.
     """
@@ -1968,7 +1965,7 @@ class _Stats(object):
         self.rate_stats[s_type].add_items(spikes_per_second, 0, n_conns)
         self.total_weights[s_type] += spikes_per_tick * (w_max * n_conns)
 
-    def __pre_spike_stats(self, proj: Projection) -> Tuple[float, float]:
+    def __pre_spike_stats(self, proj: Projection) -> tuple[float, float]:
         spikes_per_tick = max(
             1.0, self.default_spikes_per_second / self.steps_per_second)
         spikes_per_second = self.default_spikes_per_second

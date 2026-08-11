@@ -15,7 +15,6 @@
 import functools
 import math
 from collections import defaultdict
-from typing import Dict, List
 
 import numpy
 import pyNN.spiNNaker as p
@@ -118,33 +117,33 @@ def check_params(param: float, result: ConnectionHolder) -> None:
             assert param.parameters["high"] >= maximum
 
 
-def check_one_to_one(n: int, conns: List[List[int]]) -> None:
+def check_one_to_one(n: int, conns: list[list[int]]) -> None:
     assert len(conns) == n
     assert all(pre == post for pre, post in conns)
 
 
-def conns_by_pre(conns: List[List[int]]) -> Dict[int, List[int]]:
+def conns_by_pre(conns: list[list[int]]) -> dict[int, list[int]]:
     cbp = defaultdict(list)
     for pre, post in conns:
         cbp[pre].append(post)
     return cbp
 
 
-def conns_by_post(conns: List[List[int]]) -> Dict[int, List[int]]:
+def conns_by_post(conns: list[list[int]]) -> dict[int, list[int]]:
     cbp = defaultdict(list)
     for pre, post in conns:
         cbp[post].append(pre)
     return cbp
 
 
-def check_all_to_all(n: int, conns: List[List[int]]) -> None:
+def check_all_to_all(n: int, conns: list[list[int]]) -> None:
     cbp = conns_by_pre(conns)
     assert len(cbp) == n
     for pre in cbp:
         assert numpy.array_equal(sorted(cbp[pre]), range(n))
 
 
-def check_fixed_prob(n: int, prob: float, conns: List[List[int]]) -> None:
+def check_fixed_prob(n: int, prob: float, conns: list[list[int]]) -> None:
     cbpre = conns_by_pre(conns)
     cbpost = conns_by_post(conns)
     expected = n * prob
@@ -157,7 +156,7 @@ def check_fixed_prob(n: int, prob: float, conns: List[List[int]]) -> None:
     assert avgpost <= (expected + error)
 
 
-def check_fixed_total(total: int, conns: List[List[int]]) -> None:
+def check_fixed_total(total: int, conns: list[list[int]]) -> None:
     assert len(conns) == total
 
 

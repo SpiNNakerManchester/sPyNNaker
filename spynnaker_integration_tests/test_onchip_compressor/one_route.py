@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import math
-from typing import Tuple
 from unittest import SkipTest
 
 import pyNN.spiNNaker as sim
@@ -27,7 +26,7 @@ from spynnaker.pyNN.extra_algorithms.splitter_components import (
 )
 
 
-def find_good_chip(machine: Machine, n_target: int) -> Tuple[int, int]:
+def find_good_chip(machine: Machine, n_target: int) -> tuple[int, int]:
     for x in range(1, 8):
         for y in range(1, 8):
             chip = machine.get_chip_at(x, y)

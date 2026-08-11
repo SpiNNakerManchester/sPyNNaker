@@ -37,7 +37,7 @@ from spynnaker.pyNN.utilities.constants import (
 )
 
 
-class SpynnakerExternalDevicePluginManager(object):
+class SpynnakerExternalDevicePluginManager:
     """
     User-level interface for the external device plug-in manager.
     """
