@@ -798,7 +798,7 @@ class NeuronRecorder(object):
             return 0
         if variable in self.__bitfield_variables:
             # Overflow can be ignored as it is not save if in an extra word
-            out_spike_words = int(math.ceil(n_neurons / BITS_PER_WORD))
+            out_spike_words = math.ceil(n_neurons / BITS_PER_WORD)
             out_spike_bytes = out_spike_words * BYTES_PER_WORD
             return self._N_BYTES_FOR_TIMESTAMP + out_spike_bytes
         else:
@@ -1030,7 +1030,7 @@ class NeuronRecorder(object):
         """
         # Assumes that BYTES_PER_WORD is divisible by _N_BYTES_PER_INDEX
         n_bytes = n_neurons * self._N_BYTES_PER_INDEX
-        ceil_bytes = int(math.ceil(n_bytes / BYTES_PER_WORD)) * BYTES_PER_WORD
+        ceil_bytes = math.ceil(n_bytes / BYTES_PER_WORD) * BYTES_PER_WORD
         return ceil_bytes // self._N_BYTES_PER_INDEX
 
     def __add_indices(

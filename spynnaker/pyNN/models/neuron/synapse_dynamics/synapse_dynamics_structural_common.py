@@ -363,7 +363,7 @@ class SynapseDynamicsStructuralCommon(
 
         # Break data into rows based on target and strip target out
         rows = [conn_data[connections["target"] == i]
-                for i in range(0, vertex_slice.n_atoms)]
+                for i in range(vertex_slice.n_atoms)]
 
         if any(len(row) > self.s_max for row in rows):
             raise ValueError(

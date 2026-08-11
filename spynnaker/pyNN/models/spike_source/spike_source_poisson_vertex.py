@@ -537,7 +537,7 @@ class SpikeSourcePoissonVertex(
         max_spikes_per_ts = scipy.stats.poisson.ppf(
             1.0 - (1.0 / float(chance_ts)),
             float(self.__max_rate) / ts_per_second)
-        return int(math.ceil(max_spikes_per_ts)) + 1.0
+        return math.ceil(max_spikes_per_ts) + 1.0
 
     def get_recording_sdram_usage(self, vertex_slice: Slice) -> AbstractSDRAM:
         """

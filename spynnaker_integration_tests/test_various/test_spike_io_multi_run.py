@@ -163,7 +163,7 @@ def do_run() -> Tuple[Block, Block]:
     # reaches the end
     loop_forward = []
     loop_backward = []
-    for i in range(0, n_neurons - 1):
+    for i in range(n_neurons - 1):
         loop_forward.append((i, (i + 1) % n_neurons, weight_to_spike, 3))
         loop_backward.append(((i + 1) % n_neurons, i, weight_to_spike, 3))
     Frontend.Projection(pop_forward, pop_forward,

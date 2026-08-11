@@ -52,7 +52,7 @@ def do_run(nNeurons: int, ver_num: str) -> None:
     delay = 1
 
     connections = []
-    for i in range(0, nNeurons):
+    for i in range(nNeurons):
         singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
         connections.append(singleConnection)
 

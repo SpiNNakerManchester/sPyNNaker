@@ -246,5 +246,5 @@ class _DelaySupportAdder(object):
                 f"the max delay supported is {total_delay_ms}")
 
         # return data for building delay extensions
-        n_stages = int(math.ceil(max_delay_needed_ms / max_delay_ms)) - 1
+        n_stages = math.ceil(max_delay_needed_ms / max_delay_ms) - 1
         return n_stages, max_delay_steps, True

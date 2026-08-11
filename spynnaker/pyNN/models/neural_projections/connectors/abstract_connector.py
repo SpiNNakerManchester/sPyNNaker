@@ -226,8 +226,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
             prob_in_range = utility_calls.get_probability_within_range(
                 delays, min_delay, max_delay)
             if prob_in_range > 0:
-                v = int(math.ceil(utility_calls.get_probable_maximum_selected(
-                    n_total_connections, n_connections, prob_in_range)))
+                v = math.ceil(utility_calls.get_probable_maximum_selected(
+                    n_total_connections, n_connections, prob_in_range))
                 # If the probability is so low as to result in 0, assume
                 # at least 1 if there is some probability that the delay is
                 # in range
@@ -244,11 +244,11 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 return 0
             n_total = len(delays)
             prob_delayed = float(n_delayed) / float(n_total)
-            return int(math.ceil(utility_calls.get_probable_maximum_selected(
-                n_total_connections, n_connections, prob_delayed)))
+            return math.ceil(utility_calls.get_probable_maximum_selected(
+                n_total_connections, n_connections, prob_delayed))
         elif is_scalar(delays):
             if min_delay <= delays <= max_delay:
-                return int(math.ceil(n_connections))
+                return math.ceil(n_connections)
             return 0
         raise self.delay_type_exception(delays)
 
@@ -636,7 +636,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if isinstance(size, int):
             return size
         # Allow a float which has a near int value
-        temp = int(round(size))
+        temp = round(size)
         if abs(temp - size) < 0.001:
             logger.warning("Size of {} rounded from {} to {}. "
                            "Please use int values for size",

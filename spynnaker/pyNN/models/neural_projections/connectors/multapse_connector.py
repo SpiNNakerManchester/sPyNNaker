@@ -143,7 +143,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         multinomial = numpy.zeros(size, int)
         total = 1.0
         dn = num_synapses
-        for j in range(0, size - 1):
+        for j in range(size - 1):
             multinomial[j] = rng.next(
                 1, distribution="binomial",
                 parameters={'n': dn, 'p': prob_connect[j] / total})
@@ -221,7 +221,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             self.__num_synapses, max_in_slice, prob_in_row), 1)
 
         if min_delay is None or max_delay is None:
-            return int(math.ceil(n_connections))
+            return math.ceil(n_connections)
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,

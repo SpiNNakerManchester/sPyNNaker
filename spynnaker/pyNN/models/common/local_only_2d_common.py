@@ -56,7 +56,7 @@ def get_div_const(value: int) -> int:
     :param value: The value to be divided by
     :return: The values required encoded as fields of a 32-bit integer
     """
-    log_val = int(ceil(log2(value)))
+    log_val = ceil(log2(value))
     log_m_val = ((2 ** log_val) - value) / value
     m = int(floor((2 ** BITS_PER_SHORT) * log_m_val) + 1)
     sh1 = min(log_val, 1)
