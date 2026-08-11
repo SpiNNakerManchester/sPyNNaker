@@ -367,7 +367,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>    <span class="comment">// First we do x = (inv_gauss_cdf(U(0, 1)) * 0.5) + sqrt(lambda)</span></div>
 <div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    uint32_t U = <a class="code hl_function" href="spike__source__poisson_8c.html#a62b426a3cc403e96d3f3c71761cf797d">rng</a>();</div>
 <div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    <a class="code hl_typedef" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> x = (norminv_urt(U) * <a class="code hl_define" href="maths-util_8h.html#a37c4c48ff47f0838f64b5a1fb3c803b2">HALF</a>) + sqrt_lambda;</div>
-<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>    <span class="comment">// Then we return int(roundk(x * x))</span></div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>    <span class="comment">// Then we return roundk(x * x)</span></div>
 <div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>    <span class="keywordflow">return</span> (uint32_t) roundk(x * x, 15);</div>
 <div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>}</div>
 </div>
@@ -1243,7 +1243,7 @@ $(document).ready(function() { init_codefold(0); });
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 10 2026 13:21:37 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
+Generated on Tue Aug 11 2026 10:05:15 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
 </small></address>
 </body>
 </html>
