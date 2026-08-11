@@ -25,6 +25,7 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotSpeaker,
 )
 
+
 class Test(unittest.TestCase):
 
     def setUp(self) -> None:

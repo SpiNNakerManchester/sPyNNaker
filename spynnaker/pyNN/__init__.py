@@ -76,7 +76,6 @@ from spynnaker.pyNN import external_devices, extra_models
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 
 # current sources
 # noinspection PyUnresolvedReferences
@@ -110,6 +109,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
 from spynnaker.pyNN.models.neural_projections.connectors import (
     MultapseConnector as FixedTotalNumberConnector,
 )
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 
 # neuron stuff
 # noinspection PyUnresolvedReferences
