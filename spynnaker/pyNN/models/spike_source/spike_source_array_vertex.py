@@ -209,7 +209,7 @@ class SpikeSourceArrayVertex(
 
     def _check_density_double_list(self, spike_times: _DoubleList) -> None:
         counter: Counter = Counter()
-        for neuron_id in range(0, self.n_atoms):
+        for neuron_id in range(self.n_atoms):
             counter.update(spike_times[neuron_id])
         top = counter.most_common(1)
         val, count = top[0]
@@ -258,7 +258,7 @@ class SpikeSourceArrayVertex(
         :param spike_times:
         """
         current_time = SpynnakerDataView.get_current_run_time_ms()
-        for neuron_id in range(0, self.n_atoms):
+        for neuron_id in range(self.n_atoms):
             id_times = spike_times[neuron_id]
             for id_time in id_times:
                 if id_time < current_time:

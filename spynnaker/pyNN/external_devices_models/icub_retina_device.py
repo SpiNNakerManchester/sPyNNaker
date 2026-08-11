@@ -72,7 +72,7 @@ class ICUBRetinaDevice(Application2DSpiNNakerLinkVertex):
         # avoid!
         if not is_power_of_2(width):
             if width == DEFAULT_WIDTH:
-                width = 2 ** int(ceil(log2(width)))
+                width = 2 ** ceil(log2(width))
                 logger.warning(
                     "The width of the ICUB retina has been rounded up from {}"
                     " to {}.  This is to ensure that the coordinates are"

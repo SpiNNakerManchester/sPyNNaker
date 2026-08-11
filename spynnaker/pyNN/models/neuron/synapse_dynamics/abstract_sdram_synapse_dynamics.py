@@ -123,7 +123,7 @@ class AbstractSDRAMSynapseDynamics(
         :returns: The number of items in each row
         """
         return numpy.array([
-            int(math.ceil(float(row.size) / float(item_size)))
+            math.ceil(float(row.size) / float(item_size))
             for row in rows], dtype=uint32).reshape((-1, 1))
 
     def get_words(self, rows: List[NDArray]) -> List[NDArray[uint32]]:

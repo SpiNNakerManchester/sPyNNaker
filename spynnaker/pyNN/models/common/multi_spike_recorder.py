@@ -56,6 +56,6 @@ class MultiSpikeRecorder(object):
             return ConstantSDRAM(0)
 
         out_spike_bytes = (
-            int(math.ceil(n_neurons / BITS_PER_WORD)) * BYTES_PER_WORD)
+            math.ceil(n_neurons / BITS_PER_WORD) * BYTES_PER_WORD)
         return VariableSDRAM(0, (2 * BYTES_PER_WORD) + (
             out_spike_bytes * spikes_per_timestep))

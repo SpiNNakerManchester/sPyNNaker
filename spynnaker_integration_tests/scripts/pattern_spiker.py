@@ -43,7 +43,7 @@ class PatternSpiker(object):
             v_rate: Optional[int] = None,
             v_rec_indexes: Optional[List[int]] = None) -> Population:
 
-        v_start = self.V_PATTERN * int(math.ceil(n_neurons/self.V_COUNT))
+        v_start = self.V_PATTERN * math.ceil(n_neurons/self.V_COUNT)
         v_start = v_start[:n_neurons]
         pop = sim.Population(n_neurons,
                              sim.IF_curr_exp(i_offset=1, tau_refrac=0),

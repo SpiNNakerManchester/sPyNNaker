@@ -1420,7 +1420,7 @@ class PopulationVertex(
         # Convert these to powers; we could use int.bit_length() for this if
         # they were integers, but they aren't...
         max_weight_powers = (
-            0 if w <= 0 else int(math.ceil(max(0, math.log2(w))))
+            0 if w <= 0 else math.ceil(max(0, math.log2(w)))
             for w in max_weights)
 
         # If 2^max_weight_power equals the max weight, we have to add another
@@ -1543,7 +1543,7 @@ class PopulationVertex(
         vertex = app_edge.pre_vertex
         max_atoms = vertex.get_max_atoms_per_core()
         n_sub_atoms = int(min(max_atoms, vertex.n_atoms))
-        n_sub_edges = int(math.ceil(vertex.n_atoms / n_sub_atoms))
+        n_sub_edges = math.ceil(vertex.n_atoms / n_sub_atoms)
 
         if max_row_info.undelayed_max_n_synapses > 0:
             size = n_sub_atoms * max_row_info.undelayed_max_bytes
@@ -1606,7 +1606,7 @@ class PopulationVertex(
                 vertex = app_edge.pre_vertex
                 max_atoms = float(min(vertex.get_max_atoms_per_core(),
                                       vertex.n_atoms))
-                n_sub_edges = int(math.ceil(vertex.n_atoms / max_atoms))
+                n_sub_edges = math.ceil(vertex.n_atoms / max_atoms)
             size += self.__generator_info_size(synapse_info) * n_sub_edges
         size += get_sdram_for_keys(self.incoming_projections)
         return size
@@ -2017,9 +2017,9 @@ class _Stats(object):
 
         # Upper end of range for Poisson summation required below
         # upper_bound needs to be an integer
-        upper_bound = int(round(average_spikes_per_timestep +
-                                POISSON_SIGMA_SUMMATION_LIMIT *
-                                math.sqrt(average_spikes_per_timestep)))
+        upper_bound = round(average_spikes_per_timestep +
+                            POISSON_SIGMA_SUMMATION_LIMIT *
+                            math.sqrt(average_spikes_per_timestep))
 
         # pylint:disable=wrong-spelling-in-comment
         # Closed-form exact solution for summation that gives the variance

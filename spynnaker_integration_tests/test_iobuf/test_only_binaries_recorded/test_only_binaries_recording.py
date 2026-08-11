@@ -46,7 +46,7 @@ class TestCoresAndBinariesRecording(BaseTestCase):
                 machine_vertex)
             data.add(placement)
 
-        false_data = list(range(0, 16))
+        false_data = list(range(16))
         for placement in SpynnakerDataView.iterate_placements_on_core((0, 0)):
             if placement in data:
                 false_data.remove(placement.p)

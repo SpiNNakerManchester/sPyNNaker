@@ -242,7 +242,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             self.__n_post, prob_in_slice, chance=1.0/100000.0)
 
         if min_delay is None or max_delay is None:
-            return int(math.ceil(n_connections))
+            return math.ceil(n_connections)
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
@@ -257,7 +257,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons, selection_prob,
             chance=1.0/100000.0)
-        return int(math.ceil(n_connections))
+        return math.ceil(n_connections)
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:

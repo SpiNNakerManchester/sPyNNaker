@@ -40,7 +40,7 @@ def do_run(nNeurons: int, ver_num: str) -> None:
     v_rest = []
     v_thresh = []
 
-    for _ in range(0, nNeurons):
+    for _ in range(nNeurons):
         cm.append(0.25)
         i_off.append(0.0)
         tau_m.append(10.0)
@@ -65,7 +65,7 @@ def do_run(nNeurons: int, ver_num: str) -> None:
     delay = 1
 
     connections = []
-    for i in range(0, nNeurons):
+    for i in range(nNeurons):
         singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
         connections.append(singleConnection)
 

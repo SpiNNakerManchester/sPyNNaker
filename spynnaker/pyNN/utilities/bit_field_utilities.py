@@ -94,11 +94,11 @@ def get_sdram_for_bit_field_region(
     sdram = FILTER_HEADER_WORDS * BYTES_PER_WORD
     for in_edge, _part_id in _unique_edges(incoming_projections):
         n_atoms = in_edge.pre_vertex.n_atoms
-        n_words_for_atoms = int(math.ceil(n_atoms / BIT_IN_A_WORD))
+        n_words_for_atoms = math.ceil(n_atoms / BIT_IN_A_WORD)
         sdram += (FILTER_INFO_WORDS + n_words_for_atoms) * BYTES_PER_WORD
         # Also add for delay vertices if needed
-        n_words_for_delays = int(math.ceil(
-            n_atoms * in_edge.n_delay_stages / BIT_IN_A_WORD))
+        n_words_for_delays = math.ceil(
+            n_atoms * in_edge.n_delay_stages / BIT_IN_A_WORD)
         sdram += (FILTER_INFO_WORDS + n_words_for_delays) * BYTES_PER_WORD
     return sdram
 
