@@ -15,6 +15,9 @@
 import unittest
 
 from spynnaker.pyNN.config_setup import unittest_setup
+from spynnaker.pyNN.external_devices_models.push_bot import (
+    AbstractPushBotOutputDevice,
+)
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotLaser,
     PushBotLED,
@@ -22,13 +25,13 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotSpeaker,
 )
 
-
 class Test(unittest.TestCase):
 
     def setUp(self) -> None:
         unittest_setup()
 
-    def _test_device_enum(self, enum_class: type) -> None:
+    def _test_device_enum(
+            self, enum_class: type[AbstractPushBotOutputDevice]) -> None:
         for item in enum_class:
             print(item)
             item.value

@@ -76,6 +76,7 @@ from spynnaker.pyNN import external_devices, extra_models
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 
 # current sources
 # noinspection PyUnresolvedReferences
@@ -498,7 +499,7 @@ def list_standard_models() -> list[str]:
 
 
 def set_number_of_neurons_per_core(
-        neuron_type: type,
+        neuron_type: type[AbstractPyNNNeuronModel],
         max_permitted: Optional[Union[int, tuple[int, ...]]]) -> None:
     """
     Sets a ceiling on the number of neurons of a given model that can be
@@ -536,7 +537,8 @@ def set_number_of_neurons_per_core(
 
 
 def set_number_of_synapse_cores(
-        neuron_type: type, n_synapse_cores: Optional[int]) -> None:
+        neuron_type: type[AbstractPyNNNeuronModel],
+        n_synapse_cores: Optional[int]) -> None:
     """
     Sets the number of synapse cores for a model.
 
@@ -553,7 +555,8 @@ def set_number_of_synapse_cores(
 
 
 def set_allow_delay_extensions(
-        neuron_type: type, allow_delay_extensions: bool) -> None:
+        neuron_type: type[AbstractPyNNNeuronModel],
+        allow_delay_extensions: bool) -> None:
     """
     Sets whether to allow delay extensions for a model.
 
