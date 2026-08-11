@@ -13,7 +13,7 @@
 # limitations under the License.
 import ctypes
 from enum import IntEnum
-from typing import List, Optional, Sequence
+from typing import Optional, Sequence
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -239,7 +239,7 @@ class PopulationNeuronsMachineVertex(
                     " scale factor, or reducing the number of spikes sent")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
-    def get_recorded_region_ids(self) -> List[int]:
+    def get_recorded_region_ids(self) -> list[int]:
         ids = self._pop_vertex.neuron_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         return ids

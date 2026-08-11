@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Iterator, MutableMapping, Optional, Tuple, cast
+from typing import Iterator, MutableMapping, Optional, cast
 
 import numpy
 from numpy import uint32
@@ -58,7 +58,7 @@ def _all_one_val_gen(rd: RangeDictionary[float]) -> bool:
     return True
 
 
-class NeuronData(object):
+class NeuronData:
     """
     Holds and creates the data for a group of neurons.
     """
@@ -222,7 +222,7 @@ class NeuronData(object):
         return struct.get_data(values, vertex_slice)
 
     def __get_neuron_builder_data(
-            self, vertex_slice: Slice) -> Tuple[int, NDArray[uint32]]:
+            self, vertex_slice: Slice) -> tuple[int, NDArray[uint32]]:
         """
         Get the data to build neuron parameters with.
 

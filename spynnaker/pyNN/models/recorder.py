@@ -18,7 +18,6 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Collection,
-    Dict,
     Mapping,
     Optional,
     Sequence,
@@ -44,7 +43,7 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class Recorder(object):
+class Recorder:
     """
     Object to hold recording behaviour, used by populations.
     """
@@ -66,7 +65,7 @@ class Recorder(object):
         self.__vertex = vertex
 
         # file flags, allows separate files for the recorded variables
-        self.__write_to_files_indicators: Dict[str, IoDest] = {
+        self.__write_to_files_indicators: dict[str, IoDest] = {
             'spikes': None,
             'gsyn_exc': None,
             'gsyn_inh': None,
@@ -216,7 +215,7 @@ class Recorder(object):
 
     def extract_neo_block(
             self, variables: Names, view_indexes: Optional[Sequence[int]],
-            clear: bool, annotations: Optional[Dict[str, Any]]) -> neo.Block:
+            clear: bool, annotations: Optional[dict[str, Any]]) -> neo.Block:
         """
         Extracts block from the vertices and puts them into a Neo block.
 
@@ -244,7 +243,7 @@ class Recorder(object):
     def write_data(
             self, csv_file: str, variables: Optional[Names],
             view_indexes: Optional[Sequence[int]] = None,
-            annotations: Optional[Dict[str, Any]] = None) -> None:
+            annotations: Optional[dict[str, Any]] = None) -> None:
         """
         Extracts block from the vertices and puts them into a Neo block.
 
@@ -294,7 +293,7 @@ class Recorder(object):
     def __append_current_segment(
             self, block: neo.Block, variables: Names,
             view_indexes: Optional[Sequence[int]], clear: bool,
-            annotations: Optional[Dict[str, Any]]) -> neo.Block:
+            annotations: Optional[dict[str, Any]]) -> neo.Block:
         """
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
@@ -324,7 +323,7 @@ class Recorder(object):
             self, block: Optional[neo.Block], segment_number: int,
             variables: Names, view_indexes: Optional[Sequence[int]],
             clear: bool,
-            annotations: Optional[Dict[str, Any]]) -> Optional[neo.Block]:
+            annotations: Optional[dict[str, Any]]) -> Optional[neo.Block]:
         """
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:

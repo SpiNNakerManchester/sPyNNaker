@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Optional, Sequence, Union
 
 from spinn_utilities.config_holder import get_config_bool
 
@@ -38,7 +38,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.populations import Population, PopulationView
 
 
-class SynapseInformation(object):
+class SynapseInformation:
     """
     Contains the synapse information including the connector, synapse type
     and synapse dynamics.
@@ -107,7 +107,7 @@ class SynapseInformation(object):
         self.__partition_id = partition_id or SPIKE_PARTITION_ID
 
         # Make a list of holders to be updated
-        self.__pre_run_connection_holders: List[ConnectionHolder] = []
+        self.__pre_run_connection_holders: list[ConnectionHolder] = []
 
     @property
     def connector(self) -> AbstractConnector:

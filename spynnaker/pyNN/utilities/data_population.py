@@ -17,9 +17,7 @@ import logging
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
     Iterable,
-    List,
     Optional,
     Sequence,
     Union,
@@ -53,7 +51,7 @@ _SELECTIVE_RECORDED_MSG = (
     "in numerical order and without repeats.")
 
 
-class DataPopulation(object):
+class DataPopulation:
     """
     A wrapper of a sqlite3 database to provide the Population data methods
     """
@@ -99,7 +97,7 @@ class DataPopulation(object):
     @overrides(Population.describe)
     def describe(self, template: Optional[str] = None,
                  engine: Optional[Union[str, TemplateEngine]] = None
-                 ) -> Union[str, Dict[str, Any]]:
+                 ) -> Union[str, dict[str, Any]]:
         # pylint: disable=missing-function-docstring
         if template is not None:
             logger.warning("Ignoring template as not supported in this mode")
@@ -113,7 +111,7 @@ class DataPopulation(object):
     def get_data(
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
-            annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
+            annotations: Optional[dict[str, Any]] = None) -> neo.Block:
         # pylint: disable=missing-function-docstring,protected-access
         Population._check_params(gather, annotations)
         if clear:
@@ -134,7 +132,7 @@ class DataPopulation(object):
                 self.__label, variable, as_matrix, self._indexes)
 
     @overrides(Population.get_spike_counts)
-    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
+    def get_spike_counts(self, gather: bool = True) -> dict[int, int]:
         # pylint: disable=missing-function-docstring
         Population._check_params(gather)  # pylint: disable=protected-access
         with NeoBufferDatabase(self.__database_file) as db:
@@ -174,13 +172,13 @@ class DataPopulation(object):
 
     @overload
     def id_to_index(
-            self, id: Iterable[int]) -> List[int]:  # @ReservedAssignment
+            self, id: Iterable[int]) -> list[int]:  # @ReservedAssignment
         # pylint: disable=redefined-builtin
         ...
 
     @overrides(Population.id_to_index)
     def id_to_index(self, id: Union[int, Iterable[int]]
-                    ) -> Union[int, List[int]]:  # @ReservedAssignment
+                    ) -> Union[int, list[int]]:  # @ReservedAssignment
         # pylint: disable=missing-function-docstring,redefined-builtin
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
@@ -200,12 +198,12 @@ class DataPopulation(object):
         ...
 
     @overload
-    def index_to_id(self, index: Iterable[int]) -> List[int]:
+    def index_to_id(self, index: Iterable[int]) -> list[int]:
         ...
 
     @overrides(Population.index_to_id)
     def index_to_id(self, index: Union[int, Iterable[int]]
-                    ) -> Union[int, List[int]]:
+                    ) -> Union[int, list[int]]:
         # pylint: disable=missing-function-docstring
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:

@@ -20,11 +20,8 @@ from datetime import datetime
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
     Iterable,
-    List,
     Optional,
-    Tuple,
     Union,
 )
 
@@ -47,7 +44,7 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class NeoCsv(object):
+class NeoCsv:
     """
     Code to read a csv file and create a neo object.
 
@@ -115,7 +112,7 @@ class NeoCsv(object):
         parts = as_str.split(" ")
         return Quantity(float(parts[0]), units=parts[1])
 
-    def __read_variable_metadata(self, csv_reader: CSVReader) -> Tuple[
+    def __read_variable_metadata(self, csv_reader: CSVReader) -> tuple[
             Quantity, Quantity, Quantity, str]:
         """
         Reads a block of metadata, formats it and returns it as a dict
@@ -322,8 +319,8 @@ class NeoCsv(object):
 
     def _insert_formation_events(
             self, segment: Segment, variable: str,
-            formation_times: List[Quantity],
-            formation_labels: List[str]) -> None:
+            formation_times: list[Quantity],
+            formation_labels: list[str]) -> None:
         """
         Adds formation data to a neo segment.
 
@@ -343,8 +340,8 @@ class NeoCsv(object):
 
     def _insert_elimination_events(
             self, segment: Segment, variable: str,
-            elimination_times: List[Quantity],
-            elimination_labels: List[str]) -> None:
+            elimination_times: list[Quantity],
+            elimination_labels: list[str]) -> None:
         """
         Adds elimination data to a neo segment.
 
@@ -371,10 +368,10 @@ class NeoCsv(object):
         :param event_array: the raw "event" data
         :param variable: the variable name
         """
-        formation_times: List[Quantity] = []
-        formation_labels: List[str] = []
-        elimination_times: List[Quantity] = []
-        elimination_labels: List[str] = []
+        formation_times: list[Quantity] = []
+        formation_labels: list[str] = []
+        elimination_times: list[Quantity] = []
+        elimination_labels: list[str] = []
 
         for event in event_array:
             event_time = event[0] * ms
@@ -400,8 +397,8 @@ class NeoCsv(object):
         :param csv_writer: Open CSV writer to write to
         :param event_array: the raw "event" data
         """
-        formation: List[Tuple[Quantity, str]] = []
-        elimination: List[Tuple[Quantity, str]] = []
+        formation: list[tuple[Quantity, str]] = []
+        elimination: list[tuple[Quantity, str]] = []
 
         for event in event_array:
             event_time = event[0] * ms
@@ -421,16 +418,16 @@ class NeoCsv(object):
         csv_writer.writerows(elimination)
         csv_writer.writerow([])
 
-    def __read_times_and_labels(self, csv_reader: CSVReader) -> Tuple[
-            List[Quantity], List[str]]:
+    def __read_times_and_labels(self, csv_reader: CSVReader) -> tuple[
+            list[Quantity], list[str]]:
         """
         Reads formation or elimination data from the CSV file.
 
         :param csv_reader: Open CSV writer to read from
         :return: A list of times and a list of labels
         """
-        times: List[Quantity] = []
-        labels: List[str] = []
+        times: list[Quantity] = []
+        labels: list[str] = []
         row = next(csv_reader)
         while len(row) > 0:
             assert len(row) == 2
@@ -536,7 +533,7 @@ class NeoCsv(object):
         block = Block()
         block.name = pop_label
         block.description = description
-        metadata: Dict[str, Any] = {}
+        metadata: dict[str, Any] = {}
         metadata[self._SIZE] = size
         metadata["first_index"] = 0
         metadata['last_index'] = size,
@@ -594,7 +591,7 @@ class NeoCsv(object):
             simulator=metadata.pop(self._SIMULATOR),
             annotations=metadata)
 
-    def __read_metadata(self, csv_reader: CSVReader) -> Dict[str, str]:
+    def __read_metadata(self, csv_reader: CSVReader) -> dict[str, str]:
         """
         Reads a block of metadata and converts it to a dict.
 
@@ -604,7 +601,7 @@ class NeoCsv(object):
         :param csv_reader: Open CSV writer to read from
         :return: a dict of the keys to unformatted values
         """
-        metadata: Dict[str, str] = {}
+        metadata: dict[str, str] = {}
         row = next(csv_reader)
         while len(row) > 0:
             assert len(row) == 2

@@ -14,7 +14,7 @@
 
 import os
 import sys
-from typing import List, Optional, Sequence, Tuple
+from typing import Optional, Sequence
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -54,7 +54,7 @@ def run_script(
         inh_rec_indexes: Optional[Sequence[int]] = None,
         inh_get_indexes: Optional[Sequence[int]] = None,
         file_prefix: str = ""
-        ) -> Tuple[Optional[SpikeTrainList],
+        ) -> tuple[Optional[SpikeTrainList],
                    Optional[AnalogSignal], Optional[AnalogSignal],
                    Optional[AnalogSignal]]:
 
@@ -148,7 +148,7 @@ def run_script(
     return spikes, v,  exc, inh
 
 
-def compare_spikearrays(this: List[float], full: List[float],
+def compare_spikearrays(this: list[float], full: list[float],
                         tolerance: bool = False) -> float:
     if numpy.array_equal(this, full):
         return sys.maxsize
@@ -324,8 +324,8 @@ def write_spikes(spikes: SpikeTrainList, spike_file: str) -> None:
 
 
 def ordered_rounded_set(
-        in_list: List[str], factor: int, simtime: int) -> List[float]:
-    out_list: List[float] = []
+        in_list: list[str], factor: int, simtime: int) -> list[float]:
+    out_list: list[float] = []
     added = set()
     for s in in_list[1:]:
         raw = float(s)
@@ -341,8 +341,8 @@ def ordered_rounded_set(
 
 
 def read_spikes(name: str, simtime: int, n_neurons: int, rate: int = 1,
-                indexes: Optional[Sequence[int]] = None) -> List[List[float]]:
-    spikes: List[List[float]] = []
+                indexes: Optional[Sequence[int]] = None) -> list[list[float]]:
+    spikes: list[list[float]] = []
     with open(name, encoding="utf-8") as f:
         for line in f:
             parts = line.split(",")

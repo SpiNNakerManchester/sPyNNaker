@@ -14,7 +14,7 @@
 
 import logging
 import os
-from typing import Any, Collection, Optional, Type, Union, cast
+from typing import Any, Collection, Optional, Union, cast
 
 from lazyarray import __version__ as lazyarray_version
 from neo import __version__ as neo_version
@@ -146,7 +146,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @property
     @overrides(AbstractSpinnakerBase._data_writer_cls)
-    def _data_writer_cls(self) -> Type[SpynnakerDataWriter]:
+    def _data_writer_cls(self) -> type[SpynnakerDataWriter]:
         return SpynnakerDataWriter
 
     @property

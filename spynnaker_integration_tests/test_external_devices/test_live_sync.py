@@ -14,7 +14,6 @@
 
 import traceback
 from time import sleep
-from typing import List
 
 import pyNN.spiNNaker as p
 
@@ -30,7 +29,7 @@ n_spikes = []
 n_spikes.append(0)
 
 
-def recv(label: str, time: int, neuron_ids: List[int]) -> None:
+def recv(label: str, time: int, neuron_ids: list[int]) -> None:
     """ Receive spikes and add the number received to the current segment count
     """
     print("Time: {}; Received spikes from {}:{}".format(

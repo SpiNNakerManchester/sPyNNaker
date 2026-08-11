@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Mapping
+from typing import Mapping
 
 import numpy
 
@@ -87,7 +87,7 @@ class NoisyCurrentSource(AbstractCurrentSource):
             'dt': DataType.S1615,
             'seed': DataType.UINT32}
 
-        self.__parameters: Dict[str, CurrentParameter] = {
+        self.__parameters: dict[str, CurrentParameter] = {
             'mean': self.__mean,
             'stdev': self.__stdev,
             'start': self.__start,

@@ -16,7 +16,7 @@
 Types (and related) that are useful for implementing connectors.
 """
 
-from typing import Final, Iterable, List, Optional, Sequence, Union
+from typing import Final, Iterable, Optional, Sequence, Union
 
 import neo
 import numpy
@@ -43,7 +43,7 @@ IoDest: TypeAlias = Union[
 ViewIndices = Union[None, Sequence[int], NDArray[numpy.integer]]
 #: :meta private:
 Selector: TypeAlias = Union[
-    None, int, slice, Sequence[int], List[bool], NDArray[numpy.bool_],
+    None, int, slice, Sequence[int], list[bool], NDArray[numpy.bool_],
     NDArray[numpy.integer]]
 
 WeightScales: TypeAlias = Union[NDArray[numpy.floating], Sequence[float]]

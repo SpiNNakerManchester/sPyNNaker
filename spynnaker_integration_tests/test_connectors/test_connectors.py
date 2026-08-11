@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Union
+from typing import Union
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -37,7 +37,7 @@ class ConnectorsTest(BaseTestCase):
     def test_onetoone_multicore_population_views(self) -> None:
         self.runsafe(self.onetoone_multicore_population_views)
 
-    def spike_received_count(self, v_line: Quantity) -> List[int]:
+    def spike_received_count(self, v_line: Quantity) -> list[int]:
         counts = []
         for v in v_line:
             if v < -64:
@@ -56,8 +56,8 @@ class ConnectorsTest(BaseTestCase):
                 counts.append(OVERFLOW)
         return counts
 
-    def calc_spikes_received(self, v: AnalogSignal) -> List[List[int]]:
-        counts: List[List[int]] = []
+    def calc_spikes_received(self, v: AnalogSignal) -> list[list[int]]:
+        counts: list[list[int]] = []
         counts.append(self.spike_received_count(v[2]))
         counts.append(self.spike_received_count(v[22]))
         counts.append(self.spike_received_count(v[42]))
@@ -65,7 +65,7 @@ class ConnectorsTest(BaseTestCase):
         counts.append(self.spike_received_count(v[82]))
         return counts
 
-    def check_counts(self, counts: Union[List[List[int]], NDArray],
+    def check_counts(self, counts: Union[list[list[int]], NDArray],
                      connections: int, repeats: bool) -> None:
         for count in counts:
             if not repeats:

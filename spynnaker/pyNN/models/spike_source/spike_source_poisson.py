@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Sequence, Tuple, Union
+from typing import Optional, Sequence, Union
 
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.overrides import overrides
@@ -63,7 +63,7 @@ class SpikeSourcePoisson(AbstractPyNNModel):
             self, n_neurons: int, label: str, *,
             seed: Optional[int] = None, max_rate: Optional[float] = None,
             splitter: Optional[AbstractSplitterCommon] = None,
-            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
+            neurons_per_core: Optional[Union[int, tuple[int, ...]]] = None,
             n_colour_bits: Optional[int] = None) -> SpikeSourcePoissonVertex:
         """
         :param label: The name for the vertex.

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Callable, List, Optional, Sequence, Union
+from typing import Callable, Optional, Sequence, Union
 
 from pyNN.random import RandomDistribution
 from typing_extensions import TypeAlias
@@ -44,7 +44,7 @@ class SpynnakerRangedList(RangedList):
     @overrides(RangedList.as_list)
     def as_list(
             self, value: _ListType, size: int,
-            ids: Optional[IdsType] = None) -> List[T]:
+            ids: Optional[IdsType] = None) -> list[T]:
         if isinstance(value, RandomDistribution):
             return value.next(n=size)
 

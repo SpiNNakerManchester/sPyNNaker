@@ -25,7 +25,7 @@ from spinn_front_end_common.utilities.constants import (
 _TWO_WORDS = struct.Struct("<II")
 
 
-class MultiSpikeRecorder(object):
+class MultiSpikeRecorder:
     """
     Support for recording more than one spike per timestep.
     """

@@ -19,11 +19,8 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Collection,
-    Dict,
-    List,
     Optional,
     Sequence,
-    Tuple,
     Union,
 )
 
@@ -93,7 +90,7 @@ def _as_numpy_ticks(
 
 def _send_buffer_times(
         spike_times: Spikes, time_step: float) -> Union[
-            NDArray[numpy.int64], List[NDArray[numpy.int64]]]:
+            NDArray[numpy.int64], list[NDArray[numpy.int64]]]:
     # Convert to ticks
     if _is_double_list(spike_times):
         return [_as_numpy_ticks(times, time_step) for times in spike_times]
@@ -124,7 +121,7 @@ class SpikeSourceArrayVertex(
 
     def __init__(
             self, n_neurons: int, spike_times: Spikes, label: str,
-            max_atoms_per_core: Union[int, Tuple[int, ...]],
+            max_atoms_per_core: Union[int, tuple[int, ...]],
             model: SpikeSourceArray,
             splitter: Optional[AbstractSplitterCommon],
             n_colour_bits: Optional[int]):
@@ -226,7 +223,7 @@ class SpikeSourceArrayVertex(
 
     @property
     @overrides(ReverseIpTagMultiCastSource.atoms_shape)
-    def atoms_shape(self) -> Tuple[int, ...]:
+    def atoms_shape(self) -> tuple[int, ...]:
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.n_atoms)
         return super().atoms_shape
@@ -306,7 +303,7 @@ class SpikeSourceArrayVertex(
             selector, value, use_list_as_value=not _is_double_list(value))
 
     @overrides(PopulationApplicationVertex.get_parameters)
-    def get_parameters(self) -> List[str]:
+    def get_parameters(self) -> list[str]:
         return ["spike_times"]
 
     @overrides(PopulationApplicationVertex.get_units)
@@ -318,7 +315,7 @@ class SpikeSourceArrayVertex(
         raise KeyError(f"Units for {name} unknown")
 
     @overrides(PopulationApplicationVertex.get_recordable_variables)
-    def get_recordable_variables(self) -> List[str]:
+    def get_recordable_variables(self) -> list[str]:
         return ["spikes"]
 
     @overrides(PopulationApplicationVertex.get_buffer_data_type)
@@ -360,7 +357,7 @@ class SpikeSourceArrayVertex(
         self.enable_recording(False)
 
     @overrides(PopulationApplicationVertex.get_recording_variables)
-    def get_recording_variables(self) -> List[str]:
+    def get_recording_variables(self) -> list[str]:
         if self._is_recording:
             return ["spikes"]
         return []
@@ -384,7 +381,7 @@ class SpikeSourceArrayVertex(
         return None
 
     def describe(
-            self) -> Dict[str, Union[str, ParameterHolder, Dict[str, Any]]]:
+            self) -> dict[str, Union[str, ParameterHolder, dict[str, Any]]]:
         """
         Returns a human-readable description of the cell or synapse type.
 

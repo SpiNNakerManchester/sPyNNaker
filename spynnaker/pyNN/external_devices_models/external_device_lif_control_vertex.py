@@ -17,10 +17,8 @@ from __future__ import annotations
 from typing import (
     TYPE_CHECKING,
     Iterable,
-    List,
     Optional,
     Sequence,
-    Tuple,
     Union,
 )
 
@@ -79,7 +77,7 @@ class ExternalDeviceLifControlVertex(
     def __init__(
             self, *, devices: Sequence[AbstractMulticastControllableDevice],
             create_edges: bool,
-            max_atoms_per_core: Union[int, Tuple[int, ...]],
+            max_atoms_per_core: Union[int, tuple[int, ...]],
             n_synapse_cores: Optional[int],
             allow_delay_extensions: bool,
             neuron_impl: AbstractNeuronImpl,
@@ -88,7 +86,7 @@ class ExternalDeviceLifControlVertex(
             spikes_per_second: Optional[float] = None,
             label: Optional[str] = None,
             ring_buffer_sigma: Optional[float] = None,
-            max_expected_summed_weight: Optional[List[float]] = None,
+            max_expected_summed_weight: Optional[list[float]] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterPopulationVertex] = None,
@@ -146,7 +144,7 @@ class ExternalDeviceLifControlVertex(
 
     @staticmethod
     def __dependents(
-            devices: Sequence[AbstractMulticastControllableDevice]) -> Tuple[
+            devices: Sequence[AbstractMulticastControllableDevice]) -> tuple[
                 ApplicationVirtualVertex, ...]:
         return tuple(
             dev for dev in devices
@@ -178,13 +176,13 @@ class ExternalDeviceLifControlVertex(
         return self.__message_translator
 
     @overrides(AbstractEthernetController.get_outgoing_partition_ids)
-    def get_outgoing_partition_ids(self) -> List[str]:
+    def get_outgoing_partition_ids(self) -> list[str]:
         return list(self.__devices.keys())
 
     @overrides(HasCustomAtomKeyMap.get_atom_key_map)
     def get_atom_key_map(
             self, pre_vertex: MachineVertex, partition_id: str,
-            routing_info: RoutingInfo) -> Iterable[Tuple[int, int]]:
+            routing_info: RoutingInfo) -> Iterable[tuple[int, int]]:
         index = self.__indices[partition_id]
         device = self.__devices[partition_id]
         return [(index, device.device_control_key)]

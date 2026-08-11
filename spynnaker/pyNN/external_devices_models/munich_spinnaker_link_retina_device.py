@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List, Literal, Optional, Union
+from typing import Iterable, Literal, Optional, Union
 
 from typing_extensions import TypeAlias
 
@@ -171,5 +171,5 @@ class MunichRetinaDevice(
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
-    def timed_commands(self) -> List[MultiCastCommand]:
+    def timed_commands(self) -> list[MultiCastCommand]:
         return []

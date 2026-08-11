@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable, List
+from typing import TYPE_CHECKING, Iterable
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     )
 
 
-class AbstractEthernetController(object, metaclass=AbstractBase):
+class AbstractEthernetController(metaclass=AbstractBase):
     """
     A controller that can send multicast packets which can be received
     over Ethernet and translated to control an external device.
@@ -49,7 +49,7 @@ class AbstractEthernetController(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_outgoing_partition_ids(self) -> List[str]:
+    def get_outgoing_partition_ids(self) -> list[str]:
         """
         :returns: The partition IDs of messages coming out of the controller.
         """

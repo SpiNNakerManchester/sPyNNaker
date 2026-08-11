@@ -13,7 +13,7 @@
 # limitations under the License.
 from collections import defaultdict, namedtuple
 from math import ceil, floor, log2
-from typing import TYPE_CHECKING, Dict, List, Tuple, Union
+from typing import TYPE_CHECKING, Union
 
 from pacman.model.graphs.application import (
     ApplicationVertex,
@@ -65,7 +65,7 @@ def get_div_const(value: int) -> int:
             + (sh1 << BITS_PER_SHORT) + m)
 
 
-def get_delay_for_source(incoming: "Projection") -> Tuple[
+def get_delay_for_source(incoming: "Projection") -> tuple[
         ColouredApplicationVertex, int, int, str]:
     """ Get the vertex which will send data from a given source projection,
         along with the delay stage and locally-handled delay value
@@ -94,7 +94,7 @@ def get_delay_for_source(incoming: "Projection") -> Tuple[
 
 def get_rinfo_for_spike_source(
         pre_vertex: ApplicationVertex,
-        partition_id: str) -> Tuple[AppVertexRoutingInfo, int, int]:
+        partition_id: str) -> tuple[AppVertexRoutingInfo, int, int]:
     """
     Get the routing information for the source of a projection in the
     given partition.
@@ -122,8 +122,8 @@ def get_rinfo_for_spike_source(
     return r_info, core_mask, mask_shift
 
 
-def get_sources_for_target(app_vertex: "PopulationVertex") -> Dict[
-        Tuple[ColouredApplicationVertex, str], List[Source]]:
+def get_sources_for_target(app_vertex: "PopulationVertex") -> dict[
+        tuple[ColouredApplicationVertex, str], list[Source]]:
     """
     Get all the application vertex sources that will hit the given application
     vertex.
@@ -142,7 +142,7 @@ def get_sources_for_target(app_vertex: "PopulationVertex") -> Dict[
 
 
 def get_first_and_last_slice(pre_vertex: ApplicationVertex) -> \
-        Union[Tuple[Slice, Slice], Tuple[MDSlice, MDSlice]]:
+        Union[tuple[Slice, Slice], tuple[MDSlice, MDSlice]]:
     """
     :param pre_vertex: The source vertex
     :returns: The first and last slice of an application vertex.

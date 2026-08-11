@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Union
 
 from spinn_utilities.overrides import overrides
 
@@ -61,7 +61,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         "tau_m", "cm", "v_rest", "v_reset", "tau_syn_E", "tau_syn_I",
         "tau_refrac", "i_offset"})
     def __init__(
-            self, devices:  List[AbstractMulticastControllableDevice],
+            self, devices:  list[AbstractMulticastControllableDevice],
             create_edges: bool,
             translator: Optional[AbstractEthernetTranslator] = None,
             # default params for the neuron model type
@@ -119,13 +119,13 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             self, n_neurons: int, label: str, *,
             spikes_per_second: Optional[float] = None,
             ring_buffer_sigma: Optional[float] = None,
-            max_expected_summed_weight: Optional[List[float]] = None,
+            max_expected_summed_weight: Optional[list[float]] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
             n_steps_per_timestep: int = 1,
-            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
+            neurons_per_core: Optional[Union[int, tuple[int, ...]]] = None,
             n_synapse_cores: Optional[int] = None,
             allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
         if n_neurons != len(self._devices):

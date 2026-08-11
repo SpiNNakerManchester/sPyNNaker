@@ -20,14 +20,10 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Dict,
     Iterable,
     Iterator,
-    List,
     Optional,
     Sequence,
-    Tuple,
-    Type,
     Union,
     cast,
     final,
@@ -72,8 +68,8 @@ if TYPE_CHECKING:
 
 logger = FormatAdapter(logging.getLogger(__file__))
 _CellType: TypeAlias = Union[AbstractPyNNModel, PopulationApplicationVertex]
-_CellTypeArg: TypeAlias = Union[Type[AbstractPyNNModel], _CellType]
-_ParamDict: TypeAlias = Dict[str, Any]
+_CellTypeArg: TypeAlias = Union[type[AbstractPyNNModel], _CellType]
+_ParamDict: TypeAlias = dict[str, Any]
 
 
 class Population(PopulationBase):
@@ -96,7 +92,7 @@ class Population(PopulationBase):
             self, size: Union[int, float, None], cellclass: _CellTypeArg,
             cellparams: Optional[_ParamDict] = None,
             structure: Optional[BaseStructure] = None,
-            initial_values: Optional[Dict[str, float]] = None,
+            initial_values: Optional[dict[str, float]] = None,
             label: Optional[str] = None,
             additional_parameters: Optional[_ParamDict] = None,
             **additional_kwargs: _ParamDict):
@@ -143,7 +139,7 @@ class Population(PopulationBase):
         if realsize is None:
             realsize = self.__vertex.n_atoms
         self.__size = realsize
-        self.__annotations: Dict[str, Any] = {}
+        self.__annotations: dict[str, Any] = {}
 
         # things for pynn demands
         self.__first_id, self.__last_id = SpynnakerDataView.add_population(
@@ -175,7 +171,7 @@ class Population(PopulationBase):
             yield IDMixin(self, _id)
 
     @property
-    def annotations(self) -> Dict[str, Any]:
+    def annotations(self) -> dict[str, Any]:
         """
         The annotations given by the end user.
         """
@@ -223,7 +219,7 @@ class Population(PopulationBase):
     @overrides(PopulationBase.write_data)
     def write_data(self, io: Union[str, BaseIO], variables: Names = 'all',
                    gather: bool = True, clear: bool = False,
-                   annotations: Optional[Dict[str, Any]] = None) -> None:
+                   annotations: Optional[dict[str, Any]] = None) -> None:
         self._check_params(gather, annotations)
 
         if isinstance(io, str):
@@ -241,7 +237,7 @@ class Population(PopulationBase):
 
     def describe(self, template: str = 'population_default.txt',
                  engine:  Optional[Union[str, TemplateEngine]] = 'default'
-                 ) -> Union[str, Dict[str, Any]]:
+                 ) -> Union[str, dict[str, Any]]:
         """
         Returns a human-readable description of the population.
 
@@ -256,7 +252,7 @@ class Population(PopulationBase):
         :param engine: Template substitution engine
         :returns: Human-readable description as a string or dict
         """
-        context: Dict[str, Any] = {
+        context: dict[str, Any] = {
             "label": self.label,
             "celltype": self.celltype.describe(template=None),
             "structure": None,
@@ -296,7 +292,7 @@ class Population(PopulationBase):
     def get_data(
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
-            annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
+            annotations: Optional[dict[str, Any]] = None) -> neo.Block:
         self._check_params(gather, annotations)
         return self.__recorder.extract_neo_block(
             variables, None, clear, annotations)
@@ -322,7 +318,7 @@ class Population(PopulationBase):
                                          variable, as_matrix, view_indexes)
 
     @overrides(PopulationBase.get_spike_counts)
-    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
+    def get_spike_counts(self, gather: bool = True) -> dict[int, int]:
         self._check_params(gather)
         with NeoBufferDatabase() as db:
             return db.get_spike_counts(self.__recorder.recording_label)
@@ -459,7 +455,7 @@ class Population(PopulationBase):
 
     @property
     @overrides(PopulationBase.all_cells)
-    def all_cells(self) -> List[IDMixin]:
+    def all_cells(self) -> list[IDMixin]:
         return [IDMixin(self, _id) for _id in range(self.__size)]
 
     @property
@@ -492,7 +488,7 @@ class Population(PopulationBase):
 
     @property
     @overrides(PopulationBase._view_range)
-    def _view_range(self) -> Tuple[int, int]:
+    def _view_range(self) -> tuple[int, int]:
         return 0, self.size - 1
 
     @property
@@ -528,11 +524,11 @@ class Population(PopulationBase):
 
     @overload
     def id_to_index(
-            self, id: Iterable[int]) -> List[int]:  # @ReservedAssignment
+            self, id: Iterable[int]) -> list[int]:  # @ReservedAssignment
         ...
 
     def id_to_index(self, id: Union[int, Iterable[int]]
-                    ) -> Union[int, List[int]]:  # @ReservedAssignment
+                    ) -> Union[int, list[int]]:  # @ReservedAssignment
         """
         Given the ID(s) of cell(s) in the Population, return its (their)
         index (order in the Population).
@@ -558,11 +554,11 @@ class Population(PopulationBase):
         ...
 
     @overload
-    def index_to_id(self, index: Iterable[int]) -> List[int]:
+    def index_to_id(self, index: Iterable[int]) -> list[int]:
         ...
 
     def index_to_id(self, index: Union[int, Iterable[int]]
-                    ) -> Union[int, List[int]]:
+                    ) -> Union[int, list[int]]:
         """
         Given the index (order in the Population) of cell(s) in the
         Population, return their ID(s)
@@ -648,7 +644,7 @@ class Population(PopulationBase):
 
     # NON-PYNN API CALL
     def set_max_atoms_per_core(
-            self, max_atoms_per_core: Union[int, Tuple[int, ...]]) -> None:
+            self, max_atoms_per_core: Union[int, tuple[int, ...]]) -> None:
         """
         Supports the setting of this population's max atoms per
         dimension per core.

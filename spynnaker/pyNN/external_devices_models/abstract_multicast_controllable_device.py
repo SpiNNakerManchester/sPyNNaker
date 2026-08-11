@@ -37,7 +37,7 @@ class SendType(Enum):
     SEND_TYPE_UFRACT = 5
 
 
-class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
+class AbstractMulticastControllableDevice(metaclass=AbstractBase):
     """
     A device that can be controlled by sending multicast packets to it,
     either directly, or via Ethernet using an AbstractEthernetTranslator.

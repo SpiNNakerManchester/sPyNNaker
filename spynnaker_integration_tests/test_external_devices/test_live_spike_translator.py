@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import unittest
-from typing import Callable, List, Tuple
+from typing import Callable
 
 import pyNN.spiNNaker as p
 
@@ -64,7 +64,7 @@ class TestLiveGatherTranslator(BaseTestCase):
         self.listener.start()
 
     def live_spike_receive_translated(self) -> None:
-        self.stored_data: List[Tuple[int, int]] = []
+        self.stored_data: list[tuple[int, int]] = []
 
         db_conn = DatabaseConnection(local_port=None)
         db_conn.add_database_callback(self.database_callback)

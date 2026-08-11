@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     )
 
 
-class HasSynapses(object, metaclass=AbstractBase):
+class HasSynapses(metaclass=AbstractBase):
     """
     API for getting connections from the machine.
     """

@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Sized
-from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Any, Optional, Union, cast
 
 import numpy
 from numpy import float64, floating, integer, uint16, uint32
@@ -71,8 +71,8 @@ class PoolDenseConnector(AbstractConnector):
     )
 
     def __init__(self, weights: ArrayLike,
-                 pool_shape: Union[int, Tuple[int], None] = None,
-                 pool_stride: Union[int, Tuple[int], None] = None,
+                 pool_shape: Union[int, tuple[int], None] = None,
+                 pool_stride: Union[int, tuple[int], None] = None,
                  positive_receptor_type: str = "excitatory",
                  negative_receptor_type: str = "inhibitory",
                  safe: bool = True, verbose: bool = False,
@@ -119,7 +119,7 @@ class PoolDenseConnector(AbstractConnector):
         self.__negative_receptor_type = negative_receptor_type
 
     @overrides(AbstractConnector.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["weights"] = self.weights
         parameters["pool_shape"] = self.__pool_shape
@@ -150,7 +150,7 @@ class PoolDenseConnector(AbstractConnector):
         return self.__weights
 
     def __decode_weights(
-            self, pre_shape: Tuple[int, ...], post_shape: Tuple[int, ...],
+            self, pre_shape: tuple[int, ...], post_shape: tuple[int, ...],
             post_vertex_slice: Slice) -> NDArray[float64]:
         if isinstance(self.__weights, (int, float)):
             n_weights = self.__get_n_weights(
@@ -177,14 +177,14 @@ class PoolDenseConnector(AbstractConnector):
 
     @staticmethod
     def __to_nd_shape_or_none(
-            shape: Optional[Union[int, Tuple[int, ...]]], n_dims: int,
+            shape: Optional[Union[int, tuple[int, ...]]], n_dims: int,
             param_name: str) -> Optional[NDArray[integer]]:
         if shape is None:
             return None
         return PoolDenseConnector.__to_nd_shape(shape, n_dims, param_name)
 
     @staticmethod
-    def __to_nd_shape(shape: Union[int, Tuple[int, ...]],
+    def __to_nd_shape(shape: Union[int, tuple[int, ...]],
                       n_dims: int, param_name: str) -> NDArray[integer]:
         if numpy.isscalar(shape):
             return numpy.array([shape] * n_dims, dtype=int)
@@ -197,9 +197,9 @@ class PoolDenseConnector(AbstractConnector):
 
     @classmethod
     def get_post_pool_shape(
-            cls, pre_shape: Tuple[int, ...],
-            pool_shape: Union[int, Tuple[int, ...], None] = None,
-            pool_stride: Union[int, Tuple[int, ...], None] = None) -> NDArray:
+            cls, pre_shape: tuple[int, ...],
+            pool_shape: Union[int, tuple[int, ...], None] = None,
+            pool_stride: Union[int, tuple[int, ...], None] = None) -> NDArray:
         """
         :param pre_shape: tuple(int)
         :param pool_shape:
@@ -217,12 +217,12 @@ class PoolDenseConnector(AbstractConnector):
             shape = shape // real_pool_stride
         return shape
 
-    def __get_pre_in_post_shape(self, pre_shape: Tuple[int, ...]) -> NDArray:
+    def __get_pre_in_post_shape(self, pre_shape: tuple[int, ...]) -> NDArray:
         return self.get_post_pool_shape(
             pre_shape, self.__pool_shape, self.__pool_stride)
 
     def __get_n_weights(
-            self, pre_shape: Tuple[int, ...],
+            self, pre_shape: tuple[int, ...],
             post_n_atoms: int) -> int:
         """
         Get the expected number of weights.
@@ -302,7 +302,7 @@ class PoolDenseConnector(AbstractConnector):
         return super()._get_weight_maximum(
             self.__weights, n_conns, synapse_info)
 
-    def local_only_n_bytes(self, pre_shape: Tuple[int, ...],
+    def local_only_n_bytes(self, pre_shape: tuple[int, ...],
                            n_post_atoms: int) -> int:
         """
         :param pre_shape:

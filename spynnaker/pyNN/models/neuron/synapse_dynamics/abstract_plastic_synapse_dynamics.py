@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List, Tuple, Union
+from typing import Union
 
 from numpy import integer, uint32
 from numpy.typing import NDArray
@@ -50,9 +50,9 @@ class AbstractPlasticSynapseDynamics(
             n_synapse_types: int,
             max_n_synapses: int, max_atoms_per_core: int,
             ring_buffer_weight_scales: WeightScales) -> Union[
-                Tuple[NDArray[uint32], NDArray[uint32],
+                tuple[NDArray[uint32], NDArray[uint32],
                       NDArray[uint32], NDArray[uint32]],
-                Tuple[List[NDArray[uint32]], List[NDArray[uint32]],
+                tuple[list[NDArray[uint32]], list[NDArray[uint32]],
                       NDArray[uint32], NDArray[uint32]]]:
         """
         Get the fixed-plastic data, and plastic-plastic data for each row, and
@@ -116,8 +116,8 @@ class AbstractPlasticSynapseDynamics(
     @abstractmethod
     def read_plastic_synaptic_data(
             self, n_synapse_types: int,
-            pp_size: NDArray[uint32], pp_data: List[NDArray[uint32]],
-            fp_size: NDArray[uint32], fp_data: List[NDArray[uint32]],
+            pp_size: NDArray[uint32], pp_data: list[NDArray[uint32]],
+            fp_size: NDArray[uint32], fp_data: list[NDArray[uint32]],
             max_atoms_per_core: int,
             ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         """

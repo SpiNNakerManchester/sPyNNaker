@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import math
-from typing import List, Optional
+from typing import Optional
 
 import numpy
 from numpy import floating, integer, uint32
@@ -93,7 +93,7 @@ class AbstractSDRAMSynapseDynamics(
 
     def convert_per_connection_data_to_rows(
             self, connection_row_indices: NDArray[integer], n_rows: int,
-            data: NDArray, max_n_synapses: int) -> List[NDArray]:
+            data: NDArray, max_n_synapses: int) -> list[NDArray]:
         """
         Converts per-connection data generated from connections into
         row-based data to be returned from get_synaptic_data.
@@ -113,7 +113,7 @@ class AbstractSDRAMSynapseDynamics(
             for i in range(n_rows)]
 
     def get_n_items(
-            self, rows: List[NDArray], item_size: int) -> NDArray[uint32]:
+            self, rows: list[NDArray], item_size: int) -> NDArray[uint32]:
         """
         Get the number of items in each row as 4-byte values, given the
         item size.
@@ -126,7 +126,7 @@ class AbstractSDRAMSynapseDynamics(
             math.ceil(float(row.size) / float(item_size))
             for row in rows], dtype=uint32).reshape((-1, 1))
 
-    def get_words(self, rows: List[NDArray]) -> List[NDArray[uint32]]:
+    def get_words(self, rows: list[NDArray]) -> list[NDArray[uint32]]:
         """
         Convert the row data to words.
 

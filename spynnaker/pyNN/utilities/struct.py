@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from enum import Enum
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import Any, Mapping, Optional, Sequence, Union
 
 import numpy
 from numpy import integer, uint8, uint32
@@ -56,7 +56,7 @@ class StructRepeat(Enum):
     PER_NEURON = 1
 
 
-class Struct(object):
+class Struct:
     """
     Represents a C code structure.
     """
@@ -67,9 +67,9 @@ class Struct(object):
     )
 
     def __init__(
-            self, fields: Sequence[Tuple[DataType, str]],
+            self, fields: Sequence[tuple[DataType, str]],
             repeat_type: StructRepeat = StructRepeat.PER_NEURON,
-            default_values: Optional[Dict[str, Union[int, float]]] = None):
+            default_values: Optional[dict[str, Union[int, float]]] = None):
         """
         :param fields:
             The types and names of the fields, ordered as they appear in the
@@ -84,7 +84,7 @@ class Struct(object):
         self.__default_values = default_values or {}
 
     @property
-    def fields(self) -> Sequence[Tuple[DataType, str]]:
+    def fields(self) -> Sequence[tuple[DataType, str]]:
         """
         The types and names of the fields, ordered as they appear in the
         structure.
@@ -227,7 +227,7 @@ class Struct(object):
         # total size of data written (0 as filled in later),
         # and number of fields in struct
         data = [self.numpy_dtype.itemsize, n_repeats, 0, len(self.__fields)]
-        gen_data: List[NDArray[uint32]] = []
+        gen_data: list[NDArray[uint32]] = []
 
         # Go through all values and add in generator data for each
         for data_type, name in self.__fields:
@@ -256,7 +256,7 @@ class Struct(object):
         return numpy.concatenate(all_data)
 
     def __gen_data_one_for_all(
-            self, data: List[int], gen_data: List[NDArray[uint32]],
+            self, data: list[int], gen_data: list[NDArray[uint32]],
             values: ValueMap, name: str, n_repeats: int) -> None:
         """
         Generate data with a single value for all neurons.
@@ -285,7 +285,7 @@ class Struct(object):
         gen_data.append(param_generator_params(value))
 
     def __gen_data_for_slice(
-            self, data: List[int], gen_data: List[NDArray[uint32]],
+            self, data: list[int], gen_data: list[NDArray[uint32]],
             values: ValueMap, name: str, vertex_slice: Slice) -> None:
         """
         Generate data with different values for each neuron.

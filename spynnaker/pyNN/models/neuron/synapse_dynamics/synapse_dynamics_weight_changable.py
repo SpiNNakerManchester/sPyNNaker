@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Tuple, cast
+from typing import TYPE_CHECKING, Iterable, Optional, cast
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
@@ -96,7 +96,7 @@ class SynapseDynamicsWeightChangable(
         super().__init__(delay=delay, weight=weight)
         self.__weight_max = weight_max
         self.__weight_min = weight_min
-        self.__synapse_info_to_index: Dict[SynapseInformation, int] = {}
+        self.__synapse_info_to_index: dict[SynapseInformation, int] = {}
         self.__next_index = 0
 
         if weight_min < 0.0:
@@ -216,8 +216,8 @@ class SynapseDynamicsWeightChangable(
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
             max_n_synapses: int, max_atoms_per_core: int,
-            ring_buffer_weight_scales: WeightScales) -> Tuple[
-                List[NDArray[uint32]], List[NDArray[uint32]],
+            ring_buffer_weight_scales: WeightScales) -> tuple[
+                list[NDArray[uint32]], list[NDArray[uint32]],
                 NDArray[uint32], NDArray[uint32]]:
         raise NotImplementedError(
             "WeightChangable can only be generated on machine")
@@ -246,8 +246,8 @@ class SynapseDynamicsWeightChangable(
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
             self, n_synapse_types: int, pp_size: NDArray[uint32],
-            pp_data: List[NDArray[uint32]], fp_size: NDArray[uint32],
-            fp_data: List[NDArray[uint32]],
+            pp_data: list[NDArray[uint32]], fp_size: NDArray[uint32],
+            fp_data: list[NDArray[uint32]],
             max_atoms_per_core: int,
             ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         logger.warning(

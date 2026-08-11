@@ -16,11 +16,9 @@ from __future__ import annotations
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
     Iterable,
     Optional,
     Sequence,
-    Tuple,
     Union,
 )
 
@@ -169,7 +167,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         self.__connections: ConnectionsInfo = {}
 
         self.__rng = numpy.random.RandomState(seed)
-        self.__seeds: Dict[Any, Tuple[int, ...]] = {}
+        self.__seeds: dict[Any, tuple[int, ...]] = {}
 
     @overrides(AbstractStaticSynapseDynamics.merge)
     def merge(self, synapse_dynamics: AbstractSynapseDynamics
@@ -357,7 +355,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
     def get_connected_vertices(
             self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
-            Tuple[MachineVertex, Sequence[AbstractVertex]]]:
+            tuple[MachineVertex, Sequence[AbstractVertex]]]:
 
         # Things change, so assume all connected
         return [(m_vertex, [source_vertex])

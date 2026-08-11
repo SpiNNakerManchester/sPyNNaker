@@ -18,10 +18,8 @@ from collections import defaultdict
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
     Optional,
     Sequence,
-    Tuple,
     Union,
     cast,
 )
@@ -50,7 +48,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     __slots__ = ()
 
     # The maximum number of atoms per core for PyNN models
-    _max_atoms_per_core: Dict[type, Optional[Tuple[int, ...]]] = defaultdict(
+    _max_atoms_per_core: dict[type, Optional[tuple[int, ...]]] = defaultdict(
         lambda: None)
 
     _model_created = False
@@ -87,7 +85,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
 
     @classmethod
     def set_model_max_atoms_per_dimension_per_core(
-            cls, n_atoms: Union[None, int, Tuple[int, ...]] = None) -> None:
+            cls, n_atoms: Union[None, int, tuple[int, ...]] = None) -> None:
         """
         Set the default maximum number of atoms per dimension per core for
         this model.  This can be overridden by the individual Population.
@@ -117,12 +115,12 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
                 raise SpynnakerException(
                     "The absolute maximum sum of neurons per core for this"
                     f" model is {abs_max}")
-            max_atoms_tuple: Tuple[int, ...] = cast(
-                Tuple[int, ...],  n_atoms)
+            max_atoms_tuple: tuple[int, ...] = cast(
+                tuple[int, ...],  n_atoms)
             AbstractPyNNModel._max_atoms_per_core[cls] = max_atoms_tuple
 
     @classmethod
-    def get_model_max_atoms_per_dimension_per_core(cls) -> Tuple[int, ...]:
+    def get_model_max_atoms_per_dimension_per_core(cls) -> tuple[int, ...]:
         """
         :returns:
             The maximum number of atoms per dimension per core for this model.
@@ -174,10 +172,10 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     #: The default values for the parameters at the population level.
     #: These are parameters that can be passed in to the Population
     #: constructor in addition to the standard PyNN options.
-    default_population_parameters: Dict[str, Any] = {}
+    default_population_parameters: dict[str, Any] = {}
 
     @classmethod
-    def _get_default_population_parameters(cls) -> Dict[str, Any]:
+    def _get_default_population_parameters(cls) -> dict[str, Any]:
         """
         Get the default population parameters.
         Slightly contorted to allow for overriding class variables.

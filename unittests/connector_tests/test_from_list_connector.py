@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List, Optional, Sequence
+from typing import Iterable, Optional, Sequence
 
 import numpy
 import pytest
@@ -62,11 +62,11 @@ from unittests.mocks import (
         "3-elements-extra"
     ])
 def test_connector(
-        clist: NDArray, column_names: Optional[List[str]],
+        clist: NDArray, column_names: Optional[list[str]],
         weights: int, delays: int, expected_clist: Optional[NDArray],
-        expected_weights: List[int], expected_delays: List[int],
+        expected_weights: list[int], expected_delays: list[int],
         expected_extra_parameters: Optional[NDArray],
-        expected_extra_parameter_names: Optional[List[str]]) -> None:
+        expected_extra_parameter_names: Optional[list[str]]) -> None:
     unittest_setup()
     connector = FromListConnector(clist, column_names=column_names)
     if expected_clist is not None:
@@ -156,7 +156,7 @@ def test_connector_split() -> None:
 
 class MockSplitter(AbstractSplitterCommon):
 
-    def __init__(self, slices: List[Slice], app_vertex: ApplicationVertex):
+    def __init__(self, slices: list[Slice], app_vertex: ApplicationVertex):
         super().__init__()
         self.slices = slices
         self.m_vertices = [SimpleMachineVertex(
@@ -197,7 +197,7 @@ class MockSplitter(AbstractSplitterCommon):
 
 class MockAppVertex(MockVertex):
 
-    def __init__(self, n_atoms: int, slices: List[Slice]):
+    def __init__(self, n_atoms: int, slices: list[Slice]):
         super().__init__(splitter=MockSplitter(slices, self))
         self._n_atoms = n_atoms
 

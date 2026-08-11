@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List, Tuple
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -86,7 +85,7 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
                                delta=tolerance)
 
     def make_delta_pop(self, n_neurons: int, ssp: Population, weight: float,
-                       delay: float = 1.0) -> Tuple[Population, Projection]:
+                       delay: float = 1.0) -> tuple[Population, Projection]:
         pop_1 = sim.Population(
             n_neurons, sim.IF_curr_delta(**PARAMS), label='pop_1',
             n_synapse_cores=1)
@@ -174,7 +173,7 @@ class TestPoissonSpikeSourceSDRAM(BaseTestCase):
     def test_poisson_sdram_with_delay(self) -> None:
         self.runsafe(self.poisson_sdram_with_delay)
 
-    def check_rates(self, rates: List[float], seconds: int, seed: int) -> None:
+    def check_rates(self, rates: list[float], seconds: int, seed: int) -> None:
         n_neurons = 100
         weight = 2.0
         sim.setup(timestep=1.0)

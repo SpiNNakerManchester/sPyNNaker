@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Iterable, Optional, Tuple
+from typing import TYPE_CHECKING, Iterable, Optional
 
 import numpy
 from numpy import uint32
@@ -64,7 +64,7 @@ def is_sdram_poisson_source(app_edge: ApplicationEdge) -> bool:
 
 
 def _unique_edges(projections: Iterable[Projection]) -> Iterable[
-        Tuple[ProjectionApplicationEdge, str]]:
+        tuple[ProjectionApplicationEdge, str]]:
     """
     Get the unique application edges of a collection of projections.
 

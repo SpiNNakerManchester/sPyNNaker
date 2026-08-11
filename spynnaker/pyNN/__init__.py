@@ -27,13 +27,9 @@ import os
 from typing import (
     Any,
     Callable,
-    Dict,
     Iterable,
-    List,
     Optional,
     Sequence,
-    Tuple,
-    Type,
     TypedDict,
     Union,
     cast,
@@ -113,6 +109,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
 from spynnaker.pyNN.models.neural_projections.connectors import (
     MultapseConnector as FixedTotalNumberConnector,
 )
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 
 # neuron stuff
 # noinspection PyUnresolvedReferences
@@ -270,16 +267,16 @@ class __PynnOperations(TypedDict, total=False):
     get_min_delay: Callable[[], int]
     num_processes: Callable[[], int]
     rank: Callable[[], int]
-    reset: Callable[[Dict[str, Any]], None]
+    reset: Callable[[dict[str, Any]], None]
     create: Callable[
-        [Union[Type, AbstractPyNNModel], Optional[Dict[str, Any]], int],
+        [Union[type, AbstractPyNNModel], Optional[dict[str, Any]], int],
         Population]
     connect: Callable[
         [Population, Population, float, Optional[float], Optional[str], int,
          Optional[NumpyRNG]], None]
     record: Callable[
         [Union[str, Sequence[str]], PopulationBase, str, Optional[float],
-         Optional[Dict[str, Any]]], Block]
+         Optional[dict[str, Any]]], Block]
 
 
 # Dynamically-extracted operations from PyNN
@@ -292,8 +289,8 @@ __simulator: Optional[SpiNNaker] = None
 def distance(src_cell: IDMixin, tgt_cell: IDMixin,
              mask: Optional[NDArray] = None,
              scale_factor: float = 1.0, offset: float = 0.0,
-             periodic_boundaries: Optional[Tuple[
-                 Optional[Tuple[int, int]]]] = None) -> float:
+             periodic_boundaries: Optional[tuple[
+                 Optional[tuple[int, int]]]] = None) -> float:
     """
     :param src_cell: Measure from this cell
     :param tgt_cell: To this cell
@@ -490,7 +487,7 @@ def end(_: Any = True) -> None:
     __simulator.stop()
 
 
-def list_standard_models() -> List[str]:
+def list_standard_models() -> list[str]:
     """
     :returns: A list of all the StandardCellType classes available for this
         simulator.
@@ -502,8 +499,8 @@ def list_standard_models() -> List[str]:
 
 
 def set_number_of_neurons_per_core(
-        neuron_type: Type,
-        max_permitted: Optional[Union[int, Tuple[int, ...]]]) -> None:
+        neuron_type: type[AbstractPyNNNeuronModel],
+        max_permitted: Optional[Union[int, tuple[int, ...]]]) -> None:
     """
     Sets a ceiling on the number of neurons of a given model that can be
     placed on a single core.
@@ -524,12 +521,12 @@ def set_number_of_neurons_per_core(
         raise ConfigurationException(
             "set_number_of_neurons_per_core call now expects "
             "neuron_type as a class instead of as a str")
-    max_neurons: Optional[Tuple[int, ...]] = None
+    max_neurons: Optional[tuple[int, ...]] = None
     if max_permitted is not None:
         if is_singleton(max_permitted):
             max_neurons = (int(max_permitted), )
         else:
-            max_perm: Tuple[int, ...] = cast(Tuple[int, ...], max_permitted)
+            max_perm: tuple[int, ...] = cast(tuple[int, ...], max_permitted)
             max_neurons = tuple(int(m) for m in max_perm)
 
     neuron_type.set_model_max_atoms_per_dimension_per_core(max_neurons)
@@ -540,7 +537,8 @@ def set_number_of_neurons_per_core(
 
 
 def set_number_of_synapse_cores(
-        neuron_type: Type, n_synapse_cores: Optional[int]) -> None:
+        neuron_type: type[AbstractPyNNNeuronModel],
+        n_synapse_cores: Optional[int]) -> None:
     """
     Sets the number of synapse cores for a model.
 
@@ -557,7 +555,8 @@ def set_number_of_synapse_cores(
 
 
 def set_allow_delay_extensions(
-        neuron_type: Type, allow_delay_extensions: bool) -> None:
+        neuron_type: type[AbstractPyNNNeuronModel],
+        allow_delay_extensions: bool) -> None:
     """
     Sets whether to allow delay extensions for a model.
 
@@ -593,8 +592,8 @@ def connect(pre: Population, post: Population, weight: float = 0.0,
 
 
 def create(
-        cellclass: Union[Type, AbstractPyNNModel],
-        cellparams: Optional[Dict[str, Any]] = None,
+        cellclass: Union[type, AbstractPyNNModel],
+        cellparams: Optional[dict[str, Any]] = None,
         n: int = 1) -> Population:
     """
     Builds a population with certain parameters.
@@ -608,7 +607,7 @@ def create(
     return __pynn["create"](cellclass, cellparams, n)
 
 
-def NativeRNG(seed_value: Union[int, List[int], NDArray]) -> None:
+def NativeRNG(seed_value: Union[int, list[int], NDArray]) -> None:
     """
     Fixes the random number generator's seed.
 
@@ -702,7 +701,7 @@ def rank() -> int:
 
 def record(variables: Union[str, Sequence[str]], source: PopulationBase,
            filename: str, sampling_interval: Optional[float] = None,
-           annotations: Optional[Dict[str, Any]] = None) -> Block:
+           annotations: Optional[dict[str, Any]] = None) -> Block:
     """
     Sets variables to be recorded.
 
@@ -721,7 +720,7 @@ def record(variables: Union[str, Sequence[str]], source: PopulationBase,
                             annotations)
 
 
-def reset(annotations: Optional[Dict[str, Any]] = None) -> None:
+def reset(annotations: Optional[dict[str, Any]] = None) -> None:
     """
     Resets the simulation to t = 0.
 

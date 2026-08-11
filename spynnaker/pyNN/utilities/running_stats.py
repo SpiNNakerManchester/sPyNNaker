@@ -16,7 +16,7 @@ import math
 from typing import Union
 
 
-class RunningStats(object):
+class RunningStats:
     """
     Keeps running statistics.
     From: https://www.johndcook.com/blog/skewness_kurtosis/

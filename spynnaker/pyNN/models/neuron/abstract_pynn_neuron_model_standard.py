@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Any, Optional, Union, cast
 
 from spinn_utilities.overrides import overrides
 
@@ -41,7 +41,7 @@ if TYPE_CHECKING:
 
     from .population_vertex import PopulationVertex
 
-_population_parameters: Dict[str, Any] = dict(APNM_default_params)
+_population_parameters: dict[str, Any] = dict(APNM_default_params)
 _population_parameters["n_steps_per_timestep"] = 1
 
 
@@ -79,13 +79,13 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             self, n_neurons: int, label: str, *,
             spikes_per_second: Optional[float] = None,
             ring_buffer_sigma: Optional[float] = None,
-            max_expected_summed_weight: Optional[List[float]] = None,
+            max_expected_summed_weight: Optional[list[float]] = None,
             incoming_spike_buffer_size: Optional[int] = None,
             drop_late_spikes: Optional[bool] = None,
             splitter: Optional[SplitterPopulationVertex] = None,
             seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
             n_steps_per_timestep: int = 1,
-            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
+            neurons_per_core: Optional[Union[int, tuple[int, ...]]] = None,
             n_synapse_cores: Optional[int] = None,
             allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
         """

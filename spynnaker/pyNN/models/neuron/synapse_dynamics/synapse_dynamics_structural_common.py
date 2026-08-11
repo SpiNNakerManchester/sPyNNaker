@@ -17,11 +17,8 @@ from __future__ import annotations
 import math
 from typing import (
     TYPE_CHECKING,
-    Dict,
     Iterable,
-    List,
     Sequence,
-    Tuple,
     Union,
     cast,
 )
@@ -64,15 +61,15 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
     from spynnaker.pyNN.models.projection import Projection
 
-    _PopIndexType: TypeAlias = Dict[
-        Tuple[PopulationApplicationVertex, SynapseInformation], int]
-    _SubpopIndexType: TypeAlias = Dict[
-        Tuple[PopulationApplicationVertex, SynapseInformation, int], int]
+    _PopIndexType: TypeAlias = dict[
+        tuple[PopulationApplicationVertex, SynapseInformation], int]
+    _SubpopIndexType: TypeAlias = dict[
+        tuple[PopulationApplicationVertex, SynapseInformation, int], int]
 
     #: :meta private:
-    ConnectionsInfo: TypeAlias = Dict[
-        Tuple[PopulationVertex, int],
-        List[Tuple[ConnectionsArray, ProjectionApplicationEdge,
+    ConnectionsInfo: TypeAlias = dict[
+        tuple[PopulationVertex, int],
+        list[tuple[ConnectionsArray, ProjectionApplicationEdge,
                    SynapseInformation]]]
 
 #: Default value for frequency of rewiring
@@ -180,7 +177,7 @@ class SynapseDynamicsStructuralCommon(
 
     def __get_structural_projections(
             self, incoming_projections: Iterable[Projection]
-            ) -> List[Projection]:
+            ) -> list[Projection]:
         structural_projections = []
         seen_app_edges = set()
         for proj in incoming_projections:
@@ -249,7 +246,7 @@ class SynapseDynamicsStructuralCommon(
             app_vertex: ApplicationVertex,
             structural_projections: Iterable[Projection],
             weight_scales: NDArray[numpy.floating],
-            synaptic_matrices: SynapticMatrices) -> Tuple[
+            synaptic_matrices: SynapticMatrices) -> tuple[
                 _PopIndexType, _SubpopIndexType, _SubpopIndexType]:
         """
         :param spec:

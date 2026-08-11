@@ -13,7 +13,7 @@
 # limitations under the License.
 import ctypes
 from enum import IntEnum
-from typing import List, Optional, Sequence
+from typing import Optional, Sequence
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -303,7 +303,7 @@ class PopulationMachineVertex(
                     " the .spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
-    def get_recorded_region_ids(self) -> List[int]:
+    def get_recorded_region_ids(self) -> list[int]:
         ids = self._pop_vertex.neuron_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         ids.extend(self._pop_vertex.synapse_recorder.recorded_ids_by_slice(

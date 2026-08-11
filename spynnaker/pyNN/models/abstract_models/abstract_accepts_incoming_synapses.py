@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 
 
 @require_subclass(ApplicationVertex)
-class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
+class AbstractAcceptsIncomingSynapses(metaclass=AbstractBase):
     """
     Indicates an application vertex that can be a post-vertex in a PyNN
     projection.

@@ -14,7 +14,7 @@
 import logging
 from threading import RLock, Thread
 from time import sleep
-from typing import Any, List
+from typing import Any
 
 import numpy
 from matplotlib import pyplot
@@ -89,7 +89,7 @@ class PushBotRetinaViewer():
         """
         return self.__conn.local_port
 
-    def __recv(self, label: str, time: int, spikes: List[int]) -> None:
+    def __recv(self, label: str, time: int, spikes: list[int]) -> None:
         _ = (label, time)
         np_spikes = numpy.array(spikes) & self.__without_polarity_mask
         x_vals, y_vals = numpy.divmod(np_spikes, self.__height)

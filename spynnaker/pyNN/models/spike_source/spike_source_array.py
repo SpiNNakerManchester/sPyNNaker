@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 from spinn_utilities.overrides import overrides
 
@@ -43,7 +43,7 @@ class SpikeSourceArray(AbstractPyNNModel):
     def create_vertex(
             self, n_neurons: int, label: str, *,
             splitter: Optional[AbstractSplitterCommon] = None,
-            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
+            neurons_per_core: Optional[Union[int, tuple[int, ...]]] = None,
             n_colour_bits: Optional[int] = None) -> SpikeSourceArrayVertex:
         """
         :param splitter:

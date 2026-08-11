@@ -14,7 +14,7 @@
 
 import logging
 import os
-from typing import Any, Dict, Union
+from typing import Any, Union
 
 import numpy
 from numpy.typing import NDArray
@@ -101,7 +101,7 @@ class FromFileConnector(FromListConnector):
         return FromListConnector(**params)
 
     @overrides(FromListConnector.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         logger.warning("FromFileConnectors parameters are actually the ones "
                        "for the underlying FromListConnector")
         return super().get_parameters()

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Sequence
+from typing import TYPE_CHECKING, Sequence
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -115,7 +115,7 @@ class PopulationSynapsesMachineVertexLead(
         return self.__max_atoms_per_core
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
-    def get_recorded_region_ids(self) -> List[int]:
+    def get_recorded_region_ids(self) -> list[int]:
         ids = self._pop_vertex.synapse_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         return ids

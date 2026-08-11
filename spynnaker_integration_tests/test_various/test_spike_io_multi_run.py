@@ -14,7 +14,6 @@
 import random
 import time
 from threading import Condition
-from typing import List, Tuple
 
 import pyNN.spiNNaker as Frontend
 from neo import Block
@@ -62,14 +61,14 @@ def send_input_backward(label: str, sender: LiveEventConnection) -> None:
 
 
 # Create a receiver of live spikes
-def receive_spikes(label: str, time: int, neuron_ids: List[int]) -> None:
+def receive_spikes(label: str, time: int, neuron_ids: list[int]) -> None:
     for neuron_id in neuron_ids:
         print_condition.acquire()
         print("Received spike at time", time, "from", label, "-", neuron_id)
         print_condition.release()
 
 
-def do_run() -> Tuple[Block, Block]:
+def do_run() -> tuple[Block, Block]:
     random.seed(0)
 
     # initial call to set up the front end (pynn requirement)

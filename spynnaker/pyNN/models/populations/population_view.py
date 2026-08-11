@@ -19,13 +19,10 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Dict,
     Iterable,
     Iterator,
-    List,
     Optional,
     Sequence,
-    Tuple,
     Union,
     overload,
 )
@@ -127,7 +124,7 @@ class PopulationView(PopulationBase):
         if label is None:
             label = f"{parent.label}:{selector}"
         self.__label = label
-        self.__annotations: Dict[str, Any] = {}
+        self.__annotations: dict[str, Any] = {}
 
         # Get these two objects to make access easier
         # pylint: disable=protected-access
@@ -208,7 +205,7 @@ class PopulationView(PopulationBase):
         return [IDMixin(self.__population, idx) for idx in self.__indexes]
 
     @property
-    def _indexes(self) -> Tuple[int, ...]:
+    def _indexes(self) -> tuple[int, ...]:
         return tuple(self.__indexes)
 
     @overload
@@ -217,12 +214,12 @@ class PopulationView(PopulationBase):
 
     @overload
     def __getitem__(self, index: Union[
-            None, slice, List[int], List[bool], NDArray[bool_],
+            None, slice, list[int], list[bool], NDArray[bool_],
             NDArray[integer]]) -> 'PopulationView':
         ...
 
     def __getitem__(self, index: Union[
-            None, int, slice, List[int], List[bool], NDArray[bool_],
+            None, int, slice, list[int], list[bool], NDArray[bool_],
             NDArray[integer]]) -> 'PopulationView':
         """
         Return either a single cell (ID object) from the Population,
@@ -359,7 +356,7 @@ class PopulationView(PopulationBase):
     def get_data(
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
-            annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
+            annotations: Optional[dict[str, Any]] = None) -> neo.Block:
         """
         Return a Neo Block containing the data(spikes, state variables)
         recorded from the Population.
@@ -405,7 +402,7 @@ class PopulationView(PopulationBase):
             variable, as_matrix, self.__indexes)
 
     @overrides(PopulationBase.get_spike_counts)
-    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
+    def get_spike_counts(self, gather: bool = True) -> dict[int, int]:
         self._check_params(gather)
         with NeoBufferDatabase() as db:
             return db.get_spike_counts(
@@ -429,12 +426,12 @@ class PopulationView(PopulationBase):
     @overload
     def id_to_index(
             self, id: Iterable[int]  # pylint: disable=redefined-builtin
-            ) -> List[int]:
+            ) -> list[int]:
         ...
 
     def id_to_index(
             self, id: Union[int, Iterable[int]]) -> \
-            Union[int, List[int]]:  # pylint: disable=redefined-builtin
+            Union[int, list[int]]:  # pylint: disable=redefined-builtin
         """
         Given the ID(s) of cell(s) in the PopulationView, return its /
         their index / indices(order in the PopulationView).
@@ -448,7 +445,7 @@ class PopulationView(PopulationBase):
             return self.__indexes.index(id)
         return [self.__indexes.index(idx) for idx in id]
 
-    def index_in_grandparent(self, indices: Iterable[int]) -> List[int]:
+    def index_in_grandparent(self, indices: Iterable[int]) -> list[int]:
         """
         Given an array of indices, return the indices in the parent
         population at the root of the tree.
@@ -572,7 +569,7 @@ class PopulationView(PopulationBase):
     def write_data(self, io: Union[str, neo.baseio.BaseIO],
                    variables: Names = 'all',
                    gather: bool = True, clear: bool = False,
-                   annotations: Optional[Dict[str, Any]] = None) -> None:
+                   annotations: Optional[dict[str, Any]] = None) -> None:
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
                            "as if gather was set to True.")
@@ -603,7 +600,7 @@ class PopulationView(PopulationBase):
 
     @property
     @overrides(PopulationBase._view_range)
-    def _view_range(self) -> Tuple[int, int]:
+    def _view_range(self) -> tuple[int, int]:
         indices = self.__indexes
         return indices[0], indices[-1]
 

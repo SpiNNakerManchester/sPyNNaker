@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import tempfile
-from typing import List, Optional
+from typing import Optional
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -59,11 +59,11 @@ from unittests.mocks import MockPopulation, MockSynapseDynamics
         "3-elements-extra"
     ])
 def test_connector(
-        clist: Optional[NDArray], column_names: Optional[List[str]],
+        clist: Optional[NDArray], column_names: Optional[list[str]],
         weights: int, delays: int, expected_clist: Optional[NDArray],
-        expected_weights: List[int], expected_delays: List[int],
+        expected_weights: list[int], expected_delays: list[int],
         expected_extra_parameters: Optional[NDArray],
-        expected_extra_parameter_names: Optional[List[str]]) -> None:
+        expected_extra_parameter_names: Optional[list[str]]) -> None:
     sim.setup()
     temp = tempfile.NamedTemporaryFile(delete=False)
     with temp as f:

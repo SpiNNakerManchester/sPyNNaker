@@ -15,7 +15,7 @@
 import inspect
 import tempfile
 import unittest
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import csa
 import numpy
@@ -74,7 +74,7 @@ class TestConnectors(unittest.TestCase):
                 self.compare_values(key1, value1, value2)
 
     def compare_parameters(
-            self, params: Dict[str, Any], params2: Dict[str, Any]) -> None:
+            self, params: dict[str, Any], params2: dict[str, Any]) -> None:
         assert len(params) == len(params2)
         for key in params:
             self.compare_values(key, params[key], params2[key])
@@ -274,7 +274,7 @@ class TestConnectors(unittest.TestCase):
         self.compare_connectors(connector, connector3)
 
     def testFromListConnectorrSimple(self) -> None:
-        from_list: List[Tuple[int, ...]] = [(1, 2), (3, 4), (5, 6)]
+        from_list: list[tuple[int, ...]] = [(1, 2), (3, 4), (5, 6)]
         connector = FromListConnector(from_list)
         params = connector.get_parameters()
         connector2 = FromListConnector(**params)
@@ -284,7 +284,7 @@ class TestConnectors(unittest.TestCase):
         self.compare_connectors(connector, connector3)
 
     def testFromListConnectorrNamed(self) -> None:
-        from_list: List[Tuple[int, ...]] = [(1, 2, 3), (4, 5, 6)]
+        from_list: list[tuple[int, ...]] = [(1, 2, 3), (4, 5, 6)]
         connector = FromListConnector(from_list, ["weight"])
         params = connector.get_parameters()
         connector2 = FromListConnector(**params)

@@ -17,14 +17,10 @@ import math
 from types import MappingProxyType
 from typing import (
     Collection,
-    Dict,
     Iterable,
-    List,
     Mapping,
     Optional,
     Sequence,
-    Set,
-    Tuple,
 )
 
 import numpy
@@ -74,7 +70,7 @@ def get_sampling_interval(sampling_rate: float) -> float:
     return sampling_rate * SpynnakerDataView.get_simulation_time_step_ms()
 
 
-class NeuronRecorder(object):
+class NeuronRecorder:
     """
     Methods related to recording of neuron data.
     """
@@ -142,7 +138,7 @@ class NeuronRecorder(object):
     _MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
     def __init__(
-            self, allowed_variables: List[str],
+            self, allowed_variables: list[str],
             data_types: Mapping[str, DataType],
             bitfield_variables: Sequence[str],
             n_neurons: int, per_timestep_variables: Sequence[str],
@@ -159,20 +155,20 @@ class NeuronRecorder(object):
         :param events_per_core_variables:
         :param events_per_core_datatypes:
         """
-        self.__sampling_rates: Dict[str, int] = {}
-        self.__indexes: Dict[str, Optional[Sequence[int]]] = {}
+        self.__sampling_rates: dict[str, int] = {}
+        self.__indexes: dict[str, Optional[Sequence[int]]] = {}
         self.__data_types = data_types
         self.__n_neurons = n_neurons
         self.__bitfield_variables = bitfield_variables
 
         self.__per_timestep_variables = per_timestep_variables
         self.__per_timestep_datatypes = per_timestep_datatypes
-        self.__per_timestep_recording: Set[str] = set()
+        self.__per_timestep_recording: set[str] = set()
 
         self.__events_per_core_variables = events_per_core_variables
         self.__events_per_core_datatypes = events_per_core_datatypes
-        self.__events_per_core_recording: Set[str] = set()
-        self.__events_per_ts: Dict[str, int] = {}
+        self.__events_per_core_recording: set[str] = set()
+        self.__events_per_ts: dict[str, int] = {}
         self.__events_per_ts[self.MAX_REWIRES] = 0  # record('all')
 
         # Get info on variables like these
@@ -212,7 +208,7 @@ class NeuronRecorder(object):
 
     def _rate_and_count_per_slice(
             self, variable: str,
-            vertex_slice: Optional[Slice]) -> Tuple[int, int]:
+            vertex_slice: Optional[Slice]) -> tuple[int, int]:
         if variable not in self.__sampling_rates:
             return 0, 0
         if self.__sampling_rates[variable] == 0:
@@ -411,7 +407,7 @@ class NeuronRecorder(object):
             return self.__data_types[variable]
         return None
 
-    def get_recordable_variables(self) -> List[str]:
+    def get_recordable_variables(self) -> list[str]:
         """
         :returns: Names of variables that can be recorded
         """
@@ -420,7 +416,7 @@ class NeuronRecorder(object):
             *self.__events_per_core_variables,
             *self.__per_timestep_variables]
 
-    def get_event_recordable_variables(self) -> List[str]:
+    def get_event_recordable_variables(self) -> list[str]:
         """
         :returns: Names of event variables being recorded
         """
@@ -496,7 +492,7 @@ class NeuronRecorder(object):
             return True
         return any(numpy.isin(vertex_slice.get_raster_ids(), indices))
 
-    def recorded_ids_by_slice(self, vertex_slice: Slice) -> List[int]:
+    def recorded_ids_by_slice(self, vertex_slice: Slice) -> list[int]:
         """
         :param vertex_slice:
         :returns: list of the IDs of the variables actually recording.
@@ -741,7 +737,7 @@ class NeuronRecorder(object):
             raise ConfigurationException(
                 f"Variable {variable} is not supported")
 
-    def get_region_sizes(self, vertex_slice: Slice) -> List[int]:
+    def get_region_sizes(self, vertex_slice: Slice) -> list[int]:
         """
         Get the sizes of the regions for the variables, whether they are
         recorded or not, with those that are not having a size of 0.
@@ -1034,7 +1030,7 @@ class NeuronRecorder(object):
         return ceil_bytes // self._N_BYTES_PER_INDEX
 
     def __add_indices(
-            self, data: List[NDArray[uint32]], variable: str, rate: int,
+            self, data: list[NDArray[uint32]], variable: str, rate: int,
             n_recording: int, vertex_slice: Slice) -> None:
         n_indices = self.__ceil_n_indices(vertex_slice.n_atoms)
         if rate == 0:
@@ -1045,7 +1041,7 @@ class NeuronRecorder(object):
             data.append(numpy.arange(n_indices, dtype=uint16).view(uint32))
         else:
             local_index = 0
-            local_indexes: List[int] = []
+            local_indexes: list[int] = []
             # Add indices based on the raster ids
             index = 0
             for index in vertex_slice.get_raster_ids():
@@ -1064,7 +1060,7 @@ class NeuronRecorder(object):
 
     def _get_data(self, vertex_slice: Slice) -> NDArray[uint32]:
         # There is no data here for per-timestep variables by design
-        data: List[NDArray[uint32]] = []
+        data: list[NDArray[uint32]] = []
         for variable in self.__sampling_rates:
             rate, n_recording = self._rate_and_count_per_slice(
                 variable, vertex_slice)

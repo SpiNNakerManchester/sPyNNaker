@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 import matplotlib.pyplot as plt
 import numpy
@@ -26,7 +26,7 @@ from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.utilities import neo_convertor
 
 
-def do_run(plot: bool) -> Tuple[Block, Block, Block, Block]:
+def do_run(plot: bool) -> tuple[Block, Block, Block, Block]:
 
     p.setup(timestep=1.0)
 
@@ -125,7 +125,7 @@ def do_run(plot: bool) -> Tuple[Block, Block, Block, Block]:
     return v, spikes, v2, spikes2
 
 
-def do_larger_array(plot: bool) -> Tuple[Block, Block, Block]:
+def do_larger_array(plot: bool) -> tuple[Block, Block, Block]:
     p.setup(timestep=1.0)
 
     n_i = 64
@@ -205,9 +205,9 @@ class ArrayConnectorTest(BaseTestCase):
         self.runsafe(self.larger_array)
 
     def do_array_nd_test(
-            self, neurons_per_core_pre: Tuple[int, ...], pre_size: int,
+            self, neurons_per_core_pre: tuple[int, ...], pre_size: int,
             pre_shape: BaseStructure,
-            neurons_per_core_post: Union[int, Tuple[int, ...]],
+            neurons_per_core_post: Union[int, tuple[int, ...]],
             post_size: int, post_shape: Optional[BaseStructure]) -> None:
         p.setup(1.0)
         pre = p.Population(

@@ -18,10 +18,8 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Dict,
     Optional,
     Sequence,
-    Tuple,
     Union,
     final,
 )
@@ -51,7 +49,7 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class PopulationBase(object, metaclass=AbstractBase):
+class PopulationBase(metaclass=AbstractBase):
     r"""
     Shared methods between :py:class:`Population`\ s and
     :py:class:`PopulationView`\ s.
@@ -96,7 +94,7 @@ class PopulationBase(object, metaclass=AbstractBase):
     def get_data(
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
-            annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
+            annotations: Optional[dict[str, Any]] = None) -> neo.Block:
         """
         Return a Neo Block containing the data(spikes, state variables)
         recorded from the Population.
@@ -122,7 +120,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
+    def get_spike_counts(self, gather: bool = True) -> dict[int, int]:
         """
         Returns a dict containing the number of spikes for each neuron.
 
@@ -221,7 +219,7 @@ class PopulationBase(object, metaclass=AbstractBase):
     def write_data(self, io: Union[str, neo.baseio.BaseIO],
                    variables: Names = 'all',
                    gather: bool = True, clear: bool = False,
-                   annotations: Optional[Dict[str, Any]] = None) -> None:
+                   annotations: Optional[dict[str, Any]] = None) -> None:
         """
         Write recorded data to file, using one of the file formats
         supported by Neo.
@@ -301,7 +299,7 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def _view_range(self) -> Tuple[int, int]:
+    def _view_range(self) -> tuple[int, int]:
         """
         The range of neuron IDs supported.
         """
@@ -317,7 +315,7 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @staticmethod
     def _check_params(gather: bool,
-                      annotations: Optional[Dict[str, Any]] = None) -> None:
+                      annotations: Optional[dict[str, Any]] = None) -> None:
         if not gather:
             logger.warning(
                 "sPyNNaker only supports gather=True. We will run "

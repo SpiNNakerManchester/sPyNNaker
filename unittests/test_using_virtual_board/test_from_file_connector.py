@@ -15,7 +15,7 @@
 
 import os
 import tempfile
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Union
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -33,8 +33,8 @@ from spynnaker.pyNN.models.projection import Projection
 WEIGHT = 5
 DELAY = 2
 
-AsList3: TypeAlias = List[Tuple[int, int, float]]
-AsList4: TypeAlias = List[Tuple[int, int, float, float]]
+AsList3: TypeAlias = list[tuple[int, int, float]]
+AsList4: TypeAlias = list[tuple[int, int, float, float]]
 AsList: TypeAlias = Union[AsList3, AsList4]
 
 
@@ -138,7 +138,7 @@ class TestFromFileConnector(BaseTestCase):
 
     @parameterized.expand(MANY_BOARD_TYPES)
     def test_no_weight(self, _: str, ver_num: str) -> None:
-        as_list: List[Tuple[int, int, float]] = [
+        as_list: list[tuple[int, int, float]] = [
             (0, 0, 10),
             (3, 0, 11),
             (2, 3, 12),
@@ -151,7 +151,7 @@ class TestFromFileConnector(BaseTestCase):
 
     @parameterized.expand(MANY_BOARD_TYPES)
     def test_invert(self, _: str, ver_num: str) -> None:
-        as_list: List[Tuple[int, int, float, float]] = [
+        as_list: list[tuple[int, int, float, float]] = [
             (0, 0, 10, 0.1),
             (3, 0, 11, 0.2),
             (2, 3, 12, 0.3),

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-from typing import List, Tuple, cast
+from typing import cast
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
@@ -66,7 +66,7 @@ def synapse_expander() -> None:
                 vertex.read_generated_connection_holders(placement)
 
 
-def _plan_expansion() -> Tuple[ExecutableTargets, List[Placement], float]:
+def _plan_expansion() -> tuple[ExecutableTargets, list[Placement], float]:
     """
     Plan the expansion of synapses and set up the regions using USER1.
 
@@ -81,7 +81,7 @@ def _plan_expansion() -> Tuple[ExecutableTargets, List[Placement], float]:
 
     max_data = 0
     max_bit_field = 0
-    to_write: List[Tuple[int, int, int, UserRegister, int]] = []
+    to_write: list[tuple[int, int, int, UserRegister, int]] = []
     for placement in SpynnakerDataView.iterate_placemements():
         # Add all machine vertices of the population vertex to ones
         # that need synapse expansion

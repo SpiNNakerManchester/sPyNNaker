@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Optional, Sequence
 
 import numpy
 from numpy import integer, uint32
@@ -100,11 +100,11 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__pre_neurons_set = False
-        self.__pre_neurons: List[NDArray[integer]] = []
+        self.__pre_neurons: list[NDArray[integer]] = []
         self.__rng = rng
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["n"] = self.__n_pre
         parameters["allow_self_connections"] = self.allow_self_connections
@@ -142,10 +142,10 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
             synapse_info.delays, self.__n_pre * synapse_info.n_post_neurons,
             synapse_info)
 
-    def __build_pre_neurons(self, synapse_info: SynapseInformation) -> List[
+    def __build_pre_neurons(self, synapse_info: SynapseInformation) -> list[
             NDArray[integer]]:
         rng = self.__rng or NumpyRNG()
-        pre_neurons: List[NDArray[integer]] = [
+        pre_neurons: list[NDArray[integer]] = [
             numpy.zeros([0], dtype=uint32)] * synapse_info.n_post_neurons
         # Loop over all the post neurons
         for m in range(synapse_info.n_post_neurons):
@@ -171,7 +171,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
             pre_neurons[m].sort()
         return pre_neurons
 
-    def _get_pre_neurons(self, synapse_info: SynapseInformation) -> List[
+    def _get_pre_neurons(self, synapse_info: SynapseInformation) -> list[
             NDArray[integer]]:
         # If we haven't set the array up yet, do it now
         if not self.__pre_neurons_set:
@@ -249,8 +249,8 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
 
         # Set up source and target
-        pre_neurons_in_slice: List[NDArray[integer]] = []
-        post_neurons_in_slice: List[NDArray[integer]] = []
+        pre_neurons_in_slice: list[NDArray[integer]] = []
+        post_neurons_in_slice: list[NDArray[integer]] = []
         post_vertex_array = numpy.arange(lo, hi + 1)
         for n in range(lo, hi + 1):
             for pn in pre_neurons[n]:

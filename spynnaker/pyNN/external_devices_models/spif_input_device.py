@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import math
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Iterable, Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -84,7 +84,7 @@ class SPIFInputDevice(
     def __init__(self, pipe: int, n_neurons: int, n_neurons_per_partition: int,
                  base_key: Optional[int] = None,
                  board_address: Optional[str] = None,
-                 chip_coords: Optional[Tuple[int, int]] = None):
+                 chip_coords: Optional[tuple[int, int]] = None):
         """
 
         :param pipe: Which pipe on SPIF the retina is connected to
@@ -149,7 +149,7 @@ class SPIFInputDevice(
             self.__key_mask + (sub_mask << self.__index_shift))
 
         # A dictionary to get vertex index from FPGA and slice
-        self.__index_by_slice: Dict[Tuple[int, Slice], int] = {}
+        self.__index_by_slice: dict[tuple[int, Slice], int] = {}
 
         self.__pipe = pipe
         if base_key is None:
@@ -173,7 +173,7 @@ class SPIFInputDevice(
 
     def __incoming_fpgas(
             self, board_address: Optional[str],
-            chip_coords: Optional[Tuple[int, int]]) -> List[FPGAConnection]:
+            chip_coords: Optional[tuple[int, int]]) -> list[FPGAConnection]:
         """ Get the incoming FPGA connections  """
         # We use every other odd link
         return [FPGAConnection(SPIF_FPGA_ID, i, board_address, chip_coords)
@@ -181,7 +181,7 @@ class SPIFInputDevice(
 
     def __outgoing_fpga(
             self, board_address: Optional[str],
-            chip_coords: Optional[Tuple[int, int]]) -> FPGAConnection:
+            chip_coords: Optional[tuple[int, int]]) -> FPGAConnection:
         """ Get the outgoing FPGA connection (for commands) """
         return FPGAConnection(
             SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address, chip_coords)
@@ -287,13 +287,13 @@ class SPIFInputDevice(
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
-    def timed_commands(self) -> List[MultiCastCommand]:
+    def timed_commands(self) -> list[MultiCastCommand]:
         return []
 
     @overrides(PopulationApplicationVertex.get_atom_key_map)
     def get_atom_key_map(
             self, pre_vertex: MachineVertex, partition_id: str,
-            routing_info: RoutingInfo) -> Iterable[Tuple[int, int]]:
+            routing_info: RoutingInfo) -> Iterable[tuple[int, int]]:
         # Work out which machine vertex
         start = pre_vertex.vertex_slice.lo_atom
         key_and_mask = self.get_machine_fixed_key_and_mask(

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Sequence, Tuple
+from typing import TYPE_CHECKING, Sequence
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -246,7 +246,7 @@ class PopulationMachineSynapses(
 
     @overrides(AbstractReceiveRegionsToHost.get_download_regions)
     def get_download_regions(
-            self, placement: Placement) -> Sequence[Tuple[int, int, int]]:
+            self, placement: Placement) -> Sequence[tuple[int, int, int]]:
 
         # Make sure not to overwrite the recording regions
         return self._synaptic_matrices.get_download_regions(placement)

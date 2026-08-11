@@ -16,7 +16,7 @@ from typing import Iterable
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-class AbstractHasParameterNames(object, metaclass=AbstractBase):
+class AbstractHasParameterNames(metaclass=AbstractBase):
     """
     A component that has parameter names. Parameter names are usually
     properties of the component, and are frequently also settable by named

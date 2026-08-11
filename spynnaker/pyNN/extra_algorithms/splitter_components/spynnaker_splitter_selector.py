@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List, cast
+from typing import cast
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -68,7 +68,7 @@ def spynnaker_splitter_selector() -> None:
         string_describing_what_being_progressed=PROGRESS_BAR_NAME,
         total_number_of_things_to_do=SpynnakerDataView.get_n_vertices())
 
-    remaining: List[ApplicationVertex] = []
+    remaining: list[ApplicationVertex] = []
     for app_vertex in SpynnakerDataView.iterate_vertices():
         # Do Poisson first
         if isinstance(app_vertex, SpikeSourcePoissonVertex):

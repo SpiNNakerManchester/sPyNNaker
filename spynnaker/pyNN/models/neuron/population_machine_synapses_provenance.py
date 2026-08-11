@@ -47,7 +47,7 @@ class SynapseProvenance(ctypes.LittleEndianStructure):
     N_ITEMS = len(_fields_)
 
 
-class PopulationMachineSynapsesProvenance(object):
+class PopulationMachineSynapsesProvenance:
     """
     Mix-in to add synapse provenance gathering without other synapse things.
     """

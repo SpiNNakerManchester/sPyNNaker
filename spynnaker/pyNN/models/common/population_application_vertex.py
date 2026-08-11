@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Collection, Container, Iterable, List, Optional, Tuple
+from typing import Collection, Container, Iterable, Optional
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.abstract_sized import Selector
@@ -47,7 +47,7 @@ class PopulationApplicationVertex(
     __slots__ = ()
 
     @staticmethod
-    def _as_list(names: Names) -> List[str]:
+    def _as_list(names: Names) -> list[str]:
         """
         Normalise the input to a list.
 
@@ -122,7 +122,7 @@ class PopulationApplicationVertex(
         raise KeyError(
             "This Population does not support the setting of parameters")
 
-    def get_parameters(self) -> List[str]:
+    def get_parameters(self) -> list[str]:
         """
         :returns: The names of all the parameters that can be obtained
         """
@@ -193,7 +193,7 @@ class PopulationApplicationVertex(
             "This Population does not support the setting of state"
             " variables")
 
-    def get_state_variables(self) -> List[str]:
+    def get_state_variables(self) -> list[str]:
         """
         :returns: A list of supported state variables.
         """
@@ -226,7 +226,7 @@ class PopulationApplicationVertex(
     # If get_recordable_variables implemented other recording methods must
     # be too
 
-    def get_recordable_variables(self) -> List[str]:
+    def get_recordable_variables(self) -> list[str]:
         """
         Get a list of the names of things that can be recorded.
 
@@ -275,7 +275,7 @@ class PopulationApplicationVertex(
             f"{type(self)} has recording variables so should implement "
             f"set_not_recording")
 
-    def get_recording_variables(self) -> List[str]:
+    def get_recording_variables(self) -> list[str]:
         """
         :returns: A list of variables that are currently being recorded.
         """
@@ -394,7 +394,7 @@ class PopulationApplicationVertex(
     @overrides(HasCustomAtomKeyMap.get_atom_key_map)
     def get_atom_key_map(
             self, pre_vertex: MachineVertex, partition_id: str,
-            routing_info: RoutingInfo) -> Iterable[Tuple[int, int]]:
+            routing_info: RoutingInfo) -> Iterable[tuple[int, int]]:
         base_key = routing_info.get_key_from(
             pre_vertex, partition_id)
         vertex_slice = pre_vertex.vertex_slice

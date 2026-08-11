@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-from typing import List, Tuple
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
@@ -59,8 +58,8 @@ def neuron_expander() -> None:
     _fill_in_initial_data(expanded_pop_vertices)
 
 
-def _plan_expansion() -> Tuple[
-        ExecutableTargets, List[Tuple[AbstractNeuronExpandable, Placement]]]:
+def _plan_expansion() -> tuple[
+        ExecutableTargets, list[tuple[AbstractNeuronExpandable, Placement]]]:
     """
     Plan the expansion of neurons and set up the regions using USER1.
     """
@@ -68,9 +67,9 @@ def _plan_expansion() -> Tuple[
     txrx = SpynnakerDataView.get_transceiver()
 
     expander_cores = ExecutableTargets()
-    expanded_pop_vertices: List[
-        Tuple[AbstractNeuronExpandable, Placement]] = []
-    to_write: List[Tuple[int, int, int, UserRegister, int]] = []
+    expanded_pop_vertices: list[
+        tuple[AbstractNeuronExpandable, Placement]] = []
+    to_write: list[tuple[int, int, int, UserRegister, int]] = []
     for placement in SpynnakerDataView.iterate_placemements():
         # Add all machine vertices of the population vertex to ones
         # that need synapse expansion
@@ -90,8 +89,8 @@ def _plan_expansion() -> Tuple[
     return expander_cores, expanded_pop_vertices
 
 
-def _fill_in_initial_data(expanded_pop_vertices: List[
-        Tuple[AbstractNeuronExpandable, Placement]]) -> None:
+def _fill_in_initial_data(expanded_pop_vertices: list[
+        tuple[AbstractNeuronExpandable, Placement]]) -> None:
     """
     Once expander has run, fill in the connection data.
 

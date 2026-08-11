@@ -357,7 +357,7 @@ class MUNICH_MODES(Enum):
     FREE = 5
 
 
-class MunichIoSpiNNakerLinkProtocol(object):
+class MunichIoSpiNNakerLinkProtocol:
     """
     Provides Multicast commands for the Munich SpiNNaker-Link protocol.
     """
