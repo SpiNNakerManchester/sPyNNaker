@@ -24,7 +24,6 @@ from typing import (
     Callable,
     Iterable,
     Mapping,
-    Optional,
     no_type_check,
 )
 
@@ -46,8 +45,8 @@ def _check_args(
 
 def get_map_from_init(
         init_method: Callable,
-        skip: Optional[frozenset[str]] = None,
-        include: Optional[frozenset[str]] = None) -> Mapping[str, Any]:
+        skip: frozenset[str] | None = None,
+        include: frozenset[str] | None = None) -> Mapping[str, Any]:
     """
     Get an argument initialisation dictionary by examining an
     ``__init__`` method or function.
@@ -220,8 +219,8 @@ class AbstractProvidesDefaults:
     @default_initial_values decorators with values read from the init.
     """
 
-    __cashed_defaults: Optional[Mapping[str, Any]] = None
-    __cashed_initials: Optional[Mapping[str, Any]] = None
+    __cashed_defaults: Mapping[str, Any] | None = None
+    __cashed_initials: Mapping[str, Any] | None = None
 
     @classmethod
     def __fill_in_defaults(cls) -> None:

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 from spinn_utilities.overrides import overrides
 
@@ -50,7 +50,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
 
     # The number of synapse cores for PyNN models that use PopulationVertex
     # or None to determine based on time-step
-    _n_synapse_cores: dict[type, Optional[int]] = {}
+    _n_synapse_cores: dict[type, int | None] = {}
 
     # Whether to allow delay extensions when using PyNN models that use
     # PopulationVertex
@@ -60,7 +60,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     default_population_parameters = _population_parameters
 
     @classmethod
-    def set_model_n_synapse_cores(cls, n_synapse_cores: Optional[int]) -> None:
+    def set_model_n_synapse_cores(cls, n_synapse_cores: int | None) -> None:
         """
         Set the number of synapse cores for a model.
 
@@ -72,7 +72,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         cls._n_synapse_cores[cls] = n_synapse_cores
 
     @classmethod
-    def get_model_n_synapse_cores(cls) -> Optional[int]:
+    def get_model_n_synapse_cores(cls) -> int | None:
         """
         :returns: The number of synapse cores for the model.
         """
@@ -117,17 +117,17 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
             self, n_neurons: int, label: str, *,
-            spikes_per_second: Optional[float] = None,
-            ring_buffer_sigma: Optional[float] = None,
-            max_expected_summed_weight: Optional[list[float]] = None,
-            incoming_spike_buffer_size: Optional[int] = None,
-            drop_late_spikes: Optional[bool] = None,
-            splitter: Optional[SplitterPopulationVertex] = None,
-            seed: Optional[int] = None,
-            n_colour_bits: Optional[int] = None,
-            neurons_per_core: Optional[Union[int, tuple[int, ...]]] = None,
-            n_synapse_cores: Optional[int] = None,
-            allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
+            spikes_per_second: float | None = None,
+            ring_buffer_sigma: float | None = None,
+            max_expected_summed_weight: list[float] | None = None,
+            incoming_spike_buffer_size: int | None = None,
+            drop_late_spikes: bool | None = None,
+            splitter: SplitterPopulationVertex | None = None,
+            seed: int | None = None,
+            n_colour_bits: int | None = None,
+            neurons_per_core: int | tuple[int, ...] | None = None,
+            n_synapse_cores: int | None = None,
+            allow_delay_extensions: bool | None = None) -> PopulationVertex:
         """
         :param spikes_per_second:
         :param ring_buffer_sigma:

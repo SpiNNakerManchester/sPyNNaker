@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Union
 
 from numpy import integer, uint32
 from numpy.typing import NDArray
@@ -49,11 +48,11 @@ class AbstractPlasticSynapseDynamics(
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
             max_n_synapses: int, max_atoms_per_core: int,
-            ring_buffer_weight_scales: WeightScales) -> Union[
-                tuple[NDArray[uint32], NDArray[uint32],
-                      NDArray[uint32], NDArray[uint32]],
-                tuple[list[NDArray[uint32]], list[NDArray[uint32]],
-                      NDArray[uint32], NDArray[uint32]]]:
+            ring_buffer_weight_scales: WeightScales
+            ) -> (tuple[NDArray[uint32], NDArray[uint32],
+                        NDArray[uint32], NDArray[uint32]] |
+                  tuple[list[NDArray[uint32]], list[NDArray[uint32]],
+                        NDArray[uint32], NDArray[uint32]]):
         """
         Get the fixed-plastic data, and plastic-plastic data for each row, and
         lengths for the fixed_plastic and plastic-plastic parts of each row.

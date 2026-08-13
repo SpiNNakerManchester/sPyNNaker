@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable, Optional
+from typing import TYPE_CHECKING, Iterable
 
 import numpy
 from numpy import floating, integer, uint8, uint32
@@ -68,7 +68,7 @@ class SynapseDynamicsStatic(
             self, weight: _InTypes = StaticSynapse.default_parameters[
                 'weight'],
             delay: _InTypes = None,
-            pad_to_length: Optional[int] = None):
+            pad_to_length: int | None = None):
 
         """
         :param weight:
@@ -250,7 +250,7 @@ class SynapseDynamicsStatic(
 
     @property
     @overrides(AbstractStaticSynapseDynamics.pad_to_length)
-    def pad_to_length(self) -> Optional[int]:
+    def pad_to_length(self) -> int | None:
         return self.__pad_to_length
 
     @property

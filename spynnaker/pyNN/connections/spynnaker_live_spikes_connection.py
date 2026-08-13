@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Optional
+from typing import Iterable
 
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
@@ -30,10 +30,10 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
     """
     __slots__ = ()
 
-    def __init__(self, receive_labels: Optional[Iterable[str]] = None,
-                 send_labels: Optional[Iterable[str]] = None,
-                 local_host: Optional[str] = None,
-                 local_port: Optional[int] = NOTIFY_PORT,
+    def __init__(self, receive_labels: Iterable[str] | None = None,
+                 send_labels: Iterable[str] | None = None,
+                 local_host: str | None = None,
+                 local_port: int | None = NOTIFY_PORT,
                  live_packet_gather_label: str = "LiveSpikeReceiver"):
         """
         :param receive_labels:

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 
@@ -37,11 +36,11 @@ class PushBotSpiNNakerLinkLEDDevice(
     def __init__(
             self, led: PushBotLED, protocol: MunichIoSpiNNakerLinkProtocol,
             spinnaker_link_id: int, n_neurons: int = 1,
-            label: Optional[str] = None, board_address: Optional[str] = None,
-            start_active_time_front: Optional[int] = None,
-            start_active_time_back: Optional[int] = None,
-            start_total_period: Optional[int] = None,
-            start_frequency: Optional[int] = None):
+            label: str | None = None, board_address: str | None = None,
+            start_active_time_front: int | None = None,
+            start_active_time_back: int | None = None,
+            start_total_period: int | None = None,
+            start_frequency: int | None = None):
         """
         :param led: The LED device to control
         :param protocol: The protocol instance to get commands from

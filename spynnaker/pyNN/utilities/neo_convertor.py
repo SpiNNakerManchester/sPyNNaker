@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Sequence
+from typing import Sequence
 
 import numpy as np
 import quantities
@@ -70,7 +70,7 @@ def convert_data(data: Block, name: str, run: int = 0) -> NDArray:
 
 
 def convert_data_list(data: Block, name: str,
-                      runs: Optional[Sequence[int]] = None) -> list[NDArray]:
+                      runs: Sequence[int] | None = None) -> list[NDArray]:
     """
     Converts the data into a list of numpy arrays in the format ID, time,
     value.
@@ -90,7 +90,7 @@ def convert_data_list(data: Block, name: str,
 
 
 def convert_v_list(
-        data: Block, runs: Optional[Sequence[int]] = None) -> list[NDArray]:
+        data: Block, runs: Sequence[int] | None = None) -> list[NDArray]:
     """
     Converts the voltage into a list numpy array one per segment (all
     runs) in the format ID, time, value.
@@ -104,7 +104,7 @@ def convert_v_list(
 
 
 def convert_gsyn_exc_list(
-        data: Block, runs: Optional[Sequence[int]] = None) -> list[NDArray]:
+        data: Block, runs: Sequence[int] | None = None) -> list[NDArray]:
     """
     Converts the gsyn_exc into a list numpy array one per segment (all
     runs) in the format ID, time, value.
@@ -119,7 +119,7 @@ def convert_gsyn_exc_list(
 
 
 def convert_gsyn_inh_list(
-        data: Block, runs: Optional[Sequence[int]] = None) -> list[NDArray]:
+        data: Block, runs: Sequence[int] | None = None) -> list[NDArray]:
     """
     Converts the gsyn_inh into a list numpy array one per segment (all
     runs) in the format ID, time, value.

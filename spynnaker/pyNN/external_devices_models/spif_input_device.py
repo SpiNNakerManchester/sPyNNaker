@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import math
-from typing import Iterable, Optional
+from typing import Iterable
 
 from spinn_utilities.overrides import overrides
 
@@ -82,9 +82,9 @@ class SPIFInputDevice(
     ]
 
     def __init__(self, pipe: int, n_neurons: int, n_neurons_per_partition: int,
-                 base_key: Optional[int] = None,
-                 board_address: Optional[str] = None,
-                 chip_coords: Optional[tuple[int, int]] = None):
+                 base_key: int | None = None,
+                 board_address: str | None = None,
+                 chip_coords: tuple[int, int] | None = None):
         """
 
         :param pipe: Which pipe on SPIF the retina is connected to
@@ -172,16 +172,16 @@ class SPIFInputDevice(
         return (v & (v - 1) == 0) and (v != 0)
 
     def __incoming_fpgas(
-            self, board_address: Optional[str],
-            chip_coords: Optional[tuple[int, int]]) -> list[FPGAConnection]:
+            self, board_address: str | None,
+            chip_coords: tuple[int, int] | None) -> list[FPGAConnection]:
         """ Get the incoming FPGA connections  """
         # We use every other odd link
         return [FPGAConnection(SPIF_FPGA_ID, i, board_address, chip_coords)
                 for i in SPIF_INPUT_FPGA_LINKS]
 
     def __outgoing_fpga(
-            self, board_address: Optional[str],
-            chip_coords: Optional[tuple[int, int]]) -> FPGAConnection:
+            self, board_address: str | None,
+            chip_coords: tuple[int, int] | None) -> FPGAConnection:
         """ Get the outgoing FPGA connection (for commands) """
         return FPGAConnection(
             SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address, chip_coords)

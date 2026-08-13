@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Union
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -67,8 +66,8 @@ class TestFromListConnectorMixed(BaseTestCase):
     def do_list_nd_run(
             self, neurons_per_core_pre: tuple[int, ...], pre_size: int,
             pre_shape: BaseStructure,
-            neurons_per_core_post: Union[int, tuple[int, ...]],
-            post_size: int, post_shape: Optional[BaseStructure]) -> None:
+            neurons_per_core_post: int | tuple[int, ...],
+            post_size: int, post_shape: BaseStructure | None) -> None:
         random_conns = numpy.random.randint(
             0, (pre_size, post_size), (100, 2))
         sim.setup(1.0)

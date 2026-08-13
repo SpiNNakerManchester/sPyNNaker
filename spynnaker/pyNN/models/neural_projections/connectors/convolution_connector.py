@@ -20,8 +20,7 @@ from collections.abc import Iterable, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Optional,
-    Union,
+    TypeAlias,
     cast,
     overload,
 )
@@ -60,11 +59,10 @@ if TYPE_CHECKING:
 CONNECTOR_CONFIG_SIZE = (10 * BYTES_PER_SHORT) + (4 * BYTES_PER_WORD)
 
 
-_Weights = Union[
-    int, float, list[Union[int, float]], tuple[Union[int, float], ...],
-    NDArray[float64], RandomDistribution]
-_Shape = Union[int, tuple[int, int], None]
-_Padding = Union[bool, _Shape]
+_Weights: TypeAlias = (float | list[float] | tuple[float, ...] |
+                       NDArray[float64] | RandomDistribution)
+_Shape = int | tuple[int, int] | None
+_Padding = bool | _Shape
 
 
 class ConvolutionConnector(AbstractConnector):
@@ -268,7 +266,7 @@ class ConvolutionConnector(AbstractConnector):
 
     @overload
     @staticmethod
-    def __to_2d_shape(shape: Union[int, tuple[int, int]],
+    def __to_2d_shape(shape: int | tuple[int, int],
                       param_name: str) -> NDArray[integer]:
         ...
 
@@ -278,8 +276,8 @@ class ConvolutionConnector(AbstractConnector):
         ...
 
     @staticmethod
-    def __to_2d_shape(shape: _Shape, param_name: str) -> Optional[
-            NDArray[integer]]:
+    def __to_2d_shape(shape: _Shape, param_name: str
+                      ) -> NDArray[integer] | None:
         if shape is None:
             return None
         if numpy.isscalar(shape):
@@ -367,8 +365,8 @@ class ConvolutionConnector(AbstractConnector):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         if min_delay is not None and max_delay is not None:
             if not (min_delay <= self.__delay(synapse_info) <= max_delay):
                 return 0

@@ -16,7 +16,7 @@ from __future__ import annotations
 import logging
 import math
 import re
-from typing import TYPE_CHECKING, Any, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Any, Sequence
 
 import numpy
 from numpy import float64, uint8, uint16, uint32
@@ -100,7 +100,7 @@ class AbstractConnector(metaclass=AbstractBase):
         if callback is not None:
             warn_once(logger, "sPyNNaker ignores connector callbacks.")
         self.__safe = safe
-        self.__space: Optional[Space] = None
+        self.__space: Space | None = None
         self.__verbose = verbose
 
         self.__n_clipped_delays = numpy.int64(0)
@@ -184,7 +184,7 @@ class AbstractConnector(metaclass=AbstractBase):
 
     @abstractmethod
     def get_delay_minimum(
-            self, synapse_info: SynapseInformation) -> Optional[float]:
+            self, synapse_info: SynapseInformation) -> float | None:
         """
         :param synapse_info:
         :returns: The minimum delay specified by the user in ms,
@@ -255,8 +255,8 @@ class AbstractConnector(metaclass=AbstractBase):
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         """
         Get the maximum number of connections from any
         neuron in the pre vertex to the neurons in the post_vertex_slice,
@@ -542,7 +542,7 @@ class AbstractConnector(metaclass=AbstractBase):
         return self._clip_delays(delays)
 
     @staticmethod
-    def __pop_label(pop: Union[Population, PopulationView]) -> str:
+    def __pop_label(pop: Population | PopulationView) -> str:
         lbl = pop.label
         if lbl is None:
             raise ValueError("unlabelled population")
@@ -579,7 +579,7 @@ class AbstractConnector(metaclass=AbstractBase):
         return self.__safe
 
     @property
-    def space(self) -> Optional[Space]:
+    def space(self) -> Space | None:
         """
         The space object (may be updated after instantiation).
         """
@@ -624,7 +624,7 @@ class AbstractConnector(metaclass=AbstractBase):
         raise SpynnakerException("Standard pyNN connect method not supported")
 
     @staticmethod
-    def _roundsize(size: Union[int, float], label: str) -> int:
+    def _roundsize(size: int | float, label: str) -> int:
         """
         Ensures that the ``size`` is an integer. Approximate integers are
         rounded; other values cause exceptions.
@@ -730,7 +730,7 @@ class AbstractConnector(metaclass=AbstractBase):
         self.__used = True
         return self
 
-    def describe(self, template: Optional[str] = None,
+    def describe(self, template: str | None = None,
                  engine: str = 'default') -> str:
         """
         Returns a human-readable description of the connection method.

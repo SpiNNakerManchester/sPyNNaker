@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Union
 
 import pyNN.spiNNaker as sim
 from parameterized import parameterized
@@ -31,7 +30,7 @@ DELAY = 2
 
 AsList3: TypeAlias = list[tuple[int, int, float]]
 AsList4: TypeAlias = list[tuple[int, int, float, float]]
-AsList: TypeAlias = Union[AsList3, AsList4]
+AsList: TypeAlias = AsList3 | AsList4
 
 
 class TestFromListConnector(BaseTestCase):
@@ -40,7 +39,7 @@ class TestFromListConnector(BaseTestCase):
 
     def check_weights(
             self, projection: Projection, aslist: AsList,
-            w_index: Optional[int], d_index: Optional[int],
+            w_index: int | None, d_index: int | None,
             sources: int, destinations: int) -> None:
         from_pro = projection.get(["weight", "delay"], "list")
         aslist.sort()
@@ -71,8 +70,8 @@ class TestFromListConnector(BaseTestCase):
 
     def check_other_connect(
             self, aslist: AsList, ver_num: str,
-            column_names: Optional[list[str]] = None,
-            w_index: Optional[int] = 2, d_index: Optional[int] = 3,
+            column_names: list[str] | None = None,
+            w_index: int | None = 2, d_index: int | None = 3,
             sources: int = 6, destinations: int = 8) -> None:
         sim.setup(1.0)
         set_config("Machine", "version", ver_num)

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Union
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -65,7 +64,7 @@ class ConnectorsTest(BaseTestCase):
         counts.append(self.spike_received_count(v[82]))
         return counts
 
-    def check_counts(self, counts: Union[list[list[int]], NDArray],
+    def check_counts(self, counts: list[list[int]] | NDArray,
                      connections: int, repeats: bool) -> None:
         for count in counts:
             if not repeats:
@@ -124,7 +123,7 @@ class ConnectorsTest(BaseTestCase):
 
     def check_connector(
             self,
-            connector: Union[OneToOneConnector, FixedTotalNumberConnector],
+            connector: OneToOneConnector | FixedTotalNumberConnector,
             connections: int, repeats: bool, conn_type: str = "post",
             n_destinations: int = DESTINATIONS) -> None:
         sim.setup(1.0)

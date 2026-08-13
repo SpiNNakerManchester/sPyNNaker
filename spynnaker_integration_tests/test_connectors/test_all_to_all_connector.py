@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Union
 
 import pyNN.spiNNaker as sim
 from pyNN.space import BaseStructure
@@ -118,10 +117,10 @@ class TestAllToAllConnector(BaseTestCase):
         self.runsafe(self.using_population_views)
 
     def do_all_to_all_nd_test(
-            self, neurons_per_core_pre: Union[int, tuple[int, ...]],
-            pre_size: int, pre_shape: Optional[BaseStructure],
-            neurons_per_core_post: Union[int, tuple[int, ...]],
-            post_size: int, post_shape: Optional[BaseStructure]) -> None:
+            self, neurons_per_core_pre: int | tuple[int, ...],
+            pre_size: int, pre_shape: BaseStructure | None,
+            neurons_per_core_post: int | tuple[int, ...],
+            post_size: int, post_shape: BaseStructure | None) -> None:
         sim.setup(1.0)
         pre = sim.Population(
             pre_size, sim.IF_curr_exp(), structure=pre_shape)

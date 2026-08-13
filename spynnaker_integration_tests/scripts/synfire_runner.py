@@ -15,7 +15,7 @@
 """
 Synfirechain-like example
 """
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 import neo
 import pyNN.spiNNaker as p
@@ -41,34 +41,34 @@ class SynfireRunner:
     def do_run(
             self, n_neurons: int, time_step: float = 1,
             input_class: type = p.SpikeSourceArray,
-            spike_times: Optional[list[list[int]]] = None,
-            rate: Optional[float] = None, start_time: Optional[int] = None,
-            duration: Optional[float] = None, seed: Optional[int] = None,
+            spike_times: list[list[int]] | None = None,
+            rate: float | None = None, start_time: int | None = None,
+            duration: float | None = None, seed: int | None = None,
             spike_times_list: None = None,
-            placement_constraint: Optional[tuple[int, int]] = None,
+            placement_constraint: tuple[int, int] | None = None,
             weight_to_spike: float = 2.0, delay: float = 17,
-            neurons_per_core: Optional[int] = 10,
+            neurons_per_core: int | None = 10,
             cell_class: type = p.IF_curr_exp,
             constraint: None = None,
             cell_params: dict[str, float] = CELL_PARAMS_LIF,
-            run_times: Optional[list[int]] = None,
+            run_times: list[int] | None = None,
             reset: Literal[False] = False, extract_between_runs: bool = True,
-            set_between_runs: Optional[list[tuple[int, str, float]]] = None,
+            set_between_runs: list[tuple[int, str, float]] | None = None,
             new_pop: Literal[False] = False,
             record_input_spikes: bool = False,
             record_input_spikes_7: Literal[False] = False,
-            record: bool = True, get_spikes: Optional[bool] = None,
+            record: bool = True, get_spikes: bool | None = None,
             spike_path: None = None, record_7: bool = False,
-            record_v: bool = True, get_v: Optional[bool] = None,
+            record_v: bool = True, get_v: bool | None = None,
             v_path: None = None, record_v_7: bool = False,
-            v_sampling_rate: Optional[int] = None,
+            v_sampling_rate: int | None = None,
             record_gsyn_exc: bool = True, record_gsyn_inh: bool = True,
-            get_gsyn_exc: Optional[bool] = None,
-            get_gsyn_inh: Optional[bool] = None,
+            get_gsyn_exc: bool | None = None,
+            get_gsyn_inh: bool | None = None,
             gsyn_path_exc: None = None, gsyn_path_inh: None = None,
             record_gsyn_exc_7: bool = False,
             record_gsyn_inh_7: Literal[False] = False,
-            gsyn_exc_sampling_rate: Optional[int] = None,
+            gsyn_exc_sampling_rate: int | None = None,
             gsyn_inh_sampling_rate: None = None,
             get_all: Literal[False] = False,
             use_spike_connections: Literal[True] = True,
@@ -244,13 +244,13 @@ class SynfireRunner:
     def __init_object_state(self) -> None:
         """ Initialises the object's internal state. """
         self._recorded_v_list: list[neo.Block] = []
-        self._recorded_v_7: Optional[NDArray[floating]] = None
+        self._recorded_v_7: NDArray[floating] | None = None
         self._recorded_spikes_list: list[neo.Block] = []
-        self._recorded_spikes_7: Optional[NDArray[floating]] = None
+        self._recorded_spikes_7: NDArray[floating] | None = None
         self._recorded_gsyn_exc_list: list[neo.Block] = []
-        self._recorded_gsyn_exc_7: Optional[NDArray[floating]] = None
+        self._recorded_gsyn_exc_7: NDArray[floating] | None = None
         self._recorded_gsyn_inh_list: list[neo.Block] = []
-        self._recorded_gsyn_inh_7: Optional[NDArray[floating]] = None
+        self._recorded_gsyn_inh_7: NDArray[floating] | None = None
         self._recorded_all_list: list[neo.Block] = []
         self._input_spikes_recorded_list: list[neo.Block] = []
         self._input_spikes_recorded_7: Any = []
@@ -259,14 +259,14 @@ class SynfireRunner:
 
     @staticmethod
     def __verify_parameters(
-            cell_params: dict[str, float], run_times: Optional[list[int]],
-            set_between_runs: Optional[list[tuple[int, str, float]]],
-            spike_times: Optional[list[list[int]]],
-            get_spikes: Optional[bool], record: bool, record_7: bool,
-            spike_path: None, get_v: Optional[bool], record_v: bool,
-            record_v_7: bool, v_path: None, get_gsyn_exc: Optional[bool],
+            cell_params: dict[str, float], run_times: list[int] | None,
+            set_between_runs: list[tuple[int, str, float]] | None,
+            spike_times: list[list[int]] | None,
+            get_spikes: bool | None, record: bool, record_7: bool,
+            spike_path: None, get_v: bool | None, record_v: bool,
+            record_v_7: bool, v_path: None, get_gsyn_exc: bool | None,
             record_gsyn_exc: bool, record_gsyn_exc_7: bool,
-            gsyn_path_exc: None, get_gsyn_inh: Optional[bool],
+            gsyn_path_exc: None, get_gsyn_inh: bool | None,
             record_gsyn_inh: bool, record_gsyn_inh_7: Literal[False],
             gsyn_path_inh: None
             ) -> tuple[dict[str, float], list[int],
@@ -340,12 +340,12 @@ class SynfireRunner:
     def __create_synfire_chain(
             n_neurons: int, cell_class: type, cell_params: dict[str, float],
             use_wrap_around_connections: bool, weight_to_spike: float,
-            delay: float, spike_times: Optional[list[list[int]]],
+            delay: float, spike_times: list[list[int]] | None,
             spike_times_list: None,
-            placement_constraint: Optional[tuple[int, int]],
-            randomise_v_init: Literal[False], seed: Optional[int],
-            constraint: None, input_class: type, rate: Optional[float],
-            start_time: Optional[int], duration: Optional[float],
+            placement_constraint: tuple[int, int] | None,
+            randomise_v_init: Literal[False], seed: int | None,
+            constraint: None, input_class: type, rate: float | None,
+            start_time: int | None, duration: float | None,
             use_spike_connections: Literal[True]
             ) -> tuple[list[Population], list[Projection], int]:
         """ This actually builds the synfire chain. """
@@ -507,7 +507,7 @@ class SynfireRunner:
         gsyn_inh_neo = self._recorded_gsyn_inh_list[0]
         return neo_convertor.convert_data(gsyn_inh_neo, "gsyn_exc")
 
-    def get_output_pop_gsyn_inh_7(self) -> Optional[NDArray[floating]]:
+    def get_output_pop_gsyn_inh_7(self) -> NDArray[floating] | None:
         return self._recorded_gsyn_inh_7
 
     def get_output_pop_voltage_list(self) -> list[neo.Block]:

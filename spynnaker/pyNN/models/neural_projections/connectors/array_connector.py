@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Sequence
 
 import numpy
 from numpy import uint8
@@ -97,8 +97,8 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         # Break the array into n_post_atoms units
         split_positions = numpy.arange(
             0, synapse_info.n_post_neurons, n_post_atoms)

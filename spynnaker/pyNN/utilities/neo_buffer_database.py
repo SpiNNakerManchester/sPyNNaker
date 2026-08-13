@@ -25,9 +25,7 @@ from typing import (
     Any,
     Collection,
     Iterable,
-    Optional,
     Sequence,
-    Union,
 )
 
 import neo  # type: ignore[import]
@@ -71,9 +69,9 @@ if TYPE_CHECKING:
 
     from .data_population import DataPopulation
     #: :meta private:
-    Names = Optional[ConcreteNames]
+    Names = ConcreteNames | None
     #: :meta private:
-    Annotations = Optional[dict[str, Any]]
+    Annotations = dict[str, Any] | None
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -105,8 +103,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         else:
             return str(value)
 
-    def __init__(self, database_file: Optional[str] = None,
-                 read_only: Optional[bool] = None):
+    def __init__(self, database_file: str | None = None,
+                 read_only: bool | None = None):
         """
         :param database_file:
             The name of a file that contains (or will contain) an SQLite
@@ -137,7 +135,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     @classmethod
     def segement_db(cls, segment_number: int,
-                    read_only: Optional[bool] = None) -> NeoBufferDatabase:
+                    read_only: bool | None = None) -> NeoBufferDatabase:
         """
         :returns: A NeoBufferDatabase for this segment.
         """
@@ -269,9 +267,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __get_recording_id(
             self, pop_label: str, variable: str,
-            population: Population, sampling_interval_ms: Optional[float],
-            data_type: Optional[DataType], buffered_type: BufferDataType,
-            units: Optional[str], n_colour_bits: int) -> int:
+            population: Population, sampling_interval_ms: float | None,
+            data_type: DataType | None, buffered_type: BufferDataType,
+            units: str | None, n_colour_bits: int) -> int:
         """
         Gets an ID for this population and recording label combination.
         Will create a new population/recording record if required.
@@ -443,7 +441,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             results.append(self._string(row["variable"]))
         return tuple(results)
 
-    def find_units(self, pop_label: str, variable: str) -> Optional[str]:
+    def find_units(self, pop_label: str, variable: str) -> str | None:
         """
         Gets the metadata ID for this population and recording label
         combination.
@@ -469,9 +467,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         return units
 
     def __get_recording_metadata(
-            self, pop_label: str, variable: str) -> Optional[tuple[
-                int, Optional[DataType], BufferDataType, float, float, int,
-                Optional[str], int]]:
+            self, pop_label: str, variable: str
+            ) -> tuple[int, DataType | None, BufferDataType, float, float,
+                       int, str | None, int] | None:
+
         """
         Gets the metadata id for this population and recording label
         combination.
@@ -514,7 +513,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         return None
 
     def __get_region_metadata(self, rec_id: int) -> Iterable[tuple[
-            int, Optional[NDArray[integer]], Slice, Optional[bool], int, int]]:
+            int, NDArray[integer] | None, Slice, bool | None, int, int]]:
         """
         :param rec_id:
         :return:
@@ -762,8 +761,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     @staticmethod
     def __combine_indexes(
-            view_indexes: Union[Sequence[int], NDArray[integer]],
-            data_indexes: Union[Sequence[int], NDArray[integer]],
+            view_indexes: Sequence[int] | NDArray[integer],
+            data_indexes: Sequence[int] | NDArray[integer],
             variable: str) -> NDArray[integer]:
         """
         :param view_indexes:
@@ -868,8 +867,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param variable:
         :return: numpy array of the data, neurons
         """
-        signal_array: Optional[NDArray[floating]] = None
-        pop_times: Optional[NDArray[floating]] = None
+        signal_array: NDArray[floating] | None = None
+        pop_times: NDArray[floating] | None = None
         pop_neurons: list[None] = []
         indexes: list[int] = []
 
@@ -1211,7 +1210,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self._csv_spike_data(csv_writer, spikes, indexes)
 
     def get_empty_block(self, pop_label: str,
-                        annotations: Annotations) -> Optional[neo.Block]:
+                        annotations: Annotations) -> neo.Block | None:
         """
         :param pop_label: The label for the population of interest
 

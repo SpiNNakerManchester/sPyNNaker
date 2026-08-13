@@ -20,7 +20,7 @@ import math
 import os
 from collections.abc import Sized
 from math import isnan
-from typing import Optional, Union, cast
+from typing import cast
 
 import neo
 import numpy
@@ -95,7 +95,7 @@ def check_directory_exists_and_create_if_not(filename: str) -> None:
 
 
 def convert_param_to_numpy(
-        param: Union[RandomDistribution, float, list[float], NDArray],
+        param: RandomDistribution | float | list[float] | NDArray,
         no_atoms: int) -> NDArray[floating]:
     """
     Convert parameters into numpy arrays.
@@ -333,7 +333,7 @@ def get_variance(distribution: RandomDistribution) -> float:
     return stats.var(distribution)
 
 
-def high(distribution: RandomDistribution) -> Optional[float]:
+def high(distribution: RandomDistribution) -> float | None:
     """
     Gets the high or maximum boundary value for this distribution.
 
@@ -346,7 +346,7 @@ def high(distribution: RandomDistribution) -> Optional[float]:
     return stats.high(distribution)
 
 
-def low(distribution: RandomDistribution) -> Optional[float]:
+def low(distribution: RandomDistribution) -> float | None:
     """
     Gets the low or minimum boundary value for this distribution.
 

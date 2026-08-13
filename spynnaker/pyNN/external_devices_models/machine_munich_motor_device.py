@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Sequence
+from typing import Sequence
 
 from spinn_utilities.overrides import overrides
 
@@ -81,8 +81,8 @@ class MachineMunichMotorDevice(
     def __init__(
             self, speed: int, sample_time: int, update_time: int,
             delay_time: int, delta_threshold: int,
-            continue_if_not_different: bool, label: Optional[str] = None,
-            app_vertex: Optional[ApplicationVertex] = None):
+            continue_if_not_different: bool, label: str | None = None,
+            app_vertex: ApplicationVertex | None = None):
         """
         :param speed:
         :param sample_time:

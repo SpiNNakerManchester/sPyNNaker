@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy import uint32
@@ -97,8 +97,8 @@ class SynapticMatrixApp:
             self, synapse_info: SynapseInformation,
             app_edge: ProjectionApplicationEdge, n_synapse_types: int,
             synaptic_matrix_region: int, max_atoms_per_core: int,
-            all_syn_block_sz: int, app_key_info: Optional[AppKeyInfo],
-            delay_app_key_info: Optional[AppKeyInfo],
+            all_syn_block_sz: int, app_key_info: AppKeyInfo | None,
+            delay_app_key_info: AppKeyInfo | None,
             weight_scales: WeightScales):
         """
         :param synapse_info:
@@ -141,12 +141,12 @@ class SynapticMatrixApp:
             self.__max_row_info.delayed_max_bytes)
 
         # These are computed during synaptic generation
-        self.__syn_mat_offset: Optional[int] = None
-        self.__delay_syn_mat_offset: Optional[int] = None
-        self.__index: Optional[int] = None
+        self.__syn_mat_offset: int | None = None
+        self.__delay_syn_mat_offset: int | None = None
+        self.__index: int | None = None
 
-        self.__download_index: Optional[int] = None
-        self.__download_delay_index: Optional[int] = None
+        self.__download_index: int | None = None
+        self.__download_delay_index: int | None = None
 
     @property
     def gen_size(self) -> int:
@@ -401,8 +401,8 @@ class SynapticMatrixApp:
         """
         connections = []
 
-        synapses_address: Optional[int] = None
-        buffers: Optional[BufferManager] = None
+        synapses_address: int | None = None
+        buffers: BufferManager | None = None
         if (self.__download_index is None and
                 self.__download_delay_index is None):
             synapses_address = locate_memory_region_for_placement(

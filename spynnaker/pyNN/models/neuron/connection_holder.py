@@ -16,9 +16,7 @@ from typing import (
     Any,
     Callable,
     Iterator,
-    Optional,
     Sequence,
-    Union,
 )
 
 import numpy
@@ -31,8 +29,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
 )
 
 _ItemType: TypeAlias = numpy.floating
-_Items: TypeAlias = Union[tuple[NDArray[_ItemType], ...], NDArray[_ItemType],
-                          tuple[list[numpy.floating], ...]]
+_Items: TypeAlias = (tuple[NDArray[_ItemType], ...] | NDArray[_ItemType] |
+                     tuple[list[numpy.floating], ...])
 
 
 def _is_listable(value: Any) -> TypeGuard[Sequence[Any]]:
@@ -74,11 +72,11 @@ class ConnectionHolder:
     )
 
     def __init__(
-            self, data_items_to_return: Optional[list[str]], as_list: bool,
+            self, data_items_to_return: list[str] | None, as_list: bool,
             n_pre_atoms: int, n_post_atoms: int,
-            connections: Optional[list[ConnectionsArray]] = None,
-            fixed_values: Optional[list[tuple[str, int]]] = None,
-            notify: Optional[Callable[['ConnectionHolder'], None]] = None):
+            connections: list[ConnectionsArray] | None = None,
+            fixed_values: list[tuple[str, int]] | None = None,
+            notify: Callable[['ConnectionHolder'], None] | None = None):
         """
         :param data_items_to_return: A list of data fields to be returned
         :param as_list:
@@ -107,8 +105,8 @@ class ConnectionHolder:
         self.__as_list = as_list
         self.__n_pre_atoms = n_pre_atoms
         self.__n_post_atoms = n_post_atoms
-        self.__connections: Optional[list[NDArray]] = connections
-        self.__data_items: Optional[_Items] = None
+        self.__connections: list[NDArray] | None = connections
+        self.__data_items: _Items | None = None
         self.__notify = notify
         self.__fixed_values = fixed_values
 
@@ -242,9 +240,9 @@ class ConnectionHolder:
 
         return self.__data_items
 
-    def __getitem__(self, s: int) -> Union[
-            numpy.floating, NDArray[numpy.floating],
-            list[numpy.floating]]:
+    def __getitem__(self, s: int) -> (
+            numpy.floating | NDArray[numpy.floating] |
+            list[numpy.floating]):
         data = self._get_data_items()
         return data[s]
 

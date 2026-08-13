@@ -28,10 +28,8 @@ from typing import (
     Any,
     Callable,
     Iterable,
-    Optional,
     Sequence,
     TypedDict,
-    Union,
     cast,
 )
 
@@ -269,28 +267,28 @@ class __PynnOperations(TypedDict, total=False):
     rank: Callable[[], int]
     reset: Callable[[dict[str, Any]], None]
     create: Callable[
-        [Union[type, AbstractPyNNModel], Optional[dict[str, Any]], int],
+        [type | AbstractPyNNModel, dict[str, Any] | None, int],
         Population]
     connect: Callable[
-        [Population, Population, float, Optional[float], Optional[str], int,
-         Optional[NumpyRNG]], None]
+        [Population, Population, float, float | None, str | None, int,
+         NumpyRNG | None], None]
     record: Callable[
-        [Union[str, Sequence[str]], PopulationBase, str, Optional[float],
-         Optional[dict[str, Any]]], Block]
+        [str | Sequence[str], PopulationBase, str, float | None,
+         dict[str, Any] | None], Block]
 
 
 # Dynamically-extracted operations from PyNN
 __pynn: __PynnOperations = {}
 # Cache of the simulator created by setup
-__simulator: Optional[SpiNNaker] = None
+__simulator: SpiNNaker | None = None
 
 
 # Patch the bugs in the PyNN documentation... Ugh!
 def distance(src_cell: IDMixin, tgt_cell: IDMixin,
-             mask: Optional[NDArray] = None,
+             mask: NDArray | None = None,
              scale_factor: float = 1.0, offset: float = 0.0,
-             periodic_boundaries: Optional[tuple[
-                 Optional[tuple[int, int]]]] = None) -> float:
+             periodic_boundaries: tuple[tuple[int, int] | None] | None = None
+             ) -> float:
     """
     :param src_cell: Measure from this cell
     :param tgt_cell: To this cell
@@ -311,14 +309,14 @@ def distance(src_cell: IDMixin, tgt_cell: IDMixin,
         src_cell, tgt_cell, mask, scale_factor, offset, periodic_boundaries)
 
 
-def setup(timestep: Optional[Union[float, Literal["auto"]]] = None,
-          min_delay: Union[float, Literal["auto"]] = (
+def setup(timestep: float | Literal["auto"] | None = None,
+          min_delay: float | Literal["auto"] = (
               _pynn_control.DEFAULT_MIN_DELAY),
-          max_delay: Optional[Union[float, Literal["auto"]]] = None,
-          database_socket_addresses: Optional[Iterable[SocketAddress]] = None,
-          time_scale_factor: Optional[int] = None,
-          n_chips_required: Optional[int] = None,
-          n_boards_required: Optional[int] = None,
+          max_delay: float | Literal["auto"] | None = None,
+          database_socket_addresses: Iterable[SocketAddress] | None = None,
+          time_scale_factor: int | None = None,
+          n_chips_required: int | None = None,
+          n_boards_required: int | None = None,
           **extra_params: Any) -> int:
     """
     The main method needed to be called to make the PyNN 0.8 setup.
@@ -409,9 +407,9 @@ def Projection(
         presynaptic_population: Population,
         postsynaptic_population: Population,
         connector: AbstractConnector,
-        synapse_type: Optional[AbstractSynapseDynamics] = None,
+        synapse_type: AbstractSynapseDynamics | None = None,
         source: None = None, receptor_type: str = "excitatory",
-        space: Optional[Space] = None, label: Optional[str] = None,
+        space: Space | None = None, label: str | None = None,
         download_synapses: bool = False,
         partition_id: str = SPIKE_PARTITION_ID) -> SpiNNakerProjection:
     """
@@ -500,7 +498,7 @@ def list_standard_models() -> list[str]:
 
 def set_number_of_neurons_per_core(
         neuron_type: type[AbstractPyNNNeuronModel],
-        max_permitted: Optional[Union[int, tuple[int, ...]]]) -> None:
+        max_permitted: int | tuple[int, ...] | None) -> None:
     """
     Sets a ceiling on the number of neurons of a given model that can be
     placed on a single core.
@@ -521,7 +519,7 @@ def set_number_of_neurons_per_core(
         raise ConfigurationException(
             "set_number_of_neurons_per_core call now expects "
             "neuron_type as a class instead of as a str")
-    max_neurons: Optional[tuple[int, ...]] = None
+    max_neurons: tuple[int, ...] | None = None
     if max_permitted is not None:
         if is_singleton(max_permitted):
             max_neurons = (int(max_permitted), )
@@ -538,7 +536,7 @@ def set_number_of_neurons_per_core(
 
 def set_number_of_synapse_cores(
         neuron_type: type[AbstractPyNNNeuronModel],
-        n_synapse_cores: Optional[int]) -> None:
+        n_synapse_cores: int | None) -> None:
     """
     Sets the number of synapse cores for a model.
 
@@ -574,8 +572,8 @@ def set_allow_delay_extensions(
 
 
 def connect(pre: Population, post: Population, weight: float = 0.0,
-            delay: Optional[float] = None, receptor_type: Optional[str] = None,
-            p: int = 1, rng: Optional[NumpyRNG] = None) -> None:
+            delay: float | None = None, receptor_type: str | None = None,
+            p: int = 1, rng: NumpyRNG | None = None) -> None:
     """
     Builds a projection.
 
@@ -592,8 +590,8 @@ def connect(pre: Population, post: Population, weight: float = 0.0,
 
 
 def create(
-        cellclass: Union[type, AbstractPyNNModel],
-        cellparams: Optional[dict[str, Any]] = None,
+        cellclass: type | AbstractPyNNModel,
+        cellparams: dict[str, Any] | None = None,
         n: int = 1) -> Population:
     """
     Builds a population with certain parameters.
@@ -607,7 +605,7 @@ def create(
     return __pynn["create"](cellclass, cellparams, n)
 
 
-def NativeRNG(seed_value: Union[int, list[int], NDArray]) -> None:
+def NativeRNG(seed_value: int | list[int] | NDArray) -> None:
     """
     Fixes the random number generator's seed.
 
@@ -699,9 +697,9 @@ def rank() -> int:
     return __pynn["rank"]()
 
 
-def record(variables: Union[str, Sequence[str]], source: PopulationBase,
-           filename: str, sampling_interval: Optional[float] = None,
-           annotations: Optional[dict[str, Any]] = None) -> Block:
+def record(variables: str | Sequence[str], source: PopulationBase,
+           filename: str, sampling_interval: float | None = None,
+           annotations: dict[str, Any] | None = None) -> Block:
     """
     Sets variables to be recorded.
 
@@ -720,7 +718,7 @@ def record(variables: Union[str, Sequence[str]], source: PopulationBase,
                             annotations)
 
 
-def reset(annotations: Optional[dict[str, Any]] = None) -> None:
+def reset(annotations: dict[str, Any] | None = None) -> None:
     """
     Resets the simulation to t = 0.
 
@@ -732,7 +730,7 @@ def reset(annotations: Optional[dict[str, Any]] = None) -> None:
     __pynn["reset"](annotations)
 
 
-def run(simtime: float, callbacks: Optional[Callable] = None) -> float:
+def run(simtime: float, callbacks: Callable | None = None) -> float:
     """
     The run() function advances the simulation for a given number of
     milliseconds.

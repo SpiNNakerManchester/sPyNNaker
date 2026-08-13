@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import logging
 import math
-from typing import TYPE_CHECKING, Any, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Sequence
 
 import numpy
 from numpy.typing import NDArray
@@ -71,7 +71,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     def __init__(
             self, p_connect: float, allow_self_connections: bool = True,
             safe: bool = True, verbose: bool = False,
-            rng: Optional[NumpyRNG] = None, callback: None = None):
+            rng: NumpyRNG | None = None, callback: None = None):
         """
         :param p_connect:
             a value between zero and one. Each potential connection is created
@@ -139,8 +139,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_post_atoms, self._p_connect, chance=1.0/10000.0)

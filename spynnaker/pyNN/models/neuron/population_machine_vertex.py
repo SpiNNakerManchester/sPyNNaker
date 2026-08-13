@@ -13,7 +13,7 @@
 # limitations under the License.
 import ctypes
 from enum import IntEnum
-from typing import Optional, Sequence
+from typing import Sequence
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -205,7 +205,7 @@ class PopulationMachineVertex(
             NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS +
             SpikeProcessingProvenance.N_ITEMS + MainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, app_vertex.combined_binary_file_name)
-        self.__key: Optional[int] = None
+        self.__key: int | None = None
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales

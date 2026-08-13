@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Union
 
 from spinn_utilities.overrides import overrides
 
@@ -63,7 +62,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
     def __init__(
             self, devices:  list[AbstractMulticastControllableDevice],
             create_edges: bool,
-            translator: Optional[AbstractEthernetTranslator] = None,
+            translator: AbstractEthernetTranslator | None = None,
             # default params for the neuron model type
             tau_m: float = 20.0, cm: float = 1.0, v_rest: float = 0.0,
             v_reset: float = 0.0, tau_syn_E: float = 5.0,
@@ -117,17 +116,17 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
     @overrides(AbstractPyNNNeuronModelStandard.create_vertex)
     def create_vertex(
             self, n_neurons: int, label: str, *,
-            spikes_per_second: Optional[float] = None,
-            ring_buffer_sigma: Optional[float] = None,
-            max_expected_summed_weight: Optional[list[float]] = None,
-            incoming_spike_buffer_size: Optional[int] = None,
-            drop_late_spikes: Optional[bool] = None,
-            splitter: Optional[SplitterPopulationVertex] = None,
-            seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
+            spikes_per_second: float | None = None,
+            ring_buffer_sigma: float | None = None,
+            max_expected_summed_weight: list[float] | None = None,
+            incoming_spike_buffer_size: int | None = None,
+            drop_late_spikes: bool | None = None,
+            splitter: SplitterPopulationVertex | None = None,
+            seed: int | None = None, n_colour_bits: int | None = None,
             n_steps_per_timestep: int = 1,
-            neurons_per_core: Optional[Union[int, tuple[int, ...]]] = None,
-            n_synapse_cores: Optional[int] = None,
-            allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
+            neurons_per_core: int | tuple[int, ...] | None = None,
+            n_synapse_cores: int | None = None,
+            allow_delay_extensions: bool | None = None) -> PopulationVertex:
         if n_neurons != len(self._devices):
             raise ConfigurationException(
                 "Number of neurons does not match number of "

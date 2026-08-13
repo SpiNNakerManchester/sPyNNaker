@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Iterable, Optional
+from typing import Iterable
 
 from spinn_utilities.overrides import overrides
 
@@ -85,17 +85,17 @@ class SPIFRetinaDevice(
     )
 
     @classmethod
-    def __issue_device_id(cls, base_key: Optional[int]) -> int:
+    def __issue_device_id(cls, base_key: int | None) -> int:
         if base_key is None:
             base_key = cls.__n_devices
         cls.__n_devices += 1
         return base_key
 
     def __init__(self, pipe: int, width: int, height: int, sub_width: int,
-                 sub_height: int, base_key: Optional[int] = None,
+                 sub_height: int, base_key: int | None = None,
                  input_x_shift: int = 16, input_y_shift: int = 0,
-                 board_address: Optional[str] = None,
-                 chip_coords: Optional[tuple[int, int]] = None):
+                 board_address: str | None = None,
+                 chip_coords: tuple[int, int] | None = None):
         """
         :param pipe: Which pipe on SPIF the retina is connected to
         :param width: The width of the retina in pixels
@@ -198,8 +198,8 @@ class SPIFRetinaDevice(
         return n & 0xFFFFFFFF
 
     def __incoming_fpgas(
-            self, board_address: Optional[str],
-            chip_coords: Optional[tuple[int, int]]) -> list[FPGAConnection]:
+            self, board_address: str | None,
+            chip_coords: tuple[int, int] | None) -> list[FPGAConnection]:
 
         """
         Get the incoming FPGA connections.
@@ -209,8 +209,8 @@ class SPIFRetinaDevice(
                 for i in SPIF_INPUT_FPGA_LINKS]
 
     def __outgoing_fpga(
-            self, board_address: Optional[str],
-            chip_coords: Optional[tuple[int, int]]) -> FPGAConnection:
+            self, board_address: str | None,
+            chip_coords: tuple[int, int] | None) -> FPGAConnection:
         """
         Get the outgoing FPGA connection (for commands).
         """

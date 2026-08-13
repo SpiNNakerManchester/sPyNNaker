@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Optional, Sequence
+from typing import Iterable, Sequence
 
 import numpy
 import pytest
@@ -62,11 +62,11 @@ from unittests.mocks import (
         "3-elements-extra"
     ])
 def test_connector(
-        clist: NDArray, column_names: Optional[list[str]],
-        weights: int, delays: int, expected_clist: Optional[NDArray],
+        clist: NDArray, column_names: list[str] | None,
+        weights: int, delays: int, expected_clist: NDArray | None,
         expected_weights: list[int], expected_delays: list[int],
-        expected_extra_parameters: Optional[NDArray],
-        expected_extra_parameter_names: Optional[list[str]]) -> None:
+        expected_extra_parameters: NDArray | None,
+        expected_extra_parameter_names: list[str] | None) -> None:
     unittest_setup()
     connector = FromListConnector(clist, column_names=column_names)
     if expected_clist is not None:
@@ -203,7 +203,7 @@ class MockAppVertex(MockVertex):
 
     @overrides(ApplicationVertex.get_key_ordered_indices)
     def get_key_ordered_indices(
-            self, indices: Optional[numpy.ndarray] = None) -> numpy.ndarray:
+            self, indices: numpy.ndarray | None = None) -> numpy.ndarray:
         if indices is None:
             indices = numpy.arange(self.n_atoms)
         # All of them are 1D so this is good enough

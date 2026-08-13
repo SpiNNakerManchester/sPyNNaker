@@ -19,9 +19,7 @@ from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
-    Optional,
     Sequence,
-    Union,
 )
 
 import numpy
@@ -93,8 +91,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         "__weights",
     )
 
-    def __init__(self, conn_list: Union[NDArray, list[tuple[int, ...]]],
-                 column_names: Optional[Sequence[str]] = None, *,
+    def __init__(self, conn_list: NDArray | list[tuple[int, ...]],
+                 column_names: Sequence[str] | None = None, *,
                  safe: bool = True, verbose: bool = False,
                  callback: None = None):
         """
@@ -129,15 +127,15 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
         self.__column_names = column_names
         self.__split_conn_list: dict[int, NDArray[integer]] = {}
-        self.__split_post_slices: Optional[list[Slice]] = None
+        self.__split_post_slices: list[Slice] | None = None
 
         self.__conn_list: NDArray
         # These are set by __setup_using_conn_list
         self.__sources: NDArray[uint32]
         self.__targets: NDArray[uint32]
-        self.__delays: Optional[NDArray[floating]]
-        self.__weights: Optional[NDArray[floating]]
-        self.__extra_params: Optional[_ExtraParams]
+        self.__delays: NDArray[floating] | None
+        self.__weights: NDArray[floating] | None
+        self.__extra_params: _ExtraParams | None
 
         if conn_list is None or len(conn_list) == 0:
             self.__conn_list = numpy.zeros((0, 2), dtype=uint32)
@@ -197,8 +195,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             self, n_pre_atoms: int, n_post_atoms: int,
             post_slices: Sequence[Slice]) -> \
             tuple[NDArray[integer], NDArray[integer],
-                  Optional[NDArray[floating]],
-                  Optional[NDArray[floating]]]:
+                  NDArray[floating] | None,
+                  NDArray[floating] | None]:
         input_filter = numpy.logical_and(
             self.__targets < n_post_atoms, self.__sources < n_pre_atoms)
         targets = self.__targets[input_filter]
@@ -246,8 +244,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         mask = None
         delays_handled = False
         if (min_delay is not None and max_delay is not None):
@@ -478,7 +476,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             self.__extra_params = None
 
     @property
-    def column_names(self) -> Optional[Sequence[str]]:
+    def column_names(self) -> Sequence[str] | None:
         """
         The names of the columns in the array after the first two.
         Of particular interest is whether ``weight`` and ``delay`` columns
@@ -486,7 +484,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         """
         return self.__column_names
 
-    def get_extra_parameters(self) -> Optional[NDArray]:
+    def get_extra_parameters(self) -> NDArray | None:
         """
         Getter for the extra parameters. Excludes ``weight`` and
         ``delay`` columns.
@@ -495,7 +493,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         """
         return self.__extra_params.data if self.__extra_params else None
 
-    def get_extra_parameter_names(self) -> Optional[Sequence[str]]:
+    def get_extra_parameter_names(self) -> Sequence[str] | None:
         """
         :returns: The names of the extra parameters or None if there are None
         """

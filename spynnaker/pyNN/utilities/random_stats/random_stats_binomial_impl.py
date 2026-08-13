@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from pyNN.random import RandomDistribution
 from scipy.stats import binom
@@ -51,9 +50,9 @@ class RandomStatsBinomialImpl(AbstractRandomStats):
         return binom.var(*self._get_params(dist))
 
     @overrides(AbstractRandomStats.high)
-    def high(self, distribution: RandomDistribution) -> Optional[float]:
+    def high(self, distribution: RandomDistribution) -> float | None:
         return None
 
     @overrides(AbstractRandomStats.low)
-    def low(self, distribution: RandomDistribution) -> Optional[float]:
+    def low(self, distribution: RandomDistribution) -> float | None:
         return None

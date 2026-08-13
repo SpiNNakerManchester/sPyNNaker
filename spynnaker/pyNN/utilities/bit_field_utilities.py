@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Iterable, Optional
+from typing import TYPE_CHECKING, Iterable
 
 import numpy
 from numpy import uint32
@@ -155,7 +155,7 @@ def get_bitfield_key_map_data(
 def write_bitfield_init_data(
         spec: DataSpecificationBase, bit_field_region: int,
         n_bit_field_bytes: int,
-        bit_field_region_ref: Optional[int] = None) -> None:
+        bit_field_region_ref: int | None = None) -> None:
     """
     Writes the initialisation data needed for the bitfield generator.
 

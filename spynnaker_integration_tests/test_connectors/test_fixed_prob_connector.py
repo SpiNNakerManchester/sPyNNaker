@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Union
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -27,10 +26,10 @@ DESTINATIONS = 10
 class TestFixedProbConnector(BaseTestCase):
 
     def do_fixed_prob_nd_run(
-            self, neurons_per_core_pre: Union[int, tuple[int, ...]],
-            pre_size: int, pre_shape: Optional[BaseStructure],
+            self, neurons_per_core_pre: int | tuple[int, ...],
+            pre_size: int, pre_shape: BaseStructure | None,
             neurons_per_core_post: int, post_size: int,
-            post_shape: Optional[BaseStructure], prob: float) -> None:
+            post_shape: BaseStructure | None, prob: float) -> None:
         sim.setup(1.0)
         pre = sim.Population(
             pre_size, sim.IF_curr_exp(), structure=pre_shape)
@@ -53,7 +52,7 @@ class TestFixedProbConnector(BaseTestCase):
 
     def do_fixed_prob_nd_run_no_self(
             self, neurons_per_core: tuple[int, ...], size: int,
-            shape: Optional[BaseStructure], prob: float) -> None:
+            shape: BaseStructure | None, prob: float) -> None:
         sim.setup(1.0)
         pop = sim.Population(
             size, sim.IF_curr_exp(), structure=shape)

@@ -14,7 +14,7 @@
 
 import logging
 import os
-from typing import Any, Collection, Optional, Union, cast
+from typing import Any, Collection, cast
 
 from lazyarray import __version__ as lazyarray_version
 from neo import __version__ as neo_version
@@ -77,11 +77,11 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     __slots__ = ("__recorders", )
 
     def __init__(
-            self, time_scale_factor: Optional[int],
-            min_delay: Union[float, None, Literal["auto"]],
-            n_chips_required: Optional[int] = None,
-            n_boards_required: Optional[int] = None,
-            timestep: Optional[float] = 0.1):
+            self, time_scale_factor: int | None,
+            min_delay: float | None | Literal["auto"],
+            n_chips_required: int | None = None,
+            n_boards_required: int | None = None,
+            timestep: float | None = 0.1):
         """
         :param time_scale_factor:
             multiplicative factor to the machine time step
@@ -153,7 +153,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     def __writer(self) -> SpynnakerDataWriter:
         return cast(SpynnakerDataWriter, self._data_writer)
 
-    def _clear_and_run(self, run_time: Optional[float],
+    def _clear_and_run(self, run_time: float | None,
                        sync_time: float = 0.0) -> None:
         """
         Clears the projections and Run the model created.
@@ -177,7 +177,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         for projection in self.__writer.iterate_projections():
             projection._clear_cache()
 
-    def run(self, run_time: Optional[float], sync_time: float = 0.0) -> None:
+    def run(self, run_time: float | None, sync_time: float = 0.0) -> None:
         """
         Run the simulation for a span of simulation time.
 

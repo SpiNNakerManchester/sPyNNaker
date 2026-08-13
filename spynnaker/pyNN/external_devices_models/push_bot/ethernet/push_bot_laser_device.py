@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Optional
+from typing import Iterable
 
 from spinn_utilities.overrides import overrides
 
@@ -38,10 +38,10 @@ class PushBotEthernetLaserDevice(
 
     def __init__(
             self, laser: PushBotLaser, protocol: MunichIoSpiNNakerLinkProtocol,
-            start_active_time: Optional[int] = None,
-            start_total_period: Optional[int] = None,
-            start_frequency: Optional[int] = None,
-            timesteps_between_send: Optional[int] = None):
+            start_active_time: int | None = None,
+            start_total_period: int | None = None,
+            start_frequency: int | None = None,
+            timesteps_between_send: int | None = None):
         """
         :param laser: The PushBotLaser value to control
         :param protocol: The protocol instance to get commands from

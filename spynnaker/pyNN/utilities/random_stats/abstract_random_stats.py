@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from pyNN.random import RandomDistribution
 
@@ -61,7 +60,7 @@ class AbstractRandomStats(metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def high(self, distribution: RandomDistribution) -> Optional[float]:
+    def high(self, distribution: RandomDistribution) -> float | None:
         """
         :returns: The high cut-off value of the distribution, or `None` if the
         distribution is unbounded.
@@ -69,7 +68,7 @@ class AbstractRandomStats(metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def low(self, distribution: RandomDistribution) -> Optional[float]:
+    def low(self, distribution: RandomDistribution) -> float | None:
         """
         :returns: The low cut-off value of the distribution, or `None` if the
         distribution is unbounded.

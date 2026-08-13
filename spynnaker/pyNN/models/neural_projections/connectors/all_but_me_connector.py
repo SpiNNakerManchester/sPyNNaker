@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Sequence
 
 import numpy
 from numpy import uint32
@@ -67,8 +67,8 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
 
     __slots__ = ("__n_neurons_per_group", "__weights")
 
-    def __init__(self, n_neurons_per_group: Optional[int] = None,
-                 weights: Optional[NDArray[numpy.float64]] = None,
+    def __init__(self, n_neurons_per_group: int | None = None,
+                 weights: NDArray[numpy.float64] | None = None,
                  safe: bool = True, verbose: bool = False,
                  callback: None = None):
         """
@@ -105,8 +105,8 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
         parameters["weights"] = self.__weights
         return parameters
 
-    def __check_weights(self, weights: Optional[NDArray[numpy.float64]],
-                        n_neurons_per_group: Optional[int]) -> None:
+    def __check_weights(self, weights: NDArray[numpy.float64] | None,
+                        n_neurons_per_group: int | None) -> None:
         if weights is not None and n_neurons_per_group is not None:
             n_weights = n_neurons_per_group * (n_neurons_per_group - 1)
             if len(weights) != n_weights:
@@ -146,8 +146,8 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
 
         # At most, a pre-neuron will target all post-neurons in the group,
         # except the one with the same index.  For a given subset of post

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from random import randint
-from typing import Union
 
 import pyNN.spiNNaker as p
 from neo.core.spiketrainlist import SpikeTrainList
@@ -57,7 +56,7 @@ def get_retina_input() -> list[list[int]]:
 
 def find_next_spike_after(
         spike_times: Quantity,
-        time: int) -> Union[tuple[int, Quantity], tuple[None, None]]:
+        time: int) -> tuple[int, Quantity] | tuple[None, None]:
     for index, spike_time in enumerate(spike_times):
         if spike_time >= time:
             return index, spike_time

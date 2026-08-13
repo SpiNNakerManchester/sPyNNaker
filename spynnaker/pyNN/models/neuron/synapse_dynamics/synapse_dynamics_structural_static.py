@@ -17,9 +17,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Iterable,
-    Optional,
     Sequence,
-    Union,
 )
 
 import numpy
@@ -128,9 +126,9 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
             initial_weight: float = DEFAULT_INITIAL_WEIGHT,
             initial_delay: InitialDelay = DEFAULT_INITIAL_DELAY,
             s_max: int = DEFAULT_S_MAX,
-            with_replacement: bool = True, seed: Optional[int] = None,
+            with_replacement: bool = True, seed: int | None = None,
             weight: float = StaticSynapse.default_parameters['weight'],
-            delay: Optional[float] = None):
+            delay: float | None = None):
         """
         :param partner_selection: The partner selection rule
         :param formation: The formation rule
@@ -206,9 +204,10 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
 
     @overrides(AbstractStaticSynapseDynamics.is_same_as)
     @overrides(_Common.is_same_as)
-    def is_same_as(self, synapse_dynamics: Union[
-            AbstractSynapseDynamics,
-            AbstractSynapseDynamicsStructural]) -> bool:
+    def is_same_as(
+            self,
+            synapse_dynamics: AbstractSynapseDynamics |
+            AbstractSynapseDynamicsStructural) -> bool:
         if not (isinstance(synapse_dynamics, SynapseDynamicsStructuralStatic)):
             return False
         if not AbstractStaticSynapseDynamics.is_same_as(
@@ -251,7 +250,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.seed)
-    def seed(self) -> Optional[int]:
+    def seed(self) -> int | None:
         return self.__seed
 
     @property
@@ -322,7 +321,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
     @overrides(SynapseDynamicsStatic.get_delay_minimum)
     def get_delay_minimum(
             self, connector: AbstractConnector,
-            synapse_info: SynapseInformation) -> Optional[float]:
+            synapse_info: SynapseInformation) -> float | None:
         d_m = super().get_delay_minimum(connector, synapse_info)
         if d_m is None:
             return self.__initial_delay
@@ -336,7 +335,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
 
     @overrides(_Common._get_seeds)
     def _get_seeds(
-            self, app_vertex: Union[None, ApplicationVertex, Slice] = None
+            self, app_vertex: None | ApplicationVertex | Slice = None
             ) -> Sequence[int]:
         if app_vertex:
             if app_vertex not in self.__seeds:

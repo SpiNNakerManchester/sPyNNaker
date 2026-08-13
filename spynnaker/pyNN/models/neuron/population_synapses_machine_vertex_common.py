@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import ctypes
 from enum import IntEnum
-from typing import TYPE_CHECKING, Optional, Sequence
+from typing import TYPE_CHECKING, Sequence
 
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.config_holder import get_config_int
@@ -181,10 +181,10 @@ class PopulationSynapsesMachineVertexCommon(
             label, app_vertex, vertex_slice, sdram, self.COMMON_REGIONS,
             SynapseProvenance.N_ITEMS + SpikeProcessingFastProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, app_vertex.synapse_core_binary_file_name)
-        self.__sdram_partition: Optional[
-            SourceSegmentedSDRAMMachinePartition] = None
-        self.__neuron_vertex: Optional[PopulationNeuronsMachineVertex] = None
-        self.__partition_id: Optional[str] = None
+        self.__sdram_partition: (SourceSegmentedSDRAMMachinePartition |
+                                 None) = None
+        self.__neuron_vertex: PopulationNeuronsMachineVertex | None = None
+        self.__partition_id: str | None = None
 
     @overrides(SendsSynapticInputsOverSDRAM.set_sdram_partition)
     def set_sdram_partition(

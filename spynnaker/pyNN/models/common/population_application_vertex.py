@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Collection, Container, Iterable, Optional
+from typing import Collection, Container, Iterable
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.abstract_sized import Selector
@@ -239,8 +239,8 @@ class PopulationApplicationVertex(
         return []
 
     def set_recording(
-            self, name: str, sampling_interval: Optional[float] = None,
-            indices: Optional[Collection[int]] = None) -> None:
+            self, name: str, sampling_interval: float | None = None,
+            indices: Collection[int] | None = None) -> None:
         """
         Set a variable recording.
 
@@ -259,7 +259,7 @@ class PopulationApplicationVertex(
             f"set_recording")
 
     def set_not_recording(self, name: str,
-                          indices: Optional[Collection[int]] = None) -> None:
+                          indices: Collection[int] | None = None) -> None:
         """
         Set a variable not recording.
 
@@ -319,7 +319,7 @@ class PopulationApplicationVertex(
             f"{type(self)} has recording variables so should implement "
             f"get_recording_variables")
 
-    def get_data_type(self, name: str) -> Optional[DataType]:
+    def get_data_type(self, name: str) -> DataType | None:
         """
         Get the type data returned by a recording of the variable.
 
@@ -349,7 +349,7 @@ class PopulationApplicationVertex(
             f"get_recording_region")
 
     def get_neurons_recording(
-            self, name: str, vertex_slice: Slice) -> Optional[Collection[int]]:
+            self, name: str, vertex_slice: Slice) -> Collection[int] | None:
         """
         Gets the neurons being recorded on the core with this slice.
 

@@ -17,9 +17,7 @@ from __future__ import annotations
 from typing import (
     TYPE_CHECKING,
     Iterable,
-    Optional,
     Sequence,
-    Union,
 )
 
 from spinn_utilities.overrides import overrides
@@ -77,20 +75,20 @@ class ExternalDeviceLifControlVertex(
     def __init__(
             self, *, devices: Sequence[AbstractMulticastControllableDevice],
             create_edges: bool,
-            max_atoms_per_core: Union[int, tuple[int, ...]],
-            n_synapse_cores: Optional[int],
+            max_atoms_per_core: int | tuple[int, ...],
+            n_synapse_cores: int | None,
             allow_delay_extensions: bool,
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel,
-            translator: Optional[AbstractEthernetTranslator] = None,
-            spikes_per_second: Optional[float] = None,
-            label: Optional[str] = None,
-            ring_buffer_sigma: Optional[float] = None,
-            max_expected_summed_weight: Optional[list[float]] = None,
-            incoming_spike_buffer_size: Optional[int] = None,
-            drop_late_spikes: Optional[bool] = None,
-            splitter: Optional[SplitterPopulationVertex] = None,
-            seed: Optional[int] = None, n_colour_bits: Optional[int] = None):
+            translator: AbstractEthernetTranslator | None = None,
+            spikes_per_second: float | None = None,
+            label: str | None = None,
+            ring_buffer_sigma: float | None = None,
+            max_expected_summed_weight: list[float] | None = None,
+            incoming_spike_buffer_size: int | None = None,
+            drop_late_spikes: bool | None = None,
+            splitter: SplitterPopulationVertex | None = None,
+            seed: int | None = None, n_colour_bits: int | None = None):
         """
         :param devices:
             The AbstractMulticastControllableDevice instances to be controlled
@@ -189,7 +187,7 @@ class ExternalDeviceLifControlVertex(
 
     @overrides(PopulationVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(
-            self, partition_id: str) -> Optional[BaseKeyAndMask]:
+            self, partition_id: str) -> BaseKeyAndMask | None:
         return BaseKeyAndMask(
             self.__devices[partition_id].device_control_key,
             self._DEFAULT_COMMAND_MASK)

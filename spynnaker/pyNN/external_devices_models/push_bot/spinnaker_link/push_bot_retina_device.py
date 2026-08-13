@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -47,7 +46,7 @@ class DelayedPayloadMultiCastCommand(MultiCastCommand):
 
     @property
     @overrides(MultiCastCommand.payload)
-    def payload(self) -> Optional[int]:
+    def payload(self) -> int | None:
         if self._payload is None:
             self._payload = self._vertex.new_key_command_payload()
         return self._payload
@@ -70,8 +69,8 @@ class PushBotSpiNNakerLinkRetinaDevice(
             self, spinnaker_link_id: int,
             protocol: MunichIoSpiNNakerLinkProtocol,
             resolution: PushBotRetinaResolution,
-            board_address: Optional[str] = None,
-            label: Optional[str] = None,
+            board_address: str | None = None,
+            label: str | None = None,
             n_machine_vertices: int = 1):
         """
         :param spinnaker_link_id:
@@ -89,7 +88,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
             n_machine_vertices=n_machine_vertices)
 
         # stores for the injection aspects
-        self.__new_key_command: Optional[DelayedPayloadMultiCastCommand] = \
+        self.__new_key_command: DelayedPayloadMultiCastCommand | None = \
             None
 
     def new_key_command_payload(self) -> int:

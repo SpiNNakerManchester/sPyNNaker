@@ -22,9 +22,7 @@ from typing import (
     Callable,
     Iterable,
     Iterator,
-    Optional,
     Sequence,
-    Union,
     cast,
     final,
     overload,
@@ -67,8 +65,8 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.types import Names, Values
 
 logger = FormatAdapter(logging.getLogger(__file__))
-_CellType: TypeAlias = Union[AbstractPyNNModel, PopulationApplicationVertex]
-_CellTypeArg: TypeAlias = Union[type[AbstractPyNNModel], _CellType]
+_CellType: TypeAlias = AbstractPyNNModel | PopulationApplicationVertex
+_CellTypeArg: TypeAlias = type[AbstractPyNNModel] | _CellType
 _ParamDict: TypeAlias = dict[str, Any]
 
 
@@ -89,12 +87,12 @@ class Population(PopulationBase):
         "__vertex")
 
     def __init__(
-            self, size: Union[int, float, None], cellclass: _CellTypeArg,
-            cellparams: Optional[_ParamDict] = None,
-            structure: Optional[BaseStructure] = None,
-            initial_values: Optional[dict[str, float]] = None,
-            label: Optional[str] = None,
-            additional_parameters: Optional[_ParamDict] = None,
+            self, size: int | float | None, cellclass: _CellTypeArg,
+            cellparams: _ParamDict | None = None,
+            structure: BaseStructure | None = None,
+            initial_values: dict[str, float] | None = None,
+            label: str | None = None,
+            additional_parameters: _ParamDict | None = None,
             **additional_kwargs: _ParamDict):
         """
         :param size: The number of neurons in the population
@@ -128,7 +126,7 @@ class Population(PopulationBase):
         # structure should be a valid Space.py structure type.
         # generation of positions is deferred until needed.
         self.__structure = structure
-        self.__positions: Optional[numpy.ndarray] = None
+        self.__positions: numpy.ndarray | None = None
         if isinstance(self.__vertex, SupportsStructure):
             self.__vertex.set_structure(structure)
 
@@ -195,11 +193,11 @@ class Population(PopulationBase):
 
     @overrides(PopulationBase.record)
     def record(self, variables: Names, to_file: IoDest = None,
-               sampling_interval: Optional[float] = None) -> None:
+               sampling_interval: float | None = None) -> None:
         self.__recorder.record(
             variables, to_file, sampling_interval, indexes=None)
 
-    def sample(self, n: int, rng: Optional[NumpyRNG] = None) -> PopulationView:
+    def sample(self, n: int, rng: NumpyRNG | None = None) -> PopulationView:
         """
         Randomly sample `n` cells from the Population, and return a
         PopulationView object.
@@ -217,9 +215,9 @@ class Population(PopulationBase):
             label=f"Random sample size {n} from {self.label}")
 
     @overrides(PopulationBase.write_data)
-    def write_data(self, io: Union[str, BaseIO], variables: Names = 'all',
+    def write_data(self, io: str | BaseIO, variables: Names = 'all',
                    gather: bool = True, clear: bool = False,
-                   annotations: Optional[dict[str, Any]] = None) -> None:
+                   annotations: dict[str, Any] | None = None) -> None:
         self._check_params(gather, annotations)
 
         if isinstance(io, str):
@@ -236,8 +234,8 @@ class Population(PopulationBase):
         io.write(data)
 
     def describe(self, template: str = 'population_default.txt',
-                 engine:  Optional[Union[str, TemplateEngine]] = 'default'
-                 ) -> Union[str, dict[str, Any]]:
+                 engine:  str | TemplateEngine | None = 'default'
+                 ) -> str | dict[str, Any]:
         """
         Returns a human-readable description of the population.
 
@@ -264,7 +262,7 @@ class Population(PopulationBase):
         context.update(self.annotations)
         if self.size > 0:
             parameters = self.__vertex.get_parameters()
-            cell_parameters: Union[str, ParameterHolder]
+            cell_parameters: str | ParameterHolder
             if parameters:
                 cell_parameters = self.__vertex.get_parameter_values(
                     parameters, 0)
@@ -292,14 +290,14 @@ class Population(PopulationBase):
     def get_data(
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
-            annotations: Optional[dict[str, Any]] = None) -> neo.Block:
+            annotations: dict[str, Any] | None = None) -> neo.Block:
         self._check_params(gather, annotations)
         return self.__recorder.extract_neo_block(
             variables, None, clear, annotations)
 
     def spinnaker_get_data(
             self, variable: str, as_matrix: bool = False,
-            view_indexes: Optional[Sequence[int]] = None) -> NDArray[floating]:
+            view_indexes: Sequence[int] | None = None) -> NDArray[floating]:
         """
         SsPyNNaker specific method for getting data as a numpy array,
         instead of the Neo-based object
@@ -527,8 +525,8 @@ class Population(PopulationBase):
             self, id: Iterable[int]) -> list[int]:  # @ReservedAssignment
         ...
 
-    def id_to_index(self, id: Union[int, Iterable[int]]
-                    ) -> Union[int, list[int]]:  # @ReservedAssignment
+    def id_to_index(self, id: int | Iterable[int]
+                    ) -> int | list[int]:  # @ReservedAssignment
         """
         Given the ID(s) of cell(s) in the Population, return its (their)
         index (order in the Population).
@@ -557,8 +555,8 @@ class Population(PopulationBase):
     def index_to_id(self, index: Iterable[int]) -> list[int]:
         ...
 
-    def index_to_id(self, index: Union[int, Iterable[int]]
-                    ) -> Union[int, list[int]]:
+    def index_to_id(self, index: int | Iterable[int]
+                    ) -> int | list[int]:
         """
         Given the index (order in the Population) of cell(s) in the
         Population, return their ID(s)
@@ -576,7 +574,7 @@ class Population(PopulationBase):
         # this assumes IDs are consecutive
         return [_index + self.__first_id for _index in index]
 
-    def id_to_local_index(self, cell_id: Union[int, Iterable[int]]) -> Never:
+    def id_to_local_index(self, cell_id: int | Iterable[int]) -> Never:
         """
         Given the ID(s) of cell(s) in the Population, return its (their)
         index (order in the Population), counting only cells on the local
@@ -621,7 +619,7 @@ class Population(PopulationBase):
 
     @property
     @overrides(PopulationBase.structure)
-    def structure(self) -> Optional[BaseStructure]:
+    def structure(self) -> BaseStructure | None:
         """
         The structure for the population.
         """
@@ -629,7 +627,7 @@ class Population(PopulationBase):
 
     # NON-PYNN API CALL
     def add_placement_constraint(
-            self, x: int, y: int, p: Optional[int] = None) -> None:
+            self, x: int, y: int, p: int | None = None) -> None:
         """
         Add a placement constraint.
 
@@ -644,7 +642,7 @@ class Population(PopulationBase):
 
     # NON-PYNN API CALL
     def set_max_atoms_per_core(
-            self, max_atoms_per_core: Union[int, tuple[int, ...]]) -> None:
+            self, max_atoms_per_core: int | tuple[int, ...]) -> None:
         """
         Supports the setting of this population's max atoms per
         dimension per core.
@@ -675,7 +673,7 @@ class Population(PopulationBase):
     @staticmethod
     def __create_model(
             cell_class: _CellTypeArg,
-            cell_params: Optional[_ParamDict]) -> _CellType:
+            cell_params: _ParamDict | None) -> _CellType:
         """
         :param cell_class: The implementation of the individual neurons.
         :param cell_params: Parameters to pass to ``cell_class`` if it
@@ -699,8 +697,8 @@ class Population(PopulationBase):
         return model
 
     def __create_vertex_from_model(
-            self, model: AbstractPyNNModel, size: Optional[int],
-            label: Optional[str], additional_parameters: _ParamDict) -> None:
+            self, model: AbstractPyNNModel, size: int | None,
+            label: str | None, additional_parameters: _ParamDict) -> None:
         """
         Worker for :meth:`__create_vertex` to handle the case where we really
         have a model.
@@ -720,8 +718,8 @@ class Population(PopulationBase):
             size or 1, label or f"{model.name} vertex", **parameters)
 
     def __init_with_supplied_vertex(
-            self, model: PopulationApplicationVertex, size: Optional[int],
-            label: Optional[str], additional_parameters: _ParamDict) -> None:
+            self, model: PopulationApplicationVertex, size: int | None,
+            label: str | None, additional_parameters: _ParamDict) -> None:
         """
         Worker for :meth:`__create_vertex` to handle the case where we have a
         user-supplied vertex.
@@ -740,7 +738,7 @@ class Population(PopulationBase):
             self.__vertex.set_label(label)
 
     def __create_vertex(
-            self, model: _CellType, size: Optional[int], label: Optional[str],
+            self, model: _CellType, size: int | None, label: str | None,
             additional_parameters: _ParamDict) -> None:
         """
         :param model: The implementation of the individual neurons.
@@ -767,7 +765,7 @@ class Population(PopulationBase):
 
     @staticmethod
     def create(
-            cellclass: _CellTypeArg, cellparams: Optional[_ParamDict] = None,
+            cellclass: _CellTypeArg, cellparams: _ParamDict | None = None,
             n: int = 1) -> 'Population':
         """
         Pass through method to the constructor defined by PyNN.
@@ -803,8 +801,8 @@ class Population(PopulationBase):
 
     @staticmethod
     def __roundsize(
-            size: Union[int, float, None],
-            label: Optional[str]) -> Optional[int]:
+            size: int | float | None,
+            label: str | None) -> int | None:
         # External device population can have a size of None so accept for now
         if size is None or isinstance(size, int):
             return size

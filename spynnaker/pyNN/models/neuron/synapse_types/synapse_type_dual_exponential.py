@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
@@ -98,7 +97,7 @@ class SynapseTypeDualExponential(AbstractSynapseType):
         return 3
 
     @overrides(AbstractSynapseType.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         if target == "excitatory":
             return 0
         elif target == "excitatory2":

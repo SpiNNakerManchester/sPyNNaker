@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Optional
+from typing import Iterable
 
 from spinn_utilities.overrides import overrides
 
@@ -38,11 +38,11 @@ class PushBotEthernetLEDDevice(
 
     def __init__(
             self, led: PushBotLED, protocol: MunichIoSpiNNakerLinkProtocol,
-            start_active_time_front: Optional[int] = None,
-            start_active_time_back: Optional[int] = None,
-            start_total_period: Optional[int] = None,
-            start_frequency: Optional[int] = None,
-            timesteps_between_send: Optional[int] = None):
+            start_active_time_front: int | None = None,
+            start_active_time_back: int | None = None,
+            start_total_period: int | None = None,
+            start_frequency: int | None = None,
+            timesteps_between_send: int | None = None):
         """
         :param led: The LED to control
         :param protocol:

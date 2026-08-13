@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import math
-from typing import Union
 
 
 class RunningStats:
@@ -28,7 +27,7 @@ class RunningStats:
         self.__mean_2 = 0.0
         self.__n_items = 0
 
-    def add_item(self, x: Union[int, float]) -> None:
+    def add_item(self, x: int | float) -> None:
         """
         Adds an item to the running statistics.
 

@@ -17,7 +17,6 @@ from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     NamedTuple,
-    Optional,
     Sequence,
     cast,
 )
@@ -100,13 +99,13 @@ class SynapseRegionReferences(NamedTuple):
     """
     Indices of regions of synapse-implementing binaries.
     """
-    synapse_params: Optional[int] = None
-    pop_table: Optional[int] = None
-    synaptic_matrix: Optional[int] = None
-    synapse_dynamics: Optional[int] = None
-    structural_dynamics: Optional[int] = None
-    bitfield_filter: Optional[int] = None
-    connection_builder: Optional[int] = None
+    synapse_params: int | None = None
+    pop_table: int | None = None
+    synaptic_matrix: int | None = None
+    synapse_dynamics: int | None = None
+    structural_dynamics: int | None = None
+    bitfield_filter: int | None = None
+    connection_builder: int | None = None
 
 
 @dataclass(frozen=True)
@@ -217,11 +216,11 @@ class SynapticMatrices:
         self.__max_gen_data = 0
         self.__on_host_matrices: list[SynapticMatrixApp] = []
         self.__on_machine_matrices: list[SynapticMatrixApp] = []
-        self.__generated_data: Optional[NDArray[uint32]] = None
+        self.__generated_data: NDArray[uint32] | None = None
         self.__generated_data_size = 0
-        self.__master_pop_data: Optional[NDArray[uint32]] = None
+        self.__master_pop_data: NDArray[uint32] | None = None
         self.__bit_field_size = 0
-        self.__bit_field_key_map: Optional[NDArray[uint32]] = None
+        self.__bit_field_key_map: NDArray[uint32] | None = None
 
     @property
     def max_gen_data(self) -> int:
@@ -342,7 +341,7 @@ class SynapticMatrices:
             len(self.__bit_field_key_map) * BYTES_PER_WORD)
 
     def __write_pop_table(self, spec: DataSpecificationBase,
-                          poptable_ref: Optional[int] = None) -> None:
+                          poptable_ref: int | None = None) -> None:
         assert self.__master_pop_data is not None
         master_pop_table_sz = len(self.__master_pop_data) * BYTES_PER_WORD
         spec.reserve_memory_region(
@@ -396,7 +395,7 @@ class SynapticMatrices:
 
     def __write_synapse_expander_data_spec(
             self, spec: DataSpecificationBase, post_vertex_slice: Slice,
-            connection_builder_ref: Optional[int] = None) -> None:
+            connection_builder_ref: int | None = None) -> None:
         """
         Write the data spec for the synapse expander.
 
@@ -480,7 +479,7 @@ class SynapticMatrices:
 
     def __app_key_and_mask(
             self, app_edge: ProjectionApplicationEdge,
-            s_info: SynapseInformation) -> Optional[AppKeyInfo]:
+            s_info: SynapseInformation) -> AppKeyInfo | None:
         """
         Get a key and mask for an incoming application vertex as a whole.
 
@@ -498,7 +497,7 @@ class SynapticMatrices:
 
     def __delay_app_key_and_mask(
             self, app_edge: ProjectionApplicationEdge,
-            s_info: SynapseInformation) -> Optional[AppKeyInfo]:
+            s_info: SynapseInformation) -> AppKeyInfo | None:
         """
         Get a key and mask for a whole incoming delayed application
         vertex, or return `None` if no delay edge exists.

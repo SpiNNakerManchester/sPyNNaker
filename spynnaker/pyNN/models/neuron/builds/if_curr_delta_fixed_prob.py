@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
@@ -39,7 +38,7 @@ class IFCurrDeltaFixedProb(AbstractPyNNNeuronModelStandard):
             v_thresh: ModelParameter = 1.0, p_thresh: ModelParameter = 1.0,
             tau_refrac: ModelParameter = 0.0, i_offset: ModelParameter = 0.0,
             v: ModelParameter = 0.0, isyn_exc: ModelParameter = 0.0,
-            isyn_inh: ModelParameter = 0.0, seed: Optional[int] = None):
+            isyn_inh: ModelParameter = 0.0, seed: int | None = None):
         """
         :param tau_m: :math:`\\tau_m`
         :param cm: :math:`C_m`

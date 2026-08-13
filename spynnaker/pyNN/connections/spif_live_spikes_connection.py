@@ -15,7 +15,7 @@
 import logging
 import struct
 from threading import Thread
-from typing import Callable, Final, Iterable, Optional
+from typing import Callable, Final, Iterable
 
 from typing_extensions import TypeAlias
 
@@ -85,12 +85,12 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         "__start_resume_callbacks",
     )
 
-    def __init__(self, receive_labels: Optional[Iterable[str]],
+    def __init__(self, receive_labels: Iterable[str] | None,
                  spif_host: str, spif_port: int = _DEFAULT_SPIF_PORT,
                  events_per_packet: int = _EVENTS_PER_PACKET,
                  time_per_packet: int = _US_PER_PACKET,
-                 local_host: Optional[str] = None,
-                 local_port: Optional[int] = None):
+                 local_host: str | None = None,
+                 local_port: int | None = None):
         """
         :param receive_labels:
             Labels of vertices from which live events will be received.
@@ -136,8 +136,8 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
                 self.__start_resume_callbacks[label] = []
                 self.__pause_stop_callbacks[label] = []
                 self.__init_callbacks[label] = []
-        self.__receiver_listener: Optional[ConnectionListener[bytes]] = None
-        self.__receiver_connection: Optional[UDPConnection] = None
+        self.__receiver_listener: ConnectionListener[bytes] | None = None
+        self.__receiver_connection: UDPConnection | None = None
         self.__error_keys: set[int] = set()
 
     def add_receive_label(self, label: str) -> None:

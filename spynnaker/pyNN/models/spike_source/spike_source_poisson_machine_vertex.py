@@ -19,10 +19,8 @@ from enum import IntEnum
 from typing import (
     TYPE_CHECKING,
     Iterable,
-    Optional,
     Sequence,
     TypeVar,
-    Union,
     cast,
 )
 
@@ -108,7 +106,7 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 
 
-def _flatten(alist: Iterable[Union[T, Iterable[T]]]) -> Iterable[T]:
+def _flatten(alist: Iterable[T | Iterable[T]]) -> Iterable[T]:
     for item in alist:
         if hasattr(item, "__iter__"):
             yield from _flatten(item)
@@ -264,7 +262,7 @@ class SpikeSourcePoissonMachineVertex(
 
     def __init__(
             self, sdram: AbstractSDRAM, is_recording: bool,
-            label: Optional[str], app_vertex: SpikeSourcePoissonVertex,
+            label: str | None, app_vertex: SpikeSourcePoissonVertex,
             vertex_slice: Slice):
         """
         :param sdram: SDRAM usage of this vertex
@@ -282,8 +280,8 @@ class SpikeSourcePoissonMachineVertex(
             label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__is_recording = is_recording
         self.__sdram = sdram
-        self.__sdram_partition: Optional[
-            SourceSegmentedSDRAMMachinePartition] = None
+        self.__sdram_partition: (
+                SourceSegmentedSDRAMMachinePartition | None) = None
         self.__rate_changed = True
 
     @property
@@ -497,7 +495,7 @@ class SpikeSourcePoissonMachineVertex(
 
         # List starts with n_items, so start with 0.  Use arrays to allow
         # numpy concatenation to work.
-        data_items: list[Union[Sequence[int], numpy.ndarray]] = []
+        data_items: list[Sequence[int] | numpy.ndarray] = []
         data_items.append([int(self.__rate_changed)])
         data_items.append([0])
         n_items = 0
@@ -544,7 +542,7 @@ class SpikeSourcePoissonMachineVertex(
         # Write Key info for this core:
         routing_info = SpynnakerDataView.get_routing_infos()
         key = routing_info.get_single_key_from(self)
-        keys: Union[Sequence[int], numpy.ndarray]
+        keys: Sequence[int] | numpy.ndarray
         if key is None:
             spec.write_value(0)
             keys = [0] * self.vertex_slice.n_atoms

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Optional, final
+from typing import Iterable, final
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
@@ -39,7 +39,7 @@ class SplitterPopulationVertex(
 
     def __init__(self) -> None:
         super().__init__()
-        self.__slices: Optional[list[Slice]] = None
+        self.__slices: list[Slice] | None = None
 
     @final
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)

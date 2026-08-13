@@ -16,7 +16,7 @@ from __future__ import annotations
 import ctypes
 import os
 from enum import IntEnum
-from typing import Optional, Sequence, cast
+from typing import Sequence, cast
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -180,7 +180,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
             NeuronProvenance.N_ITEMS +
             LocalOnlyProvenance.N_ITEMS + MainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
-        self.__key: Optional[int] = None
+        self.__key: int | None = None
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales

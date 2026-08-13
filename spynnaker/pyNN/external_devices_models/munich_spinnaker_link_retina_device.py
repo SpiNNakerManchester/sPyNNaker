@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Literal, Optional, Union
+from typing import Iterable, Literal
 
 from typing_extensions import TypeAlias
 
@@ -81,20 +81,20 @@ class MunichRetinaDevice(
     DOWN_POLARITY = "DOWN"
     MERGED_POLARITY: Literal["MERGED"] = "MERGED"
     _Polarity: TypeAlias = \
-        Union[Literal["UP"], Literal["DOWN"], Literal["MERGED"], None]
+        Literal["UP"] | Literal["DOWN"] | Literal["MERGED"] | None
 
     #: Select the left retina
     LEFT_RETINA = "LEFT"
     #: Select the right retina
     RIGHT_RETINA = "RIGHT"
     _RETINAS = frozenset((LEFT_RETINA, RIGHT_RETINA))
-    _Retinas: TypeAlias = Union[Literal["LEFT"], Literal["RIGHT"]]
+    _Retinas: TypeAlias = Literal["LEFT"] | Literal["RIGHT"]
 
     def __init__(
             self, retina_key: int, spinnaker_link_id: int,
             position: _Retinas, label: str = "MunichRetinaDevice",
             polarity: _Polarity = None,
-            board_address: Optional[str] = None):
+            board_address: str | None = None):
         """
         :param retina_key:
         :param spinnaker_link_id:

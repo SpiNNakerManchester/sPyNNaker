@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Sequence
 
 import numpy
 from numpy import int32, uint32
@@ -60,7 +60,7 @@ class OneToOneOffsetConnector(
     __slots__ = ("__n_neurons_per_group", "__offset", "__wrap")
 
     def __init__(self, offset: int, wrap: bool,
-                 n_neurons_per_group: Optional[int] = None,
+                 n_neurons_per_group: int | None = None,
                  safe: bool = True, verbose: bool = False,
                  callback: None = None):
         """
@@ -125,8 +125,8 @@ class OneToOneOffsetConnector(
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
 
         # At most each pre-neuron will one post neuron
         return 1

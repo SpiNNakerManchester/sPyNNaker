@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Iterable, Optional
+from typing import TYPE_CHECKING, Any, Iterable
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
@@ -113,7 +113,7 @@ class SynapseDynamicsSTDP(
             voltage_dependence: None = None,
             dendritic_delay_fraction: float = 1.0,
             weight: _In_Types = StaticSynapse.default_parameters['weight'],
-            delay: _In_Types = None, pad_to_length: Optional[int] = None,
+            delay: _In_Types = None, pad_to_length: int | None = None,
             backprop_delay: bool = True):
         """
         :param timing_dependence:
@@ -142,7 +142,7 @@ class SynapseDynamicsSTDP(
         self.__dendritic_delay_fraction = float(dendritic_delay_fraction)
         self.__pad_to_length = pad_to_length
         self.__backprop_delay = backprop_delay
-        self.__neuromodulation: Optional[SynapseDynamicsNeuromodulation] = None
+        self.__neuromodulation: SynapseDynamicsNeuromodulation | None = None
 
         if self.__dendritic_delay_fraction != 1.0:
             raise NotImplementedError("All delays must be dendritic!")
@@ -263,7 +263,7 @@ class SynapseDynamicsSTDP(
         self.__backprop_delay = bool(backprop_delay)
 
     @property
-    def neuromodulation(self) -> Optional[SynapseDynamicsNeuromodulation]:
+    def neuromodulation(self) -> SynapseDynamicsNeuromodulation | None:
         """
         Synapses that target a neuromodulation receptor.
         """
@@ -654,7 +654,7 @@ class SynapseDynamicsSTDP(
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
-    def pad_to_length(self) -> Optional[int]:
+    def pad_to_length(self) -> int | None:
         return self.__pad_to_length
 
     @property

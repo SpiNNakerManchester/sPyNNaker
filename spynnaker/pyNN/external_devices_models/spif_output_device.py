@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Optional
+from typing import Iterable
 
 from spinn_utilities.config_holder import set_config
 from spinn_utilities.overrides import overrides
@@ -81,13 +81,13 @@ class SPIFOutputDevice(
         "__output_key_shift",
     )
 
-    def __init__(self, board_address: Optional[str] = None,
-                 chip_coords: Optional[tuple[int, int]] = None,
-                 label: Optional[str] = None,
+    def __init__(self, board_address: str | None = None,
+                 chip_coords: tuple[int, int] | None = None,
+                 label: str | None = None,
                  create_database: bool = True,
-                 database_notify_host: Optional[str] = None,
-                 database_notify_port_num: Optional[int] = None,
-                 database_ack_port_num: Optional[int] = None,
+                 database_notify_host: str | None = None,
+                 database_notify_port_num: int | None = None,
+                 database_ack_port_num: int | None = None,
                  output_key_shift: int = 24):
         """
         :param board_address: The board IP address of the SPIF device

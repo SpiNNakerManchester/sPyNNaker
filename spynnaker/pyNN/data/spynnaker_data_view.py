@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Iterator, Optional
+from typing import TYPE_CHECKING, Iterator
 
 from spinn_utilities.log import FormatAdapter
 
@@ -45,7 +45,7 @@ class _SpynnakerDataModel:
     What data is held where and how can change without notice.
     """
 
-    __singleton: Optional['_SpynnakerDataModel'] = None
+    __singleton: '_SpynnakerDataModel' | None = None
 
     __slots__ = (
         # Data values cached
@@ -67,7 +67,7 @@ class _SpynnakerDataModel:
         Clears out all data.
         """
         self._id_counter = 0
-        self._min_delay: Optional[float] = None
+        self._min_delay: float | None = None
         # Using a dict to verify if later could be stored here only
         self._populations: set[Population] = set()
         self._projections: set[Projection] = set()

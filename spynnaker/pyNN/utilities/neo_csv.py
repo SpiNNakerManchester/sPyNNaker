@@ -21,8 +21,6 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Iterable,
-    Optional,
-    Union,
 )
 
 import numpy
@@ -78,7 +76,7 @@ class NeoCsv:
     def _csv_variable_metdata(
             self, csv_writer: CSVWriter, variable_type: str, variable: str,
             t_start: float, t_stop: float, sampling_interval_ms: float,
-            units: Optional[str]) -> None:
+            units: str | None) -> None:
         """
         Writes the metadata for a variable to CSV
 
@@ -255,7 +253,7 @@ class NeoCsv:
     def _insert_matrix_data(
             self, variable: str, segment: Segment, signal_array: NDArray,
             indexes: NDArray[integer], t_start: float, sampling_rate: Quantity,
-            units: Union[Quantity, str, None]) -> None:
+            units: Quantity | str | None) -> None:
         """
         Adds a data item that is an analog signal to a neo segment.
 

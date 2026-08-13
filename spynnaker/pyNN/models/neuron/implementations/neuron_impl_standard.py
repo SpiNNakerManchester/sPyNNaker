@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, Mapping, Optional, Sequence
+from typing import Any, Mapping, Sequence
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
@@ -79,7 +79,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
             neuron_model: NeuronModel, input_type: AbstractInputType,
             synapse_type: AbstractSynapseType,
             threshold_type: AbstractThresholdType,
-            additional_input_type: Optional[AbstractAdditionalInput] = None):
+            additional_input_type: AbstractAdditionalInput | None = None):
         """
         :param model_name:
         :param binary:
@@ -141,7 +141,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
         return self.__synapse_type.get_n_synapse_types()
 
     @overrides(AbstractNeuronImpl.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         return self.__synapse_type.get_synapse_id_by_target(target)
 
     @overrides(AbstractNeuronImpl.get_synapse_targets)

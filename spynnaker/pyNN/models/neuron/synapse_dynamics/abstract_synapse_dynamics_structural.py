@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable, Optional
+from typing import TYPE_CHECKING, Iterable
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -132,7 +132,7 @@ class AbstractSynapseDynamicsStructural(metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def seed(self) -> Optional[int]:
+    def seed(self) -> int | None:
         """
         The seed to control the randomness.
         """

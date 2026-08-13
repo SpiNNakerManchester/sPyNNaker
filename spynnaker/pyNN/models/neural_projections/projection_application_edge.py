@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, cast
+from typing import TYPE_CHECKING, cast
 
 from typing_extensions import TypeGuard
 
@@ -46,9 +46,9 @@ class _Dynamics:
     """
     Holds late-initialised class references.
     """
-    _Structural: Optional[type[AbstractSynapseDynamicsStructural]] = None
-    _STDP: Optional[type[SynapseDynamicsSTDP]] = None
-    _Neuromodulation: Optional[type[SynapseDynamicsNeuromodulation]] = None
+    _Structural: type[AbstractSynapseDynamicsStructural] | None = None
+    _STDP: type[SynapseDynamicsSTDP] | None = None
+    _Neuromodulation: type[SynapseDynamicsNeuromodulation] | None = None
 
     @classmethod
     def structural(cls) -> type[AbstractSynapseDynamicsStructural]:
@@ -139,7 +139,7 @@ class ProjectionApplicationEdge(ApplicationEdge):
             self, pre_vertex: PopulationApplicationVertex,
             post_vertex: PopulationVertex,
             synapse_information: SynapseInformation,
-            label: Optional[str] = None):
+            label: str | None = None):
         """
         :param pre_vertex:
         :param post_vertex:
@@ -157,7 +157,7 @@ class ProjectionApplicationEdge(ApplicationEdge):
 
         # The edge from the delay extension of the pre_vertex to the
         # post_vertex - this might be None if no long delays are present
-        self.__delay_edge: Optional[DelayedApplicationEdge] = None
+        self.__delay_edge: DelayedApplicationEdge | None = None
 
     def add_synapse_information(
             self, synapse_information: SynapseInformation) -> None:
@@ -183,7 +183,7 @@ class ProjectionApplicationEdge(ApplicationEdge):
         return self.__synapse_information
 
     @property
-    def delay_edge(self) -> Optional[DelayedApplicationEdge]:
+    def delay_edge(self) -> DelayedApplicationEdge | None:
         """
         Settable.
         """

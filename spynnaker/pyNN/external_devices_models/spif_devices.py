@@ -19,7 +19,7 @@ Devices connected to the SpiNNaker peripheral interface (`SPIF`_).
 """
 
 from enum import IntEnum
-from typing import Callable, Optional
+from typing import Callable
 
 from spinn_utilities.overrides import overrides
 
@@ -115,7 +115,7 @@ class SPIFRegister(IntEnum):
     # The distiller key shift register (6 distillers)
     DIST_SHIFT_BASE = 240
 
-    def cmd(self, payload: Optional[int] = None,
+    def cmd(self, payload: int | None = None,
             index: int = 0) -> MultiCastCommand:
         """
         Make a command to send to a SPIF device to set a register value.
@@ -411,7 +411,7 @@ class SpiNNFPGARegister(IntEnum):
     #: The base of the masks that can be sent out of SpiNNake (up to 6)
     XP_MASK_BASE = 48
 
-    def cmd(self, payload: Optional[int] = None,
+    def cmd(self, payload: int | None = None,
             index: int = 0) -> MultiCastCommand:
         """
         Make a command to send to the FPGA to set a register value.

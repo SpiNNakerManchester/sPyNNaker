@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from spinn_utilities.overrides import overrides
 
@@ -41,9 +40,9 @@ class SpikeInjector(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
             self, n_neurons: int, label: str, *,
-            port: Optional[int] = None, virtual_key: Optional[int] = None,
+            port: int | None = None, virtual_key: int | None = None,
             reserve_reverse_ip_tag: bool = False,
-            splitter: Optional[AbstractSplitterCommon] = None) \
+            splitter: AbstractSplitterCommon | None = None) \
             -> SpikeInjectorVertex:
         """
         :param port:
