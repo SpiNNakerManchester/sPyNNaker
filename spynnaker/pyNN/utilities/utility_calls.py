@@ -43,6 +43,7 @@ from spinn_front_end_common.utilities.constants import (
 )
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
+from spynnaker.pyNN.types import IoDest
 from spynnaker.pyNN.utilities.constants import WRITE_BANDWIDTH_BYTES_PER_SECOND
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsBinomialImpl,
@@ -57,9 +58,6 @@ from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsUniformImpl,
     RandomStatsVonmisesImpl,
 )
-
-if TYPE_CHECKING:
-    from spynnaker.pyNN.types import IoDest
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
