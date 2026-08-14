@@ -15,6 +15,7 @@
 """
 Types (and related) that are useful for implementing connectors.
 """
+from __future__ import annotations
 
 from typing import Final, Iterable, Optional, Sequence, Union
 
