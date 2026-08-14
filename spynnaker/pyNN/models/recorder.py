@@ -31,7 +31,6 @@ from spinn_utilities.logger_utils import warn_once
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.types import IoDest
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import check_io
 
@@ -39,6 +38,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.common import PopulationApplicationVertex
     from spynnaker.pyNN.models.common.types import Names
     from spynnaker.pyNN.models.populations import Population
+    from spynnaker.pyNN.types import IoDest
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

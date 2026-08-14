@@ -17,7 +17,7 @@ Types (and related) that are useful for implementing connectors.
 """
 from __future__ import annotations
 
-from typing import Final, Iterable, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Final, Iterable, Optional, Sequence, Union
 
 import neo
 import numpy
@@ -38,8 +38,6 @@ Delays: Final['TypeAlias'] = \
 WeightsDelysIn: Final['TypeAlias'] = Optional[Union[
     float, str, RandomDistribution, Iterable[float], NDArray[numpy.float64]]]
 
-IoDest: TypeAlias = str | neo.baseio.BaseIO | None  # pylint: disable=no-member
-
 ViewIndices = Union[None, Sequence[int], NDArray[numpy.integer]]
 #: :meta private:
 Selector: TypeAlias = Union[
@@ -47,6 +45,9 @@ Selector: TypeAlias = Union[
     NDArray[numpy.integer]]
 
 WeightScales: TypeAlias = Union[NDArray[numpy.floating], Sequence[float]]
+
+if TYPE_CHECKING:
+    IoDest: TypeAlias = str | neo.baseio.BaseIO | None  # pylint: disable=no-member
 
 
 def is_scalar(value: Weights) -> TypeGuard[Union[int, float]]:

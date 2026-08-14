@@ -55,9 +55,11 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.types import Names, Values
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
     from spynnaker.pyNN.models.recorder import Recorder
-    from spynnaker.pyNN.types import IoDest
 
     from .population import Population
+
+if TYPE_CHECKING:
+    from spynnaker.pyNN.types import IoDest
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

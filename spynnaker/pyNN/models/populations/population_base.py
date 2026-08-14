@@ -37,12 +37,12 @@ from spinn_utilities.logger_utils import warn_once
 from pacman.model.graphs.application import ApplicationVertex
 
 from spynnaker.pyNN.models.recorder import Recorder
-from spynnaker.pyNN.types import IoDest
 
 if TYPE_CHECKING:
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
 
     from spynnaker.pyNN.models.common.types import Names
+    from spynnaker.pyNN.types import IoDest
 
     from .population_view import IDMixin
 

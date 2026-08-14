@@ -15,12 +15,14 @@
 """
 Utility package containing simple helper functions.
 """
+from __future__ import annotations
+
 import logging
 import math
 import os
 from collections.abc import Sized
 from math import isnan
-from typing import Optional, Union, cast
+from typing import TYPE_CHECKING, Optional, Union, cast
 
 import neo
 import numpy
@@ -41,7 +43,6 @@ from spinn_front_end_common.utilities.constants import (
 )
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
-from spynnaker.pyNN.types import IoDest
 from spynnaker.pyNN.utilities.constants import WRITE_BANDWIDTH_BYTES_PER_SECOND
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsBinomialImpl,
@@ -56,6 +57,9 @@ from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsUniformImpl,
     RandomStatsVonmisesImpl,
 )
+
+if TYPE_CHECKING:
+    from spynnaker.pyNN.types import IoDest
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
