@@ -41,6 +41,7 @@ if TYPE_CHECKING:
 
     from spynnaker.pyNN.models.common.types import Names
     from spynnaker.pyNN.types import IoDest
+
     from .population_view import IDMixin
 
 logger = FormatAdapter(logging.getLogger(__name__))
