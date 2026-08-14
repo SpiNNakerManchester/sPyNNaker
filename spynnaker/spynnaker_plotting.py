@@ -18,7 +18,7 @@ https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/utility/plotting.py
 """
 
 from types import ModuleType
-from typing import Any, TypeAlias, Union
+from typing import Any, TypeAlias
 
 import numpy as np
 import quantities
@@ -36,8 +36,8 @@ try:
 except ImportError:
     _matplotlib_missing = True
 
-TaData: TypeAlias = Union[
-    list[SpikeTrain], SpikeTrainList, AnalogSignal, NDArray, Block, Segment]
+TaData: TypeAlias = (list[SpikeTrain] | SpikeTrainList | AnalogSignal |
+                     NDArray | Block | Segment)
 
 
 def _handle_options(axes: Axes, options: dict[str, Any]) -> None:
@@ -92,7 +92,7 @@ def _plot_spikes(axes: Axes, spike_times: NDArray, neurons: NDArray,
 
 
 def plot_spiketrains(
-        axes: Axes, spiketrains: Union[list[SpikeTrain], SpikeTrainList],
+        axes: Axes, spiketrains: list[SpikeTrain] | SpikeTrainList,
         label: str = '', **options: Any) -> None:
     """
     Plot all spike trains in a Segment in a raster plot.
@@ -301,7 +301,7 @@ class SpynnakerPanel:
 
     @staticmethod
     def __plot_list(
-            axes: Axes, datum: Union[list[SpikeTrain], SpikeTrainList],
+            axes: Axes, datum: list[SpikeTrain] | SpikeTrainList,
             label: str, properties: dict[str, Any]) -> None:
         if not isinstance(datum[0], SpikeTrain):
             raise ValueError(f"Can't handle lists of type {type(datum)}")

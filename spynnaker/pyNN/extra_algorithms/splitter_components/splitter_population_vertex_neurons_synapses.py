@@ -14,7 +14,7 @@
 import logging
 import math
 from collections import defaultdict
-from typing import Optional, Sequence, cast
+from typing import Sequence, cast
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -322,7 +322,7 @@ class SplitterPopulationVertexNeuronsSynapses(
             neuron_vertex: PopulationNeuronsMachineVertex,
             atoms_per_core: int, synaptic_matrices: SynapticMatrices) -> tuple[
                 SynapseRegionReferences, str,
-                Optional[MulticastEdgePartition],
+                MulticastEdgePartition | None,
                 PopulationSynapsesMachineVertexLead]:
         """
         Add the first synapse core for a neuron core.  This core will
@@ -368,7 +368,7 @@ class SplitterPopulationVertexNeuronsSynapses(
             self, syn_label: str, s_index: int, vertex_slice: Slice,
             synapse_references: SynapseRegionReferences,
             shared_synapse_sdram: AbstractSDRAM,
-            feedback_partition: Optional[AbstractEdgePartition],
+            feedback_partition: AbstractEdgePartition | None,
             neuron_vertex: PopulationNeuronsMachineVertex)\
             -> PopulationSynapsesMachineVertexShared:
         """
@@ -403,8 +403,8 @@ class SplitterPopulationVertexNeuronsSynapses(
 
     def __add_plastic_feedback(
             self, neuron_vertex: PopulationNeuronsMachineVertex,
-            synapse_vertex: PopulationSynapsesMachineVertexCommon) -> Optional[
-                MulticastEdgePartition]:
+            synapse_vertex: PopulationSynapsesMachineVertexCommon
+            ) -> MulticastEdgePartition | None:
         """
         Add an edge if needed from the neuron core back to the synapse core
         to allow the synapse core to process plastic synapses.
@@ -668,7 +668,7 @@ class SplitterPopulationVertexNeuronsSynapses(
 
     def __get_synapse_sdram(
             self, n_atoms: int,
-            shared_sdram: Optional[MultiRegionSDRAM] = None
+            shared_sdram: MultiRegionSDRAM | None = None
             ) -> MultiRegionSDRAM:
         """
         Get the resources of the synapses of a slice of atoms from a

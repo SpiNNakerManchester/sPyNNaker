@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Iterator, MutableMapping, Optional, cast
+from typing import Iterator, MutableMapping, cast
 
 import numpy
 from numpy import uint32
@@ -88,8 +88,8 @@ class NeuronData:
         :param app_vertex: Vertex to get data from.
         """
         self.__app_vertex = app_vertex
-        self.__neuron_data: Optional[NDArray[uint32]] = None
-        self.__neuron_recording_data: Optional[NDArray[uint32]] = None
+        self.__neuron_data: NDArray[uint32] | None = None
+        self.__neuron_recording_data: NDArray[uint32] | None = None
         self.__generation_done = False
         self.__gen_on_machine = False
         self.__neuron_data_n_structs = 0

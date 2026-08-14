@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, Union, cast
+from typing import Any, cast
 
 import numpy
 from numpy import int32, uint32
@@ -66,7 +66,7 @@ PARAM_TYPE_BY_NAME = {
     "exponential_clipped": 6
 }
 
-_ParamType: TypeAlias = Union[int, float, RandomDistribution]
+_ParamType: TypeAlias = int | float | RandomDistribution
 
 
 def param_generator_id(value: _ParamType) -> int:

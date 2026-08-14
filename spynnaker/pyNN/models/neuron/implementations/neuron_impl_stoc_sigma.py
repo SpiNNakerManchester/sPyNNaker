@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Mapping, Optional, Sequence
+from typing import Mapping, Sequence
 
 from pyNN.random import NumpyRNG
 
@@ -54,7 +54,7 @@ class NeuronImplStocSigma(AbstractNeuronImpl):
 
     def __init__(self, tau_refrac: ModelParameter, alpha: ModelParameter,
                  bias: ModelParameter, refract_init: ModelParameter,
-                 seed: Optional[int]):
+                 seed: int | None):
         """
         :param tau_refrac:
         :param alpha:
@@ -104,7 +104,7 @@ class NeuronImplStocSigma(AbstractNeuronImpl):
         return 2
 
     @overrides(AbstractNeuronImpl.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         if target == "excitatory":
             return 0
         elif target == "inhibitory":

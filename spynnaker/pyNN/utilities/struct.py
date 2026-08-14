@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from enum import Enum
-from typing import Any, Mapping, Optional, Sequence, Union
+from typing import Any, Mapping, Sequence
 
 import numpy
 from numpy import integer, uint8, uint32
@@ -39,7 +39,7 @@ from spynnaker.pyNN.models.common.param_generator_data import (
 from spynnaker.pyNN.utilities.utility_calls import convert_to
 
 #: The type of values used populate structure instances
-ValueMap: TypeAlias = Mapping[str, Union[int, float, AbstractList[float]]]
+ValueMap: TypeAlias = Mapping[str, int | float | AbstractList[float]]
 
 
 REPEAT_PER_NEURON_FLAG = 0xFFFFFFFF
@@ -69,7 +69,7 @@ class Struct:
     def __init__(
             self, fields: Sequence[tuple[DataType, str]],
             repeat_type: StructRepeat = StructRepeat.PER_NEURON,
-            default_values: Optional[dict[str, Union[int, float]]] = None):
+            default_values: dict[str, int | float] | None = None):
         """
         :param fields:
             The types and names of the fields, ordered as they appear in the
@@ -119,7 +119,7 @@ class Struct:
         return (size_in_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
 
     def get_data(self, values: ValueMap,
-                 vertex_slice: Optional[Slice] = None) -> NDArray[uint32]:
+                 vertex_slice: Slice | None = None) -> NDArray[uint32]:
         """
         :param values: The values to fill in the data with
         :param vertex_slice:
@@ -201,7 +201,7 @@ class Struct:
 
     def get_generator_data(
             self, values: ValueMap,
-            vertex_slice: Optional[Slice] = None) -> NDArray[uint32]:
+            vertex_slice: Slice | None = None) -> NDArray[uint32]:
         """
         :param values: The values to fill in the data with
         :param vertex_slice:
@@ -338,7 +338,7 @@ class Struct:
     def read_data(
             self, data: bytearray | bytes, values: RangeDictionary,
             data_offset: int = 0,
-            vertex_slice: Optional[Slice] = None) -> None:
+            vertex_slice: Slice | None = None) -> None:
         """
         Read a byte string of data and write to values.
 

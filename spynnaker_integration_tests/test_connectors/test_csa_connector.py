@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Union
 
 import csa  # type: ignore[import]
 import numpy
@@ -25,10 +24,10 @@ from spinnaker_testbase.base_test_case import BaseTestCase
 class CSAConnectorTest(BaseTestCase):
 
     def do_csa_nd_test(
-            self, neurons_per_core_pre: Union[int, tuple[int, ...]],
-            pre_size: int, pre_shape: Optional[BaseStructure],
-            neurons_per_core_post: Union[int, tuple[int, ...]],
-            post_size: int, post_shape: Optional[BaseStructure],
+            self, neurons_per_core_pre: int | tuple[int, ...],
+            pre_size: int, pre_shape: BaseStructure | None,
+            neurons_per_core_post: int | tuple[int, ...],
+            post_size: int, post_shape: BaseStructure | None,
             cset: csa.connset.Mask) -> numpy.typing.NDArray:
         p.setup(1.0)
         pre = p.Population(

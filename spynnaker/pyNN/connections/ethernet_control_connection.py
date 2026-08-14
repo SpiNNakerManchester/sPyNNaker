@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utility_models import MultiCastCommand
@@ -29,8 +28,8 @@ class EthernetControlConnection(LiveEventConnection):
 
     def __init__(
             self, translator: AbstractEthernetTranslator, label: str,
-            live_packet_gather_label: str, local_host: Optional[str] = None,
-            local_port: Optional[int] = None):
+            live_packet_gather_label: str, local_host: str | None = None,
+            local_port: int | None = None):
         """
         :param translator: The translator of multicast to control commands
         :param label: The label of the vertex to attach the translator to
@@ -61,7 +60,7 @@ class EthernetControlConnection(LiveEventConnection):
             label, self._translate, translate_key=False)
 
     def _translate(self, label: str, key: int,
-                   payload: Optional[int] = None) -> None:
+                   payload: int | None = None) -> None:
         translator = self.__translators[label]
         if payload is None:
             translator.translate_control_packet(MultiCastCommand(key))

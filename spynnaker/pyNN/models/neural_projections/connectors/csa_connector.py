@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Sequence
 
 import numpy
 from numpy.typing import NDArray
@@ -29,7 +29,7 @@ from .abstract_generate_connector_on_host import (
 
 try:
     import csa  # type: ignore[import]
-    _csa_import_error: Optional[ImportError] = None
+    _csa_import_error: ImportError | None = None
 except ImportError as __ex:
     # Importing csa causes problems with readthedocs so allowing it to fail
     _csa_import_error = __ex
@@ -82,8 +82,8 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         self.__cset = cset
 
         # Storage for full connection sets
-        self.__full_connection_set: Optional[list[CSet]] = None
-        self.__full_cset: Optional[list[CSet]] = None
+        self.__full_connection_set: list[CSet] | None = None
+        self.__full_cset: list[CSet] | None = None
 
     @overrides(AbstractConnector.get_parameters)
     def get_parameters(self) -> dict[str, Any]:
@@ -135,8 +135,8 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         if min_delay is None or max_delay is None:
             raise ValueError("min_delay and max_delay must be supplied")
         n_connections_max = n_post_atoms

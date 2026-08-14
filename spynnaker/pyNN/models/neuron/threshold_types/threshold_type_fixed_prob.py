@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from pyNN.random import NumpyRNG
 
@@ -42,7 +41,7 @@ class ThresholdTypeFixedProb(AbstractThresholdType):
     __slots__ = ("__p_thresh", "__random", "__v_thresh")
 
     def __init__(self, v_thresh: ModelParameter, p_thresh: ModelParameter,
-                 seed: Optional[int]):
+                 seed: int | None):
 
         """
         :param v_thresh: :math:`V_{thresh}`

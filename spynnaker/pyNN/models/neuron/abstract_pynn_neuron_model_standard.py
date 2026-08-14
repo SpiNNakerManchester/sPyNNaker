@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from spinn_utilities.overrides import overrides
 
@@ -59,7 +59,7 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             self, model_name: str, binary: str, neuron_model: NeuronModel,
             input_type: AbstractInputType, synapse_type: AbstractSynapseType,
             threshold_type: AbstractThresholdType,
-            additional_input_type: Optional[AbstractAdditionalInput] = None):
+            additional_input_type: AbstractAdditionalInput | None = None):
         """
         :param model_name: Name of the model.
         :param binary: Name of the implementation executable.
@@ -77,17 +77,17 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
     @overrides(AbstractPyNNNeuronModel.create_vertex)  # type: ignore[has-type]
     def create_vertex(
             self, n_neurons: int, label: str, *,
-            spikes_per_second: Optional[float] = None,
-            ring_buffer_sigma: Optional[float] = None,
-            max_expected_summed_weight: Optional[list[float]] = None,
-            incoming_spike_buffer_size: Optional[int] = None,
-            drop_late_spikes: Optional[bool] = None,
-            splitter: Optional[SplitterPopulationVertex] = None,
-            seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
+            spikes_per_second: float | None = None,
+            ring_buffer_sigma: float | None = None,
+            max_expected_summed_weight: list[float] | None = None,
+            incoming_spike_buffer_size: int | None = None,
+            drop_late_spikes: bool | None = None,
+            splitter: SplitterPopulationVertex | None = None,
+            seed: int | None = None, n_colour_bits: int | None = None,
             n_steps_per_timestep: int = 1,
-            neurons_per_core: Optional[Union[int, tuple[int, ...]]] = None,
-            n_synapse_cores: Optional[int] = None,
-            allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
+            neurons_per_core: int | tuple[int, ...] | None = None,
+            n_synapse_cores: int | None = None,
+            allow_delay_extensions: bool | None = None) -> PopulationVertex:
         """
         :param n_steps_per_timestep:
         """

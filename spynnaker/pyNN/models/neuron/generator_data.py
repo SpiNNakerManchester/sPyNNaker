@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Sequence, cast
+from typing import TYPE_CHECKING, Sequence, cast
 
 import numpy
 from numpy import uint32
@@ -48,8 +48,8 @@ class GeneratorData:
     BASE_SIZE = 11 * BYTES_PER_WORD
 
     def __init__(
-            self, synaptic_matrix_offset: Optional[int],
-            delayed_synaptic_matrix_offset: Optional[int],
+            self, synaptic_matrix_offset: int | None,
+            delayed_synaptic_matrix_offset: int | None,
             app_edge: ProjectionApplicationEdge,
             synapse_information: SynapseInformation, max_row_info: MaxRowInfo,
             max_pre_atoms_per_core: int, max_post_atoms_per_core: int):

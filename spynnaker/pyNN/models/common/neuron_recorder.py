@@ -19,7 +19,6 @@ from typing import (
     Collection,
     Iterable,
     Mapping,
-    Optional,
     Sequence,
 )
 
@@ -156,7 +155,7 @@ class NeuronRecorder:
         :param events_per_core_datatypes:
         """
         self.__sampling_rates: dict[str, int] = {}
-        self.__indexes: dict[str, Optional[Sequence[int]]] = {}
+        self.__indexes: dict[str, Sequence[int] | None] = {}
         self.__data_types = data_types
         self.__n_neurons = n_neurons
         self.__bitfield_variables = bitfield_variables
@@ -208,7 +207,7 @@ class NeuronRecorder:
 
     def _rate_and_count_per_slice(
             self, variable: str,
-            vertex_slice: Optional[Slice]) -> tuple[int, int]:
+            vertex_slice: Slice | None) -> tuple[int, int]:
         if variable not in self.__sampling_rates:
             return 0, 0
         if self.__sampling_rates[variable] == 0:
@@ -226,7 +225,7 @@ class NeuronRecorder:
         return 0, 0
 
     def _max_recording_per_slice(
-            self, variable: str, n_atoms: int) -> Optional[int]:
+            self, variable: str, n_atoms: int) -> int | None:
         if variable not in self.__sampling_rates:
             return None
         if self.__sampling_rates[variable] == 0:
@@ -243,7 +242,7 @@ class NeuronRecorder:
 
     def neurons_recording(
             self, variable: str,
-            vertex_slice: Slice) -> Optional[Collection[int]]:
+            vertex_slice: Slice) -> Collection[int] | None:
         """
         :param variable:
         :param vertex_slice:
@@ -299,8 +298,8 @@ class NeuronRecorder:
     def _get_placement_matrix_data(
             self, vertex: MachineVertex, region: int, expected_rows: int,
             missing_str: str, sampling_rate: int, label: str,
-            data_type: DataType, n_per_timestep: int) -> Optional[
-                NDArray[float64]]:
+            data_type: DataType, n_per_timestep: int
+            ) -> NDArray[float64] | None:
         """
         Processes a placement for matrix data.
 
@@ -396,7 +395,7 @@ class NeuronRecorder:
         else:
             return BufferDataType.MATRIX
 
-    def get_data_type(self, variable: str) -> Optional[DataType]:
+    def get_data_type(self, variable: str) -> DataType | None:
         """
         :param variable:
         :returns: Type of the Data for this variable or None if unknown
@@ -517,7 +516,7 @@ class NeuronRecorder:
             if variable in self.__per_timestep_recording)
         return variables
 
-    def _compute_rate(self, sampling_interval: Optional[float]) -> int:
+    def _compute_rate(self, sampling_interval: float | None) -> int:
         """
         Convert a sampling interval into a rate.
         Remember, machine time step is in nanoseconds
@@ -543,7 +542,7 @@ class NeuronRecorder:
                 f"sampling_interval {sampling_interval} is negative")
         return rate
 
-    def _check_indexes(self, indexes: Optional[Collection[int]]) -> None:
+    def _check_indexes(self, indexes: Collection[int] | None) -> None:
         if indexes is None:
             return
 
@@ -568,8 +567,8 @@ class NeuronRecorder:
                 "All indexes larger than population size")
 
     def __check_per_timestep_params(
-            self, variable: str, sampling_interval: Optional[float],
-            indexes: Optional[Collection[int]]) -> None:
+            self, variable: str, sampling_interval: float | None,
+            indexes: Collection[int] | None) -> None:
         """
         Check if certain parameters have been provided for a per-timestep
         variable and if so, raise an Exception.
@@ -583,8 +582,8 @@ class NeuronRecorder:
                 "on the whole population")
 
     def __check_events_per_core_params(
-            self, variable: str, sampling_interval: Optional[float],
-            indexes: Optional[Collection[int]]) -> None:
+            self, variable: str, sampling_interval: float | None,
+            indexes: Collection[int] | None) -> None:
         """
         Check if certain parameters have been provided for an
         events-per-core variable and if so, raise an Exception.
@@ -598,8 +597,8 @@ class NeuronRecorder:
                 "on the whole population")
 
     def _turn_off_recording(
-            self, variable: str, sampling_interval: Optional[float],
-            remove_indexes: Optional[Collection[int]]) -> None:
+            self, variable: str, sampling_interval: float | None,
+            remove_indexes: Collection[int] | None) -> None:
         # If a per-timestep variable, remove it and return
         if variable in self.__per_timestep_variables:
             if variable in self.__per_timestep_recording:
@@ -650,7 +649,7 @@ class NeuronRecorder:
             self.__indexes[variable] = indexes
 
     def _check_complete_overwrite(
-            self, variable: str, indexes: Optional[Collection[int]]) -> None:
+            self, variable: str, indexes: Collection[int] | None) -> None:
         if indexes is None:
             # overwriting all OK!
             return
@@ -668,8 +667,8 @@ class NeuronRecorder:
             f"sampling_intervals for {variable} on one population.")
 
     def _turn_on_recording(
-            self, variable: str, sampling_interval: Optional[float],
-            indexes: Optional[Collection[int]]) -> None:
+            self, variable: str, sampling_interval: float | None,
+            indexes: Collection[int] | None) -> None:
         # If a per-timestep variable, update
         if variable in self.__per_timestep_variables:
             self.__check_per_timestep_params(
@@ -707,8 +706,8 @@ class NeuronRecorder:
             self.__indexes[variable] = sorted(indices)
 
     def set_recording(self, variable: str, new_state: bool,
-                      sampling_interval: Optional[float] = None,
-                      indexes: Optional[Collection[int]] = None) -> None:
+                      sampling_interval: float | None = None,
+                      indexes: Collection[int] | None = None) -> None:
         """
         Turns on the requested recording
 
@@ -1098,7 +1097,7 @@ class NeuronRecorder:
         return True
 
     def get_generator_data(
-            self, vertex_slice: Optional[Slice] = None) -> NDArray[uint32]:
+            self, vertex_slice: Slice | None = None) -> NDArray[uint32]:
         """
         :param vertex_slice:
             The slice to generate the data for, or `None` to generate for
@@ -1122,7 +1121,7 @@ class NeuronRecorder:
 
     def __get_generator_indices(
             self, variable: str,
-            vertex_slice: Optional[Slice]) -> Iterable[int]:
+            vertex_slice: Slice | None) -> Iterable[int]:
         """
         Get the indices of the variables to record in run-length-encoded form.
         """

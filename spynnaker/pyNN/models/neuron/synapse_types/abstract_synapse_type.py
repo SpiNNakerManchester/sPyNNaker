@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional, Sequence
+from typing import Sequence
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
@@ -38,7 +38,7 @@ class AbstractSynapseType(
         raise NotImplementedError
 
     @abstractmethod
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         """
         Get the ID of a synapse given the name.
 

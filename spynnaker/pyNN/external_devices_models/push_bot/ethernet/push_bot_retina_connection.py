@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from threading import RLock
-from typing import Optional
 
 import numpy
 
@@ -68,8 +67,8 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
             pushbot_wifi_connection: PushBotWIFIConnection,
             resolution: PushBotRetinaResolution = (
                     PushBotRetinaResolution.NATIVE_128_X_128),
-            local_host: Optional[str] = None,
-            local_port: Optional[int] = None):
+            local_host: str | None = None,
+            local_port: int | None = None):
         """
         :param retina_injector_label:
         :param pushbot_wifi_connection:
@@ -98,7 +97,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         self.__pushbot_listener.start()
         self.__lock = RLock()
 
-        self.__next_data: Optional[bytearray] = None
+        self.__next_data: bytearray | None = None
         self.__ready = False
 
         self.add_start_resume_callback(

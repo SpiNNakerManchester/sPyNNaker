@@ -18,9 +18,7 @@ from collections import defaultdict
 from typing import (
     TYPE_CHECKING,
     Any,
-    Optional,
     Sequence,
-    Union,
     cast,
 )
 
@@ -48,7 +46,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     __slots__ = ()
 
     # The maximum number of atoms per core for PyNN models
-    _max_atoms_per_core: dict[type, Optional[tuple[int, ...]]] = defaultdict(
+    _max_atoms_per_core: dict[type, tuple[int, ...] | None] = defaultdict(
         lambda: None)
 
     _model_created = False
@@ -85,7 +83,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
 
     @classmethod
     def set_model_max_atoms_per_dimension_per_core(
-            cls, n_atoms: Union[None, int, tuple[int, ...]] = None) -> None:
+            cls, n_atoms: None | int | tuple[int, ...] = None) -> None:
         """
         Set the default maximum number of atoms per dimension per core for
         this model.  This can be overridden by the individual Population.
@@ -201,7 +199,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         """
         return self.__class__.__name__
 
-    def describe(self, template: Optional[str] = 'modeltype_default.txt',
+    def describe(self, template: str | None = 'modeltype_default.txt',
                  engine: str = 'default') -> str:
         """
         Returns a human-readable description of the population.

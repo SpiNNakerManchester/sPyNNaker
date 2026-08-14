@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy import integer, uint32
@@ -125,7 +125,7 @@ def get_max_row_info(
     max_delay_supported = get_maximum_delay_supported_in_ms(
         in_edge.post_vertex.splitter.max_support_delay())
     max_delay = max_delay_supported * (n_delay_stages + 1)
-    pad_to_length: Optional[int] = None
+    pad_to_length: int | None = None
     if isinstance(synapse_info.synapse_dynamics, AbstractSDRAMSynapseDynamics):
         pad_to_length = synapse_info.synapse_dynamics.pad_to_length
 
@@ -350,8 +350,8 @@ def _get_row_data(
     :param ring_buffer_weight_scales:
         The scaling of the weights for the ring buffers of each synapse type
     """
-    fp_data: Union[NDArray[uint32], list[NDArray[uint32]]]
-    pp_data: Union[NDArray[uint32], list[NDArray[uint32]]]
+    fp_data: NDArray[uint32] | list[NDArray[uint32]]
+    pp_data: NDArray[uint32] | list[NDArray[uint32]]
     if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics):
         # Get the static data
         ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
@@ -610,7 +610,7 @@ def _parse_plastic_data(
 
 def _read_plastic_data(
         dynamics: AbstractPlasticSynapseDynamics, n_pre_atoms: int,
-        n_synapse_types: int, row_data: Optional[_RowData], delayed: bool,
+        n_synapse_types: int, row_data: _RowData | None, delayed: bool,
         post_vertex_max_delay_ticks: int, max_atoms_per_core: int,
         ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
     """

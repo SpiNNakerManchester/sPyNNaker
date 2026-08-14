@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Union
 
 import matplotlib.pyplot as plt
 import numpy
@@ -207,8 +206,8 @@ class ArrayConnectorTest(BaseTestCase):
     def do_array_nd_test(
             self, neurons_per_core_pre: tuple[int, ...], pre_size: int,
             pre_shape: BaseStructure,
-            neurons_per_core_post: Union[int, tuple[int, ...]],
-            post_size: int, post_shape: Optional[BaseStructure]) -> None:
+            neurons_per_core_post: int | tuple[int, ...],
+            post_size: int, post_shape: BaseStructure | None) -> None:
         p.setup(1.0)
         pre = p.Population(
             pre_size, p.IF_curr_exp(), structure=pre_shape)

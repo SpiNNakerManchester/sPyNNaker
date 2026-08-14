@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Optional
+from typing import Any
 
 from spinn_utilities.overrides import overrides
 
@@ -39,9 +39,9 @@ class PushBotEthernetRetinaDevice(
             self, protocol: MunichIoSpiNNakerLinkProtocol,
             resolution: PushBotRetinaResolution,
             pushbot_ip_address: str, pushbot_port: int = 56000,
-            injector_port: Optional[int] = None,
-            local_host: Optional[str] = None,
-            local_port: Optional[int] = None,
+            injector_port: int | None = None,
+            local_host: str | None = None,
+            local_port: int | None = None,
             retina_injector_label: str = "PushBotRetinaInjector"):
         """
         :param protocol:

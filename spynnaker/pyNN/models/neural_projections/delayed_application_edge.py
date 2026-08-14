@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Optional, Union, cast
+from typing import TYPE_CHECKING, cast
 
 from spinn_utilities.overrides import overrides
 
@@ -42,10 +42,10 @@ class DelayedApplicationEdge(ApplicationEdge):
     def __init__(
             self, pre_vertex: DelayExtensionVertex,
             post_vertex: PopulationVertex,
-            synapse_information: Union[
-                SynapseInformation, Iterable[SynapseInformation]],
+            synapse_information: SynapseInformation |
+            Iterable[SynapseInformation],
             undelayed_edge: ProjectionApplicationEdge,
-            label: Optional[str] = None):
+            label: str | None = None):
         """
         :param pre_vertex: The delay extension at the start of the edge
         :param post_vertex: The target of the synapses

@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Sized
-from typing import TYPE_CHECKING, Any, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy
 from numpy import float64, floating, integer, uint16, uint32
@@ -71,8 +71,8 @@ class PoolDenseConnector(AbstractConnector):
     )
 
     def __init__(self, weights: ArrayLike,
-                 pool_shape: Union[int, tuple[int], None] = None,
-                 pool_stride: Union[int, tuple[int], None] = None,
+                 pool_shape: int | tuple[int] | None = None,
+                 pool_stride: int | tuple[int] | None = None,
                  positive_receptor_type: str = "excitatory",
                  negative_receptor_type: str = "inhibitory",
                  safe: bool = True, verbose: bool = False,
@@ -177,14 +177,14 @@ class PoolDenseConnector(AbstractConnector):
 
     @staticmethod
     def __to_nd_shape_or_none(
-            shape: Optional[Union[int, tuple[int, ...]]], n_dims: int,
-            param_name: str) -> Optional[NDArray[integer]]:
+            shape: int | tuple[int, ...] | None, n_dims: int,
+            param_name: str) -> NDArray[integer] | None:
         if shape is None:
             return None
         return PoolDenseConnector.__to_nd_shape(shape, n_dims, param_name)
 
     @staticmethod
-    def __to_nd_shape(shape: Union[int, tuple[int, ...]],
+    def __to_nd_shape(shape: int | tuple[int, ...],
                       n_dims: int, param_name: str) -> NDArray[integer]:
         if numpy.isscalar(shape):
             return numpy.array([shape] * n_dims, dtype=int)
@@ -198,8 +198,8 @@ class PoolDenseConnector(AbstractConnector):
     @classmethod
     def get_post_pool_shape(
             cls, pre_shape: tuple[int, ...],
-            pool_shape: Union[int, tuple[int, ...], None] = None,
-            pool_stride: Union[int, tuple[int, ...], None] = None) -> NDArray:
+            pool_shape: int | tuple[int, ...] | None = None,
+            pool_stride: int | tuple[int, ...] | None = None) -> NDArray:
         """
         :param pre_shape: tuple(int)
         :param pool_shape:
@@ -280,8 +280,8 @@ class PoolDenseConnector(AbstractConnector):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         if min_delay is not None and max_delay is not None:
             if not (min_delay <= self.__delay(synapse_info) <= max_delay):
                 return 0

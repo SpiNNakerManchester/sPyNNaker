@@ -18,9 +18,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Optional,
     Sequence,
-    Union,
     final,
 )
 
@@ -37,12 +35,12 @@ from spinn_utilities.logger_utils import warn_once
 from pacman.model.graphs.application import ApplicationVertex
 
 from spynnaker.pyNN.models.recorder import Recorder
-from spynnaker.pyNN.types import IoDest
 
 if TYPE_CHECKING:
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
 
     from spynnaker.pyNN.models.common.types import Names
+    from spynnaker.pyNN.types import IoDest
 
     from .population_view import IDMixin
 
@@ -94,7 +92,7 @@ class PopulationBase(metaclass=AbstractBase):
     def get_data(
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
-            annotations: Optional[dict[str, Any]] = None) -> neo.Block:
+            annotations: dict[str, Any] | None = None) -> neo.Block:
         """
         Return a Neo Block containing the data(spikes, state variables)
         recorded from the Population.
@@ -216,10 +214,10 @@ class PopulationBase(metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def write_data(self, io: Union[str, neo.baseio.BaseIO],
+    def write_data(self, io: str | neo.baseio.BaseIO,
                    variables: Names = 'all',
                    gather: bool = True, clear: bool = False,
-                   annotations: Optional[dict[str, Any]] = None) -> None:
+                   annotations: dict[str, Any] | None = None) -> None:
         """
         Write recorded data to file, using one of the file formats
         supported by Neo.
@@ -254,7 +252,7 @@ class PopulationBase(metaclass=AbstractBase):
 
     @abstractmethod
     def record(self, variables: Names, to_file: IoDest = None,
-               sampling_interval: Optional[float] = None) -> None:
+               sampling_interval: float | None = None) -> None:
         """
         Record the specified variable or variables for all cells in the
         Population or view.
@@ -283,7 +281,7 @@ class PopulationBase(metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def structure(self) -> Optional[BaseStructure]:
+    def structure(self) -> BaseStructure | None:
         """
         The spatial structure of the parent Population.
         """
@@ -315,7 +313,7 @@ class PopulationBase(metaclass=AbstractBase):
 
     @staticmethod
     def _check_params(gather: bool,
-                      annotations: Optional[dict[str, Any]] = None) -> None:
+                      annotations: dict[str, Any] | None = None) -> None:
         if not gather:
             logger.warning(
                 "sPyNNaker only supports gather=True. We will run "

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Sequence, Union
+from typing import Sequence
 
 import numpy
 from numpy.typing import NDArray
@@ -38,10 +38,9 @@ class SpikeSourcePoissonVariable(AbstractPyNNModel):
     default_population_parameters = _population_parameters
 
     def __init__(
-            self, rates: Union[Sequence[float], NDArray[numpy.floating], None],
-            starts: Union[Sequence[int], NDArray[numpy.integer]],
-            durations: Union[
-                Sequence[int], NDArray[numpy.integer], None] = None):
+            self, rates: Sequence[float] | NDArray[numpy.floating] | None,
+            starts: Sequence[int] | NDArray[numpy.integer],
+            durations: Sequence[int] | NDArray[numpy.integer] | None = None):
         """
 =
         :param rates: The spike rate of each neuron
@@ -59,8 +58,8 @@ class SpikeSourcePoissonVariable(AbstractPyNNModel):
 
     @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
-            self, n_neurons: int, label: str, *, seed: Optional[int] = None,
-            splitter: Optional[AbstractSplitterCommon] = None
+            self, n_neurons: int, label: str, *, seed: int | None = None,
+            splitter: AbstractSplitterCommon | None = None
             ) -> SpikeSourcePoissonVertex:
         """
         :param seed:

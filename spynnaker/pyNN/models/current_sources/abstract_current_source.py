@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Mapping, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Mapping, Sequence
 
 from typing_extensions import TypeAlias
 
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
 #: General type of parameters to current sources.
 #: Individual parameters will only be one of these!
-CurrentParameter: TypeAlias = Union[int, float, Sequence[int], Sequence[float]]
+CurrentParameter: TypeAlias = int | float | Sequence[int] | Sequence[float]
 
 
 class CurrentSourceIDs(Enum):
@@ -54,8 +54,8 @@ class AbstractCurrentSource(metaclass=AbstractBase):
         "__population")
 
     def __init__(self) -> None:
-        self.__app_vertex: Optional[PopulationVertex] = None
-        self.__population: Optional[Population] = None
+        self.__app_vertex: PopulationVertex | None = None
+        self.__population: Population | None = None
 
     def inject_into(self, cells: PopulationBase) -> None:
         """
@@ -75,7 +75,7 @@ class AbstractCurrentSource(metaclass=AbstractBase):
         self.__app_vertex = vertex
 
     @property
-    def app_vertex(self) -> Optional[PopulationVertex]:
+    def app_vertex(self) -> PopulationVertex | None:
         """
         The application vertex associated with the current source.
         """
@@ -90,7 +90,7 @@ class AbstractCurrentSource(metaclass=AbstractBase):
         self.__population = population
 
     @property
-    def population(self) -> Optional[Population]:
+    def population(self) -> Population | None:
         """
         The population associated with the current source.
         """

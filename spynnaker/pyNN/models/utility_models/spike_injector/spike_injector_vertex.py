@@ -14,7 +14,7 @@
 
 import logging
 import sys
-from typing import Collection, Optional, Union
+from typing import Collection
 
 import numpy
 from numpy.typing import NDArray
@@ -57,11 +57,10 @@ class SpikeInjectorVertex(
 
     def __init__(
             self, n_neurons: int, label: str,
-            port: Optional[int], virtual_key: Optional[int],
+            port: int | None, virtual_key: int | None,
             reserve_reverse_ip_tag: bool,
-            splitter: Optional[AbstractSplitterCommon],
-            max_atoms_per_core: Optional[
-                Union[int, tuple[int, ...]]] = sys.maxsize):
+            splitter: AbstractSplitterCommon | None,
+            max_atoms_per_core: int | tuple[int, ...] | None = sys.maxsize):
         """
         :param label: The optional name of the vertex.
         """
@@ -73,7 +72,7 @@ class SpikeInjectorVertex(
 
         # Set up for recording
         self.__spike_recorder = EIEIOSpikeRecorder()
-        self.__structure: Optional[BaseStructure] = None
+        self.__structure: BaseStructure | None = None
 
     @overrides(SupportsStructure.set_structure)
     def set_structure(self, structure: BaseStructure) -> None:
@@ -92,8 +91,8 @@ class SpikeInjectorVertex(
 
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(
-            self, name: str, sampling_interval: Optional[float] = None,
-            indices: Optional[Collection[int]] = None) -> None:
+            self, name: str, sampling_interval: float | None = None,
+            indices: Collection[int] | None = None) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if sampling_interval is not None:
@@ -113,7 +112,7 @@ class SpikeInjectorVertex(
 
     @overrides(PopulationApplicationVertex.set_not_recording)
     def set_not_recording(self, name: str,
-                          indices: Optional[Collection[int]] = None) -> None:
+                          indices: Collection[int] | None = None) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if indices is not None:
@@ -159,7 +158,7 @@ class SpikeInjectorVertex(
             raise KeyError(f"Cannot record {name}")
         return vertex_slice.get_raster_ids()
 
-    def describe(self) -> dict[str, Union[str, Collection[str]]]:
+    def describe(self) -> dict[str, str | Collection[str]]:
         """
         :returns: A human-readable description of the cell or synapse type.
         """

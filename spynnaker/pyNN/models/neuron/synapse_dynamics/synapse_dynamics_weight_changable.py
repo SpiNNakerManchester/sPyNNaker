@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Iterable, Optional, cast
+from typing import TYPE_CHECKING, Iterable, cast
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
@@ -383,7 +383,7 @@ class SynapseDynamicsWeightChangable(
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
-    def pad_to_length(self) -> Optional[int]:
+    def pad_to_length(self) -> int | None:
         return None
 
     @overrides(AbstractPlasticSynapseDynamics.validate_connection)

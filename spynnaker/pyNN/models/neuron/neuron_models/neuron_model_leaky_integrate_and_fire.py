@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
@@ -54,7 +53,7 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModel):
     )
 
     def __init__(
-            self, v_init: Optional[ModelParameter], v_rest: ModelParameter,
+            self, v_init: ModelParameter | None, v_rest: ModelParameter,
             tau_m: ModelParameter, cm: ModelParameter,
             i_offset: ModelParameter, v_reset: ModelParameter,
             tau_refrac: ModelParameter):

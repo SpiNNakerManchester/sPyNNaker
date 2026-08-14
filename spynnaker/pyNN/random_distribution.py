@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 import pyNN.random
 from pyNN.random import NumpyRNG, available_distributions
@@ -78,8 +77,8 @@ class RandomDistribution(pyNN.random.RandomDistribution):
     """
     # Pylint is wrong about the super-delegation being useless
     def __init__(  # pylint: disable=useless-super-delegation
-            self, distribution: str, parameters_pos: Optional[tuple] = None,
-            rng: Optional[NumpyRNG] = None, **parameters_named: float):
+            self, distribution: str, parameters_pos: tuple | None = None,
+            rng: NumpyRNG | None = None, **parameters_named: float):
         """
         :param distribution: the name of a random number distribution.
         :param parameters_pos:

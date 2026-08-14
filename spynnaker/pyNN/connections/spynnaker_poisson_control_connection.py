@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import functools
-from typing import Iterable, Optional
+from typing import Iterable
 
 from spinn_utilities.overrides import overrides
 
@@ -41,9 +41,9 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         "__label_to_control_label")
 
     def __init__(
-            self, poisson_labels: Optional[Iterable[str]] = None,
-            local_host: Optional[str] = None,
-            local_port: Optional[int] = NOTIFY_PORT,
+            self, poisson_labels: Iterable[str] | None = None,
+            local_host: str | None = None,
+            local_port: int | None = NOTIFY_PORT,
             control_label_extension: str = "_control"):
         """
         :param poisson_labels:
@@ -59,7 +59,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         """
         self.__control_label_extension = control_label_extension
 
-        control_labels: Optional[Iterable[str]] = None
+        control_labels: Iterable[str] | None = None
         self.__control_label_to_label: dict[str, str] = {}
         self.__label_to_control_label: dict[str, str] = {}
         if poisson_labels is not None:

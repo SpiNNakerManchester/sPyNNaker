@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Optional
+from typing import Iterable
 
 from spinn_utilities.overrides import overrides
 
@@ -38,7 +38,7 @@ class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
     __slots__ = ()
 
     def __init__(self, spinnaker_link_id: int,
-                 board_address: Optional[str] = None):
+                 board_address: str | None = None):
         """
         :param spinnaker_link_id:
             The index of the spinnaker link to which the device is connected
@@ -64,11 +64,11 @@ class MunichMotorDevice(
     __slots__ = ("__dependent_vertices", )
 
     def __init__(
-            self, spinnaker_link_id: int, board_address: Optional[str] = None,
+            self, spinnaker_link_id: int, board_address: str | None = None,
             speed: int = 30, sample_time: int = 4096, update_time: int = 512,
             delay_time: int = 5, delta_threshold: int = 23,
             continue_if_not_different: bool = True,
-            label: Optional[str] = None):
+            label: str | None = None):
         """
         :param spinnaker_link_id:
             The SpiNNaker link to which the motor is connected

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Optional
+from typing import Iterable
 
 from spinn_utilities.overrides import overrides
 
@@ -38,7 +38,7 @@ class PushBotEthernetMotorDevice(
 
     def __init__(self, motor: PushBotMotor,
                  protocol: MunichIoSpiNNakerLinkProtocol,
-                 timesteps_between_send: Optional[int] = None):
+                 timesteps_between_send: int | None = None):
         """
         :param motor: indicates which motor to control
         :param protocol:

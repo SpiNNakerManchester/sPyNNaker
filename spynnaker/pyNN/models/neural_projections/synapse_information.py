@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Sequence
 
 from spinn_utilities.config_holder import get_config_bool
 
@@ -62,8 +62,8 @@ class SynapseInformation:
     )
 
     def __init__(self, connector: AbstractConnector,
-                 pre_population: Union[Population, PopulationView],
-                 post_population: Union[Population, PopulationView],
+                 pre_population: Population | PopulationView,
+                 post_population: Population | PopulationView,
                  prepop_is_view: bool, postpop_is_view: bool,
                  synapse_dynamics: AbstractSynapseDynamics,
                  synapse_type: int, receptor_type: str,
@@ -71,7 +71,7 @@ class SynapseInformation:
                  weights: Weights = None,
                  delays: Delays = None,
                  download_on_pause: bool = False,
-                 partition_id: Optional[str] = None):
+                 partition_id: str | None = None):
         """
         :param connector: The connector connected to the synapse
         :param pre_population: The population sending spikes to the synapse
@@ -117,14 +117,14 @@ class SynapseInformation:
         return self.__connector
 
     @property
-    def pre_population(self) -> Union[Population, PopulationView]:
+    def pre_population(self) -> Population | PopulationView:
         """
         The population sending spikes to the synapse.
         """
         return self.__pre_population
 
     @property
-    def post_population(self) -> Union[Population, PopulationView]:
+    def post_population(self) -> Population | PopulationView:
         """
         The population hosting the synapse.
         """

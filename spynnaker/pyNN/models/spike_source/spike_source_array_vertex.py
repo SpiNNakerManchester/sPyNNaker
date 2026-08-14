@@ -19,9 +19,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Collection,
-    Optional,
     Sequence,
-    Union,
 )
 
 import numpy
@@ -60,12 +58,10 @@ logger = FormatAdapter(logging.getLogger(__name__))
 # Cut off to warn too many spikes sent at one time
 TOO_MANY_SPIKES = 100
 
-_Number: TypeAlias = Union[int, float]
+_Number: TypeAlias = int | float
 
-_SingleList: TypeAlias = Union[
-    Sequence[_Number], NDArray[numpy.integer]]
-_DoubleList: TypeAlias = Union[
-    Sequence[Sequence[_Number]], NDArray[numpy.integer]]
+_SingleList: TypeAlias = Sequence[_Number] | NDArray[numpy.integer]
+_DoubleList: TypeAlias = Sequence[Sequence[_Number]] | NDArray[numpy.integer]
 
 
 def _is_double_list(value: Spikes) -> TypeGuard[_DoubleList]:
@@ -89,8 +85,8 @@ def _as_numpy_ticks(
 
 
 def _send_buffer_times(
-        spike_times: Spikes, time_step: float) -> Union[
-            NDArray[numpy.int64], list[NDArray[numpy.int64]]]:
+        spike_times: Spikes, time_step: float
+        ) -> NDArray[numpy.int64] | list[NDArray[numpy.int64]]:
     # Convert to ticks
     if _is_double_list(spike_times):
         return [_as_numpy_ticks(times, time_step) for times in spike_times]
@@ -121,10 +117,10 @@ class SpikeSourceArrayVertex(
 
     def __init__(
             self, n_neurons: int, spike_times: Spikes, label: str,
-            max_atoms_per_core: Union[int, tuple[int, ...]],
+            max_atoms_per_core: int | tuple[int, ...],
             model: SpikeSourceArray,
-            splitter: Optional[AbstractSplitterCommon],
-            n_colour_bits: Optional[int]):
+            splitter: AbstractSplitterCommon | None,
+            n_colour_bits: int | None):
         """
 
         :param n_neurons: The number of neurons in the population
@@ -137,7 +133,7 @@ class SpikeSourceArrayVertex(
         """
         self.__model_name = "SpikeSourceArray"
         self.__model = model
-        self.__structure: Optional[BaseStructure] = None
+        self.__structure: BaseStructure | None = None
 
         if spike_times is None:
             spike_times = []
@@ -164,7 +160,7 @@ class SpikeSourceArrayVertex(
     @overrides(ReverseIpTagMultiCastSource.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice: Slice, sdram: AbstractSDRAM,
-            label: Optional[str] = None) -> SpikeSourceArrayMachineVertex:
+            label: str | None = None) -> SpikeSourceArrayMachineVertex:
         send_buffer_times = self._filtered_send_buffer_times(vertex_slice)
         machine_vertex = SpikeSourceArrayMachineVertex(
             label=label, app_vertex=self, vertex_slice=vertex_slice,
@@ -333,8 +329,8 @@ class SpikeSourceArrayVertex(
 
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(
-            self, name: str, sampling_interval: Optional[float] = None,
-            indices: Optional[Collection[int]] = None) -> None:
+            self, name: str, sampling_interval: float | None = None,
+            indices: Collection[int] | None = None) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if sampling_interval is not None:
@@ -348,7 +344,7 @@ class SpikeSourceArrayVertex(
 
     @overrides(PopulationApplicationVertex.set_not_recording)
     def set_not_recording(self, name: str,
-                          indices: Optional[Collection[int]] = None) -> None:
+                          indices: Collection[int] | None = None) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if indices is not None:
@@ -381,7 +377,7 @@ class SpikeSourceArrayVertex(
         return None
 
     def describe(
-            self) -> dict[str, Union[str, ParameterHolder, dict[str, Any]]]:
+            self) -> dict[str, str | ParameterHolder | dict[str, Any]]:
         """
         Returns a human-readable description of the cell or synapse type.
 

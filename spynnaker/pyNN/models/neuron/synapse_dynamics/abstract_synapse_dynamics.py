@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, Optional, Sequence, cast
+from typing import TYPE_CHECKING, Any, Sequence, cast
 
 import numpy
 from pyNN.random import RandomDistribution
@@ -270,7 +270,7 @@ class AbstractSynapseDynamics(metaclass=AbstractBase):
 
     def get_delay_minimum(
             self, connector: AbstractConnector,
-            synapse_info: SynapseInformation) -> Optional[float]:
+            synapse_info: SynapseInformation) -> float | None:
         """
         Get the minimum delay for the synapses.
 
@@ -326,7 +326,7 @@ class AbstractSynapseDynamics(metaclass=AbstractBase):
         """
         return connector.get_weight_variance(weights, synapse_info)
 
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         """
         :param target: The name of the synapse
         :returns: The index of the synapse type based on the name,

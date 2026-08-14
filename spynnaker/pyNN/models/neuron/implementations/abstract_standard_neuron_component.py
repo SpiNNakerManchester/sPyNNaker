@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Union
+from typing import Iterable
 
 import numpy
 from numpy import floating
@@ -27,8 +27,8 @@ from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from spynnaker.pyNN.utilities.struct import Struct
 
 #: The type of parameters to a neuron model.
-ModelParameter: TypeAlias = Union[
-    float, Iterable[float], RandomDistribution, NDArray[floating]]
+ModelParameter: TypeAlias = (float | Iterable[float] | RandomDistribution |
+                             NDArray[floating])
 
 
 class AbstractStandardNeuronComponent(metaclass=AbstractBase):
@@ -97,7 +97,7 @@ class AbstractStandardNeuronComponent(metaclass=AbstractBase):
 
     @staticmethod
     def _convert(value: ModelParameter) -> \
-            Union[float, RangedList[float], RandomDistribution]:
+            float | RangedList[float] | RandomDistribution:
         """
         Converts a model parameter into a form that can be ingested by a
         RangeDictionary.

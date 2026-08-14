@@ -18,9 +18,7 @@ from collections.abc import Container
 from typing import (
     TYPE_CHECKING,
     NamedTuple,
-    Optional,
     Sequence,
-    Union,
     cast,
 )
 
@@ -226,7 +224,7 @@ class PopulationMachineNeurons(
         self._neuron_data.write_data(
             spec, self._vertex_slice, self._neuron_regions)
 
-    def __find_default_key(self) -> Optional[int]:
+    def __find_default_key(self) -> int | None:
         routing_info = SpynnakerDataView.get_routing_infos()
         if not self._pop_vertex.extra_partitions:
             return routing_info.get_single_key_from(
@@ -280,7 +278,7 @@ class PopulationMachineNeurons(
 
         # Write whether the key is to be used, and then the key, or 0 if it
         # isn't to be used
-        keys: Union[numpy.ndarray, list[int]]
+        keys: numpy.ndarray | list[int]
         if not self._has_key:
             spec.write_value(data=0)
             keys = [0] * n_atoms
@@ -309,7 +307,7 @@ class PopulationMachineNeurons(
         spec.write_array(keys)
 
     def __in_selector(
-            self, n: Union[int, numpy.integer], selector: Selector) -> bool:
+            self, n: int | numpy.integer, selector: Selector) -> bool:
         if isinstance(selector, Container):
             return n in selector
         return n == selector

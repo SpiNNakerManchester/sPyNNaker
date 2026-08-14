@@ -19,7 +19,6 @@ from typing import (
     TYPE_CHECKING,
     Iterable,
     Sequence,
-    Union,
     cast,
 )
 
@@ -454,7 +453,7 @@ class SynapseDynamicsStructuralCommon(
 
     @abstractmethod
     def _get_seeds(
-            self, app_vertex: Union[None, ApplicationVertex, Slice] = None
+            self, app_vertex: None | ApplicationVertex | Slice = None
             ) -> Sequence[int]:
         """
         Generate a seed for the RNG on chip that is the same for all

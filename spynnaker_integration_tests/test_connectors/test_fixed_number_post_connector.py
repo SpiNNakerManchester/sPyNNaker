@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Union
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -175,10 +174,10 @@ class TestFixedNumberPostConnector(BaseTestCase):
         sim.end()
 
     def do_fixed_number_nd_run(
-            self, neurons_per_core_pre: Union[int, tuple[int, ...]],
-            pre_size: int, pre_shape: Optional[BaseStructure],
+            self, neurons_per_core_pre: int | tuple[int, ...],
+            pre_size: int, pre_shape: BaseStructure | None,
             neurons_per_core_post: int, post_size: int,
-            post_shape: Optional[BaseStructure], fixed_n: int) -> None:
+            post_shape: BaseStructure | None, fixed_n: int) -> None:
         sim.setup(1.0)
         pre = sim.Population(
             pre_size, sim.IF_curr_exp(), structure=pre_shape)

@@ -13,7 +13,7 @@
 # limitations under the License.
 from collections import defaultdict, namedtuple
 from math import ceil, floor, log2
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 from pacman.model.graphs.application import (
     ApplicationVertex,
@@ -142,7 +142,7 @@ def get_sources_for_target(app_vertex: "PopulationVertex") -> dict[
 
 
 def get_first_and_last_slice(pre_vertex: ApplicationVertex) -> \
-        Union[tuple[Slice, Slice], tuple[MDSlice, MDSlice]]:
+        tuple[Slice, Slice] | tuple[MDSlice, MDSlice]:
     """
     :param pre_vertex: The source vertex
     :returns: The first and last slice of an application vertex.

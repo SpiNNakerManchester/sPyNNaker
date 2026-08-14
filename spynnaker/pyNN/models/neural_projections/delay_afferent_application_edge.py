@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from pacman.model.graphs.application import ApplicationEdge
 
@@ -35,7 +35,7 @@ class DelayAfferentApplicationEdge(ApplicationEdge):
 
     def __init__(self, pre_vertex: PopulationApplicationVertex,
                  delay_vertex: DelayExtensionVertex,
-                 label: Optional[str] = None):
+                 label: str | None = None):
         """
         :param pre_vertex:
         :param delay_vertex:

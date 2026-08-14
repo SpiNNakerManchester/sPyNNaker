@@ -18,9 +18,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Iterable,
-    Optional,
     Sequence,
-    Union,
     cast,
     overload,
 )
@@ -80,7 +78,7 @@ class DataPopulation:
         self._indexes = indexes
 
     @overrides(Population.write_data)
-    def write_data(self, io: Union[str, neo.baseio.BaseIO],
+    def write_data(self, io: str | neo.baseio.BaseIO,
                    variables: Names = 'all', gather: bool = True,
                    clear: bool = False,
                    annotations: Annotations = None) -> None:
@@ -95,9 +93,9 @@ class DataPopulation:
         io.write(bl=data)
 
     @overrides(Population.describe)
-    def describe(self, template: Optional[str] = None,
-                 engine: Optional[Union[str, TemplateEngine]] = None
-                 ) -> Union[str, dict[str, Any]]:
+    def describe(self, template: str | None = None,
+                 engine: str | TemplateEngine | None = None
+                 ) -> str | dict[str, Any]:
         # pylint: disable=missing-function-docstring
         if template is not None:
             logger.warning("Ignoring template as not supported in this mode")
@@ -111,7 +109,7 @@ class DataPopulation:
     def get_data(
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
-            annotations: Optional[dict[str, Any]] = None) -> neo.Block:
+            annotations: dict[str, Any] | None = None) -> neo.Block:
         # pylint: disable=missing-function-docstring,protected-access
         Population._check_params(gather, annotations)
         if clear:
@@ -123,7 +121,7 @@ class DataPopulation:
     @overrides(Population.spinnaker_get_data)
     def spinnaker_get_data(
             self, variable: str, as_matrix: bool = False,
-            view_indexes: Optional[Sequence[int]] = None) -> NDArray[floating]:
+            view_indexes: Sequence[int] | None = None) -> NDArray[floating]:
         # pylint: disable=missing-function-docstring
         if view_indexes:
             return self[view_indexes].spinnaker_get_data(variable, as_matrix)
@@ -139,7 +137,7 @@ class DataPopulation:
             return db.get_spike_counts(self.__label, self._indexes)
 
     @overrides(Population.find_units)
-    def find_units(self, variable: str) -> Optional[str]:
+    def find_units(self, variable: str) -> str | None:
         # pylint: disable=missing-function-docstring
         with NeoBufferDatabase(self.__database_file) as db:
             return db.find_units(self.__label, variable)
@@ -177,8 +175,8 @@ class DataPopulation:
         ...
 
     @overrides(Population.id_to_index)
-    def id_to_index(self, id: Union[int, Iterable[int]]
-                    ) -> Union[int, list[int]]:  # @ReservedAssignment
+    def id_to_index(self, id: int | Iterable[int]
+                    ) -> int | list[int]:  # @ReservedAssignment
         # pylint: disable=missing-function-docstring,redefined-builtin
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
@@ -202,8 +200,8 @@ class DataPopulation:
         ...
 
     @overrides(Population.index_to_id)
-    def index_to_id(self, index: Union[int, Iterable[int]]
-                    ) -> Union[int, list[int]]:
+    def index_to_id(self, index: int | Iterable[int]
+                    ) -> int | list[int]:
         # pylint: disable=missing-function-docstring
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:

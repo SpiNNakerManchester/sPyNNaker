@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Optional, Union
+from typing import Iterable
 
 from spinn_utilities.config_holder import get_config_int, get_config_str
 from spinn_utilities.socket_address import SocketAddress
@@ -45,9 +45,9 @@ class SpynnakerExternalDevicePluginManager:
 
     @staticmethod
     def add_database_socket_address(
-            database_notify_host: Optional[str],
-            database_notify_port_num: Optional[int],
-            database_ack_port_num: Optional[int]) -> None:
+            database_notify_host: str | None,
+            database_notify_port_num: int | None,
+            database_ack_port_num: int | None) -> None:
         """
         Creates a new SocketAddress and saves in into the data view
 
@@ -71,20 +71,20 @@ class SpynnakerExternalDevicePluginManager:
     @staticmethod
     def activate_live_output_for(
             population: Population, *,
-            database_notify_host: Optional[str] = None,
-            database_notify_port_num: Optional[int] = None,
-            database_ack_port_num: Optional[int] = None,
-            port: Optional[int] = None, host: Optional[str] = None,
-            tag: Optional[int] = None, strip_sdp: bool = True,
-            use_prefix: bool = False, key_prefix: Optional[int] = None,
-            prefix_type: Optional[EIEIOPrefix] = None,
+            database_notify_host: str | None = None,
+            database_notify_port_num: int | None = None,
+            database_ack_port_num: int | None = None,
+            port: int | None = None, host: str | None = None,
+            tag: int | None = None, strip_sdp: bool = True,
+            use_prefix: bool = False, key_prefix: int | None = None,
+            prefix_type: EIEIOPrefix | None = None,
             message_type: EIEIOType = EIEIOType.KEY_32_BIT,
             right_shift: int = 0, payload_as_time_stamps: bool = True,
             notify: bool = True, use_payload_prefix: bool = True,
-            payload_prefix: Optional[int] = None, payload_right_shift: int = 0,
+            payload_prefix: int | None = None, payload_right_shift: int = 0,
             number_of_packets_sent_per_time_step: int = 0,
             translate_keys: bool = False,
-            partition_ids: Optional[Iterable[str]] = None) -> None:
+            partition_ids: Iterable[str] | None = None) -> None:
         """
         Output the spikes from a given population from SpiNNaker as they
         occur in the simulation.
@@ -179,7 +179,7 @@ class SpynnakerExternalDevicePluginManager:
     @staticmethod
     def activate_live_output_to(
             population: Population,
-            device: Union[Population, ApplicationVertex],
+            device: Population | ApplicationVertex,
             partition_id: str = SPIKE_PARTITION_ID) -> None:
         """
         Activate the output of spikes from a population to an external device.
@@ -225,10 +225,10 @@ class SpynnakerExternalDevicePluginManager:
     def add_poisson_live_rate_control(
             poisson_population: Population, *,
             control_label_extension: str = "_control",
-            receive_port: Optional[int] = None,
-            database_notify_host: Optional[str] = None,
-            database_notify_port_num: Optional[int] = None,
-            database_ack_port_num: Optional[int] = None, notify: bool = True,
+            receive_port: int | None = None,
+            database_notify_host: str | None = None,
+            database_notify_port_num: int | None = None,
+            database_ack_port_num: int | None = None, notify: bool = True,
             reserve_reverse_ip_tag: bool = False) -> None:
         """
         Add a live rate controller to a Poisson population.

@@ -13,7 +13,6 @@
 # limitations under the License.
 import logging
 from math import ceil, log2
-from typing import Optional
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -47,7 +46,7 @@ class ICUBRetinaDevice(Application2DSpiNNakerLinkVertex):
                  height: int = DEFAULT_HEIGHT,
                  sub_width: int = 16, sub_height: int = 16,
                  spinnaker_link_id: int = 0,
-                 board_address: Optional[str] = None):
+                 board_address: str | None = None):
         """
         :param base_key: The key that is common over the whole vertex
         :param width: The width of the retina in pixels

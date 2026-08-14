@@ -17,9 +17,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Final,
-    Optional,
     Sequence,
-    Union,
 )
 
 import numpy
@@ -59,9 +57,9 @@ if TYPE_CHECKING:
     )
 
 
-_TWOD: Final['TypeAlias'] = Union[list[int], tuple[int, int]]
-_KERNAL: Final['TypeAlias'] = Union[
-    float, int, list[float], NDArray[numpy.floating], RandomDistribution]
+_TWOD: Final['TypeAlias'] = list[int] | tuple[int, int]
+_KERNAL: Final['TypeAlias'] = (float | list[float] |
+                               NDArray[numpy.floating] | RandomDistribution)
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 9
@@ -74,7 +72,7 @@ class ConvolutionKernel(ndarray):
 
 
 def shape2word(
-        short1: Union[int, integer], short2: Union[int, integer]) -> uint32:
+        short1: int | integer, short2: int | integer) -> uint32:
     """
     Combines two short values into 1 int by shifting the first 16 places
 
@@ -123,14 +121,14 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     def __init__(
             self, shape_pre: _TWOD, shape_post: _TWOD, shape_kernel: _TWOD,
-            weight_kernel: Optional[_KERNAL] = None,
-            delay_kernel: Optional[_KERNAL] = None,
-            shape_common: Optional[_TWOD] = None,
-            pre_sample_steps_in_post: Optional[_TWOD] = None,
-            pre_start_coords_in_post: Optional[_TWOD] = None,
-            post_sample_steps_in_pre: Optional[_TWOD] = None,
-            post_start_coords_in_pre: Optional[_TWOD] = None,
-            safe: bool = True, space: Optional[Space] = None,
+            weight_kernel: _KERNAL | None = None,
+            delay_kernel: _KERNAL | None = None,
+            shape_common: _TWOD | None = None,
+            pre_sample_steps_in_post: _TWOD | None = None,
+            pre_start_coords_in_post: _TWOD | None = None,
+            post_sample_steps_in_pre: _TWOD | None = None,
+            post_start_coords_in_pre: _TWOD | None = None,
+            safe: bool = True, space: Space | None = None,
             verbose: bool = False, callback: None = None):
         """
         :param shape_pre:
@@ -293,8 +291,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         c = ((pre_c - self._pre_start_w - 1) // self._pre_step_w) + 1
         return (r, c)
 
-    def __get_kernel_vals(self, values: Optional[Union[
-            _KERNAL, WeightsDelays]]) -> Optional[ConvolutionKernel]:
+    def __get_kernel_vals(self, values: _KERNAL | WeightsDelays | None
+                          ) -> ConvolutionKernel | None:
         """
         Convert kernel values given into the correct format.
         """
@@ -321,8 +319,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             f"{self._kernel_h} and width: {self._kernel_w}).")
 
     def __compute_statistics(
-            self, weights: Optional[Weights],
-            delays: Optional[Delays], post_vertex_slice: Slice,
+            self, weights: Weights | None,
+            delays: Delays | None, post_vertex_slice: Slice,
             n_pre_neurons: int) -> tuple[
                 int, NDArray[uint32], NDArray[uint32], NDArray[floating],
                 NDArray[floating]]:
@@ -434,8 +432,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         return numpy.clip(self._kernel_h * self._kernel_w, 0, n_post_atoms)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)

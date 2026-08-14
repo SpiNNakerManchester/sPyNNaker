@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Sequence
 
 import numpy
 from numpy.typing import NDArray
@@ -53,8 +53,8 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def __init__(
             self, degree: float, rewiring: float,
             allow_self_connections: bool = True,
-            n_connections: Optional[int] = None,
-            rng: Optional[NumpyRNG] = None,
+            n_connections: int | None = None,
+            rng: NumpyRNG | None = None,
             safe: bool = True, callback: None = None, verbose: bool = False):
         """
         :param degree:
@@ -89,7 +89,7 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         if not allow_self_connections:
             raise NotImplementedError(
                 "disabling self connections currently not supported")
-        self.__mask: Optional[NDArray] = None
+        self.__mask: NDArray | None = None
         self.__n_connections = 0
         self.__rng = rng or NumpyRNG()
 
@@ -150,8 +150,8 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         assert self.__mask is not None
         # Break the array into n_post_atoms units
         split_positions = numpy.arange(

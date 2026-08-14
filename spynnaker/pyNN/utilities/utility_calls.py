@@ -15,12 +15,14 @@
 """
 Utility package containing simple helper functions.
 """
+from __future__ import annotations
+
 import logging
 import math
 import os
 from collections.abc import Sized
 from math import isnan
-from typing import Optional, Union, cast
+from typing import TYPE_CHECKING, cast
 
 import neo
 import numpy
@@ -41,7 +43,6 @@ from spinn_front_end_common.utilities.constants import (
 )
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
-from spynnaker.pyNN.types import IoDest
 from spynnaker.pyNN.utilities.constants import WRITE_BANDWIDTH_BYTES_PER_SECOND
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsBinomialImpl,
@@ -56,6 +57,9 @@ from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsUniformImpl,
     RandomStatsVonmisesImpl,
 )
+
+if TYPE_CHECKING:
+    from spynnaker.pyNN.types import IoDest
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -95,7 +99,7 @@ def check_directory_exists_and_create_if_not(filename: str) -> None:
 
 
 def convert_param_to_numpy(
-        param: Union[RandomDistribution, float, list[float], NDArray],
+        param: RandomDistribution | float | list[float] | NDArray,
         no_atoms: int) -> NDArray[floating]:
     """
     Convert parameters into numpy arrays.
@@ -333,7 +337,7 @@ def get_variance(distribution: RandomDistribution) -> float:
     return stats.var(distribution)
 
 
-def high(distribution: RandomDistribution) -> Optional[float]:
+def high(distribution: RandomDistribution) -> float | None:
     """
     Gets the high or maximum boundary value for this distribution.
 
@@ -346,7 +350,7 @@ def high(distribution: RandomDistribution) -> Optional[float]:
     return stats.high(distribution)
 
 
-def low(distribution: RandomDistribution) -> Optional[float]:
+def low(distribution: RandomDistribution) -> float | None:
     """
     Gets the low or minimum boundary value for this distribution.
 

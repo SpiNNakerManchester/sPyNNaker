@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Sequence
 
 import numpy
 from numpy import integer, uint32
@@ -66,7 +66,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
 
     def __init__(
             self, n: int, *, allow_self_connections: bool = True,
-            with_replacement: bool = False, rng: Optional[NumpyRNG] = None,
+            with_replacement: bool = False, rng: NumpyRNG | None = None,
             safe: bool = True, verbose: bool = False, callback: None = None):
         """
         :param n:
@@ -232,8 +232,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         prob_in_slice = min(
             n_post_atoms / float(
                 synapse_info.n_post_neurons), 1.0)

@@ -16,9 +16,7 @@ from __future__ import annotations
 from typing import (
     TYPE_CHECKING,
     Iterable,
-    Optional,
     Sequence,
-    Union,
 )
 
 import numpy
@@ -132,7 +130,7 @@ class SynapseDynamicsStructuralSTDP(
             initial_weight: float = DEFAULT_INITIAL_WEIGHT,
             initial_delay: InitialDelay = DEFAULT_INITIAL_DELAY,
             s_max: int = DEFAULT_S_MAX,
-            with_replacement: bool = True, seed: Optional[int] = None,
+            with_replacement: bool = True, seed: int | None = None,
             weight: _In_Types = StaticSynapse.default_parameters['weight'],
             delay: _In_Types = None,
             backprop_delay: bool = True):
@@ -218,9 +216,10 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
     @overrides(SynapseDynamicsStructuralCommon.is_same_as)
-    def is_same_as(self, synapse_dynamics: Union[
-            AbstractSynapseDynamics,
-            AbstractSynapseDynamicsStructural]) -> bool:
+    def is_same_as(
+            self,
+            synapse_dynamics: AbstractSynapseDynamics |
+            AbstractSynapseDynamicsStructural) -> bool:
         if not (isinstance(synapse_dynamics, SynapseDynamicsStructuralSTDP)):
             return False
         if not SynapseDynamicsSTDP.is_same_as(self, synapse_dynamics):
@@ -269,7 +268,7 @@ class SynapseDynamicsStructuralSTDP(
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.seed)
-    def seed(self) -> Optional[int]:
+    def seed(self) -> int | None:
         return self.__seed
 
     @property
@@ -326,7 +325,7 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.get_delay_minimum)
     def get_delay_minimum(self, connector: AbstractConnector,
-                          synapse_info: SynapseInformation) -> Optional[float]:
+                          synapse_info: SynapseInformation) -> float | None:
         d_m = super().get_delay_minimum(connector, synapse_info)
         if d_m is None:
             return self.__initial_delay
@@ -340,7 +339,7 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsStructuralCommon._get_seeds)
     def _get_seeds(
-            self, app_vertex: Union[None, ApplicationVertex, Slice] = None
+            self, app_vertex: None | ApplicationVertex | Slice = None
             ) -> Sequence[int]:
         if app_vertex:
             if app_vertex not in self.__seeds:

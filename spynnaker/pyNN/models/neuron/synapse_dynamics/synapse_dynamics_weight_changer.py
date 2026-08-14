@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable, Optional, cast
+from typing import TYPE_CHECKING, Iterable, cast
 
 import numpy
 from numpy import floating, int16, integer, uint8, uint32
@@ -284,7 +284,7 @@ class SynapseDynamicsWeightChanger(
         return None
 
     @overrides(AbstractPlasticSynapseDynamics.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         return 0
 
     @property

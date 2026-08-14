@@ -16,8 +16,6 @@ from typing import (
     Callable,
     Iterable,
     Iterator,
-    Optional,
-    Union,
     cast,
     overload,
 )
@@ -51,9 +49,9 @@ class ParameterHolder:
      )
 
     def __init__(
-            self, data_items_to_return: Union[str, Iterable[str]],
-            get_call: Callable[[str, Selector], Union[
-                list[float], RandomDistribution]],
+            self, data_items_to_return: str | Iterable[str],
+            get_call: Callable[[str, Selector],
+                               list[float] | RandomDistribution],
             selector: Selector = None):
         """
         :param data_items_to_return: A list of data fields to be returned
@@ -62,18 +60,18 @@ class ParameterHolder:
             or `None` for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         """
-        self.__data_items_to_return: Union[str, tuple[str, ...]]
+        self.__data_items_to_return: str | tuple[str, ...]
         if isinstance(data_items_to_return, str):
             self.__data_items_to_return = data_items_to_return
-            self.__single_key: Optional[str] = data_items_to_return
+            self.__single_key: str | None = data_items_to_return
         else:
             self.__data_items_to_return = tuple(data_items_to_return)
             self.__single_key = None
         self.__get_call = get_call
-        self.__data_items: Optional[dict[str, list[float]]] = None
+        self.__data_items: dict[str, list[float]] | None = None
         self.__selector = selector
 
-    def _safe_read_values(self, parameter: str) -> Union[list[float], float]:
+    def _safe_read_values(self, parameter: str) -> list[float] | float:
         values = self.__get_call(parameter, self.__selector)
 
         # The values must be a single item, a list or a random distribution;
@@ -119,7 +117,7 @@ class ParameterHolder:
     def __getitem__(self, s: str) -> list[float]:
         ...
 
-    def __getitem__(self, s: Union[int, str]) -> Union[float, list[float]]:
+    def __getitem__(self, s: int | str) -> float | list[float]:
         data = self._get_data_items()
         if self.__single_key is not None:
             if not isinstance(s, int):
@@ -155,7 +153,7 @@ class ParameterHolder:
             return repr(data[self.__single_key])
         return repr(data)
 
-    def __contains__(self, item: Union[str, int]) -> bool:
+    def __contains__(self, item: str | int) -> bool:
         data = self._get_data_items()
         if self.__single_key is not None:
             return item in data[self.__single_key]

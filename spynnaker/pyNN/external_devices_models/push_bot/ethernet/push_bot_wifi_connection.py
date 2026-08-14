@@ -15,7 +15,7 @@
 import logging
 import select
 import socket
-from typing import Callable, Optional, TypeVar
+from typing import Callable, TypeVar
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -129,7 +129,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         return self.__local_port
 
     @property
-    def remote_ip_address(self) -> Optional[str]:
+    def remote_ip_address(self) -> str | None:
         """
         The remote IP address to which the connection is connected,
         as a dotted string, or `None` if not connected remotely.
@@ -145,7 +145,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         return self.__remote_port
 
-    def receive(self, timeout: Optional[float] = None) -> bytes:
+    def receive(self, timeout: float | None = None) -> bytes:
         """
         Receive data from the connection
 

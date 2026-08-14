@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import math
-from typing import Any, Optional
+from typing import Any
 
 import numpy
 import pytest
@@ -29,7 +29,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     scope="module",
     params=[None, [], ["weight"], ["source", "target", "weight", "delay"]],
     ids=["None", "Empty", "SingleItem", "MultiItem"])
-def data_items(request: Any) -> Optional[list[str]]:
+def data_items(request: Any) -> list[str] | None:
     return request.param
 
 
@@ -38,7 +38,7 @@ def data_items(request: Any) -> Optional[list[str]]:
     params=[None, [], [("test", 100)],
             [("test", 100), ("test_2", 200), ("test_3", 300)]],
     ids=["None", "Empty", "SingleValue", "MultiValue"])
-def fixed_values(request: Any) -> Optional[list[tuple[str, int]]]:
+def fixed_values(request: Any) -> list[tuple[str, int]] | None:
     return request.param
 
 
@@ -51,8 +51,8 @@ def as_list(request: Any) -> bool:
 
 
 def test_connection_holder(
-        data_items: Optional[list[str]],
-        fixed_values: Optional[list[tuple[str, int]]], as_list: bool) -> None:
+        data_items: list[str] | None,
+        fixed_values: list[tuple[str, int]] | None, as_list: bool) -> None:
     unittest_setup()
     all_values = None
     n_items = 0

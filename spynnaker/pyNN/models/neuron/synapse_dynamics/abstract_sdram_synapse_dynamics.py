@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import math
-from typing import Optional
 
 import numpy
 from numpy import floating, integer, uint32
@@ -85,7 +84,7 @@ class AbstractSDRAMSynapseDynamics(
 
     @property
     @abstractmethod
-    def pad_to_length(self) -> Optional[int]:
+    def pad_to_length(self) -> int | None:
         """
         The amount each row should pad to, or `None` if not specified.
         """
