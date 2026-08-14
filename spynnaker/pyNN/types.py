@@ -37,8 +37,7 @@ Delays: Final['TypeAlias'] = \
 WeightsDelysIn: Final['TypeAlias'] = Optional[Union[
     float, str, RandomDistribution, Iterable[float], NDArray[numpy.float64]]]
 
-IoDest: TypeAlias = Union[
-    str, neo.baseio.BaseIO, None]  # pylint: disable=no-member
+IoDest: TypeAlias = str | neo.baseio.BaseIO | None  # pylint: disable=no-member
 
 ViewIndices = Union[None, Sequence[int], NDArray[numpy.integer]]
 #: :meta private:
