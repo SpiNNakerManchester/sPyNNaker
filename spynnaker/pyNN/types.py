@@ -15,8 +15,9 @@
 """
 Types (and related) that are useful for implementing connectors.
 """
+from __future__ import annotations
 
-from typing import Final, Iterable, Sequence
+from typing import TYPE_CHECKING, Final, Iterable, Sequence
 
 import neo
 import numpy
@@ -38,14 +39,16 @@ WeightsDelysIn: Final['TypeAlias'] = (float | str | RandomDistribution |
                                       Iterable[float] |
                                       NDArray[numpy.float64] | None)
 
-IoDest: TypeAlias = str | neo.baseio.BaseIO | None  # pylint: disable=no-member
-
 ViewIndices = None | Sequence[int] | NDArray[numpy.integer]
 #: :meta private:
 Selector: TypeAlias = (None | int | slice | Sequence[int] | list[bool] |
                        NDArray[numpy.bool_] | NDArray[numpy.integer])
 
 WeightScales: TypeAlias = NDArray[numpy.floating] | Sequence[float]
+
+if TYPE_CHECKING:
+    IoDest: TypeAlias = (  # pylint: disable=no-member
+            str | neo.baseio.BaseIO | None)
 
 
 def is_scalar(value: Weights) -> TypeGuard[int | float]:

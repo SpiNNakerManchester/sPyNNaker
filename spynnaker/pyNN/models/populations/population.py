@@ -51,7 +51,7 @@ from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.recorder import Recorder
-from spynnaker.pyNN.types import IoDest, Selector
+from spynnaker.pyNN.types import Selector
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 
@@ -63,6 +63,7 @@ if TYPE_CHECKING:
 
     from spynnaker.pyNN.models.common.parameter_holder import ParameterHolder
     from spynnaker.pyNN.models.common.types import Names, Values
+    from spynnaker.pyNN.types import IoDest
 
 logger = FormatAdapter(logging.getLogger(__file__))
 _CellType: TypeAlias = AbstractPyNNModel | PopulationApplicationVertex
