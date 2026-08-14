@@ -20,7 +20,8 @@ from typing_extensions import TypeAlias
 from spynnaker.pyNN.random_distribution import RandomDistribution
 
 #: Type of names of parameters and state variables.
-Names: TypeAlias = str | list[str] | tuple[str, ...]
+Names: TypeAlias = (  # pylint: disable=invalid-name
+        str | list[str] | tuple[str, ...])
 
 #: Type of normal values of parameters and state variables.
 Values: TypeAlias = (float | Sequence[float] | NDArray[numpy.floating] |
