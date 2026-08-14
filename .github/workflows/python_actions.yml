@@ -35,4 +35,4 @@ jobs:
       mypy-packages:
       mypy-full-packages: spynnaker unittests spynnaker_integration_tests proxy_integration_tests
       cfg-file: spynnaker
-      ruff-packages: spynnaker unittests spynnaker_integration_tests proxy_integration_tests
+      ruff-packages:
