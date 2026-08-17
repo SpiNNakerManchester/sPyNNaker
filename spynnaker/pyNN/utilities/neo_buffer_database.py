@@ -19,13 +19,11 @@ import math
 import os
 import re
 import struct
+from collections.abc import Collection, Iterable, Sequence
 from datetime import datetime
 from typing import (
     TYPE_CHECKING,
     Any,
-    Collection,
-    Iterable,
-    Sequence,
 )
 
 import neo  # type: ignore[import]

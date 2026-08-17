@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable
+from collections.abc import Iterable
+from typing import TypeAlias
 
 import numpy
 from numpy import floating
 from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
-from typing_extensions import TypeAlias
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ranged import RangeDictionary, RangedList

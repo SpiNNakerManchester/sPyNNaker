@@ -17,13 +17,13 @@ Types (and related) that are useful for implementing connectors.
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, Iterable, Sequence
+from collections.abc import Iterable, Sequence
+from typing import TYPE_CHECKING, Final, TypeAlias, TypeGuard
 
 import neo
 import numpy
 from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
-from typing_extensions import TypeAlias, TypeGuard
 
 #: The type of weights and delays provided by Synapse / SynapseInformation
 # Combined types (where value could be either)

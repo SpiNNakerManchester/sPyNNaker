@@ -14,13 +14,8 @@
 import itertools
 import logging
 import math
+from collections.abc import Collection, Iterable, Mapping, Sequence
 from types import MappingProxyType
-from typing import (
-    Collection,
-    Iterable,
-    Mapping,
-    Sequence,
-)
 
 import numpy
 from numpy import float64, uint8, uint16, uint32

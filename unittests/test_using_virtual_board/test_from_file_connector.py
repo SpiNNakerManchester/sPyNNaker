@@ -15,11 +15,11 @@
 
 import os
 import tempfile
+from typing import TypeAlias
 
 import numpy
 import pyNN.spiNNaker as sim
 from parameterized import parameterized
-from typing_extensions import TypeAlias
 
 from spinn_utilities.config_holder import set_config
 

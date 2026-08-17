@@ -14,11 +14,10 @@
 from __future__ import annotations
 
 import ctypes
-from collections.abc import Container
+from collections.abc import Container, Sequence
 from typing import (
     TYPE_CHECKING,
     NamedTuple,
-    Sequence,
     cast,
 )
 

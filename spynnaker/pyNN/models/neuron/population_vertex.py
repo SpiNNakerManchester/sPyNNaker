@@ -17,12 +17,11 @@ import logging
 import math
 import os
 from collections import defaultdict
+from collections.abc import Collection, Iterable, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Collection,
-    Iterable,
-    Sequence,
+    TypeGuard,
     cast,
 )
 
@@ -31,7 +30,6 @@ from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
 from pyNN.space import BaseStructure, Grid2D, Grid3D
 from scipy import special  # @UnresolvedImport
-from typing_extensions import TypeGuard
 
 from spinn_utilities.config_holder import (
     get_config_bool,

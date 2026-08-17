@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ctypes
+from collections.abc import Sequence
 from enum import IntEnum
-from typing import Sequence
 
 from numpy import floating
 from numpy.typing import NDArray

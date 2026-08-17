@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Mapping, NamedTuple, Sequence, cast
+from collections.abc import Mapping, Sequence
+from typing import TYPE_CHECKING, NamedTuple, cast
 
 from spinn_utilities.overrides import overrides
 

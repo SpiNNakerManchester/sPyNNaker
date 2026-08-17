@@ -14,7 +14,8 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Iterator
+from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
 from spinn_utilities.log import FormatAdapter
 

@@ -15,7 +15,8 @@
 import logging
 import select
 import socket
-from typing import Callable, TypeVar
+from collections.abc import Callable
+from typing import TypeVar
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides

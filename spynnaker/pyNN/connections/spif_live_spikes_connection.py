@@ -14,10 +14,9 @@
 
 import logging
 import struct
+from collections.abc import Callable, Iterable
 from threading import Thread
-from typing import Callable, Final, Iterable
-
-from typing_extensions import TypeAlias
+from typing import Final, TypeAlias
 
 from spinn_utilities.log import FormatAdapter
 

@@ -14,7 +14,8 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Iterable, cast
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, cast
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32

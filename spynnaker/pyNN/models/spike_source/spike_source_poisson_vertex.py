@@ -15,13 +15,11 @@ from __future__ import annotations
 
 import logging
 import math
-from collections.abc import Sequence as Seq
-from collections.abc import Sized
+from collections.abc import Collection, Sequence, Sized
 from typing import (
     TYPE_CHECKING,
     Any,
-    Collection,
-    Sequence,
+    TypeGuard,
     cast,
 )
 
@@ -29,7 +27,6 @@ import numpy
 import scipy.stats
 from numpy.typing import NDArray
 from pyNN.space import BaseStructure, Grid2D, Grid3D
-from typing_extensions import TypeGuard
 
 from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
@@ -104,8 +101,8 @@ DURATION_FOREVER = 0xFFFFFFFF
 
 def _is_list_of_lists(value: Any) -> TypeGuard[
         Sequence[Sequence[int | float]]]:
-    return isinstance(value, (Seq, numpy.ndarray)) and isinstance(
-        value[0], (Seq, numpy.ndarray))
+    return isinstance(value, (Sequence, numpy.ndarray)) and isinstance(
+        value[0], (Sequence, numpy.ndarray))
 
 
 def _normalize_rates(

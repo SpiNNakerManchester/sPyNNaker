@@ -14,12 +14,10 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Collection, Mapping, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Collection,
-    Mapping,
-    Sequence,
 )
 
 import neo  # type: ignore[import]

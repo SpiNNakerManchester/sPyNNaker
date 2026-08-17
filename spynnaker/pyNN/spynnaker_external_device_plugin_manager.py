@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from spinn_utilities.config_holder import get_config_int, get_config_str
 from spinn_utilities.socket_address import SocketAddress

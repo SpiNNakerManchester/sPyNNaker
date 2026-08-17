@@ -44,7 +44,7 @@ from spynnaker.pyNN.types import WeightScales
 from .master_pop_table import MasterPopTableAsBinarySearch
 
 if TYPE_CHECKING:
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     from spynnaker.pyNN.models.neural_projections import (
         ProjectionApplicationEdge,

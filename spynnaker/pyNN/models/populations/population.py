@@ -16,13 +16,11 @@ from __future__ import annotations
 import inspect
 import logging
 import os
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Iterable,
-    Iterator,
-    Sequence,
+    TypeAlias,
     cast,
     final,
     overload,
@@ -37,7 +35,7 @@ from pyNN import descriptions
 from pyNN.descriptions import TemplateEngine
 from pyNN.random import NumpyRNG
 from pyNN.space import BaseStructure
-from typing_extensions import Never, TypeAlias
+from typing_extensions import Never
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once

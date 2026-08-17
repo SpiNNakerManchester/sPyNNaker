@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Sequence
+from collections.abc import Sequence
 
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.overrides import overrides

@@ -14,8 +14,9 @@
 import shutil
 import struct
 import unittest
+from collections.abc import Sequence
 from tempfile import mkdtemp
-from typing import Any, BinaryIO, Sequence
+from typing import Any, BinaryIO
 
 import numpy
 import pyNN.spiNNaker as p

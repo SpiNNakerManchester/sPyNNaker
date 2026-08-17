@@ -15,10 +15,10 @@ from __future__ import annotations
 
 import sys
 from collections import defaultdict
+from collections.abc import Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Sequence,
     cast,
 )
 

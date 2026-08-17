@@ -24,11 +24,10 @@ This package contains the profile of that code for PyNN 0.9.
 import filecmp
 import logging
 import os
+from collections.abc import Callable, Iterable, Sequence
 from typing import (
     Any,
-    Callable,
-    Iterable,
-    Sequence,
+    Literal,
     TypedDict,
     cast,
 )
@@ -50,7 +49,6 @@ from pyNN.space import (
     Sphere,
 )
 from pyNN.space import distance as _pynn_distance
-from typing_extensions import Literal
 
 from spinn_utilities.exceptions import SimulatorNotSetupException
 from spinn_utilities.helpful_functions import is_singleton

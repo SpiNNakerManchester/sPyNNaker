@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ctypes
-from typing import Sequence
+from collections.abc import Sequence
 
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 

@@ -15,11 +15,12 @@ from __future__ import annotations
 
 import functools
 import logging
+from collections.abc import Callable, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Sequence,
+    Literal,
+    TypeAlias,
     cast,
 )
 
@@ -28,7 +29,7 @@ from numpy import void
 from numpy.typing import NDArray
 from pyNN.recording.files import BaseFile
 from pyNN.space import Space as PyNNSpace
-from typing_extensions import Literal, Never, TypeAlias
+from typing_extensions import Never
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter

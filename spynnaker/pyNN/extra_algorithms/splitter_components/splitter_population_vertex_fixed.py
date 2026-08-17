@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from collections import defaultdict
-from typing import Iterable, Sequence, cast
+from collections.abc import Iterable, Sequence
+from typing import cast
 
 from numpy import floating
 from numpy.typing import NDArray

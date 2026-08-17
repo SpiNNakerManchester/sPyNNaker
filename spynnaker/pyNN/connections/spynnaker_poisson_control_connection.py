@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import functools
-from typing import Iterable
+from collections.abc import Iterable
 
 from spinn_utilities.overrides import overrides
 

@@ -14,7 +14,8 @@
 import logging
 import math
 from collections import defaultdict
-from typing import Sequence, cast
+from collections.abc import Sequence
+from typing import cast
 
 from numpy import floating
 from numpy.typing import NDArray

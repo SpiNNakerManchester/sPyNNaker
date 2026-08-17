@@ -14,8 +14,9 @@
 from __future__ import annotations
 
 import ctypes
+from collections.abc import Sequence
 from enum import IntEnum
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING
 
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.config_holder import get_config_int

@@ -13,11 +13,11 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, TypeAlias
 
 from numpy import floating
 from numpy.typing import NDArray
-from typing_extensions import TypeAlias
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 

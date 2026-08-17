@@ -13,11 +13,12 @@
 # limitations under the License.
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
     Final,
-    Sequence,
+    TypeAlias,
 )
 
 import numpy
@@ -25,7 +26,6 @@ from numpy import floating, integer, ndarray, uint32
 from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
 from pyNN.space import Space
-from typing_extensions import TypeAlias
 
 from spinn_utilities.overrides import overrides
 

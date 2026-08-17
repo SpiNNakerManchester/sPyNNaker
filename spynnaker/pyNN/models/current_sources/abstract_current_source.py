@@ -13,10 +13,9 @@
 # limitations under the License.
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from enum import Enum
-from typing import TYPE_CHECKING, Mapping, Sequence
-
-from typing_extensions import TypeAlias
+from typing import TYPE_CHECKING, TypeAlias
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
