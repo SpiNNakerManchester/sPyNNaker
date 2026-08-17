@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import math
-from typing import Sequence
+from collections.abc import Sequence
 
 from spinn_utilities.progress_bar import ProgressBar
 

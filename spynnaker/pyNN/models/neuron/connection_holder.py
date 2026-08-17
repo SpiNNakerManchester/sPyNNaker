@@ -12,17 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections.abc import Callable, Iterator, Sequence
 from typing import (
     Any,
-    Callable,
-    Iterator,
-    Sequence,
+    TypeAlias,
+    TypeGuard,
 )
 
 import numpy
 from numpy.lib.recfunctions import merge_arrays
 from numpy.typing import NDArray
-from typing_extensions import TypeAlias, TypeGuard
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     ConnectionsArray,

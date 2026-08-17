@@ -13,8 +13,9 @@
 # limitations under the License.
 from __future__ import annotations
 
+from collections.abc import Iterable
 from math import ceil
-from typing import TYPE_CHECKING, Iterable, cast
+from typing import TYPE_CHECKING, cast
 
 import numpy
 from numpy import floating, uint32

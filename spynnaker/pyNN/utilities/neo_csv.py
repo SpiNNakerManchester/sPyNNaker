@@ -16,11 +16,11 @@ from __future__ import annotations
 import csv
 import logging
 from collections import defaultdict
+from collections.abc import Iterable
 from datetime import datetime
 from typing import (
     TYPE_CHECKING,
     Any,
-    Iterable,
 )
 
 import numpy

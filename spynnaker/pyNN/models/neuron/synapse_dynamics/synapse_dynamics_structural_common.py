@@ -15,16 +15,15 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Iterable, Sequence
 from typing import (
     TYPE_CHECKING,
-    Iterable,
-    Sequence,
+    TypeAlias,
     cast,
 )
 
 import numpy
 from numpy.typing import NDArray
-from typing_extensions import TypeAlias
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides

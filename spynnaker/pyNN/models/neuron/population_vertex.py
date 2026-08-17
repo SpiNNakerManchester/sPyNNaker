@@ -17,12 +17,11 @@ import logging
 import math
 import os
 from collections import defaultdict
+from collections.abc import Collection, Iterable, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Collection,
-    Iterable,
-    Sequence,
+    TypeGuard,
     cast,
 )
 
@@ -31,7 +30,6 @@ from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
 from pyNN.space import BaseStructure, Grid2D, Grid3D
 from scipy import special  # @UnresolvedImport
-from typing_extensions import TypeGuard
 
 from spinn_utilities.config_holder import (
     get_config_bool,
@@ -52,9 +50,9 @@ from pacman.utilities.utility_calls import get_n_bits
 
 from spinn_front_end_common.interface.buffer_management\
     .recording_utilities import (
-        get_recording_data_constant_size,
-        get_recording_header_size,
-    )
+    get_recording_data_constant_size,
+    get_recording_header_size,
+)
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profile_region_size,

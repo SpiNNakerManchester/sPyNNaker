@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Mapping, NamedTuple, Sequence, cast
+from collections.abc import Mapping, Sequence
+from typing import TYPE_CHECKING, NamedTuple, cast
 
 from spinn_utilities.overrides import overrides
 
@@ -30,9 +31,9 @@ from spinn_front_end_common.interface.buffer_management.buffer_models import (
 )
 from spinn_front_end_common.interface.buffer_management\
     .recording_utilities import (
-        get_recording_header_array,
-        get_recording_header_size,
-    )
+    get_recording_header_array,
+    get_recording_header_size,
+)
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.profiling import (
     AbstractHasProfileData,

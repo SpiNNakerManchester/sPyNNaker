@@ -18,8 +18,8 @@ Devices connected to the SpiNNaker peripheral interface (`SPIF`_).
 
 """
 
+from collections.abc import Callable
 from enum import IntEnum
-from typing import Callable
 
 from spinn_utilities.overrides import overrides
 

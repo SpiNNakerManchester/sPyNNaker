@@ -14,12 +14,10 @@
 from __future__ import annotations
 
 import struct
-from collections.abc import Sized
+from collections.abc import Iterable, Sequence, Sized
 from enum import IntEnum
 from typing import (
     TYPE_CHECKING,
-    Iterable,
-    Sequence,
     TypeVar,
     cast,
 )

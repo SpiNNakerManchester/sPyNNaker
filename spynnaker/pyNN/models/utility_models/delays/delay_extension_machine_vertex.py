@@ -14,8 +14,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from enum import IntEnum
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 

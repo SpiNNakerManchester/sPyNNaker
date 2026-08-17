@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Sequence, cast
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, cast
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.overrides import overrides

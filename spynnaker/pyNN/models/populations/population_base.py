@@ -14,11 +14,11 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Sequence,
+    Never,
     final,
 )
 
@@ -26,7 +26,6 @@ import neo
 from numpy import floating
 from numpy.typing import NDArray
 from pyNN.space import BaseStructure
-from typing_extensions import Never
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter

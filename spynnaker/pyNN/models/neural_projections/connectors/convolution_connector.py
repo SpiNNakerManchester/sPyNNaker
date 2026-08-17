@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
+from collections.abc import Sequence as TSequence
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -24,7 +25,6 @@ from typing import (
     cast,
     overload,
 )
-from typing import Sequence as TSequence
 
 import numpy
 from numpy import float64, floating, int16, integer, uint16, uint32

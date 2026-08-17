@@ -18,12 +18,10 @@ Decorators to support default argument handling.
 
 import inspect
 import logging
+from collections.abc import Callable, Iterable, Mapping
 from types import MappingProxyType
 from typing import (
     Any,
-    Callable,
-    Iterable,
-    Mapping,
     no_type_check,
 )
 

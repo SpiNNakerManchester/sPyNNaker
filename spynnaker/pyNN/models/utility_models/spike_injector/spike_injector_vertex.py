@@ -14,7 +14,7 @@
 
 import logging
 import sys
-from typing import Collection
+from collections.abc import Collection
 
 import numpy
 from numpy.typing import NDArray

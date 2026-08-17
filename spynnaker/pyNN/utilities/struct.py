@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections.abc import Mapping, Sequence
 from enum import Enum
-from typing import Any, Mapping, Sequence
+from typing import Any, TypeAlias
 
 import numpy
 from numpy import integer, uint8, uint32
 from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
-from typing_extensions import TypeAlias
 
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged.abstract_list import AbstractList

@@ -15,13 +15,10 @@ from __future__ import annotations
 
 import logging
 import os
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Iterable,
-    Iterator,
-    Sequence,
     overload,
 )
 

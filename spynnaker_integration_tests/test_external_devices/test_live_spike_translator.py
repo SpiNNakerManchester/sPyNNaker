@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import unittest
-from typing import Callable
+from collections.abc import Callable
 
 import pyNN.spiNNaker as p
 

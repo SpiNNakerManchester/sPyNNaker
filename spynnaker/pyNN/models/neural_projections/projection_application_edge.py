@@ -14,9 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
-
-from typing_extensions import TypeGuard
+from typing import TYPE_CHECKING, TypeGuard, cast
 
 from spinn_utilities.overrides import overrides
 

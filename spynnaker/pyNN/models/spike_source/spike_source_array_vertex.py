@@ -15,17 +15,17 @@ from __future__ import annotations
 
 import logging
 from collections import Counter
+from collections.abc import Collection, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Collection,
-    Sequence,
+    TypeAlias,
+    TypeGuard,
 )
 
 import numpy
 from numpy.typing import ArrayLike, NDArray
 from pyNN.space import BaseStructure, Grid2D, Grid3D
-from typing_extensions import TypeAlias, TypeGuard
 
 from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter

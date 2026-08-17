@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable, cast
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, cast
 
 import numpy
 from numpy import floating, int16, integer, uint8, uint32

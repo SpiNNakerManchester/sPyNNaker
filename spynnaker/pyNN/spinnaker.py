@@ -14,14 +14,14 @@
 
 import logging
 import os
-from typing import Any, Collection, cast
+from collections.abc import Collection
+from typing import Any, Literal, Never, cast
 
 from lazyarray import __version__ as lazyarray_version
 from neo import __version__ as neo_version
 from pyNN import __version__ as pynn_version
 from pyNN.common import control as pynn_control
 from quantities import __version__ as quantities_version
-from typing_extensions import Literal, Never
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter

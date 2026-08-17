@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Literal
-
-from typing_extensions import TypeAlias
+from collections.abc import Iterable
+from typing import Literal, TypeAlias
 
 from spinn_utilities.overrides import overrides
 

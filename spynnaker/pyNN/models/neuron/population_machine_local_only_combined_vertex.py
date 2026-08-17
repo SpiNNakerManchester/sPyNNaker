@@ -15,8 +15,9 @@ from __future__ import annotations
 
 import ctypes
 import os
+from collections.abc import Sequence
 from enum import IntEnum
-from typing import Sequence, cast
+from typing import cast
 
 from numpy import floating
 from numpy.typing import NDArray

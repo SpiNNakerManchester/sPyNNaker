@@ -15,17 +15,17 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
-    Sequence,
+    TypeGuard,
 )
 
 import numpy
 from numpy import floating, int64, integer, uint32
 from numpy.typing import NDArray
-from typing_extensions import TypeGuard
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides

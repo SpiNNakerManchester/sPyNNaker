@@ -11,12 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Iterator, MutableMapping, cast
+from collections.abc import Iterator, MutableMapping
+from typing import Never, cast
 
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
-from typing_extensions import Never
 
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged import RangeDictionary, RangedList

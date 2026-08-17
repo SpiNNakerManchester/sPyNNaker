@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Callable, Sequence
+from collections.abc import Callable, Sequence
+from typing import TypeAlias
 
 from pyNN.random import RandomDistribution
-from typing_extensions import TypeAlias
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.abstract_list import IdsType, T

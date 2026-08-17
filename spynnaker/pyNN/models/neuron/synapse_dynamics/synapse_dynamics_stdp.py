@@ -14,7 +14,8 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Iterable
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, Any
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
