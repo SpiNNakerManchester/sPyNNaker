@@ -20,7 +20,6 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Literal,
-    Never,
     TypeAlias,
     cast,
 )
@@ -30,6 +29,7 @@ from numpy import void
 from numpy.typing import NDArray
 from pyNN.recording.files import BaseFile
 from pyNN.space import Space as PyNNSpace
+from typing_extensions import Never
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
