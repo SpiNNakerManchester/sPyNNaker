@@ -16,7 +16,6 @@ from __future__ import annotations
 import logging
 import math
 from collections.abc import Collection, Sequence, Sized
-from collections.abc import Sequence as Seq
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -102,8 +101,8 @@ DURATION_FOREVER = 0xFFFFFFFF
 
 def _is_list_of_lists(value: Any) -> TypeGuard[
         Sequence[Sequence[int | float]]]:
-    return isinstance(value, (Seq, numpy.ndarray)) and isinstance(
-        value[0], (Seq, numpy.ndarray))
+    return isinstance(value, (Sequence, numpy.ndarray)) and isinstance(
+        value[0], (Sequence, numpy.ndarray))
 
 
 def _normalize_rates(

@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
-from collections.abc import Sequence as TSequence
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -243,7 +242,7 @@ class ConvolutionConnector(AbstractConnector):
             return numpy.full(_shape, w, dtype=float64)
         elif isinstance(w, (Sequence, numpy.ndarray)):
             if all(isinstance(lst, (Sequence, numpy.ndarray)) for lst in w):
-                ws = cast(TSequence[TSequence[float]], w)
+                ws = cast(Sequence[Sequence[float]], w)
                 len0 = len(ws[0])
                 # 2D list
                 if not all(len(lst) == len0 for lst in ws):
