@@ -45,7 +45,7 @@ class TestMultiBoardSpikeOutput(BaseTestCase):
         pops = []
         for chip in machine.ethernet_connected_chips:
             # print("Adding population on {}, {}".format(chip.x, chip.y))
-            label = "{}, {}".format(chip.x, chip.y)
+            label = f"{chip.x}, {chip.y}"
             labels.append(label)
             pop = p.Population(
                 10, p.SpikeSourceArray(spike_times=[i for i in range(100)]),

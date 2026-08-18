@@ -76,24 +76,22 @@ class PatternSpiker:
             if actual_indexes != v_rec_indexes:
                 if is_view:
                     raise AssertionError(
-                        "Unexpected neuron order for V in {}. "
-                        "Found {} but expected {}".format(
-                            label, actual_indexes, v_rec_indexes))
+                        f"Unexpected neuron order for V in {label}. "
+                        f"Found {actual_indexes} but expected {v_rec_indexes}")
                 for neuron in v_rec_indexes:
                     if neuron not in actual_indexes:
                         raise AssertionError(
-                            "Missing V for {}. No Data for {}".format(
-                                label, neuron))
+                            f"Missing V for {label}. "
+                            f"No Data for {neuron}")
                 v_rec_indexes = actual_indexes
         for i, neuron in enumerate(v_rec_indexes):
             for t in range(len(v)):
                 if v[t, i] != self.V_PATTERN[
                         (t * v_rate + neuron) % self.V_COUNT]:
                     raise AssertionError(
-                        "Incorrect V for neuron {} at time {} in {}. "
-                        "Found {} but expected {}".format(
-                            neuron, t, label, v[t, i],
-                            self.V_PATTERN[(t + neuron) % self.V_COUNT]))
+                        f"Incorrect V for neuron {neuron} at time {t} "
+                        f"in {label}. Found {v[t, i]} but expected "
+                        f"{self.V_PATTERN[(t + neuron) % self.V_COUNT]}")
 
     def check_spikes(
             self, spikes: SpikeTrainList, simtime: int, label: str,
@@ -114,15 +112,14 @@ class PatternSpiker:
             if not numpy.array_equal(current, adjusted_spikes):
                 if spike_rate:
                     raise AssertionError(
-                        "Incorrect spikes for neuron {} in {}. "
-                        "Found {} but expected {} adjusted from {}".format(
-                            neuron, label, spikes[neuron], adjusted_spikes,
-                            expected_spikes))
+                        f"Incorrect spikes for neuron {neuron} in {label}. "
+                        f"Found {spikes[neuron]} but expected "
+                        f"{adjusted_spikes} adjusted from {expected_spikes}")
                 else:
                     raise AssertionError(
-                        "Incorrect spikes for neuron {} in {}. "
-                        "Found {} but expected {}".format(
-                            neuron, label, spikes[neuron], adjusted_spikes, ))
+                        f"Incorrect spikes for neuron {neuron} in {label}. "
+                        f"Found {spikes[neuron]} "
+                        f"but expected {adjusted_spikes}")
 
     def check(
             self, pop: Population, simtime: int,

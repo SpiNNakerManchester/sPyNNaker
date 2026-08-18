@@ -154,7 +154,7 @@ class TestPoissonSpikeSource(BaseTestCase):
         for rate in rates:
             ssp = sim.Population(
                 n_neurons, sim.SpikeSourcePoisson(rate),
-                label='inputSpikes_{}'.format(rate),
+                label=f'inputSpikes_{rate}',
                 additional_parameters={"seed": seed})
             ssp.record("spikes")
             ssps[rate] = ssp

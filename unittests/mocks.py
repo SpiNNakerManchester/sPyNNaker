@@ -65,7 +65,7 @@ class MockPopulation(Population):
         return self._size
 
     def __repr__(self) -> str:
-        return "Population {}".format(self._label)
+        return f"Population {self._label}"
 
     @property
     @overrides(Population._vertex)

@@ -39,7 +39,7 @@ class ManyBoards(BaseTestCase):
     def add_pop(self, x: int, y: int, n_neurons: int,
                 input_pop: Population) -> Population:
         pop = sim.Population(
-            n_neurons, sim.IF_curr_exp(), label="pop_{}_{}".format(x, y))
+            n_neurons, sim.IF_curr_exp(), label=f"pop_{x}_{y}")
         pop.add_placement_constraint(x=x, y=y)
         sim.Projection(input_pop, pop, sim.AllToAllConnector(),
                        synapse_type=sim.StaticSynapse(weight=5, delay=1))
@@ -84,8 +84,8 @@ class ManyBoards(BaseTestCase):
             style += "advanced"
         else:
             style += "simple"
-        return "{}_n_boards={}_n_neurons={}_simtime={}".format(
-            style, self.n_boards, self.n_neurons, self.simtime)
+        return (f"{style}_n_boards={self.n_boards}_n_neurons={self.n_neurons}"
+                f"_simtime={self.simtime}")
 
     def do_run(self) -> None:
         self.setup()
@@ -100,11 +100,10 @@ class ManyBoards(BaseTestCase):
             results = db.get_run_time_of_buffer_extractor()
         self.report(results, report_file)
         self.report(
-            "machine run time was: {} seconds\n".format(
-                t_after_machine-t_before),
+            f"machine run time was: {t_after_machine-t_before} seconds\n",
             report_file)
         self.report(
-            "total run time was: {} seconds\n".format(t_after_check-t_before),
+            f"total run time was: {t_after_check-t_before} seconds\n",
             report_file)
         sim.end()
 

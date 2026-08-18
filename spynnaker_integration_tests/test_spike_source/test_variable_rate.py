@@ -153,7 +153,7 @@ def variable_rate_options() -> None:
             output = ""
             values = []
             for name in names:
-                output += "{}: {{}}; ".format(name)
+                output += f"{name}: {{}}; "
                 values.append(pop.get(name)[i])
             print(output.format(*values))
             print(spikes[i])
@@ -175,10 +175,9 @@ def variable_rate_options() -> None:
                 expected = (rate / 1000.0) * (end - start)
                 tolerance = scipy.stats.poisson.ppf(0.99, expected) - expected
                 n_spikes = len(rate_spikes)
-                print("Received {} spikes, expected {} spikes"
-                      " (with tolerance {}) for rate {}"
-                      " for duration {}".format(
-                          n_spikes, expected, tolerance, rate, (end - start)))
+                print(f"Received {n_spikes} spikes, expected {expected} spikes"
+                      f" (with tolerance {tolerance}) for rate {rate}"
+                      f" for duration {end - start}")
                 assert n_spikes >= (expected - tolerance)
                 assert n_spikes <= (expected + tolerance)
 
@@ -259,10 +258,9 @@ def variable_rate_100us() -> None:
         expected = (rate / 1000.0) * (end - start)
         tolerance = scipy.stats.poisson.ppf(0.99, expected) - expected
         n_spikes_rate = n_spikes[rate, start, end] / 100.0
-        print("Received {} spikes, expected {} spikes"
-              " (with tolerance {}) for rate {}"
-              " for duration {}".format(
-                  n_spikes_rate, expected, tolerance, rate, (end - start)))
+        print(f"Received {n_spikes_rate} spikes, expected {expected} spikes"
+              f" (with tolerance {tolerance}) for rate {rate}"
+              f" for duration {end - start}")
         assert n_spikes_rate >= (expected - tolerance)
         assert n_spikes_rate <= (expected + tolerance)
 

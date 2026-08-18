@@ -115,7 +115,7 @@ def do_run(plot: bool) -> tuple[Block, Block, Block, Block]:
                   data_labels=[pop2.label], yticks=True,
                   xlim=(0, runtime), xticks=True),
             title="Testing ArrayConnector",
-            annotations="Simulated with {}".format(p.name())
+            annotations=f"Simulated with {p.name()}"
         )
         plt.show()
 
@@ -171,7 +171,7 @@ def do_larger_array(plot: bool) -> tuple[Block, Block, Block]:
                   data_labels=[inhit_pop.label], yticks=True,
                   xlim=(0, runtime), xticks=True),
             title="Testing ArrayConnector",
-            annotations="Simulated with {}".format(p.name())
+            annotations=f"Simulated with {p.name()}"
         )
         plt.show()
 

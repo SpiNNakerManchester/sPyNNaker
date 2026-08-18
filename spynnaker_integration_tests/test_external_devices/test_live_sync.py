@@ -32,8 +32,7 @@ n_spikes.append(0)
 def recv(label: str, time: int, neuron_ids: list[int]) -> None:
     """ Receive spikes and add the number received to the current segment count
     """
-    print("Time: {}; Received spikes from {}:{}".format(
-        time, label, neuron_ids))
+    print(f"Time: {time}; Received spikes from {label}:{neuron_ids}")
     n_spikes[len(n_spikes) - 1] += len(neuron_ids)
 
 

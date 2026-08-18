@@ -94,7 +94,7 @@ def do_run(plot: bool) -> Block:
                   data_labels=[exc_pop.label], yticks=True,
                   xlim=(0, runtime), xticks=True),
             title="Testing FromFileConnector",
-            annotations="Simulated with {}".format(p.name())
+            annotations=f"Simulated with {p.name()}"
         )
         plt.show()
 
