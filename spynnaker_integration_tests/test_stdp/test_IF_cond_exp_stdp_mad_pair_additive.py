@@ -106,12 +106,12 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
             pre_spikes, post_spikes, initial_weight, plastic_delay,
             a_plus, a_minus, tau_plus, tau_minus)
 
-        print("Pre neuron spikes at: {}".format(pre_spikes))
-        print("Post-neuron spikes at: {}".format(post_spikes))
+        print(f"Pre neuron spikes at: {pre_spikes}")
+        print(f"Post-neuron spikes at: {post_spikes}")
         target_spikes = [1013, 1032, 1051, 1055]
         self.assertListEqual(list(post_spikes), target_spikes)
-        print("New weight exact: {}".format(new_weight_exact))
-        print("New weight SpiNNaker: {}".format(weights))
+        print(f"New weight exact: {new_weight_exact}")
+        print(f"New weight SpiNNaker: {weights}")
 
         self.assertTrue(numpy.allclose(weights, new_weight_exact, rtol=0.001))
 

@@ -59,7 +59,7 @@ def do_run() -> None:
     targets = []
     for t in range(n_target):
         pop = sim.Population(
-            n_neurons, sim.IF_curr_exp(), label="target_{}".format(t),
+            n_neurons, sim.IF_curr_exp(), label=f"target_{t}",
             additional_parameters={
                 "splitter": SplitterPopulationVertexFixed()})
         pop.add_placement_constraint(x=target_x, y=target_y)
@@ -68,7 +68,7 @@ def do_run() -> None:
     sources = []
     for s in range(n_source):
         sources.append(sim.Population(
-            n_neurons, sim.IF_curr_exp(), label="source_{}".format(s),
+            n_neurons, sim.IF_curr_exp(), label=f"source_{s}",
             additional_parameters={
                 "splitter": SplitterPopulationVertexFixed()}))
 

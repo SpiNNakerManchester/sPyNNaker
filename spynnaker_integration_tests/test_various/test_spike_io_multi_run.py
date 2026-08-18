@@ -32,9 +32,9 @@ print_condition = Condition()
 # Create an initialisation method
 def init_pop(label: str, n_neurons: int, run_time_ms: float,
              machine_timestep_ms: float) -> None:
-    print("{} has {} neurons".format(label, n_neurons))
-    print("Simulation will run for {}ms at {}ms timesteps".format(
-        run_time_ms, machine_timestep_ms))
+    print(f"{label} has {n_neurons} neurons")
+    print(f"Simulation will run for {run_time_ms}ms "
+          f"at {machine_timestep_ms}ms timesteps")
 
 
 # Create a sender of packets for the forward population

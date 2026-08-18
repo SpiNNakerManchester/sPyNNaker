@@ -98,7 +98,7 @@ def do_run(plot: bool) -> tuple[Block, Block, ConnectionHolder]:
                   data_labels=[small_world.label], yticks=True,
                   xlim=(0, runtime), xticks=True),
             title="Simple small world connector",
-            annotations="Simulated with {}".format(p.name())
+            annotations=f"Simulated with {p.name()}"
         )
         plt.show()
 

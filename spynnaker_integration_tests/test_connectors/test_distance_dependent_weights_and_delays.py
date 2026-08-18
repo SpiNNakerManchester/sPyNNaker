@@ -92,7 +92,7 @@ def do_run(plot: bool) -> tuple[ConnectionHolder, ConnectionHolder]:
                   data_labels=[grid.label], yticks=True, xlim=(0, runtime),
                   xticks=True),
             title="Simple 2D grid distance-dependent weights and delays",
-            annotations="Simulated with {}".format(p.name())
+            annotations=f"Simulated with {p.name()}"
         )
         plt.show()
 

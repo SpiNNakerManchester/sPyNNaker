@@ -142,6 +142,6 @@ def _check_warnings(lc: LogCapture, expected: list[str],
         if record.levelname == "WARNING" and match:
             warning_variables.add(match.group(1))
 
-    print("Found warnings for variables {}".format(warning_variables))
+    print(f"Found warnings for variables {warning_variables}")
     assert all(item in warning_variables for item in expected)
     assert all(item not in warning_variables for item in not_expected)

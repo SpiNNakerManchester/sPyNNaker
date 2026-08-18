@@ -62,7 +62,7 @@ def do_synfire_npop(nNeurons: int, n_pops: int, neurons_per_core: int,
     for i in range(n_pops):
         populations.append(p.Population(
             nNeurons, p.IF_curr_exp(**cell_params_lif),
-            label='pop_{}'.format(i)))
+            label=f'pop_{i}'))
 
     populations.append(p.Population(
         1, p.SpikeSourceArray(**spikeArray), label='inputSpikes_1'))

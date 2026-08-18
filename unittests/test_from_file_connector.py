@@ -70,7 +70,7 @@ def test_connector(
         if column_names is not None:
             columns = ["i", "j"]
             columns.extend(column_names)
-            header = 'columns = {}'.format(columns)
+            header = f'columns = {columns}'
         if clist is not None and len(clist):
             numpy.savetxt(f, clist, header=header)
         else:

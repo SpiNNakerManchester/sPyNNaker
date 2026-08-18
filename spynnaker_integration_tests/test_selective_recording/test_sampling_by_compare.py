@@ -155,8 +155,7 @@ def compare_spikearrays(this: list[float], full: list[float],
     if this[0] != full[0]:
         raise ValueError("Index mismatch")
     if len(this) != len(full):
-        print("{} spikes length differ. {} != {}".format(
-            this[0], len(this), len(full)))
+        print(f"{this[0]} spikes length differ. {len(this)} != {len(full)}")
     i1 = 0
     i2 = 0
     lowest = None
@@ -165,24 +164,22 @@ def compare_spikearrays(this: list[float], full: list[float],
             i1 += 1
             i2 += 1
         elif this[i1] < full[i2]:
-            print("extra spike {} has spike at {}".format(this[0], this[i1]))
+            print(f"extra spike {this[0]} has spike at {this[i1]}")
             i1 += 1
             if lowest is None:
                 lowest = this[i1]
         elif this[i1] > full[i2]:
-            print("spike missing {} no spike at {}".format(this[0], full[i2]))
+            print(f"spike missing {this[0]} no spike at {full[i2]}")
             i2 += 1
             if lowest is None:
                 lowest = full[i2]
     while i1 < len(this):
-        print("trailing extra spike {} has spike at {}".format(
-            this[0], this[i1]))
+        print(f"trailing extra spike {this[0]} has spike at {this[i1]}")
         if lowest is None:
             lowest = this[i1]
         i1 += 1
     while i2 < len(full):
-        print("trailing spike missing {} no spike at {}".format(
-            this[0], full[i2]))
+        print(f"trailing spike missing {this[0]} no spike at {full[i2]}")
         if lowest is None:
             lowest = full[i2]
         i2 += 1
@@ -273,7 +270,7 @@ def run_and_compare_script(
         inh_rec_indexes: Sequence[int] | None = None,
         inh_get_indexes: Sequence[int] | None = None,
         tolerance: int = sys.maxsize) -> None:
-    full_prefix = "{}_{}_".format(simtime, n_neurons)
+    full_prefix = f"{simtime}_{n_neurons}_"
     if (not os.path.exists(full_prefix + "spikes.csv") or
             not os.path.exists(full_prefix + "v.csv") or
             not os.path.exists(full_prefix + "v.csv") or
@@ -319,7 +316,7 @@ def write_spikes(spikes: SpikeTrainList, spike_file: str) -> None:
         for spiketrain in spikes:
             f.write("{}".format(spiketrain.annotations["source_index"]))
             for time in spiketrain.times:
-                f.write(",{}".format(time.magnitude))
+                f.write(f",{time.magnitude}")
             f.write("\n")
 
 

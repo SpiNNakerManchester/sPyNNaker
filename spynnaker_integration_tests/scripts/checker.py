@@ -23,9 +23,8 @@ def check_neuron_data(
 
     if len(spikes) != expected_spikes:
         raise AssertionError(
-            "Incorrect number of spikes for neuron {} in {}. "
-            "Expected {} found {}".
-            format(index, label, expected_spikes, len(spikes)))
+            f"Incorrect number of spikes for neuron {index} in {label}. "
+            f"Expected {expected_spikes} found {len(spikes)}")
 
     # Add a tolerance for when offset goes too early or a bit late
     last_spike = spikes[0].magnitude - 8
@@ -42,24 +41,21 @@ def check_neuron_data(
         if t_delta <= 2:
             if v[t].magnitude != -65:
                 raise AssertionError(
-                    "Incorrect V for neuron {} at time {} "
-                    "(which is {} since last spike) in {}. "
-                    "Found {} but expected 65".format(
-                        index, t, t_delta, label, v[t].magnitude))
+                    f"Incorrect V for neuron {index} at time {t} "
+                    f"(which is {t_delta} since last spike) in {label}. "
+                    f"Found {v[t].magnitude} but expected 65")
         else:
             target_v = v[t - 1].magnitude + exc[t - 1].magnitude
             if v[t] > target_v:
                 raise AssertionError(
-                    "Incorrect V for neuron {} at time {} "
-                    "(which is {} since last spike) in {}. "
-                    "Found {} but expected more than {}".format(
-                        index, t, t_delta, label, v[t], target_v))
+                    f"Incorrect V for neuron {index} at time {t} "
+                    f"(which is {t_delta} since last spike) in {label}. "
+                    f"Found {v[t]} but expected more than {target_v}")
             if v[t] < target_v - 1:
                 raise AssertionError(
-                    "Incorrect V for neuron {} at time {} "
-                    "(which is {} since last spike) in {}. "
-                    "Found {} but expected more than than {}".format(
-                        index, t, t_delta, label, v[t], target_v - 1))
+                    f"Incorrect V for neuron {index} at time {t} "
+                    f"(which is {t_delta} since last spike) in {label}. "
+                    f"Found {v[t]} but expected more than than {target_v - 1}")
 
 
 def check_data(pop: Population, expected_spikes: int, simtime: int) -> None:
