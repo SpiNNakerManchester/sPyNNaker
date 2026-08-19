@@ -79,7 +79,7 @@ class IndexBasedProbabilityConnector(AbstractConnector,
     dependent upon the indices of the pre- and post-populations.
     """
 
-    __slots = [
+    __slots__ = [
         "__allow_self_connections",
         "__index_expression",
         "__probs",

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Final
+
 import numpy
 import pyNN.spiNNaker as p
 from neo.core import Block
@@ -52,7 +54,7 @@ def do_run(n_neurons: int, n_cores: int, i_offset2: int,
 
 
 class TestSetTOffset(BaseTestCase):
-    expected = [2011., 2148., 2288., 2427., 2565., 2703., 2844., 2982.]
+    expected: Final = [2011., 2148., 2288., 2427., 2565., 2703., 2844., 2982.]
 
     def one_core(self) -> None:
         n_neurons = 32

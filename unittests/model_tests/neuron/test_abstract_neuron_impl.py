@@ -33,7 +33,7 @@ from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
 
 class _MyPyNNModelImpl(AbstractPyNNModel):
 
-    default_population_parameters = {}
+    default_population_parameters = {} # NOQA RUF102
 
     @default_initial_values({"svar"})
     def __init__(self, param: float = 1.0, svar: float = 2.0):

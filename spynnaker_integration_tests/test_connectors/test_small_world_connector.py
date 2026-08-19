@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from collections import defaultdict
+from typing import Final
 
 import matplotlib.pyplot as plt
 import pyNN.spiNNaker as p
@@ -108,11 +109,11 @@ def do_run(plot: bool) -> tuple[Block, Block, ConnectionHolder]:
 
 
 class SmallWorldConnectorTest(BaseTestCase):
-    S_COUNTS = [(0, 4), (1, 6), (2, 6), (3, 6), (4, 4),
-                (5, 6), (6, 9), (7, 9), (8, 9), (9, 6),
-                (10, 6), (11, 9), (12, 9), (13, 9), (14, 6),
-                (15, 6), (16, 9), (17, 9), (18, 9), (19, 6),
-                (20, 4), (21, 6), (22, 6), (23, 6), (24, 4)]
+    S_COUNTS: Final = [(0, 4), (1, 6), (2, 6), (3, 6), (4, 4),
+                       (5, 6), (6, 9), (7, 9), (8, 9), (9, 6),
+                       (10, 6), (11, 9), (12, 9), (13, 9), (14, 6),
+                       (15, 6), (16, 9), (17, 9), (18, 9), (19, 6),
+                       (20, 4), (21, 6), (22, 6), (23, 6), (24, 4)]
 
     def directly_connected(
             self, weights: ConnectionHolder) -> dict[int, set[int]]:

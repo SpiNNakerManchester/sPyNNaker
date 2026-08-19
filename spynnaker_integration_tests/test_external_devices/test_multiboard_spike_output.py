@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import unittest
+from typing import ClassVar
 
 import pyNN.spiNNaker as p
 
@@ -25,7 +26,7 @@ from spynnaker.pyNN.exceptions import ConfigurationException
 
 class TestMultiBoardSpikeOutput(BaseTestCase):
 
-    counts: dict[str, int] = {}
+    counts: ClassVar[dict[str, int]] = {}
 
     @staticmethod
     def spike_receiver(label: str, time: int, neuron_ids: list[int]) -> None:
