@@ -14,6 +14,7 @@
 import ctypes
 from collections.abc import Sequence
 from enum import IntEnum
+from typing import ClassVar, Final
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -54,7 +55,7 @@ class SpikeProcessingProvenance(ctypes.LittleEndianStructure):
     """
     The provenance from spike processing.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # A count of the times that the synaptic input circular buffers
         # overflowed
         ("n_buffer_overflows", ctypes.c_uint32),
@@ -77,7 +78,7 @@ class MainProvenance(ctypes.LittleEndianStructure):
     """
     Provenance items from synapse processing.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # the maximum number of background tasks queued
         ("max_background_queued", ctypes.c_uint32),
         # the number of times the background queue overloaded
@@ -167,7 +168,7 @@ class PopulationMachineVertex(
         REGIONS.BIT_FIELD_FILTER,
         REGIONS.CONNECTOR_BUILDER)
 
-    _PROFILE_TAG_LABELS = {
+    _PROFILE_TAG_LABELS: Final = {
         0: "TIMER",
         1: "DMA_READ",
         2: "INCOMING_SPIKE",

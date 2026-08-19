@@ -27,7 +27,7 @@ class SpikeSourceArray(AbstractPyNNModel):
     """
     Model that creates a Spike Source Array Vertex
     """
-    default_population_parameters = {
+    default_population_parameters = {  # NOQA RUF102
         "splitter": None, "n_colour_bits": None, "neurons_per_core": None}
 
     def __init__(self, spike_times: Spikes | None = None):

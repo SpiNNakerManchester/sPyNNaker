@@ -50,7 +50,7 @@ class SpikeInjectorVertex(
         "__spike_recorder",
         "__structure")
 
-    default_parameters = {
+    default_parameters = {  # NOQA RUF102
         'label': "spikeInjector", 'port': None, 'virtual_key': None}
 
     SPIKE_RECORDING_REGION_ID = 0

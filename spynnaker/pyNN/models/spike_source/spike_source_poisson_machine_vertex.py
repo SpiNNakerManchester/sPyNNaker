@@ -18,6 +18,7 @@ from collections.abc import Iterable, Sequence, Sized
 from enum import IntEnum
 from typing import (
     TYPE_CHECKING,
+    Final,
     TypeVar,
     cast,
 )
@@ -241,7 +242,7 @@ class SpikeSourcePoissonMachineVertex(
         #: Data for the on-chip connection generator binaries.
         EXPANDER_REGION = 7
 
-    PROFILE_TAG_LABELS = {
+    PROFILE_TAG_LABELS: Final = {
         0: "TIMER",
         1: "PROB_FUNC"}
 

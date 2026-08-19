@@ -18,6 +18,7 @@ import math
 from collections.abc import Iterable, Sequence
 from typing import (
     TYPE_CHECKING,
+    ClassVar,
     TypeVar,
 )
 
@@ -91,7 +92,7 @@ class _MasterPopEntryCType(ctypes.LittleEndianStructure):
     """
     A Master Population Table Entry; matches the C struct.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # The key to match against the incoming message
         ("key", ctypes.c_uint32),
         # The mask to select the relevant bits of key for matching
@@ -128,7 +129,7 @@ class _AddressListEntryCType(ctypes.LittleEndianStructure):
     """
     An Address and Row Length structure; matches the C struct.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # the length of the row
         ("row_length", ctypes.c_uint32, 8),
         # the address

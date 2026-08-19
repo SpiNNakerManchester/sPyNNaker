@@ -14,6 +14,7 @@
 import ctypes
 from collections.abc import Sequence
 from enum import IntEnum
+from typing import ClassVar, Final
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -67,7 +68,7 @@ class NeuronMainProvenance(ctypes.LittleEndianStructure):
     """
     Provenance items from synapse processing.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # the maximum number of times the timer tick didn't complete in time
         ("n_timer_overruns", ctypes.c_uint32),
     ]
@@ -128,7 +129,7 @@ class PopulationNeuronsMachineVertex(
         REGIONS.NEURON_BUILDER,
         REGIONS.INITIAL_VALUES)
 
-    _PROFILE_TAG_LABELS = {
+    _PROFILE_TAG_LABELS: Final = {
         0: "TIMER_NEURONS"}
 
     def __init__(

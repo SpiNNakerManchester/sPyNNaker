@@ -16,7 +16,7 @@ from __future__ import annotations
 import ctypes
 from collections.abc import Sequence
 from enum import IntEnum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar, Final
 
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.config_holder import get_config_int
@@ -64,7 +64,7 @@ class SpikeProcessingFastProvenance(ctypes.LittleEndianStructure):
     """
     Types of provenance and the DataType used to represent each.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # A count of the times that the synaptic input circular buffers
         # overflowed
         ("n_buffer_overflows", ctypes.c_uint32),
@@ -162,7 +162,7 @@ class PopulationSynapsesMachineVertexCommon(
         REGIONS.BIT_FIELD_FILTER,
         REGIONS.CONNECTOR_BUILDER)
 
-    _PROFILE_TAG_LABELS = {
+    _PROFILE_TAG_LABELS: Final = {
         0: "TIMER_SYNAPSES",
         1: "DMA_READ",
         2: "INCOMING_SPIKE",
