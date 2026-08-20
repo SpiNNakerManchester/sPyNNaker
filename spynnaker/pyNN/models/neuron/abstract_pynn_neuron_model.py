@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from spinn_utilities.overrides import overrides
 
@@ -50,14 +50,14 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
 
     # The number of synapse cores for PyNN models that use PopulationVertex
     # or None to determine based on time-step
-    _n_synapse_cores: dict[type, int | None] = {}
+    _n_synapse_cores: ClassVar[dict[type, int | None]] = {}
 
     # Whether to allow delay extensions when using PyNN models that use
     # PopulationVertex
-    _allow_delay_extensions: dict[type, bool] = {}
+    _allow_delay_extensions: ClassVar[dict[type, bool]] = {}
 
     #: Population parameters for neuron models.
-    default_population_parameters = _population_parameters
+    default_population_parameters = _population_parameters  # NOQA ROU102
 
     @classmethod
     def set_model_n_synapse_cores(cls, n_synapse_cores: int | None) -> None:

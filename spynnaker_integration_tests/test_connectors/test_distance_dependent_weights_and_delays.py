@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import math
+from typing import Final
 
 import matplotlib.pyplot as plt
 import pyNN.spiNNaker as p
@@ -102,7 +103,7 @@ def do_run(plot: bool) -> tuple[ConnectionHolder, ConnectionHolder]:
 
 
 class DistanceDependentWeightsAndDelaysTest(BaseTestCase):
-    POSITIONS = [(i, j) for i in range(4) for j in range(4)]
+    POSITIONS: Final = [(i, j) for i in range(4) for j in range(4)]
 
     def check_exc_weights(self, exc_weights_delays: ConnectionHolder) -> None:
         for conn in exc_weights_delays:

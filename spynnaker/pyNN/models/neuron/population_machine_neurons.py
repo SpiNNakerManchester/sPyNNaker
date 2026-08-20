@@ -17,6 +17,7 @@ import ctypes
 from collections.abc import Container, Sequence
 from typing import (
     TYPE_CHECKING,
+    ClassVar,
     NamedTuple,
     cast,
 )
@@ -54,7 +55,7 @@ class NeuronProvenance(ctypes.LittleEndianStructure):
     """
     Provenance items from neuron processing.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # The timer tick at the end of simulation
         ("current_timer_tick", ctypes.c_uint32),
         # The number of misses of TDMA time slots

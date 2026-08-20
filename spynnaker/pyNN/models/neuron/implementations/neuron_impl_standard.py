@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from collections.abc import Mapping, Sequence
-from typing import Any
+from typing import Any, Final
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
@@ -62,15 +62,15 @@ class NeuronImplStandard(AbstractNeuronImpl):
         "__threshold_type",
     )
 
-    _RECORDABLES = ["v", "gsyn_exc", "gsyn_inh"]
+    _RECORDABLES: Final = ["v", "gsyn_exc", "gsyn_inh"]
 
-    _RECORDABLE_DATA_TYPES = {
+    _RECORDABLE_DATA_TYPES: Final = {
         "v": DataType.S1615,
         "gsyn_exc": DataType.S1615,
         "gsyn_inh": DataType.S1615
     }
 
-    _RECORDABLE_UNITS = {
+    _RECORDABLE_UNITS: Final = {
         'v': 'mV',
         'gsyn_exc': "uS",
         'gsyn_inh': "uS"}

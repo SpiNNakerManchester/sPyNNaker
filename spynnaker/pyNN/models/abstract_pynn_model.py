@@ -19,6 +19,7 @@ from collections.abc import Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
+    ClassVar,
     cast,
 )
 
@@ -46,8 +47,8 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     __slots__ = ()
 
     # The maximum number of atoms per core for PyNN models
-    _max_atoms_per_core: dict[type, tuple[int, ...] | None] = defaultdict(
-        lambda: None)
+    _max_atoms_per_core: ClassVar[dict[type, tuple[int, ...] | None]] = (
+        defaultdict(lambda: None))
 
     _model_created = False
 
@@ -170,7 +171,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     #: The default values for the parameters at the population level.
     #: These are parameters that can be passed in to the Population
     #: constructor in addition to the standard PyNN options.
-    default_population_parameters: dict[str, Any] = {}
+    default_population_parameters: dict[str, Any] = {}  # NOQA RUF102
 
     @classmethod
     def _get_default_population_parameters(cls) -> dict[str, Any]:

@@ -824,7 +824,7 @@ class _VertexHolder(AbstractPyNNModel):
     It has nothing to configure.
     """
     __slots__ = ("__vertex", )
-    default_population_parameters = {}
+    default_population_parameters = {}  # NOQA RUF102
 
     def __init__(self, vertex: PopulationApplicationVertex):
         """
