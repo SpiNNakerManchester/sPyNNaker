@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import traceback
 from time import sleep
 
 import pyNN.spiNNaker as p
@@ -50,8 +49,7 @@ def send_sync(label: str, conn: LiveEventConnection) -> None:
             except SimulatorShutdownException:
                 # Weird raise condition lost
                 sim_finished = True
-            except Exception:  # pylint: disable=broad-except
-                traceback.print_exc()
+            # Removed except Exception  So reevaluate if there is an error
 
 
 def stop(label: str, conn: LiveEventConnection) -> None:
@@ -81,7 +79,7 @@ def test_live_sync() -> None:
 
     try:
         p.external_devices.run_sync(100, 20)
-    except Exception:
+    except Exception:  # NOQA
         if sim_finished:
             SpynnakerDataView.raise_skiptest("Stopped too soon")
 
