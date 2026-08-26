@@ -176,7 +176,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         try:
             self.__socket.shutdown(socket.SHUT_WR)
-        except Exception:  # pylint: disable=broad-except
+        except Exception:  # NOQA
             pass
         self.__socket.close()
 
