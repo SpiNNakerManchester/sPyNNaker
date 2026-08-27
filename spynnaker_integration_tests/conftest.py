@@ -31,7 +31,7 @@ def check_end_is_called(request: SubRequest) -> Iterator[None]:
         return
     try:
         sim.end()
-    except Exception:  # pylint: disable=broad-except
+    except Exception:  # NOQA
         # Ignore anything that comes from this
         pass
     raise Exception(f"Simulation has not been stopped in {request.function}!")

@@ -165,16 +165,10 @@ def test_connectors(
                 assert not numpy.array_equal(
                     test_synaptic_block, synaptic_block)
 
-        try:
-            assert max(source_histogram) <= max_row_length
-            assert max(target_histogram) <= max_col_length
-            assert matrix_max_weight <= max_weight
-            assert matrix_max_delay <= max_delay
-        except Exception:
-            print(connector, n_pre, n_post, n_in_slice)
-            print(max_row_length, max(source_histogram), source_histogram)
-            print(max_col_length, max(target_histogram), target_histogram)
-            print(max_weight, matrix_max_weight, synaptic_block["weight"])
-            print(max_delay, matrix_max_delay, synaptic_block["delay"])
+        # Was in a try catch so if fails randomly reevaluate
+        assert max(source_histogram) <= max_row_length
+        assert max(target_histogram) <= max_col_length
+        assert matrix_max_weight <= max_weight
+        assert matrix_max_delay <= max_delay
     print(connector, n_pre, n_post, n_in_slice, max_row_length,
           max_source, max_col_length, max_target)
