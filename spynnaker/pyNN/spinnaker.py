@@ -168,7 +168,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # sPyNNaker specific algorithms to do before starting a run
         self.__flush_post_vertex_caches()
 
-        super(SpiNNaker, self).run(run_time, sync_time)
+        super().run(run_time, sync_time)
 
         # PyNNaker specific algorithms to do after finishing a run
         self.__flush_post_vertex_caches()

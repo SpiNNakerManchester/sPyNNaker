@@ -56,7 +56,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     def __new__(cls, *args: Any, **kwargs: Any) -> "AbstractPyNNModel":
         _ = (args, kwargs)
         AbstractPyNNModel._model_created = True
-        return super(AbstractPyNNModel, cls).__new__(cls)
+        return super().__new__(cls)
 
     @classmethod
     def verify_may_set(cls, param: str) -> None:

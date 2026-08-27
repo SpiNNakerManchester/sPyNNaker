@@ -268,4 +268,4 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
                     post.get_max_atoms_per_dimension_per_core()):
                 print("Not generating on core!")
                 return False
-        return super(OneToOneConnector, self).generate_on_machine(synapse_info)
+        return super().generate_on_machine(synapse_info)
