@@ -85,7 +85,7 @@ class TestFromListConnectorMixed(BaseTestCase):
             [(int(i), int(j)) for i, j in proj.get([], "list")])
         sim.end()
 
-        _nrows, ncols = conns.shape
+        _nrows, _ = conns.shape
         diff = numpy.setdiff1d(conns, random_conns)
 
         assert len(diff) == 0

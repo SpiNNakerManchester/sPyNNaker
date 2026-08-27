@@ -87,7 +87,7 @@ class SynfireIzhikevich(BaseTestCase):
 
     def check_run(self) -> None:
         nNeurons = 200  # number of neurons in each population
-        (v, gsyn, spikes) = do_run(nNeurons)
+        (_, _, spikes) = do_run(nNeurons)
         spike_checker.synfire_spike_checker(spikes, nNeurons)
         self.assertEqual(215, len(spikes))
 

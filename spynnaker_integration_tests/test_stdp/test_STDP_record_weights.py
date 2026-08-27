@@ -234,9 +234,9 @@ def record_weights_using_multirun(
 
 class TestSTDPRecordWeights(BaseTestCase):
     def do_run(self) -> None:
-        ILSpike_c, LIFLS_c, v_c, w_callback = record_weights_using_callback()
+        _, _, _, w_callback = record_weights_using_callback()
 
-        ILSpike_r, LIFLS_r, v_r, w_multirun = record_weights_using_multirun()
+        _, _, _, w_multirun = record_weights_using_multirun()
 
         assert all(wc[0] == wm[0] for wc, wm in zip(w_callback, w_multirun))
         assert all(wc[1] == wm[1] for wc, wm in zip(w_callback, w_multirun))
