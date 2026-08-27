@@ -695,7 +695,7 @@ class AbstractConnector(metaclass=AbstractBase):
             "callback": None
         }
 
-    def clone(self) -> "AbstractConnector":
+    def clone(self) -> AbstractConnector:
         """
         Create a clone of the Connector at init point
 
@@ -709,7 +709,7 @@ class AbstractConnector(metaclass=AbstractBase):
             f"Cloning type{self} which may lead to incorrect results.")
         return theType(**params)
 
-    def get_unused(self) -> "AbstractConnector":
+    def get_unused(self) -> AbstractConnector:
         """
         Checks the Connector is unused and clones if needed
 

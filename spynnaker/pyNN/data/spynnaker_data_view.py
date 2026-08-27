@@ -46,7 +46,7 @@ class _SpynnakerDataModel:
     What data is held where and how can change without notice.
     """
 
-    __singleton: '_SpynnakerDataModel' | None = None
+    __singleton: _SpynnakerDataModel | None = None
 
     __slots__ = (
         # Data values cached
@@ -55,7 +55,7 @@ class _SpynnakerDataModel:
         "_populations",
         "_projections")
 
-    def __new__(cls) -> '_SpynnakerDataModel':
+    def __new__(cls) -> _SpynnakerDataModel:
         if cls.__singleton is not None:
             return cls.__singleton
         obj = object.__new__(cls)
