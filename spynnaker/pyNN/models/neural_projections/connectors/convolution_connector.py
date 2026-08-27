@@ -389,7 +389,7 @@ class ConvolutionConnector(AbstractConnector):
             target_vertex: ApplicationVertex) -> Sequence[
                 tuple[MachineVertex, Sequence[AbstractVertex]]]:
         if not self.__filter_edges:
-            return super(ConvolutionConnector, self).get_connected_vertices(
+            return super().get_connected_vertices(
                 s_info, source_vertex, target_vertex)
         pre_vertices = numpy.array(
             source_vertex.splitter.get_out_going_vertices(s_info.partition_id))

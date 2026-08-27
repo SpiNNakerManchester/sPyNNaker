@@ -104,7 +104,7 @@ class SPIFOutputDevice(
         :param output_key_shift:
             The shift to apply to the population indices when added to the key
         """
-        super(SPIFOutputDevice, self).__init__(
+        super().__init__(
             n_atoms=1,
             outgoing_fpga_connection=FPGAConnection(
                 SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address,
