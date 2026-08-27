@@ -27,17 +27,17 @@ from pyNN.random import RandomDistribution
 
 #: The type of weights and delays provided by Synapse / SynapseInformation
 # Combined types (where value could be either)
-WeightsDelays: Final['TypeAlias'] = (float | str | RandomDistribution |
-                                     NDArray[numpy.float64] | None)
-Weights: Final['TypeAlias'] = (float | str | RandomDistribution |
-                               NDArray[numpy.float64] | None)
-Delays: Final['TypeAlias'] = \
+WeightsDelays: Final[TypeAlias] = (float | str | RandomDistribution |
+                                   NDArray[numpy.float64] | None)
+Weights: Final[TypeAlias] = (float | str | RandomDistribution |
+                             NDArray[numpy.float64] | None)
+Delays: Final[TypeAlias] = \
     float | str | RandomDistribution | NDArray[numpy.float64]
 # These are the Types we know are coming in.
 # Most things that can be considered floats (including int)  will work
-WeightsDelysIn: Final['TypeAlias'] = (float | str | RandomDistribution |
-                                      Iterable[float] |
-                                      NDArray[numpy.float64] | None)
+WeightsDelysIn: Final[TypeAlias] = (
+        float | str | RandomDistribution | Iterable[float] |
+        NDArray[numpy.float64] | None)
 
 ViewIndices = None | Sequence[int] | NDArray[numpy.integer]
 #: :meta private:

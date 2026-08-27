@@ -765,7 +765,7 @@ class Population(PopulationBase):
     @staticmethod
     def create(
             cellclass: _CellTypeArg, cellparams: _ParamDict | None = None,
-            n: int = 1) -> 'Population':
+            n: int = 1) -> Population:
         """
         Pass through method to the constructor defined by PyNN.
         Create ``n`` cells all of the same type.

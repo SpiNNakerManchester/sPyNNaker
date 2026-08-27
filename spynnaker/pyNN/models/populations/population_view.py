@@ -86,7 +86,7 @@ class PopulationView(PopulationBase):
     __realslots__ = frozenset("_PopulationView" + item for item in __slots__)
 
     def __init__(
-            self, parent: Population | 'PopulationView',
+            self, parent: Population | PopulationView,
             selector: Selector, label: str | None = None):
         """
         :param parent: the population or view to make the view from
@@ -177,7 +177,7 @@ class PopulationView(PopulationBase):
             self.__vertex.get_state_variables(), self.__indexes)
 
     @property
-    def parent(self) -> Population | 'PopulationView':
+    def parent(self) -> Population | PopulationView:
         """
         A reference to the parent Population (that this is a view of).
         """
@@ -192,7 +192,7 @@ class PopulationView(PopulationBase):
 
     @property
     @overrides(PopulationBase.all_cells)
-    def all_cells(self) -> Sequence['IDMixin']:
+    def all_cells(self) -> Sequence[IDMixin]:
         """
         An array containing the cell IDs of all neurons in the
         Population (all MPI nodes).
@@ -204,16 +204,16 @@ class PopulationView(PopulationBase):
         return tuple(self.__indexes)
 
     @overload
-    def __getitem__(self, index: int) -> 'IDMixin':
+    def __getitem__(self, index: int) -> IDMixin:
         ...
 
     @overload
     def __getitem__(self, index: None | slice | list[int] | list[bool] |
-                    NDArray[bool_] | NDArray[integer]) -> 'PopulationView':
+                    NDArray[bool_] | NDArray[integer]) -> PopulationView:
         ...
 
     def __getitem__(self, index: None | int | slice | list[int] | list[bool] |
-                    NDArray[bool_] | NDArray[integer]) -> 'PopulationView':
+                    NDArray[bool_] | NDArray[integer]) -> PopulationView:
         """
         Return either a single cell (ID object) from the Population,
         if index is an integer, or a subset of the cells
@@ -229,7 +229,7 @@ class PopulationView(PopulationBase):
             return IDMixin(self.__population, index)
         return PopulationView(self, index, label=self.label + "_" + str(index))
 
-    def __iter__(self) -> Iterator['IDMixin']:
+    def __iter__(self) -> Iterator[IDMixin]:
         """
         Iterator over cell IDs (on the local node).
         """
@@ -513,7 +513,7 @@ class PopulationView(PopulationBase):
         raise NotImplementedError("Not implemented for views")
 
     def sample(
-            self, n: int, rng: NumpyRNG | None = None) -> 'PopulationView':
+            self, n: int, rng: NumpyRNG | None = None) -> PopulationView:
         """
         Randomly sample `n` cells from the Population view, and return a
         new PopulationView object.

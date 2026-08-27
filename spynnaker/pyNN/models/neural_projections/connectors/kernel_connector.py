@@ -57,9 +57,9 @@ if TYPE_CHECKING:
     )
 
 
-_TWOD: Final['TypeAlias'] = list[int] | tuple[int, int]
-_KERNAL: Final['TypeAlias'] = (float | list[float] |
-                               NDArray[numpy.floating] | RandomDistribution)
+_TWOD: Final[TypeAlias] = list[int] | tuple[int, int]
+_KERNAL: Final[TypeAlias] = (float | list[float] |
+                             NDArray[numpy.floating] | RandomDistribution)
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 9
