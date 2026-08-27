@@ -605,7 +605,7 @@ class PopulationView(PopulationBase):
             return True
         return tuple(self.__indexes) == tuple(cont)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, PopulationView):
             return False
         return (self.__vertex == other._vertex and

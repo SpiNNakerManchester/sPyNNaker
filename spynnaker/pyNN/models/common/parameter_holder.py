@@ -13,7 +13,6 @@
 # limitations under the License.
 from collections.abc import Callable, Iterable, Iterator
 from typing import (
-    Any,
     cast,
     overload,
 )
@@ -157,7 +156,7 @@ class ParameterHolder:
             return item in data[self.__single_key]
         return item in data
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         data = self._get_data_items()
         if self.__single_key is not None:
             return data[self.__single_key] == other
