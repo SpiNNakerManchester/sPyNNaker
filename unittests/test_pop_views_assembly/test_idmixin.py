@@ -58,7 +58,7 @@ class TestIDMixin(BaseTestCase):
         pop_1 = sim.Population(4, sim.IF_curr_exp(), label=LABEL)
         cell = pop_1.all_cells[2]
         with pytest.raises(Exception):
-            cell.variable_that_is_not_there
+            _ = cell.variable_that_is_not_there
         with pytest.raises(Exception):
             cell.variable_that_is_not_there = "pop"
         sim.end()
