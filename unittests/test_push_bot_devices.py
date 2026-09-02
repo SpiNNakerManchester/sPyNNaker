@@ -35,11 +35,11 @@ class Test(unittest.TestCase):
             self, enum_class: type[AbstractPushBotOutputDevice]) -> None:
         for item in enum_class:
             print(item)
-            item.value
-            item.protocol_property
-            item.min_value
-            item.max_value
-            item.time_between_send
+            _: object = item.value
+            _ = item.protocol_property
+            _ = item.min_value
+            _ = item.max_value
+            _ = item.time_between_send
 
     def test_laser_device(self) -> None:
         self._test_device_enum(PushBotLaser)

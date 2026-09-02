@@ -21,7 +21,7 @@ from matplotlib import pyplot
 
 from spinn_utilities.log import FormatAdapter
 
-import spynnaker.pyNN.external_devices as external_devices
+from spynnaker.pyNN import external_devices
 from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotRetinaResolution,
