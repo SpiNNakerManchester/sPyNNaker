@@ -183,7 +183,7 @@ def do_larger_array(plot: bool) -> tuple[Block, Block, Block]:
 class ArrayConnectorTest(BaseTestCase):
 
     def a_run(self) -> None:
-        v, spikes, v2, spikes2 = do_run(plot=False)
+        _, spikes, _, spikes2 = do_run(plot=False)
         # any checks go here
         spikes_test = neo_convertor.convert_spikes(spikes)
         spikes_test2 = neo_convertor.convert_spikes(spikes2)
@@ -194,7 +194,7 @@ class ArrayConnectorTest(BaseTestCase):
         self.runsafe(self.a_run)
 
     def larger_array(self) -> None:
-        v, spikes, conns = do_larger_array(plot=False)
+        _, spikes, conns = do_larger_array(plot=False)
         # checks go here
         spikes_test = neo_convertor.convert_spikes(spikes)
         self.assertEqual(4032, len(conns))

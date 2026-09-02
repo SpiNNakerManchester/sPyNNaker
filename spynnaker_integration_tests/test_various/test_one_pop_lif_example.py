@@ -57,7 +57,7 @@ def do_run(nNeurons: int) -> tuple[Block, Block, Block]:
 class OnePopLifExample(BaseTestCase):
     def do_run(self) -> None:
         nNeurons = 5  # number of neurons in each population
-        (v, gsyn, spikes) = do_run(nNeurons)
+        (_, _, spikes) = do_run(nNeurons)
         self.assertEqual(5, len(spikes))
         self.assertEqual(spikes[0][0], 0)
         self.assertEqual(spikes[0][1], 76)
