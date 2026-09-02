@@ -23,7 +23,7 @@ from numpy.typing import NDArray
 
 from spinnaker_testbase import BaseTestCase
 
-import spynnaker.spike_checker as spike_checker
+from spynnaker import spike_checker
 from spynnaker.pyNN.utilities import neo_convertor
 
 

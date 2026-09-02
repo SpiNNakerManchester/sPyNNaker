@@ -19,7 +19,7 @@ from pyNN.utility.plotting import Figure
 
 from spinnaker_testbase import BaseTestCase
 
-import spynnaker.spike_checker as spike_checker
+from spynnaker import spike_checker
 from spynnaker.spynnaker_plotting import SpynnakerPanel
 
 from spynnaker_integration_tests.scripts import SynfireRunner
