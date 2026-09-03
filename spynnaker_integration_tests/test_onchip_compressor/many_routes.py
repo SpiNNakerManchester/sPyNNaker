@@ -53,7 +53,7 @@ def do_run() -> None:
         if "Failure to detect machine " in str(oops):
             SpynnakerDataView.raise_skiptest(
                 f"You Need at least {n_boards} boards to run this test", oops)
-        raise oops
+        raise
     target_x, target_y = find_good_chip(machine, n_target)
 
     targets = []

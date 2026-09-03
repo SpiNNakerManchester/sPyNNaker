@@ -52,7 +52,7 @@ def do_one_run() -> None:
             raise SkipTest(
                 f"You Need at least {n_boards} boards "
                 f"to run this test") from oops
-        raise oops
+        raise
     target_x, target_y = find_good_chip(machine, n_target)
 
     targets = []

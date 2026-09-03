@@ -149,9 +149,9 @@ def test_connector_split() -> None:
         # Check each connection has a place
         for source, target in zip(sources, targets):
             assert (source, target) in has_block
-    except AssertionError as e:
+    except AssertionError:
         print(connection_list)
-        raise e
+        raise
 
 
 class MockSplitter(AbstractSplitterCommon):
