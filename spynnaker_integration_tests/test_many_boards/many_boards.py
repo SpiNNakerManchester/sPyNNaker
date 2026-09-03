@@ -55,7 +55,7 @@ class ManyBoards(BaseTestCase):
                 SpynnakerDataView.raise_skiptest(
                     f"You Need at least {self.n_boards} boards for this test",
                     oops)
-            raise oops
+            raise
 
         input_spikes = list(range(0, self.simtime - 100, 10))
         self._expected_spikes = len(input_spikes)

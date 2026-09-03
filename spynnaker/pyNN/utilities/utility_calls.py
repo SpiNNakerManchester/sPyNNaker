@@ -454,7 +454,7 @@ def get_neo_io(file_or_folder: str) -> BaseIO:
     """
     try:
         return neo.get_io(file_or_folder)
-    except ValueError as ex:
+    except ValueError:
         try:
             _, suffix = os.path.splitext(file_or_folder)
             suffix = suffix[1:].lower()
@@ -464,7 +464,7 @@ def get_neo_io(file_or_folder: str) -> BaseIO:
         except AttributeError:
             # for older neo which has no io_by_extension
             pass
-        raise ex
+        raise
 
 
 def report_non_spynnaker_pynn(msg: str) -> None:
