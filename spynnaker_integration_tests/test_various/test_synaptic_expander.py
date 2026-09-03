@@ -92,12 +92,12 @@ def run_script() -> None:
                 check_params(weight, weights)
             check_params(delay, delays)
             check(conns)
-        except AssertionError as e:
+        except AssertionError:
             print(proj)
             print("Weight:", weight, ":-", weights)
             print("Delay:", delay, ":-", delays)
             p.end()
-            raise e
+            raise
     p.end()
 
 
