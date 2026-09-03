@@ -19,7 +19,7 @@
 //!        processing of spikes without the use of transfers from SDRAM
 
 #include "local_only.h"
-#include "local_only/local_only_impl.h"
+#include "local_only_dir/local_only_impl.h"
 #include <debug.h>
 #include <circular_buffer.h>
 #include <recording.h>

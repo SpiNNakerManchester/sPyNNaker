@@ -17,7 +17,7 @@
 #include "c_main_neuron_common.h"
 #include "c_main_common.h"
 #include "profile_tags.h"
-#include "local_only/local_only_impl.h"
+#include "local_only_dir/local_only_impl.h"
 #include "local_only.h"
 #include "synapse_row.h"
 
