@@ -50,11 +50,11 @@ class TestSetRecord(BaseTestCase):
         if_curr.record("v")
 
         # SpikeSourceArray must throw if asked to record voltage
-        with self.assertRaises(Exception):
+        with self.assertRaises(KeyError):
             ssa.record("v")
 
         # SpikeSourcePoisson must throw if asked to record voltage
-        with self.assertRaises(Exception):
+        with self.assertRaises(KeyError):
             ssp.record("v")
 
         sim.end()
