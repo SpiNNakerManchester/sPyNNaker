@@ -139,8 +139,7 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
                 "is not yet feasible. "
                 "Please report it to Spinnaker user mail list.")
 
-        if n_delay_stages > self.__n_delay_stages:
-            self.__n_delay_stages = n_delay_stages
+        self.__n_delay_stages = max(self.__n_delay_stages, n_delay_stages)
 
     @property
     def delay_per_stage(self) -> int:

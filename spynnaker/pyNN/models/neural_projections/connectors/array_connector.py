@@ -129,8 +129,7 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                 if self.__array[i, j] == 1:
                     n_connections_col = 0
 
-            if n_connections_col > max_connections_col:
-                max_connections_col = n_connections_col
+            max_connections_col = max(max_connections_col, n_connections_col)
 
         return max_connections_col
 
