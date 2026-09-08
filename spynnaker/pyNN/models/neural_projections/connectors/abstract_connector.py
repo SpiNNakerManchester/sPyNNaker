@@ -625,7 +625,7 @@ class AbstractConnector(metaclass=AbstractBase):
         raise SpynnakerException("Standard pyNN connect method not supported")
 
     @staticmethod
-    def _roundsize(size: int | float, label: str) -> int:
+    def _roundsize(size: float, label: str) -> int:
         """
         Ensures that the ``size`` is an integer. Approximate integers are
         rounded; other values cause exceptions.
