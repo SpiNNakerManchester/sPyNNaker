@@ -20,7 +20,7 @@ def _clamp(a: int, b: int, c: int) -> int:
     return max(a, min(b, c))
 
 
-def _active_time_for_frequency(frequency: int | float) -> int:
+def _active_time_for_frequency(frequency: float) -> int:
     if frequency > 0:
         return int(1000000.0 / float(frequency))
     return 0
@@ -145,7 +145,7 @@ class MunichIoEthernetProtocol:
         return f"!PC0={active_time}\n".encode("ascii")
 
     @staticmethod
-    def led_frequency(frequency: int | float) -> bytes:
+    def led_frequency(frequency: float) -> bytes:
         """
         :param frequency:
         :returns: Command to set the led times based on frequency
@@ -155,7 +155,7 @@ class MunichIoEthernetProtocol:
         return f"!PC={active_time}\n!PC0={at2}\n!PC1={at2}\n".encode("ascii")
 
     @staticmethod
-    def speaker_frequency(frequency: int | float) -> bytes:
+    def speaker_frequency(frequency: float) -> bytes:
         """
         :param frequency:
         :returns: Command to set the speaker times based on frequency.
@@ -180,7 +180,7 @@ class MunichIoEthernetProtocol:
         return f"!PB0={active_time}\n".encode("ascii")
 
     @staticmethod
-    def laser_frequency(frequency: int | float) -> bytes:
+    def laser_frequency(frequency: float) -> bytes:
         """
         :param frequency:
         :returns: Command to set the laser periods based on the frequency.
