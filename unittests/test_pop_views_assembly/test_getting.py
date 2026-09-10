@@ -64,7 +64,7 @@ class TestGetting(BaseTestCase):
         with open(my_v) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                floats = list(map(lambda x: float(x), row))
+                floats = [float(x) for x in row]
                 v_expected.append(floats)
         cls.v_expected = numpy.array(v_expected)
         my_spikes = os.path.join(my_dir, "spikes.csv")
@@ -72,7 +72,7 @@ class TestGetting(BaseTestCase):
         with open(my_spikes) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                floats = list(map(lambda x: float(x), row))
+                floats = [float(x) for x in row]
                 spikes_expected_l.append((floats[0], floats[1]))
         cls.spikes_expected = numpy.array(spikes_expected_l)
 
@@ -282,7 +282,7 @@ class TestGetting(BaseTestCase):
         with open(my_packets) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                floats = list(map(lambda x: float(x), row))
+                floats = [float(x) for x in row]
                 packets_expected.append(floats)
 
         assert numpy.array_equal(packets,  packets_expected)
