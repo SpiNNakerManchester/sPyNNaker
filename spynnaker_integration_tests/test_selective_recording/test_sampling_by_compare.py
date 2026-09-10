@@ -315,8 +315,7 @@ def write_spikes(spikes: SpikeTrainList, spike_file: str) -> None:
     with open(spike_file, "w", encoding="utf-8") as f:
         for spiketrain in spikes:
             f.write("{}".format(spiketrain.annotations["source_index"]))
-            for time in spiketrain.times:
-                f.write(f",{time.magnitude}")
+            f.writelines(f",{time.magnitude}" for time in spiketrain.times)
             f.write("\n")
 
 
