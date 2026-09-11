@@ -106,9 +106,9 @@ class TestOneToOneOffsetConnector(BaseTestCase):
         block_wrap = conn_wrap.create_synaptic_block(
             post_slices, post_vertex_slice, synapse_type, synapse_info_wrap)
         offline_conns_no_wrap = sorted(
-            list([i, j] for (i, j, _w, _d, _typ) in block_no_wrap))
+            [i, j] for (i, j, _w, _d, _typ) in block_no_wrap)
         offline_conns_wrap = sorted(
-            list([i, j] for (i, j, _w, _d, _typ) in block_wrap))
+            [i, j] for (i, j, _w, _d, _typ) in block_wrap)
         sim.end()
         assert numpy.array_equal(conns_no_wrap, offline_conns_no_wrap)
         assert numpy.array_equal(conns_wrap, offline_conns_wrap)
