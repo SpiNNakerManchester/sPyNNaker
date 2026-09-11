@@ -141,7 +141,7 @@ def variable_rate_options() -> None:
     p.end()
 
     for pop, spikes in zip(pops, all_spikes):
-        print("")
+        print()
         print("==============================")
         print(pop.label)
         if isinstance(pop.celltype, p.SpikeSourcePoisson):
