@@ -270,7 +270,7 @@ class SPIFOutputDevice(
                     start = vertex_slice.lo_atom
                     atom_keys = [(i, k) for i, k in enumerate(keys, start)]
 
-                atom_keys_mapped = ((i, key | ((k & mask) >> shift))
-                                    for i, k in atom_keys)
+                atom_keys_mapped = list(  # NOQA: C400
+                    (i, key | ((k & mask) >> shift)) for i, k in atom_keys)
                 all_keys[m_vertex] = atom_keys_mapped
         return all_keys
