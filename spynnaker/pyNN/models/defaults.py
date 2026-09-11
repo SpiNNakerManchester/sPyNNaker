@@ -30,7 +30,7 @@ from spinn_utilities.log import FormatAdapter
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
-# This is PyNN decorator code so needs to use getattr with constant
+# This is PyNN decorator code
 # ruff: noqa: B009
 
 
