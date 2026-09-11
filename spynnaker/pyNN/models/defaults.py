@@ -30,6 +30,8 @@ from spinn_utilities.log import FormatAdapter
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
+# This is PyNN decorator code so needs to use getattr with constant
+# NOQA B009
 
 def _check_args(
         args_to_find: frozenset[str], default_args: list[str],
@@ -90,7 +92,7 @@ def default_parameters(parameters: Iterable[str]) -> Callable:
         # Find the real method in case we use multiple of these decorators
         wrapped = method
         while hasattr(method, "_method"):
-            method = getattr(method, "_method")
+            method = method._method
 
         # Set the parameters of the method to be used later
         method._parameters = (  # type: ignore[attr-defined]
@@ -137,7 +139,7 @@ def default_initial_values(state_variables: Iterable[str]) -> Callable:
         # Find the real method in case we use multiple of these decorators
         wrapped = method
         while hasattr(method, "_method"):
-            method = getattr(method, "_method")
+            method = method._method
 
         # Store the state variables of the method to be used later
         method._state_variables = (  # type: ignore[attr-defined]
@@ -185,15 +187,15 @@ def defaults(cls: type) -> type:
         raise TypeError(f"{cls} is not a class")
     if not hasattr(cls, "__init__"):
         raise AttributeError(f"No __init__ found in {cls}")
-    init = getattr(cls, "__init__")
+    init = cls.__init__
     while hasattr(init, "_method"):
-        init = getattr(init, "_method")
+        init = init._method
     params = None
     if hasattr(init, "_parameters"):
-        params = getattr(init, "_parameters")
+        params = init._parameters
     svars = None
     if hasattr(init, "_state_variables"):
-        svars = getattr(init, "_state_variables")
+        svars = init._state_variables
     if params is None and svars is None:
         cls.default_parameters = get_map_from_init(init)
         cls.default_initial_values = {}
@@ -226,10 +228,10 @@ class AbstractProvidesDefaults:
         Fills in default_parameters and default_initial_values attributes
         """
         # get the init method
-        init = getattr(cls, "__init__")
+        init = cls.__init__
         # Find the real method as there may be decorators
         while hasattr(init, "_method"):
-            init = getattr(init, "_method")
+            init = init._method
 
         # read the values from the init method
         init_args = inspect.getfullargspec(init)
@@ -245,16 +247,16 @@ class AbstractProvidesDefaults:
 
         # get the keys based on the decorators
         if hasattr(init, "_parameters"):
-            params = getattr(init, "_parameters")
+            params = init._parameters
             if hasattr(init, "_state_variables"):
-                svars = getattr(init, "_state_variables")
+                svars = init._state_variables
                 assert len(params.intersection(svars)) == 0
             else:
                 svars = frozenset(svar for svar in default_args
                                   if svar not in params)
         else:
             if hasattr(init, "_state_variables"):
-                svars = getattr(init, "_state_variables")
+                svars = init._state_variables
                 params = frozenset(param for param in default_args
                                    if param not in svars)
             else:
