@@ -101,9 +101,8 @@ def spynnaker_vertex_selector(app_vertex: ApplicationVertex) -> None:
                 app_vertex.splitter = SplitterPopulationVertexFixed()
             else:
                 app_vertex.splitter = SplitterPopulationVertexNeuronsSynapses()
-        elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
-            app_vertex.splitter = SplitterExternalDevice()
-        elif isinstance(app_vertex, ApplicationFPGAVertex):
+        elif (isinstance(app_vertex, ApplicationSpiNNakerLinkVertex) or
+              isinstance(app_vertex, ApplicationFPGAVertex)):
             app_vertex.splitter = SplitterExternalDevice()
         elif isinstance(app_vertex, SpikeSourceArrayVertex):
             app_vertex.splitter = SplitterFixedLegacy()

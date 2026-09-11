@@ -64,11 +64,8 @@ class TestConnectors(unittest.TestCase):
         for (key1, value1), (key2, value2) in zip(members, members2):
             if key1 != key2:
                 raise AssertionError(f"{key1=}, {key2=}")
-            if key1.startswith("__") and key2.endswith("__"):
-                pass
-            elif inspect.ismethod(value1):
-                pass
-            elif inspect.isfunction(value1):
+            if (key1.startswith("__") and key2.endswith("__") or
+                    inspect.ismethod(value1) or inspect.isfunction(value1)):
                 pass
             else:
                 self.compare_values(key1, value1, value2)
