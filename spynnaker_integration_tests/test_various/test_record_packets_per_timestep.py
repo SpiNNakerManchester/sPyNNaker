@@ -25,7 +25,7 @@ class TestRecordPacketsPerTimestep(BaseTestCase):
         runtime = 500
         n_neurons = 10
 
-        spike_times = list(n for n in range(0, runtime, 100))
+        spike_times = range(0, runtime, 100)
         pop_src = sim.Population(n_neurons, sim.SpikeSourceArray(spike_times),
                                  label="src")
         pop_lif = sim.Population(n_neurons, sim.IF_curr_exp(), label="lif")
@@ -57,7 +57,7 @@ class TestRecordPacketsPerTimestep(BaseTestCase):
         n_neurons = 10
         spikegap = 50
 
-        spike_times = list(n for n in range(0, runtime, spikegap))
+        spike_times = range(0, runtime, spikegap)
         pop_src = sim.Population(n_neurons, sim.SpikeSourceArray(spike_times),
                                  label="src")
 
@@ -91,7 +91,7 @@ class TestRecordPacketsPerTimestep(BaseTestCase):
         n_neurons = 10
         spikegap = 50
 
-        spike_times = list(n for n in range(0, runtime, spikegap))
+        spike_times = range(0, runtime, spikegap)
         pop_src = sim.Population(n_neurons, sim.SpikeSourceArray(spike_times),
                                  label="src")
 
