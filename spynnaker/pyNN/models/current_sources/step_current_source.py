@@ -12,14 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
+
 from .abstract_current_source import (
-    AbstractCurrentSource, CurrentSourceIDs, CurrentParameter)
+    AbstractCurrentSource,
+    CurrentParameter,
+    CurrentSourceIDs,
+)
 
 
 class StepCurrentSource(AbstractCurrentSource):
@@ -28,9 +35,10 @@ class StepCurrentSource(AbstractCurrentSource):
     """
     __slots__ = (
         "__amplitudes",
-        "__times",
+        "__parameter_types",
         "__parameters",
-        "__parameter_types")
+        "__times",
+    )
 
     def __init__(
             self, times: Sequence[int] = (), amplitudes: Sequence[float] = ()):
@@ -54,7 +62,7 @@ class StepCurrentSource(AbstractCurrentSource):
             'times': DataType.UINT32,  # arrays?
             'amplitudes': DataType.S1615}
 
-        self.__parameters: Dict[str, CurrentParameter] = {
+        self.__parameters: dict[str, CurrentParameter] = {
             'times': self.__times,
             'amplitudes': self.__amplitudes}
 

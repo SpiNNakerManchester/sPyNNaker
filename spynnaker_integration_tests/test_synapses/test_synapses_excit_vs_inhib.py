@@ -15,8 +15,10 @@
 # limitations under the License.
 
 import pyNN.spiNNaker as p
-from spynnaker.pyNN.utilities import neo_convertor
+
 from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.utilities import neo_convertor
 
 
 class TestSynapsesExcitVsInhib(BaseTestCase):

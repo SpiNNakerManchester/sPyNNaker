@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Sequence, Union, Tuple
-from spinn_utilities.overrides import overrides
+from collections.abc import Sequence
+
 from spinn_utilities.classproperty import classproperty
+from spinn_utilities.overrides import overrides
+
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
+
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+
 from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
 
 _population_parameters = {
@@ -37,9 +41,9 @@ class SpikeSourcePoisson(AbstractPyNNModel):
 
     default_population_parameters = _population_parameters
 
-    def __init__(self, rate: Union[float, Sequence[float]] = 0.0,
-                 start: Union[int, Sequence[int]] = 0,
-                 duration: Union[int, Sequence[int], None] = None):
+    def __init__(self, rate: float | Sequence[float] = 0.0,
+                 start: int | Sequence[int] = 0,
+                 duration: int | Sequence[int] | None = None):
         """
         :param rate:
         :param start:
@@ -57,10 +61,10 @@ class SpikeSourcePoisson(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
             self, n_neurons: int, label: str, *,
-            seed: Optional[int] = None, max_rate: Optional[float] = None,
-            splitter: Optional[AbstractSplitterCommon] = None,
-            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
-            n_colour_bits: Optional[int] = None) -> SpikeSourcePoissonVertex:
+            seed: int | None = None, max_rate: float | None = None,
+            splitter: AbstractSplitterCommon | None = None,
+            neurons_per_core: int | tuple[int, ...] | None = None,
+            n_colour_bits: int | None = None) -> SpikeSourcePoissonVertex:
         """
         :param label: The name for the vertex.
         :param seed:

@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Iterable, List, Union
+from collections.abc import Iterable
+from typing import TypeAlias
 
 import numpy
 from numpy import floating
 from numpy.typing import NDArray
-from typing_extensions import TypeAlias
-
 from pyNN.random import RandomDistribution
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
@@ -28,11 +27,11 @@ from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from spynnaker.pyNN.utilities.struct import Struct
 
 #: The type of parameters to a neuron model.
-ModelParameter: TypeAlias = Union[
-    float, Iterable[float], RandomDistribution, NDArray[floating]]
+ModelParameter: TypeAlias = (float | Iterable[float] | RandomDistribution |
+                             NDArray[floating])
 
 
-class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
+class AbstractStandardNeuronComponent(metaclass=AbstractBase):
     """
     Represents a component of a standard neural model.
     """
@@ -40,7 +39,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         "__structs",
         "__units")
 
-    def __init__(self, structs: List[Struct], units: Dict[str, str]):
+    def __init__(self, structs: list[Struct], units: dict[str, str]):
         """
         :param structs: The structures of the component
         :param units: The units to use for each parameter
@@ -49,7 +48,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         self.__units = units
 
     @property
-    def structs(self) -> List[Struct]:
+    def structs(self) -> list[Struct]:
         """
         The structures of the component.  If there are multiple structures,
         the order is how they will appear in memory; where there are
@@ -107,7 +106,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
 
     @staticmethod
     def _convert(value: ModelParameter) -> \
-            Union[float, RangedList[float], RandomDistribution]:
+            float | RangedList[float] | RandomDistribution:
         """
         Converts a model parameter into a form that can be ingested by a
         RangeDictionary.

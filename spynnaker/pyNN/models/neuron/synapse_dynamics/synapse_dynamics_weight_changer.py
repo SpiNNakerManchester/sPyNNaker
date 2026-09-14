@@ -12,37 +12,52 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING, cast
+
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, cast
 
 import numpy
-from numpy import floating, integer, uint8, uint32, int16
+from numpy import floating, int16, integer, uint8, uint32
 from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
+
 from pacman.utilities.utility_calls import get_n_bits
 
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.exceptions import (
-    SynapticConfigurationException, InvalidParameterType)
+    InvalidParameterType,
+    SynapticConfigurationException,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE)
+    NUMPY_CONNECTORS_DTYPE,
+)
+from spynnaker.pyNN.types import WeightScales
+
+from .abstract_generate_on_machine import (
+    AbstractGenerateOnMachine,
+    MatrixGeneratorID,
+)
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
-from .abstract_generate_on_machine import AbstractGenerateOnMachine
-from .abstract_generate_on_machine import MatrixGeneratorID
 from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
-    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
-    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neural_projections.connectors import (
-        AbstractConnector)
-    from spynnaker.pyNN.types import Weights
+        AbstractConnector,
+    )
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray,
+    )
+    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
     from spynnaker.pyNN.models.projection import Projection
+    from spynnaker.pyNN.types import Weights
+
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 
@@ -138,14 +153,21 @@ class SynapseDynamicsWeightChanger(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
-            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
+            max_n_synapses: int, max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> tuple[
                 NDArray[uint32], NDArray[uint32], NDArray[uint32],
                 NDArray[uint32]]:
-        weights = numpy.rint(numpy.abs(connections["weight"]))
+
+        # Pre-scale the weights here to match the ring buffer format to make
+        # addition to the weights easier
+        scaled_weights = (
+            numpy.abs(connections["weight"]) *
+            numpy.array(ring_buffer_weight_scales)[
+                connections["synapse_type"]])
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
         fixed_plastic = (
-            ((weights.astype(uint32) & 0xFFFF) << 16) |
+            ((numpy.rint(scaled_weights).astype(uint32) & 0xFFFF) << 16) |
             (connections["synapse_type"].astype(uint32) << n_neuron_id_bits) |
             (connections["target"] & neuron_id_mask))
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
@@ -188,11 +210,13 @@ class SynapseDynamicsWeightChanger(
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
             self, n_synapse_types: int,
-            pp_size: NDArray[uint32], pp_data: List[NDArray[uint32]],
-            fp_size: NDArray[uint32], fp_data: List[NDArray[uint32]],
-            max_atoms_per_core: int) -> ConnectionsArray:
+            pp_size: NDArray[uint32], pp_data: list[NDArray[uint32]],
+            fp_size: NDArray[uint32], fp_data: list[NDArray[uint32]],
+            max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         data = numpy.concatenate(fp_data)
         weight = ((data >> 16) & 0xFFFF).astype(int16)
+        n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
         connections = numpy.zeros(data.size, dtype=NUMPY_CONNECTORS_DTYPE)
@@ -201,6 +225,10 @@ class SynapseDynamicsWeightChanger(
         connections["target"] = data & neuron_id_mask
         connections["weight"] = weight
         connections["delay"] = 1
+        synapse_type = (
+            (data >> n_neuron_id_bits) & ((1 << n_synapse_type_bits) - 1))
+        connections["weight"] /= numpy.array(ring_buffer_weight_scales)[
+            synapse_type]
         return connections
 
     @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)
@@ -257,7 +285,7 @@ class SynapseDynamicsWeightChanger(
         return None
 
     @overrides(AbstractPlasticSynapseDynamics.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         return 0
 
     @property

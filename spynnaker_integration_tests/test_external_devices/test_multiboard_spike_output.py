@@ -12,26 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, List
-
 import unittest
-from spynnaker.pyNN.exceptions import ConfigurationException
+from typing import ClassVar
+
 import pyNN.spiNNaker as p
-from spynnaker.pyNN.data import SpynnakerDataView
-import spynnaker.pyNN.external_devices as e
+
 from spinnaker_testbase import BaseTestCase
+
+import spynnaker.pyNN.external_devices as e
+from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.exceptions import ConfigurationException
 
 
 class TestMultiBoardSpikeOutput(BaseTestCase):
 
-    counts: Dict[str, int] = dict()
+    counts: ClassVar[dict[str, int]] = {}
 
     @staticmethod
-    def spike_receiver(label: str, time: int, neuron_ids: List[int]) -> None:
+    def spike_receiver(label: str, time: int, neuron_ids: list[int]) -> None:
         TestMultiBoardSpikeOutput.counts[label] += len(neuron_ids)
 
     def multi_board_spike_output(self) -> None:
-        TestMultiBoardSpikeOutput.counts = dict()
+        TestMultiBoardSpikeOutput.counts = {}
         try:
             p.setup(1.0, n_chips_required=((48 * 2) + 1))
             machine = p.get_machine()
@@ -40,11 +42,11 @@ class TestMultiBoardSpikeOutput(BaseTestCase):
                 SpynnakerDataView.raise_skiptest(
                     "You Need at least 3 boards to run this test", oops)
 
-        labels = list()
-        pops = list()
+        labels = []
+        pops = []
         for chip in machine.ethernet_connected_chips:
             # print("Adding population on {}, {}".format(chip.x, chip.y))
-            label = "{}, {}".format(chip.x, chip.y)
+            label = f"{chip.x}, {chip.y}"
             labels.append(label)
             pop = p.Population(
                 10, p.SpikeSourceArray(spike_times=[i for i in range(100)]),

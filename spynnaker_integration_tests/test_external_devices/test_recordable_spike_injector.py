@@ -12,19 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
+import unittest
 from collections import defaultdict
 from random import randint
-import time
-from typing import Dict
-import unittest
+from typing import Final
+
 import pyNN.spiNNaker as p
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
 
 
 class TestRecordableSpikeInjector(BaseTestCase):
 
-    _n_spikes: Dict[int, int] = defaultdict(lambda: 0)
+    _n_spikes: Final[dict[int, int]] = defaultdict(lambda: 0)
     _n_neurons = 100
 
     def _inject(self, label: str,
@@ -50,13 +53,13 @@ class TestRecordableSpikeInjector(BaseTestCase):
         spikes = pop.get_data("spikes").segments[0].spiketrains
         p.end()
 
-        spike_trains = dict()
+        spike_trains = {}
         for spiketrain in spikes:
             i = spiketrain.annotations['source_index']
             if __name__ == "__main__":
                 if self._n_spikes[i] < len(spiketrain):
-                    print("Incorrect number of spikes, expected {} but got {}:"
-                          .format(self._n_spikes[i], len(spiketrain)))
+                    print(f"Incorrect number of spikes, expected "
+                          f"{self._n_spikes[i]} but got {len(spiketrain)}:")
                     print(spiketrain)
             else:
                 # If too many things send spikes at the same time, some might
@@ -70,8 +73,8 @@ class TestRecordableSpikeInjector(BaseTestCase):
         for (index, count) in self._n_spikes.items():
             if __name__ == "__main__":
                 if index not in spike_trains:
-                    print("Neuron {} should have spiked {} times but didn't"
-                          .format(index, count))
+                    print(f"Neuron {index} should have spiked {count} times "
+                          f"but didn't")
             else:
                 assert index in spike_trains
 

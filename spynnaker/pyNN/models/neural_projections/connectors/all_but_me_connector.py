@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Any, Dict, Sequence, Optional, TYPE_CHECKING
+
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any
 
 import numpy
 from numpy import uint32
@@ -22,20 +24,25 @@ from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs.common import Slice
 
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.interface.ds import DataType
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.types import Weights
 
 from .abstract_connector import AbstractConnector
-from .abstract_generate_connector_on_machine import (
-    AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
-    AbstractGenerateConnectorOnHost)
+    AbstractGenerateConnectorOnHost,
+)
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine,
+    ConnectorIDs,
+)
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neural_projections import SynapseInformation
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
 
 
 class AllButMeConnector(AbstractGenerateConnectorOnMachine,
@@ -61,8 +68,8 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
 
     __slots__ = ("__n_neurons_per_group", "__weights")
 
-    def __init__(self, n_neurons_per_group: Optional[int] = None,
-                 weights: Optional[NDArray[numpy.float64]] = None,
+    def __init__(self, n_neurons_per_group: int | None = None,
+                 weights: NDArray[numpy.float64] | None = None,
                  safe: bool = True, verbose: bool = False,
                  callback: None = None):
         """
@@ -93,14 +100,14 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
         self.__check_weights(weights, n_neurons_per_group)
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["n_neurons_per_group"] = self.__n_neurons_per_group
         parameters["weights"] = self.__weights
         return parameters
 
-    def __check_weights(self, weights: Optional[NDArray[numpy.float64]],
-                        n_neurons_per_group: Optional[int]) -> None:
+    def __check_weights(self, weights: NDArray[numpy.float64] | None,
+                        n_neurons_per_group: int | None) -> None:
         if weights is not None and n_neurons_per_group is not None:
             n_weights = n_neurons_per_group * (n_neurons_per_group - 1)
             if len(weights) != n_weights:
@@ -140,8 +147,8 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
 
         # At most, a pre-neuron will target all post-neurons in the group,
         # except the one with the same index.  For a given subset of post
@@ -211,8 +218,8 @@ class AllButMeConnector(AbstractGenerateConnectorOnMachine,
         pre_end = min(pre_start + group_size, pre_hi + 1)
         n_values = pre_end - pre_start
 
-        pres = list()
-        posts = list()
+        pres = []
+        posts = []
         for post in range(post_start, post_end):
             for value in range(n_values):
                 if value != post_value:

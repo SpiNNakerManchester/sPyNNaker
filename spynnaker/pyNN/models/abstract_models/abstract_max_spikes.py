@@ -14,11 +14,12 @@
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.require_subclass import require_subclass
+
 from pacman.model.graphs.machine import MachineVertex
 
 
 @require_subclass(MachineVertex)
-class AbstractMaxSpikes(object, metaclass=AbstractBase):
+class AbstractMaxSpikes(metaclass=AbstractBase):
     """
     Indicates a class (a
     :py:class:`~pacman.model.graphs.machine.MachineVertex`)

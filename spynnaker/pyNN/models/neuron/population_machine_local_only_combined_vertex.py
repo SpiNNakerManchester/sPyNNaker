@@ -12,34 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import ctypes
-from enum import IntEnum
 import os
-from typing import List, Optional, Sequence, cast
+from collections.abc import Sequence
+from enum import IntEnum
+from typing import ClassVar, Final, cast
 
 from numpy import floating
 from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
 
-from pacman.model.placements import Placement
 from pacman.model.graphs.common import Slice
+from pacman.model.placements import Placement
 from pacman.model.resources import AbstractSDRAM
 
 from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+    AbstractGeneratesDataSpecification,
+    AbstractRewritesDataSpecification,
+)
 from spinn_front_end_common.interface.ds import (
-    DataSpecificationGenerator, DataSpecificationReloader)
+    DataSpecificationGenerator,
+    DataSpecificationReloader,
+)
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
-    NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
+    NeuronProvenance,
+    NeuronRegions,
+    PopulationMachineNeurons,
+)
 from .population_vertex import PopulationVertex
 
 
@@ -47,7 +56,7 @@ class LocalOnlyProvenance(ctypes.LittleEndianStructure):
     """
     Types of provenance and the DataType used to represent each.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # The maximum number of spikes received in a time step
         ("max_spikes_per_timestep", ctypes.c_uint32),
         # The number of packets that were dropped due to being late
@@ -66,7 +75,7 @@ class MainProvenance(ctypes.LittleEndianStructure):
     """
     Provenance items from synapse processing.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # the maximum number of background tasks queued
         ("max_background_queued", ctypes.c_uint32),
         # the number of times the background queue overloaded
@@ -87,12 +96,13 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     __slots__ = (
         "__key",
-        "__ring_buffer_shifts",
-        "__weight_scales",
-        "__slice_index",
-        "__neuron_data",
         "__max_atoms_per_core",
-        "__regenerate_data")
+        "__neuron_data",
+        "__regenerate_data",
+        "__ring_buffer_shifts",
+        "__slice_index",
+        "__weight_scales",
+    )
 
     # log_n_neurons, log_n_synapse_types, log_max_delay, input_buffer_size,
     # clear_input_buffer
@@ -138,7 +148,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
         REGIONS.NEURON_BUILDER,
         REGIONS.INITIAL_VALUES)
 
-    _PROFILE_TAG_LABELS = {
+    _PROFILE_TAG_LABELS: Final = {
         0: "TIMER",
         1: "DMA_READ",
         2: "INCOMING_SPIKE"}
@@ -171,7 +181,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
             NeuronProvenance.N_ITEMS +
             LocalOnlyProvenance.N_ITEMS + MainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
-        self.__key: Optional[int] = None
+        self.__key: int | None = None
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
@@ -273,7 +283,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
                     " the .spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
-    def get_recorded_region_ids(self) -> List[int]:
+    def get_recorded_region_ids(self) -> list[int]:
         ids = self._pop_vertex.neuron_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         ids.extend(self._pop_vertex.synapse_recorder.recorded_ids_by_slice(

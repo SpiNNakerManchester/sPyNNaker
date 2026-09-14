@@ -12,37 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, Optional, TYPE_CHECKING
+
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, TypeAlias
 
 from numpy import floating
 from numpy.typing import NDArray
-from typing_extensions import TypeAlias
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 from pacman.model.graphs.common import Slice
+
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
+    from spynnaker.pyNN.models.neuron import PopulationVertex
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-        .partner_selection import AbstractPartnerSelection
+        .elimination import AbstractElimination
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
         .formation import AbstractFormation
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-        .elimination import AbstractElimination
-    from spynnaker.pyNN.models.projection import Projection
+        .partner_selection import AbstractPartnerSelection
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray,
+    )
     from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
-    from spynnaker.pyNN.models.neuron import PopulationVertex
-    from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+    from spynnaker.pyNN.models.projection import Projection
 
 # see https://github.com/SpiNNakerManchester/sPyNNaker/issues/1427
 #: :meta private:
 InitialDelay: TypeAlias = float
 
 
-class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
+class AbstractSynapseDynamicsStructural(metaclass=AbstractBase):
     """
     Base class for synapse dynamics that structural plasticity understands.
     """
@@ -126,7 +132,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def seed(self) -> Optional[int]:
+    def seed(self) -> int | None:
         """
         The seed to control the randomness.
         """

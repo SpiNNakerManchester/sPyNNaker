@@ -13,11 +13,16 @@
 # limitations under the License.
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
+
 from spinn_front_end_common.interface.ds import DataType
-from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent, ModelParameter)
-from spynnaker.pyNN.utilities.struct import Struct
+
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent,
+    ModelParameter,
+)
+from spynnaker.pyNN.utilities.struct import Struct
+
 from .neuron_model import NeuronModel
 
 A = 'a'
@@ -36,8 +41,14 @@ class NeuronModelIzh(NeuronModel):
     Model of neuron due to Eugene M. Izhikevich et al.
     """
     __slots__ = (
-        "__a", "__b", "__c", "__d",
-        "__v_init", "__u_init", "__i_offset")
+        "__a",
+        "__b",
+        "__c",
+        "__d",
+        "__i_offset",
+        "__u_init",
+        "__v_init",
+    )
 
     def __init__(
             self, a: ModelParameter, b: ModelParameter, c: ModelParameter,

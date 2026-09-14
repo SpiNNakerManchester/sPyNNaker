@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from spynnaker.pyNN.external_devices_models import ExternalDeviceLifControl
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
-    PushBotEthernetDevice)
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+    PushBotEthernetDevice,
+)
 from spynnaker.pyNN.models.defaults import default_initial_values
+from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 
 
 class PushBotLifSpinnakerLink(ExternalDeviceLifControl):

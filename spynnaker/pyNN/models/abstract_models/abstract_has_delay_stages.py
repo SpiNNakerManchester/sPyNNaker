@@ -14,11 +14,12 @@
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.require_subclass import require_subclass
+
 from pacman.model.graphs.application import ApplicationVertex
 
 
 @require_subclass(ApplicationVertex)
-class AbstractHasDelayStages(object, metaclass=AbstractBase):
+class AbstractHasDelayStages(metaclass=AbstractBase):
     """
     Indicates that this object (an application vertex) has delay stages that
     are used to increase the space required for bitfields in

@@ -13,13 +13,14 @@
 # limitations under the License.
 
 import os
-from typing import Set
 
 from spinn_utilities.config_holder import clear_cfg_files
+
 from spinn_front_end_common.interface.config_setup import (
-    add_default_cfg, add_spinnaker_cfg)
-from spinn_front_end_common.interface.config_setup import (
-    fec_cfg_paths_skipped)
+    add_default_cfg,
+    add_spinnaker_cfg,
+    fec_cfg_paths_skipped,
+)
 
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
@@ -55,7 +56,7 @@ def add_spynnaker_cfg() -> None:
     add_default_cfg(os.path.join(os.path.dirname(__file__), SPYNNAKER_CFG))
 
 
-def cfg_paths_skipped() -> Set[str]:
+def cfg_paths_skipped() -> set[str]:
     """
     Set of cfg path that would not be found based on other cfg settings
 

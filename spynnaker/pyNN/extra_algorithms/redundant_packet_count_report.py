@@ -13,13 +13,15 @@
 # limitations under the License.
 
 import logging
-from typing import Final, TextIO, Tuple, cast
+from typing import Final, TextIO, cast
 
 from spinn_utilities.config_holder import get_report_path
 from spinn_utilities.log import FormatAdapter
 
 from spinn_front_end_common.interface.provenance import (
-    ProvenanceReader, ProvenanceWriter)
+    ProvenanceReader,
+    ProvenanceWriter,
+)
 
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 
@@ -102,7 +104,7 @@ def _write_report(output: TextIO) -> None:
     with ProvenanceReader() as db:
         for data in db.run_query("SELECT * FROM redundancy_by_core"):
             (_, _, _, source, _, filtered, invalid, _, redundant, total,
-             percent) = cast(Tuple[int, ...], data)
+             percent) = cast(tuple[int, ...], data)
             output.write(f"\ncore {source} \n")
             output.write(f"    {total} packets received.\n")
             output.write(
@@ -121,7 +123,7 @@ def _write_report(output: TextIO) -> None:
             (sum_total, max_total, min_total, avg_total,
                 sum_redundant, max_redundant, min_redundant, avg_redundant,
                 max_percent, min_percent, avg_percent, global_percent) = cast(
-                    Tuple[float, ...], data)
+                    tuple[float, ...], data)
             output.write(
                 f"\nThe total packets flown in system was {sum_total}.\n")
             output.write(

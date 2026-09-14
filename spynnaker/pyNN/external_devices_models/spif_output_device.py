@@ -12,34 +12,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Iterable, List, Optional, Tuple
+from collections.abc import Iterable
 
-from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
+from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs.application import (
-    ApplicationEdge, ApplicationEdgePartition, ApplicationFPGAVertex,
-    FPGAConnection)
+    ApplicationEdge,
+    ApplicationEdgePartition,
+    ApplicationFPGAVertex,
+    FPGAConnection,
+)
 from pacman.model.graphs.machine import MachineVertex
 from pacman.utilities.utility_calls import get_keys
 
 from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex, LiveOutputDevice,
-    HasCustomAtomKeyMap)
-from spinn_front_end_common.utility_models.command_sender import CommandSender
+    AbstractSendMeMulticastCommandsVertex,
+    HasCustomAtomKeyMap,
+    LiveOutputDevice,
+)
 from spinn_front_end_common.utility_models import MultiCastCommand
+from spinn_front_end_common.utility_models.command_sender import CommandSender
 
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.populations import Population
-from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
-    SpynnakerExternalDevicePluginManager)
+    SpynnakerExternalDevicePluginManager,
+)
 
 from .spif_devices import (
-    SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK,
-    set_distiller_key, set_distiller_mask,
-    set_distiller_mask_delayed, set_distiller_shift,
-    set_xp_key_delayed, set_xp_mask_delayed)
+    SPIF_FPGA_ID,
+    SPIF_OUTPUT_FPGA_LINK,
+    set_distiller_key,
+    set_distiller_mask,
+    set_distiller_mask_delayed,
+    set_distiller_shift,
+    set_xp_key_delayed,
+    set_xp_mask_delayed,
+)
 
 # The maximum number of partitions that can be supported.
 N_OUTGOING = 6
@@ -63,16 +74,20 @@ class SPIFOutputDevice(
     packet, but this can be controlled with the output_key_shift parameter.
     """
 
-    __slots__ = ("__incoming_partitions", "__create_database",
-                 "__output_key_shift", "__output_key_and_mask")
+    __slots__ = (
+        "__create_database",
+        "__incoming_partitions",
+        "__output_key_and_mask",
+        "__output_key_shift",
+    )
 
-    def __init__(self, board_address: Optional[str] = None,
-                 chip_coords: Optional[Tuple[int, int]] = None,
-                 label: Optional[str] = None,
+    def __init__(self, board_address: str | None = None,
+                 chip_coords: tuple[int, int] | None = None,
+                 label: str | None = None,
                  create_database: bool = True,
-                 database_notify_host: Optional[str] = None,
-                 database_notify_port_num: Optional[int] = None,
-                 database_ack_port_num: Optional[int] = None,
+                 database_notify_host: str | None = None,
+                 database_notify_port_num: int | None = None,
+                 database_ack_port_num: int | None = None,
                  output_key_shift: int = 24):
         """
         :param board_address: The board IP address of the SPIF device
@@ -89,13 +104,13 @@ class SPIFOutputDevice(
         :param output_key_shift:
             The shift to apply to the population indices when added to the key
         """
-        super(SPIFOutputDevice, self).__init__(
+        super().__init__(
             n_atoms=1,
             outgoing_fpga_connection=FPGAConnection(
                 SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address,
                 chip_coords),
             label=label)
-        self.__incoming_partitions: List[ApplicationEdgePartition] = list()
+        self.__incoming_partitions: list[ApplicationEdgePartition] = []
         # Force creation of the database, to be used in the read side of things
         if create_database:
             set_config("Database", "create_database", "True")
@@ -105,7 +120,7 @@ class SPIFOutputDevice(
         self.__create_database = create_database
         self.__output_key_shift = output_key_shift
         self.__output_key_and_mask: \
-            Dict[PopulationApplicationVertex, Tuple[int, int]] = dict()
+            dict[PopulationApplicationVertex, tuple[int, int]] = {}
 
     def set_output_key_and_mask(
             self, population: Population, key: int, mask: int) -> None:
@@ -197,7 +212,7 @@ class SPIFOutputDevice(
     def start_resume_commands(self) -> Iterable[MultiCastCommand]:
         # The commands here are delayed, as at the time of providing them,
         # we don't know the key or mask of the incoming link...
-        commands: List[MultiCastCommand] = list()
+        commands: list[MultiCastCommand] = []
         for i, part in enumerate(self.__incoming_partitions):
             pop_vertex = part.pre_vertex
             assert isinstance(pop_vertex, PopulationApplicationVertex)
@@ -223,13 +238,13 @@ class SPIFOutputDevice(
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
-    def timed_commands(self) -> List[MultiCastCommand]:
+    def timed_commands(self) -> list[MultiCastCommand]:
         return []
 
     @overrides(LiveOutputDevice.get_device_output_keys)
-    def get_device_output_keys(self) -> Dict[MachineVertex,
-                                             List[Tuple[int, int]]]:
-        all_keys: Dict[MachineVertex, List[Tuple[int, int]]] = dict()
+    def get_device_output_keys(self) -> dict[MachineVertex,
+                                             list[tuple[int, int]]]:
+        all_keys: dict[MachineVertex, list[tuple[int, int]]] = {}
         routing_infos = SpynnakerDataView.get_routing_infos()
         for i, part in enumerate(self.__incoming_partitions):
             pop_vertex = part.pre_vertex
@@ -242,7 +257,7 @@ class SPIFOutputDevice(
             shift = pop_vertex.n_colour_bits
             for m_vertex in part.pre_vertex.splitter.get_out_going_vertices(
                     part.identifier):
-                atom_keys: Iterable[Tuple[int, int]] = list()
+                atom_keys: Iterable[tuple[int, int]] = []
                 if isinstance(m_vertex.app_vertex, HasCustomAtomKeyMap):
                     atom_keys = m_vertex.app_vertex.get_atom_key_map(
                         m_vertex, part.identifier, routing_infos)

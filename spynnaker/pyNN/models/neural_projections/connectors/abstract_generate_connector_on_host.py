@@ -12,21 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Sequence, Tuple, TYPE_CHECKING
+
+from collections.abc import Sequence
+from typing import TYPE_CHECKING
+
 from numpy.typing import NDArray
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 from pacman.model.graphs.common import Slice
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 
-class AbstractGenerateConnectorOnHost(object, metaclass=AbstractBase):
+class AbstractGenerateConnectorOnHost(metaclass=AbstractBase):
     """
     A connector that can be generated on host.
     """
 
     # Mix-in class, so don't add anything here!
-    __slots__: Tuple[str, ...] = ()
+    __slots__: tuple[str, ...] = ()
 
     @abstractmethod
     def create_synaptic_block(

@@ -13,23 +13,33 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import List, Sequence, TYPE_CHECKING, Union, Optional
+
+from collections.abc import Sequence
+from typing import TYPE_CHECKING
+
 from spinn_utilities.config_holder import get_config_bool
+
 from pacman.model.graphs.application import ApplicationVertex
+
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector, AbstractGenerateConnectorOnMachine)
+    AbstractConnector,
+    AbstractGenerateConnectorOnMachine,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine)
-from spynnaker.pyNN.types import (Delays, Weights)
+    AbstractGenerateOnMachine,
+)
+from spynnaker.pyNN.types import Delays, Weights
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.populations import Population, PopulationView
     from spynnaker.pyNN.models.neuron import ConnectionHolder
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-        AbstractSynapseDynamics)
+        AbstractSynapseDynamics,
+    )
+    from spynnaker.pyNN.models.populations import Population, PopulationView
 
 
-class SynapseInformation(object):
+class SynapseInformation:
     """
     Contains the synapse information including the connector, synapse type
     and synapse dynamics.
@@ -37,23 +47,24 @@ class SynapseInformation(object):
     # Made by a Projection
     __slots__ = (
         "__connector",
-        "__pre_population",
+        "__delays",
+        "__download_on_pause",
+        "__partition_id",
         "__post_population",
-        "__prepop_is_view",
         "__postpop_is_view",
+        "__pre_population",
+        "__pre_run_connection_holders",
+        "__prepop_is_view",
+        "__receptor_type",
         "__synapse_dynamics",
         "__synapse_type",
-        "__receptor_type",
-        "__weights",
-        "__delays",
-        "__pre_run_connection_holders",
         "__synapse_type_from_dynamics",
-        "__download_on_pause",
-        "__partition_id")
+        "__weights",
+    )
 
     def __init__(self, connector: AbstractConnector,
-                 pre_population: Union[Population, PopulationView],
-                 post_population: Union[Population, PopulationView],
+                 pre_population: Population | PopulationView,
+                 post_population: Population | PopulationView,
                  prepop_is_view: bool, postpop_is_view: bool,
                  synapse_dynamics: AbstractSynapseDynamics,
                  synapse_type: int, receptor_type: str,
@@ -61,7 +72,7 @@ class SynapseInformation(object):
                  weights: Weights = None,
                  delays: Delays = None,
                  download_on_pause: bool = False,
-                 partition_id: Optional[str] = None):
+                 partition_id: str | None = None):
         """
         :param connector: The connector connected to the synapse
         :param pre_population: The population sending spikes to the synapse
@@ -97,7 +108,7 @@ class SynapseInformation(object):
         self.__partition_id = partition_id or SPIKE_PARTITION_ID
 
         # Make a list of holders to be updated
-        self.__pre_run_connection_holders: List[ConnectionHolder] = list()
+        self.__pre_run_connection_holders: list[ConnectionHolder] = []
 
     @property
     def connector(self) -> AbstractConnector:
@@ -107,14 +118,14 @@ class SynapseInformation(object):
         return self.__connector
 
     @property
-    def pre_population(self) -> Union[Population, PopulationView]:
+    def pre_population(self) -> Population | PopulationView:
         """
         The population sending spikes to the synapse.
         """
         return self.__pre_population
 
     @property
-    def post_population(self) -> Union[Population, PopulationView]:
+    def post_population(self) -> Population | PopulationView:
         """
         The population hosting the synapse.
         """

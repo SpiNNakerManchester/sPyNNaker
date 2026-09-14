@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Tuple, Union
+
 import numpy
 import pyNN.spiNNaker as sim
+
 from spinnaker_testbase import BaseTestCase
 
 SOURCES = 5
@@ -24,8 +25,8 @@ DESTINATIONS = 10
 class TestFixedTotalNumberConnector(BaseTestCase):
 
     def do_fixed_total_nd_run(
-            self, neurons_per_core_pre: Union[int, Tuple[int, ...]],
-            pre_size: int, pre_shape: Optional[sim.Grid3D],
+            self, neurons_per_core_pre: int | tuple[int, ...],
+            pre_size: int, pre_shape: sim.Grid3D | None,
             neurons_per_core_post: int, post_size: int, post_shape: None,
             n_fixed: int, with_replace: bool) -> None:
         sim.setup(1.0)
@@ -49,7 +50,7 @@ class TestFixedTotalNumberConnector(BaseTestCase):
             assert len(numpy.unique(conns, axis=0)) == len(conns)
 
     def do_fixed_total_nd_run_no_self(
-            self, neurons_per_core: Tuple[int, ...], size: int,
+            self, neurons_per_core: tuple[int, ...], size: int,
             shape: sim.Grid2D, n_fixed: int, with_replace: bool) -> None:
         sim.setup(1.0)
         pop = sim.Population(

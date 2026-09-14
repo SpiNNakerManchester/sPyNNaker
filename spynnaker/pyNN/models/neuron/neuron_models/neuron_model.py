@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent)
+    AbstractStandardNeuronComponent,
+)
 
 
 class NeuronModel(AbstractStandardNeuronComponent):

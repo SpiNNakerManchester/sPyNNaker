@@ -12,10 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import ctypes
 import math
+from collections.abc import Iterable, Sequence
 from typing import (
-    Dict, Iterable, List, Sequence, Tuple, Type, TypeVar, TYPE_CHECKING)
+    TYPE_CHECKING,
+    ClassVar,
+    TypeVar,
+)
 
 import numpy
 from numpy import uint32
@@ -26,9 +31,11 @@ from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.exceptions import (
-    SynapseRowTooBigException, SynapticConfigurationException)
-from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
+    SynapseRowTooBigException,
+    SynapticConfigurationException,
+)
 from spynnaker.pyNN.utilities.bit_field_utilities import BIT_IN_A_WORD
+from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
@@ -68,7 +75,7 @@ def _n_bits(field: ctypes._CField) -> int:
     return _BITS_PER_BYTES * field.size
 
 
-def _make_array(ctype: Type[_T], n_items: int) -> ctypes.Array[_T]:
+def _make_array(ctype: type[_T], n_items: int) -> ctypes.Array[_T]:
     """
     Make an array of ctype items; done separately as the syntax is a
     little odd!
@@ -85,7 +92,7 @@ class _MasterPopEntryCType(ctypes.LittleEndianStructure):
     """
     A Master Population Table Entry; matches the C struct.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # The key to match against the incoming message
         ("key", ctypes.c_uint32),
         # The mask to select the relevant bits of key for matching
@@ -122,7 +129,7 @@ class _AddressListEntryCType(ctypes.LittleEndianStructure):
     """
     An Address and Row Length structure; matches the C struct.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # the length of the row
         ("row_length", ctypes.c_uint32, 8),
         # the address
@@ -168,24 +175,25 @@ def _to_numpy(array: ctypes.Array) -> NDArray[uint32]:
     return numpy.ctypeslib.as_array(uint32_array, (n_words,))
 
 
-class _MasterPopEntry(object):
+class _MasterPopEntry:
     """
     Internal class that contains a master population table entry.
     """
     __slots__ = (
         "__addresses_and_row_lengths",
-        # The mask to match this entry on
-        "__mask",
-        # The routing key to match this entry on
-        "__routing_key",
         # The part of the key where the core id is held after shifting (below)
         "__core_mask",
         # Where in the key that the core id is held
         "__core_shift",
+        # The mask to match this entry on
+        "__mask",
+        # The number of bits reserved for the colour
+        "__n_colour_bits",
         # The number of neurons on every core except the last
         "__n_neurons",
-        # The number of bits reserved for the colour
-        "__n_colour_bits")
+        # The routing key to match this entry on
+        "__routing_key",
+    )
 
     def __init__(self, routing_key: int, mask: int, core_mask: int,
                  core_shift: int, n_neurons: int, n_colour_bits: int):
@@ -204,7 +212,7 @@ class _MasterPopEntry(object):
         self.__core_shift = core_shift
         self.__n_neurons = n_neurons
         self.__n_colour_bits = n_colour_bits
-        self.__addresses_and_row_lengths: List[Tuple[int, int, bool]] = list()
+        self.__addresses_and_row_lengths: list[tuple[int, int, bool]] = []
 
     def append(self, address: int, row_length: int) -> int:
         """
@@ -270,7 +278,7 @@ class _MasterPopEntry(object):
         return self.__n_neurons
 
     @property
-    def addresses_and_row_lengths(self) -> Sequence[Tuple[int, int, bool]]:
+    def addresses_and_row_lengths(self) -> Sequence[tuple[int, int, bool]]:
         """
         The memory address that this master pop entry points at
         (in the synaptic matrix).
@@ -304,7 +312,7 @@ class _MasterPopEntry(object):
 
         entry.n_colour_bits = self.__n_colour_bits
         entry.core_mask = self.__core_mask
-        entry.n_words = int(math.ceil(self.__n_neurons / BIT_IN_A_WORD))
+        entry.n_words = math.ceil(self.__n_neurons / BIT_IN_A_WORD)
         entry.n_neurons = self.__n_neurons
         entry.mask_shift = self.__core_shift
 
@@ -319,7 +327,7 @@ class _MasterPopEntry(object):
         return n_entries
 
 
-class MasterPopTableAsBinarySearch(object):
+class MasterPopTableAsBinarySearch:
     """
     Master population table, implemented as binary search master.
     """
@@ -328,7 +336,7 @@ class MasterPopTableAsBinarySearch(object):
         "__n_addresses")
 
     def __init__(self) -> None:
-        self.__entries: Dict[int, _MasterPopEntry] = {}
+        self.__entries: dict[int, _MasterPopEntry] = {}
         self.__n_addresses = 0
 
     @staticmethod
@@ -405,7 +413,7 @@ class MasterPopTableAsBinarySearch(object):
         """
         Initialise the master pop data structure.
         """
-        self.__entries = dict()
+        self.__entries = {}
         self.__n_addresses = 0
 
     def add_application_entry(

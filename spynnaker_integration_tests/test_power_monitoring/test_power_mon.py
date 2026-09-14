@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+
 import numpy
 import pyNN.spiNNaker as p
 

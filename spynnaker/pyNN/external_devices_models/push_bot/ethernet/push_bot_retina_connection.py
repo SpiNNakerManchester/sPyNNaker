@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from threading import RLock
-from typing import Optional
 
 import numpy
 
@@ -24,7 +23,8 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
 
 from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotRetinaResolution)
+    PushBotRetinaResolution,
+)
 
 from .push_bot_wifi_connection import PushBotWIFIConnection
 
@@ -48,26 +48,27 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
     """
     __slots__ = (
         "__lock",
+        "__next_data",
+        "__orig_x_shift",
+        "__orig_y_shift",
         "__p_shift",
         "__pixel_shift",
         "__pushbot_listener",
+        "__ready",
         "__retina_injector_label",
-        "__x_shift",
-        "__y_shift",
-        "__orig_x_shift",
-        "__orig_y_shift",
         "__x_mask",
+        "__x_shift",
         "__y_mask",
-        "__next_data",
-        "__ready")
+        "__y_shift",
+    )
 
     def __init__(
             self, retina_injector_label: str,
             pushbot_wifi_connection: PushBotWIFIConnection,
             resolution: PushBotRetinaResolution = (
                     PushBotRetinaResolution.NATIVE_128_X_128),
-            local_host: Optional[str] = None,
-            local_port: Optional[int] = None):
+            local_host: str | None = None,
+            local_port: int | None = None):
         """
         :param retina_injector_label:
         :param pushbot_wifi_connection:
@@ -96,7 +97,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         self.__pushbot_listener.start()
         self.__lock = RLock()
 
-        self.__next_data: Optional[bytearray] = None
+        self.__next_data: bytearray | None = None
         self.__ready = False
 
         self.add_start_resume_callback(

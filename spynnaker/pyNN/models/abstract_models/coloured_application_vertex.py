@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from spinn_utilities.abstract_base import abstractmethod
+
 from pacman.model.graphs.application import ApplicationVertex
 
 

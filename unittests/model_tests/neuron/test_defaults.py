@@ -12,13 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
+import re
+
+from testfixtures import LogCapture  # type: ignore[import]
 
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.defaults import (
-    AbstractProvidesDefaults, default_parameters, default_initial_values)
-from testfixtures import LogCapture  # type: ignore[import]
-import re
+    AbstractProvidesDefaults,
+    default_initial_values,
+    default_parameters,
+)
+
 # pylint: disable=no-member
 
 
@@ -127,8 +131,8 @@ def test_setting_state_variables() -> None:
         _AnotherClass(param_3=3)
 
 
-def _check_warnings(lc: LogCapture, expected: List[str],
-                    not_expected: List[str]) -> None:
+def _check_warnings(lc: LogCapture, expected: list[str],
+                    not_expected: list[str]) -> None:
     line_matcher = re.compile(
         "Formal PyNN specifies that (.*) should be set using initial_values"
         " not cell_params")
@@ -138,6 +142,6 @@ def _check_warnings(lc: LogCapture, expected: List[str],
         if record.levelname == "WARNING" and match:
             warning_variables.add(match.group(1))
 
-    print("Found warnings for variables {}".format(warning_variables))
+    print(f"Found warnings for variables {warning_variables}")
     assert all(item in warning_variables for item in expected)
     assert all(item not in warning_variables for item in not_expected)

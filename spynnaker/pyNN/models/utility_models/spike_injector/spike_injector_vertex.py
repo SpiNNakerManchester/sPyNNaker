@@ -14,21 +14,27 @@
 
 import logging
 import sys
-from typing import (Collection, Dict, List, Optional, Tuple, Union)
+from collections.abc import Collection
+
 import numpy
 from numpy.typing import NDArray
-from pyNN.space import Grid2D, Grid3D, BaseStructure
+from pyNN.space import BaseStructure, Grid2D, Grid3D
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.common import Slice
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
-from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
-from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
-from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
-from spynnaker.pyNN.models.abstract_models import SupportsStructure
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
+from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
+
+from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.models.common import (
+    EIEIOSpikeRecorder,
+    PopulationApplicationVertex,
+)
+from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -44,18 +50,17 @@ class SpikeInjectorVertex(
         "__spike_recorder",
         "__structure")
 
-    default_parameters = {
+    default_parameters = {  # NOQA RUF102
         'label': "spikeInjector", 'port': None, 'virtual_key': None}
 
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
             self, n_neurons: int, label: str,
-            port: Optional[int], virtual_key: Optional[int],
+            port: int | None, virtual_key: int | None,
             reserve_reverse_ip_tag: bool,
-            splitter: Optional[AbstractSplitterCommon],
-            max_atoms_per_core: Optional[
-                Union[int, Tuple[int, ...]]] = sys.maxsize):
+            splitter: AbstractSplitterCommon | None,
+            max_atoms_per_core: int | tuple[int, ...] | None = sys.maxsize):
         """
         :param label: The optional name of the vertex.
         """
@@ -67,7 +72,7 @@ class SpikeInjectorVertex(
 
         # Set up for recording
         self.__spike_recorder = EIEIOSpikeRecorder()
-        self.__structure: Optional[BaseStructure] = None
+        self.__structure: BaseStructure | None = None
 
     @overrides(SupportsStructure.set_structure)
     def set_structure(self, structure: BaseStructure) -> None:
@@ -75,19 +80,19 @@ class SpikeInjectorVertex(
 
     @property
     @overrides(PopulationApplicationVertex.atoms_shape)
-    def atoms_shape(self) -> Tuple[int, ...]:
+    def atoms_shape(self) -> tuple[int, ...]:
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.n_atoms)
         return super().atoms_shape
 
     @overrides(PopulationApplicationVertex.get_recordable_variables)
-    def get_recordable_variables(self) -> List[str]:
+    def get_recordable_variables(self) -> list[str]:
         return ["spikes"]
 
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(
-            self, name: str, sampling_interval: Optional[float] = None,
-            indices: Optional[Collection[int]] = None) -> None:
+            self, name: str, sampling_interval: float | None = None,
+            indices: Collection[int] | None = None) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if sampling_interval is not None:
@@ -100,14 +105,14 @@ class SpikeInjectorVertex(
         self.__spike_recorder.record = True
 
     @overrides(PopulationApplicationVertex.get_recording_variables)
-    def get_recording_variables(self) -> List[str]:
+    def get_recording_variables(self) -> list[str]:
         if self.__spike_recorder.record:
             return ["spikes"]
         return []
 
     @overrides(PopulationApplicationVertex.set_not_recording)
     def set_not_recording(self, name: str,
-                          indices: Optional[Collection[int]] = None) -> None:
+                          indices: Collection[int] | None = None) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if indices is not None:
@@ -153,7 +158,7 @@ class SpikeInjectorVertex(
             raise KeyError(f"Cannot record {name}")
         return vertex_slice.get_raster_ids()
 
-    def describe(self) -> Dict[str, Union[str, Collection[str]]]:
+    def describe(self) -> dict[str, str | Collection[str]]:
         """
         :returns: A human-readable description of the cell or synapse type.
         """

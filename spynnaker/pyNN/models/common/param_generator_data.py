@@ -11,18 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, Union, cast
+from typing import Any, TypeAlias, cast
 
 import numpy
-from numpy import uint32, int32
+from numpy import int32, uint32
 from numpy.typing import NDArray
-from typing_extensions import TypeAlias
-
 from pyNN.random import RandomDistribution, available_distributions
 
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-
 
 #: The generator param type for each data type
 _GENERATOR_TYPES = {
@@ -68,7 +65,7 @@ PARAM_TYPE_BY_NAME = {
     "exponential_clipped": 6
 }
 
-_ParamType: TypeAlias = Union[int, float, RandomDistribution]
+_ParamType: TypeAlias = int | float | RandomDistribution
 
 
 def param_generator_id(value: _ParamType) -> int:

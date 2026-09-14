@@ -16,24 +16,26 @@ import csv
 import os
 import pickle
 import shutil
-from typing import List
 
 import numpy
-from numpy.typing import NDArray
+import pyNN.spiNNaker as sim
 import pytest
+from numpy.typing import NDArray
 
 from spinn_front_end_common.utilities.base_database import BaseDatabase
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
+from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.data import SpynnakerDataView
-import pyNN.spiNNaker as sim
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities import neo_convertor
-from spinnaker_testbase import BaseTestCase
+
 from .make_test_data import N_NEURONS
 
 
 def trim_spikes(spikes: NDArray[numpy.floating],
-                indexes: List[int]) -> List[List[numpy.floating]]:
+                indexes: list[int]) -> list[list[numpy.floating]]:
     return [[n, t] for [n, t] in spikes if n in indexes]
 
 

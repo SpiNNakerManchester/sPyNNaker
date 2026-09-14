@@ -13,51 +13,74 @@
 # limitations under the License.
 import shutil
 import struct
-from typing import Any, BinaryIO, List, Optional, Sequence, Tuple
 import unittest
+from collections.abc import Sequence
 from tempfile import mkdtemp
-import numpy
-import pytest
+from typing import Any, BinaryIO
 
-from spinn_utilities.overrides import overrides
+import numpy
+import pyNN.spiNNaker as p
+import pytest
+from parameterized import parameterized
+
 from spinn_utilities.config_holder import set_config
-from spinn_machine.version.version_strings import VersionStrings
-from spinnman.transceiver.mockable_transceiver import MockableTransceiver
+from spinn_utilities.overrides import overrides
+
+from spinn_machine.version import MANY_BOARD_TYPES, Spin1Gen, Spin2Gen
+
 from spinnman.transceiver import Transceiver
+from spinnman.transceiver.mockable_transceiver import MockableTransceiver
+
 from pacman.model.placements import Placement
-from pacman.operations.routing_info_allocator_algorithms import (
-    ZonedRoutingInfoAllocator)
 from pacman.operations.partition_algorithms import splitter_partitioner
+from pacman.operations.routing_info_allocator_algorithms import (
+    ZonedRoutingInfoAllocator,
+)
+
 from spinn_front_end_common.interface.ds import (
-    DataSpecificationGenerator, DsSqlliteDatabase)
+    DataSpecificationGenerator,
+    DsSqlliteDatabase,
+)
 from spinn_front_end_common.interface.interface_functions import (
-    load_application_data_specs)
+    load_application_data_specs,
+)
+
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
-from spynnaker.pyNN.models.neuron.synaptic_matrices import (
-    SynapticMatrices, SynapseRegions, SynapseRegionReferences)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
-    SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic,
-    SynapseDynamicsNeuromodulation)
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.extra_algorithms import delay_support_adder
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    SplitterPopulationVertexFixed,
+)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractGenerateConnectorOnMachine,
+)
+from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    TimingDependenceSpikePair)
+    TimingDependenceSpikePair,
+)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
-    WeightDependenceAdditive, WeightDependenceMultiplicative)
+    WeightDependenceAdditive,
+    WeightDependenceMultiplicative,
+)
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .partner_selection import (LastNeuronSelection, RandomSelection)
+    .elimination import RandomByWeightElimination
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
     .formation import DistanceDependentFormation
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .elimination import RandomByWeightElimination
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPopulationVertexFixed)
-from spynnaker.pyNN.extra_algorithms import delay_support_adder
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
-from spynnaker.pyNN.config_setup import unittest_setup
-import pyNN.spiNNaker as p
+    .partner_selection import LastNeuronSelection, RandomSelection
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsNeuromodulation,
+    SynapseDynamicsStatic,
+    SynapseDynamicsSTDP,
+    SynapseDynamicsStructuralStatic,
+    SynapseDynamicsStructuralSTDP,
+)
+from spynnaker.pyNN.models.neuron.synaptic_matrices import (
+    SynapseRegionReferences,
+    SynapseRegions,
+    SynapticMatrices,
+)
 
 
 class _MockTransceiverinOut(MockableTransceiver):
@@ -72,8 +95,8 @@ class _MockTransceiverinOut(MockableTransceiver):
     def write_memory(
             self, x: int, y: int, base_address: int,
             data: BinaryIO | bytearray | bytes | int | str, *,
-            n_bytes: Optional[int] = None, offset: int = 0, cpu: int = 0,
-            get_sum: bool = False) -> Tuple[int, int]:
+            n_bytes: int | None = None, offset: int = 0, cpu: int = 0,
+            get_sum: bool = False) -> tuple[int, int]:
         if data is None:
             return
         if isinstance(data, int):
@@ -103,9 +126,10 @@ def say_false(*args: Any, **kwargs: Any) -> bool:
     return False
 
 
-def test_write_data_spec() -> None:
+@parameterized.expand(MANY_BOARD_TYPES)
+def test_write_data_spec(_: str, ver_num: str) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.ANY.text)
+    set_config("Machine", "version", ver_num)
     writer = SpynnakerDataWriter.mock()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.\
@@ -408,37 +432,56 @@ def test_set_synapse_dynamics() -> None:
 
 @pytest.mark.parametrize(
     "undelayed_indices_connected,delayed_indices_connected,n_pre_neurons,"
-    "neurons_per_core,max_delay", [
+    "neurons_per_core,max_delay,version_number", [
         # Only undelayed, all edges exist
-        (range(10), [], 1000, 100, None),
+        (range(10), [], 1000, 100, None, Spin1Gen.FIVE.value),
         # Only delayed, all edges exist
-        ([], range(10), 1000, 100, 200),
+        ([], range(10), 1000, 100, 200, Spin1Gen.FIVE.value),
         # All undelayed and delayed edges exist
-        (range(10), range(10), 1000, 100, 200),
+        (range(10), range(10), 1000, 100, 200, Spin1Gen.FIVE.value),
         # Only undelayed, some connections missing but app keys can still work
-        ([0, 1, 2, 3, 4], [], 1000, 100, None),
+        ([0, 1, 2, 3, 4], [], 1000, 100, None, Spin1Gen.FIVE.value),
         # Only delayed, some connections missing but app keys can still work
-        ([], [5, 6, 7, 8, 9], 1000, 100, 200),
+        ([], [5, 6, 7, 8, 9], 1000, 100, 200, Spin1Gen.FIVE.value),
         # Both delayed and undelayed, some undelayed edges don't exist
         # (app keys work because undelayed aren't filtered)
-        ([3, 4, 5, 6, 7], range(10), 1000, 100, 200),
+        ([3, 4, 5, 6, 7], range(10), 1000, 100, 200, Spin1Gen.FIVE.value),
         # Both delayed and undelayed, some delayed edges don't exist
         # (app keys work because all undelayed exist)
-        (range(10), [4, 5, 6, 7], 1000, 100, 200),
+        (range(10), [4, 5, 6, 7], 1000, 100, 200, Spin1Gen.FIVE.value),
         # Should work but number of cores doesn't work out
-        (range(100), [], 10000, 5, None)
+        (range(100), [], 10000, 5, None, Spin1Gen.FIVE.value),
+        # Only undelayed, all edges exist
+        (range(10), [], 1000, 100, None, Spin2Gen.SPIN2_48CHIP.value),
+        # Only delayed, all edges exist
+        ([], range(10), 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
+        # All undelayed and delayed edges exist
+        (range(10), range(10), 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
+        # Only undelayed, some connections missing but app keys can still work
+        ([0, 1, 2, 3, 4], [], 1000, 100, None, Spin2Gen.SPIN2_48CHIP.value),
+        # Only delayed, some connections missing but app keys can still work
+        ([], [5, 6, 7, 8, 9], 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
+        # Both delayed and undelayed, some undelayed edges don't exist
+        # (app keys work because undelayed aren't filtered)
+        ([3, 4, 5, 6, 7], range(10), 1000, 100, 200,
+         Spin2Gen.SPIN2_48CHIP.value),
+        # Both delayed and undelayed, some delayed edges don't exist
+        # (app keys work because all undelayed exist)
+        (range(10), [4, 5, 6, 7], 1000, 100, 200, Spin2Gen.SPIN2_48CHIP.value),
+        # Should work but number of cores doesn't work out
+        (range(100), [], 10000, 5, None, Spin2Gen.SPIN2_48CHIP.value)
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected: Sequence[int],
         delayed_indices_connected: Sequence[int],
         n_pre_neurons: int, neurons_per_core: int,
-        max_delay: Optional[int]) -> None:
+        max_delay: int | None, version_number: int) -> None:
     unittest_setup()
-    set_config("Machine", "versions", VersionStrings.FOUR_PLUS.text)
+    set_config("Machine", "version", str(version_number))
     writer = SpynnakerDataWriter.mock()
 
     # Build a from list connector with the delays we want
-    connections: List[Tuple[int, int, int, Optional[int]]] = []
+    connections: list[tuple[int, int, int, int | None]] = []
     connections.extend([(i * neurons_per_core + j, j, 0, 10)
                         for i in undelayed_indices_connected
                         for j in range(100)])

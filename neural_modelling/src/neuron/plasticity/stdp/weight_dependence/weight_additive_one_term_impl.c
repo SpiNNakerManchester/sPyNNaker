@@ -48,13 +48,12 @@ address_t weight_initialise(
 
     plasticity_weight_region_data_t *dtcm_copy = plasticity_weight_region_data =
             spin1_malloc(sizeof(plasticity_weight_region_data_t) * n_synapse_types);
-    if (dtcm_copy == NULL) {
-        log_error("Could not initialise weight region data");
-        return NULL;
-    }
 
     weight_shift = spin1_malloc(sizeof(uint32_t) * n_synapse_types);
-    if (weight_shift == NULL) {
+
+    // combining these two in one check needed to save ITCM
+    // IZK_cond_exp_dual_stdp_mad_pair_additive overflows
+    if (dtcm_copy == NULL || weight_shift == NULL) {
         log_error("Could not initialise weight region data");
         return NULL;
     }

@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy import integer, uint32
@@ -25,24 +26,33 @@ from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractConnector,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractStaticSynapseDynamics, AbstractSDRAMSynapseDynamics,
-    AbstractPlasticSynapseDynamics)
+    AbstractPlasticSynapseDynamics,
+    AbstractSDRAMSynapseDynamics,
+    AbstractStaticSynapseDynamics,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE, ConnectionsArray)
+    NUMPY_CONNECTORS_DTYPE,
+    ConnectionsArray,
+)
 from spynnaker.pyNN.types import WeightScales
 
 from .master_pop_table import MasterPopTableAsBinarySearch
 
 if TYPE_CHECKING:
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
+
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-        AbstractSynapseDynamics)
+        AbstractSynapseDynamics,
+    )
     _RowData: TypeAlias = numpy.ndarray  # 2D
 
 _N_HEADER_WORDS = 3
@@ -51,7 +61,7 @@ _STD_DELAY_SLOTS = 16
 
 
 @dataclass(frozen=True)
-class MaxRowInfo(object):
+class MaxRowInfo:
     """
     Information about the maximums for rows in a synaptic matrix.
     """
@@ -115,7 +125,7 @@ def get_max_row_info(
     max_delay_supported = get_maximum_delay_supported_in_ms(
         in_edge.post_vertex.splitter.max_support_delay())
     max_delay = max_delay_supported * (n_delay_stages + 1)
-    pad_to_length: Optional[int] = None
+    pad_to_length: int | None = None
     if isinstance(synapse_info.synapse_dynamics, AbstractSDRAMSynapseDynamics):
         pad_to_length = synapse_info.synapse_dynamics.pad_to_length
 
@@ -217,9 +227,10 @@ def _get_allowed_row_length(
 def get_synapses(
         connections: ConnectionsArray, synapse_info: SynapseInformation,
         n_delay_stages: int, n_synapse_types: int,
-        weight_scales: WeightScales, app_edge: ProjectionApplicationEdge,
+        ring_buffer_weight_scales: WeightScales,
+        app_edge: ProjectionApplicationEdge,
         max_row_info: MaxRowInfo, gen_undelayed: bool, gen_delayed: bool,
-        max_atoms_per_core: int) -> Tuple[_RowData, _RowData]:
+        max_atoms_per_core: int) -> tuple[_RowData, _RowData]:
     """
     Get the synapses as an array of words for non-delayed synapses and
     an array of words for delayed synapses. This is used to prepare
@@ -233,7 +244,8 @@ def get_synapses(
         The number of delay stages in total to be represented
     :param n_synapse_types:
         The number of synapse types in total to be represented
-    :param weight_scales: The scaling of the weights for each synapse type
+    :param ring_buffer_weight_scales:
+        The scaling of the weights for the ring buffers of each synapse type
     :param app_edge:
         The incoming machine edge that the synapses are on
     :param max_row_info:
@@ -260,11 +272,6 @@ def get_synapses(
         connections["delay"] *
         SpynnakerDataView.get_simulation_time_step_per_ms())
 
-    # Scale weights
-    if not synapse_info.synapse_type_from_dynamics:
-        connections["weight"] = (connections["weight"] * weight_scales[
-            synapse_info.synapse_type])
-
     # Split the connections up based on the delays
     if max_delay is not None:
         plastic_delay_mask = (connections["delay"] <= max_delay)
@@ -285,7 +292,8 @@ def get_synapses(
             app_edge.pre_vertex.n_atoms, n_synapse_types,
             synapse_info.synapse_dynamics,
             max_row_info.undelayed_max_n_synapses,
-            max_row_info.undelayed_max_words, max_atoms_per_core)
+            max_row_info.undelayed_max_words, max_atoms_per_core,
+            ring_buffer_weight_scales)
         del undelayed_row_indices
     del undelayed_connections
 
@@ -311,7 +319,8 @@ def get_synapses(
             app_edge.pre_vertex.n_atoms * n_delay_stages,
             n_synapse_types, synapse_info.synapse_dynamics,
             max_row_info.delayed_max_n_synapses,
-            max_row_info.delayed_max_words, max_atoms_per_core)
+            max_row_info.delayed_max_words, max_atoms_per_core,
+            ring_buffer_weight_scales)
         del delayed_row_indices
     del delayed_connections
 
@@ -322,7 +331,8 @@ def _get_row_data(
         connections: ConnectionsArray, row_indices: NDArray[numpy.integer],
         n_rows: int, n_synapse_types: int,
         synapse_dynamics: AbstractSynapseDynamics, max_row_n_synapses: int,
-        max_row_n_words: int, max_atoms_per_core: int) -> _RowData:
+        max_row_n_words: int, max_atoms_per_core: int,
+        ring_buffer_weight_scales: WeightScales) -> _RowData:
     """
     :param connections:
         The connections to convert; the dtype is
@@ -337,14 +347,17 @@ def _get_row_data(
     :param max_row_n_synapses: The maximum number of synapses in a row
     :param max_row_n_words: The maximum number of words in a row
     :param max_atoms_per_core: The maximum number of atoms per core
+    :param ring_buffer_weight_scales:
+        The scaling of the weights for the ring buffers of each synapse type
     """
-    fp_data: Union[NDArray[uint32], List[NDArray[uint32]]]
-    pp_data: Union[NDArray[uint32], List[NDArray[uint32]]]
+    fp_data: NDArray[uint32] | list[NDArray[uint32]]
+    pp_data: NDArray[uint32] | list[NDArray[uint32]]
     if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics):
         # Get the static data
         ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
             connections, row_indices, n_rows, n_synapse_types,
-            max_row_n_synapses, max_atoms_per_core)
+            max_row_n_synapses, max_atoms_per_core,
+            ring_buffer_weight_scales)
 
         # Blank the plastic data
         fp_data = numpy.zeros((n_rows, 0), dtype=uint32)
@@ -363,7 +376,8 @@ def _get_row_data(
         fp_data, pp_data, fp_size, pp_size = \
             synapse_dynamics.get_plastic_synaptic_data(
                 connections, row_indices, n_rows, n_synapse_types,
-                max_row_n_synapses, max_atoms_per_core)
+                max_row_n_synapses, max_atoms_per_core,
+                ring_buffer_weight_scales)
 
     # Add some padding
     row_lengths = [
@@ -385,7 +399,7 @@ def _get_row_data(
 def convert_to_connections(
         synapse_info: SynapseInformation, post_vertex_slice: Slice,
         n_pre_atoms: int, max_row_length: int, n_synapse_types: int,
-        weight_scales: WeightScales,
+        ring_buffer_weight_scales: WeightScales,
         data: bytearray | bytes | memoryview | NDArray | None,
         delayed: bool, post_vertex_max_delay_ticks: int,
         max_atoms_per_core: int) -> ConnectionsArray:
@@ -402,7 +416,7 @@ def convert_to_connections(
         The length of each row in the data
     :param n_synapse_types:
         The number of synapse types in total
-    :param weight_scales:
+    :param ring_buffer_weight_scales:
         The weight scaling of each synapse type
     :param data:
         The raw data containing the synapses
@@ -428,12 +442,14 @@ def convert_to_connections(
         # Read static data
         connections = _read_static_data(
             dynamics, n_pre_atoms, n_synapse_types, row_data, delayed,
-            post_vertex_max_delay_ticks, max_atoms_per_core)
+            post_vertex_max_delay_ticks, max_atoms_per_core,
+            ring_buffer_weight_scales)
     elif isinstance(dynamics, AbstractPlasticSynapseDynamics):
         # Read plastic data
         connections = _read_plastic_data(
             dynamics, n_pre_atoms, n_synapse_types, row_data, delayed,
-            post_vertex_max_delay_ticks, max_atoms_per_core)
+            post_vertex_max_delay_ticks, max_atoms_per_core,
+            ring_buffer_weight_scales)
     else:
         raise TypeError(f"{dynamics=} has unexpected type {type(dynamics)}")
 
@@ -448,14 +464,15 @@ def convert_to_connections(
     connections = __convert_sources_and_targets(
         connections, synapse_info.pre_vertex, post_vertex_slice)
 
-    # Return the connections after appropriate scaling
-    return _rescale_connections(connections, weight_scales, synapse_info)
+    # Return the delays values to milliseconds
+    connections["delay"] /= SpynnakerDataView.get_simulation_time_step_per_ms()
+    return connections
 
 
 def read_all_synapses(
         data: NDArray[uint32], delayed_data: NDArray[uint32],
         synapse_info: SynapseInformation, n_synapse_types: int,
-        weight_scales: WeightScales, post_vertex_slice: Slice,
+        ring_buffer_weight_scales: WeightScales, post_vertex_slice: Slice,
         n_pre_atoms: int, post_vertex_max_delay_ticks: int,
         max_row_info: MaxRowInfo, max_atoms_per_core: int
         ) -> ConnectionsArray:
@@ -471,8 +488,8 @@ def read_all_synapses(
         The synapse info that generated the synapses
     :param n_synapse_types:
         The total number of synapse types available
-    :param weight_scales:
-        A weight scale for each synapse type
+    :param ring_buffer_weight_scales:
+        The weight scale of the ring buffers for each synapse type
     :param n_pre_atoms: The number of atoms in the pre-vertex
     :param post_vertex_slice:
         The slice of the post-vertex to read the synapses for
@@ -485,17 +502,17 @@ def read_all_synapses(
     :return: The connections read from the data; the dtype is
         :py:const:`~.NUMPY_CONNECTORS_DTYPE`
     """
-    connections: List[ConnectionsArray] = []
+    connections: list[ConnectionsArray] = []
     max_row_length = max_row_info.undelayed_max_words
     delayed_max_row_length = max_row_info.delayed_max_words
     connections.append(convert_to_connections(
         synapse_info, post_vertex_slice, n_pre_atoms, max_row_length,
-        n_synapse_types, weight_scales, data, False,
+        n_synapse_types, ring_buffer_weight_scales, data, False,
         post_vertex_max_delay_ticks, max_atoms_per_core))
     connections.append(convert_to_connections(
-        synapse_info, post_vertex_slice, n_pre_atoms,
-        delayed_max_row_length, n_synapse_types, weight_scales, delayed_data,
-        True, post_vertex_max_delay_ticks, max_atoms_per_core))
+        synapse_info, post_vertex_slice, n_pre_atoms, delayed_max_row_length,
+        n_synapse_types, ring_buffer_weight_scales, delayed_data, True,
+        post_vertex_max_delay_ticks, max_atoms_per_core))
 
     # Join the connections into a single list and return it
     return numpy.concatenate(connections)
@@ -503,8 +520,8 @@ def read_all_synapses(
 
 def _parse_static_data(
         row_data: _RowData,
-        dynamics: AbstractStaticSynapseDynamics) -> Tuple[
-            NDArray[numpy.integer], List[_RowData]]:
+        dynamics: AbstractStaticSynapseDynamics) -> tuple[
+            NDArray[numpy.integer], list[_RowData]]:
     """
     Parse static synaptic data.
 
@@ -527,8 +544,8 @@ def _parse_static_data(
 def _read_static_data(
         dynamics: AbstractStaticSynapseDynamics, n_pre_atoms: int,
         n_synapse_types: int, row_data: _RowData, delayed: bool,
-        post_vertex_max_delay_ticks: int,
-        max_atoms_per_core: int) -> ConnectionsArray:
+        post_vertex_max_delay_ticks: int, max_atoms_per_core: int,
+        ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
     """
     Read static data from row data.
 
@@ -542,6 +559,8 @@ def _read_static_data(
     :param delayed: True if data should be considered delayed
     :param post_vertex_max_delay_ticks: post vertex delay maximum
     :param max_atoms_per_core: The maximum number of atoms on a core
+    :param ring_buffer_weight_scales:
+        The scaling of the weights for the ring buffers of each synapse type
     :return: the connections read with dtype
         :py:const:`~.NUMPY_CONNECTORS_DTYPE`
     """
@@ -549,7 +568,8 @@ def _read_static_data(
         return numpy.zeros(0, dtype=NUMPY_CONNECTORS_DTYPE)
     ff_size, ff_data = _parse_static_data(row_data, dynamics)
     connections = dynamics.read_static_synaptic_data(
-        n_synapse_types, ff_size, ff_data, max_atoms_per_core)
+        n_synapse_types, ff_size, ff_data, max_atoms_per_core,
+        ring_buffer_weight_scales)
     if delayed:
         n_synapses = dynamics.get_n_synapses_in_rows(ff_size)
         connections = _convert_delayed_data(
@@ -560,8 +580,8 @@ def _read_static_data(
 
 def _parse_plastic_data(
         row_data: _RowData,
-        dynamics: AbstractPlasticSynapseDynamics) -> Tuple[
-            NDArray[uint32], List[_RowData], NDArray[uint32], List[_RowData]]:
+        dynamics: AbstractPlasticSynapseDynamics) -> tuple[
+            NDArray[uint32], list[_RowData], NDArray[uint32], list[_RowData]]:
     """
     Parse plastic synapses from raw row data.
 
@@ -590,9 +610,9 @@ def _parse_plastic_data(
 
 def _read_plastic_data(
         dynamics: AbstractPlasticSynapseDynamics, n_pre_atoms: int,
-        n_synapse_types: int, row_data: Optional[_RowData], delayed: bool,
-        post_vertex_max_delay_ticks: int,
-        max_atoms_per_core: int) -> ConnectionsArray:
+        n_synapse_types: int, row_data: _RowData | None, delayed: bool,
+        post_vertex_max_delay_ticks: int, max_atoms_per_core: int,
+        ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
     """
     Read plastic data from raw data.
 
@@ -606,6 +626,8 @@ def _read_plastic_data(
     :param delayed: True if data should be considered delayed
     :param post_vertex_max_delay_ticks: post vertex delay maximum
     :param max_atoms_per_core: The maximum number of atoms on a core
+    :param ring_buffer_weight_scales:
+        The scaling of the weights for the ring buffers of each synapse type
     :return: the connections read with dtype
         :py:const:`~.NUMPY_CONNECTORS_DTYPE`
     """
@@ -615,30 +637,13 @@ def _read_plastic_data(
         row_data, dynamics)
     connections = dynamics.read_plastic_synaptic_data(
         n_synapse_types, pp_size, pp_data, fp_size, fp_data,
-        max_atoms_per_core)
+        max_atoms_per_core, ring_buffer_weight_scales)
 
     if delayed:
         n_synapses = dynamics.get_n_synapses_in_rows(pp_size, fp_size)
         connections = _convert_delayed_data(
             n_synapses, n_pre_atoms, connections,
             post_vertex_max_delay_ticks)
-    return connections
-
-
-def _rescale_connections(
-        connections: ConnectionsArray, weight_scales: WeightScales,
-        synapse_info: SynapseInformation) -> ConnectionsArray:
-    """
-    Scale the connection data into machine values.
-
-    :param connections: The connections to be rescaled
-    :param weight_scales: The weight scale of each synapse type
-    :param synapse_info: The synapse information of the connections
-    """
-    # Return the delays values to milliseconds
-    connections["delay"] /= SpynnakerDataView.get_simulation_time_step_per_ms()
-    # Undo the weight scaling
-    connections["weight"] /= weight_scales[synapse_info.synapse_type]
     return connections
 
 

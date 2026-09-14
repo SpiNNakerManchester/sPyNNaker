@@ -15,42 +15,43 @@
 """
 Types (and related) that are useful for implementing connectors.
 """
+from __future__ import annotations
 
-from typing import Final, Iterable, Optional, Sequence, List, Union
-
-import numpy
-from numpy.typing import NDArray
-from typing_extensions import TypeAlias, TypeGuard
+from collections.abc import Iterable, Sequence
+from typing import TYPE_CHECKING, Final, TypeAlias, TypeGuard
 
 import neo
+import numpy
+from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
 
 #: The type of weights and delays provided by Synapse / SynapseInformation
 # Combined types (where value could be either)
-WeightsDelays: Final['TypeAlias'] = Optional[Union[
-    float, str, RandomDistribution, NDArray[numpy.float64]]]
-Weights: Final['TypeAlias'] = Optional[Union[
-    float, str, RandomDistribution, NDArray[numpy.float64]]]
-Delays: Final['TypeAlias'] = \
-    Union[float, str, RandomDistribution, NDArray[numpy.float64]]
+WeightsDelays: Final[TypeAlias] = (float | str | RandomDistribution |
+                                   NDArray[numpy.float64] | None)
+Weights: Final[TypeAlias] = (float | str | RandomDistribution |
+                             NDArray[numpy.float64] | None)
+Delays: Final[TypeAlias] = \
+    float | str | RandomDistribution | NDArray[numpy.float64]
 # These are the Types we know are coming in.
 # Most things that can be considered floats (including int)  will work
-WeightsDelysIn: Final['TypeAlias'] = Optional[Union[
-    float, str, RandomDistribution, Iterable[float], NDArray[numpy.float64]]]
+WeightsDelysIn: Final[TypeAlias] = (
+        float | str | RandomDistribution | Iterable[float] |
+        NDArray[numpy.float64] | None)
 
-IoDest: TypeAlias = Union[
-    str, neo.baseio.BaseIO, None]  # pylint: disable=no-member
-
-ViewIndices = Union[None, Sequence[int], NDArray[numpy.integer]]
+ViewIndices = None | Sequence[int] | NDArray[numpy.integer]
 #: :meta private:
-Selector: TypeAlias = Union[
-    None, int, slice, Sequence[int], List[bool], NDArray[numpy.bool_],
-    NDArray[numpy.integer]]
+Selector: TypeAlias = (None | int | slice | Sequence[int] | list[bool] |
+                       NDArray[numpy.bool_] | NDArray[numpy.integer])
 
-WeightScales: TypeAlias = Union[NDArray[numpy.floating], Sequence[float]]
+WeightScales: TypeAlias = NDArray[numpy.floating] | Sequence[float]
+
+if TYPE_CHECKING:
+    IoDest: TypeAlias = (  # pylint: disable=no-member
+            str | neo.baseio.BaseIO | None)
 
 
-def is_scalar(value: Weights) -> TypeGuard[Union[int, float]]:
+def is_scalar(value: Weights) -> TypeGuard[int | float]:
     """
     Are the weights or delays a simple integer or float?
 

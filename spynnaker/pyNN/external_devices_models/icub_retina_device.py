@@ -11,17 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from math import ceil, log2
-from typing import Dict, Optional
 import logging
-from spinn_utilities.overrides import overrides
+from math import ceil, log2
+
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import Application2DSpiNNakerLinkVertex
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 from pacman.utilities.constants import BITS_IN_KEY
 from pacman.utilities.utility_calls import is_power_of_2
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -36,14 +38,15 @@ class ICUBRetinaDevice(Application2DSpiNNakerLinkVertex):
     """
 
     __slots__ = (
+        "__base_key",
         "__index_by_slice",
-        "__base_key")
+    )
 
     def __init__(self, base_key: int = 0, width: int = DEFAULT_WIDTH,
                  height: int = DEFAULT_HEIGHT,
                  sub_width: int = 16, sub_height: int = 16,
                  spinnaker_link_id: int = 0,
-                 board_address: Optional[str] = None):
+                 board_address: str | None = None):
         """
         :param base_key: The key that is common over the whole vertex
         :param width: The width of the retina in pixels
@@ -68,7 +71,7 @@ class ICUBRetinaDevice(Application2DSpiNNakerLinkVertex):
         # avoid!
         if not is_power_of_2(width):
             if width == DEFAULT_WIDTH:
-                width = 2 ** int(ceil(log2(width)))
+                width = 2 ** ceil(log2(width))
                 logger.warning(
                     "The width of the ICUB retina has been rounded up from {}"
                     " to {}.  This is to ensure that the coordinates are"
@@ -92,7 +95,7 @@ class ICUBRetinaDevice(Application2DSpiNNakerLinkVertex):
             board_address, incoming=True, outgoing=True)
 
         # A dictionary to get vertex index from FPGA and slice
-        self.__index_by_slice: Dict[Slice, int] = dict()
+        self.__index_by_slice: dict[Slice, int] = {}
         self.__base_key = base_key
 
     @overrides(Application2DSpiNNakerLinkVertex.get_incoming_slice)

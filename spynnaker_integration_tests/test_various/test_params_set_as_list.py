@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pyNN.random import RandomDistribution, NumpyRNG
-import pyNN.spiNNaker as p
-from spinnaker_testbase import BaseTestCase
 import numpy
+import pyNN.spiNNaker as p
+from pyNN.random import NumpyRNG, RandomDistribution
+
+from spinnaker_testbase import BaseTestCase
 
 
 class ParamsSetAsList(BaseTestCase):
@@ -26,16 +27,16 @@ class ParamsSetAsList(BaseTestCase):
 
         p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
 
-        cm = list()
-        i_off = list()
-        tau_m = list()
-        tau_re = list()
-        tau_syn_e = list()
-        tau_syn_i = list()
-        v_reset = list()
-        v_rest = list()
+        cm = []
+        i_off = []
+        tau_m = []
+        tau_re = []
+        tau_syn_e = []
+        tau_syn_i = []
+        v_reset = []
+        v_rest = []
 
-        for atom in range(0, nNeurons):
+        for atom in range(nNeurons):
             cm.append(0.25)
             i_off.append(0.0 + atom * 0.01)
             tau_m.append(10.0 + atom // 2 * 0.1)

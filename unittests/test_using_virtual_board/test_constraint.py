@@ -13,8 +13,14 @@
 # limitations under the License.
 
 import pyNN.spiNNaker as sim
+from parameterized import parameterized
+
 from spinn_utilities.config_holder import set_config
+
+from spinn_machine.version import MANY_BOARD_TYPES
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 
 
@@ -22,12 +28,14 @@ class TestConstraint(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_placement_constraint(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_placement_constraint(self, _: str, ver_num: str) -> None:
         """
         test the get_placements call.
 
         """
         sim.setup(timestep=1.0)
+        set_config("Machine", "version", ver_num)
         width, height = SpynnakerDataView.get_machine_version().board_shape
         # pick and XY in the middle of the board
         x = (width + 1) // 3

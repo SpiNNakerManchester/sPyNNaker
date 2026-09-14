@@ -11,37 +11,50 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from enum import IntEnum
 import ctypes
-from typing import List, Optional, Sequence
+from collections.abc import Sequence
+from enum import IntEnum
+from typing import ClassVar, Final
 
 from numpy import floating
 from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
 
-from pacman.model.graphs.machine import (
-    MachineVertex, SDRAMMachineEdge, SourceSegmentedSDRAMMachinePartition)
 from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM
+from pacman.model.graphs.machine import (
+    MachineVertex,
+    SDRAMMachineEdge,
+    SourceSegmentedSDRAMMachinePartition,
+)
 from pacman.model.placements import Placement
+from pacman.model.resources import AbstractSDRAM
 
 from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
-from spinn_front_end_common.interface.provenance import ProvenanceWriter
+    AbstractGeneratesDataSpecification,
+    AbstractRewritesDataSpecification,
+)
 from spinn_front_end_common.interface.ds import (
-    DataSpecificationGenerator, DataSpecificationReloader)
+    DataSpecificationGenerator,
+    DataSpecificationReloader,
+)
+from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
-    ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
+    ReceivesSynapticInputsOverSDRAM,
+    SendsSynapticInputsOverSDRAM,
+)
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
-    NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
+    NeuronProvenance,
+    NeuronRegions,
+    PopulationMachineNeurons,
+)
 from .population_vertex import PopulationVertex
 
 # Size of SDRAM params = 1 word for address + 1 word for size
@@ -55,7 +68,7 @@ class NeuronMainProvenance(ctypes.LittleEndianStructure):
     """
     Provenance items from synapse processing.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # the maximum number of times the timer tick didn't complete in time
         ("n_timer_overruns", ctypes.c_uint32),
     ]
@@ -75,13 +88,14 @@ class PopulationNeuronsMachineVertex(
 
     __slots__ = (
         "__key",
-        "__sdram_partition",
-        "__ring_buffer_shifts",
-        "__weight_scales",
-        "__slice_index",
-        "__neuron_data",
         "__max_atoms_per_core",
-        "__regenerate_data")
+        "__neuron_data",
+        "__regenerate_data",
+        "__ring_buffer_shifts",
+        "__sdram_partition",
+        "__slice_index",
+        "__weight_scales",
+    )
 
     class REGIONS(IntEnum):
         """
@@ -115,7 +129,7 @@ class PopulationNeuronsMachineVertex(
         REGIONS.NEURON_BUILDER,
         REGIONS.INITIAL_VALUES)
 
-    _PROFILE_TAG_LABELS = {
+    _PROFILE_TAG_LABELS: Final = {
         0: "TIMER_NEURONS"}
 
     def __init__(
@@ -142,9 +156,9 @@ class PopulationNeuronsMachineVertex(
             label, app_vertex, vertex_slice, sdram, self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS + NeuronMainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, app_vertex.neuron_core_binary_file_name)
-        self.__key: Optional[int] = None
-        self.__sdram_partition: Optional[
-            SourceSegmentedSDRAMMachinePartition] = None
+        self.__key: int | None = None
+        self.__sdram_partition: (
+                SourceSegmentedSDRAMMachinePartition | None) = None
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
@@ -226,7 +240,7 @@ class PopulationNeuronsMachineVertex(
                     " scale factor, or reducing the number of spikes sent")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
-    def get_recorded_region_ids(self) -> List[int]:
+    def get_recorded_region_ids(self) -> list[int]:
         ids = self._pop_vertex.neuron_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         return ids

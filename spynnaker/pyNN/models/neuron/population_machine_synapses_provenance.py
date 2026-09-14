@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ctypes
-from typing import Sequence
+from collections.abc import Sequence
+from typing import ClassVar
+
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 
@@ -20,7 +22,7 @@ class SynapseProvenance(ctypes.LittleEndianStructure):
     """
     Provenance items from synapse processing.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # A count of presynaptic events.
         ("n_pre_synaptic_events", ctypes.c_uint32),
         # A count of synaptic saturations.
@@ -46,7 +48,7 @@ class SynapseProvenance(ctypes.LittleEndianStructure):
     N_ITEMS = len(_fields_)
 
 
-class PopulationMachineSynapsesProvenance(object):
+class PopulationMachineSynapsesProvenance:
     """
     Mix-in to add synapse provenance gathering without other synapse things.
     """

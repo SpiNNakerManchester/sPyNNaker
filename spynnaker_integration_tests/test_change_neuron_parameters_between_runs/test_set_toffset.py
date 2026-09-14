@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from neo.core import Block
+from typing import Final
+
 import numpy
 import pyNN.spiNNaker as p
-from spynnaker.pyNN.utilities import neo_convertor
+from neo.core import Block
+
 from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.utilities import neo_convertor
 
 
 def do_run(n_neurons: int, n_cores: int, i_offset2: int,
@@ -35,7 +39,7 @@ def do_run(n_neurons: int, n_cores: int, i_offset2: int,
                        'v_thresh': -50.0
                        }
 
-    populations = list()
+    populations = []
 
     populations.append(p.Population(n_neurons, p.IF_curr_exp, cell_params_lif,
                                     label='pop_1'))
@@ -60,10 +64,10 @@ def do_run(n_neurons: int, n_cores: int, i_offset2: int,
 
 
 class TestSetTOffset(BaseTestCase):
-    expected = [104., 112., 120., 128., 136., 144., 152., 160., 168., 176.,
-                184., 192., 200., 205., 210., 215., 220., 225., 230., 235.,
-                240., 245., 250., 255., 260., 265., 270., 275., 280., 285.,
-                290., 295.]
+    expected: Final = [104., 112., 120., 128., 136., 144., 152., 160., 168.,
+                       176., 184., 192., 200., 205., 210., 215., 220., 225.,
+                       230., 235., 240., 245., 250., 255., 260., 265., 270.,
+                       275., 280., 285., 290., 295.]
 
     def one_core(self) -> None:
         n_neurons = 6

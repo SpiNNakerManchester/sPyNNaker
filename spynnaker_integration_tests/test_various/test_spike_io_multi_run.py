@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import random
-from threading import Condition
 import time
-from typing import List, Tuple
+from threading import Condition
 
-from neo import Block
 import pyNN.spiNNaker as Frontend
+from neo import Block
+
 from spinn_front_end_common.utilities.connections import LiveEventConnection
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.external_devices import SpynnakerLiveSpikesConnection
 from spynnaker.pyNN.utilities import neo_convertor
 
@@ -30,9 +32,9 @@ print_condition = Condition()
 # Create an initialisation method
 def init_pop(label: str, n_neurons: int, run_time_ms: float,
              machine_timestep_ms: float) -> None:
-    print("{} has {} neurons".format(label, n_neurons))
-    print("Simulation will run for {}ms at {}ms timesteps".format(
-        run_time_ms, machine_timestep_ms))
+    print(f"{label} has {n_neurons} neurons")
+    print(f"Simulation will run for {run_time_ms}ms "
+          f"at {machine_timestep_ms}ms timesteps")
 
 
 # Create a sender of packets for the forward population
@@ -59,14 +61,14 @@ def send_input_backward(label: str, sender: LiveEventConnection) -> None:
 
 
 # Create a receiver of live spikes
-def receive_spikes(label: str, time: int, neuron_ids: List[int]) -> None:
+def receive_spikes(label: str, time: int, neuron_ids: list[int]) -> None:
     for neuron_id in neuron_ids:
         print_condition.acquire()
         print("Received spike at time", time, "from", label, "-", neuron_id)
         print_condition.release()
 
 
-def do_run() -> Tuple[Block, Block]:
+def do_run() -> tuple[Block, Block]:
     random.seed(0)
 
     # initial call to set up the front end (pynn requirement)
@@ -158,9 +160,9 @@ def do_run() -> Tuple[Block, Block]:
     # Synfire chain connection where each neuron is connected to next neuron
     # NOTE: there is no recurrent connection so that each chain stops once it
     # reaches the end
-    loop_forward = list()
-    loop_backward = list()
-    for i in range(0, n_neurons - 1):
+    loop_forward = []
+    loop_backward = []
+    for i in range(n_neurons - 1):
         loop_forward.append((i, (i + 1) % n_neurons, weight_to_spike, 3))
         loop_backward.append(((i + 1) % n_neurons, i, weight_to_spike, 3))
     Frontend.Projection(pop_forward, pop_forward,

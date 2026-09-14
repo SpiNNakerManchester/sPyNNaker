@@ -14,9 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
 import pyNN.spiNNaker as p
+
 from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 
 class TestMultipleStdpMechsOnSameNeuron(BaseTestCase):
@@ -32,14 +34,14 @@ class TestMultipleStdpMechsOnSameNeuron(BaseTestCase):
                            'tau_syn_I': 5.0, 'v_reset': -70.0, 'v_rest': -65.0,
                            'v_thresh': -50.0}
 
-        populations = list()
-        projections = list()
+        populations = []
+        projections = []
 
         weight_to_spike = 2.0
         delay = 1
 
-        connections = list()
-        for i in range(0, nNeurons):
+        connections = []
+        for i in range(nNeurons):
             singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike,
                                 delay)
             connections.append(singleConnection)

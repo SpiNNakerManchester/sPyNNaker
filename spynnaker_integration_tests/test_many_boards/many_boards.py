@@ -12,15 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import time
+
 import pyNN.spiNNaker as sim
 
 from spinn_utilities.config_holder import get_config_bool
+
 from spinn_front_end_common.interface.provenance import GlobalProvenance
+
+from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import ConfigurationException
 from spynnaker.pyNN.models.populations import Population
+
 from spynnaker_integration_tests.scripts import check_data
-from spinnaker_testbase import BaseTestCase
 
 CHIPS_PER_BOARD_EXCLUDING_SAFETY = 43.19
 
@@ -34,7 +39,7 @@ class ManyBoards(BaseTestCase):
     def add_pop(self, x: int, y: int, n_neurons: int,
                 input_pop: Population) -> Population:
         pop = sim.Population(
-            n_neurons, sim.IF_curr_exp(), label="pop_{}_{}".format(x, y))
+            n_neurons, sim.IF_curr_exp(), label=f"pop_{x}_{y}")
         pop.add_placement_constraint(x=x, y=y)
         sim.Projection(input_pop, pop, sim.AllToAllConnector(),
                        synapse_type=sim.StaticSynapse(weight=5, delay=1))
@@ -50,7 +55,7 @@ class ManyBoards(BaseTestCase):
                 SpynnakerDataView.raise_skiptest(
                     f"You Need at least {self.n_boards} boards for this test",
                     oops)
-            raise oops
+            raise
 
         input_spikes = list(range(0, self.simtime - 100, 10))
         self._expected_spikes = len(input_spikes)
@@ -79,8 +84,8 @@ class ManyBoards(BaseTestCase):
             style += "advanced"
         else:
             style += "simple"
-        return "{}_n_boards={}_n_neurons={}_simtime={}".format(
-            style, self.n_boards, self.n_neurons, self.simtime)
+        return (f"{style}_n_boards={self.n_boards}_n_neurons={self.n_neurons}"
+                f"_simtime={self.simtime}")
 
     def do_run(self) -> None:
         self.setup()
@@ -95,11 +100,10 @@ class ManyBoards(BaseTestCase):
             results = db.get_run_time_of_buffer_extractor()
         self.report(results, report_file)
         self.report(
-            "machine run time was: {} seconds\n".format(
-                t_after_machine-t_before),
+            f"machine run time was: {t_after_machine-t_before} seconds\n",
             report_file)
         self.report(
-            "total run time was: {} seconds\n".format(t_after_check-t_before),
+            f"total run time was: {t_after_check-t_before} seconds\n",
             report_file)
         sim.end()
 

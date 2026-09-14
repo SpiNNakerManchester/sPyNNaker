@@ -12,16 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Sequence, Mapping
+from collections.abc import Mapping, Sequence
+
 from pyNN.random import NumpyRNG
-from spinn_front_end_common.interface.ds import DataType
+
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
-from spynnaker.pyNN.utilities.struct import Struct
-from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractNeuronImpl, ModelParameter)
+
+from spinn_front_end_common.interface.ds import DataType
+
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractNeuronImpl,
+    ModelParameter,
+)
 from spynnaker.pyNN.random_distribution import RandomDistribution
+from spynnaker.pyNN.utilities.struct import Struct
 
 TAU = "tau"
 TIMESTEP = "timestep"
@@ -47,7 +53,7 @@ class NeuronImplStocExp(AbstractNeuronImpl):
     """
 
     def __init__(self, tau: ModelParameter, bias: ModelParameter,
-                 refract_init: ModelParameter, seed: Optional[int]):
+                 refract_init: ModelParameter, seed: int | None):
         """
         :param tau: :math:`\\tau_m`
         :param bias:
@@ -94,7 +100,7 @@ class NeuronImplStocExp(AbstractNeuronImpl):
         return 2
 
     @overrides(AbstractNeuronImpl.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         if target == "excitatory":
             return 0
         elif target == "inhibitory":

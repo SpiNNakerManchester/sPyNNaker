@@ -12,18 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Tuple
+
 import numpy
-from pyNN.space import BaseStructure
 import pyNN.spiNNaker as p
+from pyNN.space import BaseStructure
+
 from spinnaker_testbase import BaseTestCase
 
 
 class IndexBasedProbabilityConnectorTest(BaseTestCase):
 
     def do_index_nd_test(
-            self, neurons_per_core_pre: Tuple[int, ...], pre_size: int,
-            pre_shape: BaseStructure, neurons_per_core_post: Tuple[int, ...],
+            self, neurons_per_core_pre: tuple[int, ...], pre_size: int,
+            pre_shape: BaseStructure, neurons_per_core_post: tuple[int, ...],
             post_size: int, post_shape: BaseStructure) -> None:
         p.setup(1.0)
         pre = p.Population(

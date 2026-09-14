@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Tuple, Union
+
 import numpy
-from pyNN.space import BaseStructure
 import pyNN.spiNNaker as sim
+from pyNN.space import BaseStructure
+
 from spinnaker_testbase import BaseTestCase
 
 
@@ -63,10 +64,10 @@ class TestFromListConnectorMixed(BaseTestCase):
         self.runsafe(self.do_run)
 
     def do_list_nd_run(
-            self, neurons_per_core_pre: Tuple[int, ...], pre_size: int,
+            self, neurons_per_core_pre: tuple[int, ...], pre_size: int,
             pre_shape: BaseStructure,
-            neurons_per_core_post: Union[int, Tuple[int, ...]],
-            post_size: int, post_shape: Optional[BaseStructure]) -> None:
+            neurons_per_core_post: int | tuple[int, ...],
+            post_size: int, post_shape: BaseStructure | None) -> None:
         random_conns = numpy.random.randint(
             0, (pre_size, post_size), (100, 2))
         sim.setup(1.0)
@@ -84,7 +85,7 @@ class TestFromListConnectorMixed(BaseTestCase):
             [(int(i), int(j)) for i, j in proj.get([], "list")])
         sim.end()
 
-        _nrows, ncols = conns.shape
+        _nrows, _ = conns.shape
         diff = numpy.setdiff1d(conns, random_conns)
 
         assert len(diff) == 0

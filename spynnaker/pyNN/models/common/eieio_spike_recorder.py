@@ -14,13 +14,14 @@
 
 import logging
 import struct
+
 from spinn_utilities.log import FormatAdapter
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
 
 
-class EIEIOSpikeRecorder(object):
+class EIEIOSpikeRecorder:
     """
     Records spikes using EIEIO format.
     """

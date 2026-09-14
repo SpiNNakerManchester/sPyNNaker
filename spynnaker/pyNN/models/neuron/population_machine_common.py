@@ -12,32 +12,49 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Mapping, NamedTuple, Sequence, cast, TYPE_CHECKING
-from spinn_utilities.overrides import overrides
-from spinnman.model.enums import ExecutableType
-from pacman.model.graphs.machine import MachineVertex
-from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM
-from pacman.model.placements import Placement
 
-from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
-from spinn_front_end_common.interface.buffer_management.buffer_models import (
-    AbstractReceiveBuffersToHost)
-from spinn_front_end_common.utilities.helpful_functions import (
-    locate_memory_region_for_placement)
-from spinn_front_end_common.interface.profiling.profile_utils import (
-    get_profiling_data, reserve_profile_region, write_profile_region_data)
+from collections.abc import Mapping, Sequence
+from typing import TYPE_CHECKING, NamedTuple, cast
+
+from spinn_utilities.overrides import overrides
+
+from spinnman.model.enums import ExecutableType
+
+from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
+from pacman.model.placements import Placement
+from pacman.model.resources import AbstractSDRAM
+
 from spinn_front_end_common.abstract_models import AbstractHasAssociatedBinary
+from spinn_front_end_common.interface.buffer_management.buffer_models import (
+    AbstractReceiveBuffersToHost,
+)
 from spinn_front_end_common.interface.buffer_management\
     .recording_utilities import (
-        get_recording_header_size, get_recording_header_array)
-from spinn_front_end_common.interface.simulation.simulation_utilities import (
-    get_simulation_header_array)
+        get_recording_header_array,
+        get_recording_header_size,
+    )
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.profiling import (
-    AbstractHasProfileData, ProfileData)
+    AbstractHasProfileData,
+    ProfileData,
+)
+from spinn_front_end_common.interface.profiling.profile_utils import (
+    get_profiling_data,
+    reserve_profile_region,
+    write_profile_region_data,
+)
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl,
+)
+from spinn_front_end_common.interface.simulation.simulation_utilities import (
+    get_simulation_header_array,
+)
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
+from spinn_front_end_common.utilities.helpful_functions import (
+    locate_memory_region_for_placement,
+)
+
 if TYPE_CHECKING:
     from .population_vertex import PopulationVertex
 
@@ -68,16 +85,17 @@ class PopulationMachineCommon(
     """
 
     __slots__ = (
-        # Sdram used by the machine vertex
-        "__sdram",
-        # Regions to be used
-        "__regions",
+        # The name of the binary to run on the core
+        "__binary_file_name",
         # The total number of provenance items returned by this core
         "__n_provenance_items",
         # The profile tags to be decoded
         "__profile_tags",
-        # The name of the binary to run on the core
-        "__binary_file_name")
+        # Regions to be used
+        "__regions",
+        # Sdram used by the machine vertex
+        "__sdram",
+    )
 
     def __init__(
             self, label: str, app_vertex: PopulationVertex,

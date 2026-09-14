@@ -15,22 +15,24 @@
 import csv
 import os
 import pickle
-from typing import List, Tuple
 
 import numpy
-from numpy.typing import NDArray
 import pytest
+from numpy.typing import NDArray
 
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
+from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities import neo_convertor
-from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+
 from .make_test_data import N_NEURONS
 
 
 def trim_spikes(spikes: NDArray[numpy.floating],
-                indexes: List[int]) -> List[List[numpy.floating]]:
+                indexes: list[int]) -> list[list[numpy.floating]]:
     return [[n, t] for [n, t] in spikes if n in indexes]
 
 
@@ -51,7 +53,7 @@ class TestDataPopulation(BaseTestCase):
                 v_expected_l.append(floats)
         cls.v_expected = numpy.array(v_expected_l)
         my_spikes = os.path.join(my_dir, "spikes.csv")
-        spikes_expected_l: List[Tuple[float, float]] = []
+        spikes_expected_l: list[tuple[float, float]] = []
         with open(my_spikes) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:

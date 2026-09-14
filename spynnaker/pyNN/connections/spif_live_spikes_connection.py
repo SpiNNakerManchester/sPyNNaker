@@ -14,17 +14,22 @@
 
 import logging
 import struct
+from collections.abc import Callable, Iterable
 from threading import Thread
-from typing import Callable, Dict, Final, Iterable, List, Optional, Set, Tuple
-from typing_extensions import TypeAlias
+from typing import Final, TypeAlias
+
 from spinn_utilities.log import FormatAdapter
+
 from spinnman.connections import ConnectionListener
 from spinnman.connections.udp_packet_connections import UDPConnection
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.database import DatabaseConnection
-from spinn_front_end_common.utilities.database import DatabaseReader
 
-Event: Final['TypeAlias'] = Callable[[str, List[int]], None]
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.database import (
+    DatabaseConnection,
+    DatabaseReader,
+)
+
+Event: Final['TypeAlias'] = Callable[[str, list[int]], None]
 Init: Final['TypeAlias'] = Callable[[str, int, float, float], None]
 StartStop: Final['TypeAlias'] = Callable[
     [str, 'SPIFLiveSpikesConnection'], None]
@@ -72,18 +77,19 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         "__receive_labels",
         "__receiver_connection",
         "__receiver_listener",
-        "__start_resume_callbacks",
         "__spif_host",
-        "__spif_port",
         "__spif_packet_size",
-        "__spif_packet_time_us")
+        "__spif_packet_time_us",
+        "__spif_port",
+        "__start_resume_callbacks",
+    )
 
-    def __init__(self, receive_labels: Optional[Iterable[str]],
+    def __init__(self, receive_labels: Iterable[str] | None,
                  spif_host: str, spif_port: int = _DEFAULT_SPIF_PORT,
                  events_per_packet: int = _EVENTS_PER_PACKET,
                  time_per_packet: int = _US_PER_PACKET,
-                 local_host: Optional[str] = None,
-                 local_port: Optional[int] = None):
+                 local_host: str | None = None,
+                 local_port: int | None = None):
         """
         :param receive_labels:
             Labels of vertices from which live events will be received.
@@ -118,20 +124,20 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         self.__spif_port = spif_port
         self.__spif_packet_size = events_per_packet * BYTES_PER_WORD
         self.__spif_packet_time_us = time_per_packet
-        self.__key_to_atom_id_and_label: Dict[int, Tuple[int, int]] = dict()
-        self.__live_event_callbacks: List[List[Tuple[Event, bool]]] = list()
-        self.__start_resume_callbacks: Dict[str, List[StartStop]] = dict()
-        self.__pause_stop_callbacks: Dict[str, List[StartStop]] = dict()
-        self.__init_callbacks: Dict[str, List[Init]] = dict()
+        self.__key_to_atom_id_and_label: dict[int, tuple[int, int]] = {}
+        self.__live_event_callbacks: list[list[tuple[Event, bool]]] = []
+        self.__start_resume_callbacks: dict[str, list[StartStop]] = {}
+        self.__pause_stop_callbacks: dict[str, list[StartStop]] = {}
+        self.__init_callbacks: dict[str, list[Init]] = {}
         if receive_labels is not None:
             for label in receive_labels:
-                self.__live_event_callbacks.append(list())
-                self.__start_resume_callbacks[label] = list()
-                self.__pause_stop_callbacks[label] = list()
-                self.__init_callbacks[label] = list()
-        self.__receiver_listener: Optional[ConnectionListener[bytes]] = None
-        self.__receiver_connection: Optional[UDPConnection] = None
-        self.__error_keys: Set[int] = set()
+                self.__live_event_callbacks.append([])
+                self.__start_resume_callbacks[label] = []
+                self.__pause_stop_callbacks[label] = []
+                self.__init_callbacks[label] = []
+        self.__receiver_listener: ConnectionListener[bytes] | None = None
+        self.__receiver_connection: UDPConnection | None = None
+        self.__error_keys: set[int] = set()
 
     def add_receive_label(self, label: str) -> None:
         """
@@ -141,11 +147,11 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         """
         if label not in self.__receive_labels:
             self.__receive_labels.append(label)
-            self.__live_event_callbacks.append(list())
+            self.__live_event_callbacks.append([])
         if label not in self.__start_resume_callbacks:
-            self.__start_resume_callbacks[label] = list()
-            self.__pause_stop_callbacks[label] = list()
-            self.__init_callbacks[label] = list()
+            self.__start_resume_callbacks[label] = []
+            self.__pause_stop_callbacks[label] = []
+            self.__init_callbacks[label] = []
 
     def add_init_callback(self, label: str, init_callback: Init) -> None:
         """
@@ -213,7 +219,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
     def __read_database_callback(self, db_reader: DatabaseReader) -> None:
         self.__handle_possible_rerun_state()
 
-        vertex_sizes: Dict[str, int] = dict()
+        vertex_sizes: dict[str, int] = {}
         run_time_ms = db_reader.get_configuration_parameter_value(
             "runtime") or 0.0
         machine_timestep_ms = (
@@ -229,7 +235,7 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
                     label, vertex_size, run_time_ms, machine_timestep_ms)
 
     def __init_receivers(
-            self, db: DatabaseReader, vertex_sizes: Dict[str, int]) -> None:
+            self, db: DatabaseReader, vertex_sizes: dict[str, int]) -> None:
         # Set up a single connection for receive
         if self.__receiver_connection is None:
             self.__receiver_connection = UDPConnection(
@@ -295,16 +301,16 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             logger.warning("problem handling received packet", exc_info=True)
 
     def __handle_packet(self, packet: bytes) -> None:
-        key_labels: Dict[int, List[int]] = dict()
-        atoms_labels: Dict[int, List[int]] = dict()
+        key_labels: dict[int, list[int]] = {}
+        atoms_labels: dict[int, list[int]] = {}
         n_events = len(packet) // BYTES_PER_WORD
         events = struct.unpack(f"<{n_events}I", packet)
         for key in events:
             if key in self.__key_to_atom_id_and_label:
                 atom_id, label_id = self.__key_to_atom_id_and_label[key]
                 if label_id not in key_labels:
-                    key_labels[label_id] = list()
-                    atoms_labels[label_id] = list()
+                    key_labels[label_id] = []
+                    atoms_labels[label_id] = []
                 key_labels[label_id].append(key)
                 atoms_labels[label_id].append(atom_id)
             else:

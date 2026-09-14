@@ -13,8 +13,11 @@
 # limitations under the License.
 
 import os
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 import pyNN.spiNNaker as sim
+
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spinnaker_testbase import BaseTestCase
 
 
@@ -160,7 +163,7 @@ class TestRecordingLaterAdditions(BaseTestCase):
         try:
             if os.path.exists(file):
                 os.remove(file)
-        except Exception:
+        except FileNotFoundError:
             pass
 
     def test_later_additions(self) -> None:

@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy
 import unittest
+
+import numpy
 import pyNN.spiNNaker as p
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    calculate_spike_pair_additive_stdp_weight)
+
 from spinnaker_testbase import BaseTestCase
 
 
@@ -37,7 +37,7 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
         max_weight = 0.5
         min_weight = 0
 
-        pre_spikes = numpy.array([10, 50])
+        pre_spikes = [10, 50]
         extra_spikes = [30]
 
         for i in range(len(pre_spikes)):
@@ -68,9 +68,9 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
             p.StaticSynapse(weight=0.1, delay=1), receptor_type="excitatory")
 
         syn_plas = p.STDPMechanism(
-            timing_dependence=p.SpikePairRule(tau_plus=tau_plus,
-                                              tau_minus=tau_minus,
-                                              A_plus=a_plus, A_minus=a_minus),
+            timing_dependence=p.extra_models.SpikeNearestPairRule(
+                tau_plus=tau_plus, tau_minus=tau_minus,
+                A_plus=a_plus, A_minus=a_minus),
             weight_dependence=p.AdditiveWeightDependence(w_min=min_weight,
                                                          w_max=max_weight),
             weight=initial_weight, delay=plastic_delay)
@@ -98,16 +98,38 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
         # End the simulation as all information gathered
         p.end()
 
-        new_weight_exact = calculate_spike_pair_additive_stdp_weight(
-            pre_spikes, post_spikes, initial_weight, plastic_delay,
-            a_plus, a_minus, tau_plus, tau_minus)
+        # Get the spikes and time differences that will be considered by
+        # the simulation (as the last pre-spike will be considered differently)
+        pre_spikes_n = numpy.array(pre_spikes)
+        last_pre_spike = pre_spikes_n[-1]
+        considered_post_spikes = post_spikes[post_spikes < last_pre_spike]
+        considered_post_spikes += plastic_delay
+        potentiation_times = []
+        depression_times = []
+        for time in pre_spikes_n:
+            post_times = considered_post_spikes[considered_post_spikes > time]
+            if len(post_times) > 0:
+                last_time = post_times[0]
+                potentiation_times.append(time - last_time)
+            post_times = considered_post_spikes[considered_post_spikes < time]
+            if len(post_times) > 0:
+                last_time = post_times[-1]
+                depression_times.append(last_time - time)
 
-        print("Pre neuron spikes at: {}".format(pre_spikes))
-        print("Post-neuron spikes at: {}".format(post_spikes))
+        # Work out the weight according to the rules
+        potentiations = a_plus * numpy.exp(
+            (numpy.array(potentiation_times) / tau_plus))
+        depressions = a_minus * numpy.exp(
+            (numpy.array(depression_times) / tau_minus))
+        new_weight_exact = \
+            initial_weight + numpy.sum(potentiations) - numpy.sum(depressions)
+
+        print(f"Pre neuron spikes at: {pre_spikes_n}")
+        print(f"Post-neuron spikes at: {post_spikes}")
         target_spikes = [1013, 1032, 1051, 1055]
         self.assertListEqual(list(post_spikes), target_spikes)
-        print("New weight exact: {}".format(new_weight_exact))
-        print("New weight SpiNNaker: {}".format(weights))
+        print(f"New weight exact: {new_weight_exact}")
+        print(f"New weight SpiNNaker: {weights}")
 
         self.assertTrue(numpy.allclose(weights, new_weight_exact, rtol=0.001))
 

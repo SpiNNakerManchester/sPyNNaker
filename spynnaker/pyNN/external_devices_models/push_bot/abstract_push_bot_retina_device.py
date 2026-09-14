@@ -12,15 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List, Optional
+from collections.abc import Iterable
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex)
+    AbstractSendMeMulticastCommandsVertex,
+)
 from spinn_front_end_common.utility_models import MultiCastCommand
 
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotRetinaResolution)
+    PushBotRetinaResolution,
+)
+from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 
 
 class AbstractPushBotRetinaDevice(
@@ -30,7 +34,7 @@ class AbstractPushBotRetinaDevice(
     """
 
     def __init__(self, protocol: MunichIoSpiNNakerLinkProtocol,
-                 resolution: Optional[PushBotRetinaResolution]):
+                 resolution: PushBotRetinaResolution | None):
         """
         :param protocol:
         :param resolution:
@@ -60,5 +64,5 @@ class AbstractPushBotRetinaDevice(
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
-    def timed_commands(self) -> List[MultiCastCommand]:
+    def timed_commands(self) -> list[MultiCastCommand]:
         return []

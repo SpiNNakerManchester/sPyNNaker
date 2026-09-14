@@ -11,14 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List, Tuple
 
 from numpy import integer, uint32
 from numpy.typing import NDArray
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    ConnectionsArray)
+    ConnectionsArray,
+)
+from spynnaker.pyNN.types import WeightScales
+
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 
 
@@ -44,8 +47,9 @@ class AbstractStaticSynapseDynamics(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
-            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
-                List[NDArray[uint32]], NDArray[integer]]:
+            max_n_synapses: int, max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> tuple[
+                list[NDArray[uint32]], NDArray[integer]]:
         """
         Get the fixed-fixed data for each row, and lengths for the
         fixed-fixed parts of each row.
@@ -65,6 +69,11 @@ class AbstractStaticSynapseDynamics(
         :param n_synapse_types: The number of synapse types
         :param max_n_synapses: The maximum number of synapses to generate
         :param max_atoms_per_core: The maximum number of atoms on a core
+        :param ring_buffer_weight_scales:
+            The ring buffer scaling of the weights for each synapse type.  This
+            does not have to be used in the storage of synapses, but could
+            instead be used when converting stored weights to ring buffer
+            weights.
         :return: (ff_data, ff_size)
         """
         raise NotImplementedError
@@ -91,8 +100,9 @@ class AbstractStaticSynapseDynamics(
     @abstractmethod
     def read_static_synaptic_data(
             self, n_synapse_types: int,
-            ff_size: NDArray[integer], ff_data: List[NDArray[uint32]],
-            max_atoms_per_core: int) -> ConnectionsArray:
+            ff_size: NDArray[integer], ff_data: list[NDArray[uint32]],
+            max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         """
         Read the connections from the words of data in `ff_data`.
 
@@ -100,6 +110,7 @@ class AbstractStaticSynapseDynamics(
         :param ff_size:
         :param ff_data:
         :param max_atoms_per_core:
+        :param ring_buffer_weight_scales:
         :return: the connections read with dtype
             :py:const:`~.NUMPY_CONNECTORS_DTYPE`
         """

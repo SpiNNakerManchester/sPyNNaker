@@ -13,8 +13,10 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
+
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
-    AbstractSynapseStructure)
+    AbstractSynapseStructure,
+)
 
 
 class SynapseStructureWeightAccumulator(AbstractSynapseStructure):

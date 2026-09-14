@@ -12,42 +12,53 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, List, Optional, Tuple, Dict, TYPE_CHECKING, cast
+
 import logging
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, cast
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
 from numpy.typing import NDArray
-
 from pyNN.standardmodels.synapses import StaticSynapse
 
-from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+    BYTES_PER_SHORT,
+    BYTES_PER_WORD,
+)
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector)
-from spynnaker.pyNN.types import Weights
+    AbstractConnector,
+    AbstractGenerateConnectorOnMachine,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    NUMPY_CONNECTORS_DTYPE,
+)
+from spynnaker.pyNN.types import Weights, WeightScales
 from spynnaker.pyNN.types import WeightsDelysIn as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE)
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
-from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+
 from .abstract_generate_on_machine import (
-    AbstractGenerateOnMachine, MatrixGeneratorID)
+    AbstractGenerateOnMachine,
+    MatrixGeneratorID,
+)
+from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
+        ConnectionsArray,
+    )
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -61,18 +72,18 @@ class SynapseDynamicsWeightChangable(
     """
 
     __slots__ = (
+        # The next index to use for the next projection
+        "__next_index",
+
+        # The map of synapse information to index
+        "__synapse_info_to_index",
 
         # The maximum weight
         "__weight_max",
 
         # The minimum weight
         "__weight_min",
-
-        # The map of synapse information to index
-        "__synapse_info_to_index",
-
-        # The next index to use for the next projection
-        "__next_index")
+    )
 
     def __init__(
             self,
@@ -86,7 +97,7 @@ class SynapseDynamicsWeightChangable(
         super().__init__(delay=delay, weight=weight)
         self.__weight_max = weight_max
         self.__weight_min = weight_min
-        self.__synapse_info_to_index: Dict[SynapseInformation, int] = dict()
+        self.__synapse_info_to_index: dict[SynapseInformation, int] = {}
         self.__next_index = 0
 
         if weight_min < 0.0:
@@ -133,7 +144,8 @@ class SynapseDynamicsWeightChangable(
         # Note: hack required to avoid circular import
         # pylint: disable=import-outside-toplevel
         from .synapse_dynamics_weight_changer import (
-            SynapseDynamicsWeightChanger)
+            SynapseDynamicsWeightChanger,
+        )
         if isinstance(synapse_dynamics, SynapseDynamicsWeightChanger):
             return self
 
@@ -204,8 +216,9 @@ class SynapseDynamicsWeightChangable(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
-            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
-                List[NDArray[uint32]], List[NDArray[uint32]],
+            max_n_synapses: int, max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> tuple[
+                list[NDArray[uint32]], list[NDArray[uint32]],
                 NDArray[uint32], NDArray[uint32]]:
         raise NotImplementedError(
             "WeightChangable can only be generated on machine")
@@ -234,9 +247,10 @@ class SynapseDynamicsWeightChangable(
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
             self, n_synapse_types: int, pp_size: NDArray[uint32],
-            pp_data: List[NDArray[uint32]], fp_size: NDArray[uint32],
-            fp_data: List[NDArray[uint32]],
-            max_atoms_per_core: int) -> ConnectionsArray:
+            pp_data: list[NDArray[uint32]], fp_size: NDArray[uint32],
+            fp_data: list[NDArray[uint32]],
+            max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         logger.warning(
             "Weights are only changed when a pre-spike arrives after a"
             " change-spike has been received, and so the weights might"
@@ -265,6 +279,10 @@ class SynapseDynamicsWeightChangable(
         connections["weight"] = pp_half_words
         connections["delay"] = data_fixed >> (
             n_neuron_id_bits + n_synapse_type_bits)
+        synapse_type = (data_fixed >> n_neuron_id_bits) & (
+            (1 << n_synapse_type_bits) - 1)
+        connections["weight"] /= numpy.array(ring_buffer_weight_scales)[
+            synapse_type]
         return connections
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)
@@ -366,7 +384,7 @@ class SynapseDynamicsWeightChangable(
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
-    def pad_to_length(self) -> Optional[int]:
+    def pad_to_length(self) -> int | None:
         return None
 
     @overrides(AbstractPlasticSynapseDynamics.validate_connection)

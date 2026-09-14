@@ -14,7 +14,9 @@
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
+
 from spynnaker.pyNN.utilities.struct import Struct
+
 from .abstract_input_type import AbstractInputType
 
 
@@ -25,7 +27,7 @@ class InputTypeCurrent(AbstractInputType):
     __slots__ = ()
 
     def __init__(self) -> None:
-        super().__init__([Struct([])], dict())
+        super().__init__([Struct([])], {})
 
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

@@ -12,13 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import tempfile
+
 import os
-from typing import List, Optional, Tuple, Union
-from typing_extensions import TypeAlias
+import tempfile
+from typing import TypeAlias
 
 import numpy
 import pyNN.spiNNaker as sim
+from parameterized import parameterized
+
+from spinn_utilities.config_holder import set_config
+
+from spinn_machine.version import MANY_BOARD_TYPES
 
 from spinnaker_testbase import BaseTestCase
 
@@ -27,9 +32,9 @@ from spynnaker.pyNN.models.projection import Projection
 WEIGHT = 5
 DELAY = 2
 
-AsList3: TypeAlias = List[Tuple[int, int, float]]
-AsList4: TypeAlias = List[Tuple[int, int, float, float]]
-AsList: TypeAlias = Union[AsList3, AsList4]
+AsList3: TypeAlias = list[tuple[int, int, float]]
+AsList4: TypeAlias = list[tuple[int, int, float, float]]
+AsList: TypeAlias = AsList3 | AsList4
 
 
 class TestFromFileConnector(BaseTestCase):
@@ -38,8 +43,8 @@ class TestFromFileConnector(BaseTestCase):
 
     def check_weights(
             self, projection: Projection,
-            aslist: AsList, w_index: Optional[int],
-            d_index: Optional[int], sources: int, destinations: int) -> None:
+            aslist: AsList, w_index: int | None,
+            d_index: int | None, sources: int, destinations: int) -> None:
         from_pro = list(projection.get(["weight", "delay"], "list"))
         aslist.sort()
         as_index = 0
@@ -68,9 +73,9 @@ class TestFromFileConnector(BaseTestCase):
             as_index += 1
 
     def check_other_connect(
-            self, aslist: AsList,
-            header: Optional[str] = None, w_index: Optional[int] = 2,
-            d_index: Optional[int] = 3, sources: int = 6,
+            self, aslist: AsList, ver_num: str,
+            header: str | None = None, w_index: int | None = 2,
+            d_index: int | None = 3, sources: int = 6,
             destinations: int = 8) -> None:
         _, name = tempfile.mkstemp(".temp")
         if header:
@@ -79,6 +84,7 @@ class TestFromFileConnector(BaseTestCase):
             numpy.savetxt(name, aslist)
 
         sim.setup(1.0)
+        set_config("Machine", "version", ver_num)
         pop1 = sim.Population(sources, sim.IF_curr_exp(), label="pop1")
         pop2 = sim.Population(destinations, sim.IF_curr_exp(), label="pop2")
         synapse_type = sim.StaticSynapse(weight=WEIGHT, delay=DELAY)
@@ -94,7 +100,8 @@ class TestFromFileConnector(BaseTestCase):
         except OSError:
             pass
 
-    def test_simple(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_simple(self, _: str, ver_num: str) -> None:
         as_list: AsList4 = [
             (0, 0, 0.1, 10),
             (3, 0, 0.2, 11),
@@ -102,9 +109,10 @@ class TestFromFileConnector(BaseTestCase):
             (5, 1, 0.4, 13),
             (0, 1, 0.5, 14),
         ]
-        self.check_other_connect(as_list)
+        self.check_other_connect(as_list, ver_num)
 
-    def test_list_too_big(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_list_too_big(self, _: str, ver_num: str) -> None:
         as_list: AsList4 = [
             (0, 0, 0.1, 10),
             (13, 0, 0.2, 11),
@@ -112,9 +120,10 @@ class TestFromFileConnector(BaseTestCase):
             (5, 1, 0.4, 13),
             (0, 1, 0.5, 14),
         ]
-        self.check_other_connect(as_list)
+        self.check_other_connect(as_list, ver_num)
 
-    def test_no_delays(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_no_delays(self, _: str, ver_num: str) -> None:
         as_list = [
             (0, 0, 0.1),
             (3, 0, 0.2),
@@ -123,10 +132,12 @@ class TestFromFileConnector(BaseTestCase):
             (0, 1, 0.5),
         ]
         self.check_other_connect(
-            as_list, header='columns = ["i", "j", "weight"]', d_index=None)
+            as_list, ver_num, header='columns = ["i", "j", "weight"]',
+            d_index=None)
 
-    def test_no_weight(self) -> None:
-        as_list: List[Tuple[int, int, float]] = [
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_no_weight(self, _: str, ver_num: str) -> None:
+        as_list: list[tuple[int, int, float]] = [
             (0, 0, 10),
             (3, 0, 11),
             (2, 3, 12),
@@ -134,11 +145,12 @@ class TestFromFileConnector(BaseTestCase):
             (0, 1, 14),
         ]
         self.check_other_connect(
-            as_list, header='columns = ["i", "j", "delay"]', d_index=2,
-            w_index=None)
+            as_list, ver_num, header='columns = ["i", "j", "delay"]',
+            d_index=2, w_index=None)
 
-    def test_invert(self) -> None:
-        as_list: List[Tuple[int, int, float, float]] = [
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_invert(self, _: str, ver_num: str) -> None:
+        as_list: list[tuple[int, int, float, float]] = [
             (0, 0, 10, 0.1),
             (3, 0, 11, 0.2),
             (2, 3, 12, 0.3),
@@ -146,10 +158,12 @@ class TestFromFileConnector(BaseTestCase):
             (0, 1, 14, 0.5),
         ]
         self.check_other_connect(
-            as_list, header='columns = ["i", "j", "delay", "weight"]',
+            as_list, ver_num,
+            header='columns = ["i", "j", "delay", "weight"]',
             w_index=3, d_index=2)
 
-    def test_big(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_big(self, _: str, ver_num: str) -> None:
         sources = 200
         destinations = 300
         aslist: AsList4 = []
@@ -158,5 +172,5 @@ class TestFromFileConnector(BaseTestCase):
                 aslist.append((s, d, 5, 2))
 
         self.check_other_connect(
-            aslist, header=None, w_index=2, d_index=3, sources=sources,
-            destinations=destinations)
+            aslist, ver_num, header=None, w_index=2, d_index=3,
+            sources=sources, destinations=destinations)

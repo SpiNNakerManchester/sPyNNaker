@@ -12,11 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.models.populations import PopulationView
 import pyNN.spiNNaker as sim
+import pytest
+
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.models.populations import PopulationView
 
 
 class Test_IDMixin(BaseTestCase):

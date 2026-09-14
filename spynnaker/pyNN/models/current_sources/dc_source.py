@@ -12,14 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Mapping
+from collections.abc import Mapping
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
+
 from .abstract_current_source import (
-    AbstractCurrentSource, CurrentSourceIDs, CurrentParameter)
+    AbstractCurrentSource,
+    CurrentParameter,
+    CurrentSourceIDs,
+)
 
 
 class DCSource(AbstractCurrentSource):
@@ -28,10 +35,11 @@ class DCSource(AbstractCurrentSource):
     """
     __slots__ = (
         "__amplitude",
+        "__parameter_types",
+        "__parameters",
         "__start",
         "__stop",
-        "__parameters",
-        "__parameter_types")
+    )
 
     def __init__(self, amplitude: float = 0.0, start: float = 0.0,
                  stop: float = 0.0) -> None:
@@ -54,7 +62,7 @@ class DCSource(AbstractCurrentSource):
             'stop': DataType.UINT32}
 
         time_convert_ms = SpynnakerDataView.get_simulation_time_step_per_ms()
-        self.__parameters: Dict[str, CurrentParameter] = {
+        self.__parameters: dict[str, CurrentParameter] = {
             'amplitude': self.__amplitude,
             # Convert to integers i.e. timesteps
             'start': int(self.__start * time_convert_ms),

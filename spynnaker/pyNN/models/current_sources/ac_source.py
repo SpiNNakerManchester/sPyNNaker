@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Mapping
+from collections.abc import Mapping
 
 import numpy
 
@@ -25,7 +25,10 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 
 from .abstract_current_source import (
-    AbstractCurrentSource, CurrentSourceIDs, CurrentParameter)
+    AbstractCurrentSource,
+    CurrentParameter,
+    CurrentSourceIDs,
+)
 
 
 class ACSource(AbstractCurrentSource):
@@ -34,14 +37,15 @@ class ACSource(AbstractCurrentSource):
     "stop", given (y-)offset, amplitude, frequency and phase.
     """
     __slots__ = (
+        "__amplitude",
+        "__frequency",
+        "__offset",
+        "__parameter_types",
+        "__parameters",
+        "__phase",
         "__start",
         "__stop",
-        "__amplitude",
-        "__offset",
-        "__frequency",
-        "__phase",
-        "__parameters",
-        "__parameter_types")
+    )
 
     def __init__(self, start: float = 0.0, stop: float = 0.0,
                  amplitude: float = 0.0, offset: float = 0.0,
@@ -72,7 +76,7 @@ class ACSource(AbstractCurrentSource):
             'frequency': DataType.S1615,
             'phase': DataType.S1615}
 
-        self.__parameters: Dict[str, CurrentParameter] = {
+        self.__parameters: dict[str, CurrentParameter] = {
             'start': self.__start,
             'stop': self.__stop,
             'amplitude': self.__amplitude,

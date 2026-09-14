@@ -12,53 +12,67 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import math
-from typing import Any, Iterable, List, Optional, Tuple, TYPE_CHECKING
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, Any
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
 from numpy.typing import NDArray
-
 from pyNN.standardmodels.synapses import StaticSynapse
 
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+    BYTES_PER_SHORT,
+    BYTES_PER_WORD,
+)
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
-    SynapticConfigurationException, InvalidParameterType)
+    InvalidParameterType,
+    SynapticConfigurationException,
+)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector)
+    AbstractConnector,
+)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
     abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
-from spynnaker.pyNN.types import Weights
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    NUMPY_CONNECTORS_DTYPE,
+)
+from spynnaker.pyNN.types import Weights, WeightScales
 from spynnaker.pyNN.types import WeightsDelysIn as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE)
 
+from .abstract_generate_on_machine import (
+    AbstractGenerateOnMachine,
+    MatrixGeneratorID,
+)
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
-    AbstractSynapseDynamicsStructural)
-from .abstract_generate_on_machine import (
-    AbstractGenerateOnMachine, MatrixGeneratorID)
+    AbstractSynapseDynamicsStructural,
+)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 from .synapse_dynamics_weight_changable import SynapseDynamicsWeightChangable
 from .synapse_dynamics_weight_changer import SynapseDynamicsWeightChanger
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
-    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.\
         abstract_timing_dependence import AbstractTimingDependence
     from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
         abstract_weight_dependence import AbstractWeightDependence
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray,
+    )
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 # How large are the time-stamps stored with each event
@@ -80,18 +94,19 @@ class SynapseDynamicsSTDP(
     """
 
     __slots__ = (
+        # Whether to use back-propagation delay or not
+        "__backprop_delay",
         # Fraction of delay that is dendritic (instead of axonal or synaptic)
         "__dendritic_delay_fraction",
-        # timing dependence to use for the STDP rule
-        "__timing_dependence",
-        # weight dependence to use for the STDP rule
-        "__weight_dependence",
         # The neuromodulation instance if enabled
         "__neuromodulation",
         # padding to add to a synaptic row for synaptic rewiring
         "__pad_to_length",
-        # Whether to use back-propagation delay or not
-        "__backprop_delay")
+        # timing dependence to use for the STDP rule
+        "__timing_dependence",
+        # weight dependence to use for the STDP rule
+        "__weight_dependence",
+    )
 
     def __init__(
             self, timing_dependence: AbstractTimingDependence,
@@ -99,7 +114,7 @@ class SynapseDynamicsSTDP(
             voltage_dependence: None = None,
             dendritic_delay_fraction: float = 1.0,
             weight: _In_Types = StaticSynapse.default_parameters['weight'],
-            delay: _In_Types = None, pad_to_length: Optional[int] = None,
+            delay: _In_Types = None, pad_to_length: int | None = None,
             backprop_delay: bool = True):
         """
         :param timing_dependence:
@@ -128,7 +143,7 @@ class SynapseDynamicsSTDP(
         self.__dendritic_delay_fraction = float(dendritic_delay_fraction)
         self.__pad_to_length = pad_to_length
         self.__backprop_delay = backprop_delay
-        self.__neuromodulation: Optional[SynapseDynamicsNeuromodulation] = None
+        self.__neuromodulation: SynapseDynamicsNeuromodulation | None = None
 
         if self.__dendritic_delay_fraction != 1.0:
             raise NotImplementedError("All delays must be dendritic!")
@@ -177,7 +192,8 @@ class SynapseDynamicsSTDP(
         # NOTE: Import here as otherwise we get a circular dependency
         # pylint: disable=import-outside-toplevel
         from .synapse_dynamics_structural_stdp import (
-            SynapseDynamicsStructuralSTDP)
+            SynapseDynamicsStructuralSTDP,
+        )
         if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
             return SynapseDynamicsStructuralSTDP(
                 synapse_dynamics.partner_selection, synapse_dynamics.formation,
@@ -248,7 +264,7 @@ class SynapseDynamicsSTDP(
         self.__backprop_delay = bool(backprop_delay)
 
     @property
-    def neuromodulation(self) -> Optional[SynapseDynamicsNeuromodulation]:
+    def neuromodulation(self) -> SynapseDynamicsNeuromodulation | None:
         """
         Synapses that target a neuromodulation receptor.
         """
@@ -335,7 +351,7 @@ class SynapseDynamicsSTDP(
 
         # The actual number of bytes is in a word-aligned struct, so work out
         # the number of bytes as a number of words
-        return int(math.ceil(float(n_bytes) / BYTES_PER_WORD)) * BYTES_PER_WORD
+        return math.ceil(float(n_bytes) / BYTES_PER_WORD) * BYTES_PER_WORD
 
     def __get_n_connections(
             self, n_connections: int, check_length_padded: bool = True) -> int:
@@ -355,7 +371,7 @@ class SynapseDynamicsSTDP(
         # Neuromodulation synapses have the actual weight separately
         if self.__neuromodulation:
             pp_size_bytes += BYTES_PER_SHORT * n_connections
-        pp_size_words = int(math.ceil(float(pp_size_bytes) / BYTES_PER_WORD))
+        pp_size_words = math.ceil(float(pp_size_bytes) / BYTES_PER_WORD)
 
         return fp_size_words + pp_size_words
 
@@ -372,15 +388,22 @@ class SynapseDynamicsSTDP(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
-            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
-                List[NDArray[uint32]], List[NDArray[uint32]],
+            max_n_synapses: int, max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> tuple[
+                list[NDArray[uint32]], list[NDArray[uint32]],
                 NDArray[uint32], NDArray[uint32]]:
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
 
+        # Pre-scale the weights here to match the ring buffer format to make
+        # addition to the ring buffer easy
+        scaled_weights = (
+            numpy.abs(connections["weight"]) *
+            numpy.array(ring_buffer_weight_scales)[
+                connections["synapse_type"]])
+
         # Get the fixed data
-        # Old branch
         dendritic_delays = (
             connections["delay"] * self.__dendritic_delay_fraction)
         axonal_delays = (
@@ -391,14 +414,13 @@ class SynapseDynamicsSTDP(
         # isolation discussion. dendritic_delay_fraction is enforced to be
         # 1.0 above, so axonal_delays is currently always 0.
         fixed_plastic = (
-            ((dendritic_delays.astype("uint16") & 0xFF) <<
+            ((dendritic_delays.astype(uint16) & 0xFF) <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
             ((axonal_delays.astype("uint16") & 0xF) <<
              (4 + n_neuron_id_bits + n_synapse_type_bits)) |
-            (connections["synapse_type"].astype("uint16")
+            (connections["synapse_type"].astype(uint16)
              << n_neuron_id_bits) |
-            ((connections["target"].astype("uint16") -
-              post_vertex_slice.lo_atom) & neuron_id_mask))
+            (connections["target"].astype(uint16) & neuron_id_mask))
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
             fixed_plastic.view(dtype=uint8).reshape((-1, 2)),
@@ -422,7 +444,7 @@ class SynapseDynamicsSTDP(
         plastic_plastic = numpy.zeros(
             len(connections) * n_half_words, dtype=uint16)
         plastic_plastic[half_word::n_half_words] = \
-            numpy.rint(connections["weight"]).astype("uint16")
+            numpy.rint(scaled_weights).astype(uint16)
 
         # Convert the plastic data into groups of bytes per connection and
         # then into rows
@@ -448,8 +470,8 @@ class SynapseDynamicsSTDP(
 
         return fp_data, pp_data, fp_size, pp_size
 
-    def _pad_row(self, rows: List[NDArray],
-                 no_bytes_per_connection: int) -> List[NDArray]:
+    def _pad_row(self, rows: list[NDArray],
+                 no_bytes_per_connection: int) -> list[NDArray]:
         pad_len = self.__pad_to_length or 1
         # Row elements are (individual) bytes
         return [
@@ -485,9 +507,9 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
             self, n_synapse_types: int, pp_size: NDArray[uint32],
-            pp_data: List[NDArray[uint32]], fp_size: NDArray[uint32],
-            fp_data: List[NDArray[uint32]],
-            max_atoms_per_core: int) -> ConnectionsArray:
+            pp_data: list[NDArray[uint32]], fp_size: NDArray[uint32],
+            fp_data: list[NDArray[uint32]], max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         n_rows = len(fp_size)
 
         n_synapse_type_bits = get_n_bits(n_synapse_types)
@@ -506,7 +528,7 @@ class SynapseDynamicsSTDP(
             n_half_words += 1
             half_word = 0
         pp_half_words = numpy.concatenate([
-            pp[:size * n_half_words * BYTES_PER_SHORT].view("int16")[
+            pp[:size * n_half_words * BYTES_PER_SHORT].view(int16)[
                 half_word::n_half_words]
             for pp, size in zip(pp_without_headers, fp_size)])
 
@@ -516,12 +538,12 @@ class SynapseDynamicsSTDP(
             [numpy.repeat(i, fp_size[i]) for i in range(len(fp_size))])
         connections["target"] = data_fixed & neuron_id_mask
         connections["weight"] = pp_half_words
-        connections["delay"] = (data_fixed >> (
-            n_neuron_id_bits + n_synapse_type_bits)) & 0xFF
-        connections["delay"][connections["delay"] == 0] = 16
-        # master commented out here...
-        # connections["delay"] = data_fixed >> (
-        #     n_neuron_id_bits + n_synapse_type_bits)
+        connections["delay"] = data_fixed >> (
+            n_neuron_id_bits + n_synapse_type_bits)
+        synapse_type = (data_fixed >> n_neuron_id_bits) & (
+            (1 << n_synapse_type_bits) - 1)
+        connections["weight"] /= numpy.array(ring_buffer_weight_scales)[
+            synapse_type]
         return connections
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)
@@ -644,7 +666,7 @@ class SynapseDynamicsSTDP(
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
-    def pad_to_length(self) -> Optional[int]:
+    def pad_to_length(self) -> int | None:
         return self.__pad_to_length
 
     @property

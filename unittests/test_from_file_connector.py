@@ -13,20 +13,21 @@
 # limitations under the License.
 
 import tempfile
-from typing import Optional, List
 
 import numpy
-from numpy.typing import NDArray
-import pytest
 import pyNN.spiNNaker as sim
+import pytest
+from numpy.typing import NDArray
 
 from pacman.model.graphs.common.slice import Slice
 
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    FromFileConnector)
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    FromFileConnector,
+)
+
 from unittests.connector_tests.test_from_list_connector import MockAppVertex
-from unittests.mocks import MockSynapseDynamics, MockPopulation
+from unittests.mocks import MockPopulation, MockSynapseDynamics
 
 # NO unittest_setup() as sim.setup is called
 
@@ -57,11 +58,11 @@ from unittests.mocks import MockSynapseDynamics, MockPopulation
         "3-elements-extra"
     ])
 def test_connector(
-        clist: Optional[NDArray], column_names: Optional[List[str]],
-        weights: int, delays: int, expected_clist: Optional[NDArray],
-        expected_weights: List[int], expected_delays: List[int],
-        expected_extra_parameters: Optional[NDArray],
-        expected_extra_parameter_names: Optional[List[str]]) -> None:
+        clist: NDArray | None, column_names: list[str] | None,
+        weights: int, delays: int, expected_clist: NDArray | None,
+        expected_weights: list[int], expected_delays: list[int],
+        expected_extra_parameters: NDArray | None,
+        expected_extra_parameter_names: list[str] | None) -> None:
     sim.setup()
     temp = tempfile.NamedTemporaryFile(delete=False)
     with temp as f:
@@ -69,7 +70,7 @@ def test_connector(
         if column_names is not None:
             columns = ["i", "j"]
             columns.extend(column_names)
-            header = 'columns = {}'.format(columns)
+            header = f'columns = {columns}'
         if clist is not None and len(clist):
             numpy.savetxt(f, clist, header=header)
         else:

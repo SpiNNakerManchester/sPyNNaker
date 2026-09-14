@@ -12,39 +12,68 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    TimingDependenceRecurrent as RecurrentRule,
-    TimingDependenceSpikeNearestPair as SpikeNearestPairRule,
-    TimingDependenceVogels2011 as Vogels2011Rule,
-    TimingDependencePfisterSpikeTriplet as PfisterSpikeTriplet)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsNeuromodulation as Neuromodulation,
-    SynapseDynamicsWeightChangable as WeightChangeable,
-    SynapseDynamicsWeightChanger as WeightChanger)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
-    WeightDependenceAdditiveTriplet, WeightDependenceEpropReg)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    TimingDependenceEprop)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AllButMeConnector,
+    OneToOneOffsetConnector,
+)
 from spynnaker.pyNN.models.neuron.builds import (
     IFCondExpStoc,
-    IFCurrDelta as IFCurDelta,
+    IFCurrDeltaCa2Adaptive,
+    IFCurrDeltaFixedProb,
     IFCurrExpCa2Adaptive,
+    IFTruncDelta,
+    StocExp,
+    StocExpStable,
+    StocSigma,
+)
+from spynnaker.pyNN.models.neuron.builds import IFCurrDelta as IFCurDelta
+from spynnaker.pyNN.models.neuron.builds import (
     IFCurrDualExpBase as IF_curr_dual_exp,
-    IzkCondExpBase as Izhikevich_cond,
-    IzkCondDualExpBase as Izhikevich_cond_dual,
+)
+from spynnaker.pyNN.models.neuron.builds import (
     IFCurrExpSEMDBase as IF_curr_exp_sEMD,
-    EPropAdaptive as EPropAdaptive,
-    SinusoidReadout as SinusoidReadout,
-    LeftRightReadout as LeftRightReadout,
-    IFCurrDeltaCa2Adaptive, StocExp, StocExpStable, StocSigma, IFTruncDelta,
-    IFCurrDeltaFixedProb)
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AllButMeConnector, OneToOneOffsetConnector)
+)
+from spynnaker.pyNN.models.neuron.builds import (
+    IzkCondDualExpBase as Izhikevich_cond_dual,
+)
+from spynnaker.pyNN.models.neuron.builds import (
+    IzkCondExpBase as Izhikevich_cond,
+)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependencePfisterSpikeTriplet as PfisterSpikeTriplet,
+)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceRecurrent as RecurrentRule,
+)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceSpikeNearestPair as SpikeNearestPairRule,
+)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceVogels2011 as Vogels2011Rule,
+)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependenceAdditiveTriplet,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsNeuromodulation as Neuromodulation,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsWeightChangable as WeightChangeable,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsWeightChanger as WeightChanger,
+)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependenceEpropReg)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceEprop)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    EPropAdaptive, SinusoidReadout, LeftRightReadout)
 
 # Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
 
-__all__ = [
+__all__ = [  # noqa: RUF022
     # sPyNNaker models not currently part of full pyNN
     'IFCurDelta', 'IFCurrExpCa2Adaptive', 'IFCondExpStoc',
     'Izhikevich_cond', 'IF_curr_dual_exp', 'IF_curr_exp_sEMD',

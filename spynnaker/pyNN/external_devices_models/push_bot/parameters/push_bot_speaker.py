@@ -13,9 +13,11 @@
 # limitations under the License.
 
 from spinn_front_end_common.interface.ds import DataType
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+
 from spynnaker.pyNN.external_devices_models.push_bot import (
-    AbstractPushBotOutputDevice)
+    AbstractPushBotOutputDevice,
+)
+from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 
 
 class PushBotSpeaker(AbstractPushBotOutputDevice):

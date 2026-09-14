@@ -13,12 +13,17 @@
 # limitations under the License.
 
 from unittest import SkipTest
+
 import pyNN.spiNNaker as sim
+
 from spinn_utilities.config_holder import set_config
 from spinn_utilities.overrides import overrides
-from spinnman.processes.get_machine_process import GetMachineProcess
+
 from spinnman.messages.scp.impl.get_chip_info_response import (
-    GetChipInfoResponse)
+    GetChipInfoResponse,
+)
+from spinnman.processes.get_machine_process import GetMachineProcess
+
 from spinnaker_testbase import BaseTestCase
 
 

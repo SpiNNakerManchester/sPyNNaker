@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
+from collections.abc import Iterable
 from math import ceil
-from typing import (
-    Dict, Iterable, List, Tuple, cast, TYPE_CHECKING)
+from typing import TYPE_CHECKING, cast
 
 import numpy
 from numpy import floating, uint32
@@ -25,31 +26,46 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 
 from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationGenerator)
+    DataSpecificationGenerator,
+    DataType,
+)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_SHORT, BYTES_PER_WORD)
+    BYTES_PER_SHORT,
+    BYTES_PER_WORD,
+)
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    ConvolutionConnector, AbstractConnector)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSupportsSignedWeights)
-from spynnaker.pyNN.types import WeightsDelysIn
 from spynnaker.pyNN.models.common.local_only_2d_common import (
-    get_div_const, get_rinfo_for_spike_source, get_sources_for_target,
-    BITS_PER_SHORT, N_COLOUR_BITS_BITS, KEY_INFO_SIZE,
-    get_first_and_last_slice, Source)
+    BITS_PER_SHORT,
+    KEY_INFO_SIZE,
+    N_COLOUR_BITS_BITS,
+    Source,
+    get_div_const,
+    get_first_and_last_slice,
+    get_rinfo_for_spike_source,
+    get_sources_for_target,
+)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractConnector,
+    ConvolutionConnector,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSupportsSignedWeights,
+)
+from spynnaker.pyNN.types import WeightsDelysIn
+
 from .abstract_local_only import AbstractLocalOnly
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.population_vertex import (
-        PopulationVertex)
-    from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neuron import (
-        PopulationMachineLocalOnlyCombinedVertex)
+        PopulationMachineLocalOnlyCombinedVertex,
+    )
+    from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-        AbstractSynapseDynamics)
+        AbstractSynapseDynamics,
+    )
+    from spynnaker.pyNN.models.projection import Projection
 
 
 #: Size of convolution config main bytes
@@ -77,9 +93,9 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         super().__init__(delay)
 
         # Store the sources to avoid recalculation
-        self.__cached_sources: Dict[ApplicationVertex, Dict[
-                Tuple[ColouredApplicationVertex, str],
-                List[Source]]] = dict()
+        self.__cached_sources: dict[ApplicationVertex, dict[
+                tuple[ColouredApplicationVertex, str],
+                list[Source]]] = {}
 
     @property
     def _delay(self) -> float:
@@ -151,11 +167,11 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.switch_write_focus(region)
 
         # Get spec for each incoming source
-        connector_weight_index: Dict[AbstractConnector, int] = dict()
+        connector_weight_index: dict[AbstractConnector, int] = {}
         next_weight_index: int = 0
-        source_data = list()
-        connector_data: List[NDArray[uint32]] = list()
-        weight_data = list()
+        source_data = []
+        connector_data: list[NDArray[uint32]] = []
+        weight_data = []
         for (pre_vertex, part_id), source_infos in sources.items():
 
             # Add connectors as needed
@@ -194,8 +210,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
             # Get cores per width / height
             pre_shape = list(pre_vertex.atoms_shape)
-            cores_per_width = int(ceil(pre_shape[0] / width_per_core))
-            cores_per_height = int(ceil(pre_shape[1] / height_per_core))
+            cores_per_width = ceil(pre_shape[0] / width_per_core)
+            cores_per_height = ceil(pre_shape[1] / height_per_core)
 
             # Add the key and mask...
             source_data.extend([r_info.key, r_info.mask])
@@ -249,8 +265,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             numpy.concatenate(weight_data, dtype="int16").view("uint32"))
 
     def __get_sources_for_target(
-            self, app_vertex: PopulationVertex) -> Dict[
-                Tuple[ColouredApplicationVertex, str], List[Source]]:
+            self, app_vertex: PopulationVertex) -> dict[
+                tuple[ColouredApplicationVertex, str], list[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.

@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from enum import Enum
-from typing import Optional
-from spinn_front_end_common.utility_models import MultiCastCommand
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.utility_models import MultiCastCommand
 
 # structure of command is KKKKKKKKKKKKKKKKKKKKK-IIIIIII-F-DDD
 # K = ignored key at the top of the command
@@ -356,7 +356,7 @@ class MUNICH_MODES(Enum):
     FREE = 5
 
 
-class MunichIoSpiNNakerLinkProtocol(object):
+class MunichIoSpiNNakerLinkProtocol:
     """
     Provides Multicast commands for the Munich SpiNNaker-Link protocol.
     """
@@ -373,7 +373,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
     # Keeps track of whether the mode has been configured already
     __sent_mode_command = False
 
-    def __init__(self, mode: MUNICH_MODES, instance_key: Optional[int] = None,
+    def __init__(self, mode: MUNICH_MODES, instance_key: int | None = None,
                  uart_id: int = 0):
         """
         :param mode: The mode of operation of the protocol
@@ -424,7 +424,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
         return MunichIoSpiNNakerLinkProtocol.__sent_mode_command
 
     def _get_key(self, command: int,
-                 offset_to_uart_id: Optional[int] = None) -> int:
+                 offset_to_uart_id: int | None = None) -> int:
         if offset_to_uart_id is None:
             return command | self.__instance_key
         return (
@@ -432,7 +432,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             (self.__uart_id << offset_to_uart_id))
 
     def configure_master_key(self, new_key: int,
-                             time: Optional[int] = None) -> MultiCastCommand:
+                             time: int | None = None) -> MultiCastCommand:
         """
         :param new_key:
         :param time: The time within the simulation at which to send the
@@ -442,7 +442,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
         return MultiCastCommand(
             self._get_key(CONFIGURE_MASTER_KEY), payload=new_key, time=time)
 
-    def set_mode(self, time: Optional[int] = None) -> MultiCastCommand:
+    def set_mode(self, time: int | None = None) -> MultiCastCommand:
         """
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
@@ -461,7 +461,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             ACTIVE_RETINA_EVENT_STREAMING_SET_KEY, RETINA_UART_SHIFT)
 
     def set_retina_key(self, new_key: int,
-                       time: Optional[int] = None) -> MultiCastCommand:
+                       time: int | None = None) -> MultiCastCommand:
         """
         :param new_key:
         :param time: The time within the simulation at which to send the
@@ -478,7 +478,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         return self._get_key(DISABLE_RETINA_EVENT_STREAMING, RETINA_UART_SHIFT)
 
-    def disable_retina(self, time: Optional[int] = None) -> MultiCastCommand:
+    def disable_retina(self, time: int | None = None) -> MultiCastCommand:
         """
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
@@ -487,7 +487,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
         return MultiCastCommand(self.disable_retina_key, time=time)
 
     def master_slave_use_internal_counter(
-            self, time: Optional[int] = None) -> MultiCastCommand:
+            self, time: int | None = None) -> MultiCastCommand:
         """
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
@@ -498,7 +498,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             payload=_PAYLOAD_MASTER_SLAVE_USE_INTERNAL_COUNTER, time=time)
 
     def master_slave_set_slave(
-            self, time: Optional[int] = None) -> MultiCastCommand:
+            self, time: int | None = None) -> MultiCastCommand:
         """
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
@@ -509,7 +509,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             payload=_PAYLOAD_MASTER_SLAVE_SET_SLAVE, time=time)
 
     def master_slave_set_master_clock_not_started(
-            self, time: Optional[int] = None) -> MultiCastCommand:
+            self, time: int | None = None) -> MultiCastCommand:
         """
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
@@ -521,7 +521,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             time=time)
 
     def master_slave_set_master_clock_active(
-            self, time: Optional[int] = None) -> MultiCastCommand:
+            self, time: int | None = None) -> MultiCastCommand:
         """
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
@@ -533,7 +533,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             time=time)
 
     def bias_values(self, bias_id: int, bias_value: int,
-                    time: Optional[int] = None) -> MultiCastCommand:
+                    time: int | None = None) -> MultiCastCommand:
         """
         :param bias_id:
         :param bias_value:
@@ -545,7 +545,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             self._get_key(BIAS_KEY, RETINA_UART_SHIFT),
             payload=((bias_id << 0) | (bias_value << 8)), time=time)
 
-    def reset_retina(self, time: Optional[int] = None) -> MultiCastCommand:
+    def reset_retina(self, time: int | None = None) -> MultiCastCommand:
         """
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
@@ -556,7 +556,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def turn_off_sensor_reporting(
             self, sensor_id: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param sensor_id:
         :param time: The time within the simulation at which to send the
@@ -568,7 +568,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             payload=(sensor_id << _PAYLOAD_SENSOR_ID_OFFSET), time=time)
 
     def poll_sensors_once(self, sensor_id: int,
-                          time: Optional[int] = None) -> MultiCastCommand:
+                          time: int | None = None) -> MultiCastCommand:
         """
         :param sensor_id:
         :param time: The time within the simulation at which to send the
@@ -581,7 +581,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def poll_individual_sensor_continuously(
             self, sensor_id: int, time_in_ms: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param sensor_id:
         :param time_in_ms: time to sensor
@@ -603,7 +603,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
         return self._get_key(ENABLE_DISABLE_MOTOR_KEY, RETINA_UART_SHIFT)
 
     def generic_motor_enable(
-            self, time: Optional[int] = None) -> MultiCastCommand:
+            self, time: int | None = None) -> MultiCastCommand:
         """
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
@@ -613,7 +613,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             self.enable_disable_motor_key, payload=1, time=time)
 
     def generic_motor_disable(
-            self, time: Optional[int] = None) -> MultiCastCommand:
+            self, time: int | None = None) -> MultiCastCommand:
         """
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
@@ -624,7 +624,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def generic_motor_total_period(
             self, time_in_ms: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param time_in_ms:
         :param time: The time within the simulation at which to send the
@@ -637,7 +637,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def generic_motor0_raw_output_permanent(
             self, pwm_signal: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param pwm_signal:
         :param time: The time within the simulation at which to send the
@@ -650,7 +650,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def generic_motor1_raw_output_permanent(
             self, pwm_signal: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param pwm_signal:
         :param time: The time within the simulation at which to send the
@@ -663,7 +663,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def generic_motor0_raw_output_leak_to_0(
             self, pwm_signal: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param pwm_signal:
         :param time: The time within the simulation at which to send the
@@ -676,7 +676,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def generic_motor1_raw_output_leak_to_0(
             self, pwm_signal: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param pwm_signal:
         :param time: The time within the simulation at which to send the
@@ -689,7 +689,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def pwm_pin_output_timer_a_duration(
             self, timer_period: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param timer_period:
         :param time: The time within the simulation at which to send the
@@ -702,7 +702,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def pwm_pin_output_timer_b_duration(
             self, timer_period: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param timer_period:
         :param time: The time within the simulation at which to send the
@@ -715,7 +715,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def pwm_pin_output_timer_c_duration(
             self, timer_period: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param timer_period:
         :param time: The time within the simulation at which to send the
@@ -728,7 +728,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def pwm_pin_output_timer_a_channel_0_ratio(
             self, timer_period: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param timer_period:
         :param time: The time within the simulation at which to send the
@@ -742,7 +742,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def pwm_pin_output_timer_a_channel_1_ratio(
             self, timer_period: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param timer_period:
         :param time: The time within the simulation at which to send the
@@ -756,7 +756,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def pwm_pin_output_timer_b_channel_0_ratio(
             self, timer_period: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param timer_period:
         :param time: The time within the simulation at which to send the
@@ -771,7 +771,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def pwm_pin_output_timer_b_channel_1_ratio(
             self, timer_period: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param timer_period:
         :param time: The time within the simulation at which to send the
@@ -785,7 +785,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def pwm_pin_output_timer_c_channel_0_ratio(
             self, timer_period: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param timer_period:
         :param time: The time within the simulation at which to send the
@@ -799,7 +799,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def pwm_pin_output_timer_c_channel_1_ratio(
             self, timer_period: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param timer_period:
         :returns: Command to set c channel 1 output timer.
@@ -812,7 +812,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             payload=timer_period, time=time)
 
     def query_state_of_io_lines(
-            self, time: Optional[int] = None) -> MultiCastCommand:
+            self, time: int | None = None) -> MultiCastCommand:
         """
         :param time: The time within the simulation at which to send the
             command, or ``None`` if this is not a timed command
@@ -823,7 +823,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def set_output_pattern_for_payload(
             self, payload: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param payload:
         :param time: The time within the simulation at which to send the
@@ -835,7 +835,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def add_payload_logic_to_current_output(
             self, payload: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param payload:
         :param time: The time within the simulation at which to send the
@@ -848,7 +848,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def remove_payload_logic_to_current_output(
             self, payload: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param payload:
         :param time: The time within the simulation at which to send the
@@ -861,7 +861,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def set_payload_pins_to_high_impedance(
             self, payload: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param payload:
         :param time: The time within the simulation at which to send the
@@ -888,7 +888,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_laser_config_total_period(
             self, total_period: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param total_period:
         :param time: The time within the simulation at which to send the
@@ -911,7 +911,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_laser_config_active_time(
             self, active_time: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param active_time: The time for the laser
         :param time: The time within the simulation at which to send the
@@ -935,7 +935,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_laser_set_frequency(
             self, frequency: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param frequency:
         :param time: The time within the simulation at which to send the
@@ -958,7 +958,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_speaker_config_total_period(
             self, total_period: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param total_period:
         :param time: The time within the simulation at which to send the
@@ -981,7 +981,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_speaker_config_active_time(
             self, active_time: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param active_time:
         :param time: The time within the simulation at which to send the
@@ -1005,7 +1005,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_speaker_set_tone(
             self, frequency: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param frequency:
         :param time: The time within the simulation at which to send the
@@ -1029,7 +1029,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_speaker_set_melody(
             self, melody: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param melody:
         :param time: The time within the simulation at which to send the
@@ -1052,7 +1052,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_led_total_period(
             self, total_period: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param total_period: total period for the LED
         :param time: The time within the simulation at which to send the
@@ -1075,7 +1075,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_led_back_active_time(
             self, active_time: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param active_time:
         :param time: The time within the simulation at which to send the
@@ -1098,7 +1098,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_led_front_active_time(
             self, active_time: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param active_time:
         :param time: The time within the simulation at which to send the
@@ -1122,7 +1122,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_led_set_frequency(
             self, frequency: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param frequency:
         :param time: The time within the simulation at which to send the
@@ -1145,7 +1145,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_motor_0_permanent(
             self, velocity: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param velocity:
         :param time: The time within the simulation at which to send the
@@ -1168,7 +1168,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_motor_1_permanent(
             self, velocity: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param velocity:
         :param time: The time within the simulation at which to send the
@@ -1191,7 +1191,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_motor_0_leaking_towards_zero(
             self, velocity: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param velocity:
         :param time: The time within the simulation at which to send the
@@ -1214,7 +1214,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def push_bot_motor_1_leaking_towards_zero(
             self, velocity: int,
-            time: Optional[int] = None) -> MultiCastCommand:
+            time: int | None = None) -> MultiCastCommand:
         """
         :param velocity:
         :param time: The time within the simulation at which to send the
@@ -1245,9 +1245,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
             RETINA_UART_SHIFT)
 
     def set_retina_transmission(
-            self, retina_key: Optional[RetinaKey] = RetinaKey.NATIVE_128_X_128,
-            retina_payload: Optional[RetinaPayload] = None,
-            time: Optional[int] = None) -> MultiCastCommand:
+            self, retina_key: RetinaKey | None = RetinaKey.NATIVE_128_X_128,
+            retina_payload: RetinaPayload | None = None,
+            time: int | None = None) -> MultiCastCommand:
         """
         Set the retina transmission key.
 

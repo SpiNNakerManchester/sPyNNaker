@@ -13,27 +13,44 @@
 # limitations under the License.
 
 from __future__ import annotations
+
+from collections.abc import Iterable, Sequence
 from typing import (
-    Iterable, List, Optional, Sequence, Tuple, TYPE_CHECKING, Union)
+    TYPE_CHECKING,
+)
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import (
-    ApplicationVertex, ApplicationVirtualVertex)
+    ApplicationVertex,
+    ApplicationVirtualVertex,
+)
 from pacman.model.routing_info import BaseKeyAndMask
+
 from spinn_front_end_common.abstract_models import (
-    AbstractVertexWithEdgeToDependentVertices, HasCustomAtomKeyMap)
+    AbstractVertexWithEdgeToDependentVertices,
+    HasCustomAtomKeyMap,
+)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.models.neuron import PopulationVertex
+
 from .abstract_ethernet_controller import AbstractEthernetController
 from .abstract_multicast_controllable_device import (
-    AbstractMulticastControllableDevice)
+    AbstractMulticastControllableDevice,
+)
+
 if TYPE_CHECKING:
     from pacman.model.graphs.machine.machine_vertex import MachineVertex
     from pacman.model.routing_info.routing_info import RoutingInfo
-    from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
-    from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
-    from .abstract_ethernet_translator import AbstractEthernetTranslator
+
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterPopulationVertex)
+        SplitterPopulationVertex,
+    )
+    from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
+    from spynnaker.pyNN.models.neuron.implementations import AbstractNeuronImpl
+
+    from .abstract_ethernet_translator import AbstractEthernetTranslator
 
 
 class ExternalDeviceLifControlVertex(
@@ -57,20 +74,20 @@ class ExternalDeviceLifControlVertex(
     def __init__(
             self, *, devices: Sequence[AbstractMulticastControllableDevice],
             create_edges: bool,
-            max_atoms_per_core: Union[int, Tuple[int, ...]],
-            n_synapse_cores: Optional[int],
+            max_atoms_per_core: int | tuple[int, ...],
+            n_synapse_cores: int | None,
             allow_delay_extensions: bool,
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel,
-            translator: Optional[AbstractEthernetTranslator] = None,
-            spikes_per_second: Optional[float] = None,
-            label: Optional[str] = None,
-            ring_buffer_sigma: Optional[float] = None,
-            max_expected_summed_weight: Optional[List[float]] = None,
-            incoming_spike_buffer_size: Optional[int] = None,
-            drop_late_spikes: Optional[bool] = None,
-            splitter: Optional[SplitterPopulationVertex] = None,
-            seed: Optional[int] = None, n_colour_bits: Optional[int] = None):
+            translator: AbstractEthernetTranslator | None = None,
+            spikes_per_second: float | None = None,
+            label: str | None = None,
+            ring_buffer_sigma: float | None = None,
+            max_expected_summed_weight: list[float] | None = None,
+            incoming_spike_buffer_size: int | None = None,
+            drop_late_spikes: bool | None = None,
+            splitter: SplitterPopulationVertex | None = None,
+            seed: int | None = None, n_colour_bits: int | None = None):
         """
         :param devices:
             The AbstractMulticastControllableDevice instances to be controlled
@@ -124,7 +141,7 @@ class ExternalDeviceLifControlVertex(
 
     @staticmethod
     def __dependents(
-            devices: Sequence[AbstractMulticastControllableDevice]) -> Tuple[
+            devices: Sequence[AbstractMulticastControllableDevice]) -> tuple[
                 ApplicationVirtualVertex, ...]:
         return tuple(
             dev for dev in devices
@@ -156,20 +173,20 @@ class ExternalDeviceLifControlVertex(
         return self.__message_translator
 
     @overrides(AbstractEthernetController.get_outgoing_partition_ids)
-    def get_outgoing_partition_ids(self) -> List[str]:
+    def get_outgoing_partition_ids(self) -> list[str]:
         return list(self.__devices.keys())
 
     @overrides(HasCustomAtomKeyMap.get_atom_key_map)
     def get_atom_key_map(
             self, pre_vertex: MachineVertex, partition_id: str,
-            routing_info: RoutingInfo) -> Iterable[Tuple[int, int]]:
+            routing_info: RoutingInfo) -> Iterable[tuple[int, int]]:
         index = self.__indices[partition_id]
         device = self.__devices[partition_id]
         return [(index, device.device_control_key)]
 
     @overrides(PopulationVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(
-            self, partition_id: str) -> Optional[BaseKeyAndMask]:
+            self, partition_id: str) -> BaseKeyAndMask | None:
         return BaseKeyAndMask(
             self.__devices[partition_id].device_control_key,
             self._DEFAULT_COMMAND_MASK)

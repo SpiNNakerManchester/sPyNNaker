@@ -12,16 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Tuple
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
 
 from spinn_front_end_common.interface.ds import DataType
 
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.utilities.struct import Struct
-from spynnaker.pyNN.data import SpynnakerDataView
 
 from .abstract_synapse_type import AbstractSynapseType
 
@@ -37,10 +36,11 @@ class SynapseTypeExponential(AbstractSynapseType):
     A simple exponential synapse.
     """
     __slots__ = (
+        "__isyn_exc",
+        "__isyn_inh",
         "__tau_syn_E",
         "__tau_syn_I",
-        "__isyn_exc",
-        "__isyn_inh")
+    )
 
     def __init__(self, tau_syn_E: ModelParameter, tau_syn_I: ModelParameter,
                  isyn_exc: ModelParameter, isyn_inh: ModelParameter):
@@ -82,7 +82,7 @@ class SynapseTypeExponential(AbstractSynapseType):
         return 2
 
     @overrides(AbstractSynapseType.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         if target == "excitatory":
             return 0
         elif target == "inhibitory":
@@ -90,7 +90,7 @@ class SynapseTypeExponential(AbstractSynapseType):
         return None
 
     @overrides(AbstractSynapseType.get_synapse_targets)
-    def get_synapse_targets(self) -> Tuple[str, ...]:
+    def get_synapse_targets(self) -> tuple[str, ...]:
         return "excitatory", "inhibitory"
 
     @property

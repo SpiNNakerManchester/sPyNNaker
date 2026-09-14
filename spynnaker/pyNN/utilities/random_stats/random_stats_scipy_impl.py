@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
+
 import scipy.stats
-from spinn_utilities.overrides import overrides
 from pyNN.random import RandomDistribution
+
+from spinn_utilities.overrides import overrides
+
 from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
@@ -51,13 +53,13 @@ class RandomStatsScipyImpl(AbstractRandomStats):
         return self._scipy_stats.var(*dist.parameters)
 
     @overrides(AbstractRandomStats.high)
-    def high(self, distribution: RandomDistribution) -> Optional[float]:
+    def high(self, distribution: RandomDistribution) -> float | None:
         if "high" in distribution.parameters:
             return distribution.parameters['high']
         return None
 
     @overrides(AbstractRandomStats.low)
-    def low(self, distribution: RandomDistribution) -> Optional[float]:
+    def low(self, distribution: RandomDistribution) -> float | None:
         if "low" in distribution.parameters:
             return distribution.parameters['low']
         return None

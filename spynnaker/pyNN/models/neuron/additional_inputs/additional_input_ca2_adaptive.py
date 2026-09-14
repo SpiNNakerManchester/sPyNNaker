@@ -17,9 +17,9 @@ from spinn_utilities.ranged import RangeDictionary
 
 from spinn_front_end_common.interface.ds import DataType
 
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.utilities.struct import Struct
-from spynnaker.pyNN.data import SpynnakerDataView
 
 from .abstract_additional_input import AbstractAdditionalInput
 
@@ -34,9 +34,10 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
     The additional model parameters for a leaky integrate and fire model.
     """
     __slots__ = (
-        "__tau_ca2",
+        "__i_alpha",
         "__i_ca2",
-        "__i_alpha")
+        "__tau_ca2",
+    )
 
     def __init__(self, tau_ca2: ModelParameter, i_ca2: ModelParameter,
                  i_alpha: ModelParameter):

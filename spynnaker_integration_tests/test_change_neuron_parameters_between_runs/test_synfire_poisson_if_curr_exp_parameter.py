@@ -13,7 +13,9 @@
 # limitations under the License.
 import numpy
 import pyNN.spiNNaker as p
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker_integration_tests.scripts import SynfireRunner
 
 n_neurons = 200  # number of neurons in each population

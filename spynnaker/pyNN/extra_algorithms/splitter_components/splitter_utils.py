@@ -15,11 +15,16 @@ from pacman.model.graphs.application import ApplicationVertex
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPoissonDelegate)
+    SplitterPoissonDelegate,
+)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector, OneToOneConnector)
+    AbstractConnector,
+    OneToOneConnector,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamics, SynapseDynamicsStatic)
+    AbstractSynapseDynamics,
+    SynapseDynamicsStatic,
+)
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.types import Delays
 

@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import math
-from typing import cast, List
 import unittest
+from typing import cast
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -23,7 +23,8 @@ from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
-    AbstractWeightDependence)
+    AbstractWeightDependence,
+)
 
 
 class TestSTDPNeuromodulation(BaseTestCase):
@@ -149,7 +150,7 @@ class TestSTDPNeuromodulation(BaseTestCase):
         weight_exact = (
             ((el * DA_concentration) * const)*((decay_d * decay_e) - 1))
         print(f"Weight calculated: {weight_exact}")
-        weights0 = cast(List[float], weights[0])
+        weights0 = cast(list[float], weights[0])
         print(f"Weight from SpiNNaker: {weights0[2]}")
         self.assertTrue(numpy.allclose(
                         weights0[2], weight_exact, atol=0.02))

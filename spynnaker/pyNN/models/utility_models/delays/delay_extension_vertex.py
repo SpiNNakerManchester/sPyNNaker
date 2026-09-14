@@ -12,21 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Sequence, Tuple, TYPE_CHECKING, cast
-from spinn_utilities.overrides import overrides
+
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, cast
+
 from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import (
-    ApplicationEdgePartition, ApplicationVertex)
+    ApplicationEdgePartition,
+    ApplicationVertex,
+)
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
 from spynnaker.pyNN.exceptions import DelayExtensionException
-from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
-from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractHasDelayStages,
+    ColouredApplicationVertex,
+)
 from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
+from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterDelayVertexSlice)
+        SplitterDelayVertexSlice,
+    )
 
 _DELAY_PARAM_HEADER_WORDS = 9
 
@@ -37,13 +48,14 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
     of a neuron (typically 16 or 32).
     """
     __slots__ = (
+        "__delay_per_stage",
+        "__drop_late_spikes",
+        "__n_colour_bits",
+        "__n_delay_stages",
+        "__outgoing_edges",
         # The partition this Delay is supporting
         "__partition",
-        "__delay_per_stage",
-        "__n_delay_stages",
-        "__drop_late_spikes",
-        "__outgoing_edges",
-        "__n_colour_bits")
+    )
 
     # this maps to what master assumes
     MAX_SLOTS = 8
@@ -71,7 +83,7 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
         self.__drop_late_spikes = get_config_bool(
             "Simulation", "drop_late_spikes") or False
 
-        self.__outgoing_edges: List[DelayedApplicationEdge] = list()
+        self.__outgoing_edges: list[DelayedApplicationEdge] = []
 
         self.__n_colour_bits = n_colour_bits
 
@@ -84,7 +96,7 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
 
     @property
     @overrides(ColouredApplicationVertex.atoms_shape)
-    def atoms_shape(self) -> Tuple[int, ...]:
+    def atoms_shape(self) -> tuple[int, ...]:
         return self.__partition.pre_vertex.atoms_shape
 
     @property
@@ -127,8 +139,7 @@ class DelayExtensionVertex(ColouredApplicationVertex, AbstractHasDelayStages):
                 "is not yet feasible. "
                 "Please report it to Spinnaker user mail list.")
 
-        if n_delay_stages > self.__n_delay_stages:
-            self.__n_delay_stages = n_delay_stages
+        self.__n_delay_stages = max(self.__n_delay_stages, n_delay_stages)
 
     @property
     def delay_per_stage(self) -> int:

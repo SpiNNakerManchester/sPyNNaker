@@ -15,21 +15,31 @@
 import logging
 import select
 import socket
-from typing import Callable, Optional, TypeVar
+from collections.abc import Callable
+from typing import TypeVar
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ping import Ping
-from spinnman.connections.abstract_classes import Listenable, Connection
+
+from spinnman.connections.abstract_classes import Connection, Listenable
 from spinnman.utilities.socket_utils import (
-    get_tcp_socket, connect_socket, get_socket_address, resolve_host,
-    receive_message, send_message)
+    connect_socket,
+    get_socket_address,
+    get_tcp_socket,
+    receive_message,
+    resolve_host,
+    send_message,
+)
+
 from spinn_front_end_common.utilities.constants import BYTES_PER_KB
+
 #: :meta private:
 T = TypeVar("T")
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # A set of connections that have already been made
-_existing_connections: dict[tuple[str, int], "PushBotWIFIConnection"] = dict()
+_existing_connections: dict[tuple[str, int], "PushBotWIFIConnection"] = {}
 
 
 def get_pushbot_wifi_connection(
@@ -120,7 +130,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         return self.__local_port
 
     @property
-    def remote_ip_address(self) -> Optional[str]:
+    def remote_ip_address(self) -> str | None:
         """
         The remote IP address to which the connection is connected,
         as a dotted string, or `None` if not connected remotely.
@@ -136,7 +146,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         return self.__remote_port
 
-    def receive(self, timeout: Optional[float] = None) -> bytes:
+    def receive(self, timeout: float | None = None) -> bytes:
         """
         Receive data from the connection
 
@@ -166,7 +176,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         try:
             self.__socket.shutdown(socket.SHUT_WR)
-        except Exception:  # pylint: disable=broad-except
+        except Exception:  # NOQA
             pass
         self.__socket.close()
 

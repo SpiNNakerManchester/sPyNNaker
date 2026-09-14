@@ -12,31 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from enum import IntEnum
-import ctypes
-from typing import Optional, Sequence, TYPE_CHECKING
 
-from spinn_utilities.overrides import overrides
+import ctypes
+from collections.abc import Sequence
+from enum import IntEnum
+from typing import TYPE_CHECKING, ClassVar, Final
+
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.config_holder import get_config_int
-from pacman.model.resources import AbstractSDRAM
-from pacman.model.graphs.machine import (
-    SDRAMMachineEdge, SourceSegmentedSDRAMMachinePartition)
+from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import (
+    SDRAMMachineEdge,
+    SourceSegmentedSDRAMMachinePartition,
+)
+from pacman.model.resources import AbstractSDRAM
+
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
-    ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
+    ReceivesSynapticInputsOverSDRAM,
+    SendsSynapticInputsOverSDRAM,
+)
+
 from .population_machine_common import CommonRegions, PopulationMachineCommon
-from .synaptic_matrices import SynapseRegions
 from .population_machine_synapses_provenance import SynapseProvenance
+from .synaptic_matrices import SynapseRegions
+
 if TYPE_CHECKING:
-    from .population_vertex import PopulationVertex
     from .population_neurons_machine_vertex import (
-        PopulationNeuronsMachineVertex)
+        PopulationNeuronsMachineVertex,
+    )
+    from .population_vertex import PopulationVertex
 
 # Size of SDRAM params = 1 word for address + 1 word for size
 #  + 1 word for time to send
@@ -52,7 +64,7 @@ class SpikeProcessingFastProvenance(ctypes.LittleEndianStructure):
     """
     Types of provenance and the DataType used to represent each.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # A count of the times that the synaptic input circular buffers
         # overflowed
         ("n_buffer_overflows", ctypes.c_uint32),
@@ -110,9 +122,10 @@ class PopulationSynapsesMachineVertexCommon(
     MAX_SPIKE_OVERFLOW = "Max_spike_overflow_in_time_step"
 
     __slots__ = (
-        "__sdram_partition",
         "__neuron_vertex",
-        "__partition_id")
+        "__partition_id",
+        "__sdram_partition",
+    )
 
     class REGIONS(IntEnum):
         """
@@ -149,7 +162,7 @@ class PopulationSynapsesMachineVertexCommon(
         REGIONS.BIT_FIELD_FILTER,
         REGIONS.CONNECTOR_BUILDER)
 
-    _PROFILE_TAG_LABELS = {
+    _PROFILE_TAG_LABELS: Final = {
         0: "TIMER_SYNAPSES",
         1: "DMA_READ",
         2: "INCOMING_SPIKE",
@@ -169,10 +182,10 @@ class PopulationSynapsesMachineVertexCommon(
             label, app_vertex, vertex_slice, sdram, self.COMMON_REGIONS,
             SynapseProvenance.N_ITEMS + SpikeProcessingFastProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, app_vertex.synapse_core_binary_file_name)
-        self.__sdram_partition: Optional[
-            SourceSegmentedSDRAMMachinePartition] = None
-        self.__neuron_vertex: Optional[PopulationNeuronsMachineVertex] = None
-        self.__partition_id: Optional[str] = None
+        self.__sdram_partition: (SourceSegmentedSDRAMMachinePartition |
+                                 None) = None
+        self.__neuron_vertex: PopulationNeuronsMachineVertex | None = None
+        self.__partition_id: str | None = None
 
     @overrides(SendsSynapticInputsOverSDRAM.set_sdram_partition)
     def set_sdram_partition(

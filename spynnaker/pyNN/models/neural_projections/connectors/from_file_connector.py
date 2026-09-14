@@ -14,11 +14,10 @@
 
 import logging
 import os
-from typing import Any, Dict, Union
+from typing import Any
 
 import numpy
 from numpy.typing import NDArray
-
 from pyNN.recording.files import BaseFile, StandardTextFile
 
 from spinn_utilities.log import FormatAdapter
@@ -36,7 +35,7 @@ class FromFileConnector(FromListConnector):
     __slots__ = ("_file", )
 
     def __init__(
-            self, file: Union[str, BaseFile],  # @ReservedAssignment
+            self, file: str | BaseFile,  # @ReservedAssignment
             distributed: bool = False, safe: bool = True,
             callback: None = None, verbose: bool = False):
         """
@@ -102,7 +101,7 @@ class FromFileConnector(FromListConnector):
         return FromListConnector(**params)
 
     @overrides(FromListConnector.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         logger.warning("FromFileConnectors parameters are actually the ones "
                        "for the underlying FromListConnector")
         return super().get_parameters()
@@ -114,7 +113,7 @@ class FromFileConnector(FromListConnector):
         filename = f"{os.path.basename(the_file.file)}."
 
         # This assumes it finds the files in the right order!
-        conns = list()
+        conns = []
         for found_file in os.listdir(os.path.dirname(the_file.file)):
             if found_file.startswith(filename):
                 file_reader = self.get_reader(found_file)

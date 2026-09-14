@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional
-from scipy.stats import truncnorm
-from spinn_utilities.overrides import overrides
+
 from pyNN.random import RandomDistribution
+from scipy.stats import truncnorm
+
+from spinn_utilities.overrides import overrides
+
 from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
@@ -25,7 +27,7 @@ class RandomStatsNormalClippedImpl(AbstractRandomStats):
     are clipped to a boundary (redrawn).
     """
 
-    def _get_params(self, dist: RandomDistribution) -> List[float]:
+    def _get_params(self, dist: RandomDistribution) -> list[float]:
         low = ((dist.parameters['low'] - dist.parameters['mu']) /
                dist.parameters['sigma'])
         high = ((dist.parameters['high'] - dist.parameters['mu']) /
@@ -54,9 +56,9 @@ class RandomStatsNormalClippedImpl(AbstractRandomStats):
         return truncnorm.var(*self._get_params(dist))
 
     @overrides(AbstractRandomStats.high)
-    def high(self, distribution: RandomDistribution) -> Optional[float]:
+    def high(self, distribution: RandomDistribution) -> float | None:
         return distribution.parameters['high']
 
     @overrides(AbstractRandomStats.low)
-    def low(self, distribution: RandomDistribution) -> Optional[float]:
+    def low(self, distribution: RandomDistribution) -> float | None:
         return distribution.parameters['low']

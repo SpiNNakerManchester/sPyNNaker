@@ -13,15 +13,17 @@
 # limitations under the License.
 
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
-from .spynnaker_splitter_selector import spynnaker_splitter_selector
+from .abstract_supports_one_to_one_sdram_input import (
+    AbstractSupportsOneToOneSDRAMInput,
+)
 from .splitter_delay_vertex_slice import SplitterDelayVertexSlice
 from .splitter_poisson_delegate import SplitterPoissonDelegate
 from .splitter_population_vertex import SplitterPopulationVertex
 from .splitter_population_vertex_fixed import SplitterPopulationVertexFixed
 from .splitter_population_vertex_neurons_synapses import (
-    SplitterPopulationVertexNeuronsSynapses)
-from .abstract_supports_one_to_one_sdram_input import (
-    AbstractSupportsOneToOneSDRAMInput)
+    SplitterPopulationVertexNeuronsSynapses,
+)
+from .spynnaker_splitter_selector import spynnaker_splitter_selector
 
 __all__ = [
     'AbstractSpynnakerSplitterDelay', 'AbstractSupportsOneToOneSDRAMInput',

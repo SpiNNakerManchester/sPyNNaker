@@ -13,24 +13,33 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING
+
+from typing import TYPE_CHECKING
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.require_subclass import require_subclass
+
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.application import ApplicationVertex
+
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
-    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-        AbstractSynapseDynamics)
-    from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
     from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        AbstractSpynnakerSplitterDelay)
+        AbstractSpynnakerSplitterDelay,
+    )
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
+    from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+        AbstractSynapseDynamics,
+    )
+    from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+        ConnectionsArray,
+    )
 
 
 @require_subclass(ApplicationVertex)
-class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
+class AbstractAcceptsIncomingSynapses(metaclass=AbstractBase):
     """
     Indicates an application vertex that can be a post-vertex in a PyNN
     projection.
@@ -41,7 +50,7 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         """
         :param target: The name of the synapse
         :returns: The ID of the synapse with this name
@@ -94,7 +103,8 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         # Delayed import to avoid circular dependency
         # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.extra_algorithms.splitter_components import (
-            AbstractSpynnakerSplitterDelay as DelaySplitter)
+            AbstractSpynnakerSplitterDelay as DelaySplitter,
+        )
         if not isinstance(splitter, DelaySplitter):
             raise PacmanConfigurationException(
                 "The splitter needs to be an instance of "

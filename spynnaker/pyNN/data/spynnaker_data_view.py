@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
-from typing import Iterator, Optional, Set, Tuple, TYPE_CHECKING
+from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
 from spinn_utilities.log import FormatAdapter
 
@@ -22,14 +24,14 @@ from spinn_front_end_common.data import FecDataView
 from spynnaker import _version
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.populations import Population
+    from spynnaker.pyNN.models.projection import Projection
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access
 
 
-class _SpynnakerDataModel(object):
+class _SpynnakerDataModel:
     """
     Singleton data model.
 
@@ -44,7 +46,7 @@ class _SpynnakerDataModel(object):
     What data is held where and how can change without notice.
     """
 
-    __singleton: Optional['_SpynnakerDataModel'] = None
+    __singleton: _SpynnakerDataModel | None = None
 
     __slots__ = (
         # Data values cached
@@ -53,7 +55,7 @@ class _SpynnakerDataModel(object):
         "_populations",
         "_projections")
 
-    def __new__(cls) -> '_SpynnakerDataModel':
+    def __new__(cls) -> _SpynnakerDataModel:
         if cls.__singleton is not None:
             return cls.__singleton
         obj = object.__new__(cls)
@@ -66,10 +68,10 @@ class _SpynnakerDataModel(object):
         Clears out all data.
         """
         self._id_counter = 0
-        self._min_delay: Optional[float] = None
+        self._min_delay: float | None = None
         # Using a dict to verify if later could be stored here only
-        self._populations: Set[Population] = set()
-        self._projections: Set[Projection] = set()
+        self._populations: set[Population] = set()
+        self._projections: set[Projection] = set()
 
     def _hard_reset(self) -> None:
         """
@@ -194,7 +196,7 @@ class SpynnakerDataView(FecDataView):
         return len(cls.__spy_data._populations)
 
     @classmethod
-    def add_population(cls, population: Population) -> Tuple[int, int]:
+    def add_population(cls, population: Population) -> tuple[int, int]:
         """
         Called by each population to add itself to the list.
 
@@ -215,7 +217,8 @@ class SpynnakerDataView(FecDataView):
         # UGLY but needed to avoid circular import
         # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.models.populations.population import (
-            Population as Pop)
+            Population as Pop,
+        )
         cls.check_user_can_act()
         if not isinstance(population, Pop):
             raise TypeError("The population must be a Population")

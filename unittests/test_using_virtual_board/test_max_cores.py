@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import pyNN.spiNNaker as sim
-from spynnaker.pyNN.exceptions import SpynnakerException
+
 from spinnaker_testbase import BaseTestCase
+
+from spynnaker.pyNN.exceptions import SpynnakerException
 
 
 class Test_Max_Cores(BaseTestCase):

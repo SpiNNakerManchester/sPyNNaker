@@ -11,14 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import pyNN.spiNNaker as sim
 from itertools import permutations
-from typing import List
 
-import pytest
 import numpy
+import pyNN.spiNNaker as sim
+import pytest
 
 from pacman.model.graphs.common.slice import Slice
+
 from spinnaker_testbase import BaseTestCase
 
 
@@ -54,7 +54,7 @@ class TestAllButMeConnector(BaseTestCase):
         sim.run(0)
         conns = list(proj.get([], format="list"))
         sim.end()
-        groups: List[List[int]] = list()
+        groups: list[list[int]] = []
         for group_start in range(0, 12, 3):
             group_end = min(12, group_start + 3)
             neurons_in_group = range(group_start, group_end)

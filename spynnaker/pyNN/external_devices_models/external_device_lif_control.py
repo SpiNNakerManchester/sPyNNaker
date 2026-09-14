@@ -12,26 +12,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, List, Union, Tuple
+
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPopulationVertex)
-from spynnaker.pyNN.models.neuron import (
-    PopulationVertex, AbstractPyNNNeuronModelStandard)
+    SplitterPopulationVertex,
+)
 from spynnaker.pyNN.models.defaults import (
-    default_initial_values, default_parameters)
-from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
+    default_initial_values,
+    default_parameters,
+)
+from spynnaker.pyNN.models.neuron import (
+    AbstractPyNNNeuronModelStandard,
+    PopulationVertex,
+)
 from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
+from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.neuron_models import (
-    NeuronModelLeakyIntegrateAndFire)
+    NeuronModelLeakyIntegrateAndFire,
+)
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
+
 from .abstract_ethernet_translator import AbstractEthernetTranslator
 from .abstract_multicast_controllable_device import (
-    AbstractMulticastControllableDevice)
+    AbstractMulticastControllableDevice,
+)
 from .external_device_lif_control_vertex import ExternalDeviceLifControlVertex
 from .threshold_type_multicast_device_control import (
-    ThresholdTypeMulticastDeviceControl)
+    ThresholdTypeMulticastDeviceControl,
+)
 
 
 class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
@@ -49,9 +60,9 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         "tau_m", "cm", "v_rest", "v_reset", "tau_syn_E", "tau_syn_I",
         "tau_refrac", "i_offset"})
     def __init__(
-            self, devices:  List[AbstractMulticastControllableDevice],
+            self, devices:  list[AbstractMulticastControllableDevice],
             create_edges: bool,
-            translator: Optional[AbstractEthernetTranslator] = None,
+            translator: AbstractEthernetTranslator | None = None,
             # default params for the neuron model type
             tau_m: float = 20.0, cm: float = 1.0, v_rest: float = 0.0,
             v_reset: float = 0.0, tau_syn_E: float = 5.0,
@@ -105,17 +116,17 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
     @overrides(AbstractPyNNNeuronModelStandard.create_vertex)
     def create_vertex(
             self, n_neurons: int, label: str, *,
-            spikes_per_second: Optional[float] = None,
-            ring_buffer_sigma: Optional[float] = None,
-            max_expected_summed_weight: Optional[List[float]] = None,
-            incoming_spike_buffer_size: Optional[int] = None,
-            drop_late_spikes: Optional[bool] = None,
-            splitter: Optional[SplitterPopulationVertex] = None,
-            seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
+            spikes_per_second: float | None = None,
+            ring_buffer_sigma: float | None = None,
+            max_expected_summed_weight: list[float] | None = None,
+            incoming_spike_buffer_size: int | None = None,
+            drop_late_spikes: bool | None = None,
+            splitter: SplitterPopulationVertex | None = None,
+            seed: int | None = None, n_colour_bits: int | None = None,
             n_steps_per_timestep: int = 1,
-            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
-            n_synapse_cores: Optional[int] = None,
-            allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
+            neurons_per_core: int | tuple[int, ...] | None = None,
+            n_synapse_cores: int | None = None,
+            allow_delay_extensions: bool | None = None) -> PopulationVertex:
         if n_neurons != len(self._devices):
             raise ConfigurationException(
                 "Number of neurons does not match number of "

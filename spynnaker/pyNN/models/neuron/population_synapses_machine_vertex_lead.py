@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import List, Sequence, TYPE_CHECKING
+
+from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -20,23 +22,32 @@ from numpy.typing import NDArray
 from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM
 from pacman.model.placements import Placement
+from pacman.model.resources import AbstractSDRAM
 
 from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
+    AbstractGeneratesDataSpecification,
+    AbstractRewritesDataSpecification,
+)
 from spinn_front_end_common.interface.ds import (
-    DataSpecificationGenerator, DataSpecificationReloader)
+    DataSpecificationGenerator,
+    DataSpecificationReloader,
+)
 
 from .population_machine_common import PopulationMachineCommon
 from .population_machine_synapses import PopulationMachineSynapses
 from .population_synapses_machine_vertex_common import (
-    PopulationSynapsesMachineVertexCommon)
+    PopulationSynapsesMachineVertexCommon,
+)
 
 if TYPE_CHECKING:
-    from .population_vertex import PopulationVertex
     from spynnaker.pyNN.models.neuron.synaptic_matrices import (
-        SynapseRegions, SynapseRegionReferences, SynapticMatrices)
+        SynapseRegionReferences,
+        SynapseRegions,
+        SynapticMatrices,
+    )
+
+    from .population_vertex import PopulationVertex
 
 
 class PopulationSynapsesMachineVertexLead(
@@ -50,13 +61,14 @@ class PopulationSynapsesMachineVertexLead(
     """
 
     __slots__ = (
-        "__synaptic_matrices",
+        "__max_atoms_per_core",
+        "__regenerate_data",
         "__ring_buffer_shifts",
-        "__weight_scales",
         "__structural_sz",
         "__synapse_references",
-        "__max_atoms_per_core",
-        "__regenerate_data")
+        "__synaptic_matrices",
+        "__weight_scales",
+    )
 
     def __init__(
             self, sdram: AbstractSDRAM, label: str,
@@ -104,7 +116,7 @@ class PopulationSynapsesMachineVertexLead(
         return self.__max_atoms_per_core
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
-    def get_recorded_region_ids(self) -> List[int]:
+    def get_recorded_region_ids(self) -> list[int]:
         ids = self._pop_vertex.synapse_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         return ids

@@ -13,16 +13,41 @@
 # limitations under the License.
 
 from __future__ import annotations
+
 import math
-from typing import Any, Dict, Optional, Sequence, TYPE_CHECKING
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any
 
 import numpy
 from numpy import (
-    arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
-    hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
-    minimum, e, pi)
+    arccos,
+    arcsin,
+    arctan,
+    arctan2,
+    ceil,
+    cos,
+    cosh,
+    e,
+    exp,
+    fabs,
+    floor,
+    fmod,
+    hypot,
+    ldexp,
+    log,
+    log10,
+    maximum,
+    minimum,
+    modf,
+    pi,
+    power,
+    sin,
+    sinh,
+    sqrt,
+    tan,
+    tanh,
+)
 from numpy.typing import NDArray
-
 from pyNN.random import NumpyRNG
 
 from spinn_utilities.overrides import overrides
@@ -34,7 +59,8 @@ from spynnaker.pyNN.utilities import utility_calls
 
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
-    AbstractGenerateConnectorOnHost)
+    AbstractGenerateConnectorOnHost,
+)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import SynapseInformation
@@ -53,7 +79,7 @@ class IndexBasedProbabilityConnector(AbstractConnector,
     dependent upon the indices of the pre- and post-populations.
     """
 
-    __slots = [
+    __slots__ = [
         "__allow_self_connections",
         "__index_expression",
         "__probs",
@@ -61,7 +87,7 @@ class IndexBasedProbabilityConnector(AbstractConnector,
 
     def __init__(
             self, index_expression: str, allow_self_connections: bool = True,
-            rng: Optional[NumpyRNG] = None,
+            rng: NumpyRNG | None = None,
             safe: bool = True, callback: None = None, verbose: bool = False):
         """
         :param index_expression:
@@ -95,10 +121,10 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         self.__rng = rng or NumpyRNG()
         self.__index_expression = index_expression
         self.__allow_self_connections = allow_self_connections
-        self.__probs: Optional[NDArray] = None
+        self.__probs: NDArray | None = None
 
     @overrides(AbstractConnector.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["index_expression"] = self.index_expression
         parameters["allow_self_connections"] = self.__allow_self_connections
@@ -139,15 +165,15 @@ class IndexBasedProbabilityConnector(AbstractConnector,
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         probs = self._update_probs_from_index_expression(synapse_info)
         n_connections = utility_calls.get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_post_atoms, numpy.amax(probs))
 
         if min_delay is None or max_delay is None:
-            return int(math.ceil(n_connections))
+            return math.ceil(n_connections)
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,

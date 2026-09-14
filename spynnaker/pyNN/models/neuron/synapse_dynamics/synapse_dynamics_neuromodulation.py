@@ -12,38 +12,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING
+
+from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy import floating, integer, uint8, uint32
 from numpy.typing import NDArray
-
 from pyNN.standardmodels.synapses import StaticSynapse
 
 from spinn_utilities.overrides import overrides
 
-from spinn_front_end_common.interface.ds import DataType, DataSpecificationBase
+from spinn_front_end_common.interface.ds import DataSpecificationBase, DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
-    SynapticConfigurationException, InvalidParameterType)
-from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE)
+    InvalidParameterType,
+    SynapticConfigurationException,
+)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    STDP_FIXED_POINT_ONE, get_exp_lut_array)
+    STDP_FIXED_POINT_ONE,
+    get_exp_lut_array,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
+    NUMPY_CONNECTORS_DTYPE,
+)
+from spynnaker.pyNN.types import WeightScales
 from spynnaker.pyNN.types import WeightsDelysIn as _Weight
 
-from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (
-    AbstractGenerateOnMachine, MatrixGeneratorID)
+    AbstractGenerateOnMachine,
+    MatrixGeneratorID,
+)
+from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
-    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
+        ConnectionsArray,
+    )
+    from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
+
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 # The targets of neuromodulation
@@ -66,11 +79,12 @@ class SynapseDynamicsNeuromodulation(
 
     __slots__ = (
         "__tau_c",
-        "__tau_d",
         "__tau_c_data",
+        "__tau_d",
         "__tau_d_data",
+        "__w_max",
         "__w_min",
-        "__w_max")
+    )
 
     def __init__(
             self, weight: _Weight = StaticSynapse.default_parameters['weight'],
@@ -215,7 +229,8 @@ class SynapseDynamicsNeuromodulation(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
-            max_n_synapses: int, max_atoms_per_core: int) -> Tuple[
+            max_n_synapses: int, max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> tuple[
                 NDArray[uint32], NDArray[uint32], NDArray[uint32],
                 NDArray[uint32]]:
         weights = numpy.rint(
@@ -269,15 +284,16 @@ class SynapseDynamicsNeuromodulation(
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
             self, n_synapse_types: int,
-            pp_size: NDArray[uint32], pp_data: List[NDArray[uint32]],
-            fp_size: NDArray[uint32], fp_data: List[NDArray[uint32]],
-            max_atoms_per_core: int) -> ConnectionsArray:
+            pp_size: NDArray[uint32], pp_data: list[NDArray[uint32]],
+            fp_size: NDArray[uint32], fp_data: list[NDArray[uint32]],
+            max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         data = numpy.concatenate(fp_data)
         connections = numpy.zeros(data.size, dtype=NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, fp_size[i]) for i in range(len(fp_size))])
         connections["target"] = data & 0xFFFF
-        connections["weight"] = (data >> 16) & 0xFFFF
+        connections["weight"] = ((data >> 16) & 0xFFFF) / STDP_FIXED_POINT_ONE
         connections["delay"] = 1
         return connections
 
@@ -328,7 +344,7 @@ class SynapseDynamicsNeuromodulation(
         return None
 
     @overrides(AbstractPlasticSynapseDynamics.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         return NEUROMODULATION_TARGETS.get(target, None)
 
     @property

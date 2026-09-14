@@ -17,11 +17,17 @@
 """
 Synfirechain-like example
 """
+
 import pyNN.spiNNaker as p
+from numpy.typing import NDArray
+
 from spinnaker_testbase import BaseTestCase
 
+from spynnaker import spike_checker
+from spynnaker.pyNN.utilities import neo_convertor
 
-def do_run(nNeurons: int) -> None:
+
+def do_run(nNeurons: int) -> tuple[NDArray, NDArray, NDArray]:
     p.setup(timestep=1.0, min_delay=1.0)
     p.set_number_of_neurons_per_core(p.Izhikevich, 100)
 
@@ -37,14 +43,14 @@ def do_run(nNeurons: int) -> None:
         'i_offset': 0
         }
 
-    populations = list()
-    projections = list()
+    populations = []
+    projections = []
 
     weight_to_spike = 40
     delay = 1
 
-    connections = list()
-    for i in range(0, nNeurons):
+    connections = []
+    for i in range(nNeurons):
         singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
         connections.append(singleConnection)
 
@@ -68,20 +74,30 @@ def do_run(nNeurons: int) -> None:
 
     neo = populations[0].get_data(["v", "spikes", "gsyn_exc"])
 
+    v = neo_convertor.convert_data(neo, name="v")
+    gsyn = neo_convertor.convert_data(neo, name="gsyn_exc")
+    spikes = neo_convertor.convert_spikes(neo)
+
     p.end()
 
-    return neo
+    return (v, gsyn, spikes)
 
 
 class SynfireIzhikevich(BaseTestCase):
 
-    # NO unittest_setup() as sim.setup is called
+    def check_run(self) -> None:
+        nNeurons = 200  # number of neurons in each population
+        (_, _, spikes) = do_run(nNeurons)
+        spike_checker.synfire_spike_checker(spikes, nNeurons)
+        self.assertEqual(215, len(spikes))
 
     def test_run(self) -> None:
-        nNeurons = 200  # number of neurons in each population
-        do_run(nNeurons)
+        self.runsafe(self.check_run)
 
 
 if __name__ == '__main__':
-    x = SynfireIzhikevich()
-    x.test_run()
+    nNeurons = 200  # number of neurons in each population
+    (v, gsyn, spikes) = do_run(nNeurons)
+    print(len(spikes))
+    print(v)
+    print(gsyn)

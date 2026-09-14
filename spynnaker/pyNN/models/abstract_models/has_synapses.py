@@ -12,19 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Sequence, TYPE_CHECKING
+
+from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from numpy.typing import NDArray
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 from pacman.model.placements import Placement
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
 
 
-class HasSynapses(object, metaclass=AbstractBase):
+class HasSynapses(metaclass=AbstractBase):
     """
     API for getting connections from the machine.
     """

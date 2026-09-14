@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 import numpy
 import pyNN.spiNNaker as sim
 
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 
@@ -27,7 +27,7 @@ class TestSTDPRandomRun(BaseTestCase):
     # machine
 
     def run_model(self, model: AbstractPyNNModel,
-                  n_synapse_cores: Optional[int] = None) -> None:
+                  n_synapse_cores: int | None = None) -> None:
         """
         Runs the test with the requested model
         """

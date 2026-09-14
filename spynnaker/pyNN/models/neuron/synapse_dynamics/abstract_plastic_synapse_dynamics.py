@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List, Tuple, Union
 
 from numpy import integer, uint32
 from numpy.typing import NDArray
@@ -19,7 +18,9 @@ from numpy.typing import NDArray
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    ConnectionsArray)
+    ConnectionsArray,
+)
+from spynnaker.pyNN.types import WeightScales
 
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 
@@ -46,11 +47,12 @@ class AbstractPlasticSynapseDynamics(
             self, connections: ConnectionsArray,
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
-            max_n_synapses: int, max_atoms_per_core: int) -> Union[
-                Tuple[NDArray[uint32], NDArray[uint32],
-                      NDArray[uint32], NDArray[uint32]],
-                Tuple[List[NDArray[uint32]], List[NDArray[uint32]],
-                      NDArray[uint32], NDArray[uint32]]]:
+            max_n_synapses: int, max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales
+            ) -> (tuple[NDArray[uint32], NDArray[uint32],
+                        NDArray[uint32], NDArray[uint32]] |
+                  tuple[list[NDArray[uint32]], list[NDArray[uint32]],
+                        NDArray[uint32], NDArray[uint32]]):
         """
         Get the fixed-plastic data, and plastic-plastic data for each row, and
         lengths for the fixed_plastic and plastic-plastic parts of each row.
@@ -71,6 +73,11 @@ class AbstractPlasticSynapseDynamics(
         :param n_synapse_types: The number of synapse types
         :param max_n_synapses: The maximum number of synapses to generate
         :param max_atoms_per_core: The maximum number of atoms on a core
+        :param ring_buffer_weight_scales:
+            The ring buffer scaling of the weights for each synapse type.  This
+            does not have to be used in the storage of synapses, but could
+            instead be used when converting stored weights to ring buffer
+            weights.
         :return: (fp_data (2D), pp_data (2D), fp_size (1D), pp_size (1D))
         """
         raise NotImplementedError
@@ -108,9 +115,10 @@ class AbstractPlasticSynapseDynamics(
     @abstractmethod
     def read_plastic_synaptic_data(
             self, n_synapse_types: int,
-            pp_size: NDArray[uint32], pp_data: List[NDArray[uint32]],
-            fp_size: NDArray[uint32], fp_data: List[NDArray[uint32]],
-            max_atoms_per_core: int) -> ConnectionsArray:
+            pp_size: NDArray[uint32], pp_data: list[NDArray[uint32]],
+            fp_size: NDArray[uint32], fp_data: list[NDArray[uint32]],
+            max_atoms_per_core: int,
+            ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         """
         Read the connections indicated in the connection indices from the
         data in `pp_data` and `fp_data`.
@@ -121,6 +129,7 @@ class AbstractPlasticSynapseDynamics(
         :param fp_size: 1D
         :param fp_data: 2D
         :param max_atoms_per_core:
+        :param ring_buffer_weight_scales:
         :return:
             array with columns ``source``, ``target``, ``weight``, ``delay``
         """

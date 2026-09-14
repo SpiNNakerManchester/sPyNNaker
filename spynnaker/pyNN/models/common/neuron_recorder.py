@@ -14,9 +14,8 @@
 import itertools
 import logging
 import math
+from collections.abc import Collection, Iterable, Mapping, Sequence
 from types import MappingProxyType
-from typing import (
-    Collection, Dict, Iterable, List, Mapping, Optional, Sequence, Set, Tuple)
 
 import numpy
 from numpy import float64, uint8, uint16, uint32
@@ -25,16 +24,17 @@ from numpy.typing import NDArray
 from spinn_utilities.log import FormatAdapter
 
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM, VariableSDRAM
+from pacman.model.graphs.machine import MachineVertex
 from pacman.model.placements import Placement
+from pacman.model.resources import AbstractSDRAM, VariableSDRAM
 
-from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationBase)
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.interface.ds import DataSpecificationBase, DataType
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BITS_PER_WORD)
+    BITS_PER_WORD,
+    BYTES_PER_WORD,
+)
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
@@ -64,25 +64,26 @@ def get_sampling_interval(sampling_rate: float) -> float:
     return sampling_rate * SpynnakerDataView.get_simulation_time_step_ms()
 
 
-class NeuronRecorder(object):
+class NeuronRecorder:
     """
     Methods related to recording of neuron data.
     """
     __slots__ = (
-        "__indexes",
-        "__n_neurons",
-        "__sampling_rates",
-        "__data_types",
         "__bitfield_variables",
-        "__per_timestep_variables",
-        "__per_timestep_datatypes",
-        "__per_timestep_recording",
-        "__events_per_core_variables",
+        "__data_types",
         "__events_per_core_datatypes",
         "__events_per_core_recording",
+        "__events_per_core_variables",
         "__events_per_ts",
+        "__indexes",
+        "__n_neurons",
+        "__offset_added",
+        "__per_timestep_datatypes",
+        "__per_timestep_recording",
+        "__per_timestep_variables",
         "__region_ids",
-        "__offset_added")
+        "__sampling_rates",
+    )
 
     _N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
     _N_BYTES_PER_RATE = BYTES_PER_WORD
@@ -131,7 +132,7 @@ class NeuronRecorder(object):
     _MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
     def __init__(
-            self, allowed_variables: List[str],
+            self, allowed_variables: list[str],
             data_types: Mapping[str, DataType],
             bitfield_variables: Sequence[str],
             n_neurons: int, per_timestep_variables: Sequence[str],
@@ -148,20 +149,20 @@ class NeuronRecorder(object):
         :param events_per_core_variables:
         :param events_per_core_datatypes:
         """
-        self.__sampling_rates: Dict[str, int] = dict()
-        self.__indexes: Dict[str, Optional[Sequence[int]]] = dict()
+        self.__sampling_rates: dict[str, int] = {}
+        self.__indexes: dict[str, Sequence[int] | None] = {}
         self.__data_types = data_types
         self.__n_neurons = n_neurons
         self.__bitfield_variables = bitfield_variables
 
         self.__per_timestep_variables = per_timestep_variables
         self.__per_timestep_datatypes = per_timestep_datatypes
-        self.__per_timestep_recording: Set[str] = set()
+        self.__per_timestep_recording: set[str] = set()
 
         self.__events_per_core_variables = events_per_core_variables
         self.__events_per_core_datatypes = events_per_core_datatypes
-        self.__events_per_core_recording: Set[str] = set()
-        self.__events_per_ts: Dict[str, int] = dict()
+        self.__events_per_core_recording: set[str] = set()
+        self.__events_per_ts: dict[str, int] = {}
         self.__events_per_ts[self.MAX_REWIRES] = 0  # record('all')
 
         # Get info on variables like these
@@ -201,7 +202,7 @@ class NeuronRecorder(object):
 
     def _rate_and_count_per_slice(
             self, variable: str,
-            vertex_slice: Optional[Slice]) -> Tuple[int, int]:
+            vertex_slice: Slice | None) -> tuple[int, int]:
         if variable not in self.__sampling_rates:
             return 0, 0
         if self.__sampling_rates[variable] == 0:
@@ -219,7 +220,7 @@ class NeuronRecorder(object):
         return 0, 0
 
     def _max_recording_per_slice(
-            self, variable: str, n_atoms: int) -> Optional[int]:
+            self, variable: str, n_atoms: int) -> int | None:
         if variable not in self.__sampling_rates:
             return None
         if self.__sampling_rates[variable] == 0:
@@ -236,7 +237,7 @@ class NeuronRecorder(object):
 
     def neurons_recording(
             self, variable: str,
-            vertex_slice: Slice) -> Optional[Collection[int]]:
+            vertex_slice: Slice) -> Collection[int] | None:
         """
         :param variable:
         :param vertex_slice:
@@ -292,8 +293,8 @@ class NeuronRecorder(object):
     def _get_placement_matrix_data(
             self, vertex: MachineVertex, region: int, expected_rows: int,
             missing_str: str, sampling_rate: int, label: str,
-            data_type: DataType, n_per_timestep: int) -> Optional[
-                NDArray[float64]]:
+            data_type: DataType, n_per_timestep: int
+            ) -> NDArray[float64] | None:
         """
         Processes a placement for matrix data.
 
@@ -389,7 +390,7 @@ class NeuronRecorder(object):
         else:
             return BufferDataType.MATRIX
 
-    def get_data_type(self, variable: str) -> Optional[DataType]:
+    def get_data_type(self, variable: str) -> DataType | None:
         """
         :param variable:
         :returns: Type of the Data for this variable or None if unknown
@@ -400,7 +401,7 @@ class NeuronRecorder(object):
             return self.__data_types[variable]
         return None
 
-    def get_recordable_variables(self) -> List[str]:
+    def get_recordable_variables(self) -> list[str]:
         """
         :returns: Names of variables that can be recorded
         """
@@ -409,7 +410,7 @@ class NeuronRecorder(object):
             *self.__events_per_core_variables,
             *self.__per_timestep_variables]
 
-    def get_event_recordable_variables(self) -> List[str]:
+    def get_event_recordable_variables(self) -> list[str]:
         """
         :returns: Names of event variables being recorded
         """
@@ -485,7 +486,7 @@ class NeuronRecorder(object):
             return True
         return any(numpy.isin(vertex_slice.get_raster_ids(), indices))
 
-    def recorded_ids_by_slice(self, vertex_slice: Slice) -> List[int]:
+    def recorded_ids_by_slice(self, vertex_slice: Slice) -> list[int]:
         """
         :param vertex_slice:
         :returns: list of the IDs of the variables actually recording.
@@ -510,7 +511,7 @@ class NeuronRecorder(object):
             if variable in self.__per_timestep_recording)
         return variables
 
-    def _compute_rate(self, sampling_interval: Optional[float]) -> int:
+    def _compute_rate(self, sampling_interval: float | None) -> int:
         """
         Convert a sampling interval into a rate.
         Remember, machine time step is in nanoseconds
@@ -536,7 +537,7 @@ class NeuronRecorder(object):
                 f"sampling_interval {sampling_interval} is negative")
         return rate
 
-    def _check_indexes(self, indexes: Optional[Collection[int]]) -> None:
+    def _check_indexes(self, indexes: Collection[int] | None) -> None:
         if indexes is None:
             return
 
@@ -561,8 +562,8 @@ class NeuronRecorder(object):
                 "All indexes larger than population size")
 
     def __check_per_timestep_params(
-            self, variable: str, sampling_interval: Optional[float],
-            indexes: Optional[Collection[int]]) -> None:
+            self, variable: str, sampling_interval: float | None,
+            indexes: Collection[int] | None) -> None:
         """
         Check if certain parameters have been provided for a per-timestep
         variable and if so, raise an Exception.
@@ -576,8 +577,8 @@ class NeuronRecorder(object):
                 "on the whole population")
 
     def __check_events_per_core_params(
-            self, variable: str, sampling_interval: Optional[float],
-            indexes: Optional[Collection[int]]) -> None:
+            self, variable: str, sampling_interval: float | None,
+            indexes: Collection[int] | None) -> None:
         """
         Check if certain parameters have been provided for an
         events-per-core variable and if so, raise an Exception.
@@ -591,8 +592,8 @@ class NeuronRecorder(object):
                 "on the whole population")
 
     def _turn_off_recording(
-            self, variable: str, sampling_interval: Optional[float],
-            remove_indexes: Optional[Collection[int]]) -> None:
+            self, variable: str, sampling_interval: float | None,
+            remove_indexes: Collection[int] | None) -> None:
         # If a per-timestep variable, remove it and return
         if variable in self.__per_timestep_variables:
             if variable in self.__per_timestep_recording:
@@ -643,7 +644,7 @@ class NeuronRecorder(object):
             self.__indexes[variable] = indexes
 
     def _check_complete_overwrite(
-            self, variable: str, indexes: Optional[Collection[int]]) -> None:
+            self, variable: str, indexes: Collection[int] | None) -> None:
         if indexes is None:
             # overwriting all OK!
             return
@@ -661,8 +662,8 @@ class NeuronRecorder(object):
             f"sampling_intervals for {variable} on one population.")
 
     def _turn_on_recording(
-            self, variable: str, sampling_interval: Optional[float],
-            indexes: Optional[Collection[int]]) -> None:
+            self, variable: str, sampling_interval: float | None,
+            indexes: Collection[int] | None) -> None:
         # If a per-timestep variable, update
         if variable in self.__per_timestep_variables:
             self.__check_per_timestep_params(
@@ -700,8 +701,8 @@ class NeuronRecorder(object):
             self.__indexes[variable] = sorted(indices)
 
     def set_recording(self, variable: str, new_state: bool,
-                      sampling_interval: Optional[float] = None,
-                      indexes: Optional[Collection[int]] = None) -> None:
+                      sampling_interval: float | None = None,
+                      indexes: Collection[int] | None = None) -> None:
         """
         Turns on the requested recording
 
@@ -730,7 +731,7 @@ class NeuronRecorder(object):
             raise ConfigurationException(
                 f"Variable {variable} is not supported")
 
-    def get_region_sizes(self, vertex_slice: Slice) -> List[int]:
+    def get_region_sizes(self, vertex_slice: Slice) -> list[int]:
         """
         Get the sizes of the regions for the variables, whether they are
         recorded or not, with those that are not having a size of 0.
@@ -787,7 +788,7 @@ class NeuronRecorder(object):
             return 0
         if variable in self.__bitfield_variables:
             # Overflow can be ignored as it is not save if in an extra word
-            out_spike_words = int(math.ceil(n_neurons / BITS_PER_WORD))
+            out_spike_words = math.ceil(n_neurons / BITS_PER_WORD)
             out_spike_bytes = out_spike_words * BYTES_PER_WORD
             return self._N_BYTES_FOR_TIMESTAMP + out_spike_bytes
         else:
@@ -1019,11 +1020,11 @@ class NeuronRecorder(object):
         """
         # Assumes that BYTES_PER_WORD is divisible by _N_BYTES_PER_INDEX
         n_bytes = n_neurons * self._N_BYTES_PER_INDEX
-        ceil_bytes = int(math.ceil(n_bytes / BYTES_PER_WORD)) * BYTES_PER_WORD
+        ceil_bytes = math.ceil(n_bytes / BYTES_PER_WORD) * BYTES_PER_WORD
         return ceil_bytes // self._N_BYTES_PER_INDEX
 
     def __add_indices(
-            self, data: List[NDArray[uint32]], variable: str, rate: int,
+            self, data: list[NDArray[uint32]], variable: str, rate: int,
             n_recording: int, vertex_slice: Slice) -> None:
         n_indices = self.__ceil_n_indices(vertex_slice.n_atoms)
         if rate == 0:
@@ -1034,7 +1035,7 @@ class NeuronRecorder(object):
             data.append(numpy.arange(n_indices, dtype=uint16).view(uint32))
         else:
             local_index = 0
-            local_indexes: List[int] = list()
+            local_indexes: list[int] = []
             # Add indices based on the raster ids
             index = 0
             for index in vertex_slice.get_raster_ids():
@@ -1053,7 +1054,7 @@ class NeuronRecorder(object):
 
     def _get_data(self, vertex_slice: Slice) -> NDArray[uint32]:
         # There is no data here for per-timestep variables by design
-        data: List[NDArray[uint32]] = list()
+        data: list[NDArray[uint32]] = []
         for variable in self.__sampling_rates:
             rate, n_recording = self._rate_and_count_per_slice(
                 variable, vertex_slice)
@@ -1091,7 +1092,7 @@ class NeuronRecorder(object):
         return True
 
     def get_generator_data(
-            self, vertex_slice: Optional[Slice] = None) -> NDArray[uint32]:
+            self, vertex_slice: Slice | None = None) -> NDArray[uint32]:
         """
         :param vertex_slice:
             The slice to generate the data for, or `None` to generate for
@@ -1115,7 +1116,7 @@ class NeuronRecorder(object):
 
     def __get_generator_indices(
             self, variable: str,
-            vertex_slice: Optional[Slice]) -> Iterable[int]:
+            vertex_slice: Slice | None) -> Iterable[int]:
         """
         Get the indices of the variables to record in run-length-encoded form.
         """

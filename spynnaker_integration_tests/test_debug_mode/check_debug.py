@@ -13,14 +13,20 @@
 # limitations under the License.
 
 import os
+
+import pyNN.spiNNaker as sim
+
 from spinn_utilities.config_holder import (
-    config_options, config_sections, get_report_path, get_timestamp_path)
+    config_options,
+    config_sections,
+    get_report_path,
+    get_timestamp_path,
+)
 
 from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.config_setup import cfg_paths_skipped
 from spynnaker.pyNN.data import SpynnakerDataView
-import pyNN.spiNNaker as sim
 
 
 class CheckDebug(BaseTestCase):

@@ -12,28 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Optional, Sequence, cast, TYPE_CHECKING
+
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, cast
 
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
+    AbstractGenerateConnectorOnMachine,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine)
+    AbstractGenerateOnMachine,
+)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
 
 # Address to indicate that the synaptic region is unused
 SYN_REGION_UNUSED = 0xFFFFFFFF
 
 
-class GeneratorData(object):
+class GeneratorData:
     """
     Data for each connection of the synapse generator.
     """
@@ -42,8 +49,8 @@ class GeneratorData(object):
     BASE_SIZE = 11 * BYTES_PER_WORD
 
     def __init__(
-            self, synaptic_matrix_offset: Optional[int],
-            delayed_synaptic_matrix_offset: Optional[int],
+            self, synaptic_matrix_offset: int | None,
+            delayed_synaptic_matrix_offset: int | None,
             app_edge: ProjectionApplicationEdge,
             synapse_information: SynapseInformation, max_row_info: MaxRowInfo,
             max_pre_atoms_per_core: int, max_post_atoms_per_core: int):
@@ -79,7 +86,7 @@ class GeneratorData(object):
                                 synapse_information.synapse_dynamics)
 
         # Create the data needed
-        self.__data = list()
+        self.__data = []
         self.__data.append(numpy.array([
             pre_lo, pre_hi, post_lo, post_hi,
             synapse_information.synapse_type,

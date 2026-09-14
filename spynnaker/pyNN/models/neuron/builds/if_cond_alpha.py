@@ -14,7 +14,9 @@
 
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import (
-    AbstractProvidesDefaults, default_initial_values)
+    AbstractProvidesDefaults,
+    default_initial_values,
+)
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 
 

@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, Mapping, Optional, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any, Final
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
@@ -20,9 +21,12 @@ from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.models.neuron.additional_inputs import (
-    AbstractAdditionalInput)
+    AbstractAdditionalInput,
+)
 from spynnaker.pyNN.models.neuron.input_types import (
-    AbstractInputType, InputTypeConductance)
+    AbstractInputType,
+    InputTypeConductance,
+)
 from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
@@ -47,25 +51,26 @@ class NeuronImplStandard(AbstractNeuronImpl):
     """
 
     __slots__ = (
-        "__model_name",
+        "__additional_input_type",
         "__binary",
-        "__neuron_model",
+        "__components",
         "__input_type",
+        "__model_name",
+        "__n_steps_per_timestep",
+        "__neuron_model",
         "__synapse_type",
         "__threshold_type",
-        "__additional_input_type",
-        "__components",
-        "__n_steps_per_timestep")
+    )
 
-    _RECORDABLES = ["v", "gsyn_exc", "gsyn_inh"]
+    _RECORDABLES: Final = ["v", "gsyn_exc", "gsyn_inh"]
 
-    _RECORDABLE_DATA_TYPES = {
+    _RECORDABLE_DATA_TYPES: Final = {
         "v": DataType.S1615,
         "gsyn_exc": DataType.S1615,
         "gsyn_inh": DataType.S1615
     }
 
-    _RECORDABLE_UNITS = {
+    _RECORDABLE_UNITS: Final = {
         'v': 'mV',
         'gsyn_exc': "uS",
         'gsyn_inh': "uS"}
@@ -75,7 +80,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
             neuron_model: NeuronModel, input_type: AbstractInputType,
             synapse_type: AbstractSynapseType,
             threshold_type: AbstractThresholdType,
-            additional_input_type: Optional[AbstractAdditionalInput] = None):
+            additional_input_type: AbstractAdditionalInput | None = None):
         """
         :param model_name:
         :param binary:
@@ -141,7 +146,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
         return self.__synapse_type.get_n_synapse_types()
 
     @overrides(AbstractNeuronImpl.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         return self.__synapse_type.get_synapse_id_by_target(target)
 
     @overrides(AbstractNeuronImpl.get_synapse_targets)

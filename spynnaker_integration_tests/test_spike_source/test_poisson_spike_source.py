@@ -13,13 +13,15 @@
 # limitations under the License.
 import math
 import time
-from typing import List
-from neo import Block
-import pyNN.spiNNaker as sim
 
-from spinnaker_testbase import BaseTestCase
+import pyNN.spiNNaker as sim
+from neo import Block
+
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
+from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.connections import SpynnakerPoissonControlConnection
 
 
@@ -145,14 +147,14 @@ class TestPoissonSpikeSource(BaseTestCase):
     def test_recording_poisson_spikes_rate_0(self) -> None:
         self.runsafe(self.recording_poisson_spikes_rate_0)
 
-    def check_rates(self, rates: List[float], seconds: int, seed: int) -> None:
+    def check_rates(self, rates: list[float], seconds: int, seed: int) -> None:
         n_neurons = 100
         sim.setup(timestep=1.0)
         ssps = {}
         for rate in rates:
             ssp = sim.Population(
                 n_neurons, sim.SpikeSourcePoisson(rate),
-                label='inputSpikes_{}'.format(rate),
+                label=f'inputSpikes_{rate}',
                 additional_parameters={"seed": seed})
             ssp.record("spikes")
             ssps[rate] = ssp

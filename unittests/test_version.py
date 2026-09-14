@@ -13,11 +13,17 @@
 # limitations under the License.
 
 import unittest
+
 import spinn_utilities
+
 import spinn_machine
-import pacman
+
 import spinnman
+
+import pacman
+
 import spinn_front_end_common
+
 import spynnaker
 
 

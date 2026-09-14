@@ -13,15 +13,16 @@
 # limitations under the License.
 
 from collections import defaultdict
-from typing import Dict, Set, Tuple
+from typing import Final
 
 import matplotlib.pyplot as plt
+import pyNN.spiNNaker as p
 from neo import Block
 from pyNN.random import NumpyRNG
-import pyNN.spiNNaker as p
 from pyNN.utility.plotting import Figure, Panel
 
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.utilities import neo_convertor
@@ -44,7 +45,7 @@ def create_grid(n: int, label: str, dx: float = 1.0,
                         structure=grid_structure, label=label)
 
 
-def do_run(plot: bool) -> Tuple[Block, Block, ConnectionHolder]:
+def do_run(plot: bool) -> tuple[Block, Block, ConnectionHolder]:
 
     p.setup(timestep=1.0)
 
@@ -98,7 +99,7 @@ def do_run(plot: bool) -> Tuple[Block, Block, ConnectionHolder]:
                   data_labels=[small_world.label], yticks=True,
                   xlim=(0, runtime), xticks=True),
             title="Simple small world connector",
-            annotations="Simulated with {}".format(p.name())
+            annotations=f"Simulated with {p.name()}"
         )
         plt.show()
 
@@ -108,23 +109,23 @@ def do_run(plot: bool) -> Tuple[Block, Block, ConnectionHolder]:
 
 
 class SmallWorldConnectorTest(BaseTestCase):
-    S_COUNTS = [(0, 4), (1, 6), (2, 6), (3, 6), (4, 4),
-                (5, 6), (6, 9), (7, 9), (8, 9), (9, 6),
-                (10, 6), (11, 9), (12, 9), (13, 9), (14, 6),
-                (15, 6), (16, 9), (17, 9), (18, 9), (19, 6),
-                (20, 4), (21, 6), (22, 6), (23, 6), (24, 4)]
+    S_COUNTS: Final = [(0, 4), (1, 6), (2, 6), (3, 6), (4, 4),
+                       (5, 6), (6, 9), (7, 9), (8, 9), (9, 6),
+                       (10, 6), (11, 9), (12, 9), (13, 9), (14, 6),
+                       (15, 6), (16, 9), (17, 9), (18, 9), (19, 6),
+                       (20, 4), (21, 6), (22, 6), (23, 6), (24, 4)]
 
     def directly_connected(
-            self, weights: ConnectionHolder) -> Dict[int, Set[int]]:
-        singles: Dict[int, Set[int]] = defaultdict(set)
+            self, weights: ConnectionHolder) -> dict[int, set[int]]:
+        singles: dict[int, set[int]] = defaultdict(set)
         for (s, d, _) in weights:
             singles[s].add(d)
             singles[d].add(s)
         return singles
 
-    def next_connected(self, previous: Dict[int, Set[int]],
-                       single: Dict[int, Set[int]]) -> Dict[int, Set[int]]:
-        current: Dict[int, Set[int]] = dict()
+    def next_connected(self, previous: dict[int, set[int]],
+                       single: dict[int, set[int]]) -> dict[int, set[int]]:
+        current: dict[int, set[int]] = {}
         for i in range(25):
             current[i] = set(previous[i])
             for j in previous[i]:

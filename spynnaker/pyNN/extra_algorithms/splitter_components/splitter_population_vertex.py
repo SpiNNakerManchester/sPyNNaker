@@ -12,16 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional, final, Iterable
-from spinn_utilities.overrides import overrides
+from collections.abc import Iterable
+from typing import final
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.overrides import overrides
+
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.utilities.algorithm_utilities\
     .partition_algorithm_utilities import get_multidimensional_slices
-from pacman.model.graphs.machine.machine_vertex import MachineVertex
+
 from spynnaker.pyNN.models.neuron import PopulationVertex
+
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 
 
@@ -35,7 +40,7 @@ class SplitterPopulationVertex(
 
     def __init__(self) -> None:
         super().__init__()
-        self.__slices: Optional[List[Slice]] = None
+        self.__slices: list[Slice] | None = None
 
     @final
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
@@ -64,7 +69,7 @@ class SplitterPopulationVertex(
         return self.governed_app_vertex.allow_delay_extension
 
     @final
-    def _get_fixed_slices(self) -> List[Slice]:
+    def _get_fixed_slices(self) -> list[Slice]:
         """
         Get a list of fixed slices from the Application vertex.
         """

@@ -13,19 +13,25 @@
 # limitations under the License.
 
 import unittest
+
+import pyNN.spiNNaker as sim
+
 from spinn_utilities.exceptions import (
-    DataNotYetAvialable, SimulatorRunningException)
-from spinn_front_end_common.utilities.exceptions import (
-    ConfigurationException)
+    DataNotYetAvialable,
+    SimulatorRunningException,
+)
+
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    OneToOneConnector)
+    OneToOneConnector,
+)
 from spynnaker.pyNN.models.neuron.builds import IFCurrExpBase
-from spynnaker.pyNN.models.projection import Projection
 from spynnaker.pyNN.models.populations.population import Population
-import pyNN.spiNNaker as sim
+from spynnaker.pyNN.models.projection import Projection
 
 
 class TestSimulatorData(unittest.TestCase):

@@ -12,44 +12,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections.abc import Callable, Iterator, Sequence
 from typing import (
-    Any, Callable, Iterator, List, Optional, Sequence, Tuple, Union)
+    Any,
+    TypeAlias,
+    TypeGuard,
+)
 
 import numpy
 from numpy.lib.recfunctions import merge_arrays
 from numpy.typing import NDArray
-from typing_extensions import TypeAlias, TypeGuard
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    ConnectionsArray)
+    ConnectionsArray,
+)
 
 _ItemType: TypeAlias = numpy.floating
-_Items: TypeAlias = Union[Tuple[NDArray[_ItemType], ...], NDArray[_ItemType],
-                          Tuple[List[numpy.floating], ...]]
+_Items: TypeAlias = (tuple[NDArray[_ItemType], ...] | NDArray[_ItemType] |
+                     tuple[list[numpy.floating], ...])
 
 
 def _is_listable(value: Any) -> TypeGuard[Sequence[Any]]:
     return hasattr(value, "__len__")
 
 
-class ConnectionHolder(object):
+class ConnectionHolder:
     """
     Holds a set of connections to be returned in a PyNN-specific format.
     """
 
     __slots__ = (
-        # A list of items of data that are to be present in each element
-        "__data_items_to_return",
-
         # True if the values should be returned as a list of tuples,
         # False if they should be returned as a tuple of matrices
         "__as_list",
-
-        # The number of atoms in the pre-vertex
-        "__n_pre_atoms",
-
-        # The number of atoms in the post-vertex
-        "__n_post_atoms",
 
         # A list of the connections that have been added
         "__connections",
@@ -57,21 +52,30 @@ class ConnectionHolder(object):
         # The merged connections formed just before the data is read
         "__data_items",
 
+        # A list of items of data that are to be present in each element
+        "__data_items_to_return",
+
         # Additional fixed values to be added to the data returned,
         # with the same values per synapse, as a list of tuples of
         # (field name, value)
         "__fixed_values",
+
+        # The number of atoms in the post-vertex
+        "__n_post_atoms",
+
+        # The number of atoms in the pre-vertex
+        "__n_pre_atoms",
 
         # A callback to call with the data when finished
         "__notify"
     )
 
     def __init__(
-            self, data_items_to_return: Optional[List[str]], as_list: bool,
+            self, data_items_to_return: list[str] | None, as_list: bool,
             n_pre_atoms: int, n_post_atoms: int,
-            connections: Optional[List[ConnectionsArray]] = None,
-            fixed_values: Optional[List[Tuple[str, int]]] = None,
-            notify: Optional[Callable[['ConnectionHolder'], None]] = None):
+            connections: list[ConnectionsArray] | None = None,
+            fixed_values: list[tuple[str, int]] | None = None,
+            notify: Callable[['ConnectionHolder'], None] | None = None):
         """
         :param data_items_to_return: A list of data fields to be returned
         :param as_list:
@@ -100,8 +104,8 @@ class ConnectionHolder(object):
         self.__as_list = as_list
         self.__n_pre_atoms = n_pre_atoms
         self.__n_post_atoms = n_post_atoms
-        self.__connections: Optional[List[NDArray]] = connections
-        self.__data_items: Optional[_Items] = None
+        self.__connections: list[NDArray] | None = connections
+        self.__data_items: _Items | None = None
         self.__notify = notify
         self.__fixed_values = fixed_values
 
@@ -114,11 +118,11 @@ class ConnectionHolder(object):
             source, target, weight and delay
         """
         if self.__connections is None:
-            self.__connections = list()
+            self.__connections = []
         self.__connections.append(connections)
 
     @property
-    def connections(self) -> List[ConnectionsArray]:
+    def connections(self) -> list[ConnectionsArray]:
         """
         The connections stored.
         """
@@ -199,7 +203,7 @@ class ConnectionHolder(object):
                     connections[order][self.__data_items_to_return[0]]
 
             # Return in a format which can be understood by a FromListConnector
-            items: List[List[numpy.floating]] = []
+            items: list[list[numpy.floating]] = []
             # NB: The types in here are all wrong, but that's
             for data_item in data_items:
                 if _is_listable(data_item):
@@ -213,7 +217,7 @@ class ConnectionHolder(object):
                 return ()
 
             # Keep track of the matrices
-            merged: List[NDArray[_ItemType]] = []
+            merged: list[NDArray[_ItemType]] = []
             for item in self.__data_items_to_return:
                 # Build an empty matrix and fill it with NAN
                 matrix = numpy.empty((self.__n_pre_atoms, self.__n_post_atoms))
@@ -235,9 +239,9 @@ class ConnectionHolder(object):
 
         return self.__data_items
 
-    def __getitem__(self, s: int) -> Union[
-            numpy.floating, NDArray[numpy.floating],
-            List[numpy.floating]]:
+    def __getitem__(self, s: int) -> (
+            numpy.floating | NDArray[numpy.floating] |
+            list[numpy.floating]):
         data = self._get_data_items()
         return data[s]
 

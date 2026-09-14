@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Mapping
+from collections.abc import Mapping
+
 import numpy
 
 from spinn_utilities.overrides import overrides
@@ -25,7 +26,10 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities import utility_calls
 
 from .abstract_current_source import (
-    AbstractCurrentSource, CurrentSourceIDs, CurrentParameter)
+    AbstractCurrentSource,
+    CurrentParameter,
+    CurrentSourceIDs,
+)
 
 
 class NoisyCurrentSource(AbstractCurrentSource):
@@ -35,14 +39,15 @@ class NoisyCurrentSource(AbstractCurrentSource):
     updating every `dt` (`dt` should default to the machine time step).
     """
     __slots__ = (
-        "__mean",
-        "__stdev",
-        "__start",
-        "__stop",
         "__dt",
-        "__rng",
+        "__mean",
+        "__parameter_types",
         "__parameters",
-        "__parameter_types")
+        "__rng",
+        "__start",
+        "__stdev",
+        "__stop",
+    )
 
     def __init__(self, mean: float = 0.0, stdev: float = 0.0,
                  start: float = 0.0, stop: float = 0.0, dt: float = 1.0,
@@ -82,7 +87,7 @@ class NoisyCurrentSource(AbstractCurrentSource):
             'dt': DataType.S1615,
             'seed': DataType.UINT32}
 
-        self.__parameters: Dict[str, CurrentParameter] = {
+        self.__parameters: dict[str, CurrentParameter] = {
             'mean': self.__mean,
             'stdev': self.__stdev,
             'start': self.__start,

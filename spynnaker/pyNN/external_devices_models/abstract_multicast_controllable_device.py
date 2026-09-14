@@ -14,7 +14,7 @@
 
 from decimal import Decimal
 from enum import Enum
-from typing import Optional
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
@@ -36,7 +36,7 @@ class SendType(Enum):
     SEND_TYPE_UFRACT = 5
 
 
-class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
+class AbstractMulticastControllableDevice(metaclass=AbstractBase):
     """
     A device that can be controlled by sending multicast packets to it,
     either directly, or via Ethernet using an AbstractEthernetTranslator.
@@ -87,7 +87,7 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def device_control_timesteps_between_sending(self) -> Optional[int]:
+    def device_control_timesteps_between_sending(self) -> int | None:
         """
         The number of timesteps between sending commands to the device.
         This defines the "sampling interval" for the device.
@@ -110,7 +110,7 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
         return 1
 
     @property
-    def device_control_first_send_timestep(self) -> Optional[int]:
+    def device_control_first_send_timestep(self) -> int | None:
         """
         The first timestep that the device should send in (0 by default).
         """

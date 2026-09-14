@@ -15,7 +15,9 @@
 import os
 import shutil
 import unittest
+
 from pyNN.random import RandomDistribution
+
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.utilities import utility_calls
 

@@ -14,13 +14,16 @@
 
 from .ethernet_command_connection import EthernetCommandConnection
 from .ethernet_control_connection import EthernetControlConnection
+from .spif_live_spikes_connection import SPIFLiveSpikesConnection
 from .spynnaker_live_spikes_connection import SpynnakerLiveSpikesConnection
 from .spynnaker_poisson_control_connection import (
-    SpynnakerPoissonControlConnection)
-from .spif_live_spikes_connection import SPIFLiveSpikesConnection
+    SpynnakerPoissonControlConnection,
+)
 
 __all__ = [
-    "EthernetCommandConnection", "EthernetControlConnection",
-    "SpynnakerLiveSpikesConnection", "SpynnakerPoissonControlConnection",
-    "SPIFLiveSpikesConnection"
+    "EthernetCommandConnection",
+    "EthernetControlConnection",
+    "SPIFLiveSpikesConnection",
+    "SpynnakerLiveSpikesConnection",
+    "SpynnakerPoissonControlConnection"
 ]

@@ -11,14 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Mapping, Optional, Sequence
+from collections.abc import Mapping, Sequence
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ranged import RangeDictionary
+
 from spinn_front_end_common.interface.ds import DataType
+
 from spynnaker.pyNN.utilities.struct import Struct
 
 
-class AbstractNeuronImpl(object, metaclass=AbstractBase):
+class AbstractNeuronImpl(metaclass=AbstractBase):
     """
     An abstraction of a whole neuron model including all parts.
     """
@@ -64,7 +67,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         """
         :param target: The name of the synapse
         :returns: The ID of a synapse given the name.

@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 from spynnaker.pyNN.external_devices_models.push_bot import (
-    AbstractPushBotOutputDevice)
+    AbstractPushBotOutputDevice,
+)
+from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 
 
 class PushBotMotor(AbstractPushBotOutputDevice):

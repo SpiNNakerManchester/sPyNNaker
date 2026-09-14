@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
-from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 from spynnaker.pyNN.models.defaults import default_parameters
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 from spynnaker.pyNN.models.neuron.implementations import (
-    ModelParameter, NeuronImplStocSigma)
+    ModelParameter,
+    NeuronImplStocSigma,
+)
 
 
 class StocSigma(AbstractPyNNNeuronModel):
@@ -28,7 +29,7 @@ class StocSigma(AbstractPyNNNeuronModel):
     def __init__(self, tau_refrac: ModelParameter = 1,
                  alpha: ModelParameter = 1.0, bias: ModelParameter = 0,
                  refract_init: ModelParameter = 0,
-                 seed: Optional[int] = None):
+                 seed: int | None = None):
         """
         :param tau_refrac:
         :param alpha:

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import pyNN.spiNNaker as p
+
 from spinnaker_testbase import BaseTestCase
 
 

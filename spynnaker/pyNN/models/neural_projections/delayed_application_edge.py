@@ -12,18 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from collections.abc import Iterable
-from typing import List, Optional, Union, cast, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import ApplicationEdge
 
 if TYPE_CHECKING:
+    from spynnaker.pyNN.models.neural_projections import (
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron import PopulationVertex
     from spynnaker.pyNN.models.utility_models.delays import (
-        DelayExtensionVertex)
-    from spynnaker.pyNN.models.neural_projections import (
-        SynapseInformation, ProjectionApplicationEdge)
+        DelayExtensionVertex,
+    )
 
 
 class DelayedApplicationEdge(ApplicationEdge):
@@ -37,10 +42,10 @@ class DelayedApplicationEdge(ApplicationEdge):
     def __init__(
             self, pre_vertex: DelayExtensionVertex,
             post_vertex: PopulationVertex,
-            synapse_information: Union[
-                SynapseInformation, Iterable[SynapseInformation]],
+            synapse_information: SynapseInformation |
+            Iterable[SynapseInformation],
             undelayed_edge: ProjectionApplicationEdge,
-            label: Optional[str] = None):
+            label: str | None = None):
         """
         :param pre_vertex: The delay extension at the start of the edge
         :param post_vertex: The target of the synapses
@@ -68,7 +73,7 @@ class DelayedApplicationEdge(ApplicationEdge):
         return cast('PopulationVertex', super().post_vertex)
 
     @property
-    def synapse_information(self) -> List[SynapseInformation]:
+    def synapse_information(self) -> list[SynapseInformation]:
         """
         The synapse information on this edge
         """

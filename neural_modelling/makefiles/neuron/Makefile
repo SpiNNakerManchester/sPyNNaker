@@ -49,12 +49,7 @@ ifneq ($(SPYNNAKER_DEBUG), DEBUG)
               IF_curr_exp_stdp_mad_recurrent_pre_stochastic_multiplicative \
               IF_curr_exp_stdp_mad_pfister_triplet_additive \
               IF_curr_exp_weight_change \
-              IF_curr_exp_sEMD \
-              eprop_adaptive \
-              eprop_adaptive_stdp_mad_eprop_reg \
-              sinusoid_readout \
-              sinusoid_readout_stdp_mad_eprop_reg \
-              left_right_readout_stdp_mad_eprop_reg
+              IF_curr_exp_sEMD
 endif
 
 all:

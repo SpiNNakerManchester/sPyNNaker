@@ -14,6 +14,7 @@
 
 
 import pyNN.spiNNaker as sim
+
 from spinnaker_testbase import BaseTestCase
 
 

@@ -12,25 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Callable, Optional, Type
-
-import pytest
+from collections.abc import Callable
+from typing import Any
 
 import pyNN.spiNNaker as sim
+import pytest
 
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
 from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, SynapseInformation)
+    ProjectionApplicationEdge,
+    SynapseInformation,
+)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceSpikePair,
+)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependenceAdditive,
+)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics,
-    SynapseDynamicsStatic, SynapseDynamicsSTDP)
+    SynapseDynamicsStatic,
+    SynapseDynamicsSTDP,
+)
 from spynnaker.pyNN.models.neuron.synapse_io import _get_allowed_row_length
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
-    WeightDependenceAdditive)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    TimingDependenceSpikePair)
+
 from unittests.mocks import (
-    MockApvVertex, MockConnector, MockPopulation, MockVertex)
+    MockApvVertex,
+    MockConnector,
+    MockPopulation,
+    MockVertex,
+)
 
 # No unittest_setup as sim.setup must be called before SynapseDynamicsStatic
 
@@ -57,7 +68,7 @@ from unittests.mocks import (
 def test_get_allowed_row_length(
         dynamics_class: Callable[..., AbstractSynapseDynamics],
         timing: Any, weight: Any, size: int,
-        exception: Optional[Type[SynapseRowTooBigException]],
+        exception: type[SynapseRowTooBigException] | None,
         max_size: int) -> None:
     sim.setup()
     if timing is not None and weight is not None:

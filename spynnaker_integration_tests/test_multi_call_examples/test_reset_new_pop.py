@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import pyNN.spiNNaker as sim
-from typing import List
+
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.models.populations import Population
+
 from spynnaker_integration_tests.scripts import check_neuron_data
 
 n_neurons = 20  # number of neurons in each population
@@ -26,7 +29,7 @@ simtime = 200
 class TestResetNewInput(BaseTestCase):
 
     def check_data(self, pop: Population, expected_spikes: int, simtime: int,
-                   segments: List[int]) -> None:
+                   segments: list[int]) -> None:
         neo = pop.get_data("all")
         for segment in segments:
             spikes = neo.segments[segment].spiketrains

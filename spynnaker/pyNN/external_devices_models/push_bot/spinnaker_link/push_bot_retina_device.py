@@ -12,18 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
+
 from spinn_front_end_common.utility_models import MultiCastCommand
+
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.external_devices_models.push_bot import (
-    AbstractPushBotRetinaDevice)
+    AbstractPushBotRetinaDevice,
+)
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotRetinaResolution)
+    PushBotRetinaResolution,
+)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 
 class DelayedPayloadMultiCastCommand(MultiCastCommand):
@@ -41,7 +46,7 @@ class DelayedPayloadMultiCastCommand(MultiCastCommand):
 
     @property
     @overrides(MultiCastCommand.payload)
-    def payload(self) -> Optional[int]:
+    def payload(self) -> int | None:
         if self._payload is None:
             self._payload = self._vertex.new_key_command_payload()
         return self._payload
@@ -64,8 +69,8 @@ class PushBotSpiNNakerLinkRetinaDevice(
             self, spinnaker_link_id: int,
             protocol: MunichIoSpiNNakerLinkProtocol,
             resolution: PushBotRetinaResolution,
-            board_address: Optional[str] = None,
-            label: Optional[str] = None,
+            board_address: str | None = None,
+            label: str | None = None,
             n_machine_vertices: int = 1):
         """
         :param spinnaker_link_id:
@@ -83,7 +88,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
             n_machine_vertices=n_machine_vertices)
 
         # stores for the injection aspects
-        self.__new_key_command: Optional[DelayedPayloadMultiCastCommand] = \
+        self.__new_key_command: DelayedPayloadMultiCastCommand | None = \
             None
 
     def new_key_command_payload(self) -> int:
@@ -100,9 +105,9 @@ class PushBotSpiNNakerLinkRetinaDevice(
     @property
     @overrides(AbstractPushBotRetinaDevice.start_resume_commands)
     def start_resume_commands(
-            self) -> List[MultiCastCommand]:
+            self) -> list[MultiCastCommand]:
         # Update the commands with the additional one to set the key
-        new_commands: List[MultiCastCommand] = list()
+        new_commands: list[MultiCastCommand] = []
         for command in super().start_resume_commands:
             if command.key == self._protocol.set_retina_transmission_key:
                 # This has to be stored so that the payload can be updated

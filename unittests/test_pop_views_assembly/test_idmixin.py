@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 import pyNN.spiNNaker as sim
+import pytest
+
 from spinnaker_testbase import BaseTestCase
 
 N_NEURONS = 4
@@ -56,9 +57,9 @@ class TestIDMixin(BaseTestCase):
         sim.setup(timestep=1.0)
         pop_1 = sim.Population(4, sim.IF_curr_exp(), label=LABEL)
         cell = pop_1.all_cells[2]
-        with pytest.raises(Exception):
-            cell.variable_that_is_not_there
-        with pytest.raises(Exception):
+        with pytest.raises(KeyError):
+            _ = cell.variable_that_is_not_there
+        with pytest.raises(KeyError):
             cell.variable_that_is_not_there = "pop"
         sim.end()
 

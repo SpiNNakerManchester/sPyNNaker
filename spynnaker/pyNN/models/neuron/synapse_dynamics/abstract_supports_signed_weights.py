@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
 
 
-class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
+class AbstractSupportsSignedWeights(metaclass=AbstractBase):
     """
     A synapse dynamics object that supports signed weights.
     """

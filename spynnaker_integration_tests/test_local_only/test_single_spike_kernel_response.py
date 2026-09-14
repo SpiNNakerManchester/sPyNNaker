@@ -12,16 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Tuple
-import numpy
-from numpy.typing import NDArray
-import pyNN.spiNNaker as sim
-from pyNN.space import Grid2D
+
 import matplotlib.pyplot as plt
+import numpy
+import pyNN.spiNNaker as sim
+from numpy.typing import NDArray
+from pyNN.space import Grid2D
+
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(plot: bool) -> Tuple[NDArray, NDArray]:
+def do_run(plot: bool) -> tuple[NDArray, NDArray]:
     in_shape = (11, 11)
     n_input = int(numpy.prod(in_shape))
     print("n_input ", n_input)

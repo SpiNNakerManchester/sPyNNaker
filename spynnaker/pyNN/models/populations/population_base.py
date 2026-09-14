@@ -12,15 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-import logging
-from typing import (
-    Any, Callable, Dict, final, Optional, Sequence, Tuple, TYPE_CHECKING,
-    Union)
 
-from pyNN.space import BaseStructure
+import logging
+from collections.abc import Callable, Sequence
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    final,
+)
+
 import neo
 from numpy import floating
 from numpy.typing import NDArray
+from pyNN.space import BaseStructure
 from typing_extensions import Never
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
@@ -30,17 +34,19 @@ from spinn_utilities.logger_utils import warn_once
 from pacman.model.graphs.application import ApplicationVertex
 
 from spynnaker.pyNN.models.recorder import Recorder
-from spynnaker.pyNN.types import IoDest
 
 if TYPE_CHECKING:
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
+
     from spynnaker.pyNN.models.common.types import Names
+    from spynnaker.pyNN.types import IoDest
+
     from .population_view import IDMixin
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class PopulationBase(object, metaclass=AbstractBase):
+class PopulationBase(metaclass=AbstractBase):
     r"""
     Shared methods between :py:class:`Population`\ s and
     :py:class:`PopulationView`\ s.
@@ -85,7 +91,7 @@ class PopulationBase(object, metaclass=AbstractBase):
     def get_data(
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
-            annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
+            annotations: dict[str, Any] | None = None) -> neo.Block:
         """
         Return a Neo Block containing the data(spikes, state variables)
         recorded from the Population.
@@ -111,7 +117,7 @@ class PopulationBase(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
+    def get_spike_counts(self, gather: bool = True) -> dict[int, int]:
         """
         Returns a dict containing the number of spikes for each neuron.
 
@@ -207,10 +213,10 @@ class PopulationBase(object, metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def write_data(self, io: Union[str, neo.baseio.BaseIO],
+    def write_data(self, io: str | neo.baseio.BaseIO,
                    variables: Names = 'all',
                    gather: bool = True, clear: bool = False,
-                   annotations: Optional[Dict[str, Any]] = None) -> None:
+                   annotations: dict[str, Any] | None = None) -> None:
         """
         Write recorded data to file, using one of the file formats
         supported by Neo.
@@ -245,7 +251,7 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @abstractmethod
     def record(self, variables: Names, to_file: IoDest = None,
-               sampling_interval: Optional[float] = None) -> None:
+               sampling_interval: float | None = None) -> None:
         """
         Record the specified variable or variables for all cells in the
         Population or view.
@@ -274,7 +280,7 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def structure(self) -> Optional[BaseStructure]:
+    def structure(self) -> BaseStructure | None:
         """
         The spatial structure of the parent Population.
         """
@@ -290,7 +296,7 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def _view_range(self) -> Tuple[int, int]:
+    def _view_range(self) -> tuple[int, int]:
         """
         The range of neuron IDs supported.
         """
@@ -306,7 +312,7 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @staticmethod
     def _check_params(gather: bool,
-                      annotations: Optional[Dict[str, Any]] = None) -> None:
+                      annotations: dict[str, Any] | None = None) -> None:
         if not gather:
             logger.warning(
                 "sPyNNaker only supports gather=True. We will run "

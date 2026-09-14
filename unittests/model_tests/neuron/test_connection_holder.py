@@ -13,21 +13,23 @@
 # limitations under the License.
 
 import math
-import pytest
+from typing import Any
+
 import numpy
-from typing import Any, List, Optional, Tuple
+import pytest
 
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-    NUMPY_CONNECTORS_DTYPE)
+    NUMPY_CONNECTORS_DTYPE,
+)
 
 
 @pytest.fixture(
     scope="module",
     params=[None, [], ["weight"], ["source", "target", "weight", "delay"]],
     ids=["None", "Empty", "SingleItem", "MultiItem"])
-def data_items(request: Any) -> Optional[List[str]]:
+def data_items(request: Any) -> list[str] | None:
     return request.param
 
 
@@ -36,7 +38,7 @@ def data_items(request: Any) -> Optional[List[str]]:
     params=[None, [], [("test", 100)],
             [("test", 100), ("test_2", 200), ("test_3", 300)]],
     ids=["None", "Empty", "SingleValue", "MultiValue"])
-def fixed_values(request: Any) -> Optional[List[Tuple[str, int]]]:
+def fixed_values(request: Any) -> list[tuple[str, int]] | None:
     return request.param
 
 
@@ -49,13 +51,13 @@ def as_list(request: Any) -> bool:
 
 
 def test_connection_holder(
-        data_items: Optional[List[str]],
-        fixed_values: Optional[List[Tuple[str, int]]], as_list: bool) -> None:
+        data_items: list[str] | None,
+        fixed_values: list[tuple[str, int]] | None, as_list: bool) -> None:
     unittest_setup()
     all_values = None
     n_items = 0
     if data_items is not None or fixed_values is not None:
-        all_values = list()
+        all_values = []
     elif as_list:
         n_items = 4
     if data_items is not None:

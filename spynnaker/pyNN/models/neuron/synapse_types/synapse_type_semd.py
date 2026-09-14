@@ -12,16 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Tuple
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
 
 from spinn_front_end_common.interface.ds import DataType
 
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.utilities.struct import Struct
-from spynnaker.pyNN.data import SpynnakerDataView
 
 from .abstract_synapse_type import AbstractSynapseType
 
@@ -44,15 +43,16 @@ class SynapseTypeSEMD(AbstractSynapseType):
     inhibitory input (see https://www.cit-ec.de/en/nbs/spiking-insect-vision)
     """
     __slots__ = (
-        "__tau_syn_E",
-        "__tau_syn_E2",
-        "__tau_syn_I",
+        "__exc2_old",
         "__isyn_exc",
         "__isyn_exc2",
         "__isyn_inh",
         "__multiplicator",
-        "__exc2_old",
-        "__scaling_factor")
+        "__scaling_factor",
+        "__tau_syn_E",
+        "__tau_syn_E2",
+        "__tau_syn_I",
+    )
 
     def __init__(
             self, tau_syn_E: ModelParameter, tau_syn_E2: ModelParameter,
@@ -120,7 +120,7 @@ class SynapseTypeSEMD(AbstractSynapseType):
         return 3
 
     @overrides(AbstractSynapseType.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         if target == "excitatory":
             return 0
         elif target == "excitatory2":
@@ -130,7 +130,7 @@ class SynapseTypeSEMD(AbstractSynapseType):
         return None
 
     @overrides(AbstractSynapseType.get_synapse_targets)
-    def get_synapse_targets(self) -> Tuple[str, ...]:
+    def get_synapse_targets(self) -> tuple[str, ...]:
         return "excitatory", "excitatory2", "inhibitory"
 
     @property

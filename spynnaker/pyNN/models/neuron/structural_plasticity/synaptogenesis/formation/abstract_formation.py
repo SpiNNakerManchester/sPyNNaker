@@ -13,9 +13,12 @@
 # limitations under the License.
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 from spinn_front_end_common.interface.ds import DataSpecificationBase
+
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractHasParameterNames)
+    AbstractHasParameterNames,
+)
 
 
 class AbstractFormation(AbstractHasParameterNames, metaclass=AbstractBase):

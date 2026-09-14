@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Iterator, MutableMapping, Optional, Tuple, cast
-from typing_extensions import Never
+from collections.abc import Iterator, MutableMapping
+from typing import cast
 
 import numpy
 from numpy import uint32
 from numpy.typing import NDArray
+from typing_extensions import Never
 
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged import RangeDictionary, RangedList
@@ -27,14 +28,15 @@ from pacman.model.placements import Placement
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.helpful_functions import (
-    locate_memory_region_for_placement)
+    locate_memory_region_for_placement,
+)
 
-from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.neuron.population_vertex import (
-    PopulationVertex)
 from spynnaker.pyNN.models.neuron.population_machine_neurons import (
-    NeuronRegions)
+    NeuronRegions,
+)
+from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
+from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
 
 
 def _all_one_val_gen(rd: RangeDictionary[float]) -> bool:
@@ -57,7 +59,7 @@ def _all_one_val_gen(rd: RangeDictionary[float]) -> bool:
     return True
 
 
-class NeuronData(object):
+class NeuronData:
     """
     Holds and creates the data for a group of neurons.
     """
@@ -65,6 +67,12 @@ class NeuronData(object):
     __slots__ = (
         # The application vertex
         "__app_vertex",
+
+        # Whether to generate things on the machine
+        "__gen_on_machine",
+
+        # Whether an attempt has been made to generate neuron data
+        "__generation_done",
 
         # The data to be written for all vertices, if applicable
         "__neuron_data",
@@ -74,20 +82,15 @@ class NeuronData(object):
 
         # The neuron recording data for all vertices, if applicable
         "__neuron_recording_data",
-
-        # Whether an attempt has been made to generate neuron data
-        "__generation_done",
-
-        # Whether to generate things on the machine
-        "__gen_on_machine")
+    )
 
     def __init__(self, app_vertex: PopulationVertex):
         """
         :param app_vertex: Vertex to get data from.
         """
         self.__app_vertex = app_vertex
-        self.__neuron_data: Optional[NDArray[uint32]] = None
-        self.__neuron_recording_data: Optional[NDArray[uint32]] = None
+        self.__neuron_data: NDArray[uint32] | None = None
+        self.__neuron_recording_data: NDArray[uint32] | None = None
         self.__generation_done = False
         self.__gen_on_machine = False
         self.__neuron_data_n_structs = 0
@@ -220,7 +223,7 @@ class NeuronData(object):
         return struct.get_data(values, vertex_slice)
 
     def __get_neuron_builder_data(
-            self, vertex_slice: Slice) -> Tuple[int, NDArray[uint32]]:
+            self, vertex_slice: Slice) -> tuple[int, NDArray[uint32]]:
         """
         Get the data to build neuron parameters with.
 

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import math
+
 import numpy
 from numpy import uint16, uint32
 from numpy.typing import NDArray
@@ -26,7 +27,7 @@ def float_to_fixed(value: float) -> int:
     :param value:
     :returns: value in fixed point format
     """
-    return int(round(float(value) * STDP_FIXED_POINT_ONE))
+    return round(float(value) * STDP_FIXED_POINT_ONE)
 
 
 def get_exp_lut_array(time_step: float, time_constant: float,

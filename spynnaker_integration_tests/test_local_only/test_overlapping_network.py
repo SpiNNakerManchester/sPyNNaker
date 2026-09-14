@@ -22,9 +22,12 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utility_models import MultiCastCommand
 
-from spynnaker.pyNN.external_devices_models import (
-    AbstractEthernetTranslator, AbstractMulticastControllableDevice)
 from spinnaker_testbase.base_test_case import BaseTestCase
+
+from spynnaker.pyNN.external_devices_models import (
+    AbstractEthernetTranslator,
+    AbstractMulticastControllableDevice,
+)
 from spynnaker.pyNN.external_devices_models \
     .abstract_multicast_controllable_device import SendType
 

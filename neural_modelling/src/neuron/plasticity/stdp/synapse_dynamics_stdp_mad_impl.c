@@ -16,7 +16,6 @@
 
 //! \file
 //! \brief STDP core implementation
-#include "post_events.h"
 #include "synapse_dynamics_stdp_common.h"
 
 //! The format of the plastic data region of a synaptic row
@@ -195,34 +194,34 @@ void synapse_dynamics_process_post_synaptic_event(
 //---------------------------------------
 static inline plastic_synapse_t process_plastic_synapse(
         uint32_t control_word, uint32_t last_pre_time, pre_trace_t last_pre_trace,
-		pre_trace_t new_pre_trace, weight_t *ring_buffers, uint32_t time,
-		uint32_t colour_delay, plastic_synapse_t synapse) {
+        pre_trace_t new_pre_trace, weight_t *ring_buffers, uint32_t time,
+        uint32_t colour_delay, plastic_synapse_t synapse) {
     fixed_stdp_synapse s = synapse_dynamics_stdp_get_fixed(control_word, time,
             colour_delay);
 
-	// Create update state from the plastic synaptic word
-	update_state_t current_state = synapse_structure_get_update_state(
-	        synapse, s.type);
+    // Create update state from the plastic synaptic word
+    update_state_t current_state = synapse_structure_get_update_state(
+            synapse, s.type);
 
-	// Update the synapse state
-	uint32_t post_delay = s.delay_dendritic;
-	if (!params.backprop_delay) {
-		post_delay = 0;
-	}
-	final_state_t final_state = plasticity_update_synapse(
-			time - colour_delay, last_pre_time, last_pre_trace, new_pre_trace,
-			post_delay, s.delay_axonal, current_state,
-			&post_event_history[s.index]);
+    // Update the synapse state
+    uint32_t post_delay = s.delay_dendritic;
+    if (!params.backprop_delay) {
+        post_delay = 0;
+    }
+    final_state_t final_state = plasticity_update_synapse(
+            time - colour_delay, last_pre_time, last_pre_trace, new_pre_trace,
+            post_delay, s.delay_axonal, current_state,
+            &post_event_history[s.index]);
 
-	// Add weight to ring-buffer entry, but only if not too late
-	if (s.delay_axonal + s.delay_dendritic > colour_delay) {
-	    int32_t weight = synapse_structure_get_final_weight(final_state);
-	    synapse_dynamics_stdp_update_ring_buffers(ring_buffers, s, weight);
+    // Add weight to ring-buffer entry, but only if not too late
+    if (s.delay_axonal + s.delay_dendritic > colour_delay) {
+        int32_t weight = synapse_structure_get_final_weight(final_state);
+        synapse_dynamics_stdp_update_ring_buffers(ring_buffers, s, weight);
     } else {
         skipped_synapses++;
     }
 
-	return synapse_structure_get_final_synaptic_word(final_state);
+    return synapse_structure_get_final_synaptic_word(final_state);
 }
 
 bool synapse_dynamics_process_plastic_synapses(

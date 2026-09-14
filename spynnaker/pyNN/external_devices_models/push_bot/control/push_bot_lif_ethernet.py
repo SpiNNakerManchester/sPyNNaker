@@ -12,17 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
 
-from spynnaker.pyNN.models.defaults import default_initial_values
-from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
-    PushBotTranslator)
 from spynnaker.pyNN.external_devices_models import (
-    AbstractMulticastControllableDevice, ExternalDeviceLifControl)
+    AbstractMulticastControllableDevice,
+    ExternalDeviceLifControl,
+)
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
-    get_pushbot_wifi_connection)
+    PushBotTranslator,
+    get_pushbot_wifi_connection,
+)
+from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
-    MunichIoSpiNNakerLinkProtocol)
+    MunichIoSpiNNakerLinkProtocol,
+)
 
 
 class PushBotLifEthernet(ExternalDeviceLifControl):
@@ -51,7 +53,7 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(
             self, protocol: MunichIoSpiNNakerLinkProtocol,
-            devices: List[AbstractMulticastControllableDevice],
+            devices: list[AbstractMulticastControllableDevice],
             pushbot_ip_address: str, pushbot_port: int = 56000,
             # default params for the neuron model type
             tau_m: float = 20.0, cm: float = 1.0, v_rest: float = 0.0,

@@ -17,8 +17,8 @@ from spinn_utilities.ranged import RangeDictionary
 
 from spinn_front_end_common.interface.ds import DataType
 
-from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.utilities.struct import Struct
 
 from .abstract_input_type import AbstractInputType
 
@@ -35,7 +35,7 @@ class InputTypeDelta(AbstractInputType):
         super().__init__(
             # scale_factor, calculated from timestep
             [Struct([(DataType.S1615, TIME_STEP)])],
-            dict())
+            {})
 
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

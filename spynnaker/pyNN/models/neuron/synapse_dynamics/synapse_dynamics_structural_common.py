@@ -13,13 +13,17 @@
 # limitations under the License.
 
 from __future__ import annotations
+
 import math
+from collections.abc import Iterable, Sequence
 from typing import (
-    cast, Dict, Iterable, List, Sequence, Tuple, Union, TYPE_CHECKING)
+    TYPE_CHECKING,
+    TypeAlias,
+    cast,
+)
 
 import numpy
 from numpy.typing import NDArray
-from typing_extensions import TypeAlias
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
@@ -27,39 +31,43 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 
-from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationBase)
+from spinn_front_end_common.interface.ds import DataSpecificationBase, DataType
 from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+    BYTES_PER_SHORT,
+    BYTES_PER_WORD,
+    MICRO_TO_MILLISECOND_CONVERSION,
+    MICRO_TO_SECOND_CONVERSION,
+)
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 from .abstract_synapse_dynamics_structural import (
-    AbstractSynapseDynamicsStructural)
+    AbstractSynapseDynamicsStructural,
+)
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.projection import Projection
     from spynnaker.pyNN.models.neural_projections import (
-        SynapseInformation)
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.neuron import PopulationVertex
-    from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
-        ConnectionsArray)
-    from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge)
+        ConnectionsArray,
+    )
+    from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+    from spynnaker.pyNN.models.projection import Projection
 
-    _PopIndexType: TypeAlias = Dict[
-        Tuple[PopulationApplicationVertex, SynapseInformation], int]
-    _SubpopIndexType: TypeAlias = Dict[
-        Tuple[PopulationApplicationVertex, SynapseInformation, int], int]
+    _PopIndexType: TypeAlias = dict[
+        tuple[PopulationApplicationVertex, SynapseInformation], int]
+    _SubpopIndexType: TypeAlias = dict[
+        tuple[PopulationApplicationVertex, SynapseInformation, int], int]
 
     #: :meta private:
-    ConnectionsInfo: TypeAlias = Dict[
-        Tuple[PopulationVertex, int],
-        List[Tuple[ConnectionsArray, ProjectionApplicationEdge,
+    ConnectionsInfo: TypeAlias = dict[
+        tuple[PopulationVertex, int],
+        list[tuple[ConnectionsArray, ProjectionApplicationEdge,
                    SynapseInformation]]]
 
 #: Default value for frequency of rewiring
@@ -167,8 +175,8 @@ class SynapseDynamicsStructuralCommon(
 
     def __get_structural_projections(
             self, incoming_projections: Iterable[Projection]
-            ) -> List[Projection]:
-        structural_projections = list()
+            ) -> list[Projection]:
+        structural_projections = []
         seen_app_edges = set()
         for proj in incoming_projections:
             # pylint: disable=protected-access
@@ -236,7 +244,7 @@ class SynapseDynamicsStructuralCommon(
             app_vertex: ApplicationVertex,
             structural_projections: Iterable[Projection],
             weight_scales: NDArray[numpy.floating],
-            synaptic_matrices: SynapticMatrices) -> Tuple[
+            synaptic_matrices: SynapticMatrices) -> tuple[
                 _PopIndexType, _SubpopIndexType, _SubpopIndexType]:
         """
         :param spec:
@@ -247,10 +255,10 @@ class SynapseDynamicsStructuralCommon(
         :param synaptic_matrices:
         """
         spec.comment("Writing pre-population info")
-        pop_index: _PopIndexType = dict()
+        pop_index: _PopIndexType = {}
         routing_info = SpynnakerDataView.get_routing_infos()
-        subpop_index: _SubpopIndexType = dict()
-        lo_atom_index: _SubpopIndexType = dict()
+        subpop_index: _SubpopIndexType = {}
+        lo_atom_index: _SubpopIndexType = {}
         index = 0
         for proj in structural_projections:
             spec.comment(f"Writing pre-population info for {proj.label}")
@@ -350,7 +358,7 @@ class SynapseDynamicsStructuralCommon(
 
         # Break data into rows based on target and strip target out
         rows = [conn_data[connections["target"] == i]
-                for i in range(0, vertex_slice.n_atoms)]
+                for i in range(vertex_slice.n_atoms)]
 
         if any(len(row) > self.s_max for row in rows):
             raise ValueError(
@@ -429,9 +437,9 @@ class SynapseDynamicsStructuralCommon(
             # pylint: disable=unidiomatic-typecheck
             (type(self.partner_selection) ==  # noqa: E721
              type(synapse_dynamics.partner_selection)) and
-            (type(self.formation) ==
+            (type(self.formation) is
              type(synapse_dynamics.formation)) and
-            (type(self.elimination) ==
+            (type(self.elimination) is
              type(synapse_dynamics.elimination)))
 
     @property
@@ -444,7 +452,7 @@ class SynapseDynamicsStructuralCommon(
 
     @abstractmethod
     def _get_seeds(
-            self, app_vertex: Union[None, ApplicationVertex, Slice] = None
+            self, app_vertex: None | ApplicationVertex | Slice = None
             ) -> Sequence[int]:
         """
         Generate a seed for the RNG on chip that is the same for all

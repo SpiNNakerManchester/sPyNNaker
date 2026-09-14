@@ -12,42 +12,53 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from collections import defaultdict
-from typing import Dict, Iterable, List, Sequence, Tuple, cast
+from collections.abc import Iterable, Sequence
+from typing import cast
 
 from numpy import floating
 from numpy.typing import NDArray
 
-from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
+from spinn_utilities.overrides import overrides
 
 from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
-from pacman.model.resources import AbstractSDRAM, MultiRegionSDRAM
+from pacman.model.graphs.machine import MachineVertex
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
+from pacman.model.resources import AbstractSDRAM, MultiRegionSDRAM
 from pacman.utilities.utility_objs import ChipCounter
 
 from spynnaker.pyNN.models.common.population_application_vertex import (
-    PopulationApplicationVertex)
+    PopulationApplicationVertex,
+)
 from spynnaker.pyNN.models.neuron import (
+    LocalOnlyProvenance,
+    PopulationMachineLocalOnlyCombinedVertex,
     PopulationMachineVertex,
-    PopulationMachineLocalOnlyCombinedVertex, LocalOnlyProvenance)
-from spynnaker.pyNN.models.neuron.population_machine_vertex import (
-    NeuronProvenance, SynapseProvenance, MainProvenance,
-    SpikeProcessingProvenance)
-from spynnaker.pyNN.models.neuron.master_pop_table import (
-    MasterPopTableAsBinarySearch)
-from spynnaker.pyNN.utilities.bit_field_utilities import (
-    get_sdram_for_bit_field_region)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural)
+)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
-from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+from spynnaker.pyNN.models.neuron.master_pop_table import (
+    MasterPopTableAsBinarySearch,
+)
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.population_machine_common import (
-    PopulationMachineCommon)
+    PopulationMachineCommon,
+)
+from spynnaker.pyNN.models.neuron.population_machine_vertex import (
+    MainProvenance,
+    NeuronProvenance,
+    SpikeProcessingProvenance,
+    SynapseProvenance,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamicsStructural,
+)
+from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.utilities.bit_field_utilities import (
+    get_sdram_for_bit_field_region,
+)
 
 from .splitter_population_vertex import SplitterPopulationVertex
 
@@ -91,11 +102,11 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
             app_vertex.remember_machine_vertex(machine_vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
-    def get_in_coming_slices(self) -> List[Slice]:
+    def get_in_coming_slices(self) -> list[Slice]:
         return self._get_fixed_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
-    def get_out_going_slices(self) -> List[Slice]:
+    def get_out_going_slices(self) -> list[Slice]:
         return self._get_fixed_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
@@ -111,8 +122,8 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
             self, source_vertex: ApplicationVertex,
-            partition_id: str) -> List[
-                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
+            partition_id: str) -> list[
+                tuple[MachineVertex, Sequence[AbstractVertex]]]:
         # Determine the real pre-vertex
         pre_vertex = source_vertex
         if isinstance(source_vertex, DelayExtensionVertex):
@@ -121,7 +132,7 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
             return []
 
         # Use the real pre-vertex to get the projections
-        targets: Dict[MachineVertex, OrderedSet[
+        targets: dict[MachineVertex, OrderedSet[
             AbstractVertex]] = defaultdict(OrderedSet)
         for proj in self.governed_app_vertex.get_incoming_projections_from(
                 pre_vertex):

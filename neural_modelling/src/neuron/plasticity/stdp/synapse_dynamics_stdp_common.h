@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
+// Check for required imports
+#ifndef _TIMING_H_
+#error "Missing timing rule definition.  Make sure you define TIMING_DEPENDENCE_H in your makefile."
+#endif
+#ifndef _WEIGHT_H_
+#error "Missing weight rule definition.  Make sure you define WEIGHT_DEPENDENCE_H in your makefile."
+#endif
+
 //! \file
 //! \brief STDP core implementation
 //!

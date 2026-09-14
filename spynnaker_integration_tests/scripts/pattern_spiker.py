@@ -12,37 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from types import ModuleType
-from typing import List, Optional
-import numpy
 import math
+from types import ModuleType
+from typing import Final
+
+import numpy
 from neo import AnalogSignal
 from neo.core.spiketrainlist import SpikeTrainList
 
-from spynnaker.pyNN.models.populations import (Population, PopulationView)
+from spynnaker.pyNN.models.populations import Population, PopulationView
 
 
-class PatternSpiker(object):
-    V_PATTERN = [-65.0, -64.024658203125, -63.09686279296875,
-                 -62.214324951171875,
-                 -61.37481689453125, -60.576263427734375, -59.816650390625,
-                 -59.09405517578125, -58.406707763671875, -57.752899169921875,
-                 -57.130950927734375, -56.539337158203125, -55.976593017578125,
-                 -55.4412841796875, -54.93206787109375, -54.44769287109375,
-                 -53.9869384765625, -53.54864501953125, -53.131744384765625,
-                 -52.73516845703125, -52.357940673828125, -51.999114990234375,
-                 -51.65777587890625, -51.33306884765625, -51.024200439453125,
-                 -50.73040771484375, -50.450927734375, -50.185089111328125]
+class PatternSpiker:
+    V_PATTERN: Final = [
+        -65.0, -64.024658203125, -63.09686279296875, -62.214324951171875,
+        -61.37481689453125, -60.576263427734375, -59.816650390625,
+        -59.09405517578125, -58.406707763671875, -57.752899169921875,
+        -57.130950927734375, -56.539337158203125, -55.976593017578125,
+        -55.4412841796875, -54.93206787109375, -54.44769287109375,
+        -53.9869384765625, -53.54864501953125, -53.131744384765625,
+        -52.73516845703125, -52.357940673828125, -51.999114990234375,
+        -51.65777587890625, -51.33306884765625, -51.024200439453125,
+        -50.73040771484375, -50.450927734375, -50.185089111328125]
     V_COUNT = len(V_PATTERN)
 
     def create_population(
             self, sim: ModuleType, n_neurons: int, label: str,
-            spike_rate: Optional[int] = None,
-            spike_rec_indexes: Optional[List[int]] = None,
-            v_rate: Optional[int] = None,
-            v_rec_indexes: Optional[List[int]] = None) -> Population:
+            spike_rate: int | None = None,
+            spike_rec_indexes: list[int] | None = None,
+            v_rate: int | None = None,
+            v_rec_indexes: list[int] | None = None) -> Population:
 
-        v_start = self.V_PATTERN * int(math.ceil(n_neurons/self.V_COUNT))
+        v_start = self.V_PATTERN * math.ceil(n_neurons/self.V_COUNT)
         v_start = v_start[:n_neurons]
         pop = sim.Population(n_neurons,
                              sim.IF_curr_exp(i_offset=1, tau_refrac=0),
@@ -60,8 +61,8 @@ class PatternSpiker(object):
             view.record(['v'], sampling_interval=v_rate)
         return pop
 
-    def check_v(self, v: AnalogSignal, label: str, v_rate: Optional[int],
-                v_rec_indexes: Optional[List[int]], is_view: bool,
+    def check_v(self, v: AnalogSignal, label: str, v_rate: int | None,
+                v_rec_indexes: list[int] | None, is_view: bool,
                 missing: bool) -> None:
         if v_rate is None:
             v_rate = 1
@@ -76,29 +77,27 @@ class PatternSpiker(object):
             if actual_indexes != v_rec_indexes:
                 if is_view:
                     raise AssertionError(
-                        "Unexpected neuron order for V in {}. "
-                        "Found {} but expected {}".format(
-                            label, actual_indexes, v_rec_indexes))
+                        f"Unexpected neuron order for V in {label}. "
+                        f"Found {actual_indexes} but expected {v_rec_indexes}")
                 for neuron in v_rec_indexes:
                     if neuron not in actual_indexes:
                         raise AssertionError(
-                            "Missing V for {}. No Data for {}".format(
-                                label, neuron))
+                            f"Missing V for {label}. "
+                            f"No Data for {neuron}")
                 v_rec_indexes = actual_indexes
         for i, neuron in enumerate(v_rec_indexes):
             for t in range(len(v)):
                 if v[t, i] != self.V_PATTERN[
                         (t * v_rate + neuron) % self.V_COUNT]:
                     raise AssertionError(
-                        "Incorrect V for neuron {} at time {} in {}. "
-                        "Found {} but expected {}".format(
-                            neuron, t, label, v[t, i],
-                            self.V_PATTERN[(t + neuron) % self.V_COUNT]))
+                        f"Incorrect V for neuron {neuron} at time {t} "
+                        f"in {label}. Found {v[t, i]} but expected "
+                        f"{self.V_PATTERN[(t + neuron) % self.V_COUNT]}")
 
     def check_spikes(
             self, spikes: SpikeTrainList, simtime: int, label: str,
-            spike_rate: Optional[int],
-            spike_rec_indexes: Optional[List[int]]) -> None:
+            spike_rate: int | None,
+            spike_rec_indexes: list[int] | None) -> None:
         for neuron in range(len(spikes)):
             if spike_rec_indexes and neuron not in spike_rec_indexes:
                 continue
@@ -114,22 +113,21 @@ class PatternSpiker(object):
             if not numpy.array_equal(current, adjusted_spikes):
                 if spike_rate:
                     raise AssertionError(
-                        "Incorrect spikes for neuron {} in {}. "
-                        "Found {} but expected {} adjusted from {}".format(
-                            neuron, label, spikes[neuron], adjusted_spikes,
-                            expected_spikes))
+                        f"Incorrect spikes for neuron {neuron} in {label}. "
+                        f"Found {spikes[neuron]} but expected "
+                        f"{adjusted_spikes} adjusted from {expected_spikes}")
                 else:
                     raise AssertionError(
-                        "Incorrect spikes for neuron {} in {}. "
-                        "Found {} but expected {}".format(
-                            neuron, label, spikes[neuron], adjusted_spikes, ))
+                        f"Incorrect spikes for neuron {neuron} in {label}. "
+                        f"Found {spikes[neuron]} "
+                        f"but expected {adjusted_spikes}")
 
     def check(
             self, pop: Population, simtime: int,
-            spike_rate: Optional[int] = None,
-            spike_rec_indexes: Optional[List[int]] = None,
-            v_rate: Optional[int] = None,
-            v_rec_indexes: Optional[List[int]] = None, is_view: bool = False,
+            spike_rate: int | None = None,
+            spike_rec_indexes: list[int] | None = None,
+            v_rate: int | None = None,
+            v_rec_indexes: list[int] | None = None, is_view: bool = False,
             missing: bool = False) -> None:
         if is_view:
             neo = pop.get_data("spikes")

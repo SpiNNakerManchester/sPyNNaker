@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy
 import os
 import shutil
-from spinn_front_end_common.utilities.base_database import BaseDatabase
-from spynnaker.pyNN.utilities import neo_convertor
+
+import numpy
 import pyNN.spiNNaker as sim
+
+from spinn_front_end_common.utilities.base_database import BaseDatabase
+
+from spynnaker.pyNN.utilities import neo_convertor
 
 N_NEURONS = 9
 

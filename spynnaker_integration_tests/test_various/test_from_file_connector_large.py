@@ -15,14 +15,15 @@
 import os
 import random
 
-import numpy
 import matplotlib.pyplot as plt
+import numpy
+import pyNN.spiNNaker as p
 from neo import Block
 from pyNN.utility.plotting import Figure, Panel
-import pyNN.spiNNaker as p
+
+from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.utilities import neo_convertor
-from spinnaker_testbase import BaseTestCase
 
 
 def do_run(plot: bool) -> Block:
@@ -93,7 +94,7 @@ def do_run(plot: bool) -> Block:
                   data_labels=[exc_pop.label], yticks=True,
                   xlim=(0, runtime), xticks=True),
             title="Testing FromFileConnector",
-            annotations="Simulated with {}".format(p.name())
+            annotations=f"Simulated with {p.name()}"
         )
         plt.show()
 
@@ -120,7 +121,7 @@ class FromFileConnectorLargeTest(BaseTestCase):
 
     def do_run(self) -> None:
         self.make_file()
-        v, spikes = do_run(plot=False)
+        _, spikes = do_run(plot=False)
         # any checks go here
         spikes_test = neo_convertor.convert_spikes(spikes)
         self.assertEqual(2, len(spikes_test))

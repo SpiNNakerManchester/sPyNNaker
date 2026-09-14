@@ -13,16 +13,23 @@
 # limitations under the License.
 
 import os
-import unittest
+
+import pyNN.spiNNaker as sim
+from parameterized import parameterized
 
 from spinn_utilities.config_holder import (
-    config_options, config_sections, get_report_path, get_timestamp_path)
+    config_options,
+    config_sections,
+    get_report_path,
+    get_timestamp_path,
+    set_config,
+)
+
+from spinn_machine.version import MANY_BOARD_TYPES
 
 from spinnaker_testbase import BaseTestCase
 
 from spynnaker.pyNN.config_setup import cfg_paths_skipped
-
-import pyNN.spiNNaker as sim
 
 
 class TestDebug(BaseTestCase):
@@ -49,8 +56,10 @@ class TestDebug(BaseTestCase):
                     raise AssertionError(
                         f"Unable to find report for {option} {path}")
 
-    def debug(self) -> None:
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_debug(self, _: str, ver_num: str) -> None:
         sim.setup(1.0)
+        set_config("Machine", "version", ver_num)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
         pop.record("v")
         inp = sim.Population(1, sim.SpikeSourceArray(
@@ -62,10 +71,3 @@ class TestDebug(BaseTestCase):
         sim.end()
 
         self.assert_reports()
-
-    def test_debug(self) -> None:
-        self.runsafe(self.debug)
-
-
-if __name__ == '__main__':
-    unittest.main()

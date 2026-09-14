@@ -13,8 +13,10 @@
 # limitations under the License.
 
 from spinnaker_testbase import BaseTestCase
-from spynnaker_integration_tests.test_onchip_compressor.many_routes \
-    import do_run
+
+from spynnaker_integration_tests.test_onchip_compressor.many_routes import (
+    do_run,
+)
 
 
 class TestOrderedCoveringCompressor(BaseTestCase):

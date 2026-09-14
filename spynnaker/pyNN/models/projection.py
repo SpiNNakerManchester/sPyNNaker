@@ -12,19 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import functools
 import logging
+from collections.abc import Callable, Sequence
 from typing import (
-    Any, Callable, Dict, List, Optional, Sequence, Tuple, Union,
-    cast, TYPE_CHECKING)
+    TYPE_CHECKING,
+    Any,
+    Literal,
+    TypeAlias,
+    cast,
+)
 
 import numpy
 from numpy import void
 from numpy.typing import NDArray
-from typing_extensions import Literal, Never, TypeAlias
-
 from pyNN.recording.files import BaseFile
 from pyNN.space import Space as PyNNSpace
+from typing_extensions import Never
 
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
@@ -34,32 +39,39 @@ from pacman.model.graphs.application import ApplicationVertex
 
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
+from spynnaker._version import __version__
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
-    AbstractAcceptsIncomingSynapses)
+    AbstractAcceptsIncomingSynapses,
+)
 from spynnaker.pyNN.models.neural_projections import (
-    SynapseInformation, ProjectionApplicationEdge)
+    ProjectionApplicationEdge,
+    SynapseInformation,
+)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    FromListConnector)
-from spynnaker.pyNN.models.neuron import (
-    PopulationVertex, ConnectionHolder)
-from spynnaker.pyNN.models.populations import Population, PopulationView
+    FromListConnector,
+)
+from spynnaker.pyNN.models.neuron import ConnectionHolder, PopulationVertex
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsStatic, AbstractHasParameterNames)
+    AbstractHasParameterNames,
+    SynapseDynamicsStatic,
+)
+from spynnaker.pyNN.models.populations import Population, PopulationView
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from spynnaker._version import __version__
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections.connectors import (
-        AbstractConnector)
+        AbstractConnector,
+    )
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-        AbstractSynapseDynamics)
-    _Pop: TypeAlias = Union[Population, PopulationView]
+        AbstractSynapseDynamics,
+    )
+    _Pop: TypeAlias = Population | PopulationView
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class Projection(object):
+class Projection:
     """
     A container for all the connections of a given type (same synapse type and
     plasticity mechanisms) between two populations, together with methods to
@@ -68,21 +80,21 @@ class Projection(object):
     # "format" param name defined by PyNN/
     # pylint: disable=redefined-builtin
     __slots__ = (
+        "__label",
         "__projection_edge",
         "__synapse_information",
-        "__virtual_connection_list",
-        "__label"
+        "__virtual_connection_list"
     )
 
     def __init__(
             self, pre_synaptic_population: _Pop,
             post_synaptic_population: _Pop, connector: AbstractConnector,
-            synapse_type: Optional[AbstractSynapseDynamics] = None,
+            synapse_type: AbstractSynapseDynamics | None = None,
             source: None = None, receptor_type: str = "excitatory",
-            space: Optional[PyNNSpace] = None,
-            label: Optional[str] = None,
+            space: PyNNSpace | None = None,
+            label: str | None = None,
             download_synapses: bool = False,
-            partition_id: Optional[str] = None):
+            partition_id: str | None = None):
         """
         :param pre_synaptic_population:
         :param post_synaptic_population:
@@ -193,9 +205,9 @@ class Projection(object):
 
         # If there is a virtual board, we need to hold the data in case the
         # user asks for it
-        self.__virtual_connection_list: Optional[List[NDArray[void]]] = None
+        self.__virtual_connection_list: list[NDArray[void]] | None = None
         if get_config_bool("Machine", "virtual_board"):
-            self.__virtual_connection_list = list()
+            self.__virtual_connection_list = []
             self.__synapse_information.add_pre_run_connection_holder(
                 ConnectionHolder(
                     None, False, pre_vertex.n_atoms, post_vertex.n_atoms,
@@ -231,7 +243,7 @@ class Projection(object):
         # Projection is compatible with PopulationView
         return True
 
-    def get(self, attribute_names: Union[str, Sequence[str]],
+    def get(self, attribute_names: str | Sequence[str],
             format: str,  # @ReservedAssignment
             gather: Literal[True] = True, with_address: bool = True,
             multiple_synapses: Literal['last'] = 'last') -> ConnectionHolder:
@@ -263,8 +275,8 @@ class Projection(object):
         return self.__get_data(an, format, with_address, notify=None)
 
     def save(
-            self, attribute_names: Union[str, Sequence[str]],
-            file: Union[str, BaseFile],
+            self, attribute_names: str | Sequence[str],
+            file: str | BaseFile,
             format: str = 'list',  # @ReservedAssignment
             gather: Literal[True] = True, with_address: bool = True) -> None:
         """
@@ -306,10 +318,10 @@ class Projection(object):
             notify=functools.partial(self.__save_callback, file, metadata))
 
     def __get_data(
-            self, attribute_names: List[str],
+            self, attribute_names: list[str],
             format: str,  # @ReservedAssignment
             with_address: bool,
-            notify: Optional[Callable[[ConnectionHolder], None]]
+            notify: Callable[[ConnectionHolder], None] | None
             ) -> ConnectionHolder:
         """
         Internal data getter to add notify option.
@@ -324,7 +336,7 @@ class Projection(object):
         if isinstance(attribute_names, str):
             attribute_names = [attribute_names]
 
-        data_items: List[str] = list()
+        data_items: list[str] = []
         if format != "list":
             with_address = False
         if with_address:
@@ -340,7 +352,7 @@ class Projection(object):
                 attribute_names.remove("target")
 
         # Split out attributes in to standard versus synapse dynamics data
-        fixed_values: List[Tuple[str, int]] = list()
+        fixed_values: list[tuple[str, int]] = []
         for attribute in attribute_names:
             data_items.append(attribute)
             synapse_dynamics = self._synapse_information.synapse_dynamics
@@ -354,8 +366,8 @@ class Projection(object):
 
     @staticmethod
     def __save_callback(
-            save_file: Union[str, BaseFile],
-            metadata: Dict[str, Any], data: ConnectionHolder) -> None:
+            save_file: str | BaseFile,
+            metadata: dict[str, Any], data: ConnectionHolder) -> None:
         """
         :param save_file:
         :param metadata:
@@ -418,7 +430,7 @@ class Projection(object):
     def _find_existing_edge(
             self, pre_synaptic_vertex: ApplicationVertex,
             post_synaptic_vertex: ApplicationVertex,
-            partition_id: str) -> Optional[ProjectionApplicationEdge]:
+            partition_id: str) -> ProjectionApplicationEdge | None:
         """
         Searches though the graph's edges to locate any
         edge which has the same post- and pre- vertex
@@ -444,9 +456,9 @@ class Projection(object):
         return None
 
     def _get_synaptic_data(
-            self, as_list: bool, data_to_get: List[str],
-            fixed_values: List[Tuple[str, int]],
-            notify: Optional[Callable[[ConnectionHolder], None]]
+            self, as_list: bool, data_to_get: list[str],
+            fixed_values: list[tuple[str, int]],
+            notify: Callable[[ConnectionHolder], None] | None
             ) -> ConnectionHolder:
         post_vertex = self.__projection_edge.post_vertex
         pre_vertex = self.__projection_edge.pre_vertex

@@ -139,14 +139,14 @@ static inline update_state_t timing_apply_pre_spike(
     uint32_t time_since_last_post = time - last_post_time;
     int32_t exponential_decay = maths_lut_exponential_decay(
             time_since_last_post, tau_lookup);
-    int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_post_trace, exponential_decay)
+    int32_t decayed_trace = STDP_FIXED_MUL_16X16(last_post_trace, exponential_decay)
             - plasticity_trace_region_data.alpha;
 
-    log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d\n",
-            time_since_last_post, decayed_o1);
+    log_debug("\t\t\ttime_since_last_post_event=%u, decayed_trace=%d\n",
+            time_since_last_post, decayed_trace);
 
     // Apply potentiation to state (which is a weight_state)
-    return weight_one_term_apply_potentiation(previous_state, decayed_o1);
+    return weight_one_term_apply_potentiation(previous_state, decayed_trace);
 
 }
 //---------------------------------------

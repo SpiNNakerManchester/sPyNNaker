@@ -12,26 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, cast, TYPE_CHECKING, Union, Tuple
+
+from typing import TYPE_CHECKING, Any, cast
 
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
+
 from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
-    AbstractPyNNNeuronModel, _population_parameters as APNM_default_params)
+    AbstractPyNNNeuronModel,
+)
+from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
+    _population_parameters as APNM_default_params,
+)
+from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 
 if TYPE_CHECKING:
+    from spynnaker.pyNN.extra_algorithms.splitter_components import (
+        SplitterPopulationVertex,
+    )
     from spynnaker.pyNN.models.neuron.additional_inputs import (
-        AbstractAdditionalInput)
+        AbstractAdditionalInput,
+    )
     from spynnaker.pyNN.models.neuron.input_types import AbstractInputType
     from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
     from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
     from spynnaker.pyNN.models.neuron.threshold_types import (
-        AbstractThresholdType)
-    from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterPopulationVertex)
+        AbstractThresholdType,
+    )
+
     from .population_vertex import PopulationVertex
 
-_population_parameters: Dict[str, Any] = dict(APNM_default_params)
+_population_parameters: dict[str, Any] = dict(APNM_default_params)
 _population_parameters["n_steps_per_timestep"] = 1
 
 
@@ -49,7 +59,7 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             self, model_name: str, binary: str, neuron_model: NeuronModel,
             input_type: AbstractInputType, synapse_type: AbstractSynapseType,
             threshold_type: AbstractThresholdType,
-            additional_input_type: Optional[AbstractAdditionalInput] = None):
+            additional_input_type: AbstractAdditionalInput | None = None):
         """
         :param model_name: Name of the model.
         :param binary: Name of the implementation executable.
@@ -67,17 +77,17 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
     @overrides(AbstractPyNNNeuronModel.create_vertex)  # type: ignore[has-type]
     def create_vertex(
             self, n_neurons: int, label: str, *,
-            spikes_per_second: Optional[float] = None,
-            ring_buffer_sigma: Optional[float] = None,
-            max_expected_summed_weight: Optional[List[float]] = None,
-            incoming_spike_buffer_size: Optional[int] = None,
-            drop_late_spikes: Optional[bool] = None,
-            splitter: Optional[SplitterPopulationVertex] = None,
-            seed: Optional[int] = None, n_colour_bits: Optional[int] = None,
+            spikes_per_second: float | None = None,
+            ring_buffer_sigma: float | None = None,
+            max_expected_summed_weight: list[float] | None = None,
+            incoming_spike_buffer_size: int | None = None,
+            drop_late_spikes: bool | None = None,
+            splitter: SplitterPopulationVertex | None = None,
+            seed: int | None = None, n_colour_bits: int | None = None,
             n_steps_per_timestep: int = 1,
-            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
-            n_synapse_cores: Optional[int] = None,
-            allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
+            neurons_per_core: int | tuple[int, ...] | None = None,
+            n_synapse_cores: int | None = None,
+            allow_delay_extensions: bool | None = None) -> PopulationVertex:
         """
         :param n_steps_per_timestep:
         """

@@ -12,24 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Iterable, Sequence, Tuple
+from collections.abc import Iterable, Sequence
 
 from spinn_utilities.overrides import overrides
 
 from pacman.exceptions import (
-    PacmanConfigurationException, PacmanInvalidParameterException)
+    PacmanConfigurationException,
+    PacmanInvalidParameterException,
+)
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.graphs.machine import MachineVertex
 from pacman.model.graphs.common import Slice
+from pacman.model.graphs.machine import MachineVertex
 from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.model.resources import AbstractSDRAM, ConstantSDRAM
 from pacman.utilities.utility_objs.chip_counter import ChipCounter
 
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, BYTES_PER_WORD)
+    BYTES_PER_WORD,
+    SYSTEM_BYTES_REQUIREMENT,
+)
 
 from spynnaker.pyNN.models.utility_models.delays import (
-    DelayExtensionVertex, DelayExtensionMachineVertex)
+    DelayExtensionMachineVertex,
+    DelayExtensionVertex,
+)
 
 
 class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
@@ -52,8 +58,8 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
 
     def __init__(self) -> None:
         super().__init__()
-        self._machine_vertex_by_slice: Dict[
-            Slice, DelayExtensionMachineVertex] = dict()
+        self._machine_vertex_by_slice: dict[
+            Slice, DelayExtensionMachineVertex] = {}
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(
@@ -68,7 +74,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
             self, source_vertex: ApplicationVertex,
-            partition_id: str) -> Sequence[Tuple[
+            partition_id: str) -> Sequence[tuple[
                 DelayExtensionMachineVertex, Sequence[MachineVertex]]]:
         # Only connect to the source that matches the slice
         return [
@@ -146,7 +152,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self) -> None:
-        self._machine_vertex_by_slice = dict()
+        self._machine_vertex_by_slice = {}
 
     def get_machine_vertex(
             self, vertex_slice: Slice) -> DelayExtensionMachineVertex:

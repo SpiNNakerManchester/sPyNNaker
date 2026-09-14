@@ -12,28 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pyNN.random import RandomDistribution
 import pyNN.spiNNaker as p
+from parameterized import parameterized
+from pyNN.random import RandomDistribution
+
+from spinn_utilities.config_holder import set_config
+
+from spinn_machine.version import MANY_BOARD_TYPES
+
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(nNeurons: int) -> None:
+def do_run(nNeurons: int, ver_num: str) -> None:
 
     p.setup(timestep=1.0, min_delay=1.0)
+    set_config("Machine", "version", ver_num)
 
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
 
-    cm = list()
-    i_off = list()
-    tau_m = list()
-    tau_re = list()
-    tau_syn_e = list()
-    tau_syn_i = list()
-    v_reset = list()
-    v_rest = list()
-    v_thresh = list()
+    cm = []
+    i_off = []
+    tau_m = []
+    tau_re = []
+    tau_syn_e = []
+    tau_syn_i = []
+    v_reset = []
+    v_rest = []
+    v_thresh = []
 
-    for _ in range(0, nNeurons):
+    for _ in range(nNeurons):
         cm.append(0.25)
         i_off.append(0.0)
         tau_m.append(10.0)
@@ -51,14 +58,14 @@ def do_run(nNeurons: int) -> None:
                        'tau_syn_I': tau_syn_i, 'v_reset': v_reset,
                        'v_rest': v_rest, 'v_thresh': v_thresh}
 
-    populations = list()
-    projections = list()
+    populations = []
+    projections = []
 
     weight_to_spike = 2
     delay = 1
 
-    connections = list()
-    for i in range(0, nNeurons):
+    connections = []
+    for i in range(nNeurons):
         singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
         connections.append(singleConnection)
 
@@ -97,9 +104,6 @@ class ParamsSetAsList(BaseTestCase):
 
     # NO unittest_setup() as sim.setup is called
 
-    def test_run(self) -> None:
-        do_run(225)  # number of neurons in each population
-
-
-if __name__ == '__main__':
-    do_run(225)  # number of neurons in each population
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_run(self, _: str, ver_num: str) -> None:
+        do_run(255, ver_num)

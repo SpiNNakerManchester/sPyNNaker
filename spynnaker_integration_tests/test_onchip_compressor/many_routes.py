@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import math
-from typing import Tuple
 
 import pyNN.spiNNaker as sim
 
@@ -20,13 +19,14 @@ from spinn_machine import Machine
 
 from spinn_front_end_common.interface.provenance import GlobalProvenance
 
-from spynnaker.pyNN.exceptions import ConfigurationException
 from spynnaker.pyNN import SpynnakerDataView
+from spynnaker.pyNN.exceptions import ConfigurationException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPopulationVertexFixed)
+    SplitterPopulationVertexFixed,
+)
 
 
-def find_good_chip(machine: Machine, n_target: int) -> Tuple[int, int]:
+def find_good_chip(machine: Machine, n_target: int) -> tuple[int, int]:
     for x in range(1, 8):
         for y in range(1, 8):
             chip = machine.get_chip_at(x, y)
@@ -53,13 +53,13 @@ def do_run() -> None:
         if "Failure to detect machine " in str(oops):
             SpynnakerDataView.raise_skiptest(
                 f"You Need at least {n_boards} boards to run this test", oops)
-        raise oops
+        raise
     target_x, target_y = find_good_chip(machine, n_target)
 
     targets = []
     for t in range(n_target):
         pop = sim.Population(
-            n_neurons, sim.IF_curr_exp(), label="target_{}".format(t),
+            n_neurons, sim.IF_curr_exp(), label=f"target_{t}",
             additional_parameters={
                 "splitter": SplitterPopulationVertexFixed()})
         pop.add_placement_constraint(x=target_x, y=target_y)
@@ -68,7 +68,7 @@ def do_run() -> None:
     sources = []
     for s in range(n_source):
         sources.append(sim.Population(
-            n_neurons, sim.IF_curr_exp(), label="source_{}".format(s),
+            n_neurons, sim.IF_curr_exp(), label=f"source_{s}",
             additional_parameters={
                 "splitter": SplitterPopulationVertexFixed()}))
 

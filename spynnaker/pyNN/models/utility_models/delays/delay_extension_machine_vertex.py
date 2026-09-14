@@ -13,8 +13,10 @@
 # limitations under the License.
 
 from __future__ import annotations
+
+from collections.abc import Sequence
 from enum import IntEnum
-from typing import Optional, Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 
@@ -26,9 +28,13 @@ from pacman.model.graphs.machine import MachineVertex
 from pacman.model.resources import AbstractSDRAM
 
 from spinn_front_end_common.abstract_models import (
-    AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
+    AbstractGeneratesDataSpecification,
+    AbstractHasAssociatedBinary,
+)
 from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
+    ProvenanceWriter,
+    ProvidesProvenanceDataFromMachineImpl,
+)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 
@@ -38,6 +44,7 @@ from .delay_extension_vertex import DelayExtensionVertex
 
 if TYPE_CHECKING:
     from pacman.model.placements import Placement
+
     from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 
 
@@ -50,8 +57,9 @@ class DelayExtensionMachineVertex(
     """
 
     __slots__ = (
+        "__drop_late_spikes",
         "__sdram",
-        "__drop_late_spikes")
+    )
 
     class _DelayExtensionRegions(IntEnum):
         """
@@ -108,7 +116,7 @@ class DelayExtensionMachineVertex(
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
     def __init__(self, sdram: AbstractSDRAM, label: str, vertex_slice: Slice,
-                 app_vertex: Optional[ApplicationVertex] = None):
+                 app_vertex: ApplicationVertex | None = None):
         """
         :param sdram: The SDRAM required by the vertex
         :param label: The name of the vertex
@@ -326,7 +334,7 @@ class DelayExtensionMachineVertex(
 
     def write_delay_parameters(
             self, spec: DataSpecificationGenerator, vertex_slice: Slice,
-            key: Optional[int], incoming_key: int, incoming_mask: int) -> None:
+            key: int | None, incoming_key: int, incoming_mask: int) -> None:
         """
         Generate Delay Parameter data.
 

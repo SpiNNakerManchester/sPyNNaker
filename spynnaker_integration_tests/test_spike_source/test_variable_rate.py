@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy
-from numpy.typing import NDArray
 import pyNN.spiNNaker as p
 import scipy
+from numpy.typing import NDArray
 
 from spinnaker_testbase import BaseTestCase
+
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
-    DURATION_FOREVER)
+    DURATION_FOREVER,
+)
 
 
 def array(value: NDArray) -> NDArray:
@@ -33,7 +35,7 @@ def variable_rate_options() -> None:
     run_time = 20000
     seed = 0
 
-    pops = list()
+    pops = []
 
     pops.append(
         p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
@@ -133,7 +135,7 @@ def variable_rate_options() -> None:
 
     p.run(run_time)
 
-    all_spikes = list()
+    all_spikes = []
     for pop in pops:
         all_spikes.append(pop.get_data("spikes").segments[0].spiketrains)
     p.end()
@@ -151,7 +153,7 @@ def variable_rate_options() -> None:
             output = ""
             values = []
             for name in names:
-                output += "{}: {{}}; ".format(name)
+                output += f"{name}: {{}}; "
                 values.append(pop.get(name)[i])
             print(output.format(*values))
             print(spikes[i])
@@ -159,7 +161,7 @@ def variable_rate_options() -> None:
             # Check the rates
             rates, starts, durations = (
                 array(values[0]), array(values[1]), array(values[2]))
-            ends = list()
+            ends = []
             for j, (start, duration) in enumerate(zip(starts, durations)):
                 if duration == DURATION_FOREVER and (j + 1) >= len(starts):
                     ends.append(run_time)
@@ -173,10 +175,9 @@ def variable_rate_options() -> None:
                 expected = (rate / 1000.0) * (end - start)
                 tolerance = scipy.stats.poisson.ppf(0.99, expected) - expected
                 n_spikes = len(rate_spikes)
-                print("Received {} spikes, expected {} spikes"
-                      " (with tolerance {}) for rate {}"
-                      " for duration {}".format(
-                          n_spikes, expected, tolerance, rate, (end - start)))
+                print(f"Received {n_spikes} spikes, expected {expected} spikes"
+                      f" (with tolerance {tolerance}) for rate {rate}"
+                      f" for duration {end - start}")
                 assert n_spikes >= (expected - tolerance)
                 assert n_spikes <= (expected + tolerance)
 
@@ -244,7 +245,7 @@ def variable_rate_100us() -> None:
     spikes = pop.get_data("spikes").segments[0].spiketrains
     p.end()
 
-    n_spikes = dict()
+    n_spikes = {}
     for i in range(len(spikes)):
         for rate, start, end in zip(rates, starts, ends):
             rate_spikes = spikes[i][(spikes[i] >= start) &
@@ -257,10 +258,9 @@ def variable_rate_100us() -> None:
         expected = (rate / 1000.0) * (end - start)
         tolerance = scipy.stats.poisson.ppf(0.99, expected) - expected
         n_spikes_rate = n_spikes[rate, start, end] / 100.0
-        print("Received {} spikes, expected {} spikes"
-              " (with tolerance {}) for rate {}"
-              " for duration {}".format(
-                  n_spikes_rate, expected, tolerance, rate, (end - start)))
+        print(f"Received {n_spikes_rate} spikes, expected {expected} spikes"
+              f" (with tolerance {tolerance}) for rate {rate}"
+              f" for duration {end - start}")
         assert n_spikes_rate >= (expected - tolerance)
         assert n_spikes_rate <= (expected + tolerance)
 

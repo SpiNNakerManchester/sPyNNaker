@@ -12,44 +12,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import annotations
+
 import logging
 import math
 import re
-from typing import Any, Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING
-from typing_extensions import Never
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any
 
 import numpy
-from numpy import float64, uint32, uint16, uint8
+from numpy import float64, uint8, uint16, uint32
 from numpy.typing import NDArray
-
 from pyNN import descriptions
 from pyNN.random import NumpyRNG, RandomDistribution
 from pyNN.space import Space
+from typing_extensions import Never
 
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 from pacman.model.graphs import AbstractVertex
-from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
 
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.types import (
-    Delays, is_scalar, WeightsDelays, Weights)
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.types import Delays, Weights, WeightsDelays, is_scalar
+from spynnaker.pyNN.utilities import utility_calls
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
-        ProjectionApplicationEdge, SynapseInformation)
-    from spynnaker.pyNN.models.projection import Projection
+        ProjectionApplicationEdge,
+        SynapseInformation,
+    )
     from spynnaker.pyNN.models.populations import Population, PopulationView
+    from spynnaker.pyNN.models.projection import Projection
 
 # global objects
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -61,7 +63,7 @@ _expr_context = SafeEval(
     numpy.maximum, numpy.minimum, e=numpy.e, pi=numpy.pi)
 
 
-class AbstractConnector(object, metaclass=AbstractBase):
+class AbstractConnector(metaclass=AbstractBase):
     """
     Abstract class that all PyNN Connectors extend.
     """
@@ -74,11 +76,12 @@ class AbstractConnector(object, metaclass=AbstractBase):
     __slots__ = (
         "__min_delay",
         "__n_clipped_delays",
+        "__param_seeds",
         "__safe",
         "__space",
+        "__used",
         "__verbose",
-        "__param_seeds",
-        "__used")
+    )
 
     def __init__(self, safe: bool = True, callback: None = None,
                  verbose: bool = False):
@@ -98,12 +101,12 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if callback is not None:
             warn_once(logger, "sPyNNaker ignores connector callbacks.")
         self.__safe = safe
-        self.__space: Optional[Space] = None
+        self.__space: Space | None = None
         self.__verbose = verbose
 
         self.__n_clipped_delays = numpy.int64(0)
         self.__min_delay = 0.0
-        self.__param_seeds: Dict[Tuple[int, int], int] = dict()
+        self.__param_seeds: dict[tuple[int, int], int] = {}
         self.__used = False
 
     def set_space(self, space: Space) -> None:
@@ -184,7 +187,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_delay_minimum(
-            self, synapse_info: SynapseInformation) -> Optional[float]:
+            self, synapse_info: SynapseInformation) -> float | None:
         """
         :param synapse_info:
         :returns: The minimum delay specified by the user in ms,
@@ -228,8 +231,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
             prob_in_range = utility_calls.get_probability_within_range(
                 delays, min_delay, max_delay)
             if prob_in_range > 0:
-                v = int(math.ceil(utility_calls.get_probable_maximum_selected(
-                    n_total_connections, n_connections, prob_in_range)))
+                v = math.ceil(utility_calls.get_probable_maximum_selected(
+                    n_total_connections, n_connections, prob_in_range))
                 # If the probability is so low as to result in 0, assume
                 # at least 1 if there is some probability that the delay is
                 # in range
@@ -246,19 +249,19 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 return 0
             n_total = len(delays)
             prob_delayed = float(n_delayed) / float(n_total)
-            return int(math.ceil(utility_calls.get_probable_maximum_selected(
-                n_total_connections, n_connections, prob_delayed)))
+            return math.ceil(utility_calls.get_probable_maximum_selected(
+                n_total_connections, n_connections, prob_delayed))
         elif is_scalar(delays):
             if min_delay <= delays <= max_delay:
-                return int(math.ceil(n_connections))
+                return math.ceil(n_connections)
             return 0
         raise self.delay_type_exception(delays)
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         """
         Get the maximum number of connections from any
         neuron in the pre vertex to the neurons in the post_vertex_slice,
@@ -301,7 +304,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return abs(weights)
         elif hasattr(weights, "__getitem__"):
             return numpy.mean(weights)
-        raise self.weight_type_exception(weights)
+        raise self.weight_type_exception(synapse_info)
 
     def _get_weight_maximum(
             self, weights: Weights, n_connections: int,
@@ -433,6 +436,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return SpynnakerException(
                 f"Str Weights {weights} not supported by a {(type(self))}")
         elif isinstance(weights, numpy.ndarray):
+            # The problem is that these methods are for a MachineVertex/ core
+            # while weight and delay are supplied at the application level
+            # The FromList is also the one designed to handle the 2D case
             return SpynnakerException(
                 f"For efficiency reason {type(self)} does not supports "
                 f"list or arrays for weight."
@@ -449,6 +455,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return SpynnakerException(
                 f"Str delays {delays} not supported by {(type(self))}")
         elif isinstance(delays, numpy.ndarray):
+            # The problem is that these methods are for a MachineVertex/ core
+            # while weight and delay are supplied at the application level
+            # The FromList is also the one designed to handle the 2D case
             return SpynnakerException(
                 f"For efficiency reason {type(self)} does not supports "
                 f"list or arrays for weight or delay."
@@ -472,12 +481,16 @@ class AbstractConnector(object, metaclass=AbstractBase):
             if isinstance(values, str):
                 expand_distances = self._expand_distances(values)
 
+                # At this point we need to now get the values corresponding to
+                # the distances between connections in "sources" and "targets"
                 eval_values = numpy.zeros(n_connections, dtype=float64)
                 for i in range(n_connections):
+                    # get the distance for this source and target pair
                     dist = self.__space.distances(
                         synapse_info.pre_population.positions[sources[i]],
                         synapse_info.post_population.positions[targets[i]],
                         expand_distances)
+                    # evaluate expression at this distance
                     eval_values[i:i+1] = _expr_context.eval(values, d=dist)
                 return eval_values
 
@@ -515,8 +528,10 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         Clip delay values, keeping track of how many have been clipped.
         """
+        # count values that could be clipped
         self.__n_clipped_delays = numpy.sum(delays < self.__min_delay)
 
+        # clip values
         if delays.size:
             delays[delays < self.__min_delay] = self.__min_delay
         return delays
@@ -535,7 +550,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         return self._clip_delays(delays)
 
     @staticmethod
-    def __pop_label(pop: Union[Population, PopulationView]) -> str:
+    def __pop_label(pop: Population | PopulationView) -> str:
         lbl = pop.label
         if lbl is None:
             raise ValueError("unlabelled population")
@@ -547,6 +562,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         :param synapse_info:
         """
+        # Convert to native Python integer; provenance system assumption
         ncd = self.__n_clipped_delays.item()
         with ProvenanceWriter() as db:
             db.insert_connector(
@@ -571,7 +587,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         return self.__safe
 
     @property
-    def space(self) -> Optional[Space]:
+    def space(self) -> Space | None:
         """
         The space object (may be updated after instantiation).
         """
@@ -587,7 +603,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def get_connected_vertices(
             self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
-                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
+                tuple[MachineVertex, Sequence[AbstractVertex]]]:
         """
         Get the machine vertices that are connected to each other with
         this connector
@@ -597,6 +613,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param target_vertex: The target of the spikes
         :return: A list of tuples of (target machine vertex, list of sources)
         """
+        # By default, just return that the whole target connects to the
+        # whole source
         return [(m_vertex, [source_vertex])
                 for m_vertex in target_vertex.splitter.get_in_coming_vertices(
                     s_info.partition_id)]
@@ -614,7 +632,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         raise SpynnakerException("Standard pyNN connect method not supported")
 
     @staticmethod
-    def _roundsize(size: Union[int, float], label: str) -> int:
+    def _roundsize(size: int | float, label: str) -> int:
         """
         Ensures that the ``size`` is an integer. Approximate integers are
         rounded; other values cause exceptions.
@@ -625,7 +643,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         if isinstance(size, int):
             return size
-        temp = int(round(size))
+        # Allow a float which has a near int value
+        temp = round(size)
         if abs(temp - size) < 0.001:
             logger.warning("Size of {} rounded from {} to {}. "
                            "Please use int values for size",
@@ -657,7 +676,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
                 "PopulationView on a multi-dimensional Population is not "
                 "supported")
 
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         """
         A list of parameters that would recreate this connector.
 
@@ -667,11 +686,13 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         :return: A map of the init parameters to the values passed in.
         """
+        # The default is error
+        # This to avoid missing parameters in user Connectors
         raise NotImplementedError(
             f"{type(self)} does not implement "
             f"Standard pyNN get_parameters method")
 
-    def _get_parameters(self) -> Dict[str, Any]:
+    def _get_parameters(self) -> dict[str, Any]:
         """
         :return: A map of the init parameters to the values passed in.
         """
@@ -681,7 +702,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             "callback": None
         }
 
-    def clone(self) -> "AbstractConnector":
+    def clone(self) -> AbstractConnector:
         """
         Create a clone of the Connector at init point
 
@@ -695,9 +716,16 @@ class AbstractConnector(object, metaclass=AbstractBase):
             f"Cloning type{self} which may lead to incorrect results.")
         return theType(**params)
 
-    def get_unused(self) -> "AbstractConnector":
+    def get_unused(self) -> AbstractConnector:
         """
         Checks the Connector is unused and clones if needed
+
+        This method should just check the connector is unused,
+        mark it as used and return it.
+
+        If the Connector is used will attempt to make a clone,
+        log warning that this is not recommended and may be incorrect,
+        and returns the clone.
 
         :return: Ideally this Connector
         """
@@ -705,11 +733,12 @@ class AbstractConnector(object, metaclass=AbstractBase):
             logger.warning(
                 "Reusing Connectors in sPyNNaker is not recommended")
             clone = self.clone()
+            # call get_unused to mark used
             return clone.get_unused()
         self.__used = True
         return self
 
-    def describe(self, template: Optional[str] = None,
+    def describe(self, template: str | None = None,
                  engine: str = 'default') -> str:
         """
         Returns a human-readable description of the connection method.

@@ -12,18 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable
+from collections.abc import Iterable
 
 import numpy
-from numpy import uint16, floating
+from numpy import floating, uint16
 from numpy.typing import ArrayLike, NDArray
 
 from spinn_utilities.overrides import overrides
 
-from spinn_front_end_common.interface.ds import (
-    DataType, DataSpecificationBase)
+from spinn_front_end_common.interface.ds import DataSpecificationBase, DataType
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+    BYTES_PER_SHORT,
+    BYTES_PER_WORD,
+)
 
 from .abstract_formation import AbstractFormation
 
@@ -38,13 +39,14 @@ class DistanceDependentFormation(AbstractFormation):
     """
 
     __slots__ = (
-        "__grid",
-        "__p_form_forward",
-        "__sigma_form_forward",
-        "__p_form_lateral",
-        "__sigma_form_lateral",
         "__ff_distance_probabilities",
-        "__lat_distance_probabilities")
+        "__grid",
+        "__lat_distance_probabilities",
+        "__p_form_forward",
+        "__p_form_lateral",
+        "__sigma_form_forward",
+        "__sigma_form_lateral",
+    )
 
     def __init__(
             self, grid: ArrayLike = (16, 16), p_form_forward: float = 0.16,

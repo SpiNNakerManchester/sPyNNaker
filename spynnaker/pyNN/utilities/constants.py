@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_KB)
+    BYTES_PER_KB,
+    BYTES_PER_WORD,
+)
 
 POISSON_SIGMA_SUMMATION_LIMIT = 3.0
 

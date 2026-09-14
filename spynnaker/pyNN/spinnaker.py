@@ -14,47 +14,58 @@
 
 import logging
 import os
-from typing import Any, Collection, Optional, Type, Union, cast
+from collections.abc import Collection
+from typing import Any, Literal, cast
 
 from lazyarray import __version__ as lazyarray_version
-
 from neo import __version__ as neo_version
-from quantities import __version__ as quantities_version
-from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
-from typing_extensions import Literal, Never
+from pyNN.common import control as pynn_control
+from quantities import __version__ as quantities_version
+from typing_extensions import Never
 
-
-from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
-    AbstractSpinnakerBase)
+    AbstractSpinnakerBase,
+)
 from spinn_front_end_common.interface.config_setup import (
-    add_spinnaker_template)
+    add_spinnaker_template,
+)
 from spinn_front_end_common.interface.provenance import (
-    FecTimer, GlobalProvenance, TimerCategory, TimerWork)
+    FecTimer,
+    GlobalProvenance,
+    TimerCategory,
+    TimerWork,
+)
 
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
-from spynnaker.pyNN.config_setup import add_spynnaker_cfg, SPYNNAKER_CFG
-from spynnaker.pyNN.models.recorder import Recorder
-from spynnaker.pyNN.models.neuron import (
-    AbstractPyNNNeuronModel, PopulationVertex)
+from spynnaker.pyNN.config_setup import SPYNNAKER_CFG, add_spynnaker_cfg
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.extra_algorithms import (
-    delay_support_adder, neuron_expander, synapse_expander,
+    delay_support_adder,
+    neuron_expander,
     redundant_packet_count_report,
-    spynnaker_neuron_graph_network_specification_report)
+    spynnaker_neuron_graph_network_specification_report,
+    synapse_expander,
+)
 from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
-    finish_connection_holders)
+    finish_connection_holders,
+)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    spynnaker_splitter_selector)
+    spynnaker_splitter_selector,
+)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neuron import (
+    AbstractPyNNNeuronModel,
+    PopulationVertex,
+)
+from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
-
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -67,11 +78,11 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     __slots__ = ("__recorders", )
 
     def __init__(
-            self, time_scale_factor: Optional[int],
-            min_delay: Union[float, None, Literal["auto"]],
-            n_chips_required: Optional[int] = None,
-            n_boards_required: Optional[int] = None,
-            timestep: Optional[float] = 0.1):
+            self, time_scale_factor: int | None,
+            min_delay: float | None | Literal["auto"],
+            n_chips_required: int | None = None,
+            n_boards_required: int | None = None,
+            timestep: float | None = 0.1):
         """
         :param time_scale_factor:
             multiplicative factor to the machine time step
@@ -136,14 +147,14 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @property
     @overrides(AbstractSpinnakerBase._data_writer_cls)
-    def _data_writer_cls(self) -> Type[SpynnakerDataWriter]:
+    def _data_writer_cls(self) -> type[SpynnakerDataWriter]:
         return SpynnakerDataWriter
 
     @property
     def __writer(self) -> SpynnakerDataWriter:
         return cast(SpynnakerDataWriter, self._data_writer)
 
-    def _clear_and_run(self, run_time: Optional[float],
+    def _clear_and_run(self, run_time: float | None,
                        sync_time: float = 0.0) -> None:
         """
         Clears the projections and Run the model created.
@@ -157,7 +168,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # sPyNNaker specific algorithms to do before starting a run
         self.__flush_post_vertex_caches()
 
-        super(SpiNNaker, self).run(run_time, sync_time)
+        super().run(run_time, sync_time)
 
         # PyNNaker specific algorithms to do after finishing a run
         self.__flush_post_vertex_caches()
@@ -167,7 +178,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         for projection in self.__writer.iterate_projections():
             projection._clear_cache()
 
-    def run(self, run_time: Optional[float], sync_time: float = 0.0) -> None:
+    def run(self, run_time: float | None, sync_time: float = 0.0) -> None:
         """
         Run the simulation for a span of simulation time.
 

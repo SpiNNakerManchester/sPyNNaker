@@ -12,18 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List, Optional
+from collections.abc import Iterable
 
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex)
+    AbstractSendMeMulticastCommandsVertex,
+)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import MultiCastCommand
 
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotMotor)
+    PushBotMotor,
+)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+
 from .push_bot_device import PushBotEthernetDevice
 
 
@@ -35,7 +38,7 @@ class PushBotEthernetMotorDevice(
 
     def __init__(self, motor: PushBotMotor,
                  protocol: MunichIoSpiNNakerLinkProtocol,
-                 timesteps_between_send: Optional[int] = None):
+                 timesteps_between_send: int | None = None):
         """
         :param motor: indicates which motor to control
         :param protocol:
@@ -73,5 +76,5 @@ class PushBotEthernetMotorDevice(
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
-    def timed_commands(self) -> List[MultiCastCommand]:
+    def timed_commands(self) -> list[MultiCastCommand]:
         return []

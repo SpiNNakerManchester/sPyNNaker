@@ -12,12 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Type
-
 import unittest
+
 from spynnaker.pyNN.config_setup import unittest_setup
+from spynnaker.pyNN.external_devices_models.push_bot import (
+    AbstractPushBotOutputDevice,
+)
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotLaser, PushBotMotor, PushBotSpeaker, PushBotLED)
+    PushBotLaser,
+    PushBotLED,
+    PushBotMotor,
+    PushBotSpeaker,
+)
 
 
 class Test(unittest.TestCase):
@@ -25,14 +31,15 @@ class Test(unittest.TestCase):
     def setUp(self) -> None:
         unittest_setup()
 
-    def _test_device_enum(self, enum_class: Type) -> None:
+    def _test_device_enum(
+            self, enum_class: type[AbstractPushBotOutputDevice]) -> None:
         for item in enum_class:
             print(item)
-            item.value
-            item.protocol_property
-            item.min_value
-            item.max_value
-            item.time_between_send
+            _: object = item.value
+            _ = item.protocol_property
+            _ = item.min_value
+            _ = item.max_value
+            _ = item.time_between_send
 
     def test_laser_device(self) -> None:
         self._test_device_enum(PushBotLaser)

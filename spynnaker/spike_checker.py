@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Union
+
 import numpy
 from numpy.typing import NDArray
 
 
-def synfire_spike_checker(spikes: Union[NDArray, List[NDArray]],
+def synfire_spike_checker(spikes: NDArray | list[NDArray],
                           n_neurons: int) -> None:
     """
     Checks the spikes and prints an error file if needed.

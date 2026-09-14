@@ -18,9 +18,13 @@ Decorators to support default argument handling.
 
 import inspect
 import logging
+from collections.abc import Callable, Iterable, Mapping
 from types import MappingProxyType
 from typing import (
-    Any, Callable, FrozenSet, Iterable, List, Mapping, Optional, Tuple)
+    Any,
+    no_type_check,
+)
+
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.log import FormatAdapter
 
@@ -28,7 +32,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def _check_args(
-        args_to_find: FrozenSet[str], default_args: List[str],
+        args_to_find: frozenset[str], default_args: list[str],
         init_method: Callable) -> None:
     for arg in args_to_find:
         if arg not in default_args:
@@ -39,8 +43,8 @@ def _check_args(
 
 def get_map_from_init(
         init_method: Callable,
-        skip: Optional[FrozenSet[str]] = None,
-        include: Optional[FrozenSet[str]] = None) -> Mapping[str, Any]:
+        skip: frozenset[str] | None = None,
+        include: frozenset[str] | None = None) -> Mapping[str, Any]:
     """
     Get an argument initialisation dictionary by examining an
     ``__init__`` method or function.
@@ -159,6 +163,7 @@ def default_initial_values(state_variables: Iterable[str]) -> Callable:
     return wrap
 
 
+@no_type_check
 def defaults(cls: type) -> type:
     """
     Deprecated! Extend AbstractProvidesDefaults instead
@@ -204,7 +209,7 @@ def defaults(cls: type) -> type:
     return cls
 
 
-class AbstractProvidesDefaults(object):
+class AbstractProvidesDefaults:
     """
     Provides the default_parameters and default_initial_values properties
 
@@ -212,8 +217,8 @@ class AbstractProvidesDefaults(object):
     @default_initial_values decorators with values read from the init.
     """
 
-    __cashed_defaults: Optional[Mapping[str, Any]] = None
-    __cashed_initials: Optional[Mapping[str, Any]] = None
+    __cashed_defaults: Mapping[str, Any] | None = None
+    __cashed_initials: Mapping[str, Any] | None = None
 
     @classmethod
     def __fill_in_defaults(cls) -> None:
@@ -234,7 +239,7 @@ class AbstractProvidesDefaults(object):
         default_args = ([] if init_args.args is None else
                         init_args.args[n_args - n_defaults:])
         if init_args.defaults is None:
-            default_values: Tuple = ()
+            default_values: tuple = ()
         else:
             default_values = init_args.defaults
 

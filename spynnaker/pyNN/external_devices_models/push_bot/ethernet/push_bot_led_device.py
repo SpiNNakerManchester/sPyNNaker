@@ -12,17 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List, Optional
+from collections.abc import Iterable
 
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex)
+    AbstractSendMeMulticastCommandsVertex,
+)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import MultiCastCommand
 
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotLED)
+    PushBotLED,
+)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 
 from .push_bot_device import PushBotEthernetDevice
@@ -36,11 +38,11 @@ class PushBotEthernetLEDDevice(
 
     def __init__(
             self, led: PushBotLED, protocol: MunichIoSpiNNakerLinkProtocol,
-            start_active_time_front: Optional[int] = None,
-            start_active_time_back: Optional[int] = None,
-            start_total_period: Optional[int] = None,
-            start_frequency: Optional[int] = None,
-            timesteps_between_send: Optional[int] = None):
+            start_active_time_front: int | None = None,
+            start_active_time_back: int | None = None,
+            start_total_period: int | None = None,
+            start_frequency: int | None = None,
+            timesteps_between_send: int | None = None):
         """
         :param led: The LED to control
         :param protocol:
@@ -104,5 +106,5 @@ class PushBotEthernetLEDDevice(
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
-    def timed_commands(self) -> List[MultiCastCommand]:
+    def timed_commands(self) -> list[MultiCastCommand]:
         return []

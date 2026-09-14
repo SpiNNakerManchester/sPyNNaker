@@ -11,11 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List, Tuple, Union
 from random import randint
 
-from neo.core.spiketrainlist import SpikeTrainList
 import pyNN.spiNNaker as p
+from neo.core.spiketrainlist import SpikeTrainList
 from pyNN.space import Grid2D
 from quantities import Quantity
 
@@ -37,12 +36,12 @@ SUB_HEIGHT = 16
 WEIGHT = 5
 
 
-def get_retina_input() -> List[List[int]]:
+def get_retina_input() -> list[list[int]]:
     """ This is used to create random input as a spike array
     """
 
     time = int(sleep_time * 1000)
-    spikes_to_send: List[List[int]] = [[] for _ in range(WIDTH * HEIGHT)]
+    spikes_to_send: list[list[int]] = [[] for _ in range(WIDTH * HEIGHT)]
     for _ in range(n_packets):
         n_spikes = randint(10, 100)
         for _ in range(n_spikes):
@@ -57,7 +56,7 @@ def get_retina_input() -> List[List[int]]:
 
 def find_next_spike_after(
         spike_times: Quantity,
-        time: int) -> Union[Tuple[int, Quantity], Tuple[None, None]]:
+        time: int) -> tuple[int, Quantity] | tuple[None, None]:
     for index, spike_time in enumerate(spike_times):
         if spike_time >= time:
             return index, spike_time
@@ -67,8 +66,8 @@ def find_next_spike_after(
 def find_square_of_spikes(
         x: int, y: int, time: Quantity, spikes: SpikeTrainList, s_label: str,
         t_label: str
-        ) -> Tuple[SpikeTrainList, List[Tuple[int, int, Quantity]]]:
-    found_spikes = list()
+        ) -> tuple[SpikeTrainList, list[tuple[int, int, Quantity]]]:
+    found_spikes = []
     last_target_time = None
     for x_t in range(x - 1, x + 2):
         if x_t < 0 or x_t >= WIDTH:
@@ -96,7 +95,7 @@ def find_square_of_spikes(
     return spikes, found_spikes
 
 
-def do_run() -> Tuple[SpikeTrainList, SpikeTrainList, SpikeTrainList]:
+def do_run() -> tuple[SpikeTrainList, SpikeTrainList, SpikeTrainList]:
     # Set up PyNN
     p.setup(1.0)
 

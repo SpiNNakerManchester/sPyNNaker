@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 from spinn_utilities.overrides import overrides
 
@@ -25,15 +25,20 @@ from pacman.model.placements import Placement
 from pacman.model.resources import ConstantSDRAM
 
 from spinn_front_end_common.abstract_models import (
-    AbstractHasAssociatedBinary)
-from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification)
+    AbstractGeneratesDataSpecification,
+    AbstractHasAssociatedBinary,
+)
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
+    ProvenanceWriter,
+    ProvidesProvenanceDataFromMachineImpl,
+)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
+    BYTES_PER_WORD,
+    SIMULATION_N_BYTES,
+    SYSTEM_BYTES_REQUIREMENT,
+)
 
 from spynnaker.pyNN.data import SpynnakerDataView
 
@@ -76,8 +81,8 @@ class MachineMunichMotorDevice(
     def __init__(
             self, speed: int, sample_time: int, update_time: int,
             delay_time: int, delta_threshold: int,
-            continue_if_not_different: bool, label: Optional[str] = None,
-            app_vertex: Optional[ApplicationVertex] = None):
+            continue_if_not_different: bool, label: str | None = None,
+            app_vertex: ApplicationVertex | None = None):
         """
         :param speed:
         :param sample_time:

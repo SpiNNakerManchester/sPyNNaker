@@ -13,10 +13,14 @@
 # limitations under the License.
 from numpy import floating
 from numpy.typing import NDArray
+
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+
 from spinn_front_end_common.interface.ds import DataSpecificationBase
+
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractHasParameterNames)
+    AbstractHasParameterNames,
+)
 
 
 class AbstractWeightDependence(
