@@ -55,7 +55,7 @@ class _SpynnakerDataModel:
         "_populations",
         "_projections")
 
-    def __new__(cls) -> _SpynnakerDataModel:
+    def __new__(cls) -> _SpynnakerDataModel:  # NOQA: PYI034
         if cls.__singleton is not None:
             return cls.__singleton
         obj = object.__new__(cls)

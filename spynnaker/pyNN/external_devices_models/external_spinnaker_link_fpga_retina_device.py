@@ -67,13 +67,7 @@ def get_spike_value_from_fpga_retina(key: int, mode: int) -> int | None:
     :param mode:
     :returns: Spike value if mode is expected otherwise None.
     """
-    if mode == 128:
-        return (key >> 14) & 0x1
-    elif mode == 64:
-        return (key >> 14) & 0x1
-    elif mode == 32:
-        return (key >> 14) & 0x1
-    elif mode == 16:
+    if mode == 128 or mode == 64 or mode == 32 or mode == 16:
         return (key >> 14) & 0x1
     return None
 

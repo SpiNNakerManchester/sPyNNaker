@@ -25,6 +25,7 @@ from typing import (
 
 import numpy
 from pyNN import descriptions
+from typing_extensions import Self
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.classproperty import classproperty
@@ -53,7 +54,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     _model_created = False
 
     # Using new as most super classes do not call the init
-    def __new__(cls, *args: Any, **kwargs: Any) -> AbstractPyNNModel:
+    def __new__(cls, *args: Any, **kwargs: Any) -> Self:
         _ = (args, kwargs)
         AbstractPyNNModel._model_created = True
         return super().__new__(cls)

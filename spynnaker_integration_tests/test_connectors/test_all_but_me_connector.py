@@ -79,10 +79,11 @@ class TestAllButMeConnector(BaseTestCase):
         synapse_type = 0
         synapse_info = proj._synapse_information
         offline_conns = sorted(
-            list([i, j] for (i, j, _w, _d, _typ) in conn.create_synaptic_block(
-                post_slices, post_vertex_slice, synapse_type, synapse_info)))
+            [i, j] for (i, j, _w, _d, _typ) in conn.create_synaptic_block(
+                post_slices, post_vertex_slice, synapse_type, synapse_info))
         sim.end()
-        groups = list([i, j] for (i, j) in permutations(range(11), 2))
+        groups = list(  # NOQA: C400
+            [i, j] for (i, j) in permutations(range(11), 2))
         print(conns)
         print(groups)
         print(offline_conns)
@@ -105,7 +106,7 @@ class TestAllButMeConnector(BaseTestCase):
         sim.run(0)
         conns = list(proj.get(["weight"], format="list"))
         sim.end()
-        groups = list(
+        groups = list(  # NOQA: C400
             [i, j, w] for ((i, j), w) in
             zip(permutations(range(11), 2), weights))
         print(conns)

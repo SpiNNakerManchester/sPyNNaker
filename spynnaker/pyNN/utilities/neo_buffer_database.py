@@ -584,7 +584,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     spike_times.append(record_time[time_indice])
         else:
             indices = neurons[local_indices]
-            times = record_time[time_indices].reshape((-1))
+            times = record_time[time_indices].reshape(-1)
             spike_ids.extend(indices)
             spike_times.extend(times)
 
@@ -1414,7 +1414,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     FROM region_metadata NATURAL JOIN recording_view
                     WHERE label = ? AND variable = ?
                     """, (pop_label, variable)):
-                region_ids.append(int((row["region_id"])))
+                region_ids.append(int(row["region_id"]))
 
         for region_id in region_ids:
             self._clear_recording_region(region_id)

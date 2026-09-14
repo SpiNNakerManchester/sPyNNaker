@@ -121,7 +121,7 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         pair_list = (
             csa.cross(
                 range(synapse_info.n_pre_neurons),
-                list(int(x) for x in post_vertex_slice.get_raster_ids()))
+                (int(x) for x in post_vertex_slice.get_raster_ids()))
             * self.__full_cset)
 
         if self.verbose:

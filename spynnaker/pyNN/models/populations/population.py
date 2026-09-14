@@ -86,7 +86,7 @@ class Population(PopulationBase):
         "__vertex")
 
     def __init__(
-            self, size: int | float | None, cellclass: _CellTypeArg,
+            self, size: float | None, cellclass: _CellTypeArg,
             cellparams: _ParamDict | None = None,
             structure: BaseStructure | None = None,
             initial_values: dict[str, float] | None = None,
@@ -800,7 +800,7 @@ class Population(PopulationBase):
 
     @staticmethod
     def __roundsize(
-            size: int | float | None,
+            size: float | None,
             label: str | None) -> int | None:
         # External device population can have a size of None so accept for now
         if size is None or isinstance(size, int):
