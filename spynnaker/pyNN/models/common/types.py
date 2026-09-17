@@ -17,6 +17,8 @@ from typing import TypeAlias
 import numpy
 from numpy.typing import NDArray
 
+from spinn_utilities.ranged import RangedList
+
 from spynnaker.pyNN.random_distribution import RandomDistribution
 
 #: Type of names of parameters and state variables.
@@ -31,6 +33,8 @@ Values: TypeAlias = (float | Sequence[float] | NDArray[numpy.floating] |
 Spikes: TypeAlias = (
     # Can be floating point values (will round)
     Values |
+    # Can be a ranged list of floats (will round)
+    RangedList[float] |
     # Can be integer values, or lists of such
     int | Sequence[int] | Sequence[Sequence[int]] | NDArray[numpy.integer]
     )
