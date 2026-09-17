@@ -108,8 +108,7 @@ class SpikeSourceArrayVertex(
         "__model",
         "__model_name",
         "__n_colour_bits",
-        "__structure",
-        "__n_colour_bits")
+        "__structure")
 
     #: ID of the recording region used for recording transmitted spikes.
     SPIKE_RECORDING_REGION_ID = 0
