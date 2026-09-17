@@ -16,10 +16,14 @@ from .abstract_threshold_type import AbstractThresholdType
 from .threshold_type_fixed_prob import ThresholdTypeFixedProb
 from .threshold_type_maass_stochastic import ThresholdTypeMaassStochastic
 from .threshold_type_static import ThresholdTypeStatic
+from .threshold_type_adaptive import ThresholdTypeAdaptive
+from .threshold_type_none import ThresholdTypeNone
 
 __all__ = [
            "AbstractThresholdType",
            "ThresholdTypeFixedProb",
            "ThresholdTypeMaassStochastic",
            "ThresholdTypeStatic",
+           "ThresholdTypeAdaptive",
+           "ThresholdTypeNone",
 ]

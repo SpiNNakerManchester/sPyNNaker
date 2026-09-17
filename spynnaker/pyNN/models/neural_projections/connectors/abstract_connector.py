@@ -172,6 +172,8 @@ class AbstractConnector(metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(delays, d=d))
         elif is_scalar(delays):
             return delays
+        elif hasattr(delays, "__getitem__"):
+            return numpy.max(delays)
         raise self.delay_type_exception(delays)
 
     @abstractmethod
@@ -207,6 +209,8 @@ class AbstractConnector(metaclass=AbstractBase):
             return numpy.var(_expr_context.eval(delays, d=d))
         elif is_scalar(delays):
             return 0.0
+        elif hasattr(delays, "__getitem__"):
+            return numpy.var(delays)
         raise self.delay_type_exception(delays)
 
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
@@ -298,6 +302,8 @@ class AbstractConnector(metaclass=AbstractBase):
             return numpy.mean(_expr_context.eval(weights, d=d))
         elif is_scalar(weights):
             return abs(weights)
+        elif hasattr(weights, "__getitem__"):
+            return numpy.mean(weights)
         raise self.weight_type_exception(synapse_info)
 
     def _get_weight_maximum(
@@ -327,6 +333,8 @@ class AbstractConnector(metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(weights, d=d))
         elif is_scalar(weights):
             return abs(weights)
+        elif hasattr(weights, "__getitem__"):
+            return numpy.amax(numpy.abs(weights))
         raise self.weight_type_exception(weights)
 
     @abstractmethod
@@ -351,6 +359,8 @@ class AbstractConnector(metaclass=AbstractBase):
             return numpy.var(_expr_context.eval(weights, d=d))
         elif is_scalar(weights):
             return 0.0
+        elif hasattr(weights, "__getitem__"):
+            return numpy.var(weights)
         raise self.weight_type_exception(weights)
 
     def _expand_distances(self, d_expression: str) -> bool:
@@ -492,6 +502,8 @@ class AbstractConnector(metaclass=AbstractBase):
             return values(d)
         elif is_scalar(values):
             return numpy.repeat([values], n_connections).astype(float64)
+        elif hasattr(values, "__getitem__"):
+            return numpy.array(values).astype(float64)
         if weights:
             raise self.weight_type_exception(values)
         else:
@@ -510,12 +522,7 @@ class AbstractConnector(metaclass=AbstractBase):
         if self.__safe:
             if not weights.size:
                 warn_once(logger, "No connection in " + str(self))
-            elif numpy.amin(weights) < 0 < numpy.amax(weights):
-                raise SpynnakerException(
-                    "Weights must be either all positive or all negative in "
-                    f"projection {synapse_info.pre_population.label}->"
-                    f"{synapse_info.post_population.label}")
-        return numpy.abs(weights)
+        return weights
 
     def _clip_delays(self, delays: NDArray[float64]) -> NDArray[float64]:
         """

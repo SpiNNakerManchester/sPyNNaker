@@ -63,6 +63,12 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsWeightChanger as WeightChanger,
 )
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependenceEpropReg)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceEprop)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    EPropAdaptive, SinusoidReadout, LeftRightReadout)
 
 # Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
@@ -73,6 +79,9 @@ __all__ = [  # noqa: RUF022
     'Izhikevich_cond', 'IF_curr_dual_exp', 'IF_curr_exp_sEMD',
     'Izhikevich_cond_dual', 'IFCurrDeltaCa2Adaptive',
 
+    # Eprop implementation and related models (Adam Perrett/Oliver Rhodes)
+    'EPropAdaptive', 'SinusoidReadout', 'LeftRightReadout',
+
     # Neuromodulation synapse dynamics (Mantas Mikaitis)
     'Neuromodulation',
 
@@ -81,6 +90,9 @@ __all__ = [  # noqa: RUF022
     'PfisterSpikeTriplet',
     'SpikeNearestPairRule',
     'RecurrentRule', 'Vogels2011Rule',
+    # eprop plastic stuff
+    'TimingDependenceEprop',
+    'WeightDependenceEpropReg',
 
     # Variable rate Poisson
     'SpikeSourcePoissonVariable',

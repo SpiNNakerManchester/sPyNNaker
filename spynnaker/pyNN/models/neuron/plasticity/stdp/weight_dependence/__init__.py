@@ -17,6 +17,7 @@ from .abstract_weight_dependence import AbstractWeightDependence
 from .weight_dependence_additive import WeightDependenceAdditive
 from .weight_dependence_additive_triplet import WeightDependenceAdditiveTriplet
 from .weight_dependence_multiplicative import WeightDependenceMultiplicative
+from .weight_dependence_eprop_reg import WeightDependenceEpropReg
 
 __all__ = [
            "AbstractHasAPlusAMinus",
@@ -24,4 +25,4 @@ __all__ = [
            "WeightDependenceAdditive",
            "WeightDependenceAdditiveTriplet",
            "WeightDependenceMultiplicative",
-]
+           "WeightDependenceEpropReg"]

@@ -150,6 +150,8 @@ void resume_callback(void) {
 static inline void process_ring_buffers(void) {
     uint32_t first_index = synapse_row_get_first_ring_buffer_index(
             time, synapse_type_index_bits, synapse_delay_mask);
+//	log_info("process_ring_buffers, synapse_delay_mask is %u first_index %u ring_buffer %d",
+//			synapse_delay_mask, first_index, ring_buffers[first_index]);
     neuron_transfer(&ring_buffers[first_index]);
 
     // Print the neuron inputs.

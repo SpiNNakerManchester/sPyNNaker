@@ -310,7 +310,7 @@ static void neuron_impl_do_timestep_update(
             state_t result = neuron_model_state_update(
                     NUM_EXCITATORY_RECEPTORS, exc_input_values,
                     NUM_INHIBITORY_RECEPTORS, inh_input_values,
-                    external_bias, current_offset, this_neuron);
+                    external_bias, current_offset, this_neuron, 0.0k);
 
             // determine if a spike should occur
             bool spike_now =

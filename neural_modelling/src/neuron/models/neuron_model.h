@@ -65,14 +65,15 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 //!     terms of stimulation.
 //! \param[in] external_bias: This is the intrinsic plasticity which could be
 //!     used for ac, noisy input etc etc. (general purpose input)
-//! \param[in,out] neuron: the pointer to a neuron parameter struct which
-//!     contains all the parameters for a specific neuron
-//! \return the value to be compared with a threshold value to determine if the
-//!     neuron has spiked
+//! \param[in] neuron the pointer to a neuron parameter struct which contains
+//!     all the parameters for a specific neuron
+//! \return state_t which is the value to be compared with a threshold value
+//!     to determine if the neuron has spiked
 static state_t neuron_model_state_update(
-        uint16_t num_excitatory_inputs, const input_t *exc_input,
-        uint16_t num_inhibitory_inputs, const input_t *inh_input,
-        input_t external_bias, REAL current_offset, neuron_t *restrict neuron);
+        uint16_t num_excitatory_inputs, const input_t* exc_input,
+        uint16_t num_inhibitory_inputs, const input_t* inh_input,
+        input_t external_bias, REAL current_offset, neuron_t *restrict neuron,
+		REAL B_t);
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief Indicates that the neuron has spiked

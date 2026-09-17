@@ -22,6 +22,7 @@ from .timing_dependence_spike_nearest_pair import (
 )
 from .timing_dependence_spike_pair import TimingDependenceSpikePair
 from .timing_dependence_vogels_2011 import TimingDependenceVogels2011
+from .timing_dependence_eprop import TimingDependenceEprop
 
 __all__ = [
     "AbstractTimingDependence",
@@ -29,5 +30,6 @@ __all__ = [
     "TimingDependenceRecurrent",
     "TimingDependenceSpikeNearestPair",
     "TimingDependenceSpikePair",
-    "TimingDependenceVogels2011"
+    "TimingDependenceVogels2011",
+    "TimingDependenceEprop"
 ]

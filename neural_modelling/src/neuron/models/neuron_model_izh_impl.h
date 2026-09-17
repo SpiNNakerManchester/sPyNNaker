@@ -65,6 +65,11 @@ struct neuron_t {
     REAL reset_h;
 };
 
+// Mark a value as possibly unused while not using any instructions, guaranteed
+#ifndef __use
+#define __use(x)    do { (void) (x); } while (0)
+#endif
+
 static inline void neuron_model_initialise(neuron_t *state, neuron_params_t *params,
 		uint32_t n_steps_per_timestep) {
 	state->A = params->A;
@@ -166,7 +171,10 @@ static inline void rk2_kernel_midpoint(
 static inline state_t neuron_model_state_update(
         uint16_t num_excitatory_inputs, const input_t *exc_input,
         uint16_t num_inhibitory_inputs, const input_t *inh_input,
-        input_t external_bias, REAL current_offset, neuron_t *restrict neuron) {
+        input_t external_bias, REAL current_offset, neuron_t *restrict neuron,
+		REAL B_t) {
+	__use(B_t);
+
     REAL total_exc = ZERO;
     REAL total_inh = ZERO;
 

@@ -41,6 +41,9 @@ from .izk_curr_exp_base import IzkCurrExpBase
 from .stoc_exp import StocExp
 from .stoc_exp_stable import StocExpStable
 from .stoc_sigma import StocSigma
+from .eprop_adaptive import EPropAdaptive
+from .sinusoid_readout import SinusoidReadout
+from .left_right_readout import LeftRightReadout
 
 __all__ = [
            "EIFConductanceAlphaPopulation",
@@ -64,4 +67,7 @@ __all__ = [
            "StocExp",
            "StocExpStable",
            "StocSigma",
+           "EPropAdaptive", 
+           "SinusoidReadout", 
+           "LeftRightReadout",
 ]

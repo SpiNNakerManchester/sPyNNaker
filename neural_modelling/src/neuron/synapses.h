@@ -47,7 +47,6 @@ extern uint32_t synapse_type_mask;
 extern uint32_t synapse_delay_bits;
 //! Mask to pick out the delay
 extern uint32_t synapse_delay_mask;
-
 //! Count of the number of times the synapses have saturated their weights.
 extern uint32_t synapses_saturation_count;
 

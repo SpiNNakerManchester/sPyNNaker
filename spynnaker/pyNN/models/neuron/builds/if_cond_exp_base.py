@@ -21,6 +21,7 @@ from spynnaker.pyNN.models.neuron.neuron_models import (
 )
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 
 
 class IFCondExpBase(AbstractPyNNNeuronModelStandard):
