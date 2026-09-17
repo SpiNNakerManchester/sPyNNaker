@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from spynnaker.pyNN.models.defaults import default_parameters
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
@@ -32,7 +31,7 @@ class StocExpStable(AbstractPyNNNeuronModel):
             self, v_init: ModelParameter = 0, v_reset: ModelParameter = 0,
             tau: ModelParameter = 0.1, tau_refrac: ModelParameter = 1,
             bias: ModelParameter = 0, refract_init: ModelParameter = 0,
-            seed: Optional[int] = None):
+            seed: int | None = None):
         """
         :param v_init: :math:`V_{init}`
         :param v_reset: :math:`V_{reset}`

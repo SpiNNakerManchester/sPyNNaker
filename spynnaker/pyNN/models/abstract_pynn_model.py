@@ -15,19 +15,17 @@ from __future__ import annotations
 
 import sys
 from collections import defaultdict
+from collections.abc import Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
+    ClassVar,
     cast,
 )
 
 import numpy
 from pyNN import descriptions
+from typing_extensions import Self
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.classproperty import classproperty
@@ -50,16 +48,16 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     __slots__ = ()
 
     # The maximum number of atoms per core for PyNN models
-    _max_atoms_per_core: Dict[type, Optional[Tuple[int, ...]]] = defaultdict(
-        lambda: None)
+    _max_atoms_per_core: ClassVar[dict[type, tuple[int, ...] | None]] = (
+        defaultdict(lambda: None))
 
     _model_created = False
 
     # Using new as most super classes do not call the init
-    def __new__(cls, *args: Any, **kwargs: Any) -> "AbstractPyNNModel":
+    def __new__(cls, *args: Any, **kwargs: Any) -> Self:
         _ = (args, kwargs)
         AbstractPyNNModel._model_created = True
-        return super(AbstractPyNNModel, cls).__new__(cls)
+        return super().__new__(cls)
 
     @classmethod
     def verify_may_set(cls, param: str) -> None:
@@ -87,7 +85,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
 
     @classmethod
     def set_model_max_atoms_per_dimension_per_core(
-            cls, n_atoms: Union[None, int, Tuple[int, ...]] = None) -> None:
+            cls, n_atoms: None | int | tuple[int, ...] = None) -> None:
         """
         Set the default maximum number of atoms per dimension per core for
         this model.  This can be overridden by the individual Population.
@@ -117,12 +115,12 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
                 raise SpynnakerException(
                     "The absolute maximum sum of neurons per core for this"
                     f" model is {abs_max}")
-            max_atoms_tuple: Tuple[int, ...] = cast(
-                Tuple[int, ...],  n_atoms)
+            max_atoms_tuple: tuple[int, ...] = cast(
+                tuple[int, ...],  n_atoms)
             AbstractPyNNModel._max_atoms_per_core[cls] = max_atoms_tuple
 
     @classmethod
-    def get_model_max_atoms_per_dimension_per_core(cls) -> Tuple[int, ...]:
+    def get_model_max_atoms_per_dimension_per_core(cls) -> tuple[int, ...]:
         """
         :returns:
             The maximum number of atoms per dimension per core for this model.
@@ -174,10 +172,10 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     #: The default values for the parameters at the population level.
     #: These are parameters that can be passed in to the Population
     #: constructor in addition to the standard PyNN options.
-    default_population_parameters: Dict[str, Any] = {}
+    default_population_parameters: dict[str, Any] = {}  # NOQA RUF102
 
     @classmethod
-    def _get_default_population_parameters(cls) -> Dict[str, Any]:
+    def _get_default_population_parameters(cls) -> dict[str, Any]:
         """
         Get the default population parameters.
         Slightly contorted to allow for overriding class variables.
@@ -203,7 +201,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
         """
         return self.__class__.__name__
 
-    def describe(self, template: Optional[str] = 'modeltype_default.txt',
+    def describe(self, template: str | None = 'modeltype_default.txt',
                  engine: str = 'default') -> str:
         """
         Returns a human-readable description of the population.

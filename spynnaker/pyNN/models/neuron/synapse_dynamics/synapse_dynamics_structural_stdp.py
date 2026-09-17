@@ -13,14 +13,9 @@
 # limitations under the License.
 from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 from typing import (
     TYPE_CHECKING,
-    Dict,
-    Iterable,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
 )
 
 import numpy
@@ -95,32 +90,33 @@ class SynapseDynamicsStructuralSTDP(
     Written by Petrut Bogdan.
     """
     __slots__ = (
+        # Holds initial connectivity as defined via connector
+        "__connections",
+        # The elimination rule
+        "__elimination",
         # Frequency of rewiring (Hz)
         "__f_rew",
-        # Initial weight assigned to a newly formed connection
-        "__initial_weight",
+        # The formation rule
+        "__formation",
         # Delay assigned to a newly formed connection
         "__initial_delay",
+        # Initial weight assigned to a newly formed connection
+        "__initial_weight",
+        # The partner selection rule
+        "__partner_selection",
+        # The RNG used with the seed that is passed in
+        "__rng",
         # Maximum fan-in per target layer neuron
         "__s_max",
         # The seed
         "__seed",
-        # Holds initial connectivity as defined via connector
-        "__connections",
+        # Shared RNG seed to be written on all cores
+        "__seeds",
         # The actual type of weights: static through the simulation or those
         # that can be change through STDP
         "__weight_dynamics",
-        # Shared RNG seed to be written on all cores
-        "__seeds",
-        # The RNG used with the seed that is passed in
-        "__rng",
-        # The partner selection rule
-        "__partner_selection",
-        # The formation rule
-        "__formation",
-        # The elimination rule
-        "__elimination",
-        "__with_replacement")
+        "__with_replacement",
+    )
 
     def __init__(
             self, partner_selection: AbstractPartnerSelection,
@@ -133,7 +129,7 @@ class SynapseDynamicsStructuralSTDP(
             initial_weight: float = DEFAULT_INITIAL_WEIGHT,
             initial_delay: InitialDelay = DEFAULT_INITIAL_DELAY,
             s_max: int = DEFAULT_S_MAX,
-            with_replacement: bool = True, seed: Optional[int] = None,
+            with_replacement: bool = True, seed: int | None = None,
             weight: _In_Types = StaticSynapse.default_parameters['weight'],
             delay: _In_Types = None,
             backprop_delay: bool = True):
@@ -179,10 +175,10 @@ class SynapseDynamicsStructuralSTDP(
         self.__s_max = s_max
         self.__with_replacement = with_replacement
         self.__seed = seed
-        self.__connections: ConnectionsInfo = dict()
+        self.__connections: ConnectionsInfo = {}
 
         self.__rng = numpy.random.RandomState(seed)
-        self.__seeds: Dict[object, Tuple[int, ...]] = dict()
+        self.__seeds: dict[object, tuple[int, ...]] = {}
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
     def merge(self, synapse_dynamics: AbstractSynapseDynamics
@@ -219,9 +215,10 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
     @overrides(SynapseDynamicsStructuralCommon.is_same_as)
-    def is_same_as(self, synapse_dynamics: Union[
-            AbstractSynapseDynamics,
-            AbstractSynapseDynamicsStructural]) -> bool:
+    def is_same_as(
+            self,
+            synapse_dynamics: AbstractSynapseDynamics |
+            AbstractSynapseDynamicsStructural) -> bool:
         if not (isinstance(synapse_dynamics, SynapseDynamicsStructuralSTDP)):
             return False
         if not SynapseDynamicsSTDP.is_same_as(self, synapse_dynamics):
@@ -243,7 +240,7 @@ class SynapseDynamicsStructuralSTDP(
         if not isinstance(synapse_info.synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
             return
-        self.__connections = dict()
+        self.__connections = {}
         collector = self.__connections.setdefault(
             (app_edge.post_vertex, post_vertex_slice.lo_atom), [])
         collector.append((connections, app_edge, synapse_info))
@@ -270,7 +267,7 @@ class SynapseDynamicsStructuralSTDP(
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.seed)
-    def seed(self) -> Optional[int]:
+    def seed(self) -> int | None:
         return self.__seed
 
     @property
@@ -327,7 +324,7 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.get_delay_minimum)
     def get_delay_minimum(self, connector: AbstractConnector,
-                          synapse_info: SynapseInformation) -> Optional[float]:
+                          synapse_info: SynapseInformation) -> float | None:
         d_m = super().get_delay_minimum(connector, synapse_info)
         if d_m is None:
             return self.__initial_delay
@@ -341,7 +338,7 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsStructuralCommon._get_seeds)
     def _get_seeds(
-            self, app_vertex: Union[None, ApplicationVertex, Slice] = None
+            self, app_vertex: None | ApplicationVertex | Slice = None
             ) -> Sequence[int]:
         if app_vertex:
             if app_vertex not in self.__seeds:
@@ -361,7 +358,7 @@ class SynapseDynamicsStructuralSTDP(
             self, s_info: SynapseInformation,
             source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
-                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
+                tuple[MachineVertex, Sequence[AbstractVertex]]]:
         # Things change, so assume all connected
         return [(m_vertex, [source_vertex])
                 for m_vertex in target_vertex.splitter.get_in_coming_vertices(

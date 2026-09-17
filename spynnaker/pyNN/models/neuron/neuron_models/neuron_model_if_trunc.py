@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
@@ -44,15 +43,16 @@ class NeuronModelIFTrunc(NeuronModel):
     the membrane voltage ever go below it.
     """
     __slots__ = (
-        "__v_init",
-        "__tau_m",
         "__cm",
         "__i_offset",
+        "__tau_m",
+        "__tau_refrac",
+        "__v_init",
         "__v_reset",
-        "__tau_refrac")
+    )
 
     def __init__(
-            self, v_init: Optional[ModelParameter],
+            self, v_init: ModelParameter | None,
             tau_m: ModelParameter, cm: ModelParameter,
             i_offset: ModelParameter, v_reset: ModelParameter,
             tau_refrac: ModelParameter):

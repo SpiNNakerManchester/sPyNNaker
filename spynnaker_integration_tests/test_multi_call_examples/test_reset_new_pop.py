@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
 
 import pyNN.spiNNaker as sim
 
@@ -30,7 +29,7 @@ simtime = 200
 class TestResetNewInput(BaseTestCase):
 
     def check_data(self, pop: Population, expected_spikes: int, simtime: int,
-                   segments: List[int]) -> None:
+                   segments: list[int]) -> None:
         neo = pop.get_data("all")
         for segment in segments:
             spikes = neo.segments[segment].spiketrains

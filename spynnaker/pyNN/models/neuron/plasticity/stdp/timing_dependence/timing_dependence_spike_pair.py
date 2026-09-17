@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -41,12 +41,13 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
     A basic timing dependence STDP rule.
     """
     __slots__ = (
+        "__a_minus",
+        "__a_plus",
         "__tau_minus",
         "__tau_minus_data",
         "__tau_plus",
         "__tau_plus_data",
-        "__a_plus",
-        "__a_minus")
+    )
     __PARAM_NAMES = ('tau_plus', 'tau_minus')
 
     def __init__(

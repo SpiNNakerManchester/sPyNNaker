@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Tuple
 
 import numpy
 from numpy import integer, uint32
@@ -21,7 +20,7 @@ from numpy.typing import NDArray
 
 def _calculate_stdp_times(
         pre_spikes: NDArray[integer], post_spikes: NDArray[integer],
-        plastic_delay: int) -> Tuple[NDArray[integer], NDArray[integer]]:
+        plastic_delay: int) -> tuple[NDArray[integer], NDArray[integer]]:
     # If no post spikes, no changes
     if len(post_spikes) == 0:
         return numpy.zeros(0, dtype=uint32), numpy.zeros(0, dtype=uint32)

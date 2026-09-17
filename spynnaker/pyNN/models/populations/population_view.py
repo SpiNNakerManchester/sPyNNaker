@@ -15,18 +15,10 @@ from __future__ import annotations
 
 import logging
 import os
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
     overload,
 )
 
@@ -87,14 +79,15 @@ class PopulationView(PopulationBase):
         "__mask",
         "__parent",
         "__population",
+        "__recorder",
         "__vertex",
-        "__recorder")
+    )
 
     __realslots__ = frozenset("_PopulationView" + item for item in __slots__)
 
     def __init__(
-            self, parent: Union[Population, 'PopulationView'],
-            selector: Selector, label: Optional[str] = None):
+            self, parent: Population | PopulationView,
+            selector: Selector, label: str | None = None):
         """
         :param parent: the population or view to make the view from
         :param selector: a slice or numpy mask array.
@@ -126,7 +119,7 @@ class PopulationView(PopulationBase):
         if label is None:
             label = f"{parent.label}:{selector}"
         self.__label = label
-        self.__annotations: Dict[str, Any] = dict()
+        self.__annotations: dict[str, Any] = {}
 
         # Get these two objects to make access easier
         # pylint: disable=protected-access
@@ -184,7 +177,7 @@ class PopulationView(PopulationBase):
             self.__vertex.get_state_variables(), self.__indexes)
 
     @property
-    def parent(self) -> Union[Population, 'PopulationView']:
+    def parent(self) -> Population | PopulationView:
         """
         A reference to the parent Population (that this is a view of).
         """
@@ -199,7 +192,7 @@ class PopulationView(PopulationBase):
 
     @property
     @overrides(PopulationBase.all_cells)
-    def all_cells(self) -> Sequence['IDMixin']:
+    def all_cells(self) -> Sequence[IDMixin]:
         """
         An array containing the cell IDs of all neurons in the
         Population (all MPI nodes).
@@ -207,22 +200,20 @@ class PopulationView(PopulationBase):
         return [IDMixin(self.__population, idx) for idx in self.__indexes]
 
     @property
-    def _indexes(self) -> Tuple[int, ...]:
+    def _indexes(self) -> tuple[int, ...]:
         return tuple(self.__indexes)
 
     @overload
-    def __getitem__(self, index: int) -> 'IDMixin':
+    def __getitem__(self, index: int) -> IDMixin:
         ...
 
     @overload
-    def __getitem__(self, index: Union[
-            None, slice, List[int], List[bool], NDArray[bool_],
-            NDArray[integer]]) -> 'PopulationView':
+    def __getitem__(self, index: None | slice | list[int] | list[bool] |
+                    NDArray[bool_] | NDArray[integer]) -> PopulationView:
         ...
 
-    def __getitem__(self, index: Union[
-            None, int, slice, List[int], List[bool], NDArray[bool_],
-            NDArray[integer]]) -> 'PopulationView':
+    def __getitem__(self, index: None | int | slice | list[int] | list[bool] |
+                    NDArray[bool_] | NDArray[integer]) -> PopulationView:
         """
         Return either a single cell (ID object) from the Population,
         if index is an integer, or a subset of the cells
@@ -238,7 +229,7 @@ class PopulationView(PopulationBase):
             return IDMixin(self.__population, index)
         return PopulationView(self, index, label=self.label + "_" + str(index))
 
-    def __iter__(self) -> Iterator['IDMixin']:
+    def __iter__(self) -> Iterator[IDMixin]:
         """
         Iterator over cell IDs (on the local node).
         """
@@ -358,7 +349,7 @@ class PopulationView(PopulationBase):
     def get_data(
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
-            annotations: Optional[Dict[str, Any]] = None) -> neo.Block:
+            annotations: dict[str, Any] | None = None) -> neo.Block:
         """
         Return a Neo Block containing the data(spikes, state variables)
         recorded from the Population.
@@ -404,7 +395,7 @@ class PopulationView(PopulationBase):
             variable, as_matrix, self.__indexes)
 
     @overrides(PopulationBase.get_spike_counts)
-    def get_spike_counts(self, gather: bool = True) -> Dict[int, int]:
+    def get_spike_counts(self, gather: bool = True) -> dict[int, int]:
         self._check_params(gather)
         with NeoBufferDatabase() as db:
             return db.get_spike_counts(
@@ -428,12 +419,12 @@ class PopulationView(PopulationBase):
     @overload
     def id_to_index(
             self, id: Iterable[int]  # pylint: disable=redefined-builtin
-            ) -> List[int]:
+            ) -> list[int]:
         ...
 
     def id_to_index(
-            self, id: Union[int, Iterable[int]]) -> \
-            Union[int, List[int]]:  # pylint: disable=redefined-builtin
+            self, id: int | Iterable[int]) -> \
+            int | list[int]:  # pylint: disable=redefined-builtin
         """
         Given the ID(s) of cell(s) in the PopulationView, return its /
         their index / indices(order in the PopulationView).
@@ -447,7 +438,7 @@ class PopulationView(PopulationBase):
             return self.__indexes.index(id)
         return [self.__indexes.index(idx) for idx in id]
 
-    def index_in_grandparent(self, indices: Iterable[int]) -> List[int]:
+    def index_in_grandparent(self, indices: Iterable[int]) -> list[int]:
         """
         Given an array of indices, return the indices in the parent
         population at the root of the tree.
@@ -512,17 +503,17 @@ class PopulationView(PopulationBase):
 
     @overrides(PopulationBase.record)
     def record(self, variables: Names, to_file: IoDest = None,
-               sampling_interval: Optional[float] = None) -> None:
+               sampling_interval: float | None = None) -> None:
         self.__recorder.record(
             variables, to_file, sampling_interval, self.__indexes)
 
     @property
     @overrides(PopulationBase.structure)
-    def structure(self) -> Optional[BaseStructure]:
+    def structure(self) -> BaseStructure | None:
         raise NotImplementedError("Not implemented for views")
 
     def sample(
-            self, n: int, rng: Optional[NumpyRNG] = None) -> 'PopulationView':
+            self, n: int, rng: NumpyRNG | None = None) -> PopulationView:
         """
         Randomly sample `n` cells from the Population view, and return a
         new PopulationView object.
@@ -568,10 +559,10 @@ class PopulationView(PopulationBase):
                 parameter, value, self.__indexes)
 
     @overrides(PopulationBase.write_data)
-    def write_data(self, io: Union[str, neo.baseio.BaseIO],
+    def write_data(self, io: str | neo.baseio.BaseIO,
                    variables: Names = 'all',
                    gather: bool = True, clear: bool = False,
-                   annotations: Optional[Dict[str, Any]] = None) -> None:
+                   annotations: dict[str, Any] | None = None) -> None:
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
                            "as if gather was set to True.")
@@ -602,7 +593,7 @@ class PopulationView(PopulationBase):
 
     @property
     @overrides(PopulationBase._view_range)
-    def _view_range(self) -> Tuple[int, int]:
+    def _view_range(self) -> tuple[int, int]:
         indices = self.__indexes
         return indices[0], indices[-1]
 
@@ -614,7 +605,7 @@ class PopulationView(PopulationBase):
             return True
         return tuple(self.__indexes) == tuple(cont)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, PopulationView):
             return False
         return (self.__vertex == other._vertex and
@@ -715,5 +706,5 @@ class IDMixin(PopulationView):
 
     @property
     @overrides(PopulationBase.structure)
-    def structure(self) -> Optional[BaseStructure]:
+    def structure(self) -> BaseStructure | None:
         raise NotImplementedError("Not implemented for IDMixin")

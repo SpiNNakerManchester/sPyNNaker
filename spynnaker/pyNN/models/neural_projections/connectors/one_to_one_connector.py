@@ -14,7 +14,8 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any
 
 import numpy
 from numpy import floating, integer, uint32
@@ -60,7 +61,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     __slots__ = ()
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         return self._get_parameters()
 
     @overrides(AbstractConnector.get_delay_maximum)
@@ -80,8 +81,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         delays = synapse_info.delays
 
         if min_delay is None or max_delay is None or delays is None:
@@ -183,7 +184,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     def get_connected_vertices(
             self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
-                Tuple[MachineVertex, Sequence[MachineVertex]]]:
+                tuple[MachineVertex, Sequence[MachineVertex]]]:
         src_vtxs = source_vertex.splitter.get_out_going_vertices(
             s_info.partition_id)
         tgt_vtxs = target_vertex.splitter.get_in_coming_vertices(
@@ -267,4 +268,4 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
                     post.get_max_atoms_per_dimension_per_core()):
                 print("Not generating on core!")
                 return False
-        return super(OneToOneConnector, self).generate_on_machine(synapse_info)
+        return super().generate_on_machine(synapse_info)

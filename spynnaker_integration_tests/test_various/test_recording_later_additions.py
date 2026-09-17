@@ -163,7 +163,7 @@ class TestRecordingLaterAdditions(BaseTestCase):
         try:
             if os.path.exists(file):
                 os.remove(file)
-        except Exception:
+        except FileNotFoundError:
             pass
 
     def test_later_additions(self) -> None:

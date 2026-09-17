@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ctypes
+from collections.abc import Sequence
 from enum import IntEnum
-from typing import List, Optional, Sequence
+from typing import ClassVar, Final
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -54,7 +55,7 @@ class SpikeProcessingProvenance(ctypes.LittleEndianStructure):
     """
     The provenance from spike processing.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # A count of the times that the synaptic input circular buffers
         # overflowed
         ("n_buffer_overflows", ctypes.c_uint32),
@@ -77,7 +78,7 @@ class MainProvenance(ctypes.LittleEndianStructure):
     """
     Provenance items from synapse processing.
     """
-    _fields_ = [
+    _fields_: ClassVar = [
         # the maximum number of background tasks queued
         ("max_background_queued", ctypes.c_uint32),
         # the number of times the background queue overloaded
@@ -98,16 +99,17 @@ class PopulationMachineVertex(
     """
 
     __slots__ = (
-        "__synaptic_matrices",
-        "__neuron_data",
         "__key",
-        "__ring_buffer_shifts",
-        "__weight_scales",
-        "__structural_sz",
-        "__slice_index",
         "__max_atoms_per_core",
+        "__neuron_data",
         "__regenerate_neuron_data",
-        "__regenerate_synapse_data")
+        "__regenerate_synapse_data",
+        "__ring_buffer_shifts",
+        "__slice_index",
+        "__structural_sz",
+        "__synaptic_matrices",
+        "__weight_scales",
+    )
 
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
     DMA_COMPLETE = "DMA's that were completed"
@@ -166,7 +168,7 @@ class PopulationMachineVertex(
         REGIONS.BIT_FIELD_FILTER,
         REGIONS.CONNECTOR_BUILDER)
 
-    _PROFILE_TAG_LABELS = {
+    _PROFILE_TAG_LABELS: Final = {
         0: "TIMER",
         1: "DMA_READ",
         2: "INCOMING_SPIKE",
@@ -204,7 +206,7 @@ class PopulationMachineVertex(
             NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS +
             SpikeProcessingProvenance.N_ITEMS + MainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, app_vertex.combined_binary_file_name)
-        self.__key: Optional[int] = None
+        self.__key: int | None = None
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
@@ -302,7 +304,7 @@ class PopulationMachineVertex(
                     " the .spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
-    def get_recorded_region_ids(self) -> List[int]:
+    def get_recorded_region_ids(self) -> list[int]:
         ids = self._pop_vertex.neuron_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         ids.extend(self._pop_vertex.synapse_recorder.recorded_ids_by_slice(

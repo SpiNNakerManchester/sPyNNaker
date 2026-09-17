@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from decimal import Decimal
-from typing import Optional
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
@@ -41,8 +40,8 @@ class PushBotEthernetDevice(
     def __init__(
             self, protocol: MunichIoSpiNNakerLinkProtocol,
             device: AbstractPushBotOutputDevice,
-            uses_payload: bool, time_between_send: Optional[int],
-            first_send_timestep: Optional[int] = _DEFAULT_FIRST_SEND_TIMESTEP):
+            uses_payload: bool, time_between_send: int | None,
+            first_send_timestep: int | None = _DEFAULT_FIRST_SEND_TIMESTEP):
         """
         :param protocol:
             The protocol instance to get commands from
@@ -89,7 +88,7 @@ class PushBotEthernetDevice(
     @property
     @overrides(AbstractMulticastControllableDevice
                .device_control_timesteps_between_sending)
-    def device_control_timesteps_between_sending(self) -> Optional[int]:
+    def device_control_timesteps_between_sending(self) -> int | None:
         return self.__time_between_send
 
     @property
@@ -101,7 +100,7 @@ class PushBotEthernetDevice(
     @property
     @overrides(AbstractMulticastControllableDevice
                .device_control_first_send_timestep)
-    def device_control_first_send_timestep(self) -> Optional[int]:
+    def device_control_first_send_timestep(self) -> int | None:
         return self.__first_send_timestep
 
     @property

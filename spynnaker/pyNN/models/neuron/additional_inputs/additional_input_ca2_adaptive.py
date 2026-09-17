@@ -34,9 +34,10 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
     The additional model parameters for a leaky integrate and fire model.
     """
     __slots__ = (
-        "__tau_ca2",
+        "__i_alpha",
         "__i_ca2",
-        "__i_alpha")
+        "__tau_ca2",
+    )
 
     def __init__(self, tau_ca2: ModelParameter, i_ca2: ModelParameter,
                  i_alpha: ModelParameter):

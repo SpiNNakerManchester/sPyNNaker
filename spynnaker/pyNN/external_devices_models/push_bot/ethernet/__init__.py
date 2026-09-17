@@ -25,8 +25,15 @@ from .push_bot_wifi_connection import (
     get_pushbot_wifi_connection,
 )
 
-__all__ = ["PushBotEthernetDevice", "PushBotEthernetLaserDevice",
-           "PushBotEthernetLEDDevice", "PushBotEthernetMotorDevice",
-           "PushBotEthernetRetinaDevice", "PushBotEthernetSpeakerDevice",
-           "PushBotRetinaConnection", "PushBotTranslator",
-           "get_pushbot_wifi_connection", "PushBotWIFIConnection"]
+__all__ = [
+    "PushBotEthernetDevice",
+    "PushBotEthernetLEDDevice",
+    "PushBotEthernetLaserDevice",
+    "PushBotEthernetMotorDevice",
+    "PushBotEthernetRetinaDevice",
+    "PushBotEthernetSpeakerDevice",
+    "PushBotRetinaConnection",
+    "PushBotTranslator",
+    "PushBotWIFIConnection",
+    "get_pushbot_wifi_connection",
+]

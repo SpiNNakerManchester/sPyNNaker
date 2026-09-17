@@ -13,16 +13,12 @@
 # limitations under the License.
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
     Final,
-    List,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
+    TypeAlias,
 )
 
 import numpy
@@ -30,7 +26,6 @@ from numpy import floating, integer, ndarray, uint32
 from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
 from pyNN.space import Space
-from typing_extensions import TypeAlias
 
 from spinn_utilities.overrides import overrides
 
@@ -62,9 +57,9 @@ if TYPE_CHECKING:
     )
 
 
-_TWOD: Final['TypeAlias'] = Union[List[int], Tuple[int, int]]
-_KERNAL: Final['TypeAlias'] = Union[
-    float, int, List[float], NDArray[numpy.floating], RandomDistribution]
+_TWOD: Final[TypeAlias] = list[int] | tuple[int, int]
+_KERNAL: Final[TypeAlias] = (float | list[float] |
+                             NDArray[numpy.floating] | RandomDistribution)
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 9
@@ -77,7 +72,7 @@ class ConvolutionKernel(ndarray):
 
 
 def shape2word(
-        short1: Union[int, integer], short2: Union[int, integer]) -> uint32:
+        short1: int | integer, short2: int | integer) -> uint32:
     """
     Combines two short values into 1 int by shifting the first 16 places
 
@@ -98,29 +93,42 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     through a (kernel) set of weights and/or delays.
     """
     __slots__ = (
-        "_kernel_w", "_kernel_h",
-        "_hlf_k_w", "_hlf_k_h",
-        "_pre_w", "_pre_h",
-        "_post_w", "_post_h",
-        "_pre_start_w", "_pre_start_h",
-        "_post_start_w", "_post_start_h",
-        "_pre_step_w", "_pre_step_h",
-        "_post_step_w", "_post_step_h",
-        "_krn_weights", "_krn_delays", "_shape_common",
-        "_common_w", "_common_h",
-        "_shape_pre", "_shape_post",
-        "_post_as_pre")
+        "_common_h",
+        "_common_w",
+        "_hlf_k_h",
+        "_hlf_k_w",
+        "_kernel_h",
+        "_kernel_w",
+        "_krn_delays",
+        "_krn_weights",
+        "_post_as_pre",
+        "_post_h",
+        "_post_start_h",
+        "_post_start_w",
+        "_post_step_h",
+        "_post_step_w",
+        "_post_w",
+        "_pre_h",
+        "_pre_start_h",
+        "_pre_start_w",
+        "_pre_step_h",
+        "_pre_step_w",
+        "_pre_w",
+        "_shape_common",
+        "_shape_post",
+        "_shape_pre",
+    )
 
     def __init__(
             self, shape_pre: _TWOD, shape_post: _TWOD, shape_kernel: _TWOD,
-            weight_kernel: Optional[_KERNAL] = None,
-            delay_kernel: Optional[_KERNAL] = None,
-            shape_common: Optional[_TWOD] = None,
-            pre_sample_steps_in_post: Optional[_TWOD] = None,
-            pre_start_coords_in_post: Optional[_TWOD] = None,
-            post_sample_steps_in_pre: Optional[_TWOD] = None,
-            post_start_coords_in_pre: Optional[_TWOD] = None,
-            safe: bool = True, space: Optional[Space] = None,
+            weight_kernel: _KERNAL | None = None,
+            delay_kernel: _KERNAL | None = None,
+            shape_common: _TWOD | None = None,
+            pre_sample_steps_in_post: _TWOD | None = None,
+            pre_start_coords_in_post: _TWOD | None = None,
+            post_sample_steps_in_pre: _TWOD | None = None,
+            post_start_coords_in_pre: _TWOD | None = None,
+            safe: bool = True, space: Space | None = None,
             verbose: bool = False, callback: None = None):
         """
         :param shape_pre:
@@ -218,11 +226,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         self._shape_post = shape_post
 
         # Create storage for later
-        self._post_as_pre: Dict[
-            Slice, Tuple[NDArray[integer], NDArray[integer]]] = {}
+        self._post_as_pre: dict[
+            Slice, tuple[NDArray[integer], NDArray[integer]]] = {}
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["shape_pre"] = [self._pre_h, self._pre_w]
         parameters["shape_post"] = [self._post_h, self._post_w]
@@ -242,7 +250,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return parameters
 
     def __to_post_coords(
-            self, post_vertex_slice: Slice) -> Tuple[
+            self, post_vertex_slice: Slice) -> tuple[
                 NDArray[integer], NDArray[integer]]:
         """
         Get a list of possible post-slice coordinates.
@@ -255,7 +263,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return numpy.divmod(post, self._post_w)
 
     def __map_to_pre_coords(
-            self, post_r: NDArray[integer], post_c: NDArray[integer]) -> Tuple[
+            self, post_r: NDArray[integer], post_c: NDArray[integer]) -> tuple[
                 NDArray[integer], NDArray[integer]]:
         """
         Get a map from post to pre-population coordinates.
@@ -263,7 +271,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return (self._post_start_h + post_r * self._post_step_h,
                 self._post_start_w + post_c * self._post_step_w)
 
-    def __post_as_pre(self, post_vertex_slice: Slice) -> Tuple[
+    def __post_as_pre(self, post_vertex_slice: Slice) -> tuple[
             NDArray[integer], NDArray[integer]]:
         """
         Write post-population coordinates as pre-population coordinates.
@@ -275,7 +283,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
                 self.__map_to_pre_coords(post_r, post_c)
         return self._post_as_pre[post_vertex_slice]
 
-    def __pre_as_post(self, pre_r: int, pre_c: int) -> Tuple[int, int]:
+    def __pre_as_post(self, pre_r: int, pre_c: int) -> tuple[int, int]:
         """
         Write pre-population coordinates as post-population coordinates.
         """
@@ -283,8 +291,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         c = ((pre_c - self._pre_start_w - 1) // self._pre_step_w) + 1
         return (r, c)
 
-    def __get_kernel_vals(self, values: Optional[Union[
-            _KERNAL, WeightsDelays]]) -> Optional[ConvolutionKernel]:
+    def __get_kernel_vals(self, values: _KERNAL | WeightsDelays | None
+                          ) -> ConvolutionKernel | None:
         """
         Convert kernel values given into the correct format.
         """
@@ -311,9 +319,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             f"{self._kernel_h} and width: {self._kernel_w}).")
 
     def __compute_statistics(
-            self, weights: Optional[Weights],
-            delays: Optional[Delays], post_vertex_slice: Slice,
-            n_pre_neurons: int) -> Tuple[
+            self, weights: Weights | None,
+            delays: Delays | None, post_vertex_slice: Slice,
+            n_pre_neurons: int) -> tuple[
                 int, NDArray[uint32], NDArray[uint32], NDArray[floating],
                 NDArray[floating]]:
         """
@@ -329,12 +337,12 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         assert self._krn_delays is not None
 
         post_as_pre_r, post_as_pre_c = self.__post_as_pre(post_vertex_slice)
-        coords: Dict[int, List[int]] = {}
+        coords: dict[int, list[int]] = {}
         hh, hw = self._hlf_k_h, self._hlf_k_w
-        all_pre_ids: List[int] = []
-        all_post_ids: List[int] = []
-        all_delays: List[NDArray[floating]] = []
-        all_weights: List[NDArray[floating]] = []
+        all_pre_ids: list[int] = []
+        all_post_ids: list[int] = []
+        all_delays: list[NDArray[floating]] = []
+        all_weights: list[NDArray[floating]] = []
         count = 0
         post_lo = post_vertex_slice.lo_atom
 
@@ -424,8 +432,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         return numpy.clip(self._kernel_h * self._kernel_w, 0, n_post_atoms)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
@@ -534,7 +542,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     def get_connected_vertices(
             self, s_info: SynapseInformation, source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
-                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
+                tuple[MachineVertex, Sequence[AbstractVertex]]]:
         src_splitter = source_vertex.splitter
         return [
             (t_vert,

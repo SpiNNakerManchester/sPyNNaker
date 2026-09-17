@@ -25,7 +25,7 @@ from spinn_front_end_common.utilities.constants import (
 _TWO_WORDS = struct.Struct("<II")
 
 
-class MultiSpikeRecorder(object):
+class MultiSpikeRecorder:
     """
     Support for recording more than one spike per timestep.
     """
@@ -56,6 +56,6 @@ class MultiSpikeRecorder(object):
             return ConstantSDRAM(0)
 
         out_spike_bytes = (
-            int(math.ceil(n_neurons / BITS_PER_WORD)) * BYTES_PER_WORD)
+            math.ceil(n_neurons / BITS_PER_WORD) * BYTES_PER_WORD)
         return VariableSDRAM(0, (2 * BYTES_PER_WORD) + (
             out_spike_bytes * spikes_per_timestep))

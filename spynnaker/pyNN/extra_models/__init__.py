@@ -67,7 +67,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 # Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
 
-__all__ = [
+__all__ = [  # noqa: RUF022
     # sPyNNaker models not currently part of full pyNN
     'IFCurDelta', 'IFCurrExpCa2Adaptive', 'IFCondExpStoc',
     'Izhikevich_cond', 'IF_curr_dual_exp', 'IF_curr_exp_sEMD',

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Tuple
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
@@ -45,10 +44,11 @@ class SynapseTypeAlpha(AbstractSynapseType):
         "__exc_response",
         "__inh_exp_response",
         "__inh_response",
+        "__q_exc",
+        "__q_inh",
         "__tau_syn_E",
         "__tau_syn_I",
-        "__q_exc",
-        "__q_inh")
+    )
 
     def __init__(
             self, exc_response: ModelParameter,
@@ -109,7 +109,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
         return 2  # excitatory and inhibitory
 
     @overrides(AbstractSynapseType.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         if target == "excitatory":
             return 0
         elif target == "inhibitory":
@@ -117,7 +117,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
         return None
 
     @overrides(AbstractSynapseType.get_synapse_targets)
-    def get_synapse_targets(self) -> Tuple[str, ...]:
+    def get_synapse_targets(self) -> tuple[str, ...]:
         return "excitatory", "inhibitory"
 
     @property

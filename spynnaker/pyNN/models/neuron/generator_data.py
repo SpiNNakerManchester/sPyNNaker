@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Sequence, cast
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, cast
 
 import numpy
 from numpy import uint32
@@ -39,7 +40,7 @@ if TYPE_CHECKING:
 SYN_REGION_UNUSED = 0xFFFFFFFF
 
 
-class GeneratorData(object):
+class GeneratorData:
     """
     Data for each connection of the synapse generator.
     """
@@ -48,8 +49,8 @@ class GeneratorData(object):
     BASE_SIZE = 11 * BYTES_PER_WORD
 
     def __init__(
-            self, synaptic_matrix_offset: Optional[int],
-            delayed_synaptic_matrix_offset: Optional[int],
+            self, synaptic_matrix_offset: int | None,
+            delayed_synaptic_matrix_offset: int | None,
             app_edge: ProjectionApplicationEdge,
             synapse_information: SynapseInformation, max_row_info: MaxRowInfo,
             max_pre_atoms_per_core: int, max_post_atoms_per_core: int):
@@ -85,7 +86,7 @@ class GeneratorData(object):
                                 synapse_information.synapse_dynamics)
 
         # Create the data needed
-        self.__data = list()
+        self.__data = []
         self.__data.append(numpy.array([
             pre_lo, pre_hi, post_lo, post_hi,
             synapse_information.synapse_type,

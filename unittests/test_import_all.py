@@ -15,7 +15,7 @@
 import os
 import unittest
 
-import spinn_utilities.package_loader as package_loader
+from spinn_utilities import package_loader
 
 
 class ImportAllModule(unittest.TestCase):

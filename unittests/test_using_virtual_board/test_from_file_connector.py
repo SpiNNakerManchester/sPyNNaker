@@ -15,12 +15,11 @@
 
 import os
 import tempfile
-from typing import List, Optional, Tuple, Union
+from typing import TypeAlias
 
 import numpy
 import pyNN.spiNNaker as sim
 from parameterized import parameterized
-from typing_extensions import TypeAlias
 
 from spinn_utilities.config_holder import set_config
 
@@ -33,9 +32,9 @@ from spynnaker.pyNN.models.projection import Projection
 WEIGHT = 5
 DELAY = 2
 
-AsList3: TypeAlias = List[Tuple[int, int, float]]
-AsList4: TypeAlias = List[Tuple[int, int, float, float]]
-AsList: TypeAlias = Union[AsList3, AsList4]
+AsList3: TypeAlias = list[tuple[int, int, float]]
+AsList4: TypeAlias = list[tuple[int, int, float, float]]
+AsList: TypeAlias = AsList3 | AsList4
 
 
 class TestFromFileConnector(BaseTestCase):
@@ -44,8 +43,8 @@ class TestFromFileConnector(BaseTestCase):
 
     def check_weights(
             self, projection: Projection,
-            aslist: AsList, w_index: Optional[int],
-            d_index: Optional[int], sources: int, destinations: int) -> None:
+            aslist: AsList, w_index: int | None,
+            d_index: int | None, sources: int, destinations: int) -> None:
         from_pro = list(projection.get(["weight", "delay"], "list"))
         aslist.sort()
         as_index = 0
@@ -75,8 +74,8 @@ class TestFromFileConnector(BaseTestCase):
 
     def check_other_connect(
             self, aslist: AsList, ver_num: str,
-            header: Optional[str] = None, w_index: Optional[int] = 2,
-            d_index: Optional[int] = 3, sources: int = 6,
+            header: str | None = None, w_index: int | None = 2,
+            d_index: int | None = 3, sources: int = 6,
             destinations: int = 8) -> None:
         _, name = tempfile.mkstemp(".temp")
         if header:
@@ -138,7 +137,7 @@ class TestFromFileConnector(BaseTestCase):
 
     @parameterized.expand(MANY_BOARD_TYPES)
     def test_no_weight(self, _: str, ver_num: str) -> None:
-        as_list: List[Tuple[int, int, float]] = [
+        as_list: list[tuple[int, int, float]] = [
             (0, 0, 10),
             (3, 0, 11),
             (2, 3, 12),
@@ -151,7 +150,7 @@ class TestFromFileConnector(BaseTestCase):
 
     @parameterized.expand(MANY_BOARD_TYPES)
     def test_invert(self, _: str, ver_num: str) -> None:
-        as_list: List[Tuple[int, int, float, float]] = [
+        as_list: list[tuple[int, int, float, float]] = [
             (0, 0, 10, 0.1),
             (3, 0, 11, 0.2),
             (2, 3, 12, 0.3),

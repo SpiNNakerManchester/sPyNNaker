@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional
 
 from pyNN.random import RandomDistribution
 from scipy.stats import gamma
@@ -27,7 +26,7 @@ class RandomStatsGammaImpl(AbstractRandomStats):
     An implementation of AbstractRandomStats for gamma distributions.
     """
 
-    def _get_params(self, dist: RandomDistribution) -> List[float]:
+    def _get_params(self, dist: RandomDistribution) -> list[float]:
         return [dist.parameters['k'], dist.parameters['theta']]
 
     @overrides(AbstractRandomStats.cdf)
@@ -51,9 +50,9 @@ class RandomStatsGammaImpl(AbstractRandomStats):
         return gamma.var(*self._get_params(dist))
 
     @overrides(AbstractRandomStats.high)
-    def high(self, distribution: RandomDistribution) -> Optional[float]:
+    def high(self, distribution: RandomDistribution) -> float | None:
         return None
 
     @overrides(AbstractRandomStats.low)
-    def low(self, distribution: RandomDistribution) -> Optional[float]:
+    def low(self, distribution: RandomDistribution) -> float | None:
         return None

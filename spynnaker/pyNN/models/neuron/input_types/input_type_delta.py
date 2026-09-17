@@ -35,7 +35,7 @@ class InputTypeDelta(AbstractInputType):
         super().__init__(
             # scale_factor, calculated from timestep
             [Struct([(DataType.S1615, TIME_STEP)])],
-            dict())
+            {})
 
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters: RangeDictionary[float]) -> None:

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Tuple
 
 import numpy
 import pyNN.spiNNaker as p
@@ -24,9 +23,9 @@ from spinnaker_testbase import BaseTestCase
 class DistanceDependentProbabilityConnectorTest(BaseTestCase):
 
     def do_distance_nd_test(
-            self, neurons_per_core_pre: Tuple[int, ...],
+            self, neurons_per_core_pre: tuple[int, ...],
             pre_size: int, pre_shape: BaseStructure,
-            neurons_per_core_post: Tuple[int, ...], post_size: int,
+            neurons_per_core_post: tuple[int, ...], post_size: int,
             post_shape: BaseStructure, max_dist: float) -> None:
         p.setup(1.0)
         pre = p.Population(

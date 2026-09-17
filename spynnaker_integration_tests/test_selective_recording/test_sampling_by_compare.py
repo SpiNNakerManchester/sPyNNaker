@@ -14,7 +14,7 @@
 
 import os
 import sys
-from typing import List, Optional, Sequence, Tuple
+from collections.abc import Sequence
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -41,22 +41,22 @@ Which is why most tests are commented out.
 
 def run_script(
         simtime: int, n_neurons: int, run_split: int = 1,
-        record_spikes: bool = False, spike_rate: Optional[int] = None,
-        spike_rec_indexes: Optional[Sequence[int]] = None,
-        spike_get_indexes: Optional[Sequence[int]] = None,
-        record_v: bool = False, v_rate: Optional[int] = None,
-        v_rec_indexes: Optional[Sequence[int]] = None,
-        v_get_indexes: Optional[Sequence[int]] = None,
-        record_exc: bool = False, exc_rate: Optional[int] = None,
-        exc_rec_indexes: Optional[Sequence[int]] = None,
-        exc_get_indexes: Optional[Sequence[int]] = None,
-        record_inh: bool = False, inh_rate: Optional[int] = None,
-        inh_rec_indexes: Optional[Sequence[int]] = None,
-        inh_get_indexes: Optional[Sequence[int]] = None,
+        record_spikes: bool = False, spike_rate: int | None = None,
+        spike_rec_indexes: Sequence[int] | None = None,
+        spike_get_indexes: Sequence[int] | None = None,
+        record_v: bool = False, v_rate: int | None = None,
+        v_rec_indexes: Sequence[int] | None = None,
+        v_get_indexes: Sequence[int] | None = None,
+        record_exc: bool = False, exc_rate: int | None = None,
+        exc_rec_indexes: Sequence[int] | None = None,
+        exc_get_indexes: Sequence[int] | None = None,
+        record_inh: bool = False, inh_rate: int | None = None,
+        inh_rec_indexes: Sequence[int] | None = None,
+        inh_get_indexes: Sequence[int] | None = None,
         file_prefix: str = ""
-        ) -> Tuple[Optional[SpikeTrainList],
-                   Optional[AnalogSignal], Optional[AnalogSignal],
-                   Optional[AnalogSignal]]:
+        ) -> tuple[SpikeTrainList | None,
+                   AnalogSignal | None, AnalogSignal | None,
+                   AnalogSignal | None]:
 
     sim.setup(timestep=1)
 
@@ -148,15 +148,14 @@ def run_script(
     return spikes, v,  exc, inh
 
 
-def compare_spikearrays(this: List[float], full: List[float],
+def compare_spikearrays(this: list[float], full: list[float],
                         tolerance: bool = False) -> float:
     if numpy.array_equal(this, full):
         return sys.maxsize
     if this[0] != full[0]:
         raise ValueError("Index mismatch")
     if len(this) != len(full):
-        print("{} spikes length differ. {} != {}".format(
-            this[0], len(this), len(full)))
+        print(f"{this[0]} spikes length differ. {len(this)} != {len(full)}")
     i1 = 0
     i2 = 0
     lowest = None
@@ -165,24 +164,22 @@ def compare_spikearrays(this: List[float], full: List[float],
             i1 += 1
             i2 += 1
         elif this[i1] < full[i2]:
-            print("extra spike {} has spike at {}".format(this[0], this[i1]))
+            print(f"extra spike {this[0]} has spike at {this[i1]}")
             i1 += 1
             if lowest is None:
                 lowest = this[i1]
         elif this[i1] > full[i2]:
-            print("spike missing {} no spike at {}".format(this[0], full[i2]))
+            print(f"spike missing {this[0]} no spike at {full[i2]}")
             i2 += 1
             if lowest is None:
                 lowest = full[i2]
     while i1 < len(this):
-        print("trailing extra spike {} has spike at {}".format(
-            this[0], this[i1]))
+        print(f"trailing extra spike {this[0]} has spike at {this[i1]}")
         if lowest is None:
             lowest = this[i1]
         i1 += 1
     while i2 < len(full):
-        print("trailing spike missing {} no spike at {}".format(
-            this[0], full[i2]))
+        print(f"trailing spike missing {this[0]} no spike at {full[i2]}")
         if lowest is None:
             lowest = full[i2]
         i2 += 1
@@ -194,7 +191,7 @@ def compare_spikearrays(this: List[float], full: List[float],
 
 def compare_spikes(file_path: str, full_path: str, simtime: int,
                    n_neurons: int, spike_rate: int = 1,
-                   spike_indexes: Optional[Sequence[int]] = None,
+                   spike_indexes: Sequence[int] | None = None,
                    tolerance: int = sys.maxsize) -> float:
     this_spikes = read_spikes(file_path, simtime, n_neurons)
     full_spikes = read_spikes(full_path, simtime, n_neurons, rate=spike_rate,
@@ -214,14 +211,14 @@ def compare_spikes(file_path: str, full_path: str, simtime: int,
 
 def compare_results(
         simtime: int, n_neurons: int,
-        record_spikes: bool = False, spike_rate: Optional[int] = None,
-        spike_indexes: Optional[Sequence[int]] = None,
-        record_v: bool = False, v_rate: Optional[int] = None,
-        v_indexes: Optional[Sequence[int]] = None,
-        record_exc: bool = False, exc_rate: Optional[int] = None,
-        exc_indexes: Optional[Sequence[int]] = None,
-        record_inh: bool = False, inh_rate: Optional[int] = None,
-        inh_indexes: Optional[Sequence[int]] = None, full_prefix: str = "",
+        record_spikes: bool = False, spike_rate: int | None = None,
+        spike_indexes: Sequence[int] | None = None,
+        record_v: bool = False, v_rate: int | None = None,
+        v_indexes: Sequence[int] | None = None,
+        record_exc: bool = False, exc_rate: int | None = None,
+        exc_indexes: Sequence[int] | None = None,
+        record_inh: bool = False, inh_rate: int | None = None,
+        inh_indexes: Sequence[int] | None = None, full_prefix: str = "",
         tolerance: int = sys.maxsize) -> None:
     if record_spikes:
         file_path = "spikes.csv"
@@ -244,8 +241,8 @@ def compare_results(
 
 
 def merge_indexes(
-        rec_indexes: Optional[Sequence[int]],
-        get_indexes: Optional[Sequence[int]]) -> Optional[Sequence[int]]:
+        rec_indexes: Sequence[int] | None,
+        get_indexes: Sequence[int] | None) -> Sequence[int] | None:
     if rec_indexes is None:
         if get_indexes is None:
             return None
@@ -260,20 +257,20 @@ def merge_indexes(
 
 def run_and_compare_script(
         simtime: int, n_neurons: int, run_split: int = 1,
-        record_spikes: bool = False, spike_rate: Optional[int] = None,
-        spike_rec_indexes:  Optional[Sequence[int]] = None,
-        spike_get_indexes: Optional[Sequence[int]] = None,
-        record_v: bool = False, v_rate: Optional[int] = None,
-        v_rec_indexes: Optional[Sequence[int]] = None,
-        v_get_indexes: Optional[Sequence[int]] = None,
-        record_exc: bool = False, exc_rate: Optional[int] = None,
-        exc_rec_indexes: Optional[Sequence[int]] = None,
-        exc_get_indexes: Optional[Sequence[int]] = None,
-        record_inh: bool = False, inh_rate: Optional[int] = None,
-        inh_rec_indexes: Optional[Sequence[int]] = None,
-        inh_get_indexes: Optional[Sequence[int]] = None,
+        record_spikes: bool = False, spike_rate: int | None = None,
+        spike_rec_indexes:  Sequence[int] | None = None,
+        spike_get_indexes: Sequence[int] | None = None,
+        record_v: bool = False, v_rate: int | None = None,
+        v_rec_indexes: Sequence[int] | None = None,
+        v_get_indexes: Sequence[int] | None = None,
+        record_exc: bool = False, exc_rate: int | None = None,
+        exc_rec_indexes: Sequence[int] | None = None,
+        exc_get_indexes: Sequence[int] | None = None,
+        record_inh: bool = False, inh_rate: int | None = None,
+        inh_rec_indexes: Sequence[int] | None = None,
+        inh_get_indexes: Sequence[int] | None = None,
         tolerance: int = sys.maxsize) -> None:
-    full_prefix = "{}_{}_".format(simtime, n_neurons)
+    full_prefix = f"{simtime}_{n_neurons}_"
     if (not os.path.exists(full_prefix + "spikes.csv") or
             not os.path.exists(full_prefix + "v.csv") or
             not os.path.exists(full_prefix + "v.csv") or
@@ -318,14 +315,13 @@ def write_spikes(spikes: SpikeTrainList, spike_file: str) -> None:
     with open(spike_file, "w", encoding="utf-8") as f:
         for spiketrain in spikes:
             f.write("{}".format(spiketrain.annotations["source_index"]))
-            for time in spiketrain.times:
-                f.write(",{}".format(time.magnitude))
+            f.writelines(f",{time.magnitude}" for time in spiketrain.times)
             f.write("\n")
 
 
 def ordered_rounded_set(
-        in_list: List[str], factor: int, simtime: int) -> List[float]:
-    out_list: List[float] = []
+        in_list: list[str], factor: int, simtime: int) -> list[float]:
+    out_list: list[float] = []
     added = set()
     for s in in_list[1:]:
         raw = float(s)
@@ -341,8 +337,8 @@ def ordered_rounded_set(
 
 
 def read_spikes(name: str, simtime: int, n_neurons: int, rate: int = 1,
-                indexes: Optional[Sequence[int]] = None) -> List[List[float]]:
-    spikes: List[List[float]] = []
+                indexes: Sequence[int] | None = None) -> list[list[float]]:
+    spikes: list[list[float]] = []
     with open(name, encoding="utf-8") as f:
         for line in f:
             parts = line.split(",")
@@ -358,8 +354,8 @@ def read_spikes(name: str, simtime: int, n_neurons: int, rate: int = 1,
     return spikes
 
 
-def compare(current: str, full: str, rate: Optional[int],
-            indexes: Optional[Sequence[int]]) -> None:
+def compare(current: str, full: str, rate: int | None,
+            indexes: Sequence[int] | None) -> None:
     """ Compares two data files to see if they contain similar data.\
     Ignores data not recorded due to sampling rate or indexes.
 

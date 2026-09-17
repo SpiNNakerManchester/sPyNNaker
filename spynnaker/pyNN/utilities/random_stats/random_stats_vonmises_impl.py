@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional
 
 from pyNN.random import RandomDistribution
 from scipy.stats import vonmises
@@ -28,7 +27,7 @@ class RandomStatsVonmisesImpl(AbstractRandomStats):
     An implementation of AbstractRandomStats for von Mises distributions.
     """
 
-    def _get_params(self, dist: RandomDistribution) -> List[float]:
+    def _get_params(self, dist: RandomDistribution) -> list[float]:
         return [dist.parameters['mu'], dist.parameters['kappa']]
 
     @overrides(AbstractRandomStats.cdf)
@@ -52,9 +51,9 @@ class RandomStatsVonmisesImpl(AbstractRandomStats):
         return vonmises.var(*self._get_params(dist))
 
     @overrides(AbstractRandomStats.high)
-    def high(self, distribution: RandomDistribution) -> Optional[float]:
+    def high(self, distribution: RandomDistribution) -> float | None:
         return None
 
     @overrides(AbstractRandomStats.low)
-    def low(self, distribution: RandomDistribution) -> Optional[float]:
+    def low(self, distribution: RandomDistribution) -> float | None:
         return None

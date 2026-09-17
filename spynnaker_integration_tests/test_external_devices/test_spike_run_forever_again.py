@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from time import sleep
-from typing import List
 
 import pyNN.spiNNaker as sim
 
@@ -36,7 +35,7 @@ def sim_control(label: str, sender: SpynnakerLiveSpikesConnection) -> None:
     sim.external_devices.request_stop()
 
 
-def receive_spikes(label: str, time: int, neuron_ids: List[int]) -> None:
+def receive_spikes(label: str, time: int, neuron_ids: list[int]) -> None:
     global spike_receive_count
     spike_receive_count += len(neuron_ids)
 

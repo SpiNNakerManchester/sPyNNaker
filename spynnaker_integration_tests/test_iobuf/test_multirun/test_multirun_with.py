@@ -28,8 +28,8 @@ class TestIobuffMultirun(BaseTestCase):
     def check_size(self, prov_path: str, placement: Placement) -> int:
         iofile = os.path.join(
             prov_path,
-            "iobuf_for_chip_{}_{}_processor_id_{}.txt".format(
-                placement.x, placement.y, placement.p))
+            f"iobuf_for_chip_{placement.x}_{placement.y}"
+            f"_processor_id_{placement.p}.txt")
         return os.path.getsize(iofile)
 
     def do_run(self) -> None:

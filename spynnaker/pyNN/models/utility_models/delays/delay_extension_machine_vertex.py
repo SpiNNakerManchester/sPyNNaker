@@ -14,8 +14,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from enum import IntEnum
-from typing import TYPE_CHECKING, Optional, Sequence
+from typing import TYPE_CHECKING
 
 from spinn_utilities.overrides import overrides
 
@@ -56,8 +57,9 @@ class DelayExtensionMachineVertex(
     """
 
     __slots__ = (
+        "__drop_late_spikes",
         "__sdram",
-        "__drop_late_spikes")
+    )
 
     class _DelayExtensionRegions(IntEnum):
         """
@@ -114,7 +116,7 @@ class DelayExtensionMachineVertex(
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
     def __init__(self, sdram: AbstractSDRAM, label: str, vertex_slice: Slice,
-                 app_vertex: Optional[ApplicationVertex] = None):
+                 app_vertex: ApplicationVertex | None = None):
         """
         :param sdram: The SDRAM required by the vertex
         :param label: The name of the vertex
@@ -332,7 +334,7 @@ class DelayExtensionMachineVertex(
 
     def write_delay_parameters(
             self, spec: DataSpecificationGenerator, vertex_slice: Slice,
-            key: Optional[int], incoming_key: int, incoming_mask: int) -> None:
+            key: int | None, incoming_key: int, incoming_mask: int) -> None:
         """
         Generate Delay Parameter data.
 

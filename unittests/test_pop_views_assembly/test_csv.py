@@ -14,7 +14,6 @@
 
 import csv
 import os
-from typing import List
 
 import numpy
 from numpy.typing import NDArray
@@ -27,7 +26,7 @@ from spynnaker.pyNN.utilities.neo_csv import NeoCsv
 
 
 def trim_spikes(spikes: NDArray[numpy.floating],
-                indexes: List[int]) -> List[List[numpy.floating]]:
+                indexes: list[int]) -> list[list[numpy.floating]]:
     return [[n, t] for [n, t] in spikes if n in indexes]
 
 
@@ -40,11 +39,11 @@ class TestCSV(BaseTestCase):
     def setUpClass(cls) -> None:
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_v = os.path.join(my_dir, "v.csv")
-        v_expected_l: List[List[float]] = []
+        v_expected_l: list[list[float]] = []
         with open(my_v) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                row_f = list(map(lambda x: float(x), row))
+                row_f = [float(x) for x in row]
                 v_expected_l.append(row_f)
         cls.v_expected = numpy.array(v_expected_l)
         my_spikes = os.path.join(my_dir, "spikes.csv")
@@ -52,7 +51,7 @@ class TestCSV(BaseTestCase):
         with open(my_spikes) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                floats = list(map(lambda x: float(x), row))
+                floats = [float(x) for x in row]
                 spikes_expected_l.append((floats[0], floats[1]))
         cls.spikes_expected = numpy.array(spikes_expected_l)
 
@@ -65,7 +64,7 @@ class TestCSV(BaseTestCase):
         with open(my_packets) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                floats = list(map(lambda x: float(x), row))
+                floats = [float(x) for x in row]
                 packets_expected.append(floats)
 
         with NeoBufferDatabase(my_buffer) as db:

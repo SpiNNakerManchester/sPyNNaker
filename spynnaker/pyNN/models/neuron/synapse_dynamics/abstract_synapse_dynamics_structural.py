@@ -13,11 +13,11 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable, Optional
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, TypeAlias
 
 from numpy import floating
 from numpy.typing import NDArray
-from typing_extensions import TypeAlias
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
@@ -48,7 +48,7 @@ if TYPE_CHECKING:
 InitialDelay: TypeAlias = float
 
 
-class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
+class AbstractSynapseDynamicsStructural(metaclass=AbstractBase):
     """
     Base class for synapse dynamics that structural plasticity understands.
     """
@@ -132,7 +132,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @property
     @abstractmethod
-    def seed(self) -> Optional[int]:
+    def seed(self) -> int | None:
         """
         The seed to control the randomness.
         """

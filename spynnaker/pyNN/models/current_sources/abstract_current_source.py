@@ -13,10 +13,9 @@
 # limitations under the License.
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from enum import Enum
-from typing import TYPE_CHECKING, Mapping, Optional, Sequence, Union
-
-from typing_extensions import TypeAlias
+from typing import TYPE_CHECKING, TypeAlias
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
@@ -28,7 +27,7 @@ if TYPE_CHECKING:
 
 #: General type of parameters to current sources.
 #: Individual parameters will only be one of these!
-CurrentParameter: TypeAlias = Union[int, float, Sequence[int], Sequence[float]]
+CurrentParameter: TypeAlias = int | float | Sequence[int] | Sequence[float]
 
 
 class CurrentSourceIDs(Enum):
@@ -43,7 +42,7 @@ class CurrentSourceIDs(Enum):
     N_SOURCES = 4
 
 
-class AbstractCurrentSource(object, metaclass=AbstractBase):
+class AbstractCurrentSource(metaclass=AbstractBase):
     """
     A simplified version of the PyNN class, since in most cases we work
     out the actual offset value on the SpiNNaker machine itself based on
@@ -54,8 +53,8 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         "__population")
 
     def __init__(self) -> None:
-        self.__app_vertex: Optional[PopulationVertex] = None
-        self.__population: Optional[Population] = None
+        self.__app_vertex: PopulationVertex | None = None
+        self.__population: Population | None = None
 
     def inject_into(self, cells: PopulationBase) -> None:
         """
@@ -75,7 +74,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         self.__app_vertex = vertex
 
     @property
-    def app_vertex(self) -> Optional[PopulationVertex]:
+    def app_vertex(self) -> PopulationVertex | None:
         """
         The application vertex associated with the current source.
         """
@@ -90,7 +89,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         self.__population = population
 
     @property
-    def population(self) -> Optional[Population]:
+    def population(self) -> Population | None:
         """
         The population associated with the current source.
         """

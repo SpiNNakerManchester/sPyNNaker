@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any
 
 import numpy
 from numpy import int32, uint32
@@ -60,7 +61,7 @@ class OneToOneOffsetConnector(
     __slots__ = ("__n_neurons_per_group", "__offset", "__wrap")
 
     def __init__(self, offset: int, wrap: bool,
-                 n_neurons_per_group: Optional[int] = None,
+                 n_neurons_per_group: int | None = None,
                  safe: bool = True, verbose: bool = False,
                  callback: None = None):
         """
@@ -91,7 +92,7 @@ class OneToOneOffsetConnector(
         self.__wrap = wrap
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["n_neurons_per_group"] = self.__n_neurons_per_group
         parameters["offset"] = self.__offset
@@ -125,8 +126,8 @@ class OneToOneOffsetConnector(
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
 
         # At most each pre-neuron will one post neuron
         return 1
@@ -161,8 +162,8 @@ class OneToOneOffsetConnector(
         pre_start = pre_lo + (post_group * group_size)
         pre_end = min(pre_start + group_size, pre_hi)
 
-        pres = list()
-        posts = list()
+        pres = []
+        posts = []
         for post in range(post_start, post_end):
             pre = post - self.__offset
             if pre < pre_start:

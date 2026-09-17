@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable, List, Optional, Tuple
+from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy import floating, integer, uint8, uint32
@@ -68,7 +69,7 @@ class SynapseDynamicsStatic(
             self, weight: _InTypes = StaticSynapse.default_parameters[
                 'weight'],
             delay: _InTypes = None,
-            pad_to_length: Optional[int] = None):
+            pad_to_length: int | None = None):
 
         """
         :param weight:
@@ -128,8 +129,8 @@ class SynapseDynamicsStatic(
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
             max_n_synapses: int, max_atoms_per_core: int,
-            ring_buffer_weight_scales: WeightScales) -> Tuple[
-                List[NDArray], NDArray]:
+            ring_buffer_weight_scales: WeightScales) -> tuple[
+                list[NDArray], NDArray]:
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
         n_synapse_type_bits = get_n_bits(n_synapse_types)
@@ -159,8 +160,8 @@ class SynapseDynamicsStatic(
 
         return ff_data, ff_size
 
-    def _pad_row(self, rows: List[NDArray],
-                 no_bytes_per_connection: int) -> List[NDArray]:
+    def _pad_row(self, rows: list[NDArray],
+                 no_bytes_per_connection: int) -> list[NDArray]:
         assert self.__pad_to_length is not None
         return [
             numpy.concatenate([
@@ -182,7 +183,7 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.read_static_synaptic_data)
     def read_static_synaptic_data(
             self, n_synapse_types: int, ff_size: NDArray[integer],
-            ff_data: List[NDArray[uint32]], max_atoms_per_core: int,
+            ff_data: list[NDArray[uint32]], max_atoms_per_core: int,
             ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
@@ -250,7 +251,7 @@ class SynapseDynamicsStatic(
 
     @property
     @overrides(AbstractStaticSynapseDynamics.pad_to_length)
-    def pad_to_length(self) -> Optional[int]:
+    def pad_to_length(self) -> int | None:
         return self.__pad_to_length
 
     @property

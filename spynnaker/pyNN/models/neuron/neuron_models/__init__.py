@@ -21,6 +21,7 @@ from .neuron_model_leaky_integrate_and_fire import (
 
 __all__ = [
     "NeuronModel",
+    "NeuronModelIFTrunc",
     "NeuronModelIzh",
     "NeuronModelLeakyIntegrateAndFire",
-    "NeuronModelIFTrunc"]
+]

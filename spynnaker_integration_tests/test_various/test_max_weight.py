@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 # Copyright (c) 2017 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,10 +58,10 @@ def do_run() -> None:
 
     p.end()
 
-    print("Auto 1 weights: {}".format(weights_auto_1[0]))
-    print("Fixed 1 weights: {}".format(weights_fixed_1[0]))
-    print("Auto 2 weights: {}".format(weights_auto_2[0]))
-    print("Fixed 2 weights: {}".format(weights_fixed_2[0]))
+    print(f"Auto 1 weights: {weights_auto_1[0]}")
+    print(f"Fixed 1 weights: {weights_fixed_1[0]}")
+    print(f"Auto 2 weights: {weights_auto_2[0]}")
+    print(f"Fixed 2 weights: {weights_fixed_2[0]}")
 
     assert weights_auto_1[0] != weights_auto_2[0]
     assert weights_fixed_1[0] == weights_fixed_2[0]

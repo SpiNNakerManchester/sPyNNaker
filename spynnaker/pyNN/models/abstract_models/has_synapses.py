@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Sequence
+from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from numpy.typing import NDArray
 
@@ -28,7 +29,7 @@ if TYPE_CHECKING:
     )
 
 
-class HasSynapses(object, metaclass=AbstractBase):
+class HasSynapses(metaclass=AbstractBase):
     """
     API for getting connections from the machine.
     """

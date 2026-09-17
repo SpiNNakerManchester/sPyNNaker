@@ -14,7 +14,8 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any
 
 import numpy
 from numpy import integer, uint32
@@ -60,12 +61,13 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         "__n_post",
         "__post_neurons",
         "__post_neurons_set",
+        "__rng",
         "__with_replacement",
-        "__rng")
+    )
 
     def __init__(
             self, n: int, *, allow_self_connections: bool = True,
-            with_replacement: bool = False, rng: Optional[NumpyRNG] = None,
+            with_replacement: bool = False, rng: NumpyRNG | None = None,
             safe: bool = True, verbose: bool = False, callback: None = None):
         """
         :param n:
@@ -100,12 +102,12 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         self.__n_post = self._roundsize(n, "FixedNumberPostConnector")
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
-        self.__post_neurons: List[NDArray[integer]] = []
+        self.__post_neurons: list[NDArray[integer]] = []
         self.__post_neurons_set = False
         self.__rng = rng
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["n"] = self.__n_post
         parameters["allow_self_connections"] = self.allow_self_connections
@@ -143,9 +145,9 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             synapse_info.delays, n_connections, synapse_info)
 
     def __build_post_neurons(
-            self, synapse_info: SynapseInformation) -> List[NDArray[integer]]:
+            self, synapse_info: SynapseInformation) -> list[NDArray[integer]]:
         rng = self.__rng or NumpyRNG()
-        post_neurons: List[NDArray[integer]] = \
+        post_neurons: list[NDArray[integer]] = \
             [numpy.empty([0], dtype=uint32)] * synapse_info.n_pre_neurons
         # Loop over all the pre neurons
         for m in range(synapse_info.n_pre_neurons):
@@ -172,7 +174,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         return post_neurons
 
     def _get_post_neurons(
-            self, synapse_info: SynapseInformation) -> List[NDArray[integer]]:
+            self, synapse_info: SynapseInformation) -> list[NDArray[integer]]:
         # If we haven't set the array up yet, do it now
         if not self.__post_neurons_set:
             self.__post_neurons = self.__build_post_neurons(synapse_info)
@@ -231,8 +233,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         prob_in_slice = min(
             n_post_atoms / float(
                 synapse_info.n_post_neurons), 1.0)
@@ -241,7 +243,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             self.__n_post, prob_in_slice, chance=1.0/100000.0)
 
         if min_delay is None or max_delay is None:
-            return int(math.ceil(n_connections))
+            return math.ceil(n_connections)
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
@@ -256,7 +258,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons, selection_prob,
             chance=1.0/100000.0)
-        return int(math.ceil(n_connections))
+        return math.ceil(n_connections)
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:

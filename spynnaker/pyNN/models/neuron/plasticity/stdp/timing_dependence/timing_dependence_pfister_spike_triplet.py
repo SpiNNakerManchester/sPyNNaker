@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -47,6 +47,8 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     20 September 2006, 26 (38) 9673-9682; DOI: 10.1523/JNEUROSCI.1425-06.2006
     """
     __slots__ = (
+        "__a_minus",
+        "__a_plus",
         "__tau_minus",
         "__tau_minus_data",
         "__tau_plus",
@@ -55,8 +57,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         "__tau_x_data",
         "__tau_y",
         "__tau_y_data",
-        "__a_plus",
-        "__a_minus")
+    )
     __PARAM_NAMES = ('tau_plus', 'tau_minus', 'tau_x', 'tau_y')
 
     # noinspection PyPep8Naming

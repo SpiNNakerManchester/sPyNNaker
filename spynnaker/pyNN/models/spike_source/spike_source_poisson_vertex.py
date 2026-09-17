@@ -15,18 +15,11 @@ from __future__ import annotations
 
 import logging
 import math
-from collections.abc import Sequence as Seq
-from collections.abc import Sized
+from collections.abc import Collection, Sequence, Sized
 from typing import (
     TYPE_CHECKING,
     Any,
-    Collection,
-    Dict,
-    List,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
+    TypeGuard,
     cast,
 )
 
@@ -34,7 +27,6 @@ import numpy
 import scipy.stats
 from numpy.typing import NDArray
 from pyNN.space import BaseStructure, Grid2D, Grid3D
-from typing_extensions import TypeGuard
 
 from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.log import FormatAdapter
@@ -108,15 +100,15 @@ DURATION_FOREVER = 0xFFFFFFFF
 
 
 def _is_list_of_lists(value: Any) -> TypeGuard[
-        Sequence[Sequence[Union[int, float]]]]:
-    return isinstance(value, (Seq, numpy.ndarray)) and isinstance(
-        value[0], (Seq, numpy.ndarray))
+        Sequence[Sequence[int | float]]]:
+    return isinstance(value, (Sequence, numpy.ndarray)) and isinstance(
+        value[0], (Sequence, numpy.ndarray))
 
 
 def _normalize_rates(
-        rate: Union[float, Sequence[float], None],
-        rates: Union[Sequence[float], NDArray[numpy.floating], None]
-        ) -> Union[NDArray[numpy.floating], List[NDArray[numpy.floating]]]:
+        rate: float | Sequence[float] | None,
+        rates: Sequence[float] | NDArray[numpy.floating] | None
+        ) -> NDArray[numpy.floating] | list[NDArray[numpy.floating]]:
     if rates is None:
         if isinstance(rate, (Sequence, numpy.ndarray)):
             # Single rate per neuron for whole simulation
@@ -132,9 +124,9 @@ def _normalize_rates(
 
 
 def _normalize_times(
-        time: Union[int, Sequence[int], None],
-        times: Union[Sequence[int], NDArray[numpy.integer], None]
-        ) -> Union[NDArray[numpy.integer], List[NDArray[numpy.integer]], None]:
+        time: int | Sequence[int] | None,
+        times: Sequence[int] | NDArray[numpy.integer] | None
+        ) -> NDArray[numpy.integer] | list[NDArray[numpy.integer]] | None:
     if times is None:
         if time is None:
             return None
@@ -152,7 +144,7 @@ def _normalize_times(
 
 
 def is_iterable(value: Values) -> TypeGuard[
-        Union[Sequence[float], NDArray[numpy.floating]]]:
+        Sequence[float] | NDArray[numpy.floating]]:
     """
     Check that the Value is iterable.
 
@@ -170,42 +162,41 @@ class SpikeSourcePoissonVertex(
     """
 
     __slots__ = (
+        "__allowed_parameters",
+        "__data",
+        "__incoming_control_edge",
+        "__is_variable_rate",
+        "__kiss_seed",  # dict indexed by vertex slice
         "__last_rate_read_time",
+        "__max_n_rates",
+        "__max_rate",
         "__model",
         "__model_name",
         "__n_atoms",
+        "__n_colour_bits",
+        "__n_profile_samples",
+        "__outgoing_projections",
         "__rng",
         "__seed",
         "__spike_recorder",
-        "__kiss_seed",  # dict indexed by vertex slice
-        "__max_rate",
-        "__max_n_rates",
-        "__n_profile_samples",
-        "__data",
-        "__is_variable_rate",
-        "__outgoing_projections",
-        "__incoming_control_edge",
         "__structure",
-        "__allowed_parameters",
-        "__n_colour_bits")
+    )
 
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
-            self, n_neurons: int, label: str, seed: Optional[int],
-            max_atoms_per_core: Optional[Union[int, Tuple[int, ...]]],
-            model: Union[SpikeSourcePoisson, SpikeSourcePoissonVariable],
-            rate: Union[float, Sequence[float], None] = None,
-            start: Union[int, Sequence[int], None] = None,
-            duration: Union[int, Sequence[int], None] = None,
-            rates: Union[
-                Sequence[float], NDArray[numpy.floating], None] = None,
-            starts: Union[Sequence[int], NDArray[numpy.integer], None] = None,
-            durations: Union[
-                Sequence[int], NDArray[numpy.integer], None] = None,
-            max_rate: Optional[float] = None,
-            splitter: Optional[AbstractSplitterCommon] = None,
-            n_colour_bits: Optional[int] = None):
+            self, n_neurons: int, label: str, seed: int | None,
+            max_atoms_per_core: int | tuple[int, ...] | None,
+            model: SpikeSourcePoisson | SpikeSourcePoissonVariable,
+            rate: float | Sequence[float] | None = None,
+            start: int | Sequence[int] | None = None,
+            duration: int | Sequence[int] | None = None,
+            rates: Sequence[float] | NDArray[numpy.floating] | None = None,
+            starts: Sequence[int] | NDArray[numpy.integer] | None = None,
+            durations: Sequence[int] | NDArray[numpy.integer] | None = None,
+            max_rate: float | None = None,
+            splitter: AbstractSplitterCommon | None = None,
+            n_colour_bits: int | None = None):
         """
         :param n_neurons: The number of neurons in this vertex.
         :param label: The optional name of the vertex.
@@ -234,7 +225,7 @@ class SpikeSourcePoissonVertex(
         self.__model_name = "SpikeSourcePoisson"
         self.__model = model
         self.__seed = seed
-        self.__kiss_seed: Dict[Slice, Tuple[int, ...]] = dict()
+        self.__kiss_seed: dict[Slice, tuple[int, ...]] = {}
 
         self.__spike_recorder = MultiSpikeRecorder()
 
@@ -301,7 +292,7 @@ class SpikeSourcePoissonVertex(
                     raise ValueError("Each rate must have its own duration")
 
         self.__data: RangeDictionary[
-            Union[NDArray[numpy.floating], NDArray[numpy.integer]]
+            NDArray[numpy.floating] | NDArray[numpy.integer]
             ] = RangeDictionary(n_neurons)
         rates_list: RangedList = RangedList(
             n_neurons, _rates,
@@ -322,7 +313,7 @@ class SpikeSourcePoissonVertex(
         self.__spike_recorder = MultiSpikeRecorder()
 
         if max_rate is None:
-            all_rates: List[numpy.floating] = list(
+            all_rates: list[numpy.floating] = list(
                 _flatten(self.__data["rates"]))
             self.__max_rate = numpy.amax(all_rates) if all_rates else 0
         else:
@@ -330,10 +321,10 @@ class SpikeSourcePoissonVertex(
         self.__max_n_rates = max(len(r) for r in rates_list)
 
         # Keep track of how many outgoing projections exist
-        self.__outgoing_projections: List[Projection] = list()
-        self.__incoming_control_edge: Optional[ApplicationEdge] = None
+        self.__outgoing_projections: list[Projection] = []
+        self.__incoming_control_edge: ApplicationEdge | None = None
 
-        self.__structure: Optional[BaseStructure] = None
+        self.__structure: BaseStructure | None = None
 
         if self.__is_variable_rate:
             self.__allowed_parameters = frozenset(
@@ -342,7 +333,7 @@ class SpikeSourcePoissonVertex(
             self.__allowed_parameters = frozenset(
                 {"rate", "duration", "start"})
 
-        self.__last_rate_read_time: Optional[float] = None
+        self.__last_rate_read_time: float | None = None
 
         if n_colour_bits is None:
             n_colour_bits = get_config_int("Simulation", "n_colour_bits")
@@ -442,7 +433,7 @@ class SpikeSourcePoissonVertex(
                 selector, numpy.array([value]), use_list_as_value=True)
 
     @overrides(PopulationApplicationVertex.get_parameters)
-    def get_parameters(self) -> List[str]:
+    def get_parameters(self) -> list[str]:
         return list(self.__allowed_parameters)
 
     @overrides(PopulationApplicationVertex.get_units)
@@ -457,7 +448,7 @@ class SpikeSourcePoissonVertex(
         raise KeyError(f"Units for {name} unknown")
 
     @overrides(PopulationApplicationVertex.get_recordable_variables)
-    def get_recordable_variables(self) -> List[str]:
+    def get_recordable_variables(self) -> list[str]:
         return ["spikes"]
 
     def get_buffer_data_type(self, name: str) -> BufferDataType:
@@ -472,8 +463,8 @@ class SpikeSourcePoissonVertex(
 
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(
-            self, name: str, sampling_interval: Optional[float] = None,
-            indices: Optional[Collection[int]] = None) -> None:
+            self, name: str, sampling_interval: float | None = None,
+            indices: Collection[int] | None = None) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if sampling_interval is not None:
@@ -487,14 +478,14 @@ class SpikeSourcePoissonVertex(
         self.__spike_recorder.record = True
 
     @overrides(PopulationApplicationVertex.get_recording_variables)
-    def get_recording_variables(self) -> List[str]:
+    def get_recording_variables(self) -> list[str]:
         if self.__spike_recorder.record:
             return ["spikes"]
         return []
 
     @overrides(PopulationApplicationVertex.set_not_recording)
     def set_not_recording(self, name: str,
-                          indices: Optional[Collection[int]] = None) -> None:
+                          indices: Collection[int] | None = None) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         if indices is not None:
@@ -536,7 +527,7 @@ class SpikeSourcePoissonVertex(
         max_spikes_per_ts = scipy.stats.poisson.ppf(
             1.0 - (1.0 / float(chance_ts)),
             float(self.__max_rate) / ts_per_second)
-        return int(math.ceil(max_spikes_per_ts)) + 1.0
+        return math.ceil(max_spikes_per_ts) + 1.0
 
     def get_recording_sdram_usage(self, vertex_slice: Slice) -> AbstractSDRAM:
         """
@@ -576,7 +567,7 @@ class SpikeSourcePoissonVertex(
 
     @property
     @overrides(PopulationApplicationVertex.atoms_shape)
-    def atoms_shape(self) -> Tuple[int, ...]:
+    def atoms_shape(self) -> tuple[int, ...]:
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.__n_atoms)
         return super().atoms_shape
@@ -584,7 +575,7 @@ class SpikeSourcePoissonVertex(
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice: Slice, sdram: AbstractSDRAM,
-            label: Optional[str] = None) -> SpikeSourcePoissonMachineVertex:
+            label: str | None = None) -> SpikeSourcePoissonMachineVertex:
         return SpikeSourcePoissonMachineVertex(
             sdram, self.__spike_recorder.record,
             label, self, vertex_slice)
@@ -604,7 +595,7 @@ class SpikeSourcePoissonVertex(
         return self.__max_n_rates
 
     @property
-    def seed(self) -> Optional[int]:
+    def seed(self) -> int | None:
         """
         The seed set if any.
         """
@@ -613,10 +604,10 @@ class SpikeSourcePoissonVertex(
     @seed.setter
     def seed(self, seed: int) -> None:
         self.__seed = seed
-        self.__kiss_seed = dict()
+        self.__kiss_seed = {}
         self.__rng = numpy.random.RandomState(seed)
 
-    def kiss_seed(self, vertex_slice: Slice) -> Tuple[int, ...]:
+    def kiss_seed(self, vertex_slice: Slice) -> tuple[int, ...]:
         """
         The seed for this vertex slice.
 
@@ -655,7 +646,7 @@ class SpikeSourcePoissonVertex(
                 SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)
 
     def describe(
-            self) -> Dict[str, Union[str, ParameterHolder, Dict[str, Any]]]:
+            self) -> dict[str, str | ParameterHolder | dict[str, Any]]:
         """
         Return a human-readable description of the cell or synapse type.
 
@@ -690,7 +681,7 @@ class SpikeSourcePoissonVertex(
         self.__incoming_control_edge = edge
 
     @property
-    def incoming_control_edge(self) -> Optional[ApplicationEdge]:
+    def incoming_control_edge(self) -> ApplicationEdge | None:
         """
         The live poisson control edge/ generator is set
         """
@@ -698,7 +689,7 @@ class SpikeSourcePoissonVertex(
 
     @property
     def data(self) -> RangeDictionary[
-            Union[NDArray[numpy.floating], NDArray[numpy.integer]]]:
+            NDArray[numpy.floating] | NDArray[numpy.integer]]:
         """
         A dictionary holding all the data as ranges
         """
@@ -709,13 +700,13 @@ class SpikeSourcePoissonVertex(
         return self.__n_colour_bits
 
     def read_connections(
-            self, synapse_info: SynapseInformation) -> List[ConnectionsArray]:
+            self, synapse_info: SynapseInformation) -> list[ConnectionsArray]:
         """ Read Poisson connections from the machine
 
         :param synapse_info: The synapse information of the data being read
         :return: The set of connections from all machine vertices
         """
-        connections = list()
+        connections = []
         for m_vertex in self.machine_vertices:
             connections.append(m_vertex.read_connections(synapse_info))
         return connections

@@ -15,7 +15,7 @@
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
+class AbstractSpynnakerSplitterDelay(metaclass=AbstractBase):
     """
     Defines that a splitter is able to handle delays in some way.
 

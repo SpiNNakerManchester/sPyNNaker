@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import random
-from typing import List
 
 import numpy
 import pyNN.spiNNaker as p
@@ -41,8 +40,8 @@ class TestSpikeSourceArray(BaseTestCase):
                            'v_thresh': -50.0
                            }
 
-        populations = list()
-        projections = list()
+        populations = []
+        projections = []
 
         spike_array = {'spike_times': [[0]]}
         populations.append(p.Population(n_neurons, p.IF_curr_exp,
@@ -85,14 +84,14 @@ class TestSpikeSourceArray(BaseTestCase):
                            'v_thresh': -50.0
                            }
 
-        populations = list()
-        projections = list()
+        populations = []
+        projections = []
 
         boxed_array: NDArray = numpy.zeros(shape=(0, 2))
-        spike_array: List[List[int]] = list()
-        for neuron_id in range(0, n_neurons):
-            spike_array.append(list())
-            for counter in range(0, 20):
+        spike_array: list[list[int]] = []
+        for neuron_id in range(n_neurons):
+            spike_array.append([])
+            for counter in range(20):
                 random_time = random.randint(0, 4999)
                 boxed_array = numpy.append(
                     boxed_array, [[neuron_id, random_time]], axis=0)

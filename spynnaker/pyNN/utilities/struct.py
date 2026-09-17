@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections.abc import Mapping, Sequence
 from enum import Enum
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import Any, TypeAlias
 
 import numpy
 from numpy import integer, uint8, uint32
 from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
-from typing_extensions import TypeAlias
 
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged.abstract_list import AbstractList
@@ -39,7 +39,7 @@ from spynnaker.pyNN.models.common.param_generator_data import (
 from spynnaker.pyNN.utilities.utility_calls import convert_to
 
 #: The type of values used populate structure instances
-ValueMap: TypeAlias = Mapping[str, Union[int, float, AbstractList[float]]]
+ValueMap: TypeAlias = Mapping[str, int | float | AbstractList[float]]
 
 
 REPEAT_PER_NEURON_FLAG = 0xFFFFFFFF
@@ -56,19 +56,20 @@ class StructRepeat(Enum):
     PER_NEURON = 1
 
 
-class Struct(object):
+class Struct:
     """
     Represents a C code structure.
     """
     __slots__ = (
+        "__default_values",
         "__fields",
         "__repeat_type",
-        "__default_values")
+    )
 
     def __init__(
-            self, fields: Sequence[Tuple[DataType, str]],
+            self, fields: Sequence[tuple[DataType, str]],
             repeat_type: StructRepeat = StructRepeat.PER_NEURON,
-            default_values: Optional[Dict[str, Union[int, float]]] = None):
+            default_values: dict[str, int | float] | None = None):
         """
         :param fields:
             The types and names of the fields, ordered as they appear in the
@@ -80,10 +81,10 @@ class Struct(object):
         """
         self.__fields = fields
         self.__repeat_type = repeat_type
-        self.__default_values = default_values or dict()
+        self.__default_values = default_values or {}
 
     @property
-    def fields(self) -> Sequence[Tuple[DataType, str]]:
+    def fields(self) -> Sequence[tuple[DataType, str]]:
         """
         The types and names of the fields, ordered as they appear in the
         structure.
@@ -118,7 +119,7 @@ class Struct(object):
         return (size_in_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
 
     def get_data(self, values: ValueMap,
-                 vertex_slice: Optional[Slice] = None) -> NDArray[uint32]:
+                 vertex_slice: Slice | None = None) -> NDArray[uint32]:
         """
         :param values: The values to fill in the data with
         :param vertex_slice:
@@ -200,7 +201,7 @@ class Struct(object):
 
     def get_generator_data(
             self, values: ValueMap,
-            vertex_slice: Optional[Slice] = None) -> NDArray[uint32]:
+            vertex_slice: Slice | None = None) -> NDArray[uint32]:
         """
         :param values: The values to fill in the data with
         :param vertex_slice:
@@ -226,7 +227,7 @@ class Struct(object):
         # total size of data written (0 as filled in later),
         # and number of fields in struct
         data = [self.numpy_dtype.itemsize, n_repeats, 0, len(self.__fields)]
-        gen_data: List[NDArray[uint32]] = list()
+        gen_data: list[NDArray[uint32]] = []
 
         # Go through all values and add in generator data for each
         for data_type, name in self.__fields:
@@ -255,7 +256,7 @@ class Struct(object):
         return numpy.concatenate(all_data)
 
     def __gen_data_one_for_all(
-            self, data: List[int], gen_data: List[NDArray[uint32]],
+            self, data: list[int], gen_data: list[NDArray[uint32]],
             values: ValueMap, name: str, n_repeats: int) -> None:
         """
         Generate data with a single value for all neurons.
@@ -284,7 +285,7 @@ class Struct(object):
         gen_data.append(param_generator_params(value))
 
     def __gen_data_for_slice(
-            self, data: List[int], gen_data: List[NDArray[uint32]],
+            self, data: list[int], gen_data: list[NDArray[uint32]],
             values: ValueMap, name: str, vertex_slice: Slice) -> None:
         """
         Generate data with different values for each neuron.
@@ -337,7 +338,7 @@ class Struct(object):
     def read_data(
             self, data: bytearray | bytes, values: RangeDictionary,
             data_offset: int = 0,
-            vertex_slice: Optional[Slice] = None) -> None:
+            vertex_slice: Slice | None = None) -> None:
         """
         Read a byte string of data and write to values.
 

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Tuple
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -23,7 +22,7 @@ from pyNN.space import Grid2D
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run() -> Tuple[AnalogSignal, SpikeTrainList]:
+def do_run() -> tuple[AnalogSignal, SpikeTrainList]:
     numpy.random.seed(13)
 
     shape = numpy.array([5, 5])
@@ -104,7 +103,7 @@ def do_run() -> Tuple[AnalogSignal, SpikeTrainList]:
 class TestPoolDense(BaseTestCase):
 
     def check_run(self) -> None:
-        (v, spikes) = do_run()
+        do_run()
 
     def test_run(self) -> None:
         self.runsafe(self.check_run)

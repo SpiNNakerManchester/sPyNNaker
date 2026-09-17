@@ -15,13 +15,14 @@
 from spinn_utilities.abstract_base import AbstractBase
 
 
-class AbstractHasAPlusAMinus(object, metaclass=AbstractBase):
+class AbstractHasAPlusAMinus(metaclass=AbstractBase):
     """
     An object that has :math:`A^+` and :math:`A^-` properties.
     """
     __slots__ = (
+        '__a_minus',
         '__a_plus',
-        '__a_minus')
+    )
 
     def __init__(self) -> None:
         self.__a_plus: float = 0.0

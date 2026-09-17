@@ -66,7 +66,7 @@ class TestPowerMonitoring(BaseTestCase):
                     "WHERE description = 'Exec time (seconds)'"):
                 exec_times.add(row[0])
         # combined
-        self.assertEqual(exec_times, set([0.06]))
+        self.assertEqual(exec_times, {0.06})
 
     def test_power_monitoring(self) -> None:
         self.runsafe(self.do_run)

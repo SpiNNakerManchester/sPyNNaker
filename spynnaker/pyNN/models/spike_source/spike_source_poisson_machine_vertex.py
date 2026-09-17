@@ -14,16 +14,12 @@
 from __future__ import annotations
 
 import struct
-from collections.abc import Sized
+from collections.abc import Iterable, Sequence, Sized
 from enum import IntEnum
 from typing import (
     TYPE_CHECKING,
-    Iterable,
-    List,
-    Optional,
-    Sequence,
+    Final,
     TypeVar,
-    Union,
     cast,
 )
 
@@ -109,7 +105,7 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 
 
-def _flatten(alist: Iterable[Union[T, Iterable[T]]]) -> Iterable[T]:
+def _flatten(alist: Iterable[T | Iterable[T]]) -> Iterable[T]:
     for item in alist:
         if hasattr(item, "__iter__"):
             yield from _flatten(item)
@@ -220,9 +216,10 @@ class SpikeSourcePoissonMachineVertex(
         "__buffered_sdram_per_timestep",
         "__is_recording",
         "__minimum_buffer_sdram",
+        "__rate_changed",
         "__sdram",
         "__sdram_partition",
-        "__rate_changed")
+    )
 
     class _PoissonSpikeSourceRegions(IntEnum):
         """
@@ -245,7 +242,7 @@ class SpikeSourcePoissonMachineVertex(
         #: Data for the on-chip connection generator binaries.
         EXPANDER_REGION = 7
 
-    PROFILE_TAG_LABELS = {
+    PROFILE_TAG_LABELS: Final = {
         0: "TIMER",
         1: "PROB_FUNC"}
 
@@ -264,7 +261,7 @@ class SpikeSourcePoissonMachineVertex(
 
     def __init__(
             self, sdram: AbstractSDRAM, is_recording: bool,
-            label: Optional[str], app_vertex: SpikeSourcePoissonVertex,
+            label: str | None, app_vertex: SpikeSourcePoissonVertex,
             vertex_slice: Slice):
         """
         :param sdram: SDRAM usage of this vertex
@@ -282,8 +279,8 @@ class SpikeSourcePoissonMachineVertex(
             label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__is_recording = is_recording
         self.__sdram = sdram
-        self.__sdram_partition: Optional[
-            SourceSegmentedSDRAMMachinePartition] = None
+        self.__sdram_partition: (
+                SourceSegmentedSDRAMMachinePartition | None) = None
         self.__rate_changed = True
 
     @property
@@ -330,7 +327,7 @@ class SpikeSourcePoissonMachineVertex(
         return 1
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
-    def get_recorded_region_ids(self) -> List[int]:
+    def get_recorded_region_ids(self) -> list[int]:
         if self.__is_recording:
             return [0]
         return []
@@ -497,7 +494,7 @@ class SpikeSourcePoissonMachineVertex(
 
         # List starts with n_items, so start with 0.  Use arrays to allow
         # numpy concatenation to work.
-        data_items: List[Union[Sequence[int], numpy.ndarray]] = list()
+        data_items: list[Sequence[int] | numpy.ndarray] = []
         data_items.append([int(self.__rate_changed)])
         data_items.append([0])
         n_items = 0
@@ -544,7 +541,7 @@ class SpikeSourcePoissonMachineVertex(
         # Write Key info for this core:
         routing_info = SpynnakerDataView.get_routing_infos()
         key = routing_info.get_single_key_from(self)
-        keys: Union[Sequence[int], numpy.ndarray]
+        keys: Sequence[int] | numpy.ndarray
         if key is None:
             spec.write_value(0)
             keys = [0] * self.vertex_slice.n_atoms
@@ -636,7 +633,7 @@ class SpikeSourcePoissonMachineVertex(
                 n_rates, = _ONE_WORD.unpack_from(byte_array, offset)
                 # Skip the count and index
                 offset += PARAMS_WORDS_PER_NEURON * BYTES_PER_WORD
-                rates: List[float] = list()
+                rates: list[float] = []
                 for _ in range(n_rates):
                     rate_int = _ONE_WORD.unpack_from(byte_array, offset)[0]
                     rates.append(rate_int / DataType.S1615.scale)

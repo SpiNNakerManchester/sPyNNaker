@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-from typing import Set
 
 from spinn_utilities.config_holder import clear_cfg_files
 
@@ -57,7 +56,7 @@ def add_spynnaker_cfg() -> None:
     add_default_cfg(os.path.join(os.path.dirname(__file__), SPYNNAKER_CFG))
 
 
-def cfg_paths_skipped() -> Set[str]:
+def cfg_paths_skipped() -> set[str]:
     """
     Set of cfg path that would not be found based on other cfg settings
 

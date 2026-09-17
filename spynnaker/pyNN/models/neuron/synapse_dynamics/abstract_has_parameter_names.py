@@ -11,12 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Iterable
+from collections.abc import Iterable
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-class AbstractHasParameterNames(object, metaclass=AbstractBase):
+class AbstractHasParameterNames(metaclass=AbstractBase):
     """
     A component that has parameter names. Parameter names are usually
     properties of the component, and are frequently also settable by named

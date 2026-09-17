@@ -21,7 +21,9 @@ from .spynnaker_poisson_control_connection import (
 )
 
 __all__ = [
-    "EthernetCommandConnection", "EthernetControlConnection",
-    "SpynnakerLiveSpikesConnection", "SpynnakerPoissonControlConnection",
-    "SPIFLiveSpikesConnection"
+    "EthernetCommandConnection",
+    "EthernetControlConnection",
+    "SPIFLiveSpikesConnection",
+    "SpynnakerLiveSpikesConnection",
+    "SpynnakerPoissonControlConnection"
 ]

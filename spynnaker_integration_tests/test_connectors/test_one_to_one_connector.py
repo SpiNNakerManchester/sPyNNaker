@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Tuple, Union
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -74,10 +73,10 @@ class TestOneToOneConnector(BaseTestCase):
             assert spikes[i][0] > (i % 100)
 
     def do_one_to_one_nd_test(
-            self, neurons_per_core_pre: Tuple[int, ...], pre_size: int,
+            self, neurons_per_core_pre: tuple[int, ...], pre_size: int,
             pre_shape: BaseStructure,
-            neurons_per_core_post: Union[int, Tuple[int, ...]],
-            post_size: int, post_shape: Optional[BaseStructure]) -> None:
+            neurons_per_core_post: int | tuple[int, ...],
+            post_size: int, post_shape: BaseStructure | None) -> None:
         sim.setup(1.0)
         pre = sim.Population(pre_size, sim.SpikeSourceArray(
             [[i % 100] for i in range(pre_size)]), structure=pre_shape)

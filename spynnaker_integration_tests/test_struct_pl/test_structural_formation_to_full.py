@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Tuple
 
 import pyNN.spiNNaker as p
 
@@ -20,7 +19,7 @@ from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 
-def structural_formation_to_full() -> Tuple[ConnectionHolder, int, int, str]:
+def structural_formation_to_full() -> tuple[ConnectionHolder, int, int, str]:
     p.setup(1.0)
     stim = p.Population(4, p.SpikeSourceArray(range(10)), label="stim")
 
@@ -61,7 +60,7 @@ def structural_formation_to_full() -> Tuple[ConnectionHolder, int, int, str]:
 
 
 def structural_formation_to_full_with_reset(
-        ) -> Tuple[ConnectionHolder, int, int, str, str]:
+        ) -> tuple[ConnectionHolder, int, int, str, str]:
     p.setup(1.0)
     stim = p.Population(4, p.SpikeSourceArray(range(10)), label="stim")
 

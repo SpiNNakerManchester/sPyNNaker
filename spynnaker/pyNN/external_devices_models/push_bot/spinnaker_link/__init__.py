@@ -18,8 +18,10 @@ from .push_bot_motor_device import PushBotSpiNNakerLinkMotorDevice
 from .push_bot_retina_device import PushBotSpiNNakerLinkRetinaDevice
 from .push_bot_speaker_device import PushBotSpiNNakerLinkSpeakerDevice
 
-__all__ = ["PushBotSpiNNakerLinkLaserDevice",
+__all__ = [
            "PushBotSpiNNakerLinkLEDDevice",
+           "PushBotSpiNNakerLinkLaserDevice",
            "PushBotSpiNNakerLinkMotorDevice",
            "PushBotSpiNNakerLinkRetinaDevice",
-           "PushBotSpiNNakerLinkSpeakerDevice"]
+           "PushBotSpiNNakerLinkSpeakerDevice",
+]

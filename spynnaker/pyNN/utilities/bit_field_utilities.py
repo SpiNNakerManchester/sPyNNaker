@@ -14,7 +14,8 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Iterable, Optional, Tuple
+from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy import uint32
@@ -64,7 +65,7 @@ def is_sdram_poisson_source(app_edge: ApplicationEdge) -> bool:
 
 
 def _unique_edges(projections: Iterable[Projection]) -> Iterable[
-        Tuple[ProjectionApplicationEdge, str]]:
+        tuple[ProjectionApplicationEdge, str]]:
     """
     Get the unique application edges of a collection of projections.
 
@@ -94,11 +95,11 @@ def get_sdram_for_bit_field_region(
     sdram = FILTER_HEADER_WORDS * BYTES_PER_WORD
     for in_edge, _part_id in _unique_edges(incoming_projections):
         n_atoms = in_edge.pre_vertex.n_atoms
-        n_words_for_atoms = int(math.ceil(n_atoms / BIT_IN_A_WORD))
+        n_words_for_atoms = math.ceil(n_atoms / BIT_IN_A_WORD)
         sdram += (FILTER_INFO_WORDS + n_words_for_atoms) * BYTES_PER_WORD
         # Also add for delay vertices if needed
-        n_words_for_delays = int(math.ceil(
-            n_atoms * in_edge.n_delay_stages / BIT_IN_A_WORD))
+        n_words_for_delays = math.ceil(
+            n_atoms * in_edge.n_delay_stages / BIT_IN_A_WORD)
         sdram += (FILTER_INFO_WORDS + n_words_for_delays) * BYTES_PER_WORD
     return sdram
 
@@ -155,7 +156,7 @@ def get_bitfield_key_map_data(
 def write_bitfield_init_data(
         spec: DataSpecificationBase, bit_field_region: int,
         n_bit_field_bytes: int,
-        bit_field_region_ref: Optional[int] = None) -> None:
+        bit_field_region_ref: int | None = None) -> None:
     """
     Writes the initialisation data needed for the bitfield generator.
 

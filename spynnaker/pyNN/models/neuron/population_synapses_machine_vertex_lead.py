@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Sequence
+from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from numpy import floating
 from numpy.typing import NDArray
@@ -60,13 +61,14 @@ class PopulationSynapsesMachineVertexLead(
     """
 
     __slots__ = (
-        "__synaptic_matrices",
+        "__max_atoms_per_core",
+        "__regenerate_data",
         "__ring_buffer_shifts",
-        "__weight_scales",
         "__structural_sz",
         "__synapse_references",
-        "__max_atoms_per_core",
-        "__regenerate_data")
+        "__synaptic_matrices",
+        "__weight_scales",
+    )
 
     def __init__(
             self, sdram: AbstractSDRAM, label: str,
@@ -114,7 +116,7 @@ class PopulationSynapsesMachineVertexLead(
         return self.__max_atoms_per_core
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
-    def get_recorded_region_ids(self) -> List[int]:
+    def get_recorded_region_ids(self) -> list[int]:
         ids = self._pop_vertex.synapse_recorder.recorded_ids_by_slice(
             self.vertex_slice)
         return ids

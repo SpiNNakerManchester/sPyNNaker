@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional, Tuple
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy import uint32
@@ -50,54 +50,55 @@ if TYPE_CHECKING:
     from .master_pop_table import MasterPopTableAsBinarySearch
 
 
-class SynapticMatrixApp(object):
+class SynapticMatrixApp:
     """
     The synaptic matrix (and delay matrix if applicable) for an incoming
     application edge.
     """
 
     __slots__ = (
-        # The synaptic info that these matrices are for
-        "__synapse_info",
-        # The application edge that these matrices are for
-        "__app_edge",
-        # The number of synapse types incoming
-        "__n_synapse_types",
-        # The ID of the synaptic matrix region
-        "__synaptic_matrix_region",
-        # The maximum row length of delayed and undelayed matrices
-        "__max_row_info",
         # The maximum summed size of the synaptic matrices
         "__all_syn_block_sz",
+        # The application edge that these matrices are for
+        "__app_edge",
         # The application-level key information for the incoming edge
         "__app_key_info",
         # The application-level key information for the incoming delay edge
         "__delay_app_key_info",
-        # The weight scaling used by each synapse type
-        "__weight_scales",
-        # The expected size in bytes of a synaptic matrix
-        "__matrix_size",
         # The expected size in bytes of a delayed synaptic matrix
         "__delay_matrix_size",
-        # The offset of the undelayed synaptic matrix in the region
-        "__syn_mat_offset",
         # The offset of the delayed synaptic matrix in the region
         "__delay_syn_mat_offset",
-        # The index of the synaptic matrix within the master population table
-        "__index",
-        # The number of bits to use for neuron IDs
-        "__max_atoms_per_core",
+        # The download index for the delayed synaptic matrix
+        "__download_delay_index",
         # The download index for the undelayed synaptic matrix
         "__download_index",
-        # The download index for the delayed synaptic matrix
-        "__download_delay_index")
+        # The index of the synaptic matrix within the master population table
+        "__index",
+        # The expected size in bytes of a synaptic matrix
+        "__matrix_size",
+        # The number of bits to use for neuron IDs
+        "__max_atoms_per_core",
+        # The maximum row length of delayed and undelayed matrices
+        "__max_row_info",
+        # The number of synapse types incoming
+        "__n_synapse_types",
+        # The offset of the undelayed synaptic matrix in the region
+        "__syn_mat_offset",
+        # The synaptic info that these matrices are for
+        "__synapse_info",
+        # The ID of the synaptic matrix region
+        "__synaptic_matrix_region",
+        # The weight scaling used by each synapse type
+        "__weight_scales",
+    )
 
     def __init__(
             self, synapse_info: SynapseInformation,
             app_edge: ProjectionApplicationEdge, n_synapse_types: int,
             synaptic_matrix_region: int, max_atoms_per_core: int,
-            all_syn_block_sz: int, app_key_info: Optional[AppKeyInfo],
-            delay_app_key_info: Optional[AppKeyInfo],
+            all_syn_block_sz: int, app_key_info: AppKeyInfo | None,
+            delay_app_key_info: AppKeyInfo | None,
             weight_scales: WeightScales):
         """
         :param synapse_info:
@@ -140,12 +141,12 @@ class SynapticMatrixApp(object):
             self.__max_row_info.delayed_max_bytes)
 
         # These are computed during synaptic generation
-        self.__syn_mat_offset: Optional[int] = None
-        self.__delay_syn_mat_offset: Optional[int] = None
-        self.__index: Optional[int] = None
+        self.__syn_mat_offset: int | None = None
+        self.__delay_syn_mat_offset: int | None = None
+        self.__index: int | None = None
 
-        self.__download_index: Optional[int] = None
-        self.__download_delay_index: Optional[int] = None
+        self.__download_index: int | None = None
+        self.__download_delay_index: int | None = None
 
     @property
     def gen_size(self) -> int:
@@ -265,7 +266,7 @@ class SynapticMatrixApp(object):
 
     def append_matrix(
             self, post_vertex_slice: Slice,
-            data_to_write: List[NDArray[uint32]],
+            data_to_write: list[NDArray[uint32]],
             block_addr: int) -> int:
         """
         Append a synaptic matrix from be written from host.
@@ -292,7 +293,7 @@ class SynapticMatrixApp(object):
         return block_addr
 
     def __get_padding(
-            self, data_to_write: List[NDArray[uint32]],
+            self, data_to_write: list[NDArray[uint32]],
             expected_offset: int, block_addr: int) -> int:
         if expected_offset < block_addr:
             raise ValueError(
@@ -305,7 +306,7 @@ class SynapticMatrixApp(object):
         return block_addr
 
     def __get_row_data(
-            self, post_vertex_slice: Slice) -> Tuple[NDArray, NDArray]:
+            self, post_vertex_slice: Slice) -> tuple[NDArray, NDArray]:
         """
         Generate the row data for a synaptic matrix from the description.
 
@@ -389,7 +390,7 @@ class SynapticMatrixApp(object):
                 for holder in self.__synapse_info.pre_run_connection_holders:
                     holder.add_connections(conns)
 
-    def get_connections(self, placement: Placement) -> List[NDArray]:
+    def get_connections(self, placement: Placement) -> list[NDArray]:
         """
         Read connections from an address on the machine.
 
@@ -398,10 +399,10 @@ class SynapticMatrixApp(object):
         :return: A list of arrays of connections, each with dtype
             :py:const:`~.NUMPY_CONNECTORS_DTYPE`
         """
-        connections = list()
+        connections = []
 
-        synapses_address: Optional[int] = None
-        buffers: Optional[BufferManager] = None
+        synapses_address: int | None = None
+        buffers: BufferManager | None = None
         if (self.__download_index is None and
                 self.__download_delay_index is None):
             synapses_address = locate_memory_region_for_placement(
@@ -484,7 +485,7 @@ class SynapticMatrixApp(object):
 
     def get_download_regions(
             self, placement: Placement,
-            start_index: int) -> List[Tuple[int, int, int]]:
+            start_index: int) -> list[tuple[int, int, int]]:
         """
         Get the data regions that should be downloaded when the simulation
         pauses.
@@ -500,7 +501,7 @@ class SynapticMatrixApp(object):
             return []
         synapses_address = locate_memory_region_for_placement(
             placement, self.__synaptic_matrix_region)
-        regions = list()
+        regions = []
         if self.__syn_mat_offset is not None:
             regions.append((start_index,
                             synapses_address + self.__syn_mat_offset,

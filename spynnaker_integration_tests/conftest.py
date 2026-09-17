@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterator
+from collections.abc import Iterator
 
 import pyNN.spiNNaker as sim
 import pytest
@@ -31,7 +31,7 @@ def check_end_is_called(request: SubRequest) -> Iterator[None]:
         return
     try:
         sim.end()
-    except Exception:  # pylint: disable=broad-except
+    except Exception:  # NOQA
         # Ignore anything that comes from this
         pass
     raise Exception(f"Simulation has not been stopped in {request.function}!")

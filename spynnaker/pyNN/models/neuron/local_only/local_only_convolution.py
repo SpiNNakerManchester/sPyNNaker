@@ -13,8 +13,9 @@
 # limitations under the License.
 from __future__ import annotations
 
+from collections.abc import Iterable
 from math import ceil
-from typing import TYPE_CHECKING, Dict, Iterable, List, Tuple, cast
+from typing import TYPE_CHECKING, cast
 
 import numpy
 from numpy import floating, uint32
@@ -92,9 +93,9 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         super().__init__(delay)
 
         # Store the sources to avoid recalculation
-        self.__cached_sources: Dict[ApplicationVertex, Dict[
-                Tuple[ColouredApplicationVertex, str],
-                List[Source]]] = dict()
+        self.__cached_sources: dict[ApplicationVertex, dict[
+                tuple[ColouredApplicationVertex, str],
+                list[Source]]] = {}
 
     @property
     def _delay(self) -> float:
@@ -166,11 +167,11 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.switch_write_focus(region)
 
         # Get spec for each incoming source
-        connector_weight_index: Dict[AbstractConnector, int] = dict()
+        connector_weight_index: dict[AbstractConnector, int] = {}
         next_weight_index: int = 0
-        source_data = list()
-        connector_data: List[NDArray[uint32]] = list()
-        weight_data = list()
+        source_data = []
+        connector_data: list[NDArray[uint32]] = []
+        weight_data = []
         for (pre_vertex, part_id), source_infos in sources.items():
 
             # Add connectors as needed
@@ -209,8 +210,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
             # Get cores per width / height
             pre_shape = list(pre_vertex.atoms_shape)
-            cores_per_width = int(ceil(pre_shape[0] / width_per_core))
-            cores_per_height = int(ceil(pre_shape[1] / height_per_core))
+            cores_per_width = ceil(pre_shape[0] / width_per_core)
+            cores_per_height = ceil(pre_shape[1] / height_per_core)
 
             # Add the key and mask...
             source_data.extend([r_info.key, r_info.mask])
@@ -264,8 +265,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             numpy.concatenate(weight_data, dtype="int16").view("uint32"))
 
     def __get_sources_for_target(
-            self, app_vertex: PopulationVertex) -> Dict[
-                Tuple[ColouredApplicationVertex, str], List[Source]]:
+            self, app_vertex: PopulationVertex) -> dict[
+                tuple[ColouredApplicationVertex, str], list[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.

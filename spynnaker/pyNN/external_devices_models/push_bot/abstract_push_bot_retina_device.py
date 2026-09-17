@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List, Optional
+from collections.abc import Iterable
 
 from spinn_utilities.overrides import overrides
 
@@ -34,7 +34,7 @@ class AbstractPushBotRetinaDevice(
     """
 
     def __init__(self, protocol: MunichIoSpiNNakerLinkProtocol,
-                 resolution: Optional[PushBotRetinaResolution]):
+                 resolution: PushBotRetinaResolution | None):
         """
         :param protocol:
         :param resolution:
@@ -64,5 +64,5 @@ class AbstractPushBotRetinaDevice(
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
-    def timed_commands(self) -> List[MultiCastCommand]:
+    def timed_commands(self) -> list[MultiCastCommand]:
         return []

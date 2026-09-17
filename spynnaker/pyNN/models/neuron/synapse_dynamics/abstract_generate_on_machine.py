@@ -39,7 +39,7 @@ class MatrixGeneratorID(Enum):
     CHANGE_WEIGHT_MATRIX = 3
 
 
-class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
+class AbstractGenerateOnMachine(metaclass=AbstractBase):
     """
     A synapse dynamics that can be generated on the machine.
     """

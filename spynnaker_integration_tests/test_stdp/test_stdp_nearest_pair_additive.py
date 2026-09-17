@@ -20,21 +20,21 @@ import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 
-class TestIFCondExpSTDPPairAdditive(BaseTestCase):
+class TestSTDPNearestPairAdditive(BaseTestCase):
 
-    def potentiation_and_depression(self) -> None:
+    def potentiation_and_depression(self, n_synapse_cores: int) -> None:
         p.setup(1)
         runtime = 100
         initial_run = 1000  # to negate any initial conditions
 
         # STDP parameters
-        a_plus = 0.1
-        a_minus = 0.0375
+        a_plus = 0.01
+        a_minus = 0.01
         tau_plus = 20
-        tau_minus = 64
-        plastic_delay = 1
-        initial_weight = 0.05
-        max_weight = 0.5
+        tau_minus = 20
+        plastic_delay = 3
+        initial_weight = 2.5
+        max_weight = 5
         min_weight = 0
 
         pre_spikes = [10, 50]
@@ -56,23 +56,24 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
                                  {'spike_times': extra_spikes}, label="extra")
 
         # Post-plastic-synapse population
-        post_pop = p.Population(1, p.IF_cond_exp(),  label="post")
+        post_pop = p.Population(1, p.IF_curr_exp(), label="post",
+                                n_synapse_cores=n_synapse_cores)
 
         # Create projections
         p.Projection(
             pre_pop, post_pop, p.OneToOneConnector(),
-            p.StaticSynapse(weight=0.1, delay=1), receptor_type="excitatory")
+            p.StaticSynapse(weight=5.0, delay=1), receptor_type="excitatory")
 
         p.Projection(
             extra_pop, post_pop, p.OneToOneConnector(),
-            p.StaticSynapse(weight=0.1, delay=1), receptor_type="excitatory")
+            p.StaticSynapse(weight=5.0, delay=1), receptor_type="excitatory")
 
         syn_plas = p.STDPMechanism(
             timing_dependence=p.extra_models.SpikeNearestPairRule(
                 tau_plus=tau_plus, tau_minus=tau_minus,
                 A_plus=a_plus, A_minus=a_minus),
-            weight_dependence=p.AdditiveWeightDependence(w_min=min_weight,
-                                                         w_max=max_weight),
+            weight_dependence=p.AdditiveWeightDependence(
+                w_min=min_weight, w_max=max_weight),
             weight=initial_weight, delay=plastic_delay)
 
         plastic_synapse = p.Projection(pre_pop, post_pop,
@@ -104,8 +105,8 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
         last_pre_spike = pre_spikes_n[-1]
         considered_post_spikes = post_spikes[post_spikes < last_pre_spike]
         considered_post_spikes += plastic_delay
-        potentiation_times = list()
-        depression_times = list()
+        potentiation_times = []
+        depression_times = []
         for time in pre_spikes_n:
             post_times = considered_post_spikes[considered_post_spikes > time]
             if len(post_times) > 0:
@@ -118,23 +119,40 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
 
         # Work out the weight according to the rules
         potentiations = a_plus * numpy.exp(
-            (numpy.array(potentiation_times) / tau_plus))
+            numpy.array(potentiation_times) / tau_plus)
         depressions = a_minus * numpy.exp(
-            (numpy.array(depression_times) / tau_minus))
+            numpy.array(depression_times) / tau_minus)
         new_weight_exact = \
             initial_weight + numpy.sum(potentiations) - numpy.sum(depressions)
 
-        print("Pre neuron spikes at: {}".format(pre_spikes_n))
-        print("Post-neuron spikes at: {}".format(post_spikes))
-        target_spikes = [1013, 1032, 1051, 1055]
+        # print("Pre neuron spikes at: {}".format(pre_spikes_n))
+        # print("Post-neuron spikes at: {}".format(post_spikes))
+        target_spikes = [1014,  1032, 1053]
         self.assertListEqual(list(post_spikes), target_spikes)
-        print("New weight exact: {}".format(new_weight_exact))
-        print("New weight SpiNNaker: {}".format(weights))
+        # print("Potentiation time differences: {}".format(potentiation_times))
+        # print("Depression time differences: {}".format(depression_times))
+        # print("Potentiation: {}".format(potentiations))
+        # print("Depressions: {}".format(depressions))
+        # print("New weight exact: {}".format(new_weight_exact))
+        # print("New weight SpiNNaker: {}".format(weights))
 
-        self.assertTrue(numpy.allclose(weights, new_weight_exact, rtol=0.001))
+        self.assertTrue(numpy.allclose(
+                        weights[0], new_weight_exact, atol=0.001))
+
+    def do_synapse(self) -> None:
+        self.potentiation_and_depression(1)
 
     def test_potentiation_and_depression(self) -> None:
-        self.runsafe(self.potentiation_and_depression)
+        self.runsafe(self.do_synapse)
+        self.check_binary_used("synapses_stdp_mad_nearest_pair_additive.aplx")
+
+    def do_combined(self) -> None:
+        self.potentiation_and_depression(0)
+
+    def test_combined(self) -> None:
+        self.runsafe(self.do_combined)
+        self.check_binary_used(
+            "IF_curr_exp_stdp_mad_nearest_pair_additive.aplx")
 
 
 if __name__ == '__main__':

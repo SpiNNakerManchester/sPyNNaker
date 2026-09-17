@@ -19,5 +19,11 @@ from .push_bot_retina_resolution import PushBotRetinaResolution
 from .push_bot_retina_viewer import PushBotRetinaViewer
 from .push_bot_speaker import PushBotSpeaker
 
-__all__ = ["PushBotLaser", "PushBotLED", "PushBotMotor", "PushBotSpeaker",
-           "PushBotRetinaResolution", "PushBotRetinaViewer"]
+__all__ = [
+           "PushBotLED",
+           "PushBotLaser",
+           "PushBotMotor",
+           "PushBotRetinaResolution",
+           "PushBotRetinaViewer",
+           "PushBotSpeaker",
+]

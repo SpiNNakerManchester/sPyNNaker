@@ -21,7 +21,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
 
 
-class EIEIOSpikeRecorder(object):
+class EIEIOSpikeRecorder:
     """
     Records spikes using EIEIO format.
     """

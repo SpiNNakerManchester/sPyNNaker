@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, List, Optional
+from collections.abc import Iterable
 
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex,
@@ -34,10 +34,10 @@ class EthernetCommandConnection(DatabaseConnection):
 
     def __init__(
             self, translator: AbstractEthernetTranslator,
-            command_containers: Optional[Iterable[
-                AbstractSendMeMulticastCommandsVertex]] = None,
-            local_host: Optional[str] = None,
-            local_port: Optional[int] = NOTIFY_PORT):
+            command_containers: Iterable[
+            AbstractSendMeMulticastCommandsVertex] | None = None,
+            local_host: str | None = None,
+            local_port: int | None = NOTIFY_PORT):
         """
         :param translator:
             A translator of multicast commands to device commands
@@ -54,8 +54,8 @@ class EthernetCommandConnection(DatabaseConnection):
             stop_pause_callback_function=self._stop_pause_callback,
             local_host=local_host, local_port=local_port)
 
-        self.__command_containers: List[
-            AbstractSendMeMulticastCommandsVertex] = list()
+        self.__command_containers: list[
+            AbstractSendMeMulticastCommandsVertex] = []
         if command_containers is not None:
             for command_container in command_containers:
                 self.add_command_container(command_container)

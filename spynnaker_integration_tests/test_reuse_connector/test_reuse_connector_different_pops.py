@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Tuple
 
 import pyNN.spiNNaker as p
 
@@ -21,7 +20,7 @@ from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 
-def do_run() -> Tuple[ConnectionHolder, ConnectionHolder]:
+def do_run() -> tuple[ConnectionHolder, ConnectionHolder]:
 
     p.setup(timestep=1.0)
     # The larger population needs to be first for this test

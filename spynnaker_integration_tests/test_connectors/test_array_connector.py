@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy
@@ -26,7 +25,7 @@ from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.utilities import neo_convertor
 
 
-def do_run(plot: bool) -> Tuple[Block, Block, Block, Block]:
+def do_run(plot: bool) -> tuple[Block, Block, Block, Block]:
 
     p.setup(timestep=1.0)
 
@@ -116,7 +115,7 @@ def do_run(plot: bool) -> Tuple[Block, Block, Block, Block]:
                   data_labels=[pop2.label], yticks=True,
                   xlim=(0, runtime), xticks=True),
             title="Testing ArrayConnector",
-            annotations="Simulated with {}".format(p.name())
+            annotations=f"Simulated with {p.name()}"
         )
         plt.show()
 
@@ -125,7 +124,7 @@ def do_run(plot: bool) -> Tuple[Block, Block, Block, Block]:
     return v, spikes, v2, spikes2
 
 
-def do_larger_array(plot: bool) -> Tuple[Block, Block, Block]:
+def do_larger_array(plot: bool) -> tuple[Block, Block, Block]:
     p.setup(timestep=1.0)
 
     n_i = 64
@@ -172,7 +171,7 @@ def do_larger_array(plot: bool) -> Tuple[Block, Block, Block]:
                   data_labels=[inhit_pop.label], yticks=True,
                   xlim=(0, runtime), xticks=True),
             title="Testing ArrayConnector",
-            annotations="Simulated with {}".format(p.name())
+            annotations=f"Simulated with {p.name()}"
         )
         plt.show()
 
@@ -184,7 +183,7 @@ def do_larger_array(plot: bool) -> Tuple[Block, Block, Block]:
 class ArrayConnectorTest(BaseTestCase):
 
     def a_run(self) -> None:
-        v, spikes, v2, spikes2 = do_run(plot=False)
+        _, spikes, _, spikes2 = do_run(plot=False)
         # any checks go here
         spikes_test = neo_convertor.convert_spikes(spikes)
         spikes_test2 = neo_convertor.convert_spikes(spikes2)
@@ -195,7 +194,7 @@ class ArrayConnectorTest(BaseTestCase):
         self.runsafe(self.a_run)
 
     def larger_array(self) -> None:
-        v, spikes, conns = do_larger_array(plot=False)
+        _, spikes, conns = do_larger_array(plot=False)
         # checks go here
         spikes_test = neo_convertor.convert_spikes(spikes)
         self.assertEqual(4032, len(conns))
@@ -205,10 +204,10 @@ class ArrayConnectorTest(BaseTestCase):
         self.runsafe(self.larger_array)
 
     def do_array_nd_test(
-            self, neurons_per_core_pre: Tuple[int, ...], pre_size: int,
+            self, neurons_per_core_pre: tuple[int, ...], pre_size: int,
             pre_shape: BaseStructure,
-            neurons_per_core_post: Union[int, Tuple[int, ...]],
-            post_size: int, post_shape: Optional[BaseStructure]) -> None:
+            neurons_per_core_post: int | tuple[int, ...],
+            post_size: int, post_shape: BaseStructure | None) -> None:
         p.setup(1.0)
         pre = p.Population(
             pre_size, p.IF_curr_exp(), structure=pre_shape)

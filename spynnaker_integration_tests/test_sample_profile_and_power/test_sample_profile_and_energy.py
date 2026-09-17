@@ -51,7 +51,7 @@ class TestSampleProfilingWithEnerfy(BaseTestCase):
                     "WHERE description = 'Exec time (seconds)'"):
                 exec_times.add(row[0])
         # combined
-        self.assertEqual(exec_times, set([0.06]))
+        self.assertEqual(exec_times, {0.06})
 
     def assert_sample_profile_report(self) -> None:
         path = get_report_path("path_sample_profile_report")

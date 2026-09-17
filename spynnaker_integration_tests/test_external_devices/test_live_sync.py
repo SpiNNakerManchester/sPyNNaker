@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import traceback
 from time import sleep
-from typing import List
 
 import pyNN.spiNNaker as p
 
@@ -26,15 +24,14 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.external_devices import SpynnakerLiveSpikesConnection
 
 sim_finished = False
-n_spikes = list()
+n_spikes = []
 n_spikes.append(0)
 
 
-def recv(label: str, time: int, neuron_ids: List[int]) -> None:
+def recv(label: str, time: int, neuron_ids: list[int]) -> None:
     """ Receive spikes and add the number received to the current segment count
     """
-    print("Time: {}; Received spikes from {}:{}".format(
-        time, label, neuron_ids))
+    print(f"Time: {time}; Received spikes from {label}:{neuron_ids}")
     n_spikes[len(n_spikes) - 1] += len(neuron_ids)
 
 
@@ -52,8 +49,7 @@ def send_sync(label: str, conn: LiveEventConnection) -> None:
             except SimulatorShutdownException:
                 # Weird raise condition lost
                 sim_finished = True
-            except Exception:  # pylint: disable=broad-except
-                traceback.print_exc()
+            # Removed except Exception  So reevaluate if there is an error
 
 
 def stop(label: str, conn: LiveEventConnection) -> None:
@@ -83,7 +79,7 @@ def test_live_sync() -> None:
 
     try:
         p.external_devices.run_sync(100, 20)
-    except Exception:
+    except Exception:  # NOQA
         if sim_finished:
             SpynnakerDataView.raise_skiptest("Stopped too soon")
 

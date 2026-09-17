@@ -15,7 +15,8 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, Optional, Sequence, Set, Tuple, cast
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy
 from pyNN.random import RandomDistribution
@@ -47,7 +48,7 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class AbstractSynapseDynamics(object, metaclass=AbstractBase):
+class AbstractSynapseDynamics(metaclass=AbstractBase):
     """
     How do the dynamics of a synapse interact with the rest of the model.
     """
@@ -227,7 +228,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         raise NotImplementedError
 
-    def get_synapse_parameter_names(self) -> Set[str]:
+    def get_synapse_parameter_names(self) -> set[str]:
         """
         :return: the names of the parameters that can be extracted from
          synapses read from the machine.
@@ -270,7 +271,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
     def get_delay_minimum(
             self, connector: AbstractConnector,
-            synapse_info: SynapseInformation) -> Optional[float]:
+            synapse_info: SynapseInformation) -> float | None:
         """
         Get the minimum delay for the synapses.
 
@@ -326,7 +327,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return connector.get_weight_variance(weights, synapse_info)
 
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         """
         :param target: The name of the synapse
         :returns: The index of the synapse type based on the name,
@@ -339,7 +340,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             self, s_info: SynapseInformation,
             source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
-                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
+                tuple[MachineVertex, Sequence[AbstractVertex]]]:
         """
         Get the machine vertices that are connected to each other with
         this connector.

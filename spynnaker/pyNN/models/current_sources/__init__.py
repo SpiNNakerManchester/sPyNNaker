@@ -18,5 +18,11 @@ from .dc_source import DCSource
 from .noisy_current_source import NoisyCurrentSource
 from .step_current_source import StepCurrentSource
 
-__all__ = ["AbstractCurrentSource", "CurrentSourceIDs", "DCSource", "ACSource",
-           "StepCurrentSource", "NoisyCurrentSource"]
+__all__ = [
+           "ACSource",
+           "AbstractCurrentSource",
+           "CurrentSourceIDs",
+           "DCSource",
+           "NoisyCurrentSource",
+           "StepCurrentSource",
+]

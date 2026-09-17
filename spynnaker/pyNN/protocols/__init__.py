@@ -20,5 +20,10 @@ from .munich_io_spinnaker_link_protocol import (
     RetinaPayload,
 )
 
-__all__ = ["MunichIoEthernetProtocol", "MunichIoSpiNNakerLinkProtocol",
-           "MUNICH_MODES", "RetinaKey", "RetinaPayload"]
+__all__ = [
+    "MUNICH_MODES",
+    "MunichIoEthernetProtocol",
+    "MunichIoSpiNNakerLinkProtocol",
+    "RetinaKey",
+    "RetinaPayload",
+]

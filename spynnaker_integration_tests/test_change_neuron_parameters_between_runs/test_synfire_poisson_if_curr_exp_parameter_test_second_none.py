@@ -16,7 +16,7 @@ import pyNN.spiNNaker as p
 
 from spinnaker_testbase import BaseTestCase
 
-import spynnaker.spike_checker as spike_checker
+from spynnaker import spike_checker
 
 from spynnaker_integration_tests.scripts import SynfireRunner
 

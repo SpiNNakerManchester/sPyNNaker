@@ -14,14 +14,10 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Collection, Mapping, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Collection,
-    Dict,
-    Mapping,
-    Optional,
-    Sequence,
 )
 
 import neo  # type: ignore[import]
@@ -32,7 +28,6 @@ from spinn_utilities.logger_utils import warn_once
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.types import IoDest
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import check_io
 
@@ -40,11 +35,12 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.common import PopulationApplicationVertex
     from spynnaker.pyNN.models.common.types import Names
     from spynnaker.pyNN.models.populations import Population
+    from spynnaker.pyNN.types import IoDest
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class Recorder(object):
+class Recorder:
     """
     Object to hold recording behaviour, used by populations.
     """
@@ -66,7 +62,7 @@ class Recorder(object):
         self.__vertex = vertex
 
         # file flags, allows separate files for the recorded variables
-        self.__write_to_files_indicators: Dict[str, IoDest] = {
+        self.__write_to_files_indicators: dict[str, IoDest] = {
             'spikes': None,
             'gsyn_exc': None,
             'gsyn_inh': None,
@@ -82,8 +78,8 @@ class Recorder(object):
 
     def record(
             self, variables: Names, to_file: IoDest,
-            sampling_interval: Optional[float],
-            indexes: Optional[Collection[int]]) -> None:
+            sampling_interval: float | None,
+            indexes: Collection[int] | None) -> None:
         """
         Turns on (or off) recording.
 
@@ -137,8 +133,8 @@ class Recorder(object):
                         variable, sampling_interval, to_file, indexes)
 
     def __turn_on_all_record(
-            self, sampling_interval: Optional[float], to_file: IoDest,
-            indexes: Optional[Collection[int]]) -> None:
+            self, sampling_interval: float | None, to_file: IoDest,
+            indexes: Collection[int] | None) -> None:
         """
         :param sampling_interval: the interval to record them
         :param to_file: If set, a file to write to (by handle or name)
@@ -157,9 +153,9 @@ class Recorder(object):
                 variable, sampling_interval, to_file, indexes)
 
     def turn_on_record(
-            self, variable: str, sampling_interval: Optional[float] = None,
+            self, variable: str, sampling_interval: float | None = None,
             to_file: IoDest = None,
-            indexes: Optional[Collection[int]] = None) -> None:
+            indexes: Collection[int] | None = None) -> None:
         """
         Tell the vertex to record data.
 
@@ -205,7 +201,7 @@ class Recorder(object):
         return self.__vertex.label or "!!UNLABELLED VERTEX!!"
 
     def turn_off_all_recording(
-            self, indexes: Optional[Collection[int]] = None) -> None:
+            self, indexes: Collection[int] | None = None) -> None:
         """
         Turns off recording, is used by a pop saying ``.record()``.
 
@@ -215,8 +211,8 @@ class Recorder(object):
             self.__vertex.set_not_recording(variable, indexes)
 
     def extract_neo_block(
-            self, variables: Names, view_indexes: Optional[Sequence[int]],
-            clear: bool, annotations: Optional[Dict[str, Any]]) -> neo.Block:
+            self, variables: Names, view_indexes: Sequence[int] | None,
+            clear: bool, annotations: dict[str, Any] | None) -> neo.Block:
         """
         Extracts block from the vertices and puts them into a Neo block.
 
@@ -232,7 +228,7 @@ class Recorder(object):
         """
         SpynnakerDataView.check_user_can_act()
 
-        block: Optional[neo.Block] = None
+        block: neo.Block | None = None
         for previous in range(SpynnakerDataView.get_reset_number()):
             block = self.__append_previous_segment(
                 block, previous, variables, view_indexes, clear, annotations)
@@ -242,9 +238,9 @@ class Recorder(object):
             block, variables, view_indexes, clear, annotations)
 
     def write_data(
-            self, csv_file: str, variables: Optional[Names],
-            view_indexes: Optional[Sequence[int]] = None,
-            annotations: Optional[Dict[str, Any]] = None) -> None:
+            self, csv_file: str, variables: Names | None,
+            view_indexes: Sequence[int] | None = None,
+            annotations: dict[str, Any] | None = None) -> None:
         """
         Extracts block from the vertices and puts them into a Neo block.
 
@@ -293,8 +289,8 @@ class Recorder(object):
 
     def __append_current_segment(
             self, block: neo.Block, variables: Names,
-            view_indexes: Optional[Sequence[int]], clear: bool,
-            annotations: Optional[Dict[str, Any]]) -> neo.Block:
+            view_indexes: Sequence[int] | None, clear: bool,
+            annotations: dict[str, Any] | None) -> neo.Block:
         """
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
@@ -321,10 +317,10 @@ class Recorder(object):
             return block
 
     def __append_previous_segment(
-            self, block: Optional[neo.Block], segment_number: int,
-            variables: Names, view_indexes: Optional[Sequence[int]],
+            self, block: neo.Block | None, segment_number: int,
+            variables: Names, view_indexes: Sequence[int] | None,
             clear: bool,
-            annotations: Optional[Dict[str, Any]]) -> Optional[neo.Block]:
+            annotations: dict[str, Any] | None) -> neo.Block | None:
         """
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:

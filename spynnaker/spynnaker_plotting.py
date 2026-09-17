@@ -18,7 +18,7 @@ https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/utility/plotting.py
 """
 
 from types import ModuleType
-from typing import Any, Dict, List, TypeAlias, Union
+from typing import Any, TypeAlias
 
 import numpy as np
 import quantities
@@ -36,11 +36,11 @@ try:
 except ImportError:
     _matplotlib_missing = True
 
-TaData: TypeAlias = Union[
-    List[SpikeTrain], SpikeTrainList, AnalogSignal, NDArray, Block, Segment]
+TaData: TypeAlias = (list[SpikeTrain] | SpikeTrainList | AnalogSignal |
+                     NDArray | Block | Segment)
 
 
-def _handle_options(axes: Axes, options: Dict[str, Any]) -> None:
+def _handle_options(axes: Axes, options: dict[str, Any]) -> None:
     """
     Handles options that can not be passed to `axes.plot`.
 
@@ -88,11 +88,11 @@ def _plot_spikes(axes: Axes, spike_times: NDArray, neurons: NDArray,
     if label:
         plt.text(0.95, 0.95, label,
                  transform=axes.transAxes, ha='right', va='top',
-                 bbox=dict(facecolor='white', alpha=1.0))
+                 bbox={"facecolor": 'white', "alpha": 1.0})
 
 
 def plot_spiketrains(
-        axes: Axes, spiketrains: Union[List[SpikeTrain], SpikeTrainList],
+        axes: Axes, spiketrains: list[SpikeTrain] | SpikeTrainList,
         label: str = '', **options: Any) -> None:
     """
     Plot all spike trains in a Segment in a raster plot.
@@ -146,7 +146,7 @@ def _heat_plot(axes: Axes, values: NDArray, label: str = '',
     if label:
         plt.text(0.95, 0.95, label,
                  transform=axes.transAxes, ha='right', va='top',
-                 bbox=dict(facecolor='white', alpha=1.0))
+                 bbox={"facecolor": 'white', "alpha": 1.0})
 
 
 def heat_plot_numpy(axes: Axes, data: NDArray, label: str = '',
@@ -221,7 +221,7 @@ def plot_segment(axes: Axes, segment: Segment, label: str = '',
         raise ValueError("Block does not appear to hold any data")
 
 
-class SpynnakerPanel(object):
+class SpynnakerPanel:
     """
     Represents a single panel in a multi-panel figure.
 
@@ -301,15 +301,15 @@ class SpynnakerPanel(object):
 
     @staticmethod
     def __plot_list(
-            axes: Axes, datum: Union[List[SpikeTrain], SpikeTrainList],
-            label: str, properties: Dict[str, Any]) -> None:
+            axes: Axes, datum: list[SpikeTrain] | SpikeTrainList,
+            label: str, properties: dict[str, Any]) -> None:
         if not isinstance(datum[0], SpikeTrain):
             raise ValueError(f"Can't handle lists of type {type(datum)}")
         plot_spiketrains(axes, datum, label=label, **properties)
 
     @staticmethod
     def __plot_array(axes: Axes, datum: NDArray, label: str,
-                     properties: Dict[str, Any]) -> None:
+                     properties: dict[str, Any]) -> None:
         if len(datum[0]) == 2:
             plot_spikes_numpy(axes, datum, label=label, **properties)
         elif len(datum[0]) == 3:
@@ -320,7 +320,7 @@ class SpynnakerPanel(object):
 
     @staticmethod
     def __plot_block(axes: Axes, datum: Block, label: str,
-                     properties: Dict[str, Any]) -> None:
+                     properties: dict[str, Any]) -> None:
         if "run" in properties:
             run = int(properties.pop("run"))
             if len(datum.segments) <= run:

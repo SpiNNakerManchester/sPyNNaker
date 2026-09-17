@@ -14,14 +14,14 @@
 import logging
 from threading import RLock, Thread
 from time import sleep
-from typing import Any, List
+from typing import Any
 
 import numpy
 from matplotlib import pyplot
 
 from spinn_utilities.log import FormatAdapter
 
-import spynnaker.pyNN.external_devices as external_devices
+from spynnaker.pyNN import external_devices
 from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotRetinaResolution,
@@ -39,10 +39,15 @@ class PushBotRetinaViewer():
     Viewer of retina from the PushBot.
     """
     __slots__ = (
-        "__image_data", "__image_lock",
-        "__without_polarity_mask", "__height",
-        "__fig", "__plot",
-        "__running", "__conn")
+        "__conn",
+        "__fig",
+        "__height",
+        "__image_data",
+        "__image_lock",
+        "__plot",
+        "__running",
+        "__without_polarity_mask",
+    )
 
     def __init__(self, retina_resolution: PushBotRetinaResolution,
                  label: str, sim: None = None):
@@ -84,7 +89,7 @@ class PushBotRetinaViewer():
         """
         return self.__conn.local_port
 
-    def __recv(self, label: str, time: int, spikes: List[int]) -> None:
+    def __recv(self, label: str, time: int, spikes: list[int]) -> None:
         _ = (label, time)
         np_spikes = numpy.array(spikes) & self.__without_polarity_mask
         x_vals, y_vals = numpy.divmod(np_spikes, self.__height)

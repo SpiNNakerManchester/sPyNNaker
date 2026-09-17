@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Iterable, List, Optional
+from collections.abc import Iterable
 
 from spinn_utilities.overrides import overrides
 
@@ -27,7 +27,7 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
-def get_y_from_fpga_retina(key: int, mode: int) -> Optional[int]:
+def get_y_from_fpga_retina(key: int, mode: int) -> int | None:
     """
     :param key:
     :param mode:
@@ -44,7 +44,7 @@ def get_y_from_fpga_retina(key: int, mode: int) -> Optional[int]:
     return None
 
 
-def get_x_from_fpga_retina(key: int, mode: int) -> Optional[int]:
+def get_x_from_fpga_retina(key: int, mode: int) -> int | None:
     """
     :param key:
     :param mode:
@@ -61,19 +61,13 @@ def get_x_from_fpga_retina(key: int, mode: int) -> Optional[int]:
     return None
 
 
-def get_spike_value_from_fpga_retina(key: int, mode: int) -> Optional[int]:
+def get_spike_value_from_fpga_retina(key: int, mode: int) -> int | None:
     """
     :param key:
     :param mode:
     :returns: Spike value if mode is expected otherwise None.
     """
-    if mode == 128:
-        return (key >> 14) & 0x1
-    elif mode == 64:
-        return (key >> 14) & 0x1
-    elif mode == 32:
-        return (key >> 14) & 0x1
-    elif mode == 16:
+    if mode == 128 or mode == 64 or mode == 32 or mode == 16:
         return (key >> 14) & 0x1
     return None
 
@@ -98,8 +92,8 @@ class ExternalFPGARetinaDevice(
 
     def __init__(
             self, mode: str, retina_key: int, spinnaker_link_id: int,
-            polarity: str, label: Optional[str] = None,
-            board_address: Optional[str] = None):
+            polarity: str, label: str | None = None,
+            board_address: str | None = None):
         """
         :param mode: The retina "mode"
         :param retina_key: The value of the top 16-bits of the key
@@ -185,5 +179,5 @@ class ExternalFPGARetinaDevice(
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
-    def timed_commands(self) -> List[MultiCastCommand]:
+    def timed_commands(self) -> list[MultiCastCommand]:
         return []

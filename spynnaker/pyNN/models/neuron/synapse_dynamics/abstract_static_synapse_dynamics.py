@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List, Tuple
 
 from numpy import integer, uint32
 from numpy.typing import NDArray
@@ -49,8 +48,8 @@ class AbstractStaticSynapseDynamics(
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
             max_n_synapses: int, max_atoms_per_core: int,
-            ring_buffer_weight_scales: WeightScales) -> Tuple[
-                List[NDArray[uint32]], NDArray[integer]]:
+            ring_buffer_weight_scales: WeightScales) -> tuple[
+                list[NDArray[uint32]], NDArray[integer]]:
         """
         Get the fixed-fixed data for each row, and lengths for the
         fixed-fixed parts of each row.
@@ -101,7 +100,7 @@ class AbstractStaticSynapseDynamics(
     @abstractmethod
     def read_static_synaptic_data(
             self, n_synapse_types: int,
-            ff_size: NDArray[integer], ff_data: List[NDArray[uint32]],
+            ff_size: NDArray[integer], ff_data: list[NDArray[uint32]],
             max_atoms_per_core: int,
             ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         """

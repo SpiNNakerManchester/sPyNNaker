@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.projection import Projection
 
 
-class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
+class AbstractSupportsSignedWeights(metaclass=AbstractBase):
     """
     A synapse dynamics object that supports signed weights.
     """

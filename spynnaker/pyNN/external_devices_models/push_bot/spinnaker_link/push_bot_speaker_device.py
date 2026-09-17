@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 
@@ -38,12 +37,12 @@ class PushBotSpiNNakerLinkSpeakerDevice(
             self, speaker: PushBotSpeaker,
             protocol: MunichIoSpiNNakerLinkProtocol, spinnaker_link_id: int,
             n_neurons: int = 1,
-            label: Optional[str] = None,
-            board_address: Optional[str] = None,
+            label: str | None = None,
+            board_address: str | None = None,
             start_active_time: int = 50,
             start_total_period: int = 100,
-            start_frequency: Optional[int] = None,
-            start_melody: Optional[int] = None):
+            start_frequency: int | None = None,
+            start_melody: int | None = None):
         """
         :param speaker: Which speaker device to control
         :param protocol: The protocol instance to get commands from

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from spinn_utilities.typing.coords import XY
 
@@ -33,8 +32,8 @@ class ArbitraryFPGADevice(ApplicationFPGAVertex, PopulationApplicationVertex):
 
     def __init__(
             self, n_neurons: int, fpga_link_id: int, fpga_id: int,
-            board_address: Optional[str] = None,
-            chip_coords: Optional[XY] = None, label: Optional[str] = None):
+            board_address: str | None = None,
+            chip_coords: XY | None = None, label: str | None = None):
         """
         :param n_neurons: Number of neurons
         :param fpga_link_id: The ID of the link of the FPGA (0-15)

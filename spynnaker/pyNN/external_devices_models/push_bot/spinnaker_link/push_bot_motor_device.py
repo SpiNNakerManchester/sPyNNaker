@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 
@@ -37,7 +36,7 @@ class PushBotSpiNNakerLinkMotorDevice(
     def __init__(
             self, motor: PushBotMotor, protocol: MunichIoSpiNNakerLinkProtocol,
             spinnaker_link_id: int,  n_neurons: int = 1,
-            label: Optional[str] = None,  board_address: Optional[str] = None):
+            label: str | None = None,  board_address: str | None = None):
         """
         :param motor: the motor to control
         :param protocol: The protocol used to control the device

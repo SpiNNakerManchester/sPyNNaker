@@ -40,13 +40,26 @@ from .one_to_one_offset_connector import OneToOneOffsetConnector
 from .pool_dense_connector import PoolDenseConnector
 from .small_world_connector import SmallWorldConnector
 
-__all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
-           "AbstractGenerateConnectorOnHost", "AllButMeConnector",
-           "AllToAllConnector", "ArrayConnector", "CSAConnector",
-           "DistanceDependentProbabilityConnector", "FixedNumberPostConnector",
-           "FixedNumberPreConnector", "FixedProbabilityConnector",
-           "FromFileConnector",
-           "FromListConnector", "IndexBasedProbabilityConnector",
-           "KernelConnector", "ConvolutionConnector", "PoolDenseConnector",
-           "MultapseConnector", "OneToOneConnector", "SmallWorldConnector",
-           "OneToOneOffsetConnector"]
+__all__ = [
+    "AbstractConnector",
+    "AbstractGenerateConnectorOnHost",
+    "AbstractGenerateConnectorOnMachine",
+    "AllButMeConnector",
+    "AllToAllConnector",
+    "ArrayConnector",
+    "CSAConnector",
+    "ConvolutionConnector",
+    "DistanceDependentProbabilityConnector",
+    "FixedNumberPostConnector",
+    "FixedNumberPreConnector",
+    "FixedProbabilityConnector",
+    "FromFileConnector",
+    "FromListConnector",
+    "IndexBasedProbabilityConnector",
+    "KernelConnector",
+    "MultapseConnector",
+    "OneToOneConnector",
+    "OneToOneOffsetConnector",
+    "PoolDenseConnector",
+    "SmallWorldConnector",
+]

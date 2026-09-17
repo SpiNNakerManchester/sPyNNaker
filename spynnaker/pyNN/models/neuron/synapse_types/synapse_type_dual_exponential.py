@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Tuple
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
@@ -39,12 +38,13 @@ class SynapseTypeDualExponential(AbstractSynapseType):
     A synapse with 2 excitatory values.
     """
     __slots__ = (
+        "__isyn_exc",
+        "__isyn_exc2",
+        "__isyn_inh",
         "__tau_syn_E",
         "__tau_syn_E2",
         "__tau_syn_I",
-        "__isyn_exc",
-        "__isyn_exc2",
-        "__isyn_inh")
+    )
 
     def __init__(
             self, tau_syn_E: ModelParameter, tau_syn_E2: ModelParameter,
@@ -97,7 +97,7 @@ class SynapseTypeDualExponential(AbstractSynapseType):
         return 3
 
     @overrides(AbstractSynapseType.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         if target == "excitatory":
             return 0
         elif target == "excitatory2":
@@ -107,7 +107,7 @@ class SynapseTypeDualExponential(AbstractSynapseType):
         return None
 
     @overrides(AbstractSynapseType.get_synapse_targets)
-    def get_synapse_targets(self) -> Tuple[str, ...]:
+    def get_synapse_targets(self) -> tuple[str, ...]:
         return "excitatory", "excitatory2", "inhibitory"
 
     @property

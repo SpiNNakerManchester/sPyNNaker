@@ -24,9 +24,11 @@ from .spynnaker_neuron_network_specification_report import (
 from .synapse_expander import synapse_expander
 
 __all__ = [
+    "SpYNNakerConnectionHolderGenerator",
     "delay_support_adder",
     "finish_connection_holders",
+    "neuron_expander",
     "redundant_packet_count_report",
-    "SpYNNakerConnectionHolderGenerator",
     "spynnaker_neuron_graph_network_specification_report",
-    "synapse_expander", "neuron_expander"]
+    "synapse_expander",
+]

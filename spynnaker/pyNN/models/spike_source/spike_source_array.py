@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Tuple, Union
 
 from spinn_utilities.overrides import overrides
 
@@ -28,10 +27,10 @@ class SpikeSourceArray(AbstractPyNNModel):
     """
     Model that creates a Spike Source Array Vertex
     """
-    default_population_parameters = {
+    default_population_parameters = {  # NOQA RUF102
         "splitter": None, "n_colour_bits": None, "neurons_per_core": None}
 
-    def __init__(self, spike_times: Optional[Spikes] = None):
+    def __init__(self, spike_times: Spikes | None = None):
         """
         :param spike_times: Timesteps on which to spike
         """
@@ -42,9 +41,9 @@ class SpikeSourceArray(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
             self, n_neurons: int, label: str, *,
-            splitter: Optional[AbstractSplitterCommon] = None,
-            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
-            n_colour_bits: Optional[int] = None) -> SpikeSourceArrayVertex:
+            splitter: AbstractSplitterCommon | None = None,
+            neurons_per_core: int | tuple[int, ...] | None = None,
+            n_colour_bits: int | None = None) -> SpikeSourceArrayVertex:
         """
         :param splitter:
         :param n_colour_bits:

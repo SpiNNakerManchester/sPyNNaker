@@ -110,8 +110,8 @@ class TestSTDPNearestPairAdditive(BaseTestCase):
         last_pre_spike = pre_spikes_n[-1]
         considered_post_spikes = post_spikes[post_spikes < last_pre_spike]
         considered_post_spikes += plastic_delay
-        potentiation_times = list()
-        depression_times = list()
+        potentiation_times = []
+        depression_times = []
         for time in pre_spikes_n:
             post_times = considered_post_spikes[considered_post_spikes > time]
             if len(post_times) > 0:
@@ -124,9 +124,9 @@ class TestSTDPNearestPairAdditive(BaseTestCase):
 
         # Work out the exact weight according to the multiplicative rule
         potentiations = (max_weight - initial_weight) * a_plus * numpy.exp(
-            (numpy.array(potentiation_times) / tau_plus))
+            numpy.array(potentiation_times) / tau_plus)
         depressions = (initial_weight - min_weight) * a_minus * numpy.exp(
-            (numpy.array(depression_times) / tau_minus))
+            numpy.array(depression_times) / tau_minus)
         new_weight_exact = \
             initial_weight + numpy.sum(potentiations) - numpy.sum(depressions)
 

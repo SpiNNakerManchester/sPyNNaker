@@ -56,19 +56,19 @@ class TestCoresAndBinariesRecording(BaseTestCase):
                     machine_vertex)
                 data.add(placement)
 
-        false_data = list(range(0, 16))
+        false_data = list(range(16))
         for placement in SpynnakerDataView.iterate_placements_on_core((0, 0)):
             if placement in data:
                 false_data.remove(placement.p)
 
         for placement in data:
             self.assertIn(
-                "iobuf_for_chip_{}_{}_processor_id_{}.txt".format(
-                    placement.x, placement.y, placement.p), provenance_files)
+                f"iobuf_for_chip_{placement.x}_{placement.y}"
+                f"_processor_id_{placement.p}.txt", provenance_files)
         for processor in false_data:
             # extract_iobuf_from_cores = None
             self.assertNotIn(
-                "iobuf_for_chip_0_0_processor_id_{}.txt".format(processor),
+                f"iobuf_for_chip_0_0_processor_id_{processor}.txt",
                 provenance_files)
 
     def test_do_run(self) -> None:

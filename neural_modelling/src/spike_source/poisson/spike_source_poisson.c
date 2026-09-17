@@ -357,7 +357,7 @@ static inline uint32_t faster_spike_source_get_num_spikes(
     // First we do x = (inv_gauss_cdf(U(0, 1)) * 0.5) + sqrt(lambda)
     uint32_t U = rng();
     REAL x = (norminv_urt(U) * HALF) + sqrt_lambda;
-    // Then we return int(roundk(x * x))
+    // Then we return roundk(x * x)
     return (uint32_t) roundk(x * x, 15);
 }
 

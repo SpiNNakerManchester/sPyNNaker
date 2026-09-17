@@ -20,15 +20,10 @@ from collections.abc import Iterable, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union,
+    TypeAlias,
     cast,
     overload,
 )
-from typing import Sequence as TSequence
 
 import numpy
 from numpy import float64, floating, int16, integer, uint16, uint32
@@ -63,11 +58,10 @@ if TYPE_CHECKING:
 CONNECTOR_CONFIG_SIZE = (10 * BYTES_PER_SHORT) + (4 * BYTES_PER_WORD)
 
 
-_Weights = Union[
-    int, float, List[Union[int, float]], Tuple[Union[int, float], ...],
-    NDArray[float64], RandomDistribution]
-_Shape = Union[int, Tuple[int, int], None]
-_Padding = Union[bool, _Shape]
+_Weights: TypeAlias = (float | list[float] | tuple[float, ...] |
+                       NDArray[float64] | RandomDistribution)
+_Shape = int | tuple[int, int] | None
+_Padding = bool | _Shape
 
 
 class ConvolutionConnector(AbstractConnector):
@@ -83,14 +77,14 @@ class ConvolutionConnector(AbstractConnector):
     """
 
     __slots__ = (
+        "__filter_edges",
         "__kernel_weights",
-        "__strides",
+        "__negative_receptor_type",
         "__padding_shape",
         "__pool_shape",
         "__pool_stride",
         "__positive_receptor_type",
-        "__negative_receptor_type",
-        "__filter_edges"
+        "__strides"
     )
 
     def __init__(self, kernel_weights: _Weights,
@@ -186,7 +180,7 @@ class ConvolutionConnector(AbstractConnector):
         self.__negative_receptor_type = negative_receptor_type
 
     @overrides(AbstractConnector.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         if self.__pool_shape is None:
             parameters["kernel_weights"] = self.__kernel_weights
@@ -231,7 +225,7 @@ class ConvolutionConnector(AbstractConnector):
         """
         return self.__kernel_weights
 
-    def __get_kernel_shape(self, shape: _Shape) -> Tuple[int, int]:
+    def __get_kernel_shape(self, shape: _Shape) -> tuple[int, int]:
         if shape is None:
             raise SynapticConfigurationException(
                 "kernel_shape must be provided")
@@ -248,7 +242,7 @@ class ConvolutionConnector(AbstractConnector):
             return numpy.full(_shape, w, dtype=float64)
         elif isinstance(w, (Sequence, numpy.ndarray)):
             if all(isinstance(lst, (Sequence, numpy.ndarray)) for lst in w):
-                ws = cast(TSequence[TSequence[float]], w)
+                ws = cast(Sequence[Sequence[float]], w)
                 len0 = len(ws[0])
                 # 2D list
                 if not all(len(lst) == len0 for lst in ws):
@@ -271,7 +265,7 @@ class ConvolutionConnector(AbstractConnector):
 
     @overload
     @staticmethod
-    def __to_2d_shape(shape: Union[int, Tuple[int, int]],
+    def __to_2d_shape(shape: int | tuple[int, int],
                       param_name: str) -> NDArray[integer]:
         ...
 
@@ -281,8 +275,8 @@ class ConvolutionConnector(AbstractConnector):
         ...
 
     @staticmethod
-    def __to_2d_shape(shape: _Shape, param_name: str) -> Optional[
-            NDArray[integer]]:
+    def __to_2d_shape(shape: _Shape, param_name: str
+                      ) -> NDArray[integer] | None:
         if shape is None:
             return None
         if numpy.isscalar(shape):
@@ -306,7 +300,7 @@ class ConvolutionConnector(AbstractConnector):
             raise SynapticConfigurationException(
                 f"Unrecognized padding {padding}")
 
-    def get_post_shape(self, shape: Tuple[int, ...]) -> Tuple[int, ...]:
+    def get_post_shape(self, shape: tuple[int, ...]) -> tuple[int, ...]:
         """
         :returns: The shape of the post image given the pre-image shape.
         """
@@ -370,8 +364,8 @@ class ConvolutionConnector(AbstractConnector):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         if min_delay is not None and max_delay is not None:
             if not (min_delay <= self.__delay(synapse_info) <= max_delay):
                 return 0
@@ -393,9 +387,9 @@ class ConvolutionConnector(AbstractConnector):
             self, s_info: SynapseInformation,
             source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
-                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
+                tuple[MachineVertex, Sequence[AbstractVertex]]]:
         if not self.__filter_edges:
-            return super(ConvolutionConnector, self).get_connected_vertices(
+            return super().get_connected_vertices(
                 s_info, source_vertex, target_vertex)
         pre_vertices = numpy.array(
             source_vertex.splitter.get_out_going_vertices(s_info.partition_id))
@@ -403,7 +397,7 @@ class ConvolutionConnector(AbstractConnector):
             m_vertex.vertex_slice for m_vertex in pre_vertices)
         hlf_k_w, hlf_k_h = numpy.array(self.__kernel_weights.shape) // 2
 
-        connected: List[Tuple[MachineVertex, List[MachineVertex]]] = []
+        connected: list[tuple[MachineVertex, list[MachineVertex]]] = []
         for post in target_vertex.splitter.get_in_coming_vertices(
                 s_info.partition_id):
             post_slice = post.vertex_slice

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from itertools import permutations
-from typing import List
 
 import numpy
 import pyNN.spiNNaker as sim
@@ -55,7 +54,7 @@ class TestAllButMeConnector(BaseTestCase):
         sim.run(0)
         conns = list(proj.get([], format="list"))
         sim.end()
-        groups: List[List[int]] = list()
+        groups: list[list[int]] = []
         for group_start in range(0, 12, 3):
             group_end = min(12, group_start + 3)
             neurons_in_group = range(group_start, group_end)
@@ -80,10 +79,11 @@ class TestAllButMeConnector(BaseTestCase):
         synapse_type = 0
         synapse_info = proj._synapse_information
         offline_conns = sorted(
-            list([i, j] for (i, j, _w, _d, _typ) in conn.create_synaptic_block(
-                post_slices, post_vertex_slice, synapse_type, synapse_info)))
+            [i, j] for (i, j, _w, _d, _typ) in conn.create_synaptic_block(
+                post_slices, post_vertex_slice, synapse_type, synapse_info))
         sim.end()
-        groups = list([i, j] for (i, j) in permutations(range(11), 2))
+        groups = list(  # NOQA: C400
+            [i, j] for (i, j) in permutations(range(11), 2))
         print(conns)
         print(groups)
         print(offline_conns)
@@ -106,7 +106,7 @@ class TestAllButMeConnector(BaseTestCase):
         sim.run(0)
         conns = list(proj.get(["weight"], format="list"))
         sim.end()
-        groups = list(
+        groups = list(  # NOQA: C400
             [i, j, w] for ((i, j), w) in
             zip(permutations(range(11), 2), weights))
         print(conns)

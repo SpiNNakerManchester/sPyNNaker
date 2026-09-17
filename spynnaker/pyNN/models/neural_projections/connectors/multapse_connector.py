@@ -16,7 +16,8 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any
 
 import numpy.random
 from numpy import integer, uint32
@@ -61,12 +62,13 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         "__allow_self_connections",
         "__num_synapses",
         "__post_slices",
+        "__rng",
         "__synapses_per_edge",
         "__with_replacement",
-        "__rng")
+    )
 
     def __init__(self, n: int, allow_self_connections: bool = True,
-                 with_replacement: bool = True, rng: Optional[NumpyRNG] = None,
+                 with_replacement: bool = True, rng: NumpyRNG | None = None,
                  safe: bool = True, verbose: bool = False,
                  callback: None = None):
         """
@@ -97,11 +99,11 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__post_slices: Sequence[Slice] = ()
-        self.__synapses_per_edge: Optional[NDArray[integer]] = None
+        self.__synapses_per_edge: NDArray[integer] | None = None
         self.__rng = rng
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["n"] = self.__num_synapses
         parameters["allow_self_connections"] = self.__allow_self_connections
@@ -142,7 +144,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         multinomial = numpy.zeros(size, int)
         total = 1.0
         dn = num_synapses
-        for j in range(0, size - 1):
+        for j in range(size - 1):
             multinomial[j] = rng.next(
                 1, distribution="binomial",
                 parameters={'n': dn, 'p': prob_connect[j] / total})
@@ -203,8 +205,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         # If the chance of there being a connection in the slice is almost 0,
         # there will probably be at least 1 connection somewhere
         prob_in_slice = min(
@@ -220,7 +222,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             self.__num_synapses, max_in_slice, prob_in_row), 1)
 
         if min_delay is None or max_delay is None:
-            return int(math.ceil(n_connections))
+            return math.ceil(n_connections)
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,

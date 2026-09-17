@@ -14,9 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional, Type, cast
-
-from typing_extensions import TypeGuard
+from typing import TYPE_CHECKING, TypeGuard, cast
 
 from spinn_utilities.overrides import overrides
 
@@ -46,12 +44,12 @@ class _Dynamics:
     """
     Holds late-initialised class references.
     """
-    _Structural: Optional[Type[AbstractSynapseDynamicsStructural]] = None
-    _STDP: Optional[Type[SynapseDynamicsSTDP]] = None
-    _Neuromodulation: Optional[Type[SynapseDynamicsNeuromodulation]] = None
+    _Structural: type[AbstractSynapseDynamicsStructural] | None = None
+    _STDP: type[SynapseDynamicsSTDP] | None = None
+    _Neuromodulation: type[SynapseDynamicsNeuromodulation] | None = None
 
     @classmethod
-    def structural(cls) -> Type[AbstractSynapseDynamicsStructural]:
+    def structural(cls) -> type[AbstractSynapseDynamicsStructural]:
         """
         :returns: Delayed import of AbstractSynapseDynamicsStructural
         """
@@ -65,7 +63,7 @@ class _Dynamics:
         return cls._Structural
 
     @classmethod
-    def stdp(cls) -> Type[SynapseDynamicsSTDP]:
+    def stdp(cls) -> type[SynapseDynamicsSTDP]:
         """
         :returns: Delayed import of SynapseDynamicsSTDP
         """
@@ -79,7 +77,7 @@ class _Dynamics:
         return cls._STDP
 
     @classmethod
-    def neuromodulation(cls) -> Type[SynapseDynamicsNeuromodulation]:
+    def neuromodulation(cls) -> type[SynapseDynamicsNeuromodulation]:
         """
         :returns: Delayed import of SynapseDynamicsNeuromodulation
         """
@@ -131,14 +129,15 @@ class ProjectionApplicationEdge(ApplicationEdge):
     """
     __slots__ = (
         "__delay_edge",
+        "__is_neuromodulation",
         "__synapse_information",
-        "__is_neuromodulation")
+    )
 
     def __init__(
             self, pre_vertex: PopulationApplicationVertex,
             post_vertex: PopulationVertex,
             synapse_information: SynapseInformation,
-            label: Optional[str] = None):
+            label: str | None = None):
         """
         :param pre_vertex:
         :param post_vertex:
@@ -156,7 +155,7 @@ class ProjectionApplicationEdge(ApplicationEdge):
 
         # The edge from the delay extension of the pre_vertex to the
         # post_vertex - this might be None if no long delays are present
-        self.__delay_edge: Optional[DelayedApplicationEdge] = None
+        self.__delay_edge: DelayedApplicationEdge | None = None
 
     def add_synapse_information(
             self, synapse_information: SynapseInformation) -> None:
@@ -175,14 +174,14 @@ class ProjectionApplicationEdge(ApplicationEdge):
         self.__synapse_information.append(synapse_information)
 
     @property
-    def synapse_information(self) -> List[SynapseInformation]:
+    def synapse_information(self) -> list[SynapseInformation]:
         """
         The synapse information on this edge
         """
         return self.__synapse_information
 
     @property
-    def delay_edge(self) -> Optional[DelayedApplicationEdge]:
+    def delay_edge(self) -> DelayedApplicationEdge | None:
         """
         Settable.
         """

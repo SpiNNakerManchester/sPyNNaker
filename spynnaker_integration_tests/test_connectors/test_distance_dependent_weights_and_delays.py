@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import math
-from typing import Tuple
+from typing import Final
 
 import matplotlib.pyplot as plt
 import pyNN.spiNNaker as p
@@ -25,7 +25,7 @@ from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 
-def do_run(plot: bool) -> Tuple[ConnectionHolder, ConnectionHolder]:
+def do_run(plot: bool) -> tuple[ConnectionHolder, ConnectionHolder]:
 
     p.setup(timestep=1.0)
 
@@ -93,7 +93,7 @@ def do_run(plot: bool) -> Tuple[ConnectionHolder, ConnectionHolder]:
                   data_labels=[grid.label], yticks=True, xlim=(0, runtime),
                   xticks=True),
             title="Simple 2D grid distance-dependent weights and delays",
-            annotations="Simulated with {}".format(p.name())
+            annotations=f"Simulated with {p.name()}"
         )
         plt.show()
 
@@ -103,7 +103,7 @@ def do_run(plot: bool) -> Tuple[ConnectionHolder, ConnectionHolder]:
 
 
 class DistanceDependentWeightsAndDelaysTest(BaseTestCase):
-    POSITIONS = [(i, j) for i in range(4) for j in range(4)]
+    POSITIONS: Final = [(i, j) for i in range(4) for j in range(4)]
 
     def check_exc_weights(self, exc_weights_delays: ConnectionHolder) -> None:
         for conn in exc_weights_delays:

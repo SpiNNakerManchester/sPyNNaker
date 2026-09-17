@@ -19,19 +19,11 @@ import math
 import os
 import re
 import struct
+from collections.abc import Collection, Iterable, Sequence
 from datetime import datetime
 from typing import (
     TYPE_CHECKING,
     Any,
-    Collection,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Union,
 )
 
 import neo  # type: ignore[import]
@@ -75,13 +67,13 @@ if TYPE_CHECKING:
 
     from .data_population import DataPopulation
     #: :meta private:
-    Names = Optional[ConcreteNames]
+    Names = ConcreteNames | None
     #: :meta private:
-    Annotations = Optional[Dict[str, Any]]
+    Annotations = dict[str, Any] | None
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
-segment_cache: Dict[int, str] = {}
+segment_cache: dict[int, str] = {}
 
 
 class NeoBufferDatabase(BufferDatabase, NeoCsv):
@@ -109,8 +101,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         else:
             return str(value)
 
-    def __init__(self, database_file: Optional[str] = None,
-                 read_only: Optional[bool] = None):
+    def __init__(self, database_file: str | None = None,
+                 read_only: bool | None = None):
         """
         :param database_file:
             The name of a file that contains (or will contain) an SQLite
@@ -141,7 +133,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     @classmethod
     def segement_db(cls, segment_number: int,
-                    read_only: Optional[bool] = None) -> NeoBufferDatabase:
+                    read_only: bool | None = None) -> NeoBufferDatabase:
         """
         :returns: A NeoBufferDatabase for this segment.
         """
@@ -188,7 +180,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             SET t_stop = ?
             """, (t_stop,))
 
-    def __get_segment_info(self) -> Tuple[int, datetime, float, float, str]:
+    def __get_segment_info(self) -> tuple[int, datetime, float, float, str]:
         """
         Gets the metadata for the segment.
 
@@ -273,9 +265,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __get_recording_id(
             self, pop_label: str, variable: str,
-            population: Population, sampling_interval_ms: Optional[float],
-            data_type: Optional[DataType], buffered_type: BufferDataType,
-            units: Optional[str], n_colour_bits: int) -> int:
+            population: Population, sampling_interval_ms: float | None,
+            data_type: DataType | None, buffered_type: BufferDataType,
+            units: str | None, n_colour_bits: int) -> int:
         """
         Gets an ID for this population and recording label combination.
         Will create a new population/recording record if required.
@@ -347,7 +339,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             return True
         return False
 
-    def get_population_metadata(self, pop_label: str) -> Tuple[int, int, str]:
+    def get_population_metadata(self, pop_label: str) -> tuple[int, int, str]:
         """
         Gets the metadata for the population with this label
 
@@ -374,7 +366,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     self._string(row["description"]))
         raise ConfigurationException(f"There is no Metadata for {pop_label}")
 
-    def get_recording_populations(self) -> Tuple[str, ...]:
+    def get_recording_populations(self) -> tuple[str, ...]:
         """
         Gets a list of the labels of Populations recording.
         Or to be exact the ones with metadata saved so likely to be recording.
@@ -421,7 +413,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         # DataPopulation validates the pop_label so no need to do here too
         return DataPop(self._database_file, pop_label)
 
-    def get_recording_variables(self, pop_label: str) -> Tuple[str, ...]:
+    def get_recording_variables(self, pop_label: str) -> tuple[str, ...]:
         """
         List of the names of variables recording.
         Or, to be exact, list of the names of variables with metadata so likely
@@ -436,7 +428,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         :return: List of variable names
         """
-        results: List[str] = []
+        results: list[str] = []
         for row in self.cursor().execute(
                 """
                 SELECT variable
@@ -447,7 +439,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             results.append(self._string(row["variable"]))
         return tuple(results)
 
-    def find_units(self, pop_label: str, variable: str) -> Optional[str]:
+    def find_units(self, pop_label: str, variable: str) -> str | None:
         """
         Gets the metadata ID for this population and recording label
         combination.
@@ -473,9 +465,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         return units
 
     def __get_recording_metadata(
-            self, pop_label: str, variable: str) -> Optional[Tuple[
-                int, Optional[DataType], BufferDataType, float, float, int,
-                Optional[str], int]]:
+            self, pop_label: str, variable: str
+            ) -> tuple[int, DataType | None, BufferDataType, float, float,
+                       int, str | None, int] | None:
+
         """
         Gets the metadata id for this population and recording label
         combination.
@@ -517,8 +510,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     row["n_colour_bits"])
         return None
 
-    def __get_region_metadata(self, rec_id: int) -> Iterable[Tuple[
-            int, Optional[NDArray[integer]], Slice, Optional[bool], int, int]]:
+    def __get_region_metadata(self, rec_id: int) -> Iterable[tuple[
+            int, NDArray[integer] | None, Slice, bool | None, int, int]]:
         """
         :param rec_id:
         :return:
@@ -552,7 +545,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def __get_spikes_by_region(
             self, region_id: int, neurons: NDArray[integer],
             simulation_time_step_ms: float, selective_recording: bool,
-            spike_times: List[float], spike_ids: List[int]) -> None:
+            spike_times: list[float], spike_ids: list[int]) -> None:
         """
         Adds spike data for this region to the lists.
 
@@ -566,7 +559,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         neurons_recording = len(neurons)
         if neurons_recording == 0:
             return
-        n_words = int(math.ceil(neurons_recording / BITS_PER_WORD))
+        n_words = math.ceil(neurons_recording / BITS_PER_WORD)
         n_bytes = n_words * BYTES_PER_WORD
         n_words_with_timestamp = n_words + 1
 
@@ -591,22 +584,22 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     spike_times.append(record_time[time_indice])
         else:
             indices = neurons[local_indices]
-            times = record_time[time_indices].reshape((-1))
+            times = record_time[time_indices].reshape(-1)
             spike_ids.extend(indices)
             spike_times.extend(times)
 
-    def __get_neuron_spikes(self, rec_id: int) -> Tuple[
-            NDArray, List[int]]:
+    def __get_neuron_spikes(self, rec_id: int) -> tuple[
+            NDArray, list[int]]:
         """
         Gets the spikes for this population/recording ID.
 
         :param rec_id:
         :return: numpy array of spike IDs and spike times, all IDs recording
         """
-        spike_times: List[float] = []
-        spike_ids: List[int] = []
+        spike_times: list[float] = []
+        spike_ids: list[int] = []
         simulation_time_step_ms = self.__get_simulation_time_step_ms()
-        indexes: List[int] = []
+        indexes: list[int] = []
         for region_id, neurons, _, selective_recording, _, _ in \
                 self.__get_region_metadata(rec_id):
             if neurons is None or selective_recording is None:
@@ -623,7 +616,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self, region_id: int,
             simulation_time_step_ms: float, base_key: int,
             vertex_slice: Slice, n_colour_bits: int,
-            results: List[NDArray]) -> NDArray[integer]:
+            results: list[NDArray]) -> NDArray[integer]:
         """
         Adds spike data for this region to the list.
 
@@ -670,16 +663,16 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         return slice_ids
 
     def __get_eieio_spikes(
-            self, rec_id: int, n_colour_bits: int) -> Tuple[
-                NDArray, List[int]]:
+            self, rec_id: int, n_colour_bits: int) -> tuple[
+                NDArray, list[int]]:
         """
         Gets the spikes for this population/recording ID.
 
         :return: numpy array of spike IDs and spike times, all IDs recording
         """
         simulation_time_step_ms = self.__get_simulation_time_step_ms()
-        results: List[NDArray] = []
-        indexes: List[int] = []
+        results: list[NDArray] = []
+        indexes: list[int] = []
 
         for region_id, _, vertex_slice, selective_recording, base_key, _ in \
                 self.__get_region_metadata(rec_id):
@@ -698,8 +691,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def __get_multi_spikes_by_region(
             self, region_id: int, neurons: NDArray[integer],
             simulation_time_step_ms: float,
-            spike_times: List[NDArray[floating]],
-            spike_ids: List[NDArray[integer]]) -> None:
+            spike_times: list[NDArray[floating]],
+            spike_ids: list[NDArray[integer]]) -> None:
         """
         Adds spike data for this region to the lists.
 
@@ -711,7 +704,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         raw_data = self._read_recording(region_id)
 
-        n_words = int(math.ceil(len(neurons) / BITS_PER_WORD))
+        n_words = math.ceil(len(neurons) / BITS_PER_WORD)
         n_bytes_per_block = n_words * BYTES_PER_WORD
         offset = 0
         while offset < len(raw_data):
@@ -733,17 +726,17 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             spike_ids.append(indices)
             spike_times.append(times)
 
-    def __get_multi_spikes(self, rec_id: int) -> Tuple[
-            NDArray, List[int]]:
+    def __get_multi_spikes(self, rec_id: int) -> tuple[
+            NDArray, list[int]]:
         """
         Gets the spikes for this population/recording ID.
 
         :param rec_id:
         :return: numpy array of spike IDs and spike times, all IDs recording
         """
-        spike_times_l: List[NDArray[floating]] = []
-        spike_ids_l: List[NDArray[integer]] = []
-        indexes: List[int] = []
+        spike_times_l: list[NDArray[floating]] = []
+        spike_ids_l: list[NDArray[integer]] = []
+        indexes: list[int] = []
         simulation_time_step_ms = self.__get_simulation_time_step_ms()
         for region_id, neurons, _, selective_recording, _, _ in \
                 self.__get_region_metadata(rec_id):
@@ -766,8 +759,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     @staticmethod
     def __combine_indexes(
-            view_indexes: Union[Sequence[int], NDArray[integer]],
-            data_indexes: Union[Sequence[int], NDArray[integer]],
+            view_indexes: Sequence[int] | NDArray[integer],
+            data_indexes: Sequence[int] | NDArray[integer],
             variable: str) -> NDArray[integer]:
         """
         :param view_indexes:
@@ -779,7 +772,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         data_set = set(data_indexes)
         indexes = [i for i in view_indexes if i in data_set]
         # check for missing and report
-        view_set: Set[int] = set(view_indexes)
+        view_set: set[int] = set(view_indexes)
         missing = view_set.difference(data_indexes)
         if missing:
             logger.warning("No {} available for neurons {}",
@@ -789,7 +782,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def __get_spikes(
             self, rec_id: int, view_indexes: ViewIndices,
             buffer_type: BufferDataType, n_colour_bits: int,
-            variable: str) -> Tuple[NDArray, NDArray[integer]]:
+            variable: str) -> tuple[NDArray, NDArray[integer]]:
         """
         Gets the data as a Numpy array for one population and variable.
 
@@ -825,7 +818,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __get_matrix_data_by_region(
             self, region_id: int, neurons: NDArray[integer],
-            data_type: DataType) -> Tuple[
+            data_type: DataType) -> tuple[
                 NDArray[floating], NDArray[floating]]:
         """
         Extracts data for this region.
@@ -860,7 +853,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def __get_matrix_data(
             self, rec_id: int, data_type: DataType,
             view_indexes: ViewIndices, pop_size: int,
-            variable: str) -> Tuple[NDArray[floating], NDArray[integer]]:
+            variable: str) -> tuple[NDArray[floating], NDArray[integer]]:
         """
         Gets the matrix data  for this population/recording ID.
 
@@ -872,10 +865,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param variable:
         :return: numpy array of the data, neurons
         """
-        signal_array: Optional[NDArray[floating]] = None
-        pop_times: Optional[NDArray[floating]] = None
-        pop_neurons: List[None] = []
-        indexes: List[int] = []
+        signal_array: NDArray[floating] | None = None
+        pop_times: NDArray[floating] | None = None
+        pop_neurons: list[None] = []
+        indexes: list[int] = []
 
         for region_id, neurons, _, _, _, index in \
                 self.__get_region_metadata(rec_id):
@@ -921,8 +914,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __get_rewires_by_region(
             self, region_id: int, vertex_slice: Slice,
-            rewire_values: List[int], rewire_postids: List[int],
-            rewire_preids: List[int], rewire_times: List[int],
+            rewire_values: list[int], rewire_postids: list[int],
+            rewire_preids: list[int], rewire_times: list[int],
             sampling_interval_ms: float) -> None:
         """
         Extracts rewires data for this region and adds it to the lists.
@@ -968,10 +961,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param rec_id:
         :return: (rewire_values, rewire_postids, rewire_preids, rewire_times)
         """
-        rewire_times: List[int] = []
-        rewire_values: List[int] = []
-        rewire_postids: List[int] = []
-        rewire_preids: List[int] = []
+        rewire_times: list[int] = []
+        rewire_values: list[int] = []
+        rewire_postids: list[int] = []
+        rewire_preids: list[int] = []
 
         for region_id, _, vertex_slice, _, _, _ in \
                 self.__get_region_metadata(rec_id):
@@ -1017,7 +1010,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         n_neurons = len(indexes)
         column_length = n_machine_time_steps * n_neurons
         times = [i * sampling_interval_ms
-                 for i in range(0, n_machine_time_steps)]
+                 for i in range(n_machine_time_steps)]
         return numpy.column_stack((
                 numpy.repeat(indexes, n_machine_time_steps, 0),
                 numpy.tile(times, n_neurons),
@@ -1068,7 +1061,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def get_spike_counts(
             self, pop_label: str,
-            view_indexes: ViewIndices = None) -> Dict[int, int]:
+            view_indexes: ViewIndices = None) -> dict[int, int]:
         """
         Gets the spike counts for the population with this label.
 
@@ -1215,7 +1208,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self._csv_spike_data(csv_writer, spikes, indexes)
 
     def get_empty_block(self, pop_label: str,
-                        annotations: Annotations) -> Optional[neo.Block]:
+                        annotations: Annotations) -> neo.Block | None:
         """
         :param pop_label: The label for the population of interest
 
@@ -1342,9 +1335,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         return True
 
     def __clean_variables(
-            self, variables: Names, pop_label: str) -> Tuple[str, ...]:
+            self, variables: Names, pop_label: str) -> tuple[str, ...]:
         if variables is None:
-            vs: Tuple[str, ...] = ("all", )
+            vs: tuple[str, ...] = ("all", )
         elif isinstance(variables, str):
             vs = (variables, )
         else:
@@ -1421,7 +1414,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     FROM region_metadata NATURAL JOIN recording_view
                     WHERE label = ? AND variable = ?
                     """, (pop_label, variable)):
-                region_ids.append(int((row["region_id"])))
+                region_ids.append(int(row["region_id"]))
 
         for region_id in region_ids:
             self._clear_recording_region(region_id)
@@ -1530,7 +1523,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         return results
 
     @classmethod
-    def string_to_array(cls, string: str) -> List[int]:
+    def string_to_array(cls, string: str) -> list[int]:
         """
         Converts a string into a list of integers.
         Assumes the string was created by :py:meth:`array_to_string`
@@ -1541,7 +1534,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         if not string:
             return []
         string = cls._string(string)
-        results: List[int] = []
+        results: list[int] = []
         parts = re.findall(r"\d+[,:]*", string)
         start = None
         for part in parts:

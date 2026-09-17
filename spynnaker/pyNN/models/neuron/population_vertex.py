@@ -17,17 +17,11 @@ import logging
 import math
 import os
 from collections import defaultdict
+from collections.abc import Collection, Iterable, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Collection,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
+    TypeGuard,
     cast,
 )
 
@@ -36,7 +30,6 @@ from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
 from pyNN.space import BaseStructure, Grid2D, Grid3D
 from scipy import special  # @UnresolvedImport
-from typing_extensions import TypeGuard
 
 from spinn_utilities.config_holder import (
     get_config_bool,
@@ -219,42 +212,43 @@ class PopulationVertex(
     """
 
     __slots__ = (
-        "__incoming_spike_buffer_size",
-        "__n_atoms",
-        "__n_profile_samples",
-        "__neuron_impl",
-        "__neuron_recorder",
-        "__synapse_recorder",
-        "__parameters",
-        "__pynn_model",
-        "__state_variables",
-        "__initial_state_variables",
-        "__updated_state_variables",
-        "__ring_buffer_sigma",
-        "__spikes_per_second",
-        "__drop_late_spikes",
-        "__incoming_projections",
-        "__incoming_poisson_projections",
-        "__synapse_dynamics",
-        "__max_row_info",
-        "__self_projection",
-        "__current_sources",
-        "__current_source_id_list",
-        "__structure",
-        "__rng",
-        "__pop_seed",
-        "__core_seeds",
+        "__allow_delay_extensions",
         "__connection_cache",
-        "__read_initial_values",
-        "__have_read_initial_values",
-        "__last_parameter_read_time",
-        "__n_colour_bits",
+        "__core_seeds",
+        "__current_source_id_list",
+        "__current_sources",
+        "__drop_late_spikes",
         "__extra_partitions",
+        "__have_read_initial_values",
+        "__incoming_poisson_projections",
+        "__incoming_projections",
+        "__incoming_spike_buffer_size",
+        "__initial_state_variables",
+        "__last_parameter_read_time",
+        "__max_delay_ms",
+        "__max_delay_slots_available",
+        "__max_row_info",
+        "__n_atoms",
+        "__n_colour_bits",
+        "__n_profile_samples",
         "__n_synapse_cores",
         "__n_synapse_cores_param",
-        "__allow_delay_extensions",
-        "__max_delay_ms",
-        "__max_delay_slots_available")
+        "__neuron_impl",
+        "__neuron_recorder",
+        "__parameters",
+        "__pop_seed",
+        "__pynn_model",
+        "__read_initial_values",
+        "__ring_buffer_sigma",
+        "__rng",
+        "__self_projection",
+        "__spikes_per_second",
+        "__state_variables",
+        "__structure",
+        "__synapse_dynamics",
+        "__synapse_recorder",
+        "__updated_state_variables",
+    )
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -275,18 +269,18 @@ class PopulationVertex(
 
     def __init__(
             self, *, n_neurons: int, label: str,
-            max_atoms_per_core: Union[int, Tuple[int, ...]],
-            n_synapse_cores: Optional[int],
+            max_atoms_per_core: int | tuple[int, ...],
+            n_synapse_cores: int | None,
             allow_delay_extensions: bool,
-            spikes_per_second: Optional[float],
-            ring_buffer_sigma: Optional[float],
-            max_expected_summed_weight: Optional[List[float]],
-            incoming_spike_buffer_size: Optional[int],
+            spikes_per_second: float | None,
+            ring_buffer_sigma: float | None,
+            max_expected_summed_weight: list[float] | None,
+            incoming_spike_buffer_size: int | None,
             neuron_impl: AbstractNeuronImpl,
             pynn_model: AbstractPyNNNeuronModel, drop_late_spikes: bool,
-            splitter: Optional[SplitterPopulationVertex],
-            seed: Optional[int], n_colour_bits: Optional[int],
-            extra_partitions: Optional[List[str]] = None):
+            splitter: SplitterPopulationVertex | None,
+            seed: int | None, n_colour_bits: int | None,
+            extra_partitions: list[str] | None = None):
         """
         :param n_neurons: The number of neurons in the population
         :param label: The label on the population
@@ -385,53 +379,53 @@ class PopulationVertex(
             {NeuronRecorder.REWIRING: NeuronRecorder.REWIRING_TYPE})
 
         # Current sources for this vertex
-        self.__current_sources: List[AbstractCurrentSource] = []
-        self.__current_source_id_list: Dict[
-            AbstractCurrentSource, Selector] = dict()
+        self.__current_sources: list[AbstractCurrentSource] = []
+        self.__current_source_id_list: dict[
+            AbstractCurrentSource, Selector] = {}
 
         # Set up for profiling
         self.__n_profile_samples = get_config_int(
             "Reports", "n_profile_samples")
 
         # Set up for incoming
-        self.__incoming_projections: Dict[
-            PopulationApplicationVertex, List[Projection]] = defaultdict(list)
-        self.__incoming_poisson_projections: Dict[
-            SpikeSourcePoissonVertex, List[Projection]] = defaultdict(list)
-        self.__max_row_info: Dict[
-            Tuple[ProjectionApplicationEdge, SynapseInformation, int],
-            MaxRowInfo] = dict()
-        self.__self_projection: Optional[Projection] = None
+        self.__incoming_projections: dict[
+            PopulationApplicationVertex, list[Projection]] = defaultdict(list)
+        self.__incoming_poisson_projections: dict[
+            SpikeSourcePoissonVertex, list[Projection]] = defaultdict(list)
+        self.__max_row_info: dict[
+            tuple[ProjectionApplicationEdge, SynapseInformation, int],
+            MaxRowInfo] = {}
+        self.__self_projection: Projection | None = None
 
         # Keep track of the synapse dynamics for the vertex overall
-        self.__synapse_dynamics: Union[
-            AbstractLocalOnly, AbstractSDRAMSynapseDynamics] = \
-            SynapseDynamicsStatic()
+        self.__synapse_dynamics: (
+                AbstractLocalOnly | AbstractSDRAMSynapseDynamics
+                ) = SynapseDynamicsStatic()
 
-        self.__structure: Optional[BaseStructure] = None
+        self.__structure: BaseStructure | None = None
 
         # An RNG for use in synaptic generation
         self.__rng = numpy.random.RandomState(seed)
         self.__pop_seed = create_mars_kiss_seeds(self.__rng)
-        self.__core_seeds: Dict[Slice, Sequence[int]] = dict()
+        self.__core_seeds: dict[Slice, Sequence[int]] = {}
 
         # Store connections read from machine until asked to clear
         # Key is app_edge, synapse_info
-        self.__connection_cache: Dict[Tuple[
-            ProjectionApplicationEdge, SynapseInformation], NDArray] = dict()
+        self.__connection_cache: dict[tuple[
+            ProjectionApplicationEdge, SynapseInformation], NDArray] = {}
         self.__read_initial_values = False
         self.__have_read_initial_values = False
-        self.__last_parameter_read_time: Optional[float] = None
+        self.__last_parameter_read_time: float | None = None
         self.__extra_partitions = extra_partitions
 
         self.__n_synapse_cores = n_synapse_cores
         self.__n_synapse_cores_param = n_synapse_cores
         self.__allow_delay_extensions = allow_delay_extensions
-        self.__max_delay_ms: Optional[float] = None
-        self.__max_delay_slots_available: Optional[int] = None
+        self.__max_delay_ms: float | None = None
+        self.__max_delay_slots_available: int | None = None
 
     @property
-    def extra_partitions(self) -> List[str]:
+    def extra_partitions(self) -> list[str]:
         """ The extra partitions that are to be sent by the vertex. """
         if self.__extra_partitions is None:
             return []
@@ -476,7 +470,7 @@ class PopulationVertex(
 
     @overrides(
         PopulationApplicationVertex.get_max_atoms_per_dimension_per_core)
-    def get_max_atoms_per_dimension_per_core(self) -> Tuple[int, ...]:
+    def get_max_atoms_per_dimension_per_core(self) -> tuple[int, ...]:
         max_atoms = self.get_max_atoms_per_core()
 
         # If single dimensional, we can use the max atoms calculation
@@ -504,7 +498,7 @@ class PopulationVertex(
     @overrides(PopulationApplicationVertex.
                set_max_atoms_per_dimension_per_core)
     def set_max_atoms_per_dimension_per_core(
-            self, new_value: Union[int, Tuple[int, ...]]) -> None:
+            self, new_value: int | tuple[int, ...]) -> None:
         max_atoms = self.__synapse_dynamics.absolute_max_atoms_per_core
         if numpy.prod(new_value) > max_atoms:
             raise SpynnakerException(
@@ -724,7 +718,7 @@ class PopulationVertex(
                 s_info = proj._synapse_information
                 dynamics = s_info.synapse_dynamics
                 conn = s_info.connector
-                n_conns: Optional[int] = None
+                n_conns: int | None = None
                 if isinstance(dynamics, AbstractSDRAMSynapseDynamics):
                     n_conns = dynamics.pad_to_length
                 if n_conns is None:
@@ -809,7 +803,7 @@ class PopulationVertex(
             SpynnakerDataView().get_simulation_time_step_ms())
         return delay_available_ms < max_delay_ms
 
-    def __update_max_delay(self) -> Tuple[float, int]:
+    def __update_max_delay(self) -> tuple[float, int]:
         if self.__max_delay_ms is not None:
             # Can't have one without the other
             assert self.__max_delay_slots_available is not None
@@ -834,7 +828,7 @@ class PopulationVertex(
         return self.__max_delay_ms, self.__max_delay_slots_available
 
     def _is_direct_poisson(self, pre_vertex: PopulationApplicationVertex,
-                           projs: List[Projection]) -> bool:
+                           projs: list[Projection]) -> bool:
         # The only way to avoid circular imports!
         # pylint: disable=import-outside-toplevel
         from spynnaker.pyNN.extra_algorithms.splitter_components\
@@ -897,7 +891,7 @@ class PopulationVertex(
             self.__incoming_poisson_projections[pre_vertex].append(projection)
 
     @property
-    def self_projection(self) -> Optional[Projection]:
+    def self_projection(self) -> Projection | None:
         """
         Any projection from this vertex to itself.
         """
@@ -910,7 +904,7 @@ class PopulationVertex(
 
     @property
     @overrides(PopulationApplicationVertex.atoms_shape)
-    def atoms_shape(self) -> Tuple[int, ...]:
+    def atoms_shape(self) -> tuple[int, ...]:
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.__n_atoms)
         return super().atoms_shape
@@ -1116,7 +1110,7 @@ class PopulationVertex(
         self.__parameters[name].set_value_by_selector(selector, value)
 
     @overrides(PopulationApplicationVertex.get_parameters)
-    def get_parameters(self) -> List[str]:
+    def get_parameters(self) -> list[str]:
         return list(self.__pynn_model.default_parameters.keys())
 
     def __read_initial_state_variable(
@@ -1177,7 +1171,7 @@ class PopulationVertex(
             selector, value)
 
     @overrides(PopulationApplicationVertex.get_state_variables)
-    def get_state_variables(self) -> List[str]:
+    def get_state_variables(self) -> list[str]:
         return list(self.__pynn_model.default_initial_values.keys())
 
     @overrides(PopulationApplicationVertex.get_units)
@@ -1197,7 +1191,7 @@ class PopulationVertex(
         return self.__neuron_impl.is_conductance_based
 
     @overrides(PopulationApplicationVertex.get_recordable_variables)
-    def get_recordable_variables(self) -> List[str]:
+    def get_recordable_variables(self) -> list[str]:
         return [
             *self.__neuron_recorder.get_recordable_variables(),
             *self.__synapse_recorder.get_recordable_variables()]
@@ -1212,8 +1206,8 @@ class PopulationVertex(
 
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(
-            self, name: str, sampling_interval: Optional[float] = None,
-            indices: Optional[Collection[int]] = None) -> None:
+            self, name: str, sampling_interval: float | None = None,
+            indices: Collection[int] | None = None) -> None:
         if self.__neuron_recorder.is_recordable(name):
             self.__neuron_recorder.set_recording(
                 name, True, sampling_interval, indices)
@@ -1226,7 +1220,7 @@ class PopulationVertex(
 
     @overrides(PopulationApplicationVertex.set_not_recording)
     def set_not_recording(self, name: str,
-                          indices: Optional[Collection[int]] = None) -> None:
+                          indices: Collection[int] | None = None) -> None:
         if self.__neuron_recorder.is_recordable(name):
             self.__neuron_recorder.set_recording(name, False, indexes=indices)
         elif self.__synapse_recorder.is_recordable(name):
@@ -1235,7 +1229,7 @@ class PopulationVertex(
             raise KeyError(f"It is not possible to record {name}")
 
     @overrides(PopulationApplicationVertex.get_recording_variables)
-    def get_recording_variables(self) -> List[str]:
+    def get_recording_variables(self) -> list[str]:
         return [
             *self.__neuron_recorder.recording_variables,
             *self.__synapse_recorder.recording_variables]
@@ -1249,7 +1243,7 @@ class PopulationVertex(
         raise KeyError(f"It is not possible to record {name}")
 
     @overrides(PopulationApplicationVertex.get_data_type)
-    def get_data_type(self, name: str) -> Optional[DataType]:
+    def get_data_type(self, name: str) -> DataType | None:
         if self.__neuron_recorder.is_recordable(name):
             return self.__neuron_recorder.get_data_type(name)
         if self.__synapse_recorder.is_recordable(name):
@@ -1266,7 +1260,7 @@ class PopulationVertex(
 
     @overrides(PopulationApplicationVertex.get_neurons_recording)
     def get_neurons_recording(
-            self, name: str, vertex_slice: Slice) -> Optional[Collection[int]]:
+            self, name: str, vertex_slice: Slice) -> Collection[int] | None:
         if self.__neuron_recorder.is_recordable(name):
             return self.__neuron_recorder.neurons_recording(
                 name, vertex_slice)
@@ -1321,7 +1315,7 @@ class PopulationVertex(
         """
         self.__connection_cache.clear()
 
-    def describe(self) -> Dict[str, Union[str, Dict[str, Any]]]:
+    def describe(self) -> dict[str, str | dict[str, Any]]:
         """
         :returns: A human-readable description of vertex and its parameters
         """
@@ -1336,7 +1330,7 @@ class PopulationVertex(
         }
         return context
 
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         """
         :param target: The synapse to get the id of
         :returns: The id of synapse using its target name.
@@ -1356,14 +1350,14 @@ class PopulationVertex(
             m_vertex.set_reload_required(True)
 
     @property
-    def current_sources(self) -> List[AbstractCurrentSource]:
+    def current_sources(self) -> list[AbstractCurrentSource]:
         """
         Current sources needed to be available to machine vertex.
         """
         return self.__current_sources
 
     @property
-    def current_source_id_list(self) -> Dict[AbstractCurrentSource, Selector]:
+    def current_source_id_list(self) -> dict[AbstractCurrentSource, Selector]:
         """
         Current source ID list needed to be available to machine vertex.
         """
@@ -1391,7 +1385,7 @@ class PopulationVertex(
             # generation
             self.__tell_neuron_vertices_to_regenerate()
 
-    def get_ring_buffer_shifts(self) -> List[int]:
+    def get_ring_buffer_shifts(self) -> list[int]:
         """
         :returns: The shift of the ring buffers for transfer of values into
             the input buffers for this model.
@@ -1419,7 +1413,7 @@ class PopulationVertex(
         # Convert these to powers; we could use int.bit_length() for this if
         # they were integers, but they aren't...
         max_weight_powers = (
-            0 if w <= 0 else int(math.ceil(max(0, math.log2(w))))
+            0 if w <= 0 else math.ceil(max(0, math.log2(w)))
             for w in max_weights)
 
         # If 2^max_weight_power equals the max weight, we have to add another
@@ -1463,7 +1457,7 @@ class PopulationVertex(
             return self.__connection_cache[app_edge, synapse_info]
 
         # Start with something in the list so that concatenate works
-        connections: List[ConnectionsArray] = [
+        connections: list[ConnectionsArray] = [
             numpy.zeros(0, dtype=NUMPY_CONNECTORS_DTYPE)]
         progress = ProgressBar(
             len(self.machine_vertices),
@@ -1542,7 +1536,7 @@ class PopulationVertex(
         vertex = app_edge.pre_vertex
         max_atoms = vertex.get_max_atoms_per_core()
         n_sub_atoms = int(min(max_atoms, vertex.n_atoms))
-        n_sub_edges = int(math.ceil(vertex.n_atoms / n_sub_atoms))
+        n_sub_edges = math.ceil(vertex.n_atoms / n_sub_atoms)
 
         if max_row_info.undelayed_max_n_synapses > 0:
             size = n_sub_atoms * max_row_info.undelayed_max_bytes
@@ -1605,7 +1599,7 @@ class PopulationVertex(
                 vertex = app_edge.pre_vertex
                 max_atoms = float(min(vertex.get_max_atoms_per_core(),
                                       vertex.n_atoms))
-                n_sub_edges = int(math.ceil(vertex.n_atoms / max_atoms))
+                n_sub_edges = math.ceil(vertex.n_atoms / max_atoms)
             size += self.__generator_info_size(synapse_info) * n_sub_edges
         size += get_sdram_for_keys(self.incoming_projections)
         return size
@@ -1639,14 +1633,14 @@ class PopulationVertex(
         return self.__synapse_dynamics.get_vertex_executable_suffix()
 
     @property
-    def neuron_recordables(self) -> List[str]:
+    def neuron_recordables(self) -> list[str]:
         """
         The names of variables that can be recorded by the neuron.
         """
         return self.__neuron_recorder.get_recordable_variables()
 
     @property
-    def synapse_recordables(self) -> List[str]:
+    def synapse_recordables(self) -> list[str]:
         """
         The names of variables that can be recorded by the synapses.
         """
@@ -1838,7 +1832,7 @@ class PopulationVertex(
         _check_random_dists(self.__state_variables)
         return True
 
-    def set_n_synapse_cores(self, n_synapse_cores: Optional[int]) -> None:
+    def set_n_synapse_cores(self, n_synapse_cores: int | None) -> None:
         """
         Set the number of synapse cores.
 
@@ -1858,22 +1852,23 @@ class PopulationVertex(
         self.__allow_delay_extensions = allow_delay_extensions
 
 
-class _Stats(object):
+class _Stats:
     """
     Object to keep hold of and process statistics for ring buffer scaling.
     """
     __slots__ = (
+        "biggest_weight",
+        "default_spikes_per_second",
+        "delay_running_totals",
+        "n_synapse_types",
+        "rate_stats",
+        "ring_buffer_sigma",
+        "running_totals",
+        "steps_per_second",
+        "total_weights",
         "w_scale",
         "w_scale_sq",
-        "n_synapse_types",
-        "running_totals",
-        "delay_running_totals",
-        "total_weights",
-        "biggest_weight",
-        "rate_stats",
-        "steps_per_second",
-        "default_spikes_per_second",
-        "ring_buffer_sigma")
+    )
 
     def __init__(
             self, neuron_impl: AbstractNeuronImpl,
@@ -1966,7 +1961,7 @@ class _Stats(object):
         self.rate_stats[s_type].add_items(spikes_per_second, 0, n_conns)
         self.total_weights[s_type] += spikes_per_tick * (w_max * n_conns)
 
-    def __pre_spike_stats(self, proj: Projection) -> Tuple[float, float]:
+    def __pre_spike_stats(self, proj: Projection) -> tuple[float, float]:
         spikes_per_tick = max(
             1.0, self.default_spikes_per_second / self.steps_per_second)
         spikes_per_second = self.default_spikes_per_second
@@ -2015,9 +2010,9 @@ class _Stats(object):
 
         # Upper end of range for Poisson summation required below
         # upper_bound needs to be an integer
-        upper_bound = int(round(average_spikes_per_timestep +
-                                POISSON_SIGMA_SUMMATION_LIMIT *
-                                math.sqrt(average_spikes_per_timestep)))
+        upper_bound = round(average_spikes_per_timestep +
+                            POISSON_SIGMA_SUMMATION_LIMIT *
+                            math.sqrt(average_spikes_per_timestep))
 
         # pylint:disable=wrong-spelling-in-comment
         # Closed-form exact solution for summation that gives the variance

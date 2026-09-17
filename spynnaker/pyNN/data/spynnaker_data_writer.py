@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import logging
-from typing import Optional
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -59,7 +58,7 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
         FecDataWriter._soft_reset(self)
         self.__spy_data._soft_reset()
 
-    def set_min_delay(self, min_delay: Optional[float]) -> None:
+    def set_min_delay(self, min_delay: float | None) -> None:
         """
         Sets a min delay or accepts `None` to use simulation_time_step_ms.
 

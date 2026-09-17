@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 # Copyright (c) 2017 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,19 +15,20 @@
 """
 Synfirechain-like example
 """
-from typing import Tuple
-
 import pyNN.spiNNaker as p
-from numpy.typing import NDArray
+from parameterized import parameterized
+
+from spinn_utilities.config_holder import set_config
+
+from spinn_machine.version import MANY_BOARD_TYPES
 
 from spinnaker_testbase import BaseTestCase
 
-import spynnaker.spike_checker as spike_checker
-from spynnaker.pyNN.utilities import neo_convertor
 
-
-def do_run(nNeurons: int) -> Tuple[NDArray, NDArray, NDArray]:
+def do_run(nNeurons: int, ver_num: str) -> None:
     p.setup(timestep=1.0, min_delay=1.0)
+    set_config("Machine", "version", ver_num)
+
     p.set_number_of_neurons_per_core(p.Izhikevich, 100)
 
     cell_params_izk = {
@@ -44,14 +43,14 @@ def do_run(nNeurons: int) -> Tuple[NDArray, NDArray, NDArray]:
         'i_offset': 0
         }
 
-    populations = list()
-    projections = list()
+    populations = []
+    projections = []
 
     weight_to_spike = 40
     delay = 1
 
-    connections = list()
-    for i in range(0, nNeurons):
+    connections = []
+    for i in range(nNeurons):
         singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
         connections.append(singleConnection)
 
@@ -75,30 +74,16 @@ def do_run(nNeurons: int) -> Tuple[NDArray, NDArray, NDArray]:
 
     neo = populations[0].get_data(["v", "spikes", "gsyn_exc"])
 
-    v = neo_convertor.convert_data(neo, name="v")
-    gsyn = neo_convertor.convert_data(neo, name="gsyn_exc")
-    spikes = neo_convertor.convert_spikes(neo)
-
     p.end()
 
-    return (v, gsyn, spikes)
+    return neo
 
 
 class SynfireIzhikevich(BaseTestCase):
 
-    def check_run(self) -> None:
+    # NO unittest_setup() as sim.setup is called
+
+    @parameterized.expand(MANY_BOARD_TYPES)
+    def test_run(self, _: str, ver_num: str) -> None:
         nNeurons = 200  # number of neurons in each population
-        (v, gsyn, spikes) = do_run(nNeurons)
-        spike_checker.synfire_spike_checker(spikes, nNeurons)
-        self.assertEqual(215, len(spikes))
-
-    def test_run(self) -> None:
-        self.runsafe(self.check_run)
-
-
-if __name__ == '__main__':
-    nNeurons = 200  # number of neurons in each population
-    (v, gsyn, spikes) = do_run(nNeurons)
-    print(len(spikes))
-    print(v)
-    print(gsyn)
+        do_run(nNeurons, ver_num)

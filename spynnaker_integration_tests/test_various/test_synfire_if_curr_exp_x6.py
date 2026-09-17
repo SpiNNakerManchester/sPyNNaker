@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 # Copyright (c) 2017 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +15,6 @@
 """
 Synfirechain-like example with 6 chains
 """
-from typing import List
 
 import pyNN.spiNNaker as p
 from numpy.typing import NDArray
@@ -25,7 +22,7 @@ from numpy.typing import NDArray
 from spinnaker_testbase import BaseTestCase
 
 
-def do_run(nNeurons: int) -> List[NDArray]:
+def do_run(nNeurons: int) -> list[NDArray]:
     p.setup(timestep=1.0, min_delay=1.0)
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
 
@@ -33,14 +30,14 @@ def do_run(nNeurons: int) -> List[NDArray]:
                        'tau_refrac': 2.0, 'tau_syn_E': 0.5, 'tau_syn_I': 0.5,
                        'v_reset': -65.0, 'v_rest': -65.0, 'v_thresh': -64.4}
 
-    populations = list()
-    projections = list()
+    populations = []
+    projections = []
 
     weight_to_spike = 2
     delay = 1
 
-    connections = list()
-    for i in range(0, nNeurons):
+    connections = []
+    for i in range(nNeurons):
         singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
         connections.append(singleConnection)
 

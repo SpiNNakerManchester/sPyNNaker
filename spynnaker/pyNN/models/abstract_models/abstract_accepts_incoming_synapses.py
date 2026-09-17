@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.require_subclass import require_subclass
@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 
 
 @require_subclass(ApplicationVertex)
-class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
+class AbstractAcceptsIncomingSynapses(metaclass=AbstractBase):
     """
     Indicates an application vertex that can be a post-vertex in a PyNN
     projection.
@@ -50,7 +50,7 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def get_synapse_id_by_target(self, target: str) -> Optional[int]:
+    def get_synapse_id_by_target(self, target: str) -> int | None:
         """
         :param target: The name of the synapse
         :returns: The ID of the synapse with this name

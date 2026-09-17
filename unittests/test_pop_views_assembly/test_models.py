@@ -72,7 +72,7 @@ class TestPopulation(BaseTestCase):
         label = "pop_1"
         sim.setup(timestep=1.0)
         model = sim.IF_curr_exp(i_offset=[value, value, value, value])
-        with self.assertRaises(Exception):
+        with self.assertRaises(AssertionError):
             sim.Population(n_neurons, model, label=label)
         sim.end()
 

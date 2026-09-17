@@ -14,7 +14,8 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any
 
 import numpy
 from numpy.typing import NDArray
@@ -53,8 +54,8 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def __init__(
             self, degree: float, rewiring: float,
             allow_self_connections: bool = True,
-            n_connections: Optional[int] = None,
-            rng: Optional[NumpyRNG] = None,
+            n_connections: int | None = None,
+            rng: NumpyRNG | None = None,
             safe: bool = True, callback: None = None, verbose: bool = False):
         """
         :param degree:
@@ -89,7 +90,7 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         if not allow_self_connections:
             raise NotImplementedError(
                 "disabling self connections currently not supported")
-        self.__mask: Optional[NDArray] = None
+        self.__mask: NDArray | None = None
         self.__n_connections = 0
         self.__rng = rng or NumpyRNG()
 
@@ -99,7 +100,7 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                 " SmallWorldConnector on this platform")
 
     @overrides(AbstractConnector.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["rewiring"] = self.__rewiring
         parameters["degree"] = self.__degree
@@ -135,7 +136,7 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             d = distances
 
         self.__mask = (d < self.__degree).astype(numpy.float64)
-        self.__n_connections = int(math.ceil(numpy.sum(self.__mask)))
+        self.__n_connections = math.ceil(numpy.sum(self.__mask))
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info: SynapseInformation) -> float:
@@ -150,8 +151,8 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         assert self.__mask is not None
         # Break the array into n_post_atoms units
         split_positions = numpy.arange(

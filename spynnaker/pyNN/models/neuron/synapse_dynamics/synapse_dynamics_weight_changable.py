@@ -14,7 +14,8 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Tuple, cast
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, cast
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
@@ -71,18 +72,18 @@ class SynapseDynamicsWeightChangable(
     """
 
     __slots__ = (
+        # The next index to use for the next projection
+        "__next_index",
+
+        # The map of synapse information to index
+        "__synapse_info_to_index",
 
         # The maximum weight
         "__weight_max",
 
         # The minimum weight
         "__weight_min",
-
-        # The map of synapse information to index
-        "__synapse_info_to_index",
-
-        # The next index to use for the next projection
-        "__next_index")
+    )
 
     def __init__(
             self,
@@ -96,7 +97,7 @@ class SynapseDynamicsWeightChangable(
         super().__init__(delay=delay, weight=weight)
         self.__weight_max = weight_max
         self.__weight_min = weight_min
-        self.__synapse_info_to_index: Dict[SynapseInformation, int] = dict()
+        self.__synapse_info_to_index: dict[SynapseInformation, int] = {}
         self.__next_index = 0
 
         if weight_min < 0.0:
@@ -216,8 +217,8 @@ class SynapseDynamicsWeightChangable(
             connection_row_indices: NDArray[integer], n_rows: int,
             n_synapse_types: int,
             max_n_synapses: int, max_atoms_per_core: int,
-            ring_buffer_weight_scales: WeightScales) -> Tuple[
-                List[NDArray[uint32]], List[NDArray[uint32]],
+            ring_buffer_weight_scales: WeightScales) -> tuple[
+                list[NDArray[uint32]], list[NDArray[uint32]],
                 NDArray[uint32], NDArray[uint32]]:
         raise NotImplementedError(
             "WeightChangable can only be generated on machine")
@@ -246,8 +247,8 @@ class SynapseDynamicsWeightChangable(
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
             self, n_synapse_types: int, pp_size: NDArray[uint32],
-            pp_data: List[NDArray[uint32]], fp_size: NDArray[uint32],
-            fp_data: List[NDArray[uint32]],
+            pp_data: list[NDArray[uint32]], fp_size: NDArray[uint32],
+            fp_data: list[NDArray[uint32]],
             max_atoms_per_core: int,
             ring_buffer_weight_scales: WeightScales) -> ConnectionsArray:
         logger.warning(
@@ -383,7 +384,7 @@ class SynapseDynamicsWeightChangable(
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
-    def pad_to_length(self) -> Optional[int]:
+    def pad_to_length(self) -> int | None:
         return None
 
     @overrides(AbstractPlasticSynapseDynamics.validate_connection)

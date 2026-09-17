@@ -15,22 +15,17 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
-    List,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
+    TypeGuard,
 )
 
 import numpy
 from numpy import floating, int64, integer, uint32
 from numpy.typing import NDArray
-from typing_extensions import TypeGuard
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -85,18 +80,19 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     Make connections according to a list.
     """
     __slots__ = (
-        "__conn_list",
         "__column_names",
-        "__sources",
-        "__targets",
-        "__weights",
+        "__conn_list",
         "__delays",
         "__extra_params",
+        "__sources",
         "__split_conn_list",
-        "__split_post_slices")
+        "__split_post_slices",
+        "__targets",
+        "__weights",
+    )
 
-    def __init__(self, conn_list: Union[NDArray, List[Tuple[int, ...]]],
-                 column_names: Optional[Sequence[str]] = None, *,
+    def __init__(self, conn_list: NDArray | list[tuple[int, ...]],
+                 column_names: Sequence[str] | None = None, *,
                  safe: bool = True, verbose: bool = False,
                  callback: None = None):
         """
@@ -130,16 +126,16 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         super().__init__(safe, callback, verbose)
 
         self.__column_names = column_names
-        self.__split_conn_list: Dict[int, NDArray[integer]] = {}
-        self.__split_post_slices: Optional[List[Slice]] = None
+        self.__split_conn_list: dict[int, NDArray[integer]] = {}
+        self.__split_post_slices: list[Slice] | None = None
 
         self.__conn_list: NDArray
         # These are set by __setup_using_conn_list
         self.__sources: NDArray[uint32]
         self.__targets: NDArray[uint32]
-        self.__delays: Optional[NDArray[floating]]
-        self.__weights: Optional[NDArray[floating]]
-        self.__extra_params: Optional[_ExtraParams]
+        self.__delays: NDArray[floating] | None
+        self.__weights: NDArray[floating] | None
+        self.__extra_params: _ExtraParams | None
 
         if conn_list is None or len(conn_list) == 0:
             self.__conn_list = numpy.zeros((0, 2), dtype=uint32)
@@ -148,7 +144,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         self.__setup_using_conn_list()
 
     @overrides(AbstractConnector.get_parameters)
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         parameters = self._get_parameters()
         parameters["conn_list"] = self.conn_list
         parameters["column_names"] = self.column_names
@@ -198,9 +194,9 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     def _split_connections(
             self, n_pre_atoms: int, n_post_atoms: int,
             post_slices: Sequence[Slice]) -> \
-            Tuple[NDArray[integer], NDArray[integer],
-                  Optional[NDArray[floating]],
-                  Optional[NDArray[floating]]]:
+            tuple[NDArray[integer], NDArray[integer],
+                  NDArray[floating] | None,
+                  NDArray[floating] | None]:
         input_filter = numpy.logical_and(
             self.__targets < n_post_atoms, self.__sources < n_pre_atoms)
         targets = self.__targets[input_filter]
@@ -248,8 +244,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms: int, synapse_info: SynapseInformation,
-            min_delay: Optional[float] = None,
-            max_delay: Optional[float] = None) -> int:
+            min_delay: float | None = None,
+            max_delay: float | None = None) -> int:
         mask = None
         delays_handled = False
         if (min_delay is not None and max_delay is not None):
@@ -294,7 +290,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             max_targets, min_delay, max_delay, synapse_info)
 
     @staticmethod
-    def __numpy_group(conns: NDArray, column: int) -> List[NDArray]:
+    def __numpy_group(conns: NDArray, column: int) -> list[NDArray]:
         # Sort by the column to group by
         s = conns[conns[:, column].argsort()]
 
@@ -480,7 +476,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             self.__extra_params = None
 
     @property
-    def column_names(self) -> Optional[Sequence[str]]:
+    def column_names(self) -> Sequence[str] | None:
         """
         The names of the columns in the array after the first two.
         Of particular interest is whether ``weight`` and ``delay`` columns
@@ -488,7 +484,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         """
         return self.__column_names
 
-    def get_extra_parameters(self) -> Optional[NDArray]:
+    def get_extra_parameters(self) -> NDArray | None:
         """
         Getter for the extra parameters. Excludes ``weight`` and
         ``delay`` columns.
@@ -497,7 +493,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         """
         return self.__extra_params.data if self.__extra_params else None
 
-    def get_extra_parameter_names(self) -> Optional[Sequence[str]]:
+    def get_extra_parameter_names(self) -> Sequence[str] | None:
         """
         :returns: The names of the extra parameters or None if there are None
         """
@@ -508,7 +504,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             self, s_info: SynapseInformation,
             source_vertex: ApplicationVertex,
             target_vertex: ApplicationVertex) -> Sequence[
-                Tuple[MachineVertex, Sequence[AbstractVertex]]]:
+                tuple[MachineVertex, Sequence[AbstractVertex]]]:
         # Divide the targets into bins based on post slices
         post_slices = [m.vertex_slice
                        for m in target_vertex.splitter.get_in_coming_vertices(

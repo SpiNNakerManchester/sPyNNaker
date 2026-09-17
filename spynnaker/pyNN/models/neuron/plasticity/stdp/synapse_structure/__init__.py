@@ -18,5 +18,8 @@ from .synapse_structure_weight_accumulator import (
 )
 from .synapse_structure_weight_only import SynapseStructureWeightOnly
 
-__all__ = ["AbstractSynapseStructure", "SynapseStructureWeightOnly",
-           "SynapseStructureWeightAccumulator"]
+__all__ = [
+    "AbstractSynapseStructure",
+    "SynapseStructureWeightAccumulator",
+    "SynapseStructureWeightOnly",
+]

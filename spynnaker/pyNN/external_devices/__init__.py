@@ -21,7 +21,7 @@ PushBot (https://spinnakermanchester.github.io/docs/push_bot/).
     accuracy to gain performance.
 """
 import os
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 from spinn_utilities.socket_address import SocketAddress
 
@@ -107,7 +107,8 @@ SpynnakerDataView.register_binary_search_path(
     os.path.dirname(model_binaries.__file__))
 spynnaker_external_devices = Plugins()
 
-__all__ = [
+
+__all__ = [  # noqa: RUF022
     "EIEIOType",
 
     # General Devices
@@ -146,7 +147,7 @@ __all__ = [
     "protocols"
 ]
 # Cache of the simulator provided by pyNN/__init__py
-__simulator: Optional[SpiNNaker] = None
+__simulator: SpiNNaker | None = None
 
 
 def run_forever(sync_time: float = 0.0) -> None:
@@ -212,10 +213,10 @@ def register_database_notification_request(
 
 
 # Store the connection to be used by multiple users
-__ethernet_control_connection: Optional[EthernetControlConnection] = None
+__ethernet_control_connection: EthernetControlConnection | None = None
 
 
-def __vtx(population: Population) -> Tuple[
+def __vtx(population: Population) -> tuple[
         PopulationVertex, AbstractEthernetController, str]:
     vertex = population._vertex  # pylint: disable=protected-access
     if isinstance(vertex, PopulationVertex):
@@ -234,11 +235,11 @@ def __vtx(population: Population) -> Tuple[
 
 
 def EthernetControlPopulation(
-        n_neurons: int, model: _CellTypeArg, label: Optional[str] = None,
-        local_host: Optional[str] = None, local_port: Optional[int] = None,
-        database_notify_port_num: Optional[int] = None,
-        database_ack_port_num: Optional[int] = None,
-        **additional_kwargs: Dict[str, Any]) -> Population:
+        n_neurons: int, model: _CellTypeArg, label: str | None = None,
+        local_host: str | None = None, local_port: int | None = None,
+        database_notify_port_num: int | None = None,
+        database_ack_port_num: int | None = None,
+        **additional_kwargs: dict[str, Any]) -> Population:
     # pylint: disable=invalid-name
     """
     Create a PyNN population that can be included in a network to
@@ -306,10 +307,10 @@ def EthernetControlPopulation(
 
 
 def EthernetSensorPopulation(
-        device: AbstractEthernetSensor, local_host: Optional[str] = None,
-        database_notify_port_num: Optional[int] = None,
-        database_ack_port_num: Optional[int] = None,
-        **additional_kwargs: Dict[str, Any]) -> Population:
+        device: AbstractEthernetSensor, local_host: str | None = None,
+        database_notify_port_num: int | None = None,
+        database_ack_port_num: int | None = None,
+        **additional_kwargs: dict[str, Any]) -> Population:
     # pylint: disable=invalid-name
     """
     Create a pyNN population which can be included in a network to
@@ -360,9 +361,9 @@ def EthernetSensorPopulation(
 
 
 def SpikeInjector(
-        notify: bool = True, database_notify_host: Optional[str] = None,
-        database_notify_port_num: Optional[int] = None,
-        database_ack_port_num: Optional[int] = None) -> AbstractPyNNModel:
+        notify: bool = True, database_notify_host: str | None = None,
+        database_notify_port_num: int | None = None,
+        database_ack_port_num: int | None = None) -> AbstractPyNNModel:
     # pylint: disable=invalid-name
     """
     Supports creating a spike injector that can be added to the

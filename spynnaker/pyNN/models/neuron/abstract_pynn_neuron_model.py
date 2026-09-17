@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from spinn_utilities.overrides import overrides
 
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 # make it easier when all-to-all-connector is used
 DEFAULT_MAX_ATOMS_PER_CORE = POP_TABLE_MAX_ROW_LENGTH
 
-_population_parameters: Dict[str, Any] = {
+_population_parameters: dict[str, Any] = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
     "max_expected_summed_weight": None,
     "incoming_spike_buffer_size": None, "drop_late_spikes": None,
@@ -50,17 +50,17 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
 
     # The number of synapse cores for PyNN models that use PopulationVertex
     # or None to determine based on time-step
-    _n_synapse_cores: Dict[type, Optional[int]] = {}
+    _n_synapse_cores: ClassVar[dict[type, int | None]] = {}
 
     # Whether to allow delay extensions when using PyNN models that use
     # PopulationVertex
-    _allow_delay_extensions: Dict[type, bool] = {}
+    _allow_delay_extensions: ClassVar[dict[type, bool]] = {}
 
     #: Population parameters for neuron models.
-    default_population_parameters = _population_parameters
+    default_population_parameters = _population_parameters  # NOQA ROU102
 
     @classmethod
-    def set_model_n_synapse_cores(cls, n_synapse_cores: Optional[int]) -> None:
+    def set_model_n_synapse_cores(cls, n_synapse_cores: int | None) -> None:
         """
         Set the number of synapse cores for a model.
 
@@ -72,7 +72,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         cls._n_synapse_cores[cls] = n_synapse_cores
 
     @classmethod
-    def get_model_n_synapse_cores(cls) -> Optional[int]:
+    def get_model_n_synapse_cores(cls) -> int | None:
         """
         :returns: The number of synapse cores for the model.
         """
@@ -117,17 +117,17 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
             self, n_neurons: int, label: str, *,
-            spikes_per_second: Optional[float] = None,
-            ring_buffer_sigma: Optional[float] = None,
-            max_expected_summed_weight: Optional[List[float]] = None,
-            incoming_spike_buffer_size: Optional[int] = None,
-            drop_late_spikes: Optional[bool] = None,
-            splitter: Optional[SplitterPopulationVertex] = None,
-            seed: Optional[int] = None,
-            n_colour_bits: Optional[int] = None,
-            neurons_per_core: Optional[Union[int, Tuple[int, ...]]] = None,
-            n_synapse_cores: Optional[int] = None,
-            allow_delay_extensions: Optional[bool] = None) -> PopulationVertex:
+            spikes_per_second: float | None = None,
+            ring_buffer_sigma: float | None = None,
+            max_expected_summed_weight: list[float] | None = None,
+            incoming_spike_buffer_size: int | None = None,
+            drop_late_spikes: bool | None = None,
+            splitter: SplitterPopulationVertex | None = None,
+            seed: int | None = None,
+            n_colour_bits: int | None = None,
+            neurons_per_core: int | tuple[int, ...] | None = None,
+            n_synapse_cores: int | None = None,
+            allow_delay_extensions: bool | None = None) -> PopulationVertex:
         """
         :param spikes_per_second:
         :param ring_buffer_sigma:

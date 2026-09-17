@@ -22,7 +22,7 @@ SYNAPSE_EXPANDER_APLX = "synapse_expander.aplx"
 
 
 @require_subclass(MachineVertex)
-class AbstractSynapseExpandable(object, metaclass=AbstractBase):
+class AbstractSynapseExpandable(metaclass=AbstractBase):
     """
     Indicates a class (a
     :py:class:`~pacman.model.graphs.machine.MachineVertex`)

@@ -13,14 +13,13 @@
 # limitations under the License.
 
 import unittest
-from typing import List
 
 from spinn_utilities.ranged.abstract_sized import Selector
 
 from spynnaker.pyNN.models.common import ParameterHolder
 
 
-def get_mock(parameter: str, selector: Selector) -> List[float]:
+def get_mock(parameter: str, selector: Selector) -> list[float]:
     assert selector is None
     if parameter == "foo":
         return [1, 2, 3]

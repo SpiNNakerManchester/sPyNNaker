@@ -122,10 +122,10 @@ class TestPopulation(BaseTestCase):
     def test_init_bad(self) -> None:
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp())
-        with pytest.raises(Exception):
-            pop.set_initial_value(variable="NOT_THERE", value="Anything")
-        with pytest.raises(Exception):
-            pop.get_initial_value(variable="NOT_THERE")
+        with pytest.raises(KeyError):
+            pop.initialize(variable="NOT_THERE", value="Anything")
+        with pytest.raises(KeyError):
+            pop.initial_values["NOT_THERE"]
         sim.end()
 
     def test_no_init(self) -> None:

@@ -22,7 +22,7 @@ NEURON_EXPANDER_APLX = "neuron_expander.aplx"
 
 
 @require_subclass(MachineVertex)
-class AbstractNeuronExpandable(object, metaclass=AbstractBase):
+class AbstractNeuronExpandable(metaclass=AbstractBase):
     """
     Indicates a class (a
     :py:class:`~pacman.model.graphs.machine.MachineVertex`)

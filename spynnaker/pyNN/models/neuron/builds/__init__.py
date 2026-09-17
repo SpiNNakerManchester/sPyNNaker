@@ -42,10 +42,26 @@ from .stoc_exp import StocExp
 from .stoc_exp_stable import StocExpStable
 from .stoc_sigma import StocSigma
 
-__all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
-           "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",
-           "IFCurrExpBase", "IFFacetsConductancePopulation", "IzkCondExpBase",
-           "IzkCurrExpBase", "IFCondExpStoc", "IzkCondDualExpBase",
-           "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase",
-           "IFCurrDeltaCa2Adaptive", "StocExp", "StocExpStable", "StocSigma",
-           "IFTruncDelta", "IFCurrDeltaFixedProb"]
+__all__ = [
+           "EIFConductanceAlphaPopulation",
+           "HHCondExp",
+           "IFCondAlpha",
+           "IFCondExpBase",
+           "IFCondExpStoc",
+           "IFCurrAlpha",
+           "IFCurrDelta",
+           "IFCurrDeltaCa2Adaptive",
+           "IFCurrDeltaFixedProb",
+           "IFCurrDualExpBase",
+           "IFCurrExpBase",
+           "IFCurrExpCa2Adaptive",
+           "IFCurrExpSEMDBase",
+           "IFFacetsConductancePopulation",
+           "IFTruncDelta",
+           "IzkCondDualExpBase",
+           "IzkCondExpBase",
+           "IzkCurrExpBase",
+           "StocExp",
+           "StocExpStable",
+           "StocSigma",
+]

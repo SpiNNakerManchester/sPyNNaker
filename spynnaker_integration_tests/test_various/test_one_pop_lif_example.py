@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 # Copyright (c) 2017 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Tuple
 
 import pyNN.spiNNaker as p
 from neo import Block
@@ -24,7 +21,7 @@ from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.utilities import neo_convertor
 
 
-def do_run(nNeurons: int) -> Tuple[Block, Block, Block]:
+def do_run(nNeurons: int) -> tuple[Block, Block, Block]:
 
     p.setup(timestep=1.0, min_delay=1.0)
 
@@ -58,7 +55,7 @@ def do_run(nNeurons: int) -> Tuple[Block, Block, Block]:
 class OnePopLifExample(BaseTestCase):
     def do_run(self) -> None:
         nNeurons = 5  # number of neurons in each population
-        (v, gsyn, spikes) = do_run(nNeurons)
+        (_, _, spikes) = do_run(nNeurons)
         self.assertEqual(5, len(spikes))
         self.assertEqual(spikes[0][0], 0)
         self.assertEqual(spikes[0][1], 76)

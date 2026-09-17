@@ -13,8 +13,9 @@
 # limitations under the License.
 from __future__ import annotations
 
+from collections.abc import Iterable
 from math import ceil
-from typing import TYPE_CHECKING, Dict, Iterable, List, Tuple, cast
+from typing import TYPE_CHECKING, cast
 
 import numpy
 from numpy import floating, uint32
@@ -86,8 +87,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             The delay used in the connection; by default 1 time step
         """
         # Store the sources to avoid recalculation
-        self.__cached_sources: Dict[ApplicationVertex, Dict[
-                Tuple[ColouredApplicationVertex, str], List[Source]]] = dict()
+        self.__cached_sources: dict[ApplicationVertex, dict[
+                tuple[ColouredApplicationVertex, str], list[Source]]] = {}
 
         super().__init__(delay)
         if not isinstance(self.delay, (float, int)):
@@ -164,8 +165,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.reserve_memory_region(region, size, label="LocalOnlyPoolDense")
         spec.switch_write_focus(region)
 
-        connector_data: List[NDArray[uint32]] = list()
-        source_data = list()
+        connector_data: list[NDArray[uint32]] = []
+        source_data = []
         n_connectors = 0
         for (pre_vertex, part_id), source_infos in sources.items():
             first_conn_index = len(connector_data)
@@ -205,9 +206,9 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             cum_size = 1
             cum_cores_per_dim = 1
             cum_last_size = 1
-            all_dim_data = list()
+            all_dim_data = []
             for i in range(n_dims):
-                dim_data = list()
+                dim_data = []
                 # Size per core
                 dim_data.append(first_slice.shape[i])
                 dim_data.append(cum_size)
@@ -215,7 +216,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
                 cum_size *= first_slice.shape[i]
 
                 # Cores
-                cores_per_dim = int(ceil(pre_shape[i] / first_slice.shape[i]))
+                cores_per_dim = ceil(pre_shape[i] / first_slice.shape[i])
                 dim_data.append(cores_per_dim)
                 dim_data.append(cum_cores_per_dim)
                 dim_data.append(get_div_const(cum_cores_per_dim))
@@ -239,8 +240,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.write_array(numpy.concatenate(connector_data))
 
     def __get_sources_for_target(
-            self, app_vertex: PopulationVertex) -> Dict[
-            Tuple[ColouredApplicationVertex, str], List[Source]]:
+            self, app_vertex: PopulationVertex) -> dict[
+            tuple[ColouredApplicationVertex, str], list[Source]]:
         """
         Get all the application vertex sources that will hit the given
         application vertex.
