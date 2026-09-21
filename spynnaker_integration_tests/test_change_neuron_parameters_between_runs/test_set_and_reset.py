@@ -14,7 +14,6 @@
 
 from numpy.typing import NDArray
 import pyNN.spiNNaker as sim
-from numpy.typing import NDArray
 
 from spinnaker_testbase import BaseTestCase
 

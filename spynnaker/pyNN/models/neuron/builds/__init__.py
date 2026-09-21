@@ -67,7 +67,7 @@ __all__ = [
            "StocExp",
            "StocExpStable",
            "StocSigma",
-           "EPropAdaptive", 
-           "SinusoidReadout", 
+           "EPropAdaptive",
+           "SinusoidReadout",
            "LeftRightReadout",
 ]

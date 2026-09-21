@@ -14,7 +14,6 @@
 from pyNN.space import BaseStructure
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from pyNN.space import BaseStructure
 
 
 class SupportsStructure(metaclass=AbstractBase):
