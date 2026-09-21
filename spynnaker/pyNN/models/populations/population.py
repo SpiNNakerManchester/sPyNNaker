@@ -791,7 +791,7 @@ class Population(PopulationBase):
             the additional parameters the vertex can support.
         :return: the list of parameters that are accepted.
         """
-        for key in additional_parameters.keys():
+        for key in additional_parameters:
             if key in population_parameters:
                 population_parameters[key] = additional_parameters[key]
             else:

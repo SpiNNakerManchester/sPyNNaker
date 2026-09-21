@@ -71,6 +71,9 @@ class ParameterHolder:
     def _safe_read_values(self, parameter: str) -> list[float] | float:
         values = self.__get_call(parameter, self.__selector)
 
+        if not values:
+            return values
+
         # The values must be a single item, a list or a random distribution;
         # if a random distribution we must not have generated yet!
         if isinstance(values, RandomDistribution):

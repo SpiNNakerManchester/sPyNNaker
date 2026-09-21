@@ -355,10 +355,10 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         SpynnakerDataView.register_binary_search_path(search_path)
 
     def _execute_write_neo_metadata(self) -> None:
-        with FecTimer("Write Neo Metadata", TimerWork.OTHER):
-            with NeoBufferDatabase() as db:
-                db.write_segment_metadata()
-                db.write_metadata()
+        with (FecTimer("Write Neo Metadata", TimerWork.OTHER),
+              NeoBufferDatabase() as db):
+            db.write_segment_metadata()
+            db.write_metadata()
 
     @overrides(AbstractSpinnakerBase._do_write_metadata)
     def _do_write_metadata(self) -> None:
