@@ -170,7 +170,7 @@ def _all_gen(rd: RangeDictionary) -> bool:
     """
     Determine if all the values of a ranged dictionary can be generated.
     """
-    for key in rd.keys():
+    for key in rd.keys():  # NOQA: SIM118
         if is_singleton(rd[key]):
             if not is_param_generatable(rd[key]):
                 return False
@@ -188,7 +188,7 @@ def _check_random_dists(rd: RangeDictionary) -> None:
     Check all RandomDistribution instances in a range dictionary to see if
     they have the rng value set.
     """
-    for key in rd.keys():
+    for key in rd.keys():  # NOQA: SIM118
         if is_singleton(rd[key]):
             a_rd = rd[key]
             if isinstance(a_rd, RandomDistribution):
@@ -1781,7 +1781,7 @@ class PopulationVertex(
 
         :param vertex_slice: The slice to copy now
         """
-        for key in self.__state_variables.keys():
+        for key in self.__state_variables.keys():  # NOQA: SIM118
             value = self.__state_variables[key][vertex_slice.get_raster_ids()]
             self.__initial_state_variables[key].set_value_by_ids(
                 vertex_slice.get_raster_ids(), value)
