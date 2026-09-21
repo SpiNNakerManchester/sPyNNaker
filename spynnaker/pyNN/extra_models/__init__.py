@@ -25,6 +25,9 @@ from spynnaker.pyNN.models.neuron.builds import (
     StocExp,
     StocExpStable,
     StocSigma,
+    EPropAdaptive,
+    SinusoidReadout,
+    LeftRightReadout,
 )
 from spynnaker.pyNN.models.neuron.builds import IFCurrDelta as IFCurDelta
 from spynnaker.pyNN.models.neuron.builds import (
@@ -67,8 +70,6 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceEpropReg)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceEprop)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    EPropAdaptive, SinusoidReadout, LeftRightReadout)
 
 # Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
