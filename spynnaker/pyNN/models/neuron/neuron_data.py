@@ -48,7 +48,7 @@ def _all_one_val_gen(rd: RangeDictionary[float]) -> bool:
         A random distribution is considered the same if the same distribution
         is used for all neurons.
     """
-    for key in rd.keys():
+    for key in rd.keys():  # NOQA: SIM118
         if is_singleton(rd[key]):
             return True
         if not rd[key].range_based():
