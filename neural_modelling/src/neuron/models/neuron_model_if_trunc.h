@@ -117,7 +117,8 @@ static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *par
 static inline state_t neuron_model_state_update(
         uint16_t num_excitatory_inputs, const input_t *exc_input,
         uint16_t num_inhibitory_inputs, const input_t *inh_input,
-        input_t external_bias, REAL current_offset, neuron_t *restrict neuron) {
+        input_t external_bias, REAL current_offset, neuron_t *restrict neuron,
+		UNUSED REAL B_t) {
 
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
