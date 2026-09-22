@@ -316,13 +316,13 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             else:
                 self.__handle_unknown_key(key)
 
-        for label_id in key_labels:
+        for label_id, label_value in key_labels.items():
             label = self.__receive_labels[label_id]
             for c_back, use_atom in self.__live_event_callbacks[label_id]:
                 if use_atom:
                     c_back(label, atoms_labels[label_id])
                 else:
-                    c_back(label, key_labels[label_id])
+                    c_back(label, label_value)
 
     def __handle_unknown_key(self, key: int) -> None:
         if key not in self.__error_keys:
