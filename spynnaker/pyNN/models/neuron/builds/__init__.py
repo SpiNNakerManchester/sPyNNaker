@@ -47,6 +47,7 @@ from .left_right_readout import LeftRightReadout
 
 __all__ = [
            "EIFConductanceAlphaPopulation",
+           "EPropAdaptive",
            "HHCondExp",
            "IFCondAlpha",
            "IFCondExpBase",
@@ -64,10 +65,9 @@ __all__ = [
            "IzkCondDualExpBase",
            "IzkCondExpBase",
            "IzkCurrExpBase",
+           "LeftRightReadout",
+           "SinusoidReadout",
            "StocExp",
            "StocExpStable",
            "StocSigma",
-           "EPropAdaptive",
-           "SinusoidReadout",
-           "LeftRightReadout",
 ]

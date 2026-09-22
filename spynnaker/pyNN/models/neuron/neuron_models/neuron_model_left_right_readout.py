@@ -11,13 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged import RangeDictionary
+
 from spinn_front_end_common.interface.ds import DataType
-from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent)
+
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 
 # constants
 SYNAPSES_PER_NEURON = 250   # around 415 with only 3 in syn_state (?)
@@ -61,33 +63,39 @@ Z_BAR = "z_bar"
 UPDATE_READY = "update_ready"
 
 
-class NeuronModelLeftRightReadout(AbstractStandardNeuronComponent):
+class NeuronModelLeftRightReadout(NeuronModel):
     __slots__ = [
-        "__v_init",
-        "__v_rest",
-        "__tau_m",
         "__cm",
-        "__i_offset",
-        "__v_reset",
-        "__tau_refrac",
-        "__rate_off",
-        "__rate_on",
-        "__learning_signal",
-        "__w_fb",
-        "__window_size",
+        "__cross_entropy",
         "__eta",
+        "__i_offset",
+        "__learning_signal",
         "__mean_l",
         "__mean_r",
-        "__cross_entropy",
+        "__number_of_cues",
         "__poisson_key",
         "__poisson_pop_size",
-        "__number_of_cues"
+        "__rate_off",
+        "__rate_on",
+        "__tau_m",
+        "__tau_refrac",
+        "__v_init",
+        "__v_reset",
+        "__v_rest",
+        "__w_fb",
+        "__window_size",
         ]
 
     def __init__(
-            self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
-            rate_on, rate_off, poisson_pop_size, learning_signal, w_fb, eta,
-            window_size, number_of_cues):
+            self, v_init: ModelParameter, v_rest: ModelParameter,
+            tau_m: ModelParameter, cm: ModelParameter,
+            i_offset: ModelParameter, v_reset: ModelParameter,
+            tau_refrac: ModelParameter,
+            rate_on: ModelParameter, rate_off: ModelParameter,
+            poisson_pop_size: ModelParameter, learning_signal: ModelParameter,
+            w_fb: ModelParameter, eta: ModelParameter,
+            window_size: ModelParameter,
+            number_of_cues: ModelParameter) -> None:
 
         struct_neuron_vals = [
             (DataType.S1615, V),  # v
@@ -158,22 +166,22 @@ class NeuronModelLeftRightReadout(AbstractStandardNeuronComponent):
         self.__window_size = window_size
         self.__number_of_cues = number_of_cues
 
-    def set_poisson_key(self, p_key):
+    def set_poisson_key(self, p_key: int) -> None:
         self.__poisson_key = p_key
 
-    @overrides(AbstractStandardNeuronComponent.add_parameters)
-    def add_parameters(self, parameters):
-        parameters[V_REST] = self.__v_rest
-        parameters[TAU_M] = self.__tau_m
-        parameters[CM] = self.__cm
-        parameters[I_OFFSET] = self.__i_offset
-        parameters[V_RESET] = self.__v_reset
-        parameters[TAU_REFRAC] = self.__tau_refrac
+    @overrides(NeuronModel.add_parameters)
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
+        parameters[V_REST] = self._convert(self.__v_rest)
+        parameters[TAU_M] = self._convert(self.__tau_m)
+        parameters[CM] = self._convert(self.__cm)
+        parameters[I_OFFSET] = self._convert(self.__i_offset)
+        parameters[V_RESET] = self._convert(self.__v_reset)
+        parameters[TAU_REFRAC] = self._convert(self.__tau_refrac)
         parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
-        parameters[L] = self.__learning_signal
-        parameters[W_FB] = self.__w_fb
-        parameters[WINDOW_SIZE] = self.__window_size
+        parameters[L] = self._convert(self.__learning_signal)
+        parameters[W_FB] = self._convert(self.__w_fb)
+        parameters[WINDOW_SIZE] = self._convert(self.__window_size)
         # These should probably have defaults earlier than this
         # TODO: some confusion as to which values were actually being used?
         parameters[SEED1] = 1  # 10065
@@ -181,124 +189,126 @@ class NeuronModelLeftRightReadout(AbstractStandardNeuronComponent):
         parameters[SEED3] = 3  # 3634
         parameters[SEED4] = 4  # 4877
 
-        parameters[RATE_ON] = self.__rate_on
-        parameters[RATE_OFF] = self.__rate_off
+        parameters[RATE_ON] = self._convert(self.__rate_on)
+        parameters[RATE_OFF] = self._convert(self.__rate_off)
 
         parameters[TICKS_PER_SECOND] = 0.0
         parameters[TIME_SINCE_LAST_SPIKE] = 0.0
         parameters[RATE_AT_LAST_SETTING] = 0.0
-        parameters[POISSON_POP_SIZE] = self.__poisson_pop_size
-        parameters[MEAN_L] = self.__mean_l
-        parameters[MEAN_R] = self.__mean_r
-        parameters[CROSS_ENTROPY] = self.__cross_entropy
-        parameters[POISSON_KEY] = self.__poisson_key
-        parameters[POISSON_POP_SIZE] = self.__poisson_pop_size
-        parameters[ETA] = self.__eta
-        parameters[NUMBER_OF_CUES] = self.__number_of_cues
+        parameters[POISSON_POP_SIZE] = self._convert(self.__poisson_pop_size)
+        parameters[MEAN_L] = self._convert(self.__mean_l)
+        parameters[MEAN_R] = self._convert(self.__mean_r)
+        parameters[CROSS_ENTROPY] = self._convert(self.__cross_entropy)
+        parameters[POISSON_KEY] = self._convert(self.__poisson_key)
+        parameters[POISSON_POP_SIZE] = self._convert(self.__poisson_pop_size)
+        parameters[ETA] = self._convert(self.__eta)
+        parameters[NUMBER_OF_CUES] = self._convert(self.__number_of_cues)
 
-    @overrides(AbstractStandardNeuronComponent.add_state_variables)
-    def add_state_variables(self, state_variables):
-        state_variables[V] = self.__v_init
+    @overrides(NeuronModel.add_state_variables)
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
+        state_variables[V] = self._convert(self.__v_init)
         state_variables[REFRACT_TIMER] = 0
 
         # learning params
-        state_variables[L] = self.__learning_signal
+        state_variables[L] = self._convert(self.__learning_signal)
 
         for n in range(SYNAPSES_PER_NEURON):
             state_variables[DELTA_W+str(n)] = 0
             state_variables[Z_BAR_OLD+str(n)] = 0
             state_variables[Z_BAR+str(n)] = 0
-            state_variables[UPDATE_READY+str(n)] = self.__window_size
+            state_variables[UPDATE_READY+str(n)] = self._convert(
+                self.__window_size)
 
     @property
-    def rate_on(self):
+    def rate_on(self) -> ModelParameter:
         return self.__rate_on
 
     @rate_on.setter
-    def rate_on(self, rate_on):
+    def rate_on(self, rate_on: ModelParameter) -> None:
         self.__rate_on = rate_on
 
     @property
-    def rate_off(self):
+    def rate_off(self) -> ModelParameter:
         return self.__rate_off
 
-    @rate_on.setter
-    def rate_on(self, rate_off):
+    @rate_off.setter
+    def rate_off(self, rate_off: ModelParameter) -> None:
         self.__rate_off = rate_off
 
     @property
-    def v_init(self):
+    def v_init(self) -> ModelParameter:
         return self.__v_init
 
     @v_init.setter
-    def v_init(self, v_init):
+    def v_init(self, v_init: ModelParameter) -> None:
         self.__v_init = v_init
 
     @property
-    def v_rest(self):
+    def v_rest(self) -> ModelParameter:
         return self.__v_rest
 
     @v_rest.setter
-    def v_rest(self, v_rest):
+    def v_rest(self, v_rest: ModelParameter) -> None:
         self.__v_rest = v_rest
 
     @property
-    def tau_m(self):
+    def tau_m(self) -> ModelParameter:
         return self.__tau_m
 
     @tau_m.setter
-    def tau_m(self, tau_m):
+    def tau_m(self, tau_m: ModelParameter) -> None:
         self.__tau_m = tau_m
 
     @property
-    def cm(self):
+    def cm(self) -> ModelParameter:
         return self.__cm
 
     @cm.setter
-    def cm(self, cm):
+    def cm(self, cm: ModelParameter) -> None:
         self.__cm = cm
 
     @property
-    def i_offset(self):
+    def i_offset(self) -> ModelParameter:
         return self.__i_offset
 
     @i_offset.setter
-    def i_offset(self, i_offset):
+    def i_offset(self, i_offset: ModelParameter) -> None:
         self.__i_offset = i_offset
 
     @property
-    def v_reset(self):
+    def v_reset(self) -> ModelParameter:
         return self.__v_reset
 
     @v_reset.setter
-    def v_reset(self, v_reset):
+    def v_reset(self, v_reset: ModelParameter) -> None:
         self.__v_reset = v_reset
 
     @property
-    def tau_refrac(self):
+    def tau_refrac(self) -> ModelParameter:
         return self.__tau_refrac
 
     @tau_refrac.setter
-    def tau_refrac(self, tau_refrac):
+    def tau_refrac(self, tau_refrac: ModelParameter) -> None:
         self.__tau_refrac = tau_refrac
 
     @property
-    def w_fb(self):
+    def w_fb(self) -> ModelParameter:
         return self.__w_fb
 
     @w_fb.setter
-    def w_fb(self, new_value):
+    def w_fb(self, new_value: ModelParameter) -> None:
         self.__w_fb = new_value
 
     @property
-    def window_size(self):
+    def window_size(self) -> ModelParameter:
         return self.__window_size
 
     @window_size.setter
-    def window_size(self, new_value):
+    def window_size(self, new_value: ModelParameter) -> None:
         self.__window_size = new_value
 
     @property
-    @overrides(AbstractStandardNeuronComponent.uses_eprop)
-    def uses_eprop(self):
+    @overrides(NeuronModel.uses_eprop)
+    def uses_eprop(self) -> bool:
         return True

@@ -20,6 +20,7 @@ from spynnaker.pyNN.models.neuron.synapse_types import (
     SynapseTypeEPropAdaptive)
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeNone
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 
 
 class EPropAdaptive(AbstractPyNNNeuronModelStandard):
@@ -33,26 +34,34 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
     def __init__(
             self,
             # neuron model params
-            tau_m=20.0, cm=1.0, v_rest=0, v_reset=0,
-            tau_refrac=5.0, i_offset=0.0, v=0.0,  psi=0.0,
+            tau_m: ModelParameter = 20.0, cm: ModelParameter = 1.0,
+            v_rest: ModelParameter = 0, v_reset: ModelParameter = 0,
+            tau_refrac: ModelParameter = 5.0, i_offset: ModelParameter = 0.0,
+            v: ModelParameter = 0.0, psi: ModelParameter = 0.0,
 
             # synapse type params
             # tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0, tau_syn_I2=5.0,
-            isyn_exc=0.0, isyn_exc2=0.0, isyn_inh=0.0, isyn_inh2=0.0,
+            isyn_exc: ModelParameter = 0.0, isyn_exc2: ModelParameter = 0.0,
+            isyn_inh: ModelParameter = 0.0, isyn_inh2: ModelParameter = 0.0,
 
             # Regularisation params
-            target_rate=10.0, tau_err=1000.0,  # fits with 1 ms timestep
+            target_rate: ModelParameter = 10.0,
+            tau_err: ModelParameter = 1000.0,  # fits with 1 ms timestep
 
             # Threshold parameters
-            B=10.0, small_b=0.0, small_b_0=10.0, tau_a=500.0, beta=1.8,
+            B: ModelParameter = 10.0, small_b: ModelParameter = 0.0,
+            small_b_0: ModelParameter = 10.0, tau_a: ModelParameter = 500.0,
+            beta: ModelParameter = 1.8,
 
             # Learning signal and weight update constants
-            learning_signal=0.0, w_fb=0.5, window_size=13000,
-            number_of_cues=0,
+            learning_signal: ModelParameter = 0.0,
+            w_fb: ModelParameter = 0.5,
+            window_size: ModelParameter = 13000,
+            number_of_cues: ModelParameter = 0,
 
             # eprop "global"
-            eta=1.0
-            ):
+            eta: ModelParameter = 1.0
+            ) -> None:
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelEPropAdaptive(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac, psi,
@@ -72,11 +81,11 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
 
         threshold_type = ThresholdTypeNone()
 
-        super(EPropAdaptive, self).__init__(
+        super().__init__(
             model_name="eprop_adaptive", binary="eprop_adaptive.aplx",
             neuron_model=neuron_model, input_type=input_type,
             synapse_type=synapse_type, threshold_type=threshold_type)
 
     @classmethod
-    def get_max_atoms_per_core(cls):
+    def get_max_atoms_per_core(cls) -> int:
         return 8

@@ -13,11 +13,12 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged import RangeDictionary
 from spinn_front_end_common.interface.ds import DataType
-from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent)
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
 
 # constants
 SYNAPSES_PER_NEURON = 250   # around 415 with only 3 in syn_state
@@ -45,27 +46,29 @@ UPDATE_READY = "update_ready"
 
 
 class NeuronModelLeakyIntegrateAndFireSinusoidReadout(
-        AbstractStandardNeuronComponent):
+        NeuronModel):
     __slots__ = [
-        "__v_init",
-        "__v_rest",
-        "__tau_m",
         "__cm",
-        "__i_offset",
-        "__v_reset",
-        "__tau_refrac",
-        "__target_data",
-
-        # learning signal
-        "__learning_signal",
-        "__w_fb",
         "__eta",
-        "__update_ready"
+        "__i_offset",
+        "__learning_signal",
+        "__target_data",
+        "__tau_m",
+        "__tau_refrac",
+        "__update_ready",
+        "__v_init",
+        "__v_reset",
+        "__v_rest",
+        "__w_fb",
         ]
 
     def __init__(
-            self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
-            target_data, learning_signal, w_fb, eta, update_ready):
+            self, v_init: ModelParameter, v_rest: ModelParameter,
+            tau_m: ModelParameter, cm: ModelParameter,
+            i_offset: ModelParameter, v_reset: ModelParameter,
+            tau_refrac: ModelParameter, target_data: list[float],
+            learning_signal: ModelParameter, w_fb: ModelParameter,
+            eta: ModelParameter, update_ready: bool) -> None:
 
         struct_neuron_vals = [
             (DataType.S1615, V),  # v
@@ -122,32 +125,34 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(
 
         self.__update_ready = update_ready
 
-    @overrides(AbstractStandardNeuronComponent.add_parameters)
-    def add_parameters(self, parameters):
-        parameters[V_REST] = self.__v_rest
-        parameters[TAU_M] = self.__tau_m
-        parameters[CM] = self.__cm
-        parameters[I_OFFSET] = self.__i_offset
-        parameters[V_RESET] = self.__v_reset
-        parameters[TAU_REFRAC] = self.__tau_refrac
+    @overrides(NeuronModel.add_parameters)
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
+        parameters[V_REST] = self._convert(self.__v_rest)
+        parameters[TAU_M] = self._convert(self.__tau_m)
+        parameters[CM] = self._convert(self.__cm)
+        parameters[I_OFFSET] = self._convert(self.__i_offset)
+        parameters[V_RESET] = self._convert(self.__v_reset)
+        parameters[TAU_REFRAC] = self._convert(self.__tau_refrac)
         parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
         # learning params
-        parameters[W_FB] = self.__w_fb
+        parameters[W_FB] = self._convert(self.__w_fb)
 
         # Target data (formerly global data)
         for n in range(1024):
-            parameters[TARGET_DATA+str(n)] = self.__target_data[n]
+            parameters[TARGET_DATA+str(n)] = self._convert(
+                self.__target_data[n])
 
-        parameters[ETA] = self.__eta
+        parameters[ETA] = self._convert(self.__eta)
 
-    @overrides(AbstractStandardNeuronComponent.add_state_variables)
-    def add_state_variables(self, state_variables):
-        state_variables[V] = self.__v_init
+    @overrides(NeuronModel.add_state_variables)
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
+        state_variables[V] = self._convert(self.__v_init)
         state_variables[REFRACT_TIMER] = 0
 
         # learning params
-        state_variables[L] = self.__learning_signal
+        state_variables[L] = self._convert(self.__learning_signal)
 
         for n in range(SYNAPSES_PER_NEURON):
             state_variables[DELTA_W+str(n)] = 0
@@ -156,78 +161,78 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(
             state_variables[UPDATE_READY+str(n)] = self.__update_ready
 
     @property
-    def target_data(self):
+    def target_data(self) -> list[float]:
         return self.__target_data
 
     @target_data.setter
-    def target_data(self, target_data):
+    def target_data(self, target_data: list[float]) -> None:
         self.__target_data = target_data
 
     @property
-    def v_init(self):
+    def v_init(self) -> ModelParameter:
         return self.__v_init
 
     @v_init.setter
-    def v_init(self, v_init):
+    def v_init(self, v_init: ModelParameter) -> None:
         self.__v_init = v_init
 
     @property
-    def v_rest(self):
+    def v_rest(self) -> ModelParameter:
         return self.__v_rest
 
     @v_rest.setter
-    def v_rest(self, v_rest):
+    def v_rest(self, v_rest: ModelParameter) -> None:
         self.__v_rest = v_rest
 
     @property
-    def tau_m(self):
+    def tau_m(self) -> ModelParameter:
         return self.__tau_m
 
     @tau_m.setter
-    def tau_m(self, tau_m):
+    def tau_m(self, tau_m: ModelParameter) -> None:
         self.__tau_m = tau_m
 
     @property
-    def cm(self):
+    def cm(self) -> ModelParameter:
         return self.__cm
 
     @cm.setter
-    def cm(self, cm):
+    def cm(self, cm: ModelParameter) -> None:
         self.__cm = cm
 
     @property
-    def i_offset(self):
+    def i_offset(self) -> ModelParameter:
         return self.__i_offset
 
     @i_offset.setter
-    def i_offset(self, i_offset):
+    def i_offset(self, i_offset: ModelParameter) -> None:
         self.__i_offset = i_offset
 
     @property
-    def v_reset(self):
+    def v_reset(self) -> ModelParameter:
         return self.__v_reset
 
     @v_reset.setter
-    def v_reset(self, v_reset):
+    def v_reset(self, v_reset: ModelParameter) -> None:
         self.__v_reset = v_reset
 
     @property
-    def tau_refrac(self):
+    def tau_refrac(self) -> ModelParameter:
         return self.__tau_refrac
 
     @tau_refrac.setter
-    def tau_refrac(self, tau_refrac):
+    def tau_refrac(self, tau_refrac: ModelParameter) -> None:
         self.__tau_refrac = tau_refrac
 
     @property
-    def w_fb(self):
+    def w_fb(self) -> ModelParameter:
         return self.__w_fb
 
     @w_fb.setter
-    def w_fb(self, w_fb):
+    def w_fb(self, w_fb: ModelParameter) -> None:
         self.__w_fb = w_fb
 
     @property
-    @overrides(AbstractStandardNeuronComponent.uses_eprop)
-    def uses_eprop(self):
+    @overrides(NeuronModel.uses_eprop)
+    def uses_eprop(self) -> bool:
         return True
