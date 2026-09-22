@@ -89,9 +89,9 @@ def redundant_packet_count_report() -> None:
         _create_views()
         with open(file_name, "w", encoding="utf-8") as f:
             _write_report(f)
-    except Exception as e:  # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-except
         logger.exception(
-            "Error {} doing redundant_packet_count_report {}:", e, file_name)
+            "Error doing redundant_packet_count_report {}:", file_name)
 
 
 def _create_views() -> None:
