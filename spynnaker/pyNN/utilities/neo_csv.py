@@ -245,9 +245,9 @@ class NeoCsv:
             sampling_rate = 1000 / sampling_period
             self._insert_spike_data(
                 indexes, segment, spikes, t_start, t_stop, sampling_rate)
-        except KeyError as ex:
-            logger.exception("Metadata for {} is missing {}. "
-                             "So this data will be skipped", variable, ex)
+        except KeyError:
+            logger.exception("Metadata for {} is missing. "
+                             "So this data will be skipped", variable)
             return
 
     def _insert_matrix_data(
