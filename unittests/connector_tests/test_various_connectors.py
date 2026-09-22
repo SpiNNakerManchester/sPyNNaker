@@ -73,8 +73,8 @@ class TestConnectors(unittest.TestCase):
     def compare_parameters(
             self, params: dict[str, Any], params2: dict[str, Any]) -> None:
         assert len(params) == len(params2)
-        for key in params:
-            self.compare_values(key, params[key], params2[key])
+        for key, value in params.items():
+            self.compare_values(key, value, params2[key])
 
     def testOneToOneConnector_defaults(self) -> None:
         connector = OneToOneConnector()
