@@ -329,7 +329,7 @@ class PopulationMachineVertex(
         # pylint: disable=protected-access
         if isinstance(self._pop_vertex._pynn_model._model.neuron_model,
                       NeuronModelLeftRightReadout):
-            poisson_key = routing_info.get_first_key_from_pre_vertex(
+            poisson_key = routing_info.get_key_from(
                 placement.vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
             # pylint: disable=protected-access
             self._pop_vertex._pynn_model._model.neuron_model.set_poisson_key(

@@ -81,11 +81,6 @@ struct neuron_t {
     int32_t  T_refract;
 };
 
-// Mark a value as possibly unused while not using any instructions, guaranteed
-#ifndef __use
-#define __use(x)    do { (void) (x); } while (0)
-#endif
-
 //! \brief Performs a ceil operation on an accum
 //! \param[in] value The value to ceil
 //! \return The ceil of the value
@@ -148,8 +143,7 @@ static inline state_t neuron_model_state_update(
         uint16_t num_excitatory_inputs, const input_t *exc_input,
         uint16_t num_inhibitory_inputs, const input_t *inh_input,
         input_t external_bias, REAL current_offset, neuron_t *restrict neuron,
-		REAL B_t) {
-	__use(B_t);
+		UNUSED REAL B_t) {
 
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {

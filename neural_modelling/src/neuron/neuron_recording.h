@@ -201,7 +201,6 @@ static inline void neuron_recording_record(uint32_t time) {
             bf_info->count += bf_info->increment;
         }
     }
-
 }
 
 //! \brief sets up state for next recording.

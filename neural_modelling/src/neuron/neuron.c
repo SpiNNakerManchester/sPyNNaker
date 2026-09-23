@@ -25,16 +25,6 @@
 #include "plasticity/synapse_dynamics.h"
 #include <debug.h>
 
-//// declare spin1_wfi
-//extern void spin1_wfi(void);
-//
-//// Spin1 API ticks - to know when the timer wraps
-//extern uint ticks;
-//
-//#define SPIKE_RECORDING_CHANNEL 0
-
-//! The key to be used for this core (will be ORed with neuron ID)
-//key_t key;  //MADE NON STATIC!!!
 //! The keys to be used by the neurons (one per neuron)
 uint32_t *neuron_keys;
 

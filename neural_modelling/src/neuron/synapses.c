@@ -24,7 +24,6 @@
 #include <debug.h>
 #include <spin1_api.h>
 #include <utils.h>
-//#include "models/neuron_model_eprop_adaptive_impl.h"
 
 //! if using profiler import profiler tags
 #ifdef PROFILER_ENABLED
@@ -33,7 +32,6 @@
 
 //! Globals required for synapse benchmarking to work.
 uint32_t  num_fixed_pre_synaptic_events = 0;
-//extern neuron_t *neuron_array;
 
 //! The number of neurons
 static uint32_t n_neurons;
