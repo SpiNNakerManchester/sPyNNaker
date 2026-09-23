@@ -26,7 +26,7 @@ class TestAllToAllConnector(BaseTestCase):
     def check_weights(self, projection: Projection, sources: int,
                       destinations: int) -> None:
         weights = projection.get(["weight"], "list")
-        s_d_set = set((s, d) for s, d, _ in weights)
+        s_d_set = {(s, d) for s, d, _ in weights}
         self.assertEqual(len(weights), sources * destinations)
         self.assertEqual(len(s_d_set), sources * destinations)
 
@@ -132,7 +132,7 @@ class TestAllToAllConnector(BaseTestCase):
             pre, post, sim.AllToAllConnector(),
             sim.StaticSynapse(weight=1.0, delay=1.0))
         sim.run(0)
-        conns = set((int(i), int(j)) for i, j in proj.get([], "list"))
+        conns = {(int(i), int(j)) for i, j in proj.get([], "list")}
         sim.end()
 
         for i in range(pre_size):
@@ -164,7 +164,7 @@ class TestAllToAllConnector(BaseTestCase):
                 allow_self_connections=self_connect),
             sim.StaticSynapse(weight=1.0, delay=1.0))
         sim.run(0)
-        conns = set((int(i), int(j)) for i, j in proj.get([], "list"))
+        conns = {(int(i), int(j)) for i, j in proj.get([], "list")}
         sim.end()
 
         for i in range(size):

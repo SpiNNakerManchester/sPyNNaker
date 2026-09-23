@@ -254,7 +254,7 @@ def variable_rate_100us() -> None:
                 n_spikes[rate, start, end] = len(rate_spikes)
             else:
                 n_spikes[rate, start, end] += len(rate_spikes)
-    for rate, start, end in n_spikes:
+    for rate, start, end in n_spikes:  # NOQA: PLC0206
         expected = (rate / 1000.0) * (end - start)
         tolerance = scipy.stats.poisson.ppf(0.99, expected) - expected
         n_spikes_rate = n_spikes[rate, start, end] / 100.0
