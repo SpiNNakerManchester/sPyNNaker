@@ -172,8 +172,6 @@ class AbstractConnector(metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(delays, d=d))
         elif is_scalar(delays):
             return delays
-        elif hasattr(delays, "__getitem__"):
-            return numpy.max(delays)
         raise self.delay_type_exception(delays)
 
     @abstractmethod
