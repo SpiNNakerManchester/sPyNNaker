@@ -24,6 +24,7 @@ from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 
 
 class LeftRightReadout(AbstractPyNNNeuronModelStandard):
+    """ Leaky integrate and fire neuron model with left-right readout. """
 
     @default_initial_values({"v", "isyn_exc", "isyn_exc2", "isyn_inh",
                              "isyn_inh2", "learning_signal", "w_fb", "eta",

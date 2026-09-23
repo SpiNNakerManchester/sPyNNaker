@@ -24,6 +24,6 @@ __all__ = [
            "ThresholdTypeAdaptive",
            "ThresholdTypeFixedProb",
            "ThresholdTypeMaassStochastic",
-           "ThresholdTypeStatic",
            "ThresholdTypeNone",
+           "ThresholdTypeStatic",
 ]

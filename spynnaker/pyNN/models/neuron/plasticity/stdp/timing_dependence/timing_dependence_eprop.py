@@ -32,8 +32,7 @@ class TimingDependenceEprop(AbstractTimingDependence):
 
     __slots__ = [
         "__a_minus",
-        "__a_plus",
-        "__synapse_structure"
+        "__a_plus"
     ]
 
     def __init__(self, A_plus: float = 0.01,
@@ -49,8 +48,7 @@ class TimingDependenceEprop(AbstractTimingDependence):
         self.__a_plus = A_plus
         self.__a_minus = A_minus
 
-        self.__synapse_structure: SynapseStructureWeightOnly = \
-            SynapseStructureWeightOnly()
+        super().__init__(SynapseStructureWeightOnly())
 
     @property
     def A_plus(self) -> float:
@@ -103,11 +101,6 @@ class TimingDependenceEprop(AbstractTimingDependence):
             synapse_weight_scales: NDArray[floating]) -> None:
         # There are currently no parameters to write for this rule
         pass
-
-    @property
-    @overrides(AbstractTimingDependence.synaptic_structure)
-    def synaptic_structure(self) -> SynapseStructureWeightOnly:
-        return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self) -> list[str]:

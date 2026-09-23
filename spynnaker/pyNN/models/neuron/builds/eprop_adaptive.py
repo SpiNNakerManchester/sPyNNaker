@@ -88,4 +88,5 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
 
     @classmethod
     def get_max_atoms_per_core(cls) -> int:
+        """ Get the maximum number of atoms per core for this model. """
         return 8
