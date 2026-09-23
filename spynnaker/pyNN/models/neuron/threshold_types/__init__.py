@@ -21,9 +21,9 @@ from .threshold_type_none import ThresholdTypeNone
 
 __all__ = [
            "AbstractThresholdType",
+           "ThresholdTypeAdaptive",
            "ThresholdTypeFixedProb",
            "ThresholdTypeMaassStochastic",
            "ThresholdTypeStatic",
-           "ThresholdTypeAdaptive",
            "ThresholdTypeNone",
 ]

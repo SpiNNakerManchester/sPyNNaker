@@ -24,6 +24,9 @@ from spynnaker.pyNN.models.neuron.implementations import ModelParameter
 
 
 class SinusoidReadout(AbstractPyNNNeuronModelStandard):
+    """ A neuron model that implements a sinusoidal readout with
+        e-prop learning.
+    """
 
     @default_initial_values({"v", "isyn_exc", "isyn_exc2", "isyn_inh",
                              "isyn_inh2", "target_data", "learning_signal",

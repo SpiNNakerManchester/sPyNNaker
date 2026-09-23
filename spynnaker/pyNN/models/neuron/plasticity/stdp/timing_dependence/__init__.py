@@ -26,10 +26,10 @@ from .timing_dependence_eprop import TimingDependenceEprop
 
 __all__ = [
     "AbstractTimingDependence",
+    "TimingDependenceEprop",
     "TimingDependencePfisterSpikeTriplet",
     "TimingDependenceRecurrent",
     "TimingDependenceSpikeNearestPair",
     "TimingDependenceSpikePair",
     "TimingDependenceVogels2011",
-    "TimingDependenceEprop"
 ]

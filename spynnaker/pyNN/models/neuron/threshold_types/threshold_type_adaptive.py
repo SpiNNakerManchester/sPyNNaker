@@ -14,9 +14,11 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
 from spinn_front_end_common.interface.ds import DataType
-from .abstract_threshold_type import AbstractThresholdType
 from spynnaker.pyNN.utilities.struct import Struct
+from spynnaker.pyNN.models.neuron.implementations import ModelParameter
+from .abstract_threshold_type import AbstractThresholdType
 
 BIG_B = "big_b"
 SMALL_B = "small_b"
@@ -31,15 +33,24 @@ class ThresholdTypeAdaptive(AbstractThresholdType):
     """ A threshold that is adaptive
     """
     __slots__ = [
-        "__B",
+        "__beta",
+        "__big_b",
+        "__scalar",
         "__small_b",
         "__small_b_0",
-        "__tau_a",
-        "__beta",
-        "__scalar"
+        "__tau_a"
         ]
 
-    def __init__(self,  B, small_b, small_b_0, tau_a, beta):
+    def __init__(self,  big_b: ModelParameter, small_b: ModelParameter,
+                 small_b_0: ModelParameter, tau_a: ModelParameter,
+                 beta: ModelParameter) -> None:
+        """
+        :param big_b: The big b parameter
+        :param small_b: The small b parameter
+        :param small_b_0: The small b 0 parameter
+        :param tau_a: The tau a parameter
+        :param beta: The beta parameter
+        """
         super().__init__(
             [Struct([
                 (DataType.S1615, BIG_B),
@@ -50,61 +61,71 @@ class ThresholdTypeAdaptive(AbstractThresholdType):
                 (DataType.UINT32, SCALAR)])],
             {BIG_B: "mV", SMALL_B: "mV", SMALL_B_0: "mV", TAU_A: "ms",
              BETA: "", SCALAR: ""})
-        self.__B = B
-        self.__small_b = small_b
-        self.__small_b_0 = small_b_0
-        self.__tau_a = tau_a
-        self.__beta = beta
-        self.__scalar = 1000
+        self.__big_b: ModelParameter = big_b
+        self.__small_b: ModelParameter = small_b
+        self.__small_b_0: ModelParameter = small_b_0
+        self.__tau_a: ModelParameter = tau_a
+        self.__beta: ModelParameter = beta
+        self.__scalar: int = 1000
 
     @overrides(AbstractThresholdType.add_parameters)
-    def add_parameters(self, parameters):
-        parameters[SMALL_B_0] = self.__small_b_0
-        parameters[TAU_A] = self.__tau_a
-        parameters[BETA] = self.__beta
-        parameters[SCALAR] = self.__scalar
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
+        parameters[SMALL_B_0] = self._convert(self.__small_b_0)
+        parameters[TAU_A] = self._convert(self.__tau_a)
+        parameters[BETA] = self._convert(self.__beta)
+        parameters[SCALAR] = self._convert(self.__scalar)
 
     @overrides(AbstractThresholdType.add_state_variables)
-    def add_state_variables(self, state_variables):
-        state_variables[BIG_B] = self.__B
-        state_variables[SMALL_B] = self.__small_b
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
+        state_variables[BIG_B] = self._convert(self.__big_b)
+        state_variables[SMALL_B] = self._convert(self.__small_b)
 
     @property
-    def B(self):
-        return self.__B
+    def big_b(self) -> ModelParameter:
+        """ The big b parameter """
+        return self.__big_b
 
-    @B.setter
-    def B(self, new_value):
-        self.__B = new_value
+    @big_b.setter
+    def big_b(self, new_value: ModelParameter) -> None:
+        """ Set the big b parameter """
+        self.__big_b = new_value
 
     @property
-    def small_b(self):
+    def small_b(self) -> ModelParameter:
+        """ The small b parameter """
         return self.__small_b
 
     @small_b.setter
-    def small_b(self, new_value):
+    def small_b(self, new_value: ModelParameter) -> None:
+        """ Set the small b parameter """
         self.__small_b = new_value
 
     @property
-    def small_b_0(self):
+    def small_b_0(self) -> ModelParameter:
+        """ The small b 0 parameter """
         return self.__small_b_0
 
     @small_b_0.setter
-    def small_b_0(self, new_value):
+    def small_b_0(self, new_value: ModelParameter) -> None:
+        """ Set the small b 0 parameter """
         self.__small_b_0 = new_value
 
     @property
-    def tau_a(self):
+    def tau_a(self) -> ModelParameter:
+        """ The tau a parameter """
         return self.__tau_a
 
     @tau_a.setter
-    def tau_a(self, new_value):
+    def tau_a(self, new_value: ModelParameter) -> None:
+        """ Set the tau a parameter """
         self.__tau_a = new_value
 
     @property
-    def beta(self):
+    def beta(self) -> ModelParameter:
+        """ The beta parameter """
         return self.__beta
 
     @beta.setter
-    def beta(self, new_value):
+    def beta(self, new_value: ModelParameter) -> None:
         self.__beta = new_value

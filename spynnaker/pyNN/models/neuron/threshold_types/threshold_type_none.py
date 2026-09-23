@@ -13,24 +13,27 @@
 # limitations under the License.
 
 from spinn_utilities.overrides import overrides
-from .abstract_threshold_type import AbstractThresholdType
+from spinn_utilities.ranged import RangeDictionary
 from spynnaker.pyNN.utilities.struct import Struct
+
+from .abstract_threshold_type import AbstractThresholdType
 
 
 class ThresholdTypeNone(AbstractThresholdType):
     """ A threshold that is empty of parameters and unused
     """
-    __slots__ = []
+    __slots__ = ()
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(
             [Struct([])],  # no params
             {})  # no units
 
     @overrides(AbstractThresholdType.add_parameters)
-    def add_parameters(self, parameters):
+    def add_parameters(self, parameters: RangeDictionary[float]) -> None:
         pass
 
     @overrides(AbstractThresholdType.add_state_variables)
-    def add_state_variables(self, state_variables):
+    def add_state_variables(
+            self, state_variables: RangeDictionary[float]) -> None:
         pass

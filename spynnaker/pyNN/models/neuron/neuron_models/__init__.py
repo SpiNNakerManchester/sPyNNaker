@@ -25,9 +25,9 @@ from .neuron_model_left_right_readout import NeuronModelLeftRightReadout
 
 __all__ = [
     "NeuronModel",
+    "NeuronModelEPropAdaptive",
     "NeuronModelIFTrunc",
     "NeuronModelIzh",
     "NeuronModelLeakyIntegrateAndFire",
-    "NeuronModelEPropAdaptive",
     "NeuronModelLeakyIntegrateAndFireSinusoidReadout",
     "NeuronModelLeftRightReadout"]

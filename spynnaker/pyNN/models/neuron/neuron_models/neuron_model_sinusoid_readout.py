@@ -45,8 +45,9 @@ Z_BAR = "z_bar"
 UPDATE_READY = "update_ready"
 
 
-class NeuronModelLeakyIntegrateAndFireSinusoidReadout(
-        NeuronModel):
+class NeuronModelLeakyIntegrateAndFireSinusoidReadout(NeuronModel):
+    """ Leaky integrate and fire neuron model with sinusoid readout. """
+
     __slots__ = [
         "__cm",
         "__eta",
@@ -69,20 +70,34 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(
             tau_refrac: ModelParameter, target_data: list[float],
             learning_signal: ModelParameter, w_fb: ModelParameter,
             eta: ModelParameter, update_ready: bool) -> None:
+        """
+        :param v_init: Initial membrane voltage (mV)
+        :param v_rest: Resting membrane voltage (mV)
+        :param tau_m: Membrane time constant (ms)
+        :param cm: Membrane capacitance (nF)
+        :param i_offset: Offset current (nA)
+        :param v_reset: Reset voltage (mV)
+        :param tau_refrac: Refractory period (ms)
+        :param target_data: Target data for the readout
+        :param learning_signal: Learning signal for the readout
+        :param w_fb: Feedback weight for the readout
+        :param eta: Learning rate for the readout
+        :param update_ready: Whether the synapse is ready to update
+        """
 
         struct_neuron_vals = [
-            (DataType.S1615, V),  # v
-            (DataType.S1615, V_REST),  # v_rest
-            (DataType.S1615, CM),  # r_membrane (= tau_m / cm)
-            (DataType.S1615, TAU_M),  # exp_tc (= e^(-ts / tau_m))
-            (DataType.S1615, I_OFFSET),  # i_offset
-            (DataType.S1615, V_RESET),  # v_reset
-            (DataType.S1615, TAU_REFRAC),  # tau_refrac
-            (DataType.INT32, REFRACT_TIMER),  # count_refrac
-            (DataType.S1615, TIMESTEP),  # timestep
+            (DataType.S1615, V),
+            (DataType.S1615, V_REST),
+            (DataType.S1615, CM),
+            (DataType.S1615, TAU_M),
+            (DataType.S1615, I_OFFSET),
+            (DataType.S1615, V_RESET),
+            (DataType.S1615, TAU_REFRAC),
+            (DataType.INT32, REFRACT_TIMER),
+            (DataType.S1615, TIMESTEP),
             # Learning signal
-            (DataType.S1615, L),  # L
-            (DataType.S1615, W_FB)  # w_fb
+            (DataType.S1615, L),
+            (DataType.S1615, W_FB)
         ]
 
         # former global parameters
@@ -162,74 +177,92 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(
 
     @property
     def target_data(self) -> list[float]:
+        """ Get the target data for the readout. """
         return self.__target_data
 
     @target_data.setter
     def target_data(self, target_data: list[float]) -> None:
+        """ Set the target data for the readout. """
         self.__target_data = target_data
 
     @property
     def v_init(self) -> ModelParameter:
+        """ Get the initial membrane voltage. """
         return self.__v_init
 
     @v_init.setter
     def v_init(self, v_init: ModelParameter) -> None:
+        """ Set the initial membrane voltage. """
         self.__v_init = v_init
 
     @property
     def v_rest(self) -> ModelParameter:
+        """ Get the resting membrane voltage. """
         return self.__v_rest
 
     @v_rest.setter
     def v_rest(self, v_rest: ModelParameter) -> None:
+        """ Set the resting membrane voltage. """
         self.__v_rest = v_rest
 
     @property
     def tau_m(self) -> ModelParameter:
+        """ Get the membrane time constant. """
         return self.__tau_m
 
     @tau_m.setter
     def tau_m(self, tau_m: ModelParameter) -> None:
+        """ Set the membrane time constant. """
         self.__tau_m = tau_m
 
     @property
     def cm(self) -> ModelParameter:
+        """ Get the membrane capacitance. """
         return self.__cm
 
     @cm.setter
     def cm(self, cm: ModelParameter) -> None:
+        """ Set the membrane capacitance. """
         self.__cm = cm
 
     @property
     def i_offset(self) -> ModelParameter:
+        """ Get the offset current. """
         return self.__i_offset
 
     @i_offset.setter
     def i_offset(self, i_offset: ModelParameter) -> None:
+        """ Set the offset current. """
         self.__i_offset = i_offset
 
     @property
     def v_reset(self) -> ModelParameter:
+        """ Get the reset voltage. """
         return self.__v_reset
 
     @v_reset.setter
     def v_reset(self, v_reset: ModelParameter) -> None:
+        """ Set the reset voltage. """
         self.__v_reset = v_reset
 
     @property
     def tau_refrac(self) -> ModelParameter:
+        """ Get the refractory period. """
         return self.__tau_refrac
 
     @tau_refrac.setter
     def tau_refrac(self, tau_refrac: ModelParameter) -> None:
+        """ Set the refractory period. """
         self.__tau_refrac = tau_refrac
 
     @property
     def w_fb(self) -> ModelParameter:
+        """ Get the feedback weight for the readout. """
         return self.__w_fb
 
     @w_fb.setter
     def w_fb(self, w_fb: ModelParameter) -> None:
+        """ Set the feedback weight for the readout. """
         self.__w_fb = w_fb
 
     @property

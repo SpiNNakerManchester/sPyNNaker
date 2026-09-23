@@ -68,38 +68,38 @@ UPDATE_READY = "update_ready"
 
 
 class NeuronModelEPropAdaptive(NeuronModel):
+    """ Leaky integrate and fire neuron model with eprop and adaptive
+        threshold.
+    """
+
     __slots__ = [
-        "__v_init",
-        "__v_rest",
-        "__tau_m",
-        "__cm",
-        "__i_offset",
-        "__v_reset",
-        "__tau_refrac",
-        "__z",
         "__a",
-        "__psi",
-        # threshold params
-        "__B",
-        "__small_b",
-        "__small_b_0",
-        "__tau_a",
         "__beta",
-        "__scalar",
-        # reg params
-        "__target_rate",
-        "__tau_err",
-        # learning signal
-        "__learning_signal",
-        "__w_fb",
-        "__window_size",
-        "__number_of_cues",
-        # eprop "global"
+        "__big_b",
+        "__cm",
         "__core_pop_rate",
         "__core_target_rate",
+        "__eta",
+        "__i_offset",
+        "__learning_signal",
+        "__number_of_cues",
+        "__psi",
         "__rate_exp_TC",
-        "__eta"
-        ]
+        "__scalar",
+        "__small_b",
+        "__small_b_0",
+        "__target_rate",
+        "__tau_a",
+        "__tau_err",
+        "__tau_m",
+        "__tau_refrac",
+        "__v_init",
+        "__v_reset",
+        "__v_rest",
+        "__w_fb",
+        "__window_size",
+        "__z",
+    ]
 
     def __init__(
             self, v_init: ModelParameter, v_rest: ModelParameter,
@@ -107,7 +107,7 @@ class NeuronModelEPropAdaptive(NeuronModel):
             i_offset: ModelParameter, v_reset: ModelParameter,
             tau_refrac: ModelParameter, psi: ModelParameter,
             # threshold params
-            B: ModelParameter, small_b: ModelParameter,
+            big_b: ModelParameter, small_b: ModelParameter,
             small_b_0: ModelParameter, tau_a: ModelParameter,
             beta: ModelParameter,
             # regularisation params
@@ -117,7 +117,28 @@ class NeuronModelEPropAdaptive(NeuronModel):
             # eprop "global"
             eta: ModelParameter
             ) -> None:
-        # TODO: documentation of parameters
+        """
+        :param v_init: Initial membrane voltage (mV)
+        :param v_rest: Resting membrane voltage (mV)
+        :param tau_m: Membrane time constant (ms)
+        :param cm: Membrane capacitance (nF)
+        :param i_offset: Offset current (nA)
+        :param v_reset: Reset voltage (mV)
+        :param tau_refrac: Refractory period (ms)
+        :param psi: Pseudo-derivative parameter
+        :param big_b: Adaptive threshold parameter
+        :param small_b: Adaptive threshold parameter
+        :param small_b_0: Adaptive threshold parameter
+        :param tau_a: Adaptive threshold parameter
+        :param beta: Adaptive threshold parameter
+        :param target_rate: Target firing rate for regularisation
+        :param tau_err: Time constant for regularisation
+        :param learning_signal: Learning signal for the readout
+        :param w_fb: Feedback weight for the readout
+        :param window_size: Window size for eprop synapse updates
+        :param number_of_cues: Number of cues for eprop synapse updates
+        :param eta: Learning rate for the readout
+        """
 
         struct_neuron_vals = [
             # neuron params
@@ -150,7 +171,7 @@ class NeuronModelEPropAdaptive(NeuronModel):
 
         for n in range(SYNAPSES_PER_NEURON):
             struct_neuron_vals.extend(
-                # eprop syn state
+                # eprop synapse state
                 [(DataType.S1615, DELTA_W+str(n)),  # delta_w
                  (DataType.S1615, Z_BAR_OLD+str(n)),  # z_bar_old
                  (DataType.S1615, Z_BAR+str(n)),  # z_bar
@@ -177,7 +198,7 @@ class NeuronModelEPropAdaptive(NeuronModel):
         self.__psi = psi
 
         # threshold params
-        self.__B = B
+        self.__big_b = big_b
         self.__small_b = small_b
         self.__small_b_0 = small_b_0
         self.__tau_a = tau_a
@@ -230,7 +251,7 @@ class NeuronModelEPropAdaptive(NeuronModel):
         state_variables[Z] = 0  # initialise to zero
         state_variables[A] = 0  # initialise to zero
 
-        state_variables[BIG_B] = self._convert(self.__B)
+        state_variables[BIG_B] = self._convert(self.__big_b)
         state_variables[SMALL_B] = self._convert(self.__small_b)
 
         state_variables[L] = self._convert(self.__learning_signal)
@@ -246,122 +267,152 @@ class NeuronModelEPropAdaptive(NeuronModel):
 
     @property
     def v_init(self) -> ModelParameter:
+        """ Get the initial membrane voltage. """
         return self.__v_init
 
     @v_init.setter
     def v_init(self, v_init: ModelParameter) -> None:
+        """ Set the initial membrane voltage. """
         self.__v_init = v_init
 
     @property
     def v_rest(self) -> ModelParameter:
+        """ Get the resting membrane voltage. """
         return self.__v_rest
 
     @v_rest.setter
     def v_rest(self, v_rest: ModelParameter) -> None:
+        """ Set the resting membrane voltage. """
         self.__v_rest = v_rest
 
     @property
     def tau_m(self) -> ModelParameter:
+        """ Get the membrane time constant. """
         return self.__tau_m
 
     @tau_m.setter
     def tau_m(self, tau_m: ModelParameter) -> None:
+        """ Set the membrane time constant. """
         self.__tau_m = tau_m
 
     @property
     def cm(self) -> ModelParameter:
+        """ Get the membrane capacitance. """
         return self.__cm
 
     @cm.setter
     def cm(self, cm: ModelParameter) -> None:
+        """ Set the membrane capacitance. """
         self.__cm = cm
 
     @property
     def i_offset(self) -> ModelParameter:
+        """ Get the offset current. """
         return self.__i_offset
 
     @i_offset.setter
     def i_offset(self, i_offset: ModelParameter) -> None:
+        """ Set the offset current. """
         self.__i_offset = i_offset
 
     @property
     def v_reset(self) -> ModelParameter:
+        """ Get the reset voltage. """
         return self.__v_reset
 
     @v_reset.setter
     def v_reset(self, v_reset: ModelParameter) -> None:
+        """ Set the reset voltage. """
         self.__v_reset = v_reset
 
     @property
     def tau_refrac(self) -> ModelParameter:
+        """ Get the refractory period. """
         return self.__tau_refrac
 
     @tau_refrac.setter
     def tau_refrac(self, tau_refrac: ModelParameter) -> None:
+        """ Set the refractory period. """
         self.__tau_refrac = tau_refrac
 
     @property
-    def B(self) -> ModelParameter:
-        return self.__B
+    def big_b(self) -> ModelParameter:
+        """ Get the adaptive threshold parameter big_b. """
+        return self.__big_b
 
-    @B.setter
-    def B(self, new_value: ModelParameter) -> None:
-        self.__B = new_value
+    @big_b.setter
+    def big_b(self, new_value: ModelParameter) -> None:
+        """ Set the adaptive threshold parameter big_b. """
+        self.__big_b = new_value
 
     @property
     def small_b(self) -> ModelParameter:
+        """ Get the adaptive threshold parameter small_b. """
         return self.__small_b
 
     @small_b.setter
     def small_b(self, new_value: ModelParameter) -> None:
+        """ Set the adaptive threshold parameter small_b. """
         self.__small_b = new_value
 
     @property
     def small_b_0(self) -> ModelParameter:
+        """ Get the adaptive threshold parameter small_b_0. """
         return self.__small_b_0
 
     @small_b_0.setter
     def small_b_0(self, new_value: ModelParameter) -> None:
+        """ Set the adaptive threshold parameter small_b_0. """
         self.__small_b_0 = new_value
 
     @property
     def tau_a(self) -> ModelParameter:
+        """ Get the adaptive threshold parameter tau_a. """
         return self.__tau_a
 
     @tau_a.setter
     def tau_a(self, new_value: ModelParameter) -> None:
+        """ Set the adaptive threshold parameter tau_a. """
         self.__tau_a = new_value
 
     @property
     def beta(self) -> ModelParameter:
+        """ Get the adaptive threshold parameter beta. """
         return self.__beta
 
     @beta.setter
     def beta(self, new_value: ModelParameter) -> None:
+        """ Set the adaptive threshold parameter beta. """
         self.__beta = new_value
 
     @property
     def w_fb(self) -> ModelParameter:
+        """ Get the feedback weight for the readout. """
         return self.__w_fb
 
     @w_fb.setter
     def w_fb(self, new_value: ModelParameter) -> None:
+        """ Set the feedback weight for the readout. """
         self.__w_fb = new_value
 
     @property
     def window_size(self) -> ModelParameter:
+        """ Get the window size for eprop synapse updates. """
         return self.__window_size
 
     @window_size.setter
     def window_size(self, new_value: ModelParameter) -> None:
+        """ Set the window size for eprop synapse updates. """
         self.__window_size = new_value
 
     @property
     def number_of_cues(self) -> ModelParameter:
+        """ Get the number of cues for eprop synapse updates. """
         return self.__number_of_cues
 
     @number_of_cues.setter
     def number_of_cues(self, new_value: ModelParameter) -> None:
+        """ Set the number of cues for eprop synapse updates. """
         self.__number_of_cues = new_value
 
     @property

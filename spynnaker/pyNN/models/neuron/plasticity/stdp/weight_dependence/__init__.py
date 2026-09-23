@@ -24,5 +24,5 @@ __all__ = [
            "AbstractWeightDependence",
            "WeightDependenceAdditive",
            "WeightDependenceAdditiveTriplet",
-           "WeightDependenceMultiplicative",
-           "WeightDependenceEpropReg"]
+           "WeightDependenceEpropReg",
+           "WeightDependenceMultiplicative"]

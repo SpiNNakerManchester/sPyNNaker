@@ -25,7 +25,7 @@ __all__ = [
            "SynapseTypeAlpha",
            "SynapseTypeDelta",
            "SynapseTypeDualExponential",
+           "SynapseTypeEPropAdaptive",
            "SynapseTypeExponential",
-           "SynapseTypeSEMD",
-           "SynapseTypeEPropAdaptive"
+           "SynapseTypeSEMD"
 ]
