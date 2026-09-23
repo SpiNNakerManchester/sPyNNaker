@@ -100,7 +100,7 @@ class AbstractStandardNeuronComponent(metaclass=AbstractBase):
         """
         Determines if the component is an e-prop model.
 
-        :returns: whether the component is an e-prop model (default false)
+        :return: whether the component is an e-prop model (default false)
         """
         return False
 
