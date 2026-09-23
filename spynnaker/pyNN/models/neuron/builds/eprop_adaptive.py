@@ -62,6 +62,33 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             # eprop "global"
             eta: ModelParameter = 1.0
             ) -> None:
+        """
+        :param tau_m: Membrane time constant (ms)
+        :param cm: Membrane capacitance (nF)
+        :param v_rest: Resting membrane potential (mV)
+        :param v_reset: Reset potential (mV)
+        :param tau_refrac: Refractory period (ms)
+        :param i_offset: Offset current (nA)
+        :param v: Initial membrane potential (mV)
+        :param psi: Soft threshold parameter (mV)
+        :param isyn_exc: Initial excitatory synaptic current (nA)
+        :param isyn_exc2: Initial excitatory synaptic current 2 (nA)
+        :param isyn_inh: Initial inhibitory synaptic current (nA)
+        :param isyn_inh2: Initial inhibitory synaptic current 2 (nA)
+        :param target_rate: Target firing rate (Hz)
+        :param tau_err: Error time constant (ms)
+        :param B: Adaptive threshold parameter (mV)
+        :param small_b: Adaptive threshold parameter (mV)
+        :param small_b_0: Adaptive threshold parameter (mV)
+        :param tau_a: Adaptive threshold time constant (ms)
+        :param beta: Adaptive threshold parameter (mV)
+        :param learning_signal: Learning signal (nA)
+        :param w_fb: Feedback weight (nA)
+        :param window_size: Window size for learning signal (ms)
+        :param number_of_cues: Number of cues for learning signal
+        :param eta: Learning rate
+        """
+
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelEPropAdaptive(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac, psi,

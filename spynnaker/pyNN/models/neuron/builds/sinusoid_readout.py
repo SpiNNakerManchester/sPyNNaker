@@ -45,16 +45,36 @@ class SinusoidReadout(AbstractPyNNNeuronModelStandard):
             isyn_exc2: ModelParameter = 0.0,
             isyn_inh: ModelParameter = 0.0,
             isyn_inh2: ModelParameter = 0.0,
-            target_data: ModelParameter = 0,
+            target_data: list[float] | None = None,
             # Learning signal and weight update constants
             learning_signal: ModelParameter = 0,
             w_fb: ModelParameter = 0.5,
             eta: ModelParameter = 1.0,
-            update_ready: ModelParameter = 1024) -> None:
+            update_ready: int = 1024) -> None:
+        """
+        :param tau_m: Membrane time constant (ms)
+        :param cm: Membrane capacitance (nF)
+        :param v_rest: Resting membrane potential (mV)
+        :param v_reset: Reset potential (mV)
+        :param v_thresh: Spike threshold (mV)
+        :param tau_refrac: Refractory period (ms)
+        :param i_offset: Offset current (nA)
+        :param v: Initial membrane potential (mV)
+        :param isyn_exc: Initial excitatory synaptic current (nA)
+        :param isyn_exc2: Initial excitatory synaptic current 2 (nA)
+        :param isyn_inh: Initial inhibitory synaptic current (nA)
+        :param isyn_inh2: Initial inhibitory synaptic current 2 (nA)
+        :param target_data: Target data for the readout (nA)
+        :param learning_signal: Learning signal for e-prop (nA)
+        :param w_fb: Feedback weight for the readout (nA)
+        :param eta: Learning rate for e-prop
+        :param update_ready: Update ready flag for e-prop
+        """
 
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelLeakyIntegrateAndFireSinusoidReadout(
-            v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac, target_data,
+            v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
+            target_data or [0.0],
             # Learning signal params
             learning_signal, w_fb, eta, update_ready)
 

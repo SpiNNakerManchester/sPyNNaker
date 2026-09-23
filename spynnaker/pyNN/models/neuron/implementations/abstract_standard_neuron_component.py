@@ -96,11 +96,11 @@ class AbstractStandardNeuronComponent(metaclass=AbstractBase):
         return self.__units[variable]
 
     @property
-    def uses_eprop(self):
+    def uses_eprop(self) -> bool:
         """
-        Says whether the component is an e-prop model (default false)
+        Determines if the component is an e-prop model.
 
-        :rtype: bool
+        :returns: whether the component is an e-prop model (default false)
         """
         return False
 

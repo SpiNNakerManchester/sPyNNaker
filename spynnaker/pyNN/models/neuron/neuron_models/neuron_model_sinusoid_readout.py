@@ -69,7 +69,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(NeuronModel):
             i_offset: ModelParameter, v_reset: ModelParameter,
             tau_refrac: ModelParameter, target_data: list[float],
             learning_signal: ModelParameter, w_fb: ModelParameter,
-            eta: ModelParameter, update_ready: bool) -> None:
+            eta: ModelParameter, update_ready: int) -> None:
         """
         :param v_init: Initial membrane voltage (mV)
         :param v_rest: Resting membrane voltage (mV)

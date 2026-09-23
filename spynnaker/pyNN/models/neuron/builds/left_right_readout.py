@@ -52,6 +52,28 @@ class LeftRightReadout(AbstractPyNNNeuronModelStandard):
             eta: ModelParameter = 1.0,
             window_size: ModelParameter = 13000,
             number_of_cues: ModelParameter = 1) -> None:
+        """
+        :param tau_m: Membrane time constant (ms)
+        :param cm: Membrane capacitance (nF)
+        :param v_rest: Resting membrane potential (mV)
+        :param v_reset: Reset potential (mV)
+        :param v_thresh: Spike threshold (mV)
+        :param tau_refrac: Refractory period (ms)
+        :param i_offset: Offset current (nA)
+        :param v: Initial membrane potential (mV)
+        :param isyn_exc: Initial excitatory synaptic current (nA)
+        :param isyn_exc2: Initial excitatory synaptic current 2 (nA)
+        :param isyn_inh: Initial inhibitory synaptic current (nA)
+        :param isyn_inh2: Initial inhibitory synaptic current 2 (nA)
+        :param rate_on: Rate of the Poisson input when the cue is on (Hz)
+        :param rate_off: Rate of the Poisson input when the cue is off (Hz)
+        :param poisson_pop_size: Size of the Poisson input population
+        :param learning_signal: Initial learning signal (nA)
+        :param w_fb: Feedback weight
+        :param eta: Learning rate
+        :param window_size: Size of the time window for learning (ms)
+        :param number_of_cues: Number of cues to be learned
+        """
 
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelLeftRightReadout(
