@@ -64,8 +64,7 @@ def test_connector(
         expected_extra_parameters: NDArray | None,
         expected_extra_parameter_names: list[str] | None) -> None:
     sim.setup()
-    temp = tempfile.NamedTemporaryFile(delete=False)
-    with temp as f:
+    with tempfile.NamedTemporaryFile(delete=False) as f:
         header = ''
         if column_names is not None:
             columns = ["i", "j"]
@@ -76,7 +75,7 @@ def test_connector(
         else:
             assert len(header) == 0
 
-    connector = FromFileConnector(temp.name)
+    connector = FromFileConnector(f.name)
     if expected_clist is not None:
         assert numpy.array_equal(connector.conn_list, expected_clist)
     else:
