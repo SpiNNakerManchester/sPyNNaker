@@ -203,8 +203,8 @@ def test_write_data_spec(_: str, ver_num: str) -> None:
 
         # Check that all the connections have the right weight and delay
         assert len(connections_1) == post_vertex_slice.n_atoms
-        assert all([conn["weight"] == 1.5 for conn in connections_1])
-        assert all([conn["delay"] == 1.0 for conn in connections_1])
+        assert all(conn["weight"] == 1.5 for conn in connections_1)
+        assert all(conn["delay"] == 1.0 for conn in connections_1)
 
         connections_2 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
@@ -214,8 +214,8 @@ def test_write_data_spec(_: str, ver_num: str) -> None:
 
         # Check that all the connections have the right weight and delay
         assert len(connections_2) == post_vertex_slice.n_atoms
-        assert all([conn["weight"] == 2.5 for conn in connections_2])
-        assert all([conn["delay"] == 2.0 for conn in connections_2])
+        assert all(conn["weight"] == 2.5 for conn in connections_2)
+        assert all(conn["delay"] == 2.0 for conn in connections_2)
 
         connections_3 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
@@ -225,8 +225,8 @@ def test_write_data_spec(_: str, ver_num: str) -> None:
 
         # Check that all the connections have the right weight and delay
         assert len(connections_3) == 100
-        assert all([conn["weight"] == 4.5 for conn in connections_3])
-        assert all([conn["delay"] == 4.0 for conn in connections_3])
+        assert all(conn["weight"] == 4.5 for conn in connections_3)
+        assert all(conn["delay"] == 4.0 for conn in connections_3)
 
         connections_4 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
