@@ -504,7 +504,7 @@ class SpikeSourcePoissonVertex(
     def get_data_type(self, name: str) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
-        return None
+        return
 
     @overrides(PopulationApplicationVertex.get_neurons_recording)
     def get_neurons_recording(self, name: str, vertex_slice: Slice) -> NDArray:
