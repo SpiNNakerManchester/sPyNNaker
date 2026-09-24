@@ -379,8 +379,9 @@ class Projection:
             data = data.astype(dtype)
         npdata = numpy.nan_to_num(cast(NDArray, data))
         if isinstance(save_file, str):
-            data_file = open(save_file, mode='wb')
+            data_file = open(save_file, mode='wb')  # NOQA: SIM115
         else:
+            # https://github.com/SpiNNakerManchester/sPyNNaker/issues/1734
             data_file = save_file
         try:
             header_lines = [
