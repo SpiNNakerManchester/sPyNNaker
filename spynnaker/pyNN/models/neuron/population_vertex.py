@@ -673,9 +673,7 @@ class PopulationVertex(
 
         # If the timestep is 1 or greater, use a combined core generally,
         # unless only a split core exists!
-        if not self.combined_binary_exists:
-            return False
-        return True
+        return self.combined_binary_exists
 
     @property
     def n_synapse_cores_required(self) -> int:
