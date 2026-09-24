@@ -28,6 +28,7 @@ from pacman.model.partitioner_splitters import (
 from spinn_front_end_common.interface.splitter_selectors import vertex_selector
 
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.exceptions import SpynnakerSplitterConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses,
 )
@@ -107,7 +108,8 @@ def spynnaker_vertex_selector(app_vertex: ApplicationVertex) -> None:
         elif isinstance(app_vertex, SpikeSourceArrayVertex):
             app_vertex.splitter = SplitterFixedLegacy()
         elif isinstance(app_vertex, SpikeSourcePoissonVertex):
-            raise Exception("These should be done already!")
+            raise SpynnakerSplitterConfigurationException(
+                "These should be done already!")
         else:  # go to basic selector. it might know what to do
             vertex_selector(app_vertex)
     if isinstance(app_vertex, AbstractAcceptsIncomingSynapses):
