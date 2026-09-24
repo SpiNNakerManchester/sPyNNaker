@@ -34,4 +34,5 @@ def check_end_is_called(request: SubRequest) -> Iterator[None]:
     except Exception:  # NOQA
         # Ignore anything that comes from this
         pass
-    raise AssertionError(f"Simulation has not been stopped in {request.function}!")
+    raise AssertionError(
+        f"Simulation has not been stopped in {request.function}!")
