@@ -35,6 +35,7 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable,
     HasSynapses,
 )
+from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSDRAMSynapseDynamics,
     AbstractSynapseDynamicsStructural,
@@ -46,7 +47,6 @@ from .population_machine_synapses_provenance import (
 )
 from .population_vertex import PopulationVertex
 from .synaptic_matrices import SynapseRegionReferences, SynapseRegions
-from spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard import NeuronImplStandard
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (

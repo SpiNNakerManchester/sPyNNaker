@@ -53,6 +53,7 @@ from .population_machine_synapses import PopulationMachineSynapses
 from .population_machine_synapses_provenance import SynapseProvenance
 from .population_vertex import PopulationVertex
 from .synaptic_matrices import SynapseRegions
+from spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard import NeuronImplStandard
 
 
 class SpikeProcessingProvenance(ctypes.LittleEndianStructure):
@@ -327,13 +328,15 @@ class PopulationMachineVertex(
         # Set the poisson key for eprop left-right
         routing_info = SpynnakerDataView.get_routing_infos()
         # pylint: disable=protected-access
-        if isinstance(self._pop_vertex._pynn_model._model.neuron_model,
-                      NeuronModelLeftRightReadout):
-            poisson_key = routing_info.get_key_from(
-                placement.vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
-            # pylint: disable=protected-access
-            self._pop_vertex._pynn_model._model.neuron_model.set_poisson_key(
-                poisson_key)
+        neuron_impl = self._pop_vertex._pynn_model._model
+        if isinstance(neuron_impl, NeuronImplStandard):
+            neuron_model = neuron_impl.neuron_model
+            if isinstance(neuron_model, NeuronModelLeftRightReadout):
+                poisson_key = routing_info.get_key_from(
+                    placement.vertex,
+                    constants.LIVE_POISSON_CONTROL_PARTITION_ID)
+                # pylint: disable=protected-access
+                neuron_model.set_poisson_key(poisson_key)
 
         self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
 
