@@ -37,6 +37,7 @@ from spinn_front_end_common.interface.ds import (
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.neuron_models import (
     NeuronModelLeftRightReadout)
@@ -53,7 +54,6 @@ from .population_machine_synapses import PopulationMachineSynapses
 from .population_machine_synapses_provenance import SynapseProvenance
 from .population_vertex import PopulationVertex
 from .synaptic_matrices import SynapseRegions
-from spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard import NeuronImplStandard
 
 
 class SpikeProcessingProvenance(ctypes.LittleEndianStructure):
