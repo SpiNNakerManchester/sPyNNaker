@@ -46,6 +46,7 @@ from .population_machine_synapses_provenance import (
 )
 from .population_vertex import PopulationVertex
 from .synaptic_matrices import SynapseRegionReferences, SynapseRegions
+from spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard import NeuronImplStandard
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
@@ -211,7 +212,11 @@ class PopulationMachineSynapses(
         spec.write_value(get_n_bits(n_neurons))
         spec.write_value(get_n_bits(n_synapse_types))
 
-        if self._pop_vertex.neuron_impl.neuron_model.uses_eprop:
+        neuron_impl = self._pop_vertex.neuron_impl
+        is_eprop = False
+        if isinstance(neuron_impl, NeuronImplStandard):
+            is_eprop = neuron_impl.neuron_model.uses_eprop
+        if is_eprop:
             spec.write_value(1)
         else:
             spec.write_value(get_n_bits(max_delay))

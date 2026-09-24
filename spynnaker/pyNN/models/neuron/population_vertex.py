@@ -1370,7 +1370,7 @@ class PopulationVertex(
         return self.__str__()
 
     @property
-    def _pynn_model(self):
+    def _pynn_model(self) -> AbstractPyNNNeuronModel:
         return self.__pynn_model
 
     def reset_to_first_timestep(self) -> None:
