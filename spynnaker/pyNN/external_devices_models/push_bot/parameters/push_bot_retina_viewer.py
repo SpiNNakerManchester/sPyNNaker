@@ -34,7 +34,7 @@ DECAY_FACTOR = 0.5
 SLEEP_TIME = 0.1
 
 
-class PushBotRetinaViewer():
+class PushBotRetinaViewer:
     """
     Viewer of retina from the PushBot.
     """
