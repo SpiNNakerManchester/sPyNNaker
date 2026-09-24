@@ -63,7 +63,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.types import Names, Values
     from spynnaker.pyNN.types import IoDest
 
-logger = FormatAdapter(logging.getLogger(__file__))
+logger = FormatAdapter(logging.getLogger(__name__))
 _CellType: TypeAlias = AbstractPyNNModel | PopulationApplicationVertex
 _CellTypeArg: TypeAlias = type[AbstractPyNNModel] | _CellType
 _ParamDict: TypeAlias = dict[str, Any]

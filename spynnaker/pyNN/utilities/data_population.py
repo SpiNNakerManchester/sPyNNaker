@@ -41,7 +41,7 @@ from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 if TYPE_CHECKING:
     from .neo_buffer_database import Annotations
 
-logger = FormatAdapter(logging.getLogger(__file__))
+logger = FormatAdapter(logging.getLogger(__name__))
 _SELECTIVE_RECORDED_MSG = (
     "Getting data on a whole population when selective recording was "
     "active will result in only the recorded neurons being returned "
