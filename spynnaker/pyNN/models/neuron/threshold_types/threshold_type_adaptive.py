@@ -15,9 +15,12 @@
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
+
 from spinn_front_end_common.interface.ds import DataType
-from spynnaker.pyNN.utilities.struct import Struct
+
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
+from spynnaker.pyNN.utilities.struct import Struct
+
 from .abstract_threshold_type import AbstractThresholdType
 
 BIG_B = "big_b"

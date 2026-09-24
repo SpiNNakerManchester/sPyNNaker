@@ -13,8 +13,11 @@
 # limitations under the License.
 from numpy import floating
 from numpy.typing import NDArray
+
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.interface.ds import DataType, DataSpecificationBase
+
+from spinn_front_end_common.interface.ds import DataSpecificationBase, DataType
+
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
 

@@ -18,9 +18,13 @@ from numpy import floating
 from numpy.typing import NDArray
 
 from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.interface.ds import DataSpecificationBase
+
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
-    SynapseStructureWeightOnly)
+    SynapseStructureWeightOnly,
+)
+
 from .abstract_timing_dependence import AbstractTimingDependence
 
 logger = logging.getLogger(__name__)

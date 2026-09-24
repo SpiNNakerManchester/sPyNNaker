@@ -40,7 +40,8 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.neuron_models import (
-    NeuronModelLeftRightReadout)
+    NeuronModelLeftRightReadout,
+)
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.utilities import constants
 

@@ -21,6 +21,7 @@ running on SpiNNaker.
 """
 
 from .eif_cond_alpha_isfa_ista import EIFConductanceAlphaPopulation
+from .eprop_adaptive import EPropAdaptive
 from .hh_cond_exp import HHCondExp
 from .if_cond_alpha import IFCondAlpha
 from .if_cond_exp_base import IFCondExpBase
@@ -38,12 +39,11 @@ from .if_trunc_delta import IFTruncDelta
 from .izk_cond_dual_exp_base import IzkCondDualExpBase
 from .izk_cond_exp_base import IzkCondExpBase
 from .izk_curr_exp_base import IzkCurrExpBase
+from .left_right_readout import LeftRightReadout
+from .sinusoid_readout import SinusoidReadout
 from .stoc_exp import StocExp
 from .stoc_exp_stable import StocExpStable
 from .stoc_sigma import StocSigma
-from .eprop_adaptive import EPropAdaptive
-from .sinusoid_readout import SinusoidReadout
-from .left_right_readout import LeftRightReadout
 
 __all__ = [
            "EIFConductanceAlphaPopulation",

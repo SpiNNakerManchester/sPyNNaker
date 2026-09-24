@@ -14,13 +14,13 @@
 
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
-from spynnaker.pyNN.models.neuron.neuron_models import (
-    NeuronModelLeakyIntegrateAndFireSinusoidReadout)
-from spynnaker.pyNN.models.neuron.synapse_types import (
-    SynapseTypeEPropAdaptive)
-from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
-from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.implementations import ModelParameter
+from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
+from spynnaker.pyNN.models.neuron.neuron_models import (
+    NeuronModelLeakyIntegrateAndFireSinusoidReadout,
+)
+from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeEPropAdaptive
+from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 
 
 class SinusoidReadout(AbstractPyNNNeuronModelStandard):

@@ -17,7 +17,7 @@ from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
 import numpy
-from numpy import floating, integer, uint8, uint32, int16
+from numpy import floating, int16, integer, uint8, uint32
 from numpy.typing import NDArray
 from pyNN.standardmodels.synapses import StaticSynapse
 

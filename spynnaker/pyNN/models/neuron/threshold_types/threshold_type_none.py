@@ -14,6 +14,7 @@
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary
+
 from spynnaker.pyNN.utilities.struct import Struct
 
 from .abstract_threshold_type import AbstractThresholdType
