@@ -247,12 +247,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         pre_s_lo = pre_slice.lo_atom - pre_lo
         post_s_lo = post_slice.lo_atom - post_lo
 
-        if pre_s_hi < post_s_lo:
-            return False
-        if pre_s_lo > post_s_hi:
-            return False
-
-        return True
+        return not (pre_s_hi < post_s_lo or pre_s_lo > post_s_hi)
 
     @overrides(AbstractGenerateConnectorOnMachine.generate_on_machine)
     def generate_on_machine(self, synapse_info: SynapseInformation) -> bool:

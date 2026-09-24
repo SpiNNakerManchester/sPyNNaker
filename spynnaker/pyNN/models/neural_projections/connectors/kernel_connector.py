@@ -572,14 +572,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         max_pre_y = (post_slice_y.stop + self._hlf_k_h) - 1
 
         # No part of the pre square overlaps the post-square, don't connect
-        if (pre_slice_x.stop <= min_pre_x or
-                pre_slice_x.start > max_pre_x or
-                pre_slice_y.stop <= min_pre_y or
-                pre_slice_y.start > max_pre_y):
-            return False
-
-        # Otherwise, they do
-        return True
+        return not (pre_slice_x.stop <= min_pre_x or
+                    pre_slice_x.start > max_pre_x or
+                    pre_slice_y.stop <= min_pre_y or
+                    pre_slice_y.start > max_pre_y)
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
