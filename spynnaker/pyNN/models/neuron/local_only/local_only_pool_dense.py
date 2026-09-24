@@ -285,7 +285,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         conn = self.__connector(incoming_projection)
         # We know the connector doesn't care about the argument
         max_weight = numpy.amax(conn.weights)
-        return max_weight if max_weight > 0 else 0
+        return max(0, max_weight)
 
     @overrides(AbstractSupportsSignedWeights.get_minimum_negative_weight)
     def get_minimum_negative_weight(
@@ -293,7 +293,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         conn = self.__connector(incoming_projection)
         # This is different because the connector happens to support this
         min_weight = numpy.amin(conn.weights)
-        return min_weight if min_weight < 0 else 0
+        return min(0, min_weight)
 
     @overrides(AbstractSupportsSignedWeights.get_mean_positive_weight)
     def get_mean_positive_weight(
