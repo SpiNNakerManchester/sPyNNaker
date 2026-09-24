@@ -296,15 +296,15 @@ class SpynnakerPanel:
             elif isinstance(datum, Segment):
                 plot_segment(axes, datum, label=label, **properties)
             else:
-                raise ValueError(f"Can't handle type {type(datum)}; "
-                                 f"consider using pyNN.utility.plotting")
+                raise TypeError(f"Can't handle type {type(datum)}; "
+                                f"consider using pyNN.utility.plotting")
 
     @staticmethod
     def __plot_list(
             axes: Axes, datum: list[SpikeTrain] | SpikeTrainList,
             label: str, properties: dict[str, Any]) -> None:
         if not isinstance(datum[0], SpikeTrain):
-            raise ValueError(f"Can't handle lists of type {type(datum)}")
+            raise TypeError(f"Can't handle lists of type {type(datum)}")
         plot_spiketrains(axes, datum, label=label, **properties)
 
     @staticmethod

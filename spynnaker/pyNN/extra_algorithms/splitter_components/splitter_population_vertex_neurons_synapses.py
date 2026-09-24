@@ -535,7 +535,7 @@ class SplitterPopulationVertexNeuronsSynapses(
         elif isinstance(source_vertex, PopulationApplicationVertex):
             pre_vertex = source_vertex
         else:
-            raise ValueError(
+            raise TypeError(
                 f"unsupported source vertex type: {type(source_vertex)}")
 
         # Filter out edges from Poisson sources being done using SDRAM

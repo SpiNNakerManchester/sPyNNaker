@@ -77,7 +77,7 @@ class ParameterHolder:
         # The values must be a single item, a list or a random distribution;
         # if a random distribution we must not have generated yet!
         if isinstance(values, RandomDistribution):
-            raise ValueError(
+            raise TypeError(
                 "Although it is possible to request the values"
                 " before the simulation has run, it is not possible to read"
                 " those values until after the simulation has run.  Please run"
