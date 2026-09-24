@@ -272,7 +272,7 @@ class SpikeSourcePoissonVertex(
         for i in range(n_neurons):
             rate_set = _rates[i] if _is_list_of_lists(_rates) else _rates
             if not isinstance(rate_set, Sized):
-                raise ValueError("Multiple rates must be a list")
+                raise TypeError("Multiple rates must be a list")
             if starts is None and len(rate_set) > 1:
                 raise ValueError(
                     "When multiple rates are specified,"

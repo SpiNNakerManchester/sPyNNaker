@@ -152,7 +152,7 @@ class SPIFOutputDevice(
         # Only add edges from PopulationApplicationVertices
         if not isinstance(edge.pre_vertex, PopulationApplicationVertex):
             if not isinstance(edge.pre_vertex, CommandSender):
-                raise ValueError(
+                raise TypeError(
                     "This vertex only accepts input from "
                     "PopulationApplicationVertex instances")
             # Ignore the command sender sending to us!
