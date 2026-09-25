@@ -17,11 +17,14 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneOffsetConnector,
 )
 from spynnaker.pyNN.models.neuron.builds import (
+    EPropAdaptive,
     IFCondExpStoc,
     IFCurrDeltaCa2Adaptive,
     IFCurrDeltaFixedProb,
     IFCurrExpCa2Adaptive,
     IFTruncDelta,
+    LeftRightReadout,
+    SinusoidReadout,
     StocExp,
     StocExpStable,
     StocSigma,
@@ -40,6 +43,9 @@ from spynnaker.pyNN.models.neuron.builds import (
     IzkCondExpBase as Izhikevich_cond,
 )
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceEprop,
+)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependencePfisterSpikeTriplet as PfisterSpikeTriplet,
 )
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
@@ -53,6 +59,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
 )
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditiveTriplet,
+    WeightDependenceEpropReg,
 )
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsNeuromodulation as Neuromodulation,
@@ -73,6 +80,9 @@ __all__ = [  # noqa: RUF022
     'Izhikevich_cond', 'IF_curr_dual_exp', 'IF_curr_exp_sEMD',
     'Izhikevich_cond_dual', 'IFCurrDeltaCa2Adaptive',
 
+    # Eprop implementation and related models (Adam Perrett/Oliver Rhodes)
+    'EPropAdaptive', 'SinusoidReadout', 'LeftRightReadout',
+
     # Neuromodulation synapse dynamics (Mantas Mikaitis)
     'Neuromodulation',
 
@@ -81,6 +91,9 @@ __all__ = [  # noqa: RUF022
     'PfisterSpikeTriplet',
     'SpikeNearestPairRule',
     'RecurrentRule', 'Vogels2011Rule',
+    # eprop plastic stuff
+    'TimingDependenceEprop',
+    'WeightDependenceEpropReg',
 
     # Variable rate Poisson
     'SpikeSourcePoissonVariable',

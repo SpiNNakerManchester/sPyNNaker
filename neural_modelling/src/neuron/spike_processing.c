@@ -117,6 +117,8 @@ static struct {
 //! the region to record the packets per timestep in
 static uint32_t p_per_ts_region;
 
+REAL learning_signal;
+
 /* PRIVATE FUNCTIONS - static for inlining */
 
 //! \brief Perform a DMA read of a synaptic row
@@ -308,18 +310,18 @@ static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
 //! \brief Called when a multicast packet is received
 //! \param[in] key: The key of the packet. The spike.
 //! \param[in] payload: the payload of the packet. The count.
-static void multicast_packet_pl_received_callback(uint key, uint payload) {
-    p_per_ts_struct.packets_this_time_step += 1;
-
-    // cycle through the packet insertion
-    bool added = false;
-    for (uint count = payload; count > 0; count--) {
-        added = in_spikes_add_spike(key);
-    }
-    if (added) {
-        start_dma_loop();
-    }
-}
+//static void multicast_packet_pl_received_callback(uint key, uint payload) {
+//    p_per_ts_struct.packets_this_time_step += 1;
+//
+//    // cycle through the packet insertion
+//    bool added = false;
+//    for (uint count = payload; count > 0; count--) {
+//        added = in_spikes_add_spike(key);
+//    }
+//    if (added) {
+//        start_dma_loop();
+//    }
+//}
 
 //! \brief Called when a DMA completes
 //! \param unused: unused
@@ -328,6 +330,9 @@ static void dma_complete_callback(UNUSED uint unused, UNUSED uint tag) {
 
     // increment the dma complete count for provenance generation
     dma_complete_count++;
+
+//    io_printf(IO_BUF, "Entering DMA Complete...\n");
+//    log_info("Entering DMA Complete...\n");
 
     // Get pointer to current buffer
     uint32_t current_buffer_index = buffer_being_read;
@@ -409,6 +414,34 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
     }
 }
 
+static void multicast_packet_wpayload_received_callback(uint key, uint payload){
+
+	learning_signal = kbits(payload);
+
+	// Print payload to test transmission of error
+//	io_printf(IO_BUF, "    payload (learning signal): %k\n", learning_signal);
+
+	// Assign learning signal to global memory
+
+//    // If there was space to add spike to incoming spike queue
+//    if (in_spikes_add_spike(key)) {
+//        // If we're not already processing synaptic DMAs,
+//        // flag pipeline as busy and trigger a feed event
+//        if (!dma_busy) {
+//            log_debug("Sending user event for new spike");
+//            if (spin1_trigger_user_event(0, 0)) {
+//                dma_busy = true;
+//            } else {
+//                log_debug("Could not trigger user event\n");
+//            }
+//        }
+//    } else {
+//        io_printf(IO_BUF, "Could not add spike in mc_payload_received\n");
+//    }
+
+}
+
+
 /* INTERFACE FUNCTIONS - cannot be static */
 void spike_processing_clear_input_buffer(timer_t time) {
     uint32_t n_spikes = in_spikes_size();
@@ -455,11 +488,21 @@ bool spike_processing_initialise( // EXPORTED
     // Set up the callbacks
     spin1_callback_on(MC_PACKET_RECEIVED,
             multicast_packet_received_callback, mc_packet_callback_priority);
-    spin1_callback_on(MCPL_PACKET_RECEIVED,
-            multicast_packet_pl_received_callback, mc_packet_callback_priority);
+//    spin1_callback_on(MCPL_PACKET_RECEIVED,
+//            multicast_packet_pl_received_callback, mc_packet_callback_priority);
     simulation_dma_transfer_done_callback_on(
             DMA_TAG_READ_SYNAPTIC_ROW, dma_complete_callback);
     spin1_callback_on(USER_EVENT, user_event_callback, user_event_priority);
+
+
+//    io_printf(IO_BUF, "About to register MCPL callback\n");
+//
+//    // This is unlikely to work properly now because of the use of MCPL for multiple spikes
+//    // Register MC_PACKET_RECEIVED_PAYLOAD
+    spin1_callback_on(MCPL_PACKET_RECEIVED,
+    		multicast_packet_wpayload_received_callback, mc_packet_callback_priority);
+//
+//    io_printf(IO_BUF, "Registered MCPL callback successfully\n");
 
     return true;
 }

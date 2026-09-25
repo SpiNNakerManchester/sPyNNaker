@@ -18,7 +18,7 @@ from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
 
 import numpy
-from numpy import floating, integer, uint8, uint16, uint32
+from numpy import floating, int16, integer, uint8, uint16, uint32
 from numpy.typing import NDArray
 from pyNN.standardmodels.synapses import StaticSynapse
 
@@ -404,9 +404,20 @@ class SynapseDynamicsSTDP(
                 connections["synapse_type"]])
 
         # Get the fixed data
+        dendritic_delays = (
+            connections["delay"] * self.__dendritic_delay_fraction)
+        axonal_delays = (
+            connections["delay"] * (1.0 - self.__dendritic_delay_fraction))
+
+        # Delay/target encoding matches the eprop C-side synapses.c, which
+        # is also kept at the eprop version pending PR #1368 C-level
+        # isolation discussion. dendritic_delay_fraction is enforced to be
+        # 1.0 above, so axonal_delays is currently always 0.
         fixed_plastic = (
-            (connections["delay"].astype(uint16) <<
+            ((dendritic_delays.astype(uint16) & 0xFF) <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
+            ((axonal_delays.astype("uint16") & 0xF) <<
+             (4 + n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype(uint16)
              << n_neuron_id_bits) |
             (connections["target"].astype(uint16) & neuron_id_mask))
@@ -517,7 +528,7 @@ class SynapseDynamicsSTDP(
             n_half_words += 1
             half_word = 0
         pp_half_words = numpy.concatenate([
-            pp[:size * n_half_words * BYTES_PER_SHORT].view(uint16)[
+            pp[:size * n_half_words * BYTES_PER_SHORT].view(int16)[
                 half_word::n_half_words]
             for pp, size in zip(pp_without_headers, fp_size)])
 

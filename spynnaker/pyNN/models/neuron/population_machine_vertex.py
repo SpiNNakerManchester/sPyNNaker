@@ -36,8 +36,14 @@ from spinn_front_end_common.interface.ds import (
 )
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
+from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+from spynnaker.pyNN.models.neuron.neuron_models import (
+    NeuronModelLeftRightReadout,
+)
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+from spynnaker.pyNN.utilities import constants
 
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
@@ -320,6 +326,19 @@ class PopulationMachineVertex(
             self.vertex_slice))
         self._write_common_data_spec(spec, rec_regions)
 
+        # Set the poisson key for eprop left-right
+        routing_info = SpynnakerDataView.get_routing_infos()
+        # pylint: disable=protected-access
+        neuron_impl = self._pop_vertex._pynn_model._model
+        if isinstance(neuron_impl, NeuronImplStandard):
+            neuron_model = neuron_impl.neuron_model
+            if isinstance(neuron_model, NeuronModelLeftRightReadout):
+                poisson_key = routing_info.get_key_from(
+                    placement.vertex,
+                    constants.LIVE_POISSON_CONTROL_PARTITION_ID)
+                # pylint: disable=protected-access
+                neuron_model.set_poisson_key(poisson_key)
+
         self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
 
         self._write_synapse_data_spec(
@@ -428,4 +447,17 @@ class PopulationMachineVertex(
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id: str) -> int:
         n_colours = 2 ** self._pop_vertex.n_colour_bits
-        return self.vertex_slice.n_atoms * n_colours
+        if partition_id == constants.LIVE_POISSON_CONTROL_PARTITION_ID:
+            n_keys = 0
+            partitions = (
+                SpynnakerDataView.
+                get_outgoing_edge_partitions_starting_at_vertex(
+                    self._pop_vertex))
+            for partition in partitions:
+                if partition.identifier == (
+                        constants.LIVE_POISSON_CONTROL_PARTITION_ID):
+                    for edge in partition.edges:
+                        n_keys += edge.post_vertex.n_atoms
+            return n_keys * n_colours
+        else:
+            return self.vertex_slice.n_atoms * n_colours

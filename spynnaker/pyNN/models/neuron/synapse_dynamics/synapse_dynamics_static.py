@@ -17,7 +17,7 @@ from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
 import numpy
-from numpy import floating, integer, uint8, uint32
+from numpy import floating, int16, integer, uint8, uint32
 from numpy.typing import NDArray
 from pyNN.standardmodels.synapses import StaticSynapse
 
@@ -138,7 +138,7 @@ class SynapseDynamicsStatic(
         # Pre-scale the weights here to match the ring buffer format to make
         # addition to the ring buffer easy
         scaled_weights = (
-            numpy.abs(connections["weight"]) *
+            connections["weight"] *
             numpy.array(ring_buffer_weight_scales)[
                 connections["synapse_type"]])
 
@@ -194,7 +194,7 @@ class SynapseDynamicsStatic(
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, ff_size[i]) for i in range(len(ff_size))])
         connections["target"] = data & neuron_id_mask
-        connections["weight"] = (data >> 16) & 0xFFFF
+        connections["weight"] = ((data >> 16) & 0xFFFF).astype(int16)
         connections["delay"] = (data & 0xFFFF) >> (
             n_neuron_id_bits + n_synapse_type_bits)
         synapse_type = (data >> n_neuron_id_bits) & (

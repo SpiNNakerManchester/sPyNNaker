@@ -95,6 +95,13 @@ class AbstractStandardNeuronComponent(metaclass=AbstractBase):
         """
         return self.__units[variable]
 
+    @property
+    def uses_eprop(self) -> bool:
+        """
+        Get whether the component is an e-prop model.
+        """
+        return False
+
     @staticmethod
     def _convert(value: ModelParameter) -> \
             float | RangedList[float] | RandomDistribution:

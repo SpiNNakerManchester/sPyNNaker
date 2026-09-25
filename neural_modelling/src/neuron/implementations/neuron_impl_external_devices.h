@@ -312,7 +312,7 @@ static void neuron_impl_do_timestep_update(
             state_t result = neuron_model_state_update(
                     NUM_EXCITATORY_RECEPTORS, exc_input_values,
                     NUM_INHIBITORY_RECEPTORS, inh_input_values,
-                    0, current_offset, this_neuron);
+                    0, current_offset, this_neuron, 0.0k);
 
             // determine if a packet should fly
             will_fire = _test_will_fire(the_packet_firing);

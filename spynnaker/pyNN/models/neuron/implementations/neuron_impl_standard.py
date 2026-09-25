@@ -106,6 +106,11 @@ class NeuronImplStandard(AbstractNeuronImpl):
             self.__components.append(self.__additional_input_type)
 
     @property
+    def neuron_model(self) -> NeuronModel:
+        """ Get the neuron model used in this implementation """
+        return self.__neuron_model
+
+    @property
     def n_steps_per_timestep(self) -> int:
         """
         Get the last set n steps per timestep
