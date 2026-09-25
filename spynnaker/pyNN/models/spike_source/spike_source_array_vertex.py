@@ -356,7 +356,6 @@ class SpikeSourceArrayVertex(
     def get_data_type(self, name: str) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
-        return
 
     def describe(
             self) -> dict[str, str | ParameterHolder | dict[str, Any]]:

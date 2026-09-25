@@ -259,14 +259,12 @@ class SynapseDynamicsStructuralCommon(
         routing_info = SpynnakerDataView.get_routing_infos()
         subpop_index: _SubpopIndexType = {}
         lo_atom_index: _SubpopIndexType = {}
-        index = 0
-        for proj in structural_projections:
+        for index, proj in enumerate(structural_projections):
             spec.comment(f"Writing pre-population info for {proj.label}")
             # pylint: disable=protected-access
             app_edge = proj._projection_edge
             synapse_info = proj._synapse_information
             pop_index[app_edge.pre_vertex, synapse_info] = index
-            index += 1
             dynamics = cast(AbstractSynapseDynamicsStructural,
                             synapse_info.synapse_dynamics)
 

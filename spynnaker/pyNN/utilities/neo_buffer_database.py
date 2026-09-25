@@ -518,16 +518,15 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             region_id, neurons, vertex_slice, selective_recording, base_key,
             index
         """
-        index = 0
         # Need to put the rows in a list to get them to persist.
-        for row in list(self.cursor().execute(
+        for index, row in enumerate(list(self.cursor().execute(
                 """
                 SELECT region_id, recording_neurons_st, vertex_slice, base_key
                 FROM region_metadata
                 WHERE rec_id = ?
                 ORDER BY region_id, recording_neurons_st, vertex_slice,
                     base_key
-                """, (rec_id,))):
+                """, (rec_id,)))):
             vertex_slice = MDSlice.from_string(
                 self._string(row["vertex_slice"]))
             recording_neurons_st = row["recording_neurons_st"]
@@ -540,7 +539,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             else:
                 yield (row["region_id"], None, vertex_slice, None,
                        row["base_key"], index)
-            index += 1
 
     def __get_spikes_by_region(
             self, region_id: int, neurons: NDArray[integer],
