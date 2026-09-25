@@ -307,8 +307,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
                 ConvolutionKernel)
         elif numpy.isscalar(values):
             return numpy.full(krn_shape, values).view(ConvolutionKernel)
-        elif ((isinstance(values, numpy.ndarray) or
-               isinstance(values, ConvolutionKernel)) and
+        elif ((isinstance(values, (numpy.ndarray, ConvolutionKernel))) and
               values.shape[HEIGHT] == self._kernel_h and
               values.shape[WIDTH] == self._kernel_w):
             return values.view(ConvolutionKernel)
