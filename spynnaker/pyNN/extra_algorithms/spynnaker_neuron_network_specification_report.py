@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING
 
 from spinn_utilities.config_holder import (
     get_config_str_or_none,
@@ -33,7 +33,6 @@ if TYPE_CHECKING:
     import graphviz as gv  # type: ignore[import]
 
 logger = FormatAdapter(logging.getLogger(__name__))
-_RE = TypeVar("_RE", bound=RuntimeError)
 
 CUTOFF = 100
 _GRAPH_TITLE = "The graph of the network in graphical form"
