@@ -187,9 +187,9 @@ class NeuronRecorder:
         :param offset: The offset to add
         """
         if not self.__offset_added:
-            self.__region_ids = dict(
+            self.__region_ids = {
                 (var, region + offset)
-                for var, region in self.__region_ids.items())
+                for var, region in self.__region_ids.items()}
 
         self.__offset_added = True
 
