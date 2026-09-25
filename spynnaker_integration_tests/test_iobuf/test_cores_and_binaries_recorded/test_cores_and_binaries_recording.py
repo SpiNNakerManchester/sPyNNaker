@@ -48,10 +48,9 @@ class TestCoresAndBinariesRecording(BaseTestCase):
         data = set()
 
         for machine_vertex in SpynnakerDataView.iterate_machine_vertices():
-            if (isinstance(machine_vertex, PopulationMachineVertex) or
-                    isinstance(
-                        machine_vertex,
-                        ReverseIPTagMulticastSourceMachineVertex)):
+            if (isinstance(machine_vertex, (
+                    PopulationMachineVertex,
+                    ReverseIPTagMulticastSourceMachineVertex))):
                 placement = SpynnakerDataView.get_placement_of_vertex(
                     machine_vertex)
                 data.add(placement)
