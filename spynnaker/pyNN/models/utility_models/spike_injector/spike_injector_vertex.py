@@ -131,7 +131,6 @@ class SpikeInjectorVertex(
     def get_data_type(self, name: str) -> None:
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
-        return
 
     @overrides(PopulationApplicationVertex.get_buffer_data_type)
     def get_buffer_data_type(self, name: str) -> BufferDataType:
