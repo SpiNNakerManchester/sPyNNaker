@@ -33,7 +33,6 @@ if TYPE_CHECKING:
     import graphviz as gv  # type: ignore[import]
 
 logger = FormatAdapter(logging.getLogger(__name__))
-_RE = TypeVar("_RE", bound=RuntimeError)
 
 CUTOFF = 100
 _GRAPH_TITLE = "The graph of the network in graphical form"
