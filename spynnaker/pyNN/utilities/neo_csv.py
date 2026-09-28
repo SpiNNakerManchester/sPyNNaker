@@ -508,7 +508,8 @@ class NeoCsv:
         """
         row = next(csv_reader)
         assert (row[0] == self._REC_DATETIME)
-        rec_datetime = datetime.strptime(row[1], '%Y-%m-%d %H:%M:%S.%f')
+        rec_datetime = datetime.strptime(
+            row[1], '%Y-%m-%d %H:%M:%S.%f').astimezone()
         # consume the empty line
         next(csv_reader)
         return self._insert_empty_segment(
