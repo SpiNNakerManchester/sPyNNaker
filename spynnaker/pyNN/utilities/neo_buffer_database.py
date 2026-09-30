@@ -58,7 +58,7 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.types import ViewIndices
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import SPIKES
-from spynnaker.pyNN.utilities.neo_csv import NeoCsv
+from spynnaker.pyNN.utilities.neo_csv import DATE_FORMAT, NeoCsv
 
 if TYPE_CHECKING:
     from _csv import Writer as CSVWriter
@@ -75,8 +75,6 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 
 segment_cache: dict[int, str] = {}
-
-_DATE_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 
 
 class NeoBufferDatabase(BufferDatabase, NeoCsv):
@@ -162,7 +160,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             VALUES (?, ?, ?, ?, ?)
             """, (SpynnakerDataView.get_simulation_time_step_ms(),
                   SpynnakerDataView.get_reset_number(),
-                  datetime.now(LOCAL).strftime(_DATE_FORMAT),
+                  datetime.now(LOCAL).strftime(DATE_FORMAT),
                   SpynnakerDataView.get_simulation_time_step_ms(),
                   SpynnakerDataView.get_sim_name()))
 
@@ -200,7 +198,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 LIMIT 1
                 """):
             t_str = self._string(row[self._REC_DATETIME])
-            time = datetime.strptime(t_str, _DATE_FORMAT).replace(tzinfo=LOCAL)
+            time = datetime.strptime(t_str, DATE_FORMAT).replace(tzinfo=LOCAL)
             if row[self._T_STOP] is None:
                 t_stop = 0.0
                 logger.warning("Data from a virtual run will be empty")
