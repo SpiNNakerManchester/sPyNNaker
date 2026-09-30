@@ -29,6 +29,7 @@ from numpy import float64, integer
 from numpy.typing import NDArray
 from quantities import Quantity, ms
 
+from spinn_utilities.local_time_zone import LOCAL
 from spinn_utilities.log import FormatAdapter
 
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -508,7 +509,8 @@ class NeoCsv:
         """
         row = next(csv_reader)
         assert (row[0] == self._REC_DATETIME)
-        rec_datetime = datetime.strptime(row[1], '%Y-%m-%d %H:%M:%S.%f')
+        rec_datetime = datetime.strptime(
+            row[1], '%Y-%m-%d %H:%M:%S.%f').replace(tzinfo=LOCAL)
         # consume the empty line
         next(csv_reader)
         return self._insert_empty_segment(

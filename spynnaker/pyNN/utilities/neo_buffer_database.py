@@ -32,6 +32,7 @@ import quantities
 from numpy import float64, floating, integer, uint8, uint32
 from numpy.typing import NDArray
 
+from spinn_utilities.local_time_zone import LOCAL
 from spinn_utilities.log import FormatAdapter
 
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
@@ -74,6 +75,8 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 
 segment_cache: dict[int, str] = {}
+
+_DATE_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 
 
 class NeoBufferDatabase(BufferDatabase, NeoCsv):
@@ -159,7 +162,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             VALUES (?, ?, ?, ?, ?)
             """, (SpynnakerDataView.get_simulation_time_step_ms(),
                   SpynnakerDataView.get_reset_number(),
-                  datetime.now(),
+                  datetime.now(LOCAL).strftime(_DATE_FORMAT),
                   SpynnakerDataView.get_simulation_time_step_ms(),
                   SpynnakerDataView.get_sim_name()))
 
@@ -197,7 +200,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 LIMIT 1
                 """):
             t_str = self._string(row[self._REC_DATETIME])
-            time = datetime.strptime(t_str, "%Y-%m-%d %H:%M:%S.%f")
+            time = datetime.strptime(t_str, _DATE_FORMAT).replace(tzinfo=LOCAL)
             if row[self._T_STOP] is None:
                 t_stop = 0.0
                 logger.warning("Data from a virtual run will be empty")
