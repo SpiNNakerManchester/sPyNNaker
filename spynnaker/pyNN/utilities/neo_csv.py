@@ -29,6 +29,7 @@ from numpy import float64, integer
 from numpy.typing import NDArray
 from quantities import Quantity, ms
 
+from spinn_utilities.local_time_zone import LOCAL
 from spinn_utilities.log import FormatAdapter
 
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -40,6 +41,8 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.utilities.neo_buffer_database import Annotations
 
 logger = FormatAdapter(logging.getLogger(__name__))
+
+DATE_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 
 
 class NeoCsv:
@@ -492,7 +495,8 @@ class NeoCsv:
         :param rec_datetime:
         """
         csv_writer.writerow([self._SEGMENT_NUMBER, segment_number])
-        csv_writer.writerow([self._REC_DATETIME, rec_datetime])
+        csv_writer.writerow([self._REC_DATETIME,
+                             rec_datetime.strftime(DATE_FORMAT)])
         csv_writer.writerow([])
 
     def __read_segment(self, csv_reader: CSVReader, block: Block,
@@ -508,7 +512,8 @@ class NeoCsv:
         """
         row = next(csv_reader)
         assert (row[0] == self._REC_DATETIME)
-        rec_datetime = datetime.strptime(row[1], '%Y-%m-%d %H:%M:%S.%f')
+        rec_datetime = datetime.strptime(
+            row[1], DATE_FORMAT).replace(tzinfo=LOCAL)
         # consume the empty line
         next(csv_reader)
         return self._insert_empty_segment(
