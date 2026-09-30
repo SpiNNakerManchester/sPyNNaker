@@ -80,14 +80,14 @@ class MunichRetinaDevice(
     DOWN_POLARITY = "DOWN"
     MERGED_POLARITY: Literal["MERGED"] = "MERGED"
     _Polarity: TypeAlias = \
-        Literal["UP"] | Literal["DOWN"] | Literal["MERGED"] | None
+        Literal["UP", "DOWN", "MERGED"] | None
 
     #: Select the left retina
     LEFT_RETINA = "LEFT"
     #: Select the right retina
     RIGHT_RETINA = "RIGHT"
     _RETINAS = frozenset((LEFT_RETINA, RIGHT_RETINA))
-    _Retinas: TypeAlias = Literal["LEFT"] | Literal["RIGHT"]
+    _Retinas: TypeAlias = Literal["LEFT", "RIGHT"]
 
     def __init__(
             self, retina_key: int, spinnaker_link_id: int,
