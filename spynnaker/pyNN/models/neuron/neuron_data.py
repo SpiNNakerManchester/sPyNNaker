@@ -368,7 +368,7 @@ class _MergedDict(MutableMapping[str, RangedList[float]]):
         else:
             raise KeyError(f"No such key {key}")
 
-    def __delitem__(self, __v: str) -> Never:
+    def __delitem__(self, v: str) -> Never:
         raise NotImplementedError("items may not be deleted")
 
     def __iter__(self) -> Iterator[str]:

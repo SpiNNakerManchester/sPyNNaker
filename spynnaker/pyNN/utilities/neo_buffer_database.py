@@ -43,7 +43,7 @@ from pacman.utilities.utility_calls import get_keys
 from spinn_front_end_common.interface. \
     buffer_management.storage_objects import BufferDatabase
 from spinn_front_end_common.interface.ds import DataType
-from spinn_front_end_common.utilities.base_database import _SqliteTypes
+from spinn_front_end_common.utilities.base_database import SqliteTypes
 from spinn_front_end_common.utilities.constants import (
     BITS_PER_WORD,
     BYTES_PER_WORD,
@@ -96,7 +96,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     __REWIRING_N_WORDS = 2
 
     @staticmethod
-    def _string(value: _SqliteTypes) -> str:
+    def _string(value: SqliteTypes) -> str:
         if isinstance(value, (bytes, memoryview)):
             return str(value, 'utf-8')
         else:
