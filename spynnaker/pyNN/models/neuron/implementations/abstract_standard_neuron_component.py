@@ -12,12 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections.abc import Iterable
-from typing import TypeAlias
-
 import numpy
-from numpy import floating
-from numpy.typing import NDArray
 from pyNN.random import RandomDistribution
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
@@ -26,9 +21,7 @@ from spinn_utilities.ranged import RangeDictionary, RangedList
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from spynnaker.pyNN.utilities.struct import Struct
 
-#: The type of parameters to a neuron model.
-ModelParameter: TypeAlias = (float | Iterable[float] | RandomDistribution |
-                             NDArray[floating])
+from .model_parameter import ModelParameter
 
 
 class AbstractStandardNeuronComponent(metaclass=AbstractBase):
