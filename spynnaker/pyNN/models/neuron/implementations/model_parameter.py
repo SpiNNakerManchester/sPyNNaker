@@ -21,4 +21,3 @@ from pyNN.random import RandomDistribution
 
 ModelParameter: TypeAlias = (float | Iterable[float] | RandomDistribution |
                              NDArray[floating])
-
