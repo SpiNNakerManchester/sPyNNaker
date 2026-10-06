@@ -15,8 +15,8 @@
 from .abstract_neuron_impl import AbstractNeuronImpl
 from .abstract_standard_neuron_component import (
     AbstractStandardNeuronComponent,
-    ModelParameter,
 )
+from .model_parameter import ModelParameter
 from .neuron_impl_standard import NeuronImplStandard
 from .neuron_impl_stoc_exp import NeuronImplStocExp
 from .neuron_impl_stoc_exp_stable import NeuronImplStocExpStable
