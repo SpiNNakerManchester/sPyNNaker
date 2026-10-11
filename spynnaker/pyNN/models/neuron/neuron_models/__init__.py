@@ -13,15 +13,22 @@
 # limitations under the License.
 
 from .neuron_model import NeuronModel
+from .neuron_model_eprop_adaptive import NeuronModelEPropAdaptive
 from .neuron_model_if_trunc import NeuronModelIFTrunc
 from .neuron_model_izh import NeuronModelIzh
 from .neuron_model_leaky_integrate_and_fire import (
     NeuronModelLeakyIntegrateAndFire,
 )
+from .neuron_model_left_right_readout import NeuronModelLeftRightReadout
+from .neuron_model_sinusoid_readout import (
+    NeuronModelLeakyIntegrateAndFireSinusoidReadout,
+)
 
 __all__ = [
     "NeuronModel",
+    "NeuronModelEPropAdaptive",
     "NeuronModelIFTrunc",
     "NeuronModelIzh",
     "NeuronModelLeakyIntegrateAndFire",
-]
+    "NeuronModelLeakyIntegrateAndFireSinusoidReadout",
+    "NeuronModelLeftRightReadout"]

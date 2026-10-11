@@ -35,6 +35,7 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable,
     HasSynapses,
 )
+from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSDRAMSynapseDynamics,
     AbstractSynapseDynamicsStructural,
@@ -210,7 +211,15 @@ class PopulationMachineSynapses(
         spec.write_value(n_synapse_types)
         spec.write_value(get_n_bits(n_neurons))
         spec.write_value(get_n_bits(n_synapse_types))
-        spec.write_value(get_n_bits(max_delay))
+
+        neuron_impl = self._pop_vertex.neuron_impl
+        is_eprop = False
+        if isinstance(neuron_impl, NeuronImplStandard):
+            is_eprop = neuron_impl.neuron_model.uses_eprop
+        if is_eprop:
+            spec.write_value(1)
+        else:
+            spec.write_value(get_n_bits(max_delay))
         spec.write_value(int(self._pop_vertex.drop_late_spikes))
         spec.write_value(self._pop_vertex.incoming_spike_buffer_size)
         spec.write_array(ring_buffer_shifts)

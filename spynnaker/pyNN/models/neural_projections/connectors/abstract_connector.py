@@ -510,12 +510,7 @@ class AbstractConnector(metaclass=AbstractBase):
         if self.__safe:
             if not weights.size:
                 warn_once(logger, "No connection in " + str(self))
-            elif numpy.amin(weights) < 0 < numpy.amax(weights):
-                raise SpynnakerException(
-                    "Weights must be either all positive or all negative in "
-                    f"projection {synapse_info.pre_population.label}->"
-                    f"{synapse_info.post_population.label}")
-        return numpy.abs(weights)
+        return weights
 
     def _clip_delays(self, delays: NDArray[float64]) -> NDArray[float64]:
         """
