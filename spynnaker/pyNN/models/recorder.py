@@ -32,7 +32,9 @@ from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import check_io
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.common import PopulationApplicationVertex
+    from spynnaker.pyNN.models.common.population_application_vertex import (
+        PopulationApplicationVertex,
+    )
     from spynnaker.pyNN.models.common.types import Names
     from spynnaker.pyNN.models.populations import Population
     from spynnaker.pyNN.types import IoDest

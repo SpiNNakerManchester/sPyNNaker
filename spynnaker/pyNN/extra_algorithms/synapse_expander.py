@@ -28,7 +28,7 @@ from spinn_front_end_common.utilities.system_control_logic import (
 )
 
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import (
+from spynnaker.pyNN.models.abstract_models.abstract_synapse_expandable import (
     SYNAPSE_EXPANDER_APLX,
     AbstractSynapseExpandable,
 )

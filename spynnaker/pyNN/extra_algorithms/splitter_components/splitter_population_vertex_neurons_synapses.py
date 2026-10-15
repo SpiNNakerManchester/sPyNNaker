@@ -42,25 +42,36 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.abstract_models import SendsSynapticInputsOverSDRAM
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from spynnaker.pyNN.models.neuron import (
-    NeuronProvenance,
-    PopulationNeuronsMachineVertex,
-    PopulationSynapsesMachineVertexLead,
-    PopulationSynapsesMachineVertexShared,
-    SpikeProcessingFastProvenance,
-    SynapseProvenance,
+from spynnaker.pyNN.models.abstract_models. \
+    sends_synaptic_inputs_over_sdram import SendsSynapticInputsOverSDRAM
+from spynnaker.pyNN.models.common.population_application_vertex import (
+    PopulationApplicationVertex,
 )
+from spynnaker.pyNN.models.neural_projections. \
+    projection_application_edge import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neuron. \
+    population_machine_synapses_provenance import SynapseProvenance
+from spynnaker.pyNN.models.neuron. \
+    population_machine_vertex import NeuronProvenance
+from spynnaker.pyNN.models.neuron. \
+    population_neurons_machine_vertex import PopulationNeuronsMachineVertex
 from spynnaker.pyNN.models.neuron. \
     population_synapses_machine_vertex_common import (
         KEY_CONFIG_SIZE,
         PopulationSynapsesMachineVertexCommon,
+        SpikeProcessingFastProvenance,
     )
 from spynnaker.pyNN.models.neuron. \
     population_synapses_machine_vertex_common import (
         SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE,
+    )
+from spynnaker.pyNN.models.neuron. \
+    population_synapses_machine_vertex_lead import (
+        PopulationSynapsesMachineVertexLead,
+    )
+from spynnaker.pyNN.models.neuron. \
+    population_synapses_machine_vertex_shared import (
+        PopulationSynapsesMachineVertexShared,
     )
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch,
@@ -72,19 +83,23 @@ from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
 from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
     NeuronMainProvenance,
 )
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural,
-    SynapseDynamicsStatic,
-)
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_synapse_dynamics_structural import (
+        AbstractSynapseDynamicsStructural,
+    )
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    synapse_dynamics_static import SynapseDynamicsStatic
 from spynnaker.pyNN.models.neuron.synaptic_matrices import (
     SynapseRegionReferences,
     SynapticMatrices,
 )
 from spynnaker.pyNN.models.projection import Projection
-from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.models.spike_source. \
     spike_source_poisson_machine_vertex import SpikeSourcePoissonMachineVertex
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.models.spike_source. \
+    spike_source_poisson_vertex import SpikeSourcePoissonVertex
+from spynnaker.pyNN.models.utility_models.delays. \
+    delay_extension_vertex import DelayExtensionVertex
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region,
 )

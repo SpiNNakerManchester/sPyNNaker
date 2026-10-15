@@ -41,7 +41,9 @@ from spinn_front_end_common.utilities.constants import (
 
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.common.population_application_vertex import (
+    PopulationApplicationVertex,
+    )
 
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural,
@@ -52,7 +54,7 @@ if TYPE_CHECKING:
         ProjectionApplicationEdge,
         SynapseInformation,
     )
-    from spynnaker.pyNN.models.neuron import PopulationVertex
+    from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray,
     )

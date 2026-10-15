@@ -47,8 +47,8 @@ from spynnaker.pyNN.utilities.utility_calls import convert_to, get_n_bits
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
-    from spynnaker.pyNN.models.neuron import PopulationVertex
     from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+    from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
 
 
 class NeuronProvenance(ctypes.LittleEndianStructure):

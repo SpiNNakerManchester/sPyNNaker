@@ -31,7 +31,7 @@ if TYPE_CHECKING:
         DelayedApplicationEdge,
         SynapseInformation,
     )
-    from spynnaker.pyNN.models.neuron import PopulationVertex
+    from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
     from spynnaker.pyNN.models.neuron.synapse_dynamics import (
         AbstractSynapseDynamics,
         AbstractSynapseDynamicsStructural,

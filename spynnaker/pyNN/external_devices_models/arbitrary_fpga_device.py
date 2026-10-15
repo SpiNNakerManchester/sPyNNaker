@@ -20,7 +20,9 @@ from pacman.model.graphs.application import (
     FPGAConnection,
 )
 
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.common.population_application_vertex import (
+    PopulationApplicationVertex,
+    )
 
 
 class ArbitraryFPGADevice(ApplicationFPGAVertex, PopulationApplicationVertex):

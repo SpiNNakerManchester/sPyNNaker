@@ -15,7 +15,9 @@
 from spynnaker.pyNN.external_devices_models.push_bot import (
     AbstractPushBotOutputDevice,
 )
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
+    MunichIoSpiNNakerLinkProtocol,
+    )
 
 
 class PushBotMotor(AbstractPushBotOutputDevice):

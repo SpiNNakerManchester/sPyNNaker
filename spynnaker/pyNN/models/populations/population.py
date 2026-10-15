@@ -47,7 +47,9 @@ from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.common.population_application_vertex import (
+    PopulationApplicationVertex,
+    )
 from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.types import Selector
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase

@@ -23,16 +23,22 @@ from spynnaker.pyNN.models.defaults import (
     default_initial_values,
     default_parameters,
 )
-from spynnaker.pyNN.models.neuron import (
+from spynnaker.pyNN.models.neuron. \
+    synapse_types.synapse_type_exponential import SynapseTypeExponential
+from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard import (
     AbstractPyNNNeuronModelStandard,
-    PopulationVertex,
 )
-from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
-from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
-from spynnaker.pyNN.models.neuron.neuron_models import (
-    NeuronModelLeakyIntegrateAndFire,
+from spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard import (
+    NeuronImplStandard,
 )
-from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
+from spynnaker.pyNN.models.neuron.input_types.input_type_current import (
+    InputTypeCurrent,
+)
+from spynnaker.pyNN.models.neuron.neuron_models. \
+    neuron_model_leaky_integrate_and_fire import (
+        NeuronModelLeakyIntegrateAndFire,
+    )
+from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
 
 from .abstract_ethernet_translator import AbstractEthernetTranslator
 from .abstract_multicast_controllable_device import (

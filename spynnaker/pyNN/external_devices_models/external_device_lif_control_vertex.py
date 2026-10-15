@@ -33,7 +33,7 @@ from spinn_front_end_common.abstract_models import (
 )
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
-from spynnaker.pyNN.models.neuron import PopulationVertex
+from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
 
 from .abstract_ethernet_controller import AbstractEthernetController
 from .abstract_multicast_controllable_device import (

@@ -28,8 +28,11 @@ from spynnaker.pyNN.models.neuron.input_types import (
     InputTypeConductance,
 )
 from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
-from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
-from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
+from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type import (
+    AbstractSynapseType,
+)
+from spynnaker.pyNN.models.neuron.threshold_types. \
+    abstract_threshold_type import AbstractThresholdType
 from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
 
 from .abstract_neuron_impl import AbstractNeuronImpl

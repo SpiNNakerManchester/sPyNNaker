@@ -26,7 +26,9 @@ from spynnaker.pyNN.external_devices_models.push_bot import (
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotRetinaResolution,
 )
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.common.population_application_vertex import (
+    PopulationApplicationVertex,
+    )
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 

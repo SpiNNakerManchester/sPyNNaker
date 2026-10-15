@@ -91,7 +91,7 @@ from spynnaker.pyNN.external_devices_models.push_bot.spinnaker_link import (
     PushBotSpiNNakerLinkSpeakerDevice,
 )
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-from spynnaker.pyNN.models.neuron import PopulationVertex
+from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
 from spynnaker.pyNN.models.populations.population import (
     Population,
     _CellTypeArg,
