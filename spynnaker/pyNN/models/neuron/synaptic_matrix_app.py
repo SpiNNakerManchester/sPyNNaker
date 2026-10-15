@@ -28,7 +28,7 @@ from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement,
 )
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnHost,
 )

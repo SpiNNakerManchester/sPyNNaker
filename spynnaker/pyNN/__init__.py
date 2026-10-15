@@ -69,7 +69,7 @@ from spynnaker._version import (  # NOQA
     __version_year__,
 )
 from spynnaker.pyNN import external_devices, extra_models
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 

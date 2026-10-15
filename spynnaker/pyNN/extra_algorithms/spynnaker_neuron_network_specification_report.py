@@ -25,7 +25,7 @@ from spinn_utilities.progress_bar import ProgressBar
 
 from pacman.model.graphs.application import ApplicationVertex
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 

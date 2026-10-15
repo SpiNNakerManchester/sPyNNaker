@@ -39,7 +39,7 @@ from spinn_front_end_common.utilities.constants import (
     MICRO_TO_SECOND_CONVERSION,
 )
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 

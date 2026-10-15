@@ -41,27 +41,36 @@ from spinn_front_end_common.interface.provenance import (
     TimerWork,
 )
 
-from spynnaker import _version
+from spynnaker._version import __name__ as spynnaker_name  # NOQA
+from spynnaker._version import __version__ as spynnaker_version  # NOQA
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import SPYNNAKER_CFG, add_spynnaker_cfg
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
-from spynnaker.pyNN.extra_algorithms import (
-    delay_support_adder,
-    neuron_expander,
-    redundant_packet_count_report,
-    spynnaker_neuron_graph_network_specification_report,
-    synapse_expander,
-)
-from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
-    finish_connection_holders,
-)
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    spynnaker_splitter_selector,
-)
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from spynnaker.pyNN.models.neuron import (
+from spynnaker.pyNN.extra_algorithms. \
+    connection_holder_finisher import finish_connection_holders
+from spynnaker.pyNN.extra_algorithms. \
+    delay_support_adder import delay_support_adder
+from spynnaker.pyNN.extra_algorithms. \
+    neuron_expander import neuron_expander
+from spynnaker.pyNN.extra_algorithms. \
+    redundant_packet_count_report import redundant_packet_count_report
+from spynnaker.pyNN.extra_algorithms. \
+    splitter_components.spynnaker_splitter_selector import (
+        spynnaker_splitter_selector,
+    )
+from spynnaker.pyNN.extra_algorithms. \
+    spynnaker_neuron_network_specification_report import (
+        spynnaker_neuron_graph_network_specification_report,
+    )
+from spynnaker.pyNN.extra_algorithms. \
+    synapse_expander import synapse_expander
+from spynnaker.pyNN.models.neural_projections. \
+    projection_application_edge import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
     AbstractPyNNNeuronModel,
+)
+from spynnaker.pyNN.models.neuron.population_vertex import (
     PopulationVertex,
 )
 from spynnaker.pyNN.models.recorder import Recorder
@@ -125,7 +134,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         self.__writer.set_min_delay(min_delay)
 
         with GlobalProvenance() as db:
-            db.insert_version("sPyNNaker_version", _version.__version__)
+            db.insert_version("sPyNNaker_version", spynnaker_version)
             db.insert_version("pyNN_version", pynn_version)
             db.insert_version("quantities_version", quantities_version)
             db.insert_version("neo_version", neo_version)
@@ -314,7 +323,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         The name of the simulator. Used to ensure PyNN recording neo
         blocks are correctly labelled.
         """
-        return _version.NAME
+        return spynnaker_version
 
     @property
     def recorders(self) -> Collection[Recorder]:

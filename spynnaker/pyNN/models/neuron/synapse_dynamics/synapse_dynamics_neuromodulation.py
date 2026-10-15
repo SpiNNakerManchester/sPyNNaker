@@ -26,7 +26,7 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import DataSpecificationBase, DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
     InvalidParameterType,
     SynapticConfigurationException,

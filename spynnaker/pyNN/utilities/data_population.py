@@ -33,7 +33,7 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.abstract_sized import AbstractSized, Selector
 
 from spynnaker.pyNN.models.common.types import Names
-from spynnaker.pyNN.models.populations import Population
+from spynnaker.pyNN.models.populations.population import Population
 from spynnaker.pyNN.types import ViewIndices
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io

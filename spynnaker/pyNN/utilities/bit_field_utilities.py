@@ -27,7 +27,7 @@ from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (
@@ -54,9 +54,8 @@ def is_sdram_poisson_source(app_edge: ApplicationEdge) -> bool:
     """
     # Avoid circular import
     # pylint: disable=import-outside-toplevel
-    from spynnaker.pyNN.extra_algorithms.splitter_components import (
-        SplitterPoissonDelegate,
-    )
+    from spynnaker.pyNN.extra_algorithms.splitter_components. \
+        splitter_poisson_delegate import SplitterPoissonDelegate
     splitter: AbstractSplitterCommon = app_edge.pre_vertex.splitter
     if isinstance(splitter, SplitterPoissonDelegate):
         if splitter.send_over_sdram:

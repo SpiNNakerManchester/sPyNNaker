@@ -19,7 +19,7 @@ from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 
 from spinn_front_end_common.utility_models import MultiCastCommand
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.external_devices_models.push_bot import (
     AbstractPushBotRetinaDevice,
 )

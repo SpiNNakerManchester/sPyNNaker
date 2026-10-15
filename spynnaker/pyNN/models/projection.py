@@ -40,14 +40,14 @@ from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker._version import __version__
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses,
 )
-from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge,
-    SynapseInformation,
-)
+from spynnaker.pyNN.models.neural_projections. \
+    projection_application_edge import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections. \
+    synapse_information import SynapseInformation
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FromListConnector,
 )

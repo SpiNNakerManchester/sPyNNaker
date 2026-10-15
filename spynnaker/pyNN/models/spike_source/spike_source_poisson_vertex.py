@@ -45,7 +45,7 @@ from spinn_front_end_common.interface.buffer_management import (
 from spinn_front_end_common.interface.profiling import profile_utils
 from spinn_front_end_common.utilities.constants import SYSTEM_BYTES_REQUIREMENT
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.common import (
     MultiSpikeRecorder,

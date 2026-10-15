@@ -13,7 +13,7 @@
 # limitations under the License.
 from pacman.model.graphs.application import ApplicationVertex
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterPoissonDelegate,
 )

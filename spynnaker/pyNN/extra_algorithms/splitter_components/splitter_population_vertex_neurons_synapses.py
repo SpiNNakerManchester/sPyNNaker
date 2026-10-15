@@ -40,7 +40,7 @@ from pacman.utilities.utility_objs import ChipCounter
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import SendsSynapticInputsOverSDRAM
 from spynnaker.pyNN.models.common import PopulationApplicationVertex

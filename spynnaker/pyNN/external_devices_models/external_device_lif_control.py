@@ -17,9 +17,8 @@ from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPopulationVertex,
-)
+from spynnaker.pyNN.extra_algorithms.splitter_components. \
+    splitter_population_vertex import SplitterPopulationVertex
 from spynnaker.pyNN.models.defaults import (
     default_initial_values,
     default_parameters,

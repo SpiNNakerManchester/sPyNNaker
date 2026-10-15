@@ -35,14 +35,22 @@ from spinn_front_end_common.utilities.utility_objs import (
 )
 
 from spynnaker.pyNN import model_binaries, protocols
-from spynnaker.pyNN.connections import (
+from spynnaker.pyNN.connections.ethernet_command_connection import (
     EthernetCommandConnection,
+    )
+from spynnaker.pyNN.connections.ethernet_control_connection import (
     EthernetControlConnection,
+    )
+from spynnaker.pyNN.connections.spif_live_spikes_connection import (
     SPIFLiveSpikesConnection,
+    )
+from spynnaker.pyNN.connections.spynnaker_live_spikes_connection import (
     SpynnakerLiveSpikesConnection,
+    )
+from spynnaker.pyNN.connections.spynnaker_poisson_control_connection import (
     SpynnakerPoissonControlConnection,
-)
-from spynnaker.pyNN.data import SpynnakerDataView
+    )
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetController,
     AbstractEthernetSensor,

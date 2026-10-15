@@ -30,7 +30,7 @@ from typing_extensions import Self
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.classproperty import classproperty
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import AbstractProvidesDefaults
 

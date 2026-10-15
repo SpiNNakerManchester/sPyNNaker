@@ -22,7 +22,7 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     get_exp_lut_array,
 )

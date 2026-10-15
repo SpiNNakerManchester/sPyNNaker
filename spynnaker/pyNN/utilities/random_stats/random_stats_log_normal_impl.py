@@ -18,7 +18,8 @@ from scipy.stats import lognorm
 
 from spinn_utilities.overrides import overrides
 
-from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
+from spynnaker.pyNN.utilities.random_stats. \
+    abstract_random_stats import AbstractRandomStats
 
 
 class RandomStatsLogNormalImpl(AbstractRandomStats):

@@ -26,7 +26,7 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD,
 )
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     STDP_FIXED_POINT_ONE,
 )

@@ -40,7 +40,7 @@ from spinn_front_end_common.interface.ds import (
 )
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import AbstractNeuronExpandable
 from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
 from spynnaker.pyNN.utilities.utility_calls import convert_to, get_n_bits
