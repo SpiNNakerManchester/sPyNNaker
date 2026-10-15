@@ -35,7 +35,7 @@ from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.abstract_sized import AbstractSized
 
-from spynnaker.pyNN.types import Selector
+from spynnaker.pyNN.spynnaker_types import Selector
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 
@@ -50,7 +50,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.common.types import Names, Values
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
     from spynnaker.pyNN.models.recorder import Recorder
-    from spynnaker.pyNN.types import IoDest
+    from spynnaker.pyNN.spynnaker_types import IoDest
 
     from .population import Population
 

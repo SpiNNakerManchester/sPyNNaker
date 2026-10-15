@@ -30,8 +30,8 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE,
 )
-from spynnaker.pyNN.types import WeightScales
-from spynnaker.pyNN.types import WeightsDelysIn as _InTypes
+from spynnaker.pyNN.spynnaker_types import WeightScales
+from spynnaker.pyNN.spynnaker_types import WeightsDelysIn as _InTypes
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 from .abstract_generate_on_machine import (

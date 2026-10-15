@@ -34,7 +34,7 @@ from spynnaker.pyNN.exceptions import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE,
 )
-from spynnaker.pyNN.types import WeightScales
+from spynnaker.pyNN.spynnaker_types import WeightScales
 
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine,
@@ -56,7 +56,7 @@ if TYPE_CHECKING:
     )
     from spynnaker.pyNN.models.neuron.synapse_io import MaxRowInfo
     from spynnaker.pyNN.models.projection import Projection
-    from spynnaker.pyNN.types import Weights
+    from spynnaker.pyNN.spynnaker_types import Weights
 
     from .abstract_synapse_dynamics import AbstractSynapseDynamics
 

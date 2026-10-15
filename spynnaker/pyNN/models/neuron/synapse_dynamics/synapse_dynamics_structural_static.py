@@ -28,7 +28,7 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.graphs.common import Slice
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.types import Weights
+from spynnaker.pyNN.spynnaker_types import Weights
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
@@ -75,7 +75,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray,
     )
-    from spynnaker.pyNN.types import Delays
+    from spynnaker.pyNN.spynnaker_types import Delays
 
     from .synapse_dynamics_structural_common import ConnectionsInfo
 
